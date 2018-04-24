@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.apache.log4j.Logger;
@@ -54,16 +52,18 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 	// How is this working if nothing is injected?  But presumably it uses "Provider" only as a syntax clarifier, but the class
 	// is not injectable. kai, jun'16
 	
+    private static enum RouterType {
+    	STANDARD, ANRAPTOR, SBBRAPTOR;
+    }
+	
 	private final static Logger log = Logger.getLogger(PTransitRouterFactory.class);
 	private TransitRouterConfig transitRouterConfig;
-	private final String ptEnabler;
-	private final String ptRouter;
+	private final RouterType ptRouter;
 	private final double costPerBoarding;
 	private final double costPerMeterTraveled;
 	
 	private boolean needToUpdateRouter = true;
 	private TransitRouterNetwork routerNetwork = null;
-	private Provider<TransitRouter> routerFactory = null;
 	@Inject private TransitSchedule schedule;
 	private RaptorDisutility raptorDisutility;
 	
@@ -71,11 +71,24 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
     private SwissRailRaptorData swissRailRaptorData = null;
     private final RaptorConfig swissRailRaptorConfig;
     private final RaptorRouteSelector swissRailRaptorRouteSelector = new LeastCostRaptorRouteSelector();
-
+    
 	public PTransitRouterFactory(Config config){
 		PConfigGroup pConfig = ConfigUtils.addOrGetModule(config, PConfigGroup.class) ;
-		this.ptEnabler = pConfig.getPtEnabler() ;
-		this.ptRouter = pConfig.getPtRouter() ;
+		switch (pConfig.getPtRouter()) {
+		case "standard": 
+			ptRouter = RouterType.STANDARD; 
+			break;
+		case "raptor": 
+			ptRouter = RouterType.ANRAPTOR; 
+			break;
+		case "SwissRailRaptor": 
+			ptRouter = RouterType.SBBRAPTOR;
+			break;
+		default: 
+			ptRouter = RouterType.STANDARD;
+			break;
+		}
+		
 		this.costPerBoarding = pConfig.getEarningsPerBoardingPassenger() ;
 		this.costPerMeterTraveled = pConfig.getEarningsPerKilometerAndPassenger() ;
 		
@@ -90,48 +103,52 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 	void updateTransitSchedule() {
 		this.needToUpdateRouter = true;
 //		this.schedule = PTransitLineMerger.mergeSimilarRoutes(schedule);
-		
-		if (this.ptRouter.equalsIgnoreCase("raptor")) {
-			// this could also hold updated prices
+		switch (ptRouter) {
+		case ANRAPTOR: 
 			this.raptorDisutility = new RaptorDisutility(this.transitRouterConfig, this.costPerBoarding, this.costPerMeterTraveled);
-		} else if (this.ptRouter.equalsIgnoreCase("SwissRailRaptor")){
+			break;
+		case SBBRAPTOR:
 			swissRailRaptorData = null;
+			break;
+		default:
+			// no action needed for the other routers
+			break;
 		}
 	}
 
 	@Override
 	public TransitRouter get() {
-		if(needToUpdateRouter) {
+		if (needToUpdateRouter) {
 			// okay update all routers
-			this.routerFactory = createSpeedyRouter();
-			if(this.routerFactory == null) {
-				if (this.ptRouter.equalsIgnoreCase("raptor") || this.ptRouter.equalsIgnoreCase("SwissRailRaptor")) {
-					// nothing to do here
-				} else {
-					log.info("Could not create speedy router, fall back to normal one.  This is so far not fatal.");
-//					Gbl.assertNotNull(this.schedule);
-					Gbl.assertNotNull(this.transitRouterConfig);
-					this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.transitRouterConfig.getBeelineWalkConnectionDistance());
-				}
+			switch (ptRouter) {
+			case STANDARD:
+//				Gbl.assertNotNull(this.schedule);
+				Gbl.assertNotNull(this.transitRouterConfig);
+				this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, 
+						this.transitRouterConfig.getBeelineWalkConnectionDistance());
+				break;
+			default:
+				// no action needed for other routers
+				break;
 			}
 			needToUpdateRouter = false;
 		}
 		
-		if (this.routerFactory == null) {
-			if (this.ptRouter.equalsIgnoreCase("raptor")) {
-				log.info("Using raptor routing");
-				return this.createRaptorRouter();
-			} else if (this.ptRouter.equalsIgnoreCase("SwissRailRaptor")) {
-				log.info("Using SwissRailRaptor routing");
-				return this.createSwissRailRaptor();
-			} else {
-				// no speedy router available - return old one
-				PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(schedule);
-				TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.transitRouterConfig, preparedTransitSchedule);
-				return new TransitRouterImpl(this.transitRouterConfig, preparedTransitSchedule, routerNetwork, ttCalculator, ttCalculator);
-			}
-		} else {
-			return this.routerFactory.get();
+		switch (ptRouter) {
+		case STANDARD:
+			PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(schedule);
+			TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.transitRouterConfig, preparedTransitSchedule);
+			return new TransitRouterImpl(this.transitRouterConfig, preparedTransitSchedule, routerNetwork, ttCalculator, ttCalculator);
+		case ANRAPTOR:
+			log.info("Using raptor routing");
+			return this.createRaptorRouter();
+		case SBBRAPTOR:
+			log.info("Using SwissRailRaptor routing");
+			return this.createSwissRailRaptor();
+		default: 
+			// make the compiler happy even though the constructor excludes this case
+			log.error("Unknown router type.");
+			return null;
 		}
 	}
 	
@@ -165,19 +182,6 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
         return this.swissRailRaptorData;
     }
 	
-	private Provider<TransitRouter> createSpeedyRouter() {
-		try {
-			Class<?> cls = Class.forName("com.senozon.matsim.pt.speedyrouter.SpeedyTransitRouterFactory");
-			Constructor<?> ct = cls.getConstructor(new Class[] {TransitSchedule.class, TransitRouterConfig.class, String.class});
-			return (Provider<TransitRouter>) ct.newInstance(this.schedule, this.transitRouterConfig, this.ptEnabler);
-		} catch (ClassNotFoundException | SecurityException | NoSuchMethodException | IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-//			e.printStackTrace();
-			// I don't like output to stderr when the program execution is actually ok.  kai, jan'16
-			log.info(e.toString() );
-		}
-        return null;
-	}
-
 	//see MATSim-768
 //	void notifyIterationStarts(IterationStartsEvent event) {
 //		this.updateTransitSchedule();

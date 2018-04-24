@@ -410,7 +410,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(PASSENGERS_BOARD_EVERY_LINE, "Agents will board every vehicles serving the destination (stop), if set to true. Set to false, to force agents to take only vehicles of the line planned. Default is false.");
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, "Will initialize one operator for each transit line with the given time of operation and number of vehicles");
 		map.put(MERGE_TRANSIT_LINE, "Merges all routes of a transit line that have the same sequence of stops. Does not respect the time profile of the routes. Default is false.");
-		map.put(PT_ROUTER, "Uses a experimental connection scan algorithm for routing if set to 'raptor'. Defaults to MATSim standard router.");
+		map.put(PT_ROUTER, "Uses a experimental connection scan algorithm for routing if set to 'raptor' (AN implementation) or 'SwissRailRaptor' (SBB implementation). Defaults to MATSim standard router.");
 		map.put(OPERATIONMODE, "the mode of transport in which the paratransit operates");
 		map.put(TOPOTYPESFORSTOPS, "comma separated integer-values, as used in NetworkCalcTopoTypes");
 		map.put(MIN_CAPACITY_FOR_STOPS, "Link cannot serve as paratransit stop, if its capacity is lower than the limit set here. Default is 0.");
