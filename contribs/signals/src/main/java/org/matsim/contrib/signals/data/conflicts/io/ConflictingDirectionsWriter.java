@@ -25,13 +25,13 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.signals.data.conflicts.ConflictData;
 import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.utils.io.AbstractMatsimWriter;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author tthunig
  */
-public class ConflictingDirectionsWriter extends AbstractMatsimWriter implements MatsimWriter {
+public class ConflictingDirectionsWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	private static final Logger LOG = Logger.getLogger(ConflictingDirectionsWriter.class);
 	
