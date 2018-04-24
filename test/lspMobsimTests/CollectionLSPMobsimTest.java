@@ -173,7 +173,7 @@ public class CollectionLSPMobsimTest {
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(10);
+		config.controler().setLastIteration(2);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("input\\lsp\\network\\2regions.xml");
 		controler.run();
@@ -188,6 +188,8 @@ public class CollectionLSPMobsimTest {
 			Collections.sort(scheduleElements, new AbstractShipmentPlanElementComparator());
 			ArrayList<AbstractShipmentPlanElement> logElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getLog().getPlanElements().values());
 			Collections.sort(logElements, new AbstractShipmentPlanElementComparator());
+			
+			
 			System.out.println();
 			for(int i = 0; i < shipment.getSchedule().getPlanElements().size(); i++) {
 				System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId()+ "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());

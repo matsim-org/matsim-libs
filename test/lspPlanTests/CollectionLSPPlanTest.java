@@ -101,6 +101,7 @@ public class CollectionLSPPlanTest {
 		assertTrue(collectionPlan.getScore() == 0);
 		assertTrue(collectionPlan.getLsp() == null);
 		assertTrue(collectionPlan.getSolutions().size() == 1);
+		assertTrue(collectionPlan.getSolutions().iterator().next() == collectionSolution);
 	}
 
 }

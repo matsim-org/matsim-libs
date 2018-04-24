@@ -232,6 +232,7 @@ public class CompleteLSPPlanTest {
 		assertTrue(completePlan.getLsp() == null);
 		assertTrue(completePlan.getScore() == 0);
 		assertTrue(completePlan.getSolutions().size() ==1);
+		assertTrue(completePlan.getSolutions().iterator().next() == completeSolution);
 	}
 	
 }

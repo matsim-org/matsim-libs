@@ -1,6 +1,8 @@
 package lspShipmentTest;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,10 +22,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
 
-public class collectionShipmentBuilderTest {
+public class DistributionShipmentBuilderTest {
 
 	private Network network;
-	private Id<Link> toLinkId;
+	private Id<Link> fromLinkId;
 	private ArrayList<LSPShipment> shipments;
 	
 	
@@ -35,8 +37,8 @@ public class collectionShipmentBuilderTest {
         new MatsimNetworkReader(scenario.getNetwork()).readFile("input\\lsp\\network\\2regions.xml");
         this.network = scenario.getNetwork();
         ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
-        Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
-        this.toLinkId = network.getLinks().get(collectionLinkId).getId();
+        Id<Link> distributionLinkId = Id.createLinkId("(14 2) (14 3)");
+        this.fromLinkId = network.getLinks().get(distributionLinkId).getId();
         this.shipments = new ArrayList<LSPShipment>();
         
         for(int i = 1; i < 11; i++) {
@@ -47,18 +49,20 @@ public class collectionShipmentBuilderTest {
         	
         	while(true) {
         		Collections.shuffle(linkList);
-        		Link pendingFromLink = linkList.get(0);
-        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
-        		   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
-        		   pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
-        		   pendingFromLink.getToNode().getCoord().getY() <= 4000    ) {
-        		   builder.setFromLinkId(pendingFromLink.getId());
+        		Link pendingToLink = linkList.get(0);
+        		if((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
+        			pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
+        			pendingToLink.getFromNode().getCoord().getX() >= 14000 &&       			
+        			pendingToLink.getToNode().getCoord().getX() <= 18000 &&
+        			pendingToLink.getToNode().getCoord().getY() <= 4000  &&
+        			pendingToLink.getToNode().getCoord().getX() >= 14000	)) {
+        		   builder.setToLinkId(pendingToLink.getId());
         		   break;	
         		}
         	
         	}
         	
-        	builder.setToLinkId(toLinkId);
+        	builder.setFromLinkId(fromLinkId);
         	TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
         	builder.setEndTimeWindow(endTimeWindow);
         	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
@@ -89,12 +93,11 @@ public class collectionShipmentBuilderTest {
 			
 			assertEquals(shipment.getSchedule().getShipment(), shipment);
 			assertTrue(shipment.getSchedule().getPlanElements().isEmpty());
-			
-			Link link = network.getLinks().get(shipment.getFromLinkId());
-			assertTrue(link.getFromNode().getCoord().getX() <= 4000);
-			assertTrue(link.getFromNode().getCoord().getY() <= 4000);
-
+			Link link = network.getLinks().get(shipment.getToLinkId());
+			assertTrue(link.getFromNode().getCoord().getX() <= 18000);
+			assertTrue(link.getFromNode().getCoord().getX() >= 14000);
+			assertTrue(link.getToNode().getCoord().getX() <= 18000);
+			assertTrue(link.getToNode().getCoord().getX() >= 14000);
 		}
 	}
-	
 }

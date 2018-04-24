@@ -60,6 +60,7 @@ public class CascadingInfoTest {
 	private LogisticsSolution collectionSolution;
 	private AverageTimeInfo elementInfo;
 	private AverageTimeInfo solutionInfo;
+	private AverageTimeTracker timeTracker;
 	
 	@Before
 	public void initialize() {
@@ -83,9 +84,7 @@ public class CascadingInfoTest {
 		
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Link collectionLink = network.getLinks().get(collectionLinkId);
-		if (collectionLink == null) {
-			System.exit(1);
-		}
+		
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLink.getId());
 		carrierVehicle.setVehicleType(collectionType);
@@ -105,8 +104,8 @@ public class CascadingInfoTest {
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		collectionAdapter = adapterBuilder.build();
-		
-		collectionAdapter.addSimulationTracker(new AverageTimeTracker());
+		timeTracker = new AverageTimeTracker();
+		collectionAdapter.addSimulationTracker(timeTracker);
 		
 		
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
@@ -196,18 +195,29 @@ public class CascadingInfoTest {
 
 	@Test
 	public void testCascadingInfos() {
+		assertTrue(timeTracker.getInfos().iterator().next() == elementInfo.getPredecessorInfos().iterator().next());
+		assertTrue(timeTracker.getInfos().iterator().next() instanceof AverageTimeInfo);
+		AverageTimeInfo resourceInfo = (AverageTimeInfo) timeTracker.getInfos().iterator().next();
+		assertTrue(resourceInfo.getFunction() instanceof AverageTimeInfoFunction);
+		AverageTimeInfoFunction resourceInfoFunction = (AverageTimeInfoFunction) resourceInfo.getFunction();
+		assertTrue(resourceInfoFunction.getValues().size() == 1);
+		assertTrue(resourceInfoFunction.getValues().iterator().next() instanceof AverageTimeInfoFunctionValue);
+		AverageTimeInfoFunctionValue averageResourceValue = (AverageTimeInfoFunctionValue) resourceInfoFunction.getValues().iterator().next();
 		assertTrue(elementInfo.getFunction() instanceof AverageTimeInfoFunction);
 		AverageTimeInfoFunction averageElementFunction = (AverageTimeInfoFunction) elementInfo.getFunction();
 		assertTrue(averageElementFunction.getValues().size() == 1);
 		assertTrue(averageElementFunction.getValues().iterator().next() instanceof AverageTimeInfoFunctionValue);
 		AverageTimeInfoFunctionValue averageElementValue = (AverageTimeInfoFunctionValue) averageElementFunction.getValues().iterator().next();
+		assertTrue(averageElementValue.getValue() > 0);
 		assertTrue(averageElementFunction.getValues().iterator().next().getValue() instanceof Double);
-		assertTrue(elementInfo.getFunction() instanceof AverageTimeInfoFunction);
+		assertTrue(solutionInfo.getFunction() instanceof AverageTimeInfoFunction);
+		assertTrue(solutionInfo.getPredecessorInfos().iterator().next() == elementInfo);
 		AverageTimeInfoFunction averageSolutionFunction = (AverageTimeInfoFunction) solutionInfo.getFunction();
 		assertTrue(averageSolutionFunction.getValues().size() == 1);
 		assertTrue(averageSolutionFunction.getValues().iterator().next() instanceof AverageTimeInfoFunctionValue);
 		AverageTimeInfoFunctionValue averageSolutionValue = (AverageTimeInfoFunctionValue) averageSolutionFunction.getValues().iterator().next();
 		assertTrue(averageSolutionValue.getValue() > 0);
+		assertTrue(averageElementValue.getValue() == averageResourceValue.getValue());
 		assertTrue(averageElementValue.getValue() == averageSolutionValue.getValue());
 	}
 
