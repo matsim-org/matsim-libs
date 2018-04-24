@@ -53,7 +53,7 @@ import org.xml.sax.SAXException;
  */
 public class ObjectAttributesXmlReader extends MatsimXmlParser {
 	private final static Logger log = Logger.getLogger(ObjectAttributesXmlReader.class);
-	private final Map<String, AttributeConverter<?>> converters = new HashMap<String, AttributeConverter<?>>();
+	private final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 	private final ObjectAttributes attributes;
 	private boolean readCharacters = false;
 	private String currentObject = null;
@@ -61,24 +61,10 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 	private String currentAttributeClass = null;
 	private long count = 0;
 
-	private static final StringConverter STRING_Converter = new StringConverter();
-	private static final IntegerConverter INTEGER_Converter = new IntegerConverter();
-	private static final FloatConverter FLOAT_Converter = new FloatConverter();
-	private static final DoubleConverter DOUBLE_Converter = new DoubleConverter();
-	private static final BooleanConverter BOOLEAN_Converter = new BooleanConverter();
-	private static final LongConverter LONG_Converter = new LongConverter();
-
-	private final Set<String> missingConverters = new HashSet<String>();
 
 	public ObjectAttributesXmlReader(final ObjectAttributes attributes) {
 		this.attributes = attributes;
 		super.setValidating(false);
-		this.converters.put(String.class.getCanonicalName(), STRING_Converter);
-		this.converters.put(Integer.class.getCanonicalName(), INTEGER_Converter);
-		this.converters.put(Float.class.getCanonicalName(), FLOAT_Converter);
-		this.converters.put(Double.class.getCanonicalName(), DOUBLE_Converter);
-		this.converters.put(Boolean.class.getCanonicalName(), BOOLEAN_Converter);
-		this.converters.put(Long.class.getCanonicalName(), LONG_Converter);
 	}
 
 	@Override
@@ -96,15 +82,9 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 	public void endTag(String name, String content, Stack<String> context) {
 		if (TAG_ATTRIBUTE.equals(name)) {
 			this.readCharacters = false;
-			AttributeConverter<?> c = this.converters.get(this.currentAttributeClass);
-			if (c == null) {
-				if (missingConverters.add(this.currentAttributeClass)) {
-					log.warn("No AttributeConverter found for class " + this.currentAttributeClass + ". Not all attribute values can be read.");
-				}
-			} else {
-				Object o = this.converters.get(this.currentAttributeClass).convert(content);
-				this.attributes.putAttribute(this.currentObject, this.currentAttribute, o);
-			}
+
+			Object o = converter.convert(this.currentAttributeClass, content);
+			this.attributes.putAttribute(this.currentObject, this.currentAttribute, o);
 		} else if (TAG_OBJECT.equals(name)) {
 			if (this.count % 100000 == 0) {
 				log.info("reading object #" + this.count);
@@ -135,14 +115,12 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 	 * @return the previously registered converter for this class, or <code>null</code> if none was set before.
 	 */
 	public AttributeConverter<?> putAttributeConverter(final Class<?> clazz, final AttributeConverter<?> converter) {
-		return this.converters.put(clazz.getCanonicalName(), converter);
+		return this.converter.putAttributeConverter(clazz, converter);
 	}
 
 	@Inject
 	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
-		for ( Map.Entry<Class<?>, AttributeConverter<?>> e : converters.entrySet() ) {
-			putAttributeConverter( e.getKey() , e.getValue() );
-		}
+		this.converter.putAttributeConverters(converters);
 	}
 
 	/**
@@ -152,7 +130,7 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 	 * @return the previously registered converter for this class, of <code>null</code> if none was set.
 	 */
 	public AttributeConverter<?> removeAttributeConverter(final Class<?> clazz) {
-		return this.converters.remove(clazz.getCanonicalName());
+		return this.converter.removeAttributeConverter(clazz);
 	}
 
 }
