@@ -67,7 +67,7 @@ import testMutualreplanningWithOfferUpdate.MutualReplanningAndOfferUpdateTest;
 	CollectionLSPReplanningTest.class,
 	CollectionLSPSchedulingTest.class,
 	CompleteLSPSchedulingTest.class,
-	//FirstReloadLSPSchedulingTest.class,
+	FirstReloadLSPSchedulingTest.class,
 	MainRunLSPSchedulingTest.class,
 	SecondReloadLSPSchedulingTest.class,
 	CollectionLSPScoringTest.class,
