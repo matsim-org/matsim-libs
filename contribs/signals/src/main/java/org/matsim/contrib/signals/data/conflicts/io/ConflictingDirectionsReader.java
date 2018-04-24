@@ -58,6 +58,7 @@ public class ConflictingDirectionsReader extends MatsimXmlParser {
 	
 	public ConflictingDirectionsReader(ConflictData conflictData) {
 		this.conflictData = conflictData;
+		this.setValidating(false);
 	}
 	
 	
@@ -94,7 +95,9 @@ public class ConflictingDirectionsReader extends MatsimXmlParser {
 		case DIRECTIONS_WITH_RIGHT_OF_WAY:
 		case DIRECTIONS_WHICH_MUST_YIELD:
 		case NON_CONFLICTING_DIRECTIONS:
-			addConflictsForCurrentDirection(name, content);
+			if (content != null && !content.equals("") && !content.equals(" ")) {
+				addConflictsForCurrentDirection(name, content);
+			}
 			break;
 		default:
 			break;

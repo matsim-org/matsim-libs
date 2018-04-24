@@ -43,12 +43,7 @@ public class SignalConflictDataReaderWriterTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	@Test
-	public void testReader() {
-		// TODO
-	}
-	
-	@Test
-	public void testWriter() {
+	public void testReaderAndWriter() {
 		LOG.info("create conflict data");
 		ConflictData conflictData = createConflictDataForTestCase();
 		
@@ -58,12 +53,12 @@ public class SignalConflictDataReaderWriterTest {
 		writer.write(filename);
 		
 		LOG.info("read conflict data");
-		ConflictData newConflictData = new ConflictDataImpl();
-		ConflictingDirectionsReader reader = new ConflictingDirectionsReader(newConflictData);
+		ConflictData readConflictData = new ConflictDataImpl();
+		ConflictingDirectionsReader reader = new ConflictingDirectionsReader(readConflictData);
 		reader.readFile(filename);
 		
-		LOG.info("compare conflict data");
-		compare(conflictData, newConflictData);
+		LOG.info("compare written and read conflict data");
+		compare(conflictData, readConflictData);
 	}
 	
 	private void compare(ConflictData conflictData1, ConflictData conflictData2) {
