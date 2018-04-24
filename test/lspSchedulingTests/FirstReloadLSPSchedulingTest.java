@@ -160,7 +160,7 @@ public class FirstReloadLSPSchedulingTest {
 	
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
 		
-		 for(int i = 1; i < 11; i++) {
+		 for(int i = 1; i < 2; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 	        	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
 	        	//Random random = new Random(1);

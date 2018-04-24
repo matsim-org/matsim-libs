@@ -54,7 +54,7 @@ import lsp.scoring.LSPScoringModuleImpl;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
 
-public class CollectionLSPScoringTest {
+public class MultipleIterationsCollectionLSPScoringTest {
 
 	private Network network;
 	private LSP collectionLSP;
@@ -196,7 +196,7 @@ public class CollectionLSPScoringTest {
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(1);
+		config.controler().setLastIteration(10);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("input\\lsp\\network\\2regions.xml");
 		controler.run();

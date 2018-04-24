@@ -54,7 +54,7 @@ import lsp.shipment.AbstractShipmentPlanElementComparator;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
 
-public class CollectionLSPSchedulingTest {
+public class MultipleShipmentsCollectionLSPSchedulingTest {
 	
 	private Network network;
 	private LSP collectionLSP;	
@@ -133,7 +133,7 @@ public class CollectionLSPSchedulingTest {
 	    Id<Link> toLinkId = collectionLinkId;
 	
 	        
-	    for(int i = 1; i < 2; i++) {
+	    for(int i = 1; i < 100; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
         	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
         	Random random = new Random(1);

@@ -25,8 +25,14 @@ import lspSchedulingTests.CollectionLSPSchedulingTest;
 import lspSchedulingTests.CompleteLSPSchedulingTest;
 import lspSchedulingTests.FirstReloadLSPSchedulingTest;
 import lspSchedulingTests.MainRunLSPSchedulingTest;
+import lspSchedulingTests.MultipleShipmentsCollectionLSPSchedulingTest;
+import lspSchedulingTests.MultipleShipmentsCompleteLSPSchedulingTest;
+import lspSchedulingTests.MultipleShipmentsFirstReloadLSPSchedulingTest;
+import lspSchedulingTests.MultipleShipmentsMainRunLSPSchedulingTest;
+import lspSchedulingTests.MultipleShipmentsSecondReloadLSPSchedulingTest;
 import lspSchedulingTests.SecondReloadLSPSchedulingTest;
 import lspScoringTests.CollectionLSPScoringTest;
+import lspScoringTests.MultipleIterationsCollectionLSPScoringTest;
 import lspShipmentAssignmentTests.CollectionLSPShipmentAssigmentTest;
 import lspShipmentAssignmentTests.CompleteLSPShipmentAssignerTest;
 import lspShipmentTest.CollectionShipmentBuilderTest;
@@ -88,7 +94,12 @@ import testMutualreplanningWithOfferUpdate.MutualReplanningAndOfferUpdateTest;
 	MutualReplanningAndOfferUpdateTest.class,
 	CollectionLSPShipmentAssigmentTest.class,
 	CompleteLSPShipmentAssignerTest.class,
-	
+	MultipleShipmentsCollectionLSPSchedulingTest.class,
+	MultipleShipmentsFirstReloadLSPSchedulingTest.class,
+	MultipleShipmentsMainRunLSPSchedulingTest.class,
+	MultipleShipmentsSecondReloadLSPSchedulingTest.class,
+	MultipleShipmentsCompleteLSPSchedulingTest.class,
+	MultipleIterationsCollectionLSPScoringTest.class,
 })
 
 public class FTLabTestSuite {
