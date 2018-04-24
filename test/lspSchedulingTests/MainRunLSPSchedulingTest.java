@@ -1,6 +1,5 @@
 package lspSchedulingTests;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -29,8 +28,6 @@ import org.matsim.vehicles.VehicleType;
 import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
 import lsp.usecase.DeterministicShipmentAssigner;
-import lsp.usecase.DistributionCarrierAdapter;
-import lsp.usecase.DistributionCarrierScheduler;
 import lsp.usecase.MainRunCarrierAdapter;
 import lsp.usecase.MainRunCarrierScheduler;
 import lsp.usecase.ReloadingPoint;
@@ -254,4 +251,6 @@ public class MainRunLSPSchedulingTest {
 			System.out.println();	
 		}
 	}
+	
+		
 }

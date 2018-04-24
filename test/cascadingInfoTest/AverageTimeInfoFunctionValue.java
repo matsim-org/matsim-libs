@@ -2,27 +2,22 @@ package cascadingInfoTest;
 
 import lsp.functions.InfoFunctionValue;
 
-public class AverageTimeInfoFunctionValue implements InfoFunctionValue{
+public class AverageTimeInfoFunctionValue implements InfoFunctionValue<Double>{
 
-	private String value;
+	private Double value;
 	
 	@Override
 	public String getName() {
-		return "agerageTimeInSeconds";
+		return "averageTimeInSeconds";
 	}
-
+	
 	@Override
-	public Class<?> getDataType() {
-		return Double.class;
-	}
-
-	@Override
-	public String getValue() {
-		return value;
-	}
-
-	@Override
-	public void setValue(String value) {
+	public void setValue(Double value) {
 		this.value = value;
+	}
+
+	@Override
+	public Double getValue() {
+		return value;
 	}
 }

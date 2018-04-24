@@ -25,12 +25,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import example.LSPScoring.TipEventHandler;
-import example.LSPScoring.TipInfo;
-import example.LSPScoring.TipInfoFunction;
-import example.LSPScoring.TipInfoFunctionValue;
-import example.LSPScoring.TipScorer;
-import example.LSPScoring.TipSimulationTracker;
+
 import lsp.LSP;
 import lsp.LSPImpl;
 import lsp.LSPPlan;
@@ -43,6 +38,7 @@ import lsp.LogisticsSolutionImpl;
 import lsp.ShipmentAssigner;
 import lsp.SolutionScheduler;
 import lsp.controler.LSPModule;
+import lsp.events.EventUtils;
 import lsp.replanning.LSPReplannerImpl;
 import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.resources.Resource;
@@ -194,7 +190,7 @@ public class ExampleLSPReplanning {
         ArrayList<LSP> lspList = new ArrayList<LSP>();
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);	
-		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps));
+		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
 
 	  //Start the Mobsim two iterations are necessary for replanning
 		Controler controler = new Controler(config);

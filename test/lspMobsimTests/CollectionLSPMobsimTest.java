@@ -32,6 +32,7 @@ import lsp.usecase.CollectionCarrierScheduler;
 import lsp.usecase.DeterministicShipmentAssigner;
 import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
+import lsp.events.EventUtils;
 import lsp.LSP;
 import lsp.LSPImpl;
 import lsp.LSPPlanImpl;
@@ -168,11 +169,11 @@ public class CollectionLSPMobsimTest {
 		
 		Controler controler = new Controler(config);
 		
-		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps));
+		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(2);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("input\\lsp\\network\\2regions.xml");
 		controler.run();
@@ -180,9 +181,6 @@ public class CollectionLSPMobsimTest {
 
 	@Test
 	public void testCollectionLSPMobsim() {
-		
-			
-		
 		for(LSPShipment shipment : collectionLSP.getShipments()) {
 			assertFalse(shipment.getLog().getPlanElements().isEmpty());
 			assertTrue(shipment.getSchedule().getPlanElements().size() == shipment.getLog().getPlanElements().size());
@@ -190,6 +188,8 @@ public class CollectionLSPMobsimTest {
 			Collections.sort(scheduleElements, new AbstractShipmentPlanElementComparator());
 			ArrayList<AbstractShipmentPlanElement> logElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getLog().getPlanElements().values());
 			Collections.sort(logElements, new AbstractShipmentPlanElementComparator());
+			
+			
 			System.out.println();
 			for(int i = 0; i < shipment.getSchedule().getPlanElements().size(); i++) {
 				System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId()+ "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());

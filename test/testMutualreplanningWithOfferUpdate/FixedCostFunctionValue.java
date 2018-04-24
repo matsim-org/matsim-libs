@@ -2,9 +2,9 @@ package testMutualreplanningWithOfferUpdate;
 
 import lsp.functions.InfoFunctionValue;
 
-public class FixedCostFunctionValue implements InfoFunctionValue {
+public class FixedCostFunctionValue implements InfoFunctionValue<Double> {
 
-	private String value;
+	private Double value;
 		
 	@Override
 	public String getName() {
@@ -12,17 +12,12 @@ public class FixedCostFunctionValue implements InfoFunctionValue {
 	}
 
 	@Override
-	public Class<?> getDataType() {
-		return Double.class;
-	}
-
-	@Override
-	public String getValue() {
+	public Double getValue() {
 		return value;
 	}
 
 	@Override
-	public void setValue(String value) {
+	public void setValue(Double value) {
 		this.value = value;
 	}
 

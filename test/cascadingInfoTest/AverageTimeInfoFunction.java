@@ -10,15 +10,15 @@ import lsp.functions.InfoFunctionValue;
 
 public class AverageTimeInfoFunction implements InfoFunction{
 
-	private Collection<InfoFunctionValue> values;
+	private Collection<InfoFunctionValue<?>> values;
 	
 	public AverageTimeInfoFunction() {
-		values = new ArrayList<InfoFunctionValue>();
+		values = new ArrayList<InfoFunctionValue<?>>();
 		values.add(new AverageTimeInfoFunctionValue());
 	}
 		
 	@Override
-	public Collection<InfoFunctionValue> getValues() {
+	public Collection<InfoFunctionValue<?>> getValues() {
 		return values;
 	}
 

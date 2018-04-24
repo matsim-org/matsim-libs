@@ -32,6 +32,11 @@ import lsp.usecase.CollectionCarrierScheduler;
 import lsp.usecase.DeterministicShipmentAssigner;
 import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
+import lsp.events.EventUtils;
+import lsp.functions.InfoFunction;
+import lsp.functions.InfoFunctionImpl;
+import lsp.functions.InfoFunctionValue;
+import lsp.functions.InfoFunctionValueImpl;
 import lsp.LSP;
 import lsp.LSPImpl;
 import lsp.LSPPlanImpl;
@@ -57,11 +62,11 @@ public class CollectionLSPScoringTest {
 	private Carrier carrier;
 	private Resource collectionAdapter;
 	private LogisticsSolutionElement collectionElement;
-	private LSPScorer trinkgeldScorer;
-	private TrinkgeldSimulationTracker trinkgeldTracker;
-	private TrinkgeldInfo info;
-	private TrinkgeldInfoFunction function;
-	private TrinkgeldInfoFunctionValue value;
+	private LSPScorer tipScorer;
+	private TipSimulationTracker tipTracker;
+	private TipInfo info;
+	private InfoFunction function;
+	private InfoFunctionValue<Double> value;
 	private int numberOfShipments = 25;
 	
 	@Before
@@ -135,15 +140,15 @@ public class CollectionLSPScoringTest {
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	
-		TrinkgeldEventHandler handler = new TrinkgeldEventHandler();
-		TrinkgeldInfoFunctionValue value = new TrinkgeldInfoFunctionValue();
-		function = new TrinkgeldInfoFunction();
+		TipEventHandler handler = new TipEventHandler();
+		value = new InfoFunctionValueImpl<Double>("TIP IN EUR");
+		function = new InfoFunctionImpl();
 		function.getValues().add(value);
-		info = new TrinkgeldInfo(function);
-		trinkgeldTracker = new TrinkgeldSimulationTracker(handler,info);
-		collectionAdapter.addSimulationTracker(trinkgeldTracker);
-		trinkgeldScorer = new TrinkgeldScorer(collectionLSP, trinkgeldTracker);
-		collectionLSP.setScorer(trinkgeldScorer);
+		info = new TipInfo(function);
+		tipTracker = new TipSimulationTracker(handler,info);
+		collectionAdapter.addSimulationTracker(tipTracker);
+		tipScorer = new TipScorer(collectionLSP, tipTracker);
+		collectionLSP.setScorer(tipScorer);
 		
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
 	    Id<Link> toLinkId = collectionLinkId;
@@ -186,11 +191,11 @@ public class CollectionLSPScoringTest {
 		
 		Controler controler = new Controler(config);
 		
-		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps));
+		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(25);
+		config.controler().setLastIteration(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("input\\lsp\\network\\2regions.xml");
 		controler.run();
@@ -201,7 +206,7 @@ public class CollectionLSPScoringTest {
 		System.out.println(collectionLSP.getSelectedPlan().getScore());
 		assertTrue(collectionLSP.getShipments().size() == numberOfShipments);
 		assertTrue(collectionLSP.getSelectedPlan().getSolutions().iterator().next().getShipments().size() == numberOfShipments);
-		assertTrue(collectionLSP.getSelectedPlan().getScore() >0);
+		assertTrue(collectionLSP.getSelectedPlan().getScore() > 0);
 		assertTrue(collectionLSP.getSelectedPlan().getScore() <=(numberOfShipments*5));
 	}
 

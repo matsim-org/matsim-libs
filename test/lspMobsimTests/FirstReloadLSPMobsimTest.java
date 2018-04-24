@@ -35,6 +35,7 @@ import lsp.usecase.ReloadingPoint;
 import lsp.usecase.ReloadingPointScheduler;
 import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
+import lsp.events.EventUtils;
 import lsp.LSP;
 import lsp.LSPImpl;
 import lsp.LSPPlanImpl;
@@ -158,11 +159,12 @@ public class FirstReloadLSPMobsimTest {
 		 for(int i = 1; i < 4; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 	        	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
-	        	int capacityDemand = new Random().nextInt(4);
+	        	Random random = new Random(1);
+	        	int capacityDemand = random.nextInt(4);
 	        	builder.setCapacityDemand(capacityDemand);
 	        	
 	        	while(true) {
-	        		Collections.shuffle(linkList);
+	        		Collections.shuffle(linkList, random);
 	        		Link pendingToLink = linkList.get(0);
 	        		if((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
 	        			pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
@@ -177,7 +179,7 @@ public class FirstReloadLSPMobsimTest {
 	        	}
 	        	
 	        	while(true) {
-	        		Collections.shuffle(linkList);
+	        		Collections.shuffle(linkList, random);
 	        		Link pendingFromLink = linkList.get(0);
 	        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
 	        		   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
@@ -205,7 +207,7 @@ public class FirstReloadLSPMobsimTest {
 		
 		Controler controler = new Controler(config);
 		
-		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps));
+		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);

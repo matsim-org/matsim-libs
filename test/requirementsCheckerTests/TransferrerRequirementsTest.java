@@ -44,7 +44,7 @@ import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
 import lsp.usecase.SimpleForwardSolutionScheduler;
 
-public class transferrerRequirementsTest {
+public class TransferrerRequirementsTest {
 	private Network network;
 	private LogisticsSolutionWithOffers blueOfferSolution;
 	private LogisticsSolutionWithOffers redOfferSolution;

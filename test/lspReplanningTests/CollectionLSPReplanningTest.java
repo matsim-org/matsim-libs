@@ -33,6 +33,7 @@ import lsp.usecase.CollectionCarrierScheduler;
 import lsp.usecase.DeterministicShipmentAssigner;
 import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
+import lsp.events.EventUtils;
 import lsp.LSP;
 import lsp.LSPImpl;
 import lsp.LSPPlan;
@@ -47,16 +48,9 @@ import lsp.SolutionScheduler;
 import lsp.resources.Resource;
 import lsp.replanning.LSPReplannerImpl;
 import lsp.replanning.LSPReplanningModuleImpl;
-import lsp.scoring.LSPScorer;
 import lsp.scoring.LSPScoringModuleImpl;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
-import lspScoringTests.TrinkgeldEventHandler;
-import lspScoringTests.TrinkgeldInfo;
-import lspScoringTests.TrinkgeldInfoFunction;
-import lspScoringTests.TrinkgeldInfoFunctionValue;
-import lspScoringTests.TrinkgeldScorer;
-import lspScoringTests.TrinkgeldSimulationTracker;
 
 public class CollectionLSPReplanningTest {
 	private Network network;
@@ -184,7 +178,7 @@ public class CollectionLSPReplanningTest {
 		
 		Controler controler = new Controler(config);
 		
-		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps));
+		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);

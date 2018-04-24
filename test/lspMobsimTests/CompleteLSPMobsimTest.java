@@ -39,6 +39,7 @@ import lsp.usecase.ReloadingPoint;
 import lsp.usecase.ReloadingPointScheduler;
 import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
+import lsp.events.EventUtils;
 import lsp.LSP;
 import lsp.LSPImpl;
 import lsp.LSPPlanImpl;
@@ -64,10 +65,7 @@ public class CompleteLSPMobsimTest {
 	private LSPPlanImpl completePlan;
 	private SolutionScheduler simpleScheduler;
 	private LSP completeLSP;	
-	private Carrier carrier;
-	private Resource completeAdapter;
-	private LogisticsSolutionElement completeElement;
-	 
+	
 	@Before
 	public void initialize() {
 		Config config = new Config();
@@ -272,15 +270,15 @@ public class CompleteLSPMobsimTest {
 		completeLSP = completeLSPBuilder.build();
 	
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
-		
+		Random rand = new Random(1);
 		 for(int i = 1; i < 2; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 	        	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
-	        	int capacityDemand = new Random().nextInt(4);
+	        	int capacityDemand =  rand.nextInt(4);
 	        	builder.setCapacityDemand(capacityDemand);
 	        	
 	        	while(true) {
-	        		Collections.shuffle(linkList);
+	        		Collections.shuffle(linkList,rand);
 	        		Link pendingToLink = linkList.get(0);
 	        		if((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
 	        			pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
@@ -295,7 +293,7 @@ public class CompleteLSPMobsimTest {
 	        	}
 	        	
 	        	while(true) {
-	        		Collections.shuffle(linkList);
+	        		Collections.shuffle(linkList, rand);
 	        		Link pendingFromLink = linkList.get(0);
 	        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
 	        		   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
@@ -323,11 +321,11 @@ public class CompleteLSPMobsimTest {
 		
 		Controler controler = new Controler(config);
 		
-		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps));
+		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(2);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("input\\lsp\\network\\2regions.xml");
 		controler.run();
@@ -337,7 +335,6 @@ public class CompleteLSPMobsimTest {
 	public void testFirstReloadLSPMobsim() {
 		for(LSPShipment shipment : completeLSP.getShipments()) {
 			assertFalse(shipment.getLog().getPlanElements().isEmpty());
-			//assertTrue(shipment.getSchedule().getPlanElements().size() == shipment.getLog().getPlanElements().size());
 			ArrayList<AbstractShipmentPlanElement> scheduleElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
 			Collections.sort(scheduleElements, new AbstractShipmentPlanElementComparator());
 			ArrayList<AbstractShipmentPlanElement> logElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getLog().getPlanElements().values());

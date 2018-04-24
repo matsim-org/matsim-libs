@@ -5,6 +5,8 @@ import java.util.Collection;
 
 import lsp.functions.InfoFunction;
 import lsp.functions.InfoFunctionValue;
+import testLSPWithCostTracker.FixedCostFunctionValue;
+import testLSPWithCostTracker.LinearCostFunctionValue;
 
 
 
@@ -12,10 +14,10 @@ public class CostInfoFunction implements InfoFunction {
 
 	private FixedCostFunctionValue fixedValue;
 	private LinearCostFunctionValue linearValue;
-	private Collection<InfoFunctionValue> values;
+	private Collection<InfoFunctionValue<?>> values;
 	
 	public CostInfoFunction() {
-		values = new ArrayList<InfoFunctionValue>();
+		values = new ArrayList<InfoFunctionValue<?>>();
 		fixedValue = new FixedCostFunctionValue();
 		linearValue = new LinearCostFunctionValue();
 		values.add(fixedValue);
@@ -24,7 +26,7 @@ public class CostInfoFunction implements InfoFunction {
 	}
 	
 	@Override
-	public Collection<InfoFunctionValue> getValues() {
+	public Collection<InfoFunctionValue<?>> getValues() {
 		return values;
 	}
 

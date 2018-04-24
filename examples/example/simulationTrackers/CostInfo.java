@@ -2,10 +2,11 @@ package example.simulationTrackers;
 
 import lsp.functions.Info;
 import lsp.functions.InfoFunction;
+import testLSPWithCostTracker.CostInfoFunction;
 
 public class CostInfo extends Info {
 
-	private CostInfoFunction costFunction;
+private CostInfoFunction costFunction;
 	
 	public CostInfo() {
 		this.costFunction = new CostInfoFunction();
@@ -35,6 +36,13 @@ public class CostInfo extends Info {
 
 	@Override
 	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setName(String name) {
 		// TODO Auto-generated method stub
 		
 	}

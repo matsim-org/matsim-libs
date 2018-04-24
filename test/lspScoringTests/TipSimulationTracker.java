@@ -8,14 +8,15 @@ import org.matsim.core.events.handler.EventHandler;
 
 import lsp.functions.Info;
 import lsp.functions.InfoFunctionValue;
+import lsp.functions.InfoFunctionValueImpl;
 import lsp.tracking.SimulationTracker;
 
-public class TrinkgeldSimulationTracker implements SimulationTracker {
+public class TipSimulationTracker implements SimulationTracker {
 
-	private TrinkgeldEventHandler handler;
-	private Info info;
+	private TipEventHandler handler;
+	private TipInfo info;
 	
-	public TrinkgeldSimulationTracker(TrinkgeldEventHandler handler, Info info) {
+	public TipSimulationTracker(TipEventHandler handler, TipInfo info) {
 		this.info = info;
 		this.handler = handler;
 	}
@@ -36,9 +37,10 @@ public class TrinkgeldSimulationTracker implements SimulationTracker {
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		double trinkgeld = handler.getTrinkgeld();
-		InfoFunctionValue  value = info.getFunction().getValues().iterator().next();
-		value.setValue(String.valueOf(trinkgeld));
+		double tip = handler.getTip();
+		InfoFunctionValue<Double>  value = new InfoFunctionValueImpl<Double>("TIP IN EUR");
+		value.setValue(tip);
+		info.getFunction().getValues().add(value);
 	}
 
 	@Override

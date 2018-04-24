@@ -19,16 +19,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import demand.demandAgent.DemandAgent;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
 
-public class distributionShipmentBuilderTest {
-
+public class CompleteShipmentBuilderTest {
+	
 	private Network network;
-	private Id<Link> fromLinkId;
 	private ArrayList<LSPShipment> shipments;
-	
-	
+
 	@Before
 	public void initialize(){
 		Config config = new Config();
@@ -37,8 +36,6 @@ public class distributionShipmentBuilderTest {
         new MatsimNetworkReader(scenario.getNetwork()).readFile("input\\lsp\\network\\2regions.xml");
         this.network = scenario.getNetwork();
         ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
-        Id<Link> distributionLinkId = Id.createLinkId("(14 2) (14 3)");
-        this.fromLinkId = network.getLinks().get(distributionLinkId).getId();
         this.shipments = new ArrayList<LSPShipment>();
         
         for(int i = 1; i < 11; i++) {
@@ -62,7 +59,19 @@ public class distributionShipmentBuilderTest {
         	
         	}
         	
-        	builder.setFromLinkId(fromLinkId);
+        	while(true) {
+        		Collections.shuffle(linkList);
+        		Link pendingFromLink = linkList.get(0);
+        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
+        		   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
+        		   pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
+        		   pendingFromLink.getToNode().getCoord().getY() <= 4000    ) {
+        		   builder.setFromLinkId(pendingFromLink.getId());
+        		   break;	
+        		}
+        	
+        	}
+        	
         	TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
         	builder.setEndTimeWindow(endTimeWindow);
         	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
@@ -72,6 +81,7 @@ public class distributionShipmentBuilderTest {
         }
 	}
 	
+		
 	@Test
 	public void testShipments() {
 		assertTrue(shipments.size() == 10);
@@ -98,6 +108,10 @@ public class distributionShipmentBuilderTest {
 			assertTrue(link.getFromNode().getCoord().getX() >= 14000);
 			assertTrue(link.getToNode().getCoord().getX() <= 18000);
 			assertTrue(link.getToNode().getCoord().getX() >= 14000);
+			
+			link = network.getLinks().get(shipment.getFromLinkId());
+			assertTrue(link.getFromNode().getCoord().getX() <= 4000);
+			assertTrue(link.getFromNode().getCoord().getY() <= 4000);
 		}
 	}
 }

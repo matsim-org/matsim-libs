@@ -1,19 +1,17 @@
 package lspScoringTests;
 
-import org.matsim.api.core.v01.population.HasPlansAndId;
-
 import lsp.LSP;
 import lsp.functions.Info;
 import lsp.functions.InfoFunction;
 import lsp.functions.InfoFunctionValue;
 import lsp.scoring.LSPScorer;
 
-public class TrinkgeldScorer implements LSPScorer {
+public class TipScorer implements LSPScorer {
 
 	private LSP lsp;
-	private TrinkgeldSimulationTracker tracker;
+	private TipSimulationTracker tracker;
 	
-	public TrinkgeldScorer(LSP lsp, TrinkgeldSimulationTracker tracker) {
+	public TipScorer(LSP lsp, TipSimulationTracker tracker) {
 		this.lsp = lsp;
 		this.tracker = tracker;
 	}
@@ -22,12 +20,12 @@ public class TrinkgeldScorer implements LSPScorer {
 	public double scoreCurrentPlan(LSP lsp) {
 		double score = 0;
 		for(Info info : tracker.getInfos()) {
-			if(info.getName() == "TRINKGELDINFO") {
+			if(info.getName() == "TIPINFO") {
 				InfoFunction function = info.getFunction(); 
-					for(InfoFunctionValue value : function.getValues()) {
-						if(value.getName() == "TRINKGELD IN EUR") {
-							double trinkgeldValue = Double.parseDouble(value.getValue());
-							score += trinkgeldValue;
+					for(InfoFunctionValue<?> value : function.getValues()) {
+						if(value.getName() == "TIP IN EUR" && value.getValue() instanceof Double) {
+							double tipValue = (Double)value.getValue();
+							score += tipValue;
 						}
 					}
 			}

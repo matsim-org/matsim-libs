@@ -1,6 +1,8 @@
 package demand.controler;
 
 import java.util.ArrayList;
+import java.util.Collection;
+
 import javax.inject.Inject;
 
 import org.matsim.api.core.v01.events.Event;
@@ -11,12 +13,14 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
@@ -32,6 +36,7 @@ import lsp.LSPPlan;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
 import lsp.controler.FreightControlerListener;
+import lsp.events.EventCreator;
 import lsp.functions.Info;
 import lsp.mobsim.CarrierResourceTracker;
 import lsp.resources.CarrierResource;
@@ -40,7 +45,7 @@ import lsp.shipment.LSPShipment;
 import lsp.tracking.SimulationTracker;
 
 public class MutualControlerListener implements FreightControlerListener, BeforeMobsimListener, AfterMobsimListener,
-		ScoringListener, ReplanningListener, IterationEndsListener, StartupListener {
+		ScoringListener, ReplanningListener, IterationEndsListener, StartupListener, IterationStartsListener {
 
 	private CarrierResourceTracker carrierResourceTracker;
 	private Carriers carriers;
@@ -48,58 +53,69 @@ public class MutualControlerListener implements FreightControlerListener, Before
 	private DemandObjects demandObjects;
 	private MutualScoringModule mutualScoringModule;
 	private MutualReplanningModule replanningModule;
-
+	private Collection<EventCreator> creators;
 	private ArrayList<EventHandler> registeredHandlers;
 
-	@Inject
-	EventsManager eventsManager;
-	@Inject
-	Network network;
+	@Inject	EventsManager eventsManager;
+	@Inject	Network network;
 
 	@Inject
 	protected MutualControlerListener(LSPDecorators lsps, DemandObjects demandObjects,
-			MutualScoringModule demandScoringModule, MutualReplanningModule replanningModule) {
+			MutualScoringModule demandScoringModule, MutualReplanningModule replanningModule, Collection<EventCreator> creators) {
 		this.lsps = lsps;
 		this.demandObjects = demandObjects;
 		this.mutualScoringModule = demandScoringModule;
 		this.replanningModule = replanningModule;
+		this.creators = creators;
 		this.carriers = getCarriers();
 	}
 
-	public CarrierResourceTracker getCarrierResourceTracker() {
-		return carrierResourceTracker;
-	}
-
+	
 	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 
-		SupplyClearer supplyClearer = new SupplyClearer(lsps);
-		supplyClearer.notifyIterationEnds(event);
+		carrierResourceTracker = new CarrierResourceTracker(carriers, network, this, creators);
+		eventsManager.addHandler(carrierResourceTracker);
 
-		for (EventHandler handler : registeredHandlers) {
-			eventsManager.removeHandler(handler);
-		}
+		SupplyRescheduler rescheduler = new SupplyRescheduler(lsps);
+		rescheduler.notifyBeforeMobsim(event);
+
+		registeredHandlers = new ArrayList<EventHandler>();
 
 		for (LSP lsp : lsps.getLSPs().values()) {
 			for (LSPShipment shipment : lsp.getShipments()) {
-				shipment.getEventHandlers().clear();
+				for (EventHandler handler : shipment.getEventHandlers()) {
+					eventsManager.addHandler(handler);
+					registeredHandlers.add(handler);
+				}
 			}
-
-			for (LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
+			LSPPlan selectedPlan = lsp.getSelectedPlan();
+			for (LogisticsSolution solution : selectedPlan.getSolutions()) {
 				for (EventHandler handler : solution.getEventHandlers()) {
-					handler.reset(event.getIteration());
+					eventsManager.addHandler(handler);
 				}
 				for (LogisticsSolutionElement element : solution.getSolutionElements()) {
 					for (EventHandler handler : element.getEventHandlers()) {
-						handler.reset(event.getIteration());
+						eventsManager.addHandler(handler);
 					}
-					for (EventHandler handler : element.getResource().getEventHandlers()) {
-						handler.reset(event.getIteration());
+					ArrayList<EventHandler> resourceHandlers = (ArrayList<EventHandler>) element.getResource().getEventHandlers();
+					for (EventHandler handler : resourceHandlers) {
+						if (!registeredHandlers.contains(handler)) {
+							eventsManager.addHandler(handler);
+							registeredHandlers.add(handler);
+						}
 					}
 				}
 			}
 		}
+	}
 
+	
+	
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		SupplyClearer supplyClearer = new SupplyClearer(lsps);
+		supplyClearer.notifyIterationEnds(event);
 	}
 
 	@Override
@@ -141,17 +157,14 @@ public class MutualControlerListener implements FreightControlerListener, Before
 						if (!alreadyUpdatedTrackers.contains(tracker)) {
 							tracker.notifyAfterMobsim(event);
 							alreadyUpdatedTrackers.add(tracker);
-							tracker.reset();
 						}
 					}
 					for (SimulationTracker tracker : element.getSimulationTrackers()) {
 						tracker.notifyAfterMobsim(event);
-						tracker.reset();
 					}
 				}
 				for (SimulationTracker tracker : solution.getSimulationTrackers()) {
 					tracker.notifyAfterMobsim(event);
-					tracker.reset();
 				}
 			}
 		}
@@ -171,48 +184,7 @@ public class MutualControlerListener implements FreightControlerListener, Before
 
 	}
 
-	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-
-		carrierResourceTracker = new CarrierResourceTracker(carriers, network, this);
-		eventsManager.addHandler(carrierResourceTracker);
-
-		SupplyRescheduler rescheduler = new SupplyRescheduler(lsps);
-		rescheduler.notifyBeforeMobsim(event);
-
-		registeredHandlers = new ArrayList<EventHandler>();
-
-		for (LSP lsp : lsps.getLSPs().values()) {
-			for (LSPShipment shipment : lsp.getShipments()) {
-				for (EventHandler handler : shipment.getEventHandlers()) {
-					eventsManager.addHandler(handler);
-					registeredHandlers.add(handler);
-				}
-			}
-			LSPPlan selectedPlan = lsp.getSelectedPlan();
-			for (LogisticsSolution solution : selectedPlan.getSolutions()) {
-				for (EventHandler handler : solution.getEventHandlers()) {
-					eventsManager.addHandler(handler);
-					registeredHandlers.add(handler);
-				}
-				for (LogisticsSolutionElement element : solution.getSolutionElements()) {
-					for (EventHandler handler : element.getEventHandlers()) {
-						eventsManager.addHandler(handler);
-						registeredHandlers.add(handler);
-					}
-					ArrayList<EventHandler> resourceHandlers = (ArrayList<EventHandler>) element.getResource()
-							.getEventHandlers();
-					for (EventHandler handler : resourceHandlers) {
-						if (!registeredHandlers.contains(handler)) {
-							eventsManager.addHandler(handler);
-							registeredHandlers.add(handler);
-						}
-					}
-				}
-			}
-		}
-	}
-
+	
 	public void processEvent(Event event) {
 		eventsManager.processEvent(event);
 	}
@@ -243,4 +215,48 @@ public class MutualControlerListener implements FreightControlerListener, Before
 		initialAssigner.notifyStartup(event);
 	}
 
+	public CarrierResourceTracker getCarrierResourceTracker() {
+		return carrierResourceTracker;
+	}
+
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		if(event.getIteration() > 0) {
+			for(EventHandler handler : registeredHandlers) {
+				eventsManager.removeHandler(handler);
+			}
+		
+			for(LSP lsp : lsps.getLSPs().values()) {
+				for(LSPShipment shipment : lsp.getShipments()) {
+					shipment.getEventHandlers().clear();
+				}
+			
+				for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
+					for(EventHandler handler : solution.getEventHandlers()) {
+						handler.reset(event.getIteration());
+					}
+					for(SimulationTracker tracker : solution.getSimulationTrackers()) {
+						tracker.reset();
+					}			
+					for(LogisticsSolutionElement element : solution.getSolutionElements()) {
+						for(EventHandler handler : element.getEventHandlers()) {
+							handler.reset(event.getIteration());
+						}
+						for(SimulationTracker tracker : element.getSimulationTrackers()) {
+							tracker.reset();
+						}
+						for(EventHandler handler : element.getResource().getEventHandlers()) {
+							handler.reset(event.getIteration());
+						}		
+						for(SimulationTracker tracker : element.getResource().getSimulationTrackers()) {
+							tracker.reset();
+						}
+					}			
+				}		
+			}			
+		}	
+		
+	}
+	
 }

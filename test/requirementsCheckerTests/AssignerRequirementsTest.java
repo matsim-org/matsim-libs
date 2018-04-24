@@ -43,7 +43,7 @@ import lsp.usecase.CollectionCarrierScheduler;
 import lsp.usecase.DeterministicShipmentAssigner;
 import lsp.usecase.SimpleForwardSolutionScheduler;
 
-public class assignerRequirementsTest {
+public class AssignerRequirementsTest {
 	
 	private Network network;
 	private LogisticsSolution blueSolution;

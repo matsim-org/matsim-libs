@@ -3,6 +3,8 @@ package requirementsCheckerTests;
 import lsp.functions.Info;
 import lsp.functions.InfoFunction;
 import lsp.functions.InfoFunctionImpl;
+import lsp.functions.InfoFunctionValue;
+import lsp.functions.InfoFunctionValueImpl;
 
 public class BlueInfo extends Info{
 
@@ -10,7 +12,9 @@ public class BlueInfo extends Info{
 	
 	public BlueInfo() {
 		blueInfoFunction = new InfoFunctionImpl();
-		blueInfoFunction.getValues().add(new BlueInfoFunctionValue());
+		InfoFunctionValue<String> value = new InfoFunctionValueImpl<String>("blue");
+		value.setValue("blue");
+		blueInfoFunction.getValues().add(value);
 	}
 	
 	@Override
@@ -37,6 +41,12 @@ public class BlueInfo extends Info{
 
 	@Override
 	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setName(String name) {
 		// TODO Auto-generated method stub
 		
 	}

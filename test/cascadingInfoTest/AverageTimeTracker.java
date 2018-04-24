@@ -44,7 +44,7 @@ public class AverageTimeTracker implements SimulationTracker {
 		double totalTransportTime = handler.getTotalTime();
 		double averageTransportTime = totalTransportTime/numberOfStops;
 		AverageTimeInfoFunctionValue value =  (AverageTimeInfoFunctionValue) timeInfo.getFunction().getValues().iterator().next();
-		value.setValue(Double.toString(averageTransportTime));
+		value.setValue(averageTransportTime);
 	}
 
 

@@ -3,14 +3,18 @@ package example.requirementsChecking;
 import lsp.functions.Info;
 import lsp.functions.InfoFunction;
 import lsp.functions.InfoFunctionImpl;
+import lsp.functions.InfoFunctionValue;
+import lsp.functions.InfoFunctionValueImpl;
 
 public class RedInfo extends Info{
 
-	private InfoFunctionImpl redInfoFunction;
+private InfoFunctionImpl redInfoFunction;
 	
 	public RedInfo() {
 		redInfoFunction = new InfoFunctionImpl();
-		redInfoFunction.getValues().add(new RedInfoFunctionValue());
+		InfoFunctionValue<String> value = new InfoFunctionValueImpl<String>("red");
+		value.setValue("red");
+		redInfoFunction.getValues().add(value);
 	}
 
 	@Override
@@ -37,6 +41,12 @@ public class RedInfo extends Info{
 
 	@Override
 	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setName(String name) {
 		// TODO Auto-generated method stub
 		
 	}

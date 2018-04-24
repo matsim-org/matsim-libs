@@ -35,6 +35,11 @@ import lsp.LogisticsSolutionImpl;
 import lsp.ShipmentAssigner;
 import lsp.SolutionScheduler;
 import lsp.controler.LSPModule;
+import lsp.events.EventUtils;
+import lsp.functions.InfoFunction;
+import lsp.functions.InfoFunctionImpl;
+import lsp.functions.InfoFunctionValue;
+import lsp.functions.InfoFunctionValueImpl;
 import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.resources.Resource;
 import lsp.scoring.LSPScoringModuleImpl;
@@ -126,12 +131,10 @@ public class ExampleLSPScoring {
 		TipEventHandler handler = new TipEventHandler();
 		
 		//Create Info for the SimulationTracker which the scorer needs
-		TipInfoFunctionValue value = new TipInfoFunctionValue();
-		TipInfoFunction function = new TipInfoFunction();
-		function.getValues().add(value);
+		InfoFunction function = new InfoFunctionImpl();
 		TipInfo info = new TipInfo(function);
 		
-		//Create SimulationTracker foe the information that the Scorer needs
+		//Create SimulationTracker for the information that the Scorer needs
 		TipSimulationTracker tracker = new TipSimulationTracker(handler,info);
 		//add SimulationTracker to the Resource
 		collectionAdapter.addSimulationTracker(tracker);
@@ -206,7 +209,7 @@ public class ExampleLSPScoring {
         ArrayList<LSP> lspList = new ArrayList<LSP>();
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);	
-		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps));
+		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
 
 	  //Start the Mobsim one iteration is sufficient for scoring
 		Controler controler = new Controler(config);

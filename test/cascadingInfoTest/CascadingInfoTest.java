@@ -28,6 +28,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
+import lsp.events.EventUtils;
 import lsp.LSP;
 import lsp.LSPImpl;
 import lsp.LSPPlanImpl;
@@ -59,6 +60,7 @@ public class CascadingInfoTest {
 	private LogisticsSolution collectionSolution;
 	private AverageTimeInfo elementInfo;
 	private AverageTimeInfo solutionInfo;
+	private AverageTimeTracker timeTracker;
 	
 	@Before
 	public void initialize() {
@@ -82,9 +84,7 @@ public class CascadingInfoTest {
 		
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Link collectionLink = network.getLinks().get(collectionLinkId);
-		if (collectionLink == null) {
-			System.exit(1);
-		}
+		
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLink.getId());
 		carrierVehicle.setVehicleType(collectionType);
@@ -104,8 +104,8 @@ public class CascadingInfoTest {
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		collectionAdapter = adapterBuilder.build();
-		
-		collectionAdapter.addSimulationTracker(new AverageTimeTracker());
+		timeTracker = new AverageTimeTracker();
+		collectionAdapter.addSimulationTracker(timeTracker);
 		
 		
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
@@ -183,7 +183,7 @@ public class CascadingInfoTest {
 		
 		Controler controler = new Controler(config);
 		
-		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps));
+		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
@@ -195,18 +195,29 @@ public class CascadingInfoTest {
 
 	@Test
 	public void testCascadingInfos() {
+		assertTrue(timeTracker.getInfos().iterator().next() == elementInfo.getPredecessorInfos().iterator().next());
+		assertTrue(timeTracker.getInfos().iterator().next() instanceof AverageTimeInfo);
+		AverageTimeInfo resourceInfo = (AverageTimeInfo) timeTracker.getInfos().iterator().next();
+		assertTrue(resourceInfo.getFunction() instanceof AverageTimeInfoFunction);
+		AverageTimeInfoFunction resourceInfoFunction = (AverageTimeInfoFunction) resourceInfo.getFunction();
+		assertTrue(resourceInfoFunction.getValues().size() == 1);
+		assertTrue(resourceInfoFunction.getValues().iterator().next() instanceof AverageTimeInfoFunctionValue);
+		AverageTimeInfoFunctionValue averageResourceValue = (AverageTimeInfoFunctionValue) resourceInfoFunction.getValues().iterator().next();
 		assertTrue(elementInfo.getFunction() instanceof AverageTimeInfoFunction);
 		AverageTimeInfoFunction averageElementFunction = (AverageTimeInfoFunction) elementInfo.getFunction();
 		assertTrue(averageElementFunction.getValues().size() == 1);
 		assertTrue(averageElementFunction.getValues().iterator().next() instanceof AverageTimeInfoFunctionValue);
 		AverageTimeInfoFunctionValue averageElementValue = (AverageTimeInfoFunctionValue) averageElementFunction.getValues().iterator().next();
-		assertTrue(Double.parseDouble(averageElementValue.getValue()) > 0);
-		assertTrue(elementInfo.getFunction() instanceof AverageTimeInfoFunction);
+		assertTrue(averageElementValue.getValue() > 0);
+		assertTrue(averageElementFunction.getValues().iterator().next().getValue() instanceof Double);
+		assertTrue(solutionInfo.getFunction() instanceof AverageTimeInfoFunction);
+		assertTrue(solutionInfo.getPredecessorInfos().iterator().next() == elementInfo);
 		AverageTimeInfoFunction averageSolutionFunction = (AverageTimeInfoFunction) solutionInfo.getFunction();
 		assertTrue(averageSolutionFunction.getValues().size() == 1);
 		assertTrue(averageSolutionFunction.getValues().iterator().next() instanceof AverageTimeInfoFunctionValue);
 		AverageTimeInfoFunctionValue averageSolutionValue = (AverageTimeInfoFunctionValue) averageSolutionFunction.getValues().iterator().next();
-		assertTrue(Double.parseDouble(averageSolutionValue.getValue()) > 0);
+		assertTrue(averageSolutionValue.getValue() > 0);
+		assertTrue(averageElementValue.getValue() == averageResourceValue.getValue());
 		assertTrue(averageElementValue.getValue() == averageSolutionValue.getValue());
 	}
 
