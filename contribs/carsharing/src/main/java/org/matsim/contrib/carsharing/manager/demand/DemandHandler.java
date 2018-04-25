@@ -61,7 +61,8 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler, PersonEnt
 		RentalInfo info = agentRentals.getStatsPerVehicle().get(event.getvehicleId());
 		agentRentals.getStatsPerVehicle().remove(event.getvehicleId());
 		info.setEndTime(event.getTime());
-		info.setEndLinkId(event.getLinkId());
+		info.setDropoffLinkId(event.getLinkId());
+		info.setDropoffCoord(this.network.getLinks().get(event.getLinkId()).getCoord());
 
 		agentRentals.getArr().add(info);
 
@@ -81,6 +82,10 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler, PersonEnt
 		info.setStartTime(event.getTime());
 		info.setOriginLinkId(event.getOriginLinkId());
 		info.setPickupLinkId(event.getPickuplinkId());
+		info.setEndLinkId(event.getDestinationLinkId());
+		info.setOriginCoord(this.network.getLinks().get(event.getOriginLinkId()).getCoord());
+		info.setPickupCoord(this.network.getLinks().get(event.getPickuplinkId()).getCoord());
+		info.setEndCoord(this.network.getLinks().get(event.getDestinationLinkId()).getCoord());
 
 		if (agentRentalsMap.containsKey(event.getPersonId())) {
 			AgentRentals agentRentals = this.agentRentalsMap.get(event.getPersonId());
