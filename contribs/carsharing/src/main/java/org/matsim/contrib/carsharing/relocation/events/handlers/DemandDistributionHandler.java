@@ -68,13 +68,13 @@ public class DemandDistributionHandler implements StartRentalEventHandler, NoVeh
 		Link originLink = network.getLinks().get(event.getOriginLinkId());
 		Link destinationLink = network.getLinks().get(event.getDestinationLinkId());
 
-		String companyId = event.getCompanyId();
-
-		RelocationZone originZone = this.carsharingVehicleRelocation.getRelocationZone(companyId, originLink.getCoord());
-		RelocationZone destinationZone = this.carsharingVehicleRelocation.getRelocationZone(companyId, destinationLink.getCoord());
-
-		if ((originZone != null) && (destinationZone != null)) {
-			this.addODRelation(companyId, "no_vehicle", originZone, destinationZone);
+		for (String companyId : this.carsharingVehicleRelocation.getRelocationZones().keySet()) {
+			RelocationZone originZone = this.carsharingVehicleRelocation.getRelocationZone(companyId, originLink.getCoord());
+			RelocationZone destinationZone = this.carsharingVehicleRelocation.getRelocationZone(companyId, destinationLink.getCoord());
+	
+			if ((originZone != null) && (destinationZone != null)) {
+				this.addODRelation(companyId, "no_vehicle", originZone, destinationZone);
+			}
 		}
 	}
 
