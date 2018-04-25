@@ -50,27 +50,48 @@
 	<module name="planCalcScore">
 		<param name="BrainExpBeta" value="1.0" />
 
-		<param name="lateArrival" value="-18" />
-		<param name="earlyDeparture" value="-18" />
-		<param name="performing" value="+6" />
-		<param name="traveling" value="-6" /><!--
-		<param name="waiting" value="0" />
-		--><param name="constantWalk" value="-0" />
-		<param name="marginalUtlOfDistanceWalk" value="0" />
-		<param name="utilityOfLineSwitch" value="-1" />
-		<param name="travelingWalk" value="-12" />
-		<param name="activityType_0"            value="home" /> <!-- home -->
-		<param name="activityPriority_0"        value="1" />
-		<param name="activityTypicalDuration_0" value="18:00:00" />
+		<parameterset type="scoringParameters">
+			<param name="lateArrival" value="-18" />
+			<param name="earlyDeparture" value="-18" />
+			<param name="performing" value="+6" />
+			<!--<param name="traveling" value="-6" />
+            <param name="waiting" value="0" />
+            -->
+			<param name="utilityOfLineSwitch" value="-1" />
+
+			<parameterset type="modeParams">
+				<param name="mode" value="car"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+				<param name="mode" value="pt"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-12.0" />
+				<param name="mode" value="walk"/>
+				<param name="constant" value="-0.0" />
+			</parameterset>
+
+			<parameterset type="activityParams">
+				<param name="activityType"    value="home" /> <!-- home -->
+				<param name="priority"        value="1" />
+				<param name="typicalDuration" value="18:00:00" />
+			</parameterset>
+		</parameterset>
 	</module>
 	
 	<module name="strategy">
 	<!--	<param name="maxAgentPlanMemorySize" value="5" /> -->
 
-		<param name="ModuleProbability_1" value="0.8" />
-		<param name="Module_1" value="ChangeExpBeta" />
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="ChangeExpBeta"/>
+			<param name="weight" value="0.8"/>
+		</parameterset>
 
-	<!--	<param name="ModuleProbability_2" value="0.1" />-->
+
+		<!--	<param name="ModuleProbability_2" value="0.1" />-->
 	<!--	<param name="Module_2" value="ReRoute" />-->
 	<!--	<param name="ModuleDisableAfterIteration_3" value="90" />-->
 	<!--	<param name="ModuleProbability_3" value="0.1" />-->
