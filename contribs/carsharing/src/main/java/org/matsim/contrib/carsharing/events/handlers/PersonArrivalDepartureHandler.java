@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -42,9 +43,10 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 	@Inject
 	EventsManager eventsManager;
 	@Inject
+	Scenario scenario;
+	@Inject
 	@Named("carnetwork")
 	private Network network;
-
 	Map<Id<Person>, String> personArrivalMode = new HashMap<Id<Person>, String>();
 	Map<Id<Person>, Id<Link>> personArrivalMap = new HashMap<Id<Person>, Id<Link>>();
 	Map<Id<Person>, Id<Link>> personDepartureMap = new HashMap<Id<Person>, Id<Link>>();
@@ -126,6 +128,8 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 	public void handleEvent(PersonEntersVehicleEvent event) {
 
 		String vehId = event.getVehicleId().toString();
+		personLeavesVehicleMap.put(event.getPersonId(), event.getVehicleId());
+
 		String arrivalMode = this.personArrivalMode.get(event.getPersonId());
 
 		if (arrivalMode != null) {
