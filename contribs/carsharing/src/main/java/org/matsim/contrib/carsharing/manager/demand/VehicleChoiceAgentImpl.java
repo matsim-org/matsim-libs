@@ -1,5 +1,6 @@
 package org.matsim.contrib.carsharing.manager.demand;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,7 +47,7 @@ public class VehicleChoiceAgentImpl implements VehicleChoiceAgent {
 	public static final Logger log = Logger.getLogger(VehicleChoiceAgentImpl.class);
 
 	@Override
-	public CSVehicle chooseVehicle(Set<CSVehicle> vehicleOptions, Link startLink, Leg leg, double currentTime,
+	public CSVehicle chooseVehicle(List<CSVehicle> vehicleOptions, Link startLink, Leg leg, double currentTime,
 			Person person) {
 
 		double distance = -1.0;
@@ -65,7 +66,7 @@ public class VehicleChoiceAgentImpl implements VehicleChoiceAgent {
 	}
 
 	@Override
-	public CSVehicle chooseVehicleActivityTimeIncluded(Set<CSVehicle> vehicleOptions, Link startLink, Leg leg,
+	public CSVehicle chooseVehicleActivityTimeIncluded(List<CSVehicle> vehicleOptions, Link startLink, Leg leg,
 			double currentTime, Person person, double durationOfNextActivity, boolean keepthecar) {
 
 		CSVehicle chosenVehicle = null;

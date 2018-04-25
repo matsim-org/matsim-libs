@@ -1,8 +1,7 @@
 package org.matsim.contrib.carsharing.manager;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -65,8 +64,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 	private VehicleChoiceAgent vehicleChoiceAgent;
 
 	@Override
-	public List<PlanElement> reserveAndrouteCarsharingTrip(final Plan plan, String carsharingType, Leg legToBeRouted,
-			Double time) {
+	public List<PlanElement> reserveAndrouteCarsharingTrip(final Plan plan, String carsharingType, Leg legToBeRouted, Double time) {
 		Person person = plan.getPerson();
 		Link startLink = network.getLinks().get(legToBeRouted.getRoute().getStartLinkId());
 		Link destinationLink = network.getLinks().get(legToBeRouted.getRoute().getEndLinkId());
@@ -127,8 +125,10 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			// === possibly this could be moved to one method which decides
 			// based on the supply which vehicle to take
 			String typeOfVehicle = chooseVehicleType.getPreferredVehicleType(plan, legToBeRouted);
-
-			Set<CSVehicle> offeredVehicles = new HashSet<>();
+			// CompanyAgent companyAgent =
+			// this.carsharingSupplyContainer.getCompanyAgents().
+			// get(((CarsharingRoute)legToBeRouted.getRoute()).getCompany());
+			List<CSVehicle> offeredVehicles = new ArrayList<>();
 			for (CompanyAgent companyAgent : this.carsharingSupplyContainer.getCompanyAgents().values()) {
 
 				CSVehicle offeredVehicle = companyAgent.vehicleRequest(person.getId(), startLink, destinationLink,
@@ -138,14 +138,17 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 					offeredVehicles.add(offeredVehicle);
 			}
 
+			if (offeredVehicles.size() == 0) {
+				eventsManager.processEvent(
+						new NoVehicleCarSharingEvent(time, carsharingType, "", startLink, destinationLink));
+
+				return null;
+			}
+
 			// TODO: offer the possible cars to the agent, from which the agent
 			// can choose
-			// CSVehicle chosenVehicle =
-			// vehicleChoiceAgent.chooseVehicle(offeredVehicles, startLink,
-			// legToBeRouted, time, plan.getPerson());
-
-			CSVehicle chosenVehicle = vehicleChoiceAgent.chooseVehicleActivityTimeIncluded(offeredVehicles, startLink,
-					legToBeRouted, time, plan.getPerson(), durationOfNextActivity, keepTheCar);
+			CSVehicle chosenVehicle = vehicleChoiceAgent.chooseVehicle(offeredVehicles, startLink, legToBeRouted, time,
+					plan.getPerson());
 
 			if (chosenVehicle == null) {
 				eventsManager.processEvent(
