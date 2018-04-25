@@ -80,6 +80,11 @@ public class MobismBeforeSimStepRelocationListener implements MobsimBeforeSimSte
 
 				eventsManager.processEvent(new DispatchRelocationsEvent(start, end, companyId));
 			}
+			else if (start % 3600 == 0) {
+				this.demandDistributionHandler.createODMatrices(companyId, start);
+
+				this.carsharingVehicleRelocation.resetRelocationZones(companyId);
+			}
 		}
 	}
 }

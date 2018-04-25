@@ -98,14 +98,14 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 
 			int demandEstimateIterations = this.carsharingVehicleRelocation.demandEstimateIterations();
 			for (int i = 1; i <= demandEstimateIterations; i++) {
-				Map<String, Map<Double, Matrices>> previousODMatrices = this.demandTracker.getODMatrices(iteration - i);
+				Map<String, Map<Double, Matrices>> previousODMatrices = this.demandTracker.getODMatrices(this.iteration - 1);
 
 				if (null != previousODMatrices) {
 					previousODMatricesList.add(previousODMatrices);
 				}
 			}
 
-			this.avgODMatrices = this.calculateAvgODMAtrices(previousODMatricesList);
+			this.avgODMatrices = this.demandTracker.getODMatrices(this.iteration - 1);
 
 			// this.writeAvgODMatrices();
 
@@ -382,14 +382,20 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 			double numberOfVehicles = relocationZone.getNumberOfSurplusVehicles();
 
 			if (numberOfVehicles >= 1) {
-
-				if (relocationZone.getNumberOfVehicles() > 0 && (relocationZone.getNumberOfVehicles() + relocationZone.getNumberOfExpectedReturns() / 2.0)
+				
+				if (relocationZone.getNumberOfExpectedRequests() < relocationZone.getNumberOfVehicles())
+				{
+					vehicleSurplusZones.put(new Integer(relocationZones.indexOf(relocationZone)),
+							relocationZone.getNumberOfVehicles() - relocationZone.getNumberOfExpectedRequests());
+					qtSurplus.put(relocationZone.getCenter().getX(), relocationZone.getCenter().getY(), relocationZone);
+				}
+				/*if (relocationZone.getNumberOfVehicles() > 0 && (relocationZone.getNumberOfVehicles() + relocationZone.getNumberOfExpectedReturns() / 2.0)
 						- relocationZone.getNumberOfExpectedRequests() > 0) {
 					vehicleSurplusZones.put(new Integer(relocationZones.indexOf(relocationZone)),
 							Math.min(numberOfVehicles, relocationZone.getNumberOfVehicles()));
 					qtSurplus.put(relocationZone.getCenter().getX(), relocationZone.getCenter().getY(), relocationZone);
 
-				}
+				}*/
 
 			} else if (numberOfVehicles <= -1) {
 				vehicleDemandZones.put(new Integer(relocationZones.indexOf(relocationZone)),
@@ -437,7 +443,7 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 			String vehicleId = vehiclesEntry.getValue().get(0);
 			originZone.removeVehicles(originLink, new ArrayList<String>(Arrays.asList(new String[] { vehicleId })));
 
-			if (originZone.getNumberOfVehicles() == 0.0) {
+			if (originZone.getNumberOfVehicles() - originZone.getNumberOfExpectedRequests() == 0.0) {
 				qtSurplus.remove(originZone.getCenter().getX(), originZone.getCenter().getY(), originZone);
 			}
 			//if (CoordUtils.calcEuclideanDistance(originLink.getCoord(), destinationLink.getCoord()) >= 1000.0)
