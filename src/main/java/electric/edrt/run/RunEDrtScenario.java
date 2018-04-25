@@ -26,7 +26,6 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -46,16 +45,43 @@ import electric.edrt.energyconsumption.VwAVAuxEnergyConsumption;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 
 public class RunEDrtScenario {
-	private static final String CONFIG_FILE = "mielec_2014_02/mielec_edrt_config.xml";
 	private static final double CHARGING_SPEED_FACTOR = 1.; // full speed
 	private static final double MAX_RELATIVE_SOC = 0.8;// charge up to 80% SOC
 	private static final double MIN_RELATIVE_SOC = 0.2;// send to chargers vehicles below 20% SOC
 	private static final double TEMPERATURE = 20;// oC
+	private static String inputPath = "C:\\Users\\Joschka\\Documents\\shared-svn\\projects\\vw_rufbus\\projekt2\\drt_test_Scenarios\\BS_DRT\\input\\";
 
-	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
+	public static void main(String[] args) {
+		Config config = ConfigUtils.loadConfig(inputPath+"edrt-config.xml", new DrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup(), new EvConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.plans().setInputFile("population/vw219_it_1_sampleRate0.1replaceRate_bs_drt.xml.gz");
+		config.controler().setLastIteration(1); // Number of simulation iterations
+		config.controler().setWriteEventsInterval(1); // Write Events file every x-Iterations
+		config.controler().setWritePlansInterval(1); // Write Plan file every x-Iterations
+		config.network().setInputFile("network/modifiedNetwork.xml.gz");
+		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+
+		// Use custom stop duration
+		drt.setOperationalScheme("stopbased");
+		drt.setMaxTravelTimeBeta(500);
+		drt.setMaxTravelTimeAlpha(1.3);
+		drt.setMaxWaitTime(500);
+		drt.setStopDuration(15);
+		drt.setTransitStopFile("virtualstops/stopsGrid_300m.xml");
+		drt.setMaxWalkDistance(800.0);
+		drt.setPrintDetailedWarnings(false);
+		drt.setVehiclesFile("edrt/e-drt_bs_100.xml");
+		drt.setIdleVehiclesReturnToDepots(true);
+
+		String runId = "edrt-test";
+		config.controler().setRunId(runId);
+		config.qsim().setFlowCapFactor(0.12);
+		config.qsim().setStorageCapFactor(0.24);
+
+		config.controler().setOutputDirectory(inputPath+"../output/" + runId); 
+		
+		
 		createControler(config).run();
 	}
 
@@ -95,7 +121,5 @@ public class RunEDrtScenario {
 		return false;
 	}
 
-	public static void main(String[] args) {
-		RunEDrtScenario.run(CONFIG_FILE, false);
-	}
+	
 }

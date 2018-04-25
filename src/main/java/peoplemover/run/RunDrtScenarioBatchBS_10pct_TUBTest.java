@@ -71,11 +71,6 @@ public class RunDrtScenarioBatchBS_10pct_TUBTest {
 
 		// This part allows to change dynamically DRT config parameters
 		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
-		// DRT optimizer searches only the x-most closed vehicles.
-		// Handling more vehicles cost more time and will induce more empty trip
-		// mileage, because faraway vehicles are also considered to service the customer
-		// request
-		// drt.setkNearestVehicles(90);
 
 		// Use custom stop duration
 		drt.setOperationalScheme("stopbased");
@@ -92,8 +87,7 @@ public class RunDrtScenarioBatchBS_10pct_TUBTest {
 		config.qsim().setFlowCapFactor(0.12);
 		config.qsim().setStorageCapFactor(0.24);
 
-		config.controler().setOutputDirectory(inputPath+"../output/" + runId); // Define dynamically the the
-																						// output path
+		config.controler().setOutputDirectory(inputPath+"../output/" + runId); 
 
 		// For each demand scenario we are using a predefined drt vehicle fleet size
 		drt.setVehiclesFile("fleets/fleet_100.xml.gz");
