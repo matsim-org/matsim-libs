@@ -52,6 +52,10 @@
 				<param name="mode" value="pt"/>
 				<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
 			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="walk"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+			</parameterset>
 
 			<parameterset type="activityParams">
 				<param name="activityType"    value="h" /> <!-- home -->
