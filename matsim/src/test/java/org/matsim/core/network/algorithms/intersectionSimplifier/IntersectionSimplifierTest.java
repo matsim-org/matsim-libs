@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -33,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.algorithms.intersectionSimplifier.containers.Cluster;
@@ -53,11 +53,11 @@ public class IntersectionSimplifierTest {
 		} catch (Exception e) {
 			Assert.fail("Should build and write without exception.");
 		}
-		
+
 		Assert.assertEquals("Wrong number of nodes", 28, network.getNodes().size());
 		Assert.assertEquals("Wrong number of links", 50, network.getLinks().size());
 	}
-	
+
 	@Test
 	public void testSimplifyCallOnlyOnce() {
 		Network network = buildComplexIntersection();
@@ -67,7 +67,7 @@ public class IntersectionSimplifierTest {
 		} catch(Exception e) {
 			Assert.fail("Should not throw exceptions when simplifying network.");
 		}
-		
+
 		try {
 			ns.simplify(network, utils.getOutputDirectory() + "clusters.csv");
 			Assert.fail("Should not allow to simplify a network more than once");
@@ -76,41 +76,41 @@ public class IntersectionSimplifierTest {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Test
 	public void testIsClustered() {
 		Network network = buildComplexIntersection();
 		IntersectionSimplifier ns = new IntersectionSimplifier(10.0, 2);
-		
+
 		/* Test before simplifying. */
 		Node n = network.getNodes().get(Id.createNodeId(5));
 		Assert.assertFalse("Cannot be clustered before simplification was done.", ns.isClustered(n));
-		
+
 		/* Test after simplifying. */
 		ns.simplify(network, utils.getOutputDirectory() + "clusters.csv");
 		Assert.assertTrue("Must be clustered after simplification was done.", ns.isClustered(n));
 	}
-	
+
 	@Test
 	public void testGetClusteredNode() {
 		Network network = buildComplexIntersection();
 		IntersectionSimplifier ns = new IntersectionSimplifier(10.0, 2);
-		
+
 		/* Test before simplifying. */
 		Node n = network.getNodes().get(Id.createNodeId(5));
 		Assert.assertNull("Cannot be clustered before simplification was done.", ns.getClusteredNode(n));
-		
+
 		/* Test after simplifying. */
 		ns.simplify(network, utils.getOutputDirectory() + "clusters.csv");
 		Node centroid = ns.getClusteredNode(n);
 		Assert.assertNotNull("Must be associated with a cluster.", centroid);
-		
+
 		Coord centroidCoord = CoordUtils.createCoord(85.0, 85.0);
 		Assert.assertTrue("Wrong centroid Coord.", centroidCoord.equals(centroid.getCoord()));
 		Assert.assertTrue("Wrong centroid Id start.", centroid.getId().toString().startsWith("simplified_"));
 	}
-	
-	
+
+
 	@Test
 	public void testSimplifyOne() {
 		Network network = buildComplexIntersection();
@@ -118,64 +118,98 @@ public class IntersectionSimplifierTest {
 		Network cleanNetwork = ns.simplify(network, utils.getOutputDirectory() + "clusters.csv");
 		List<Cluster> clusters = ns.getClusters();
 		Assert.assertEquals("Wrong number of clusters", 6l, clusters.size());
-		
+
 		/* Check some clusters. */
-		Cluster foundCluster = null;
-		Iterator<Cluster> iterator = clusters.iterator();
-		while(foundCluster == null & iterator.hasNext()) {
-			Cluster cluster = iterator.next();
-			if(cluster.getCenterOfGravity().equals(CoordUtils.createCoord(85.0, 85.0))) {
-				foundCluster = cluster;
-			}
-		}
-		Assert.assertNotNull("Could not find a cluster with centroid (85.0,85.0)", foundCluster);
-		
-		List<ClusterActivity> points = foundCluster.getPoints();
-		Assert.assertEquals("Wrong number of points", 4, points.size());
+		Cluster c1 = findCluster(clusters, CoordUtils.createCoord(85.0, 85.0));
+		Assert.assertNotNull("Could not find a cluster with centroid (85.0,85.0)", c1);
+		Assert.assertEquals("Wrong number of points", 4, c1.getPoints().size());
+
+		Cluster c2 = findCluster(clusters, CoordUtils.createCoord(225.0, 85.0));
+		Assert.assertNotNull("Could not find cluster with centroid (225.0,85.0)", c2);
+		Assert.assertEquals("Wrong number of points", 4, c2.getPoints().size());
 		
 		/* Write the cleaned network to file. */
 		new NetworkWriter(cleanNetwork).write(utils.getOutputDirectory() + "cleanNetwork.xml");
 	}
 
 	@Test
-	@Ignore
 	public void testSimplifyTwo() {
 		Network network = buildComplexIntersection();
 		IntersectionSimplifier ns = new IntersectionSimplifier(30.0, 4);
 		Network cleanNetwork = ns.simplify(network, utils.getOutputDirectory() + "clusters.csv");
 		List<Cluster> clusters = ns.getClusters();
 		Assert.assertEquals("Wrong number of clusters", 2l, clusters.size());
-		
+
 		/* Check some clusters. */
-		Cluster cluster = clusters.get(1);
-		Assert.assertEquals("Wrong Id", Id.create("2", Cluster.class), cluster.getId());
-		Assert.assertEquals("Wrong coordinate", CoordUtils.createCoord(225.0, 85.0), cluster.getCenterOfGravity());
-		
-		List<ClusterActivity> points = cluster.getPoints();
-		Assert.assertEquals("Wrong number of points", 12, points.size());
+		Cluster c1 = findCluster(clusters, CoordUtils.createCoord(85.0, 85.0));
+		Assert.assertNotNull("Could not find cluster with centroid (85.0,85.0)", c1);
+		Assert.assertEquals("Wrong number of points", 4, c1.getPoints().size());
+
+		Cluster c2 = findCluster(clusters, CoordUtils.createCoord(225.0, 85.0));
+		Assert.assertNotNull("Could not find cluster with centroid (225.0,85.0)", c2);
+		Assert.assertEquals("Wrong number of points", 12, c2.getPoints().size());
 		
 		/* Write the cleaned network to file. */
 		new NetworkWriter(cleanNetwork).write(utils.getOutputDirectory() + "cleanNetwork.xml");
 	}
-	
+
+	/**
+	 * The network cleaner will/should ensure that full connectivity remains. 
+	 */
 	@Test
 	public void testNetworkCleaner() {
 		Network network = buildComplexIntersection();
 		IntersectionSimplifier ns = new IntersectionSimplifier(10.0, 2);
 		Network simpleNetwork = ns.simplify(network, utils.getOutputDirectory() + "clusters.csv");
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network1.xml");
-		
+
 		new NetworkCleaner().run(simpleNetwork);
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network2.xml");
-		
-		Assert.assertEquals("Wrong number of nodes.", 12l, simpleNetwork.getNodes().size());
+
+		Assert.assertEquals("Wrong number of nodes.", 18l, simpleNetwork.getNodes().size());
+		Assert.assertEquals("Wrong number of nodes.", 18l, simpleNetwork.getNodes().size());
 		Assert.assertNotNull("Should find node '1'", simpleNetwork.getNodes().get(Id.createLinkId("1")));
 		Assert.assertNotNull("Should find node '3'", simpleNetwork.getNodes().get(Id.createLinkId("3")));
 		Assert.assertNotNull("Should find node '10'", simpleNetwork.getNodes().get(Id.createLinkId("10")));
 		Assert.assertNotNull("Should find node '11'", simpleNetwork.getNodes().get(Id.createLinkId("11")));
 		Assert.assertNotNull("Should find node '26'", simpleNetwork.getNodes().get(Id.createLinkId("26")));
 		Assert.assertNotNull("Should find node '28'", simpleNetwork.getNodes().get(Id.createLinkId("28")));
-		
+
+		Assert.assertNotNull("Should find node '2'", simpleNetwork.getNodes().get(Id.createNodeId("2")));
+		Assert.assertNotNull("Should find node '4'", simpleNetwork.getNodes().get(Id.createNodeId("4")));
+		Assert.assertNotNull("Should find node '9'", simpleNetwork.getNodes().get(Id.createNodeId("9")));
+		Assert.assertNotNull("Should find node '12'", simpleNetwork.getNodes().get(Id.createNodeId("12")));
+		Assert.assertNotNull("Should find node '25'", simpleNetwork.getNodes().get(Id.createNodeId("25")));
+		Assert.assertNotNull("Should find node '27'", simpleNetwork.getNodes().get(Id.createNodeId("27")));
+
+		Assert.assertNotNull("Should find node 'simplified_0'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_0")));
+		Assert.assertNotNull("Should find node 'simplified_2'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_2")));
+		Assert.assertNotNull("Should find node 'simplified_4'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_4")));
+		Assert.assertNotNull("Should find node 'simplified_6'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_6")));
+		Assert.assertNotNull("Should find node 'simplified_8'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_8")));
+		Assert.assertNotNull("Should find node 'simplified_10'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_10")));
+	}
+
+	@Test
+	public void testNetworklSimplifier() {
+		Network network = buildComplexIntersection();
+		IntersectionSimplifier is = new IntersectionSimplifier(10.0, 2);
+		Network simpleNetwork = is.simplify(network, utils.getOutputDirectory() + "clusters.csv");
+
+		NetworkCalcTopoType nct = new NetworkCalcTopoType();
+		nct.run(simpleNetwork);
+		NetworkSimplifier ns = new NetworkSimplifier();
+		ns.run(simpleNetwork);
+		new NetworkCleaner().run(simpleNetwork);
+		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network.xml");
+
+		Assert.assertNotNull("Should find node '1'", simpleNetwork.getNodes().get(Id.createLinkId("1")));
+		Assert.assertNotNull("Should find node '3'", simpleNetwork.getNodes().get(Id.createLinkId("3")));
+		Assert.assertNotNull("Should find node '10'", simpleNetwork.getNodes().get(Id.createLinkId("10")));
+		Assert.assertNotNull("Should find node '11'", simpleNetwork.getNodes().get(Id.createLinkId("11")));
+		Assert.assertNotNull("Should find node '26'", simpleNetwork.getNodes().get(Id.createLinkId("26")));
+		Assert.assertNotNull("Should find node '28'", simpleNetwork.getNodes().get(Id.createLinkId("28")));
+
 		Assert.assertNull("Should NOT find node '2'", simpleNetwork.getNodes().get(Id.createNodeId("2")));
 		Assert.assertNull("Should NOT find node '4'", simpleNetwork.getNodes().get(Id.createNodeId("4")));
 		Assert.assertNull("Should NOT find node '9'", simpleNetwork.getNodes().get(Id.createNodeId("9")));
@@ -190,19 +224,19 @@ public class IntersectionSimplifierTest {
 		Assert.assertNotNull("Should find node 'simplified_8'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_8")));
 		Assert.assertNotNull("Should find node 'simplified_10'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_10")));
 	}
+
 	
-	private Node findNode(Network network, Coord c) {
-		Node node = null;
-		Iterator<? extends Node> iterator = network.getNodes().values().iterator();
-		while(node == null & iterator.hasNext()) {
-			Node thisNode = iterator.next();
-			if(thisNode.getCoord().equals(c)) {
-				node = thisNode;
+	private Cluster findCluster(List<Cluster> clusters, Coord c) {
+		Cluster cluster = null;
+		Iterator<Cluster> iterator = clusters.iterator();
+		while(cluster == null & iterator.hasNext()) {
+			Cluster thisCluster = iterator.next();
+			if(thisCluster.getCenterOfGravity().equals(c)) {
+				cluster = thisCluster;
 			}
 		}
-		return node;
+		return cluster;
 	}
-
 
 
 	/**
@@ -282,7 +316,7 @@ public class IntersectionSimplifierTest {
 		Node n26 = NetworkUtils.createAndAddNode(network, Id.createNodeId(26), CoordUtils.createCoord(225.0,   0.0));
 		Node n27 = NetworkUtils.createAndAddNode(network, Id.createNodeId(27), CoordUtils.createCoord(280.0,  85.0));
 		Node n28 = NetworkUtils.createAndAddNode(network, Id.createNodeId(28), CoordUtils.createCoord(320.0,  85.0));
-		
+
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("11_12"), n11, n12, 50.0, 80.0/3.6, 1000.0, 1.0 );
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("12_11"), n12, n11, 50.0, 80.0/3.6, 1000.0, 1.0 );
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("12_14"), n12, n14, 50.0, 80.0/3.6, 1000.0, 1.0 );
@@ -315,13 +349,13 @@ public class IntersectionSimplifierTest {
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("27_22"), n27, n22, 50.0, 80.0/3.6, 1000.0, 1.0 );
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("27_28"), n27, n28, 50.0, 80.0/3.6, 1000.0, 1.0 );
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("28_27"), n28, n27, 50.0, 80.0/3.6, 1000.0, 1.0 );
-		
+
 		/* Link the two clusters */
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("6_15"), n06, n15, 50.0, 80.0/3.6, 1000.0, 2.0 );
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("19_8"), n19, n08, 50.0, 80.0/3.6, 1000.0, 2.0 );
-		
+
 		network.setName("Two complex intersections test network.");
-		
+
 		return network;
 	}
 }

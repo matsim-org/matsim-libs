@@ -33,8 +33,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.network.algorithms.intersectionSimplifier.containers.Cluster;
 import org.matsim.core.network.algorithms.intersectionSimplifier.containers.ClusterActivity;
 import org.matsim.core.utils.collections.QuadTree;
@@ -70,7 +68,7 @@ public class IntersectionSimplifier {
 			throw new RuntimeException("Should instantiate a new NetworkSimplifier");
 		}
 
-		LOG.info("Simplifying the network...");
+		LOG.info("Simplifying the intersections...");
 		reportNetworkStatistics(network);
 		Network newNetwork = NetworkUtils.createNetwork();
 
@@ -137,6 +135,14 @@ public class IntersectionSimplifier {
 				 * Coords will now be the same. The link can be completely ignored, 
 				 * so we need to process it here any further. */
 			} else {
+				
+				/* FIXME Remove after debugging. */
+				if(newFromNode.getId().toString().equalsIgnoreCase("2") || newToNode.getId().toString().equalsIgnoreCase("2")) {
+					LOG.info("Got node \"2\"");
+				}
+				
+				
+				
 				if(!newNetwork.getNodes().containsKey(newLink.getFromNode().getId())) {
 					/* FIXME currently the new node carries no additional 
 					 * information from the original network. */
@@ -145,6 +151,8 @@ public class IntersectionSimplifier {
 				if(!newNetwork.getNodes().containsKey(newLink.getToNode().getId())) {
 					NetworkUtils.createAndAddNode(newNetwork, newLink.getToNode().getId(), newLink.getToNode().getCoord());
 				}
+				newLink.setFromNode(newNetwork.getNodes().get(newFromNode.getId()));
+				newLink.setToNode(newNetwork.getNodes().get(newToNode.getId()));
 				newNetwork.addLink(newLink);
 			}
 		}
@@ -158,26 +166,11 @@ public class IntersectionSimplifier {
 			LOG.warn("The given network does not have a description. This makes reproducibility hard!");
 		}
 
-		LOG.info("Done simplifying the network");
+		LOG.info("Done simplifying the intersections");
 		reportNetworkStatistics(newNetwork);
-//		org.matsim.core.network.algorithms.NetworkSimplifier merger = new org.matsim.core.network.algorithms.NetworkSimplifier();
-//		merger.run(newNetwork, 50.0);
-		
-		/*FIXME For some odd reason I have to "cleanup" the links as their "to nodes" are not the same
-		 * as the actual nodes in the network. */
-		
-		
-		
-		
 		return newNetwork;
 	}
 	
-	public Network cleanNetwork(Network network) {
-		new NetworkCleaner().run(network);
-		return network;
-	}
-	
-
 
 	protected Node getClusteredNode(Node node) {
 		Node n = null;
@@ -211,7 +204,7 @@ public class IntersectionSimplifier {
 		return this.djc.getClusterList();
 	}
 
-	private void reportNetworkStatistics(Network network) {
+	public static void reportNetworkStatistics(Network network) {
 		LOG.info("--- Network statistics: ------------------------------------------------------");
 		LOG.info("   Network description: " + network.getName());
 		LOG.info("       Number of nodes: " + network.getNodes().size());
