@@ -255,6 +255,19 @@ public class WarmEmissionAnalysisModule {
 		double efFreeFlow_gpkm;
 		double efStopGo_gpkm;
 
+
+		if(averageSpeed_kmh <= 0.0){
+			throw new RuntimeException("Average speed has been calculated to 0.0 or a negative value. Aborting...");
+		}
+		if ((averageSpeed_kmh - freeFlowSpeed_kmh) > 1.0){
+			if (ecg.handlesHighAverageSpeeds()) {
+				logger.warn("averageSpeed was capped from " + averageSpeed_kmh + " to" + freeFlowSpeed_kmh);
+				averageSpeed_kmh = freeFlowSpeed_kmh;
+			} else {
+				throw new RuntimeException("Average speed has been calculated to be greater than free flow speed; this might produce negative warm emissions. Aborting...");
+			}
+		}
+
 		for (WarmPollutant warmPollutant : WarmPollutant.values()) {
 			double generatedEmissions;
 
@@ -290,13 +303,7 @@ public class WarmEmissionAnalysisModule {
 				freeFlowSpeedFromTable_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
 //				vehAttributesNotSpecified.add(personId);
 			}
-			
-			if(averageSpeed_kmh <= 0.0){
-				throw new RuntimeException("Average speed has been calculated to 0.0 or a negative value. Aborting...");
-			}
-			if ((averageSpeed_kmh - freeFlowSpeed_kmh) > 1.0){
-				throw new RuntimeException("Average speed has been calculated to be greater than free flow speed; this might produce negative warm emissions. Aborting...");
-			}
+
 			/* NOTE: the following comparision does not make sense since HBEFA assumes free flow speeds to be different from speed limits.
 			 * For instance, for RUR/MW/80/Freeflow HBEFA assumes a free flow speed of 82.80 kmh.
 			 * benjamin, amit 01'2014
