@@ -36,7 +36,6 @@ import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.algorithms.intersectionSimplifier.containers.Cluster;
-import org.matsim.core.network.algorithms.intersectionSimplifier.containers.ClusterActivity;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -61,15 +60,16 @@ public class IntersectionSimplifierTest {
 	@Test
 	public void testSimplifyCallOnlyOnce() {
 		Network network = buildComplexIntersection();
-		IntersectionSimplifier ns = new IntersectionSimplifier(10.0, 2);
+		IntersectionSimplifier is = new IntersectionSimplifier(10.0, 2);
 		try{
-			ns.simplify(network, utils.getOutputDirectory() + "clusters.csv");
+			is.simplify(network);
+			is.writeClustersToFile(utils.getOutputDirectory() + "clusters.csv");
 		} catch(Exception e) {
 			Assert.fail("Should not throw exceptions when simplifying network.");
 		}
 
 		try {
-			ns.simplify(network, utils.getOutputDirectory() + "clusters.csv");
+			is.simplify(network);
 			Assert.fail("Should not allow to simplify a network more than once");
 		} catch(Exception e) {
 			/* Pass. */
@@ -80,29 +80,31 @@ public class IntersectionSimplifierTest {
 	@Test
 	public void testIsClustered() {
 		Network network = buildComplexIntersection();
-		IntersectionSimplifier ns = new IntersectionSimplifier(10.0, 2);
+		IntersectionSimplifier is = new IntersectionSimplifier(10.0, 2);
 
 		/* Test before simplifying. */
 		Node n = network.getNodes().get(Id.createNodeId(5));
-		Assert.assertFalse("Cannot be clustered before simplification was done.", ns.isClustered(n));
+		Assert.assertFalse("Cannot be clustered before simplification was done.", is.isClustered(n));
 
 		/* Test after simplifying. */
-		ns.simplify(network, utils.getOutputDirectory() + "clusters.csv");
-		Assert.assertTrue("Must be clustered after simplification was done.", ns.isClustered(n));
+		is.simplify(network);
+		is.writeClustersToFile(utils.getOutputDirectory() + "clusters.csv");
+		Assert.assertTrue("Must be clustered after simplification was done.", is.isClustered(n));
 	}
 
 	@Test
 	public void testGetClusteredNode() {
 		Network network = buildComplexIntersection();
-		IntersectionSimplifier ns = new IntersectionSimplifier(10.0, 2);
+		IntersectionSimplifier is = new IntersectionSimplifier(10.0, 2);
 
 		/* Test before simplifying. */
 		Node n = network.getNodes().get(Id.createNodeId(5));
-		Assert.assertNull("Cannot be clustered before simplification was done.", ns.getClusteredNode(n));
+		Assert.assertNull("Cannot be clustered before simplification was done.", is.getClusteredNode(n));
 
 		/* Test after simplifying. */
-		ns.simplify(network, utils.getOutputDirectory() + "clusters.csv");
-		Node centroid = ns.getClusteredNode(n);
+		is.simplify(network);
+		is.writeClustersToFile(utils.getOutputDirectory() + "clusters.csv");
+		Node centroid = is.getClusteredNode(n);
 		Assert.assertNotNull("Must be associated with a cluster.", centroid);
 
 		Coord centroidCoord = CoordUtils.createCoord(85.0, 85.0);
@@ -114,9 +116,10 @@ public class IntersectionSimplifierTest {
 	@Test
 	public void testSimplifyOne() {
 		Network network = buildComplexIntersection();
-		IntersectionSimplifier ns = new IntersectionSimplifier(10.0, 2);
-		Network cleanNetwork = ns.simplify(network, utils.getOutputDirectory() + "clusters.csv");
-		List<Cluster> clusters = ns.getClusters();
+		IntersectionSimplifier is = new IntersectionSimplifier(10.0, 2);
+		Network simpleNetwork = is.simplify(network);
+		is.writeClustersToFile(utils.getOutputDirectory() + "clusters.csv");
+		List<Cluster> clusters = is.getClusters();
 		Assert.assertEquals("Wrong number of clusters", 6l, clusters.size());
 
 		/* Check some clusters. */
@@ -129,15 +132,16 @@ public class IntersectionSimplifierTest {
 		Assert.assertEquals("Wrong number of points", 4, c2.getPoints().size());
 		
 		/* Write the cleaned network to file. */
-		new NetworkWriter(cleanNetwork).write(utils.getOutputDirectory() + "cleanNetwork.xml");
+		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "cleanNetwork.xml");
 	}
 
 	@Test
 	public void testSimplifyTwo() {
 		Network network = buildComplexIntersection();
-		IntersectionSimplifier ns = new IntersectionSimplifier(30.0, 4);
-		Network cleanNetwork = ns.simplify(network, utils.getOutputDirectory() + "clusters.csv");
-		List<Cluster> clusters = ns.getClusters();
+		IntersectionSimplifier is = new IntersectionSimplifier(30.0, 4);
+		Network simpleNetwork = is.simplify(network);
+		is.writeClustersToFile(utils.getOutputDirectory() + "clusters.csv");
+		List<Cluster> clusters = is.getClusters();
 		Assert.assertEquals("Wrong number of clusters", 2l, clusters.size());
 
 		/* Check some clusters. */
@@ -150,7 +154,7 @@ public class IntersectionSimplifierTest {
 		Assert.assertEquals("Wrong number of points", 12, c2.getPoints().size());
 		
 		/* Write the cleaned network to file. */
-		new NetworkWriter(cleanNetwork).write(utils.getOutputDirectory() + "cleanNetwork.xml");
+		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "cleanNetwork.xml");
 	}
 
 	/**
@@ -159,8 +163,9 @@ public class IntersectionSimplifierTest {
 	@Test
 	public void testNetworkCleaner() {
 		Network network = buildComplexIntersection();
-		IntersectionSimplifier ns = new IntersectionSimplifier(10.0, 2);
-		Network simpleNetwork = ns.simplify(network, utils.getOutputDirectory() + "clusters.csv");
+		IntersectionSimplifier is = new IntersectionSimplifier(10.0, 2);
+		Network simpleNetwork = is.simplify(network);
+		is.writeClustersToFile(utils.getOutputDirectory() + "clusters.csv");
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network1.xml");
 
 		new NetworkCleaner().run(simpleNetwork);
@@ -194,7 +199,8 @@ public class IntersectionSimplifierTest {
 	public void testNetworklSimplifier() {
 		Network network = buildComplexIntersection();
 		IntersectionSimplifier is = new IntersectionSimplifier(10.0, 2);
-		Network simpleNetwork = is.simplify(network, utils.getOutputDirectory() + "clusters.csv");
+		Network simpleNetwork = is.simplify(network);
+		is.writeClustersToFile(utils.getOutputDirectory() + "clusters.csv");
 
 		NetworkCalcTopoType nct = new NetworkCalcTopoType();
 		nct.run(simpleNetwork);

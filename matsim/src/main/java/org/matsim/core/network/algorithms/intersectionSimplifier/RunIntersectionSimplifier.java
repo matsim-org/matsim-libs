@@ -51,13 +51,12 @@ public class RunIntersectionSimplifier {
 	public static void run(String[] args) {
 		String input = args[0];
 		String output = args[1];
-		String cluster = args[2];
 		
 		Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(input);
 		
 		IntersectionSimplifier ns = new IntersectionSimplifier(30.0, 2);
-		Network newNetwork = ns.simplify(network, cluster);
+		Network newNetwork = ns.simplify(network);
 		NetworkCalcTopoType nct = new NetworkCalcTopoType();
 		nct.run(newNetwork);
 		

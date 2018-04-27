@@ -60,7 +60,7 @@ public class IntersectionSimplifier {
 		this.epsilon = epsilon;
 	}
 
-	public Network simplify(Network network, String clusterFile) {
+	public Network simplify(Network network) {
 		/* TODO The clusterFile argument can eventually be removed. */
 
 		if(this.djc != null) {
@@ -82,7 +82,6 @@ public class IntersectionSimplifier {
 		LOG.info("Clustering the network nodes...");
 		this.djc = new DensityCluster(nodes, true);
 		djc.clusterInput(pmin, epsilon);
-		djc.writeClustersToFile(clusterFile);
 		LOG.info("Done clustering.");
 
 		/* Do the mapping of clustered points. */
@@ -172,16 +171,41 @@ public class IntersectionSimplifier {
 	}
 	
 
+	/**
+	 * Gets the {@link Cluster} centroid closest to the provided {@link Node}.
+	 * TODO maybe worth checking if this is indeed the right approach. Maybe it
+	 * would be better to rather go through the (nearby) {@link Cluster}s and 
+	 * ensures the {@link Node} is indeed part of <i><b>that</b></i> {@link Cluster}.
+	 * @param node
+	 * @return
+	 */
 	protected Node getClusteredNode(Node node) {
 		Node n = null;
 		if(isClustered(node)) {
 			n = clusteredCentroids.getClosest(node.getCoord().getX(), node.getCoord().getY());
 		}
-
 		return n;
 	}
+	
+	
+	/**
+	 * Checking that clustering has been done, and then writes the clusters to 
+	 * file using {@link DensityCluster#writeClustersToFile(String)}.
+	 * @param file
+	 */
+	public void writeClustersToFile(String file) {
+		if(this.djc == null) {
+			LOG.info("Density-based clustering has not been run yet. Cannot write to file.");
+		} else {
+			this.djc.writeClustersToFile(file);
+		}
+	}
 
-
+	/**
+	 * Checks if a given {@link Node} was included in a density-based cluster. 
+	 * @param node
+	 * @return
+	 */
 	protected boolean isClustered(Node node) {
 		boolean result = false;
 		if(this.clusteredNodes == null) {
@@ -196,6 +220,11 @@ public class IntersectionSimplifier {
 		return result;
 	}
 
+	/**
+	 * Returns all the {@link Cluster}s.
+	 * 
+	 * @return
+	 */
 	public List<Cluster> getClusters() {
 		if(this.djc == null) {
 			LOG.warn("The network has not been simplified yet. Returning 0 clusters");
@@ -204,6 +233,10 @@ public class IntersectionSimplifier {
 		return this.djc.getClusterList();
 	}
 
+	/**
+	 * Provides basic statistics of a given {@link Network}.  
+	 * @param network
+	 */
 	public static void reportNetworkStatistics(Network network) {
 		LOG.info("--- Network statistics: ------------------------------------------------------");
 		LOG.info("   Network description: " + network.getName());
