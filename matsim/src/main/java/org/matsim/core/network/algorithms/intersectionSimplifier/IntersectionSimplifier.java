@@ -128,11 +128,12 @@ public class IntersectionSimplifier {
 			Link newLink = NetworkUtils.createLink(
 					link.getId(), newFromNode, newToNode, newNetwork, 
 					link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
+			newLink.setAllowedModes(link.getAllowedModes());
 			
 			if(newLink.getFromNode().getCoord().equals(newLink.getToNode().getCoord())) {
 				/* If both link nodes are part of the same cluster, their node
 				 * Coords will now be the same. The link can be completely ignored, 
-				 * so we need to process it here any further. */
+				 * so we do not need to process it here any further. */
 			} else {
 				
 				/* FIXME Remove after debugging. */
