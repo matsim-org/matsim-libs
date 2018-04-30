@@ -20,6 +20,7 @@
 package org.matsim.contrib.signals.data;
 
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesData;
+import org.matsim.contrib.signals.data.conflicts.ConflictData;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
@@ -49,5 +50,9 @@ public interface SignalsData {
 	 * @return null if feature is not enabled
 	 */
 	public IntergreenTimesData getIntergreenTimesData();
+	/**
+	 * @return null if feature is not enabled
+	 */
+	public ConflictData getConflictingDirectionsData();
 	
 }

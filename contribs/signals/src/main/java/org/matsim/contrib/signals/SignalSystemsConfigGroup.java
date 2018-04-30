@@ -38,6 +38,8 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	public static final String SIGNALGROUPS_FILE = "signalgroups";
 	public static final String USE_AMBER_TIMES = "useAmbertimes";
 	public static final String AMBERTIMES_FILE = "ambertimes";
+	public static final String CONFLICTING_DIRECTIONS_FILE = "conflictingDirections";
+	public static final String USE_CONFLICTING_DIRECTIONS = "useConflictingDirections";	
 	public static final String INTERGREENTIMES_FILE = "intergreentimes";
 	public static final String USE_INTERGREEN_TIMES = "useIntergreentimes";
 	public static final String ACTION_ON_INTERGREEN_VIOLATION = "actionOnIntergreenViolation";
@@ -50,9 +52,11 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	private String signalGroupsFile;
 	private String amberTimesFile;
 	private String intergreenTimesFile;
+	private String conflictingDirectionsFile;
 	private boolean useIntergreens = false;
 	private boolean useAmbertimes = false;
 	private boolean useSignalSystems = false;
+	private boolean useConflictingDirections = false;
 	private ActionOnIntergreenViolation actionOnIntergreenViolation = ActionOnIntergreenViolation.WARN;
 	
 	public SignalSystemsConfigGroup() {
@@ -116,6 +120,16 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	public void setSignalControlFile(String signalControlFile){
 		this.signalControlFile = signalControlFile;
 	}
+	
+	@StringGetter( CONFLICTING_DIRECTIONS_FILE )
+	public String getConflictingDirectionsFile() {
+		return this.conflictingDirectionsFile;
+	}
+	
+	@StringSetter( CONFLICTING_DIRECTIONS_FILE )
+	public void setConflictingDirectionsFile(String conflictingDirectionsFile){
+		this.conflictingDirectionsFile = conflictingDirectionsFile;
+	}
 
 	@StringGetter( USE_INTERGREEN_TIMES )
 	public boolean isUseIntergreenTimes() {
@@ -166,4 +180,15 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	public void setUseSignalSystems(final boolean useSignalSystems) {
 		this.useSignalSystems = useSignalSystems;
 	}
+	
+	@StringGetter( USE_CONFLICTING_DIRECTIONS )
+	public boolean isUseConflictingDirections() {
+		return this.useConflictingDirections;
+	}
+	
+	@StringSetter( USE_CONFLICTING_DIRECTIONS )
+	public void setUseConflictingDirections(boolean useConflictingDirections){
+		this.useConflictingDirections = useConflictingDirections;
+	}
 }
+

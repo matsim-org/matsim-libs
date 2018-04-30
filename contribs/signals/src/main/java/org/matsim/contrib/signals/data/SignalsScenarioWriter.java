@@ -22,6 +22,8 @@ package org.matsim.contrib.signals.data;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesWriter10;
+import org.matsim.contrib.signals.data.conflicts.ConflictData;
+import org.matsim.contrib.signals.data.conflicts.io.ConflictingDirectionsWriter;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesData;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesWriter10;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
@@ -49,19 +51,16 @@ public class SignalsScenarioWriter {
 	public static final String FILENAME_SIGNAL_CONTROL = "output_signal_control_v2.0.xml.gz";
 	public static final String FILENAME_AMBER_TIMES = "output_amber_times_v1.0.xml.gz";
 	private static final String FILENAME_INTERGREEN_TIMES = "output_intergreen_times_v1.0.xml.gz";
+	private static final String FILENAME_CONFLICTING_DIRECTIONS = "output_conflicting_directions_v1.0.xml.gz";
 	private static final String FILENAME_SIGNAL_CSV = "via_signals.csv.gz";
 
 	private String pathToSignalSystemsOutputFilename = null;
-
 	private String pathToSignalGroupsOutputFilename = null;
-
 	private String pathToSignalControlOutputFilename = null;
-
 	private String pathToAmberTimesOutputFilename = null;
-
 	private String pathToIntergreenTimesOutputFilename = null;
-	
 	private String pathToSignalCSVOutputFilename = null;
+	private String pathToConflictingDirectionsOutputFilename = null;
 
 	public SignalsScenarioWriter(){
 	}
@@ -73,6 +72,7 @@ public class SignalsScenarioWriter {
 		this.pathToAmberTimesOutputFilename = outputDirectoryPath + FILENAME_AMBER_TIMES;
 		this.pathToIntergreenTimesOutputFilename =  outputDirectoryPath + FILENAME_INTERGREEN_TIMES;
 		this.pathToSignalCSVOutputFilename = outputDirectoryPath + FILENAME_SIGNAL_CSV;
+		this.pathToConflictingDirectionsOutputFilename = outputDirectoryPath + FILENAME_CONFLICTING_DIRECTIONS;
 	}
 	
 	
@@ -83,6 +83,7 @@ public class SignalsScenarioWriter {
 		this.pathToAmberTimesOutputFilename = controlerIo.getOutputFilename(FILENAME_AMBER_TIMES);
 		this.pathToIntergreenTimesOutputFilename = controlerIo.getOutputFilename(FILENAME_INTERGREEN_TIMES);
 		this.pathToSignalCSVOutputFilename = controlerIo.getOutputFilename(FILENAME_SIGNAL_CSV);
+		this.pathToConflictingDirectionsOutputFilename = controlerIo.getOutputFilename(FILENAME_CONFLICTING_DIRECTIONS);
 	}
 	
 	public void writeSignalsData(Scenario scenario){
@@ -117,6 +118,12 @@ public class SignalsScenarioWriter {
 		}
 		else{
 			log.info("No IntergreenTimesData object set to write!");
+		}
+		if (signalsData.getConflictingDirectionsData() != null){
+			writeConflictingDirectionsData(signalsData.getConflictingDirectionsData());
+		}
+		else{
+			log.info("No ConflictData object set to write!");
 		}
 	}
 
@@ -167,6 +174,16 @@ public class SignalsScenarioWriter {
 		}
 		else {
 			log.warn("No path to intergreen times output file set!");
+		}
+	}
+	
+	public void writeConflictingDirectionsData(ConflictData conflictData){
+		if (this.pathToConflictingDirectionsOutputFilename != null){
+			ConflictingDirectionsWriter writer = new ConflictingDirectionsWriter(conflictData);
+			writer.write(this.pathToConflictingDirectionsOutputFilename);
+		}
+		else {
+			log.warn("No path to conflicting directions output file set!");
 		}
 	}
 
