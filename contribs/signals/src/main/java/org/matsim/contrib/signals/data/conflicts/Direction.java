@@ -37,6 +37,8 @@ public interface Direction extends Identifiable<Direction> {
 	public Id<Node> getNodeId();
 	public Id<Link> getFromLink();
 	public Id<Link> getToLink();
+	public void setToLink(Id<Link> toLinkId);
+	public void setFromLink(Id<Link> fromLinkId);
 	
 	public List<Id<Direction>> getConflictingDirections();
 	public void addConflictingDirection(Id<Direction> directionId);

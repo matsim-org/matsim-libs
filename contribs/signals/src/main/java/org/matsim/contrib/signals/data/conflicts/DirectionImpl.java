@@ -116,4 +116,14 @@ public class DirectionImpl implements Direction {
 		return id;
 	}
 
+	@Override
+	public void setToLink(Id<Link> toLinkId) {
+		this.toLinkId = toLinkId;
+	}
+
+	@Override
+	public void setFromLink(Id<Link> fromLinkId) {
+		this.fromLinkId = fromLinkId;
+	}
+
 }
