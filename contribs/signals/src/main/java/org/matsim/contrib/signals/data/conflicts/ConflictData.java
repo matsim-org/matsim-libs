@@ -43,4 +43,8 @@ public interface ConflictData extends MatsimToplevelContainer {
 	
 	public void setFactory(ConflictDataFactory factory);
 	
+	public void removeConflictingDirectionsForSignalSystem(Id<SignalSystem> signalSystemId);
+	
+	public void removeConflictingDirectionsForNode(Id<Node> nodeId);
+	
 }
