@@ -132,8 +132,26 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
 	 */
 	public OsmNetworkReader(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults) {
+		this(network, transformation, useHighwayDefaults, false);
+	}
+	
+	/**
+	 * Creates a new Reader to convert OSM data into a MATSim network.
+	 * 
+	 * After discussion, we (kn,ik,dz) introduced some adjustments to links regarding speeds and capacities
+	 * that aim to represent different travel times in urban vs. rural areas better, esp. taking into account
+	 * intersections/traffic lights and their implications on speeds and capacities in urban areas.
+	 *
+	 * @param network An empty network where the converted OSM data will be stored.
+	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
+	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
+	 * @param useVspAdjustments Highway defaults are set to standard VSP values, if true.
+	 * 
+	 */
+	public OsmNetworkReader(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults, final boolean useVspAdjustments) {
 		this.network = network;
 		this.transform = transformation;
+		this.useVspAdjustments = useVspAdjustments;
 
 		if (useHighwayDefaults) {
 			log.info("Falling back to default values.");
@@ -353,17 +371,6 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		if(nodeIDsToKeep != null && !nodeIDsToKeep.isEmpty()){
 			this.nodeIDsToKeep = nodeIDsToKeep;
 		}
-	}
-	
-	/**
-	 * After discussion, we (kn,ik,dz) introduced soem adjustments to links regasrding speeds and capacities
-	 * that aim to represent different travel times in urban vs. rural areas better, esp. taking into account
-	 * intersections/traffic lights and their implications on speeds and capacities in urban areas.
-	 * 
-	 * @param useVspAdjustments
-	 */
-	public void setUseVspAdjustments(final boolean useVspAdjustments) {
-		this.useVspAdjustments= useVspAdjustments;
 	}
 	
 	protected void addWayTags(List<String> wayTagsToAdd) {
