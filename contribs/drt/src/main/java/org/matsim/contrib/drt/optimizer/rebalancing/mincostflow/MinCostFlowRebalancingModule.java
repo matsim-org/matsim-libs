@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +16,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.run.examples;
+package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtControlerCreator;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
+import org.matsim.core.controler.AbstractModule;
 
 /**
  * @author michalm
  */
-public class RunOneSharedTaxiExample {
-	private static final String CONFIG_FILE = "one_shared_taxi/one_shared_taxi_config.xml";
+public class MinCostFlowRebalancingModule extends AbstractModule {
+	private final double cellSize;
 
-	public static void run(boolean otfvis, int lastIteration) {
-		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new DrtConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
-		config.controler().setLastIteration(lastIteration);
-		config.controler().setWriteEventsInterval(lastIteration);
-		DrtControlerCreator.createControler(config, otfvis).run();
+	public MinCostFlowRebalancingModule(double cellSize) {
+		this.cellSize = cellSize;
 	}
 
-	public static void main(String[] args) {
-		run(false, 0); // switch to 'true' to turn on visualisation
+	@Override
+	public void install() {
+		bind(DrtZonalSystem.class).toProvider(new DrtZonalSystem.DrtZonalSystemProvider(cellSize));
+		bind(RebalancingStrategy.class).to(MinCostFlowRebalancingStrategy.class).asEagerSingleton();
+		bind(RebalancingTargetCalculator.class).to(LinearRebalancingTargetCalculator.class).asEagerSingleton();
+		bind(MinCostRelocationCalculator.class).to(AggregatedMinCostRelocationCalculator.class).asEagerSingleton();
+		bind(ZonalDemandAggregator.class).asEagerSingleton();
 	}
 }

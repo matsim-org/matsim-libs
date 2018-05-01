@@ -21,6 +21,7 @@ package org.matsim.lanes.data;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -33,11 +34,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
-import org.matsim.jaxb.lanedefinitions20.ObjectFactory;
-import org.matsim.jaxb.lanedefinitions20.XMLIdRefType;
-import org.matsim.jaxb.lanedefinitions20.XMLLaneDefinitions;
-import org.matsim.jaxb.lanedefinitions20.XMLLaneType;
-import org.matsim.jaxb.lanedefinitions20.XMLLanesToLinkAssignmentType;
+import org.matsim.jaxb.lanedefinitions20.*;
+import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
 /**
@@ -52,8 +50,8 @@ public class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSomeWriter
 			.getLogger(LanesWriter.class);
 
 	private Lanes laneDefinitions;
-	
-	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
+
+	private final ObjectAttributesConverter attributesConverter = new ObjectAttributesConverter();
 
 	/**
 	 * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
@@ -135,13 +133,24 @@ public class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSomeWriter
 				xmllane.setStartsAt(startsAt);
 
 				xmllane.setAlignment(bl.getAlignment());
-				
+
 				if (bl.getAttributes() != null) {
 					xmllane.setAttributes(fac.createXMLLaneTypeXMLAttributes());
-					// this needs to be separated in AttributeJAXBWriter because one can not iterate over all attributes from outside the package. theresa, aug'17
-					attributesWriter.writeAttributesToXSDFormat(xmllane.getAttributes().getAttributeList(), bl.getAttributes(), fac);
+
+					// write attributes
+					for (Map.Entry<String, Object> objAttribute : bl.getAttributes().getAsMap().entrySet()) {
+						Class<?> clazz = objAttribute.getValue().getClass();
+						String converted = attributesConverter.convertToString(objAttribute.getValue());
+						if (converted != null) {
+							XMLAttributeType att = fac.createXMLAttributeType();
+							att.setKey(objAttribute.getKey());
+							att.setValue(converted);
+							att.setClazz(clazz.getCanonicalName());
+							xmllane.getAttributes().getAttributeList().add(att);
+						}
+					}
 				}
-				
+
 				xmlltla.getLane().add(xmllane);
 			}
 			xmllaneDefs.getLanesToLinkAssignment().add(xmlltla);

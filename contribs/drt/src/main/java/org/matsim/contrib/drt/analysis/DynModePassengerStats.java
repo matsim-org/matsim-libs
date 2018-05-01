@@ -45,6 +45,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -69,6 +70,8 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 	final private Map<Id<Person>, Double> unsharedDistances = new HashMap<>();
 	final private Map<Id<Person>, Double> unsharedTimes = new HashMap<>();
 	final String mode;
+	private final int maxcap ;
+	
 
 	final private Network network;
 	/*
@@ -81,15 +84,17 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 	 * 
 	 */
 	@Inject
-	public DynModePassengerStats(Network network, EventsManager events, Config config) {
+	public DynModePassengerStats(Network network, EventsManager events, Config config, Fleet fleet) {
 		this.mode = ((DvrpConfigGroup)config.getModules().get(DvrpConfigGroup.GROUP_NAME)).getMode();
 		this.network = network;
 		events.addHandler(this);
+		maxcap = DynModeTripsAnalyser.findMaxCap(fleet);
 	}
 
-	public DynModePassengerStats(Network network, String mode) {
+	public DynModePassengerStats(Network network, String mode, int maxcap) {
 		this.mode = mode;
 		this.network = network;
+		this.maxcap = maxcap;
 	}
 
 	@Override
@@ -115,7 +120,7 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 		if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)) {
 			Id<Vehicle> vid = Id.createVehicleId(event.getPersonId().toString());
 			this.inVehicleDistance.put(vid, new HashMap<Id<Person>, MutableDouble>());
-			this.vehicleDistances.put(vid, new double[3]);
+			this.vehicleDistances.put(vid, new double[3+maxcap]);
 		}
 	}
 
@@ -133,10 +138,13 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 				d.add(distance);
 			}
 			this.vehicleDistances.get(event.getVehicleId())[0] += distance; // overall distance drive
+			int occupancy = inVehicleDistance.get(event.getVehicleId()).size();
 			this.vehicleDistances.get(event.getVehicleId())[1] += distance
-					* inVehicleDistance.get(event.getVehicleId()).size(); // overall revenue distance
-			if (inVehicleDistance.get(event.getVehicleId()).size() > 0) {
+					* occupancy; // overall revenue distance
+			if (occupancy > 0) {
 				this.vehicleDistances.get(event.getVehicleId())[2] += distance; // overall occupied distance
+				this.vehicleDistances.get(event.getVehicleId())[2+occupancy] += distance; // overall occupied distance with n passengers
+				
 			}
 		}
 

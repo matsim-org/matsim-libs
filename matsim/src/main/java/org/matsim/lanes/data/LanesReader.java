@@ -41,6 +41,7 @@ import org.matsim.jaxb.lanedefinitions20.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions20.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions20.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions20.XMLLanesToLinkAssignmentType;
+import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.SAXException;
 
@@ -58,8 +59,8 @@ public class LanesReader implements MatsimReader {
 	
 	private Lanes lanes;
 	private LanesFactory factory;
-	
-	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
+
+	private final ObjectAttributesConverter attributesConverter = new ObjectAttributesConverter();
 
 	public LanesReader(Scenario scenario) {
 		this.lanes = scenario.getLanes();
@@ -143,10 +144,15 @@ public class LanesReader implements MatsimReader {
 				lane.setStartsAtMeterFromLinkEnd(laneType.getStartsAt().getMeterFromLinkEnd());
 
 				lane.setAlignment(laneType.getAlignment());
-				
+
 				if (laneType.getAttributes()!=null && !laneType.getAttributes().getAttributeList().isEmpty()) {
 					for (XMLAttributeType att : laneType.getAttributes().getAttributeList()){
-						lane.getAttributes().putAttribute(att.getKey(), attributesReader.convertObjectFromXSDFormat(att.getValue(), att.getClazz()));
+						Object attribute = attributesConverter.convert(att.getClazz(), att.getValue());
+						// Note: when I refactored this, the behavior was that if a converter was not found,
+						// the attribute was read as String. This is inconsistent with the way attributes are read normally,
+						// and I cannot see a use for it, so I just ignored the attribute, as is done in other readers.
+						// td, apr 18
+						if (attribute != null) lane.getAttributes().putAttribute(att.getKey(), attribute);
 					}
 				}
 

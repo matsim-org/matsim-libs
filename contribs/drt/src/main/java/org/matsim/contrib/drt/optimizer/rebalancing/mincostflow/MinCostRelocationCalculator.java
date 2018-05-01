@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +16,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.run.examples;
+package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtControlerCreator;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
+import org.matsim.contrib.dvrp.data.Vehicle;
 
 /**
  * @author michalm
  */
-public class RunOneSharedTaxiExample {
-	private static final String CONFIG_FILE = "one_shared_taxi/one_shared_taxi_config.xml";
-
-	public static void run(boolean otfvis, int lastIteration) {
-		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new DrtConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
-		config.controler().setLastIteration(lastIteration);
-		config.controler().setWriteEventsInterval(lastIteration);
-		DrtControlerCreator.createControler(config, otfvis).run();
-	}
-
-	public static void main(String[] args) {
-		run(false, 0); // switch to 'true' to turn on visualisation
-	}
+public interface MinCostRelocationCalculator {
+	List<Relocation> calcRelocations(List<Pair<String, Integer>> supply, List<Pair<String, Integer>> demand,
+			Map<String, List<Vehicle>> rebalancableVehiclesPerZone);
 }
