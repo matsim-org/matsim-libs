@@ -41,8 +41,6 @@ public class RaptorTransitRouterTest extends TransitRouterImplTest {
 	private static final Logger log = Logger.getLogger(RaptorTransitRouterTest.class) ;
 	
 	private String routerType ;
-	// yyyyyy probably better make type a String ... no point to have an enum in the core that needs to be touched every time a new router is
-	// pulled underneath this test.
 
 	@Parameters(name = "{index}: TransitRouter == {0}")
 	public static Collection<Object> createRouterTypes() {
