@@ -393,6 +393,9 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		Id<Link> linkId = planAgent.getCurrentLinkId(); 
 		if (linkId != null) { // may be bushwacking
 			QLinkI qLink = this.network.getNetsimLink(linkId);
+			if ( qLink==null ) {
+				throw new RuntimeException("netsim link lookup failed; agentId=" + planAgent.getId() + "; linkId=" + linkId ) ;
+			}
 			qLink.registerAdditionalAgentOnLink(planAgent);
 		}
 	}
