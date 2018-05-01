@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -27,12 +28,19 @@ public final class EditPlans {
 	private final QSim mobsim;
 	private final EditTrips editTrips;
 	private final PopulationFactory pf;
+	@Deprecated // population factory argument not needed.  kai, apr'18
 	public EditPlans( QSim mobsim, TripRouter tripRouter, EditTrips editTrips, PopulationFactory pf ) {
-//		log.setLevel(Level.DEBUG);
+		this( mobsim, tripRouter, editTrips ) ;
+	}
+	@Deprecated // scenario argument not needed.  kai, apr'18
+	public EditPlans( QSim mobsim, TripRouter tripRouter, EditTrips editTrips, Scenario sc) {
+		this( mobsim, tripRouter, editTrips ) ;
+	}
+	public EditPlans( QSim mobsim, TripRouter tripRouter, EditTrips editTrips ) {
 		Gbl.assertNotNull( this.mobsim = mobsim );
 		Gbl.assertNotNull( this.tripRouter = tripRouter );
 		Gbl.assertNotNull( this.editTrips = editTrips ) ;
-		Gbl.assertNotNull( this.pf = pf ) ;
+		Gbl.assertNotNull( this.pf = mobsim.getScenario().getPopulation().getFactory() ) ;
 	}
 	public boolean addActivityAtEnd(MobsimAgent agent, Activity activity, String routingMode) {
 		log.debug("entering addActivityAtEnd with routingMode=" + routingMode) ;
