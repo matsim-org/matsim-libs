@@ -139,7 +139,8 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		}
 	}
 
-	public KNAnalysisEventsHandler(final Scenario scenario) {
+	/* deliberately package */ KNAnalysisEventsHandler(final Scenario scenario) {
+		// this does not need to be injectable, since it is typically called from KaiAnalysisListener.  kai, may'18
 		this.scenario = scenario ;
 		this.population = scenario.getPopulation() ;
 
