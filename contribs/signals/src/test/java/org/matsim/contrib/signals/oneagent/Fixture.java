@@ -21,21 +21,29 @@ package org.matsim.contrib.signals.oneagent;
 
 import java.lang.reflect.Method;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.signals.data.SignalsDataLoader;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
+import org.matsim.contrib.signals.data.conflicts.ConflictingDirections;
+import org.matsim.contrib.signals.data.conflicts.Direction;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 
@@ -47,14 +55,29 @@ public class Fixture {
 
 	static final Id<Link> linkId1 = Id.create(1, Link.class);
 	static final Id<Link> linkId2 = Id.create(2, Link.class);
+	static final Id<Node> nodeId2 = Id.create(2, Node.class);
 	static final Id<SignalPlan> signalPlanId2 = Id.create(2, SignalPlan.class);
 	static final Id<SignalSystem> signalSystemId2 = Id.create(2, SignalSystem.class);
 	static final Id<SignalGroup> signalGroupId100 = Id.create(100, SignalGroup.class);
+	
+	// only available if 'TwoSignals'-Method is used
+	static final Id<SignalGroup> signalGroupId200 = Id.create(100, SignalGroup.class);
+	static final Id<Link> linkId6 = Id.create(6, Link.class);
+	static final Id<Node> nodeId6 = Id.create(6, Node.class);
+	
 
-	public Scenario createAndLoadTestScenario(Boolean useIntergreens){
+	public Scenario createAndLoadTestScenarioOneSignal(Boolean useIntergreens){
+		Config conf = createConfigOneSignal(useIntergreens);
+		Scenario scenario = ScenarioUtils.loadScenario(conf);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(conf).loadSignalsData());
+		
+		return scenario;
+	}
+
+	private Config createConfigOneSignal(Boolean useIntergreens) {
 		MatsimTestUtils testUtils = new MatsimTestUtils();
 		try {
-			Method m = this.getClass().getMethod("createAndLoadTestScenario", Boolean.class);
+			Method m = this.getClass().getMethod("createAndLoadTestScenarioOneSignal", Boolean.class);
 			testUtils.initWithoutJUnitForFixture(this.getClass(), m);
 		} catch (NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
@@ -86,17 +109,49 @@ public class Fixture {
 		}			
 
 		this.setSignalSystemConfigValues(signalsConfig, testUtils);
-		Scenario scenario = ScenarioUtils.loadScenario(conf);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(conf).loadSignalsData());
-		
-		return scenario;
+		return conf;
 	}
-
+	
 	private void setSignalSystemConfigValues(SignalSystemsConfigGroup signalsConfig, MatsimTestUtils testUtils){
 		signalsConfig.setSignalSystemFile("testSignalSystems_v2.0.xml");
 		signalsConfig.setSignalGroupsFile("testSignalGroups_v2.0.xml");
 		signalsConfig.setSignalControlFile("testSignalControl_v2.0.xml");
 		signalsConfig.setAmberTimesFile("testAmberTimes_v1.0.xml");
+	}
+
+	public Scenario createAndLoadTestScenarioTwoSignals(boolean useConflictData) {
+		Config config = createConfigOneSignal(false);
+		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		signalsConfig.setUseConflictingDirections(useConflictData);
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
+		
+		// modify scenario
+		Network net = scenario.getNetwork();
+		net.addNode(net.getFactory().createNode(nodeId6, new Coord(0, 100)));
+		net.addLink(net.getFactory().createLink(linkId6, net.getNodes().get(nodeId2), net.getNodes().get(nodeId6)));
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		// add another group
+		Id<SignalGroup> secondGroupId = Id.create(200, SignalGroup.class);
+		signalsData.getSignalGroupsData().getFactory().createSignalGroupData(signalSystemId2, secondGroupId);
+		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(signalSystemId2);
+		SignalPlanData planData = controllerData.getSignalPlanData().get(signalPlanId2);
+		SignalGroupSettingsData groupPlanSettings = signalsData.getSignalControlData().getFactory().createSignalGroupSettingsData(secondGroupId);
+		groupPlanSettings.setOnset(0);
+		groupPlanSettings.setDropping(30);
+		planData.addSignalGroupSettings(groupPlanSettings);
+		// add conflict data
+		ConflictingDirections conflictsNode2 = signalsData.getConflictingDirectionsData().getFactory().createConflictingDirectionsContainerForIntersection(signalSystemId2, nodeId2);
+		Direction direction1 = signalsData.getConflictingDirectionsData().getFactory().createDirection(signalSystemId2, nodeId2, linkId1, linkId2, Id.create(linkId1 + "-" + linkId2, Direction.class));
+		Direction direction2 = signalsData.getConflictingDirectionsData().getFactory().createDirection(signalSystemId2, nodeId2, linkId1, linkId6, Id.create(linkId1 + "-" + linkId6, Direction.class));
+		direction1.addConflictingDirection(direction2.getId());
+		direction2.addConflictingDirection(direction1.getId());
+		conflictsNode2.addDirection(direction1);
+		conflictsNode2.addDirection(direction2);
+		signalsData.getConflictingDirectionsData().addConflictingDirectionsForIntersection(signalSystemId2, nodeId2, conflictsNode2);
+		
+		return scenario;
 	}
 
 	

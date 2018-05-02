@@ -118,7 +118,7 @@ private static final Logger log = Logger.getLogger(ConflictingDirectionsLogicImp
 		for (Id<SignalGroup> greenGroupId : greenSignalsPerSystem.get(event.getSignalSystemId())) {
 			for (Direction greenDirection : setOfDirectionsPerGroup.get(greenGroupId)) {
 				for (Direction directionToSwitchGreen : setOfDirectionsPerGroup.get(event.getSignalGroupId())) {
-					if (greenDirection.getConflictingDirections().contains(directionToSwitchGreen.getId())) {
+					if (greenDirection.getConflictingDirections().contains(directionToSwitchGreen.getId()) || directionToSwitchGreen.getConflictingDirections().contains(greenDirection.getId())) {
 						String conflictingDirectionViolation = "Signal Group " + event.getSignalGroupId() + " is switched to green although " + greenGroupId 
 								+ " already shows green. This is not allowed due to the conflicting directions data defined in the scenario because direction " 
 								+ greenDirection.getId() + " from link " + greenDirection.getFromLink() + " to link " + greenDirection.getToLink() 
