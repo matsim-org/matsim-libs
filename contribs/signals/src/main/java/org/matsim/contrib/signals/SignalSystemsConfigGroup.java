@@ -43,6 +43,7 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	public static final String INTERGREENTIMES_FILE = "intergreentimes";
 	public static final String USE_INTERGREEN_TIMES = "useIntergreentimes";
 	public static final String ACTION_ON_INTERGREEN_VIOLATION = "actionOnIntergreenViolation";
+	public static final String ACTION_ON_CONFLICTING_DIRECTION_VIOLATION = "actionOnConflictingDirectionViolation";
 	public enum ActionOnIntergreenViolation{
 		WARN, EXCEPTION
 	}
@@ -58,6 +59,7 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	private boolean useSignalSystems = false;
 	private boolean useConflictingDirections = false;
 	private ActionOnIntergreenViolation actionOnIntergreenViolation = ActionOnIntergreenViolation.WARN;
+	private ActionOnIntergreenViolation actionOnConflictingDirectionViolation = ActionOnIntergreenViolation.WARN;
 	
 	public SignalSystemsConfigGroup() {
 		super(GROUPNAME);
@@ -158,6 +160,26 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 		default:
 			throw new IllegalArgumentException("The value " + actionOnIntergreenViolation 
 					+ " for key : " + ACTION_ON_INTERGREEN_VIOLATION + " is not supported by this config group");
+		}
+	}
+	
+	@StringGetter( ACTION_ON_CONFLICTING_DIRECTION_VIOLATION )
+	public ActionOnIntergreenViolation getActionOnConflictingDirectionViolation() {
+		return actionOnConflictingDirectionViolation;
+	}
+
+	@StringSetter( ACTION_ON_CONFLICTING_DIRECTION_VIOLATION )
+	public void setActionOnConflictingDirectionViolation(ActionOnIntergreenViolation actionOnConflictingDirectionViolation) {
+		switch (actionOnConflictingDirectionViolation){
+		// set the value for the supported actions
+		case WARN:
+		case EXCEPTION:
+			this.actionOnConflictingDirectionViolation = actionOnConflictingDirectionViolation;
+			break;
+		// throw an exception if the value is not supported
+		default:
+			throw new IllegalArgumentException("The value " + actionOnConflictingDirectionViolation 
+					+ " for key : " + ACTION_ON_CONFLICTING_DIRECTION_VIOLATION + " is not supported by this config group");
 		}
 	}
 	

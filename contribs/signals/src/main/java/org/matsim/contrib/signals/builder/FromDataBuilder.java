@@ -25,6 +25,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.contrib.signals.model.AmberLogicImpl;
+import org.matsim.contrib.signals.model.ConflictingDirectionsLogic;
+import org.matsim.contrib.signals.model.ConflictingDirectionsLogicImpl;
 import org.matsim.contrib.signals.model.DatabasedSignal;
 import org.matsim.contrib.signals.model.IntergreensLogicImpl;
 import org.matsim.contrib.signals.model.SignalGroupImpl;
@@ -127,6 +129,14 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		}
 	}
 	
+	private void createAndAddConflictingDirectionsLogic(SignalSystemsManager manager) {
+		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseConflictingDirections()){
+			ConflictingDirectionsLogic conflictLogic = new ConflictingDirectionsLogicImpl(this.scenario.getLanes(), this.signalsData, 
+					ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).getActionOnConflictingDirectionViolation());
+			this.events.addHandler(conflictLogic);
+		}
+	}
+
 	@Override
 	public SignalSystemsManager createAndInitializeSignalSystemsManager() {
 		//1.) SignalSystemsManager
@@ -143,6 +153,8 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		this.createAndAddAmberLogic(manager);
 		//5.) IntergreenTimesLogic 
 		this.createAndAddIntergreenTimesLogic(manager);
+		//6.) ConflictingDirectionsLogic
+		this.createAndAddConflictingDirectionsLogic(manager);
 		return manager;
 	}
 }
