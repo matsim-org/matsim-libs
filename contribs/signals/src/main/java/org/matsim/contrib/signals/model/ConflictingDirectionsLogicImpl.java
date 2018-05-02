@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup.ActionOnIntergreenViolation;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup.ActionOnSignalSpecsViolation;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.conflicts.ConflictingDirections;
 import org.matsim.contrib.signals.data.conflicts.Direction;
@@ -52,13 +52,13 @@ public class ConflictingDirectionsLogicImpl implements ConflictingDirectionsLogi
 
 private static final Logger log = Logger.getLogger(ConflictingDirectionsLogicImpl.class);
 
-	private ActionOnIntergreenViolation actionOnConflictingDirectionsViolation;
+	private ActionOnSignalSpecsViolation actionOnConflictingDirectionsViolation;
 	private Map<Id<Signal>, Set<Tuple<Id<Link>, Id<Link>>>> setOfLinkTuplesPerSignal = new HashMap<>();
 	private Map<Id<SignalGroup>, Set<Direction>> setOfDirectionsPerGroup = new HashMap<>();
 	
 	private Map<Id<SignalSystem>, List<Id<SignalGroup>>> greenSignalsPerSystem = new HashMap<>();
 
-	public ConflictingDirectionsLogicImpl(Lanes lanes, SignalsData signalsData, ActionOnIntergreenViolation actionOnConflictingDirectionsViolation) {
+	public ConflictingDirectionsLogicImpl(Lanes lanes, SignalsData signalsData, ActionOnSignalSpecsViolation actionOnConflictingDirectionsViolation) {
 		this.actionOnConflictingDirectionsViolation = actionOnConflictingDirectionsViolation;
 		
 		for (SignalSystemData signalSystem : signalsData.getSignalSystemsData().getSignalSystemData().values()) {
@@ -124,9 +124,9 @@ private static final Logger log = Logger.getLogger(ConflictingDirectionsLogicImp
 								+ greenDirection.getId() + " from link " + greenDirection.getFromLink() + " to link " + greenDirection.getToLink() 
 								+ " is conflicting to direction " + directionToSwitchGreen.getId() + " from link " + directionToSwitchGreen.getFromLink()
 								+ " to link " + directionToSwitchGreen.getToLink() + ".";
-						if (this.actionOnConflictingDirectionsViolation.equals(SignalSystemsConfigGroup.ActionOnIntergreenViolation.WARN)) {
+						if (this.actionOnConflictingDirectionsViolation.equals(SignalSystemsConfigGroup.ActionOnSignalSpecsViolation.WARN)) {
 							log.warn(conflictingDirectionViolation);
-						} else if (this.actionOnConflictingDirectionsViolation.equals(SignalSystemsConfigGroup.ActionOnIntergreenViolation.EXCEPTION)) {
+						} else if (this.actionOnConflictingDirectionsViolation.equals(SignalSystemsConfigGroup.ActionOnSignalSpecsViolation.EXCEPTION)) {
 							log.warn(conflictingDirectionViolation);
 							throw new RuntimeException(conflictingDirectionViolation);
 						}

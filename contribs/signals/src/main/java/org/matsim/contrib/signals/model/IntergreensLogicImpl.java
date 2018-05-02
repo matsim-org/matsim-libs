@@ -111,10 +111,10 @@ private static final Logger log = Logger.getLogger(IntergreensLogicImpl.class);
 										intergreenViolation.append(" The minimal intergreen required is, however, ");
 										intergreenViolation.append(intergreens4BeginningGroup.getValue());
 										intergreenViolation.append(" seconds.");
-										if (this.signalsConfig.getActionOnIntergreenViolation().equals(SignalSystemsConfigGroup.ActionOnIntergreenViolation.WARN)){
+										if (this.signalsConfig.getActionOnIntergreenViolation().equals(SignalSystemsConfigGroup.ActionOnSignalSpecsViolation.WARN)){
 											log.warn(intergreenViolation.toString());
 										}
-										else if (this.signalsConfig.getActionOnIntergreenViolation().equals(SignalSystemsConfigGroup.ActionOnIntergreenViolation.EXCEPTION)) {
+										else if (this.signalsConfig.getActionOnIntergreenViolation().equals(SignalSystemsConfigGroup.ActionOnSignalSpecsViolation.EXCEPTION)) {
 											log.warn(intergreenViolation.toString());
 											throw new RuntimeException(intergreenViolation.toString());
 										}

@@ -44,7 +44,7 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	public static final String USE_INTERGREEN_TIMES = "useIntergreentimes";
 	public static final String ACTION_ON_INTERGREEN_VIOLATION = "actionOnIntergreenViolation";
 	public static final String ACTION_ON_CONFLICTING_DIRECTION_VIOLATION = "actionOnConflictingDirectionViolation";
-	public enum ActionOnIntergreenViolation{
+	public enum ActionOnSignalSpecsViolation{
 		WARN, EXCEPTION
 	}
 
@@ -58,8 +58,8 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	private boolean useAmbertimes = false;
 	private boolean useSignalSystems = false;
 	private boolean useConflictingDirections = false;
-	private ActionOnIntergreenViolation actionOnIntergreenViolation = ActionOnIntergreenViolation.WARN;
-	private ActionOnIntergreenViolation actionOnConflictingDirectionViolation = ActionOnIntergreenViolation.WARN;
+	private ActionOnSignalSpecsViolation actionOnIntergreenViolation = ActionOnSignalSpecsViolation.WARN;
+	private ActionOnSignalSpecsViolation actionOnConflictingDirectionViolation = ActionOnSignalSpecsViolation.WARN;
 	
 	public SignalSystemsConfigGroup() {
 		super(GROUPNAME);
@@ -144,12 +144,12 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	@StringGetter( ACTION_ON_INTERGREEN_VIOLATION )
-	public ActionOnIntergreenViolation getActionOnIntergreenViolation() {
+	public ActionOnSignalSpecsViolation getActionOnIntergreenViolation() {
 		return actionOnIntergreenViolation;
 	}
 
 	@StringSetter( ACTION_ON_INTERGREEN_VIOLATION )
-	public void setActionOnIntergreenViolation(ActionOnIntergreenViolation actionOnIntergreenViolation) {
+	public void setActionOnIntergreenViolation(ActionOnSignalSpecsViolation actionOnIntergreenViolation) {
 		switch (actionOnIntergreenViolation){
 		// set the value for the supported actions
 		case WARN:
@@ -164,12 +164,12 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	@StringGetter( ACTION_ON_CONFLICTING_DIRECTION_VIOLATION )
-	public ActionOnIntergreenViolation getActionOnConflictingDirectionViolation() {
+	public ActionOnSignalSpecsViolation getActionOnConflictingDirectionViolation() {
 		return actionOnConflictingDirectionViolation;
 	}
 
 	@StringSetter( ACTION_ON_CONFLICTING_DIRECTION_VIOLATION )
-	public void setActionOnConflictingDirectionViolation(ActionOnIntergreenViolation actionOnConflictingDirectionViolation) {
+	public void setActionOnConflictingDirectionViolation(ActionOnSignalSpecsViolation actionOnConflictingDirectionViolation) {
 		switch (actionOnConflictingDirectionViolation){
 		// set the value for the supported actions
 		case WARN:
