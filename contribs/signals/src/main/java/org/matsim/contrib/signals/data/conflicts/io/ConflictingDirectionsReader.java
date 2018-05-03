@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.data.conflicts.ConflictData;
-import org.matsim.contrib.signals.data.conflicts.ConflictingDirections;
+import org.matsim.contrib.signals.data.conflicts.IntersectionDirections;
 import org.matsim.contrib.signals.data.conflicts.Direction;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -53,7 +53,7 @@ public class ConflictingDirectionsReader extends MatsimXmlParser {
 	
 	private ConflictData conflictData;
 	
-	private ConflictingDirections currentIntersection;
+	private IntersectionDirections currentIntersection;
 	private Direction currentDirection;
 	
 	public ConflictingDirectionsReader(ConflictData conflictData) {

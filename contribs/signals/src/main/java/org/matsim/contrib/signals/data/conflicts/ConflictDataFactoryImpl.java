@@ -31,9 +31,9 @@ import org.matsim.contrib.signals.model.SignalSystem;
 public class ConflictDataFactoryImpl implements ConflictDataFactory {
 
 	@Override
-	public ConflictingDirections createConflictingDirectionsContainerForIntersection(Id<SignalSystem> signalSystemId,
+	public IntersectionDirections createConflictingDirectionsContainerForIntersection(Id<SignalSystem> signalSystemId,
 			Id<Node> nodeId) {
-		return new ConflictingDirectionsImpl(signalSystemId, nodeId);
+		return new IntersectionDirectionsImpl(signalSystemId, nodeId);
 	}
 
 	@Override

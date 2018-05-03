@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup.ActionOnSignalSpecsViolation;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.conflicts.ConflictingDirections;
+import org.matsim.contrib.signals.data.conflicts.IntersectionDirections;
 import org.matsim.contrib.signals.data.conflicts.Direction;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
@@ -88,7 +88,7 @@ private static final Logger log = Logger.getLogger(ConflictingDirectionsLogicImp
 			}
 			
 			// group directions to signal groups
-			ConflictingDirections conflictsOfThisSystem = signalsData.getConflictingDirectionsData().getConflictsPerSignalSystem().get(signalSystem.getId());
+			IntersectionDirections conflictsOfThisSystem = signalsData.getConflictingDirectionsData().getConflictsPerSignalSystem().get(signalSystem.getId());
 			for (SignalGroupData group : signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(signalSystem.getId()).values()) {
 				setOfDirectionsPerGroup.put(group.getId(), new HashSet<>());
 				for (Id<Signal> signalIdOfThisGroup : signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(signalSystem.getId()).get(group.getId()).getSignalIds()) {

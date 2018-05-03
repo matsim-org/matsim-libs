@@ -31,7 +31,7 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface ConflictDataFactory extends MatsimFactory{
 
-	public ConflictingDirections createConflictingDirectionsContainerForIntersection(Id<SignalSystem> signalSystemId, Id<Node> nodeId);
+	public IntersectionDirections createConflictingDirectionsContainerForIntersection(Id<SignalSystem> signalSystemId, Id<Node> nodeId);
 	
 	public Direction createDirection(Id<SignalSystem> signalSystemId, Id<Node> nodeId, Id<Link> fromLinkId, Id<Link> toLinkId, Id<Direction> directionId);
 	

@@ -34,15 +34,15 @@ public class ConflictDataImpl implements ConflictData {
 
 	private ConflictDataFactory factory = new ConflictDataFactoryImpl();
 	
-	private Map<Id<SignalSystem>, ConflictingDirections> conflictsPerSignalSystem = new HashMap<>();
-	private Map<Id<Node>, ConflictingDirections> conflictsPerNode = new HashMap<>();
+	private Map<Id<SignalSystem>, IntersectionDirections> conflictsPerSignalSystem = new HashMap<>();
+	private Map<Id<Node>, IntersectionDirections> conflictsPerNode = new HashMap<>();
 	
 	private Map<Id<SignalSystem>, Id<Node>> system2nodeMap = new HashMap<>();
 	private Map<Id<Node>, Id<SignalSystem>> node2systemMap = new HashMap<>();
 	
 	@Override
 	public void addConflictingDirectionsForIntersection(Id<SignalSystem> signalSystemId, Id<Node> nodeId,
-			ConflictingDirections conflictingDirections) {
+			IntersectionDirections conflictingDirections) {
 		conflictsPerSignalSystem.put(signalSystemId, conflictingDirections);
 		conflictsPerNode.put(nodeId, conflictingDirections);
 		
@@ -51,12 +51,12 @@ public class ConflictDataImpl implements ConflictData {
 	}
 
 	@Override
-	public Map<Id<SignalSystem>, ConflictingDirections> getConflictsPerSignalSystem() {
+	public Map<Id<SignalSystem>, IntersectionDirections> getConflictsPerSignalSystem() {
 		return conflictsPerSignalSystem;
 	}
 
 	@Override
-	public Map<Id<Node>, ConflictingDirections> getConflictsPerNode() {
+	public Map<Id<Node>, IntersectionDirections> getConflictsPerNode() {
 		return conflictsPerNode;
 	}
 

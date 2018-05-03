@@ -20,6 +20,7 @@
  */
 package org.matsim.contrib.signals.data.conflicts;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -30,16 +31,45 @@ import org.matsim.contrib.signals.model.SignalSystem;
 /**
  * @author tthunig
  */
-public interface ConflictingDirections {
+public class IntersectionDirectionsImpl implements IntersectionDirections {
+
+	private Id<SignalSystem> signalSystemId;
+	private Id<Node> nodeId;
+	private Map<Id<Direction>, Direction> directionsOfThisIntersection = new HashMap<>();
 	
-	public Id<SignalSystem> getSignalSystemId();
+	IntersectionDirectionsImpl(Id<SignalSystem> signalSystemId, Id<Node> nodeId) {
+		this.signalSystemId = signalSystemId;
+		this.nodeId = nodeId;
+	}
 	
-	public Id<Node> getNodeId();
-	
-	public void addDirection(Direction direction);
-	
-	public Direction getDirection(Id<Link> fromLink, Id<Link> toLink);
-	
-	public Map<Id<Direction>, Direction> getDirections();
-	
+	@Override
+	public Id<SignalSystem> getSignalSystemId() {
+		return signalSystemId;
+	}
+
+	@Override
+	public Id<Node> getNodeId() {
+		return nodeId;
+	}
+
+	@Override
+	public void addDirection(Direction direction) {
+		this.directionsOfThisIntersection.put(direction.getId(), direction);
+	}
+
+	@Override
+	public Direction getDirection(Id<Link> fromLink, Id<Link> toLink) {
+		for (Direction d : directionsOfThisIntersection.values()) {
+			if (d.getFromLink().equals(fromLink) && d.getToLink().equals(toLink)) {
+				return d;
+			}
+		}
+		throw new RuntimeException("SignalSystem " + signalSystemId + " has no direction with from-Link " + fromLink + " and to-link " + toLink);
+	}
+
+	@Override
+	public Map<Id<Direction>, Direction> getDirections() {
+		return directionsOfThisIntersection;
+	}
+
 }

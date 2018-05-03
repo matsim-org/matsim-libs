@@ -27,7 +27,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.data.conflicts.ConflictData;
-import org.matsim.contrib.signals.data.conflicts.ConflictingDirections;
+import org.matsim.contrib.signals.data.conflicts.IntersectionDirections;
 import org.matsim.contrib.signals.data.conflicts.Direction;
 import org.matsim.contrib.signals.model.SignalSystem;
 
@@ -54,7 +54,7 @@ public class ConflictingDirectionsWriterHandlerImpl implements ConflictingDirect
 
 	@Override
 	public void writeIntersections(ConflictData conflictData, BufferedWriter out) throws IOException {
-		for (ConflictingDirections conflictingDirections : conflictData.getConflictsPerSignalSystem().values()) {
+		for (IntersectionDirections conflictingDirections : conflictData.getConflictsPerSignalSystem().values()) {
 			this.startIntersection(conflictingDirections.getNodeId(), conflictingDirections.getSignalSystemId(), out);
 			for (Direction direction : conflictingDirections.getDirections().values()) {
 				this.writeDirection(direction, out);

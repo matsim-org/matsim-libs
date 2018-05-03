@@ -31,7 +31,7 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup.ActionOnSignalSpecsViolation;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
-import org.matsim.contrib.signals.data.conflicts.ConflictingDirections;
+import org.matsim.contrib.signals.data.conflicts.IntersectionDirections;
 import org.matsim.contrib.signals.data.conflicts.Direction;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
@@ -159,7 +159,7 @@ public class Fixture {
 		groupPlanSettings.setDropping(10);
 		planData.addSignalGroupSettings(groupPlanSettings);
 		// add conflict data
-		ConflictingDirections conflictsNode2 = signalsData.getConflictingDirectionsData().getFactory().createConflictingDirectionsContainerForIntersection(signalSystemId2, nodeId2);
+		IntersectionDirections conflictsNode2 = signalsData.getConflictingDirectionsData().getFactory().createConflictingDirectionsContainerForIntersection(signalSystemId2, nodeId2);
 		Direction direction1 = signalsData.getConflictingDirectionsData().getFactory().createDirection(signalSystemId2, nodeId2, linkId1, linkId2, Id.create(linkId1 + "-" + linkId2, Direction.class));
 		Direction direction2 = signalsData.getConflictingDirectionsData().getFactory().createDirection(signalSystemId2, nodeId2, linkId1, linkId6, Id.create(linkId1 + "-" + linkId6, Direction.class));
 		direction1.addConflictingDirection(direction2.getId());

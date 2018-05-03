@@ -32,11 +32,11 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  */
 public interface ConflictData extends MatsimToplevelContainer {
 
-	public void addConflictingDirectionsForIntersection(Id<SignalSystem> signalSystemId, Id<Node> nodeId, ConflictingDirections conflictingDirections);
+	public void addConflictingDirectionsForIntersection(Id<SignalSystem> signalSystemId, Id<Node> nodeId, IntersectionDirections conflictingDirections);
 	
-	public Map<Id<SignalSystem>, ConflictingDirections> getConflictsPerSignalSystem();
+	public Map<Id<SignalSystem>, IntersectionDirections> getConflictsPerSignalSystem();
 	
-	public Map<Id<Node>, ConflictingDirections> getConflictsPerNode();
+	public Map<Id<Node>, IntersectionDirections> getConflictsPerNode();
 	
 	@Override
 	public ConflictDataFactory getFactory() ;

@@ -63,8 +63,8 @@ public class SignalConflictDataReaderWriterTest {
 	
 	private void compare(ConflictData conflictData1, ConflictData conflictData2) {
 		Assert.assertEquals("not the same number of intersections", conflictData1.getConflictsPerNode().size(), conflictData2.getConflictsPerNode().size());
-		for (ConflictingDirections intersection1 : conflictData1.getConflictsPerSignalSystem().values()) {
-			ConflictingDirections intersection2 = conflictData2.getConflictsPerSignalSystem().get(intersection1.getSignalSystemId());
+		for (IntersectionDirections intersection1 : conflictData1.getConflictsPerSignalSystem().values()) {
+			IntersectionDirections intersection2 = conflictData2.getConflictsPerSignalSystem().get(intersection1.getSignalSystemId());
 			Assert.assertNotNull("no conflict data exists for signal system " + intersection1.getSignalSystemId(), intersection2);
 			Assert.assertEquals("not the same node, but the same signal system " + intersection1.getSignalSystemId(), intersection1.getNodeId(), intersection2.getNodeId());
 			Assert.assertEquals("not the same number of direction at node " + intersection1.getNodeId(), intersection1.getDirections().size(), intersection2.getDirections().size());
@@ -119,7 +119,7 @@ public class SignalConflictDataReaderWriterTest {
 		Id<Direction> dirId43 = Id.create(linkId4 + "-" + linkId3, Direction.class);
 		
 		ConflictData conflictData = new ConflictDataImpl();
-		ConflictingDirections intersection1 = conflictData.getFactory().createConflictingDirectionsContainerForIntersection(signalSystemId1, nodeId1);
+		IntersectionDirections intersection1 = conflictData.getFactory().createConflictingDirectionsContainerForIntersection(signalSystemId1, nodeId1);
 		conflictData.addConflictingDirectionsForIntersection(signalSystemId1, nodeId1, intersection1);
 		
 		Direction dir13 = conflictData.getFactory().createDirection(signalSystemId1, nodeId1, linkId1, linkId3, dirId13);
@@ -146,7 +146,7 @@ public class SignalConflictDataReaderWriterTest {
 		dir23.addConflictingDirection(dirId13);
 		dir23.addConflictingDirection(dirId31);
 		
-		ConflictingDirections intersection2 = conflictData.getFactory().createConflictingDirectionsContainerForIntersection(signalSystemId2, nodeId2);
+		IntersectionDirections intersection2 = conflictData.getFactory().createConflictingDirectionsContainerForIntersection(signalSystemId2, nodeId2);
 		conflictData.addConflictingDirectionsForIntersection(signalSystemId2, nodeId2, intersection2);
 		
 		Direction dir34 = conflictData.getFactory().createDirection(signalSystemId2, nodeId2, linkId3, linkId4, dirId34);
