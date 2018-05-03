@@ -67,6 +67,7 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 				subtourModeChoiceConfigGroup.getModes(),
 				subtourModeChoiceConfigGroup.getChainBasedModes(),
 				subtourModeChoiceConfigGroup.considerCarAvailability(), tripRouterProvider);
+		this.setBehavior( subtourModeChoiceConfigGroup.getBehavior() );
 	}
 
 	public SubtourModeChoice(
@@ -82,6 +83,11 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 			new PermissibleModesCalculatorImpl(
 					this.modes,
 					considerCarAvailability);
+	}
+	
+	@Deprecated // only use when backwards compatibility is needed. kai, may'18
+	public final void setBehavior ( Behavior behavior ) {
+		this.behavior = behavior ;
 	}
 	
 	protected String[] getModes() {
