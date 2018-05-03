@@ -51,6 +51,9 @@ import org.matsim.core.router.TripRouter;
  * 
  */
 public class SubtourModeChoice extends AbstractMultithreadedModule {
+	
+	public enum Behavior { fromAllModesToSpecifiedModes, fromSpecifiedModesToSpecifiedModes }
+	private Behavior behavior = Behavior.fromSpecifiedModesToSpecifiedModes ;
 
 	private final Provider<TripRouter> tripRouterProvider;
 
@@ -95,7 +98,7 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 						this.permissibleModesCalculator,
 						this.modes,
 						this.chainBasedModes,
-						MatsimRandom.getLocalInstance());
+						MatsimRandom.getLocalInstance(), behavior);
 		chooseRandomLegMode.setAnchorSubtoursAtFacilitiesInsteadOfLinks( false );
 		return chooseRandomLegMode;
 	}

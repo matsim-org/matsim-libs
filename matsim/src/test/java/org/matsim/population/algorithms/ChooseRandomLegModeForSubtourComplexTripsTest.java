@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
+import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -457,7 +458,7 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 					new PermissibleModesCalculatorImpl( MODES , false ),
 					MODES,
 					CHAIN_BASED_MODES,
-					new Random( 20130225 ) );
+					new Random( 20130225 ), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes);
 
 		for ( Fixture f : createFixtures() ) {
 			for (int i = 0; i < 5; i++) {

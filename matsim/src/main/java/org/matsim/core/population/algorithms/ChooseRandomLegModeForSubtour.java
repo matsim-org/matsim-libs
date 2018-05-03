@@ -62,6 +62,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private Collection<String> modes;
 	private final Collection<String> chainBasedModes;
+	private final SubtourModeChoice.Behavior behavior;
 	private Collection<String> singleTripSubtourModes;
 
 	private final StageActivityTypes stageActivityTypes;
@@ -79,12 +80,13 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			final PermissibleModesCalculator permissibleModesCalculator,
 			final String[] modes,
 			final String[] chainBasedModes,
-			final Random rng) {
+			final Random rng, SubtourModeChoice.Behavior behavior) {
 		this.stageActivityTypes = stageActivityTypes;
 		this.mainModeIdentifier = mainModeIdentifier;
 		this.permissibleModesCalculator = permissibleModesCalculator;
 		this.modes = Arrays.asList(modes);
 		this.chainBasedModes = Arrays.asList(chainBasedModes);
+		this.behavior = behavior;
 		this.singleTripSubtourModes = this.chainBasedModes;
 		
 		this.rng = rng;
@@ -114,6 +116,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			((Activity) plan.getPlanElements().get(0)).getFacilityId() :
 			((Activity) plan.getPlanElements().get(0)).getLinkId();
 		Collection<String> permissibleModesForThisPlan = permissibleModesCalculator.getPermissibleModes(plan);
+		// (modes that agent can in principle use; e.g. cannot use car sharing if not member)
 
 		List<Candidate> choiceSet =
 			determineChoiceSet(
@@ -184,8 +187,10 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 					}
 				} 
 			}
-
+			
 			usableModes.remove(getTransportMode(subtour));
+			// (remove current mode so we don't get it again)
+			
 			for (String transportMode : usableModes) {
 				choiceSet.add(
 						new Candidate(
@@ -278,16 +283,25 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				subtour.getTrips().get( 0 ).getTripElements() );
 	}
 
-	private static void applyChange(
+	private void applyChange(
 			final Candidate whatToDo,
-			final Plan plan) {
+			final Plan plan)
+	{
 		for (Trip trip : whatToDo.subtour.getTrips()) {
+			if ( behavior== SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes ) {
+				if (!modes.contains(mainModeIdentifier.identifyMainMode(trip.getTripElements()))) {
+					// (ignore trips with modes that are not in "modes".   MATSIM-809)
+					continue;
+				}
+			}
+				
 			TripRouter.insertTrip(
-					plan,
-					trip.getOriginActivity(),
-					Collections.singletonList( PopulationUtils.createLeg(whatToDo.newTransportMode) ),
-					trip.getDestinationActivity());
-		}
+						plan,
+						trip.getOriginActivity(),
+						Collections.singletonList(PopulationUtils.createLeg(whatToDo.newTransportMode)),
+						trip.getDestinationActivity());
+			}
+
 	}
 
 	public void setAnchorSubtoursAtFacilitiesInsteadOfLinks(
