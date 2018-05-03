@@ -36,7 +36,7 @@ import com.google.inject.name.Named;
 public class FleetProvider implements Provider<Fleet> {
 	@Inject
 	@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-	Network network;
+	private Network network;
 
 	private final URL url;
 

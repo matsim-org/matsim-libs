@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +16,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.benchmark;
+package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 /**
- * This module overrides the bindings set up by DvrpTravelTimeModule
- * 
  * @author michalm
  */
-public class DvrpBenchmarkTravelTimeModule extends AbstractModule {
-	private final TravelTime travelTime;
+public class MinCostFlowRebalancingModule extends AbstractModule {
+	private final double cellSize;
 
-	public DvrpBenchmarkTravelTimeModule() {
-		this(new FreeSpeedTravelTime());
+	public MinCostFlowRebalancingModule(double cellSize) {
+		this.cellSize = cellSize;
 	}
 
-	public DvrpBenchmarkTravelTimeModule(final TravelTime travelTime) {
-		this.travelTime = travelTime;
-	}
-
+	@Override
 	public void install() {
-		// Because TravelTimeCalculatorModule is not installed for benchmarking, we need to add a binding
-		// for the car mode
-		bindNetworkTravelTime().toInstance(travelTime);
-		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_ESTIMATED).toInstance(travelTime);
+		bind(DrtZonalSystem.class).toProvider(new DrtZonalSystem.DrtZonalSystemProvider(cellSize));
+		bind(RebalancingStrategy.class).to(MinCostFlowRebalancingStrategy.class).asEagerSingleton();
+		bind(RebalancingTargetCalculator.class).to(LinearRebalancingTargetCalculator.class).asEagerSingleton();
+		bind(MinCostRelocationCalculator.class).to(AggregatedMinCostRelocationCalculator.class).asEagerSingleton();
+		bind(ZonalDemandAggregator.class).asEagerSingleton();
 	}
 }

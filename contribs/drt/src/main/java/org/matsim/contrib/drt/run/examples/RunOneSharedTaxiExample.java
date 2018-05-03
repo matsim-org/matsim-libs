@@ -36,6 +36,7 @@ public class RunOneSharedTaxiExample {
 		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new DrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.controler().setLastIteration(lastIteration);
+		config.controler().setWriteEventsInterval(lastIteration);
 		DrtControlerCreator.createControler(config, otfvis).run();
 	}
 

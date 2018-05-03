@@ -104,22 +104,10 @@ public class DrtVehicleOccupancyEvaluator implements PersonEntersVehicleEventHan
 			endTime = config.qsim().getEndTime();
 		this.bins = (int)(endTime - startTime);
 		events.addHandler(this);
-		maxcap = findMaxCap(fleet);
+		maxcap = DynModeTripsAnalyser.findMaxCap(fleet);
 	}
 
-	/**
-	 * @param fleet
-	 * @return
-	 */
-	private int findMaxCap(Fleet fleet) {
-		int maxCap = 0;
-		for (org.matsim.contrib.dvrp.data.Vehicle v : fleet.getVehicles().values()){
-			if (v.getCapacity()>maxCap){
-				maxCap = (int) v.getCapacity();
-			}
-		}
-		return maxCap;
-	}
+
 
 	public DrtVehicleOccupancyEvaluator(double start, double end, int maxCapacity) {
 		this.bins = (int)(end - start);
@@ -362,7 +350,7 @@ public class DrtVehicleOccupancyEvaluator implements PersonEntersVehicleEventHan
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter(statsFileName + "_plotdata.csv");
 		try {
-			bw.write("time;idle;emptyride;min;max;idle;emptyDrive");
+			bw.write("time;idle;emptyDrive");
 			for (int i = 1; i <= maxcap; i++) {
 				bw.write(";" + i + "_pax");
 			}

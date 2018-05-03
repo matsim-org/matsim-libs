@@ -17,17 +17,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package org.matsim.contrib.util.timeprofile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import org.jfree.chart.JFreeChart;
-import org.matsim.contrib.taxi.util.stats.TimeProfileCharts.*;
 import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
+import org.matsim.contrib.util.timeprofile.TimeProfileCharts.ChartType;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.mobsim.framework.events.*;
-import org.matsim.core.mobsim.framework.listeners.*;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -45,7 +50,8 @@ public class TimeProfileCollector implements MobsimBeforeSimStepListener, Mobsim
 	private final String outputFile;
 	private final MatsimServices matsimServices;
 
-	private Customizer chartCustomizer;
+	private Function<Object[], String[]> valuesToStringsConverter = TimeProfiles::combineValuesIntoStrings;
+	private BiConsumer<JFreeChart, ChartType> chartCustomizer;
 	private ChartType[] chartTypes = { ChartType.Line };
 
 	public TimeProfileCollector(ProfileCalculator calculator, int interval, String outputFile,
@@ -64,7 +70,11 @@ public class TimeProfileCollector implements MobsimBeforeSimStepListener, Mobsim
 		}
 	}
 
-	public void setChartCustomizer(TimeProfileCharts.Customizer chartCustomizer) {
+	public void setValuesToStringsConverter(Function<Object[], String[]> valuesToStringsConverter) {
+		this.valuesToStringsConverter = valuesToStringsConverter;
+	}
+
+	public void setChartCustomizer(BiConsumer<JFreeChart, ChartType> chartCustomizer) {
 		this.chartCustomizer = chartCustomizer;
 	}
 
@@ -82,7 +92,7 @@ public class TimeProfileCollector implements MobsimBeforeSimStepListener, Mobsim
 			writer.writeNext("time", calculator.getHeader());
 			for (int i = 0; i < timeProfile.size(); i++) {
 				writer.writeNext(Time.writeTime(times.get(i), timeFormat), //
-						TimeProfiles.combineValuesIntoStrings(timeProfile.get(i)));
+						valuesToStringsConverter.apply(timeProfile.get(i)));
 			}
 		}
 
@@ -94,7 +104,7 @@ public class TimeProfileCollector implements MobsimBeforeSimStepListener, Mobsim
 	private void generateImage(ChartType chartType) {
 		JFreeChart chart = TimeProfileCharts.chartProfile(calculator.getHeader(), times, timeProfile, chartType);
 		if (chartCustomizer != null) {
-			chartCustomizer.customize(chart, chartType);
+			chartCustomizer.accept(chart, chartType);
 		}
 
 		String imageFile = matsimServices.getControlerIO().getIterationFilename(matsimServices.getIterationNumber(),

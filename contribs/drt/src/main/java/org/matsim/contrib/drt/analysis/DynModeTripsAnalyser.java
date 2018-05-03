@@ -56,6 +56,7 @@ import org.jfree.data.xy.XYSeries;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -365,6 +366,7 @@ public class DynModeTripsAnalyser {
 		DescriptiveStatistics revenue = new DescriptiveStatistics();
 		DescriptiveStatistics occupied = new DescriptiveStatistics();
 		DescriptiveStatistics empty = new DescriptiveStatistics();
+	
 
 		for (double[] dist : vehicleDistances.values()) {
 			driven.addValue(dist[0]);
@@ -379,7 +381,7 @@ public class DynModeTripsAnalyser {
 				+ format.format(empty.getSum()) + del + format.format(empty.getSum() / driven.getSum()) + del
 				+ format.format(revenue.getSum()) + del + format.format(driven.getMean()) + del
 				+ format.format(empty.getMean()) + del + format.format(revenue.getMean()) + del
-				+ format.format(d_r_d_t);
+				+ format.format(d_r_d_t); 
 		return result;
 	}
 
@@ -389,5 +391,44 @@ public class DynModeTripsAnalyser {
 			driven.addValue(dist[0]);
 		}
 		return driven.getSum();
+	}
+	
+	
+	/**
+	 * @param fleet
+	 * @return
+	 */
+	public static int findMaxCap(Fleet fleet) {
+		int maxCap = 0;
+		for (org.matsim.contrib.dvrp.data.Vehicle v : fleet.getVehicles().values()){
+			if (v.getCapacity()>maxCap){
+				maxCap = (int) v.getCapacity();
+			}
+		}
+		return maxCap;
+	}
+
+	public static String summarizeDetailedOccupancyStats(Map<Id<Vehicle>, double[]> vehicleDistances, String del, int maxcap) {
+		DecimalFormat format = new DecimalFormat();
+		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+		format.setMinimumIntegerDigits(1);
+		format.setMaximumFractionDigits(2);
+		format.setGroupingUsed(false);
+		
+		double[] sum = new double[maxcap+1];
+		
+		for (double[] dist : vehicleDistances.values()) {
+			double emptyD = dist[0] - dist[2];
+			sum[0] += emptyD;
+			for (int i = 3;i<maxcap+3;i++) {
+				sum[i-2]+=dist[i];
+			}
+		}
+		String result = "";
+		for (int i = 0;i<=maxcap;i++) {
+			result = result+";"+format.format(sum[i]);
+		}
+		
+		return result;
 	}
 }

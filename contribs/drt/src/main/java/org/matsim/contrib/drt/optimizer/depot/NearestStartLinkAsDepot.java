@@ -19,12 +19,12 @@
 
 package org.matsim.contrib.drt.optimizer.depot;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.data.Vehicle;
 
 import com.google.inject.Inject;
 
@@ -44,22 +44,6 @@ public class NearestStartLinkAsDepot implements DepotFinder {
 	// TODO a simple straight-line search (for the time being)... MultiNodeDijkstra should be the ultimate solution
 	@Override
 	public Link findDepot(Vehicle vehicle) {
-		DrtStayTask currentTask = (DrtStayTask)vehicle.getSchedule().getCurrentTask();
-		Link currentLink = currentTask.getLink();
-		if (startLinks.contains(currentLink)) {
-			return null;// stay where it is
-		}
-
-		Link bestLink = null;
-		double bestDistance = Double.MAX_VALUE;
-		for (Link l : startLinks) {
-			double currentDistance = DistanceUtils.calculateSquaredDistance(currentLink.getCoord(), l.getCoord());
-			if (currentDistance < bestDistance) {
-				bestDistance = currentDistance;
-				bestLink = l;
-			}
-		}
-
-		return bestLink;
+		return Depots.findStraightLineNearestDepot(vehicle, startLinks);
 	}
 }

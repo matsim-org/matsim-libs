@@ -20,7 +20,7 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.contrib.taxi.benchmark;
+package org.matsim.contrib.dvrp.benchmark;
 
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.EventsManagerModule;

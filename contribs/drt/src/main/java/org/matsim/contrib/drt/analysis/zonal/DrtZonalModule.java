@@ -37,7 +37,8 @@ public class DrtZonalModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(ZonalDemandAggregator.class).asEagerSingleton();
-		bind(ZonalIdleVehicleCollector.class).asEagerSingleton();
+		//the MinCostFlowRebalancing does not need this collector
+		//bind(ZonalIdleVehicleCollector.class).asEagerSingleton();
 	}
 
 }

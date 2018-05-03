@@ -20,9 +20,11 @@
 package org.matsim.contrib.dvrp.path;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 
 /**
- * Contains relevant information about a dvrp path. But not (as far as I can see) information about where we are.
+ * Contains relevant information about a dvrp path. But not information about where we are. This information is
+ * accessible via {@link OnlineDriveTaskTracker#getCurrentLinkIdx()}
  * 
  * @author (of documentation) nagel
  */

@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
+import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -58,8 +59,11 @@ public class StopBasedDrtRoutingModuleTest {
 		final Double beelineFactor = 1.3;
 		TeleportationRoutingModule walkRouter = new TeleportationRoutingModule(TransportMode.walk,
 				scenario.getPopulation().getFactory(), networkTravelSpeed, beelineFactor);
-		StopBasedDrtRoutingModule stopBasedDRTRoutingModule = new StopBasedDrtRoutingModule(walkRouter,
-				scenario.getTransitSchedule(), scenario);
+		DrtConfigGroup drtCfg = DrtConfigGroup.get(scenario.getConfig());
+		AccessEgressStopFinder stopFinder = new DefaultAccessEgressStopFinder(scenario.getTransitSchedule(), drtCfg,
+				scenario.getConfig().plansCalcRoute(), scenario.getNetwork());
+		StopBasedDrtRoutingModule stopBasedDRTRoutingModule = new StopBasedDrtRoutingModule(
+				scenario.getPopulation().getFactory(), walkRouter, stopFinder, drtCfg);
 
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
 		Activity h = (Activity)p1.getSelectedPlan().getPlanElements().get(0);

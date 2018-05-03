@@ -22,6 +22,7 @@
  */
 package org.matsim.contrib.drt.analysis.zonal;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -111,8 +112,7 @@ public class ZonalDemandAggregator implements PersonDepartureEventHandler {
 	
 	public Map<String,MutableInt> getExpectedDemandForTimeBin(double time){
 		Double bin = getBinForTime(time);
-		return previousIterationDepartures.get(bin);
-		
+		return previousIterationDepartures.getOrDefault(bin, Collections.emptyMap());
 	}
 	
 }

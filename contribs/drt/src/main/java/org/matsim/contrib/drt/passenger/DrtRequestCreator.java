@@ -35,7 +35,6 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
@@ -56,13 +55,14 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 
 	@Inject
 	public DrtRequestCreator(DrtConfigGroup drtCfg, @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim,
-			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility) {
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, EventsManager eventsManager,
+			MobsimTimer timer, @Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility) {
 		this.drtCfg = drtCfg;
 		this.travelTime = travelTime;
-		this.eventsManager = qSim.getEventsManager();
-		this.timer = qSim.getSimTimer();
-
+		this.eventsManager = eventsManager;
+		this.timer = timer;
+		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
+		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
 		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
 

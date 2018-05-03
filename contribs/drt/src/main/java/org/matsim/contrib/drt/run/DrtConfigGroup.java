@@ -35,7 +35,6 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 public class DrtConfigGroup extends ReflectiveConfigGroup {
 	
 	public static final String GROUP_NAME = "drt";
-	public static final String DRT_MODE = "drt";
 
 	@SuppressWarnings("deprecation")
 	public static DrtConfigGroup get(Config config) {
@@ -57,11 +56,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	static final String MAX_TRAVEL_TIME_BETA_EXP = "Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. "
 			+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
 			+ "Beta should not be smaller than 0.";
-	
-	public static final String A_STAR_EUCLIDEAN_OVERDO_FACTOR = "AStarEuclideanOverdoFactor";
-	static final String ASTAR_OVERDO_EXP = "Used in AStarEuclidean for shortest path search for unshared (== optimistic) rides. "
-			+ "Default value is 1.0. Values above 1.0 (typically, 1.5 to 3.0) speed up search, "
-			+ "but at the cost of obtaining longer paths";
 	
 	public static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE = "changeStartLinkToLastLinkInSchedule";
 	static final String CHANGE_START_EXP = "If true, the startLink is changed to last link in the current schedule, so the taxi starts the next "
@@ -126,9 +120,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	@PositiveOrZero
 	private double maxTravelTimeBeta = Double.NaN;// [s]
 
-	@Min(1)
-	private double AStarEuclideanOverdoFactor = 1.;
-
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
 	@PositiveOrZero
@@ -179,8 +170,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 				MAX_TRAV_ALPHA_EXP);
 		map.put(MAX_TRAVEL_TIME_BETA,
 				MAX_TRAVEL_TIME_BETA_EXP);
-		map.put(A_STAR_EUCLIDEAN_OVERDO_FACTOR,
-				ASTAR_OVERDO_EXP);
 		map.put(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE,
 				CHANGE_START_EXP);
 		map.put(VEHICLES_FILE,
@@ -268,22 +257,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(MAX_TRAVEL_TIME_BETA)
 	public void setMaxTravelTimeBeta(double maxTravelTimeBeta) {
 		this.maxTravelTimeBeta = maxTravelTimeBeta;
-	}
-	/**
-	 * 
-	 * @return -- {@value #ASTAR_OVERDO_EXP}
-	 */
-	@StringGetter(A_STAR_EUCLIDEAN_OVERDO_FACTOR)
-	public double getAStarEuclideanOverdoFactor() {
-		return AStarEuclideanOverdoFactor;
-	}
-	/**
-	 * 
-	 * @param aStarEuclideanOverdoFactor -- {@value #ASTAR_OVERDO_EXP}}
-	 */
-	@StringSetter(A_STAR_EUCLIDEAN_OVERDO_FACTOR)
-	public void setAStarEuclideanOverdoFactor(double aStarEuclideanOverdoFactor) {
-		AStarEuclideanOverdoFactor = aStarEuclideanOverdoFactor;
 	}
 	/**
 	 * 

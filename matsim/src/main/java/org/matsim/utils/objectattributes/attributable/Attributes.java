@@ -1,8 +1,6 @@
 package org.matsim.utils.objectattributes.attributable;
 
-import java.util.Arrays;
-import java.util.IdentityHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class is optimized for memory footprint and query time, at the expense of insertion time.
@@ -15,8 +13,8 @@ public final class Attributes {
 	// This makes insertion costly, but query can be kept efficient even when the number of mappings
 	// increases, using binary search. This should be fine, as the typical usage is to set once and
 	// access often. Replacing a value is also efficient.
-	String[] keys = new String[0];
-	Object[] values = new Object[0];
+	private String[] keys = new String[0];
+	private Object[] values = new Object[0];
 
 	@Override
 	public String toString() {
@@ -86,7 +84,54 @@ public final class Attributes {
 		values = new Object[ 0 ];
 	}
 
-	int size() {
+	/**
+	 * Returns a view of the mappings stored by this object as an immutable Map. Behavior is undefined if the mappings
+	 * are modified after this method was called.
+	 *
+	 * It is mostly provided to allow iterating through all attributes for writing to file.
+	 *
+	 * @return a map that represents the mappings stored in this object
+	 */
+	public Map<String, Object> getAsMap() {
+		return new AbstractMap<String, Object>() {
+			@Override
+			public Set<Entry<String, Object>> entrySet() {
+				return new AbstractSet<Entry<String, Object>>() {
+					@Override
+					public Iterator<Entry<String, Object>> iterator() {
+						return new EntryIterator();
+					}
+
+					@Override
+					public int size() {
+						return keys.length;
+					}
+				};
+			}
+		};
+	}
+
+	public int size() {
 		return keys.length;
+	}
+
+	public boolean isEmpty() {
+		return size() == 0;
+	}
+
+	private class EntryIterator implements Iterator<Map.Entry<String, Object>> {
+		private int index = 0;
+
+		@Override
+		public boolean hasNext() {
+			return index < keys.length;
+		}
+
+		@Override
+		public Map.Entry<String, Object> next() {
+			Map.Entry<String, Object> entry = new AbstractMap.SimpleEntry<>(keys[index], values[index]) ;
+			index++;
+			return entry;
+		}
 	}
 }

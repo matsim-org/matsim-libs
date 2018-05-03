@@ -27,6 +27,6 @@ import org.matsim.contrib.drt.run.examples.RunOneSharedTaxiExample;
 public class RunOneSharedTaxiExampleIT {
 	@Test
 	public void testRun() {
-		RunOneSharedTaxiExample.run(false, 2);
+		RunOneSharedTaxiExample.run(false, 1);// fleet rebalancing only in it. 1
 	}
 }

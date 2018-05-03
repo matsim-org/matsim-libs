@@ -164,8 +164,7 @@ public class InsertionCostCalculator {
 
 		// vehicle's time window cannot be violated
 		DrtStayTask lastTask = (DrtStayTask)Schedules.getLastTask(vEntry.vehicle.getSchedule());
-		double timeSlack = vEntry.vehicle.getServiceEndTime() - 600
-				- Math.max(lastTask.getBeginTime(), timer.getTimeOfDay());
+		double timeSlack = vEntry.vehicle.getServiceEndTime() - Math.max(lastTask.getBeginTime(), timer.getTimeOfDay());
 		if (timeSlack < totalTimeLoss) {
 			return false;
 		}
