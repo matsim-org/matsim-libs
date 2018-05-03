@@ -10,7 +10,7 @@
                 <offset sec="0"/>
                 <signalGroupSettings refId="100">
                     <onset sec="0"/>
-                    <dropping sec="60"/>
+                    <dropping sec="59"/>
                 </signalGroupSettings>
             </signalPlan>
         </signalSystemController>

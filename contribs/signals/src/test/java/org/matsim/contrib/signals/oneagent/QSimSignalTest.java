@@ -74,7 +74,7 @@ public class QSimSignalTest implements
 	@Test
 	public void testTrafficLightIntersection2arms1AgentV20() {
 		// configure and load standard scenario
-		Scenario scenario = new Fixture().createAndLoadTestScenarioOneSignal(true);
+		Scenario scenario = new Fixture().createAndLoadTestScenarioOneSignal(false);
 		
 		this.link2EnterTime = 38.0;
 		runQSimWithSignals(scenario, true);
@@ -150,7 +150,7 @@ public class QSimSignalTest implements
 	}
 	
 	/**
-	 * Tests the setup with to conflicting directions showing green together
+	 * Tests the setup with two conflicting directions showing green together
 	 */
 	@Test(expected = RuntimeException.class)
 	public void testConflictingDirectionsAbortOneAgentDriving() {
@@ -161,6 +161,20 @@ public class QSimSignalTest implements
 		
 		// if this code is reached, no exception has been thrown
 		Assert.fail("The simulation should abort because of intergreens violation.");
+	}
+	
+	/**
+	 * Tests the setup with two conflicting directions not showing green together
+	 */
+	@Test
+	public void testConflictingDirectionsNoAbortOneAgentDriving() {
+		//configure and load test scenario with data about conflicting directions
+		Scenario scenario = new Fixture().createAndLoadTestScenarioTwoSignals(true);
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalGroupSettingsData group100setting = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Fixture.signalSystemId2).getSignalPlanData().get(Fixture.signalPlanId2).getSignalGroupSettingsDataByGroupId().get(Fixture.signalGroupId100);
+		group100setting.setOnset(15);
+
+		runQSimWithSignals(scenario, false);
 	}
 
 	
