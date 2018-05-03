@@ -28,15 +28,13 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-
-import org.matsim.contrib.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
 
 /**
  * Starts an interval-based decongestion pricing simulation run.
@@ -44,38 +42,30 @@ import org.matsim.contrib.decongestion.routing.TollTimeDistanceTravelDisutilityF
  * @author ikaddoura
  *
  */
-public class DecongestionRunFromConfig {
+public class DecongestionRunExampleFromConfig {
 
-	private static final Logger log = Logger.getLogger(DecongestionRunFromConfig.class);
+	private static final Logger log = Logger.getLogger(DecongestionRunExampleFromConfig.class);
 
 	private static String configFile;
-	private static String outputDirectory;
 	
-	public static void main(String[] args) throws IOException {
-		log.info("Starting simulation run with the following arguments:");
-		
+	public static void main(String[] args) throws IOException {		
 		if (args.length > 0) {
+			log.info("Starting simulation run with the following arguments:");
 
 			configFile = args[0];		
 			log.info("config file: "+ configFile);
-			
-			outputDirectory = args[1];		
-			log.info("output directory: "+ outputDirectory);
 
 		} else {
-			configFile = "../../../runs-svn/vickrey-decongestion/input/config.xml";
-			outputDirectory = "../../../runs-svn/vickrey-decongestion/output/";
+			configFile = "path/to/config.xml";
 		}
 		
-		DecongestionRunFromConfig main = new DecongestionRunFromConfig();
+		DecongestionRunExampleFromConfig main = new DecongestionRunExampleFromConfig();
 		main.run();
-		
 	}
 
 	private void run() throws IOException {
 		
 		Config config = ConfigUtils.loadConfig(configFile, new DecongestionConfigGroup());
-		config.controler().setOutputDirectory(outputDirectory);
 						
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
