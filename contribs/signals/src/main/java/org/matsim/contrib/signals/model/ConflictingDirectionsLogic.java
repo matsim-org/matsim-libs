@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IntergreenTimes
+ * IntergreensLogic
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +17,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.data.ambertimes.v10;
-
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
-import org.matsim.contrib.signals.model.SignalSystem;
+package org.matsim.contrib.signals.model;
 
 
+import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 
 /**
- * @author dgrether
+ * Marker interface.
+ * 
+ * @author tthunig
  *
  */
-public interface IntergreenTimesData extends MatsimToplevelContainer  {
-	
-	public IntergreensForSignalSystemData addIntergreensForSignalSystem(IntergreensForSignalSystemData intergreens);
-	
-	public Map<Id<SignalSystem>, IntergreensForSignalSystemData> getIntergreensForSignalSystemDataMap();
-	
-	@Override
-	public IntergreenTimesDataFactory getFactory() ;
-	
-	public void setFactory(IntergreenTimesDataFactory factory);
-	
+public interface ConflictingDirectionsLogic extends SignalGroupStateChangedEventHandler {
+
 }
