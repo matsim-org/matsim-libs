@@ -293,6 +293,7 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 	 */
 	/* deliberately package */ GenericPlanStrategy<T, I> chooseStrategy(HasPlansAndId<T, I> person, final String subpopulation) {
 		// yyyyyy I can see that this would need to be replaceable, but need to find some other way than inheritance.  kai, mar'18
+		// Just implemented first step towards pluggability. But ain't there yet.  kai, apr'18
 		return myStrategyChooser.chooseStrategy(person,subpopulation) ;
 	}
 
