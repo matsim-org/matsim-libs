@@ -131,7 +131,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	
 	private void createAndAddConflictingDirectionsLogic(SignalSystemsManager manager) {
 		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseConflictingDirections()){
-			ConflictingDirectionsLogic conflictLogic = new ConflictingDirectionsLogicImpl(this.scenario.getLanes(), this.signalsData, 
+			ConflictingDirectionsLogic conflictLogic = new ConflictingDirectionsLogicImpl(this.scenario.getNetwork(), this.scenario.getLanes(), this.signalsData, 
 					ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).getActionOnConflictingDirectionViolation());
 			this.events.addHandler(conflictLogic);
 		}

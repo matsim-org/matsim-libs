@@ -29,6 +29,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup.ActionOnSignalSpecsViolation;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -58,17 +59,30 @@ private static final Logger log = Logger.getLogger(ConflictingDirectionsLogicImp
 	
 	private Map<Id<SignalSystem>, List<Id<SignalGroup>>> greenSignalsPerSystem = new HashMap<>();
 
-	public ConflictingDirectionsLogicImpl(Lanes lanes, SignalsData signalsData, ActionOnSignalSpecsViolation actionOnConflictingDirectionsViolation) {
+	public ConflictingDirectionsLogicImpl(Network network, Lanes lanes, SignalsData signalsData, ActionOnSignalSpecsViolation actionOnConflictingDirectionsViolation) {
 		this.actionOnConflictingDirectionsViolation = actionOnConflictingDirectionsViolation;
 		
 		for (SignalSystemData signalSystem : signalsData.getSignalSystemsData().getSignalSystemData().values()) {
 			// remember relation of signals to directions
 			for (SignalData signal : signalSystem.getSignalData().values()) {
 				setOfLinkTuplesPerSignal.put(signal.getId(), new HashSet<>());
-				for (Id<Lane> signalizedLaneId : signal.getLaneIds()) {
-					Lane signalizedLane = lanes.getLanesToLinkAssignments().get(signal.getLinkId()).getLanes().get(signalizedLaneId);
-					for (Id<Link> toLinkId : signalizedLane.getToLinkIds()) {
-						setOfLinkTuplesPerSignal.get(signal.getId()).add(new Tuple<Id<Link>, Id<Link>>(signal.getLinkId(), toLinkId));
+				if (signal.getTurningMoveRestrictions() != null && !signal.getTurningMoveRestrictions().isEmpty()) {
+					// use turning move restrictions if possible
+					for (Id<Link> nextLinkId : signal.getTurningMoveRestrictions()) {
+						setOfLinkTuplesPerSignal.get(signal.getId()).add(new Tuple<Id<Link>, Id<Link>>(signal.getLinkId(), nextLinkId));
+					}
+				} else if (signal.getLaneIds() != null && !signal.getLaneIds().isEmpty()) {
+					// if no turning move restrictions exist, use lane information
+					for (Id<Lane> signalizedLaneId : signal.getLaneIds()) {
+						Lane signalizedLane = lanes.getLanesToLinkAssignments().get(signal.getLinkId()).getLanes().get(signalizedLaneId);
+						for (Id<Link> toLinkId : signalizedLane.getToLinkIds()) {
+							setOfLinkTuplesPerSignal.get(signal.getId()).add(new Tuple<Id<Link>, Id<Link>>(signal.getLinkId(), toLinkId));
+						}
+					}
+				} else {
+					// no turning move restrictions and no lanes exist. all outgoing links of the node are possible next links
+					for (Id<Link> outgoingLinkId : network.getLinks().get(signal.getLinkId()).getToNode().getOutLinks().keySet()) {
+						setOfLinkTuplesPerSignal.get(signal.getId()).add(new Tuple<Id<Link>, Id<Link>>(signal.getLinkId(), outgoingLinkId));
 					}
 				}
 			}
