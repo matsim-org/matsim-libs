@@ -8,58 +8,58 @@
 <!-- agent                                                           -->
 <!-- =============================================================== -->
 
-<!ELEMENT freightReceivers	(attributes?, productTypes*, receiver*)> 
+<!ELEMENT freightReceivers  (attributes?, productTypes*, receiver*)> 
 <!ATTLIST freightReceivers
-			desc			CDATA			#IMPLIED>
+          desc              CDATA           #IMPLIED>
 
-<!ELEMENT attributes    	(attribute*)>
+<!ELEMENT attributes        (attribute*)>
 
-<!ELEMENT attribute   		(#PCDATA)>
+<!ELEMENT attribute         (#PCDATA)>
 <!ATTLIST attribute
-          name        		CDATA 			#REQUIRED
-          class       		CDATA 			#REQUIRED>
+          name              CDATA           #REQUIRED
+          class             CDATA           #REQUIRED>
 
 <!ELEMENT productTypes      (productType*)>
 
 <!ELEMENT productType       (#PCDATA)>
 <!ATTLIST productType  
-		id					CDATA 			#REQUIRED
-		descr				CDATA			#IMPLIED
-		weight				CDATA			#IMPLIED>
+        id                  CDATA           #REQUIRED
+        descr               CDATA           #IMPLIED
+        weight              CDATA           #IMPLIED>
 
-<!ELEMENT receiver 			(attributes?, timeWindow*, product*, orders?)>
+<!ELEMENT receiver          (attributes?, timeWindow*, product*, orders?)>
 <!ATTLIST receiver
-		id					CDATA			#REQUIRED
-		linkId				CDATA			#IMPLIED>
+        id                  CDATA           #REQUIRED
+        linkId              CDATA           #IMPLIED>
 		
-<!ELEMENT timeWindow		(#PCDATA)>
+<!ELEMENT timeWindow        (#PCDATA)>
 <!ATTLIST timeWindow
-		start				CDATA			#REQUIRED
-		end					CDATA			#REQUIRED>
+        start               CDATA           #REQUIRED
+        end                 CDATA           #REQUIRED>
 		
-<!ELEMENT product 			(reorderPolicy?, order*)>
+<!ELEMENT product           (reorderPolicy?, order*)>
 <!ATTLIST product
-		id					CDATA			#REQUIRED
-		onHand				CDATA			#IMPLIED>
+        id                  CDATA           #REQUIRED
+        onHand              CDATA           #IMPLIED>
 
-<!ELEMENT reorderPolicy 	(attributes?)>
+<!ELEMENT reorderPolicy     (attributes?)>
 <!ATTLIST reorderPolicy
-		name				CDATA			#REQUIRED>
+        name                CDATA           #REQUIRED>
 
-<!ELEMENT orders			(order*)>
+<!ELEMENT orders            (order*)>
 
-<!ELEMENT order				(item*)>
+<!ELEMENT order             (item*)>
 <!ATTLIST order
-		carrierId			CDATA			#REQUIRED>
+        carrierId           CDATA           #REQUIRED>
 
-<!ELEMENT item				(#PCDATA)>
+<!ELEMENT item              (#PCDATA)>
 <!ATTLIST item
-		id					CDATA			#REQUIRED
-		name				CDATA			#IMPLIED
-		productId			CDATA			#REQUIRED
-		quantity			CDATA			#IMPLIED
-		serviceTime			CDATA			#IMPLIED>
-	
+        id                  CDATA           #REQUIRED
+        name                CDATA           #IMPLIED
+        productId           CDATA           #REQUIRED
+        quantity            CDATA           #IMPLIED
+        serviceTime         CDATA           #IMPLIED>
+
 
 <!-- ============================================================ -->
          
@@ -77,8 +77,3 @@
 	In practice, the first character should always be a letter or if needed an underscore.
 	Spaces are NOT allowed. -->     
 	
-<!-- ============================================================ -->	
-<!-- ELEMENT allowableWeight is NOT implemented until now. -> Values are NOT read in anyways!  -->
-
-<!-- ============================================================ -->	
-<!-- Further documentation.. needs to be inserted.	     -->
