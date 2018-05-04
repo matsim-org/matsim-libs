@@ -26,6 +26,7 @@ import static org.junit.Assert.fail;
 
 import java.util.Random;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -72,6 +73,46 @@ public class ChooseRandomSingleLegModeTest {
 		assertTrue("expected to find walk-mode", foundWalkMode);
 	}
 
+
+	@Test
+	public void testRandomChoiceWithListedModesOnly() {
+		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom(),true);
+		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
+		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
+		boolean foundCarMode = false;
+		boolean foundPtMode = false;
+		boolean foundWalkMode = false;
+		for (int i = 0; i < 5; i++) {
+			algo.run(plan);
+			String mode = leg.getMode();
+			if (TransportMode.car.equals(mode)) {
+				foundCarMode = true;
+			} else if (TransportMode.pt.equals(mode)) {
+				foundPtMode = true;
+			} else if (TransportMode.walk.equals(mode)) {
+				foundWalkMode = true;
+			} else {
+				fail("unexpected mode: " + mode);
+			}
+		}
+		assertTrue("expected to find car-mode", foundCarMode);
+		assertTrue("expected to find pt-mode", foundPtMode);
+		assertTrue("expected to find walk-mode", foundWalkMode);
+	}
+
+	@Test
+	public void testRandomChoiceWithListedModesOnlyAndDifferentFromMode() {
+		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[]{TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom(), true);
+		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
+		Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
+		algo.run(plan);
+		String mode = leg.getMode();
+		Assert.assertSame(TransportMode.car, mode);
+	}
 	@Test
 	public void testHandleEmptyPlan() {
 		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom(),false);
