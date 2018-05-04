@@ -103,7 +103,14 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		
 		Collection<String> notChainBasedModes = new ArrayList<>( this.modes ) ;
 		notChainBasedModes.removeAll( this.chainBasedModes ) ;
-		this.changeSingleLegMode = new ChooseRandomSingleLegMode((String[]) notChainBasedModes.toArray(), rng) ;
+		;
+		final String[] possibleModes = notChainBasedModes.toArray(new String[]{});
+		if ( possibleModes.length >=2 ) { // nothing to choose if there is only one mode!
+			this.changeSingleLegMode = new ChooseRandomSingleLegMode(possibleModes, rng);
+		} else {
+			this.changeSingleLegMode = null ;
+		}
+		
 	}
 
 	/**
@@ -124,7 +131,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		if (plan.getPlanElements().size() <= 1) {
 			return;
 		}
-		if ( rng.nextDouble() < this.probaForChangeSingleTripMode) {
+		if ( this.changeSingleLegMode!=null & rng.nextDouble() < this.probaForChangeSingleTripMode) {
 			this.tripsToLegs.run(plan) ;
 			this.changeSingleLegMode.run(plan);
 			return ;

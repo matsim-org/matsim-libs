@@ -33,6 +33,7 @@ import java.util.Random;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -67,6 +68,7 @@ import org.matsim.testcases.MatsimTestUtils;
 /**
  * @author mrieser, michaz
  */
+@RunWith(Parameterized.class)
 public class ChooseRandomLegModeForSubtourTest {
 	
 	private double probaForRandomSingleTripMode;
