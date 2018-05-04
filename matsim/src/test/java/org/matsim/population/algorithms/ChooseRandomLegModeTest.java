@@ -49,7 +49,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		boolean foundPtMode = false;
 		boolean foundWalkMode = false;
 		String previousMode = leg.getMode();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 10; i++) {
 			algo.run(plan);
 			assertNotSame("leg mode must have changed.", previousMode, leg.getMode());
 			previousMode = leg.getMode();
@@ -78,7 +78,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		boolean foundPtMode = false;
 		boolean foundWalkMode = false;
 		String previousMode = leg.getMode();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 10; i++) {
 			algo.run(plan);
 			assertNotSame("leg mode must have changed.", previousMode, leg.getMode());
 			previousMode = leg.getMode();

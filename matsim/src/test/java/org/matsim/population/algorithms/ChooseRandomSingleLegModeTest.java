@@ -55,7 +55,7 @@ public class ChooseRandomSingleLegModeTest {
 		boolean foundCarMode = false;
 		boolean foundPtMode = false;
 		boolean foundWalkMode = false;
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 10; i++) {
 			algo.run(plan);
 			String mode = leg.getMode();
 			if (TransportMode.car.equals(mode)) {
@@ -84,7 +84,7 @@ public class ChooseRandomSingleLegModeTest {
 		boolean foundCarMode = false;
 		boolean foundPtMode = false;
 		boolean foundWalkMode = false;
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 10; i++) {
 			algo.run(plan);
 			String mode = leg.getMode();
 			if (TransportMode.car.equals(mode)) {
@@ -138,7 +138,7 @@ public class ChooseRandomSingleLegModeTest {
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 		String oldMode = leg.getMode();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 10; i++) {
 			algo.run(plan);
 			String mode = leg.getMode();
 			assertTrue(!oldMode.equals(mode));
@@ -157,7 +157,7 @@ public class ChooseRandomSingleLegModeTest {
 		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
 		String oldMode1 = leg1.getMode();
 		String oldMode2 = leg2.getMode();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 10; i++) {
 			algo.run(plan);
 			int cntChanges = 0;
 			String mode1 = leg1.getMode();
