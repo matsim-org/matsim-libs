@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IntergreenTimesDataImpl
+ * IntergreenTimes
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,42 +19,27 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.intergreens.v10;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.contrib.signals.model.SignalSystem;
+
 
 
 /**
  * @author dgrether
  *
  */
-public class IntergreenTimesDataImpl implements IntergreenTimesData {
-
-	private IntergreenTimesDataFactory factory = new IntergreenTimesDataFactoryImpl();
-
-	private Map<Id<SignalSystem>, IntergreensForSignalSystemData> intergreensForSystemByIdMap = new HashMap<>();
+public interface IntergreenTimesData extends MatsimToplevelContainer  {
+	
+	public IntergreensForSignalSystemData addIntergreensForSignalSystem(IntergreensForSignalSystemData intergreens);
+	
+	public Map<Id<SignalSystem>, IntergreensForSignalSystemData> getIntergreensForSignalSystemDataMap();
 	
 	@Override
-	public IntergreensForSignalSystemData addIntergreensForSignalSystem(
-			IntergreensForSignalSystemData intergreens) {
-		return this.intergreensForSystemByIdMap.put(intergreens.getSignalSystemId(), intergreens);
-	}
-
-	@Override
-	public Map<Id<SignalSystem>, IntergreensForSignalSystemData> getIntergreensForSignalSystemDataMap() {
-		return this.intergreensForSystemByIdMap;
-	}
-
-	@Override
-	public IntergreenTimesDataFactory getFactory() {
-		return this.factory;
-	}
-
-	@Override
-	public void setFactory(IntergreenTimesDataFactory factory) {
-		this.factory = factory;
-	}
-
+	public IntergreenTimesDataFactory getFactory() ;
+	
+	public void setFactory(IntergreenTimesDataFactory factory);
+	
 }
