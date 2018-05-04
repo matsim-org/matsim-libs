@@ -112,23 +112,24 @@
 
 <module name="strategy">
 
-		<param name="ModuleProbability_1" value="0.0" />
-		<param name="Module_1" value="SelectExpBeta" />
+	<param name="ModuleProbability_1" value="0.0" />
+	<param name="Module_1" value="SelectExpBeta" />
 
-		<param name="maxAgentPlanMemorySize" value="5" />
-		<param name="ModuleProbability_2" value="0.5" />
+	<param name="maxAgentPlanMemorySize" value="5" />
 
-		<param name="Module_2" value="RandomTripToCarsharingStrategy" />
-		<param name="ModuleDisableAfterIteration_2" value="1000" />
-	<param name="ModuleProbability_2" value="0.5" />
+	<param name="ModuleProbability_2" value="0.0" />
+	<!--(Set from 0.5 to 0.0.  see email to Milos. kai, may'18)-->
+
+	<param name="Module_2" value="RandomTripToCarsharingStrategy" />
+	<param name="ModuleDisableAfterIteration_2" value="1000" />
 
 	<param name="ModuleProbability_3" value="1.0" />
-        <param name="Module_3" value="CarsharingSubtourModeChoiceStrategy" />
-		<param name="ModuleDisableAfterIteration_3" value="1000" />
-		
-		 <param name="ModuleProbability_4" value="1.0" />
-        <param name="Module_4" value="SubtourModeChoice" />
-		<param name="ModuleDisableAfterIteration_4" value="1000" />
+	<param name="Module_3" value="CarsharingSubtourModeChoiceStrategy" />
+	<param name="ModuleDisableAfterIteration_3" value="1000" />
+
+	<param name="ModuleProbability_4" value="1.0" />
+	<param name="Module_4" value="SubtourModeChoice" />
+	<param name="ModuleDisableAfterIteration_4" value="1000" />
 
 </module>
 
