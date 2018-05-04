@@ -47,6 +47,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private static Logger logger = Logger.getLogger(ChooseRandomLegModeForSubtour.class);
+	private final TripsToLegsAlgorithm tripsToLegs;
 	
 	private static class Candidate {
 		final Subtour subtour;
@@ -63,6 +64,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	private Collection<String> modes;
 	private final Collection<String> chainBasedModes;
 	private final SubtourModeChoice.Behavior behavior;
+	private final double probaForChangeSingleTripMode;
 	private Collection<String> singleTripSubtourModes;
 
 	private final StageActivityTypes stageActivityTypes;
@@ -74,23 +76,34 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private boolean anchorAtFacilities = false;
 	
+	private final ChooseRandomSingleLegMode changeSingleLegMode;
+	
 	public ChooseRandomLegModeForSubtour(
 			final StageActivityTypes stageActivityTypes,
 			final MainModeIdentifier mainModeIdentifier,
 			final PermissibleModesCalculator permissibleModesCalculator,
 			final String[] modes,
 			final String[] chainBasedModes,
-			final Random rng, SubtourModeChoice.Behavior behavior) {
+			final Random rng, SubtourModeChoice.Behavior behavior, double probaForChooseRandomSingleTripMode) {
 		this.stageActivityTypes = stageActivityTypes;
 		this.mainModeIdentifier = mainModeIdentifier;
 		this.permissibleModesCalculator = permissibleModesCalculator;
 		this.modes = Arrays.asList(modes);
 		this.chainBasedModes = Arrays.asList(chainBasedModes);
 		this.behavior = behavior;
+		this.probaForChangeSingleTripMode = probaForChooseRandomSingleTripMode;
 		this.singleTripSubtourModes = this.chainBasedModes;
 		
 		this.rng = rng;
 		logger.info("Chain based modes: " + this.chainBasedModes.toString());
+
+		// also set up the standard change single leg mode, in order to alternatively randomize modes in
+		// subtours.  kai, may'18
+		this.tripsToLegs = new TripsToLegsAlgorithm( this.stageActivityTypes, this.mainModeIdentifier ) ;
+		
+		Collection<String> notChainBasedModes = new ArrayList<>( this.modes ) ;
+		notChainBasedModes.removeAll( this.chainBasedModes ) ;
+		this.changeSingleLegMode = new ChooseRandomSingleLegMode((String[]) notChainBasedModes.toArray(), rng) ;
 	}
 
 	/**
@@ -111,27 +124,34 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		if (plan.getPlanElements().size() <= 1) {
 			return;
 		}
+		if ( rng.nextDouble() < this.probaForChangeSingleTripMode) {
+			this.tripsToLegs.run(plan) ;
+			this.changeSingleLegMode.run(plan);
+			return ;
+		}
 
 		final Id<? extends BasicLocation> homeLocation = anchorAtFacilities ?
 			((Activity) plan.getPlanElements().get(0)).getFacilityId() :
 			((Activity) plan.getPlanElements().get(0)).getLinkId();
+
 		Collection<String> permissibleModesForThisPlan = permissibleModesCalculator.getPermissibleModes(plan);
 		// (modes that agent can in principle use; e.g. cannot use car sharing if not member)
-
-		List<Candidate> choiceSet =
-			determineChoiceSet(
-					homeLocation,
-					TripStructureUtils.getTrips( plan , stageActivityTypes ),
-					TripStructureUtils.getSubtours(
-						plan,
-						stageActivityTypes,
-						anchorAtFacilities),
-					permissibleModesForThisPlan);
-
-		if (!choiceSet.isEmpty()) {
-			Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
-			applyChange( whatToDo , plan );
-		}
+		
+			
+			List<Candidate> choiceSet =
+					determineChoiceSet(
+							homeLocation,
+							TripStructureUtils.getTrips(plan, stageActivityTypes),
+							TripStructureUtils.getSubtours(
+									plan,
+									stageActivityTypes,
+									anchorAtFacilities),
+							permissibleModesForThisPlan);
+			
+			if (!choiceSet.isEmpty()) {
+				Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
+				applyChange(whatToDo, plan);
+			}
 	}
 
 	private List<Candidate> determineChoiceSet(

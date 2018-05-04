@@ -27,6 +27,8 @@ import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -51,6 +53,7 @@ import org.matsim.pt.PtConstants;
  * as possible.
  * @author thibautd
  */
+@RunWith(Parameterized.class)
 public class ChooseRandomLegModeForSubtourComplexTripsTest {
 	// transit_walk is not here but is in the fixtures: thus, pt trips are
 	// identified as "known mode" only if trip-level mode detection is done
@@ -60,7 +63,8 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 
 	private static final String STAGE = PtConstants.TRANSIT_ACTIVITY_TYPE;
 	private final StageActivityTypes stagesActivities = new StageActivityTypesImpl( STAGE );
-
+	private final double probaForRandomSingleTripMode;
+	
 	// /////////////////////////////////////////////////////////////////////////
 	// Fixtures
 	// /////////////////////////////////////////////////////////////////////////
@@ -449,6 +453,15 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 	// /////////////////////////////////////////////////////////////////////////
 	// tests
 	// /////////////////////////////////////////////////////////////////////////
+	@Parameterized.Parameters(name = "{index}: probaForChooseRandomSingleTripMode == {0}")
+	public static Collection<Object> createTests() {
+		return Arrays.asList(0., 0.5);
+	}
+	public ChooseRandomLegModeForSubtourComplexTripsTest( double proba ) {
+		this.probaForRandomSingleTripMode = proba ;
+	}
+	
+	
 	@Test
 	public void testMutatedTrips() {
 		final ChooseRandomLegModeForSubtour testee =
@@ -458,7 +471,8 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 					new PermissibleModesCalculatorImpl( MODES , false ),
 					MODES,
 					CHAIN_BASED_MODES,
-					new Random( 20130225 ), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes);
+					new Random( 20130225 ), SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes,
+					probaForRandomSingleTripMode);
 
 		for ( Fixture f : createFixtures() ) {
 			for (int i = 0; i < 5; i++) {

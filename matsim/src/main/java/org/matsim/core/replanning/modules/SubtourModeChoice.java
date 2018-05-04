@@ -52,6 +52,8 @@ import org.matsim.core.router.TripRouter;
  */
 public class SubtourModeChoice extends AbstractMultithreadedModule {
 	
+	private final double probaForChangeSingleTripMode ;
+	
 	public enum Behavior { fromAllModesToSpecifiedModes, fromSpecifiedModesToSpecifiedModes }
 	private Behavior behavior = Behavior.fromSpecifiedModesToSpecifiedModes ;
 
@@ -62,11 +64,15 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 	private final String[] chainBasedModes;
 	private final String[] modes;
 	
-	public SubtourModeChoice(Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup, SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup) {
+	public SubtourModeChoice(Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup,
+							 SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup) {
 		this(globalConfigGroup.getNumberOfThreads(),
 				subtourModeChoiceConfigGroup.getModes(),
 				subtourModeChoiceConfigGroup.getChainBasedModes(),
-				subtourModeChoiceConfigGroup.considerCarAvailability(), tripRouterProvider);
+				subtourModeChoiceConfigGroup.considerCarAvailability(),
+				subtourModeChoiceConfigGroup.getProbaForRandomSingleTripMode(),
+				tripRouterProvider
+		);
 		this.setBehavior( subtourModeChoiceConfigGroup.getBehavior() );
 	}
 
@@ -74,8 +80,11 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 			final int numberOfThreads,
 			final String[] modes,
 			final String[] chainBasedModes,
-			final boolean considerCarAvailability, Provider<TripRouter> tripRouterProvider) {
+			final boolean considerCarAvailability,
+			double probaForChangeSingleTripMode,
+			Provider<TripRouter> tripRouterProvider) {
 		super(numberOfThreads);
+		this.probaForChangeSingleTripMode = probaForChangeSingleTripMode;
 		this.tripRouterProvider = tripRouterProvider;
 		this.modes = modes.clone();
 		this.chainBasedModes = chainBasedModes.clone();
@@ -97,6 +106,7 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		final TripRouter tripRouter = tripRouterProvider.get();
+		
 		final ChooseRandomLegModeForSubtour chooseRandomLegMode =
 				new ChooseRandomLegModeForSubtour(
 						tripRouter.getStageActivityTypes(),
@@ -104,7 +114,7 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 						this.permissibleModesCalculator,
 						this.modes,
 						this.chainBasedModes,
-						MatsimRandom.getLocalInstance(), behavior);
+						MatsimRandom.getLocalInstance(), behavior, probaForChangeSingleTripMode);
 		chooseRandomLegMode.setAnchorSubtoursAtFacilitiesInsteadOfLinks( false );
 		return chooseRandomLegMode;
 	}

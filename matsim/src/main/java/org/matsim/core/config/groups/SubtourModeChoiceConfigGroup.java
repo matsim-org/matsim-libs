@@ -44,6 +44,8 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	private boolean considerCarAvailability = false;
 	private SubtourModeChoice.Behavior behavior = SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes ;
 	
+	private double probaForRandomSingleTripMode = 0. ; // yyyyyy backwards compatibility setting; should be change. kai, may'18
+	
 	public SubtourModeChoiceConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -143,4 +145,13 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	public final SubtourModeChoice.Behavior getBehavior() {
 		return this.behavior ;
 	}
+	
+	public double getProbaForRandomSingleTripMode() {
+		return this.probaForRandomSingleTripMode;
+	}
+	public void setProbaForRandomSingleTripMode(double probaForRandomSingleTripMode) {
+		this.probaForRandomSingleTripMode = probaForRandomSingleTripMode;
+	}
+	
+	
 }
