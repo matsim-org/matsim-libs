@@ -24,7 +24,6 @@
 
 package org.matsim.contrib.decongestion;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
@@ -38,12 +37,10 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
@@ -117,20 +114,20 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		
-		if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION() == 0. || event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() == 0.) {
+		if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getWriteOutputIteration() == 0. || event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getUpdatePriceInterval() == 0.) {
 			computeDelays(event);
 		}
 		
 		if (event.getIteration() == this.congestionInfo.getScenario().getConfig().controler().getFirstIteration()) {
 			// skip first iteration
 		
-		} else if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() == 0.) {			
+		} else if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getUpdatePriceInterval() == 0.) {
 			
 			int totalNumberOfIterations = this.congestionInfo.getScenario().getConfig().controler().getLastIteration() - this.congestionInfo.getScenario().getConfig().controler().getFirstIteration();
 			int iterationCounter = event.getIteration() - this.congestionInfo.getScenario().getConfig().controler().getFirstIteration();
 			
-			if (iterationCounter < this.congestionInfo.getDecongestionConfigGroup().getFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT() * totalNumberOfIterations
-					&& iterationCounter > this.congestionInfo.getDecongestionConfigGroup().getFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT() * totalNumberOfIterations) {
+			if (iterationCounter < this.congestionInfo.getDecongestionConfigGroup().getFractionOfIterationsToEndPriceAdjustment() * totalNumberOfIterations
+					&& iterationCounter > this.congestionInfo.getDecongestionConfigGroup().getFractionOfIterationsToStartPriceAdjustment() * totalNumberOfIterations) {
 				
 				if (tollComputation != null) {
 					log.info("+++ Iteration " + event.getIteration() + ". Update tolls per link and time bin.");
@@ -139,7 +136,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 			}
 		}
 		
-		if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION() == 0.) {
+		if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getWriteOutputIteration() == 0.) {
 			CongestionInfoWriter.writeDelays(congestionInfo, event.getIteration(), this.outputDirectory + "ITERS/it." + event.getIteration() + "/");
 			CongestionInfoWriter.writeTolls(congestionInfo, event.getIteration(), this.outputDirectory + "ITERS/it." + event.getIteration() + "/");
 		}
@@ -230,14 +227,14 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 			
-		if (congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() > 1) {
+		if (congestionInfo.getDecongestionConfigGroup().getUpdatePriceInterval() > 1) {
 			if (event.getIteration() == this.congestionInfo.getScenario().getConfig().controler().getFirstIteration()) {
 				
-				this.nextDisableInnovativeStrategiesIteration = (int) (congestionInfo.getScenario().getConfig().strategy().getFractionOfIterationsToDisableInnovation() * congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL());
+				this.nextDisableInnovativeStrategiesIteration = (int) (congestionInfo.getScenario().getConfig().strategy().getFractionOfIterationsToDisableInnovation() * congestionInfo.getDecongestionConfigGroup().getUpdatePriceInterval());
 				log.info("next disable innovative strategies iteration: " + this.nextDisableInnovativeStrategiesIteration);
 
 				if (this.nextDisableInnovativeStrategiesIteration != 0) {
-					this.nextEnableInnovativeStrategiesIteration = (int) (congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() + 1);
+					this.nextEnableInnovativeStrategiesIteration = (int) (congestionInfo.getDecongestionConfigGroup().getUpdatePriceInterval() + 1);
 				}
 				log.info("next enable innovative strategies iteration: " + this.nextEnableInnovativeStrategiesIteration);
 
@@ -256,7 +253,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 						}
 					}
 					
-					this.nextDisableInnovativeStrategiesIteration += congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL();
+					this.nextDisableInnovativeStrategiesIteration += congestionInfo.getDecongestionConfigGroup().getUpdatePriceInterval();
 					log.info("next disable innovative strategies iteration: " + this.nextDisableInnovativeStrategiesIteration);
 					
 				} else if (event.getIteration() == this.nextEnableInnovativeStrategiesIteration) {
@@ -293,7 +290,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 								event.getServices().getStrategyManager().changeWeightOfStrategy(strategy, null, originalValue);
 							}
 						}			
-						this.nextEnableInnovativeStrategiesIteration += congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL();
+						this.nextEnableInnovativeStrategiesIteration += congestionInfo.getDecongestionConfigGroup().getUpdatePriceInterval();
 					}
 				}
 			}	

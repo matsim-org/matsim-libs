@@ -66,9 +66,9 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 		final double timeBinSize = (double) this.congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
 		final double capacityPeriod = this.congestionInfo.getScenario().getNetwork().getCapacityPeriod();
 		final double flowCapacityFactor = this.congestionInfo.getScenario().getConfig().qsim().getFlowCapFactor();
-		final double toleratedAvgDelay = this.congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC();
+		final double toleratedAvgDelay = this.congestionInfo.getDecongestionConfigGroup().getToleratedAverageDelaySec();
 		final boolean msa = this.congestionInfo.getDecongestionConfigGroup().isMsa();
-		final double blendFactorFromConfig = this.congestionInfo.getDecongestionConfigGroup().getTOLL_BLEND_FACTOR();
+		final double blendFactorFromConfig = this.congestionInfo.getDecongestionConfigGroup().getTollBlendFactor();
 		
 		for (Id<Link> linkId : this.congestionInfo.getlinkInfos().keySet()) {
 			
@@ -108,7 +108,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 					
 					double avgDelayAllIterations = 0.;
 					if (integralApproach.equals(IntegralApproach.Average.toString())) {
-						if (averageDelay > congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
+						if (averageDelay > congestionInfo.getDecongestionConfigGroup().getToleratedAverageDelaySec()) {
 							if (this.linkId2time2avgDelayAllIterations.get(linkId) == null) {
 								avgDelayAllIterations = averageDelay;
 								this.linkId2time2avgDelayAllIterations.put(linkId, new HashMap<>());
@@ -149,7 +149,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 						
 						} else {	
 													
-							if (averageDelay <= congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
+							if (averageDelay <= congestionInfo.getDecongestionConfigGroup().getToleratedAverageDelaySec()) {
 								
 								if (integralApproach.equals(IntegralApproach.Average.toString())) {
 									totalDelayAllIterations = this.linkId2time2totalDelayAllIterations.get(linkId).get(intervalNr)

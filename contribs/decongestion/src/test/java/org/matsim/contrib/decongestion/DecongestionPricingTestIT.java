@@ -28,10 +28,7 @@ import org.junit.Test;
 import org.matsim.analysis.ScoreStatsControlerListener.ScoreItem;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.decongestion.DecongestionConfigGroup;
 import org.matsim.contrib.decongestion.DecongestionConfigGroup.DecongestionApproach;
-import org.matsim.contrib.decongestion.DecongestionControlerListener;
-import org.matsim.contrib.decongestion.DecongestionModule;
 import org.matsim.contrib.decongestion.data.DecongestionInfo;
 import org.matsim.contrib.decongestion.handler.DelayAnalysis;
 import org.matsim.contrib.decongestion.handler.IntervalBasedTolling;
@@ -77,14 +74,14 @@ public class DecongestionPricingTestIT {
 		config.controler().setOutputDirectory(outputDirectory);
 		
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
+		decongestionSettings.setWriteOutputIteration(1);
 		decongestionSettings.setKp(0.0123);
 		decongestionSettings.setKd(0.0);
 		decongestionSettings.setKi(0.0);
 		decongestionSettings.setMsa(false);
-		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		decongestionSettings.setTollBlendFactor(1.0);
+		decongestionSettings.setFractionOfIterationsToEndPriceAdjustment(1.0);
+		decongestionSettings.setFractionOfIterationsToStartPriceAdjustment(0.0);
 		config.addModule(decongestionSettings);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -167,14 +164,14 @@ public class DecongestionPricingTestIT {
 		config.controler().setOutputDirectory(outputDirectory);
 		
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
+		decongestionSettings.setWriteOutputIteration(1);
 		decongestionSettings.setKp(0.0123);
 		decongestionSettings.setKd(0.0);
 		decongestionSettings.setKi(0.0);
 		decongestionSettings.setMsa(false);
-		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		decongestionSettings.setTollBlendFactor(1.0);
+		decongestionSettings.setFractionOfIterationsToEndPriceAdjustment(1.0);
+		decongestionSettings.setFractionOfIterationsToStartPriceAdjustment(0.0);
 		config.addModule(decongestionSettings);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -228,14 +225,14 @@ public class DecongestionPricingTestIT {
 		config.controler().setOutputDirectory(outputDirectory);
 		
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
+		decongestionSettings.setWriteOutputIteration(1);
 		decongestionSettings.setKp(2.0);
 		decongestionSettings.setKd(0.0);
 		decongestionSettings.setKi(0.0);
 		decongestionSettings.setMsa(false);
-		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		decongestionSettings.setTollBlendFactor(1.0);
+		decongestionSettings.setFractionOfIterationsToEndPriceAdjustment(1.0);
+		decongestionSettings.setFractionOfIterationsToStartPriceAdjustment(0.0);
 		config.addModule(decongestionSettings);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);		
@@ -317,14 +314,14 @@ public class DecongestionPricingTestIT {
 		config.controler().setOutputDirectory(outputDirectory);
 		
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
+		decongestionSettings.setWriteOutputIteration(1);
 		decongestionSettings.setKp(2.0);
 		decongestionSettings.setKd(0.0);
 		decongestionSettings.setKi(0.0);
 		decongestionSettings.setMsa(false);
-		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		decongestionSettings.setTollBlendFactor(1.0);
+		decongestionSettings.setFractionOfIterationsToEndPriceAdjustment(1.0);
+		decongestionSettings.setFractionOfIterationsToStartPriceAdjustment(0.0);
 		config.addModule(decongestionSettings);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);		
@@ -378,14 +375,14 @@ public class DecongestionPricingTestIT {
 		config.controler().setOutputDirectory(outputDirectory);
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
+		decongestionSettings.setWriteOutputIteration(1);
 		decongestionSettings.setKp(0.0);
 		decongestionSettings.setKd(0.0);
 		decongestionSettings.setKi(0.0);
 		decongestionSettings.setMsa(false);
-		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		decongestionSettings.setTollBlendFactor(1.0);
+		decongestionSettings.setFractionOfIterationsToEndPriceAdjustment(1.0);
+		decongestionSettings.setFractionOfIterationsToStartPriceAdjustment(0.0);
 		config.addModule(decongestionSettings);
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -459,9 +456,9 @@ public class DecongestionPricingTestIT {
 		config.controler().setOutputDirectory(outputDirectory);
 		
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		decongestionSettings.setWriteOutputIteration(1);
+		decongestionSettings.setFractionOfIterationsToEndPriceAdjustment(1.0);
+		decongestionSettings.setFractionOfIterationsToStartPriceAdjustment(0.0);
 		decongestionSettings.setDecongestionApproach(DecongestionApproach.PID);
 		config.addModule(decongestionSettings);
 
@@ -520,9 +517,9 @@ public class DecongestionPricingTestIT {
 		config.controler().setOutputDirectory(outputDirectory);
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		decongestionSettings.setWriteOutputIteration(1);
+		decongestionSettings.setFractionOfIterationsToEndPriceAdjustment(1.0);
+		decongestionSettings.setFractionOfIterationsToStartPriceAdjustment(0.0);
 		config.addModule(decongestionSettings);
 
 		DecongestionInfo info = new DecongestionInfo();

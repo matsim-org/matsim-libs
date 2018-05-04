@@ -70,12 +70,12 @@ public class DecongestionRunExample {
 	private void run() throws IOException {
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(30.);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
-		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
+		decongestionSettings.setToleratedAverageDelaySec(30.);
+		decongestionSettings.setFractionOfIterationsToEndPriceAdjustment(1.0);
+		decongestionSettings.setFractionOfIterationsToStartPriceAdjustment(0.0);
+		decongestionSettings.setUpdatePriceInterval(1);
 		decongestionSettings.setMsa(false);
-		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
+		decongestionSettings.setTollBlendFactor(1.0);
 		
 //		decongestionSettings.setDecongestionApproach(DecongestionApproach.P_MC);
 		

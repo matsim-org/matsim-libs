@@ -89,7 +89,7 @@ public class CongestionInfoWriter {
 		}
 		
 		
-		if (congestionInfo.getDecongestionConfigGroup().isWRITE_LINK_INFO_CHARTS()) {
+		if (congestionInfo.getDecongestionConfigGroup().isWriteLinkInfoCharts()) {
 			log.info("Writing png file...");
 
 			XYLineChart chart = new XYLineChart("Iteration " + iteration, "Time of day [hours]", "Average delay [seconds]");
@@ -168,7 +168,7 @@ public class CongestionInfoWriter {
 			e.printStackTrace();
 		}
 		
-		if (congestionInfo.getDecongestionConfigGroup().isWRITE_LINK_INFO_CHARTS()) {
+		if (congestionInfo.getDecongestionConfigGroup().isWriteLinkInfoCharts()) {
 			log.info("Writing png file...");
 			
 			XYLineChart chart = new XYLineChart("Iteration " + iteration, "Time of day [hours]", "Toll [monetary units]");
