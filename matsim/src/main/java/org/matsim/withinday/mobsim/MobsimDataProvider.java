@@ -33,6 +33,8 @@ import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.vehicles.Vehicle;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +44,7 @@ import java.util.Map;
  * 
  * @author cdobler
  */
+@Singleton
 public final class MobsimDataProvider implements MobsimInitializedListener {
 	/*
 	Hallo Kai,
@@ -81,7 +84,9 @@ public final class MobsimDataProvider implements MobsimInitializedListener {
 	*/
 	
 	private QSim qSim;
-
+	
+	@Inject MobsimDataProvider(){}
+	
 	@Override
 	public final void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		qSim = (QSim) e.getQueueSimulation();

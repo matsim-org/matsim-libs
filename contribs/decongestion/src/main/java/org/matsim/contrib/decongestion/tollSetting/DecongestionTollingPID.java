@@ -33,6 +33,7 @@ import com.google.inject.Inject;
 import org.matsim.contrib.decongestion.DecongestionConfigGroup.IntegralApproach;
 import org.matsim.contrib.decongestion.data.DecongestionInfo;
 import org.matsim.contrib.decongestion.data.LinkInfo;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * 
@@ -66,11 +67,15 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 		final double timeBinSize = (double) this.congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
 		final double capacityPeriod = this.congestionInfo.getScenario().getNetwork().getCapacityPeriod();
 		final double flowCapacityFactor = this.congestionInfo.getScenario().getConfig().qsim().getFlowCapFactor();
-		final double toleratedAvgDelay = this.congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC();
+		final double toleratedAvgDelay = this.congestionInfo.getDecongestionConfigGroup().getToleratedAverageDelaySec();
 		final boolean msa = this.congestionInfo.getDecongestionConfigGroup().isMsa();
-		final double blendFactorFromConfig = this.congestionInfo.getDecongestionConfigGroup().getTOLL_BLEND_FACTOR();
+		final double blendFactorFromConfig = this.congestionInfo.getDecongestionConfigGroup().getTollBlendFactor();
 		
+		Counter counter = new Counter( "link # ", "" ) ;
+
 		for (Id<Link> linkId : this.congestionInfo.getlinkInfos().keySet()) {
+
+			counter.incCounter();
 			
 			double flowCapacityHeadwaySec = Double.NEGATIVE_INFINITY;
 			if (K_i != 0. && integralApproach.equals(IntegralApproach.UnusedHeadway.toString())) {
@@ -108,7 +113,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 					
 					double avgDelayAllIterations = 0.;
 					if (integralApproach.equals(IntegralApproach.Average.toString())) {
-						if (averageDelay > congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
+						if (averageDelay > congestionInfo.getDecongestionConfigGroup().getToleratedAverageDelaySec()) {
 							if (this.linkId2time2avgDelayAllIterations.get(linkId) == null) {
 								avgDelayAllIterations = averageDelay;
 								this.linkId2time2avgDelayAllIterations.put(linkId, new HashMap<>());
@@ -149,7 +154,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 						
 						} else {	
 													
-							if (averageDelay <= congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
+							if (averageDelay <= congestionInfo.getDecongestionConfigGroup().getToleratedAverageDelaySec()) {
 								
 								if (integralApproach.equals(IntegralApproach.Average.toString())) {
 									totalDelayAllIterations = this.linkId2time2totalDelayAllIterations.get(linkId).get(intervalNr)

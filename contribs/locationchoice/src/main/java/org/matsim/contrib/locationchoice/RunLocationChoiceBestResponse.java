@@ -23,7 +23,7 @@
 package org.matsim.contrib.locationchoice;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
@@ -41,10 +41,10 @@ public class RunLocationChoiceBestResponse {
     }
 
     public static void run(Scenario scenario) {
-        DestinationChoiceBestResponseContext dcContext = new DestinationChoiceBestResponseContext(scenario);
+        DestinationChoiceContext dcContext = new DestinationChoiceContext(scenario);
         dcContext.init();
         DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(scenario, dcContext);
-        DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) dcContext.getScenario().getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+        DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule( dcContext.getScenario().getConfig(), DestinationChoiceConfigGroup.class);
         if (dccg.getPrefsFile() == null && !scenario.getConfig().facilities().getInputFile().equals("null")) {
             dcScoringFunctionFactory.setUsingConfigParamsForScoring(false);
         } else {

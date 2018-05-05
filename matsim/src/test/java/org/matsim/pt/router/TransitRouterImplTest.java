@@ -72,8 +72,6 @@ import org.matsim.testcases.MatsimTestCase;
 public class TransitRouterImplTest {
 	private static final Logger log = Logger.getLogger(TransitRouterImplTest.class) ;
 	
-//	protected static enum TransitRouterType { standard, raptor, connectionScan } ;
-
 	private String routerType ;
 
 	@Parameters(name = "{index}: TransitRouter == {0}")

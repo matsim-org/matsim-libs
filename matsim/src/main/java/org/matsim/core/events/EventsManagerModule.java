@@ -7,7 +7,7 @@ import org.matsim.core.events.handler.EventHandler;
 import javax.inject.Inject;
 import java.util.Set;
 
-public class EventsManagerModule extends AbstractModule {
+public final class EventsManagerModule extends AbstractModule {
 
 	@Override
 	public void install() {

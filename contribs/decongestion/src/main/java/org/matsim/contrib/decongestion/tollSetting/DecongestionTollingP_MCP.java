@@ -59,9 +59,9 @@ public class DecongestionTollingP_MCP implements DecongestionTollSetting, LinkLe
 				/ this.congestionInfo.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney();
 
 			
-		final double toleratedAvgDelay = this.congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC();
+		final double toleratedAvgDelay = this.congestionInfo.getDecongestionConfigGroup().getToleratedAverageDelaySec();
 		final boolean msa = this.congestionInfo.getDecongestionConfigGroup().isMsa();
-		final double blendFactorFromConfig = this.congestionInfo.getDecongestionConfigGroup().getTOLL_BLEND_FACTOR();
+		final double blendFactorFromConfig = this.congestionInfo.getDecongestionConfigGroup().getTollBlendFactor();
 		
 		for (Id<Link> linkId : this.congestionInfo.getlinkInfos().keySet()) {
 			

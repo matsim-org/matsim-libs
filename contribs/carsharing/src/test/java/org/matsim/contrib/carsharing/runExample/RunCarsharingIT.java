@@ -37,6 +37,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -81,6 +82,13 @@ public class RunCarsharingIT {
 		//TwoWayCarsharingConfigGroup twoWayConfig = (TwoWayCarsharingConfigGroup) config.getModule( TwoWayCarsharingConfigGroup.GROUP_NAME ) ;
 		//twoWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/CarsharingStations.xml");
 
+		
+		config.subtourModeChoice().setBehavior( SubtourModeChoice.Behavior.fromAllModesToSpecifiedModes );
+		config.subtourModeChoice().setProbaForRandomSingleTripMode(0.);
+		
+//		config.global().setNumberOfThreads(1);
+//		config.qsim().setNumberOfThreads(1);
+		
 		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
@@ -141,12 +149,14 @@ public class RunCarsharingIT {
 					
 					if ( TransportMode.walk.equals(legMode) ) {
 						Assert.assertEquals(0, nOfModeLegs );
+//						Assert.assertEquals(8, nOfModeLegs );
 					} else if ( "bike".equals(legMode) ) {
 						Assert.assertEquals( 2, nOfModeLegs ) ;
 					} else if ( TransportMode.car.equals(legMode) ) {
 						Assert.assertEquals( 0, nOfModeLegs ) ;
 					} else if ( "twoway_vehicle".equals(legMode) ) {
 						Assert.assertEquals( 10, nOfModeLegs ) ;
+//						Assert.assertEquals( 8, nOfModeLegs ) ;
 					}
 					else if ( "oneway_vehicle".equals(legMode) ) {
 						Assert.assertEquals( 0, nOfModeLegs ) ;
@@ -174,6 +184,7 @@ public class RunCarsharingIT {
 						Assert.assertEquals(4, nOfModeLegs );
 					} else if ( "twoway_vehicle".equals(legMode) ) {
 						Assert.assertEquals( 10, nOfModeLegs ) ;
+//						Assert.assertEquals( 8, nOfModeLegs ) ;
 					} else if ( TransportMode.car.equals(legMode) ) {
 						Assert.assertEquals( 0, nOfModeLegs ) ;
 					} else if ( "egress_walk_tw".equals(legMode) ) {

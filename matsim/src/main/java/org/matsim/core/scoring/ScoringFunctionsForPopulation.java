@@ -64,9 +64,10 @@ import gnu.trove.list.array.TDoubleArrayList;
  * @author michaz
  *
  */
-public final class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
+ final class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
 	// yyyyyy there is currently only one place outside package where this is used, and I think it
 	// can be changed there.  kai, sep'17
+	// I just removed that.  kai, apr'18
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScoringFunctionsForPopulation.class);
@@ -87,13 +88,13 @@ public final class ScoringFunctionsForPopulation implements BasicEventHandler, E
 	private final Map<Id<Person>, TDoubleCollection> partialScores = new LinkedHashMap<>();
 	private final AtomicReference<Throwable> exception = new AtomicReference<>();
 	
-	/**
-	 * For something like the bicycle scoring, we need to know individual links at the level of the scoring function.  This is a first sketch how this could be implemented.
-	 * kai, mar'17
-	 */
-	private boolean passLinkEventsToPerson = false;
+//	/**
+//	 * For something like the bicycle scoring, we need to know individual links at the level of the scoring function.  This is a first sketch how this could be implemented.
+//	 * kai, mar'17
+//	 */
+//	private boolean passLinkEventsToPerson = false;
 	
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
 
 	@Inject
 	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
@@ -109,9 +110,9 @@ public final class ScoringFunctionsForPopulation implements BasicEventHandler, E
 		eventsManager.addHandler(this);
 		eventsToActivities.addActivityHandler(this);
 		eventsToLegs.addLegHandler(this);
-		if ( passLinkEventsToPerson ) {
-			eventsManager.addHandler(delegate);
-		}
+//		if ( passLinkEventsToPerson ) {
+			eventsManager.addHandler(vehicles2Drivers);
+//		}
 	}
 
 	private void init() {
@@ -145,18 +146,18 @@ public final class ScoringFunctionsForPopulation implements BasicEventHandler, E
 //				}
 			}
 		}
-		if ( passLinkEventsToPerson ) {
+//		if ( passLinkEventsToPerson ) {
 			// Establish and end connection between driver and vehicle
 			if (o instanceof VehicleEntersTrafficEvent) {
-				delegate.handleEvent((VehicleEntersTrafficEvent) o);
+				vehicles2Drivers.handleEvent((VehicleEntersTrafficEvent) o);
 			}
 			if (o instanceof VehicleLeavesTrafficEvent) {
-				delegate.handleEvent((VehicleLeavesTrafficEvent) o);
+				vehicles2Drivers.handleEvent((VehicleLeavesTrafficEvent) o);
 			}
 			// Pass LinkEnterEvent to person scoring, required e.g. for bicycle where link attributes are observed in scoring
 			if ( o instanceof LinkEnterEvent ) {
 				Id<Vehicle> vehicleId = ((LinkEnterEvent)o).getVehicleId() ;
-				Id<Person> driverId = delegate.getDriverOfVehicle(vehicleId) ;
+				Id<Person> driverId = vehicles2Drivers.getDriverOfVehicle(vehicleId) ;
 				ScoringFunction scoringFunction = getScoringFunctionForAgent( driverId );
 				// (this will NOT do the scoring function lookup twice since LinkEnterEvent is not an instance of HasPersonId.  kai, mar'17)
 				if (scoringFunction != null) {
@@ -170,7 +171,7 @@ public final class ScoringFunctionsForPopulation implements BasicEventHandler, E
 			 * plans service in fact does the same thing, so we should be able to get away without having to do this twice.
 			 * kai, mar'17)
 			 */
-		}
+//		}
 	}
 
 	@Override
@@ -250,11 +251,11 @@ public final class ScoringFunctionsForPopulation implements BasicEventHandler, E
 
 	}
 
-	public boolean isPassLinkEventsToPerson() {
-		return passLinkEventsToPerson;
-	}
+//	public boolean isPassLinkEventsToPerson() {
+//		return passLinkEventsToPerson;
+//	}
 
-	public void setPassLinkEventsToPerson(boolean passLinkEventsToPerson) {
-		this.passLinkEventsToPerson = passLinkEventsToPerson;
-	}
+//	public void setPassLinkEventsToPerson(boolean passLinkEventsToPerson) {
+//		this.passLinkEventsToPerson = passLinkEventsToPerson;
+//	}
 }

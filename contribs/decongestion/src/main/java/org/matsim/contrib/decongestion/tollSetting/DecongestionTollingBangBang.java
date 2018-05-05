@@ -47,11 +47,11 @@ public class DecongestionTollingBangBang implements DecongestionTollSetting {
 	
 		log.info("Number of links: " + this.congestionInfo.getlinkInfos().size());
 		
-		final double toleratedAverageDelay = this.congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC();
-		final double tollAdjustment = this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT();
-		final double initialToll = this.congestionInfo.getDecongestionConfigGroup().getINITIAL_TOLL();
+		final double toleratedAverageDelay = this.congestionInfo.getDecongestionConfigGroup().getToleratedAverageDelaySec();
+		final double tollAdjustment = this.congestionInfo.getDecongestionConfigGroup().getTollAdjustment();
+		final double initialToll = this.congestionInfo.getDecongestionConfigGroup().getInitialToll();
 		final boolean msa = this.congestionInfo.getDecongestionConfigGroup().isMsa();
-		final double blendFactorFromConfig = this.congestionInfo.getDecongestionConfigGroup().getTOLL_BLEND_FACTOR();
+		final double blendFactorFromConfig = this.congestionInfo.getDecongestionConfigGroup().getTollBlendFactor();
 		
 		for (LinkInfo linkInfo : this.congestionInfo.getlinkInfos().values()) {
 			for (Integer intervalNr : linkInfo.getTime2avgDelay().keySet()) {

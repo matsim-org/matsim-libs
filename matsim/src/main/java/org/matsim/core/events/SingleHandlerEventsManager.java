@@ -75,7 +75,7 @@ import org.matsim.core.events.handler.EventHandler;
  * 
  * @author cdobler
  */
-public class SingleHandlerEventsManager implements EventsManager {
+public final class SingleHandlerEventsManager implements EventsManager {
 
 	private static final Logger log = Logger.getLogger(SingleHandlerEventsManager.class);
 	

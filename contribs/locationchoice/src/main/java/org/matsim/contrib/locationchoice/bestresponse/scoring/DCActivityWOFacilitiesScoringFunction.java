@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
 import org.matsim.core.scoring.SumScoringFunction;
 
 public class DCActivityWOFacilitiesScoringFunction implements SumScoringFunction.ActivityScoring {
@@ -33,7 +33,7 @@ public class DCActivityWOFacilitiesScoringFunction implements SumScoringFunction
 	private double score = 0. ;
 	private final Person person;
 	
-	public DCActivityWOFacilitiesScoringFunction(Person person, DestinationChoiceBestResponseContext lcContext) {
+	public DCActivityWOFacilitiesScoringFunction(Person person, DestinationChoiceContext lcContext) {
 		this.destinationChoiceScoring = new DestinationScoring(lcContext);
 		this.person = person ; 
 	}

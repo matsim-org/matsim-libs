@@ -263,6 +263,28 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 			}
 		}
 	}
+	
+	private interface StrategyChooser <T extends BasicPlan, I extends HasPlansAndId<? extends BasicPlan, I>> {
+		GenericPlanStrategy<T,I> chooseStrategy( HasPlansAndId<T,I> person, final String subpopulation ) ;
+	}
+	private class MyStrategyChooser implements StrategyChooser<T,I> {
+		@Override
+		public GenericPlanStrategy<T, I> chooseStrategy(HasPlansAndId<T, I> person, String subpopulation) {
+			StrategyWeights<T, I> weights = GenericStrategyManager.this.getStrategyWeights(subpopulation);
+			
+			double rnd = MatsimRandom.getRandom().nextDouble() * weights.totalWeights;
+			
+			double sum = 0.0;
+			for (int i = 0, max = weights.weights.size(); i < max; i++) {
+				sum += weights.weights.get(i);
+				if (rnd <= sum) {
+					return weights.strategies.get(i);
+				}
+			}
+			return null;
+		}
+	}
+	private MyStrategyChooser myStrategyChooser = new MyStrategyChooser() ;
 
 	/**
 	 * chooses a (weight-influenced) random strategy
@@ -271,19 +293,8 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 	 */
 	/* deliberately package */ GenericPlanStrategy<T, I> chooseStrategy(HasPlansAndId<T, I> person, final String subpopulation) {
 		// yyyyyy I can see that this would need to be replaceable, but need to find some other way than inheritance.  kai, mar'18
-		
-		final StrategyWeights<T, I> weights = getStrategyWeights(subpopulation);
-
-		double rnd = MatsimRandom.getRandom().nextDouble() * weights.totalWeights;
-
-		double sum = 0.0;
-		for (int i = 0, max = weights.weights.size(); i < max; i++) {
-			sum += weights.weights.get(i);
-			if (rnd <= sum) {
-				return weights.strategies.get(i);
-			}
-		}
-		return null;
+		// Just implemented first step towards pluggability. But ain't there yet.  kai, apr'18
+		return myStrategyChooser.chooseStrategy(person,subpopulation) ;
 	}
 
 	/**
