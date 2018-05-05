@@ -33,6 +33,7 @@ import com.google.inject.Inject;
 import org.matsim.contrib.decongestion.DecongestionConfigGroup.IntegralApproach;
 import org.matsim.contrib.decongestion.data.DecongestionInfo;
 import org.matsim.contrib.decongestion.data.LinkInfo;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * 
@@ -70,7 +71,11 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 		final boolean msa = this.congestionInfo.getDecongestionConfigGroup().isMsa();
 		final double blendFactorFromConfig = this.congestionInfo.getDecongestionConfigGroup().getTollBlendFactor();
 		
+		Counter counter = new Counter( "link # ", "" ) ;
+
 		for (Id<Link> linkId : this.congestionInfo.getlinkInfos().keySet()) {
+
+			counter.incCounter();
 			
 			double flowCapacityHeadwaySec = Double.NEGATIVE_INFINITY;
 			if (K_i != 0. && integralApproach.equals(IntegralApproach.UnusedHeadway.toString())) {

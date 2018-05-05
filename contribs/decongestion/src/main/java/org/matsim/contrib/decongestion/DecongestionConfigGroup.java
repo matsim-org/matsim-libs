@@ -72,9 +72,9 @@ public class DecongestionConfigGroup extends ReflectiveConfigGroup {
 	private double tollAdjustment = 1.0;
 
 	// PID approach
-	private double kp = 1.0;
-	private double kd = 1.0;
-	private double ki = 1.0;
+	private double kp = 1.;
+	private double kd = 1.;
+	private double ki = 1.;
 	private IntegralApproach integralApproach = IntegralApproach.Zero;
 	private double integralApproachAverageAlpha = 0.1;
 	private double integralApproachUnusedHeadwayFactor = 10.;

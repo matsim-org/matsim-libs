@@ -67,7 +67,7 @@ public class DecongestionRunExample {
 		
 	}
 
-	private void run() throws IOException {
+	private void run() {
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		decongestionSettings.setToleratedAverageDelaySec(30.);
@@ -105,12 +105,11 @@ public class DecongestionRunExample {
 		
 		// toll-adjusted routing
 		
-		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
-		travelDisutilityFactory.setSigma(0.);
-		
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
+				final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
+				travelDisutilityFactory.setSigma(0.);
 				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
 			}
 		});	

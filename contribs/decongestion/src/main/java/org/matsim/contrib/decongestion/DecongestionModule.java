@@ -32,6 +32,7 @@ import org.matsim.contrib.decongestion.tollSetting.DecongestionTollSetting;
 import org.matsim.contrib.decongestion.tollSetting.DecongestionTollingBangBang;
 import org.matsim.contrib.decongestion.tollSetting.DecongestionTollingPID;
 import org.matsim.contrib.decongestion.tollSetting.DecongestionTollingP_MCP;
+import org.matsim.core.gbl.Gbl;
 
 /**
 * @author ikaddoura
@@ -49,22 +50,23 @@ public class DecongestionModule extends AbstractModule {
 	public void install() {
 		
 		if (decongestionConfigGroup.isEnableDecongestionPricing()) {
-			if (decongestionConfigGroup.getDecongestionApproach().toString().equals(DecongestionApproach.PID.toString())) {
-				this.bind(DecongestionTollingPID.class).asEagerSingleton();
-				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
-				this.addEventHandlerBinding().to(DecongestionTollingPID.class);
-				
-			} else if (decongestionConfigGroup.getDecongestionApproach().toString().equals(DecongestionApproach.P_MC.toString())) {
-				this.bind(DecongestionTollingP_MCP.class).asEagerSingleton();
-				this.bind(DecongestionTollSetting.class).to(DecongestionTollingP_MCP.class);
-				this.addEventHandlerBinding().to(DecongestionTollingP_MCP.class);
-			
-			} else if (decongestionConfigGroup.getDecongestionApproach().toString().equals(DecongestionApproach.BangBang.toString())) {
-				this.bind(DecongestionTollingBangBang.class).asEagerSingleton();
-				this.bind(DecongestionTollSetting.class).to(DecongestionTollingBangBang.class);
-			
-			} else {
-				throw new RuntimeException("Unknown decongestion pricing approach. Aborting...");
+			switch( decongestionConfigGroup.getDecongestionApproach() ) {
+				case BangBang:
+					this.bind(DecongestionTollingBangBang.class).asEagerSingleton();
+					this.bind(DecongestionTollSetting.class).to(DecongestionTollingBangBang.class);
+					break;
+				case PID:
+					this.bind(DecongestionTollingPID.class).asEagerSingleton();
+					this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
+					this.addEventHandlerBinding().to(DecongestionTollingPID.class);
+					break;
+				case P_MC:
+					this.bind(DecongestionTollingP_MCP.class).asEagerSingleton();
+					this.bind(DecongestionTollSetting.class).to(DecongestionTollingP_MCP.class);
+					this.addEventHandlerBinding().to(DecongestionTollingP_MCP.class);
+					break;
+				default:
+					throw new RuntimeException("not implemented") ;
 			}
 			
 		} else {
