@@ -117,9 +117,7 @@
 
 	<param name="maxAgentPlanMemorySize" value="5" />
 
-	<param name="ModuleProbability_2" value="0.0" />
-	<!--(Set from 0.5 to 0.0.  see email to Milos. kai, may'18)-->
-
+	<param name="ModuleProbability_2" value="0.5" />
 	<param name="Module_2" value="RandomTripToCarsharingStrategy" />
 	<param name="ModuleDisableAfterIteration_2" value="1000" />
 
@@ -180,11 +178,11 @@
 		<param name="earlyDeparture" value="0" />
 		<param name="waiting" value="0" />
 		<param name="activityType_0" value="h" />
-		<!--<param name="activityClosingTime_0" value="23:59:59" />-->
+		<param name="activityClosingTime_0" value="23:59:59" />
 		<param name="activityEarliestEndTime_0" value="undefined" />
 		<param name="activityLatestStartTime_0" value="undefined" />
 		<param name="activityMinimalDuration_0" value="08:00:00" />
-		<!--<param name="activityOpeningTime_0" value="00:00:00" />-->
+		<param name="activityOpeningTime_0" value="00:00:00" />
 		<param name="activityTypicalDuration_0" value="08:00:00" />
 
 		<param name="activityType_7" value="w" />

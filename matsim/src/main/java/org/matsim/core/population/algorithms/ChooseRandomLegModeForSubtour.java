@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.router.MainModeIdentifier;
@@ -47,7 +48,6 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private static Logger logger = Logger.getLogger(ChooseRandomLegModeForSubtour.class);
-	private final TripsToLegsAlgorithm tripsToLegs;
 	
 	private static class Candidate {
 		final Subtour subtour;
@@ -64,7 +64,6 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	private Collection<String> modes;
 	private final Collection<String> chainBasedModes;
 	private final SubtourModeChoice.Behavior behavior;
-	private final double probaForChangeSingleTripMode;
 	private Collection<String> singleTripSubtourModes;
 
 	private final StageActivityTypes stageActivityTypes;
@@ -76,7 +75,9 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private boolean anchorAtFacilities = false;
 	
-	private final ChooseRandomSingleLegMode changeSingleLegMode;
+	private final double probaForChangeSingleTripMode;
+	private TripsToLegsAlgorithm tripsToLegs = null ;
+	private ChooseRandomSingleLegMode changeSingleLegMode = null ;
 	
 	public ChooseRandomLegModeForSubtour(
 			final StageActivityTypes stageActivityTypes,
@@ -99,18 +100,18 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 		// also set up the standard change single leg mode, in order to alternatively randomize modes in
 		// subtours.  kai, may'18
-		this.tripsToLegs = new TripsToLegsAlgorithm( this.stageActivityTypes, this.mainModeIdentifier ) ;
-		
-		Collection<String> notChainBasedModes = new ArrayList<>( this.modes ) ;
-		notChainBasedModes.removeAll( this.chainBasedModes ) ;
-		;
-		final String[] possibleModes = notChainBasedModes.toArray(new String[]{});
-		if ( possibleModes.length >=2 ) { // nothing to choose if there is only one mode!
-			this.changeSingleLegMode = new ChooseRandomSingleLegMode(possibleModes, rng);
-		} else {
-			this.changeSingleLegMode = null ;
+		if ( this.probaForChangeSingleTripMode>0. ) {
+			Collection<String> notChainBasedModes = new ArrayList<>(this.modes);
+			notChainBasedModes.removeAll(this.chainBasedModes);
+			final String[] possibleModes = notChainBasedModes.toArray(new String[]{});
+			if (possibleModes.length >= 2) {
+				// nothing to choose if there is only one mode!  I also don't think that we can base this on size, since
+				// mode strings might be registered multiple times (these are not sets).  kai, may'18
+
+				this.tripsToLegs = new TripsToLegsAlgorithm(this.stageActivityTypes, this.mainModeIdentifier);
+				this.changeSingleLegMode = new ChooseRandomSingleLegMode(possibleModes, rng);
+			}
 		}
-		
 	}
 
 	/**
@@ -131,10 +132,10 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		if (plan.getPlanElements().size() <= 1) {
 			return;
 		}
-		if ( this.changeSingleLegMode!=null & rng.nextDouble() < this.probaForChangeSingleTripMode) {
-			this.tripsToLegs.run(plan) ;
+		if ( this.changeSingleLegMode!=null && rng.nextDouble() < this.probaForChangeSingleTripMode ) {
+			this.tripsToLegs.run(plan);
 			this.changeSingleLegMode.run(plan);
-			return ;
+			return;
 		}
 
 		final Id<? extends BasicLocation> homeLocation = anchorAtFacilities ?

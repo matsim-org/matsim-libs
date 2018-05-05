@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 public final class Counter {
 	private final String prefix;
 	private final String suffix;
+	private final int multiplier;
 	private final AtomicLong counter = new AtomicLong(0);
 	private final AtomicLong nextCounter = new AtomicLong(1);
 	private static final Logger log = Logger.getLogger(Counter.class);
@@ -43,21 +44,29 @@ public final class Counter {
 	public Counter(final String prefix) {
 		this( prefix , "" );
 	}
-
+	
 	/**
 	 * @param prefix Some text that is output just before the counter-value.
 	 * @param suffix Some text that is output just after the counter-value.
 	 */
-	public Counter(final String prefix, final String suffix) {
+	public Counter(final String prefix, final String suffix ) {
+		this( prefix, suffix, 2 ) ;
+	}
+		/**
+		 * @param prefix Some text that is output just before the counter-value.
+		 * @param suffix Some text that is output just after the counter-value.
+		 */
+	public Counter(final String prefix, final String suffix, int multiplier) {
 		this.prefix = prefix;
 		this.suffix = suffix;
+		this.multiplier = multiplier;
 	}
 
 	public void incCounter() {
 		long i = this.counter.incrementAndGet();
 		long n = this.nextCounter.get();
 		if (i >= n) {
-			if (this.nextCounter.compareAndSet(n, n*2)) {
+			if (this.nextCounter.compareAndSet(n, n*multiplier)) {
 				log.info(this.prefix + n + this.suffix);
 			}
 		}
