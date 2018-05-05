@@ -20,14 +20,11 @@
 
 package org.matsim.core.population.algorithms;
 
-import java.util.*;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.router.MainModeIdentifier;
@@ -36,6 +33,15 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Changes the transportation mode of one random non-empty subtour in a plan to a randomly chosen
@@ -109,7 +115,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				// mode strings might be registered multiple times (these are not sets).  kai, may'18
 
 				this.tripsToLegs = new TripsToLegsAlgorithm(this.stageActivityTypes, this.mainModeIdentifier);
-				this.changeSingleLegMode = new ChooseRandomSingleLegMode(possibleModes, rng);
+				this.changeSingleLegMode = new ChooseRandomSingleLegMode(possibleModes, rng, true);
 			}
 		}
 	}
