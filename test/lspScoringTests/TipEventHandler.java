@@ -25,7 +25,6 @@ public class TipEventHandler implements ServiceEndEventHandler{
 	@Override
 	public void handleEvent(ServiceEndEvent event) {
 		double tip = tipRandom.nextDouble() * 5;
-		System.out.println("ServiceEvent " + tip);
 		tipSum += tip;
 	}
 
