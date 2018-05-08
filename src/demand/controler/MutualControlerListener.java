@@ -199,7 +199,6 @@ public class MutualControlerListener implements FreightControlerListener, Before
 		return carrierResourceTracker;
 	}
 
-
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		if(event.getIteration() > 0) {

@@ -3,9 +3,7 @@ package demand.controler;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 import demand.decoratedLSP.LSPDecorator;
@@ -31,12 +29,12 @@ public class InitialDemandAssigner implements StartupListener{
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-			for(DemandObject demandObject : demandObjects.getDemandObjects().values()) {
-				if(demandObject.getSelectedPlan() == null) {
-					createInitialPlan(demandObject);
-				}
-				assignShipmentToLSP(demandObject);
+		for(DemandObject demandObject : demandObjects.getDemandObjects().values()) {
+			if(demandObject.getSelectedPlan() == null) {
+				createInitialPlan(demandObject);
 			}
+				assignShipmentToLSP(demandObject);
+		}
 
 		for(LSPDecorator lsp : lsps.getLSPs().values()) {
 			lsp.scheduleSoultions();
@@ -46,7 +44,7 @@ public class InitialDemandAssigner implements StartupListener{
 	private void createInitialPlan(DemandObject demandObject) {
 		Collection<Offer> offers = demandObject.getOfferRequester().requestOffers(lsps.getLSPs().values());
 		DemandPlan initialPlan = demandObject.getDemandPlanGenerator().createDemandPlan(offers);
-		demandObject.setSelectedPlan(initialPlan);
+		demandObject.setSelectedPlan(initialPlan);	
 	}
 	
 	private void assignShipmentToLSP(DemandObject demandObject) {
