@@ -2,8 +2,6 @@ package lspScoringTests;
 
 import java.util.Random;
 
-import lsp.events.ServiceStartEvent;
-import lsp.events.ServiceStartEventHandler;
 import lsp.events.ServiceEndEvent;
 import lsp.events.ServiceEndEventHandler;
 
