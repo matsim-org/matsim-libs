@@ -74,19 +74,17 @@ public class MutualControlerListener implements FreightControlerListener, Before
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 
-		carrierResourceTracker = new CarrierResourceTracker(carriers, network, this, creators);
-		eventsManager.addHandler(carrierResourceTracker);
-
 		SupplyRescheduler rescheduler = new SupplyRescheduler(lsps);
 		rescheduler.notifyBeforeMobsim(event);
-
+		
+		carrierResourceTracker = new CarrierResourceTracker(carriers, network, this, creators);
+		eventsManager.addHandler(carrierResourceTracker);
 		registeredHandlers = new ArrayList<EventHandler>();
 
 		for (LSP lsp : lsps.getLSPs().values()) {
 			for (LSPShipment shipment : lsp.getShipments()) {
 				for (EventHandler handler : shipment.getEventHandlers()) {
 					eventsManager.addHandler(handler);
-					registeredHandlers.add(handler);
 				}
 			}
 			LSPPlan selectedPlan = lsp.getSelectedPlan();
@@ -109,8 +107,6 @@ public class MutualControlerListener implements FreightControlerListener, Before
 			}
 		}
 	}
-
-	
 	
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
@@ -125,24 +121,8 @@ public class MutualControlerListener implements FreightControlerListener, Before
 
 	@Override
 	public void notifyScoring(ScoringEvent event) {
-		boolean score = true;
-		for (LSP lsp : lsps.getLSPs().values()) {
-			if (lsp.getScorer() == null) {
-				score = false;
-			}
-			if (score == true) {
-				mutualScoringModule.scoreLSPs();
-			}
-		}
-
-		for (DemandObject demandObject : demandObjects.getDemandObjects().values()) {
-			if (demandObject.getScorer() == null) {
-				score = false;
-			}
-			if (score == true) {
-				mutualScoringModule.scoreDemandObjects();
-			}
-		}
+		mutualScoringModule.scoreLSPs(event);
+		mutualScoringModule.scoreDemandObjects(event);
 	}
 
 	@Override

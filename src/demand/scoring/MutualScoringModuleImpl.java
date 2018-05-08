@@ -20,13 +20,13 @@ public class MutualScoringModuleImpl implements MutualScoringModule{
 	}
 	
 	@Override
-	public void notifyScoring(ScoringEvent arg0) {
-		scoreDemandObjects();	
-		scoreLSPs();
+	public void notifyScoring(ScoringEvent event) {
+		scoreDemandObjects(event);	
+		scoreLSPs(event);
 	}
 
 	@Override
-	public void scoreDemandObjects() {
+	public void scoreDemandObjects(ScoringEvent event) {
 		for(DemandObject demandObject : demandObjects) {
 			if(demandObject.getScorer() != null) {
 				demandObject.scoreSelectedPlan();	
@@ -35,7 +35,7 @@ public class MutualScoringModuleImpl implements MutualScoringModule{
 	}
 
 	@Override
-	public void scoreLSPs() {
+	public void scoreLSPs(ScoringEvent event) {
 		for(LSPDecorator lsp : lsps) {
 			if(lsp.getScorer() != null) {
 				lsp.scoreSelectedPlan();
