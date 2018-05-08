@@ -29,12 +29,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.usecase.CollectionCarrierAdapter;
-import lsp.usecase.CollectionCarrierScheduler;
-import lsp.usecase.DeterministicShipmentAssigner;
-import lsp.usecase.ReloadingPoint;
-import lsp.usecase.ReloadingPointScheduler;
-import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
 import lsp.events.EventUtils;
 import lsp.LSP;
@@ -47,7 +41,6 @@ import lsp.LogisticsSolutionElementImpl;
 import lsp.LogisticsSolutionImpl;
 import lsp.ShipmentAssigner;
 import lsp.SolutionScheduler;
-import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
 import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.scoring.LSPScoringModuleImpl;
@@ -55,20 +48,26 @@ import lsp.shipment.AbstractShipmentPlanElement;
 import lsp.shipment.AbstractShipmentPlanElementComparator;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
+import lsp.usecase.CollectionCarrierAdapter;
+import lsp.usecase.CollectionCarrierScheduler;
+import lsp.usecase.DeterministicShipmentAssigner;
+import lsp.usecase.MainRunCarrierAdapter;
+import lsp.usecase.MainRunCarrierScheduler;
+import lsp.usecase.ReloadingPoint;
+import lsp.usecase.ReloadingPointScheduler;
+import lsp.usecase.SimpleForwardSolutionScheduler;
 
-public class FirstReloadLSPMobsimTest {
+
+
+public class MultipleIterationsSecondReloadLSPMobsimTest {
 	private Network network;
 	private LogisticsSolution completeSolution;
 	private ShipmentAssigner assigner;
 	private LSPPlanImpl completePlan;
 	private SolutionScheduler simpleScheduler;
-	private Carrier collectionCarrier;
-	private LogisticsSolutionElement collectionElement;
-	private LogisticsSolutionElement firstReloadElement;
 	private LSP lsp;	
-	private Resource collectionAdapter;
-	private Resource firstReloadingPointAdapter;
-	 
+	private int numberOfShipments;
+	
 	@Before
 	public void initialize() {
 		Config config = new Config();
@@ -99,7 +98,7 @@ public class FirstReloadLSPMobsimTest {
 		collectionCapabilitiesBuilder.addVehicle(collectionCarrierVehicle);
 		collectionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities collectionCapabilities = collectionCapabilitiesBuilder.build();
-		collectionCarrier = CarrierImpl.newInstance(collectionCarrierId);
+		Carrier collectionCarrier = CarrierImpl.newInstance(collectionCarrierId);
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 		
 		
@@ -108,12 +107,12 @@ public class FirstReloadLSPMobsimTest {
 		collectionAdapterBuilder.setCollectionScheduler(collectionScheduler);
 		collectionAdapterBuilder.setCarrier(collectionCarrier);
 		collectionAdapterBuilder.setLocationLinkId(collectionLinkId);
-		collectionAdapter = collectionAdapterBuilder.build();
+		Resource collectionAdapter = collectionAdapterBuilder.build();
 		
 		Id<LogisticsSolutionElement> collectionElementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LogisticsSolutionElementImpl.Builder collectionBuilder = LogisticsSolutionElementImpl.Builder.newInstance(collectionElementId);
 		collectionBuilder.setResource(collectionAdapter);
-		collectionElement = collectionBuilder.build();
+		LogisticsSolutionElement collectionElement = collectionBuilder.build();
 		
 		ReloadingPointScheduler.Builder firstReloadingSchedulerBuilder =  ReloadingPointScheduler.Builder.newInstance();
         firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
@@ -125,21 +124,87 @@ public class FirstReloadLSPMobsimTest {
         
         ReloadingPoint.Builder firstReloadingPointBuilder = ReloadingPoint.Builder.newInstance(firstReloadingId, firstReloadingLinkId);
         firstReloadingPointBuilder.setReloadingScheduler(firstReloadingSchedulerBuilder.build());
-        firstReloadingPointAdapter = firstReloadingPointBuilder.build();
+        Resource firstReloadingPointAdapter = firstReloadingPointBuilder.build();
         
         Id<LogisticsSolutionElement> firstReloadingElementId = Id.create("FirstReloadElement", LogisticsSolutionElement.class);
 		LogisticsSolutionElementImpl.Builder firstReloadingElementBuilder = LogisticsSolutionElementImpl.Builder.newInstance(firstReloadingElementId);
 		firstReloadingElementBuilder.setResource(firstReloadingPointAdapter);
-		firstReloadElement = firstReloadingElementBuilder.build();
+		LogisticsSolutionElement firstReloadElement = firstReloadingElementBuilder.build();
+		
+		Id<Carrier> mainRunCarrierId = Id.create("MainRunCarrier", Carrier.class);
+		Id<VehicleType> mainRunVehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
+		CarrierVehicleType.Builder mainRunVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(mainRunVehicleTypeId);
+		mainRunVehicleTypeBuilder.setCapacity(30);
+		mainRunVehicleTypeBuilder.setCostPerDistanceUnit(0.0002);
+		mainRunVehicleTypeBuilder.setCostPerTimeUnit(0.38);
+		mainRunVehicleTypeBuilder.setFixCost(120);
+		mainRunVehicleTypeBuilder.setMaxVelocity(50/3.6);
+		CarrierVehicleType mainRunType = mainRunVehicleTypeBuilder.build();
+				
+		
+		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
+		Id<Vehicle> mainRunVehicleId = Id.createVehicleId("MainRunVehicle");
+		CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance(mainRunVehicleId, fromLinkId);
+		mainRunCarrierVehicle.setVehicleType(mainRunType);
+				
+		
+		CarrierCapabilities.Builder mainRunCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
+		mainRunCapabilitiesBuilder.addType(mainRunType);
+		mainRunCapabilitiesBuilder.addVehicle(mainRunCarrierVehicle);
+		mainRunCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
+		CarrierCapabilities mainRunCapabilities = mainRunCapabilitiesBuilder.build();
+		Carrier mainRunCarrier = CarrierImpl.newInstance(mainRunCarrierId);
+		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
+        
+        
+        
+        MainRunCarrierScheduler mainRunScheduler = new MainRunCarrierScheduler();
+        Id<Resource> mainRunId = Id.create("MainRunAdapter", Resource.class);
+        MainRunCarrierAdapter.Builder mainRunAdapterBuilder = MainRunCarrierAdapter.Builder.newInstance(mainRunId, network);
+        mainRunAdapterBuilder.setMainRunCarrierScheduler(mainRunScheduler);
+        mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
+        mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
+        mainRunAdapterBuilder.setCarrier(mainRunCarrier);
+        Resource mainRunAdapter = mainRunAdapterBuilder.build();
+	
+        Id<LogisticsSolutionElement> mainRunElementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
+		LogisticsSolutionElementImpl.Builder mainRunBuilder = LogisticsSolutionElementImpl.Builder.newInstance(mainRunElementId);
+		mainRunBuilder.setResource(mainRunAdapter);
+		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
+		
+		ReloadingPointScheduler.Builder secondSchedulerBuilder =  ReloadingPointScheduler.Builder.newInstance();
+        secondSchedulerBuilder.setCapacityNeedFixed(10);
+        secondSchedulerBuilder.setCapacityNeedLinear(1);
+       
+        
+        Id<Resource> secondReloadingId = Id.create("ReloadingPoint2", Resource.class);
+        Id<Link> secondReloadingLinkId = Id.createLinkId("(14 2) (14 3)");
+        
+        ReloadingPoint.Builder secondReloadingPointBuilder = ReloadingPoint.Builder.newInstance(secondReloadingId, secondReloadingLinkId);
+        secondReloadingPointBuilder.setReloadingScheduler(secondSchedulerBuilder.build());
+        Resource secondReloadingPointAdapter = secondReloadingPointBuilder.build();
+        
+        Id<LogisticsSolutionElement> secondReloadingElementId = Id.create("SecondReloadElement", LogisticsSolutionElement.class);
+		LogisticsSolutionElementImpl.Builder secondReloadingElementBuilder = LogisticsSolutionElementImpl.Builder.newInstance(secondReloadingElementId);
+		secondReloadingElementBuilder.setResource(secondReloadingPointAdapter);
+		LogisticsSolutionElement secondReloadElement = secondReloadingElementBuilder.build();
+		
+		
 		
 		collectionElement.setNextElement(firstReloadElement);
 		firstReloadElement.setPreviousElement(collectionElement);
+		firstReloadElement.setNextElement(mainRunElement);
+		mainRunElement.setPreviousElement(firstReloadElement);
+		mainRunElement.setNextElement(secondReloadElement);
+		secondReloadElement.setPreviousElement(mainRunElement);
 		
 		
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LogisticsSolutionImpl.Builder completeSolutionBuilder = LogisticsSolutionImpl.Builder.newInstance(solutionId);
 		completeSolutionBuilder.addSolutionElement(collectionElement);
 		completeSolutionBuilder.addSolutionElement(firstReloadElement);
+		completeSolutionBuilder.addSolutionElement(mainRunElement);
+		completeSolutionBuilder.addSolutionElement(secondReloadElement);
 		completeSolution = completeSolutionBuilder.build();
 		
 		assigner = new DeterministicShipmentAssigner();
@@ -154,19 +219,19 @@ public class FirstReloadLSPMobsimTest {
 		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
 		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
-		
-
+		resourcesList.add(mainRunAdapter);
+		resourcesList.add(secondReloadingPointAdapter);
+	
 		simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
 		simpleScheduler.setBufferTime(300);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();
 	
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
-		
-		 for(int i = 1; i < 2; i++) {
+		numberOfShipments = 1 + new Random().nextInt(50); 
+		 for(int i = 1; i < 1 + numberOfShipments; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 	        	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
-	        	//Random random = new Random(1);
 	        	int capacityDemand = 1 + new Random().nextInt(4);
 	        	builder.setCapacityDemand(capacityDemand);
 	        	
@@ -218,7 +283,7 @@ public class FirstReloadLSPMobsimTest {
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(1 + new Random().nextInt(10));
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("input\\lsp\\network\\2regions.xml");
 		controler.run();
@@ -226,7 +291,6 @@ public class FirstReloadLSPMobsimTest {
 	
 	@Test
 	public void testFirstReloadLSPMobsim() {
-
 		for(LSPShipment shipment : lsp.getShipments()) {
 			assertFalse(shipment.getLog().getPlanElements().isEmpty());
 			assertTrue(shipment.getSchedule().getPlanElements().size() == shipment.getLog().getPlanElements().size());
@@ -234,7 +298,7 @@ public class FirstReloadLSPMobsimTest {
 			Collections.sort(scheduleElements, new AbstractShipmentPlanElementComparator());
 			ArrayList<AbstractShipmentPlanElement> logElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getLog().getPlanElements().values());
 			Collections.sort(logElements, new AbstractShipmentPlanElementComparator());
-										
+			
 			for(AbstractShipmentPlanElement scheduleElement : scheduleElements){
 				AbstractShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
 				assertTrue(scheduleElement.getElementType() == logElement.getElementType());

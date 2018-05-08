@@ -74,6 +74,7 @@ import testMutualReplanning.HalfLotSizeDemandPlanGenerator;
 import testMutualReplanning.SimpleOfferTransferrer;
 
 
+@SuppressWarnings("unused")
 public class MutualReplanningAndOfferUpdateTest {
 
 	private LSPDecorator lsp;
@@ -82,8 +83,7 @@ public class MutualReplanningAndOfferUpdateTest {
 	private LinearOfferVisitor linearVisitor;
 	private LogisticsSolutionDecorator  solution;
 	private double initialFixed;
-	private 
-	double initialVariable;
+	private double initialVariable;
 	
 	@Before
 	public void initialize() {

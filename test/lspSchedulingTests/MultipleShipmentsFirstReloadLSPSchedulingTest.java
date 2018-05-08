@@ -155,6 +155,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 		
 
 		simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
+		simpleScheduler.setBufferTime(300);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();
 	
@@ -235,7 +236,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 			assertTrue(planElements.get(3).getResourceId() == firstReloadingPointAdapter.getId());
 			assertTrue(planElements.get(3).getSolutionElement() == firstReloadElement);	
 			
-			assertTrue(planElements.get(3).getStartTime() == planElements.get(2).getEndTime());
+			assertTrue(planElements.get(3).getStartTime() == planElements.get(2).getEndTime() + 300);
 			
 			assertTrue(planElements.get(2).getElementType() == "UNLOAD");
 			assertTrue(planElements.get(2).getEndTime() >= (0));
@@ -327,5 +328,17 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 			assertTrue(serviceHandler.getResourceId() == planElements.get(0).getResourceId());
 			assertTrue(serviceHandler.getResourceId()  == lsp.getResources().iterator().next().getId());
 		}	
+	
+		for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
+			for(LogisticsSolutionElement element : solution.getSolutionElements()) {
+				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
+				if(element.getNextElement() != null) {
+					assertTrue(element.getOutgoingShipments().getShipments().isEmpty());	
+				}
+				else {
+					assertFalse(element.getOutgoingShipments().getShipments().isEmpty());
+				}
+			}
+		}
 	}
 }

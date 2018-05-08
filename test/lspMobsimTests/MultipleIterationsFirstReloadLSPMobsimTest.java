@@ -56,7 +56,7 @@ import lsp.shipment.AbstractShipmentPlanElementComparator;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
 
-public class FirstReloadLSPMobsimTest {
+public class MultipleIterationsFirstReloadLSPMobsimTest {
 	private Network network;
 	private LogisticsSolution completeSolution;
 	private ShipmentAssigner assigner;
@@ -68,7 +68,8 @@ public class FirstReloadLSPMobsimTest {
 	private LSP lsp;	
 	private Resource collectionAdapter;
 	private Resource firstReloadingPointAdapter;
-	 
+	private int numberOfShipments;
+	
 	@Before
 	public void initialize() {
 		Config config = new Config();
@@ -162,8 +163,9 @@ public class FirstReloadLSPMobsimTest {
 		lsp = completeLSPBuilder.build();
 	
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		numberOfShipments = 1 + new Random().nextInt(50);
 		
-		 for(int i = 1; i < 2; i++) {
+		for(int i = 1; i <  1+ numberOfShipments; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 	        	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
 	        	//Random random = new Random(1);
@@ -218,7 +220,7 @@ public class FirstReloadLSPMobsimTest {
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(1 + new Random().nextInt(10));
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("input\\lsp\\network\\2regions.xml");
 		controler.run();

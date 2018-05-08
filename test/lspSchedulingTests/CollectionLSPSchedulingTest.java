@@ -236,5 +236,19 @@ public class CollectionLSPSchedulingTest {
 			assertTrue(serviceHandler.getResourceId() == planElements.get(1).getResourceId());
 			assertTrue(serviceHandler.getResourceId()  == collectionLSP.getResources().iterator().next().getId());
 		}		
+	
+		for(LogisticsSolution solution : collectionLSP.getSelectedPlan().getSolutions()) {
+			assertTrue(solution.getShipments().size() == 1);
+			for(LogisticsSolutionElement element : solution.getSolutionElements()) {
+				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
+				if(element.getNextElement() != null) {
+					assertTrue(element.getOutgoingShipments().getShipments().isEmpty());	
+				}
+				else {
+					assertFalse(element.getOutgoingShipments().getShipments().isEmpty());
+				}
+			}
+		}
+		
 	}
 }

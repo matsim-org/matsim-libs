@@ -126,6 +126,7 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 		resourcesList.add(collectionAdapter);
 		
 		SolutionScheduler simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
+		simpleScheduler.setBufferTime(300);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	
@@ -235,6 +236,18 @@ public class MultipleShipmentsCollectionLSPSchedulingTest {
 			assertTrue(serviceHandler.getLspShipment() == shipment);
 			assertTrue(serviceHandler.getResourceId() == planElements.get(1).getResourceId());
 			assertTrue(serviceHandler.getResourceId()  == collectionLSP.getResources().iterator().next().getId());
-		}		
+		}
+		
+		for(LogisticsSolution solution : collectionLSP.getSelectedPlan().getSolutions()) {
+			for(LogisticsSolutionElement element : solution.getSolutionElements()) {
+				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
+				if(element.getNextElement() != null) {
+					assertTrue(element.getOutgoingShipments().getShipments().isEmpty());	
+				}
+				else {
+					assertFalse(element.getOutgoingShipments().getShipments().isEmpty());
+				}
+			}
+		}
 	}
 }

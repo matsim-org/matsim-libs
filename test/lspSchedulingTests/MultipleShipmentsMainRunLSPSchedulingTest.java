@@ -203,6 +203,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 		resourcesList.add(mainRunAdapter);
 
 		simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
+		simpleScheduler.setBufferTime(300);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();
 	
@@ -305,7 +306,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 			assertTrue(planElements.get(4).getResourceId() == mainRunAdapter.getId());
 			assertTrue(planElements.get(4).getSolutionElement() == mainRunElement);	
 			
-			assertTrue(planElements.get(4).getStartTime() >= planElements.get(3).getEndTime() / (1.0001));
+			assertTrue(planElements.get(4).getStartTime() >= planElements.get(3).getEndTime() / (1.0001) + 300);
 			
 			assertTrue(planElements.get(3).getElementType() == "HANDLE");
 			assertTrue(planElements.get(3).getEndTime() >= (0));
@@ -316,7 +317,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 			assertTrue(planElements.get(3).getResourceId() == firstReloadingPointAdapter.getId());
 			assertTrue(planElements.get(3).getSolutionElement() == firstReloadElement);	
 			
-			assertTrue(planElements.get(3).getStartTime() == planElements.get(2).getEndTime());
+			assertTrue(planElements.get(3).getStartTime() == (planElements.get(2).getEndTime() +300));
 			
 			assertTrue(planElements.get(2).getElementType() == "UNLOAD");
 			assertTrue(planElements.get(2).getEndTime() >= (0));
@@ -451,5 +452,16 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 			assertTrue(mainRunEndHandler.getResource().getId()  == resources.get(2).getId());
 		}
 	
+		for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
+			for(LogisticsSolutionElement element : solution.getSolutionElements()) {
+				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
+				if(element.getNextElement() != null) {
+					assertTrue(element.getOutgoingShipments().getShipments().isEmpty());	
+				}
+				else {
+					assertFalse(element.getOutgoingShipments().getShipments().isEmpty());
+				}
+			}
+		}
 	}
 }

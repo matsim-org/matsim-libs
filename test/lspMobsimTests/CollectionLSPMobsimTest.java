@@ -43,6 +43,7 @@ import lsp.LogisticsSolutionElementImpl;
 import lsp.LogisticsSolutionImpl;
 import lsp.ShipmentAssigner;
 import lsp.SolutionScheduler;
+import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
 import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.scoring.LSPScoringModuleImpl;
@@ -80,9 +81,6 @@ public class CollectionLSPMobsimTest {
 		
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Link collectionLink = network.getLinks().get(collectionLinkId);
-		if (collectionLink == null) {
-			System.exit(1);
-		}
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLink.getId());
 		carrierVehicle.setVehicleType(collectionType);
@@ -126,6 +124,7 @@ public class CollectionLSPMobsimTest {
 		resourcesList.add(collectionAdapter);
 		
 		SolutionScheduler simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
+		simpleScheduler.setBufferTime(300);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	
@@ -136,12 +135,12 @@ public class CollectionLSPMobsimTest {
 	    for(int i = 1; i < 2; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
         	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
-        	Random random = new Random(1);
-        	int capacityDemand = random.nextInt(4);
+        	//Random random = new Random(1);
+        	int capacityDemand = 1+ new Random().nextInt(4);
         	builder.setCapacityDemand(capacityDemand);
         	
         	while(true) {
-        		Collections.shuffle(linkList, random);
+        		Collections.shuffle(linkList);
         		Link pendingFromLink = linkList.get(0);
         		if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
         		   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
@@ -173,7 +172,7 @@ public class CollectionLSPMobsimTest {
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(2);
+		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("input\\lsp\\network\\2regions.xml");
 		controler.run();
@@ -188,18 +187,20 @@ public class CollectionLSPMobsimTest {
 			Collections.sort(scheduleElements, new AbstractShipmentPlanElementComparator());
 			ArrayList<AbstractShipmentPlanElement> logElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getLog().getPlanElements().values());
 			Collections.sort(logElements, new AbstractShipmentPlanElementComparator());
+					
+			//Das muss besser in den SchedulingTest rein
+			assertTrue(collectionLSP.getResources().iterator().next() == collectionAdapter);
+			CarrierResource carrierResource = (CarrierResource) collectionAdapter;
+			assertTrue(carrierResource.getCarrier() == carrier);
+			assertTrue(carrier.getServices().size() == 1);
 			
-			
-			System.out.println();
-			for(int i = 0; i < shipment.getSchedule().getPlanElements().size(); i++) {
-				System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId()+ "  " + scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
+			for(AbstractShipmentPlanElement scheduleElement : scheduleElements){
+				AbstractShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
+				assertTrue(scheduleElement.getElementType() == logElement.getElementType());
+				assertTrue(scheduleElement.getResourceId() == logElement.getResourceId());
+				assertTrue(scheduleElement.getSolutionElement() == logElement.getSolutionElement());
+				assertEquals(scheduleElement.getStartTime(), logElement.getStartTime(), 300);
 			}
-			System.out.println();
-			for(int i = 0; i < shipment.getLog().getPlanElements().size(); i++) {
-				System.out.println("Logged: " + logElements.get(i).getSolutionElement().getId() + "  " + logElements.get(i).getResourceId() +"  " + logElements.get(i).getElementType() + " Start: " + logElements.get(i).getStartTime() + " End: " + logElements.get(i).getEndTime());
-			}
-		
-		}
-	}
-
+		}	
+	}	
 }

@@ -17,6 +17,17 @@ import lspMobsimTests.CompleteLSPMobsimTest;
 import lspMobsimTests.FirstReloadLSPMobsimTest;
 import lspMobsimTests.MainRunLSPMobsimTest;
 import lspMobsimTests.MainRunOnlyLSPMobsimTest;
+import lspMobsimTests.MultipleIterationsCollectionLSPMobsimTest;
+import lspMobsimTests.MultipleIterationsFirstReloadLSPMobsimTest;
+import lspMobsimTests.MultipleIterationsMainRunLSPMobsimTest;
+import lspMobsimTests.MultipleIterationsSecondReloadLSPMobsimTest;
+import lspMobsimTests.MultipleItreationsCompleteLSPMobsimTest;
+import lspMobsimTests.MultipleShipmentsCollectionLSPMobsimTest;
+import lspMobsimTests.MultipleShipmentsCompleteLSPMobsimTest;
+import lspMobsimTests.MultipleShipmentsFirstReloadLSPMobsimTest;
+import lspMobsimTests.MultipleShipmentsMainRunLSPMobsimTest;
+import lspMobsimTests.MultipleShipmentsSecondReloadLSPMobsimTest;
+import lspMobsimTests.RepeatedMultipleShipmentsCompleteLSPMobsimTest;
 import lspMobsimTests.SecondReloadLSPMobsimTest;
 import lspPlanTests.CollectionLSPPlanTest;
 import lspPlanTests.CompleteLSPPlanTest;
@@ -100,6 +111,17 @@ import testMutualreplanningWithOfferUpdate.MutualReplanningAndOfferUpdateTest;
 	MultipleShipmentsSecondReloadLSPSchedulingTest.class,
 	MultipleShipmentsCompleteLSPSchedulingTest.class,
 	MultipleIterationsCollectionLSPScoringTest.class,
+	MultipleIterationsCollectionLSPMobsimTest.class,
+	MultipleIterationsFirstReloadLSPMobsimTest.class,
+	MultipleIterationsMainRunLSPMobsimTest.class,
+	MultipleIterationsSecondReloadLSPMobsimTest.class,
+	MultipleItreationsCompleteLSPMobsimTest.class,
+	MultipleShipmentsCollectionLSPMobsimTest.class,
+	MultipleShipmentsCompleteLSPMobsimTest.class,
+	MultipleShipmentsFirstReloadLSPMobsimTest.class,
+	MultipleShipmentsMainRunLSPMobsimTest.class,
+	MultipleShipmentsSecondReloadLSPMobsimTest.class,
+	RepeatedMultipleShipmentsCompleteLSPMobsimTest.class,
 })
 
 public class FTLabTestSuite {

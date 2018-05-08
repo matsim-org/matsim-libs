@@ -229,10 +229,9 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 		resourcesList.add(firstReloadingPointAdapter);
 		resourcesList.add(mainRunAdapter);
 		resourcesList.add(secondReloadingPointAdapter);
-		
-
 
 		simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
+		simpleScheduler.setBufferTime(300);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();
 	
@@ -305,13 +304,13 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			assertTrue(planElements.get(7).getElementType() == "HANDLE");
 			assertTrue(planElements.get(7).getEndTime() >= (0));
 			assertTrue(planElements.get(7).getEndTime() <= (24*3600));
-			assertTrue(planElements.get(7).getStartTime() <= planElements.get(6).getEndTime());
+			assertTrue(planElements.get(7).getStartTime() <= planElements.get(7).getEndTime());
 			assertTrue(planElements.get(7).getStartTime() >= (0));
 			assertTrue(planElements.get(7).getStartTime() <= (24*3600));	
 			assertTrue(planElements.get(7).getResourceId() == secondReloadingPointAdapter.getId());
 			assertTrue(planElements.get(7).getSolutionElement() == secondReloadElement);	
 			
-			assertTrue(planElements.get(7).getStartTime() == planElements.get(6).getEndTime());
+			assertTrue(planElements.get(7).getStartTime() == (planElements.get(6).getEndTime() + 300));
 			
 			assertTrue(planElements.get(6).getElementType() == "UNLOAD");
 			assertTrue(planElements.get(6).getEndTime() >= (0));
@@ -344,7 +343,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			assertTrue(planElements.get(4).getResourceId() == mainRunAdapter.getId());
 			assertTrue(planElements.get(4).getSolutionElement() == mainRunElement);	
 			
-			assertTrue(planElements.get(4).getStartTime() >= planElements.get(3).getEndTime()/ (1.0001));
+			assertTrue(planElements.get(4).getStartTime() >= (planElements.get(3).getEndTime()/ (1.0001)) + 300);
 			
 			assertTrue(planElements.get(3).getElementType() == "HANDLE");
 			assertTrue(planElements.get(3).getEndTime() >= (0));
@@ -355,7 +354,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			assertTrue(planElements.get(3).getResourceId() == firstReloadingPointAdapter.getId());
 			assertTrue(planElements.get(3).getSolutionElement() == firstReloadElement);	
 			
-			assertTrue(planElements.get(3).getStartTime() == planElements.get(2).getEndTime());
+			assertTrue(planElements.get(3).getStartTime() == (planElements.get(2).getEndTime() + 300));
 			
 			assertTrue(planElements.get(2).getElementType() == "UNLOAD");
 			assertTrue(planElements.get(2).getEndTime() >= (0));
@@ -516,5 +515,16 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			assertTrue(mainRunEndHandler.getResource().getId()  == resources.get(2).getId());
 		}
 		
+		for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
+			for(LogisticsSolutionElement element : solution.getSolutionElements()) {
+				assertTrue(element.getIncomingShipments().getShipments().isEmpty());
+				if(element.getNextElement() != null) {
+					assertTrue(element.getOutgoingShipments().getShipments().isEmpty());	
+				}
+				else {
+					assertFalse(element.getOutgoingShipments().getShipments().isEmpty());
+				}
+			}
+		}
 	}
 }

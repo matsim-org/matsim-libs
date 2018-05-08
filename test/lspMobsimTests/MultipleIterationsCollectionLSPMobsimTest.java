@@ -1,4 +1,4 @@
-package cascadingInfoTest;
+package lspMobsimTests;
 
 import static org.junit.Assert.*;
 
@@ -17,7 +17,10 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
+import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -27,6 +30,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
+import lsp.usecase.CollectionCarrierAdapter;
+import lsp.usecase.CollectionCarrierScheduler;
+import lsp.usecase.DeterministicShipmentAssigner;
+import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
 import lsp.events.EventUtils;
 import lsp.LSP;
@@ -39,28 +46,22 @@ import lsp.LogisticsSolutionElementImpl;
 import lsp.LogisticsSolutionImpl;
 import lsp.ShipmentAssigner;
 import lsp.SolutionScheduler;
+import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
 import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.scoring.LSPScoringModuleImpl;
+import lsp.shipment.AbstractShipmentPlanElement;
+import lsp.shipment.AbstractShipmentPlanElementComparator;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
-import lsp.usecase.CollectionCarrierAdapter;
-import lsp.usecase.CollectionCarrierScheduler;
-import lsp.usecase.DeterministicShipmentAssigner;
-import lsp.usecase.SimpleForwardSolutionScheduler;
 
-
-
-public class CascadingInfoTest {
+public class MultipleIterationsCollectionLSPMobsimTest {
 	private Network network;
 	private LSP collectionLSP;	
 	private Carrier carrier;
 	private Resource collectionAdapter;
 	private LogisticsSolutionElement collectionElement;
-	private LogisticsSolution collectionSolution;
-	private AverageTimeInfo elementInfo;
-	private AverageTimeInfo solutionInfo;
-	private AverageTimeTracker timeTracker;
+	private int numberOfShipments;
 	
 	@Before
 	public void initialize() {
@@ -84,7 +85,6 @@ public class CascadingInfoTest {
 		
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Link collectionLink = network.getLinks().get(collectionLinkId);
-		
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLink.getId());
 		carrierVehicle.setVehicleType(collectionType);
@@ -104,27 +104,16 @@ public class CascadingInfoTest {
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		collectionAdapter = adapterBuilder.build();
-		timeTracker = new AverageTimeTracker();
-		collectionAdapter.addSimulationTracker(timeTracker);
-		
 		
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LogisticsSolutionElementImpl.Builder collectionElementBuilder = LogisticsSolutionElementImpl.Builder.newInstance(elementId);
 		collectionElementBuilder.setResource(collectionAdapter);
 		collectionElement = collectionElementBuilder.build();
 		
-		elementInfo = new AverageTimeInfo();
-		elementInfo.addPredecessorInfo(collectionAdapter.getInfos().iterator().next());
-		collectionElement.getInfos().add(elementInfo);
-		
 		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
 		LogisticsSolutionImpl.Builder collectionSolutionBuilder = LogisticsSolutionImpl.Builder.newInstance(collectionSolutionId);
 		collectionSolutionBuilder.addSolutionElement(collectionElement);
-		collectionSolution = collectionSolutionBuilder.build();
-		
-		solutionInfo = new AverageTimeInfo();
-		solutionInfo.addPredecessorInfo(collectionElement.getInfos().iterator().next());
-		collectionElement.getInfos().add(solutionInfo);
+		LogisticsSolution collectionSolution = collectionSolutionBuilder.build();
 		
 		ShipmentAssigner assigner = new DeterministicShipmentAssigner();
 		LSPPlanImpl collectionPlan = new LSPPlanImpl();
@@ -139,22 +128,23 @@ public class CascadingInfoTest {
 		resourcesList.add(collectionAdapter);
 		
 		SolutionScheduler simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
+		simpleScheduler.setBufferTime(300);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
 	    Id<Link> toLinkId = collectionLinkId;
 	
-	        
-	    for(int i = 1; i < 11; i++) {
+	    numberOfShipments = 1 + new Random().nextInt(50);
+	    for(int i = 1; i < 1 + numberOfShipments; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
         	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
-        	Random random = new Random(1);
-        	int capacityDemand = 1 + random.nextInt(4);
+        	//Random random = new Random(1);
+        	int capacityDemand = 1 + new Random().nextInt(4);
         	builder.setCapacityDemand(capacityDemand);
         	
         	while(true) {
-        		Collections.shuffle(linkList, random);
+        		Collections.shuffle(linkList);
         		Link pendingFromLink = linkList.get(0);
         		if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
         		   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
@@ -174,8 +164,7 @@ public class CascadingInfoTest {
         	LSPShipment shipment = builder.build();
         	collectionLSP.assignShipmentToLSP(shipment);
         }
-		
-	    collectionLSP.scheduleSoultions();
+		collectionLSP.scheduleSoultions();
 		
 		ArrayList<LSP> lspList = new ArrayList<LSP>();
 		lspList.add(collectionLSP);
@@ -187,38 +176,31 @@ public class CascadingInfoTest {
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(1 + new Random().nextInt(10));
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("input\\lsp\\network\\2regions.xml");
 		controler.run();
 	}
 
 	@Test
-	public void testCascadingInfos() {
-		assertTrue(timeTracker.getInfos().iterator().next() == elementInfo.getPredecessorInfos().iterator().next());
-		assertTrue(timeTracker.getInfos().iterator().next() instanceof AverageTimeInfo);
-		AverageTimeInfo resourceInfo = (AverageTimeInfo) timeTracker.getInfos().iterator().next();
-		assertTrue(resourceInfo.getFunction() instanceof AverageTimeInfoFunction);
-		AverageTimeInfoFunction resourceInfoFunction = (AverageTimeInfoFunction) resourceInfo.getFunction();
-		assertTrue(resourceInfoFunction.getValues().size() == 1);
-		assertTrue(resourceInfoFunction.getValues().iterator().next() instanceof AverageTimeInfoFunctionValue);
-		AverageTimeInfoFunctionValue averageResourceValue = (AverageTimeInfoFunctionValue) resourceInfoFunction.getValues().iterator().next();
-		assertTrue(elementInfo.getFunction() instanceof AverageTimeInfoFunction);
-		AverageTimeInfoFunction averageElementFunction = (AverageTimeInfoFunction) elementInfo.getFunction();
-		assertTrue(averageElementFunction.getValues().size() == 1);
-		assertTrue(averageElementFunction.getValues().iterator().next() instanceof AverageTimeInfoFunctionValue);
-		AverageTimeInfoFunctionValue averageElementValue = (AverageTimeInfoFunctionValue) averageElementFunction.getValues().iterator().next();
-		assertTrue(averageElementValue.getValue() > 0);
-		assertTrue(averageElementFunction.getValues().iterator().next().getValue() instanceof Double);
-		assertTrue(solutionInfo.getFunction() instanceof AverageTimeInfoFunction);
-		assertTrue(solutionInfo.getPredecessorInfos().iterator().next() == elementInfo);
-		AverageTimeInfoFunction averageSolutionFunction = (AverageTimeInfoFunction) solutionInfo.getFunction();
-		assertTrue(averageSolutionFunction.getValues().size() == 1);
-		assertTrue(averageSolutionFunction.getValues().iterator().next() instanceof AverageTimeInfoFunctionValue);
-		AverageTimeInfoFunctionValue averageSolutionValue = (AverageTimeInfoFunctionValue) averageSolutionFunction.getValues().iterator().next();
-		assertTrue(averageSolutionValue.getValue() > 0);
-		assertTrue(averageElementValue.getValue() == averageResourceValue.getValue());
-		assertTrue(averageElementValue.getValue() == averageSolutionValue.getValue());
+	public void testCollectionLSPMobsim() {
+		
+		for(LSPShipment shipment : collectionLSP.getShipments()) {
+			assertFalse(shipment.getLog().getPlanElements().isEmpty());
+			assertTrue(shipment.getSchedule().getPlanElements().size() == shipment.getLog().getPlanElements().size());
+			ArrayList<AbstractShipmentPlanElement> scheduleElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+			Collections.sort(scheduleElements, new AbstractShipmentPlanElementComparator());
+			ArrayList<AbstractShipmentPlanElement> logElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getLog().getPlanElements().values());
+			Collections.sort(logElements, new AbstractShipmentPlanElementComparator());
+
+			for(AbstractShipmentPlanElement scheduleElement : scheduleElements){
+				AbstractShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
+				assertTrue(scheduleElement.getElementType() == logElement.getElementType());
+				assertTrue(scheduleElement.getResourceId() == logElement.getResourceId());
+				assertTrue(scheduleElement.getSolutionElement() == logElement.getSolutionElement());
+				assertEquals(scheduleElement.getStartTime(), logElement.getStartTime(), 300);
+			}
+		}
 	}
 
 }
