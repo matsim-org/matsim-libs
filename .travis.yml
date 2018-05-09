@@ -87,4 +87,5 @@ env:
     - MODULE=contribs/protobuf             
     - MODULE=contribs/hybridsim            
     - MODULE=contribs/noise                
-    - MODULE=contribs/bicycle              
+    - MODULE=contribs/bicycle
+    - MODULE=contribs/decongestion              
