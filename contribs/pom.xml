@@ -224,7 +224,7 @@
 			<artifactId>matsim</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 			<type>jar</type>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
