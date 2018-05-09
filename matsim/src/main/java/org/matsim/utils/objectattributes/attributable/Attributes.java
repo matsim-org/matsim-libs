@@ -13,8 +13,15 @@ public final class Attributes {
 	// This makes insertion costly, but query can be kept efficient even when the number of mappings
 	// increases, using binary search. This should be fine, as the typical usage is to set once and
 	// access often. Replacing a value is also efficient.
-	private String[] keys = new String[0];
-	private Object[] values = new Object[0];
+	//
+	// In addition, as lots of classes implement Attributable, there might be a large number of empty attributes,
+	// which would result in unnecessary memory overhead if each attribute would use new instances of empty arrays
+	// (Which are essentially immutable objects), hence the two "empty" constants (idea from Marcel Rieser, see MATSIM-811)
+	private static final String[] EMPTY_KEYS = new String[0];
+	private static final Object[] EMPTY_VALUES = new Object[0];
+
+	private String[] keys = EMPTY_KEYS;
+	private Object[] values = EMPTY_VALUES;
 
 	@Override
 	public String toString() {
@@ -80,8 +87,8 @@ public final class Attributes {
 	}
 
 	public void clear() {
-		keys = new String[ 0 ];
-		values = new Object[ 0 ];
+		keys = EMPTY_KEYS;
+		values = EMPTY_VALUES;
 	}
 
 	/**
