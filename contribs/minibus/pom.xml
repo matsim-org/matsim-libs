@@ -49,10 +49,9 @@
 		<version>1.4</version>
 	</dependency>
 	 	<!-- New Raptor Transit Router Implementation -->
- 		<dependency>
-     		<groupId>com.github.vsp-gleich</groupId>
-     		<artifactId>matsim-sbb-extensions</artifactId>
-     		<version>master-SNAPSHOT</version>
-		</dependency>
-  </dependencies>
+      <dependency>
+          <groupId>com.github.SchweizerischeBundesbahnen</groupId>
+          <artifactId>matsim-sbb-extensions</artifactId>
+          <version>0.10.0</version>
+      </dependency>  </dependencies>
 </project>
