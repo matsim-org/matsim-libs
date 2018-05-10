@@ -18,10 +18,6 @@
 		<param name="maxWaitTime" value="1200.0" />
 		<!-- Maximum walk distance to next stop location in stationbased system. -->
 		<param name="maxWalkDistance" value="1500.0" />
- 
-		<!-- Number of threads used for parallel evaluation of request insertion into existing schedules. Scales well up to 4, using more does not improve performance. Default == 4 (or no. of available threads to JVM if less than 4). -->
-		
-		<!-- param name="numberOfThreads" value="4" / -->
 
 		<!-- Operational Scheme, either door2door or stopbased. door2door by default -->
 		<param name="operationalScheme" value="stopbased" />
@@ -40,8 +36,13 @@
 
 		<!-- Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration. False by default. -->
 		<param name="writeDetailedVehicleStats" value="false" />
+
+		<parameterset type="minCostFlowRebalancing">
+			<param name="targetAlpha" value="0.5"/>
+			<param name="targetBeta" value="0.5"/>
+			<param name="cellSize" value="2000"/>
+		</parameterset>
 	</module>
-	
 	
 	<module name="dvrp" >
 
@@ -54,8 +55,6 @@
 		<!-- Used for estimation of travel times for VrpOptimizer by means of the exponential moving average. The weighting decrease, alpha, must be in (0,1]. We suggest small values of alpha, e.g. 0.05. The averaging starts from the initial travel time estimates. If not provided, the free-speed TTs is used as the initial estimates For more info see comments in: VrpTravelTimeEstimator, VrpTravelTimeModules, DvrpModule. -->
 		<param name="travelTimeEstimationAlpha" value="0.05" />
 	</module>
-
-
 
 	<module name="network">
 		<param name="inputNetworkFile" value="network.xml.gz" />
@@ -82,7 +81,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="output/drt_stationbased" />
+		<param name="outputDirectory" value="output/drt_stopbased" />
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
@@ -95,7 +94,6 @@
 			<param name="openingTime" value="06:00:00" />
 			<param name="latestStartTime" value="09:00:00" />
 			<param name="closingTime" value="17:00:00" />
-
 		</parameterset>
 
 		<parameterset type="activityParams">

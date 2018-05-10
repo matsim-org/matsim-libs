@@ -23,19 +23,19 @@ import javax.inject.Inject;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 
 /**
  * @author michalm
  */
 public class LinearRebalancingTargetCalculator implements RebalancingTargetCalculator {
-	private static final double TARGET_ALPHA = 0.5;
-	private static final double TARGET_BETA = 0.5;
-
 	private final ZonalDemandAggregator demandAggregator;
+	private final MinCostFlowRebalancingParams params;
 
 	@Inject
-	public LinearRebalancingTargetCalculator(ZonalDemandAggregator demandAggregator) {
+	public LinearRebalancingTargetCalculator(ZonalDemandAggregator demandAggregator, DrtConfigGroup drtCfg) {
 		this.demandAggregator = demandAggregator;
+		params = drtCfg.getMinCostFlowRebalancing();
 	}
 
 	// FIXME targets should be calculated more intelligently
@@ -46,6 +46,6 @@ public class LinearRebalancingTargetCalculator implements RebalancingTargetCalcu
 		if (expectedDemand == null || expectedDemand.intValue() == 0) {
 			return 0;// for larger zones we may assume that target is at least 1 (or in some cases) ??????
 		}
-		return (int)Math.round(TARGET_ALPHA * expectedDemand.intValue() + TARGET_BETA);
+		return (int)Math.round(params.getTargetAlpha() * expectedDemand.intValue() + params.getTargetBeta());
 	}
 }
