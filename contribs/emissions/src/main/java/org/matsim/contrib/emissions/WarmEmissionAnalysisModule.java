@@ -75,6 +75,10 @@ public class WarmEmissionAnalysisModule {
 	private double freeFlowKmCounter = 0.0;
 	private double stopGoKmCounter = 0.0;
 
+	public HbefaRoadTypeMapping getRoadTypeMapping() {
+		return roadTypeMapping;
+	}
+
 
 	public static class WarmEmissionAnalysisModuleParameter {
 
@@ -210,7 +214,7 @@ public class WarmEmissionAnalysisModule {
 
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = new HashMap<>();
 
-		String hbefaRoadTypeName = this.roadTypeMapping.get(roadType, freeVelocity);
+		String hbefaRoadTypeName = roadType;
 
 		HbefaWarmEmissionFactorKey keyFreeFlow = new HbefaWarmEmissionFactorKey();
 		HbefaWarmEmissionFactorKey keyStopAndGo = new HbefaWarmEmissionFactorKey();

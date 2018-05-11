@@ -151,7 +151,9 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		linkLeaveCnt++;
 
 		Double freeVelocity = link.getFreespeed();
-		String roadTypeString = NetworkUtils.getType(link);
+		String roadType = (String) link.getAttributes().getAttribute("osm:highway:type");
+		if(roadType == null) roadType="unclassified";
+		String roadTypeString = warmEmissionAnalysisModule.getRoadTypeMapping().get(roadType, freeVelocity);;
 
 
 		if (roadTypeString.isEmpty()){
