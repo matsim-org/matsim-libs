@@ -20,7 +20,7 @@
 
 package peoplemover.run;
 
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingModule;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -46,7 +46,6 @@ public class RunDrtScenarioBatchBS_10pct_TUBTest {
 
 		// Enable or Disable rebalancing
 
-		boolean rebalancing = true;
 		String inputPath = "C:\\Users\\Joschka\\Documents\\shared-svn\\projects\\vw_rufbus\\projekt2\\drt_test_Scenarios\\BS_DRT\\input\\";
 		// For each demandScenario we are generating a new config file
 		// Some config parameters will be taken from the provided config file
@@ -96,21 +95,16 @@ public class RunDrtScenarioBatchBS_10pct_TUBTest {
 		// Based on the prepared configuration this part creates a controller that runs
 		Controler controler = createControler(config, otfvis);
 
-		if (rebalancing == true) {
+		// Every x-seconds the simulation calls a re-balancing process.
+		// Re-balancing has the task to move vehicles into cells or zones that fits
+		// typically with the demand situation
+		// The technically used re-balancing strategy is then installed/binded within
+		// the initialized controler
+		System.out.println("Rebalancing Online");
+		MinCostFlowRebalancingParams rebalancingParams = drt.getMinCostFlowRebalancing();
+		rebalancingParams.setInterval(600);
+		rebalancingParams.setCellSize(2000);
 
-			// Every x-seconds the simulation calls a re-balancing process.
-			// Re-balancing has the task to move vehicles into cells or zones that fits
-			// typically with the demand situation
-			// The technically used re-balancing strategy is then installed/binded within
-			// the initialized controler
-
-			System.out.println("Rebalancing Online");
-			drt.setRebalancingInterval(600);
-
-			// In this stages we are adding new modules to the MATSim controler
-			controler.addOverridingModule(new MinCostFlowRebalancingModule(2000));
-
-		}
 
 		// Change the routing module in this way, that agents are forced to go to their
 		// closest bus stop.
@@ -127,7 +121,6 @@ public class RunDrtScenarioBatchBS_10pct_TUBTest {
 				// Default alpha is 0.05. Which means i.e. 0.3 is not smooth in comparison to
 				// 0.05
 				DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.15);
-
 			}
 		});
 

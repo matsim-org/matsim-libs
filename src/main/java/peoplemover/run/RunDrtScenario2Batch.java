@@ -22,7 +22,7 @@ package peoplemover.run;
 import java.util.Arrays;
 import java.util.List;
 
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingModule;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 //import org.matsim.contrib.av.robotaxi.run.RunRobotaxiExample;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -65,18 +65,19 @@ public class RunDrtScenario2Batch {
 			config.plans().setInputFile(
 					"D:/Axer/MatsimDataStore/WOB_DRTtoPM/population/run124.100.output_plans_PT_0.3.xml.gz");
 			// config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/drt_population_iteration/population/run124.100.output_plans.xml.gz");
-			DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+			DrtConfigGroup drt = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
+
+			MinCostFlowRebalancingParams rebalancingParams = drt.getMinCostFlowRebalancing();
 			// fuehrt ein re-balancing im 30 minuten takt durch. hoehere Taktung
 			// ist nicht sinnvoll, da die Nachfrage in Halbstundenscheiben
 			// gespeichert wird.
-			drt.setRebalancingInterval(1800);
+			rebalancingParams.setInterval(1800);
+			// erstellt ein Grid mit einer Kantenlänge von 2000m über das
+			// gesamte Netz. Ggf. einen höheren Parameter wählen.
+			rebalancingParams.setCellSize(2000);
 
 			// Initialize the controller
 			Controler controler = createControler(config, otfvis);
-
-			// erstellt ein Grid mit einer Kantenlänge von 2000m über das
-			// gesamte Netz. Ggf. einen höheren Parameter wählen.
-			controler.addOverridingModule(new MinCostFlowRebalancingModule(2000));
 
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
