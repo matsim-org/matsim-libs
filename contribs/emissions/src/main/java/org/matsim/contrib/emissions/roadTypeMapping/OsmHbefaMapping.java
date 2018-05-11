@@ -72,15 +72,6 @@ public class OsmHbefaMapping implements HbefaRoadTypeMapping {
 
     }
 
-    private int getSpeedCat(double speed) {
-
-            int speedCat = Double.isInfinite(speed) ? MAX_SPEED : (int) Math.round(speed * 3.6);
-            speedCat = ((speedCat + 5) / 10) * 10;
-            speedCat = Math.min(MAX_SPEED, speedCat);
-            return speedCat;
-
-    }
-
     private String getHEBFAtype(String roadType, double freeVelocity) {
 
 
@@ -88,17 +79,18 @@ public class OsmHbefaMapping implements HbefaRoadTypeMapping {
         String type = ss[0];
 
         //TODO: could make distinction between national and city, based on shapefile, or regions.
+        double freeVelocity_kmh = freeVelocity * 3.6;
 
         if (type.equals("unclassified") || type.equals("road")) {
-            if (freeVelocity <= 50) type = "living";
-            else if (freeVelocity == 60) type = "tertiary";
-            else if (freeVelocity == 70) type = "secondary";
-            else if (freeVelocity <= 90) type = "primary";
+            if (freeVelocity_kmh <= 50) type = "living";
+            else if (freeVelocity_kmh == 60) type = "tertiary";
+            else if (freeVelocity_kmh == 70) type = "secondary";
+            else if (freeVelocity_kmh <= 90) type = "primary";
             else type = "motorway";
         }
 
         //specify that if speed > 90 and primary or motorway, then Nat.
-        if (type.equals("motorway") || type.equals("primary") && freeVelocity >= 90) {
+        if (type.equals("motorway") || type.equals("primary") && freeVelocity_kmh >= 90) {
             type += "-Nat.";
         }
         if (hbfeaMap.get(type) == null) {
@@ -106,7 +98,7 @@ public class OsmHbefaMapping implements HbefaRoadTypeMapping {
         }
         int min_speed = hbfeaMap.get(type).min;
         int max_speed = hbfeaMap.get(type).max;
-        int capped_speed = (int) Math.min(Math.max(min_speed, freeVelocity), max_speed);
+        int capped_speed = (int) Math.min(Math.max(min_speed, freeVelocity_kmh), max_speed);
 
         return "URB/" + hbfeaMap.get(type).name + "/" + capped_speed;
 
