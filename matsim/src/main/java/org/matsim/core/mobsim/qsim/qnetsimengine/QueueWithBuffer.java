@@ -368,7 +368,9 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		if (Double.isNaN(freespeedTravelTime)) {
 			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
 		}
-		double tempStorageCapacity = freespeedTravelTime * flowCapacityPerTimeStep;
+		
+		//this assumes that vehicles have the flowEfficiencyFactor of 1.0; the actual flow can be different
+		double tempStorageCapacity = freespeedTravelTime * flowCapacityPerTimeStep; 
 		// yy note: freespeedTravelTime may be Inf.  In this case, storageCapacity will also be set to Inf.  This can still be
 		// interpreted, but it means that the link will act as an infinite sink.  kai, nov'10
 
@@ -496,7 +498,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				continue;
 			}
 
-			/* is there still room left in the buffer? */
+			/* is there still any flow capacity left? */
 			if (!hasFlowCapacityLeft(veh) ) {
 				return;
 			}
