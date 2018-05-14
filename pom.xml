@@ -122,9 +122,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.github.jfbischoff</groupId>
+			<groupId>com.github.SchweizerischeBundesbahnen</groupId>
 			<artifactId>matsim-sbb-extensions</artifactId>
-			<version>master-SNAPSHOT</version>
+			<version>0.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.vsp</groupId>
