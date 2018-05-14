@@ -57,7 +57,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	@Inject
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
-			VehicleData.EntryFactory vehicleDataEntryFactory, PrecalculatablePathDataProvider pathDataProvider) {
+			VehicleData.EntryFactory vehicleDataEntryFactory, PrecalculablePathDataProvider pathDataProvider) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;

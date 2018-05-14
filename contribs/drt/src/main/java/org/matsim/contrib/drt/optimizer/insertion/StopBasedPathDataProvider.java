@@ -49,7 +49,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * @author michalm
  */
-public class StopBasedPathDataProvider implements PrecalculatablePathDataProvider {
+public class StopBasedPathDataProvider implements PrecalculablePathDataProvider {
 	private final double stopDuration;
 
 	private final ManyToManyPathData manyToManyPathData;
@@ -94,7 +94,7 @@ public class StopBasedPathDataProvider implements PrecalculatablePathDataProvide
 
 	@Override
 	public PathDataSet getPathDataSet(DrtRequest drtRequest, Entry vEntry) {
-		return PrecalculatablePathDataProvider.getPathDataSet(drtRequest, vEntry, pathsToPickupMap, pathsFromPickupMap,
+		return PrecalculablePathDataProvider.getPathDataSet(drtRequest, vEntry, pathsToPickupMap, pathsFromPickupMap,
 				pathsToDropoffMap, pathsFromDropoffMap);
 	}
 }
