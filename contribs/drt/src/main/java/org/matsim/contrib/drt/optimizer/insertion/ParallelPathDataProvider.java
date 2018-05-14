@@ -52,7 +52,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * @author michalm
  */
-public class ParallelPathDataProvider implements PrecalculatablePathDataProvider, MobsimBeforeCleanupListener {
+public class ParallelPathDataProvider implements PrecalculablePathDataProvider, MobsimBeforeCleanupListener {
 	public static final int MAX_THREADS = 4;
 
 	private final OneToManyPathSearch toPickupPathSearch;
@@ -149,7 +149,7 @@ public class ParallelPathDataProvider implements PrecalculatablePathDataProvider
 
 	@Override
 	public PathDataSet getPathDataSet(DrtRequest drtRequest, Entry vEntry) {
-		return PrecalculatablePathDataProvider.getPathDataSet(drtRequest, vEntry, pathsToPickupMap, pathsFromPickupMap,
+		return PrecalculablePathDataProvider.getPathDataSet(drtRequest, vEntry, pathsToPickupMap, pathsFromPickupMap,
 				pathsToDropoffMap, pathsFromDropoffMap);
 	}
 

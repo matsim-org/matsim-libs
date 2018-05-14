@@ -34,11 +34,11 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
-	private final PrecalculatablePathDataProvider pathDataProvider;
+	private final PrecalculablePathDataProvider pathDataProvider;
 	private final InsertionCostCalculator insertionCostCalculator;
 	private final ForkJoinPool forkJoinPool;
 
-	public ParallelMultiVehicleInsertionProblem(PrecalculatablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
+	public ParallelMultiVehicleInsertionProblem(PrecalculablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
 			MobsimTimer timer) {
 		this.pathDataProvider = pathDataProvider;
 		insertionCostCalculator = new InsertionCostCalculator(drtCfg, timer);
