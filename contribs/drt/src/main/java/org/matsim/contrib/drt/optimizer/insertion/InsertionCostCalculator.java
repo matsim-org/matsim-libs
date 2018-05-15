@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class InsertionCostCalculator {
-	public static final double INFEASIBLE_SOLUTION_COST = Double.MAX_VALUE;
+	public static final double INFEASIBLE_SOLUTION_COST = Double.MAX_VALUE / 2;
 
 	private final double stopDuration;
 	private final MobsimTimer timer;
