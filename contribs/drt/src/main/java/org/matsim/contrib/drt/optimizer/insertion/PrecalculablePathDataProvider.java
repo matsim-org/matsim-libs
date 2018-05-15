@@ -18,7 +18,6 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.Collection;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -32,7 +31,9 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
  * @author michalm
  */
 public interface PrecalculablePathDataProvider extends PathDataProvider {
-	void precalculatePathData(DrtRequest drtRequest, Collection<Entry> vEntries);
+	void precalculatePathData(DrtRequest drtRequest, Map<Id<Link>, Link> linksToPickupMap,
+			Map<Id<Link>, Link> linksFromPickupMap, Map<Id<Link>, Link> linksToDropoffMap,
+			Map<Id<Link>, Link> linksFromDropoffMap);
 
 	static PathDataSet getPathDataSet(DrtRequest drtRequest, Entry vEntry, Map<Id<Link>, PathData> pathsToPickupMap,
 			Map<Id<Link>, PathData> pathsFromPickupMap, Map<Id<Link>, PathData> pathsToDropoffMap,

@@ -18,7 +18,6 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +30,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
-import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.ManyToManyPathData;
@@ -77,7 +75,9 @@ public class StopBasedPathDataProvider implements PrecalculablePathDataProvider 
 	}
 
 	@Override
-	public void precalculatePathData(DrtRequest drtRequest, Collection<VehicleData.Entry> vEntries) {
+	public void precalculatePathData(DrtRequest drtRequest, Map<Id<Link>, Link> linksToPickupMap,
+			Map<Id<Link>, Link> linksFromPickupMap, Map<Id<Link>, Link> linksToDropoffMap,
+			Map<Id<Link>, Link> linksFromDropoffMap) {
 		Link pickup = drtRequest.getFromLink();
 		Link dropoff = drtRequest.getToLink();
 
