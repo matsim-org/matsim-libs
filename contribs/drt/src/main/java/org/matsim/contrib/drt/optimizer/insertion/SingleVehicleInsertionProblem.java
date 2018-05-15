@@ -19,11 +19,14 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.PathDataProvider.PathDataSet;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
 /**
  * @author michalm
@@ -41,7 +44,6 @@ public class SingleVehicleInsertionProblem {
 		}
 	}
 
-	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
 	private final InsertionCostCalculator costCalculator;
 	private final PathDataProvider pathDataProvider;
 
@@ -50,20 +52,37 @@ public class SingleVehicleInsertionProblem {
 		this.costCalculator = costCalculator;
 	}
 
-	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry) {
-		InsertionWithPathDataCreator insertionWithPathDataCreator = new InsertionWithPathDataCreator(pathDataProvider,
-				drtRequest, vEntry);
+	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry,
+			List<Insertion> insertions) {
+		PathDataSet set = pathDataProvider.getPathDataSet(drtRequest, vEntry);
+		int stopCount = vEntry.stops.size();
+
 		double minCost = InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 		InsertionWithPathData bestInsertion = null;
-		for (Insertion i : insertionGenerator.generateInsertions(drtRequest, vEntry)) {
-			InsertionWithPathData insertion = insertionWithPathDataCreator.create(i);
+		for (Insertion i : insertions) {
+			InsertionWithPathData insertion = create(i, set, stopCount);
 			double cost = costCalculator.calculate(drtRequest, vEntry, insertion);
 			if (cost < minCost) {
 				bestInsertion = insertion;
 				minCost = cost;
 			}
 		}
+
 		return minCost == InsertionCostCalculator.INFEASIBLE_SOLUTION_COST ? Optional.empty()
 				: Optional.of(new BestInsertion(bestInsertion, vEntry, minCost));
+	}
+
+	private InsertionWithPathData create(Insertion insertion, PathDataSet set, int stopCount) {
+		int i = insertion.pickupIdx;
+		int j = insertion.dropoffIdx;
+
+		// i -> pickup
+		PathData toPickup = set.pathsToPickup[i]; // i -> pickup
+		PathData fromPickup = set.pathsFromPickup[i == j ? 0 : i + 1]; // pickup -> (dropoff | i+1)
+		PathData toDropoff = i == j ? null // pickup followed by dropoff
+				: set.pathsToDropoff[j]; // j -> dropoff
+		PathData fromDropoff = j == stopCount ? null // dropoff inserted at the end
+				: set.pathsFromDropoff[j + 1];
+		return new InsertionWithPathData(i, j, toPickup, fromPickup, toDropoff, fromDropoff);
 	}
 }
