@@ -60,7 +60,7 @@ public class SingleVehicleInsertionProblem {
 		double minCost = InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 		InsertionWithPathData bestInsertion = null;
 		for (Insertion i : insertions) {
-			InsertionWithPathData insertion = create(i, set, stopCount);
+			InsertionWithPathData insertion = createInsertionWithPathData(i, set, stopCount);
 			double cost = costCalculator.calculate(drtRequest, vEntry, insertion);
 			if (cost < minCost) {
 				bestInsertion = insertion;
@@ -72,7 +72,7 @@ public class SingleVehicleInsertionProblem {
 				: Optional.of(new BestInsertion(bestInsertion, vEntry, minCost));
 	}
 
-	private InsertionWithPathData create(Insertion insertion, PathDataSet set, int stopCount) {
+	private InsertionWithPathData createInsertionWithPathData(Insertion insertion, PathDataSet set, int stopCount) {
 		int i = insertion.pickupIdx;
 		int j = insertion.dropoffIdx;
 
