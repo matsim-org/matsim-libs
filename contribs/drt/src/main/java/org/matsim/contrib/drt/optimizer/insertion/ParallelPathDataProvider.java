@@ -18,8 +18,6 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -34,9 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
-import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
-import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -46,8 +42,6 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * @author michalm
@@ -83,20 +77,9 @@ public class ParallelPathDataProvider implements PrecalculablePathDataProvider, 
 	}
 
 	@Override
-	public void precalculatePathData(DrtRequest drtRequest, Collection<VehicleData.Entry> vEntries) {
-		Map<Id<Link>, Link> startLinks = new HashMap<>();
-		Map<Id<Link>, Link> stopLinks = new HashMap<>();
-
-		for (VehicleData.Entry vEntry : vEntries) {
-			startLinks.put(vEntry.start.link.getId(), vEntry.start.link);
-			for (Stop s : vEntry.stops) {
-				// TODO consider a stop filter (replacement for/addition to DrtVehicleFilter)
-				// the filtering could distinguish between pickup/dropoff...
-				Link l = s.task.getLink();
-				stopLinks.put(l.getId(), l);
-			}
-		}
-
+	public void precalculatePathData(DrtRequest drtRequest, Map<Id<Link>, Link> linksToPickupMap,
+			Map<Id<Link>, Link> linksFromPickupMap, Map<Id<Link>, Link> linksToDropoffMap,
+			Map<Id<Link>, Link> linksFromDropoffMap) {
 		Link pickup = drtRequest.getFromLink();
 		Link dropoff = drtRequest.getToLink();
 
@@ -104,37 +87,24 @@ public class ParallelPathDataProvider implements PrecalculablePathDataProvider, 
 		double minTravelTime = 15 * 60; // FIXME inaccurate temp solution: fixed 15 min
 		double earliestDropoffTime = earliestPickupTime + minTravelTime + stopDuration;
 
-		ImmutableList<Link> stopLinkList = ImmutableList.copyOf(stopLinks.values());
-
 		Future<Map<Id<Link>, PathData>> pathsToPickupFuture = executorService.submit(() -> {
-			ImmutableList<Link> startAndStopLinkList = ImmutableList
-					.<Link> builderWithExpectedSize(startLinks.values().size() + stopLinkList.size())
-					.addAll(startLinks.values()).addAll(stopLinkList).build();
-			// calc backward dijkstra from pickup to ends of all stop + start
-			// TODO exclude inserting pickup after fully occupied stops
-			return toPickupPathSearch.calcPathDataMap(pickup, startAndStopLinkList, earliestPickupTime);
+			// calc backward dijkstra from pickup to ends of selected stops + starts
+			return toPickupPathSearch.calcPathDataMap(pickup, linksToPickupMap.values(), earliestPickupTime);
 		});
 
 		Future<Map<Id<Link>, PathData>> pathsFromPickupFuture = executorService.submit(() -> {
-			ImmutableList<Link> dropoffAndStopLinkList = ImmutableList
-					.<Link> builderWithExpectedSize(stopLinkList.size() + 1).add(drtRequest.getToLink())
-					.addAll(stopLinkList).build();
-			// calc forward dijkstra from pickup to beginnings of all stops + dropoff
-			// TODO exclude inserting before fully occupied stops (unless the new request's dropoff is located there)
-			return fromPickupPathSearch.calcPathDataMap(pickup, dropoffAndStopLinkList, earliestPickupTime);
+			// calc forward dijkstra from pickup to beginnings of selected stops + dropoff
+			return fromPickupPathSearch.calcPathDataMap(pickup, linksFromPickupMap.values(), earliestPickupTime);
 		});
 
 		Future<Map<Id<Link>, PathData>> pathsToDropoffFuture = executorService.submit(() -> {
-			// calc backward dijkstra from dropoff to ends of all stops
-			// TODO exclude inserting dropoff after fully occupied stops (unless the new request's dropoff is located
-			// there)
-			return toDropoffPathSearch.calcPathDataMap(dropoff, stopLinkList, earliestDropoffTime);
+			// calc backward dijkstra from dropoff to ends of selected stops
+			return toDropoffPathSearch.calcPathDataMap(dropoff, linksToDropoffMap.values(), earliestDropoffTime);
 		});
 
 		Future<Map<Id<Link>, PathData>> pathsFromDropoffFuture = executorService.submit(() -> {
-			// calc forward dijkstra from dropoff to beginnings of all stops
-			// TODO exclude inserting dropoff before fully occupied stops
-			return fromDropoffPathSearch.calcPathDataMap(dropoff, stopLinkList, earliestDropoffTime);
+			// calc forward dijkstra from dropoff to beginnings of selected stops
+			return fromDropoffPathSearch.calcPathDataMap(dropoff, linksFromDropoffMap.values(), earliestDropoffTime);
 		});
 
 		try {
