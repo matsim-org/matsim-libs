@@ -24,12 +24,12 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
  * @author michalm
  */
 public class InsertionWithPathData implements InsertionWithDetourTimes {
-	public final int pickupIdx;
-	public final int dropoffIdx;
-	public final PathData pathToPickup;
-	public final PathData pathFromPickup;
-	public final PathData pathToDropoff;// null if dropoff inserted directly after pickup
-	public final PathData pathFromDropoff;// null if dropoff inserted at the end
+	private final int pickupIdx;
+	private final int dropoffIdx;
+	private final PathData pathToPickup;
+	private final PathData pathFromPickup;
+	private final PathData pathToDropoff;// null if dropoff inserted directly after pickup
+	private final PathData pathFromDropoff;// null if dropoff inserted at the end
 
 	InsertionWithPathData(int pickupIdx, int dropoffIdx, PathData pathToPickup, PathData pathFromPickup,
 			PathData pathToDropoff, PathData pathFromDropoff) {
@@ -69,6 +69,22 @@ public class InsertionWithPathData implements InsertionWithDetourTimes {
 	@Override
 	public double getTimeFromDropoff() {
 		return pathFromDropoff.getTravelTime();// NullPointerException if dropoff inserted at the end
+	}
+
+	public PathData getPathToPickup() {
+		return pathToPickup;
+	}
+
+	public PathData getPathFromPickup() {
+		return pathFromPickup;
+	}
+
+	public PathData getPathToDropoff() {
+		return pathToDropoff;
+	}
+
+	public PathData getPathFromDropoff() {
+		return pathFromDropoff;
 	}
 
 	@Override
