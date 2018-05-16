@@ -26,6 +26,8 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
+import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
@@ -71,8 +73,9 @@ public class InsertionCostCalculator {
 		final int dropoffIdx = insertion.getDropoffIdx();
 
 		// 'no detour' is also possible now for pickupIdx==0 if the currentTask is STOP
-		boolean ongoingStopTask = pickupIdx == 0
-				&& ((DrtTask)vEntry.vehicle.getSchedule().getCurrentTask()).getDrtTaskType() == DrtTaskType.STOP;
+		Schedule schedule = vEntry.vehicle.getSchedule();
+		boolean ongoingStopTask = pickupIdx == 0 && schedule.getStatus() == ScheduleStatus.STARTED
+				&& ((DrtTask)schedule.getCurrentTask()).getDrtTaskType() == DrtTaskType.STOP;
 
 		if ((ongoingStopTask && drtRequest.getFromLink() == vEntry.start.link) //
 				|| (pickupIdx > 0 //
