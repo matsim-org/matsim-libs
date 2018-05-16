@@ -86,24 +86,31 @@ public class ParallelPathDataProvider implements PrecalculablePathDataProvider, 
 		double minTravelTime = 15 * 60; // FIXME inaccurate temp solution: fixed 15 min
 		double earliestDropoffTime = earliestPickupTime + minTravelTime + stopDuration;
 
+		// with vehicle insertion filtering -- pathsToPickup is the most computationally demanding task, while
+		// pathsFromDropoff is the least demanding one
+
+		// highest computation time (approx. 45% total CPU time)
 		Future<Map<Id<Link>, PathData>> pathsToPickupFuture = executorService.submit(() -> {
 			// calc backward dijkstra from pickup to ends of selected stops + starts
 			return toPickupPathSearch.calcPathDataMap(pickup, detourLinksSet.pickupDetourStartLinks.values(),
 					earliestPickupTime);
 		});
 
+		// medium computation time (approx. 25% total CPU time)
 		Future<Map<Id<Link>, PathData>> pathsFromPickupFuture = executorService.submit(() -> {
 			// calc forward dijkstra from pickup to beginnings of selected stops + dropoff
 			return fromPickupPathSearch.calcPathDataMap(pickup, detourLinksSet.pickupDetourEndLinks.values(),
 					earliestPickupTime);
 		});
 
+		// medium computation time (approx. 25% total CPU time)
 		Future<Map<Id<Link>, PathData>> pathsToDropoffFuture = executorService.submit(() -> {
 			// calc backward dijkstra from dropoff to ends of selected stops
 			return toDropoffPathSearch.calcPathDataMap(dropoff, detourLinksSet.dropoffDetourStartLinks.values(),
 					earliestDropoffTime);
 		});
 
+		// lowest computation time (approx. 5% total CPU time)
 		Future<Map<Id<Link>, PathData>> pathsFromDropoffFuture = executorService.submit(() -> {
 			// calc forward dijkstra from dropoff to beginnings of selected stops
 			return fromDropoffPathSearch.calcPathDataMap(dropoff, detourLinksSet.dropoffDetourEndLinks.values(),
@@ -111,10 +118,11 @@ public class ParallelPathDataProvider implements PrecalculablePathDataProvider, 
 		});
 
 		try {
-			pathsToPickupMap = pathsToPickupFuture.get();
-			pathsFromPickupMap = pathsFromPickupFuture.get();
-			pathsToDropoffMap = pathsToDropoffFuture.get();
+			// start from earliest (fastest) to latest (slowest)
 			pathsFromDropoffMap = pathsFromDropoffFuture.get();
+			pathsToDropoffMap = pathsToDropoffFuture.get();
+			pathsFromPickupMap = pathsFromPickupFuture.get();
+			pathsToPickupMap = pathsToPickupFuture.get();
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}
