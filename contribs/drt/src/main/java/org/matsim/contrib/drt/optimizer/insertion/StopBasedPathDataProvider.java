@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
+import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.ManyToManyPathData;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -75,9 +76,7 @@ public class StopBasedPathDataProvider implements PrecalculablePathDataProvider 
 	}
 
 	@Override
-	public void precalculatePathData(DrtRequest drtRequest, Map<Id<Link>, Link> linksToPickupMap,
-			Map<Id<Link>, Link> linksFromPickupMap, Map<Id<Link>, Link> linksToDropoffMap,
-			Map<Id<Link>, Link> linksFromDropoffMap) {
+	public void precalculatePathData(DrtRequest drtRequest, DetourLinksSet detourLinkSet) {
 		Link pickup = drtRequest.getFromLink();
 		Link dropoff = drtRequest.getToLink();
 
