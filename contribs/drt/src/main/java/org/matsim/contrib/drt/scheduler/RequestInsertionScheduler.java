@@ -39,6 +39,7 @@ import org.matsim.contrib.dvrp.data.Vehicles;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
@@ -95,10 +96,12 @@ public class RequestInsertionScheduler {
 		int pickupIdx = insertion.getPickupIdx();
 		int dropoffIdx = insertion.getDropoffIdx();
 
-		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
+		ScheduleStatus scheduleStatus = schedule.getStatus();
+		DrtTask currentTask = scheduleStatus == ScheduleStatus.PLANNED ? null : (DrtTask)schedule.getCurrentTask();
 		Task beforePickupTask;
 
-		if (pickupIdx == 0 && currentTask.getDrtTaskType() == DrtTaskType.DRIVE) {
+		if (pickupIdx == 0 && scheduleStatus != ScheduleStatus.PLANNED
+				&& currentTask.getDrtTaskType() == DrtTaskType.DRIVE) {
 			LinkTimePair diversion = ((OnlineDriveTaskTracker)currentTask.getTaskTracker()).getDiversionPoint();
 			if (diversion != null) { // divert vehicle
 				beforePickupTask = currentTask;
@@ -119,7 +122,10 @@ public class RequestInsertionScheduler {
 			DrtStayTask stayTask = null;
 			DrtStopTask stopTask = null;
 			if (pickupIdx == 0) {
-				if (currentTask.getDrtTaskType() == DrtTaskType.STAY) {
+				if (scheduleStatus == ScheduleStatus.PLANNED) {// PLANNED schedule
+					stayTask = (DrtStayTask)schedule.getTasks().get(0);
+					stayTask.setEndTime(stayTask.getBeginTime());// could get later removed with ScheduleTimingUpdater
+				} else if (currentTask.getDrtTaskType() == DrtTaskType.STAY) {
 					stayTask = (DrtStayTask)currentTask; // ongoing stay task
 					double now = timer.getTimeOfDay();
 					if (stayTask.getEndTime() > now) { // stop stay task; a new stop/drive task can be inserted now
@@ -279,7 +285,7 @@ public class RequestInsertionScheduler {
 				schedule.removeTask(oldStayTask);
 			}
 			if (taskIdx + 1 == schedule.getTaskCount()) {
-
+				// no stay task at the end if the pickup follows the existing stay task
 				schedule.addTask(taskFactory.createStayTask(vehicleEntry.vehicle, dropoffStopTask.getEndTime(),
 						vehicleEntry.vehicle.getServiceEndTime(), dropoffStopTask.getLink()));
 			} else {
