@@ -55,12 +55,24 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 	}
 
+	// Stats on dijkstra searches:
+	// SummaryStatistics toPickupMean = new SummaryStatistics();
+	// SummaryStatistics fromPickupMean = new SummaryStatistics();
+	// SummaryStatistics toDropoffMean = new SummaryStatistics();
+	// SummaryStatistics fromDropoffMean = new SummaryStatistics();
+
 	@Override
 	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
 		DetourLinksProvider detourLinksProvider = new DetourLinksProvider(drtCfg, timer);
 		for (Entry vEntry : vEntries) {
 			detourLinksProvider.addDetourLinks(drtRequest, vEntry);
 		}
+
+		// DetourLinksSet set = detourLinksProvider.getDetourLinksSet();
+		// toPickupMean.addValue(set.pickupDetourStartLinks.size());
+		// fromPickupMean.addValue(set.pickupDetourEndLinks.size());
+		// toDropoffMean.addValue(set.dropoffDetourStartLinks.size());
+		// fromDropoffMean.addValue(set.dropoffDetourEndLinks.size());
 
 		pathDataProvider.precalculatePathData(drtRequest, detourLinksProvider.getDetourLinksSet());
 
@@ -76,6 +88,15 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	}
 
 	public void shutdown() {
+		// System.out.println("================");
+		// System.out.println("toPickupMean=" + toPickupMean);
+		// System.out.println("================");
+		// System.out.println("fromPickupMean=" + fromPickupMean);
+		// System.out.println("================");
+		// System.out.println("toDropoffMean=" + toDropoffMean);
+		// System.out.println("================");
+		// System.out.println("fromDropoffMean=" + fromDropoffMean);
+		// System.out.println("================");
 		forkJoinPool.shutdown();
 	}
 }
