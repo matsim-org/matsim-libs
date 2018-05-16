@@ -56,9 +56,11 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 		forkJoinPool = new ForkJoinPool(drtCfg.getNumberOfThreads());
 
 		// TODO use more sophisticated DetourTimeEstimator
-		double effectiveBeelineSpeed = drtCfg.getEstimatedDrtSpeed() / drtCfg.getEstimatedBeelineDistanceFactor();
+		double optimisticBeelineSpeed = 1.5 * drtCfg.getEstimatedDrtSpeed()
+				/ drtCfg.getEstimatedBeelineDistanceFactor();// 1.5 is used to prevent filtering out feasible insertions
 		insertionFilter = new SingleVehicleInsertionFilter(//
-				new DetourTimesProvider((from, to) -> DistanceUtils.calculateDistance(from, to) / effectiveBeelineSpeed,
+				new DetourTimesProvider(
+						(from, to) -> DistanceUtils.calculateDistance(from, to) / optimisticBeelineSpeed,
 						drtCfg.getStopDuration()), //
 				new InsertionCostCalculator(drtCfg.getStopDuration(), timer));
 	}
