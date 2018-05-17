@@ -21,36 +21,87 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
+import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author michalm
  */
 public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
-	private final PrecalculatablePathDataProvider pathDataProvider;
+
+	@SuppressWarnings("unused")
+	private static class DetourLinksStats {
+		private static final Logger log = Logger.getLogger(DetourLinksStats.class);
+
+		private final SummaryStatistics toPickupStats = new SummaryStatistics();
+		private final SummaryStatistics fromPickupStats = new SummaryStatistics();
+		private final SummaryStatistics toDropoffStats = new SummaryStatistics();
+		private final SummaryStatistics fromDropoffStats = new SummaryStatistics();
+		private final SummaryStatistics vEntriesStats = new SummaryStatistics();
+
+		private void addSet(DetourLinksSet set, int vEntriesCount) {
+			toPickupStats.addValue(set.pickupDetourStartLinks.size());
+			fromPickupStats.addValue(set.pickupDetourEndLinks.size());
+			toDropoffStats.addValue(set.dropoffDetourStartLinks.size());
+			fromDropoffStats.addValue(set.dropoffDetourEndLinks.size());
+			vEntriesStats.addValue(vEntriesCount);
+		}
+
+		private void printStats() {
+			log.debug("toPickupStats:\n" + toPickupStats);
+			log.debug("fromPickupStats:\n" + fromPickupStats);
+			log.debug("toDropoffStats:\n" + toDropoffStats);
+			log.debug("fromDropoffStats:\n" + fromDropoffStats);
+			log.debug("vEntriesStats:\n" + vEntriesStats);
+		}
+	}
+
+	private final PrecalculablePathDataProvider pathDataProvider;
+	private final DrtConfigGroup drtCfg;
+	private final MobsimTimer timer;
 	private final InsertionCostCalculator insertionCostCalculator;
 	private final ForkJoinPool forkJoinPool;
+	private final DetourLinksStats detourLinksStats = new DetourLinksStats();
 
-	public ParallelMultiVehicleInsertionProblem(PrecalculatablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
-			MobsimTimer timer) {
+	public ParallelMultiVehicleInsertionProblem(PrecalculablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
+			MobsimTimer timer, ForkJoinPool forkJoinPool) {
 		this.pathDataProvider = pathDataProvider;
+		this.drtCfg = drtCfg;
+		this.timer = timer;
+		this.forkJoinPool = forkJoinPool;
 		insertionCostCalculator = new InsertionCostCalculator(drtCfg, timer);
-		forkJoinPool = new ForkJoinPool(drtCfg.getNumberOfThreads());
 	}
 
 	@Override
 	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
-		pathDataProvider.precalculatePathData(drtRequest, vEntries);
+		DetourLinksProvider detourLinksProvider = new DetourLinksProvider(drtCfg, timer, vEntries.size());
+		forkJoinPool.submit(() -> vEntries.parallelStream()//
+				.forEach(e -> detourLinksProvider.addDetourLinks(drtRequest, e)))//
+				.join();
+
+		DetourLinksSet detourLinksSet = detourLinksProvider.getDetourLinksSet();
+		detourLinksStats.addSet(detourLinksSet, vEntries.size());
+		pathDataProvider.precalculatePathData(drtRequest, detourLinksSet);
+
+		Map<Id<Vehicle>, List<Insertion>> filteredInsertionsPerVehicle = detourLinksProvider
+				.getFilteredInsertionsPerVehicle();
 		return forkJoinPool.submit(() -> vEntries.parallelStream()//
 				.map(v -> new SingleVehicleInsertionProblem(pathDataProvider, insertionCostCalculator)
-						.findBestInsertion(drtRequest, v))//
+						.findBestInsertion(drtRequest, v, filteredInsertionsPerVehicle.get(v.vehicle.getId())))//
 				.filter(Optional::isPresent)//
 				.map(Optional::get)//
 				.min(Comparator.comparing(i -> i.cost)))//
@@ -59,5 +110,6 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 	public void shutdown() {
 		forkJoinPool.shutdown();
+//		detourLinksStats.printStats();
 	}
 }
