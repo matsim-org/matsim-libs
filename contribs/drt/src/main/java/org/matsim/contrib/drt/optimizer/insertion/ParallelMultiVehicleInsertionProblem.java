@@ -88,7 +88,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 	@Override
 	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
-		DetourLinksProvider detourLinksProvider = new DetourLinksProvider(drtCfg, timer);
+		DetourLinksProvider detourLinksProvider = new DetourLinksProvider(drtCfg, timer, vEntries.size());
 		forkJoinPool.submit(() -> vEntries.parallelStream()//
 				.forEach(e -> detourLinksProvider.addDetourLinks(drtRequest, e)))//
 				.join();

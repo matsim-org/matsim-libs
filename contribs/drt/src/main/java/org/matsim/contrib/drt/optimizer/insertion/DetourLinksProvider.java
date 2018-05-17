@@ -55,14 +55,20 @@ class DetourLinksProvider {
 	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
 	private final SingleVehicleInsertionFilter insertionFilter;
 
-	private final Map<Id<Vehicle>, List<Insertion>> filteredInsertionsPerVehicle = new ConcurrentHashMap<>(1000);
+	private final Map<Id<Vehicle>, List<Insertion>> filteredInsertionsPerVehicle;
 
-	private final Map<Id<Link>, Link> linksToPickup = new ConcurrentHashMap<>(500);
-	private final Map<Id<Link>, Link> linksFromPickup = new ConcurrentHashMap<>(100);
-	private final Map<Id<Link>, Link> linksToDropoff = new ConcurrentHashMap<>(100);
-	private final Map<Id<Link>, Link> linksFromDropoff = new ConcurrentHashMap<>(100);
+	private final Map<Id<Link>, Link> linksToPickup;
+	private final Map<Id<Link>, Link> linksFromPickup;
+	private final Map<Id<Link>, Link> linksToDropoff;
+	private final Map<Id<Link>, Link> linksFromDropoff;
 
-	public DetourLinksProvider(DrtConfigGroup drtCfg, MobsimTimer timer) {
+	public DetourLinksProvider(DrtConfigGroup drtCfg, MobsimTimer timer, int vEntriesCount) {
+		filteredInsertionsPerVehicle = new ConcurrentHashMap<>(vEntriesCount);
+		linksToPickup = new ConcurrentHashMap<>(vEntriesCount / 2);
+		linksFromPickup = new ConcurrentHashMap<>();
+		linksToDropoff = new ConcurrentHashMap<>();
+		linksFromDropoff = new ConcurrentHashMap<>();
+
 		// TODO use more sophisticated DetourTimeEstimator
 		double optimisticBeelineSpeed = 1.5 * drtCfg.getEstimatedDrtSpeed()
 				/ drtCfg.getEstimatedBeelineDistanceFactor();// 1.5 is used to prevent filtering out feasible insertions
