@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
+import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -77,9 +78,7 @@ public class ParallelPathDataProvider implements PrecalculablePathDataProvider, 
 	}
 
 	@Override
-	public void precalculatePathData(DrtRequest drtRequest, Map<Id<Link>, Link> linksToPickupMap,
-			Map<Id<Link>, Link> linksFromPickupMap, Map<Id<Link>, Link> linksToDropoffMap,
-			Map<Id<Link>, Link> linksFromDropoffMap) {
+	public void precalculatePathData(DrtRequest drtRequest, DetourLinksSet detourLinksSet) {
 		Link pickup = drtRequest.getFromLink();
 		Link dropoff = drtRequest.getToLink();
 
@@ -87,31 +86,43 @@ public class ParallelPathDataProvider implements PrecalculablePathDataProvider, 
 		double minTravelTime = 15 * 60; // FIXME inaccurate temp solution: fixed 15 min
 		double earliestDropoffTime = earliestPickupTime + minTravelTime + stopDuration;
 
+		// with vehicle insertion filtering -- pathsToPickup is the most computationally demanding task, while
+		// pathsFromDropoff is the least demanding one
+
+		// highest computation time (approx. 45% total CPU time)
 		Future<Map<Id<Link>, PathData>> pathsToPickupFuture = executorService.submit(() -> {
 			// calc backward dijkstra from pickup to ends of selected stops + starts
-			return toPickupPathSearch.calcPathDataMap(pickup, linksToPickupMap.values(), earliestPickupTime);
+			return toPickupPathSearch.calcPathDataMap(pickup, detourLinksSet.pickupDetourStartLinks.values(),
+					earliestPickupTime);
 		});
 
+		// medium computation time (approx. 25% total CPU time)
 		Future<Map<Id<Link>, PathData>> pathsFromPickupFuture = executorService.submit(() -> {
 			// calc forward dijkstra from pickup to beginnings of selected stops + dropoff
-			return fromPickupPathSearch.calcPathDataMap(pickup, linksFromPickupMap.values(), earliestPickupTime);
+			return fromPickupPathSearch.calcPathDataMap(pickup, detourLinksSet.pickupDetourEndLinks.values(),
+					earliestPickupTime);
 		});
 
+		// medium computation time (approx. 25% total CPU time)
 		Future<Map<Id<Link>, PathData>> pathsToDropoffFuture = executorService.submit(() -> {
 			// calc backward dijkstra from dropoff to ends of selected stops
-			return toDropoffPathSearch.calcPathDataMap(dropoff, linksToDropoffMap.values(), earliestDropoffTime);
+			return toDropoffPathSearch.calcPathDataMap(dropoff, detourLinksSet.dropoffDetourStartLinks.values(),
+					earliestDropoffTime);
 		});
 
+		// lowest computation time (approx. 5% total CPU time)
 		Future<Map<Id<Link>, PathData>> pathsFromDropoffFuture = executorService.submit(() -> {
 			// calc forward dijkstra from dropoff to beginnings of selected stops
-			return fromDropoffPathSearch.calcPathDataMap(dropoff, linksFromDropoffMap.values(), earliestDropoffTime);
+			return fromDropoffPathSearch.calcPathDataMap(dropoff, detourLinksSet.dropoffDetourEndLinks.values(),
+					earliestDropoffTime);
 		});
 
 		try {
-			pathsToPickupMap = pathsToPickupFuture.get();
-			pathsFromPickupMap = pathsFromPickupFuture.get();
-			pathsToDropoffMap = pathsToDropoffFuture.get();
+			// start from earliest (fastest) to latest (slowest)
 			pathsFromDropoffMap = pathsFromDropoffFuture.get();
+			pathsToDropoffMap = pathsToDropoffFuture.get();
+			pathsFromPickupMap = pathsFromPickupFuture.get();
+			pathsToPickupMap = pathsToPickupFuture.get();
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}

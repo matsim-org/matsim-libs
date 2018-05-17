@@ -19,106 +19,86 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
+import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author michalm
  */
 public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
+
+	@SuppressWarnings("unused")
+	private static class DetourLinksStats {
+		private static final Logger log = Logger.getLogger(DetourLinksStats.class);
+
+		private final SummaryStatistics toPickupStats = new SummaryStatistics();
+		private final SummaryStatistics fromPickupStats = new SummaryStatistics();
+		private final SummaryStatistics toDropoffStats = new SummaryStatistics();
+		private final SummaryStatistics fromDropoffStats = new SummaryStatistics();
+		private final SummaryStatistics vEntriesStats = new SummaryStatistics();
+
+		private void addSet(DetourLinksSet set, int vEntriesCount) {
+			toPickupStats.addValue(set.pickupDetourStartLinks.size());
+			fromPickupStats.addValue(set.pickupDetourEndLinks.size());
+			toDropoffStats.addValue(set.dropoffDetourStartLinks.size());
+			fromDropoffStats.addValue(set.dropoffDetourEndLinks.size());
+			vEntriesStats.addValue(vEntriesCount);
+		}
+
+		private void printStats() {
+			log.debug("toPickupStats:\n" + toPickupStats);
+			log.debug("fromPickupStats:\n" + fromPickupStats);
+			log.debug("toDropoffStats:\n" + toDropoffStats);
+			log.debug("fromDropoffStats:\n" + fromDropoffStats);
+			log.debug("vEntriesStats:\n" + vEntriesStats);
+		}
+	}
+
 	private final PrecalculablePathDataProvider pathDataProvider;
+	private final DrtConfigGroup drtCfg;
+	private final MobsimTimer timer;
 	private final InsertionCostCalculator insertionCostCalculator;
 	private final ForkJoinPool forkJoinPool;
-	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
-	private final SingleVehicleInsertionFilter insertionFilter;
+	private final DetourLinksStats detourLinksStats = new DetourLinksStats();
 
 	public ParallelMultiVehicleInsertionProblem(PrecalculablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
-			MobsimTimer timer) {
+			MobsimTimer timer, ForkJoinPool forkJoinPool) {
 		this.pathDataProvider = pathDataProvider;
+		this.drtCfg = drtCfg;
+		this.timer = timer;
+		this.forkJoinPool = forkJoinPool;
 		insertionCostCalculator = new InsertionCostCalculator(drtCfg, timer);
-		forkJoinPool = new ForkJoinPool(drtCfg.getNumberOfThreads());
-
-		// TODO use more sophisticated DetourTimeEstimator
-		double optimisticBeelineSpeed = 1.5 * drtCfg.getEstimatedDrtSpeed()
-				/ drtCfg.getEstimatedBeelineDistanceFactor();// 1.5 is used to prevent filtering out feasible insertions
-		insertionFilter = new SingleVehicleInsertionFilter(//
-				new DetourTimesProvider(
-						(from, to) -> DistanceUtils.calculateDistance(from, to) / optimisticBeelineSpeed,
-						drtCfg.getStopDuration()), //
-				new InsertionCostCalculator(drtCfg.getStopDuration(), timer));
 	}
 
 	@Override
 	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
-		Map<Id<Vehicle>, List<Insertion>> filteredInsertionsPerVehicle = new HashMap<>();
+		DetourLinksProvider detourLinksProvider = new DetourLinksProvider(drtCfg, timer, vEntries.size());
+		forkJoinPool.submit(() -> vEntries.parallelStream()//
+				.forEach(e -> detourLinksProvider.addDetourLinks(drtRequest, e)))//
+				.join();
 
-		Map<Id<Link>, Link> linksToPickupMap = new HashMap<>();
-		Map<Id<Link>, Link> linksFromPickupMap = new HashMap<>();
-		Map<Id<Link>, Link> linksToDropoffMap = new HashMap<>();
-		Map<Id<Link>, Link> linksFromDropoffMap = new HashMap<>();
+		DetourLinksSet detourLinksSet = detourLinksProvider.getDetourLinksSet();
+		detourLinksStats.addSet(detourLinksSet, vEntries.size());
+		pathDataProvider.precalculatePathData(drtRequest, detourLinksSet);
 
-		for (Entry vEntry : vEntries) {
-			List<Insertion> insertions = insertionGenerator.generateInsertions(drtRequest, vEntry);
-
-			List<InsertionWithDetourTimes> insertionsWithDetourTimes = insertionFilter
-					.findFeasibleInsertions(drtRequest, vEntry, insertions);
-			List<Insertion> filteredInsertions = new ArrayList<>(insertionsWithDetourTimes.size());
-			filteredInsertionsPerVehicle.put(vEntry.vehicle.getId(), filteredInsertions);
-
-			for (InsertionWithDetourTimes insert : insertionsWithDetourTimes) {
-				int i = insert.getPickupIdx();
-				int j = insert.getDropoffIdx();
-				filteredInsertions.add(new Insertion(i, j));
-
-				// i -> pickup
-				Link toPickupLink = (i == 0) ? vEntry.start.link : vEntry.stops.get(i - 1).task.getLink();
-				linksToPickupMap.put(toPickupLink.getId(), toPickupLink);
-
-				// XXX optimise: if pickup/dropoff is inserted at existing stop,
-				// no need to calc a path from pickup/dropoff to the next stop (the path is already in Schedule)
-
-				if (i == j) {
-					// pickup -> dropoff
-					Link fromPickupLink = drtRequest.getToLink();
-					linksFromPickupMap.put(fromPickupLink.getId(), fromPickupLink);
-				} else {
-					// pickup -> i + 1
-					Link fromPickupLink = vEntry.stops.get(i).task.getLink();
-					linksFromPickupMap.put(fromPickupLink.getId(), fromPickupLink);
-
-					// j -> dropoff
-					Link toDropoffLink = vEntry.stops.get(j - 1).task.getLink();
-					linksToDropoffMap.put(toDropoffLink.getId(), toDropoffLink);
-				}
-
-				// dropoff -> j+1 // j+1 may not exist (dropoff appended after last stop)
-				if (j < vEntry.stops.size()) {
-					Link fromDropoffLink = vEntry.stops.get(j).task.getLink();
-					linksFromDropoffMap.put(fromDropoffLink.getId(), fromDropoffLink);
-				}
-			}
-		}
-
-		pathDataProvider.precalculatePathData(drtRequest, linksToPickupMap, linksFromPickupMap, linksToDropoffMap,
-				linksFromDropoffMap);
-
+		Map<Id<Vehicle>, List<Insertion>> filteredInsertionsPerVehicle = detourLinksProvider
+				.getFilteredInsertionsPerVehicle();
 		return forkJoinPool.submit(() -> vEntries.parallelStream()//
 				.map(v -> new SingleVehicleInsertionProblem(pathDataProvider, insertionCostCalculator)
 						.findBestInsertion(drtRequest, v, filteredInsertionsPerVehicle.get(v.vehicle.getId())))//
@@ -130,5 +110,6 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 	public void shutdown() {
 		forkJoinPool.shutdown();
+//		detourLinksStats.printStats();
 	}
 }

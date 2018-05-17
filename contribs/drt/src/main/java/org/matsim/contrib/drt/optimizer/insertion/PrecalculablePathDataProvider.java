@@ -25,15 +25,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
+import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
 /**
  * @author michalm
  */
 public interface PrecalculablePathDataProvider extends PathDataProvider {
-	void precalculatePathData(DrtRequest drtRequest, Map<Id<Link>, Link> linksToPickupMap,
-			Map<Id<Link>, Link> linksFromPickupMap, Map<Id<Link>, Link> linksToDropoffMap,
-			Map<Id<Link>, Link> linksFromDropoffMap);
+	void precalculatePathData(DrtRequest drtRequest, DetourLinksSet detourLinkSet);
 
 	static PathDataSet getPathDataSet(DrtRequest drtRequest, Entry vEntry, Map<Id<Link>, PathData> pathsToPickupMap,
 			Map<Id<Link>, PathData> pathsFromPickupMap, Map<Id<Link>, PathData> pathsToDropoffMap,
