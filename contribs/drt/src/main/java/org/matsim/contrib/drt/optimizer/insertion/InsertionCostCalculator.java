@@ -41,11 +41,7 @@ public class InsertionCostCalculator {
 	private final MobsimTimer timer;
 
 	public InsertionCostCalculator(DrtConfigGroup drtConfig, MobsimTimer timer) {
-		this(drtConfig.getStopDuration(), timer);
-	}
-
-	public InsertionCostCalculator(double stopDuration, MobsimTimer timer) {
-		this.stopDuration = stopDuration;
+		this.stopDuration = drtConfig.getStopDuration();
 		this.timer = timer;
 	}
 
@@ -104,7 +100,8 @@ public class InsertionCostCalculator {
 		final int pickupIdx = insertion.getPickupIdx();
 		final int dropoffIdx = insertion.getDropoffIdx();
 
-		if (dropoffIdx > 0 && drtRequest.getToLink() == vEntry.stops.get(dropoffIdx - 1).task.getLink()) {
+		if (dropoffIdx > 0 && pickupIdx != dropoffIdx
+				&& drtRequest.getToLink() == vEntry.stops.get(dropoffIdx - 1).task.getLink()) {
 			return 0; // no detour
 		}
 
