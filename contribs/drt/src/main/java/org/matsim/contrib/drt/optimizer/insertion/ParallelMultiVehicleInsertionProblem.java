@@ -26,9 +26,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
+import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -39,11 +41,40 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
+
+	@SuppressWarnings("unused")
+	private static class DetourLinksStats {
+		private final SummaryStatistics toPickupMean = new SummaryStatistics();
+		private final SummaryStatistics fromPickupMean = new SummaryStatistics();
+		private final SummaryStatistics toDropoffMean = new SummaryStatistics();
+		private final SummaryStatistics fromDropoffMean = new SummaryStatistics();
+
+		private void addSet(DetourLinksSet set) {
+			toPickupMean.addValue(set.pickupDetourStartLinks.size());
+			fromPickupMean.addValue(set.pickupDetourEndLinks.size());
+			toDropoffMean.addValue(set.dropoffDetourStartLinks.size());
+			fromDropoffMean.addValue(set.dropoffDetourEndLinks.size());
+		}
+
+		private void printStats() {
+			System.out.println("================");
+			System.out.println("toPickupMean=" + toPickupMean);
+			System.out.println("================");
+			System.out.println("fromPickupMean=" + fromPickupMean);
+			System.out.println("================");
+			System.out.println("toDropoffMean=" + toDropoffMean);
+			System.out.println("================");
+			System.out.println("fromDropoffMean=" + fromDropoffMean);
+			System.out.println("================");
+		}
+	}
+
 	private final PrecalculablePathDataProvider pathDataProvider;
 	private final DrtConfigGroup drtCfg;
 	private final MobsimTimer timer;
 	private final InsertionCostCalculator insertionCostCalculator;
 	private final ForkJoinPool forkJoinPool;
+	// private final DetourLinksStats detourLinksStats = new DetourLinksStats();
 
 	public ParallelMultiVehicleInsertionProblem(PrecalculablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
 			MobsimTimer timer) {
@@ -52,14 +83,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 		this.timer = timer;
 		insertionCostCalculator = new InsertionCostCalculator(drtCfg, timer);
 		forkJoinPool = new ForkJoinPool(drtCfg.getNumberOfThreads());
-
 	}
-
-	// Stats on dijkstra searches:
-	// SummaryStatistics toPickupMean = new SummaryStatistics();
-	// SummaryStatistics fromPickupMean = new SummaryStatistics();
-	// SummaryStatistics toDropoffMean = new SummaryStatistics();
-	// SummaryStatistics fromDropoffMean = new SummaryStatistics();
 
 	@Override
 	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
@@ -68,13 +92,9 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 				.forEach(e -> detourLinksProvider.addDetourLinks(drtRequest, e)))//
 				.join();
 
-		// DetourLinksSet set = detourLinksProvider.getDetourLinksSet();
-		// toPickupMean.addValue(set.pickupDetourStartLinks.size());
-		// fromPickupMean.addValue(set.pickupDetourEndLinks.size());
-		// toDropoffMean.addValue(set.dropoffDetourStartLinks.size());
-		// fromDropoffMean.addValue(set.dropoffDetourEndLinks.size());
-
-		pathDataProvider.precalculatePathData(drtRequest, detourLinksProvider.getDetourLinksSet());
+		DetourLinksSet detourLinksSet = detourLinksProvider.getDetourLinksSet();
+		// detourLinksStats.addSet(detourLinksSet);
+		pathDataProvider.precalculatePathData(drtRequest, detourLinksSet);
 
 		Map<Id<Vehicle>, List<Insertion>> filteredInsertionsPerVehicle = detourLinksProvider
 				.getFilteredInsertionsPerVehicle();
@@ -88,15 +108,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	}
 
 	public void shutdown() {
-		// System.out.println("================");
-		// System.out.println("toPickupMean=" + toPickupMean);
-		// System.out.println("================");
-		// System.out.println("fromPickupMean=" + fromPickupMean);
-		// System.out.println("================");
-		// System.out.println("toDropoffMean=" + toDropoffMean);
-		// System.out.println("================");
-		// System.out.println("fromDropoffMean=" + fromDropoffMean);
-		// System.out.println("================");
 		forkJoinPool.shutdown();
+		// detourLinksStats.printStats();
 	}
 }
