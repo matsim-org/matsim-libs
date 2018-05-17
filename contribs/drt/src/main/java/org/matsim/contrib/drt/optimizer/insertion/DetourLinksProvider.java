@@ -19,9 +19,9 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -55,12 +55,12 @@ class DetourLinksProvider {
 	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
 	private final SingleVehicleInsertionFilter insertionFilter;
 
-	private final Map<Id<Vehicle>, List<Insertion>> filteredInsertionsPerVehicle = new HashMap<>();
+	private final Map<Id<Vehicle>, List<Insertion>> filteredInsertionsPerVehicle = new ConcurrentHashMap<>(1000);
 
-	private final Map<Id<Link>, Link> linksToPickup = new HashMap<>();
-	private final Map<Id<Link>, Link> linksFromPickup = new HashMap<>();
-	private final Map<Id<Link>, Link> linksToDropoff = new HashMap<>();
-	private final Map<Id<Link>, Link> linksFromDropoff = new HashMap<>();
+	private final Map<Id<Link>, Link> linksToPickup = new ConcurrentHashMap<>(500);
+	private final Map<Id<Link>, Link> linksFromPickup = new ConcurrentHashMap<>(100);
+	private final Map<Id<Link>, Link> linksToDropoff = new ConcurrentHashMap<>(100);
+	private final Map<Id<Link>, Link> linksFromDropoff = new ConcurrentHashMap<>(100);
 
 	public DetourLinksProvider(DrtConfigGroup drtCfg, MobsimTimer timer) {
 		// TODO use more sophisticated DetourTimeEstimator
@@ -73,6 +73,12 @@ class DetourLinksProvider {
 				new InsertionCostCalculator(drtCfg.getStopDuration(), timer));
 	}
 
+	/**
+	 * Designed to be called in parallel for each vEntry in VehicleData.entries
+	 * 
+	 * @param drtRequest
+	 * @param vEntry
+	 */
 	void addDetourLinks(DrtRequest drtRequest, Entry vEntry) {
 		List<Insertion> insertions = insertionGenerator.generateInsertions(drtRequest, vEntry);
 
@@ -88,7 +94,7 @@ class DetourLinksProvider {
 
 			// i -> pickup
 			Link toPickupLink = (i == 0) ? vEntry.start.link : vEntry.stops.get(i - 1).task.getLink();
-			linksToPickup.put(toPickupLink.getId(), toPickupLink);
+			linksToPickup.putIfAbsent(toPickupLink.getId(), toPickupLink);
 
 			// XXX optimise: if pickup/dropoff is inserted at existing stop,
 			// no need to calc a path from pickup/dropoff to the next stop (the path is already in Schedule)
@@ -96,21 +102,21 @@ class DetourLinksProvider {
 			if (i == j) {
 				// pickup -> dropoff
 				Link fromPickupLink = drtRequest.getToLink();
-				linksFromPickup.put(fromPickupLink.getId(), fromPickupLink);
+				linksFromPickup.putIfAbsent(fromPickupLink.getId(), fromPickupLink);
 			} else {
 				// pickup -> i + 1
 				Link fromPickupLink = vEntry.stops.get(i).task.getLink();
-				linksFromPickup.put(fromPickupLink.getId(), fromPickupLink);
+				linksFromPickup.putIfAbsent(fromPickupLink.getId(), fromPickupLink);
 
 				// j -> dropoff
 				Link toDropoffLink = vEntry.stops.get(j - 1).task.getLink();
-				linksToDropoff.put(toDropoffLink.getId(), toDropoffLink);
+				linksToDropoff.putIfAbsent(toDropoffLink.getId(), toDropoffLink);
 			}
 
 			// dropoff -> j+1 // j+1 may not exist (dropoff appended after last stop)
 			if (j < vEntry.stops.size()) {
 				Link fromDropoffLink = vEntry.stops.get(j).task.getLink();
-				linksFromDropoff.put(fromDropoffLink.getId(), fromDropoffLink);
+				linksFromDropoff.putIfAbsent(fromDropoffLink.getId(), fromDropoffLink);
 			}
 		}
 	}
