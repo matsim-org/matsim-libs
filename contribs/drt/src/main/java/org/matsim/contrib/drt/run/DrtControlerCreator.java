@@ -69,7 +69,8 @@ public final class DrtControlerCreator {
 		adjustConfig(config);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		return addDrtToControler(controler, otfvis);
+		addDrtToControler(controler, otfvis);
+		return controler;
 	}
 
 	public static Controler createControler(Scenario scenario, boolean otfvis) {
@@ -77,10 +78,11 @@ public final class DrtControlerCreator {
 		// to modify the scenario before I pass it to the controler. kai, oct'17
 		adjustConfig(scenario.getConfig());
 		Controler controler = new Controler(scenario);
-		return addDrtToControler(controler, otfvis);
+		addDrtToControler(controler, otfvis);
+		return controler;
 	}
 
-	public static Controler addDrtToControler(Controler controler, boolean otfvis) {
+	public static void addDrtToControler(Controler controler, boolean otfvis) {
 		controler.addOverridingModule(new DvrpModule(DrtControlerCreator::createModuleForQSimPlugin, Arrays
 				.asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class, ParallelPathDataProvider.class)));
 		controler.addOverridingModule(new DrtModule());
@@ -88,7 +90,6 @@ public final class DrtControlerCreator {
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
-		return controler;
 	}
 
 	public static void adjustConfig(Config config) {

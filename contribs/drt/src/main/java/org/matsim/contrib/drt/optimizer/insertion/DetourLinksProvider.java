@@ -76,7 +76,7 @@ class DetourLinksProvider {
 				new DetourTimesProvider(
 						(from, to) -> DistanceUtils.calculateDistance(from, to) / optimisticBeelineSpeed,
 						drtCfg.getStopDuration()), //
-				new InsertionCostCalculator(drtCfg.getStopDuration(), timer));
+				new InsertionCostCalculator(drtCfg, timer));
 	}
 
 	/**
