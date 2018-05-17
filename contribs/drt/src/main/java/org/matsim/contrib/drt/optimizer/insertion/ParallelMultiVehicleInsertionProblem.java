@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
@@ -44,28 +45,28 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 	@SuppressWarnings("unused")
 	private static class DetourLinksStats {
-		private final SummaryStatistics toPickupMean = new SummaryStatistics();
-		private final SummaryStatistics fromPickupMean = new SummaryStatistics();
-		private final SummaryStatistics toDropoffMean = new SummaryStatistics();
-		private final SummaryStatistics fromDropoffMean = new SummaryStatistics();
+		private static final Logger log = Logger.getLogger(DetourLinksStats.class);
 
-		private void addSet(DetourLinksSet set) {
-			toPickupMean.addValue(set.pickupDetourStartLinks.size());
-			fromPickupMean.addValue(set.pickupDetourEndLinks.size());
-			toDropoffMean.addValue(set.dropoffDetourStartLinks.size());
-			fromDropoffMean.addValue(set.dropoffDetourEndLinks.size());
+		private final SummaryStatistics toPickupStats = new SummaryStatistics();
+		private final SummaryStatistics fromPickupStats = new SummaryStatistics();
+		private final SummaryStatistics toDropoffStats = new SummaryStatistics();
+		private final SummaryStatistics fromDropoffStats = new SummaryStatistics();
+		private final SummaryStatistics vEntriesStats = new SummaryStatistics();
+
+		private void addSet(DetourLinksSet set, int vEntriesCount) {
+			toPickupStats.addValue(set.pickupDetourStartLinks.size());
+			fromPickupStats.addValue(set.pickupDetourEndLinks.size());
+			toDropoffStats.addValue(set.dropoffDetourStartLinks.size());
+			fromDropoffStats.addValue(set.dropoffDetourEndLinks.size());
+			vEntriesStats.addValue(vEntriesCount);
 		}
 
 		private void printStats() {
-			System.out.println("================");
-			System.out.println("toPickupMean=" + toPickupMean);
-			System.out.println("================");
-			System.out.println("fromPickupMean=" + fromPickupMean);
-			System.out.println("================");
-			System.out.println("toDropoffMean=" + toDropoffMean);
-			System.out.println("================");
-			System.out.println("fromDropoffMean=" + fromDropoffMean);
-			System.out.println("================");
+			log.debug("toPickupStats:\n" + toPickupStats);
+			log.debug("fromPickupStats:\n" + fromPickupStats);
+			log.debug("toDropoffStats:\n" + toDropoffStats);
+			log.debug("fromDropoffStats:\n" + fromDropoffStats);
+			log.debug("vEntriesStats:\n" + vEntriesStats);
 		}
 	}
 
@@ -74,7 +75,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	private final MobsimTimer timer;
 	private final InsertionCostCalculator insertionCostCalculator;
 	private final ForkJoinPool forkJoinPool;
-	// private final DetourLinksStats detourLinksStats = new DetourLinksStats();
+	private final DetourLinksStats detourLinksStats = new DetourLinksStats();
 
 	public ParallelMultiVehicleInsertionProblem(PrecalculablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
 			MobsimTimer timer) {
@@ -93,7 +94,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 				.join();
 
 		DetourLinksSet detourLinksSet = detourLinksProvider.getDetourLinksSet();
-		// detourLinksStats.addSet(detourLinksSet);
+		detourLinksStats.addSet(detourLinksSet, vEntries.size());
 		pathDataProvider.precalculatePathData(drtRequest, detourLinksSet);
 
 		Map<Id<Vehicle>, List<Insertion>> filteredInsertionsPerVehicle = detourLinksProvider
@@ -109,6 +110,6 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 	public void shutdown() {
 		forkJoinPool.shutdown();
-		// detourLinksStats.printStats();
+//		detourLinksStats.printStats();
 	}
 }
