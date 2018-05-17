@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.concurrent.ForkJoinPool;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.data.DrtRequest;
@@ -52,6 +53,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final RequestInsertionScheduler insertionScheduler;
 	private final VehicleData.EntryFactory vehicleDataEntryFactory;
 
+	private final ForkJoinPool forkJoinPool;
 	private final ParallelMultiVehicleInsertionProblem insertionProblem;
 
 	@Inject
@@ -65,7 +67,9 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		this.insertionScheduler = insertionScheduler;
 		this.vehicleDataEntryFactory = vehicleDataEntryFactory;
 
-		insertionProblem = new ParallelMultiVehicleInsertionProblem(pathDataProvider, drtCfg, mobsimTimer);
+		forkJoinPool = new ForkJoinPool(drtCfg.getNumberOfThreads());
+		insertionProblem = new ParallelMultiVehicleInsertionProblem(pathDataProvider, drtCfg, mobsimTimer,
+				forkJoinPool);
 		insertionScheduler.initSchedules(drtCfg.isChangeStartLinkToLastLinkInSchedule());
 	}
 
@@ -81,7 +85,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		}
 
 		VehicleData vData = new VehicleData(mobsimTimer.getTimeOfDay(), fleet.getVehicles().values().stream(),
-				vehicleDataEntryFactory);
+				vehicleDataEntryFactory, forkJoinPool);
 
 		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {

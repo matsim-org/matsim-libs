@@ -78,12 +78,12 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	private final DetourLinksStats detourLinksStats = new DetourLinksStats();
 
 	public ParallelMultiVehicleInsertionProblem(PrecalculablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
-			MobsimTimer timer) {
+			MobsimTimer timer, ForkJoinPool forkJoinPool) {
 		this.pathDataProvider = pathDataProvider;
 		this.drtCfg = drtCfg;
 		this.timer = timer;
+		this.forkJoinPool = forkJoinPool;
 		insertionCostCalculator = new InsertionCostCalculator(drtCfg, timer);
-		forkJoinPool = new ForkJoinPool(drtCfg.getNumberOfThreads());
 	}
 
 	@Override
