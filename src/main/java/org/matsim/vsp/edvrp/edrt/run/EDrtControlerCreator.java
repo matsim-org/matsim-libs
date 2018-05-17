@@ -28,7 +28,7 @@ import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
-import org.matsim.contrib.drt.optimizer.insertion.PrecalculatablePathDataProvider;
+import org.matsim.contrib.drt.optimizer.insertion.PrecalculablePathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -117,7 +117,7 @@ public class EDrtControlerCreator {
 				bind(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
 
 				bind(ParallelPathDataProvider.class).asEagerSingleton();
-				bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
+				bind(PrecalculablePathDataProvider.class).to(ParallelPathDataProvider.class);
 			}
 		};
 	}
