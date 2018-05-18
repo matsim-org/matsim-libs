@@ -40,6 +40,48 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
+	private final PrecalculablePathDataProvider pathDataProvider;
+	private final DrtConfigGroup drtCfg;
+	private final MobsimTimer timer;
+	private final InsertionCostCalculator insertionCostCalculator;
+	private final ForkJoinPool forkJoinPool;
+	private final DetourLinksStats detourLinksStats = new DetourLinksStats();
+
+	public ParallelMultiVehicleInsertionProblem(PrecalculablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
+			MobsimTimer timer, ForkJoinPool forkJoinPool) {
+		this.pathDataProvider = pathDataProvider;
+		this.drtCfg = drtCfg;
+		this.timer = timer;
+		this.forkJoinPool = forkJoinPool;
+		insertionCostCalculator = new InsertionCostCalculator(drtCfg, timer);
+	}
+
+	@Override
+	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
+		DetourLinksProvider detourLinksProvider = new DetourLinksProvider(drtCfg, timer, drtRequest);
+		detourLinksProvider.findInsertionsAndLinks(forkJoinPool, vEntries);
+
+		detourLinksStats.updateStats(vEntries, detourLinksProvider);
+		Map<Entry, List<Insertion>> filteredInsertions = detourLinksProvider.getFilteredInsertions();
+		if (filteredInsertions.isEmpty()) {
+			return Optional.empty();
+		}
+
+		pathDataProvider.precalculatePathData(drtRequest, detourLinksProvider.getDetourLinksSet());
+
+		return forkJoinPool.submit(() -> filteredInsertions.entrySet().parallelStream()//
+				.map(e -> new SingleVehicleInsertionProblem(pathDataProvider, insertionCostCalculator)
+						.findBestInsertion(drtRequest, e.getKey(), e.getValue()))//
+				.filter(Optional::isPresent)//
+				.map(Optional::get)//
+				.min(Comparator.comparing(i -> i.cost)))//
+				.join();
+	}
+
+	public void shutdown() {
+		forkJoinPool.shutdown();
+		detourLinksStats.printStats();
+	}
 
 	private static class DetourLinksStats {
 		private static final Logger log = Logger.getLogger(DetourLinksStats.class);
@@ -101,48 +143,5 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 			log.debug("insertionAtEndStats:\n" + insertionAtEndStats);
 			log.debug("insertionAtEndWhenNoStopsStats:\n" + insertionAtEndWhenNoStopsStats);
 		}
-	}
-
-	private final PrecalculablePathDataProvider pathDataProvider;
-	private final DrtConfigGroup drtCfg;
-	private final MobsimTimer timer;
-	private final InsertionCostCalculator insertionCostCalculator;
-	private final ForkJoinPool forkJoinPool;
-	private final DetourLinksStats detourLinksStats = new DetourLinksStats();
-
-	public ParallelMultiVehicleInsertionProblem(PrecalculablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
-			MobsimTimer timer, ForkJoinPool forkJoinPool) {
-		this.pathDataProvider = pathDataProvider;
-		this.drtCfg = drtCfg;
-		this.timer = timer;
-		this.forkJoinPool = forkJoinPool;
-		insertionCostCalculator = new InsertionCostCalculator(drtCfg, timer);
-	}
-
-	@Override
-	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
-		DetourLinksProvider detourLinksProvider = new DetourLinksProvider(drtCfg, timer, drtRequest);
-		detourLinksProvider.findInsertionsAndLinks(forkJoinPool, vEntries);
-
-		detourLinksStats.updateStats(vEntries, detourLinksProvider);
-		Map<Entry, List<Insertion>> filteredInsertions = detourLinksProvider.getFilteredInsertions();
-		if (filteredInsertions.isEmpty()) {
-			return Optional.empty();
-		}
-
-		pathDataProvider.precalculatePathData(drtRequest, detourLinksProvider.getDetourLinksSet());
-
-		return forkJoinPool.submit(() -> filteredInsertions.entrySet().parallelStream()//
-				.map(e -> new SingleVehicleInsertionProblem(pathDataProvider, insertionCostCalculator)
-						.findBestInsertion(drtRequest, e.getKey(), e.getValue()))//
-				.filter(Optional::isPresent)//
-				.map(Optional::get)//
-				.min(Comparator.comparing(i -> i.cost)))//
-				.join();
-	}
-
-	public void shutdown() {
-		forkJoinPool.shutdown();
-		detourLinksStats.printStats();
 	}
 }
