@@ -30,6 +30,7 @@ import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.util.PartialSort;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
@@ -52,6 +53,9 @@ class DetourLinksProvider {
 		}
 	}
 
+	// used to prevent filtering out feasible insertions
+	private static final double OPTIMISTIC_BEELINE_SPEED_COEFF = 1.5;
+
 	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
 	private final SingleVehicleInsertionFilter insertionFilter;
 
@@ -62,6 +66,19 @@ class DetourLinksProvider {
 	private final Map<Id<Link>, Link> linksToDropoff;
 	private final Map<Id<Link>, Link> linksFromDropoff;
 
+	// synchronised addition via addInsertionAtEndCandidate(InsertionAtEnd insertionAtEnd, double timeDistance)
+	private final PartialSort<InsertionAtEnd> nearestInsertionsAtEnd = new PartialSort<>(40);
+
+	private static class InsertionAtEnd {
+		private final Entry vEntry;
+		private final InsertionWithDetourTimes insertion;
+
+		private InsertionAtEnd(Entry vEntry, InsertionWithDetourTimes insertion) {
+			this.vEntry = vEntry;
+			this.insertion = insertion;
+		}
+	}
+
 	public DetourLinksProvider(DrtConfigGroup drtCfg, MobsimTimer timer, int vEntriesCount) {
 		filteredInsertionsPerVehicle = new ConcurrentHashMap<>(vEntriesCount);
 		linksToPickup = new ConcurrentHashMap<>(vEntriesCount / 2);
@@ -70,8 +87,8 @@ class DetourLinksProvider {
 		linksFromDropoff = new ConcurrentHashMap<>();
 
 		// TODO use more sophisticated DetourTimeEstimator
-		double optimisticBeelineSpeed = 1.5 * drtCfg.getEstimatedDrtSpeed()
-				/ drtCfg.getEstimatedBeelineDistanceFactor();// 1.5 is used to prevent filtering out feasible insertions
+		double optimisticBeelineSpeed = OPTIMISTIC_BEELINE_SPEED_COEFF * drtCfg.getEstimatedDrtSpeed()
+				/ drtCfg.getEstimatedBeelineDistanceFactor();
 		insertionFilter = new SingleVehicleInsertionFilter(//
 				new DetourTimesProvider(
 						(from, to) -> DistanceUtils.calculateDistance(from, to) / optimisticBeelineSpeed,
@@ -87,44 +104,77 @@ class DetourLinksProvider {
 	 */
 	void addDetourLinks(DrtRequest drtRequest, Entry vEntry) {
 		List<Insertion> insertions = insertionGenerator.generateInsertions(drtRequest, vEntry);
-
 		List<InsertionWithDetourTimes> insertionsWithDetourTimes = insertionFilter.findFeasibleInsertions(drtRequest,
 				vEntry, insertions);
-		List<Insertion> filteredInsertions = new ArrayList<>(insertionsWithDetourTimes.size());
-		filteredInsertionsPerVehicle.put(vEntry.vehicle.getId(), filteredInsertions);
+		if (insertionsWithDetourTimes.isEmpty()) {
+			return;
+		}
 
+		List<Insertion> filteredInsertions = new ArrayList<>(insertionsWithDetourTimes.size());
 		for (InsertionWithDetourTimes insert : insertionsWithDetourTimes) {
 			int i = insert.getPickupIdx();
 			int j = insert.getDropoffIdx();
-			filteredInsertions.add(new Insertion(i, j));
 
-			// i -> pickup
-			Link toPickupLink = (i == 0) ? vEntry.start.link : vEntry.stops.get(i - 1).task.getLink();
-			linksToPickup.putIfAbsent(toPickupLink.getId(), toPickupLink);
-
-			// XXX optimise: if pickup/dropoff is inserted at existing stop,
-			// no need to calc a path from pickup/dropoff to the next stop (the path is already in Schedule)
-
-			if (i == j) {
-				// pickup -> dropoff
-				Link fromPickupLink = drtRequest.getToLink();
-				linksFromPickup.putIfAbsent(fromPickupLink.getId(), fromPickupLink);
+			if (i == j && i == vEntry.stops.size()) {
+				double departureTime = (i == 0) ? vEntry.start.time : vEntry.stops.get(i - 1).task.getEndTime();
+				// x OPTIMISTIC_BEELINE_SPEED_COEFF to remove bias towards near but still busy vehicles
+				// (timeToPickup is underestimated by this factor)
+				double timeDistance = departureTime + OPTIMISTIC_BEELINE_SPEED_COEFF * insert.getTimeToPickup();
+				addInsertionAtEndCandidate(new InsertionAtEnd(vEntry, insert), timeDistance);
 			} else {
-				// pickup -> i + 1
-				Link fromPickupLink = vEntry.stops.get(i).task.getLink();
-				linksFromPickup.putIfAbsent(fromPickupLink.getId(), fromPickupLink);
-
-				// j -> dropoff
-				Link toDropoffLink = vEntry.stops.get(j - 1).task.getLink();
-				linksToDropoff.putIfAbsent(toDropoffLink.getId(), toDropoffLink);
-			}
-
-			// dropoff -> j+1 // j+1 may not exist (dropoff appended after last stop)
-			if (j < vEntry.stops.size()) {
-				Link fromDropoffLink = vEntry.stops.get(j).task.getLink();
-				linksFromDropoff.putIfAbsent(fromDropoffLink.getId(), fromDropoffLink);
+				filteredInsertions.add(new Insertion(i, j));
+				addLinks(i, j, vEntry, drtRequest);
 			}
 		}
+
+		if (!filteredInsertions.isEmpty()) {
+			filteredInsertionsPerVehicle.put(vEntry.vehicle.getId(), filteredInsertions);
+		}
+	}
+
+	void processNearestInsertionsAtEnd(DrtRequest drtRequest) {
+		List<InsertionAtEnd> insertionsAtEnd = nearestInsertionsAtEnd.kSmallestElements();
+		for (InsertionAtEnd iAtEnd : insertionsAtEnd) {
+			int i = iAtEnd.insertion.getPickupIdx();
+			int j = iAtEnd.insertion.getDropoffIdx();
+			filteredInsertionsPerVehicle.computeIfAbsent(iAtEnd.vEntry.vehicle.getId(), k -> new ArrayList<>())
+					.add(new Insertion(i, j));
+			addLinks(i, j, iAtEnd.vEntry, drtRequest);
+		}
+	}
+
+	private synchronized void addInsertionAtEndCandidate(InsertionAtEnd insertionAtEnd, double timeDistance) {
+		nearestInsertionsAtEnd.add(insertionAtEnd, timeDistance);
+	}
+
+	private void addLinks(int i, int j, Entry vEntry, DrtRequest drtRequest) {
+		// i -> pickup
+		Link toPickupLink = (i == 0) ? vEntry.start.link : vEntry.stops.get(i - 1).task.getLink();
+		linksToPickup.putIfAbsent(toPickupLink.getId(), toPickupLink);
+
+		// XXX optimise: if pickup/dropoff is inserted at existing stop,
+		// no need to calc a path from pickup/dropoff to the next stop (the path is already in Schedule)
+
+		if (i == j) {
+			// pickup -> dropoff
+			Link fromPickupLink = drtRequest.getToLink();
+			linksFromPickup.putIfAbsent(fromPickupLink.getId(), fromPickupLink);
+		} else {
+			// pickup -> i + 1
+			Link fromPickupLink = vEntry.stops.get(i).task.getLink();
+			linksFromPickup.putIfAbsent(fromPickupLink.getId(), fromPickupLink);
+
+			// j -> dropoff
+			Link toDropoffLink = vEntry.stops.get(j - 1).task.getLink();
+			linksToDropoff.putIfAbsent(toDropoffLink.getId(), toDropoffLink);
+		}
+
+		// dropoff -> j+1 // j+1 may not exist (dropoff appended after last stop)
+		if (j < vEntry.stops.size()) {
+			Link fromDropoffLink = vEntry.stops.get(j).task.getLink();
+			linksFromDropoff.putIfAbsent(fromDropoffLink.getId(), fromDropoffLink);
+		}
+
 	}
 
 	Map<Id<Vehicle>, List<Insertion>> getFilteredInsertionsPerVehicle() {

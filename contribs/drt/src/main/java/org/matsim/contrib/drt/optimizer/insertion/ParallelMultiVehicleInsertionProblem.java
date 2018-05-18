@@ -20,6 +20,7 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -126,6 +127,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 		forkJoinPool.submit(() -> vEntries.parallelStream()//
 				.forEach(e -> detourLinksProvider.addDetourLinks(drtRequest, e)))//
 				.join();
+		detourLinksProvider.processNearestInsertionsAtEnd(drtRequest);
 
 		DetourLinksSet detourLinksSet = detourLinksProvider.getDetourLinksSet();
 		Map<Id<Vehicle>, List<Insertion>> filteredInsertionsPerVehicle = detourLinksProvider
@@ -138,7 +140,8 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 		return forkJoinPool.submit(() -> vEntries.parallelStream()//
 				.map(v -> new SingleVehicleInsertionProblem(pathDataProvider, insertionCostCalculator)
-						.findBestInsertion(drtRequest, v, filteredInsertionsPerVehicle.get(v.vehicle.getId())))//
+						.findBestInsertion(drtRequest, v,
+								filteredInsertionsPerVehicle.getOrDefault(v.vehicle.getId(), Collections.emptyList())))//
 				.filter(Optional::isPresent)//
 				.map(Optional::get)//
 				.min(Comparator.comparing(i -> i.cost)))//
