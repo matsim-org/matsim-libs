@@ -19,9 +19,11 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -60,9 +62,12 @@ class DetourLinksProvider {
 	// so we just select the nearest (in straight-line) for the MultiNodeDijkstra (OneToManyPathSearch)
 	private static final int NEAREST_INSERTIONS_AT_END_LIMIT = 40;
 
+	private final DrtRequest drtRequest;
+
 	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
 	private final SingleVehicleInsertionFilter insertionFilter;
 
+	private DetourLinksSet detourLinksSet;
 	private final Map<Entry, List<Insertion>> filteredInsertionsPerVehicle;
 
 	private final Map<Id<Link>, Link> linksToPickup;
@@ -84,7 +89,9 @@ class DetourLinksProvider {
 		}
 	}
 
-	public DetourLinksProvider(DrtConfigGroup drtCfg, MobsimTimer timer, int vEntriesCount) {
+	public DetourLinksProvider(DrtConfigGroup drtCfg, MobsimTimer timer, DrtRequest drtRequest) {
+		this.drtRequest = drtRequest;
+
 		// initial capacities of concurrent maps according to insertion stats for AT Berlin 10pct
 		// in general, for larger fleets they should be slightly higher than for smaller fleets,
 		// nevertheless NEAREST_INSERTIONS_AT_END_LIMIT keeps them more independent of the fleet size
@@ -104,13 +111,21 @@ class DetourLinksProvider {
 				new InsertionCostCalculator(drtCfg, timer));
 	}
 
+	void findInsertionsAndLinks(ForkJoinPool forkJoinPool, Collection<Entry> vEntries) {
+		forkJoinPool.submit(() -> vEntries.parallelStream()//
+				.forEach(this::addDetourLinks))//
+				.join();
+		processNearestInsertionsAtEnd();
+		detourLinksSet = new DetourLinksSet(linksToPickup, linksFromPickup, linksToDropoff, linksFromDropoff);
+	}
+
 	/**
 	 * Designed to be called in parallel for each vEntry in VehicleData.entries
 	 * 
 	 * @param drtRequest
 	 * @param vEntry
 	 */
-	void addDetourLinks(DrtRequest drtRequest, Entry vEntry) {
+	private void addDetourLinks(Entry vEntry) {
 		List<Insertion> insertions = insertionGenerator.generateInsertions(drtRequest, vEntry);
 		List<InsertionWithDetourTimes> insertionsWithDetourTimes = insertionFilter.findFeasibleInsertions(drtRequest,
 				vEntry, insertions);
@@ -131,7 +146,7 @@ class DetourLinksProvider {
 				addInsertionAtEndCandidate(new InsertionAtEnd(vEntry, insert), timeDistance);
 			} else {
 				filteredInsertions.add(new Insertion(i, j));
-				addLinks(i, j, vEntry, drtRequest);
+				addLinks(i, j, vEntry);
 			}
 		}
 
@@ -140,14 +155,14 @@ class DetourLinksProvider {
 		}
 	}
 
-	void processNearestInsertionsAtEnd(DrtRequest drtRequest) {
+	private void processNearestInsertionsAtEnd() {
 		List<InsertionAtEnd> insertionsAtEnd = nearestInsertionsAtEnd.kSmallestElements();
 		for (InsertionAtEnd iAtEnd : insertionsAtEnd) {
 			int i = iAtEnd.insertion.getPickupIdx();
 			int j = iAtEnd.insertion.getDropoffIdx();
 			filteredInsertionsPerVehicle.computeIfAbsent(iAtEnd.vEntry, k -> new ArrayList<>())
 					.add(new Insertion(i, j));
-			addLinks(i, j, iAtEnd.vEntry, drtRequest);
+			addLinks(i, j, iAtEnd.vEntry);
 		}
 	}
 
@@ -155,7 +170,7 @@ class DetourLinksProvider {
 		nearestInsertionsAtEnd.add(insertionAtEnd, timeDistance);
 	}
 
-	private void addLinks(int i, int j, Entry vEntry, DrtRequest drtRequest) {
+	private void addLinks(int i, int j, Entry vEntry) {
 		// i -> pickup
 		putLinkToMap(linksToPickup, (i == 0) ? vEntry.start.link : vEntry.stops.get(i - 1).task.getLink());
 
@@ -183,11 +198,11 @@ class DetourLinksProvider {
 		map.putIfAbsent(link.getId(), link);
 	}
 
-	Map<Entry, List<Insertion>> getFilteredInsertionsPerVehicle() {
+	Map<Entry, List<Insertion>> getFilteredInsertions() {
 		return filteredInsertionsPerVehicle;
 	}
 
 	DetourLinksSet getDetourLinksSet() {
-		return new DetourLinksSet(linksToPickup, linksFromPickup, linksToDropoff, linksFromDropoff);
+		return detourLinksSet;
 	}
 }

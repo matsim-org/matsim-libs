@@ -53,6 +53,11 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 		private final SummaryStatistics insertionAtEndStats = new SummaryStatistics();
 		private final SummaryStatistics insertionAtEndWhenNoStopsStats = new SummaryStatistics();
 
+		private void updateStats(Collection<Entry> vEntries, DetourLinksProvider detourLinksProvider) {
+			addSet(detourLinksProvider.getDetourLinksSet(), vEntries.size());
+			updateInsertionStats(vEntries, detourLinksProvider.getFilteredInsertions());
+		}
+
 		private void addSet(DetourLinksSet set, int vEntriesCount) {
 			toPickupStats.addValue(set.pickupDetourStartLinks.size());
 			fromPickupStats.addValue(set.pickupDetourEndLinks.size());
@@ -116,25 +121,18 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 	@Override
 	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
-		DetourLinksProvider detourLinksProvider = new DetourLinksProvider(drtCfg, timer, vEntries.size());
-		forkJoinPool.submit(() -> vEntries.parallelStream()//
-				.forEach(e -> detourLinksProvider.addDetourLinks(drtRequest, e)))//
-				.join();
-		detourLinksProvider.processNearestInsertionsAtEnd(drtRequest);
+		DetourLinksProvider detourLinksProvider = new DetourLinksProvider(drtCfg, timer, drtRequest);
+		detourLinksProvider.findInsertionsAndLinks(forkJoinPool, vEntries);
 
-		DetourLinksSet detourLinksSet = detourLinksProvider.getDetourLinksSet();
-		Map<Entry, List<Insertion>> filteredInsertionsPerVehicle = detourLinksProvider
-				.getFilteredInsertionsPerVehicle();
-
-		detourLinksStats.updateInsertionStats(vEntries, filteredInsertionsPerVehicle);
-		detourLinksStats.addSet(detourLinksSet, vEntries.size());
-		if (filteredInsertionsPerVehicle.isEmpty()) {
+		detourLinksStats.updateStats(vEntries, detourLinksProvider);
+		Map<Entry, List<Insertion>> filteredInsertions = detourLinksProvider.getFilteredInsertions();
+		if (filteredInsertions.isEmpty()) {
 			return Optional.empty();
 		}
 
-		pathDataProvider.precalculatePathData(drtRequest, detourLinksSet);
+		pathDataProvider.precalculatePathData(drtRequest, detourLinksProvider.getDetourLinksSet());
 
-		return forkJoinPool.submit(() -> filteredInsertionsPerVehicle.entrySet().parallelStream()//
+		return forkJoinPool.submit(() -> filteredInsertions.entrySet().parallelStream()//
 				.map(e -> new SingleVehicleInsertionProblem(pathDataProvider, insertionCostCalculator)
 						.findBestInsertion(drtRequest, e.getKey(), e.getValue()))//
 				.filter(Optional::isPresent)//
