@@ -85,10 +85,10 @@ class DetourLinksProvider {
 	}
 
 	public DetourLinksProvider(DrtConfigGroup drtCfg, MobsimTimer timer, int vEntriesCount) {
-		filteredInsertionsPerVehicle = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT * 3 / 2);
+		filteredInsertionsPerVehicle = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT * 2);
 		linksToPickup = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT);
-		linksFromPickup = new ConcurrentHashMap<>();
-		linksToDropoff = new ConcurrentHashMap<>();
+		linksFromPickup = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT / 2);
+		linksToDropoff = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT/ 2);
 		linksFromDropoff = new ConcurrentHashMap<>();
 
 		// TODO use more sophisticated DetourTimeEstimator
