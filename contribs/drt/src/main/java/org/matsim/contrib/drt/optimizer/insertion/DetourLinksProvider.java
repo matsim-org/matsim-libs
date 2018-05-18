@@ -85,10 +85,13 @@ class DetourLinksProvider {
 	}
 
 	public DetourLinksProvider(DrtConfigGroup drtCfg, MobsimTimer timer, int vEntriesCount) {
+		// initial capacities of concurrent maps according to insertion stats for AT Berlin 10pct
+		// in general, for larger fleets they should be slightly higher than for smaller fleets,
+		// nevertheless NEAREST_INSERTIONS_AT_END_LIMIT keeps them more independent of the fleet size
 		filteredInsertionsPerVehicle = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT * 2);
 		linksToPickup = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT);
 		linksFromPickup = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT / 2);
-		linksToDropoff = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT/ 2);
+		linksToDropoff = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT / 2);
 		linksFromDropoff = new ConcurrentHashMap<>();
 
 		// TODO use more sophisticated DetourTimeEstimator
