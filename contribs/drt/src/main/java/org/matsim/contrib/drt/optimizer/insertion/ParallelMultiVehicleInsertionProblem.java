@@ -135,6 +135,9 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 		detourLinksStats.updateInsertionStats(vEntries, filteredInsertionsPerVehicle);
 		detourLinksStats.addSet(detourLinksSet, vEntries.size());
+		if (filteredInsertionsPerVehicle.isEmpty()) {
+			return Optional.empty();
+		}
 
 		pathDataProvider.precalculatePathData(drtRequest, detourLinksSet);
 
