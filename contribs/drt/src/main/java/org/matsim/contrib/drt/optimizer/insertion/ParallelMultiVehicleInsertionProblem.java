@@ -52,6 +52,9 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 		private final SummaryStatistics toDropoffStats = new SummaryStatistics();
 		private final SummaryStatistics fromDropoffStats = new SummaryStatistics();
 		private final SummaryStatistics vEntriesStats = new SummaryStatistics();
+		private final SummaryStatistics insertionStats = new SummaryStatistics();
+		private final SummaryStatistics insertionAtEndStats = new SummaryStatistics();
+		private final SummaryStatistics insertionAtEndWhenNoStopsStats = new SummaryStatistics();
 
 		private void addSet(DetourLinksSet set, int vEntriesCount) {
 			toPickupStats.addValue(set.pickupDetourStartLinks.size());
@@ -61,12 +64,43 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 			vEntriesStats.addValue(vEntriesCount);
 		}
 
+		private void updateInsertionStats(Collection<Entry> vEntries,
+				Map<Id<Vehicle>, List<Insertion>> filteredInsertionsPerVehicle) {
+			int insertionCount = 0;
+			int insertionAtEndCount = 0;
+			int insertionAtEndToEmptyCount = 0;
+
+			for (Entry vEntry : vEntries) {
+				List<Insertion> insertions = filteredInsertionsPerVehicle.get(vEntry.vehicle.getId());
+				if (insertions == null) {
+					continue;
+				}
+
+				insertionCount += insertions.size();
+				Insertion lastInsertion = insertions.get(insertions.size() - 1);
+				if (lastInsertion.pickupIdx == lastInsertion.dropoffIdx
+						&& lastInsertion.pickupIdx == vEntry.stops.size()) {
+					insertionAtEndCount++;
+					if (lastInsertion.pickupIdx == 0) {
+						insertionAtEndToEmptyCount++;
+					}
+				}
+			}
+
+			insertionStats.addValue(insertionCount);
+			insertionAtEndStats.addValue(insertionAtEndCount);
+			insertionAtEndWhenNoStopsStats.addValue(insertionAtEndToEmptyCount);
+		}
+
 		private void printStats() {
 			log.debug("toPickupStats:\n" + toPickupStats);
 			log.debug("fromPickupStats:\n" + fromPickupStats);
 			log.debug("toDropoffStats:\n" + toDropoffStats);
 			log.debug("fromDropoffStats:\n" + fromDropoffStats);
 			log.debug("vEntriesStats:\n" + vEntriesStats);
+			log.debug("insertionStats:\n" + insertionStats);
+			log.debug("insertionAtEndStats:\n" + insertionAtEndStats);
+			log.debug("insertionAtEndWhenNoStopsStats:\n" + insertionAtEndWhenNoStopsStats);
 		}
 	}
 
@@ -94,11 +128,14 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 				.join();
 
 		DetourLinksSet detourLinksSet = detourLinksProvider.getDetourLinksSet();
-		detourLinksStats.addSet(detourLinksSet, vEntries.size());
-		pathDataProvider.precalculatePathData(drtRequest, detourLinksSet);
-
 		Map<Id<Vehicle>, List<Insertion>> filteredInsertionsPerVehicle = detourLinksProvider
 				.getFilteredInsertionsPerVehicle();
+
+		detourLinksStats.updateInsertionStats(vEntries, filteredInsertionsPerVehicle);
+		detourLinksStats.addSet(detourLinksSet, vEntries.size());
+
+		pathDataProvider.precalculatePathData(drtRequest, detourLinksSet);
+
 		return forkJoinPool.submit(() -> vEntries.parallelStream()//
 				.map(v -> new SingleVehicleInsertionProblem(pathDataProvider, insertionCostCalculator)
 						.findBestInsertion(drtRequest, v, filteredInsertionsPerVehicle.get(v.vehicle.getId())))//
@@ -110,6 +147,6 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 	public void shutdown() {
 		forkJoinPool.shutdown();
-//		detourLinksStats.printStats();
+		detourLinksStats.printStats();
 	}
 }
