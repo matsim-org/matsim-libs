@@ -20,7 +20,6 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -29,14 +28,12 @@ import java.util.concurrent.ForkJoinPool;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
@@ -44,7 +41,6 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  */
 public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
 
-	@SuppressWarnings("unused")
 	private static class DetourLinksStats {
 		private static final Logger log = Logger.getLogger(DetourLinksStats.class);
 
@@ -66,21 +62,18 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 		}
 
 		private void updateInsertionStats(Collection<Entry> vEntries,
-				Map<Id<Vehicle>, List<Insertion>> filteredInsertionsPerVehicle) {
+				Map<Entry, List<Insertion>> filteredInsertionsPerVehicle) {
 			int insertionCount = 0;
 			int insertionAtEndCount = 0;
 			int insertionAtEndToEmptyCount = 0;
 
-			for (Entry vEntry : vEntries) {
-				List<Insertion> insertions = filteredInsertionsPerVehicle.get(vEntry.vehicle.getId());
-				if (insertions == null) {
-					continue;
-				}
-
+			for (java.util.Map.Entry<Entry, List<Insertion>> e : filteredInsertionsPerVehicle.entrySet()) {
+				List<Insertion> insertions = e.getValue();
 				insertionCount += insertions.size();
+
 				Insertion lastInsertion = insertions.get(insertions.size() - 1);
 				if (lastInsertion.pickupIdx == lastInsertion.dropoffIdx
-						&& lastInsertion.pickupIdx == vEntry.stops.size()) {
+						&& lastInsertion.pickupIdx == e.getKey().stops.size()) {
 					insertionAtEndCount++;
 					if (lastInsertion.pickupIdx == 0) {
 						insertionAtEndToEmptyCount++;
@@ -130,7 +123,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 		detourLinksProvider.processNearestInsertionsAtEnd(drtRequest);
 
 		DetourLinksSet detourLinksSet = detourLinksProvider.getDetourLinksSet();
-		Map<Id<Vehicle>, List<Insertion>> filteredInsertionsPerVehicle = detourLinksProvider
+		Map<Entry, List<Insertion>> filteredInsertionsPerVehicle = detourLinksProvider
 				.getFilteredInsertionsPerVehicle();
 
 		detourLinksStats.updateInsertionStats(vEntries, filteredInsertionsPerVehicle);
@@ -141,10 +134,9 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 		pathDataProvider.precalculatePathData(drtRequest, detourLinksSet);
 
-		return forkJoinPool.submit(() -> vEntries.parallelStream()//
-				.map(v -> new SingleVehicleInsertionProblem(pathDataProvider, insertionCostCalculator)
-						.findBestInsertion(drtRequest, v,
-								filteredInsertionsPerVehicle.getOrDefault(v.vehicle.getId(), Collections.emptyList())))//
+		return forkJoinPool.submit(() -> filteredInsertionsPerVehicle.entrySet().parallelStream()//
+				.map(e -> new SingleVehicleInsertionProblem(pathDataProvider, insertionCostCalculator)
+						.findBestInsertion(drtRequest, e.getKey(), e.getValue()))//
 				.filter(Optional::isPresent)//
 				.map(Optional::get)//
 				.min(Comparator.comparing(i -> i.cost)))//

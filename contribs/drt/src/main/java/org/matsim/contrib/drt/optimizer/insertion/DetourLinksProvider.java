@@ -29,7 +29,6 @@ import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.util.PartialSort;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -64,7 +63,7 @@ class DetourLinksProvider {
 	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
 	private final SingleVehicleInsertionFilter insertionFilter;
 
-	private final Map<Id<Vehicle>, List<Insertion>> filteredInsertionsPerVehicle;
+	private final Map<Entry, List<Insertion>> filteredInsertionsPerVehicle;
 
 	private final Map<Id<Link>, Link> linksToPickup;
 	private final Map<Id<Link>, Link> linksFromPickup;
@@ -86,7 +85,7 @@ class DetourLinksProvider {
 	}
 
 	public DetourLinksProvider(DrtConfigGroup drtCfg, MobsimTimer timer, int vEntriesCount) {
-		filteredInsertionsPerVehicle = new ConcurrentHashMap<>(vEntriesCount);
+		filteredInsertionsPerVehicle = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT * 3 / 2);
 		linksToPickup = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT);
 		linksFromPickup = new ConcurrentHashMap<>();
 		linksToDropoff = new ConcurrentHashMap<>();
@@ -134,7 +133,7 @@ class DetourLinksProvider {
 		}
 
 		if (!filteredInsertions.isEmpty()) {
-			filteredInsertionsPerVehicle.put(vEntry.vehicle.getId(), filteredInsertions);
+			filteredInsertionsPerVehicle.put(vEntry, filteredInsertions);
 		}
 	}
 
@@ -143,7 +142,7 @@ class DetourLinksProvider {
 		for (InsertionAtEnd iAtEnd : insertionsAtEnd) {
 			int i = iAtEnd.insertion.getPickupIdx();
 			int j = iAtEnd.insertion.getDropoffIdx();
-			filteredInsertionsPerVehicle.computeIfAbsent(iAtEnd.vEntry.vehicle.getId(), k -> new ArrayList<>())
+			filteredInsertionsPerVehicle.computeIfAbsent(iAtEnd.vEntry, k -> new ArrayList<>())
 					.add(new Insertion(i, j));
 			addLinks(i, j, iAtEnd.vEntry, drtRequest);
 		}
@@ -181,7 +180,7 @@ class DetourLinksProvider {
 		map.putIfAbsent(link.getId(), link);
 	}
 
-	Map<Id<Vehicle>, List<Insertion>> getFilteredInsertionsPerVehicle() {
+	Map<Entry, List<Insertion>> getFilteredInsertionsPerVehicle() {
 		return filteredInsertionsPerVehicle;
 	}
 
