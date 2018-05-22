@@ -119,7 +119,7 @@ public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, 
 	public void writeParkingOccupancyStats(String file) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(file);
 		try {
-			bw.write("Zone;Capacity;intialOccupancy;");
+            bw.write("Zone;Capacity;intialOccupancy");
 			for (int i = 0; i<bins; i++) {
 				bw.write(";"+Time.writeTime(i*900));
 			}
@@ -146,7 +146,7 @@ public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, 
 	public void writeRelativeParkingOccupancyStats(String file) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(file);
 		try {
-			bw.write("Zone;Capacity;intialOccupancy;");
+            bw.write("Zone;Capacity;intialOccupancy");
 			for (int i = 0; i < bins; i++) {
 				bw.write(";" + Time.writeTime(i * 900));
 			}
