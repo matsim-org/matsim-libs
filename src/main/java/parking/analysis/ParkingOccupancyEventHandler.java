@@ -81,9 +81,9 @@ public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, 
 	@Override
 	public void reset(int iteration) {
 		zoneoccupancyPerBin.clear();
-		for (Id<ParkingZone> zone : parkingInfo.getParkingZones().keySet()) {
-			zoneoccupancyPerBin.put(zone,new int[bins]);
-			capacityAtIterationStart.put(zone, (int) this.parkingInfo.getParkingZones().get(parkingInfo.getParkingZones().get(zone)).getZoneParkingCapacity());
+		for (Entry<Id<ParkingZone>, ParkingZone> zone : parkingInfo.getParkingZones().entrySet()) {
+			zoneoccupancyPerBin.put(zone.getKey(), new int[bins]);
+			capacityAtIterationStart.put(zone.getKey(), (int) zone.getValue().getZoneParkingCapacity());
 		}
 
 	}
@@ -111,7 +111,7 @@ public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, 
 	
 	private int getBin(double time) {
 		int b = Math.floorDiv((int) time, 900);
-		if (b>bins) b = bins-1;
+		if (b > bins - 1) b = bins - 1;
 		return b;
 		
 	}
