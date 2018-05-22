@@ -18,11 +18,10 @@
   
 package parking.analysis;
 
+import com.google.inject.Inject;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-
-import com.google.inject.Inject;
 
 public class ParkingAnalysisListener implements IterationEndsListener {
 
@@ -33,8 +32,11 @@ public class ParkingAnalysisListener implements IterationEndsListener {
 	
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		String occupancyFileName = matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "parkingOccupancy.csv");
+		String occupancyFileName = matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "parkingOccupancy_abs.csv");
 		parkingOccupancyEventHandler.writeParkingOccupancyStats(occupancyFileName);
+		String reloccupancyFileName = matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "parkingOccupancy_rel.csv");
+		parkingOccupancyEventHandler.writeRelativeParkingOccupancyStats(reloccupancyFileName);
+		;
 	}
 
 }

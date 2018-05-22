@@ -18,14 +18,6 @@
 
 package parking.analysis;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.inject.Inject;
-
 import org.apache.commons.lang.mutable.MutableInt;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -38,10 +30,16 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-
 import parking.ParkingZone;
 import parking.ZonalLinkParkingInfo;
 import parking.capacityCalculation.LinkParkingCapacityCalculator;
+
+import javax.inject.Inject;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, PersonDepartureEventHandler {
 
@@ -49,7 +47,8 @@ public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, 
 	private LinkParkingCapacityCalculator calculator;
 	private Network network;
 	private final double storageCapacityFactor;
-	private Map<Id<ParkingZone>,int[]> zoneoccupancyPerBin = new HashMap<>();  
+	private Map<Id<ParkingZone>, int[]> zoneoccupancyPerBin = new HashMap<>();
+	private Map<Id<ParkingZone>, Integer> capacityAtIterationStart = new HashMap<>();
 	private int bins;
 	
 	
@@ -84,6 +83,7 @@ public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, 
 		zoneoccupancyPerBin.clear();
 		for (Id<ParkingZone> zone : parkingInfo.getParkingZones().keySet()) {
 			zoneoccupancyPerBin.put(zone,new int[bins]);
+			capacityAtIterationStart.put(zone, (int) this.parkingInfo.getParkingZones().get(parkingInfo.getParkingZones().get(zone)).getZoneParkingCapacity());
 		}
 
 	}
@@ -119,7 +119,7 @@ public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, 
 	public void writeParkingOccupancyStats(String file) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(file);
 		try {
-			bw.write("Zone;Capacity;intialCapacity;");
+			bw.write("Zone;Capacity;intialOccupancy;");
 			for (int i = 0; i<bins; i++) {
 				bw.write(";"+Time.writeTime(i*900));
 			}
@@ -128,12 +128,39 @@ public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, 
 				final MutableInt parkingCapacity = new MutableInt();
 				this.parkingInfo.getParkingZones().get(e.getKey()).getLinksInZone().forEach(lid -> parkingCapacity.add(calculator.getLinkCapacity(network.getLinks().get(lid))));
 				int cap = (int) (parkingCapacity.intValue() * storageCapacityFactor);
-				int initialOcc =  cap - (int) this.parkingInfo.getParkingZones().get(e.getKey()).getZoneParkingCapacity();
+				int initialOcc = cap - this.capacityAtIterationStart.get(e.getKey());
 				bw.write(e.getKey()+";"+cap+";"+initialOcc);
 				int sum = 0;
 				for (int i = 0 ; i< e.getValue().length;i++) {
 					sum+=e.getValue()[i];
 					bw.write(";"+sum);
+				}
+			}
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void writeRelativeParkingOccupancyStats(String file) {
+		BufferedWriter bw = IOUtils.getBufferedWriter(file);
+		try {
+			bw.write("Zone;Capacity;intialOccupancy;");
+			for (int i = 0; i < bins; i++) {
+				bw.write(";" + Time.writeTime(i * 900));
+			}
+			for (Entry<Id<ParkingZone>, int[]> e : this.zoneoccupancyPerBin.entrySet()) {
+				bw.newLine();
+				final MutableInt parkingCapacity = new MutableInt();
+				this.parkingInfo.getParkingZones().get(e.getKey()).getLinksInZone().forEach(lid -> parkingCapacity.add(calculator.getLinkCapacity(network.getLinks().get(lid))));
+				int cap = (int) (parkingCapacity.intValue() * storageCapacityFactor);
+				int initialOcc = cap - this.capacityAtIterationStart.get(e.getKey());
+				bw.write(e.getKey() + ";" + cap + ";" + initialOcc);
+				int sum = initialOcc;
+				for (int i = 0; i < e.getValue().length; i++) {
+					sum += e.getValue()[i];
+					bw.write(";" + String.format("%3.2f", (double) sum / (double) cap));
 				}
 			}
 			bw.flush();
