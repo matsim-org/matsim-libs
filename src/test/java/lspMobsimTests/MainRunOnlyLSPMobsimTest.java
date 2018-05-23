@@ -70,7 +70,7 @@ public class MainRunOnlyLSPMobsimTest {
 		Config config = new Config();
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("input\\lsp\\network\\2regions.xml");
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("input/lsp/network/2regions.xml");
         this.network = scenario.getNetwork();	
         
         Id<Carrier> mainRunCarrierId = Id.create("MainRunCarrier", Carrier.class);
@@ -198,7 +198,7 @@ public class MainRunOnlyLSPMobsimTest {
 			config.controler().setFirstIteration(0);
 			config.controler().setLastIteration(0);
 			config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-			config.network().setInputFile("input\\lsp\\network\\2regions.xml");
+			config.network().setInputFile("input/lsp/network/2regions.xml");
 			controler.run();
 	}
 	@Test

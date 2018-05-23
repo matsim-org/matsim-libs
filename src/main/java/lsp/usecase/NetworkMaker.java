@@ -137,7 +137,7 @@ public class NetworkMaker {
 		network.addLink(link2);
 	
 		NetworkWriter writer = new NetworkWriter(network);
-		writer.write("D:\\Transport_Chains\\workspace_TransportChains\\logistics\\input\\lsp\\network\\2regions.xml");
+		writer.write("D:/Transport_Chains/workspace_TransportChains/logistics/input/lsp/network/2regions.xml");
 		
 	}
 	

@@ -190,7 +190,7 @@ public class ExampleLSPScoring {
 		Config config = new Config();
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("input\\lsp\\network\\2regions.xml");
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("input/lsp/network/2regions.xml");
         Network network = scenario.getNetwork();
 	
         //Create LSP and shipments
@@ -217,7 +217,7 @@ public class ExampleLSPScoring {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.network().setInputFile("input\\lsp\\network\\2regions.xml");
+		config.network().setInputFile("input/lsp/network/2regions.xml");
 		controler.run();
         
 		System.out.println("The tip of all customers was: " + lsp.getSelectedPlan().getScore());

@@ -22,7 +22,7 @@ public class LSPShipmentMaker {
 	
 	Network network = NetworkUtils.createNetwork();
 	MatsimNetworkReader reader = new MatsimNetworkReader(network);
-	reader.readFile("D:\\Working_Copies_Dissertation\\Code_Dissertation\\logistics\\input\\lsp\\network\\2regions.xml");
+	reader.readFile("D:/Working_Copies_Dissertation/Code_Dissertation/logistics/input/lsp/network/2regions.xml");
 	Random random = new Random(1);
 	ArrayList<LSPShipment> shipments = new ArrayList<LSPShipment>();
 

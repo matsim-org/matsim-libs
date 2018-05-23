@@ -73,7 +73,7 @@ public class MultipleIterationsSecondReloadLSPMobsimTest {
 		Config config = new Config();
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("input\\lsp\\network\\2regions.xml");
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("input/lsp/network/2regions.xml");
         this.network = scenario.getNetwork();	
 	
    
@@ -285,7 +285,7 @@ public class MultipleIterationsSecondReloadLSPMobsimTest {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1 + new Random().nextInt(10));
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.network().setInputFile("input\\lsp\\network\\2regions.xml");
+		config.network().setInputFile("input/lsp/network/2regions.xml");
 		controler.run();
 	}
 	
