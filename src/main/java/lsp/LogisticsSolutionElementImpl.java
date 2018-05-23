@@ -16,7 +16,7 @@ import lsp.tracking.SimulationTracker;
 public class LogisticsSolutionElementImpl implements LogisticsSolutionElement {
 
 	private Id<LogisticsSolutionElement>id;
-	//die beiden nicht im Builder. Die können erst in der Solution als ganzes gesetzt werden
+	//die beiden nicht im Builder. Die koennen erst in der Solution als ganzes gesetzt werden
 	private LogisticsSolutionElement previousElement;
 	private LogisticsSolutionElement nextElement;
 	private Resource resource;

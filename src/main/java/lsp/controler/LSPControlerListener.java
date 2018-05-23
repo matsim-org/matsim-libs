@@ -106,8 +106,8 @@ ReplanningListener, IterationEndsListener, IterationStartsListener{
 	}
 	
 	
-	//Hier muss noch die Möglichkeit reinkommen, dass nicht alle LSPs nach jeder Iteration neu planen, sondern nur ein Teil von denen
-	//Das kann durch ein entsprechendes replanningModule erreicht werden. Hier muss man dann nix ändern
+	//Hier muss noch die Moeglichkeit reinkommen, dass nicht alle LSPs nach jeder Iteration neu planen, sondern nur ein Teil von denen
+	//Das kann durch ein entsprechendes replanningModule erreicht werden. Hier muss man dann nix aendern
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
 		replanningModule.replanLSPs(event);	
