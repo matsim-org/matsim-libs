@@ -328,7 +328,7 @@ public class ExampleSchedulingOfTransportChain {
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("input\\lsp\\network\\2regions.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("input/lsp/network/2regions.xml");
 		Network network = scenario.getNetwork();
 		
 		 //Create LSP and shipments

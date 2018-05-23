@@ -34,7 +34,7 @@ public class DistributionShipmentBuilderTest {
 		Config config = new Config();
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("input\\lsp\\network\\2regions.xml");
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("input/lsp/network/2regions.xml");
         this.network = scenario.getNetwork();
         ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
         Id<Link> distributionLinkId = Id.createLinkId("(14 2) (14 3)");
