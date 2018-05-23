@@ -41,7 +41,6 @@ import org.matsim.contrib.carsharing.relocation.infrastructure.AverageDemandRelo
 import org.matsim.contrib.carsharing.relocation.listeners.CarSharingDemandTracker;
 import org.matsim.contrib.carsharing.relocation.listeners.KmlWriterListener;
 import org.matsim.contrib.carsharing.relocation.qsim.RelocationQSimModule;
-import org.matsim.contrib.carsharing.relocation.qsim.RelocationQsimFactory;
 import org.matsim.contrib.carsharing.relocation.replanning.RelocationPlanStrategyModule;
 import org.matsim.contrib.carsharing.relocation.utils.ChooseTheCompanyPriceBased;
 import org.matsim.contrib.carsharing.relocation.utils.FFVehiclesRentalsWriterListener;
@@ -51,7 +50,7 @@ import org.matsim.contrib.carsharing.router.CarsharingRoute;
 import org.matsim.contrib.carsharing.router.CarsharingRouteFactory;
 import org.matsim.contrib.carsharing.runExample.CarsharingUtils;
 import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -155,8 +154,8 @@ public class RelocationExample {
 				bind(VehicleChoiceAgent.class).toInstance(vehicleChoiceAgent);
 				bind(MobismBeforeSimStepRelocationListener.class).asEagerSingleton();
 				bind(Network.class).annotatedWith(Names.named("carnetwork")).toInstance(networkFF);
-				
-				bind(Network.class).annotatedWith(Names.named(DvrpModule.DVRP_ROUTING)).to(Network.class);
+
+				bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)).to(Network.class);
 				bind(TravelTime.class).annotatedWith(Names.named("ff"))
 						.to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 
@@ -178,7 +177,7 @@ public class RelocationExample {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				//bindMobsim().toProvider(RelocationQsimFactory.class);
+				// bindMobsim().toProvider(RelocationQsimFactory.class);
 				// bindMobsim().toProvider(CarsharingQsimFactoryNew.class);
 				// this is now the only MobsimListenerBinding. Should it be
 				// handled differently?
