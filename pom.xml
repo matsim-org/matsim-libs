@@ -20,7 +20,13 @@
 			<id>ojo-snapshots</id>
 			<url>http://oss.jfrog.org/libs-snapshot</url>
 		</repository>
-    </repositories>
+		<repository>
+			<!-- Geotools is not on Maven central -->
+			<id>osgeo</id>
+			<name>Geotools repository</name>
+			<url>http://download.osgeo.org/webdav/geotools</url>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<!-- This is the matsim "core": -->
