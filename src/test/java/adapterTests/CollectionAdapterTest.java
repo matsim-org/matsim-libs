@@ -32,7 +32,7 @@ import lsp.usecase.CollectionCarrierScheduler;
 public class CollectionAdapterTest {
 
 	//die Trackers sind ja erst ein Bestandteil des Scheduling bzw. Replanning und kommen hier noch nicht rein.
-	//Man kann sie deshalb ja extra außerhalb des Builders einsetzen.
+	//Man kann sie deshalb ja extra auï¿½erhalb des Builders einsetzen.
 	
 	private Network network;
 	private CollectionCarrierScheduler scheduler;
@@ -48,7 +48,7 @@ public class CollectionAdapterTest {
 		Config config = new Config();
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("input\\lsp\\network\\2regions.xml");
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("input/lsp/network/2regions.xml");
         this.network = scenario.getNetwork();
 		
 		scheduler = new CollectionCarrierScheduler();
