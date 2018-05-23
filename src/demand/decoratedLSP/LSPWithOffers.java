@@ -310,5 +310,10 @@ public class LSPWithOffers implements LSPDecorator {
 		return copiedPlan;
 	}
 
+	@Override
+	public SolutionScheduler getScheduler() {
+		return solutionScheduler;
+	}
+
 
 }

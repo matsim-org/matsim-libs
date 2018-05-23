@@ -32,6 +32,8 @@ import org.matsim.vehicles.VehicleType;
 import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
 import lsp.usecase.DeterministicShipmentAssigner;
+import lsp.usecase.DistributionCarrierAdapter;
+import lsp.usecase.DistributionCarrierScheduler;
 import lsp.usecase.MainRunCarrierAdapter;
 import lsp.usecase.MainRunCarrierScheduler;
 import lsp.usecase.ReloadingPoint;
@@ -57,15 +59,15 @@ import lsp.shipment.AbstractShipmentPlanElementComparator;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
 
-public class MainRunLSPMobsimTest {
+public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 	private Network network;
 	private LogisticsSolution completeSolution;
 	private ShipmentAssigner assigner;
 	private LSPPlanImpl completePlan;
 	private SolutionScheduler simpleScheduler;
-	private LSP lsp;	
+	private LSP completeLSP;	
+		
 
-	@Before
 	public void initialize() {
 		Config config = new Config();
         config.addCoreModules();
@@ -120,7 +122,8 @@ public class MainRunLSPMobsimTest {
         Id<Link> firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
         
         ReloadingPoint.Builder firstReloadingPointBuilder = ReloadingPoint.Builder.newInstance(firstReloadingId, firstReloadingLinkId);
-        firstReloadingPointBuilder.setReloadingScheduler(firstReloadingSchedulerBuilder.build());
+        ReloadingPointScheduler reloadScheduler = firstReloadingSchedulerBuilder.build();
+        firstReloadingPointBuilder.setReloadingScheduler(reloadScheduler);
         Resource firstReloadingPointAdapter = firstReloadingPointBuilder.build();
         
         Id<LogisticsSolutionElement> firstReloadingElementId = Id.create("FirstReloadElement", LogisticsSolutionElement.class);
@@ -169,21 +172,82 @@ public class MainRunLSPMobsimTest {
 		mainRunBuilder.setResource(mainRunAdapter);
 		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
 		
+		ReloadingPointScheduler.Builder secondSchedulerBuilder =  ReloadingPointScheduler.Builder.newInstance();
+        secondSchedulerBuilder.setCapacityNeedFixed(10);
+        secondSchedulerBuilder.setCapacityNeedLinear(1);
+        ReloadingPointScheduler secondScheduler = secondSchedulerBuilder.build();
+        		
+        Id<Resource> secondReloadingId = Id.create("ReloadingPoint2", Resource.class);
+        Id<Link> secondReloadingLinkId = Id.createLinkId("(14 2) (14 3)");
+        
+        ReloadingPoint.Builder secondReloadingPointBuilder = ReloadingPoint.Builder.newInstance(secondReloadingId, secondReloadingLinkId);
+       
+        secondReloadingPointBuilder.setReloadingScheduler(secondScheduler);
+        Resource secondReloadingPointAdapter = secondReloadingPointBuilder.build();
+        
+        Id<LogisticsSolutionElement> secondReloadingElementId = Id.create("SecondReloadElement", LogisticsSolutionElement.class);
+		LogisticsSolutionElementImpl.Builder secondReloadingElementBuilder = LogisticsSolutionElementImpl.Builder.newInstance(secondReloadingElementId);
+		secondReloadingElementBuilder.setResource(secondReloadingPointAdapter);
+		LogisticsSolutionElement secondReloadElement = secondReloadingElementBuilder.build();
+		
+		DistributionCarrierScheduler distriutionScheduler = new DistributionCarrierScheduler();
+		Id<Carrier> distributionCarrierId = Id.create("DistributionCarrier", Carrier.class);
+		Id<VehicleType> distributionVehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
+		CarrierVehicleType.Builder dsitributionVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(distributionVehicleTypeId);
+		dsitributionVehicleTypeBuilder.setCapacity(10);
+		dsitributionVehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
+		dsitributionVehicleTypeBuilder.setCostPerTimeUnit(0.38);
+		dsitributionVehicleTypeBuilder.setFixCost(49);
+		dsitributionVehicleTypeBuilder.setMaxVelocity(50/3.6);
+		CarrierVehicleType distributionType = dsitributionVehicleTypeBuilder.build();
+		
+		Id<Link> distributionLinkId = Id.createLinkId("(14 2) (14 3)");
+		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
+		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId);
+		distributionCarrierVehicle.setVehicleType(distributionType);
+		
+		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
+		capabilitiesBuilder.addType(distributionType);
+		capabilitiesBuilder.addVehicle(distributionCarrierVehicle);
+		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
+		CarrierCapabilities distributionCapabilities = capabilitiesBuilder.build();
+		Carrier carrier = CarrierImpl.newInstance(distributionCarrierId);
+		carrier.setCarrierCapabilities(distributionCapabilities);
+		
+		
+		Id<Resource> distributionAdapterId = Id.create("DistributionCarrierAdapter", Resource.class);
+		DistributionCarrierAdapter.Builder distributionAdapterBuilder = DistributionCarrierAdapter.Builder.newInstance(distributionAdapterId, network);
+		distributionAdapterBuilder.setDistributionScheduler(distriutionScheduler);
+		distributionAdapterBuilder.setCarrier(carrier);
+		distributionAdapterBuilder.setLocationLinkId(distributionLinkId);
+		Resource distributionAdapter = distributionAdapterBuilder.build();
+		
+		Id<LogisticsSolutionElement> distributionElementId = Id.create("DistributionElement", LogisticsSolutionElement.class);
+		LogisticsSolutionElementImpl.Builder distributionBuilder = LogisticsSolutionElementImpl.Builder.newInstance(distributionElementId);
+		distributionBuilder.setResource(distributionAdapter);
+		LogisticsSolutionElement distributionElement =    distributionBuilder.build();
+		
 		collectionElement.setNextElement(firstReloadElement);
 		firstReloadElement.setPreviousElement(collectionElement);
 		firstReloadElement.setNextElement(mainRunElement);
 		mainRunElement.setPreviousElement(firstReloadElement);
+		mainRunElement.setNextElement(secondReloadElement);
+		secondReloadElement.setPreviousElement(mainRunElement);
+		secondReloadElement.setNextElement(distributionElement);
+		distributionElement.setPreviousElement(secondReloadElement);
 		
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LogisticsSolutionImpl.Builder completeSolutionBuilder = LogisticsSolutionImpl.Builder.newInstance(solutionId);
 		completeSolutionBuilder.addSolutionElement(collectionElement);
 		completeSolutionBuilder.addSolutionElement(firstReloadElement);
 		completeSolutionBuilder.addSolutionElement(mainRunElement);
+		completeSolutionBuilder.addSolutionElement(secondReloadElement);
+		completeSolutionBuilder.addSolutionElement(distributionElement);
 		completeSolution = completeSolutionBuilder.build();
 		
 		assigner = new DeterministicShipmentAssigner();
 		completePlan = new LSPPlanImpl();
-		completePlan.setAssigner(assigner);;
+		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);
 		
 		LSPImpl.Builder completeLSPBuilder = LSPImpl.Builder.getInstance();
@@ -194,18 +258,23 @@ public class MainRunLSPMobsimTest {
 		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
 		resourcesList.add(mainRunAdapter);
+		resourcesList.add(secondReloadingPointAdapter);
+		resourcesList.add(distributionAdapter);
+
 
 		simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
 		simpleScheduler.setBufferTime(300);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
-		lsp = completeLSPBuilder.build();
+		completeLSP = completeLSPBuilder.build();
 	
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		//Random rand = new Random(1);
+		int numberOfShipments = new Random().nextInt(50);
 		
-		 for(int i = 1; i < 2; i++) {
+		for(int i = 1; i < 1 +  numberOfShipments; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 	        	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
-	        	int capacityDemand = 1 + new Random().nextInt(4);
+	        	int capacityDemand =  1 + new Random().nextInt(4);
 	        	builder.setCapacityDemand(capacityDemand);
 	        	
 	        	while(true) {
@@ -242,42 +311,60 @@ public class MainRunLSPMobsimTest {
 	        	builder.setStartTimeWindow(startTimeWindow);
 	        	builder.setServiceTime(capacityDemand * 60);
 	        	LSPShipment shipment = builder.build();
-	        	lsp.assignShipmentToLSP(shipment);
+	        	completeLSP.assignShipmentToLSP(shipment);
 	        }
-		 lsp.scheduleSoultions();
-	
-			ArrayList<LSP> lspList = new ArrayList<LSP>();
-			lspList.add(lsp);
-			LSPs lsps = new LSPs(lspList);
-			
-			Controler controler = new Controler(config);
-			
-			LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
+		completeLSP.scheduleSoultions();
+		
+		ArrayList<LSP> lspList = new ArrayList<LSP>();
+		lspList.add(completeLSP);
+		LSPs lsps = new LSPs(lspList);
+		
+		Controler controler = new Controler(config);
+		
+		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
 
-			controler.addOverridingModule(module);
-			config.controler().setFirstIteration(0);
-			config.controler().setLastIteration(0);
-			config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-			config.network().setInputFile("input\\lsp\\network\\2regions.xml");
-			controler.run();
+		controler.addOverridingModule(module);
+		config.controler().setFirstIteration(0);
+		config.controler().setLastIteration(0);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.network().setInputFile("input\\lsp\\network\\2regions.xml");
+		controler.run();
 	}
+
 	@Test
-	public void testFirstReloadLSPMobsim() {
-		for(LSPShipment shipment : lsp.getShipments()) {
-			assertFalse(shipment.getLog().getPlanElements().isEmpty());
-			assertTrue(shipment.getSchedule().getPlanElements().size() == shipment.getLog().getPlanElements().size());
-			ArrayList<AbstractShipmentPlanElement> scheduleElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
-			Collections.sort(scheduleElements, new AbstractShipmentPlanElementComparator());
-			ArrayList<AbstractShipmentPlanElement> logElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getLog().getPlanElements().values());
-			Collections.sort(logElements, new AbstractShipmentPlanElementComparator());
+	public void testCompleteLSPMobsim() {
+		int numberOfIterations = 1 + new Random().nextInt(10);
+		for(int i = 0;  i < numberOfIterations; i++) {
+			initialize();
+			for(LSPShipment shipment : completeLSP.getShipments()) {
+				assertFalse(shipment.getLog().getPlanElements().isEmpty());
+				ArrayList<AbstractShipmentPlanElement> scheduleElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+				Collections.sort(scheduleElements, new AbstractShipmentPlanElementComparator());
+				ArrayList<AbstractShipmentPlanElement> logElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getLog().getPlanElements().values());
+				Collections.sort(logElements, new AbstractShipmentPlanElementComparator());
 			
-			for(AbstractShipmentPlanElement scheduleElement : scheduleElements){
-				AbstractShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
-				assertTrue(scheduleElement.getElementType() == logElement.getElementType());
-				assertTrue(scheduleElement.getResourceId() == logElement.getResourceId());
-				assertTrue(scheduleElement.getSolutionElement() == logElement.getSolutionElement());
-				assertEquals(scheduleElement.getStartTime(), logElement.getStartTime(), 300);
-			}		
+				for(AbstractShipmentPlanElement scheduleElement : scheduleElements){
+					AbstractShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
+					if(scheduleElement.getElementType() != logElement.getElementType()) {
+						System.out.println(scheduleElement.getElementType());
+						System.out.println(logElement.getElementType());
+						for(int j = 0; j < shipment.getSchedule().getPlanElements().size(); j++) {
+							System.out.println("Scheduled: " + scheduleElements.get(j).getSolutionElement().getId() + "  " + scheduleElements.get(j).getResourceId()+ "  " + scheduleElements.get(j).getElementType() + " Start: " + scheduleElements.get(j).getStartTime() + " End: " + scheduleElements.get(j).getEndTime());
+						}
+						System.out.println();
+						for(int j = 0; j < shipment.getLog().getPlanElements().size(); j++) {
+							System.out.println("Logged: " + logElements.get(j).getSolutionElement().getId() + "  " + logElements.get(j).getResourceId() +"  " + logElements.get(j).getElementType() + " Start: " + logElements.get(j).getStartTime() + " End: " + logElements.get(j).getEndTime());
+						}
+						System.out.println();
+					}
+					
+					assertTrue(scheduleElement.getElementType() == logElement.getElementType());
+					assertTrue(scheduleElement.getResourceId() == logElement.getResourceId());
+					assertTrue(scheduleElement.getSolutionElement() == logElement.getSolutionElement());
+					assertEquals(scheduleElement.getStartTime(), logElement.getStartTime(), 300);
+				}
+			}
 		}
 	}
 }
+

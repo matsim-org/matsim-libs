@@ -38,10 +38,11 @@ public class TipSimulationTracker implements SimulationTracker {
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		double tip = handler.getTip();
-		InfoFunctionValue<Double>  value = new InfoFunctionValueImpl<Double>("TIP IN EUR");
+		info.getFunction().getValues().clear();
+		InfoFunctionValue<Double> value = new InfoFunctionValueImpl<>("TIP IN EUR");
 		value.setValue(tip);
 		info.getFunction().getValues().add(value);
-	}
+	}	
 
 	@Override
 	public void reset() {

@@ -54,7 +54,7 @@ import lsp.scoring.LSPScoringModuleImpl;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
 
-public class CollectionLSPScoringTest {
+public class MultipleIterationsCollectionLSPScoringTest {
 
 	private Network network;
 	private LSP collectionLSP;
@@ -65,7 +65,7 @@ public class CollectionLSPScoringTest {
 	private TipSimulationTracker tipTracker;
 	private TipInfo info;
 	private InfoFunction function;
-	private InfoFunctionValueImpl<Double> value;
+	private InfoFunctionValue<Double> value;
 	private int numberOfShipments = 25;
 
 	@Before
@@ -90,6 +90,9 @@ public class CollectionLSPScoringTest {
 
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Link collectionLink = network.getLinks().get(collectionLinkId);
+		if (collectionLink == null) {
+			System.exit(1);
+		}
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLink.getId());
 		carrierVehicle.setVehicleType(collectionType);
@@ -193,7 +196,7 @@ public class CollectionLSPScoringTest {
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(10);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("input\\lsp\\network\\2regions.xml");
 		controler.run();
@@ -207,12 +210,6 @@ public class CollectionLSPScoringTest {
 				.size() == numberOfShipments);
 		assertTrue(collectionLSP.getSelectedPlan().getScore() > 0);
 		assertTrue(collectionLSP.getSelectedPlan().getScore() <= (numberOfShipments * 5));
-		/*noch zu testen
-		 * tipTracker
-		 * InfoFunction
-		 * Info
-		 * Scorer
-		 */
 	}
 
 }

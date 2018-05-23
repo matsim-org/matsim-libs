@@ -2,8 +2,6 @@ package lspScoringTests;
 
 import java.util.Random;
 
-import lsp.events.ServiceStartEvent;
-import lsp.events.ServiceStartEventHandler;
 import lsp.events.ServiceEndEvent;
 import lsp.events.ServiceEndEventHandler;
 
@@ -25,7 +23,6 @@ public class TipEventHandler implements ServiceEndEventHandler{
 	@Override
 	public void handleEvent(ServiceEndEvent event) {
 		double tip = tipRandom.nextDouble() * 5;
-		System.out.println("ServiceEvent " + tip);
 		tipSum += tip;
 	}
 
