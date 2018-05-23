@@ -12,6 +12,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
@@ -24,31 +26,29 @@ import org.matsim.facilities.Facility;
 
 public class Guidance {
     private final TripRouter router;
+    private LeastCostPathCalculator lcpc;
 
-    public Guidance(TripRouter router) {
+    public Guidance(TripRouter router, LeastCostPathCalculator lcpc) {
         this.router = router;
+        this.lcpc = lcpc;
     }
 
-    public Id<Link> getBestOutgoingLink(Link startLink, Link destinationLink, double now) {
+    public synchronized Id<Link> getBestOutgoingLink(Link startLink, Link destinationLink, double now) {
         Person person = null; // does this work?
         double departureTime = now;
         String mainMode = TransportMode.car;
         Facility<ActivityFacility> startFacility = new LinkWrapperFacility(startLink);
         Facility<ActivityFacility> destinationFacility = new LinkWrapperFacility(destinationLink);
         List<? extends PlanElement> trip = router.calcRoute(mainMode, startFacility, destinationFacility, departureTime, person);
-
-        Leg leg = (Leg) trip.get(0);  // test: either plan element 0 or 1 will be a car leg
-
-        NetworkRoute route = (NetworkRoute) leg.getRoute();
-
-        if (route.getLinkIds().isEmpty()) {
-        	return route.getEndLinkId();
-        }
-
-        return route.getLinkIds().get(0); // entry number 0 should be link connected to next intersection (?)
+        Path path = lcpc.calcLeastCostPath(startLink.getToNode(), destinationLink.getFromNode(), now, person, null);
+        if (path.links.size() == 0)
+        	return destinationLink.getId();
+        else
+        	return path.links.get(0).getId();
+       
     }
 
-    public double getExpectedTravelTime(Link startLink, Link destinationLink, double departureTime, String mode, Person person) {
+    public synchronized double getExpectedTravelTime(Link startLink, Link destinationLink, double departureTime, String mode, Person person) {
         Facility<ActivityFacility> startFacility = new LinkWrapperFacility(startLink);
         Facility<ActivityFacility> destinationFacility = new LinkWrapperFacility(destinationLink);
         List<? extends PlanElement> trip = router.calcRoute(mode, startFacility, destinationFacility, departureTime, person);
@@ -59,7 +59,7 @@ public class Guidance {
 		return travelTime;
     }
 
-    public double getExpectedTravelDistance(Link startLink, Link destinationLink, double departureTime, String mode, Person person) {
+    public synchronized double getExpectedTravelDistance(Link startLink, Link destinationLink, double departureTime, String mode, Person person) {
         Facility<ActivityFacility> startFacility = new LinkWrapperFacility(startLink);
         Facility<ActivityFacility> destinationFacility = new LinkWrapperFacility(destinationLink);
         List<? extends PlanElement> trip = router.calcRoute(mode, startFacility, destinationFacility, departureTime, person);

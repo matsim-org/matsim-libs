@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.qsim.CSAgentFactory;
-import org.matsim.contrib.carsharing.qsim.CarsharingPersonDriverAgentImpl;
 import org.matsim.contrib.carsharing.qsim.ParkCSVehicles;
 import org.matsim.contrib.carsharing.relocation.demand.CarsharingVehicleRelocationContainer;
 import org.matsim.contrib.carsharing.relocation.events.MobismBeforeSimStepRelocationListener;
@@ -13,16 +12,16 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.name.Named;
 
 /**
  *
@@ -43,6 +42,10 @@ public class RelocationQsimFactory implements Provider<Mobsim>{
 	@Inject private Provider<TripRouter> routerProvider;
 	
 	@Inject private MobismBeforeSimStepRelocationListener mobismBeforeSimStepRelocationListener;
+	
+	@Inject
+	@Named("ra")
+	LeastCostPathCalculator lcpc; 
 
 	@Override
 	public Mobsim get() {
@@ -72,7 +75,9 @@ public class RelocationQsimFactory implements Provider<Mobsim>{
 		ParkCSVehicles parkSource = new ParkCSVehicles(qSim, this.carsharingSupply);
 		qSim.addAgentSource(parkSource);
 
-		RelocationAgentSource relocationAgentSource = new RelocationAgentSource(this.scenario, qSim, this.carsharingVehicleRelocation, this.routerProvider, this.carsharingSupply);
+		RelocationAgentSource relocationAgentSource =
+				new RelocationAgentSource(this.scenario, qSim, this.carsharingVehicleRelocation, 
+						this.routerProvider, this.carsharingSupply, this.lcpc);
 		qSim.addAgentSource(relocationAgentSource);
 
 		
