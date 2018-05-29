@@ -10,7 +10,7 @@
    </person>
    <person employed="no" age="12" id="2">
       <plan selected="yes">
-         <act end_time="05:15:00" y="10" x="0"  type="home"/>
+         <act end_time="05:30:00" y="10" x="0"  type="home"/>
          <leg mode="pt"/>
          <act end_time="12:35:00" y="10" x="2015"  type="home"/>
       </plan>

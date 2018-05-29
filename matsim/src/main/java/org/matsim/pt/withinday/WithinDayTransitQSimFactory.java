@@ -36,14 +36,14 @@ public class WithinDayTransitQSimFactory implements Provider<Mobsim> {
 	
 	private final Scenario scenario;
 	private final EventsManager eventsManager;
-	private final WithinDayTransitEngine withinDayTransitEngine; 
-	private final SimpleDisruptionEngine simpleDisruptionEngine;
+	//private final WithinDayTransitEngine withinDayTransitEngine; 
+	private final WithinDayTransitEngine simpleDisruptionEngine;
 	
 	@Inject
-	public WithinDayTransitQSimFactory(final Scenario scenario, final EventsManager eventsManager, WithinDayTransitEngine withinDay, SimpleDisruptionEngine disruption) {
+	public WithinDayTransitQSimFactory(final Scenario scenario, final EventsManager eventsManager, /*WithinDayTransitEngine withinDay,*/ WithinDayTransitEngine disruption) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
-		this.withinDayTransitEngine = withinDay;
+		//this.withinDayTransitEngine = withinDay;
 		this.simpleDisruptionEngine = disruption;
 	}
 	
@@ -51,7 +51,7 @@ public class WithinDayTransitQSimFactory implements Provider<Mobsim> {
 	@Override
 	public Mobsim get() {
 		QSim mobsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
-		mobsim.addMobsimEngine(withinDayTransitEngine);
+		//mobsim.addMobsimEngine(withinDayTransitEngine);
 		mobsim.addMobsimEngine(simpleDisruptionEngine);
 		return mobsim;
 		

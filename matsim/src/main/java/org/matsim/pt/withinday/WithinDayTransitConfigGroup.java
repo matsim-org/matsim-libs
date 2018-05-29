@@ -23,35 +23,25 @@
 package org.matsim.pt.withinday;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.utils.misc.Time;
 
-public class SimpleDisruptionConfigGroup extends ReflectiveConfigGroup {
+public class WithinDayTransitConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUP_NAME = "simpleDisruption";
+	public static final String GROUP_NAME = "withinDayTransit";
+
+	private String disruptionsFile;
 	
-	private double disruptionStart = 0;
-	
-	public SimpleDisruptionConfigGroup() {
+	public WithinDayTransitConfigGroup() {
 		super(GROUP_NAME);
 	}
 
-	public double getDisruptionStart() {
-		return disruptionStart;
+	@StringSetter("disruptionsFile")
+	public void setDisruptionsFile(String disruptionFile) {
+		this.disruptionsFile = disruptionFile;
 	}
 	
-	public void setDisruptionStart(double disruptionStart) {
-		this.disruptionStart = disruptionStart;
+	@StringGetter("disruptionsFile")
+	public String getDisruptionsFile() {
+		return disruptionsFile;
 	}
-	
-	@StringGetter("disruptionStart")
-	public String getDisruptionStartAsString() {
-		return Time.writeTime(disruptionStart);
-	}
-	
-	@StringSetter("disruptionStart")
-	public void setDisruptionStartAsString(String disruptionStart) {
-		this.disruptionStart = Time.parseTime(disruptionStart);
-	}
-
 	
 }

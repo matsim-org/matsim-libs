@@ -65,7 +65,6 @@
 	
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
-
 		<param name="ModuleProbability_1" value="0.8" />
 		<param name="Module_1" value="ChangeExpBeta" />
 
@@ -92,9 +91,9 @@
 		<param name="searchRadius" value="10000.0" />
 	</module>
 	
-	<module name="simpleDisruption">
-		<!-- The time at which the disruption triggers and the WithinDay Replanning is triggered -->
-		<param name="disruptionStart" value="05:15:00" /> 
+	<module name="withinDayTransit">
+		<!-- The file with information about disruptions -->
+		<param name="disruptionsFile" value="disruptions.xml" />
 	</module>
 	
 

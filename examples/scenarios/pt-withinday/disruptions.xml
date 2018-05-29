@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<disruptions xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/pt_disruption.xsd" xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<disruption startTime="05:15:00" line="yellow" />
+</disruptions>

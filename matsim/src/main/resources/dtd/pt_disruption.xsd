@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://www.matsim.org/files/dtd"
+	xmlns="http://www.matsim.org/files/dtd" elementFormDefault="qualified"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"  xmlns:jxb= "http://java.sun.com/xml/ns/jaxb" jxb:version="1.0" xml:lang="en">
+
+	<!-- Editor: Paul Bouman, Erasmus University Rotterdam -->
+
+	<xs:annotation>
+		<xs:documentation>GPL</xs:documentation>
+	</xs:annotation>
+
+	<xs:element name="disruptions">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="disruption" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute name="startTime"
+							type="matsimFormattedTimeAttributeType" use="required" />
+						<xs:attribute name="endTime"
+							type="matsimFormattedTimeAttributeType" />
+						<xs:attribute name="line" type="xs:string"
+							use="required" />
+						<xs:attribute name="route" type="xs:string" />
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="matsimFormattedTimeAttributeType">
+		<xs:annotation>
+			<xs:documentation>Like xs:time but allows hours > 24
+			</xs:documentation>
+			<xs:appinfo>
+			<jxb:package name="org.matsim.jaxb.ptdisruption" />
+            <jxb:javaType 
+                name="double"
+                parseMethod="org.matsim.core.utils.misc.Time.parseTime"
+                printMethod="org.matsim.core.utils.misc.Time.writeTime"/>
+            </xs:appinfo>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]+[0-9]:[0-5][0-9]:[0-5][0-9]" />
+		</xs:restriction>
+	</xs:simpleType>
+
+
+</xs:schema>					 

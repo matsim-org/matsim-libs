@@ -24,23 +24,13 @@ package org.matsim.pt.withinday;
 
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.withinday.mobsim.MobsimDataProvider;
 
 public class WithinDayTransitModule extends AbstractModule {
 
-	private LegRerouter rerouter;
-	
-	public WithinDayTransitModule(LegRerouter rerouter) {
-		this.rerouter = rerouter;
-	}
-
 	@Override
 	public void install() {
-		bind(SimpleDisruptionEngine.class);
 		bind(WithinDayTransitEngine.class);
-        bind(MobsimDataProvider.class).asEagerSingleton();
         bind(Mobsim.class).toProvider(WithinDayTransitQSimFactory.class);
-        bind(LegRerouter.class).toInstance(rerouter);
 	}
 
 }

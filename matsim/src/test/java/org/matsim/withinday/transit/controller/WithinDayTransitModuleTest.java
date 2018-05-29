@@ -30,12 +30,9 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.withinday.SimpleDisruptionConfigGroup;
+import org.matsim.pt.withinday.WithinDayTransitConfigGroup;
 import org.matsim.pt.withinday.WithinDayTransitModule;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -61,29 +58,14 @@ public class WithinDayTransitModuleTest {
     
 	@Test
 	public void runExampleWithinDayTransitControler() {
-		Config config = utils.loadConfig("test/scenarios/pt-withinday/config.xml", new SimpleDisruptionConfigGroup());
+		Config config = utils.loadConfig("test/scenarios/pt-withinday/config.xml", new WithinDayTransitConfigGroup());
 		config.controler().setLastIteration(0);
 		Controler controler = new Controler(config);
-		controler.addOverridingModule(new WithinDayTransitModule(this::reroute));
+		controler.addOverridingModule(new WithinDayTransitModule());
 		PersonEntersVehicleEventHandler handler = this::checkEnterEvent;
 		controler.getEvents().addHandler(handler);
 		controler.run();
 	}
-	
-	public void reroute(Leg leg) {
-		Route route = leg.getRoute();
-		if (route instanceof ExperimentalTransitRoute) {
-			// This is a very ugly way to transform the routes, but for testing it will do...
-			ExperimentalTransitRoute etr = (ExperimentalTransitRoute) route;
-			String oldRoute = etr.getRouteDescription();
-			String newRoute = oldRoute.replaceAll("yellow", "red");
-			if (!oldRoute.equals(newRoute)) {
-				log.info("Rerouting transit route '"+oldRoute+"' to '"+newRoute+"'");
-				etr.setRouteDescription(newRoute);
-			}
-		}
-	}
-	
 	
 	private void checkEnterEvent(PersonEntersVehicleEvent event) {
 		if (event.getPersonId().equals(Id.createPersonId(1))) {
@@ -94,7 +76,7 @@ public class WithinDayTransitModuleTest {
 			// This person should be rerouted to the red line e.g. vehicle 3000
 			assertEquals("Person 2 should take the red line after within-day replanning", event.getVehicleId(), Id.createVehicleId(3000));
 		}
-		log.info("Hello from the handler! "+event.getPersonId()+" enters "+event.getVehicleId());
+		log.info("The test handler detected that person "+event.getPersonId()+" enters vehicle "+event.getVehicleId());
 	}
 	
 }
