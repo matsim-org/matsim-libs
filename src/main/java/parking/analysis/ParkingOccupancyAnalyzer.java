@@ -60,7 +60,7 @@ public static void main(String[] args) {
 	events.addHandler(tripHandler);
 	new MatsimEventsReader(events).readFile(eventsFile);
 	parkingOccupancyEventHandler.writeParkingOccupancyStats(parkingOccupancyOutputFile);
-	parkingOccupancyEventHandler.writeRelativeParkingOccupancyStats(parkingOccupancyOutputFile);
+    parkingOccupancyEventHandler.writeRelativeParkingOccupancyStats(relparkingOccupancyOutputFile);
 	tripHandler.writeParkingTrips(parkingTripsOutputFile);
 }
 }

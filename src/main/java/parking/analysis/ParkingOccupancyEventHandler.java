@@ -129,6 +129,9 @@ public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, 
 				this.parkingInfo.getParkingZones().get(e.getKey()).getLinksInZone().forEach(lid -> parkingCapacity.add(calculator.getLinkCapacity(network.getLinks().get(lid))));
 				int cap = (int) (parkingCapacity.intValue() * storageCapacityFactor);
 				int initialOcc = cap - this.capacityAtIterationStart.get(e.getKey());
+				if (initialOcc < 0) {
+					initialOcc = 0;
+				}
 				bw.write(e.getKey()+";"+cap+";"+initialOcc);
 				int sum = 0;
 				for (int i = 0 ; i< e.getValue().length;i++) {
@@ -156,6 +159,9 @@ public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, 
 				this.parkingInfo.getParkingZones().get(e.getKey()).getLinksInZone().forEach(lid -> parkingCapacity.add(calculator.getLinkCapacity(network.getLinks().get(lid))));
 				int cap = (int) (parkingCapacity.intValue() * storageCapacityFactor);
 				int initialOcc = cap - this.capacityAtIterationStart.get(e.getKey());
+				if (initialOcc < 0) {
+					initialOcc = 0;
+				}
 				bw.write(e.getKey() + ";" + cap + ";" + initialOcc);
 				int sum = initialOcc;
 				for (int i = 0; i < e.getValue().length; i++) {
