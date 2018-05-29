@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
@@ -89,7 +90,17 @@ class LiveServerQuadTree extends OTFServerQuadTree {
 				if (writer != null) {
 					writer.setSrc(link);
 				}
-				this.put(middleEast, middleNorth, writer);
+//				this.put(middleEast, middleNorth, writer);
+
+				// try to put links twice:
+				this.put(fromCoord.getX(), fromCoord.getY(), writer);
+				this.put(toCoord.getX(), toCoord.getY(), writer);
+				// (The unterlying QuadTree documentation says that it will accept the same object multiple times as
+				// long as at different coordinates.  So I am trying this out here.  The result will depend on the fact if
+				// the collections are implemented as sets (in which case duplicate links will just be ignored) or standard
+				// collections, in which case the plotting will supposedly happen twice, this reducing plotting speed by a
+				// factor of two.  (Does not feel like it.) kai, apr'18
+				
 			}
 		}
 	}

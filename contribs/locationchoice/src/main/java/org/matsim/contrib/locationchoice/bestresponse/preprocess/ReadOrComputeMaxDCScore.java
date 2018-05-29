@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.core.config.Config;
@@ -43,12 +43,12 @@ public class ReadOrComputeMaxDCScore {
 	private Config config;
 	private Scenario scenario; 
 	private DestinationChoiceConfigGroup dccg;
-	private DestinationChoiceBestResponseContext lcContext;
+	private DestinationChoiceContext lcContext;
 	private ObjectAttributes personsMaxDCScoreUnscaled = new ObjectAttributes();	
 	private ScaleEpsilon scaleEpsilon;	
 	private HashSet<String> flexibleTypes;
 	
-	public ReadOrComputeMaxDCScore(DestinationChoiceBestResponseContext lcContext) {
+	public ReadOrComputeMaxDCScore(DestinationChoiceContext lcContext) {
 		this.scenario = lcContext.getScenario();
 		this.config = this.scenario.getConfig();
 		this.dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);

@@ -37,6 +37,7 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class SequentialMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
 	private final SingleVehicleInsertionProblem insertionProblem;
+	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
 
 	public SequentialMultiVehicleInsertionProblem(Network network, TravelTime travelTime,
 			TravelDisutility travelDisutility, DrtConfigGroup drtCfg, MobsimTimer timer) {
@@ -52,7 +53,8 @@ public class SequentialMultiVehicleInsertionProblem implements MultiVehicleInser
 	@Override
 	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
 		return vEntries.stream()//
-				.map(v -> insertionProblem.findBestInsertion(drtRequest, v))//
+				.map(v -> insertionProblem.findBestInsertion(drtRequest, v,
+						insertionGenerator.generateInsertions(drtRequest, v)))//
 				.filter(Optional::isPresent)//
 				.map(Optional::get)//
 				.min(Comparator.comparing(i -> i.cost));

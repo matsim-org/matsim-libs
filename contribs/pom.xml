@@ -151,39 +151,40 @@
 
 	<modules>
 		<module>accessibility</module>
-		<module>av</module>
 		<module>analysis</module>
+		<module>av</module>
+		<module>bicycle</module>
 		<module>cadytsIntegration</module>
 		<module>carsharing</module>
+		<module>common</module>
+		<module>decongestion</module>
+		<module>deprecated</module>
 		<module>drt</module>
 		<module>dvrp</module>
-		<module>taxi</module>
 		<module>emissions</module>
+		<module>eventsBasedPTRouter</module>
 		<module>freight</module>
-		<module>signals</module>
+		<module>hybridsim</module>
+		<module>integration</module>
 		<module>locationchoice</module>
+		<module>matrixbasedptrouter</module>
 		<module>matsim4urbansim</module>
 		<module>minibus</module>
-		<module>networkEditor</module>
-		<module>otfvis</module>
-		<module>matrixbasedptrouter</module>
-		<module>parking</module>
-		<module>socnetsim</module>
-		<module>socnetgen</module>
-		<module>transEnergySim</module>
-		<module>roadpricing</module>
 		<module>multimodal</module>
-		<module>integration</module>
-		<module>wagonSim</module>
-		<module>pseudosimulation</module>
-		<module>common</module>
-		<module>eventsBasedPTRouter</module>
-		<module>travelsummary</module>
-		<module>deprecated</module>
-		<module>protobuf</module>
-		<module>hybridsim</module>
+		<module>networkEditor</module>
 		<module>noise</module>
-		<module>bicycle</module>
+		<module>otfvis</module>
+		<module>parking</module>
+		<module>protobuf</module>
+		<module>pseudosimulation</module>
+		<module>roadpricing</module>
+		<module>signals</module>
+		<module>socnetgen</module>
+		<module>socnetsim</module>
+		<module>taxi</module>
+		<module>transEnergySim</module>
+		<module>travelsummary</module>
+		<module>wagonSim</module>
 	</modules>
 	<repositories>
 		<repository>
@@ -223,7 +224,7 @@
 			<artifactId>matsim</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 			<type>jar</type>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>

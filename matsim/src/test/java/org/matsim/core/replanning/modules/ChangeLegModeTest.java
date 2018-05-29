@@ -65,7 +65,7 @@ public class ChangeLegModeTest {
 	
 	@Test
 	public void testWithConstructor() {
-		final ChangeLegMode module = new ChangeLegMode(0, new String[] {"car", "pt", "bike", "walk"}, true);
+		final ChangeLegMode module = new ChangeLegMode(0, new String[] {"car", "pt", "bike", "walk"}, true, false);
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
 		runTest(module, modes);
 	}

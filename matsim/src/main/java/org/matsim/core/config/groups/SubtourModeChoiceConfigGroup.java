@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.utils.misc.StringUtils;
 
 /**
@@ -35,12 +36,16 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	public final static String MODES = "modes";
 	public final static String CHAINBASEDMODES = "chainBasedModes";
 	public final static String CARAVAIL = "considerCarAvailability";
+	private static final String BEHAVIOR = "behavior";
 	
 	private String[] chainBasedModes = new String[] { TransportMode.car, TransportMode.bike };
 	private String[] allModes = new String[] { TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk };
 	// default is false for backward compatibility
 	private boolean considerCarAvailability = false;
-
+	private SubtourModeChoice.Behavior behavior = SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes ;
+	
+	private double probaForRandomSingleTripMode = 0. ; // yyyyyy backwards compatibility setting; should be change. kai, may'18
+	
 	public SubtourModeChoiceConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -95,6 +100,13 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		comments.put(MODES, "Defines all the modes available, including chain-based modes, seperated by commas" );
 		comments.put(CHAINBASEDMODES, "Defines the chain-based modes, seperated by commas" );
 		comments.put(CARAVAIL, "Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car" );
+		{
+			String msg = "Only for backwards compatibility.  Defines if only trips from modes list should change mode, or all trips.  Options: " ;
+			for ( SubtourModeChoice.Behavior behavior : SubtourModeChoice.Behavior.values() ) {
+				msg += behavior.name() + " " ;
+			}
+			comments.put(BEHAVIOR, msg);
+		}
 		return comments;
 	}
 
@@ -125,4 +137,21 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	public boolean considerCarAvailability() {
 		return considerCarAvailability;
 	}
+	@StringSetter( BEHAVIOR )
+	public final void setBehavior( SubtourModeChoice.Behavior behavior ) {
+		this.behavior = behavior ;
+	}
+	@StringGetter( BEHAVIOR )
+	public final SubtourModeChoice.Behavior getBehavior() {
+		return this.behavior ;
+	}
+	
+	public double getProbaForRandomSingleTripMode() {
+		return this.probaForRandomSingleTripMode;
+	}
+	public void setProbaForRandomSingleTripMode(double probaForRandomSingleTripMode) {
+		this.probaForRandomSingleTripMode = probaForRandomSingleTripMode;
+	}
+	
+	
 }

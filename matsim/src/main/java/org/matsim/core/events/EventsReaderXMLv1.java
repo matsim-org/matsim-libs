@@ -59,7 +59,7 @@ import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-public class EventsReaderXMLv1 extends MatsimXmlParser {
+public final class EventsReaderXMLv1 extends MatsimXmlParser {
 
 	public interface CustomEventMapper<T extends Event> /* extends Function<GenericEvent, T> */ {
 		T apply(GenericEvent event);

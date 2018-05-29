@@ -17,28 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package org.matsim.contrib.drt.analysis.zonal;
+package org.matsim.contrib.decongestion.handler;
 
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
- * @author  jbischoff
- * A module to analyse DRT trips based on a zonal grid system.
- */
+* @author ikaddoura
+*/
 
-public class DrtZonalModule extends AbstractModule {
+public interface IntervalBasedTolling extends EventHandler{
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.controler.AbstractModule#install()
-	 */
-	@Override
-	public void install() {
-		bind(ZonalDemandAggregator.class).asEagerSingleton();
-		//the MinCostFlowRebalancing does not need this collector
-		//bind(ZonalIdleVehicleCollector.class).asEagerSingleton();
-	}
+	public double getTotalTollPayments();
 
 }
+

@@ -13,6 +13,12 @@
 
 		<param name="vehiclesFile" value="vehicles-10-cap-4.xml" />
 		<!-- param name="vehiclesFile" value="vehicles-20-cap-2.xml" / -->
+
+		<parameterset type="minCostFlowRebalancing">
+			<param name="targetAlpha" value="0.5"/>
+			<param name="targetBeta" value="0.5"/>
+			<param name="cellSize" value="500"/>
+		</parameterset>
 	</module>
 
 	<module name="network">

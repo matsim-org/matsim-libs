@@ -25,6 +25,8 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 
+import javax.inject.Inject;
+
 /**
  * 
  * 
@@ -36,6 +38,8 @@ public class KaiAnalysisListener implements StartupListener, IterationEndsListen
 	// So tab-separated is the way to go. kai, sep'13
 	
 	KNAnalysisEventsHandler calcLegTimes = null ;
+	
+	// the default constructor can be injected even without annotation!  kai, may'18
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {

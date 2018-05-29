@@ -23,8 +23,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext.ActivityFacilityWithIndex;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
@@ -37,10 +37,10 @@ public class ComputeMaxDCScoreMultiThreatedModule extends AbstractMultithreadedM
 	
 	private final String type;
 	private final ActivityFacilityWithIndex[] typedFacilities;
-	private final DestinationChoiceBestResponseContext lcContext;
+	private final DestinationChoiceContext lcContext;
 	private final DestinationSampler sampler;
 		
-	public ComputeMaxDCScoreMultiThreatedModule(String type, DestinationChoiceBestResponseContext lcContext, DestinationSampler sampler) {
+	public ComputeMaxDCScoreMultiThreatedModule(String type, DestinationChoiceContext lcContext, DestinationSampler sampler) {
 		super(lcContext.getScenario().getConfig().global().getNumberOfThreads());
 		this.type = type;
 		this.lcContext = lcContext;
