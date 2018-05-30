@@ -19,13 +19,8 @@
 
 package parking;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
-
+import com.google.inject.Inject;
+import com.vividsolutions.jts.geom.Geometry;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -44,11 +39,9 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-
-import com.google.inject.Inject;
-import com.vividsolutions.jts.geom.Geometry;
-
 import parking.capacityCalculation.LinkParkingCapacityCalculator;
+
+import java.util.*;
 
 /**
  * Created by amit on 09.02.18.
@@ -114,10 +107,9 @@ public class ZonalLinkParkingInfo {
 				Link l = NetworkUtils.getNearestLink(net, c);
 				ParkingZone z = getParkingZone(l);
 				if (z!=null) {
-					if (r.nextDouble()>z.getGarageProbability()) {
 					z.updateLinkParkingCapacity(l, -1);
-					}
-				}
+
+                }
 			}
 		}
 	}
