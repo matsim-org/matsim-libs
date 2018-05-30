@@ -165,6 +165,8 @@ public class ParkingOccupancyEventHandler implements PersonDepartureEventHandler
 			}
 			bw.flush();
 			bw.close();
+            bwr.flush();
+            bwr.close();
 
 
 		} catch (IOException e) {
