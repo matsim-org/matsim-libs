@@ -34,14 +34,14 @@ import parking.capacityCalculation.LinkLengthBasedCapacityCalculator;
 public class ParkingOccupancyAnalyzer {
 public static void main(String[] args) {
 	String basefolder = "D:/runs-svn/vw_rufbus/";
-	String runId = "vw220park10";
+	String runId = "vw219_10pct_withParkImp_reroute";
 	String eventsFile = basefolder+runId+"/"+runId+".output_events.xml.gz";
 	String populationFile = basefolder+runId+"/"+runId+".output_plans.xml.gz";
 	String parkingOccupancyOutputFile = basefolder+runId+"/"+runId+".output_parkingOccupancy.csv";
 	String relparkingOccupancyOutputFile = basefolder + runId + "/" + runId + ".output_parkingOccupancy_relative.csv";
 	String parkingTripsOutputFile = basefolder+runId+"/"+runId+".output_parkingTrips.csv";
 	String networkFile = basefolder+runId+"/"+runId+".output_network.xml.gz";
-	String shapeFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/parking/bc-run/shp/parking-bs.shp";
+	String shapeFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/parking/bc-run/shp/parking-zones.shp";
 	String shapeString = "NO";
 	double endTime = 30*3600;
 	
@@ -59,8 +59,7 @@ public static void main(String[] args) {
 	events.addHandler(parkingOccupancyEventHandler);
 	events.addHandler(tripHandler);
 	new MatsimEventsReader(events).readFile(eventsFile);
-	parkingOccupancyEventHandler.writeParkingOccupancyStats(parkingOccupancyOutputFile);
-    parkingOccupancyEventHandler.writeRelativeParkingOccupancyStats(relparkingOccupancyOutputFile);
+	parkingOccupancyEventHandler.writeParkingOccupancyStats(parkingOccupancyOutputFile, relparkingOccupancyOutputFile);
 	tripHandler.writeParkingTrips(parkingTripsOutputFile);
 }
 }

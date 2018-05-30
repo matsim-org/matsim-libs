@@ -33,10 +33,8 @@ public class ParkingAnalysisListener implements IterationEndsListener {
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		String occupancyFileName = matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "parkingOccupancy_abs.csv");
-		parkingOccupancyEventHandler.writeParkingOccupancyStats(occupancyFileName);
 		String reloccupancyFileName = matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "parkingOccupancy_rel.csv");
-		parkingOccupancyEventHandler.writeRelativeParkingOccupancyStats(reloccupancyFileName);
-		;
+		parkingOccupancyEventHandler.writeParkingOccupancyStats(occupancyFileName, reloccupancyFileName);
 	}
 
 }
