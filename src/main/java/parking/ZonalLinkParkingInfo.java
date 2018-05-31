@@ -69,7 +69,7 @@ public class ZonalLinkParkingInfo {
         this.population=population;
         ParkingRouterConfigGroup prc = ParkingRouterConfigGroup.get(config);
         init(prc.getShapeFileUrl(config.getContext()).getFile(), prc.getShapeKey());
-        initializeInitialParkingOccupancy();
+
     }
     
 
@@ -84,8 +84,8 @@ public class ZonalLinkParkingInfo {
         initializeInitialParkingOccupancy();
     }
 
-	private void initializeInitialParkingOccupancy() {
-		
+    public void initializeInitialParkingOccupancy() {
+//        this.parkingZones.values().forEach(parkingZone -> parkingZone.resetParkingCapacities());
 		Network net = this.network;
 		if (NetworkUtils.isMultimodal(network)) {
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);

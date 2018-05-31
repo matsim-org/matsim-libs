@@ -50,10 +50,10 @@ public class ParkingOccupancyEventHandler implements PersonDepartureEventHandler
 	private Network network;
 	private final double storageCapacityFactor;
 	private Map<Id<ParkingZone>, int[]> zoneoccupancyPerBin = new HashMap<>();
-	private Map<Id<ParkingZone>, Integer> capacityAtIterationStart = new HashMap<>();
+	private Map<Id<ParkingZone>, Integer> capacityAtSimulationStart = new HashMap<>();
 	private int bins;
 	private Map<Id<Person>, String> lastActivityType = new HashMap<>();
-	
+	private boolean initialized = false;
 	
 	public ParkingOccupancyEventHandler(ZonalLinkParkingInfo parkingInfo, LinkParkingCapacityCalculator calculator,
 										Network network, double simEndTime, double storageCapacityFactor) {
@@ -83,11 +83,17 @@ public class ParkingOccupancyEventHandler implements PersonDepartureEventHandler
 	
 	@Override
 	public void reset(int iteration) {
+
 		zoneoccupancyPerBin.clear();
 		for (Entry<Id<ParkingZone>, ParkingZone> zone : parkingInfo.getParkingZones().entrySet()) {
 			zoneoccupancyPerBin.put(zone.getKey(), new int[bins]);
-			capacityAtIterationStart.put(zone.getKey(), (int) zone.getValue().getZoneParkingCapacity());
+			if (!initialized) {
+				capacityAtSimulationStart.put(zone.getKey(), (int) zone.getValue().getZoneParkingCapacity());
+
+			}
 		}
+		initialized = true;
+
 		lastActivityType.clear();
 
 	}
@@ -138,7 +144,7 @@ public class ParkingOccupancyEventHandler implements PersonDepartureEventHandler
 				final MutableInt parkingCapacity = new MutableInt();
 				this.parkingInfo.getParkingZones().get(e.getKey()).getLinksInZone().forEach(lid -> parkingCapacity.add(calculator.getLinkCapacity(network.getLinks().get(lid))));
 				int cap = (int) (parkingCapacity.intValue() * storageCapacityFactor);
-				int initialOcc = cap - this.capacityAtIterationStart.get(e.getKey());
+				int initialOcc = cap - this.capacityAtSimulationStart.get(e.getKey());
 
 				bw.write(e.getKey() + ";" + cap + ";");
 				bwr.write(e.getKey() + ";" + cap + ";");

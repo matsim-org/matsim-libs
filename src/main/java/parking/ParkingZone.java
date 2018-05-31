@@ -19,15 +19,11 @@
 
 package parking;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+
+import java.util.*;
 
 /**
  * Created by amit on 20.02.18.
@@ -69,6 +65,11 @@ public class ParkingZone implements Identifiable<ParkingZone> {
         double parkingCap = this.linkToParkingCapacity.getOrDefault(link.getId(), 0.);
         this.linkToParkingCapacity.put(link.getId(), parkingCap + val);
         this.zoneParkingCapacity += val;
+    }
+
+    public void resetParkingCapacities() {
+        this.linkToParkingCapacity.clear();
+        this.zoneParkingCapacity = 0;
     }
 
 

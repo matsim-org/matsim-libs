@@ -34,7 +34,7 @@ import parking.capacityCalculation.LinkLengthBasedCapacityCalculator;
 public class ParkingOccupancyAnalyzer {
 public static void main(String[] args) {
 	String basefolder = "D:/runs-svn/vw_rufbus/";
-	String runId = "vw219_10pct_withParkImp_reroute";
+	String runId = "vw220park10T";
 	String eventsFile = basefolder+runId+"/"+runId+".output_events.xml.gz";
 	String populationFile = basefolder+runId+"/"+runId+".output_plans.xml.gz";
 	String parkingOccupancyOutputFile = basefolder+runId+"/"+runId+".output_parkingOccupancy.csv";
