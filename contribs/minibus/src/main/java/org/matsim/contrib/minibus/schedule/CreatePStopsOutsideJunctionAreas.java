@@ -52,7 +52,7 @@ import java.util.*;
 /**
  * Create one TransitStopFacility for each car mode link of the network
  * 
- * @author aneumann, droeder
+ * @author aneumann, droeder, gleich
  *
  */
 public final class CreatePStopsOutsideJunctionAreas{
@@ -315,7 +315,6 @@ public final class CreatePStopsOutsideJunctionAreas{
 		
 		for (Link link : this.intersectionSimplifiedRoadNetwork.getLinks().values()) {
 			if(link.getAllowedModes().contains(TransportMode.car)){
-				log.error("Handling simplified network link " + link.getId().toString());
 				stopsAdded += addStopForSimplifiedNetworkLink(link);
 			}
 		}

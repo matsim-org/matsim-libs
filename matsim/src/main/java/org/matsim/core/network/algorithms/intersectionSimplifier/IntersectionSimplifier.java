@@ -90,14 +90,6 @@ public class IntersectionSimplifier {
 
 		/* Do the mapping of clustered points. */
 		List<Cluster> clusters = djc.getClusterList();
-		
-		for(Cluster c: clusters) {
-			String s = "";
-			for(ClusterActivity ca: c.getPoints()) {
-				s = s + "-" + ca.getNode().getId().toString();
-			}
-			LOG.debug(s);
-		}
 
 		/* Populate a QuadTree with all the clustered nodes, each with a 
 		 * reference to the cluster they belong to. */
@@ -123,8 +115,6 @@ public class IntersectionSimplifier {
 				clusteredNodeName = clusteredNodeName + nodeInCluster;
 			}
 			Id<Node> newId = Id.createNodeId(clusteredNodeName);
-			
-			LOG.debug(newId.toString());
 			
 			Node newNode = network.getFactory().createNode(newId, cluster.getCenterOfGravity());
 			Set<Id<Node>> includedNodes = new HashSet<>();
