@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -34,6 +35,7 @@ import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.algorithms.intersectionSimplifier.IntersectionSimplifier;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.filter.NetworkLinkFilter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -147,7 +149,7 @@ public final class CreatePStopsOutsideJunctionAreas{
 			this.networkCalcTopoType.run(net);
 		}
 		
-		intersectionSimplifiedRoadNetwork = runIntersectionSimplifier();
+		intersectionSimplifiedRoadNetwork = generateIntersectionSimplifiedNetwork();
 
 	}
 
@@ -259,7 +261,8 @@ public final class CreatePStopsOutsideJunctionAreas{
 				exclude.toArray(new Geometry[exclude.size()])).buffer(0);
 	}
 	
-	private Network runIntersectionSimplifier() {
+	/* Generate a simplified network to determine stop locations (the simplified network will not be used in simulation) */
+	private Network generateIntersectionSimplifiedNetwork() {
 		// Extract road network
 		NetworkFilterManager nfmCar = new NetworkFilterManager(net);
 		nfmCar.addLinkFilter(new NetworkLinkFilter() {
@@ -296,9 +299,13 @@ public final class CreatePStopsOutsideJunctionAreas{
 		
 		// Simplify network (merge links if resulting link has length < x -> maximum PStop distance on merged links)
 		NetworkSimplifier simplifier = new NetworkSimplifier();
+		// Merge links with different attributes, because we only want to achieve a proper spacing
+		simplifier.setMergeLinkStats(true);
 		simplifier.run(newClusteredIntersectionsRoadNetwork, 500);
 		new NetworkCleaner().run(newClusteredIntersectionsRoadNetwork);
 
+		new NetworkWriter(newClusteredIntersectionsRoadNetwork).write("intersectionSimplifierNet.xml");
+		
 		return(newClusteredIntersectionsRoadNetwork);
 	}
 
@@ -347,8 +354,16 @@ public final class CreatePStopsOutsideJunctionAreas{
 			reappendedlinkIds = originalIdsMergedLink[indexOfNextLinkIdToBeAppended] + "-" + reappendedlinkIds;
 			lastPartOfMergedLink = net.getLinks().get(Id.createLinkId(reappendedlinkIds));
 		}
+		
+		/* Get node ids of all nodes merged into the clustered node where the merged link ends */
+		Set<Id<Node>> originalNodeIdsBeforeClustering = new HashSet<>();
+		String[] clusteredNodeIdSplit = simplifiedNetworkLink.getToNode().getId().toString().split("-");
+		for (String originalNodeId : clusteredNodeIdSplit) {
+			originalNodeIdsBeforeClustering.add(Id.createNodeId(originalNodeId));
+		}
 				
-		while (lastPartOfMergedLink.getToNode().getOutLinks().size() <= 1 /* && ! originalIdsMergedLink.getToNode().GET_NODE_IDS_SIMPLIFIED_TO_THIS_NODE.contains(lastPartOfMergedLink.getToNode()) */) {
+		while (lastPartOfMergedLink.getToNode().getOutLinks().size() <= 1 && 
+				! originalNodeIdsBeforeClustering.contains(lastPartOfMergedLink.getToNode().getId())) {
 			lastPartOfMergedLink = lastPartOfMergedLink.getToNode().getOutLinks().values().iterator().next();
 		}
 		
