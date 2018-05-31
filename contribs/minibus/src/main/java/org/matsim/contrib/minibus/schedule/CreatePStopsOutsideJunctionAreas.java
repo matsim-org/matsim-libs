@@ -149,7 +149,23 @@ public final class CreatePStopsOutsideJunctionAreas{
 			this.networkCalcTopoType.run(net);
 		}
 		
-		intersectionSimplifiedRoadNetwork = generateIntersectionSimplifiedNetwork();
+		// parse StopLocationSelectorParameter from config
+		String[] stopLocationSelectorParameter = pConfigGroup.getStopLocationSelectorParameter().split(",");
+		if (stopLocationSelectorParameter.length != 3) {
+			log.warn("StopLocationSelectorParameter should be \"pmin,epsilon,stopDistance\" but has a different number of values. Using default values instead.");
+			stopLocationSelectorParameter = "50.0,2,Double.positiveInfinity".split(",");
+		}
+		double pmin = Double.parseDouble(stopLocationSelectorParameter[0]);
+		int epsilon = Integer.parseInt(stopLocationSelectorParameter[1]);
+		/* This is only a rough approximation of a desirable stop distance. It is not implemented to precisely resemble the value given. */
+		double stopDistance;
+		if (stopLocationSelectorParameter[2].contains("nfinity") || stopLocationSelectorParameter[2].contains("NFINITY")) {
+			stopDistance = Double.POSITIVE_INFINITY;
+		} else {
+			stopDistance = Double.parseDouble(stopLocationSelectorParameter[2]);
+		}
+		
+		intersectionSimplifiedRoadNetwork = generateIntersectionSimplifiedNetwork(pmin, epsilon, stopDistance);
 
 	}
 
@@ -262,7 +278,7 @@ public final class CreatePStopsOutsideJunctionAreas{
 	}
 	
 	/* Generate a simplified network to determine stop locations (the simplified network will not be used in simulation) */
-	private Network generateIntersectionSimplifiedNetwork() {
+	private Network generateIntersectionSimplifiedNetwork(double pmin, int epsilon, double stopDistance) {
 		// Extract road network
 		NetworkFilterManager nfmCar = new NetworkFilterManager(net);
 		nfmCar.addLinkFilter(new NetworkLinkFilter() {
@@ -289,7 +305,7 @@ public final class CreatePStopsOutsideJunctionAreas{
 		new NetworkCleaner().run(newRoadNetwork);
 		
 		// Run Johan's intersection clustering algorithm
-		IntersectionSimplifier ns = new IntersectionSimplifier(50.0, 2);
+		IntersectionSimplifier ns = new IntersectionSimplifier(pmin, epsilon);
 		Network newClusteredIntersectionsRoadNetwork = ns.simplify(newRoadNetwork);
 		new NetworkCleaner().run(newClusteredIntersectionsRoadNetwork);
 		
@@ -301,7 +317,8 @@ public final class CreatePStopsOutsideJunctionAreas{
 		NetworkSimplifier simplifier = new NetworkSimplifier();
 		// Merge links with different attributes, because we only want to achieve a proper spacing
 		simplifier.setMergeLinkStats(true);
-		simplifier.run(newClusteredIntersectionsRoadNetwork, 500);
+		/* TODO: There is a problem with reproducibility with setting a threshold distance in NetworkSimplifier. Find other solution for bus stop spacing. */
+		simplifier.run(newClusteredIntersectionsRoadNetwork, stopDistance);
 		new NetworkCleaner().run(newClusteredIntersectionsRoadNetwork);
 
 		new NetworkWriter(newClusteredIntersectionsRoadNetwork).write("intersectionSimplifierNet.xml");
