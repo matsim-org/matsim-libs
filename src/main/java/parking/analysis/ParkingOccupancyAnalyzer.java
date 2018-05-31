@@ -29,7 +29,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import parking.ZonalLinkParkingInfo;
-import parking.capacityCalculation.LinkLengthBasedCapacityCalculator;
+import parking.capacityCalculation.UseParkingCapacityFromNetwork;
 
 public class ParkingOccupancyAnalyzer {
 public static void main(String[] args) {
@@ -50,9 +50,10 @@ public static void main(String[] args) {
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	new PopulationReader(scenario).readFile(populationFile);
 	new MatsimNetworkReader(network).readFile(networkFile);
-	LinkLengthBasedCapacityCalculator  linkLengthBasedCapacityCalculator = new LinkLengthBasedCapacityCalculator();
-	ZonalLinkParkingInfo zonalLinkParkingInfo = new ZonalLinkParkingInfo(shapeFile, shapeString, 0.1, network, linkLengthBasedCapacityCalculator, scenario.getPopulation());
-	ParkingOccupancyEventHandler parkingOccupancyEventHandler = new ParkingOccupancyEventHandler(zonalLinkParkingInfo, linkLengthBasedCapacityCalculator, network, endTime,0.1);
+//	LinkLengthBasedCapacityCalculator  linkLengthBasedCapacityCalculator = new LinkLengthBasedCapacityCalculator();
+	UseParkingCapacityFromNetwork useParkingCapacityFromNetwork = new UseParkingCapacityFromNetwork();
+	ZonalLinkParkingInfo zonalLinkParkingInfo = new ZonalLinkParkingInfo(shapeFile, shapeString, 0.1, network, useParkingCapacityFromNetwork, scenario.getPopulation());
+	ParkingOccupancyEventHandler parkingOccupancyEventHandler = new ParkingOccupancyEventHandler(zonalLinkParkingInfo, useParkingCapacityFromNetwork, network, endTime, 0.1);
 	parkingOccupancyEventHandler.reset(0);
 	ParkingTripHandler tripHandler = new ParkingTripHandler(network, zonalLinkParkingInfo,scenario.getPopulation());
 	EventsManager events = EventsUtils.createEventsManager();
