@@ -32,6 +32,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.algorithms.intersectionSimplifier.containers.ClusterActivity;
 import org.matsim.core.network.algorithms.intersectionSimplifier.containers.Cluster;
 import org.matsim.core.utils.collections.QuadTree;
@@ -57,7 +58,7 @@ import org.matsim.core.utils.io.IOUtils;
  * @author jwjoubert
  */
 public class DensityCluster {
-	private List<Coord> inputPoints;
+	private List<Node> inputPoints;
 	private Map<Id<Coord>, ClusterActivity> lostPoints = new TreeMap<Id<Coord>, ClusterActivity>();
 	private QuadTree<ClusterActivity> quadTree;
 	private List<Cluster> clusterList;
@@ -74,13 +75,13 @@ public class DensityCluster {
 	 * 			independent {@link Cluster}.
 	 * @param pointsToCluster 
 	 */
-	public DensityCluster(List<Coord> pointsToCluster, boolean silent){
-		this.inputPoints = pointsToCluster;
+	public DensityCluster(List<Node> nodesToCluster, boolean silent){
+		this.inputPoints = nodesToCluster;
 		
 		/*TODO Remove later. */
 		int nullCounter = 0;
-		for(Coord c : inputPoints){
-			if(c == null){
+		for(Node node : inputPoints){
+			if(node == null || node.getCoord() == null){
 				nullCounter++;
 			}
 		}
@@ -118,7 +119,8 @@ public class DensityCluster {
 			double xMax = Double.NEGATIVE_INFINITY;
 			double yMax = Double.NEGATIVE_INFINITY;
 			
-			for (Coord c : this.inputPoints) {
+			for (Node node : this.inputPoints) {
+				Coord c = node.getCoord();
 				/* TODO Remove if no NullPointerExceptions are thrown. */
 				if(c == null){
 					log.warn("Coord is null. Number of points in list: " + inputPoints.size());
@@ -141,8 +143,8 @@ public class DensityCluster {
 			quadTree = new QuadTree<ClusterActivity>(xMin-1, yMin-1, xMax+1, yMax+1);
 			List<ClusterActivity> listOfPoints = new ArrayList<ClusterActivity>();
 			for (int i = 0; i < this.inputPoints.size(); i++) {
-				double x = inputPoints.get(i).getX();
-				double y = inputPoints.get(i).getY();
+				double x = inputPoints.get(i).getCoord().getX();
+				double y = inputPoints.get(i).getCoord().getY();
 				ClusterActivity cp = new ClusterActivity(Id.create(i, Coord.class), inputPoints.get(i), null);
 				quadTree.put(x, y, cp);
 				listOfPoints.add(cp);

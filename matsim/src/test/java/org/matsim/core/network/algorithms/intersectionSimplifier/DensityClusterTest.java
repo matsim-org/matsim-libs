@@ -26,6 +26,9 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkUtils;
 
 public class DensityClusterTest{
 	
@@ -44,7 +47,7 @@ public class DensityClusterTest{
 	 */		
 	@Test
 	public void testDJCluster(){
-		List<Coord> al = buildTestArrayList();
+		List<Node> al = buildTestArrayList();
 		DensityCluster djc = new DensityCluster(al, false);
 		djc.clusterInput(2, 3);
 		
@@ -58,43 +61,43 @@ public class DensityClusterTest{
 	}
 	
 	
-	private static List<Coord> buildTestArrayList(){
+	private static List<Node> buildTestArrayList(){
 		// Build the test QuadTree
-		List<Coord> al = new ArrayList<Coord>();
+		List<Node> al = new ArrayList<>();
 		
 		// Cluster 1
 		Coord c1 = new Coord((double) 2, (double) 1);
-		al.add(c1);
+		al.add(NetworkUtils.createNode(Id.createNodeId("c1"), c1));
 		Coord c2 = new Coord((double) 1, (double) 2);
-		al.add(c2);
+		al.add(NetworkUtils.createNode(Id.createNodeId("c2"), c2));
 		Coord c3 = new Coord((double) 1, (double) 3);
-		al.add(c3);
+		al.add(NetworkUtils.createNode(Id.createNodeId("c3"), c3));
 		Coord c4 = new Coord((double) 1, (double) 4);
-		al.add(c4);
+		al.add(NetworkUtils.createNode(Id.createNodeId("c4"), c4));
 		Coord c5 = new Coord((double) 2, (double) 5);
-		al.add(c5);
+		al.add(NetworkUtils.createNode(Id.createNodeId("c5"), c5));
 		Coord c6 = new Coord((double) 3, (double) 4);
-		al.add(c6);
+		al.add(NetworkUtils.createNode(Id.createNodeId("c6"), c6));
 		Coord c7 = new Coord((double) 3, (double) 3);
-		al.add(c7);
+		al.add(NetworkUtils.createNode(Id.createNodeId("c7"), c7));
 		Coord c8 = new Coord((double) 3, (double) 2);
-		al.add(c8);
+		al.add(NetworkUtils.createNode(Id.createNodeId("c8"), c8));
 			
 		// Cluster 2
 		Coord c9 = new Coord((double) 7, (double) 3);
-		al.add(c9);
+		al.add(NetworkUtils.createNode(Id.createNodeId("c9"), c9));
 		Coord c10 = new Coord((double) 6, (double) 4);
-		al.add(c10);
+		al.add(NetworkUtils.createNode(Id.createNodeId("c10"), c10));
 		Coord c11 = new Coord((double) 7, (double) 5);
-		al.add(c11);
+		al.add(NetworkUtils.createNode(Id.createNodeId("c11"), c11));
 		Coord c12 = new Coord((double) 8, (double) 4);
-		al.add(c12);
+		al.add(NetworkUtils.createNode(Id.createNodeId("c12"), c12));
 		
 		// Cluster 3 - not enough points
 		Coord c13 = new Coord((double) 4, (double) 7);
-		al.add(c13);
+		al.add(NetworkUtils.createNode(Id.createNodeId("c13"), c13));
 		Coord c14 = new Coord((double) 5, (double) 7);
-		al.add(c14);
+		al.add(NetworkUtils.createNode(Id.createNodeId("c14"), c14));
 
 		return al;
 	}

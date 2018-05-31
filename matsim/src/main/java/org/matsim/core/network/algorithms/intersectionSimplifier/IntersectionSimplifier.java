@@ -24,7 +24,13 @@
 package org.matsim.core.network.algorithms.intersectionSimplifier;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -47,13 +53,9 @@ public class IntersectionSimplifier {
 	final private double pmin;
 	final private int epsilon;
 
-	/* TODO I may want to look into rewriting the (clustering) code so that it
-	 * accepts a list of Nodes to cluster, and not just its (unidentifiable)
-	 * Coords. */
 	private DensityCluster djc = null;
-	private QuadTree<Coord> clusteredNodes = null;
-	private QuadTree<Node> clusteredCentroids = null;
-
+	private QuadTree<Node> clusteredNodes = null;
+	private Map<Id<Node>, Node> mergedNodeId2clusterNode = new HashMap<>();
 
 	public IntersectionSimplifier(double pmin, int epsilon) {
 		this.pmin = pmin;
@@ -73,9 +75,11 @@ public class IntersectionSimplifier {
 		Network newNetwork = NetworkUtils.createNetwork();
 
 		/* Get all the network's node coordinates that must be clustered. */
-		List<Coord> nodes = new ArrayList<Coord>();
+		List<Node> nodes = new ArrayList<>();
 		for(Node node : network.getNodes().values()) {
-			nodes.add(node.getCoord());
+			/* Create new Node instances in order to assure that the original network can not be 
+			 * changed by accident */
+			nodes.add(NetworkUtils.createNode(node.getId(), node.getCoord()));
 		}
 
 		/* Set up the clustering infrastructure. */
@@ -86,6 +90,14 @@ public class IntersectionSimplifier {
 
 		/* Do the mapping of clustered points. */
 		List<Cluster> clusters = djc.getClusterList();
+		
+		for(Cluster c: clusters) {
+			String s = "";
+			for(ClusterActivity ca: c.getPoints()) {
+				s = s + "-" + ca.getNode().getId().toString();
+			}
+			LOG.debug(s);
+		}
 
 		/* Populate a QuadTree with all the clustered nodes, each with a 
 		 * reference to the cluster they belong to. */
@@ -95,18 +107,32 @@ public class IntersectionSimplifier {
 				djc.getClusteredPoints().getMinNorthing(), 
 				djc.getClusteredPoints().getMaxEasting(), 
 				djc.getClusteredPoints().getMaxNorthing());
-		this.clusteredCentroids = new QuadTree<>(
-				djc.getClusteredPoints().getMinEasting(), 
-				djc.getClusteredPoints().getMinNorthing(), 
-				djc.getClusteredPoints().getMaxEasting(), 
-				djc.getClusteredPoints().getMaxNorthing());
 		for(Cluster cluster : clusters) {
-			Id<Node> newId = Id.createNodeId("simplified_" + cluster.getId().toString());
+			/* Add up node ids of all nodes merged into this clustered node 
+			 * and use it as id for the clustered node */
+			SortedSet<String> nodeIdsInCluster = new TreeSet<>();
+			for (ClusterActivity nodeInCluster : cluster.getPoints()) {
+				nodeIdsInCluster.add(nodeInCluster.getNode().getId().toString());
+			}
+			String clusteredNodeName = "";
+			for (String nodeInCluster : nodeIdsInCluster) {
+				/* Don't add "-" if no node id is in the clusteredNodeName yet */
+				if (! clusteredNodeName.equals("")) {
+					clusteredNodeName = clusteredNodeName + "-";
+				}
+				clusteredNodeName = clusteredNodeName + nodeInCluster;
+			}
+			Id<Node> newId = Id.createNodeId(clusteredNodeName);
+			
+			LOG.debug(newId.toString());
+			
 			Node newNode = network.getFactory().createNode(newId, cluster.getCenterOfGravity());
+			Set<Id<Node>> includedNodes = new HashSet<>();
 			for(ClusterActivity clusterPoint : cluster.getPoints()) {
 				Coord clusterPointCoord = clusterPoint.getCoord();
-				clusteredNodes.put(clusterPointCoord.getX(), clusterPointCoord.getY(), clusterPointCoord);
-				clusteredCentroids.put(clusterPointCoord.getX(), clusterPointCoord.getY(), newNode);
+				clusteredNodes.put(clusterPointCoord.getX(), clusterPointCoord.getY(), newNode);
+				includedNodes.add(clusterPoint.getNode().getId());
+				mergedNodeId2clusterNode.put(clusterPoint.getNode().getId(), newNode);
 			}
 		}
 		LOG.info("Done populating QuadTree. Number of nodes affected: " + clusteredNodes.size());
@@ -173,18 +199,13 @@ public class IntersectionSimplifier {
 	
 
 	/**
-	 * Gets the {@link Cluster} centroid closest to the provided {@link Node}.
-	 * TODO maybe worth checking if this is indeed the right approach. Maybe it
-	 * would be better to rather go through the (nearby) {@link Cluster}s and 
-	 * ensures the {@link Node} is indeed part of <i><b>that</b></i> {@link Cluster}.
+	 * Look up the {@link Cluster} node of the provided {@link Node}.
 	 * @param node
 	 * @return
 	 */
 	protected Node getClusteredNode(Node node) {
-		Node n = null;
-		if(isClustered(node)) {
-			n = clusteredCentroids.getClosest(node.getCoord().getX(), node.getCoord().getY());
-		}
+		// returns null if node was not merged into a clustered node
+		Node n = mergedNodeId2clusterNode.get(node.getId());
 		return n;
 	}
 	
@@ -202,24 +223,6 @@ public class IntersectionSimplifier {
 		}
 	}
 
-	/**
-	 * Checks if a given {@link Node} was included in a density-based cluster. 
-	 * @param node
-	 * @return
-	 */
-	protected boolean isClustered(Node node) {
-		boolean result = false;
-		if(this.clusteredNodes == null) {
-			LOG.warn("No network simplification has been done yet. So NO nodes are clustered.");
-		} else {
-			Coord closestCoord = clusteredNodes.getClosest(node.getCoord().getX(), node.getCoord().getY());
-			if(closestCoord.equals(node.getCoord())){
-				result = true;
-			}
-		}
-
-		return result;
-	}
 
 	/**
 	 * Returns all the {@link Cluster}s.

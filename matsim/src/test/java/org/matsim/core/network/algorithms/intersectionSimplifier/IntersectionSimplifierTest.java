@@ -77,20 +77,6 @@ public class IntersectionSimplifierTest {
 		}
 	}
 
-	@Test
-	public void testIsClustered() {
-		Network network = buildComplexIntersection();
-		IntersectionSimplifier is = new IntersectionSimplifier(10.0, 2);
-
-		/* Test before simplifying. */
-		Node n = network.getNodes().get(Id.createNodeId(5));
-		Assert.assertFalse("Cannot be clustered before simplification was done.", is.isClustered(n));
-
-		/* Test after simplifying. */
-		is.simplify(network);
-		is.writeClustersToFile(utils.getOutputDirectory() + "clusters.csv");
-		Assert.assertTrue("Must be clustered after simplification was done.", is.isClustered(n));
-	}
 
 	@Test
 	public void testGetClusteredNode() {
@@ -109,7 +95,7 @@ public class IntersectionSimplifierTest {
 
 		Coord centroidCoord = CoordUtils.createCoord(85.0, 85.0);
 		Assert.assertTrue("Wrong centroid Coord.", centroidCoord.equals(centroid.getCoord()));
-		Assert.assertTrue("Wrong centroid Id start.", centroid.getId().toString().startsWith("simplified_"));
+		Assert.assertTrue("Wrong centroid Id (does not contain \"-\" separator between merged node ids).", centroid.getId().toString().contains("-"));
 	}
 
 
@@ -172,13 +158,13 @@ public class IntersectionSimplifierTest {
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network2.xml");
 
 		Assert.assertEquals("Wrong number of nodes.", 18l, simpleNetwork.getNodes().size());
-		Assert.assertEquals("Wrong number of nodes.", 18l, simpleNetwork.getNodes().size());
-		Assert.assertNotNull("Should find node '1'", simpleNetwork.getNodes().get(Id.createLinkId("1")));
-		Assert.assertNotNull("Should find node '3'", simpleNetwork.getNodes().get(Id.createLinkId("3")));
-		Assert.assertNotNull("Should find node '10'", simpleNetwork.getNodes().get(Id.createLinkId("10")));
-		Assert.assertNotNull("Should find node '11'", simpleNetwork.getNodes().get(Id.createLinkId("11")));
-		Assert.assertNotNull("Should find node '26'", simpleNetwork.getNodes().get(Id.createLinkId("26")));
-		Assert.assertNotNull("Should find node '28'", simpleNetwork.getNodes().get(Id.createLinkId("28")));
+
+		Assert.assertNotNull("Should find node '1'", simpleNetwork.getNodes().get(Id.createNodeId("1")));
+		Assert.assertNotNull("Should find node '3'", simpleNetwork.getNodes().get(Id.createNodeId("3")));
+		Assert.assertNotNull("Should find node '10'", simpleNetwork.getNodes().get(Id.createNodeId("10")));
+		Assert.assertNotNull("Should find node '11'", simpleNetwork.getNodes().get(Id.createNodeId("11")));
+		Assert.assertNotNull("Should find node '26'", simpleNetwork.getNodes().get(Id.createNodeId("26")));
+		Assert.assertNotNull("Should find node '28'", simpleNetwork.getNodes().get(Id.createNodeId("28")));
 
 		Assert.assertNotNull("Should find node '2'", simpleNetwork.getNodes().get(Id.createNodeId("2")));
 		Assert.assertNotNull("Should find node '4'", simpleNetwork.getNodes().get(Id.createNodeId("4")));
@@ -187,16 +173,16 @@ public class IntersectionSimplifierTest {
 		Assert.assertNotNull("Should find node '25'", simpleNetwork.getNodes().get(Id.createNodeId("25")));
 		Assert.assertNotNull("Should find node '27'", simpleNetwork.getNodes().get(Id.createNodeId("27")));
 
-		Assert.assertNotNull("Should find node 'simplified_0'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_0")));
-		Assert.assertNotNull("Should find node 'simplified_2'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_2")));
-		Assert.assertNotNull("Should find node 'simplified_4'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_4")));
-		Assert.assertNotNull("Should find node 'simplified_6'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_6")));
-		Assert.assertNotNull("Should find node 'simplified_8'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_8")));
-		Assert.assertNotNull("Should find node 'simplified_10'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_10")));
+		Assert.assertNotNull("Should find simplified node '5-6-7-8'", simpleNetwork.getNodes().get(Id.createNodeId("5-6-7-8")));
+		Assert.assertNotNull("Should find simplified node '13-14'", simpleNetwork.getNodes().get(Id.createNodeId("13-14")));
+		Assert.assertNotNull("Should find simplified node '16-17-20-21'", simpleNetwork.getNodes().get(Id.createNodeId("16-17-20-21")));
+		Assert.assertNotNull("Should find simplified node '18-22'", simpleNetwork.getNodes().get(Id.createNodeId("18-22")));
+		Assert.assertNotNull("Should find simplified node '15-19'", simpleNetwork.getNodes().get(Id.createNodeId("15-19")));
+		Assert.assertNotNull("Should find simplified node '23-24'", simpleNetwork.getNodes().get(Id.createNodeId("23-24")));
 	}
 
 	@Test
-	public void testNetworklSimplifier() {
+	public void testNetworkSimplifier() {
 		Network network = buildComplexIntersection();
 		IntersectionSimplifier is = new IntersectionSimplifier(10.0, 2);
 		Network simpleNetwork = is.simplify(network);
@@ -208,13 +194,15 @@ public class IntersectionSimplifierTest {
 		ns.run(simpleNetwork);
 		new NetworkCleaner().run(simpleNetwork);
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network.xml");
+		
+		Assert.assertEquals("Wrong number of nodes.", 12l, simpleNetwork.getNodes().size());
 
-		Assert.assertNotNull("Should find node '1'", simpleNetwork.getNodes().get(Id.createLinkId("1")));
-		Assert.assertNotNull("Should find node '3'", simpleNetwork.getNodes().get(Id.createLinkId("3")));
-		Assert.assertNotNull("Should find node '10'", simpleNetwork.getNodes().get(Id.createLinkId("10")));
-		Assert.assertNotNull("Should find node '11'", simpleNetwork.getNodes().get(Id.createLinkId("11")));
-		Assert.assertNotNull("Should find node '26'", simpleNetwork.getNodes().get(Id.createLinkId("26")));
-		Assert.assertNotNull("Should find node '28'", simpleNetwork.getNodes().get(Id.createLinkId("28")));
+		Assert.assertNotNull("Should find node '1'", simpleNetwork.getNodes().get(Id.createNodeId("1")));
+		Assert.assertNotNull("Should find node '3'", simpleNetwork.getNodes().get(Id.createNodeId("3")));
+		Assert.assertNotNull("Should find node '10'", simpleNetwork.getNodes().get(Id.createNodeId("10")));
+		Assert.assertNotNull("Should find node '11'", simpleNetwork.getNodes().get(Id.createNodeId("11")));
+		Assert.assertNotNull("Should find node '26'", simpleNetwork.getNodes().get(Id.createNodeId("26")));
+		Assert.assertNotNull("Should find node '28'", simpleNetwork.getNodes().get(Id.createNodeId("28")));
 
 		Assert.assertNull("Should NOT find node '2'", simpleNetwork.getNodes().get(Id.createNodeId("2")));
 		Assert.assertNull("Should NOT find node '4'", simpleNetwork.getNodes().get(Id.createNodeId("4")));
@@ -223,12 +211,12 @@ public class IntersectionSimplifierTest {
 		Assert.assertNull("Should NOT find node '25'", simpleNetwork.getNodes().get(Id.createNodeId("25")));
 		Assert.assertNull("Should NOT find node '27'", simpleNetwork.getNodes().get(Id.createNodeId("27")));
 
-		Assert.assertNotNull("Should find node 'simplified_0'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_0")));
-		Assert.assertNotNull("Should find node 'simplified_2'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_2")));
-		Assert.assertNotNull("Should find node 'simplified_4'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_4")));
-		Assert.assertNotNull("Should find node 'simplified_6'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_6")));
-		Assert.assertNotNull("Should find node 'simplified_8'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_8")));
-		Assert.assertNotNull("Should find node 'simplified_10'", simpleNetwork.getNodes().get(Id.createLinkId("simplified_10")));
+		Assert.assertNotNull("Should find simplified node '5-6-7-8'", simpleNetwork.getNodes().get(Id.createNodeId("5-6-7-8")));
+		Assert.assertNotNull("Should find simplified node '13-14'", simpleNetwork.getNodes().get(Id.createNodeId("13-14")));
+		Assert.assertNotNull("Should find simplified node '16-17-20-21'", simpleNetwork.getNodes().get(Id.createNodeId("16-17-20-21")));
+		Assert.assertNotNull("Should find simplified node '18-22'", simpleNetwork.getNodes().get(Id.createNodeId("18-22")));
+		Assert.assertNotNull("Should find simplified node '15-19'", simpleNetwork.getNodes().get(Id.createNodeId("15-19")));
+		Assert.assertNotNull("Should find simplified node '23-24'", simpleNetwork.getNodes().get(Id.createNodeId("23-24")));
 	}
 
 	

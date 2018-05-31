@@ -23,6 +23,7 @@ package org.matsim.core.network.algorithms.intersectionSimplifier.containers;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Node;
 
 
 /**
@@ -32,17 +33,21 @@ import org.matsim.api.core.v01.Identifiable;
  */
 public class ClusterActivity implements Identifiable<Coord>{
 	private Id<Coord> activityId;
-	private Coord coord;
+	private Node node;
 	private Cluster cluster;
 	
-	public ClusterActivity(Id<Coord> activityId, Coord coord, Cluster cluster){
+	public ClusterActivity(Id<Coord> activityId, Node node, Cluster cluster){
 		this.activityId = activityId;
-		this.coord = coord;
+		this.node = node;
 		this.cluster = cluster;
 	}
 
 	public Coord getCoord() {
-		return this.coord;
+		return this.node.getCoord();
+	}
+	
+	public Node getNode() {
+		return this.node;
 	}
 
 	public Cluster getCluster() {
