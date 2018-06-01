@@ -114,13 +114,13 @@ public class RandomizingTransitRouterIT {
 		}
 		{
 			StrategySettings stratSets = new StrategySettings(ConfigUtils.createAvailableStrategyId(config)) ;
-			stratSets.setStrategyName( DefaultStrategy.ReRoute.toString() );
+			stratSets.setStrategyName(DefaultStrategy.ReRoute);
 			stratSets.setWeight(0.1);
 			config.strategy().addStrategySettings(stratSets);
 		}
 		{
 			StrategySettings stratSets = new StrategySettings(ConfigUtils.createAvailableStrategyId(config)) ;
-			stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
+			stratSets.setStrategyName(DefaultSelector.ChangeExpBeta);
 			stratSets.setWeight(0.9);
 			config.strategy().addStrategySettings(stratSets);
 		}
