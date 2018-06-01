@@ -33,6 +33,7 @@ import org.matsim.contrib.drt.optimizer.depot.Depots;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -58,6 +59,8 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	public static final String DRT_OPTIMIZER = "drt_optimizer";
 
 	private final DrtConfigGroup drtCfg;
+	private final MinCostFlowRebalancingParams rebalancingParams;
+	private final boolean rebalancingEnabled;
 	private final Fleet fleet;
 	private final DrtScheduleInquiry scheduleInquiry;
 	private final DrtScheduleTimingUpdater scheduleTimingUpdater;
@@ -83,12 +86,14 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		this.mobsimTimer = mobsimTimer;
 		this.eventsManager = eventsManager;
 		this.requestValidator = requestValidator;
-		this.depotFinder = drtCfg.getIdleVehiclesReturnToDepots() ? depotFinder : null;
-		this.rebalancingStrategy = drtCfg.getRebalancingInterval() != 0 ? rebalancingStrategy : null;
+		this.depotFinder = depotFinder;
+		this.rebalancingStrategy = rebalancingStrategy;
 		this.scheduleInquiry = scheduleInquiry;
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.relocator = relocator;
 		this.requestInserter = requestInserter;
+		rebalancingParams = drtCfg.getMinCostFlowRebalancing();
+		rebalancingEnabled = MinCostFlowRebalancingParams.isRebalancingEnabled(rebalancingParams);
 	}
 
 	@Override
@@ -102,7 +107,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 			requiresReoptimization = false;
 		}
 
-		if (rebalancingStrategy != null && e.getSimulationTime() % drtCfg.getRebalancingInterval() == 0) {
+		if (rebalancingEnabled && e.getSimulationTime() % rebalancingParams.getInterval() == 0) {
 			rebalanceFleet();
 		}
 	}
@@ -145,7 +150,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		vehicle.getSchedule().nextTask();
 
 		// if STOP->STAY then choose the best depot
-		if (depotFinder != null && Depots.isSwitchingFromStopToStay(vehicle)) {
+		if (drtCfg.getIdleVehiclesReturnToDepots() && Depots.isSwitchingFromStopToStay(vehicle)) {
 			Link depotLink = depotFinder.findDepot(vehicle);
 			if (depotLink != null) {
 				relocator.relocateVehicle(vehicle, depotLink);

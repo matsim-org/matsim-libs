@@ -7,7 +7,10 @@ import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
+import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingModule;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.routing.DefaultAccessEgressStopFinder;
 import org.matsim.contrib.drt.routing.DrtMainModeIdentifier;
 import org.matsim.contrib.drt.routing.DrtRoutingModule;
@@ -38,7 +41,11 @@ public final class DrtModule extends AbstractModule {
 		bind(TravelDisutilityFactory.class).annotatedWith(Names.named(DefaultDrtOptimizer.DRT_OPTIMIZER))
 				.toInstance(timeCalculator -> new TimeAsTravelDisutility(timeCalculator));
 
-		install(new MinCostFlowRebalancingModule(1000));
+		if (MinCostFlowRebalancingParams.isRebalancingEnabled(drtCfg.getMinCostFlowRebalancing())) {
+			install(new MinCostFlowRebalancingModule());
+		} else {
+			bind(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
+		}
 
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:

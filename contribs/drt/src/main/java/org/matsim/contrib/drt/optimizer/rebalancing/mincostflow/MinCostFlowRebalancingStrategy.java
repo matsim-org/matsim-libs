@@ -31,6 +31,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -46,21 +47,21 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 		int estimate(String zone, double time);
 	}
 
-	private static final double MAX_REMAINING_TIME_TO_IDLENESS = 1800;// for soon-idle vehicles
-	private static final double MIN_REMAINING_SERVICE_TIME = 3600;// for idle vehicles
-
 	private final RebalancingTargetCalculator rebalancingTargetCalculator;
 	private final DrtZonalSystem zonalSystem;
 	private final Fleet fleet;
 	private final MinCostRelocationCalculator minCostRelocationCalculator;
+	private final MinCostFlowRebalancingParams params;
 
 	@Inject
 	public MinCostFlowRebalancingStrategy(RebalancingTargetCalculator rebalancingTargetCalculator,
-			DrtZonalSystem zonalSystem, Fleet fleet, MinCostRelocationCalculator minCostRelocationCalculator) {
+			DrtZonalSystem zonalSystem, Fleet fleet, MinCostRelocationCalculator minCostRelocationCalculator,
+			DrtConfigGroup drtCfg) {
 		this.rebalancingTargetCalculator = rebalancingTargetCalculator;
 		this.zonalSystem = zonalSystem;
 		this.fleet = fleet;
 		this.minCostRelocationCalculator = minCostRelocationCalculator;
+		params = drtCfg.getMinCostFlowRebalancing();
 	}
 
 	@Override
@@ -76,7 +77,7 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 	private Map<String, List<Vehicle>> groupRebalancableVehicles(Stream<? extends Vehicle> rebalancableVehicles,
 			double time) {
 		Map<String, List<Vehicle>> rebalancableVehiclesPerZone = new HashMap<>();
-		rebalancableVehicles.filter(v -> v.getServiceEndTime() > time + MIN_REMAINING_SERVICE_TIME).forEach(v -> {
+		rebalancableVehicles.filter(v -> v.getServiceEndTime() > time + params.getMinServiceTime()).forEach(v -> {
 			Link link = ((StayTask)v.getSchedule().getCurrentTask()).getLink();
 			String zone = zonalSystem.getZoneForLinkId(link.getId());
 			if (zone != null) {
@@ -94,8 +95,8 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 			Schedule s = v.getSchedule();
 			StayTask stayTask = (StayTask)Schedules.getLastTask(s);
 			if (stayTask.getStatus() == TaskStatus.PLANNED
-					&& stayTask.getBeginTime() < time + MAX_REMAINING_TIME_TO_IDLENESS
-					&& stayTask.getBeginTime() < time + MIN_REMAINING_SERVICE_TIME) {// XXX a separate constant???
+					&& stayTask.getBeginTime() < time + params.getMaxTimeBeforeIdle()
+					&& v.getServiceEndTime() > time + params.getMinServiceTime()) {
 				String zone = zonalSystem.getZoneForLinkId(stayTask.getLink().getId());
 				if (zone != null) {
 					soonIdleVehiclesPerZone.computeIfAbsent(zone, z -> new ArrayList<>()).add(v);

@@ -16,17 +16,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.run.example;
-
-import org.junit.Test;
-import org.matsim.contrib.drt.run.examples.RunOneSharedTaxiExample;
+package org.matsim.contrib.drt.optimizer.insertion;
 
 /**
  * @author michalm
  */
-public class RunOneSharedTaxiExampleIT {
-	@Test
-	public void testRun() {
-		RunOneSharedTaxiExample.run(false, 0);
-	}
+public interface InsertionWithDetourTimes {
+	int getPickupIdx();
+
+	int getDropoffIdx();
+
+	double getTimeToPickup();
+
+	double getTimeFromPickup();
+
+	double getTimeToDropoff();// RuntimeException if dropoff inserted directly after pickup
+
+	double getTimeFromDropoff();// RuntimeException if dropoff inserted at the end
 }

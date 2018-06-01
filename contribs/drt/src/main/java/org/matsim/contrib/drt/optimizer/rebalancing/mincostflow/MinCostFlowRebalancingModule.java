@@ -18,25 +18,26 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
+import javax.inject.Inject;
+
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 
 /**
  * @author michalm
  */
 public class MinCostFlowRebalancingModule extends AbstractModule {
-	private final double cellSize;
-
-	public MinCostFlowRebalancingModule(double cellSize) {
-		this.cellSize = cellSize;
-	}
+	@Inject
+	private DrtConfigGroup drtCfg;
 
 	@Override
 	public void install() {
-		bind(DrtZonalSystem.class).toProvider(new DrtZonalSystem.DrtZonalSystemProvider(cellSize));
+		MinCostFlowRebalancingParams params = drtCfg.getMinCostFlowRebalancing();
+		bind(DrtZonalSystem.class).toProvider(new DrtZonalSystem.DrtZonalSystemProvider(params.getCellSize()));
 		bind(RebalancingStrategy.class).to(MinCostFlowRebalancingStrategy.class).asEagerSingleton();
 		bind(RebalancingTargetCalculator.class).to(LinearRebalancingTargetCalculator.class).asEagerSingleton();
 		bind(MinCostRelocationCalculator.class).to(AggregatedMinCostRelocationCalculator.class).asEagerSingleton();

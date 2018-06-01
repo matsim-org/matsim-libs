@@ -18,7 +18,6 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +30,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
-import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
+import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.ManyToManyPathData;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -49,7 +48,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * @author michalm
  */
-public class StopBasedPathDataProvider implements PrecalculatablePathDataProvider {
+public class StopBasedPathDataProvider implements PrecalculablePathDataProvider {
 	private final double stopDuration;
 
 	private final ManyToManyPathData manyToManyPathData;
@@ -77,7 +76,7 @@ public class StopBasedPathDataProvider implements PrecalculatablePathDataProvide
 	}
 
 	@Override
-	public void precalculatePathData(DrtRequest drtRequest, Collection<VehicleData.Entry> vEntries) {
+	public void precalculatePathData(DrtRequest drtRequest, DetourLinksSet detourLinkSet) {
 		Link pickup = drtRequest.getFromLink();
 		Link dropoff = drtRequest.getToLink();
 
@@ -94,7 +93,7 @@ public class StopBasedPathDataProvider implements PrecalculatablePathDataProvide
 
 	@Override
 	public PathDataSet getPathDataSet(DrtRequest drtRequest, Entry vEntry) {
-		return PrecalculatablePathDataProvider.getPathDataSet(drtRequest, vEntry, pathsToPickupMap, pathsFromPickupMap,
+		return PrecalculablePathDataProvider.getPathDataSet(drtRequest, vEntry, pathsToPickupMap, pathsFromPickupMap,
 				pathsToDropoffMap, pathsFromDropoffMap);
 	}
 }
