@@ -31,6 +31,8 @@ import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks;
+import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks.LogInfoLevel;
+import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks.MergeType;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.algorithms.intersectionSimplifier.IntersectionSimplifier;
 import org.matsim.core.network.filter.NetworkFilterManager;
@@ -310,7 +312,7 @@ public final class CreatePStopsOutsideJunctionAreas{
 		new NetworkCleaner().run(newClusteredIntersectionsRoadNetwork);
 		
 		// intersection clustering leaves some duplicate links (same start and end node), merge them
-		NetworkMergeDoubleLinks mergeDoubleLinks = new NetworkMergeDoubleLinks();
+		NetworkMergeDoubleLinks mergeDoubleLinks = new NetworkMergeDoubleLinks(MergeType.MAXIMUM, LogInfoLevel.NOINFO);
 		mergeDoubleLinks.run(newClusteredIntersectionsRoadNetwork);
 		
 		// Simplify network (merge links if resulting link has length < x -> maximum PStop distance on merged links)
