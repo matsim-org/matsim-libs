@@ -51,6 +51,9 @@ import org.matsim.core.utils.io.UncheckedIOException;
  * @author thibautd
  */
 class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
+	// yy I introduced "verbosity" to also write a reduced config.  In the end, this became so complicated
+	// that it would probably have been better to just separate the config writers for the two execution
+	// paths.  If someone feels like doing that, please go ahead.  kai, jun'18
 
 	private String newline = "\n";
 	
@@ -81,6 +84,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 			
 //			boolean lastHadComment = false;
 
+			// first write the regular config entries (key,value pairs)
 			for (Map.Entry<String, String> entry : params.entrySet()) {
 				
 				final String actual = entry.getValue();
@@ -118,7 +122,12 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 				writer.write("\t\t<"+PARAMETER+" name=\"" + entry.getKey() + "\" value=\"" + actual + "\" />");
 				writer.write( this.newline );
 			}
+			
+			if ( moduleName.equals("thisAintNoFlat") ) {
+				Logger.getLogger(this.getClass()).warn("here") ;
+			}
 
+			// then write the parameter sets:
 			for ( Entry<String, ? extends Collection<? extends ConfigGroup>> entry : module.getParameterSets().entrySet() ) {
 				Collection<? extends ConfigGroup> comparisonSets = new ArrayList<>() ;
 				if ( comparisonModule != null ) {
@@ -138,9 +147,16 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 					}
 					if ( comparisonPSet==null ) {
 						if ( pSet instanceof ScoringParameterSet ) {
-							comparisonPSet = ((PlanCalcScoreConfigGroup)comparisonModule).getOrCreateScoringParameters( ((ScoringParameterSet)pSet).getSubpopulation()) ;
+							comparisonPSet = ((PlanCalcScoreConfigGroup) comparisonModule).getOrCreateScoringParameters(((ScoringParameterSet) pSet).getSubpopulation());
 						} else {
-							comparisonPSet = pSet.getClass().newInstance();
+							try {
+								comparisonPSet = pSet.getClass().newInstance();
+							} catch (InstantiationException | IllegalAccessException e) {
+//								e.printStackTrace();
+								// this happens when pSet is not a parameter set, but the config group itself, _and_ it is a non-typed config group.
+								// Since then we don't have a default constructor.  :-(  kai, jun'18
+							}
+							comparisonPSet = new ConfigGroup(pSet.getName()) ;
 						}
 					}
 //					Logger.getLogger(this.getClass()).warn( "comparisonPSet=" + comparisonPSet ) ;
@@ -161,10 +177,6 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
 		}
 	}
 	
@@ -255,13 +267,16 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 
 	@Override
 	 void writeSeparator(final BufferedWriter out) {
-		try {
+//		try {
+////			out.write( this.newline );
+//			out.write("<!-- ====================================================================== -->");
 //			out.write( this.newline );
-			out.write("<!-- ====================================================================== -->");
-			out.write( this.newline );
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}	
+//
+//		} catch (IOException e) {
+//			throw new UncheckedIOException(e);
+//		}
+
+		// this looks ugly in the reduced config, thus disabling them for the time being.  kai, jun'18
 	}
 
 

@@ -251,7 +251,7 @@ import java.util.Map;
 		out.write(Double.toString(route.getDistance()));
 		out.write("\"");
 		if ( route instanceof NetworkRoute) {
-			out.write(" vehicleId=\"");
+			out.write(" vehicleRefId=\"");
 			final Id<Vehicle> vehicleId = ((NetworkRoute) route).getVehicleId();
 			if ( vehicleId==null ) {
 				out.write("null");

@@ -128,6 +128,13 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 			return this.id;
 		}
 	}
+	
+	public static <T> String writeId( Id<T> id ) {
+		if ( id==null ) {
+			return "null" ;
+		}
+		return id.toString() ;
+	}
 
 	// helper classes for some common cases:
 	public static Id<Person> createPersonId( final long key ) {

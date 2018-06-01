@@ -148,7 +148,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			}
 		} catch ( Exception ee ) {
 			Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
-					+ "generated in the final iteration", ee);
+					+ "generated in the final iteration" );
 		}
 	}
 
