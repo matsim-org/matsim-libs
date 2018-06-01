@@ -43,7 +43,7 @@ import javax.inject.Inject;
 /**
  * @author cdobler
  */
-public class ParallelEventsManager implements EventsManager {
+public final class ParallelEventsManager implements EventsManager {
 
 	private final static Logger log = Logger.getLogger(ParallelEventsManager.class);
 	

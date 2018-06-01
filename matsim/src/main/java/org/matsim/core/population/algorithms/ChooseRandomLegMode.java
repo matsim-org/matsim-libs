@@ -20,6 +20,8 @@
 
 package org.matsim.core.population.algorithms;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -42,18 +44,22 @@ import org.matsim.core.population.routes.NetworkRoute;
 public final class ChooseRandomLegMode implements PlanAlgorithm {
 
 	private final String[] possibleModes;
+	private final List<String> fromModes;
 	private boolean ignoreCarAvailability = true;
-
+	private boolean allowSwitchFromListedModesOnly;
 	private final Random rng;
 
 	/**
-	 * @param possibleModes
+	 * @param possibleModes modes to switch to
 	 * @param rng The random number generator used to draw random numbers to select another mode.
+	 * @param allowSwitchFromListedModesOnly allows a change only in between the modes listed
 	 * @see TransportMode
 	 * @see MatsimRandom
 	 */
-	public ChooseRandomLegMode(final String[] possibleModes, final Random rng) {
+	public ChooseRandomLegMode(final String[] possibleModes, final Random rng, boolean allowSwitchFromListedModesOnly) {
 		this.possibleModes = possibleModes.clone();
+		fromModes = Arrays.asList(possibleModes);
+		this.allowSwitchFromListedModesOnly = allowSwitchFromListedModesOnly;
 		this.rng = rng;
 	}
 
@@ -78,8 +84,13 @@ public final class ChooseRandomLegMode implements PlanAlgorithm {
 			}
 
 			final String currentMode = getTransportMode(tour);
-
+			if (allowSwitchFromListedModesOnly){
+				if (!fromModes.contains(currentMode)){
+					return;
+				}
+			}
 			String newMode;
+
 			while (true) {
 				int newModeIdx = chooseModeOtherThan(currentMode);
 				newMode = this.possibleModes[newModeIdx];

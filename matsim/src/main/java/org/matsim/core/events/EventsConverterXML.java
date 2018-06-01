@@ -51,7 +51,7 @@ import org.xml.sax.Attributes;
  * @author tthunig
  *
  */
-public class EventsConverterXML extends MatsimXmlParser{
+public final class EventsConverterXML extends MatsimXmlParser{
 
 	private static final String EVENT = "event";
 	private static final String ATTRIBUTE_PERSON = "person";

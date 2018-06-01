@@ -20,6 +20,7 @@
 
 package org.matsim.pt.router;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
@@ -43,7 +44,18 @@ import org.matsim.pt.PtConstants;
  */
 public class TransitActsRemover implements PlanAlgorithm {
 
+
 	public void run(final Plan plan) {
+		run(plan,false);
+	}
+
+	public void run(final Plan plan, boolean treatAccessEgressAsTransit) {
+		List<String> accessModes = new ArrayList<>();
+		accessModes.add(TransportMode.transit_walk);
+		if (treatAccessEgressAsTransit){
+			accessModes.add(TransportMode.access_walk);
+			accessModes.add(TransportMode.egress_walk);
+		}
 		List<PlanElement> planElements = plan.getPlanElements();
 		for (int i = 0, n = planElements.size(); i < n; i++) {
 			PlanElement pe = planElements.get(i);
@@ -57,7 +69,7 @@ public class TransitActsRemover implements PlanAlgorithm {
 				}
 			} else if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;
-				if (TransportMode.transit_walk.equals(leg.getMode())) {
+				if (accessModes.contains(leg.getMode())) {
 					leg.setMode(TransportMode.pt);
 					leg.setRoute(null);
 				}

@@ -25,7 +25,7 @@ package org.matsim.contrib.locationchoice;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
@@ -34,12 +34,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
-import javax.inject.Provider;
 
 public class RunLocationChoiceFrozenEpsilons {
 	private static final String MY_LOCATION_CHOICE = "MyLocationChoice";
@@ -65,9 +61,9 @@ public class RunLocationChoiceFrozenEpsilons {
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		final DestinationChoiceBestResponseContext lcContext = new DestinationChoiceBestResponseContext(scenario) ;
+		final DestinationChoiceContext lcContext = new DestinationChoiceContext(scenario) ;
 		lcContext.init();
-		scenario.addScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME, lcContext);
+		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME, lcContext);
 
 		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
 		computer.readOrCreateMaxDCScore(config, lcContext.kValsAreRead());

@@ -63,11 +63,11 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		Schedule schedule = vehicle.getSchedule();
 		@SuppressWarnings("unchecked")
 		List<DrtTask> tasks = (List<DrtTask>)schedule.getTasks();
-		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
 
 		LinkTimePair start;
 		int nextTaskIdx;
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
+			DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
 			switch (currentTask.getDrtTaskType()) {
 				case DRIVE:
 					DrtDriveTask driveTask = (DrtDriveTask)currentTask;

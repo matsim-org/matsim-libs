@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IntergreenTimes
+ * DefaultTravelCostCalculatorFactoryImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +17,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.data.ambertimes.v10;
+package org.matsim.contrib.decongestion.routing;
 
-import java.util.Map;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
-import org.matsim.contrib.signals.model.SignalSystem;
+import com.google.inject.Inject;
 
+import org.matsim.contrib.decongestion.data.DecongestionInfo;
 
 
 /**
- * @author dgrether
+ * @author ikaddoura
  *
  */
-public interface IntergreenTimesData extends MatsimToplevelContainer  {
+public final class TollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
+	private static final Logger log = Logger.getLogger(TollTimeDistanceTravelDisutilityFactory.class);
+
+	private double sigma = 0. ;
 	
-	public IntergreensForSignalSystemData addIntergreensForSignalSystem(IntergreensForSignalSystemData intergreens);
+	@Inject
+	private Scenario scenario;
 	
-	public Map<Id<SignalSystem>, IntergreensForSignalSystemData> getIntergreensForSignalSystemDataMap();
-	
+	@Inject
+	private DecongestionInfo info;
+		
+	public TollTimeDistanceTravelDisutilityFactory() {
+		log.info("Using the toll-adjusted travel disutility factory in the decongestion package.");
+	}
+
 	@Override
-	public IntergreenTimesDataFactory getFactory() ;
+	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
+		return new TollTimeDistanceTravelDisutility(timeCalculator, scenario.getConfig().planCalcScore(), this.sigma, info);
+	}
 	
-	public void setFactory(IntergreenTimesDataFactory factory);
-	
+	public void setSigma ( double val ) {
+		this.sigma = val;
+	}
+
 }

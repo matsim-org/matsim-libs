@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.EpsilonDistributionTypes;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
 import org.matsim.core.config.Config;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributesUtils;
@@ -40,9 +40,9 @@ public class DestinationScoring {
 	private double[] facilitiesKValuesArray;
 	private double[] personsKValuesArray;
 	private ScaleEpsilon scaleEpsilon;
-	private DestinationChoiceBestResponseContext lcContext;
+	private DestinationChoiceContext lcContext;
 		
-	public DestinationScoring(DestinationChoiceBestResponseContext lcContext) {
+	public DestinationScoring(DestinationChoiceContext lcContext) {
 		this.config = lcContext.getScenario().getConfig();
 		this.dccg = (DestinationChoiceConfigGroup) this.config.getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		this.facilitiesKValuesArray = lcContext.getFacilitiesKValuesArray();

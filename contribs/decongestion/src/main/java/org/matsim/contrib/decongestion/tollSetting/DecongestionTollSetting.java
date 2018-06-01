@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IntergreenTimesDataFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,19 +16,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.data.ambertimes.v10;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.contrib.signals.model.SignalSystem;
-
+package org.matsim.contrib.decongestion.tollSetting;
 
 /**
- * @author dgrether
- *
+ * Computes the initial tolls per link and time bin and updates the tolls.
+ * 
+ * @author ikaddoura
  */
-public interface IntergreenTimesDataFactory extends MatsimFactory {
 
-	public IntergreensForSignalSystemData createIntergreensForSignalSystem(Id<SignalSystem> signalSystemId);
+public interface DecongestionTollSetting {
 	
+	public void updateTolls();
 }
+

@@ -21,12 +21,14 @@ package org.matsim.contrib.signals.data;
 
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesDataImpl;
+import org.matsim.contrib.signals.data.conflicts.ConflictData;
+import org.matsim.contrib.signals.data.conflicts.ConflictDataImpl;
+import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesData;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesDataImpl;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsDataImpl;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataImpl;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesData;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
@@ -43,6 +45,7 @@ public class SignalsDataImpl implements SignalsData {
 	private SignalControlData signalcontroldata;
 	private AmberTimesData ambertimesdata = null;
 	private IntergreenTimesData intergreensdata = null;
+	private ConflictData conflictData = null;
 	
 	public SignalsDataImpl(SignalSystemsConfigGroup signalConfig){
 		this.initContainers(signalConfig);
@@ -57,6 +60,9 @@ public class SignalsDataImpl implements SignalsData {
 		}
 		if (signalConfig.isUseIntergreenTimes()) {
 			this.intergreensdata = new IntergreenTimesDataImpl();
+		}
+		if (signalConfig.isUseConflictingDirections()) {
+			this.conflictData = new ConflictDataImpl();
 		}
 	}
 	
@@ -84,6 +90,11 @@ public class SignalsDataImpl implements SignalsData {
 	@Override
 	public SignalSystemsData getSignalSystemsData() {
 		return this.signalsystemsdata;
+	}
+
+	@Override
+	public ConflictData getConflictingDirectionsData() {
+		return this.conflictData;
 	}
 
 }

@@ -38,10 +38,13 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	public static final String SIGNALGROUPS_FILE = "signalgroups";
 	public static final String USE_AMBER_TIMES = "useAmbertimes";
 	public static final String AMBERTIMES_FILE = "ambertimes";
+	public static final String CONFLICTING_DIRECTIONS_FILE = "conflictingDirections";
+	public static final String USE_CONFLICTING_DIRECTIONS = "useConflictingDirections";	
 	public static final String INTERGREENTIMES_FILE = "intergreentimes";
 	public static final String USE_INTERGREEN_TIMES = "useIntergreentimes";
 	public static final String ACTION_ON_INTERGREEN_VIOLATION = "actionOnIntergreenViolation";
-	public enum ActionOnIntergreenViolation{
+	public static final String ACTION_ON_CONFLICTING_DIRECTION_VIOLATION = "actionOnConflictingDirectionViolation";
+	public enum ActionOnSignalSpecsViolation{
 		WARN, EXCEPTION
 	}
 
@@ -50,10 +53,13 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	private String signalGroupsFile;
 	private String amberTimesFile;
 	private String intergreenTimesFile;
+	private String conflictingDirectionsFile;
 	private boolean useIntergreens = false;
 	private boolean useAmbertimes = false;
 	private boolean useSignalSystems = false;
-	private ActionOnIntergreenViolation actionOnIntergreenViolation = ActionOnIntergreenViolation.WARN;
+	private boolean useConflictingDirections = false;
+	private ActionOnSignalSpecsViolation actionOnIntergreenViolation = ActionOnSignalSpecsViolation.WARN;
+	private ActionOnSignalSpecsViolation actionOnConflictingDirectionViolation = ActionOnSignalSpecsViolation.WARN;
 	
 	public SignalSystemsConfigGroup() {
 		super(GROUPNAME);
@@ -116,6 +122,16 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	public void setSignalControlFile(String signalControlFile){
 		this.signalControlFile = signalControlFile;
 	}
+	
+	@StringGetter( CONFLICTING_DIRECTIONS_FILE )
+	public String getConflictingDirectionsFile() {
+		return this.conflictingDirectionsFile;
+	}
+	
+	@StringSetter( CONFLICTING_DIRECTIONS_FILE )
+	public void setConflictingDirectionsFile(String conflictingDirectionsFile){
+		this.conflictingDirectionsFile = conflictingDirectionsFile;
+	}
 
 	@StringGetter( USE_INTERGREEN_TIMES )
 	public boolean isUseIntergreenTimes() {
@@ -128,12 +144,12 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	@StringGetter( ACTION_ON_INTERGREEN_VIOLATION )
-	public ActionOnIntergreenViolation getActionOnIntergreenViolation() {
+	public ActionOnSignalSpecsViolation getActionOnIntergreenViolation() {
 		return actionOnIntergreenViolation;
 	}
 
 	@StringSetter( ACTION_ON_INTERGREEN_VIOLATION )
-	public void setActionOnIntergreenViolation(ActionOnIntergreenViolation actionOnIntergreenViolation) {
+	public void setActionOnIntergreenViolation(ActionOnSignalSpecsViolation actionOnIntergreenViolation) {
 		switch (actionOnIntergreenViolation){
 		// set the value for the supported actions
 		case WARN:
@@ -144,6 +160,26 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 		default:
 			throw new IllegalArgumentException("The value " + actionOnIntergreenViolation 
 					+ " for key : " + ACTION_ON_INTERGREEN_VIOLATION + " is not supported by this config group");
+		}
+	}
+	
+	@StringGetter( ACTION_ON_CONFLICTING_DIRECTION_VIOLATION )
+	public ActionOnSignalSpecsViolation getActionOnConflictingDirectionViolation() {
+		return actionOnConflictingDirectionViolation;
+	}
+
+	@StringSetter( ACTION_ON_CONFLICTING_DIRECTION_VIOLATION )
+	public void setActionOnConflictingDirectionViolation(ActionOnSignalSpecsViolation actionOnConflictingDirectionViolation) {
+		switch (actionOnConflictingDirectionViolation){
+		// set the value for the supported actions
+		case WARN:
+		case EXCEPTION:
+			this.actionOnConflictingDirectionViolation = actionOnConflictingDirectionViolation;
+			break;
+		// throw an exception if the value is not supported
+		default:
+			throw new IllegalArgumentException("The value " + actionOnConflictingDirectionViolation 
+					+ " for key : " + ACTION_ON_CONFLICTING_DIRECTION_VIOLATION + " is not supported by this config group");
 		}
 	}
 	
@@ -166,4 +202,15 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	public void setUseSignalSystems(final boolean useSignalSystems) {
 		this.useSignalSystems = useSignalSystems;
 	}
+	
+	@StringGetter( USE_CONFLICTING_DIRECTIONS )
+	public boolean isUseConflictingDirections() {
+		return this.useConflictingDirections;
+	}
+	
+	@StringSetter( USE_CONFLICTING_DIRECTIONS )
+	public void setUseConflictingDirections(boolean useConflictingDirections){
+		this.useConflictingDirections = useConflictingDirections;
+	}
 }
+

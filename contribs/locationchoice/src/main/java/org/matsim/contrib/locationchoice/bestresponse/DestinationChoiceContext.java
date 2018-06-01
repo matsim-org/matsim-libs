@@ -42,6 +42,7 @@ import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.router.priorityqueue.HasIndex;
 import org.matsim.core.scoring.functions.ScoringParameters;
@@ -60,9 +61,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author nagel
  *
  */
-public class DestinationChoiceBestResponseContext implements MatsimToplevelContainer {
+public class DestinationChoiceContext implements MatsimToplevelContainer {
 	
-	private static final Logger log = Logger.getLogger(DestinationChoiceBestResponseContext.class);
+	private static final Logger log = Logger.getLogger(DestinationChoiceContext.class);
 	
 	public static final String ELEMENT_NAME = "DestinationChoiceBestResponseContext";
 	
@@ -97,7 +98,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	private Map<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new HashMap<String, QuadTree<ActivityFacilityWithIndex>>();
 	private TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	
-	public DestinationChoiceBestResponseContext(Scenario scenario) {
+	public DestinationChoiceContext(Scenario scenario) {
 		this.scenario = scenario;	
 		log.info("dc context created but not yet initialized");
 		//this.init(); // actually wanted to leave this away to be able to create but not yet fill the context.
@@ -105,8 +106,8 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	
 	public void init() {
 		this.params = new ScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build();
-	this.dccg = (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
-	ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.dccg);
+		this.dccg = ConfigUtils.addOrGetModule( this.scenario.getConfig(), DestinationChoiceConfigGroup.class );
+		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.dccg);
 		this.scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
 		this.actTypeConverter = defineFlexibleActivities.getConverter();
 		this.flexibleTypes = defineFlexibleActivities.getFlexibleTypes();

@@ -64,6 +64,11 @@ public class InsertionGenerator {
 			this.pickupIdx = pickupIdx;
 			this.dropoffIdx = dropoffIdx;
 		}
+
+		@Override
+		public String toString() {
+			return "[pickupIdx=" + pickupIdx + "][dropoffIdx=" + dropoffIdx + "]";
+		}
 	}
 
 	public List<Insertion> generateInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry) {
