@@ -392,8 +392,9 @@ import java.util.Stack;
 		if (atts.getValue("distance") != null) {
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("distance")));
 		}
-		if (atts.getValue("vehicleRefId") != null && this.currRoute instanceof NetworkRoute ) {
-			((NetworkRoute)this.currRoute).setVehicleId(Id.create(atts.getValue("vehicleRefId"), Vehicle.class));
+		final String vehicleRefId = atts.getValue("vehicleRefId");
+		if (vehicleRefId != null && !vehicleRefId.equals("null") && this.currRoute instanceof NetworkRoute ) {
+			((NetworkRoute)this.currRoute).setVehicleId(Id.create(vehicleRefId, Vehicle.class));
 		}
 	}
 
