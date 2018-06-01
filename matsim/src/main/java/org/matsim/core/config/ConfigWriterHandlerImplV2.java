@@ -28,23 +28,37 @@ import static org.matsim.core.config.ConfigV2XmlNames.TYPE;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigWriter.Verbosity;
 import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author thibautd
  */
-class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
+class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 
 	private String newline = "\n";
-
-	private final Config comparisonConfig = ConfigUtils.createConfig() ;
-
+	
+	/**
+	 * So we can write only what deviates from the default.
+	 * Implementation of this functionality unfortunately became quite messy.
+	 * kai, may'18
+	 */
 	private final Verbosity verbosity;
 	
 	ConfigWriterHandlerImplV2( Verbosity verbosity ) {
@@ -57,16 +71,13 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 			final String moduleTag,
 			final String moduleNameAtt,
 			final String moduleName,
-			final ConfigGroup module) {
+			final ConfigGroup module,
+			final ConfigGroup comparisonModule ) {
 		Map<String, String> params = module.getParams();
 		Map<String, String> comments = module.getComments();
 
 		try {
-//			writer.write( this.newline );
-			writer.write( indent );
-			writer.write("\t<"+moduleTag);
-			writer.write(" "+moduleNameAtt+"=\"" + moduleName + "\" >");
-			writer.write( this.newline );
+			boolean headerHasBeenWritten=false ;
 			
 //			boolean lastHadComment = false;
 
@@ -74,16 +85,24 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 				
 				final String actual = entry.getValue();
 				if ( verbosity==Verbosity.minimal ) {
-					final String defaultValue = comparisonConfig.findParam(moduleName, entry.getKey());
-					if ( actual.equals( defaultValue ) ) {
-						continue ;
-					}
+					if ( comparisonModule!=null ) {
+						final String defaultValue = comparisonModule.getParams().get( entry.getKey() ) ;
+						if (actual.equals(defaultValue)) {
+							continue;
+						}
 //					if ( actual==null && defaultValue.equals("null") ) {
 //						continue ;
 //					}
+					}
 				}
 				
+				if ( !headerHasBeenWritten ) {
+					headerHasBeenWritten = true ;
+					writeHeader(writer, indent, moduleTag, moduleNameAtt, moduleName, newline);
+				}
+
 				if (comments.get(entry.getKey()) != null) {
+
 //					writer.write( this.newline );
 					writer.write( indent );
 					writer.write( "\t\t<!-- " + comments.get(entry.getKey()) + " -->");
@@ -101,29 +120,94 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 			}
 
 			for ( Entry<String, ? extends Collection<? extends ConfigGroup>> entry : module.getParameterSets().entrySet() ) {
+				Collection<? extends ConfigGroup> comparisonSets = new ArrayList<>() ;
+				if ( comparisonModule != null ) {
+					comparisonSets = comparisonModule.getParameterSets(entry.getKey());
+				};
+//				for ( ConfigGroup set : comparisonSets ) {
+//					Logger.getLogger(this.getClass()).warn( set ) ;
+//				}
 				for ( ConfigGroup pSet : entry.getValue() ) {
+//					Logger.getLogger(this.getClass()).warn( comparisonSets ) ;
+					ConfigGroup comparisonPSet = null ;
+					for ( ConfigGroup cg : comparisonSets ) {
+						if ( sameType( pSet, cg ) ) {
+							comparisonPSet = cg ;
+							break ;
+						}
+					}
+					if ( comparisonPSet==null ) {
+						if ( pSet instanceof ScoringParameterSet ) {
+							comparisonPSet = ((PlanCalcScoreConfigGroup)comparisonModule).getOrCreateScoringParameters( ((ScoringParameterSet)pSet).getSubpopulation()) ;
+						} else {
+							comparisonPSet = pSet.getClass().newInstance();
+						}
+					}
+//					Logger.getLogger(this.getClass()).warn( "comparisonPSet=" + comparisonPSet ) ;
 					// TODO: write comments only for the first parameter set of a given type?
-					writeModule(
-							writer,
-							indent+"\t",
-							PARAMETER_SET,
-							TYPE,
-							entry.getKey(),
-							pSet );
+					if ( !headerHasBeenWritten ) {
+						headerHasBeenWritten = true ;
+						writeHeader(writer, indent, moduleTag, moduleNameAtt, moduleName, newline);
+					}
+					writeModule(writer, indent+"\t", PARAMETER_SET, TYPE, entry.getKey(), pSet, comparisonPSet );
 				}
 			}
 
-			writer.write( indent );
-			writer.write("\t</"+moduleTag+">");
-			writer.write( this.newline );
+			if ( headerHasBeenWritten ) {
+				writer.write(indent);
+				writer.write("\t</" + moduleTag + ">");
+				writer.write(this.newline);
+			}
 
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
 		}
 	}
-
+	
+	private static void writeHeader(BufferedWriter writer, String indent, String moduleTag, String moduleNameAtt, String moduleName, String newline) throws IOException {
+		//			writer.write( this.newline );
+		writer.write( indent );
+		writer.write("\t<"+moduleTag);
+		writer.write(" "+moduleNameAtt+"=\"" + moduleName + "\" >");
+		writer.write( newline );
+	}
+	
+	private static boolean sameType(ConfigGroup pSet, ConfigGroup cg) {
+		if ( ! ( pSet.getName().equals( cg.getName() ) ) ) {
+			return false;
+		}
+		if ( pSet instanceof ModeRoutingParams ) {
+			// (these are the "teleportedRouteParameters" in config.xml)
+			if ( ((ModeRoutingParams)pSet).getMode().equals( ((ModeRoutingParams)cg).getMode() ) ) {
+				return true ;
+			}
+		}
+		if ( pSet instanceof ScoringParameterSet ) {
+			return true ;
+		}
+		if ( pSet instanceof ModeParams ) {
+			if ( ((ModeParams)pSet).getMode().equals( ((ModeParams)cg).getMode() ) ) {
+				return true ;
+			}
+		}
+		if ( pSet instanceof ActivityParams ) {
+			if ( ((ActivityParams)pSet).getActivityType().equals( ((ActivityParams)cg).getActivityType() ) ) {
+				return true ;
+			}
+		}
+		if ( pSet instanceof StrategySettings ) {
+			return true ;
+			// yy this will not work since there is no corresponding default entry!  kai, may'18
+		}
+		return false ;
+	}
+	
 	@Override
-	public void startConfig(
+	 void startConfig(
 			final Config config,
 			final BufferedWriter out) {
 		try {
@@ -136,7 +220,7 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 	}
 
 	@Override
-	public void endConfig(
+	 void endConfig(
 			final BufferedWriter out) {
 		try {
 			out.write( this.newline );
@@ -148,24 +232,29 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 	}
 
 	@Override
-	public void writeModule(
+	 void writeModule(
 			final ConfigGroup module,
 			final BufferedWriter out) {
 		if ( ! (module instanceof ChangeLegModeConfigGroup) ) {
 			// yyyy special case to provide error message; may be removed eventually.  kai, may'16
 			
+			final ConfigGroup comparisonConfig = ConfigUtils.createConfig().getModules().get(module.getName());
+			// preference to generate this here multiple times to avoid having it as a field. kai, may'18
+			
 			writeModule(
-				out,
-				"",
-				MODULE,
-				NAME,
-				module.getName(),
-				module );
+					out,
+					"",
+					MODULE,
+					NAME,
+					module.getName(),
+					module,
+					comparisonConfig
+			);
 		}
 	}
 
 	@Override
-	public void writeSeparator(final BufferedWriter out) {
+	 void writeSeparator(final BufferedWriter out) {
 		try {
 //			out.write( this.newline );
 			out.write("<!-- ====================================================================== -->");
@@ -177,7 +266,7 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 
 
 	@Override
-	public String setNewline(final String newline) {
+	 String setNewline(final String newline) {
 		String former = this.newline;
 		this.newline  = newline;
 		return former;

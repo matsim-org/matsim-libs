@@ -78,7 +78,8 @@ public final class Controler implements ControlerI, MatsimServices {
 	public static final String FILENAME_HOUSEHOLDS = "output_households.xml.gz";
 	public static final String FILENAME_LANES = "output_lanes.xml.gz";
 	public static final String FILENAME_CONFIG = "output_config.xml";
-	public static final String FILENAME_PERSON_ATTRIBUTES = "output_personAttributes.xml.gz" ; 
+	public static final String FILENAME_CONFIG_REDUCED = "output_config_reduced.xml";
+	public static final String FILENAME_PERSON_ATTRIBUTES = "output_personAttributes.xml.gz" ;
 	public static final String FILENAME_COUNTS = "output_counts.xml.gz" ;
 	public static final String DIVIDER = "###################################################";
 	
