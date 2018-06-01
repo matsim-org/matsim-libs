@@ -70,7 +70,7 @@ public class StrategyManager implements MatsimManager {
 			// now check if this modules should be disabled after some iterations
 			int maxIter = settings.getDisableAfter();
 			if ( maxIter > globalInnovationDisableAfter || maxIter==-1 ) {
-				if (!PlanStrategies.isOnlySelector(strategy)) {
+				if (!ReplanningUtils.isOnlySelector(strategy)) {
 					maxIter = globalInnovationDisableAfter ;
 				}
 			}
