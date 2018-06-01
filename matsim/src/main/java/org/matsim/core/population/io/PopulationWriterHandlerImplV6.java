@@ -22,13 +22,16 @@ package org.matsim.core.population.io;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
+import org.matsim.vehicles.Vehicle;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -247,6 +250,16 @@ import java.util.Map;
 		out.write(" distance=\"");
 		out.write(Double.toString(route.getDistance()));
 		out.write("\"");
+		if ( route instanceof NetworkRoute) {
+			out.write(" vehicleId=\"");
+			final Id<Vehicle> vehicleId = ((NetworkRoute) route).getVehicleId();
+			if ( vehicleId==null ) {
+				out.write("null");
+			} else {
+				out.write( vehicleId.toString() ) ;
+			}
+			out.write("\"");
+		}
 		out.write(">");
 		String rd = route.getRouteDescription();
 		if (rd != null) {

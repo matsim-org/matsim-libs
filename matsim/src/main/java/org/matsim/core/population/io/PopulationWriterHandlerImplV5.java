@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
@@ -248,6 +249,11 @@ import java.io.IOException;
 		out.write(" distance=\"");
 		out.write(Double.toString(route.getDistance()));
 		out.write("\"");
+		if ( route instanceof NetworkRoute ) {
+			out.write(" vehicleId=\"");
+			out.write( ((NetworkRoute) route).getVehicleId().toString() ) ;
+			out.write("\"");
+		}
 		out.write(">");
 		String rd = route.getRouteDescription();
 		if (rd != null) {
