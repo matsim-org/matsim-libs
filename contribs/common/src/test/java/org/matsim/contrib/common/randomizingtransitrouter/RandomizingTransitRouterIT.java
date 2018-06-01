@@ -114,7 +114,7 @@ public class RandomizingTransitRouterIT {
 		}
 		{
 			StrategySettings stratSets = new StrategySettings(ConfigUtils.createAvailableStrategyId(config)) ;
-			stratSets.setStrategyName( DefaultStrategy.ReRoute.name() );
+			stratSets.setStrategyName( DefaultStrategy.ReRoute.toString() );
 			stratSets.setWeight(0.1);
 			config.strategy().addStrategySettings(stratSets);
 		}

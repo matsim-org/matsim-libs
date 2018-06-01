@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.decongestion.data;
 
@@ -26,16 +26,18 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.charts.XYLineChart;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
 /**
- * 
+ *
  * @author ikaddoura
  *
  */
@@ -43,7 +45,7 @@ public class CongestionInfoWriter {
 	private static final Logger log = Logger.getLogger(CongestionInfoWriter.class);
 	
 	public static void writeDelays(DecongestionInfo congestionInfo, int iteration, String outputPath) {
-				
+		
 		String outputPathCongestionInfo = outputPath;
 		File dir = new File(outputPathCongestionInfo);
 		dir.mkdirs();
@@ -70,7 +72,7 @@ public class CongestionInfoWriter {
 				bw.write(linkId.toString());
 				
 				for (int i = 0; i < totalNumberOfTimeBins; i++) {
-										
+					
 					double timeBinValue1 = 0.;
 					if (congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().containsKey(i)) {
 						timeBinValue1 = congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().get(i);
@@ -91,11 +93,11 @@ public class CongestionInfoWriter {
 		
 		if (congestionInfo.getDecongestionConfigGroup().isWriteLinkInfoCharts()) {
 			log.info("Writing png file...");
-
+			
 			XYLineChart chart = new XYLineChart("Iteration " + iteration, "Time of day [hours]", "Average delay [seconds]");
 			
 			int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
-							
+			
 			double[] timeBins = new double[totalNumberOfTimeBins];
 			for (int i = 0; i < totalNumberOfTimeBins; i++) {
 				double timeInterval = (i + 1) * congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
@@ -104,7 +106,7 @@ public class CongestionInfoWriter {
 			
 			for (Id<Link> linkId : congestionInfo.getlinkInfos().keySet()) {
 				
-				double[] values = new double[totalNumberOfTimeBins];	
+				double[] values = new double[totalNumberOfTimeBins];
 				boolean isEmpty = true;
 				
 				for (Integer i : congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().keySet()) {
@@ -117,12 +119,16 @@ public class CongestionInfoWriter {
 			}
 			chart.saveAsPng(outputPathCongestionInfo + "delays_perLinkAndTimeBin.png", 800, 600);
 			log.info("Output written to " + outputPathCongestionInfo + "delays_perLinkAndTimeBin.png");
-
+			
 		}
 		
 	}
 	
 	public static void writeTolls(DecongestionInfo congestionInfo, int iteration, String outputPath) {
+		writeTolls4Excel(congestionInfo, iteration, outputPath);
+		writeFile4Via(congestionInfo, iteration, outputPath);
+	}
+	private static void writeTolls4Excel(DecongestionInfo congestionInfo, int iteration, String outputPath) {
 		
 		String outputPathCongestionInfo = outputPath;
 		File dir = new File(outputPathCongestionInfo);
@@ -150,7 +156,7 @@ public class CongestionInfoWriter {
 				bw.write(linkId.toString());
 				
 				for (int i = 0; i < totalNumberOfTimeBins; i++) {
-										
+					
 					double toll = 0.;
 					if (congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(i)) {
 						toll = congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(i);
@@ -174,7 +180,7 @@ public class CongestionInfoWriter {
 			XYLineChart chart = new XYLineChart("Iteration " + iteration, "Time of day [hours]", "Toll [monetary units]");
 			
 			int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
-							
+			
 			double[] timeBins = new double[totalNumberOfTimeBins];
 			for (int i = 0; i < totalNumberOfTimeBins; i++) {
 				double timeInterval = (i + 1) * congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
@@ -183,7 +189,7 @@ public class CongestionInfoWriter {
 			
 			for (Id<Link> linkId : congestionInfo.getlinkInfos().keySet()) {
 				
-				double[] values = new double[totalNumberOfTimeBins];	
+				double[] values = new double[totalNumberOfTimeBins];
 				boolean isEmpty = true;
 				
 				for (Integer i : congestionInfo.getlinkInfos().get(linkId).getTime2toll().keySet()) {
@@ -196,6 +202,68 @@ public class CongestionInfoWriter {
 			}
 			chart.saveAsPng(outputPathCongestionInfo + "toll_perLinkAndTimeBin.png", 800, 600);
 		}
+	}
+	private static void writeFile4Via(DecongestionInfo congestionInfo, int iteration, String outputPath) {
+		
+		String outputPathCongestionInfo = outputPath;
+		File dir = new File(outputPathCongestionInfo);
+		dir.mkdirs();
+		
+		log.info("Writing csv file...");
+		
+		
+		String fileName2 = outputPathCongestionInfo + iteration + ".decongestion_info_via.csv.gz";
+//		File file2 = new File(fileName2);
+		
+		try {
+//			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+			BufferedWriter bw = IOUtils.getBufferedWriter(fileName2);
+			
+			int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+			
+			bw.write("id;time;delay;toll");
+			bw.newLine();
+
+			for (int timeBin = 0; timeBin < totalNumberOfTimeBins; timeBin++) {
+				double timeInterval = timeBin * congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
+				// (in via (and most other softwares), I need the beginning of the interval in the data, not the end.  Thus, not "(timeBin+1)*...".  kai, may'18
+				
+				for ( Map.Entry<Id<Link>,LinkInfo> entry : congestionInfo.getlinkInfos().entrySet() ) {
+					Double delay = entry.getValue().getTime2avgDelay().get(timeBin);
+					Double toll = entry.getValue().getTime2toll().get(timeBin) ;
+					
+//					if ( (delay!=null && delay!=0.) || (toll!=null && toll!=0.) ) {
+					// otherwise time-dep display in VIA will not switch back to 0. kai, may'18
+						
+						bw.write(entry.getKey().toString());
+						bw.write(";" );
+//						bw.write(Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+						bw.write( Double.toString(timeInterval) ) ;
+						
+						if ( delay != null ) {
+							bw.write(";"+delay) ;
+						} else {
+							bw.write(";0.") ;
+						}
+
+						if (toll != null) {
+							bw.write(";" + toll);
+						} else {
+							bw.write(";0." );
+						}
+						
+						bw.newLine();
+//					}
+				}
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName2);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public static void writeIterationStats(
@@ -216,12 +284,12 @@ public class CongestionInfoWriter {
 			
 			for (Integer iteration : iteration2totalDelay.keySet()) {
 				bw.write(iteration + " ; "
-						+ iteration2totalDelay.get(iteration) / 3600. + " ; "
-						+ iteration2totalTollPayments.get(iteration) + " ; "
-						+ iteration2totalTravelTime.get(iteration) / 3600. + " ; "
-						+ iteration2userBenefits.get(iteration) + ";"
-						+ (iteration2totalTollPayments.get(iteration) + iteration2userBenefits.get(iteration))
-						);
+								 + iteration2totalDelay.get(iteration) / 3600. + " ; "
+								 + iteration2totalTollPayments.get(iteration) + " ; "
+								 + iteration2totalTravelTime.get(iteration) / 3600. + " ; "
+								 + iteration2userBenefits.get(iteration) + ";"
+								 + (iteration2totalTollPayments.get(iteration) + iteration2userBenefits.get(iteration))
+				);
 				bw.newLine();
 			}
 			
