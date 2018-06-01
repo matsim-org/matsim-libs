@@ -145,7 +145,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 							break ;
 						}
 					}
-					if ( comparisonPSet==null ) {
+					if ( verbosity==Verbosity.minimal && comparisonPSet==null ) {
 						if ( pSet instanceof ScoringParameterSet ) {
 							comparisonPSet = ((PlanCalcScoreConfigGroup) comparisonModule).getOrCreateScoringParameters(((ScoringParameterSet) pSet).getSubpopulation());
 						} else {
@@ -250,8 +250,12 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 		if ( ! (module instanceof ChangeLegModeConfigGroup) ) {
 			// yyyy special case to provide error message; may be removed eventually.  kai, may'16
 			
-			final ConfigGroup comparisonConfig = ConfigUtils.createConfig().getModules().get(module.getName());
-			// preference to generate this here multiple times to avoid having it as a field. kai, may'18
+			
+			ConfigGroup comparisonConfig = null ;
+			if ( verbosity==Verbosity.minimal) {
+				comparisonConfig = ConfigUtils.createConfig().getModules().get(module.getName());
+				// preference to generate this here multiple times to avoid having it as a field. kai, may'18
+			}
 			
 			writeModule(
 					out,
