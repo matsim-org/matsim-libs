@@ -320,8 +320,6 @@ public final class CreatePStopsOutsideJunctionAreas{
 		/* TODO: There is a problem with reproducibility with setting a threshold distance in NetworkSimplifier. Find other solution for bus stop spacing. */
 		simplifier.run(newClusteredIntersectionsRoadNetwork, stopDistance);
 		new NetworkCleaner().run(newClusteredIntersectionsRoadNetwork);
-
-		new NetworkWriter(newClusteredIntersectionsRoadNetwork).write("intersectionSimplifierNet.xml");
 		
 		return(newClusteredIntersectionsRoadNetwork);
 	}
