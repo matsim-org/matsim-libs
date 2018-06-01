@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.replanning.modules.ChangeLegMode;
+import org.matsim.core.replanning.modules.ChangeSingleLegMode;
 import org.matsim.core.replanning.selectors.*;
 
 import javax.inject.Inject;
@@ -126,18 +128,27 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
         }
     }
 
-    public static interface DefaultSelector { 
-	    final String KeepLastSelected="KeepLastSelected" ;
-	    final String BestScore="BestScore";
-	    final String ChangeExpBeta="ChangeExpBeta"; 
-	    final String SelectExpBeta="SelectExpBeta";
-	    final String SelectRandom="SelectRandom";
-	    final String SelectPathSizeLogit="SelectPathSizeLogit" ; 
+    public interface DefaultSelector {
+	    String KeepLastSelected="KeepLastSelected" ;
+	    String BestScore="BestScore";
+	    String ChangeExpBeta="ChangeExpBeta";
+	    String SelectExpBeta="SelectExpBeta";
+	    String SelectRandom="SelectRandom";
+	    String SelectPathSizeLogit="SelectPathSizeLogit" ;
     }
     
 
-    public static enum DefaultStrategy { ReRoute, TimeAllocationMutator, @Deprecated ChangeLegMode, TimeAllocationMutator_ReRoute, 
-    	@Deprecated ChangeSingleLegMode, ChangeSingleTripMode, SubtourModeChoice, ChangeTripMode, @Deprecated TripSubtourModeChoice }
+    public interface DefaultStrategy {
+        String ReRoute="ReRoute";
+        String TimeAllocationMutator="TimeAllocationMutator";
+        @Deprecated String ChangeLegMode="ChangeLegMode";
+        String TimeAllocationMutator_ReRoute="TimeAllocationMutator_ReRoute" ;
+    	@Deprecated String ChangeSingleLegMode = "ChangeSingleLegMode" ;
+    	String ChangeSingleTripMode="ChangeSingleTripMode" ;
+    	String SubtourModeChoice = "SubtourModeChoice" ;
+    	String ChangeTripMode = "ChangeTripMode" ;
+    	@Deprecated String TripSubtourModeChoice = "TripSubtourModeChoice" ;
+    }
     
     // yyyy Why are the following always implementing Providers of the full implementations, and not just the interface 
     // (i.e. Provider<GenericPlanSelector<Plan,Person>)?  kai, jan'15

@@ -41,8 +41,8 @@ import org.matsim.contrib.decongestion.DecongestionConfigGroup;
 
 public class DecongestionInfo {
 		
-	@Inject
-	private Scenario scenario;
+	@Inject private Scenario scenario;
+	@Inject private DecongestionConfigGroup decongestionConfigGroup ;
 	
 	private final Map<Id<Link>, LinkInfo> linkId2info = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>();
@@ -60,7 +60,8 @@ public class DecongestionInfo {
 	}
 
 	public DecongestionConfigGroup getDecongestionConfigGroup() {
-		return ConfigUtils.addOrGetModule(scenario.getConfig(), DecongestionConfigGroup.class);
+//		return ConfigUtils.addOrGetModule(scenario.getConfig(), DecongestionConfigGroup.class);
+		return decongestionConfigGroup ;
 	}
 
 }

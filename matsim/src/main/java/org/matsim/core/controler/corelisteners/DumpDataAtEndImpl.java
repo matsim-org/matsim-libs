@@ -148,7 +148,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			}
 		} catch ( Exception ee ) {
 			Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
-					+ "generated in the final iteration", ee);
+					+ "generated in the final iteration" );
 		}
 	}
 
@@ -287,6 +287,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private void dumpConfig() {
 		// dump config
 		new ConfigWriter(config).write(controlerIO.getOutputFilename(Controler.FILENAME_CONFIG));
+		new ConfigWriter(config, ConfigWriter.Verbosity.minimal).write(controlerIO.getOutputFilename(Controler.FILENAME_CONFIG_REDUCED));
 	}
 
 	private void dumpNetwork() {
