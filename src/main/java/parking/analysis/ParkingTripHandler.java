@@ -18,31 +18,12 @@
   
 package parking.analysis;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -51,11 +32,15 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
-
-import com.google.inject.Inject;
-
 import parking.ParkingZone;
 import parking.ZonalLinkParkingInfo;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ParkingTripHandler implements LinkEnterEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, ActivityEndEventHandler, ActivityStartEventHandler, TeleportationArrivalEventHandler, PersonEntersVehicleEventHandler {
 
@@ -110,7 +95,7 @@ public class ParkingTripHandler implements LinkEnterEventHandler, PersonArrivalE
 		if (!event.getActType().endsWith("parkingSearch")) {
 			previousActivity.put(event.getPersonId(), event);
 		} else  {
-			this.parkTrips.get(event.getPersonId()).parkMode = true;
+//			this.parkTrips.get(event.getPersonId()).parkMode = true;
 		}
 	}
 
@@ -165,6 +150,7 @@ public class ParkingTripHandler implements LinkEnterEventHandler, PersonArrivalE
 				trip.parkLegArrivalTime = event.getTime();
 			} else {
 				trip.carLegArrivalTime = event.getTime();
+                trip.parkMode = true;
 			}
 		} else if (event.getLegMode().equals(TransportMode.egress_walk)) {
 			if (parkTrips.containsKey(event.getPersonId())) {
@@ -213,7 +199,7 @@ public class ParkingTripHandler implements LinkEnterEventHandler, PersonArrivalE
 	public void writeParkingTrips(String file){
 		BufferedWriter bw = IOUtils.getBufferedWriter(file);
 		try {
-			bw.write("personId"+s+"previousActivity"+s+"fromLink"+s+"fromX"+s+"fromY"+s+"nextActivity"+s+"toX"+s+"toY"+s+"toZone"+s+"departureTime"+
+            bw.write("personId" + s + "previousActivity" + s + "fromLink" + s + "fromX" + s + "fromY" + s + "nextActivity" + s + "toLink" + s + "toX" + s + "toY" + s + "toZone" + s + "departureTime" +
 					s+"arrivalTime"+s+"travelTime"+s+"accessWalkTime"+s+"accessWalkDistance"+s+"carTravelTime"+s+"carTravelDistance"+s+"parkSearchTime"+s+"parkSearchDistance"+s+"egressWalkTime"+
 					s+"egressWalkDistance");
 			for (ParkTrip trip : completedTrips) {
@@ -231,9 +217,13 @@ public class ParkingTripHandler implements LinkEnterEventHandler, PersonArrivalE
 				if (z!=null) {
 					toZone = z.getId().toString();
 				}
-				
-				bw.write(trip.getPersonId().toString()+s+trip.previousActivity+s+trip.previousActivityLink.toString()+s+fromCoord.getX()+s+fromCoord.getY()+s+trip.followingActivityLink.toString()+s+toCoord.getX()+s+toCoord.getY()+s+toZone
-				+s+trip.accessWalkDepartureTime+s+trip.egressWalkArrivalTime+s+travelTime+s+accessWalkTime+s+trip.accessWalkDistance_m+carTravelTime+s+trip.carLegDistance_m+s+searchTime+s+trip.parkLegDistance_m+s+egressWalkTime+s+trip.egressWalkDistance_m);
+
+                bw.write(trip.getPersonId().toString() + s + trip.previousActivity + s + trip.previousActivityLink.toString() +
+                        s + fromCoord.getX() + s + fromCoord.getY() +
+                        s + trip.followingActivity +
+                        s + trip.followingActivityLink.toString() +
+                        s + toCoord.getX() + s + toCoord.getY() + s + toZone
+                        + s + trip.accessWalkDepartureTime + s + trip.egressWalkArrivalTime + s + travelTime + s + accessWalkTime + s + trip.accessWalkDistance_m + s + carTravelTime + s + trip.carLegDistance_m + s + searchTime + s + trip.parkLegDistance_m + s + egressWalkTime + s + trip.egressWalkDistance_m);
 			}
 		
 			bw.flush();
