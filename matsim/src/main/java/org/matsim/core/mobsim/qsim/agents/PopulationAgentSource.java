@@ -23,11 +23,10 @@ import java.util.*;
 import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.PrepareForSimImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -36,9 +35,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
 
 public final class PopulationAgentSource implements AgentSource {
 	private static final Logger log = Logger.getLogger( PopulationAgentSource.class );
@@ -89,18 +85,13 @@ public final class PopulationAgentSource implements AgentSource {
 						if (vehicleId == null) {
 							// if mode choice is allowed, it is possible that a new mode is assigned to an agent and then the route does not have the vehicle
 							// but scenario must have that vehicle; however, in order to find the vehicle, we need to identify the vehicle id. Amit July'17
-							vehicleId = createAutomaticVehicleId(p.getId(), leg.getMode());
+							vehicleId = PrepareForSimImpl.createAndSetAutomaticVehicleId(p.getId(), leg.getMode(), route, qsim.getScenario().getConfig().qsim() );
 
-							Gbl.assertNotNull(route);
-							// yyyy most execution paths through this method hedge against route==null, but this one does not. I
-							// haven't investigated why this is the case, and if it could be changed.  Would need to understand the
-							// logic of those conditionals first.  kai, may'18
-
-							route.setVehicleId(vehicleId);
 						}
 
 						// so here we have a vehicle id, now try to find or create a physical vehicle:
 						Vehicle vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
+						Gbl.assertNotNull(vehicle);
 						
 						// place the vehicle:
 						Id<Link> vehicleLinkId = findVehicleLink(p);
@@ -162,30 +153,4 @@ public final class PopulationAgentSource implements AgentSource {
 		throw new RuntimeException("Don't know where to put a vehicle for this agent.");
 	}
 
-	private Id<Vehicle> createAutomaticVehicleId(Id<Person> personId, String mode) {
-		// yyyyyy cf. PrepareForSimImpl.createAutomaticVehicleId
-		
-		Id<Vehicle> vehicleId ;
-		if (qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
-			switch (qsim.getScenario().getConfig().qsim().getVehiclesSource()) {
-				case defaultVehicle:
-				case fromVehiclesData:
-					vehicleId = Id.createVehicleId(personId);
-					break;
-				case modeVehicleTypesFromVehiclesData:
-					if(! mode.equals(TransportMode.car)) {
-						String vehIdString = personId.toString() + "_" + mode ;
-						vehicleId = Id.create(vehIdString, Vehicle.class);
-					} else {
-						vehicleId = Id.createVehicleId(personId);
-					}
-					break;
-				default:
-					throw new RuntimeException("not implemented") ;
-			}
-		} else {
-			throw new IllegalStateException("Found a network route without a vehicle id.");
-		}
-		return vehicleId;
-	}
 }

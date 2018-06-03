@@ -1,11 +1,6 @@
 package org.matsim.core.controler;
 
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -34,6 +29,12 @@ import org.matsim.facilities.FacilitiesFromPopulation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public final class PrepareForSimImpl implements PrepareForSim {
 	// I think it is ok to have this public final.  Since one may want to use it as a delegate.  kai, may'18
@@ -145,7 +146,8 @@ public final class PrepareForSimImpl implements PrepareForSim {
 							if (!seenModes.keySet().contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
 
 								if (vehicleId == null) {
-									vehicleId = createAutomaticVehicleId(person.getId(), leg.getMode(), route);
+									vehicleId = createAndSetAutomaticVehicleId(person.getId(), leg.getMode(), route,this.qSimConfigGroup);
+									// yyyy Not so clear if we need this here.  Should be sufficient in PopulationAgentSource.  kai, jun'18
 								}
 
 								// so here we have a vehicle id, now try to find or create a physical vehicle:
@@ -166,18 +168,20 @@ public final class PrepareForSimImpl implements PrepareForSim {
 
 		// create vehicles and add to scenario if using mode choice. Amit July'17
 		// creating vehicles for every network mode. Amit Dec'17
-		if (qSimConfigGroup.isCreatingVehiclesForAllNetworkModes()) {
+//		if (qSimConfigGroup.isCreatingVehiclesForAllNetworkModes()) {
 			if (qSimConfigGroup.getVehiclesSource() != QSimConfigGroup.VehiclesSource.fromVehiclesData){
-				createVehiclesForEveyNetworkMode(modeVehicleTypes);
+				createAndAddVehiclesForEveryNetworkMode(modeVehicleTypes);
 			} // don't create vehicle if vehicles are provided in vehicles file.
-		} else {
-			if (qSimConfigGroup.getVehiclesSource() != QSimConfigGroup.VehiclesSource.fromVehiclesData){
-			log.warn("Creating one vehicle corresponding to each network mode for every agent is disabled and " +
-					"vehicleSource is not " + QSimConfigGroup.VehiclesSource.fromVehiclesData.toString() + ". " +
-					"\n Simulation should run without a problem if it does not include mode choice. " +
-					"Please provide vehicles file or set 'creatingVehiclesForAllNetworkModes' to true if this is not the case.");
-			}
-		}
+//		} else {
+//			if (qSimConfigGroup.getVehiclesSource() != QSimConfigGroup.VehiclesSource.fromVehiclesData){
+//			log.warn("Creating one vehicle corresponding to each network mode for every agent is disabled and " +
+//					"vehicleSource is not " + QSimConfigGroup.VehiclesSource.fromVehiclesData.toString() + ". " +
+//					"\n Simulation should run without a problem if it does not include mode choice. " +
+//					"Please provide vehicles file or set 'creatingVehiclesForAllNetworkModes' to true if this is not the case.");
+//			}
+//		}
+		
+		// yy Could now set the vehicle IDs in the routes.  But can as well also do this later (currently in PopulationAgentSource).  kai, jun'18
 
 		if (scenario instanceof Lockable) {
 			((Lockable)scenario).setLocked();
@@ -199,10 +203,10 @@ public final class PrepareForSimImpl implements PrepareForSim {
 		// (yyyy means that if someone replaces prepareForSim and does not add the above lines, the containers are not locked.  kai, nov'16)
 	}
 
-	private void createVehiclesForEveyNetworkMode(final Map<String, VehicleType> modeVehicleTypes) {
+	private void createAndAddVehiclesForEveryNetworkMode(final Map<String, VehicleType> modeVehicleTypes) {
 		for (Id<Person> personId : scenario.getPopulation().getPersons().keySet()) {
 			for (String mode : scenario.getConfig().qsim().getMainModes()) {
-				Id<Vehicle> vehicleId = createAutomaticVehicleId(personId, mode, null);
+				Id<Vehicle> vehicleId = createAndSetAutomaticVehicleId(personId, mode, null, this.qSimConfigGroup);
 				createAndAddVehicleIfNotPresent(vehicleId, modeVehicleTypes.get(mode));
 			}
 		}
@@ -216,7 +220,7 @@ public final class PrepareForSimImpl implements PrepareForSim {
 					// initialize each mode with default vehicle type:
 					VehicleType defaultVehicleType = VehicleUtils.getDefaultVehicleType();
 					modeVehicleTypes.put(mode, defaultVehicleType);
-						if( scenario.getVehicles().getVehicleTypes().get(defaultVehicleType.getId())==null) {
+					if( scenario.getVehicles().getVehicleTypes().get(defaultVehicleType.getId())==null) {
 						scenario.getVehicles().addVehicleType(defaultVehicleType); // adding default vehicle type to vehicles container
 					}
 				}
@@ -263,16 +267,16 @@ public final class PrepareForSimImpl implements PrepareForSim {
 		return vehicle;
 	}
 
-	private Id<Vehicle> createAutomaticVehicleId(Id<Person> personId, String mode, NetworkRoute route) {
-		// yyyyyy cf. PopulationAgentSource.createAutomaticVehicleId
+	public static Id<Vehicle> createAndSetAutomaticVehicleId(Id<Person> personId, String mode, NetworkRoute route, QSimConfigGroup config) {
+		// yyyy cf. PopulationAgentSource.createAutomaticVehicleId (gone now)
 		
 		Id<Vehicle> vehicleId ;
-		if (qSimConfigGroup.getUsePersonIdForMissingVehicleId()) {
+		if (config.getUsePersonIdForMissingVehicleId()) {
 
 			// yyyy my strong preference would be to do away with this "car_" exception and to just
 			// use <mode>_personId across the board.  kai, may'18
 			
-			switch (qSimConfigGroup.getVehiclesSource()) {
+			switch (config.getVehiclesSource()) {
 				case defaultVehicle:
 				case fromVehiclesData:
 					vehicleId = Id.createVehicleId(personId);

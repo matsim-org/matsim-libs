@@ -39,7 +39,7 @@ import org.matsim.core.gbl.MatsimRandom;
     /**
      * This is deliberately not even protected.  kai, jul'12
      */
-    ControlerListenerManagerImpl controlerListenerManagerImpl;
+    private ControlerListenerManagerImpl controlerListenerManagerImpl;
 
 
     private Integer thisIteration = null;
