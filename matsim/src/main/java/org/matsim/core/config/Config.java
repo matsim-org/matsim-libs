@@ -560,7 +560,7 @@ public final class Config implements MatsimExtensionPoint {
 	
 	public void setContext(URL context) {
 		if ( this.context==null  ||  !(context.toString().equals( this.context.toString() ) ) ) {
-			log.info("setting context to" + context + "]");
+			log.info("setting context to [" + context + "]");
 			// ConfigUtils.createConfig() is used at several places, e.g. when generating an empty
 			// scenario to obtain the default factories.  This will evidently produce output here,
 			// and in some sense the wrong output, since the relevant context is probably set from

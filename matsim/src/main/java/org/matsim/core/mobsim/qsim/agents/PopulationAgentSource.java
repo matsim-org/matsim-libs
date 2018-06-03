@@ -163,6 +163,8 @@ public final class PopulationAgentSource implements AgentSource {
 	}
 
 	private Id<Vehicle> createAutomaticVehicleId(Id<Person> personId, String mode) {
+		// yyyyyy cf. PrepareForSimImpl.createAutomaticVehicleId
+		
 		Id<Vehicle> vehicleId ;
 		if (qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
 			switch (qsim.getScenario().getConfig().qsim().getVehiclesSource()) {
