@@ -56,9 +56,9 @@ import java.util.*;
  * @author aneumann, droeder, gleich
  *
  */
-public final class CreatePStopsOutsideJunctionAreas{
+public final class CreatePStopsOnJunctionApproachesAndBetweenJunctions{
 	
-	private final static Logger log = Logger.getLogger(CreatePStopsOutsideJunctionAreas.class);
+	private final static Logger log = Logger.getLogger(CreatePStopsOnJunctionApproachesAndBetweenJunctions.class);
 	
 	private final Network net;
 	private final Network intersectionSimplifiedRoadNetwork;
@@ -82,7 +82,7 @@ public final class CreatePStopsOutsideJunctionAreas{
 	}
 
 	public static TransitSchedule createPStops(Network network, PConfigGroup pConfigGroup, TransitSchedule realTransitSchedule) {
-		CreatePStopsOutsideJunctionAreas cS = new CreatePStopsOutsideJunctionAreas(network, pConfigGroup, realTransitSchedule);
+		CreatePStopsOnJunctionApproachesAndBetweenJunctions cS = new CreatePStopsOnJunctionApproachesAndBetweenJunctions(network, pConfigGroup, realTransitSchedule);
 		cS.run();
 		return cS.getTransitSchedule();
 	}
@@ -102,7 +102,7 @@ public final class CreatePStopsOutsideJunctionAreas{
 	 * @param pConfigGroup
 	 * @param realTransitSchedule
 	 */
-    private CreatePStopsOutsideJunctionAreas(Network net, PConfigGroup pConfigGroup, TransitSchedule realTransitSchedule) {
+    private CreatePStopsOnJunctionApproachesAndBetweenJunctions(Network net, PConfigGroup pConfigGroup, TransitSchedule realTransitSchedule) {
 		this.net = net;
 		this.pConfigGroup = pConfigGroup;
 		this.factory = new GeometryFactory();
@@ -154,7 +154,7 @@ public final class CreatePStopsOutsideJunctionAreas{
 		String[] stopLocationSelectorParameter = pConfigGroup.getStopLocationSelectorParameter().split(",");
 		if (stopLocationSelectorParameter.length != 3) {
 			log.warn("StopLocationSelectorParameter should be \"pmin,epsilon,stopDistance\" but has a different number of values. Using default values instead.");
-			stopLocationSelectorParameter = "50.0,2,Double.positiveInfinity".split(",");
+			stopLocationSelectorParameter = "50.0,2,500".split(",");
 		}
 		double pmin = Double.parseDouble(stopLocationSelectorParameter[0]);
 		int epsilon = Integer.parseInt(stopLocationSelectorParameter[1]);
@@ -385,7 +385,7 @@ public final class CreatePStopsOutsideJunctionAreas{
 		
 		numberOfStopsCreated += addStopOnLink(lastPartOfMergedLink);
 		
-		/* Go backward from junction approach and add more stops to create a proper spacing between bus stops. */
+		/* Go backward from junction approach and add infill stops to create a proper bus stop spacing between junctions. */
 		double distanceFromLastStop = lastPartOfMergedLink.getLength();
 		if (numberOfStopsCreated == 0) {
 			/* No stop was created on link approaching the junction (due to link characteristics excluded 
@@ -418,6 +418,8 @@ public final class CreatePStopsOutsideJunctionAreas{
 				if (distanceFromLastStop >= stopDistance) {
 					/* Try to add a new stop on current link */
 					int stopCreated = addStopOnLink(currentLink);
+					
+					// TODO: Add check of distance to next junction further backward
 					if (stopCreated > 0) {
 						/* If stop was added, reset distanceFromLastStop */
 						numberOfStopsCreated += stopCreated;

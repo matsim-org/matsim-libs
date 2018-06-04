@@ -45,7 +45,8 @@ public final class PConfigGroup extends ConfigGroup{
 	private static final long serialVersionUID = 4840713748058034511L;
 	private static final Logger log = Logger.getLogger(PConfigGroup.class);
 	
-	public static enum StopLocationSelector {allCarLinks ("allCarLinks"), outsideJunctionAreas ("outsideJunctionAreas");
+	public static enum StopLocationSelector {allCarLinks ("allCarLinks"), 
+		junctionApproachesAndBetweenJunctions ("junctionApproachesAndBetweenJunctions");
 		public final String name;
 		StopLocationSelector(String name) {this.name = name;}
 	}
@@ -288,7 +289,7 @@ public final class PConfigGroup extends ConfigGroup{
 			this.minCapacityForStops = Double.parseDouble(value);
 		} else if (STOP_LOCATION_SELECTOR.equals(key)){
 			if (value.equals(StopLocationSelector.allCarLinks.name)) {this.stopLocationSelector = StopLocationSelector.allCarLinks;}
-			else if (value.equals(StopLocationSelector.outsideJunctionAreas.name)) {this.stopLocationSelector = StopLocationSelector.outsideJunctionAreas;}
+			else if (value.equals(StopLocationSelector.junctionApproachesAndBetweenJunctions.name)) {this.stopLocationSelector = StopLocationSelector.junctionApproachesAndBetweenJunctions;}
 			else {log.error("unknown parameter value: " + key + ": " + value);}
 		} else if (STOP_LOCATION_SELECTOR_PARAMETER.equals(key)){
 			this.stopLocationSelectorParameter = value;
@@ -431,8 +432,8 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(OPERATIONMODE, "the mode of transport in which the paratransit operates");
 		map.put(TOPOTYPESFORSTOPS, "comma separated integer-values, as used in NetworkCalcTopoTypes");
 		map.put(MIN_CAPACITY_FOR_STOPS, "Link cannot serve as paratransit stop, if its capacity is lower than the limit set here. Default is 0.");
-		map.put(STOP_LOCATION_SELECTOR, "The paratransit stop locator, either one stop per car link (allCarLinks) or on approaches to junction areas and some stops between junction areas (outsideJunctionAreas). Default is allCarLinks.");
-		map.put(STOP_LOCATION_SELECTOR_PARAMETER, "Parameters for the paratransit stop locator. For allCarLinks there are no parameters to set. \nFor outsideJunctionAreas, which is based on the IntersectionSimplifier, there is pmin (maximum distance betwen 2 nodes to be merged into the same cluster, should be smaller than the maximum transfer distance), epsilon (minimum number of nodes to consider it a cluster) and rough distance between stops (used in NetworkSimplifier). \nDefault is \"\" for allCarLinks and \"50.0,2,Double.positiveInfinity\" for outsideJunctionAreas.");
+		map.put(STOP_LOCATION_SELECTOR, "The paratransit stop locator, either one stop per car link (allCarLinks) or on approaches to junction areas and some stops between junction areas (junctionApproachesAndBetweenJunctions). Default is allCarLinks.");
+		map.put(STOP_LOCATION_SELECTOR_PARAMETER, "Parameters for the paratransit stop locator. For allCarLinks there are no parameters to set. \nFor junctionApproachesAndBetweenJunctions, which is based on the IntersectionSimplifier, there is pmin (maximum distance betwen 2 nodes to be merged into the same cluster, should be smaller than the maximum transfer distance), epsilon (minimum number of nodes to consider it a cluster) and rough distance between stops (used in NetworkSimplifier). \nDefault is \"\" for allCarLinks and \"50.0,2,500\" for junctionApproachesAndBetweenJunctions.");
 		map.put(SUBSIDY_APPROACH, "Optional: add a subsidy to the operators' scores. Currently implemented: 'null': no subsidy; 'perPassenger': a subsidy of 100000 monetary units per passenger");
 		
 		for (Entry<Id<PStrategySettings>, PStrategySettings>  entry : this.strategies.entrySet()) {

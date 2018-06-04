@@ -36,8 +36,8 @@ public final class PStopsFactory {
 		// return CreateStopsForAllCarLinks.createStopsForAllCarLinks(network, pConfig, transitSchedule);
 		if (pConfig.getStopLocationSelector().equals(StopLocationSelector.allCarLinks)) {
 			return CreatePStops.createPStops(network, pConfig, transitSchedule);
-		} else if (pConfig.getStopLocationSelector().equals(StopLocationSelector.outsideJunctionAreas)) {
-			return CreatePStopsOutsideJunctionAreas.createPStops(network, pConfig, transitSchedule);
+		} else if (pConfig.getStopLocationSelector().equals(StopLocationSelector.junctionApproachesAndBetweenJunctions)) {
+			return CreatePStopsOnJunctionApproachesAndBetweenJunctions.createPStops(network, pConfig, transitSchedule);
 		} else {
 			throw new RuntimeException("unknown StopLocationSelector");
 		}
