@@ -33,6 +33,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.vehicles.Vehicle;
 
@@ -63,60 +64,70 @@ public final class PopulationAgentSource implements AgentSource {
 			insertVehicles(p);
 		}
 	}
-
-	private void insertVehicles(Person p) {
+	
+	private void insertVehicles(Person person) {
 		// this is called in every iteration.  So if a route without a vehicle id is found (e.g. after mode choice),
 		// then the id is generated here.  kai/amit, may'18
 		
-		Plan plan = p.getSelectedPlan();
 		Map<String,Id<Vehicle>> seenModes = new HashMap<>();
-		for (PlanElement planElement : plan.getPlanElements()) {
-			if (planElement instanceof Leg) {
-				Leg leg = (Leg) planElement;
-				if (this.mainModes.contains(leg.getMode())) { // only simulated modes get vehicles
-					NetworkRoute route = (NetworkRoute) leg.getRoute();
-					Id<Vehicle> vehicleId = null ;
-					if (route != null) {
-						vehicleId = route.getVehicleId();
-					}
-					if (!seenModes.keySet().contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
-						// yyyy this is already getting rather messy; need to consider simplifications ...  kai/amit, sep'16
-						
-						if (vehicleId == null) {
-							// if mode choice is allowed, it is possible that a new mode is assigned to an agent and then the route does not have the vehicle
-							// but scenario must have that vehicle; however, in order to find the vehicle, we need to identify the vehicle id. Amit July'17
-							vehicleId = PrepareForSimImpl.createAndSetAutomaticVehicleId(p.getId(), leg.getMode(), route, qsim.getScenario().getConfig().qsim() );
+		for ( Leg leg : TripStructureUtils.getLegs(person.getSelectedPlan()) ) {
+			
+			// only simulated modes get vehicles:
+			if ( !this.mainModes.contains(leg.getMode()) ) {
+				continue ;
+			}
+			
+			// determine the vehicle ID
+			NetworkRoute route = (NetworkRoute) leg.getRoute();
+			Id<Vehicle> vehicleId = null ;
+			if (route != null) {
+				vehicleId = route.getVehicleId();
+			}
+			if (vehicleId == null) {
+				vehicleId = PrepareForSimImpl.createAndSetAutomaticVehicleId(person.getId(), leg.getMode(), route, qsim.getScenario().getConfig().qsim() );
+			}
+			
+			// determine the vehicle (not the same as just its ID):
 
-						}
-
-						// so here we have a vehicle id, now try to find or create a physical vehicle:
-						Vehicle vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
-						Gbl.assertNotNull(vehicle);
-						
-						// place the vehicle:
-						Id<Link> vehicleLinkId = findVehicleLink(p);
-						
-						// Checking if the vehicle has been seen before:
-						Id<Link> result = this.seenVehicleIds.get( vehicleId ) ;
-						if ( result != null ) {
-							// if seen before, but placed on same link, then it is ok:
-							log.info( "have seen vehicle with id " + vehicleId + " before; not placing it again." );
-							if ( result != vehicleLinkId ) {
-								throw new RuntimeException("vehicle placement error: vehicleId=" + vehicleId + 
-										"; previous placement link=" + vehicleLinkId + "; current placement link=" + result ) ; 
-							}
-						} else {
-							this.seenVehicleIds.put( vehicleId, vehicleLinkId ) ;
-							qsim.createAndParkVehicleOnLink(vehicle, vehicleLinkId);
-						}
-						seenModes.put(leg.getMode(),vehicleId);
-					} else {
-						if (vehicleId==null && route!=null) {
-							vehicleId = seenModes.get(leg.getMode());
-							route.setVehicleId( vehicleId );
-						}
-					}
+			// we have seen the mode before in the plan:
+			if ( seenModes.keySet().contains( leg.getMode() ) ) {
+				if (vehicleId == null && route != null) {
+					vehicleId = seenModes.get(leg.getMode());
+					route.setVehicleId(vehicleId);
+					// yyyy what is the meaning of route==null? kai, jun'18
 				}
+				continue;
+			}
+			
+			// if we are here, we haven't seen the mode before in this plan
+			
+			// now memorizing mode and its vehicle ID:
+			seenModes.put(leg.getMode(),vehicleId);
+			
+			// find the vehicle from the vehicles container.  It should be there, see automatic vehicle creation in PrepareForSim.
+			Vehicle vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
+			Gbl.assertNotNull(vehicle);
+				
+			// find the link ID of where to place the vehicle:
+			Id<Link> vehicleLinkId = findVehicleLink(person);
+				
+			// Checking if the vehicle has been seen before:
+			Id<Link> result = this.seenVehicleIds.get( vehicleId ) ;
+			if ( result != null ) {
+				log.info( "have seen vehicle with id " + vehicleId + " before; not placing it again." );
+				if ( result != vehicleLinkId ) {
+					throw new RuntimeException("vehicle placement error: vehicleId=" + vehicleId +
+											   "; previous placement link=" + vehicleLinkId + "; current placement link=" + result ) ;
+				}
+				// yyyyyy The above condition is too strict; it should be possible that one person drives
+				// a car to some place, and some other person picks it up there.  However, this
+				// method here is sorted by persons, not departure times, and so we don't know
+				// which plan needs the vehicle first. (Looks to me that it should actually be possible
+				// to resolve this.)
+				
+			} else {
+				this.seenVehicleIds.put( vehicleId, vehicleLinkId ) ;
+				qsim.createAndParkVehicleOnLink(vehicle, vehicleLinkId);
 			}
 		}
 	}
@@ -124,17 +135,18 @@ public final class PopulationAgentSource implements AgentSource {
 	/**
 	 *	A more careful way to decide where this agent should have its vehicles created
 	 *  than to ask agent.getCurrentLinkId() after creation.
-	 * @param leg TODO
+	 * @param person TODO
 	 */
-	private Id<Link> findVehicleLink(Person p ) {
+	private Id<Link> findVehicleLink(Person person ) {
 		/* Cases that come to mind:
 		 * (1) multiple persons share car located at home, but possibly brought to different place by someone else.  
 		 *      This is treated by the following algo.
 		 * (2) person starts day with non-car leg and has car parked somewhere else.  This is NOT treated by the following algo.
 		 *      It could be treated by placing the vehicle at the beginning of the first link where it is needed, but this would not
 		 *      be compatible with variant (1).
+		 *  Also see comment in insertVehicles.
 		 */
-		for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {
+		for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
 				ActivityFacilities facilities = this.qsim.getScenario().getActivityFacilities() ;

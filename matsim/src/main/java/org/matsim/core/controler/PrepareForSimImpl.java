@@ -127,44 +127,44 @@ public final class PrepareForSimImpl implements PrepareForSim {
 		// since there will be no vehicle for it.  Needs to be fixed somehow.  kai, feb'18
 
 		Map<String, VehicleType> modeVehicleTypes = getMode2VehicleType();
-		for(Person person : scenario.getPopulation().getPersons().values()) {
-			for (Plan plan : person.getPlans()) { // go through with all plans ( when it was in population agent source, then going through only with selected plan was sufficient.) Amit May'17
-				Map<String, Id<Vehicle>> seenModes = new HashMap<>();
-				for (PlanElement planElement : plan.getPlanElements()) {
-					if (planElement instanceof Leg) {
-						Leg leg = (Leg) planElement;
-						if (qSimConfigGroup.getMainModes().contains(leg.getMode())) {// only simulated modes get vehicles
-							NetworkRoute route = (NetworkRoute) leg.getRoute();
-							Id<Vehicle> vehicleId = null;
-							if (route != null) {
-								vehicleId = route.getVehicleId(); // may be null!
-							} else {
-								throw new RuntimeException("Route not found.  Possible reason: leg did not have "
-										+ "activities with locations at both ends (e.g. plan ends with leg).");
-							}
-
-							if (!seenModes.keySet().contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
-
-								if (vehicleId == null) {
-									vehicleId = createAndSetAutomaticVehicleId(person.getId(), leg.getMode(), route,this.qSimConfigGroup);
-									// yyyy Not so clear if we need this here.  Should be sufficient in PopulationAgentSource.  kai, jun'18
-								}
-
-								// so here we have a vehicle id, now try to find or create a physical vehicle:
-								createAndAddVehicleIfNotPresent( vehicleId, modeVehicleTypes.get(leg.getMode()));
-								seenModes.put(leg.getMode(), vehicleId);
-							} else {
-								if (vehicleId == null) {
-									vehicleId = seenModes.get(leg.getMode());
-									route.setVehicleId(vehicleId);
-								}
-							}
-
-						}
-					}
-				}
-			}
-		}
+//		for(Person person : scenario.getPopulation().getPersons().values()) {
+//			for (Plan plan : person.getPlans()) { // go through with all plans ( when it was in population agent source, then going through only with selected plan was sufficient.) Amit May'17
+//				Map<String, Id<Vehicle>> seenModes = new HashMap<>();
+//				for (PlanElement planElement : plan.getPlanElements()) {
+//					if (planElement instanceof Leg) {
+//						Leg leg = (Leg) planElement;
+//						if (qSimConfigGroup.getMainModes().contains(leg.getMode())) {// only simulated modes get vehicles
+//							NetworkRoute route = (NetworkRoute) leg.getRoute();
+//							Id<Vehicle> vehicleId = null;
+//							if (route != null) {
+//								vehicleId = route.getVehicleId(); // may be null!
+//							} else {
+//								throw new RuntimeException("Route not found.  Possible reason: leg did not have "
+//										+ "activities with locations at both ends (e.g. plan ends with leg).");
+//							}
+//
+//							if (!seenModes.keySet().contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
+//
+//								if (vehicleId == null) {
+//									vehicleId = createAndSetAutomaticVehicleId(person.getId(), leg.getMode(), route,this.qSimConfigGroup);
+//									// yyyy Not so clear if we need this here.  Should be sufficient in PopulationAgentSource.  kai, jun'18
+//								}
+//
+//								// so here we have a vehicle id, now try to find or create a physical vehicle:
+//								createAndAddVehicleIfNotPresent( vehicleId, modeVehicleTypes.get(leg.getMode()));
+//								seenModes.put(leg.getMode(), vehicleId);
+//							} else {
+//								if (vehicleId == null) {
+//									vehicleId = seenModes.get(leg.getMode());
+//									route.setVehicleId(vehicleId);
+//								}
+//							}
+//
+//						}
+//					}
+//				}
+//			}
+//		}
 
 		// create vehicles and add to scenario if using mode choice. Amit July'17
 		// creating vehicles for every network mode. Amit Dec'17
@@ -241,7 +241,7 @@ public final class PrepareForSimImpl implements PrepareForSim {
 		return modeVehicleTypes;
 	}
 
-	private Vehicle createAndAddVehicleIfNotPresent(Id<Vehicle> vehicleId, VehicleType vehicleType) {
+	private void createAndAddVehicleIfNotPresent(Id<Vehicle> vehicleId, VehicleType vehicleType) {
 		// try to get vehicle from the vehicles container:
 		Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
 
@@ -264,7 +264,6 @@ public final class PrepareForSimImpl implements PrepareForSim {
 					throw new RuntimeException("not implemented") ;
 			}
 		}
-		return vehicle;
 	}
 
 	public static Id<Vehicle> createAndSetAutomaticVehicleId(Id<Person> personId, String mode, NetworkRoute route, QSimConfigGroup config) {
