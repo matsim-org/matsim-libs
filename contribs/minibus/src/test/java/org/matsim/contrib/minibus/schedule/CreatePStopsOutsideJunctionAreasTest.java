@@ -24,18 +24,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.routeProvider.PScenarioHelper;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -51,7 +48,7 @@ public class CreatePStopsOutsideJunctionAreasTest {
 		pC.addParam("stopLocationSelector", "outsideJunctionAreas");
 		pC.addParam("stopLocationSelectorParameter", "50.0,2,Double.positiveInfinity");
 		
-		String realPtStopLink = "1413";
+		String realPtStopLink = "3233";
 		
 		/* Modify some link attributes to check whether these links are excluded as specified in the config */
 		String tooLowCapacityLink = "2122";
@@ -114,19 +111,18 @@ public class CreatePStopsOutsideJunctionAreasTest {
 		Network network = buildComplexIntersection();
 		PConfigGroup pC = new PConfigGroup();
 		pC.addParam("stopLocationSelector", "outsideJunctionAreas");
-		pC.addParam("stopLocationSelectorParameter", "30.0,2,Double.positiveInfinity");
+		pC.addParam("stopLocationSelectorParameter", "30.0,2,500");
 		
 		TransitSchedule transitSchedule = CreatePStopsOutsideJunctionAreas.createPStops(network, pC);
 		
-		// BEGIN DEBUG
+		int numberOfParaStops = 0;
+		for (TransitStopFacility stopFacility : transitSchedule.getFacilities().values()) {
+			if (stopFacility.getId().toString().startsWith(pC.getPIdentifier())) {
+				numberOfParaStops++;
+			}
+		}
 		
-		TransitScheduleWriter scheduleWriter = new TransitScheduleWriter(transitSchedule);
-		scheduleWriter.writeFile("schedule.xml");
-		
-		NetworkWriter networkWriter = new NetworkWriter(network);
-		networkWriter.write("network.xml");
-		
-		// END DEBUG
+		Assert.assertEquals("Check number of paratransit stops", 16, numberOfParaStops, MatsimTestUtils.EPSILON);
 		
 		/* approaches to (unclustered) dead-ends */
 		Assert.assertNotNull("Should find paratransit stop 'p_2_1'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "2_1", TransitStopFacility.class)));
@@ -186,6 +182,10 @@ public class CreatePStopsOutsideJunctionAreasTest {
 		Assert.assertNull("Should NOT find paratransit stop at link exiting junction '5_4'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "5_4", TransitStopFacility.class)));
 		Assert.assertNull("Should NOT find paratransit stop at link exiting junction '8_9'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "8_9", TransitStopFacility.class)));
 		Assert.assertNull("Should NOT find paratransit stop at link exiting junction '18_19'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "7_2", TransitStopFacility.class)));
+		
+		/* Infill Stops between junctions / dead-ends */
+		Assert.assertNotNull("Should find infill paratransit stop 'p_30_29'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "30_29", TransitStopFacility.class)));
+		Assert.assertNotNull("Should find infill paratransit stop 'p_27_28'", transitSchedule.getFacilities().get(Id.create(pC.getPIdentifier() + "27_28", TransitStopFacility.class)));
 		
 		/* Check whether CalcTopoTypes is considered (type 8 : intersections only) */
 		pC.addParam("TopoTypesForStops", "8");

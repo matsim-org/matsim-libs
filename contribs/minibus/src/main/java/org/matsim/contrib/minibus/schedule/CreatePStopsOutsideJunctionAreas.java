@@ -37,7 +37,6 @@ import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.algorithms.intersectionSimplifier.IntersectionSimplifier;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.filter.NetworkLinkFilter;
-import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -73,6 +72,8 @@ public final class CreatePStopsOutsideJunctionAreas{
 	private final LinkedHashMap<Id<Link>, TransitStopFacility> linkId2StopFacilityMap;
 
 	private List<Integer> topoTypesForStops = null;
+	/** This is only a rough approximation of a desirable stop distance. It is not implemented to precisely resemble the value given. */
+	private final double stopDistance;
 
 	private NetworkCalcTopoType networkCalcTopoType;
 	
@@ -146,10 +147,8 @@ public final class CreatePStopsOutsideJunctionAreas{
 			log.warn("There are " + stopsWithoutLinkIds.size() + " stop facilities without a link id, namely: " + stopsWithoutLinkIds.toString());
 		}
 		this.topoTypesForStops = this.pConfigGroup.getTopoTypesForStops();
-		if(!(this.topoTypesForStops == null)){
-			this.networkCalcTopoType = new NetworkCalcTopoType();
-			this.networkCalcTopoType.run(net);
-		}
+		this.networkCalcTopoType = new NetworkCalcTopoType();
+		this.networkCalcTopoType.run(net);
 		
 		// parse StopLocationSelectorParameter from config
 		String[] stopLocationSelectorParameter = pConfigGroup.getStopLocationSelectorParameter().split(",");
@@ -159,15 +158,14 @@ public final class CreatePStopsOutsideJunctionAreas{
 		}
 		double pmin = Double.parseDouble(stopLocationSelectorParameter[0]);
 		int epsilon = Integer.parseInt(stopLocationSelectorParameter[1]);
-		/* This is only a rough approximation of a desirable stop distance. It is not implemented to precisely resemble the value given. */
-		double stopDistance;
+
 		if (stopLocationSelectorParameter[2].contains("nfinity") || stopLocationSelectorParameter[2].contains("NFINITY")) {
 			stopDistance = Double.POSITIVE_INFINITY;
 		} else {
 			stopDistance = Double.parseDouble(stopLocationSelectorParameter[2]);
 		}
 		
-		intersectionSimplifiedRoadNetwork = generateIntersectionSimplifiedNetwork(pmin, epsilon, stopDistance);
+		intersectionSimplifiedRoadNetwork = generateIntersectionSimplifiedNetwork(pmin, epsilon);
 
 	}
 
@@ -280,7 +278,7 @@ public final class CreatePStopsOutsideJunctionAreas{
 	}
 	
 	/* Generate a simplified network to determine stop locations (the simplified network will not be used in simulation) */
-	private Network generateIntersectionSimplifiedNetwork(double pmin, int epsilon, double stopDistance) {
+	private Network generateIntersectionSimplifiedNetwork(double pmin, int epsilon) {
 		// Extract road network
 		NetworkFilterManager nfmCar = new NetworkFilterManager(net);
 		nfmCar.addLinkFilter(new NetworkLinkFilter() {
@@ -315,12 +313,11 @@ public final class CreatePStopsOutsideJunctionAreas{
 		NetworkMergeDoubleLinks mergeDoubleLinks = new NetworkMergeDoubleLinks(MergeType.MAXIMUM, LogInfoLevel.NOINFO);
 		mergeDoubleLinks.run(newClusteredIntersectionsRoadNetwork);
 		
-		// Simplify network (merge links if resulting link has length < x -> maximum PStop distance on merged links)
+		// Merge all links between two junctions
 		NetworkSimplifier simplifier = new NetworkSimplifier();
-		// Merge links with different attributes, because we only want to achieve a proper spacing
+		// Merge links with different attributes, because we will not use the output network for simulation
 		simplifier.setMergeLinkStats(true);
-		/* TODO: There is a problem with reproducibility with setting a threshold distance in NetworkSimplifier. Find other solution for bus stop spacing. */
-		simplifier.run(newClusteredIntersectionsRoadNetwork, stopDistance);
+		simplifier.run(newClusteredIntersectionsRoadNetwork);
 		new NetworkCleaner().run(newClusteredIntersectionsRoadNetwork);
 		
 		return(newClusteredIntersectionsRoadNetwork);
@@ -330,6 +327,7 @@ public final class CreatePStopsOutsideJunctionAreas{
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		int stopsAdded = 0;
 		
+		/* handle all (merged) links between junction */
 		for (Link link : this.intersectionSimplifiedRoadNetwork.getLinks().values()) {
 			if(link.getAllowedModes().contains(TransportMode.car)){
 				stopsAdded += addStopForSimplifiedNetworkLink(link);
@@ -340,17 +338,19 @@ public final class CreatePStopsOutsideJunctionAreas{
 	}
 	
 	private int addStopForSimplifiedNetworkLink(Link simplifiedNetworkLink) {
+		int numberOfStopsCreated = 0;
 		String[] originalIdsMergedLink = simplifiedNetworkLink.getId().toString().split("-");
 		/* Bus stops should be placed on approaches to road junctions, and not inside junction
 		 * areas. 
 		 * The Intersection simplifier creates a network where most junction nodes are merged into 
 		 * one node per junction. By merging two neighbouring nodes, all links in between are removed.
 		 * So, initially no links are modified, but most links located inside a junction area are
-		 * removed. Than the NetworkSimplifier merges short links between intersections to larger
-		 * ones, thereby creating a proper spacing between bus stops.
+		 * removed. Than the NetworkSimplifier merges short links between intersections, thereby 
+		 * creating a network where between two junctions there is at most one link per direction.
 		 * Given that simplified network the corresponding stop locations are looked up on the
 		 * original network using the link ids remaining in the simplified network.
 		 * 
+		 * First add stops at links approaching junction areas:
 		 * Start from last part of the merged link and move forward until the first intersection 
 		 * (>=2 outlinks) is reached. This should be in most cases the begin of the junction area.
 		 *
@@ -383,7 +383,51 @@ public final class CreatePStopsOutsideJunctionAreas{
 			lastPartOfMergedLink = lastPartOfMergedLink.getToNode().getOutLinks().values().iterator().next();
 		}
 		
-		return addStopOnLink(lastPartOfMergedLink);
+		numberOfStopsCreated += addStopOnLink(lastPartOfMergedLink);
+		
+		/* Go backward from junction approach and add more stops to create a proper spacing between bus stops. */
+		double distanceFromLastStop = lastPartOfMergedLink.getLength();
+		if (numberOfStopsCreated == 0) {
+			/* No stop was created on link approaching the junction (due to link characteristics excluded 
+			in pConfigGroup, see {@link addStopOnLink(Link link)}), so make the algorithm add one on the
+			next suitable link */
+			distanceFromLastStop = stopDistance;
+		}
+		
+		Link currentLink = lastPartOfMergedLink;
+		reappendedlinkIds = "";
+		
+		/* Stop if the previous junction area is reached */
+		while (indexOfNextLinkIdToBeAppended > 0) {
+			indexOfNextLinkIdToBeAppended--;
+			if (reappendedlinkIds.equals("")) {
+				reappendedlinkIds = originalIdsMergedLink[indexOfNextLinkIdToBeAppended];
+			} else {
+				reappendedlinkIds = originalIdsMergedLink[indexOfNextLinkIdToBeAppended] + "-" + reappendedlinkIds;
+			}			
+			Link tryLinkId = net.getLinks().get(Id.createLinkId(reappendedlinkIds));
+			
+			if (tryLinkId == null) {
+				/* Next backward link could not be found, because it's id already contains "-", e.g. because */
+				continue;
+			} else {
+				distanceFromLastStop += currentLink.getLength();
+				currentLink = tryLinkId;
+				reappendedlinkIds = "";
+				
+				if (distanceFromLastStop >= stopDistance) {
+					/* Try to add a new stop on current link */
+					int stopCreated = addStopOnLink(currentLink);
+					if (stopCreated > 0) {
+						/* If stop was added, reset distanceFromLastStop */
+						numberOfStopsCreated += stopCreated;
+						distanceFromLastStop = 0;
+					}
+				}
+			}
+		}
+		
+		return numberOfStopsCreated;
 	}
 	
 	private int addStopOnLink(Link link) {
@@ -412,6 +456,11 @@ public final class CreatePStopsOutsideJunctionAreas{
 		}
 
 		if (this.linkId2StopFacilityMap.get(link.getId()) != null) {
+			log.warn("Link " + link.getId() + " has already a stop in the given (non-paratransit) TransitSchedule. This should not happen. Check code.");
+			return 0;
+		}
+		
+		if (this.transitSchedule.getFacilities().get(Id.create(pConfigGroup.getPIdentifier() + link.getId().toString(), TransitStopFacility.class)) != null) {
 			log.warn("Link " + link.getId() + " has already a stop. This should not happen. Check code.");
 			return 0;
 		}
