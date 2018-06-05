@@ -42,10 +42,6 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.testcases.MatsimTestUtils;
 
-import ch.sbb.matsim.mobsim.qsim.SBBQSimModule;
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-
-
 /**
  * Integration test of the minibus package
  * 
@@ -92,14 +88,6 @@ public class PControlerTestIT implements TabularFileHandler{
 
 		//		services.setScoringFunctionFactory(new BvgScoringFunctionFactory(services.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroup(services.getConfig()), services.getNetwork()));
 		// looks like the above was removed in head but I had a merge conflict.  kai, sep'14
-
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				// To use the fast pt router:
-				install(new SwissRailRaptorModule());
-			}
-		});
 		
 		controler.run();
 
