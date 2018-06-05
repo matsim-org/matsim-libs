@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * ClusterPoint.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +18,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.schedule;
+package org.matsim.core.network.algorithms.intersectionSimplifier.containers;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.minibus.PConfigGroup;
-import org.matsim.contrib.minibus.PConfigGroup.StopLocationSelector;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Node;
+
 
 /**
- * Creates the transit stops valid for paratransit. Currently, only a replacement for a configurable version.
+ * A simple class linking a {@link DigicoreActivity} to a specific cluster.
  * 
- * @author aneumann
- *
+ * @author jwjoubert
  */
-public final class PStopsFactory {
+public class ClusterActivity implements Identifiable<Coord>{
+	private Id<Coord> activityId;
+	private Node node;
+	private Cluster cluster;
+	
+	public ClusterActivity(Id<Coord> activityId, Node node, Cluster cluster){
+		this.activityId = activityId;
+		this.node = node;
+		this.cluster = cluster;
+	}
 
-	public static TransitSchedule createPStops(Network network, PConfigGroup pConfig, TransitSchedule transitSchedule){
-		// return CreateStopsForAllCarLinks.createStopsForAllCarLinks(network, pConfig, transitSchedule);
-		if (pConfig.getStopLocationSelector().equals(StopLocationSelector.allCarLinks)) {
-			return CreatePStops.createPStops(network, pConfig, transitSchedule);
-		} else if (pConfig.getStopLocationSelector().equals(StopLocationSelector.junctionApproachesAndBetweenJunctions)) {
-			return CreatePStopsOnJunctionApproachesAndBetweenJunctions.createPStops(network, pConfig, transitSchedule);
-		} else {
-			throw new RuntimeException("unknown StopLocationSelector");
-		}
+	public Coord getCoord() {
+		return this.node.getCoord();
 	}
 	
+	public Node getNode() {
+		return this.node;
+	}
+
+	public Cluster getCluster() {
+		return cluster;
+	}
+	
+	public void setCluster(Cluster cluster){
+		this.cluster = cluster;
+	}
+
+	@Override
+	public Id<Coord> getId() {
+		return this.activityId;
+	}
+	
+
 }

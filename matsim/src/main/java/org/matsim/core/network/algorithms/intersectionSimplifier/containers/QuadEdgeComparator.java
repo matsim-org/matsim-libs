@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,     *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,49 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.schedule;
+package org.matsim.core.network.algorithms.intersectionSimplifier.containers;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.minibus.PConfigGroup;
-import org.matsim.contrib.minibus.PConfigGroup.StopLocationSelector;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import java.util.Comparator;
+import java.util.Map;
 
-/**
- * Creates the transit stops valid for paratransit. Currently, only a replacement for a configurable version.
- * 
- * @author aneumann
- *
- */
-public final class PStopsFactory {
+import com.vividsolutions.jts.triangulate.quadedge.QuadEdge;
 
-	public static TransitSchedule createPStops(Network network, PConfigGroup pConfig, TransitSchedule transitSchedule){
-		// return CreateStopsForAllCarLinks.createStopsForAllCarLinks(network, pConfig, transitSchedule);
-		if (pConfig.getStopLocationSelector().equals(StopLocationSelector.allCarLinks)) {
-			return CreatePStops.createPStops(network, pConfig, transitSchedule);
-		} else if (pConfig.getStopLocationSelector().equals(StopLocationSelector.junctionApproachesAndBetweenJunctions)) {
-			return CreatePStopsOnJunctionApproachesAndBetweenJunctions.createPStops(network, pConfig, transitSchedule);
+public class QuadEdgeComparator implements Comparator<QuadEdge> {
+	
+	Map<QuadEdge,Double> map;
+	
+	/**
+	 * Constructor.
+	 * 
+	 * @param map
+	 * 		map containing QuadEdge and Double
+	 */
+	public QuadEdgeComparator(Map<QuadEdge,Double> map) {
+		this.map = map;
+	}
+
+	/**
+	 * Method of comparison. Ranks the QuadEdge in descending order.
+	 * 
+	 * @param qeA
+	 * 		quad edge to compare
+	 * @param qeB
+	 * 		quad edge to compare
+	 * @return
+	 * 		1 if double value associated to qeA  < double
+	 * 		value associated to qeB,
+	 * 		0 if values are equals,
+	 * 		-1 otherwise
+	 */
+	@Override
+	public int compare(QuadEdge qeA, QuadEdge qeB) {
+		if (this.map.get(qeA) < this.map.get(qeB)) {
+			return 1;
+		} else if (this.map.get(qeA) == this.map.get(qeB)) {
+			return 0;
 		} else {
-			throw new RuntimeException("unknown StopLocationSelector");
+			return -1;
 		}
 	}
-	
+
 }
