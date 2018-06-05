@@ -50,9 +50,18 @@
 	</dependency>
 	 	<!-- New Raptor Transit Router Implementation -->
 	<dependency>
+	    <groupId>com.github.vsp-gleich</groupId>
+	    <artifactId>matsim-sbb-extensions</artifactId>
+	    <version>master-SNAPSHOT</version>
+	</dependency>
+
+	 	
+	<!-- 
+	<dependency>
 	    <groupId>ch.sbb</groupId>
 	    <artifactId>matsim-sbb-extensions</artifactId>
-	    <version>0.10.0</version>
+	    <version>0.10.2</version>
 	</dependency>
+	 -->
   </dependencies>
 </project>
