@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
 import org.matsim.contrib.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.scoring.functions.ScoringParameters;
@@ -50,12 +50,12 @@ public class DCActivityScoringFunction extends org.matsim.deprecated.scoring.fun
 	private final HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
 	private ActTypeConverter converter;
 	private ObjectAttributes prefs;
-	private DestinationChoiceBestResponseContext dcContext;
+	private DestinationChoiceContext dcContext;
 	private DestinationChoiceConfigGroup dccg;
 	private List<ScoringPenalty> penalty = null;
 
 	// needs to be re-designed with delegation instead of inheritance. kai, oct'14
-	public DCActivityScoringFunction(Plan plan, DestinationChoiceBestResponseContext dcContext) {
+	public DCActivityScoringFunction(Plan plan, DestinationChoiceContext dcContext) {
 		super(dcContext.getParams());
 		this.destinationChoiceScoring = new DestinationScoring(dcContext);
 		this.facilities = dcContext.getScenario().getActivityFacilities();

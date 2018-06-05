@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.events.Event;
  *
  * @author rashid_waraich
  */
-public class LastEventOfIteration extends Event {
+public final class LastEventOfIteration extends Event {
 
 	public LastEventOfIteration(final double time) {
 		super(time);

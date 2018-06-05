@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesData;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreensForSignalSystemData;
+import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesData;
+import org.matsim.contrib.signals.data.intergreens.v10.IntergreensForSignalSystemData;
 
 
 /**
@@ -111,10 +111,10 @@ private static final Logger log = Logger.getLogger(IntergreensLogicImpl.class);
 										intergreenViolation.append(" The minimal intergreen required is, however, ");
 										intergreenViolation.append(intergreens4BeginningGroup.getValue());
 										intergreenViolation.append(" seconds.");
-										if (this.signalsConfig.getActionOnIntergreenViolation().equals(SignalSystemsConfigGroup.ActionOnIntergreenViolation.WARN)){
+										if (this.signalsConfig.getActionOnIntergreenViolation().equals(SignalSystemsConfigGroup.ActionOnSignalSpecsViolation.WARN)){
 											log.warn(intergreenViolation.toString());
 										}
-										else if (this.signalsConfig.getActionOnIntergreenViolation().equals(SignalSystemsConfigGroup.ActionOnIntergreenViolation.EXCEPTION)) {
+										else if (this.signalsConfig.getActionOnIntergreenViolation().equals(SignalSystemsConfigGroup.ActionOnSignalSpecsViolation.EXCEPTION)) {
 											log.warn(intergreenViolation.toString());
 											throw new RuntimeException(intergreenViolation.toString());
 										}

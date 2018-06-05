@@ -21,16 +21,14 @@ package org.matsim.contrib.locationchoice;
 
 import java.util.*;
 
-import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.locationchoice.bestresponse.BestResponseLocationMutator;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext.ActivityFacilityWithIndex;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
@@ -44,7 +42,6 @@ import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.QuadTree;
@@ -67,7 +64,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	protected TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new TreeMap<String, QuadTree<ActivityFacilityWithIndex>>();
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	private final Scenario scenario;
-	private DestinationChoiceBestResponseContext lcContext;
+	private DestinationChoiceContext lcContext;
 	private HashSet<String> flexibleTypes;
 	private final LeastCostPathCalculatorFactory forwardMultiNodeDijsktaFactory;
 	private final LeastCostPathCalculatorFactory backwardMultiNodeDijsktaFactory;
@@ -78,7 +75,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	private Map<String, TravelTime> travelTimes;
 	private Map<String, TravelDisutilityFactory> travelDisutilities;
 
-	public BestReplyDestinationChoice(Provider<TripRouter> tripRouterProvider, DestinationChoiceBestResponseContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled, ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities) {
+	public BestReplyDestinationChoice(Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled, ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities) {
 		super(lcContext.getScenario().getConfig().global());
 		this.tripRouterProvider = tripRouterProvider;
 		this.scoringFunctionFactory = scoringFunctionFactory;

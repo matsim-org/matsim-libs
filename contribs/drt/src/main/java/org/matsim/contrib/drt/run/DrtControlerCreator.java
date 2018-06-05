@@ -30,9 +30,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
+import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
-import org.matsim.contrib.drt.optimizer.insertion.PrecalculatablePathDataProvider;
+import org.matsim.contrib.drt.optimizer.insertion.PrecalculablePathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
@@ -67,7 +69,8 @@ public final class DrtControlerCreator {
 		adjustConfig(config);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		return addDrtToControler(controler, otfvis);
+		addDrtToControler(controler, otfvis);
+		return controler;
 	}
 
 	public static Controler createControler(Scenario scenario, boolean otfvis) {
@@ -75,10 +78,11 @@ public final class DrtControlerCreator {
 		// to modify the scenario before I pass it to the controler. kai, oct'17
 		adjustConfig(scenario.getConfig());
 		Controler controler = new Controler(scenario);
-		return addDrtToControler(controler, otfvis);
+		addDrtToControler(controler, otfvis);
+		return controler;
 	}
 
-	public static Controler addDrtToControler(Controler controler, boolean otfvis) {
+	public static void addDrtToControler(Controler controler, boolean otfvis) {
 		controler.addOverridingModule(new DvrpModule(DrtControlerCreator::createModuleForQSimPlugin, Arrays
 				.asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class, ParallelPathDataProvider.class)));
 		controler.addOverridingModule(new DrtModule());
@@ -86,7 +90,6 @@ public final class DrtControlerCreator {
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
-		return controler;
 	}
 
 	public static void adjustConfig(Config config) {
@@ -133,6 +136,7 @@ public final class DrtControlerCreator {
 
 				bind(DefaultUnplannedRequestInserter.class).asEagerSingleton();
 				bind(UnplannedRequestInserter.class).to(DefaultUnplannedRequestInserter.class);
+				bind(VehicleData.EntryFactory.class).to(VehicleDataEntryFactoryImpl.class).asEagerSingleton();
 
 				bind(DrtTaskFactory.class).to(DrtTaskFactoryImpl.class).asEagerSingleton();
 
@@ -146,7 +150,7 @@ public final class DrtControlerCreator {
 				bind(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
 
 				bind(ParallelPathDataProvider.class).asEagerSingleton();
-				bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
+				bind(PrecalculablePathDataProvider.class).to(ParallelPathDataProvider.class);
 			}
 		};
 	}

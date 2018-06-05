@@ -59,7 +59,7 @@ import javax.inject.Inject;
  * @author rashid_waraich
  *
  */
-public class ParallelEventsManagerImpl implements EventsManager {
+public final class ParallelEventsManagerImpl implements EventsManager {
 
 	private boolean parallelMode = true;
 	private int numberOfThreads;

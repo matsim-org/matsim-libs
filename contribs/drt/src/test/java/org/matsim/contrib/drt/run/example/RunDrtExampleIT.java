@@ -49,7 +49,6 @@ public class RunDrtExampleIT {
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setDumpDataAtEnd(false);
 		RunDrtExample.run(config, false);
 	}
 	
@@ -62,7 +61,6 @@ public class RunDrtExampleIT {
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setDumpDataAtEnd(false);
 		RunDrtExample.run(config, false);
 	}
 }

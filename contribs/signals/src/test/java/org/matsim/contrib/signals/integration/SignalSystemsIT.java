@@ -118,8 +118,8 @@ public class SignalSystemsIT {
 			String iterationOutput = controlerOutputDir + "ITERS/it.10/";
 
 			Assert.assertTrue("different event files after iteration 10", 
-					EventsFileComparator.compareAndReturnInt(inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz") == 
-					EventsFileComparator.CODE_FILES_ARE_EQUAL);
+					EventsFileComparator.compare(inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz") ==
+					EventsFileComparator.Result.FILES_ARE_EQUAL);
 
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());

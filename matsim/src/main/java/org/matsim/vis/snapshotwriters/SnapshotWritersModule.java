@@ -42,6 +42,7 @@ public class SnapshotWritersModule extends AbstractModule {
 			addSnapshotWriterBinding().toProvider(TransimsSnapshotWriterFactory.class);
 		}
 		if (getConfig().controler().getWriteSnapshotsInterval() != 0) {
+
 			addMobsimListenerBinding().toProvider(SnapshotWriterManagerProvider.class);
 
 		}
@@ -55,7 +56,9 @@ public class SnapshotWritersModule extends AbstractModule {
 		private final Collection<com.google.inject.Provider<SnapshotWriter>> snapshotWriters;
 
 		@Inject
-		private SnapshotWriterManagerProvider(Config config, ControlerConfigGroup controlerConfigGroup, ReplanningContext iterationContext, Collection<com.google.inject.Provider<SnapshotWriter>> snapshotWriters) {
+		private SnapshotWriterManagerProvider(Config config, ControlerConfigGroup controlerConfigGroup,
+											  ReplanningContext iterationContext,
+											  Collection<com.google.inject.Provider<SnapshotWriter>> snapshotWriters) {
 			this.config = config;
 			this.controlerConfigGroup = controlerConfigGroup;
 			this.iterationContext = iterationContext;

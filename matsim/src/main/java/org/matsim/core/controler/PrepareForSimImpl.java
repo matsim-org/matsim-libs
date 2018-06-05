@@ -35,8 +35,12 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-class PrepareForSimImpl implements PrepareForSim {
-
+public final class PrepareForSimImpl implements PrepareForSim {
+	// I think it is ok to have this public final.  Since one may want to use it as a delegate.  kai, may'18
+	
+	// yyyy There is also a PrepareForSimMultimodalImpl.  If we want two different implementations, then this one
+	// here should not contain multimodal aspects!  kai, may'18
+	
 	private static Logger log = Logger.getLogger(PrepareForSim.class);
 
 	private final GlobalConfigGroup globalConfigGroup;
@@ -196,42 +200,12 @@ class PrepareForSimImpl implements PrepareForSim {
 	}
 
 	private void createVehiclesForEveyNetworkMode(final Map<String, VehicleType> modeVehicleTypes) {
-		// yyyy maybe better just take the modes from qsim.mainMode???  kai, dec'17
-		// agree. A network mode may not be main mode (e.g. ride) and in this case,
-		// creating vehicles for every network mode is not required. IK, AA (Apr'18).
-
-//		boolean isModeChoicePresent = false;
-//		Collection<StrategyConfigGroup.StrategySettings> strategySettings = scenario.getConfig().strategy().getStrategySettings();
-//		for (StrategyConfigGroup.StrategySettings strategySetting : strategySettings) {
-//			String name = strategySetting.getStrategyName();
-//			if ( name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.name())
-//					|| name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeTripMode.name())
-//					) {
-//				isModeChoicePresent = true;
-//			} else if (name.equals(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name())) {
-//				isModeChoicePresent = true;
-//				log.warn("Creating one vehicle corresponding to each network mode for every agent and parking it to the departure link. \n" +
-//						"If this is undesirable, then write a new PrepareForSim +" +
-//						"or, somehow get vehicles generation in your plan strategy.");
-//			} else if ( ! Arrays.stream( DefaultPlanStrategiesModule.DefaultStrategy.values() ).anyMatch( e -> e.name().equals(strategySetting.getStrategyName()))
-//					&&
-//					! Arrays.stream( DefaultPlanStrategiesModule.DefaultSelector.class.getFields() ).anyMatch( e -> e.getName().equals(strategySetting.getStrategyName()))
-//					){
-//				log.warn("Vehicles are created internally for all re-planning strategies. However, "+strategySetting.getStrategyName()+" is not one of the recognized strategy." +
-//						" \n Simulation should run without a problem if it does not include mode choice. Please provide vehicles file is this is not the case.");
-//			}
-//		}
-
-//		if (isModeChoicePresent) {
-//			Collection<String> networkModes = scenario.getConfig().plansCalcRoute().getNetworkModes();
-			for (Id<Person> personId : scenario.getPopulation().getPersons().keySet()) {
-//				for (String mode : networkModes) {
-				for (String mode : scenario.getConfig().qsim().getMainModes()) {
-					Id<Vehicle> vehicleId = createAutomaticVehicleId(personId, mode, null);
-					createAndAddVehicleIfNotPresent(vehicleId, modeVehicleTypes.get(mode));
-				}
+		for (Id<Person> personId : scenario.getPopulation().getPersons().keySet()) {
+			for (String mode : scenario.getConfig().qsim().getMainModes()) {
+				Id<Vehicle> vehicleId = createAutomaticVehicleId(personId, mode, null);
+				createAndAddVehicleIfNotPresent(vehicleId, modeVehicleTypes.get(mode));
 			}
-//		}
+		}
 	}
 
 	private  Map<String, VehicleType> getMode2VehicleType(){
@@ -293,6 +267,9 @@ class PrepareForSimImpl implements PrepareForSim {
 		Id<Vehicle> vehicleId ;
 		if (qSimConfigGroup.getUsePersonIdForMissingVehicleId()) {
 
+			// yyyy my strong preference would be to do away with this "car_" exception and to just
+			// use <mode>_personId across the board.  kai, may'18
+			
 			switch (qSimConfigGroup.getVehiclesSource()) {
 				case defaultVehicle:
 				case fromVehiclesData:

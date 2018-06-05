@@ -143,7 +143,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				break;
 			case uniform:
 //				problem = true ;
-				log.log( lvl,  "found `typicalDurationScoreComputation == uniform' for activity type " + params.getActivityType() + "; vsp should try out `relative' and report. ") ;
+				log.log( lvl,  "found `typicalDurationScoreComputation == uniform' for activity type " + params.getActivityType() + "; vsp should use `relative'. ") ;
 				break;
 			default:
 				throw new RuntimeException("unexpected setting; aborting ... ") ;
@@ -164,7 +164,8 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		if ( config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
 		}
-		if ( config.planCalcScore().getModes().get(TransportMode.pt).getMonetaryDistanceRate() > 0 ) {
+		final ModeParams modeParamsPt = config.planCalcScore().getModes().get(TransportMode.pt);
+		if ( modeParamsPt!=null && modeParamsPt.getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
 			System.out.flush() ;
 			log.error("found monetary distance cost rate pt > 0.  You probably want a value < 0 here.  " +
@@ -232,7 +233,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		
 		// added feb'16
 		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
-			log.log( lvl, "found `plansCalcRoute.insertingAccessEgressWalk==false'; vsp should try out `true' and report. " ) ;
+			log.log( lvl, "found `plansCalcRoute.insertingAccessEgressWalk==false'; vsp should use `true' or talk to Kai. " ) ;
 		}
 		
 		// === qsim:
@@ -248,9 +249,9 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 		
 		// added apr'15
-		if ( !config.qsim().isUsingFastCapacityUpdate() ) {
-			log.log( lvl,  " found 'qsim.usingFastCapacityUpdate==false'; vsp should try out `true' and report. ") ;
-		}
+//		if ( !config.qsim().isUsingFastCapacityUpdate() ) {
+//			log.log( lvl,  " found 'qsim.usingFastCapacityUpdate==false'; vsp should try out `true' and report. ") ;
+//		}
 		switch( config.qsim().getTrafficDynamics() ) {
 		case withHoles:
 		case kinematicWaves:
@@ -296,7 +297,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		// added nov'15
 		boolean usingTimeMutator = false ;
 		for ( StrategySettings it : config.strategy().getStrategySettings() ) {
-			if ( DefaultStrategy.TimeAllocationMutator.name().equals( it.getName() ) ) {
+			if ( DefaultStrategy.TimeAllocationMutator.toString().equals( it.getName() ) ) {
 				usingTimeMutator = true ;
 				break ;
 			}

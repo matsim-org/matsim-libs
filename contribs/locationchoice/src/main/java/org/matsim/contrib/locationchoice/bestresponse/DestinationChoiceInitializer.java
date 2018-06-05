@@ -35,11 +35,11 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * no further coding should be required 
  */
 public class DestinationChoiceInitializer implements StartupListener {
-	private DestinationChoiceBestResponseContext dcContext;
+	private DestinationChoiceContext dcContext;
 	private static final Logger log = Logger.getLogger(DestinationChoiceInitializer.class);
 	
 	
-	public DestinationChoiceInitializer(DestinationChoiceBestResponseContext lcContext) {
+	public DestinationChoiceInitializer(DestinationChoiceContext lcContext) {
 		this.dcContext = lcContext;
 	}
 	
@@ -65,7 +65,7 @@ public class DestinationChoiceInitializer implements StartupListener {
   		}		
 		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
 		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
-		controler.getScenario().addScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME, dcContext);
+		controler.getScenario().addScenarioElement(DestinationChoiceContext.ELEMENT_NAME, dcContext);
 		controler.getScenario().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME, dcScore);
 			
 		log.info("dc initialized");

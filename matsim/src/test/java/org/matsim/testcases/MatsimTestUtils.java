@@ -106,7 +106,10 @@ public final class MatsimTestUtils extends TestWatchman {
 	public URL inputResourcePath() {
 		return getResourceNotNull("/" + getClassInputDirectory() + getMethodName() + "/.");
 	}
-
+	
+	/**
+	 * @return class input directory as URL
+	 */
 	public URL classInputResourcePath() {
 		return getResourceNotNull("/" + getClassInputDirectory() + "/.");
 	}
