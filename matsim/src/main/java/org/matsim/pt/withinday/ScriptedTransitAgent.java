@@ -144,7 +144,7 @@ public class ScriptedTransitAgent implements MobsimDriverPassengerAgent, PlanAge
 	@Override
 	public final boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome,
 			TransitVehicle transitVehicle) {
-		log.info("Je moeder is een scripted transit agent: "+line);
+		log.info("Call from the scripted transit agent: "+line);
 		return transitAgentDelegate.getEnterTransitRoute(line, transitRoute, stopsToCome, transitVehicle);
 	}
 	@Override

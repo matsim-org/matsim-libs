@@ -31,6 +31,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import org.matsim.core.mobsim.qsim.ActivityEnginePlugin;
 import org.matsim.core.mobsim.qsim.PopulationPlugin;
+import org.matsim.core.mobsim.qsim.QSimProvider;
 import org.matsim.core.mobsim.qsim.TeleportationPlugin;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
@@ -52,7 +53,8 @@ public class WithinDayTransitModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(WithinDayTransitEngine.class);
-        bind(Mobsim.class).toProvider(WithinDayTransitQSimFactory.class);
+        //bind(Mobsim.class).toProvider(WithinDayTransitQSimFactory.class);
+		bind(Mobsim.class).toProvider(QSimProvider.class);
 	}
 	
 	@Provides
@@ -68,7 +70,7 @@ public class WithinDayTransitModule extends AbstractModule {
 			plugins.add(new TransitEnginePlugin(config));
 		}
 		plugins.add(new TeleportationPlugin(config));
-		plugins.add(new WithinDayTransitPopulationPlugin(config));
+		plugins.add(new WithinDayTransitPlugin(config));
 		return plugins;
 	}
 
