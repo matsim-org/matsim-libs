@@ -200,8 +200,11 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	
 	
 	/** 
-	 * Convenience method to all addOrGetModule with only two arguments.  
-	 * 
+	 * Convenience method to all addOrGetModule with only two arguments.
+	 * <br/>
+	 * Notes:<ul>
+	 * <li>Seems to be really slow, so don't use in inner loop.</li>
+	 * </ul>
 	 * @param config
 	 * @param moduleClass
 	 * @return instance of moduleClass inside config
@@ -222,6 +225,10 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	 * method with
 	 * ConfigUtils.addOrGetModule(this, VspExperimentalConfigGroup.GROUP_NAME, VspExperimentalConfigGroup.class)
 	 * and then hit Refactor/Inline.
+	 * <br/>
+	 * Notes:<ul>
+	 * <li>Seems to be really slow, so don't use in inner loop.</li>
+	 * </ul>
 	 */
 	public static <T extends ConfigGroup> T addOrGetModule(Config config, String groupName, Class<T> moduleClass) {
 		ConfigGroup module = config.getModule(groupName);

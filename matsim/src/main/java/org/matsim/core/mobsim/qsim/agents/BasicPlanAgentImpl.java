@@ -212,12 +212,9 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		NetworkRoute route = (NetworkRoute) this.getCurrentLeg().getRoute(); // if casts fail: illegal state.
 		if (route.getVehicleId() != null) {
 			return route.getVehicleId();
-		} else {
-	        if (!getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
-	            throw new IllegalStateException("NetworkRoute without a specified vehicle id.");
-	        }
-			return Id.create(this.getId(), Vehicle.class); // we still assume the vehicleId is the agentId if no vehicleId is given.
 		}
+		Gbl.assertIf( scenario.getConfig().qsim().getUsePersonIdForMissingVehicleId() );
+		return Id.create(this.getId(), Vehicle.class); // we still assume the vehicleId is the agentId if no vehicleId is given.
 	}
 	@Override
 	public final String getMode() {

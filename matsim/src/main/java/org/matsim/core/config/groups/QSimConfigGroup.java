@@ -591,11 +591,13 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	@StringGetter(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES)
 	public boolean isCreatingVehiclesForAllNetworkModes() {
+		// yyyy do we really need this switch?  Quite in general, please try to avoid boolean switches.  kai, may'18
 		return creatingVehiclesForAllNetworkModes;
 	}
 
 	@StringSetter(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES)
 	public void setCreatingVehiclesForAllNetworkModes(boolean creatingVehiclesForAllNetworkModes) {
+		// yyyy do we really need this switch?  Quite in general, please try to avoid boolean switches.  kai, may'18
 		this.creatingVehiclesForAllNetworkModes = creatingVehiclesForAllNetworkModes;
 	}
 }

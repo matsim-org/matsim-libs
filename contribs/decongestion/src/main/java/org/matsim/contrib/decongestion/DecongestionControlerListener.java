@@ -24,15 +24,17 @@
 
 package org.matsim.contrib.decongestion;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.decongestion.data.CongestionInfoWriter;
+import org.matsim.contrib.decongestion.data.DecongestionInfo;
+import org.matsim.contrib.decongestion.data.LinkInfo;
+import org.matsim.contrib.decongestion.handler.DelayAnalysis;
+import org.matsim.contrib.decongestion.handler.IntervalBasedTolling;
+import org.matsim.contrib.decongestion.tollSetting.DecongestionTollSetting;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -43,19 +45,14 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.GenericPlanStrategy;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
+import org.matsim.core.replanning.ReplanningUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.charts.XYLineChart;
 
-import com.google.inject.Inject;
-
-import org.matsim.contrib.decongestion.data.CongestionInfoWriter;
-import org.matsim.contrib.decongestion.data.DecongestionInfo;
-import org.matsim.contrib.decongestion.data.LinkInfo;
-import org.matsim.contrib.decongestion.handler.DelayAnalysis;
-import org.matsim.contrib.decongestion.handler.IntervalBasedTolling;
-import org.matsim.contrib.decongestion.tollSetting.DecongestionTollSetting;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 
 /**
@@ -143,18 +140,30 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	}
 
 	private void computeDelays(AfterMobsimEvent event) {
-				
+//		log.warn("entering computeDelays ...") ;
+		
 		TravelTime travelTime = event.getServices().getLinkTravelTimes();
 		int timeBinSize = this.congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
 		
 		for (Link link : this.congestionInfo.getScenario().getNetwork().getLinks().values()) {
+//			log.warn("linkID=" + link.getId() ) ;
 			
 			Map<Integer, Double> time2avgDelay = new HashMap<>();
-			double freespeedTravelTime = link.getLength() / link.getFreespeed();
 			
 			int timeBinCounter = 0;
 			for (int endTime = timeBinSize ; endTime <= this.congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime(); endTime = endTime + timeBinSize ) {
-				double avgDelay = travelTime.getLinkTravelTime(link, (endTime - timeBinSize/2.), null, null) - freespeedTravelTime;
+				final double probedTime = endTime - timeBinSize / 2.;
+				double freespeedTravelTime = link.getLength() / link.getFreespeed( probedTime ) ;
+				final double congestedTravelTime = travelTime.getLinkTravelTime(link, probedTime, null, null);
+				double avgDelay = congestedTravelTime - freespeedTravelTime;
+//				if ( link.getId().equals(Id.createLinkId("24007-24006"))) {
+//					log.warn("endTime=" + endTime / 3600. + "; freeTravelTime=" + freespeedTravelTime + "; congTravelTime=" + congestedTravelTime
+//									 + "; avgDelay=" + avgDelay);
+//				}
+//				if ( avgDelay > 0 ) {
+//					log.warn( "time=" + probedTime + "; linkID=" + link.getId() + "; avgDelay=" + avgDelay  ) ;
+////					throw new RuntimeException("found a delay") ;
+//				}
 				time2avgDelay.put(timeBinCounter, avgDelay);				
 				timeBinCounter++;
 			}
@@ -162,11 +171,12 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 			if (this.congestionInfo.getlinkInfos().get(link.getId()) != null) {
 				this.congestionInfo.getlinkInfos().get(link.getId()).setTime2avgDelay(time2avgDelay);
 			} else {
-				LinkInfo linkInfo = new LinkInfo(link.getId());
+				LinkInfo linkInfo = new LinkInfo(link);
 				linkInfo.setTime2avgDelay(time2avgDelay);
 				this.congestionInfo.getlinkInfos().put(link.getId(), linkInfo);
 			}
 		}
+//		log.warn("... done with computeDelays.") ;
 	}
 
 	@Override
@@ -247,7 +257,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 					for (GenericPlanStrategy<Plan, Person> strategy : event.getServices().getStrategyManager().getStrategies(null)) {
 						
 						String strategyName = strategy.toString();
-						if (isInnovativeStrategy(strategyName)) {
+						if (isInnovativeStrategy(strategy)) {
 							log.info("Setting weight for " + strategyName + " to zero.");
 							event.getServices().getStrategyManager().changeWeightOfStrategy(strategy, null, 0.0);
 						}
@@ -270,7 +280,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 						for (GenericPlanStrategy<Plan, Person> strategy : event.getServices().getStrategyManager().getStrategies(null)) {
 							
 							String strategyName = strategy.toString();
-							if (isInnovativeStrategy(strategyName)) {
+							if (isInnovativeStrategy(strategy)) {
 								
 								double originalValue = -1.0;
 								for (StrategySettings setting : event.getServices().getConfig().strategy().getStrategySettings()) {
@@ -297,16 +307,19 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		}
 	}
 
-	private boolean isInnovativeStrategy(String strategyName) {
-		log.info("Strategy name: " + strategyName);
-		boolean innovative = false ;
-		for ( DefaultStrategy strategy : DefaultPlanStrategiesModule.DefaultStrategy.values() ) {
-			log.info("default strategy: " +  strategy.toString());
-			if ( strategyName.contains(strategy.toString()) ) {
-				innovative = true ;
-				break ;
-			}
-		}
+	private boolean isInnovativeStrategy( GenericPlanStrategy<Plan, Person> strategy) {
+		log.info("Strategy name: " + strategy.toString() );
+//		boolean innovative = false ;
+//		for ( DefaultStrategy strategy : DefaultPlanStrategiesModule.DefaultStrategy.values() ) {
+//			log.info("default strategy: " +  strategy.toString());
+//			if ( strategyName.contains(strategy.toString()) ) {
+//				innovative = true ;
+//				break ;
+//			}
+//		}
+
+		boolean innovative = ! ( ReplanningUtils.isOnlySelector( strategy ) ) ;
+
 		log.info("Innovative: " + innovative);
 		
 		return innovative;

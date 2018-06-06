@@ -32,17 +32,17 @@ import org.matsim.api.core.v01.network.Link;
 
 public class LinkInfo {
 	
-	private final Id<Link> linkId;
+	private final Link link;
 	
 	private final Map<Integer, Double> time2toll = new HashMap<>();
 	private Map<Integer, Double> time2avgDelay = new HashMap<>();
 	
-	public LinkInfo(Id<Link> linkId) {
-		this.linkId = linkId;
+	public LinkInfo(Link link) {
+		this.link = link;
 	}
 
-	public Id<Link> getLinkId() {
-		return linkId;
+	public Link getLink() {
+		return link;
 	}
 
 	public Map<Integer, Double> getTime2toll() {

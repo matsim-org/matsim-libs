@@ -63,14 +63,14 @@ public class DecongestionTollingBangBang implements DecongestionTollSetting {
 				
 				if (linkInfo.getTime2avgDelay().get(intervalNr) <= toleratedAverageDelay ) {	
 					if (previousToll != null) {
-						toll = previousToll - tollAdjustment;
+						toll = previousToll - tollAdjustment * linkInfo.getLink().getLength()/1000. ;
 					}		
 					
 				} else {
 					if (previousToll != null) {
 						toll = previousToll + tollAdjustment;
 					} else {
-						toll = initialToll;
+						toll = initialToll * linkInfo.getLink().getLength()/1000. ;
 					}
 				}
 

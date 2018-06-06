@@ -22,9 +22,12 @@
 
 package org.matsim.core.replanning;
 
-class PlanStrategies {
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 
-	static boolean isOnlySelector(PlanStrategy planStrategy) {
+public final class ReplanningUtils {
+
+	public static boolean isOnlySelector(GenericPlanStrategy<Plan, Person> planStrategy) {
 		if (planStrategy instanceof PlanStrategyImpl) {
 			return ((PlanStrategyImpl) planStrategy).getNumberOfStrategyModules() == 0;
 		}
