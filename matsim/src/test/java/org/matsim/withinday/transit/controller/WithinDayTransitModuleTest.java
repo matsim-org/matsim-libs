@@ -61,7 +61,7 @@ public class WithinDayTransitModuleTest {
 		Config config = utils.loadConfig("test/scenarios/pt-withinday/config.xml", new WithinDayTransitConfigGroup());
 		config.controler().setLastIteration(0);
 		Controler controler = new Controler(config);
-		controler.addOverridingModule(new WithinDayTransitModule());
+		controler.addOverridingModule(new WithinDayTransitModule(config));
 		PersonEntersVehicleEventHandler handler = this::checkEnterEvent;
 		controler.getEvents().addHandler(handler);
 		controler.run();
