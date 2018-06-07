@@ -255,6 +255,13 @@ public class WithinDayTransitEngine implements MobsimEngine {
 		return newPlan;
 	}
 	
+	/**
+	 * This cleans up a plan that contains unnecessary transit-walk and pt interactions
+	 * parts of the plan. This is to make sure that the agent does not wait infinitely
+	 * in some part of the plan
+	 * @param elements the list of PlanElements to clean up
+	 * @return a cleaned version of the plan
+	 */
 	private List<PlanElement> cleanUp(List<PlanElement> elements) {
 		if (elements.size() < 3) {
 			return elements;
@@ -270,6 +277,7 @@ public class WithinDayTransitEngine implements MobsimEngine {
 			skip = false;
 			
 			Leg leg = triplet.second;
+			// If we walk from and to the same link, skip this part of the plan
 			if (leg.getMode().equals(TransportMode.transit_walk) &&
 				triplet.first.getLinkId().equals(triplet.third.getLinkId())) {
 				skip = true;				
