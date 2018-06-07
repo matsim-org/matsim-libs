@@ -47,6 +47,8 @@ public class VisualizeSignalScenario {
 	public static void run(boolean startOtfvis) throws IOException {
 		// --- load the configuration file
 		Config config = ConfigUtils.loadConfig(INPUT_DIR + "config.xml");
+		// TODO add act type h to config
+		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		
 		// --- create the scenario
