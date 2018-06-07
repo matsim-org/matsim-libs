@@ -35,6 +35,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -246,10 +247,39 @@ public class WithinDayTransitEngine implements MobsimEngine {
 		}
 		// Do not forget to add the final activity
 		newPlan.add(triplets.get(triplets.size()-1).third);
+		newPlan = cleanUp(newPlan);
 		if (log.isDebugEnabled()) {
-			log.debug("Old plan: "+elements+", New plan: "+newPlan);
+			log.debug("Old plan: "+elements);
+			log.debug("New plan: "+newPlan);
 		}
 		return newPlan;
+	}
+	
+	private List<PlanElement> cleanUp(List<PlanElement> elements) {
+		if (elements.size() < 3) {
+			return elements;
+		}
+		List<PlanElement> result = new ArrayList<>();
+		List<Triplet<Activity,Leg,Activity>> triplets = toTriplets(elements);
+		boolean skip = false;
+		for (Triplet<Activity,Leg,Activity> triplet : triplets) {
+			
+			if (!skip) {
+				result.add(triplet.first);
+			}
+			skip = false;
+			
+			Leg leg = triplet.second;
+			if (leg.getMode().equals(TransportMode.transit_walk) &&
+				triplet.first.getLinkId().equals(triplet.third.getLinkId())) {
+				skip = true;				
+			}
+			else {
+				result.add(triplet.second);
+			}
+		}
+		result.add(triplets.get(triplets.size()-1).third);
+		return result;
 	}
 	
 	/**

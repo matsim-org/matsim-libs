@@ -23,6 +23,10 @@
 package org.matsim.withinday.transit.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Rule;
@@ -37,6 +41,8 @@ import org.matsim.pt.withinday.WithinDayTransitModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class WithinDayTransitModuleTest {
+
+	private Map<String,String> observations = new HashMap<>();
 
 	private static Logger log = Logger.getLogger(WithinDayTransitModuleTest.class);
 	
@@ -64,8 +70,12 @@ public class WithinDayTransitModuleTest {
 		controler.addOverridingModule(new WithinDayTransitModule(config));
 		PersonEntersVehicleEventHandler handler = this::checkEnterEvent;
 		controler.getEvents().addHandler(handler);
+		observations.clear();
 		controler.run();
+		assertTrue("Person 1 did enter a vehicle", observations.containsKey("1"));
+		assertTrue("Person 2 did enter a vehicle", observations.containsKey("2"));
 	}
+	
 	
 	private void checkEnterEvent(PersonEntersVehicleEvent event) {
 		if (event.getPersonId().equals(Id.createPersonId(1))) {
@@ -76,6 +86,7 @@ public class WithinDayTransitModuleTest {
 			// This person should be rerouted to the red line e.g. vehicle 3000
 			assertEquals("Person 2 should take the red line after within-day replanning", event.getVehicleId(), Id.createVehicleId(3000));
 		}
+		observations.put(event.getPersonId().toString(), event.getVehicleId().toString());
 		log.info("The test handler detected that person "+event.getPersonId()+" enters vehicle "+event.getVehicleId());
 	}
 	

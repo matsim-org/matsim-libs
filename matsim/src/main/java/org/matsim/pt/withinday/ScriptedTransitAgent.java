@@ -47,7 +47,13 @@ public class ScriptedTransitAgent implements MobsimDriverPassengerAgent, PlanAge
 
 	@Override
 	public final void endLegAndComputeNextState(double now) {
+		String id = basicAgentDelegate.getId().toString();
+		String cur = basicAgentDelegate.getCurrentPlanElement().toString();
+		String priorState = basicAgentDelegate.getState().toString() + "("+cur+")";
 		basicAgentDelegate.endLegAndComputeNextState(now);
+		String post = basicAgentDelegate.getCurrentPlanElement().toString();
+		String posteriorState = basicAgentDelegate.getState().toString() + "("+post+")";
+		log.info("Agent "+id+" end leg: "+priorState+" -> "+posteriorState);
 	}
 	@Override
 	public final void setStateToAbort(double now) {
@@ -59,7 +65,13 @@ public class ScriptedTransitAgent implements MobsimDriverPassengerAgent, PlanAge
 	}
 	@Override
 	public final void endActivityAndComputeNextState(double now) {
+		String id = basicAgentDelegate.getId().toString();
+		String cur = basicAgentDelegate.getCurrentPlanElement().toString();
+		String priorState = basicAgentDelegate.getState().toString() + "("+cur+")";
 		basicAgentDelegate.endActivityAndComputeNextState(now);
+		String post = basicAgentDelegate.getCurrentPlanElement().toString();
+		String posteriorState = basicAgentDelegate.getState().toString() + "("+post+")";
+		log.info("Agent "+id+" end activity: "+priorState+" -> "+posteriorState);
 	}
 	@Override
 	public final Id<Vehicle> getPlannedVehicleId() {
@@ -144,8 +156,10 @@ public class ScriptedTransitAgent implements MobsimDriverPassengerAgent, PlanAge
 	@Override
 	public final boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome,
 			TransitVehicle transitVehicle) {
-		log.info("Call from the scripted transit agent: "+line);
-		return transitAgentDelegate.getEnterTransitRoute(line, transitRoute, stopsToCome, transitVehicle);
+		boolean answer = transitAgentDelegate.getEnterTransitRoute(line, transitRoute, stopsToCome, transitVehicle);
+		String id = transitAgentDelegate.getId().toString();
+		log.info("Person "+id+" getEnterTransitRoute "+line+"/"+transitRoute+" : "+answer);
+		return answer;
 	}
 	@Override
 	public final double getWeight() {
