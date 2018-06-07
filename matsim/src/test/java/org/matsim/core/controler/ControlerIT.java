@@ -693,7 +693,7 @@ public class ControlerIT {
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getOutputFilename(Controler.FILENAME_POPULATION)).exists());
+		assertTrue(new File(controler.getControlerIO().getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_POPULATION)).exists());
 	}
 
 	/**
@@ -724,7 +724,7 @@ public class ControlerIT {
 		controler.run();
 
 
-		assertFalse(new File(controler.getControlerIO().getOutputFilename(Controler.FILENAME_POPULATION)).exists());
+		assertFalse(new File(controler.getControlerIO().getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_POPULATION)).exists());
 	}
 
 	@Test(expected = RuntimeException.class)

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
@@ -77,7 +78,7 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 			final String internalCRS = config.global().getCoordinateSystem();
 
 			if ( inputCRS == null ) {
-				new PopulationWriter(population, network).write(controlerIO.getIterationFilename(event.getIteration(), "plans.xml.gz"));
+				new PopulationWriter(population, network).write(controlerIO.getIterationFilename(event.getIteration(), Controler.FILENAME_POPULATION));
 			}
 			else {
 				log.info( "re-projecting population from "+internalCRS+" back to "+inputCRS+" for export" );
@@ -87,7 +88,7 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 								internalCRS,
 								inputCRS );
 
-				new PopulationWriter(transformation, population, network).write(controlerIO.getIterationFilename(event.getIteration(), "plans.xml.gz"));
+				new PopulationWriter(transformation, population, network).write(controlerIO.getIterationFilename(event.getIteration(), Controler.FILENAME_POPULATION));
 			}
 			log.info("finished plans dump.");
 			stopwatch.endOperation("dump all plans");
