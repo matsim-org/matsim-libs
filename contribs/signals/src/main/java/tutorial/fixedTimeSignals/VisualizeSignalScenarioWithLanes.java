@@ -20,11 +20,14 @@
 package tutorial.fixedTimeSignals;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.otfvis.OTFVisWithSignals;
+import org.matsim.contrib.signals.otfvis.OTFVisWithSignalsLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -38,11 +41,27 @@ public class VisualizeSignalScenarioWithLanes {
 	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/useSignalInput/withLanes/";
 
 	public static void run(boolean startOtfvis) {
+		// --- load the configuration file
 		Config config = ConfigUtils.loadConfig(INPUT_DIR + "config.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		
+		// --- create the scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		// load the information about signals data (i.e. fill the SignalsData object) and add it to the scenario as scenario element
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
-		OTFVisWithSignals.playScenario(scenario, startOtfvis);
+
+		// --- create the controler
+		Controler c = new Controler(scenario);
+		// add the signals module to the simulation such that SignalsData is not only
+		// contained in the scenario but also used in the simulation
+		c.addOverridingModule(new SignalsModule());
+		if (startOtfvis) {
+			// add the module that start the otfvis visualization with signals
+			c.addOverridingModule(new OTFVisWithSignalsLiveModule());
+		}
+
+		// --- run the simulation
+		c.run();
 	}
 
 	public static void main(String[] args) {
