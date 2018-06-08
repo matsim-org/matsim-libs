@@ -85,6 +85,8 @@ public class WithinDayTransitEngine implements MobsimEngine {
 	private InternalInterface internalInterface;
 	
 	private TransitSchedule currentSchedule;
+	
+	private List<XMLDisruption> active;
 	private Deque<XMLDisruption> pending;
 	
 	
@@ -107,6 +109,7 @@ public class WithinDayTransitEngine implements MobsimEngine {
 			log.error("Error while parsing disruptions XML file" , e);
 		}
 		this.pending = new ArrayDeque<>(disruptions.size());
+		this.active = new ArrayList<>(disruptions.size());
 	}
 	
 	@Override
@@ -124,6 +127,31 @@ public class WithinDayTransitEngine implements MobsimEngine {
 			
 			doReplan(router, disruption);
 		}
+	}
+	
+	public ScriptedTransitBehavior getBehavior() {
+		return null;
+	}
+	
+	public boolean isAvailable(TransitLine line, TransitRoute route) {
+		double time = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+		for (XMLDisruption disruption : active) {
+			if (disruption.getEndTime() != null && time >= disruption.getEndTime()) {
+				continue;
+			}
+			Id<TransitLine> dLine = Id.create(disruption.getLine(), TransitLine.class);
+			if (!line.getId().equals(dLine)) {
+				continue;
+			}
+			if (disruption.getRoute() == null) {
+				return false;
+			}
+			Id<TransitRoute> dRoute = Id.create(disruption.getRoute(), TransitRoute.class);
+			if (route.getId().equals(dRoute)) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	/**
@@ -481,6 +509,7 @@ public class WithinDayTransitEngine implements MobsimEngine {
 		// Reset the queue of pending disruptions
 		pending.clear();
 		pending.addAll(disruptions);
+		active.clear();
 		// Reset the current transit schedule
 		currentSchedule = scenario.getTransitSchedule();
 	}

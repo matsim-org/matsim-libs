@@ -4,11 +4,15 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.framework.HasPerson;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.HasModifiablePlan;
@@ -19,6 +23,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.facilities.Facility;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -32,17 +37,26 @@ public class ScriptedTransitAgent implements MobsimDriverPassengerAgent, PlanAge
 	private BasicPlanAgentImpl basicAgentDelegate ;
 	private PlanBasedDriverAgentImpl driverAgentDelegate ;
 	private TransitAgentImpl transitAgentDelegate ;
+	
+	private MobsimTimer timer;
+	private Scenario scenario;
+	private WithinDayTransitEngine disruptionEngine;
+	private ScriptedTransitBehavior behavior;
 
-	public static ScriptedTransitAgent createTransitAgent(Person p, Netsim simulation) {
-		ScriptedTransitAgent agent = new ScriptedTransitAgent(p, simulation);
+	public static ScriptedTransitAgent createTransitAgent(Person p, Netsim simulation, WithinDayTransitEngine engine) {
+		ScriptedTransitAgent agent = new ScriptedTransitAgent(p, simulation, engine);
 		return agent;
 	}
 
-	private ScriptedTransitAgent(final Person p, final Netsim simulation) {
+	private ScriptedTransitAgent(final Person p, final Netsim simulation, final WithinDayTransitEngine engine) {
 		basicAgentDelegate = new BasicPlanAgentImpl( p.getSelectedPlan(), simulation.getScenario(), simulation.getEventsManager(), 
 				simulation.getSimTimer() ) ;
 		driverAgentDelegate = new PlanBasedDriverAgentImpl( basicAgentDelegate ) ;
 		transitAgentDelegate = new TransitAgentImpl( basicAgentDelegate );
+		
+		timer = simulation.getSimTimer();
+		scenario = simulation.getScenario();
+		disruptionEngine = engine;
 	}
 
 	@Override
@@ -156,9 +170,55 @@ public class ScriptedTransitAgent implements MobsimDriverPassengerAgent, PlanAge
 	@Override
 	public final boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome,
 			TransitVehicle transitVehicle) {
+		
+		// Step 1: if this line or route is currently disrupted, return false
+		if (!disruptionEngine.isAvailable(line, transitRoute)) {
+			return false;
+		}
+		
+		// Step 2: if this line or route is according to plan, return true (?)
 		boolean answer = transitAgentDelegate.getEnterTransitRoute(line, transitRoute, stopsToCome, transitVehicle);
-		String id = transitAgentDelegate.getId().toString();
-		log.info("Person "+id+" getEnterTransitRoute "+line+"/"+transitRoute+" : "+answer);
+		if (answer) {
+			return true;
+		}
+		
+		// Step 3: if the stopsToCome do not contain the planned goal, do nothing
+		boolean isCandidate;
+		PlanElement cur = basicAgentDelegate.getCurrentPlanElement();
+		Leg leg;
+		Id<TransitLine> plannedLineId;
+		Id<TransitRoute> plannedRouteId;
+		if (cur instanceof Leg) {
+			leg = (Leg) cur;
+			Route route = leg.getRoute();
+			if (route instanceof ExperimentalTransitRoute) {
+				ExperimentalTransitRoute etr = (ExperimentalTransitRoute) route;
+				plannedLineId = etr.getLineId();
+				plannedRouteId = etr.getRouteId();
+				isCandidate = stopsToCome.stream()
+						                 .anyMatch(trs -> trs.getStopFacility().getId().equals(etr.getEgressStopId()));
+			}
+			else {
+				throw new IllegalStateException("Agent waiting for public transport does not have a ExperimentalTransitRoute as its route");
+			}
+		}
+		else {
+			throw new IllegalStateException("Agent waiting for the public transport does not have a Leg as the current PlanElement");
+		}
+
+		if (!isCandidate) {
+			return false;
+		}
+		
+		// Step 4: if present, delegate to the ScriptedTransitBehavior
+		if (behavior != null) {
+			double time = timer.getTimeOfDay();
+			TransitRoute plannedRoute = scenario.getTransitSchedule().getTransitLines().get(plannedLineId).getRoutes().get(plannedRouteId);
+			return behavior.enterVehicle(basicAgentDelegate.getPerson(), time, line, transitRoute, stopsToCome, leg, plannedRoute);
+		}
+		
+		//String id = transitAgentDelegate.getId().toString();
+		//log.info("Person "+id+" getEnterTransitRoute "+line+"/"+transitRoute+" : "+answer);
 		return answer;
 	}
 	@Override

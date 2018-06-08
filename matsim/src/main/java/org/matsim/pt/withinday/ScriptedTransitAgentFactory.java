@@ -10,15 +10,17 @@ import com.google.inject.Inject;
 public class ScriptedTransitAgentFactory implements AgentFactory {
 
 	private Netsim netsim;
+	private WithinDayTransitEngine engine;
 	
 	@Inject
-	public ScriptedTransitAgentFactory(Netsim netsim) {
+	public ScriptedTransitAgentFactory(Netsim netsim, WithinDayTransitEngine engine) {
 		this.netsim = netsim;
+		this.engine = engine;
 	}
 	
 	@Override
 	public MobsimAgent createMobsimAgentFromPerson(Person p) {
-		return ScriptedTransitAgent.createTransitAgent(p, netsim);
+		return ScriptedTransitAgent.createTransitAgent(p, netsim, engine);
 	}
 
 }
