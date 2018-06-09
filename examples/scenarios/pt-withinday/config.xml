@@ -94,6 +94,7 @@
 	<module name="withinDayTransit">
 		<!-- The file with information about disruptions -->
 		<param name="disruptionsFile" value="disruptions.xml" />
+		<param name="behavior" value="regular" />
 	</module>
 	
 

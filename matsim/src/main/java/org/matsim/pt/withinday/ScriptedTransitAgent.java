@@ -41,7 +41,6 @@ public class ScriptedTransitAgent implements MobsimDriverPassengerAgent, PlanAge
 	private MobsimTimer timer;
 	private Scenario scenario;
 	private WithinDayTransitEngine disruptionEngine;
-	private ScriptedTransitBehavior behavior;
 
 	public static ScriptedTransitAgent createTransitAgent(Person p, Netsim simulation, WithinDayTransitEngine engine) {
 		ScriptedTransitAgent agent = new ScriptedTransitAgent(p, simulation, engine);
@@ -186,6 +185,7 @@ public class ScriptedTransitAgent implements MobsimDriverPassengerAgent, PlanAge
 		boolean isCandidate;
 		PlanElement cur = basicAgentDelegate.getCurrentPlanElement();
 		Leg leg;
+		Id<TransitStopFacility> goal;
 		Id<TransitLine> plannedLineId;
 		Id<TransitRoute> plannedRouteId;
 		if (cur instanceof Leg) {
@@ -195,6 +195,7 @@ public class ScriptedTransitAgent implements MobsimDriverPassengerAgent, PlanAge
 				ExperimentalTransitRoute etr = (ExperimentalTransitRoute) route;
 				plannedLineId = etr.getLineId();
 				plannedRouteId = etr.getRouteId();
+				goal = etr.getEgressStopId();
 				isCandidate = stopsToCome.stream()
 						                 .anyMatch(trs -> trs.getStopFacility().getId().equals(etr.getEgressStopId()));
 			}
@@ -211,10 +212,11 @@ public class ScriptedTransitAgent implements MobsimDriverPassengerAgent, PlanAge
 		}
 		
 		// Step 4: if present, delegate to the ScriptedTransitBehavior
+		ScriptedTransitBehavior behavior = disruptionEngine.getBehavior();
 		if (behavior != null) {
 			double time = timer.getTimeOfDay();
 			TransitRoute plannedRoute = scenario.getTransitSchedule().getTransitLines().get(plannedLineId).getRoutes().get(plannedRouteId);
-			return behavior.enterVehicle(basicAgentDelegate.getPerson(), time, line, transitRoute, stopsToCome, leg, plannedRoute);
+			return behavior.enterVehicle(basicAgentDelegate.getPerson(), time, line, transitRoute, stopsToCome, goal, leg, plannedRoute);
 		}
 		
 		//String id = transitAgentDelegate.getId().toString();

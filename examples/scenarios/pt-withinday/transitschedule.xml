@@ -50,4 +50,27 @@
     </departures>
   </transitRoute>
 </transitLine>
+<transitLine id="purple">
+	<transitRoute id="purple_1">
+		<transportMode>pt</transportMode>
+		<routeProfile>
+			<stop refId="192" departureOffset="00:00:00" arrivalOffset="00:00:00" awaitDeparture="true"/>
+			<stop refId="293" departureOffset="00:00:30" arrivalOffset="00:00:30" awaitDeparture="true"/>
+			<stop refId="495" departureOffset="02:00:30" arrivalOffset="02:00:00" awaitDeparture="true"/>
+			<stop refId="596" departureOffset="02:01:30" arrivalOffset="02:01:00" awaitDeparture="true"/>
+		</routeProfile>
+		<route>
+			<link refId="1-2"/>
+			<link refId="2-3"/>
+			<link refId="3-4"/>
+			<link refId="4-5"/>
+			<link refId="5-6"/>
+		</route>
+	<departures>
+      <departure id="3000" departureTime="05:04:00" vehicleRefId="4000"/>
+      <departure id="3010" departureTime="05:33:00" vehicleRefId="5000"/>
+	  <departure id="3020" departureTime="05:35:00" vehicleRefId="6000"/>
+    </departures>
+	</transitRoute>
+</transitLine>
 </transitSchedule>

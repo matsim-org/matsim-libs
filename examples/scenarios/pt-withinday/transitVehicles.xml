@@ -11,4 +11,7 @@
 <vehicle id="1000" type="1"/>
 <vehicle id="2000" type="1"/>
 <vehicle id="3000" type="1"/>
+<vehicle id="4000" type="1"/>
+<vehicle id="5000" type="1"/>
+<vehicle id="6000" type="1"/>
 </vehicleDefinitions>

@@ -29,6 +29,7 @@ public class WithinDayTransitConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "withinDayTransit";
 
 	private String disruptionsFile;
+	private String behavior;
 	
 	public WithinDayTransitConfigGroup() {
 		super(GROUP_NAME);
@@ -42,6 +43,16 @@ public class WithinDayTransitConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter("disruptionsFile")
 	public String getDisruptionsFile() {
 		return disruptionsFile;
+	}
+	
+	@StringSetter("behavior")
+	public void setBehavior(String behavior) {
+		this.behavior = behavior;
+	}
+	
+	@StringGetter("behavior")
+	public String getBehavior() {
+		return behavior;
 	}
 	
 }

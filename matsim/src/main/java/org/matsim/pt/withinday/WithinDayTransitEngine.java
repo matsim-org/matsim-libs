@@ -22,7 +22,11 @@
 
 package org.matsim.pt.withinday;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -52,6 +56,7 @@ import org.matsim.core.mobsim.qsim.agents.HasModifiablePlan;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.jaxb.ptdisruption.XMLDisruptions;
 import org.matsim.jaxb.ptdisruption.XMLDisruptions.XMLDisruption;
@@ -68,6 +73,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 
+import com.google.common.io.Files;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -89,6 +95,7 @@ public class WithinDayTransitEngine implements MobsimEngine {
 	private List<XMLDisruption> active;
 	private Deque<XMLDisruption> pending;
 	
+	private ScriptedTransitBehavior scriptedBehavior;
 	
 	@Inject
 	public WithinDayTransitEngine(Config config, Scenario scenario) {
@@ -110,6 +117,37 @@ public class WithinDayTransitEngine implements MobsimEngine {
 		}
 		this.pending = new ArrayDeque<>(disruptions.size());
 		this.active = new ArrayList<>(disruptions.size());
+		
+		String behavior = cfg.getBehavior();
+		if (behavior == null || behavior.equals("regular")) {
+			// Do nothing for now
+		}
+		else if (behavior.equals("greedy")) {
+			this.scriptedBehavior = ScriptedTransitBehavior.greedyBehavior();
+		}
+		else if (behavior.startsWith("flexible(") && behavior.endsWith(")")) {
+			String timeStr = behavior.substring(9,behavior.length()-1).trim();
+			double time = Time.parseTime(timeStr);
+			this.scriptedBehavior = ScriptedTransitBehavior.thresholdBehavior(time);
+		}
+		else if (behavior.toLowerCase().endsWith(".js")) {
+			URL url = ConfigGroup.getInputFileURL(config.getContext(), behavior);
+			StringBuilder sb = new StringBuilder();
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(IOUtils.getInputStream(url), StandardCharsets.UTF_8))) {
+				String line;
+				while ((line = br.readLine()) != null) {
+					sb.append(line);
+					sb.append("\n");
+				}
+			}
+			catch (IOException ex) {
+				throw new IllegalArgumentException("An IO Exception occurred while reading the behavior script", ex);
+			}
+			this.scriptedBehavior = ScriptedTransitBehavior.javascriptBehavior(sb.toString());
+		}
+		else {
+			throw new IllegalArgumentException("The behavior type '"+behavior+"' is not known");
+		}
 	}
 	
 	@Override
@@ -117,6 +155,7 @@ public class WithinDayTransitEngine implements MobsimEngine {
 		// Check whether there are disruptions queued up that should be executed now
 		while (!pending.isEmpty() && time >= pending.peek().getStartTime()) {
 			XMLDisruption disruption = pending.pop();
+			active.add(disruption);
 			
 			if (log.isInfoEnabled()) {
 				log.info("Disruption was triggered. Running the replanner for " + describe(disruption));
@@ -130,7 +169,7 @@ public class WithinDayTransitEngine implements MobsimEngine {
 	}
 	
 	public ScriptedTransitBehavior getBehavior() {
-		return null;
+		return scriptedBehavior;
 	}
 	
 	public boolean isAvailable(TransitLine line, TransitRoute route) {
