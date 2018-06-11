@@ -33,7 +33,6 @@ import org.matsim.contrib.minibus.hook.PModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -121,9 +120,9 @@ public class PControlerTestIT implements TabularFileHandler{
 		// Check first iteration
 		Assert.assertEquals("Number of coops (first iteration)", "1", this.pStatsResults.get(1)[1]);
 		Assert.assertEquals("Number of routes (first iteration)", "1", this.pStatsResults.get(1)[3]);
-		Assert.assertEquals("Number of pax (first iteration)", "3399", this.pStatsResults.get(1)[5]);
+		Assert.assertEquals("Number of pax (first iteration)", "3401", this.pStatsResults.get(1)[5]);
 		Assert.assertEquals("Number of veh (first iteration)", "3", this.pStatsResults.get(1)[7]);
-		Assert.assertEquals("Number of budget (first iteration)", "-118.7326666667", this.pStatsResults.get(1)[9]);
+		Assert.assertEquals("Number of budget (first iteration)", "-118.5493333333", this.pStatsResults.get(1)[9]);
 
 		Assert.assertEquals("Number of +coops (first iteration)", "0", this.pStatsResults.get(1)[2]);
 		Assert.assertEquals("Number of +routes (first iteration)", "0", this.pStatsResults.get(1)[4]);
@@ -133,15 +132,15 @@ public class PControlerTestIT implements TabularFileHandler{
 
 		Assert.assertEquals("Number of coops (last iteration)", "2", this.pStatsResults.get(11)[1]);
 		Assert.assertEquals("Number of routes (last iteration)", "3", this.pStatsResults.get(11)[3]);
-		Assert.assertEquals("Number of pax (last iteration)", "7134", this.pStatsResults.get(11)[5]);
-		Assert.assertEquals("Number of veh (last iteration)", "10", this.pStatsResults.get(11)[7]);
-		Assert.assertEquals("Number of budget (last iteration)", "86.6193333333", this.pStatsResults.get(11)[9]);
+		Assert.assertEquals("Number of pax (last iteration)", "7566", this.pStatsResults.get(11)[5]);
+		Assert.assertEquals("Number of veh (last iteration)", "9", this.pStatsResults.get(11)[7]);
+		Assert.assertEquals("Number of budget (last iteration)", "132.8277222222", this.pStatsResults.get(11)[9]);
 
 		Assert.assertEquals("Number of +coops (last iteration)", "1", this.pStatsResults.get(11)[2]);
 		Assert.assertEquals("Number of +routes (last iteration)", "2", this.pStatsResults.get(11)[4]);
-		Assert.assertEquals("Number of +pax (last iteration)", "7055", this.pStatsResults.get(11)[6]);
-		Assert.assertEquals("Number of +veh (last iteration)", "9", this.pStatsResults.get(11)[8]);
-		Assert.assertEquals("Number of +budget (last iteration)", "100.5174444444", this.pStatsResults.get(11)[10]);
+		Assert.assertEquals("Number of +pax (last iteration)", "7460", this.pStatsResults.get(11)[6]);
+		Assert.assertEquals("Number of +veh (last iteration)", "8", this.pStatsResults.get(11)[8]);
+		Assert.assertEquals("Number of +budget (last iteration)", "190.5223333333", this.pStatsResults.get(11)[10]);
 	}
 
 	@Override
