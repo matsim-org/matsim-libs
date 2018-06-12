@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
@@ -32,6 +33,7 @@ import org.matsim.contrib.drt.optimizer.depot.Depots;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -52,9 +54,13 @@ import com.google.inject.Inject;
  * @author michalm
  */
 public class DefaultDrtOptimizer implements DrtOptimizer {
+	private static final Logger log = Logger.getLogger(DefaultDrtOptimizer.class);
+
 	public static final String DRT_OPTIMIZER = "drt_optimizer";
 
 	private final DrtConfigGroup drtCfg;
+	private final MinCostFlowRebalancingParams rebalancingParams;
+	private final boolean rebalancingEnabled;
 	private final Fleet fleet;
 	private final DrtScheduleInquiry scheduleInquiry;
 	private final DrtScheduleTimingUpdater scheduleTimingUpdater;
@@ -80,12 +86,14 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		this.mobsimTimer = mobsimTimer;
 		this.eventsManager = eventsManager;
 		this.requestValidator = requestValidator;
-		this.depotFinder = drtCfg.getIdleVehiclesReturnToDepots() ? depotFinder : null;
-		this.rebalancingStrategy = drtCfg.getRebalancingInterval() != 0 ? rebalancingStrategy : null;
+		this.depotFinder = depotFinder;
+		this.rebalancingStrategy = rebalancingStrategy;
 		this.scheduleInquiry = scheduleInquiry;
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.relocator = relocator;
 		this.requestInserter = requestInserter;
+		rebalancingParams = drtCfg.getMinCostFlowRebalancing();
+		rebalancingEnabled = MinCostFlowRebalancingParams.isRebalancingEnabled(rebalancingParams);
 	}
 
 	@Override
@@ -99,7 +107,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 			requiresReoptimization = false;
 		}
 
-		if (rebalancingStrategy != null && e.getSimulationTime() % drtCfg.getRebalancingInterval() == 0) {
+		if (rebalancingEnabled && e.getSimulationTime() % rebalancingParams.getInterval() == 0) {
 			rebalanceFleet();
 		}
 	}
@@ -108,14 +116,16 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		// right now we relocate only idle vehicles (vehicles that are being relocated cannot be relocated)
 		Stream<? extends Vehicle> rebalancableVehicles = fleet.getVehicles().values().stream()
 				.filter(scheduleInquiry::isIdle);
-
 		List<Relocation> relocations = rebalancingStrategy.calcRelocations(rebalancableVehicles,
 				mobsimTimer.getTimeOfDay());
 
-		for (Relocation r : relocations) {
-			Link currentLink = ((DrtStayTask)r.vehicle.getSchedule().getCurrentTask()).getLink();
-			if (currentLink != r.link) {
-				relocator.relocateVehicle(r.vehicle, r.link, mobsimTimer.getTimeOfDay());
+		if (!relocations.isEmpty()) {
+			log.debug("Fleet rebalancing: #relocations=" + relocations.size());
+			for (Relocation r : relocations) {
+				Link currentLink = ((DrtStayTask)r.vehicle.getSchedule().getCurrentTask()).getLink();
+				if (currentLink != r.link) {
+					relocator.relocateVehicle(r.vehicle, r.link);
+				}
 			}
 		}
 	}
@@ -140,10 +150,10 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		vehicle.getSchedule().nextTask();
 
 		// if STOP->STAY then choose the best depot
-		if (depotFinder != null && Depots.isSwitchingFromStopToStay(vehicle)) {
+		if (drtCfg.getIdleVehiclesReturnToDepots() && Depots.isSwitchingFromStopToStay(vehicle)) {
 			Link depotLink = depotFinder.findDepot(vehicle);
 			if (depotLink != null) {
-				relocator.relocateVehicle(vehicle, depotLink, mobsimTimer.getTimeOfDay());
+				relocator.relocateVehicle(vehicle, depotLink);
 			}
 		}
 	}

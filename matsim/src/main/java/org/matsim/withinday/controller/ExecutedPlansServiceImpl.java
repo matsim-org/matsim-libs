@@ -43,6 +43,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,6 +54,7 @@ import java.util.Map;
  * 
  * @author (of documentation) nagel
   */
+@Singleton
 public class ExecutedPlansServiceImpl implements AfterMobsimListener, ExecutedPlansService {
 	// I renamed this from ExperiencedPlansWriter into ExecutedPlansWriter since we also have an ExperiencedPlansService that
 	// reconstructs experienced plans from events. kai, jun'16

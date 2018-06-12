@@ -527,7 +527,7 @@ public class ControlerIT {
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.FILENAME_EVENTS_XML)).exists());
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(8, Controler.FILENAME_EVENTS_XML)).exists());
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(9, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(10, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(controler.getConfig().controler().getLastIteration(), Controler.FILENAME_EVENTS_XML)).exists());
 	}
 
 	/**
@@ -568,7 +568,7 @@ public class ControlerIT {
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.FILENAME_EVENTS_XML)).exists());
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(8, Controler.FILENAME_EVENTS_XML)).exists());
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(9, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(10, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(controler.getConfig().controler().getLastIteration(), Controler.FILENAME_EVENTS_XML)).exists());
 	}
 
 	/**
@@ -693,7 +693,7 @@ public class ControlerIT {
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getOutputFilename(Controler.FILENAME_POPULATION)).exists());
+		assertTrue(new File(controler.getControlerIO().getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_POPULATION)).exists());
 	}
 
 	/**
@@ -724,7 +724,7 @@ public class ControlerIT {
 		controler.run();
 
 
-		assertFalse(new File(controler.getControlerIO().getOutputFilename(Controler.FILENAME_POPULATION)).exists());
+		assertFalse(new File(controler.getControlerIO().getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_POPULATION)).exists());
 	}
 
 	@Test(expected = RuntimeException.class)

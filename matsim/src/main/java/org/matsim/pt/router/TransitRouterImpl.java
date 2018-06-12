@@ -46,6 +46,10 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
     private final TravelTime travelTime;
     private final TransitTravelDisutility travelDisutility;
     private final PreparedTransitSchedule preparedTransitSchedule;
+    
+    private boolean cacheTree;
+    private TransitLeastCostPathTree tree;
+	private Facility<?> previousFromFacility;
 
     public TransitRouterImpl(final TransitRouterConfig trConfig, final TransitSchedule schedule) {
         super(trConfig);
@@ -58,6 +62,8 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
         this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
         this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
         setTransitTravelDisutility(this.travelDisutility);
+        
+        this.cacheTree = trConfig.isCacheTree();
     }
 
     public TransitRouterImpl(
@@ -73,6 +79,8 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
         this.preparedTransitSchedule = preparedTransitSchedule;
         this.travelDisutility = travelDisutility;
         this.travelTime = travelTime;
+        
+        this.cacheTree = trConfig.isCacheTree();
     }
 
     private Map<Node, InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime) {
@@ -106,6 +114,8 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
         Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person,
                 fromFacility.getCoord(),
                 departureTime);
+        
+        
         // find possible end stops
         Map<Node, InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNodes(person,
                 toFacility.getCoord(),
@@ -113,13 +123,24 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
 
         TransitPassengerRoute transitPassengerRoute = null;
 
-        TransitLeastCostPathTree tree = new TransitLeastCostPathTree(getTransitRouterNetwork(),
-                getTravelDisutility(),
-                getTravelTime(),
-                wrappedFromNodes,
-                wrappedToNodes,
-                person);
-        // yyyyyy This sounds like it is doing the full tree.  But I think it is not. Kai, nov'16
+        if (cacheTree) {
+        	if (fromFacility != previousFromFacility) { // Compute tree only if the fromFacility is other than that of the last request.
+    			tree = new TransitLeastCostPathTree(getTransitRouterNetwork(),
+    					getTravelDisutility(),
+    					getTravelTime(),
+    	                wrappedFromNodes,
+    	                person);
+        	}
+        } else { // Compute new tree for every routing request
+        	tree = new TransitLeastCostPathTree(getTransitRouterNetwork(),
+					getTravelDisutility(),
+					getTravelTime(),
+	                wrappedFromNodes,
+	                wrappedToNodes,
+	                person);
+	        // yyyyyy This sounds like it is doing the full tree.  But I think it is not. Kai, nov'16
+			// Yes, only if you leave out the wrappedToNodes from the argument list, it does compute the full tree. See the new case above. dz, june'18
+        }
 
         // find routes between start and end stop
         transitPassengerRoute = tree.getTransitPassengerRoute(wrappedToNodes);
@@ -135,6 +156,9 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
         if (directWalkCost * getConfig().getDirectWalkFactor() < pathCost) {
             return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
         }
+        
+        previousFromFacility = fromFacility;        
+        
         return convertPassengerRouteToLegList(departureTime,
                 transitPassengerRoute,
                 fromFacility.getCoord(),

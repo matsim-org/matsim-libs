@@ -51,6 +51,11 @@ import org.matsim.core.router.TripRouter;
  * 
  */
 public class SubtourModeChoice extends AbstractMultithreadedModule {
+	
+	private final double probaForChangeSingleTripMode ;
+	
+	public enum Behavior { fromAllModesToSpecifiedModes, fromSpecifiedModesToSpecifiedModes }
+	private Behavior behavior = Behavior.fromSpecifiedModesToSpecifiedModes ;
 
 	private final Provider<TripRouter> tripRouterProvider;
 
@@ -59,19 +64,27 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 	private final String[] chainBasedModes;
 	private final String[] modes;
 	
-	public SubtourModeChoice(Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup, SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup) {
+	public SubtourModeChoice(Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup,
+							 SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup) {
 		this(globalConfigGroup.getNumberOfThreads(),
 				subtourModeChoiceConfigGroup.getModes(),
 				subtourModeChoiceConfigGroup.getChainBasedModes(),
-				subtourModeChoiceConfigGroup.considerCarAvailability(), tripRouterProvider);
+				subtourModeChoiceConfigGroup.considerCarAvailability(),
+				subtourModeChoiceConfigGroup.getProbaForRandomSingleTripMode(),
+				tripRouterProvider
+		);
+		this.setBehavior( subtourModeChoiceConfigGroup.getBehavior() );
 	}
 
 	public SubtourModeChoice(
 			final int numberOfThreads,
 			final String[] modes,
 			final String[] chainBasedModes,
-			final boolean considerCarAvailability, Provider<TripRouter> tripRouterProvider) {
+			final boolean considerCarAvailability,
+			double probaForChangeSingleTripMode,
+			Provider<TripRouter> tripRouterProvider) {
 		super(numberOfThreads);
+		this.probaForChangeSingleTripMode = probaForChangeSingleTripMode;
 		this.tripRouterProvider = tripRouterProvider;
 		this.modes = modes.clone();
 		this.chainBasedModes = chainBasedModes.clone();
@@ -81,6 +94,11 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 					considerCarAvailability);
 	}
 	
+	@Deprecated // only use when backwards compatibility is needed. kai, may'18
+	public final void setBehavior ( Behavior behavior ) {
+		this.behavior = behavior ;
+	}
+	
 	protected String[] getModes() {
 		return modes.clone();
 	}
@@ -88,6 +106,7 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		final TripRouter tripRouter = tripRouterProvider.get();
+		
 		final ChooseRandomLegModeForSubtour chooseRandomLegMode =
 				new ChooseRandomLegModeForSubtour(
 						tripRouter.getStageActivityTypes(),
@@ -95,7 +114,7 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 						this.permissibleModesCalculator,
 						this.modes,
 						this.chainBasedModes,
-						MatsimRandom.getLocalInstance());
+						MatsimRandom.getLocalInstance(), behavior, probaForChangeSingleTripMode);
 		chooseRandomLegMode.setAnchorSubtoursAtFacilitiesInsteadOfLinks( false );
 		return chooseRandomLegMode;
 	}

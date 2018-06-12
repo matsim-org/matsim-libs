@@ -86,6 +86,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		{
 			ActivityParams params = new ActivityParams("dummy");
 			params.setTypicalDuration(2. * 3600.);
+			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);
 			// (this is there so that an empty config prints out at least one
 			// activity type,
@@ -710,7 +711,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		// ActivityParams. I will try to pass the locked setting through the
 		// getters. kai, jun'15
 
-		final static String SET_TYPE = "activityParams";
+		public final static String SET_TYPE = "activityParams";
 
 		// ---
 
@@ -960,7 +961,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	public static class ModeParams extends ReflectiveConfigGroup implements MatsimParameters {
 
-		final static String SET_TYPE = "modeParams";
+		public final static String SET_TYPE = "modeParams";
 
 		private static final String MONETARY_DISTANCE_RATE = "monetaryDistanceRate";
 		private static final String MONETARY_DISTANCE_RATE_CMT = "[unit_of_money/m] conversion of distance into money. Normally negative.";

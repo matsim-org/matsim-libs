@@ -37,7 +37,10 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.file.*;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;
@@ -45,10 +48,14 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.log4j.Logger;
 
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
+
 /** A class with some static utility functions for file-I/O. */
 public class IOUtils {
 
 	private static final String GZ = ".gz";
+	private static final String LZ4 = ".lz4";
 
 	public static final Charset CHARSET_UTF8 = Charset.forName("UTF8");
 	public static final Charset CHARSET_WINDOWS_ISO88591 = Charset.forName("ISO-8859-1");
@@ -56,6 +63,7 @@ public class IOUtils {
 	public static final String NATIVE_NEWLINE = System.getProperty("line.separator");
 
 	private final static Logger log = Logger.getLogger(IOUtils.class);
+
 
 	public static URL getUrlFromFileOrResource(String filename) {
 		if (filename.startsWith("~" + File.separator)) {
@@ -114,40 +122,41 @@ public class IOUtils {
 			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
 		}
 		try {
-			if (new File(filename).exists()) {
-				if (filename.endsWith(GZ)) {
-					infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(new FileInputStream(filename))), charset));
-				} else {
-					infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new FileInputStream(filename)), charset));
-				}
-			} else if (new File(filename + GZ).exists()) {
-				infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(new FileInputStream(filename  + GZ))), charset));
-			} else {
-				InputStream stream = IOUtils.class.getClassLoader().getResourceAsStream(filename);
-				if (stream != null) {
-					if (filename.endsWith(GZ)) {
-						infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(stream)), charset));
-						log.info("loading file from classpath: " + filename);
-					} else {
-						infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(stream), charset));
-						log.info("loading file from classpath: " + filename);
-					}
-				} else {
-					stream = IOUtils.class.getClassLoader().getResourceAsStream(filename + GZ);
-					if (stream != null) {
-						infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(stream)), charset));
-						log.info("loading file from classpath: " + filename + GZ);
-					}
-				}
-			}
-		} catch (IOException e) {
+//			if (new File(filename).exists()) {
+//				if (filename.endsWith(GZ)) {
+//					infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(new FileInputStream(filename))), charset));
+//				} else {
+//					infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new FileInputStream(filename)), charset));
+//				}
+//			} else if (new File(filename + GZ).exists()) {
+//				infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(new FileInputStream(filename  + GZ))), charset));
+//			} else {
+//				InputStream stream = IOUtils.class.getClassLoader().getResourceAsStream(filename);
+//				if (stream != null) {
+//					if (filename.endsWith(GZ)) {
+//						infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(stream)), charset));
+//						log.info("loading file from classpath: " + filename);
+//					} else {
+//						infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(stream), charset));
+//						log.info("loading file from classpath: " + filename);
+//					}
+//				} else {
+//					stream = IOUtils.class.getClassLoader().getResourceAsStream(filename + GZ);
+//					if (stream != null) {
+//						infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(stream)), charset));
+//						log.info("loading file from classpath: " + filename + GZ);
+//					}
+//				}
+//			}
+			infile = new BufferedReader(new InputStreamReader(getInputStream(filename), charset));
+		} catch (UncheckedIOException e) {
 			log.fatal("encountered IOException.  This will most probably be fatal.  Note that for relative path names, the root is no longer the Java root, but the directory where the config file resides.");
 			throw new UncheckedIOException(e);
 		}
 
-		if (infile == null) {
-			throw new UncheckedIOException(new FileNotFoundException(filename));
-		}
+//		if (infile == null) {
+//			throw new UncheckedIOException(new FileNotFoundException(filename));
+//		}
 		return infile;
 	}
 
@@ -254,15 +263,16 @@ public class IOUtils {
 			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
 		}
 		try {
-			if (filename.toLowerCase(Locale.ROOT).endsWith(GZ)) {
-				File f = new File(filename);
-				if (append && f.exists() && (f.length() > 0)) {
-					throw new IllegalArgumentException("Appending to an existing gzip-compressed file is not supported.");
-				}
-				return new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(filename, append)), charset));
-			}
-			return new BufferedWriter(new OutputStreamWriter(new FileOutputStream (filename, append), charset));
-		} catch (IOException e) {
+//			if (filename.toLowerCase(Locale.ROOT).endsWith(GZ)) {
+//				File f = new File(filename);
+//				if (append && f.exists() && (f.length() > 0)) {
+//					throw new IllegalArgumentException("Appending to an existing gzip-compressed file is not supported.");
+//				}
+//				return new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(filename, append)), charset));
+//			}
+//			return new BufferedWriter(new OutputStreamWriter(new FileOutputStream (filename, append), charset));
+			return new BufferedWriter(new OutputStreamWriter(getOutputStream(filename, append), charset));
+		} catch (UncheckedIOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
@@ -333,12 +343,14 @@ public class IOUtils {
 			if (new File(filename).exists()) {
 				if (filename.endsWith(GZ)) {
 					inputStream = new GZIPInputStream(new FileInputStream(filename));
+				}else if (filename.endsWith(LZ4)) {
+					inputStream = new UnicodeInputStream(new LZ4BlockInputStream(new FileInputStream(filename)));
 				} else {
 					inputStream = new FileInputStream(filename);
 				}
 			} else if (new File(filename + GZ).exists()) {
-				inputStream = new GZIPInputStream(new FileInputStream(filename));
-			} else {
+				inputStream = new GZIPInputStream(new FileInputStream(filename + GZ));
+			}  else {
 				// search in classpath
 				InputStream stream = IOUtils.class.getClassLoader().getResourceAsStream(filename);
 				if (stream != null) {
@@ -378,6 +390,10 @@ public class IOUtils {
 			throw new UncheckedIOException(e);
 		}
 	}
+	
+	public static OutputStream getOutputStream(final String filename) throws UncheckedIOException {
+		return getOutputStream(filename, false);
+	}
 
 	/**
 	 * Returns a buffered and optionally gzip-compressed output stream to the specified file.
@@ -388,15 +404,25 @@ public class IOUtils {
 	 * 
 	 * <br> author mrieser
 	 */
-	public static OutputStream getOutputStream(final String filename) throws UncheckedIOException {
+	public static OutputStream getOutputStream(final String filename, boolean append) throws UncheckedIOException {
 		if (filename == null) {
 			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
 		}
 		try {
 			if (filename.toLowerCase(Locale.ROOT).endsWith(GZ)) {
-				return new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(filename)));
-			} else {
-				return new BufferedOutputStream(new FileOutputStream (filename));
+				File f = new File(filename);
+				if (append && f.exists() && (f.length() > 0)) {
+					throw new IllegalArgumentException("Appending to an existing gzip-compressed file is not supported.");
+				}
+				return new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(filename, append)));
+			} else if (filename.toLowerCase(Locale.ROOT).endsWith(LZ4)) {
+				File f = new File(filename);
+				if (append && f.exists() && (f.length() > 0)) {
+					throw new IllegalArgumentException("Appending to an existing lz4-compressed file is not supported.");
+				}
+				return new BufferedOutputStream(new LZ4BlockOutputStream(new FileOutputStream(filename)));
+			}else {
+				return new BufferedOutputStream(new FileOutputStream (filename, append));
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

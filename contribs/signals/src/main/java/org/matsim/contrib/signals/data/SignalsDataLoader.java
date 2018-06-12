@@ -25,6 +25,7 @@ import java.net.URL;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesReader10;
+import org.matsim.contrib.signals.data.conflicts.io.ConflictingDirectionsReader;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesReader10;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlReader20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsReader20;
@@ -64,6 +65,9 @@ public class SignalsDataLoader {
 		}
 		if (this.signalConfig.isUseIntergreenTimes()){
 			this.loadIntergreenTimes(data);
+		}
+		if (this.signalConfig.isUseConflictingDirections()) {
+			this.loadConflicts(data);
 		}
 		return data;
 	}
@@ -135,6 +139,21 @@ public class SignalsDataLoader {
 		}
 		else {
 			log.info("Signals: No signal systems file set, can't load signal systems information!");
+		}
+	}
+	
+	private void loadConflicts(SignalsData data) {
+		if (this.signalConfig.getConflictingDirectionsFile() != null) {
+			ConflictingDirectionsReader reader = new ConflictingDirectionsReader(data.getConflictingDirectionsData());
+			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getConflictingDirectionsFile());
+			try {
+				reader.parse(filename.openStream());
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+		else {
+			log.info("Signals: No conflicting directions file set, can't load conflicting directions information!");
 		}
 	}
 

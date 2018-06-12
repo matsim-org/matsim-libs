@@ -21,8 +21,12 @@ package org.matsim.core.scoring.functions;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.scoring.ExperiencedPlansModule;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
+/**
+ * Needs {@link ExperiencedPlansModule} (or something that binds the same interfaces) as pre-requisite.
+ */
 public class CharyparNagelScoringFunctionModule extends AbstractModule {
     @Override
     public void install() {

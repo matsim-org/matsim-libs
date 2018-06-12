@@ -22,15 +22,19 @@
  */
 package org.matsim.contrib.drt.run;
 
+import java.util.Arrays;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
+import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
-import org.matsim.contrib.drt.optimizer.insertion.PrecalculatablePathDataProvider;
+import org.matsim.contrib.drt.optimizer.insertion.PrecalculablePathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
@@ -44,7 +48,8 @@ import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpModule.MobsimTimerProvider;
+import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
@@ -63,26 +68,28 @@ public final class DrtControlerCreator {
 	public static Controler createControler(Config config, boolean otfvis) {
 		adjustConfig(config);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return createControlerImpl(otfvis, scenario);
+		Controler controler = new Controler(scenario);
+		addDrtToControler(controler, otfvis);
+		return controler;
 	}
 
 	public static Controler createControler(Scenario scenario, boolean otfvis) {
 		// yy I know that this one breaks the sequential loading of the building blocks, but I would like to be able
 		// to modify the scenario before I pass it to the controler. kai, oct'17
 		adjustConfig(scenario.getConfig());
-		return createControlerImpl(otfvis, scenario);
+		Controler controler = new Controler(scenario);
+		addDrtToControler(controler, otfvis);
+		return controler;
 	}
 
-	private static Controler createControlerImpl(boolean otfvis, Scenario scenario) {
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule(DrtControlerCreator::createModuleForQSimPlugin, DrtOptimizer.class,
-				DefaultUnplannedRequestInserter.class, ParallelPathDataProvider.class));
+	public static void addDrtToControler(Controler controler, boolean otfvis) {
+		controler.addOverridingModule(new DvrpModule(DrtControlerCreator::createModuleForQSimPlugin, Arrays
+				.asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class, ParallelPathDataProvider.class)));
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
-		return controler;
 	}
 
 	public static void adjustConfig(Config config) {
@@ -121,13 +128,15 @@ public final class DrtControlerCreator {
 			@Override
 			protected void configure() {
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-				DvrpModule.bindTravelDisutilityForOptimizer(binder(), DefaultDrtOptimizer.DRT_OPTIMIZER);
+				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
+						DefaultDrtOptimizer.DRT_OPTIMIZER);
 
 				bind(DrtOptimizer.class).to(DefaultDrtOptimizer.class).asEagerSingleton();
 				bind(VrpOptimizer.class).to(DrtOptimizer.class);
 
 				bind(DefaultUnplannedRequestInserter.class).asEagerSingleton();
 				bind(UnplannedRequestInserter.class).to(DefaultUnplannedRequestInserter.class);
+				bind(VehicleData.EntryFactory.class).to(VehicleDataEntryFactoryImpl.class).asEagerSingleton();
 
 				bind(DrtTaskFactory.class).to(DrtTaskFactoryImpl.class).asEagerSingleton();
 
@@ -141,7 +150,7 @@ public final class DrtControlerCreator {
 				bind(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
 
 				bind(ParallelPathDataProvider.class).asEagerSingleton();
-				bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
+				bind(PrecalculablePathDataProvider.class).to(ParallelPathDataProvider.class);
 			}
 		};
 	}

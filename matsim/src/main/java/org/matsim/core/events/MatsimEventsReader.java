@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
  *
  * @author mrieser
  */
-public class MatsimEventsReader implements MatsimReader {
+public final class MatsimEventsReader implements MatsimReader {
 
 	private final static Logger log = Logger.getLogger(MatsimEventsReader.class);
 	private final EventsManager events;

@@ -30,6 +30,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -152,6 +153,7 @@ public class OTFVis {
 	
 	public static void playScenario(Scenario scenario){
 		EventsManager events = EventsUtils.createEventsManager();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim qSim = QSimUtils.createDefaultQSim(scenario, events);
 
 		OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(),scenario, events, qSim);

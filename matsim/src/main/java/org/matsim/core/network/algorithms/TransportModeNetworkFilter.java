@@ -20,6 +20,7 @@
 package org.matsim.core.network.algorithms;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -28,6 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
 /**
  * This class extracts a subnetwork from a given network containing only
@@ -69,8 +71,7 @@ public final class TransportModeNetworkFilter {
 		// first, clone all nodes to ensure their order is not changed
 		for (Node node : this.fullNetwork.getNodes().values()) {
 			Node newNode = factory.createNode(node.getId(), node.getCoord());
-			for (String key : node.getAttributes().getKeys())
-				newNode.getAttributes().putAttribute(key, newNode.getAttributes().getAttribute(key));
+			AttributesUtils.copyAttributesFromTo(node, newNode);
 			subNetwork.addNode(newNode);
 		}
 		
@@ -93,9 +94,8 @@ public final class TransportModeNetworkFilter {
 				link2.setFreespeed(link.getFreespeed());
 				link2.setLength(link.getLength());
 				link2.setNumberOfLanes(link.getNumberOfLanes());
-				NetworkUtils.setType( ((Link) link2), NetworkUtils.getType(((Link) link)));
-				for (String key : link.getAttributes().getKeys())
-					link2.getAttributes().putAttribute(key, link.getAttributes().getAttribute(key));
+				NetworkUtils.setType(link2, NetworkUtils.getType(link));
+				AttributesUtils.copyAttributesFromTo(link, link2);
 				subNetwork.addLink(link2);
 			}
 		}

@@ -21,6 +21,7 @@ package org.matsim.contrib.minibus.schedule;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.minibus.PConfigGroup;
+import org.matsim.contrib.minibus.PConfigGroup.StopLocationSelector;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
@@ -33,7 +34,13 @@ public final class PStopsFactory {
 
 	public static TransitSchedule createPStops(Network network, PConfigGroup pConfig, TransitSchedule transitSchedule){
 		// return CreateStopsForAllCarLinks.createStopsForAllCarLinks(network, pConfig, transitSchedule);
-		return CreatePStops.createPStops(network, pConfig, transitSchedule);
+		if (pConfig.getStopLocationSelector().equals(StopLocationSelector.allCarLinks)) {
+			return CreatePStops.createPStops(network, pConfig, transitSchedule);
+		} else if (pConfig.getStopLocationSelector().equals(StopLocationSelector.junctionApproachesAndBetweenJunctions)) {
+			return CreatePStopsOnJunctionApproachesAndBetweenJunctions.createPStops(network, pConfig, transitSchedule);
+		} else {
+			throw new RuntimeException("unknown StopLocationSelector");
+		}
 	}
 	
 }

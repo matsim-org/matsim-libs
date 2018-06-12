@@ -139,7 +139,8 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		}
 	}
 
-	public KNAnalysisEventsHandler(final Scenario scenario) {
+	/* deliberately package */ KNAnalysisEventsHandler(final Scenario scenario) {
+		// this does not need to be injectable, since it is typically called from KaiAnalysisListener.  kai, may'18
 		this.scenario = scenario ;
 		this.population = scenario.getPopulation() ;
 
@@ -411,16 +412,21 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 		// score statistics:
 		for ( Person person : pop.getPersons().values() ) {
+			final Plan selectedPlan = person.getSelectedPlan();
+			Gbl.assertNotNull(selectedPlan);
 			{
 				// this defines to which categories this person should belong for the statistical averaging:
 				List<String> categories = new ArrayList<>() ;
 				categories.add( this.getSubpopName(person) ) ;
 				categories.add("zzzzzzz_all") ; 			// register for the overall average
 
-				this.addItemToAllRegisteredTypes(categories, StatType.personScores, person.getSelectedPlan().getScore());
+				if ( selectedPlan.getScore()!=null ) {
+					// hapens in au-flood-evac, where new plan selection is at iteration end (maybe change there). kai, may'18
+					this.addItemToAllRegisteredTypes(categories, StatType.personScores, selectedPlan.getScore());
+				}
 			}
 			{
-				for ( Trip trip : TripStructureUtils.getTrips( person.getSelectedPlan(), stageActivities ) ) {
+				for ( Trip trip : TripStructureUtils.getTrips(selectedPlan, stageActivities ) ) {
 					String mainMode = mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ;
 					Double item = calcBeelineDistance(trip.getOriginActivity(), trip.getDestinationActivity()) ;
 

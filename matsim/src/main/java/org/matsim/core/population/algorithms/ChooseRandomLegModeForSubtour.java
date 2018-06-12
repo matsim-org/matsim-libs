@@ -20,8 +20,6 @@
 
 package org.matsim.core.population.algorithms;
 
-import java.util.*;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
@@ -35,6 +33,15 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Changes the transportation mode of one random non-empty subtour in a plan to a randomly chosen
@@ -62,6 +69,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private Collection<String> modes;
 	private final Collection<String> chainBasedModes;
+	private final SubtourModeChoice.Behavior behavior;
 	private Collection<String> singleTripSubtourModes;
 
 	private final StageActivityTypes stageActivityTypes;
@@ -73,22 +81,43 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private boolean anchorAtFacilities = false;
 	
+	private final double probaForChangeSingleTripMode;
+	private TripsToLegsAlgorithm tripsToLegs = null ;
+	private ChooseRandomSingleLegMode changeSingleLegMode = null ;
+	
 	public ChooseRandomLegModeForSubtour(
 			final StageActivityTypes stageActivityTypes,
 			final MainModeIdentifier mainModeIdentifier,
 			final PermissibleModesCalculator permissibleModesCalculator,
 			final String[] modes,
 			final String[] chainBasedModes,
-			final Random rng) {
+			final Random rng, SubtourModeChoice.Behavior behavior, double probaForChooseRandomSingleTripMode) {
 		this.stageActivityTypes = stageActivityTypes;
 		this.mainModeIdentifier = mainModeIdentifier;
 		this.permissibleModesCalculator = permissibleModesCalculator;
 		this.modes = Arrays.asList(modes);
 		this.chainBasedModes = Arrays.asList(chainBasedModes);
+		this.behavior = behavior;
+		this.probaForChangeSingleTripMode = probaForChooseRandomSingleTripMode;
 		this.singleTripSubtourModes = this.chainBasedModes;
 		
 		this.rng = rng;
 		logger.info("Chain based modes: " + this.chainBasedModes.toString());
+
+		// also set up the standard change single leg mode, in order to alternatively randomize modes in
+		// subtours.  kai, may'18
+		if ( this.probaForChangeSingleTripMode>0. ) {
+			Collection<String> notChainBasedModes = new ArrayList<>(this.modes);
+			notChainBasedModes.removeAll(this.chainBasedModes);
+			final String[] possibleModes = notChainBasedModes.toArray(new String[]{});
+			if (possibleModes.length >= 2) {
+				// nothing to choose if there is only one mode!  I also don't think that we can base this on size, since
+				// mode strings might be registered multiple times (these are not sets).  kai, may'18
+
+				this.tripsToLegs = new TripsToLegsAlgorithm(this.stageActivityTypes, this.mainModeIdentifier);
+				this.changeSingleLegMode = new ChooseRandomSingleLegMode(possibleModes, rng, true);
+			}
+		}
 	}
 
 	/**
@@ -109,26 +138,34 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		if (plan.getPlanElements().size() <= 1) {
 			return;
 		}
+		if ( this.changeSingleLegMode!=null && rng.nextDouble() < this.probaForChangeSingleTripMode ) {
+			this.tripsToLegs.run(plan);
+			this.changeSingleLegMode.run(plan);
+			return;
+		}
 
 		final Id<? extends BasicLocation> homeLocation = anchorAtFacilities ?
 			((Activity) plan.getPlanElements().get(0)).getFacilityId() :
 			((Activity) plan.getPlanElements().get(0)).getLinkId();
+
 		Collection<String> permissibleModesForThisPlan = permissibleModesCalculator.getPermissibleModes(plan);
-
-		List<Candidate> choiceSet =
-			determineChoiceSet(
-					homeLocation,
-					TripStructureUtils.getTrips( plan , stageActivityTypes ),
-					TripStructureUtils.getSubtours(
-						plan,
-						stageActivityTypes,
-						anchorAtFacilities),
-					permissibleModesForThisPlan);
-
-		if (!choiceSet.isEmpty()) {
-			Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
-			applyChange( whatToDo , plan );
-		}
+		// (modes that agent can in principle use; e.g. cannot use car sharing if not member)
+		
+			
+			List<Candidate> choiceSet =
+					determineChoiceSet(
+							homeLocation,
+							TripStructureUtils.getTrips(plan, stageActivityTypes),
+							TripStructureUtils.getSubtours(
+									plan,
+									stageActivityTypes,
+									anchorAtFacilities),
+							permissibleModesForThisPlan);
+			
+			if (!choiceSet.isEmpty()) {
+				Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
+				applyChange(whatToDo, plan);
+			}
 	}
 
 	private List<Candidate> determineChoiceSet(
@@ -184,8 +221,10 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 					}
 				} 
 			}
-
+			
 			usableModes.remove(getTransportMode(subtour));
+			// (remove current mode so we don't get it again)
+			
 			for (String transportMode : usableModes) {
 				choiceSet.add(
 						new Candidate(
@@ -278,16 +317,25 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				subtour.getTrips().get( 0 ).getTripElements() );
 	}
 
-	private static void applyChange(
+	private void applyChange(
 			final Candidate whatToDo,
-			final Plan plan) {
+			final Plan plan)
+	{
 		for (Trip trip : whatToDo.subtour.getTrips()) {
+			if ( behavior== SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes ) {
+				if (!modes.contains(mainModeIdentifier.identifyMainMode(trip.getTripElements()))) {
+					// (ignore trips with modes that are not in "modes".   MATSIM-809)
+					continue;
+				}
+			}
+				
 			TripRouter.insertTrip(
-					plan,
-					trip.getOriginActivity(),
-					Collections.singletonList( PopulationUtils.createLeg(whatToDo.newTransportMode) ),
-					trip.getDestinationActivity());
-		}
+						plan,
+						trip.getOriginActivity(),
+						Collections.singletonList(PopulationUtils.createLeg(whatToDo.newTransportMode)),
+						trip.getDestinationActivity());
+			}
+
 	}
 
 	public void setAnchorSubtoursAtFacilitiesInsteadOfLinks(

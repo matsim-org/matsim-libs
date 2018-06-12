@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.InternalPlanDataStructure;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext.ActivityFacilityWithIndex;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.population.LCPlan;
@@ -61,7 +61,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	private final ScaleEpsilon scaleEpsilon;
 	private final ActTypeConverter actTypeConverter;
 	private final DestinationSampler sampler;
-	private final DestinationChoiceBestResponseContext lcContext;
+	private final DestinationChoiceContext lcContext;
 	private final MultiNodeDijkstra forwardMultiNodeDijkstra;
 	private final BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
 	private final ScoringFunctionFactory scoringFunctionFactory;
@@ -80,7 +80,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	public BestResponseLocationMutator(
 			TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
-			ObjectAttributes personsMaxDCScoreUnscaled, DestinationChoiceBestResponseContext lcContext,
+			ObjectAttributes personsMaxDCScoreUnscaled, DestinationChoiceContext lcContext,
 			DestinationSampler sampler, TripRouter tripRouter, MultiNodeDijkstra forwardMultiNodeDijkstra,
 			BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, ScoringFunctionFactory scoringFunctionFactory,
 			int iteration, Map<Id<ActivityFacility>, Id<Link>> nearestLinks) {

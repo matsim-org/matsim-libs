@@ -61,10 +61,11 @@ public class ControlerTest {
 	public void testModifySignalControlDataOnsetOffset() {
 		//configure and load standard scenario
 		Fixture fixture = new Fixture();
-		Scenario scenario = fixture.createAndLoadTestScenario(false);
+		Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(false);
 		scenario.getConfig().controler().setFirstIteration(0);
 		scenario.getConfig().controler().setLastIteration(1);
 		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
+		scenario.getConfig().controler().setWriteEventsInterval(1);
 		
 		Controler controler = new Controler(scenario);
         controler.getConfig().controler().setCreateGraphs(false);

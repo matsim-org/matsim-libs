@@ -36,8 +36,6 @@ import com.google.inject.name.Names;
  * @author michalm
  */
 public final class TaxiModule extends AbstractModule {
-	public static final String TAXI_MODE = "taxi";
-
 	@Override
 	public void install() {
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(getConfig());

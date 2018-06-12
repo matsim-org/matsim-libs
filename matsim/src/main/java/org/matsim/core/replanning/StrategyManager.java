@@ -50,7 +50,10 @@ public class StrategyManager implements MatsimManager {
 	private final GenericStrategyManager<Plan, Person> delegate;
 
 	@Inject
-	StrategyManager(StrategyConfigGroup strategyConfigGroup, PlansConfigGroup plansConfigGroup, ControlerConfigGroup controlerConfigGroup, Map<StrategyConfigGroup.StrategySettings, PlanStrategy> planStrategies) {
+	StrategyManager(StrategyConfigGroup strategyConfigGroup, PlansConfigGroup plansConfigGroup,
+					ControlerConfigGroup controlerConfigGroup,
+					Map<StrategyConfigGroup.StrategySettings, PlanStrategy> planStrategies) {
+
 		this();
 		setMaxPlansPerAgent(strategyConfigGroup.getMaxAgentPlanMemorySize());
 
@@ -67,7 +70,7 @@ public class StrategyManager implements MatsimManager {
 			// now check if this modules should be disabled after some iterations
 			int maxIter = settings.getDisableAfter();
 			if ( maxIter > globalInnovationDisableAfter || maxIter==-1 ) {
-				if (!PlanStrategies.isOnlySelector(strategy)) {
+				if (!ReplanningUtils.isOnlySelector(strategy)) {
 					maxIter = globalInnovationDisableAfter ;
 				}
 			}

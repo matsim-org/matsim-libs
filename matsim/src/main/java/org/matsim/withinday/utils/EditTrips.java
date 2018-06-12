@@ -89,13 +89,13 @@ public final class EditTrips {
 			replanCurrentTripFromStageActivity(tripElements, tripElementsIndex, agent, routingMode);
 		} else {
 			// we are on a leg
-			replanCurrentTripFromLeg(trip.getDestinationActivity(), currentPlanElement, routingMode, now, agent, scenario);
+			replanCurrentTripFromLeg(trip.getDestinationActivity(), currentPlanElement, routingMode, now, agent);
 		}
 		WithinDayAgentUtils.resetCaches(agent);
 		return true ;
 	}
 	private void replanCurrentTripFromLeg(Activity newAct, final PlanElement currentPlanElement, final String routingMode,
-			double now, MobsimAgent agent, Scenario scenario) {
+										  double now, MobsimAgent agent) {
 		log.debug("entering replanCurrentTripFromLeg");
 		Leg currentLeg = (Leg) currentPlanElement ;
 		if ( currentLeg.getRoute() instanceof NetworkRoute ) {

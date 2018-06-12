@@ -70,16 +70,25 @@ public final class Controler implements ControlerI, MatsimServices {
 	// not sufficient, people should use AbstractController.  kai, jan'13
 
 	public static final String DIRECTORY_ITERS = "ITERS";
+	public static final String FILENAME_CONFIG = "config.xml";
+	public static final String FILENAME_CONFIG_REDUCED = "config_reduced.xml";
+	public static final String FILENAME_NETWORK = "network.xml.gz";
+	public static final String FILENAME_LANES = "lanes.xml.gz";
+	public static final String FILENAME_CHANGE_EVENTS_XML = "change_events.xml.gz";
+	public static final String FILENAME_COUNTS = "counts.xml.gz" ;
+	public static final String FILENAME_POPULATION = "plans.xml.gz";
+	public static final String FILENAME_EXPERIENCED_PLANS = "experienced_plans.xml.gz";
+	public static final String FILENAME_PERSON_ATTRIBUTES = "personAttributes.xml.gz" ;
+	public static final String FILENAME_HOUSEHOLDS = "households.xml.gz";
+	public static final String FILENAME_FACILITIES = "facilities.xml.gz";
 	public static final String FILENAME_EVENTS_XML = "events.xml.gz";
+	public static final String FILENAME_TRANSIT_SCHEDULE = "transitSchedule.xml.gz";
+	public static final String FILENAME_TRANSIT_VEHICLES = "transitVehicles.xml.gz";
+	public static final String FILENAME_VEHICLES = "vehicles.xml.gz";
 	public static final String FILENAME_LINKSTATS = "linkstats.txt.gz";
 	public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats";
-	public static final String FILENAME_POPULATION = "output_plans.xml.gz";
-	public static final String FILENAME_NETWORK = "output_network.xml.gz";
-	public static final String FILENAME_HOUSEHOLDS = "output_households.xml.gz";
-	public static final String FILENAME_LANES = "output_lanes.xml.gz";
-	public static final String FILENAME_CONFIG = "output_config.xml";
-	public static final String FILENAME_PERSON_ATTRIBUTES = "output_personAttributes.xml.gz" ; 
-	public static final String FILENAME_COUNTS = "output_counts.xml.gz" ;
+	public static final String OUTPUT_PREFIX = "output_";
+
 	public static final String DIVIDER = "###################################################";
 	
 	private static final Logger log = Logger.getLogger(Controler.class);
