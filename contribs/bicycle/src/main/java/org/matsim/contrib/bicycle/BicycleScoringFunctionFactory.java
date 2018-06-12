@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.ScoringFunctionsForPopulation;
+//import org.matsim.core.scoring.ScoringFunctionsForPopulation;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
@@ -40,7 +40,7 @@ import com.google.inject.Inject;
 public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 	@Inject ScoringParametersForPerson parameters;
 
-	@Inject ScoringFunctionsForPopulation scoringFunctionsForPopulation;
+//	@Inject ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 	
 	@Inject Scenario scenario;
 	@Inject BicycleTravelTime bicycleTravelTime;
@@ -64,6 +64,7 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 //		scoringFunctionsForPopulation.setPassLinkEventsToPerson(true);
 		// yyyyyy this is the ONLY place where we need to make ScoringFunctionsForPopulation public.  Somehow,
 		// this would imply to me that we should attach this switch to something else. kai, sep'17
+		// (now always switched on. kai, apr'18)
 		
 //		BicycleScoring bicycleScoring = new BicycleScoring(scenario, bicycleTravelTime, bicycleTravelDisutilityFactory);
 //		sumScoringFunction.addScoringFunction(bicycleScoring);
