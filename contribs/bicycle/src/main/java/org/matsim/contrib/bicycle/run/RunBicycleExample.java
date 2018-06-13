@@ -58,13 +58,13 @@ public class RunBicycleExample {
 			config.addModule(new BicycleConfigGroup());
 			fillConfigWithBicycleStandardValues(config);
 			
-			config.network().setInputFile("network_cobblestone.xml"); // Modify this
+			config.network().setInputFile("network_lane.xml"); // Modify this
 			config.plans().setInputFile("population_1200.xml");
 		} else {
 			throw new RuntimeException("More than one argument was provided. There is no procedure for this situation. Thus aborting!"
 					+ " Provide either (1) only a suitable config file or (2) no argument at all to run example with given example of resources folder.");
 		}
-		config.controler().setLastIteration(0); // Modify if motorized interaction is used
+		config.controler().setLastIteration(10); // Modify if motorized interaction is used
 		boolean considerMotorizedInteraction = false;
 		
 		new RunBicycleExample().run(config, considerMotorizedInteraction);
