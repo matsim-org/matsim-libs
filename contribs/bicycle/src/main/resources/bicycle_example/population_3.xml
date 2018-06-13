@@ -9,15 +9,15 @@
 
 	<person id="1">
 		<plan selected="yes">
-			<activity type="home" x="-20000.0" y="10000.0" z="0.0" end_time="09:00:03" >
+			<activity type="home" x="-20000.0" y="0.0" z="0.0" end_time="09:00:03" >
 			</activity>
 			<leg mode="bicycle">
 			</leg>
-			<activity type="work" x="5000.0" y="10000.0" z="0.0" end_time="17:00:03" >
+			<activity type="work" x="5000.0" y="0.0" z="0.0" end_time="17:00:03" >
 			</activity>
 			<leg mode="bicycle">
 			</leg>
-			<activity type="home" x="-20000.0" y="10000.0" z="0.0" >
+			<activity type="home" x="-20000.0" y="0.0" z="0.0" >
 			</activity>
 		</plan>
 
@@ -27,15 +27,15 @@
 
 	<person id="2">
 		<plan selected="yes">
-			<activity type="home" x="-20000.0" y="10000.0" z="0.0" end_time="09:00:06" >
+			<activity type="home" x="-20000.0" y="0.0" z="0.0" end_time="09:00:06" >
 			</activity>
 			<leg mode="bicycle">
 			</leg>
-			<activity type="work" x="5000.0" y="10000.0" z="0.0" end_time="17:00:06" >
+			<activity type="work" x="5000.0" y="0.0" z="0.0" end_time="17:00:06" >
 			</activity>
 			<leg mode="bicycle">
 			</leg>
-			<activity type="home" x="-20000.0" y="10000.0" z="0.0" >
+			<activity type="home" x="-20000.0" y="0.0" z="0.0" >
 			</activity>
 		</plan>
 
@@ -45,15 +45,15 @@
 
 	<person id="3">
 		<plan selected="yes">
-			<activity type="home" x="-20000.0" y="10000.0" z="0.0" end_time="09:00:09" >
+			<activity type="home" x="-20000.0" y="0.0" z="0.0" end_time="09:00:09" >
 			</activity>
 			<leg mode="bicycle">
 			</leg>
-			<activity type="work" x="5000.0" y="10000.0" z="0.0" end_time="17:00:09" >
+			<activity type="work" x="5000.0" y="0.0" z="0.0" end_time="17:00:09" >
 			</activity>
 			<leg mode="bicycle">
 			</leg>
-			<activity type="home" x="-20000.0" y="10000.0" z="0.0" >
+			<activity type="home" x="-20000.0" y="0.0" z="0.0" >
 			</activity>
 		</plan>
 
