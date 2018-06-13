@@ -87,7 +87,7 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		return getTravelDisutilityBasedOnTTime(link, time, person, vehicle, travelTime);
 	}
 
-	// Keep these two methods separate for now because BicycleLinkScoring (currently not used) would need this)
+	// Keep these two methods separate for now because BicycleLinkScoring (currently not used) needs this
 	public double getTravelDisutilityBasedOnTTime(Link link, double enterTime, Person person, Vehicle vehicle, double travelTime) {
 		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
 		String type = (String) link.getAttributes().getAttribute("type");
