@@ -40,7 +40,7 @@
 <!-- ====================================================================== -->
    
    <links capperiod="01:00:00">
-      <link id="1" from="1" to="2" length="10000.00" capacity="36000" freespeed="5" permlanes="1" oneway="1" modes="bicycle" origid="" >
+      <link id="1" from="1" to="2" length="10000.00" capacity="36000" freespeed="13.88" permlanes="1" oneway="1" modes="bicycle" origid="" >
       	<attributes>
 			<!-- <attribute name="average_elevation" class="java.lang.Double" >0.</attribute>
 			<attribute name="cyclewaytype" class="java.lang.String" >lane</attribute>
@@ -49,12 +49,12 @@
 			<attribute name="type" class="java.lang.String" >primary</attribute>
 		</attributes>
 	  </link>
-      <link id="2" from="2" to="3" length="13000.00" capacity="3600" freespeed="5" permlanes="1" oneway="1" modes="bicycle" origid="" >
+      <link id="2" from="2" to="3" length="13000.00" capacity="3600" freespeed="13.88" permlanes="1" oneway="1" modes="bicycle" origid="" >
       	<attributes>
 			<attribute name="type" class="java.lang.String" >primary</attribute>
 		</attributes>
       </link>
-      <link id="3" from="2" to="4" length="12000.00" capacity="3600" freespeed="5" permlanes="1" oneway="1" modes="bicycle" origid="" >
+      <link id="3" from="2" to="4" length="12000.00" capacity="3600" freespeed="13.88" permlanes="1" oneway="1" modes="bicycle" origid="" >
       	<attributes>
 			<attribute name="type" class="java.lang.String" >primary</attribute>
 		</attributes>
@@ -84,22 +84,22 @@
 			<attribute name="type" class="java.lang.String" >pedestrian</attribute>
 		</attributes>
       </link>
-      <link id="9" from="2" to="10" length="12000.00" capacity="3600" freespeed="5" permlanes="1" oneway="1" modes="bicycle" origid="" >
+      <link id="9" from="2" to="10" length="12000.00" capacity="3600" freespeed="13.88" permlanes="1" oneway="1" modes="bicycle" origid="" >
       	<attributes>
 			<attribute name="type" class="java.lang.String" >primary</attribute>
 		</attributes>
       </link>
-      <link id="10" from="2" to="11" length="13000.00" capacity="3600" freespeed="5" permlanes="1" oneway="1" modes="bicycle" origid="" >
+      <link id="10" from="2" to="11" length="13000.00" capacity="3600" freespeed="13.88" permlanes="1" oneway="1" modes="bicycle" origid="" >
       	<attributes>
 			<attribute name="type" class="java.lang.String" >primary</attribute>
 		</attributes>
       </link>
-      <link id="11" from="3" to="12" length="5000.00" capacity="1000" freespeed="5" permlanes="1" oneway="1" modes="bicycle" origid="" >
+      <link id="11" from="3" to="12" length="5000.00" capacity="1000" freespeed="13.88" permlanes="1" oneway="1" modes="bicycle" origid="" >
       	<attributes>
 			<attribute name="type" class="java.lang.String" >primary</attribute>
 		</attributes>
       </link>
-      <link id="12" from="4" to="12" length="5000.00" capacity="1000" freespeed="5" permlanes="1" oneway="1" modes="bicycle" origid="" >
+      <link id="12" from="4" to="12" length="5000.00" capacity="1000" freespeed="13.88" permlanes="1" oneway="1" modes="bicycle" origid="" >
       	<attributes>
 			<attribute name="type" class="java.lang.String" >primary</attribute>
 		</attributes>
@@ -129,32 +129,32 @@
 			<attribute name="type" class="java.lang.String" >pedestrian</attribute>
 		</attributes>
       </link>
-      <link id="18" from="10" to="12" length="5000.00" capacity="1000" freespeed="5" permlanes="1" oneway="1" modes="bicycle" origid="" >
+      <link id="18" from="10" to="12" length="5000.00" capacity="1000" freespeed="13.88" permlanes="1" oneway="1" modes="bicycle" origid="" >
       	<attributes>
 			<attribute name="type" class="java.lang.String" >primary</attribute>
 		</attributes>
       </link>
-      <link id="19" from="11" to="12" length="5000.00" capacity="1000" freespeed="5" permlanes="1" oneway="1" modes="bicycle" origid="" >
+      <link id="19" from="11" to="12" length="5000.00" capacity="1000" freespeed="13.88" permlanes="1" oneway="1" modes="bicycle" origid="" >
       	<attributes>
 			<attribute name="type" class="java.lang.String" >primary</attribute>
 		</attributes>
       </link>
-      <link id="20" from="12" to="13" length="10000.00" capacity="36000" freespeed="5" permlanes="1" oneway="1" modes="bicycle" origid="" >
+      <link id="20" from="12" to="13" length="10000.00" capacity="36000" freespeed="13.88" permlanes="1" oneway="1" modes="bicycle" origid="" >
       	<attributes>
 			<attribute name="type" class="java.lang.String" >primary</attribute>
 		</attributes>
       </link>
-      <link id="21" from="13" to="14" length="10000.00" capacity="36000" freespeed="5" permlanes="1" oneway="1" modes="bicycle" origid="" >
+      <link id="21" from="13" to="14" length="10000.00" capacity="36000" freespeed="13.88" permlanes="1" oneway="1" modes="bicycle" origid="" >
       	<attributes>
 			<attribute name="type" class="java.lang.String" >primary</attribute>
 		</attributes>
       </link>
-      <link id="22" from="14" to="15" length="35000.00" capacity="36000" freespeed="5" permlanes="1" oneway="1" modes="bicycle" origid="" >
+      <link id="22" from="14" to="15" length="35000.00" capacity="36000" freespeed="13.88" permlanes="1" oneway="1" modes="bicycle" origid="" >
       	<attributes>
 			<attribute name="type" class="java.lang.String" >primary</attribute>
 		</attributes>
       </link>
-      <link id="23" from="15" to="1" length="10000.00" capacity="36000" freespeed="5" permlanes="1" oneway="1" modes="bicycle" origid="" >
+      <link id="23" from="15" to="1" length="10000.00" capacity="36000" freespeed="13.88" permlanes="1" oneway="1" modes="bicycle" origid="" >
       	<attributes>
 			<attribute name="type" class="java.lang.String" >primary</attribute>
 		</attributes>
