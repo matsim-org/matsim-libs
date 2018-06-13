@@ -19,8 +19,10 @@
 package org.matsim.contrib.bicycle;
 
 import org.apache.log4j.Logger;
+//import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+//import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -36,6 +38,8 @@ public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
 	@Inject	BicycleConfigGroup bicycleConfigGroup;
 	@Inject	PlanCalcScoreConfigGroup cnScoringGroup;
 	@Inject	PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+	
+//	@Inject Scenario scenario;
 	
 	private static int normalisationWrnCnt = 0;
 	
@@ -58,10 +62,11 @@ public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
 		// V2 -- Delegation to RandomizingTimeDistanceTravelDisutilityFactory
 		// NOTE: This version can not be applied yet as RandomizingTimeDistanceTravelDisutility does not know about integrated attributes
 		// because TransportModeNetworkFilter kicks out integrated attributes when creating a mode-specific subnetwork
-		// Accordingly, speeds won't be dependant on attributes (e.g. surface that may reduce speed)
+		// Accordingly, speeds won't be dependent on attributes (e.g. surface that may reduce speed)
 //		RandomizingTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new RandomizingTimeDistanceTravelDisutilityFactory("bicycle", cnScoringGroup);
 //		travelDisutilityFactory.setSigma(plansCalcRouteConfigGroup.getRoutingRandomness());
 //		TravelDisutility timeDistanceDisutility = travelDisutilityFactory.createTravelDisutility(timeCalculator);
+////		return timeDistanceDisutility;
 //		return new BicycleTravelDisutilityV2(scenario.getNetwork(), timeDistanceDisutility, bicycleConfigGroup, cnScoringGroup);
 		//
 	}
