@@ -84,11 +84,7 @@ public class BicycleTravelDisutility implements TravelDisutility {
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 		double travelTime = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
-		return getTravelDisutilityBasedOnTTime(link, time, person, vehicle, travelTime);
-	}
-
-	// Keep these two methods separate for now because BicycleLinkScoring (currently not used) needs this
-	public double getTravelDisutilityBasedOnTTime(Link link, double enterTime, Person person, Vehicle vehicle, double travelTime) {
+		
 		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
 		String type = (String) link.getAttributes().getAttribute("type");
 		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
@@ -151,14 +147,14 @@ public class BicycleTravelDisutility implements TravelDisutility {
 			logNormalRndGrad = 1.;
 		}
 
-		LOG.warn("Person = " + person.getId() + " / link = " + link.getId() + " / ttD = " + travelTimeDisutility	+ " / dD = "+ distanceDisutility
-				+ " / infD = " + infrastructureDisutility + " / comfD = " + comfortDisutility + " / gradD = " + gradientDisutility + " / rnd = " + normalRndLink
-				+ " / rndDist = " + logNormalRndDist + " / rndInf = "	+ logNormalRndInf + " / rndComf = " + logNormalRndComf + " / rndGrad = " + logNormalRndGrad);
+//		LOG.warn("Person = " + person.getId() + " / link = " + link.getId() + " / ttD = " + travelTimeDisutility	+ " / dD = "+ distanceDisutility
+//				+ " / infD = " + infrastructureDisutility + " / comfD = " + comfortDisutility + " / gradD = " + gradientDisutility + " / rnd = " + normalRndLink
+//				+ " / rndDist = " + logNormalRndDist + " / rndInf = "	+ logNormalRndInf + " / rndComf = " + logNormalRndComf + " / rndGrad = " + logNormalRndGrad);
 		double disutility = (1 + normalRndLink) * travelTimeDisutility + logNormalRndDist * distanceDisutility + logNormalRndInf * infrastructureDisutility
 				+ logNormalRndComf * comfortDisutility + logNormalRndGrad * gradientDisutility;
 //		double disutility = travelTimeDisutility + logNormalRndDist * distanceDisutility + (1 + normalRndLink) * logNormalRndInf * infrastructureDisutility
 //				+ (1 + normalRndLink) * logNormalRndComf * comfortDisutility + (1 + normalRndLink) * logNormalRndGrad * gradientDisutility;
-		LOG.warn("Disutility = " + disutility);
+//		LOG.warn("Disutility = " + disutility);
 		return disutility;
 	}
 
