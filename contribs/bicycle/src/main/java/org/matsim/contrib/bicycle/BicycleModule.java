@@ -33,7 +33,8 @@ public class BicycleModule extends AbstractModule {
 		bind(BicycleTravelDisutilityFactory.class).asEagerSingleton();
 		addTravelDisutilityFactoryBinding("bicycle").to(BicycleTravelDisutilityFactory.class);
 		bindScoringFunctionFactory().toInstance(new BicycleScoringFunctionFactory());
-//		bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class); // Leads to "Tried proxying org.matsim.core.scoring.ScoringFunctionsForPopulation to support a circular dependency, but it is not an interface."
+		// The following leads to "Tried proxying org.matsim.core.scoring.ScoringFunctionsForPopulation to support a circular dependency, but it is not an interface."
+//		bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class);
 		
 		if (considerMotorizedInteraction) {
 			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
