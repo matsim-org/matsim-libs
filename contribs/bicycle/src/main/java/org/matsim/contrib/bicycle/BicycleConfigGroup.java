@@ -34,11 +34,14 @@ public class BicycleConfigGroup extends ConfigGroup {
 	private static final String INPUT_COMFORT = "marginalUtilityOfComfort_m";
 	private static final String INPUT_INFRASTRUCTURE = "marginalUtilityOfInfrastructure_m";
 	private static final String INPUT_GRADIENT = "marginalUtilityOfGradient_m_100m";
+	
+	public static enum BicycleScoringType {legBased, linkBased};
 
 	private String networkAttFile = null;
 	private double marginalUtilityOfComfort;
 	private double marginalUtilityOfInfrastructure;
 	private double marginalUtilityOfGradient;
+	private BicycleScoringType bicycleScoringType = BicycleScoringType.legBased;
 	
 	public BicycleConfigGroup() {
 		super(GROUP_NAME);
@@ -126,5 +129,13 @@ public class BicycleConfigGroup extends ConfigGroup {
 
 	public double getMarginalUtilityOfGradient_m_100m() {
 		return this.marginalUtilityOfGradient;
+	}
+	
+	public void setBicycleScoringType(final BicycleScoringType value) {
+		this.bicycleScoringType = value;
+	}
+
+	public BicycleScoringType getBicycleScoringType() {
+		return this.bicycleScoringType;
 	}
 }
