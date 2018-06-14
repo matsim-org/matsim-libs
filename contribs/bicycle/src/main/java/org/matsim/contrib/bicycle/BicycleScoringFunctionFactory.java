@@ -53,33 +53,35 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-//		CarCounter carCounter = new CarCounter(bicycleScoring);
-//		eventsManager.addHandler(carCounter);
-		
 		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) scenario.getConfig().getModule("bicycle");
 		BicycleScoringType bicycleScoringType = bicycleConfigGroup.getBicycleScoringType();
 		if (bicycleScoringType == BicycleScoringType.legBased) {
 			sumScoringFunction.addScoringFunction(new BicycleLegScoring(params, scenario.getNetwork(), bicycleConfigGroup));
 		} else if (bicycleScoringType == BicycleScoringType.linkBased) {
-			sumScoringFunction.addScoringFunction(new BicycleLinkScoring(params, scenario, bicycleConfigGroup));
+			BicycleLinkScoring bicycleLinkScoring = new BicycleLinkScoring(params, scenario, bicycleConfigGroup);
+			sumScoringFunction.addScoringFunction(bicycleLinkScoring);
+
+			CarCounter carCounter = new CarCounter(bicycleLinkScoring);
+			eventsManager.addHandler(carCounter);
 		} else {
 			throw new IllegalArgumentException("Bicycle scoring type " + bicycleScoringType + " not known.");
 		}
+
 
 		return sumScoringFunction;
 	}
 
 	
-//	private class CarCounter implements MotorizedInteractionEventHandler {
-//		private BicycleScoring bicycleScoring;
-//
-//		public CarCounter(BicycleScoring bicycleScoring) {
-//			this.bicycleScoring = bicycleScoring;
-//		}
-//
-//		@Override
-//		public void handleEvent(MotorizedInteractionEvent event) {
-//			bicycleScoring.handleEvent(event);
-//		}
-//	}
+	private class CarCounter implements MotorizedInteractionEventHandler {
+		private BicycleLinkScoring bicycleLinkScoring;
+
+		public CarCounter(BicycleLinkScoring bicycleLinkScoring) {
+			this.bicycleLinkScoring = bicycleLinkScoring;
+		}
+
+		@Override
+		public void handleEvent(MotorizedInteractionEvent event) {
+			bicycleLinkScoring.handleEvent(event);
+		}
+	}
 }
