@@ -1,6 +1,6 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * CharyparNagelOpenTimesScoringFunctionFactory.java
+ * project: org.matsim.*                                                   *
+ * BicycleLegScoring.java                                                  *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -35,20 +35,12 @@ import org.matsim.core.scoring.functions.ScoringParameters;
  * @author dziemke
  */
 public class BicycleLegScoring extends CharyparNagelLegScoring {
-
-	/** The parameters used for scoring */
-	protected final ScoringParameters params;
-	protected Network network;
-
 	private final double marginalUtilityOfInfrastructure_m;
 	private final double marginalUtilityOfComfort_m;
 	private final double marginalUtilityOfGradient_m_100m;
 
 	public BicycleLegScoring(final ScoringParameters params, Network network, BicycleConfigGroup bicycleConfigGroup) {
 		super(params, network);
-		
-		this.params = params;
-		this.network = network;
 
 		this.marginalUtilityOfInfrastructure_m = bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m();
 		this.marginalUtilityOfComfort_m = bicycleConfigGroup.getMarginalUtilityOfComfort_m();
@@ -64,16 +56,17 @@ public class BicycleLegScoring extends CharyparNagelLegScoring {
 		linkIds.addAll(networkRoute.getLinkIds());
 		linkIds.add(networkRoute.getEndLinkId());
 		
+		// Iterate over all links of the route
 		for (Id<Link> linkId : linkIds) {
-			double scoreOnLink = getTravelDisutilityBasedOnTTime(network.getLinks().get(linkId));
-//			LOG.info("Bicycle score on link " + linkId + " is = " + scoreOnLink + ".");
+			double scoreOnLink = computeLinkBasedScore(network.getLinks().get(linkId));
+			// LOG.info("Bicycle score on link " + linkId + " is = " + scoreOnLink + ".");
 			legScore += scoreOnLink;
 		}
 
 		return legScore;
 	}	
 
-	public double getTravelDisutilityBasedOnTTime(Link link) {
+	public double computeLinkBasedScore(Link link) {
 		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
 		String type = (String) link.getAttributes().getAttribute("type");
 		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
