@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
+import org.matsim.contrib.bicycle.BicycleConfigGroup.BicycleScoringType;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -255,7 +256,11 @@ public class BicycleTest {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(10);
 		
-		// interaction with motor vehicles
+		// Activate link-based scoring
+		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get("bicycle");
+		bicycleConfigGroup.setBicycleScoringType(BicycleScoringType.linkBased);
+		
+		// Interaction with motor vehicles
 		new RunBicycleExample().run(config, true);
 
 		LOG.info("Checking MATSim events file ...");
