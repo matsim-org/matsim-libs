@@ -64,7 +64,7 @@ public class RunBicycleExample {
 			throw new RuntimeException("More than one argument was provided. There is no procedure for this situation. Thus aborting!"
 					+ " Provide either (1) only a suitable config file or (2) no argument at all to run example with given example of resources folder.");
 		}
-		config.controler().setLastIteration(10); // Modify if motorized interaction is used
+		config.controler().setLastIteration(100); // Modify if motorized interaction is used
 		boolean considerMotorizedInteraction = false;
 		
 		new RunBicycleExample().run(config, considerMotorizedInteraction);
@@ -82,7 +82,7 @@ public class RunBicycleExample {
 		scenario.getVehicles().addVehicleType(car);
 
 		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
-		bicycle.setMaximumVelocity(15.0/3.6);
+		bicycle.setMaximumVelocity(20.0/3.6);
 		bicycle.setPcuEquivalents(0.25);
 		scenario.getVehicles().addVehicleType(bicycle);
 

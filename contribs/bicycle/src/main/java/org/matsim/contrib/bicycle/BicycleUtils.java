@@ -30,7 +30,7 @@ public class BicycleUtils {
 	public static double getSpeed(final String travelMode){
 		double speed;
 		if (travelMode == "bicycle") {
-			speed = 15.0/3.6;
+			speed = 20.0/3.6;
 		} else {
 			throw new RuntimeException("No speed is set for travel mode " + travelMode + ".");
 		}
