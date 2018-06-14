@@ -42,7 +42,7 @@ public class BicycleTravelTime implements TravelTime {
 		// This is not yet available, but might be at some point, see https://matsim.atlassian.net/browse/MATSIM-700
 		// double bicycleVelocity = vehicle.getType().getMaximumVelocity()
 		// ... until then, use this workaround:
-		double vehicleLinkSpeed = Math.min(infrastructureSpeed, BicycleUtils.getSpeed("bicycle"));
+		double vehicleLinkSpeed = Math.min(infrastructureSpeed, BicycleSpeedUtils.getSpeed("bicycle"));
 
 		double gradientSpeed = computeGradientSpeed(link, vehicleLinkSpeed);
 

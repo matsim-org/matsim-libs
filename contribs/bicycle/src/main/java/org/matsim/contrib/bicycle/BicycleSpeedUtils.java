@@ -26,7 +26,7 @@ package org.matsim.contrib.bicycle;
  * @author dziemke based on amit
  */
 @Deprecated
-public class BicycleUtils {
+public class BicycleSpeedUtils {
 	public static double getSpeed(final String travelMode){
 		double speed;
 		if (travelMode == "bicycle") {
