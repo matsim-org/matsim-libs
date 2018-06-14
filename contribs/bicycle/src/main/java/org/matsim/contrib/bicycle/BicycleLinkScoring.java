@@ -33,13 +33,17 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * @author dziemke
+ * 
+ * This is an alternative to BicycleLegScoring. It is not thoroughly tested yet. It becomes relevant when the true times spent
+ * on an individual link are relevant.
  */
+@Deprecated
 public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring, MotorizedInteractionEventHandler {
 	private static final Logger LOG = Logger.getLogger(BicycleLinkScoring.class);
 	
 	private Scenario scenario;
 	private BicycleTravelDisutility bicycleTravelDisutility;
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private Vehicle2DriverEventHandler vehicle2Driver = new Vehicle2DriverEventHandler();
 	private Id<Link> previousLink;
 	private double previousLinkRelativePosition;
 	private double previousLinkEnterTime;
@@ -61,11 +65,10 @@ public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScor
 	@Override
 	public void handleEvent(Event event) {
 		if (event instanceof VehicleEntersTrafficEvent) {
-//			LOG.warn(event.toString());
 			VehicleEntersTrafficEvent vehEvent = (VehicleEntersTrafficEvent) event;
 			
 			// Establish connection between driver and vehicle
-			delegate.handleEvent(vehEvent);
+			vehicle2Driver.handleEvent(vehEvent);
 			
 			// No LinkEnterEvent on first link of a leg
 			previousLink = vehEvent.getLinkId();
@@ -75,7 +78,6 @@ public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScor
 			
 		}
 		if (event instanceof VehicleLeavesTrafficEvent) {
-//			LOG.warn(event.toString());
 			VehicleLeavesTrafficEvent vehEvent = (VehicleLeavesTrafficEvent) event;
 			
 			Id<Vehicle> vehId = vehEvent.getVehicleId();
@@ -84,12 +86,11 @@ public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScor
 			calculateScoreForPreviousLink(vehEvent.getLinkId(), enterTime, vehId, travelTime, previousLinkRelativePosition);
 			
 			// End connection between driver and vehicle
-			delegate.handleEvent(vehEvent);
+			vehicle2Driver.handleEvent(vehEvent);
 		}
 		if (event instanceof LinkEnterEvent) {
-			// This only works because setPassLinkEventsToPerson is activated (via ScoringFunctionsForPopulation)
+			// This only works since ScoringFunctionsForPopulation passes link events to persons; quite new; dz, june'18
 			// Otherwise ArbitraryEventScoring only handles events that are instance of HasPersonId, which is not the case for LinkEnterEvents
-//			LOG.warn(event.toString());
 			LinkEnterEvent linkEnterEvent = (LinkEnterEvent) event;
 			
 			Id<Vehicle> vehId = linkEnterEvent.getVehicleId();
@@ -104,18 +105,19 @@ public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScor
 		}
 	}
 	
+	@Deprecated
 	private void calculateScoreForPreviousLink(Id<Link> linkId, Double enterTime, Id<Vehicle> vehId, double travelTime, double relativeLinkEnterPosition) {
 		if (relativeLinkEnterPosition != 1.0) {
 			Link link = scenario.getNetwork().getLinks().get(linkId);
-			Person person = scenario.getPopulation().getPersons().get(delegate.getDriverOfVehicle(vehId));
+			Person person = scenario.getPopulation().getPersons().get(vehicle2Driver.getDriverOfVehicle(vehId));
 			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehId);
 			
 			double carScoreOffset = -(this.carCountOnLink * 0.04);
 			this.score += carScoreOffset;
 			LOG.warn("----- link = " + linkId + " -- car score offset = " + carScoreOffset);
 			
-//			this.score += bicycleTravelDisutility.getTravelDisutilityBasedOnTTime(link, enterTime, person, vehicle, travelTime);
-			this.score += bicycleTravelDisutility.getLinkTravelDisutility(link, enterTime, person, vehicle);
+			// TODO The following needs to be revised because -- as it is currently -- the randomness of the router would be picked up in scoring
+			this.score += bicycleTravelDisutility.getTravelDisutilityBasedOnTTime(link, enterTime, person, vehicle, travelTime);
 //			LOG.warn("score = " + score + " -- linkId = " + link.getId() + " -- enterTime = " + enterTime + " -- personId = " + person.getId() + " -- travelTime = " + travelTime);
 		}
 		else {
@@ -126,9 +128,7 @@ public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScor
 
 	@Override
 	public void handleEvent(MotorizedInteractionEvent event) {
-//		LOG.info("event received from link " + event.getLinkId());
 		if (event.getLinkId().equals(previousLink)) {
-//			LOG.warn("USED: Event from link " + event.getLinkId());
 			this.carCountOnLink++;
 		}
 	}
