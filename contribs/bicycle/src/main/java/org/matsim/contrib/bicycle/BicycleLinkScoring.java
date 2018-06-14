@@ -126,15 +126,15 @@ public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScor
 			
 			double carScoreOffset = -(this.carCountOnLink * 0.04);
 			this.score += carScoreOffset;
-			LOG.warn("----- link = " + linkId + " -- car score offset = " + carScoreOffset);
+			// LOG.warn("----- link = " + linkId + " -- car score offset = " + carScoreOffset);
 			
 			double scoreOnLink = BicycleUtilityUtils.computeLinkBasedScore(scenario.getNetwork().getLinks().get(linkId),
 					marginalUtilityOfComfort_m, marginalUtilityOfInfrastructure_m, marginalUtilityOfGradient_m_100m);
-			LOG.warn("----- link = " + linkId + " -- scoreOnLink = " + scoreOnLink);
+			// LOG.warn("----- link = " + linkId + " -- scoreOnLink = " + scoreOnLink);
 			this.score += scoreOnLink;
 			
 			double timeDistanceBasedScoreComponent = computeTimeDistanceBasedScoreComponent(travelTime, scenario.getNetwork().getLinks().get(linkId).getLength());
-			LOG.warn("----- link = " + linkId + " -- timeDistanceBasedScoreComponent = " + timeDistanceBasedScoreComponent);
+			// LOG.warn("----- link = " + linkId + " -- timeDistanceBasedScoreComponent = " + timeDistanceBasedScoreComponent);
 			this.score += timeDistanceBasedScoreComponent;
 		}
 		else {
