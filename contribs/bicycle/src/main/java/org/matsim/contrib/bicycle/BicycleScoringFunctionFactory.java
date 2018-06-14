@@ -21,6 +21,7 @@ package org.matsim.contrib.bicycle;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.bicycle.BicycleConfigGroup.BicycleScoringType;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -55,8 +56,15 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 //		CarCounter carCounter = new CarCounter(bicycleScoring);
 //		eventsManager.addHandler(carCounter);
 		
-//		sumScoringFunction.addScoringFunction(new BicycleLegScoring(params, scenario.getNetwork(), (BicycleConfigGroup) scenario.getConfig().getModule("bicycle")));
-		sumScoringFunction.addScoringFunction(new BicycleLinkScoring(params, scenario, (BicycleConfigGroup) scenario.getConfig().getModule("bicycle")));
+		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) scenario.getConfig().getModule("bicycle");
+		BicycleScoringType bicycleScoringType = bicycleConfigGroup.getBicycleScoringType();
+		if (bicycleScoringType == BicycleScoringType.legBased) {
+			sumScoringFunction.addScoringFunction(new BicycleLegScoring(params, scenario.getNetwork(), bicycleConfigGroup));
+		} else if (bicycleScoringType == BicycleScoringType.linkBased) {
+			sumScoringFunction.addScoringFunction(new BicycleLinkScoring(params, scenario, bicycleConfigGroup));
+		} else {
+			throw new IllegalArgumentException("Bicycle scoring type " + bicycleScoringType + " not known.");
+		}
 
 		return sumScoringFunction;
 	}
