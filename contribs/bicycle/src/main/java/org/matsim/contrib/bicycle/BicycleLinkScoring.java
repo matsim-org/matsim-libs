@@ -26,23 +26,26 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.ModeUtilityParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.vehicles.Vehicle;
 
 /**
  * @author dziemke
  * 
- * This is an alternative to BicycleLegScoring. It is not thoroughly tested yet. It becomes relevant when the true times spent
- * on an individual link are relevant.
+ * This is an alternative to BicycleLegScoring. Currently yields slightly different scores than BicyleLegScoring.
+ * This link-based scoring should be used when true times spent on an individual link are relevant
+ * and for the scoring of the interaction with motorized traffic.
  */
-@Deprecated
 public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring, MotorizedInteractionEventHandler {
 	private static final Logger LOG = Logger.getLogger(BicycleLinkScoring.class);
 	
+	protected final ScoringParameters params;
+	
 	private Scenario scenario;
-	private BicycleTravelDisutility bicycleTravelDisutility;
 	private Vehicle2DriverEventHandler vehicle2Driver = new Vehicle2DriverEventHandler();
 	private Id<Link> previousLink;
 	private double previousLinkRelativePosition;
@@ -50,9 +53,19 @@ public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScor
 	private double score;
 	private int carCountOnLink;
 	
-	public BicycleLinkScoring(Scenario scenario, BicycleTravelTime bicycleTravelTime, BicycleTravelDisutilityFactory bicycleTravelDisutilityFactory) {
-				this.scenario = scenario;
-		this.bicycleTravelDisutility = (BicycleTravelDisutility) bicycleTravelDisutilityFactory.createTravelDisutility(bicycleTravelTime);
+	private final double marginalUtilityOfInfrastructure_m;
+	private final double marginalUtilityOfComfort_m;
+	private final double marginalUtilityOfGradient_m_100m;
+	
+	private static int ccc=0 ;
+	
+	public BicycleLinkScoring(final ScoringParameters params, Scenario scenario, BicycleConfigGroup bicycleConfigGroup) {
+		this.params = params;
+		this.scenario = scenario;
+		
+		this.marginalUtilityOfInfrastructure_m = bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m();
+		this.marginalUtilityOfComfort_m = bicycleConfigGroup.getMarginalUtilityOfComfort_m();
+		this.marginalUtilityOfGradient_m_100m = bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m();
 	}
 
 	@Override public void finish() {}
@@ -105,26 +118,59 @@ public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScor
 		}
 	}
 	
-	@Deprecated
 	private void calculateScoreForPreviousLink(Id<Link> linkId, Double enterTime, Id<Vehicle> vehId, double travelTime, double relativeLinkEnterPosition) {
 		if (relativeLinkEnterPosition != 1.0) {
-			Link link = scenario.getNetwork().getLinks().get(linkId);
-			Person person = scenario.getPopulation().getPersons().get(vehicle2Driver.getDriverOfVehicle(vehId));
-			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehId);
+			// Link link = scenario.getNetwork().getLinks().get(linkId);
+			// Person person = scenario.getPopulation().getPersons().get(vehicle2Driver.getDriverOfVehicle(vehId));
+			// Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehId);
 			
 			double carScoreOffset = -(this.carCountOnLink * 0.04);
 			this.score += carScoreOffset;
 			LOG.warn("----- link = " + linkId + " -- car score offset = " + carScoreOffset);
 			
-			// TODO The following needs to be revised because -- as it is currently -- the randomness of the router would be picked up in scoring
-			this.score += bicycleTravelDisutility.getTravelDisutilityBasedOnTTime(link, enterTime, person, vehicle, travelTime);
-//			LOG.warn("score = " + score + " -- linkId = " + link.getId() + " -- enterTime = " + enterTime + " -- personId = " + person.getId() + " -- travelTime = " + travelTime);
+			double scoreOnLink = BicycleUtilityUtils.computeLinkBasedScore(scenario.getNetwork().getLinks().get(linkId),
+					marginalUtilityOfComfort_m, marginalUtilityOfInfrastructure_m, marginalUtilityOfGradient_m_100m);
+			LOG.warn("----- link = " + linkId + " -- scoreOnLink = " + scoreOnLink);
+			this.score += scoreOnLink;
+			
+			double timeDistanceBasedScoreComponent = computeTimeDistanceBasedScoreComponent(travelTime, scenario.getNetwork().getLinks().get(linkId).getLength());
+			LOG.warn("----- link = " + linkId + " -- timeDistanceBasedScoreComponent = " + timeDistanceBasedScoreComponent);
+			this.score += timeDistanceBasedScoreComponent;
 		}
 		else {
-			// If agent was already at the end of the link and thus did not travel on it, do nothing
+			double timeDistanceBasedScoreComponent = computeTimeDistanceBasedScoreComponent(travelTime, 0.);
+			this.score += timeDistanceBasedScoreComponent;
 		}
-		// TODO Use relative position in a more sophisticated way.
 	}
+	
+	
+	// Copied and adapted from CharyparNagelLegScoring
+	protected double computeTimeDistanceBasedScoreComponent(double travelTime, double dist) {
+		double tmpScore = 0.0;
+		ModeUtilityParameters modeParams = this.params.modeParams.get("bicycle");
+		if (modeParams == null) {
+			throw new RuntimeException("no scoring parameters are defined for bicycle") ;
+		}
+		tmpScore += travelTime * modeParams.marginalUtilityOfTraveling_s;
+		if (modeParams.marginalUtilityOfDistance_m != 0.0 || modeParams.monetaryDistanceCostRate != 0.0) {
+			if ( Double.isNaN(dist) ) {
+				if ( ccc<10 ) {
+					ccc++ ;
+					Logger.getLogger(this.getClass()).warn("distance is NaN. Will make score of this plan NaN. Possible reason: Simulation does not report " +
+							"a distance for this trip. Possible reason for that: mode is teleported and router does not " +
+							"write distance into plan.  Needs to be fixed or these plans will die out.") ;
+					if ( ccc==10 ) {
+						Logger.getLogger(this.getClass()).warn(Gbl.FUTURE_SUPPRESSED) ;
+					}
+				}
+			}
+			tmpScore += modeParams.marginalUtilityOfDistance_m * dist;
+			tmpScore += modeParams.monetaryDistanceCostRate * this.params.marginalUtilityOfMoney * dist;
+		}
+		tmpScore += modeParams.constant;
+		return tmpScore;
+	}
+	
 
 	@Override
 	public void handleEvent(MotorizedInteractionEvent event) {

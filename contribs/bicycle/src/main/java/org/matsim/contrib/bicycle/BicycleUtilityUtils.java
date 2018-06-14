@@ -24,6 +24,26 @@ import org.matsim.api.core.v01.network.Link;
  * @author dziemke
  */
 public class BicycleUtilityUtils {
+	
+	public static double computeLinkBasedScore(Link link, double marginalUtilityOfComfort_m,
+			double marginalUtilityOfInfrastructure_m, double marginalUtilityOfGradient_m_100m) {
+		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
+		String type = (String) link.getAttributes().getAttribute("type");
+		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
+
+		double distance = link.getLength();
+		
+		double comfortFactor = BicycleUtilityUtils.getComfortFactor(surface, type);
+		double comfortDisutility = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance;
+		
+		double infrastructureFactor = BicycleUtilityUtils.getInfrastructureFactor(type, cyclewaytype);
+		double infrastructureDisutility = marginalUtilityOfInfrastructure_m * (1. - infrastructureFactor) * distance;
+		
+		double gradientFactor = BicycleUtilityUtils.getGradientFactor(link);
+		double gradientDisutility = marginalUtilityOfGradient_m_100m * gradientFactor * distance;
+		return (infrastructureDisutility + comfortDisutility + gradientDisutility);
+	}
+	
 	public static double getGradientFactor(Link link) {
 		double gradient = 0.;
 		Double fromNodeZ = link.getFromNode().getCoord().getZ();
@@ -36,7 +56,7 @@ public class BicycleUtilityUtils {
 		return gradient;
 	}
 
-	// TODO combine this with speeds
+	// TODO Combine this with speeds?
 	public static double getComfortFactor(String surface, String type) {
 		double comfortFactor = 1.0;
 		if (surface != null) {

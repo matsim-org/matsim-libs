@@ -23,6 +23,7 @@ package org.matsim.contrib.bicycle;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -35,6 +36,8 @@ import org.matsim.core.scoring.functions.ScoringParameters;
  * @author dziemke
  */
 public class BicycleLegScoring extends CharyparNagelLegScoring {
+	// private static final Logger LOG = Logger.getLogger(BicycleLegScoring.class);
+
 	private final double marginalUtilityOfInfrastructure_m;
 	private final double marginalUtilityOfComfort_m;
 	private final double marginalUtilityOfGradient_m_100m;
@@ -48,7 +51,9 @@ public class BicycleLegScoring extends CharyparNagelLegScoring {
 	}
 	
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
+		// Get leg score from regular CharyparNagelLegScoring
 		double legScore = super.calcLegScore(departureTime, arrivalTime, leg);
+		// LOG.warn("----- legScore = " + legScore);
 		
 		NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
 		
@@ -58,29 +63,11 @@ public class BicycleLegScoring extends CharyparNagelLegScoring {
 		
 		// Iterate over all links of the route
 		for (Id<Link> linkId : linkIds) {
-			double scoreOnLink = computeLinkBasedScore(network.getLinks().get(linkId));
-			// LOG.info("Bicycle score on link " + linkId + " is = " + scoreOnLink + ".");
+			double scoreOnLink = BicycleUtilityUtils.computeLinkBasedScore(network.getLinks().get(linkId),
+					marginalUtilityOfComfort_m, marginalUtilityOfInfrastructure_m, marginalUtilityOfGradient_m_100m);
+			// LOG.warn("----- link = " + linkId + " -- scoreOnLink = " + scoreOnLink);
 			legScore += scoreOnLink;
 		}
-
 		return legScore;
-	}	
-
-	public double computeLinkBasedScore(Link link) {
-		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
-		String type = (String) link.getAttributes().getAttribute("type");
-		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
-
-		double distance = link.getLength();
-		
-		double comfortFactor = BicycleUtilityUtils.getComfortFactor(surface, type);
-		double comfortDisutility = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance;
-		
-		double infrastructureFactor = BicycleUtilityUtils.getInfrastructureFactor(type, cyclewaytype);
-		double infrastructureDisutility = marginalUtilityOfInfrastructure_m * (1. - infrastructureFactor) * distance;
-		
-		double gradientFactor = BicycleUtilityUtils.getGradientFactor(link);
-		double gradientDisutility = marginalUtilityOfGradient_m_100m * gradientFactor * distance;
-		return (infrastructureDisutility + comfortDisutility + gradientDisutility);
 	}
 }
