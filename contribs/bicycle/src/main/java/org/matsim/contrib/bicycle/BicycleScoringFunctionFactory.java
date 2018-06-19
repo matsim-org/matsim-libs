@@ -41,7 +41,6 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 	
 	@Inject Scenario scenario;
 	@Inject BicycleTravelTime bicycleTravelTime;
-	@Inject BicycleTravelDisutilityFactory bicycleTravelDisutilityFactory;
 	
 	@Inject EventsManager eventsManager;
 	
