@@ -3,4 +3,5 @@
 .classpath
 /target
 /test
-/output 
+/output
+*.iml
