@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
@@ -47,7 +48,10 @@ import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -106,12 +110,14 @@ abstract class AbstractQLink implements QLinkI {
 	private final NetsimEngineContext context;
 
 	private final NetsimInternalInterface netsimEngine;
-
-	AbstractQLink(Link link, QNodeI toNode, NetsimEngineContext context, NetsimInternalInterface netsimEngine2) {
+	private final LinkSpeedCalculator linkSpeedCalculator;
+	
+	AbstractQLink(Link link, QNodeI toNode, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, LinkSpeedCalculator linkSpeedCalculator) {
 		this.link = link ;
 		this.toQNode = toNode ;
 		this.context = context;
 		this.netsimEngine = netsimEngine2;
+		this.linkSpeedCalculator = linkSpeedCalculator;
 	}
 
 	@Override
@@ -465,6 +471,85 @@ abstract class AbstractQLink implements QLinkI {
 
 	void setTransitQLink(TransitQLink transitQLink) {
 		this.transitQLink = transitQLink;
+	}
+	
+	/**
+	 * The idea here is to keep some control over what the implementations of QLaneI have access to.  And maybe reduce
+	 * it over time, so that they become more encapsulated.  kai, feb'18
+	 */
+	public final class QLinkInternalInterface {
+		
+		public QNodeI getToNodeQ() {
+			return AbstractQLink.this.toQNode ;
+		}
+		public Node getToNode() {
+			return AbstractQLink.this.link.getToNode() ;
+		}
+		
+		public double getFreespeed() {
+			// yyyy does it make sense to provide the method without time?  kai, feb'18
+			return AbstractQLink.this.link.getFreespeed() ;
+		}
+		
+		public Id<Link> getId() {
+			return AbstractQLink.this.link.getId() ;
+		}
+		
+		public HandleTransitStopResult handleTransitStop(double now, QVehicle veh, TransitDriverAgent driver, Id<Link> linkId) {
+			// yy now would not be needed as an argument. kai, feb'18
+			// yy linkId would not be needed as an argument. kai, feb'18
+			return AbstractQLink.this.transitQLink.handleTransitStop(now, veh, driver, linkId) ;
+		}
+		
+		public void addParkedVehicle(QVehicle veh) {
+			AbstractQLink.this.addParkedVehicle(veh);
+		}
+		
+		public void letVehicleArrive(QVehicle veh) {
+			AbstractQLink.this.letVehicleArrive(veh);
+		}
+		
+		public void makeVehicleAvailableToNextDriver(QVehicle veh) {
+			AbstractQLink.this.makeVehicleAvailableToNextDriver(veh);
+		}
+		
+		public void activateLink() {
+			AbstractQLink.this.activateLink();
+		}
+		
+		public double getMaximumVelocityFromLinkSpeedCalculator(QVehicle veh, double now) {
+			final LinkSpeedCalculator linkSpeedCalculator = AbstractQLink.this.linkSpeedCalculator;
+			Gbl.assertNotNull(linkSpeedCalculator);
+			return linkSpeedCalculator.getMaximumVelocity(veh, AbstractQLink.this.link, now) ;
+		}
+		
+		public void setCurrentLinkToVehicle(QVehicle veh) {
+			veh.setCurrentLink( AbstractQLink.this.link );
+		}
+		
+		public QLaneI getAcceptingQLane() {
+			return AbstractQLink.this.getAcceptingQLane() ;
+		}
+		
+		public List<QLaneI> getOfferingQLanes() {
+			return AbstractQLink.this.getOfferingQLanes() ;
+		}
+		
+		public Node getFromNode() {
+			return AbstractQLink.this.link.getFromNode() ;
+		}
+		
+		public double getFreespeed(double now) {
+			return AbstractQLink.this.link.getFreespeed(now) ;
+		}
+		
+		public int getNumberOfLanesAsInt(double now) {
+			return NetworkUtils.getNumberOfLanesAsInt(now,AbstractQLink.this.link) ;
+		}
+	}
+	private final QLinkInternalInterface qLinkInternalInterface = new QLinkInternalInterface() ;
+	public final QLinkInternalInterface getInternalInterface() {
+		return qLinkInternalInterface ;
 	}
 
 }

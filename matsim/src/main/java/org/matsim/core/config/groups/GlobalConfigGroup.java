@@ -20,16 +20,17 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
+
+import java.util.Map;
 
 public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
 
 	public static final String GROUP_NAME = "global";
-
+	private boolean insistingOnDeprecatedConfigVersion = true ;
+	
 	public GlobalConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -79,6 +80,14 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( COORDINATE_SYSTEM )
 	public void setCoordinateSystem(final String coordinateSystem) {
 		this.coordinateSystem = coordinateSystem;
+	}
+	
+	private static final String INSITING_ON_DEPRECATED_CONFIG_VERSION = "insistingOnDeprecatedConfigVersion" ;
+	@StringGetter( INSITING_ON_DEPRECATED_CONFIG_VERSION )
+	public final boolean isInsistingOnDeprecatedConfigVersion() { return this.insistingOnDeprecatedConfigVersion ; }
+	@StringSetter( INSITING_ON_DEPRECATED_CONFIG_VERSION )
+	public final void setInsistingOnDeprecatedConfigVersion( boolean val ) {
+		this.insistingOnDeprecatedConfigVersion = val ;
 	}
 
 }

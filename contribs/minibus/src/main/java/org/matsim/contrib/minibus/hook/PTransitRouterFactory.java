@@ -27,15 +27,15 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.performance.raptor.Raptor;
 import org.matsim.contrib.minibus.performance.raptor.RaptorDisutility;
-import org.matsim.contrib.minibus.performance.raptor.TransitRouterQuadTree;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.pt.router.*;
+import org.matsim.pt.router.PreparedTransitSchedule;
+import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterImpl;
+import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
@@ -43,7 +43,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author aneumann
  *
  */
-class PTransitRouterFactory implements Provider<TransitRouter>, StartupListener, IterationStartsListener {
+class PTransitRouterFactory implements Provider<TransitRouter> {
 	// How is this working if nothing is injected?  But presumably it uses "Provider" only as a syntax clarifier, but the class
 	// is not injectable. kai, jun'16
 	
@@ -59,8 +59,7 @@ class PTransitRouterFactory implements Provider<TransitRouter>, StartupListener,
 	private Provider<TransitRouter> routerFactory = null;
 	@Inject private TransitSchedule schedule;
 	private RaptorDisutility raptorDisutility;
-	private TransitRouterQuadTree transitRouterQuadTree;
-	
+
 	public PTransitRouterFactory(Config config){
 		PConfigGroup pConfig = ConfigUtils.addOrGetModule(config, PConfigGroup.class) ;
 		this.ptEnabler = pConfig.getPtEnabler() ;
@@ -75,16 +74,13 @@ class PTransitRouterFactory implements Provider<TransitRouter>, StartupListener,
 		this.transitRouterConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 	}
 	
-	private void updateTransitSchedule() {
+	void updateTransitSchedule() {
 		this.needToUpdateRouter = true;
 //		this.schedule = PTransitLineMerger.mergeSimilarRoutes(schedule);
 		
 		if (this.ptRouter.equalsIgnoreCase("raptor")) {
 			// this could also hold updated prices
 			this.raptorDisutility = new RaptorDisutility(this.transitRouterConfig, this.costPerBoarding, this.costPerMeterTraveled);
-			
-			this.transitRouterQuadTree = new TransitRouterQuadTree(this.raptorDisutility);
-			this.transitRouterQuadTree.initializeFromSchedule(this.schedule, this.transitRouterConfig.getBeelineWalkConnectionDistance());
 		}
 	}
 
@@ -122,7 +118,10 @@ class PTransitRouterFactory implements Provider<TransitRouter>, StartupListener,
 	}
 	
 	private TransitRouter createRaptorRouter() {
-		return new Raptor(this.transitRouterQuadTree, this.raptorDisutility, this.transitRouterConfig);
+		if ( this.raptorDisutility == null) {
+			updateTransitSchedule();
+		}
+        return new Raptor(this.transitRouterConfig, this.schedule, this.raptorDisutility);
 	}
 
 	private Provider<TransitRouter> createSpeedyRouter() {
@@ -138,13 +137,12 @@ class PTransitRouterFactory implements Provider<TransitRouter>, StartupListener,
         return null;
 	}
 
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		this.updateTransitSchedule();
-	}
-
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		this.updateTransitSchedule();
-	}
+	//see MATSim-768
+//	void notifyIterationStarts(IterationStartsEvent event) {
+//		this.updateTransitSchedule();
+//	}
+//
+//	void notifyStartup(StartupEvent event) {
+//		this.updateTransitSchedule();
+//	}
 }

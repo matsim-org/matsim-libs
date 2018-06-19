@@ -80,7 +80,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		writer.closeFile();
 
 		System.out.println("reffile: " + referenceEventsFileName);
-		assertTrue("different event files", EventsFileComparator.compare(referenceEventsFileName, eventsFileName) == EventsFileComparator.CODE_FILES_ARE_EQUAL);
+		assertTrue("different event files", EventsFileComparator.compareAndReturnInt(referenceEventsFileName, eventsFileName) == EventsFileComparator.CODE_FILES_ARE_EQUAL);
 		
 	}
 
@@ -120,7 +120,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 
 		writer.closeFile();
 
-		assertTrue("different event files", EventsFileComparator.compare(referenceEventsFileName, eventsFileName) == EventsFileComparator.CODE_FILES_ARE_EQUAL);
+		assertTrue("different event files", EventsFileComparator.compareAndReturnInt(referenceEventsFileName, eventsFileName) == EventsFileComparator.CODE_FILES_ARE_EQUAL);
 		
 	}
 

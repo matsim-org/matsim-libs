@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -40,18 +39,17 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 		Plan plan = createSamplePlan();
 		Activity oldActivity = (Activity)plan.getPlanElements().get(0);
 		Activity newActivity = PopulationUtils.createActivityFromCoord("s", new Coord((double) 200, (double) 200));
-		ReplacePlanElements rpe = new ReplacePlanElements();
 		
 		// expect rpe to return false if the plan or one of the activities is null
-		assertEquals(rpe.replaceActivity(null, oldActivity, newActivity), false);
-		assertEquals(rpe.replaceActivity(plan, null, newActivity), false);
-		assertEquals(rpe.replaceActivity(plan, oldActivity, null), false);
+		assertEquals(EditPlans.replaceActivityBlindly(null, oldActivity, newActivity), false);
+		assertEquals(EditPlans.replaceActivityBlindly(plan, null, newActivity), false);
+		assertEquals(EditPlans.replaceActivityBlindly(plan, oldActivity, null), false);
 		
 		// old activity has to be part of the plan
-		assertEquals(rpe.replaceActivity(plan, newActivity, newActivity), false);
+		assertEquals(EditPlans.replaceActivityBlindly(plan, newActivity, newActivity), false);
 
 		// replace activity successful
-		assertEquals(rpe.replaceActivity(plan, oldActivity, newActivity), true);
+		assertEquals(EditPlans.replaceActivityBlindly(plan, oldActivity, newActivity), true);
 		
 		// check whether activity has really be replaced
 		assertEquals(plan.getPlanElements().get(0).equals(newActivity), true);
@@ -64,18 +62,17 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 		Plan plan = createSamplePlan();
 		Leg oldLeg = (Leg)plan.getPlanElements().get(1);
 		Leg newLeg = PopulationUtils.createLeg(TransportMode.walk);
-		ReplacePlanElements rpe = new ReplacePlanElements();
 		
 		// expect rpe to return false if the plan or one of the legs is null
-		assertEquals(rpe.replaceLeg(null, oldLeg, newLeg), false);
-		assertEquals(rpe.replaceLeg(plan, null, newLeg), false);
-		assertEquals(rpe.replaceLeg(plan, oldLeg, null), false);
+		assertEquals(EditPlans.replaceLegBlindly(null, oldLeg, newLeg), false);
+		assertEquals(EditPlans.replaceLegBlindly(plan, null, newLeg), false);
+		assertEquals(EditPlans.replaceLegBlindly(plan, oldLeg, null), false);
 		
 		// old leg has to be part of the plan
-		assertEquals(rpe.replaceLeg(plan, newLeg, newLeg), false);
+		assertEquals(EditPlans.replaceLegBlindly(plan, newLeg, newLeg), false);
 		
 		// replace leg successful
-		assertEquals(rpe.replaceLeg(plan, oldLeg, newLeg), true);
+		assertEquals(EditPlans.replaceLegBlindly(plan, oldLeg, newLeg), true);
 		
 		// check whether leg has really be replaced
 		assertEquals(plan.getPlanElements().get(1).equals(newLeg), true);
@@ -84,7 +81,7 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 	/**
 	 * @author cdobler
 	 */
-	private Plan createSamplePlan() {
+	private static Plan createSamplePlan() {
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		
 		PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));

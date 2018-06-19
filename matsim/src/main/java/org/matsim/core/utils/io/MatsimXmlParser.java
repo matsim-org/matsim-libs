@@ -153,6 +153,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 		Gbl.assertNotNull(url);
 		this.theSource = url.toString();
 		log.info("starting to parse xml from url " + this.theSource + " ...");
+		System.out.flush();
 		if (url.getFile().endsWith(".gz")) {
 			try {
 				parse(new InputSource(new GZIPInputStream(url.openStream())));

@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Permission;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.rules.TestWatchman;
 import org.junit.runners.model.FrameworkMethod;
@@ -105,7 +106,10 @@ public final class MatsimTestUtils extends TestWatchman {
 	public URL inputResourcePath() {
 		return getResourceNotNull("/" + getClassInputDirectory() + getMethodName() + "/.");
 	}
-
+	
+	/**
+	 * @return class input directory as URL
+	 */
 	public URL classInputResourcePath() {
 		return getResourceNotNull("/" + getClassInputDirectory() + "/.");
 	}
@@ -222,7 +226,17 @@ public final class MatsimTestUtils extends TestWatchman {
 	 */
 	public String getClassInputDirectory() {
 		if (this.classInputDirectory == null) {
-			this.classInputDirectory = "test/input/" + this.testClass.getCanonicalName().replace('.', '/') + "/";
+			
+			Logger.getLogger(this.getClass()).warn( "user.dir = " + System.getProperty("user.dir") ) ;
+			
+			this.classInputDirectory = "test/input/" +
+											   this.testClass.getCanonicalName().replace('.', '/') + "/";
+//			this.classInputDirectory = System.getProperty("user.dir") + "/test/input/" +
+//											   this.testClass.getCanonicalName().replace('.', '/') + "/";
+			// (this used to be relative, i.e. ... = "test/input/" + ... .  Started failing when
+			// this was used in tests to read a second config file when I made the path of that
+			// relative to the root of the initial config file.  Arghh.  kai, feb'18)
+			// yyyyyy needs to be discussed, see MATSIM-776 and MATSIM-777. kai, feb'18
 		}
 		return this.classInputDirectory;
 	}
@@ -298,7 +312,7 @@ public final class MatsimTestUtils extends TestWatchman {
   }
   
   public static int compareEventsFiles( String filename1, String filename2 ) {
-	  return EventsFileComparator.compare(filename1, filename2) ;
+	  return EventsFileComparator.compareAndReturnInt(filename1, filename2) ;
   }
   public static void compareFilesBasedOnCRC( String filename1, String filename2 ) {
 	  long checksum1 = CRCChecksum.getCRCFromFile(filename1) ;

@@ -20,6 +20,7 @@
 
 package org.matsim.pt.router;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
@@ -94,6 +95,8 @@ public class TransitRouterConfig implements MatsimParameters {
 	private Double beelineDistanceFactor;
 
 	private final double directWalkFactor ;
+	
+	private boolean cacheTree;
 
 	public TransitRouterConfig(final Config config) {
 		this(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
@@ -103,6 +106,12 @@ public class TransitRouterConfig implements MatsimParameters {
 			final TransitRouterConfigGroup trConfig, final VspExperimentalConfigGroup vspConfig ) 
 	{
 		pcsConfig.setLocked(); pcrConfig.setLocked() ; trConfig.setLocked() ; vspConfig.setLocked() ;
+		
+		if (pcsConfig.getScoringParametersPerSubpopulation().size()>1){
+			Logger.getLogger(getClass()).warn("More than one subpopulation is used in plansCalcScore. "
+					+ "This is not currently implemented in the TransitRouter (but should work for scoring),"
+					+ " so the values for the \"default\" subpopulation will be used. (jb, Feb 2018)");
+		}
 		
 		// walk:
 		this.beelineDistanceFactor = pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
@@ -133,6 +142,7 @@ public class TransitRouterConfig implements MatsimParameters {
 		this.setBeelineWalkConnectionDistance(trConfig.getMaxBeelineWalkConnectionDistance());
 		this.setAdditionalTransferTime(trConfig.getAdditionalTransferTime());
 		this.directWalkFactor = trConfig.getDirectWalkFactor() ;
+		this.cacheTree = trConfig.isCacheTree();
 	}
 
 	public void setUtilityOfLineSwitch_utl(final double utilityOfLineSwitch_utl_sec) {
@@ -246,5 +256,11 @@ public class TransitRouterConfig implements MatsimParameters {
 		return this.directWalkFactor ;
 	}
 
+	public boolean isCacheTree() {
+		return cacheTree;
+	}
 
+	public void setCacheTree(boolean cacheTree) {
+		this.cacheTree = cacheTree;
+	}
 }

@@ -19,20 +19,22 @@
 
 package org.matsim.contrib.drt.optimizer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.data.DrtRequest;
-import org.matsim.contrib.drt.schedule.DrtDriveTask;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author michalm
@@ -41,12 +43,14 @@ public class VehicleData {
 	public static class Entry {
 		public final Vehicle vehicle;
 		public final LinkTimePair start;
-		public int startOccupancy;
-		public final List<Stop> stops = new ArrayList<>();
+		public final int startOccupancy;
+		public final ImmutableList<Stop> stops;
 
-		public Entry(Vehicle vehicle, LinkTimePair start) {
+		public Entry(Vehicle vehicle, LinkTimePair start, int startOccupancy, ImmutableList<Stop> stops) {
 			this.vehicle = vehicle;
 			this.start = start;
+			this.startOccupancy = startOccupancy;
+			this.stops = stops;
 		}
 	}
 
@@ -55,10 +59,12 @@ public class VehicleData {
 		public final double maxArrivalTime;// relating to max pass drive time (for dropoff requests)
 		public final double maxDepartureTime;// relating to pass max wait time (for pickup requests)
 		public final int occupancyChange;// diff in pickups and dropoffs
-		public int outputOccupancy;
+		public final int outgoingOccupancy;
 
-		public Stop(DrtStopTask task) {
+		public Stop(DrtStopTask task, int outputOccupancy) {
 			this.task = task;
+			this.outgoingOccupancy = outputOccupancy;
+
 			maxArrivalTime = calcMaxArrivalTime();
 			maxDepartureTime = calcMaxDepartureTime();
 			occupancyChange = task.getPickupRequests().size() - task.getDropoffRequests().size();
@@ -86,107 +92,49 @@ public class VehicleData {
 			return maxTime;
 		}
 
+		@Override
+		public String toString() {
+			return "VehicleData.Stop for: " + task.toString();
+		}
 	}
 
-	private final List<Entry> entries = new ArrayList<>();
+	public interface EntryFactory {
+		Entry create(Vehicle vehicle, double currentTime);
+	}
+
 	private final double currentTime;
+	private final EntryFactory entryFactory;
+	private final Map<Id<Vehicle>, Entry> entries;
 
-	public VehicleData(double currentTime, Iterable<? extends Vehicle> vehicles) {
+	public VehicleData(double currentTime, Stream<? extends Vehicle> vehicles, EntryFactory entryFactory,
+			ForkJoinPool forkJoinPool) {
 		this.currentTime = currentTime;
-
-		for (Vehicle v : vehicles) {
-			Entry e = createVehicleData(v);
-			if (e != null) {
-				entries.add(e);
-			}
+		this.entryFactory = entryFactory;
+		try {
+			entries = forkJoinPool.submit(() -> vehicles.parallel()//
+					.map(v -> entryFactory.create(v, currentTime))//
+					.filter(Objects::nonNull)//
+					.collect(Collectors.toMap(e -> e.vehicle.getId(), e -> e)))//
+					.get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
-	public void updateEntry(Entry vEntry) {
-		int idx = entries.indexOf(vEntry);// TODO inefficient! ==> use map instead of list for storing entries...
-		Entry e = createVehicleData(vEntry.vehicle);
+	public void updateEntry(Vehicle vehicle) {
+		Entry e = entryFactory.create(vehicle, currentTime);
 		if (e != null) {
-			entries.set(idx, e);
+			entries.put(vehicle.getId(), e);
 		} else {
-			entries.remove(idx);
+			entries.remove(vehicle.getId());
 		}
-	}
-
-	private Entry createVehicleData(Vehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-		ScheduleStatus status = schedule.getStatus();
-		if (currentTime <= vehicle.getServiceBeginTime()) {
-			return null;
-		}
-		if (currentTime >= vehicle.getServiceEndTime() || status == ScheduleStatus.COMPLETED) {
-			return null;
-		}
-
-		@SuppressWarnings("unchecked")
-		List<DrtTask> tasks = (List<DrtTask>)schedule.getTasks();
-		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
-
-		LinkTimePair start;
-		int nextTaskIdx;
-		if (status == ScheduleStatus.STARTED) {
-			switch (currentTask.getDrtTaskType()) {
-				case DRIVE:
-					DrtDriveTask driveTask = (DrtDriveTask)currentTask;
-					start = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
-					if (start == null) { // too late to divert a vehicle
-						start = new LinkTimePair(driveTask.getPath().getToLink(), driveTask.getEndTime());
-					}
-					break;
-
-				case STOP:
-					DrtStopTask stopTask = (DrtStopTask)currentTask;
-					start = new LinkTimePair(stopTask.getLink(), stopTask.getEndTime());
-					break;
-
-				case STAY:
-					DrtStayTask stayTask = (DrtStayTask)currentTask;
-					start = new LinkTimePair(stayTask.getLink(), currentTime);
-					break;
-
-				default:
-					throw new RuntimeException();
-			}
-
-			nextTaskIdx = currentTask.getTaskIdx() + 1;
-		} else { // PLANNED
-			start = new LinkTimePair(vehicle.getStartLink(), vehicle.getServiceBeginTime());
-			nextTaskIdx = 0;
-		}
-
-		Entry data = new Entry(vehicle, start);
-		for (int i = nextTaskIdx; i < tasks.size(); i++) {
-			DrtTask task = tasks.get(i);
-			if (task.getDrtTaskType() == DrtTaskType.STOP) {
-				Stop stop = new Stop((DrtStopTask)task);
-				data.stops.add(stop);
-			}
-		}
-
-		int outputOccupancy = 0;
-		for (int i = data.stops.size() - 1; i >= 0; i--) {
-			Stop s = data.stops.get(i);
-			s.outputOccupancy = outputOccupancy;
-			outputOccupancy -= s.occupancyChange;
-		}
-		data.startOccupancy = outputOccupancy;
-
-		return data;
 	}
 
 	public int getSize() {
 		return entries.size();
 	}
 
-	public Entry getEntry(int idx) {
-		return entries.get(idx);
-	}
-
-	public List<Entry> getEntries() {
-		return entries;
+	public Collection<Entry> getEntries() {
+		return Collections.unmodifiableCollection(entries.values());
 	}
 }

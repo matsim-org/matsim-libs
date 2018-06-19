@@ -44,14 +44,14 @@ public class TransitScheduleWriterTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	/**
-	 * Tests that the default format written is in v1 format.
+	 * Tests that the default format written is in v2 format.
 	 *
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
 	@Test
-	public void testDefaultV1() throws IOException, SAXException, ParserConfigurationException {
+	public void testDefaultV2() throws IOException, SAXException, ParserConfigurationException {
 		String filename = this.utils.getOutputDirectory() + "schedule.xml";
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
@@ -64,7 +64,7 @@ public class TransitScheduleWriterTest {
 
 		TransitScheduleFactory builder2 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule2 = builder2.createTransitSchedule();
-		new TransitScheduleReaderV1(schedule2, new RouteFactories()).readFile(filename);
+		new TransitScheduleReaderV2(schedule2, new RouteFactories()).readFile(filename);
 		Assert.assertEquals(1, schedule2.getTransitLines().size());
 	}
 	

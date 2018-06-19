@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.io;
 
-import net.opengis.kml._2.PlacemarkType;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import net.opengis.kml.v_2_2_0.PlacemarkType;
 
 /**
  * A composite of multiple {@link KMLObjectDetailComposite} objects.

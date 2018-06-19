@@ -1,6 +1,8 @@
 # NOTE: This is NOT a makefile to compile matsim.  Instead, it performs
 # certain maintenance helper tasks.
 
+QUICK=-Dmaven.test.skip -Dmaven.javadoc.skip -Dsource.skip -Dassembly.skipAssembly=true -DskipTests --offline
+
 .PHONY: hs hybridsim
 
 hs: hybridsim
@@ -14,7 +16,8 @@ release:
 	mvn clean ; cd matsim ; mvn -f ~/git/matsim/pom.xml --projects playgrounds/kairuns/ --also-make install -DskipTests
 	cd playgrounds/kairuns ; mvn clean ; mvn -Prelease -DskipTests=true
 
-
+matsim-quick:
+	cd matsim ; mvn clean install ${QUICK}
 
 
 #	cd matsim ; mvn clean ; mvn install -DskipTests=true 

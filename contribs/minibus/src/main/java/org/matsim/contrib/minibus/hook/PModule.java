@@ -42,15 +42,19 @@ public final class PModule extends AbstractModule {
 	@Override public void install() {
 		final PTransitRouterFactory pTransitRouterFactory = new PTransitRouterFactory(this.getConfig());
 		bind(TransitRouter.class).toProvider(pTransitRouterFactory);
+		bind(PTransitRouterFactory.class).toInstance(pTransitRouterFactory);
 
 		addControlerListenerBinding().to(PControlerListener.class) ;
-		addControlerListenerBinding().toInstance( pTransitRouterFactory ) ;
+//		addControlerListenerBinding().toInstance(pTransitRouterFactory);
 		// (needs to be injected _after_ PControlerListener, so that it is executed _before_ PControlerListener.
 		// yyyy injecting the TransitRouterFactory besides the TransitRouter is a fix to re-configure the factory in every iteration.
 		// A more general solution suggested by MZ would be to define an iteration scope.  Then the factory could be forced
 		// to reconstruct itself in every iteration, thus pulling new information (in this case the updated transit schedule)
 		// by itself.  Is on the "list", has not been done yet, will be done eventually, until then this remains the way it is.
 		// kai, jan'17)
+		// The iteration scope of PControlerListener should be executed before iteration scope of PTransitRouterFactory.
+		// It is not clear, how to control over the order of the execution. If transit schedule and thus transit router needs to be updated at every iteration,
+		// it needs to be explicitly triggered in PControlerListener which is mainly same as before. See also MATSim-768. GL, AA, AN. Jan'18
 
 		bind(TicketMachineI.class).to(TicketMachineDefaultImpl.class);
 		

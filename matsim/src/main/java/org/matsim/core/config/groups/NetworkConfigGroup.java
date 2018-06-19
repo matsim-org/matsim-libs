@@ -96,6 +96,7 @@ public final class NetworkConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( TIME_VARIANT_NETWORK )
 	public void setTimeVariantNetwork(final boolean timeVariantNetwork) {
+		testForLocked();
 		this.timeVariantNetwork = timeVariantNetwork;
 	}
 	@StringGetter( TIME_VARIANT_NETWORK )

@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.network.Link;
  * @author kainagel
  *
  */
-interface TurnAcceptanceLogic {
+public interface TurnAcceptanceLogic {
 	
 	enum AcceptTurn { GO, WAIT, ABORT }
 

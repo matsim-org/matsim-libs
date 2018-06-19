@@ -68,10 +68,10 @@ public class EquilWithCarrierWithPassIT {
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		config.network().setInputFile(NETWORK_FILENAME);
 		config.plans().setInputFile(PLANS_FILENAME);
-		StrategySettings bestScore = new StrategySettings(Id.create("1", StrategySettings.class));
+		StrategySettings bestScore = new StrategySettings();
 		bestScore.setStrategyName("BestScore");
 		bestScore.setWeight(1.0);
-		StrategySettings reRoute = new StrategySettings(Id.create("2", StrategySettings.class));
+		StrategySettings reRoute = new StrategySettings();
 		reRoute.setStrategyName("ReRoute");
 		reRoute.setWeight(0.0);
 		reRoute.setDisableAfter(300);

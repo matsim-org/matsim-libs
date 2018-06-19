@@ -31,7 +31,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
@@ -68,7 +68,8 @@ public class WagonSimQSimFactory implements MobsimFactory {
 	// to plug an own AgentFactory to the simulation.
 	// Although it is possible to plug another AgentSource to the QSim it is not possible to remove
 	// those that are inserted here. Hence, QSim will try to create TransitAgents AND 
-	//	WagonSimAgents. 
+	//	WagonSimAgents.
+	// yy I think that this is correct.  The mobsim architecture right now only allows to add, not to override.
 	@Override
 	public Mobsim createMobsim(Scenario scenario, EventsManager eventsManager) {
 
@@ -89,7 +90,7 @@ public class WagonSimQSimFactory implements MobsimFactory {
 		//
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
+		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 
 		// use an own TransitStopHandlerFactory here
@@ -103,7 +104,7 @@ public class WagonSimQSimFactory implements MobsimFactory {
 		qSim.addAgentSource(transitEngine);
 		qSim.addMobsimEngine(transitEngine);
 		if (scenario.getConfig().network().isTimeVariantNetwork()) {
-			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
+			qSim.addMobsimEngine(NetworkChangeEventsEngine.createNetworkChangeEventsEngine());
 		}
 		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);

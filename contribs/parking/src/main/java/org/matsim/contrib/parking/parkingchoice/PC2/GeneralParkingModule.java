@@ -1,8 +1,8 @@
 package org.matsim.contrib.parking.parkingchoice.PC2;
 
-import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingScoreManager;
+import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingScore;
 import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingChoiceSimulation;
-import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingInfrastructureManager;
+import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingInfrastructure;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -12,16 +12,16 @@ import org.matsim.core.controler.listener.StartupListener;
 public class GeneralParkingModule implements StartupListener, BeforeMobsimListener {
 
 	private Controler controler;
-	private ParkingScoreManager parkingScoreManager;
-	public final ParkingScoreManager getParkingScoreManager() {
+	private ParkingScore parkingScoreManager;
+	public final ParkingScore getParkingScoreManager() {
 		return parkingScoreManager;
 	}
 
-	public final void setParkingScoreManager(ParkingScoreManager parkingScoreManager) {
+	public final void setParkingScoreManager(ParkingScore parkingScoreManager) {
 		this.parkingScoreManager = parkingScoreManager;
 	}
 
-	private ParkingInfrastructureManager parkingInfrastructureManager;
+	private ParkingInfrastructure parkingInfrastructureManager;
 	private ParkingChoiceSimulation parkingSimulation;
 
 	public GeneralParkingModule(Controler controler){
@@ -38,11 +38,11 @@ public class GeneralParkingModule implements StartupListener, BeforeMobsimListen
 		// was not doing anything there. kai, jul'15
 	}
 
-	public final ParkingInfrastructureManager getParkingInfrastructure() {
+	public final ParkingInfrastructure getParkingInfrastructure() {
 		return parkingInfrastructureManager;
 	}
 	
-	public final void setParkingInfrastructurManager(ParkingInfrastructureManager parkingInfrastructureManager) {
+	public final void setParkingInfrastructurManager(ParkingInfrastructure parkingInfrastructureManager) {
 		this.parkingInfrastructureManager = parkingInfrastructureManager;
 	}
 
@@ -60,7 +60,7 @@ public class GeneralParkingModule implements StartupListener, BeforeMobsimListen
 		parkingSimulation.prepareForNewIteration();
 	}
 
-	protected final ParkingInfrastructureManager getParkingInfrastructureManager() {
+	protected final ParkingInfrastructure getParkingInfrastructureManager() {
 		return parkingInfrastructureManager;
 	}
 	

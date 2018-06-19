@@ -19,9 +19,9 @@
 
 package org.matsim.contrib.util;
 
-import org.matsim.api.core.v01.network.Link;
+import java.util.function.Function;
 
-import com.google.common.base.Function;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * @author michalm

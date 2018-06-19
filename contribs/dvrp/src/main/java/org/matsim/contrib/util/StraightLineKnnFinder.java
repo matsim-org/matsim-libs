@@ -20,6 +20,7 @@
 package org.matsim.contrib.util;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.util.distance.DistanceUtils;
@@ -38,15 +39,9 @@ public class StraightLineKnnFinder<T, N> {
 		this.neighbourToLink = neighbourToLink;
 	}
 
-	public List<N> findNearest(T obj, Iterable<N> neighbours) {
+	public List<N> findNearest(T obj, Stream<N> neighbours) {
 		Coord objectCoord = objectToLink.apply(obj).getCoord();
-		PartialSort<N> nearestRequestSort = new PartialSort<N>(k);
-
-		for (N n : neighbours) {
-			Coord nCoord = neighbourToLink.apply(n).getCoord();
-			nearestRequestSort.add(n, DistanceUtils.calculateSquaredDistance(objectCoord, nCoord));
-		}
-
-		return nearestRequestSort.retriveKSmallestElements();
+		return PartialSort.kSmallestElements(k, neighbours,
+				n -> DistanceUtils.calculateSquaredDistance(objectCoord, neighbourToLink.apply(n).getCoord()));
 	}
 }

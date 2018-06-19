@@ -28,9 +28,7 @@ import org.matsim.contrib.dvrp.data.Request;
 /**
  * @author michalm
  */
-
 public class DrtRequestRejectedEvent extends Event {
-
 	public static final String EVENT_TYPE = "DrtRequest rejected";
 
 	public static final String ATTRIBUTE_REQUEST = "request";
@@ -43,13 +41,12 @@ public class DrtRequestRejectedEvent extends Event {
 	}
 
 	@Override
-	
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-	
+
 	/**
-	 *  the ID of the initial request submitted
+	 * the ID of the initial request submitted
 	 */
 	public Id<Request> getRequestId() {
 		return requestId;

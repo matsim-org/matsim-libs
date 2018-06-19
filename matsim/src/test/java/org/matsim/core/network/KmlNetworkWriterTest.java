@@ -27,11 +27,6 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import com.google.common.io.ByteStreams;
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.ObjectFactory;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
@@ -43,6 +38,12 @@ import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKmlStyleFactory;
+
+import com.google.common.io.ByteStreams;
+
+import net.opengis.kml.v_2_2_0.DocumentType;
+import net.opengis.kml.v_2_2_0.KmlType;
+import net.opengis.kml.v_2_2_0.ObjectFactory;
 
 /**
  * @author mrieser

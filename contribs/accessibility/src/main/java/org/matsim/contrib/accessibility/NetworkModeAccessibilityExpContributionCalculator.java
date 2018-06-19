@@ -86,9 +86,9 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 
 	@Override
-	public void notifyNewOriginNode(Node fromNode1, Double departureTime) {
-		this.fromNode = fromNode1;
-		this.lcpt.calculateExtended(scenario.getNetwork(), fromNode1, departureTime);
+	public void notifyNewOriginNode(Node fromNode, Double departureTime) {
+		this.fromNode = fromNode;
+		this.lcpt.calculateExtended(scenario.getNetwork(), fromNode, departureTime);
 	}
 	
 	

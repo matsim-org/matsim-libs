@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
@@ -61,7 +60,7 @@ import java.util.Set;
 	@Override
 	public void startNetwork(final Network network, final BufferedWriter out) throws IOException {
 		out.write("<network");
-		if (network instanceof Network && (network.getName() != null)) {
+		if (network.getName() != null) {
 			out.write(" name=\"" + network.getName() + "\"");
 		}
 		out.write(">\n\n");
@@ -99,10 +98,8 @@ import java.util.Set;
 			out.write(" capperiod=\"" + Time.writeTime(network.getCapacityPeriod()) + "\"");
 		}
 
-		if (network instanceof Network) {
-			out.write(" effectivecellsize=\"" + network.getEffectiveCellSize() + "\"");
-			out.write(" effectivelanewidth=\"" + network.getEffectiveLaneWidth() + "\"");
-		}
+		out.write(" effectivecellsize=\"" + network.getEffectiveCellSize() + "\"");
+		out.write(" effectivelanewidth=\"" + network.getEffectiveLaneWidth() + "\"");
 
 		out.write(">\n");
 	}

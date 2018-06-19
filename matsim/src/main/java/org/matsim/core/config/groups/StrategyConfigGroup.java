@@ -20,9 +20,6 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Collection;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
@@ -32,6 +29,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultPlansRemover;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Configuration group for specifying the plans-replanning to be used.
@@ -99,9 +99,12 @@ public final class StrategyConfigGroup extends ConfigGroup {
 			sels.append( DefaultSelector.SelectPathSizeLogit ) ;
 			
 			StringBuilder strats = new StringBuilder() ;
-			for ( DefaultStrategy strat : DefaultStrategy.values() ) {
-				strats.append( strat.toString() + " ") ;
-			}
+			strats.append( DefaultStrategy.ReRoute ) ;
+			strats.append( DefaultStrategy.TimeAllocationMutator ) ;
+			strats.append( DefaultStrategy.TimeAllocationMutator_ReRoute ) ;
+			strats.append( DefaultStrategy.ChangeSingleTripMode ) ;
+			strats.append( DefaultStrategy.ChangeTripMode ) ;
+			strats.append( DefaultStrategy.SubtourModeChoice ) ;
 			
 			map.put( "strategyName",
 					"strategyName of strategy.  Possible default names: " + sels + " (selectors), " + strats + " (innovative strategies)." );

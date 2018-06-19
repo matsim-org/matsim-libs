@@ -24,6 +24,18 @@ import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 public interface PassengerRequest extends Request {
+	/**
+	 * @return beginning of the time window (inclusive) - earliest time when the passenger can be picked up
+	 */
+	double getEarliestStartTime();
+
+	/**
+	 * @return end of the time window (exclusive) - time by which the passenger should be picked up
+	 */
+	default double getLatestStartTime() {
+		return Double.MAX_VALUE;
+	}
+
 	Link getFromLink();
 
 	Link getToLink();

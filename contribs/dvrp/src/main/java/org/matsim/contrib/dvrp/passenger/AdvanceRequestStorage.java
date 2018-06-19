@@ -19,12 +19,14 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
 class AdvanceRequestStorage {
@@ -35,7 +37,7 @@ class AdvanceRequestStorage {
 		Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passengerId);
 
 		if (passengerAdvReqs == null) {
-			passengerAdvReqs = new PriorityQueue<>(3, Requests.T0_COMPARATOR);
+			passengerAdvReqs = new PriorityQueue<>(3, PassengerRequests.EARLIEST_START_TIME_COMPARATOR);
 			advanceRequests.put(passengerId, passengerAdvReqs);
 		}
 

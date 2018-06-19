@@ -19,7 +19,10 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -45,6 +48,11 @@ public class ScheduleImpl implements Schedule {
 	@Override
 	public List<? extends Task> getTasks() {
 		return unmodifiableTasks;
+	}
+
+	@Override
+	public Stream<? extends Task> tasks() {
+		return tasks.stream();
 	}
 
 	@Override
@@ -83,7 +91,7 @@ public class ScheduleImpl implements Schedule {
 		double beginTime = task.getBeginTime();
 		double endTime = task.getEndTime();
 		Link beginLink = Tasks.getBeginLink(task);
-		Link endLink = Tasks.getEndLink(task);
+		// Link endLink = Tasks.getEndLink(task);
 		int taskCount = tasks.size();
 
 		if (taskIdx < 0 || taskIdx > taskCount) {
@@ -112,17 +120,17 @@ public class ScheduleImpl implements Schedule {
 			}
 		}
 
-//		if (taskIdx < taskCount) {
-//			Task nextTask = tasks.get(taskIdx);// currently at taskIdx, but soon at taskIdx+1
-//
-//			if (nextTask.getBeginTime() != endTime) {
-//				throw new IllegalArgumentException();
-//			}
-//
-//			if (Tasks.getBeginLink(nextTask) != endLink) {
-//				throw new IllegalArgumentException();
-//			}
-//		}
+		// if (taskIdx < taskCount) {
+		// Task nextTask = tasks.get(taskIdx);// currently at taskIdx, but soon at taskIdx+1
+		//
+		// if (nextTask.getBeginTime() != endTime) {
+		// throw new IllegalArgumentException();
+		// }
+		//
+		// if (Tasks.getBeginLink(nextTask) != endLink) {
+		// throw new IllegalArgumentException();
+		// }
+		// }
 	}
 
 	@Override

@@ -80,7 +80,7 @@ import org.matsim.core.events.handler.EventHandler;
  * @author dstrippgen
  * @author mrieser
  */
-public class EventsManagerImpl implements EventsManager {
+public final class EventsManagerImpl implements EventsManager {
 
 	private static final Logger log = Logger.getLogger(EventsManagerImpl.class);
 
@@ -130,7 +130,7 @@ public class EventsManagerImpl implements EventsManager {
 	public void processEvent(final Event event) {
 		this.counter++;
 		if (this.counter == this.nextCounterMsg) {
-			this.nextCounterMsg *= 2;
+			this.nextCounterMsg *= 4;
 			log.info(" event # " + this.counter);
 		}
 		computeEvent(event);

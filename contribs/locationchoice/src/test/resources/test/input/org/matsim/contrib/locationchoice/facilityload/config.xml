@@ -34,6 +34,7 @@
 		
 	<module name="facilities" >
 		<param name="inputFacilitiesFile" value="test/scenarios/equil/facilities.xml" />
+		<param name="facilitiesSource" value="fromFile" />
 	</module>	
 	
 	<module name="qsim">

@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -96,7 +97,8 @@ ShutdownListener {
 		this.modeOut = IOUtils.getBufferedWriter(this.modeFileName + ".txt");
 		try {
 			this.modeOut.write("Iteration");
-			this.modes = scoreConfig.getModes().keySet();
+			this.modes = new TreeSet<>();
+			this.modes.addAll(scoreConfig.getAllModes());
 			for ( String mode : modes ) {
 				this.modeOut.write("\t" + mode);
 			}
@@ -185,6 +187,7 @@ ShutdownListener {
 			chart.addMatsimLogo();
 			chart.saveAsPng(this.modeFileName + ".png", 800, 600);
 		}
+		modeCnt.clear();
 	}
 
 	@Override

@@ -22,11 +22,14 @@ package org.matsim.core.population.routes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -39,6 +42,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * @author mrieser
  */
 public class RouteUtils {
+	private static final Logger log = Logger.getLogger( RouteUtils.class ) ;
+	
 	private RouteUtils(){} // do not instantiate
 
 	/**
@@ -127,7 +132,6 @@ public class RouteUtils {
 		return route.getSubRoute(fromLinkId, toLinkId);
 	}
 
-
 	/**
 	 * Calculates the distance of the complete route, <b>excluding</b> the distance traveled
 	 * on the start- and end-link of the route.
@@ -169,6 +173,14 @@ public class RouteUtils {
 		}
 		return routeDistance;
 	}
+	
+	public static double calcDistance( final LeastCostPathCalculator.Path path ) {
+		double length = 0. ;
+		for ( Link link : path.links ) {
+			length += link.getLength() ;
+		}
+		return length ;
+	}
 
 	public static NetworkRoute createNetworkRoute(List<Id<Link>> routeLinkIds, final Network network) {
 		Id<Link> startLinkId = routeLinkIds.get(0);
@@ -201,6 +213,9 @@ public class RouteUtils {
 		for (Id<Link> linkId : nr.getLinkIds()) {
 			if (count) {
 				Link l = network.getLinks().get(linkId);
+				if ( l==null ) {
+					log.error( "link is null; linkId=" + linkId + "; network=" + network ) ;
+				}
 				dist += l.getLength();
 			}
 			if (enterLinkId.equals(linkId)) {

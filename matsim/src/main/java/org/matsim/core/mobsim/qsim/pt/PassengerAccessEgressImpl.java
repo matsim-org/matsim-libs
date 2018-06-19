@@ -109,7 +109,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		
 		if (this.isGeneratingDeniedBoardingEvents) {
 			
-			for (PTPassengerAgent agent : this.agentTracker.getAgentsAtStop(stop.getId())) {
+			for (PTPassengerAgent agent : this.agentTracker.getAgentsAtFacility(stop.getId())) {
 				if (agent.getEnterTransitRoute(transitLine, transitRoute, stopsToCome, vehicle)) {
 					if (freeCapacity >= 1) {
 						passengersEntering.add(agent);
@@ -122,7 +122,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 
 		} else {
 		
-			for (PTPassengerAgent agent : this.agentTracker.getAgentsAtStop(stop.getId())) {
+			for (PTPassengerAgent agent : this.agentTracker.getAgentsAtFacility(stop.getId())) {
 				if (freeCapacity == 0) {
 					break;
 				}

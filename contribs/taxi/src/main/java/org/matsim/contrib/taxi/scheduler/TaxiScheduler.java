@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.data.Vehicles;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelDataImpl;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -71,15 +71,17 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	private final LeastCostPathCalculator router;
 
 	@Inject
-	public TaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet, @Named(DvrpModule.DVRP_ROUTING) Network network,
-			MobsimTimer timer, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+	public TaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet,
+			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER) TravelDisutility travelDisutility) {
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
 		this.timer = timer;
 		this.travelTime = travelTime;
 
-		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
+		router = new FastAStarEuclideanFactory(taxiCfg.getAStarEuclideanOverdoFactor()).createPathCalculator(network,
+				travelDisutility, travelTime);
 		initFleet(taxiCfg);
 	}
 
@@ -179,7 +181,9 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		}
 
 		Schedule schedule = veh.getSchedule();
-		if (/* context.getTime() >= veh.getT1() || */schedule.getStatus() != ScheduleStatus.STARTED) {
+		// timer.getTimeOfDay() >= veh.getServiceEndTime() is ALLOWED because we need to stop/divert delayed vehicles
+		// so do not return null
+		if (schedule.getStatus() != ScheduleStatus.STARTED) {
 			return null;
 		}
 

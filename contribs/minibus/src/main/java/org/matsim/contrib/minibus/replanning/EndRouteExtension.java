@@ -71,7 +71,29 @@ public final class EndRouteExtension extends AbstractPStrategyModule {
 		ArrayList<TransitStopFacility> currentStopsToBeServed = oldPlan.getStopsToBeServed();
 		
 		TransitStopFacility baseStop = currentStopsToBeServed.get(0);
+		/* 
+		 * Paratransit TransitRoutes are always circular instead of having one TransitRoute each for each direction between two 
+		 * terminus stops. So we only know one terminus stop, the base stop, and try to find the other terminus, the other end 
+		 * of the route, by scanning the stops on the TransitRoute for the stop which has the largest distance from the base stop.
+		 */
 		TransitStopFacility remoteStop = this.findStopWithLargestDistance(currentStopsToBeServed);
+		
+		if (baseStop.equals(remoteStop)) {
+			/*
+			 * TODO:
+			 * findStopWithLargestDistance() should never return a remote stop which equals the base stop unless the input 
+			 * stop sequence of the oldPlan has only stops at exactly the same coordinate (which should be prohibited somewhere
+			 * else). If baseStop and remoteStop are equal createGeometryFromStops() fails because it asks for a LineString of 
+			 * just one point (the base stop = remote stop).
+			 */
+			log.debug(
+					"EndRouteExtension replanning is skipped for TransitLine "
+							+ operator.getCurrentTransitLine().getId()
+							+ ", because base stop and remote stop returned by findStopWithLargestDistance() are equal. This"
+							+ " should not happen. Base stop: " + baseStop.getId() + ". Remote stop: " + remoteStop.getId());
+			return null;
+		}
+
 		double bufferSizeBasedOnRatio = CoordUtils.calcEuclideanDistance(baseStop.getCoord(), remoteStop.getCoord()) * this.ratio;
 		
 		List<Geometry> lineStrings = this.createGeometryFromStops(currentStopsToBeServed, remoteStop);

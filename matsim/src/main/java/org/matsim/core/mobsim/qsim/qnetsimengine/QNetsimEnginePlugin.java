@@ -7,8 +7,8 @@ import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 public class QNetsimEnginePlugin extends AbstractQSimPlugin {
 
@@ -18,28 +18,22 @@ public class QNetsimEnginePlugin extends AbstractQSimPlugin {
 
 	@Override
 	public Collection<? extends Module> modules() {
-		Collection<Module> result = new ArrayList<>();
-		result.add(new AbstractModule() {
+		return Collections.singletonList(new AbstractModule() {
 			@Override
 			protected void configure() {
 				bind(QNetsimEngine.class).asEagerSingleton();
 				bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class).asEagerSingleton();
 			}
 		});
-		return result;
 	}
 
 	@Override
 	public Collection<Class<? extends DepartureHandler>> departureHandlers() {
-		Collection<Class<? extends DepartureHandler>> result = new ArrayList<>();
-		result.add(VehicularDepartureHandler.class);
-		return result;
+		return Collections.singletonList(VehicularDepartureHandler.class);
 	}
 
 	@Override
 	public Collection<Class<? extends MobsimEngine>> engines() {
-		Collection<Class<? extends MobsimEngine>> result = new ArrayList<>();
-		result.add(QNetsimEngine.class);
-		return result;
+		return Collections.singletonList(QNetsimEngine.class);
 	}
 }

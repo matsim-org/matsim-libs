@@ -96,7 +96,7 @@ public class SignalSystemsIT {
 			//iteration 0 
 			String iterationOutput = controlerOutputDir + "ITERS/it.0/";
 
-			Assert.assertEquals("different events files after iteration 0 ", EventsFileComparator.compare(inputDirectory + "0.events.xml.gz", iterationOutput + "0.events.xml.gz"),0);
+			Assert.assertEquals("different events files after iteration 0 ", EventsFileComparator.compareAndReturnInt(inputDirectory + "0.events.xml.gz", iterationOutput + "0.events.xml.gz"),0);
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(c.getConfig().network().getInputFileURL(c.getConfig().getContext()).getFile());
@@ -118,8 +118,8 @@ public class SignalSystemsIT {
 			String iterationOutput = controlerOutputDir + "ITERS/it.10/";
 
 			Assert.assertTrue("different event files after iteration 10", 
-					EventsFileComparator.compare(inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz") == 
-					EventsFileComparator.CODE_FILES_ARE_EQUAL);
+					EventsFileComparator.compare(inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz") ==
+					EventsFileComparator.Result.FILES_ARE_EQUAL);
 
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
@@ -179,7 +179,7 @@ public class SignalSystemsIT {
 			String iterationOutput = controlerOutputDir + "ITERS/it.0/";
 
 			Assert.assertEquals("different events files after iteration 0 ", 
-					EventsFileComparator.compare(inputDirectory + "0.events.xml.gz", iterationOutput + "0.events.xml.gz"),
+					EventsFileComparator.compareAndReturnInt(inputDirectory + "0.events.xml.gz", iterationOutput + "0.events.xml.gz"),
 					0);
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
@@ -202,7 +202,7 @@ public class SignalSystemsIT {
 			String iterationOutput = controlerOutputDir + "ITERS/it.10/";
 
 			Assert.assertTrue("different event files after iteration 10", 
-					EventsFileComparator.compare(inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz") == 
+					EventsFileComparator.compareAndReturnInt(inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz") == 
 					EventsFileComparator.CODE_FILES_ARE_EQUAL);
 
 

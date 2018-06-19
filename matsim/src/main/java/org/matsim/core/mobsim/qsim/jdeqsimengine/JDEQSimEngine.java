@@ -89,4 +89,10 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
         }
     }
 
+@Override
+public void rescheduleActivityEnd(MobsimAgent agent) {
+	// TODO Auto-generated method stub
+	
+}
+
 }

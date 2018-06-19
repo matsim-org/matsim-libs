@@ -2,15 +2,15 @@ package org.matsim.contrib.freight.usecases.chessboard;
 
 import java.util.Collection;
 
-import jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
-import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.cost.VehicleRoutingActivityCosts;
-import jsprit.core.problem.driver.Driver;
-import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import jsprit.core.problem.solution.route.activity.TourActivity;
-import jsprit.core.problem.vehicle.Vehicle;
-import jsprit.core.util.Solutions;
+import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import com.graphhopper.jsprit.core.problem.driver.Driver;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import com.graphhopper.jsprit.core.util.Solutions;
+import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -80,6 +80,7 @@ public class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 
 					private double penalty4missedTws = 0.008; 
 					
+					//TODO: Why is here always returned 0.0? KMT jan/2018
 					@Override
 					public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {	
 						double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
@@ -88,6 +89,13 @@ public class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 //						return penalty4missedTws*tooLate + vehicle.getType().getVehicleCostParams().perTimeUnit*waiting + service;
 //						return penalty4missedTws*tooLate;
 						return 0.0;
+					}
+
+					@Override
+					public double getActivityDuration(TourActivity tourAct, double arrivalTime, Driver driver,
+							Vehicle vehicle) {
+						// TODO Auto-generated method stub
+						return 0;
 					}
 					
 				};

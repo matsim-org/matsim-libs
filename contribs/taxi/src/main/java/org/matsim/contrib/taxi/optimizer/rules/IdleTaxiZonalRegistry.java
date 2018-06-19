@@ -19,11 +19,12 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
@@ -35,9 +36,6 @@ import org.matsim.contrib.zone.ZonalSystem;
 import org.matsim.contrib.zone.ZonalSystems;
 import org.matsim.contrib.zone.Zone;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 public class IdleTaxiZonalRegistry {
@@ -87,41 +85,28 @@ public class IdleTaxiZonalRegistry {
 		}
 	}
 
-	public List<Vehicle> findNearestVehicles(Node node, int minCount) {
+	public Stream<Vehicle> findNearestVehicles(Node node, int minCount) {
 		return findNearestVehicles(node, minCount, null);
 	}
 
-	public List<Vehicle> findNearestVehicles(Node node, int minCount, Predicate<Vehicle> vehicleFilter) {
-		if (minCount >= vehicles.size()) {
-			return getVehicles();
-		}
-
+	public Stream<Vehicle> findNearestVehicles(Node node, int minCount, Predicate<Vehicle> vehicleFilter) {
 		Predicate<Vehicle> idleVehicleFilter = vehicleFilter == null ? scheduleInquiry::isIdle
-				: Predicates.and(vehicleFilter, scheduleInquiry::isIdle);
+				: vehicleFilter.and(scheduleInquiry::isIdle);
 
-		Zone zone = zonalSystem.getZone(node);
-		Iterable<? extends Zone> zonesByDistance = zonesSortedByDistance.get(zone.getId());
-		List<Vehicle> nearestVehs = new ArrayList<>();
-
-		for (Zone z : zonesByDistance) {
-			Iterables.addAll(nearestVehs, Iterables.filter(vehiclesInZones.get(z.getId()).values(), idleVehicleFilter));
-
-			if (nearestVehs.size() >= minCount) {
-				return nearestVehs;
-			}
-		}
-
-		return nearestVehs;
+		return minCount >= vehicles.size() //
+				? vehicles.values().stream().filter(idleVehicleFilter)
+				: zonesSortedByDistance.get(zonalSystem.getZone(node).getId()).stream()//
+						.flatMap(z -> vehiclesInZones.get(z.getId()).values().stream())//
+						.filter(idleVehicleFilter)//
+						.limit(minCount);
 	}
 
 	private Id<Zone> getZoneId(TaxiStayTask stayTask) {
 		return zonalSystem.getZone(stayTask.getLink().getToNode()).getId();
 	}
 
-	public List<Vehicle> getVehicles() {
-		List<Vehicle> vehs = new ArrayList<>();
-		Iterables.addAll(vehs, Iterables.filter(vehicles.values(), scheduleInquiry::isIdle));
-		return vehs;
+	public Stream<Vehicle> vehicles() {
+		return vehicles.values().stream().filter(scheduleInquiry::isIdle);
 	}
 
 	public int getVehicleCount() {

@@ -95,7 +95,7 @@ public class AgentSnapshotInfoFactory {
 	 */
 	private final static void calculateAndSetPosition(PositionInfo info, Coord startCoord, Coord endCoord, double odometerOnLink, 
 			double lengthOfCurve, double lanePosition){
-		// yyyy move the link width calculator into calling method, then this one can be static. kai, apr'16
+
 		double dx = -startCoord.getX() + endCoord.getX();
 		double dy = -startCoord.getY() + endCoord.getY();
 		double theta = 0.0;

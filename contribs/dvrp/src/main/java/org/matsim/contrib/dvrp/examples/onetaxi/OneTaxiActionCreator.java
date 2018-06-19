@@ -46,7 +46,7 @@ final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
 		Task task = vehicle.getSchedule().getCurrentTask(); 
 		if (task instanceof DriveTask) {
-			return VrpLegs.createLegWithOfflineTracker(vehicle, timer);
+			return VrpLegFactory.createWithOfflineTracker(vehicle, timer);
 		} else if (task instanceof OneTaxiServeTask) { // PICKUP or DROPOFF
 			final OneTaxiServeTask serveTask = (OneTaxiServeTask)task;
 

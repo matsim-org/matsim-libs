@@ -62,7 +62,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		// show counter
 		this.counter++;
 		if (this.counter % this.nextMsg == 0) {
-			this.nextMsg *= 2;
+			this.nextMsg *= 4;
 			printPlansCount();
 		}
 

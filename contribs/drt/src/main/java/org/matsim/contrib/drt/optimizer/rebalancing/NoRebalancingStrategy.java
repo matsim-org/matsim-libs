@@ -19,7 +19,9 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 
@@ -28,7 +30,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
  */
 public class NoRebalancingStrategy implements RebalancingStrategy {
 	@Override
-	public List<Relocation> calcRelocations(Iterable<? extends Vehicle> rebalancableVehicles, double time) {
+	public List<Relocation> calcRelocations(Stream<? extends Vehicle> rebalancableVehicles, double time) {
 		return Collections.emptyList();
 	}
 }

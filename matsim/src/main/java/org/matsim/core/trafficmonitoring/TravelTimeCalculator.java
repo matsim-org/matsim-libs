@@ -310,7 +310,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 			 * Workaround for jumps in returned travel times due to time bin approach?
 			 * Should not be necessary when using linear interpolated travel times.
 			 */
-//			DataContainer data = this.dataContainerProvider.getTravelTimeData(link, true);
+//			DataContainer data = this.dataContainerProvider.getTravelTimeInfo(link, true);
 //			if (data.needsConsolidation) {
 //				consolidateData(data);
 //			}

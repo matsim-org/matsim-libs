@@ -28,10 +28,11 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
-import org.matsim.withinday.utils.EditRoutes;
+import org.matsim.withinday.utils.EditTrips;
 
 /**
  * The NextLegReplanner can be used while an agent is performing an activity. The
@@ -59,45 +60,14 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
 		// Get the activity currently performed by the agent as well as the subsequent trip.
 		Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
-		Trip trip = EditRoutes.getTrip(executedPlan, currentActivity, this.tripRouter);
+		Trip trip = TripStructureUtils.findTripStartingAtActivity(currentActivity, executedPlan, this.tripRouter.getStageActivityTypes() );
 
 		// If there is no trip after the activity.
 		if (trip == null) return false;
 		
 		String mainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
-		double departureTime = EditRoutes.getDepatureTime(trip);
-		EditRoutes.replanFutureTrip(trip, executedPlan, mainMode, departureTime, scenario.getNetwork(), this.tripRouter);
-		
-		/*
-		 * Updated code to use the TripRouter approach. This might result in problems at a few
-		 * places where people assumed that only routes are updated but the leg objects remain
-		 * in an agent's plan. 
-		 */
-//		// if it is a more complex trip than just a single leg use modern approach
-//		if (trip.getTripElements().size() > 1) {
-//			String mainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
-//			double departureTime = EditRoutes.getDepatureTime(trip);
-//			EditRoutes.replanFutureTrip(trip, executedPlan, mainMode, departureTime, scenario.getNetwork(), this.tripRouter);
-//		} else {		
-//			// Get the index of the current PlanElement.
-//			int currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
-//			
-//			// Search next leg in the agent's plan.
-//			Leg nextLeg = null;
-//			for (int i = currentPlanElementIndex + 1; i < executedPlan.getPlanElements().size(); i++) {
-//				PlanElement planElement = executedPlan.getPlanElements().get(i);
-//				if (planElement instanceof Leg) {
-//					nextLeg = (Leg) planElement;
-//					break;
-//				}
-//			}
-//			
-//			// check whether a next leg was found
-//			if (nextLeg == null) return false;
-//			
-//			// new Route for next Leg
-//			EditRoutes.replanFutureLegRoute(nextLeg, executedPlan.getPerson(), scenario.getNetwork(), tripRouter);
-//		}
+		double departureTime = EditTrips.getDepartureTime(trip);
+		new EditTrips(this.tripRouter, scenario).replanFutureTrip(trip, executedPlan, mainMode, departureTime);
 		
 		return true;
 	}

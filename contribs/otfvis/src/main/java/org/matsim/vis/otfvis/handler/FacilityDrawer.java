@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.mobsim.qsim.AgentTracker;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -59,11 +60,11 @@ public class FacilityDrawer {
 
 		private static final long serialVersionUID = 1L;
 		private final transient TransitSchedule schedule;
-		private final transient TransitStopAgentTracker agentTracker;
+		private final transient AgentTracker agentTracker;
 		private final transient Network network ;
 		private final transient AgentSnapshotInfoFactory agentSnapshotInfoFactory;
 
-		public Writer(final Network network, final TransitSchedule schedule, final TransitStopAgentTracker agentTracker, AgentSnapshotInfoFactory agentSnapshotInfoFactory) {
+		public Writer(final Network network, final TransitSchedule schedule, final AgentTracker agentTracker, AgentSnapshotInfoFactory agentSnapshotInfoFactory) {
 			this.network = network ;
 			this.schedule = schedule;
 			this.agentTracker = agentTracker;
@@ -104,7 +105,7 @@ public class FacilityDrawer {
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
 			for (TransitStopFacility facility : this.schedule.getFacilities().values()) {
-				out.putInt(this.agentTracker.getAgentsAtStop(facility.getId()).size());
+				out.putInt(this.agentTracker.getAgentsAtFacility(facility.getId()).size());
 			}
 		}
 

@@ -103,7 +103,7 @@ public final class AccessibilityModule extends AbstractModule {
 				ActivityFacilities opportunities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType) ;
 				
 				final BoundingBox boundingBox;
-				final ActivityFacilitiesImpl measuringPoints;
+				final ActivityFacilities measuringPoints;
 				
 				if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromShapeFile) {
 					Geometry boundary = GridUtils.getBoundary(acg.getShapeFileCellBasedAccessibility());

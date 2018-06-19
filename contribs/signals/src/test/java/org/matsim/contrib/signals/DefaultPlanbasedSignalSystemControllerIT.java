@@ -463,6 +463,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		}
 	}
 	
+	// TODO Test plan with negative offset
+	
 	private class ScenarioRunner{
 		
 		private Double plan1StartTime;

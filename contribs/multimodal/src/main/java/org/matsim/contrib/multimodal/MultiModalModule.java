@@ -35,7 +35,7 @@ import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.NetworkRouting;
+import org.matsim.core.router.NetworkRoutingProvider;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -65,7 +65,7 @@ public class MultiModalModule extends AbstractModule {
                 Provider<TravelTime> factory = new WalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
                 addTravelTimeBinding(mode).toProvider(factory);
                 addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutilityFactory( mode, cnScoringGroup ) );
-                addRoutingModuleBinding(mode).toProvider(new NetworkRouting(mode));
+                addRoutingModuleBinding(mode).toProvider(new NetworkRoutingProvider(mode));
             } else if (mode.equals(TransportMode.transit_walk)) {
 //                Provider<TravelTime> factory = new TransitWalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
 //                addTravelTimeBinding(mode).toProvider(factory);
@@ -75,7 +75,7 @@ public class MultiModalModule extends AbstractModule {
                 Provider<TravelTime> factory = new BikeTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
                 addTravelTimeBinding(mode).toProvider(factory);
                 addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutilityFactory( mode, cnScoringGroup ) );
-                addRoutingModuleBinding(mode).toProvider(new NetworkRouting(mode));
+                addRoutingModuleBinding(mode).toProvider(new NetworkRoutingProvider(mode));
             } else {
                 Provider<TravelTime> factory = additionalTravelTimeFactories.get(mode);
                 if (factory == null) {
@@ -90,7 +90,7 @@ public class MultiModalModule extends AbstractModule {
                 }
                 addTravelTimeBinding(mode).toProvider(factory);
                 addTravelDisutilityFactoryBinding(mode).toInstance(new RandomizingTimeDistanceTravelDisutilityFactory( mode, cnScoringGroup ));
-                addRoutingModuleBinding(mode).toProvider(new NetworkRouting(mode));
+                addRoutingModuleBinding(mode).toProvider(new NetworkRoutingProvider(mode));
             }
         }
         addControlerListenerBinding().to(MultiModalControlerListener.class);

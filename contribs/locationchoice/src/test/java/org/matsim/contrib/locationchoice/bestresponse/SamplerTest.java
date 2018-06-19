@@ -42,7 +42,7 @@ public class SamplerTest {
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils();
 
-    private DestinationChoiceBestResponseContext context;
+    private DestinationChoiceContext context;
     private Scenario scenario;
 
     @Before
@@ -50,7 +50,7 @@ public class SamplerTest {
         Config config = ConfigUtils.loadConfig("test/scenarios/chessboard/config.xml", new DestinationChoiceConfigGroup());
         ConfigUtils.loadConfig(config, utils.getPackageInputDirectory() + "/config.xml");
         scenario = ScenarioUtils.loadScenario(config);
-        this.context = new DestinationChoiceBestResponseContext(this.scenario);
+        this.context = new DestinationChoiceContext(this.scenario);
         this.context.init();
     }
 

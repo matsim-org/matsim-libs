@@ -108,13 +108,14 @@ public class PlansCalcRouteConfigGroupTest {
 
 		assertIdentical("re-read v2", initialGroup, configV2.plansCalcRoute());
 	}
-
+	
 	@Test( expected=RuntimeException.class )
 	public void testConsistencyCheckIfNoTeleportedSpeed() {
 		final Config config = ConfigUtils.createConfig();
 
 		final ModeRoutingParams params = new ModeRoutingParams( "skateboard" );
 		config.plansCalcRoute().addModeRoutingParams( params );
+		// (one needs to set one of the teleported speed settings)
 
 		config.checkConsistency();
 	}

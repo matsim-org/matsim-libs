@@ -33,6 +33,8 @@ import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.vehicles.Vehicle;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +44,7 @@ import java.util.Map;
  * 
  * @author cdobler
  */
+@Singleton
 public final class MobsimDataProvider implements MobsimInitializedListener {
 	/*
 	Hallo Kai,
@@ -67,9 +70,11 @@ public final class MobsimDataProvider implements MobsimInitializedListener {
 
 	Bin gerade über Deinen MobsimDataProvider gestolpert.  Die Gruppe von Lin Padham verwendet den.  
 
-	Ich würde es aber für ein Problem halten, dass er mit der QSim nicht automatisch konsistent ist.  Z.B. kann man in der QSim nachträglich Agenten und Fahrzeuge einfügen; der MobsimDataProvider würde das aber nicht mitbekommen.
+	Ich würde es aber für ein Problem halten, dass er mit der QSim nicht automatisch konsistent ist.  Z.B. kann man in der QSim 
+	nachträglich Agenten und Fahrzeuge einfügen; der MobsimDataProvider würde das aber nicht mitbekommen.
 
-	Ich würde von der Tendenz her das "Durchschleifen", also die Information im MobsimDataProvider nicht mehr separat sammeln, sondern die entsprechenden Methoden aus der QSim verwenden.  Falls die nicht schnell genug sind, könnten wir sie ja optimieren.
+	Ich würde von der Tendenz her das "Durchschleifen", also die Information im MobsimDataProvider nicht mehr separat sammeln,
+	sondern die entsprechenden Methoden aus der QSim verwenden.  Falls die nicht schnell genug sind, könnten wir sie ja optimieren.
 
 	Oder?
 
@@ -78,28 +83,13 @@ public final class MobsimDataProvider implements MobsimInitializedListener {
 	Kai
 	*/
 	
-	private final Map<Id<Vehicle>, MobsimVehicle> vehicles = new HashMap<Id<Vehicle>, MobsimVehicle>();
-
-	private NetsimNetwork netsimNetwork;
 	private QSim qSim;
-
-	public MobsimDataProvider() {
-
-	}
-
+	
+	@Inject MobsimDataProvider(){}
+	
 	@Override
 	public final void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		
 		qSim = (QSim) e.getQueueSimulation();
-		this.netsimNetwork = qSim.getNetsimNetwork();
-		
-		// collect all vehicles
-		this.vehicles.clear();
-		for (NetsimLink netsimLink : netsimNetwork.getNetsimLinks().values()) {
-			for (MobsimVehicle mobsimVehicle : netsimLink.getAllVehicles()) {
-				this.vehicles.put(mobsimVehicle.getId(), mobsimVehicle);
-			}
-		}
 	}
 
 	public final Map<Id<Person>, MobsimAgent> getAgents() {
@@ -111,15 +101,15 @@ public final class MobsimDataProvider implements MobsimInitializedListener {
 	}
 	
 	public final Map<Id<Vehicle>, MobsimVehicle> getVehicles() {
-		return this.vehicles;
+		return this.qSim.getVehicles() ;
 	}
 	
 	public final MobsimVehicle getVehicle(Id<Vehicle> vehicleId) {
-		return this.vehicles.get(vehicleId);
+		return this.getVehicles().get(vehicleId);
 	}
 	
 	public final Collection<MobsimVehicle> getEnrouteVehiclesOnLink(Id<Link> linkId) {
-		return this.netsimNetwork.getNetsimLink(linkId).getAllNonParkedVehicles();
+		return this.qSim.getNetsimNetwork().getNetsimLink(linkId).getAllNonParkedVehicles();
 	}
 	
 	public final MobsimVehicle getDriversVehicle(Id<Person> driverId) {
@@ -131,7 +121,7 @@ public final class MobsimDataProvider implements MobsimInitializedListener {
 	}
 	
 	public final MobsimAgent getVehiclesDriver(Id<Vehicle> vehicleId) {
-		MobsimVehicle mobsimVehicle = this.vehicles.get(vehicleId);
+		MobsimVehicle mobsimVehicle = this.getVehicles().get(vehicleId);
 		if (mobsimVehicle == null) return null;
 		else return mobsimVehicle.getDriver();
 	}

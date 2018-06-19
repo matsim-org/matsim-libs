@@ -20,7 +20,6 @@
 
 package org.matsim.roadpricing;
 
-import java.util.Map;
 import java.util.TreeMap;
 
 import javax.inject.Inject;
@@ -74,20 +73,20 @@ public final class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 		this.network = network;
 		this.scheme = scheme;
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {
-			this.handler = new DistanceTollBehaviour();
+			this.handler = new DistanceTollBehaviour(events);
 			log.info("just instantiated DistanceTollBehavior") ;
 		} else if (RoadPricingScheme.TOLL_TYPE_AREA.equals(scheme.getType())) {
-			this.handler = new AreaTollBehaviour();
+			this.handler = new AreaTollBehaviour(events);
 			log.info("just instantiated AreaTollBehavior") ;
 			log.warn("area toll does not work if you have different toll amounts on different " +
 					"links.  Make sure you get what you want.  kai, mar'12");
 		} else if (RoadPricingScheme.TOLL_TYPE_CORDON.equals(scheme.getType())) {
-			this.handler = new CordonTollBehaviour();
+			this.handler = new CordonTollBehaviour(events);
 			log.info("just instantiated CordonTollBehavior") ;
 			log.warn("cordon toll only charges at transition from untolled to tolled. " +
 					"Make sure this is what you want. kai, mar'12") ;
 		} else if (RoadPricingScheme.TOLL_TYPE_LINK.equals(scheme.getType())) {
-			this.handler = new LinkTollBehaviour();
+			this.handler = new LinkTollBehaviour(events);
 			log.info("just instantiated LinkTollBehavior") ;
 		} else {
 			throw new IllegalArgumentException("RoadPricingScheme of type \"" + scheme.getType() + "\" is not supported.");
@@ -128,13 +127,13 @@ public final class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 	 * @param time the current time the generated events are associated with
 	 * @param events the {@link EventsManager} collection, the generated events are sent to for processing
 	 */
-	public void sendMoneyEvents(final double time, final EventsManager events) {
-		// public is currently needed. kai, sep'13
-
-		for (Map.Entry<Id<Person>, AgentTollInfo> entries : this.agents.entrySet()) {
-			events.processEvent(new PersonMoneyEvent(time, entries.getKey(), -entries.getValue().toll));
-		}
-	}
+//	public void sendMoneyEvents(final double time, final EventsManager events) {
+//		// public is currently needed. kai, sep'13
+//
+//		for (Map.Entry<Id<Person>, AgentTollInfo> entries : this.agents.entrySet()) {
+//			events.processEvent(new PersonMoneyEvent(time, entries.getKey(), -entries.getValue().toll));
+//		}
+//	}
 
 	@Override
 	public void reset(final int iteration) {
@@ -200,6 +199,14 @@ public final class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 	 * as it may have paid already when arriving on the link.
 	 */
 	class DistanceTollBehaviour implements TollBehaviourI {
+		private EventsManager events;
+		/**
+		 * @param events The EventsManager to send money events
+		 */
+		public DistanceTollBehaviour(EventsManager events) {
+			this.events = events;
+		}
+
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
@@ -218,12 +225,23 @@ public final class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 					CalcPaidToll.this.agents.put(driverId, info);
 				}
 				info.toll += newToll;
+				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-newToll));
+
 			}
 		}
 	}
 
 	
 	class LinkTollBehaviour implements TollBehaviourI {
+		private EventsManager events;
+		/**
+		 * @param events The EventsManager to send money events
+		 */
+		public LinkTollBehaviour(EventsManager events) {
+			this.events = events;
+
+		}
+
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
 
@@ -243,6 +261,7 @@ public final class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 					CalcPaidToll.this.agents.put(driverId, info);
 				}
 				info.toll += cost.amount;
+				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount));
 			}
 		}
 	}
@@ -258,6 +277,14 @@ public final class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 	 * </ul> 
 	 */
 	class AreaTollBehaviour implements TollBehaviourI {
+		private EventsManager events;
+		/**
+		 * @param events The EventsManager to send money events
+		 */
+		public AreaTollBehaviour(EventsManager events) {
+			this.events = events;
+		}
+
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
@@ -276,6 +303,7 @@ public final class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 					/* The toll amount comes from the current link, but should 
 					 * be the same for all links. */
 					info.toll = cost.amount;
+					events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount));
 				}
 			}
 		}
@@ -286,6 +314,14 @@ public final class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 	 * crosses the cordon from the outside to the inside.
 	 */
 	class CordonTollBehaviour implements TollBehaviourI {
+		private EventsManager events;
+		/**
+		 * @param events The EventsManager to send money events
+		 */
+		public CordonTollBehaviour(EventsManager events) {
+			this.events = events;
+		}
+
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
@@ -315,6 +351,7 @@ public final class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 					// agent was outside before, now inside the toll area --> agent has to pay
 					info.insideCordonArea = true;
 					info.toll += cost.amount;
+					events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount));
 				}
 				// else: agent was already in toll area, does not have to pay again (this implementation is a bit unusual!)
 			} else {

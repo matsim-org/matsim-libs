@@ -20,6 +20,8 @@
 
 package org.matsim.facilities;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -29,6 +31,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.xml.sax.Attributes;
 
 /**
@@ -38,7 +41,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  */
 public class MatsimFacilitiesReader extends MatsimXmlParser {
-	/* Why is this suddenly a "Matsim"FacilitiesReader and not just a Facilities reader to be consistent with all other 
+    /* Why is this suddenly a "Matsim"FacilitiesReader and not just a Facilities reader to be consistent with all other
 	 * naming conventions?  kai, jan09
 	 * because all other readers in Matsim are also called Matsim*Reader,
 	 * e.g. MatsimPopulationReader, MatsimNetworkReader, MatsimWorldReader, ...
@@ -56,56 +59,67 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
 	 */
 
 
-	private final static String FACILITIES_V1 = "facilities_v1.dtd";
+    private final static String FACILITIES_V1 = "facilities_v1.dtd";
 
-	private final static Logger log = Logger.getLogger(MatsimFacilitiesReader.class);
+    private final static Logger log = Logger.getLogger(MatsimFacilitiesReader.class);
 
-	private final CoordinateTransformation coordinateTransformation;
-	private final Scenario scenario;
-	private MatsimXmlParser delegate = null;
+    private final CoordinateTransformation coordinateTransformation;
+    private final Scenario scenario;
+    private MatsimXmlParser delegate = null;
+    private Map<Class<?>, AttributeConverter<?>> attributeConverters;
 
-	/**
-	 * Creates a new reader for MATSim facilities files.
-	 *
-	 * @param scenario The scenario containing the Facilities-object to store the facilities in.
-	 */
-	public MatsimFacilitiesReader(final Scenario scenario) {
-		this( new IdentityTransformation() , scenario );
-	}
+    /**
+     * Creates a new reader for MATSim facilities files.
+     *
+     * @param scenario The scenario containing the Facilities-object to store the facilities in.
+     */
+    public MatsimFacilitiesReader(final Scenario scenario) {
+        this(new IdentityTransformation(), scenario);
+    }
 
-	/**
-	 * Creates a new reader for MATSim facilities files.
-	 *
-	 * @param coordinateTransformation a transformation from the CRS of the data file to the CRS inside MATSim
-	 * @param scenario The scenario containing the Facilities-object to store the facilities in.
-	 */
-	public MatsimFacilitiesReader(
-			final CoordinateTransformation coordinateTransformation,
-			final Scenario scenario) {
-		this.coordinateTransformation = coordinateTransformation;
-		this.scenario = scenario;
-	}
+    /**
+     * Creates a new reader for MATSim facilities files.
+     *
+     * @param coordinateTransformation a transformation from the CRS of the data file to the CRS inside MATSim
+     * @param scenario                 The scenario containing the Facilities-object to store the facilities in.
+     */
+    public MatsimFacilitiesReader(
+            final CoordinateTransformation coordinateTransformation,
+            final Scenario scenario) {
+        this.coordinateTransformation = coordinateTransformation;
+        this.scenario = scenario;
+        this.attributeConverters = new HashMap();
+    }
 
-	@Override
-	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
-		this.delegate.startTag(name, atts, context);
-	}
+    public void putAttributeConverter(Class<?> clazz, AttributeConverter<?> converter) {
+        this.attributeConverters.put(clazz, converter);
+    }
 
-	@Override
-	public void endTag(final String name, final String content, final Stack<String> context) {
-		this.delegate.endTag(name, content, context);
-	}
+    public void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {
+        this.attributeConverters.putAll(converters);
+    }
 
-	@Override
-	protected void setDoctype(final String doctype) {
-		super.setDoctype(doctype);
-		// Currently the only facilities-type is v1
-		if (FACILITIES_V1.equals(doctype)) {
-			this.delegate = new FacilitiesReaderMatsimV1( coordinateTransformation , scenario );
-			log.info("using facilities_v1-reader.");
-		} else {
-			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
-		}
-	}
+    @Override
+    public void startTag(final String name, final Attributes atts, final Stack<String> context) {
+        this.delegate.startTag(name, atts, context);
+    }
+
+    @Override
+    public void endTag(final String name, final String content, final Stack<String> context) {
+        this.delegate.endTag(name, content, context);
+    }
+
+    @Override
+    protected void setDoctype(final String doctype) {
+        super.setDoctype(doctype);
+        // Currently the only facilities-type is v1
+        if (FACILITIES_V1.equals(doctype)) {
+            this.delegate = new FacilitiesReaderMatsimV1(coordinateTransformation, scenario);
+            ((FacilitiesReaderMatsimV1)this.delegate).putAttributeConverters(this.attributeConverters);
+            log.info("using facilities_v1-reader.");
+        } else {
+            throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
+        }
+    }
 
 }

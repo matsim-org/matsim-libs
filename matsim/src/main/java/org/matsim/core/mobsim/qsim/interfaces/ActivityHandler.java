@@ -25,4 +25,6 @@ public interface ActivityHandler {
 
 	boolean handleActivity(MobsimAgent agent);
 
+	void rescheduleActivityEnd(MobsimAgent agent);
+
 }

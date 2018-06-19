@@ -22,12 +22,14 @@
  */
 package org.matsim.contrib.noise.data;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -37,8 +39,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.handler.NoiseEquations;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.*;
 
 /**
  * Contains the grid and further noise-specific information.
@@ -56,8 +63,8 @@ public class NoiseContext {
 			
 	private final Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
 	private double xCoordMinLinkNode = Double.MAX_VALUE;
-	private double xCoordMaxLinkNode = Double.MIN_VALUE;
-	private double yCoordMinLinkNode = Double.MAX_VALUE;
+//	private double xCoordMaxLinkNode = Double.MIN_VALUE;
+//	private double yCoordMinLinkNode = Double.MAX_VALUE;
 	private double yCoordMaxLinkNode = Double.MIN_VALUE;
 	
 	private final Set<Id<Vehicle>> asBusConsideredTransitVehicleIDs = new HashSet<>();
@@ -80,15 +87,17 @@ public class NoiseContext {
 	
 	public NoiseContext(Scenario scenario) {
 		this.scenario = scenario;
-				
-		if ((NoiseConfigGroup) this.scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME) == null) {
+
+//		if ((NoiseConfigGroup) this.scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME) == null) {
+		noiseParams = ConfigUtils.addOrGetModule(this.scenario.getConfig(), NoiseConfigGroup.class);
+		if (noiseParams == null) {
 			throw new RuntimeException("Could not find a noise config group. "
 					+ "Check if the custom module is loaded, e.g. 'ConfigUtils.loadConfig(configFile, new NoiseConfigGroup())'"
 					+ " Aborting...");
 		}
 		
-		this.noiseParams = (NoiseConfigGroup) this.scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
-		this.noiseParams.checkNoiseParametersForConsistency();
+//		this.noiseParams = (NoiseConfigGroup) this.scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
+//		this.noiseParams.checkNoiseParametersForConsistency();
 		
 		this.grid = new Grid(scenario);
 				
@@ -98,6 +107,8 @@ public class NoiseContext {
 		this.noiseLinks = new HashMap<Id<Link>, NoiseLink>();
 		
 		checkConsistency();
+		setLinksMinMax();
+		setLinksToZones();
 		setRelevantLinkInfo();
 	}
 
@@ -157,139 +168,38 @@ public class NoiseContext {
 	}
 
 	private void setRelevantLinkInfo() {
-		
-		setLinksMinMax();
-		setLinksToZones();
-				
-		int counter = 0;
-		
-		for (ReceiverPoint rp : this.grid.getReceiverPoints().values()) {
-			
-			counter++;
-			if (counter % 10000. == 0.) {
-				log.info("Setting relevant link information for receiver point # " + counter);
-			}
+
+		Counter cnt = new Counter("set relevant link-info # ");
+		// go through all rp's and throw them away. We need noise-rps from here on.
+		ConcurrentLinkedQueue<ReceiverPoint> rps = new ConcurrentLinkedQueue<>(this.grid.getAndClearReceiverPoints().values());
+		ReceiverPoint rp = null;
+		while((rp = rps.poll()) != null){
 			
 			NoiseReceiverPoint nrp = new NoiseReceiverPoint(rp.getId(), rp.getCoord());
-			
-			double pointCoordX = nrp.getCoord().getX();
-			double pointCoordY = nrp.getCoord().getY();
 
-			Map<Id<Link>,Double> relevantLinkIds2Ds = new HashMap<>();
-			Map<Id<Link>,Double> relevantLinkIds2angleImmissionCorrection = new HashMap<>();
-		
 			// get the zone grid cell around the receiver point
-			Tuple<Integer,Integer> zoneTuple = getZoneTupleForLinks(nrp.getCoord());
-			
-			// collect all Ids of links in this zone grid cell...
-			List<Id<Link>> potentialLinks = new ArrayList<>();
-			if(zoneTuple2listOfLinkIds.containsKey(zoneTuple)) {
-				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(zoneTuple));
-			}
-			// collect all Ids of links in all surrounding zone grid cells
-			int x = zoneTuple.getFirst();
-			int y = zoneTuple.getSecond();
-			Tuple<Integer,Integer> TupleNW = new Tuple<Integer, Integer>(x-1, y-1);
-			if(zoneTuple2listOfLinkIds.containsKey(TupleNW)) {
-				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleNW));
-			}
-			Tuple<Integer,Integer> TupleN = new Tuple<Integer, Integer>(x, y-1);
-			if(zoneTuple2listOfLinkIds.containsKey(TupleN)) {
-				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleN));
-			}
-			Tuple<Integer,Integer> TupleNO = new Tuple<Integer, Integer>(x+1, y-1);
-			if(zoneTuple2listOfLinkIds.containsKey(TupleNO)) {
-				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleNO));
-			}
-			Tuple<Integer,Integer> TupleW = new Tuple<Integer, Integer>(x-1, y);
-			if(zoneTuple2listOfLinkIds.containsKey(TupleW)) {
-				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleW));
-			}
-			Tuple<Integer,Integer> TupleO = new Tuple<Integer, Integer>(x+1, y);
-			if(zoneTuple2listOfLinkIds.containsKey(TupleO)) {
-				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleO));
-			}
-			Tuple<Integer,Integer> TupleSW = new Tuple<Integer, Integer>(x-1, y+1);
-			if(zoneTuple2listOfLinkIds.containsKey(TupleSW)) {
-				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleSW));
-			}
-			Tuple<Integer,Integer> TupleS = new Tuple<Integer, Integer>(x, y+1);
-			if(zoneTuple2listOfLinkIds.containsKey(TupleS)) {
-				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleS));
-			}
-			Tuple<Integer,Integer> TupleSO = new Tuple<Integer, Integer>(x+1, y+1);
-			if(zoneTuple2listOfLinkIds.containsKey(TupleSO)) {
-				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleSO));
+			Set<Id<Link>> potentialLinks = new HashSet<>();
+			Tuple<Integer,Integer>[] zoneTuples = getZoneTuplesForLinks(nrp.getCoord());
+			for(Tuple<Integer, Integer> key: zoneTuples) {
+				List<Id<Link>> links = zoneTuple2listOfLinkIds.get(key);
+				if(links != null) {
+					potentialLinks.addAll(links);
+				}
 			}
 
 			// go through these potential relevant link Ids
-			List<Id<Link>> relevantLinkIds = new ArrayList<>();
+			Set<Id<Link>> relevantLinkIds = new HashSet<>();
 			for (Id<Link> linkId : potentialLinks){
 				if (!(relevantLinkIds.contains(linkId))) {
-					double fromCoordX = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX();
-					double fromCoordY = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY();
-					double toCoordX = scenario.getNetwork().getLinks().get(linkId).getToNode().getCoord().getX();
-					double toCoordY = scenario.getNetwork().getLinks().get(linkId).getToNode().getCoord().getY();
-				
-					double lotPointX = 0.;
-					double lotPointY = 0.;
-				
-					double vectorX = toCoordX - fromCoordX;
-					if (vectorX == 0.) {
-						vectorX = 0.00000001;
-						// dividing by zero is not possible
-					}
-					
-					double vectorY = toCoordY - fromCoordY;
-					double vector = vectorY/vectorX;
-					if (vector == 0.) {
-						vector = 0.00000001;
-						// dividing by zero is not possible
-					}
-				
-					double vector2 = (-1) * (1/vector);
-					double yAbschnitt = fromCoordY - (fromCoordX * vector);
-					double yAbschnittOriginal = fromCoordY - (fromCoordX * vector);
-				
-					double yAbschnitt2 = pointCoordY - (pointCoordX * vector2);
-				
-					double xValue = 0.;
-					double yValue = 0.;
-				
-					if (yAbschnitt<yAbschnitt2) {
-						yAbschnitt2 = yAbschnitt2 - yAbschnitt;
-						yAbschnitt = 0;
-						xValue = yAbschnitt2 / (vector - vector2);
-						yValue = yAbschnittOriginal + (xValue*vector);
-					} else if(yAbschnitt2<yAbschnitt) {
-						yAbschnitt = yAbschnitt - yAbschnitt2;
-						yAbschnitt2 = 0;
-						xValue = yAbschnitt / (vector2 - vector);
-						yValue = yAbschnittOriginal + (xValue*vector);
-					}
-				
-					lotPointX = xValue;
-					lotPointY = yValue;
-					double distance = 0.;
-					
-					if(((xValue>fromCoordX)&&(xValue<toCoordX))||((xValue>toCoordX)&&(xValue<fromCoordX))||((yValue>fromCoordY)&&(yValue<toCoordY))||((yValue>toCoordY)&&(yValue<fromCoordY))) {
-						// no edge solution
-						distance = Math.sqrt((Math.pow(lotPointX-pointCoordX, 2))+(Math.pow(lotPointY-pointCoordY, 2)));
-					} else {
-						// edge solution (Randloesung)
-						double distanceToFromNode = Math.sqrt((Math.pow(fromCoordX-pointCoordX, 2))+(Math.pow(fromCoordY-pointCoordY, 2)));
-						double distanceToToNode = Math.sqrt((Math.pow(toCoordX-pointCoordX, 2))+(Math.pow(toCoordY-pointCoordY, 2)));
-						if (distanceToFromNode > distanceToToNode) {
-							distance = distanceToToNode;
-						} else {
-							distance = distanceToFromNode;
-						}
-					}
+					Link candidateLink = scenario.getNetwork().getLinks().get(linkId);
+					//maybe replace the disctance-calculation to remove dupolicated code. Not absolute sure, since tests are failing, when method is replaced.
+					//double distance = CoordUtils.distancePointLinesegment(candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
+					double distance = calcDistance(nrp, candidateLink);
 					
 					if (distance < noiseParams.getRelevantRadius()){
 						
 						relevantLinkIds.add(linkId);
-						
+						// wouldn't it be good to check distance < minDistance here? DR20180215
 						if (distance == 0) {
 							double minimumDistance = 5.;
 							distance = minimumDistance;
@@ -298,56 +208,137 @@ public class NoiseContext {
 						double correctionTermDs = NoiseEquations.calculateDistanceCorrection(distance);
 						double correctionTermAngle = calculateAngleImmissionCorrection(nrp.getCoord(), scenario.getNetwork().getLinks().get(linkId));
 						
-						relevantLinkIds2Ds.put(linkId, correctionTermDs);
-						relevantLinkIds2angleImmissionCorrection.put(linkId, correctionTermAngle);						
+						nrp.setLinkId2distanceCorrection(linkId, correctionTermDs);
+						nrp.setLinkId2angleCorrection(linkId, correctionTermAngle);
 					}
 				}
 			}
 			
-			nrp.setLinkId2distanceCorrection(relevantLinkIds2Ds);
-			nrp.setLinkId2angleCorrection(relevantLinkIds2angleImmissionCorrection);
-			
 			this.noiseReceiverPoints.put(nrp.getId(), nrp);
+			cnt.incCounter();
 		}
+		cnt.printCounter();
 	}
 	
-	private void setLinksMinMax() {
+	/**
+	 * @param nrp
+	 * @param candidateLink
+	 * @return
+	 */
+	private double calcDistance(NoiseReceiverPoint nrp, Link candidateLink) {
+		double pointCoordX = nrp.getCoord().getX();
+		double pointCoordY = nrp.getCoord().getY();
+		double fromCoordX = candidateLink.getFromNode().getCoord().getX();
+		double fromCoordY = candidateLink.getFromNode().getCoord().getY();
+		double toCoordX = candidateLink.getToNode().getCoord().getX();
+		double toCoordY = candidateLink.getToNode().getCoord().getY();
+	
+		double lotPointX = 0.;
+		double lotPointY = 0.;
+	
+		double vectorX = toCoordX - fromCoordX;
+		if (vectorX == 0.) {
+			vectorX = 0.00000001;
+			// dividing by zero is not possible
+		}
 		
-		for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()){
-			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX()) < xCoordMinLinkNode) {
-				xCoordMinLinkNode = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX();
+		double vectorY = toCoordY - fromCoordY;
+		double vector = vectorY/vectorX;
+		if (vector == 0.) {
+			vector = 0.00000001;
+			// dividing by zero is not possible
+		}
+	
+		double vector2 = (-1) * (1/vector);
+		double yAbschnitt = fromCoordY - (fromCoordX * vector);
+		double yAbschnittOriginal = fromCoordY - (fromCoordX * vector);
+	
+		double yAbschnitt2 = pointCoordY - (pointCoordX * vector2);
+	
+		double xValue = 0.;
+		double yValue = 0.;
+	
+		if (yAbschnitt<yAbschnitt2) {
+			yAbschnitt2 = yAbschnitt2 - yAbschnitt;
+			yAbschnitt = 0;
+			xValue = yAbschnitt2 / (vector - vector2);
+			yValue = yAbschnittOriginal + (xValue*vector);
+		} else if(yAbschnitt2<yAbschnitt) {
+			yAbschnitt = yAbschnitt - yAbschnitt2;
+			yAbschnitt2 = 0;
+			xValue = yAbschnitt / (vector2 - vector);
+			yValue = yAbschnittOriginal + (xValue*vector);
+		}
+	
+		lotPointX = xValue;
+		lotPointY = yValue;
+		double distance = 0.;
+		
+		if(((xValue>fromCoordX)&&(xValue<toCoordX))||((xValue>toCoordX)&&(xValue<fromCoordX))||((yValue>fromCoordY)&&(yValue<toCoordY))||((yValue>toCoordY)&&(yValue<fromCoordY))) {
+			// no edge solution
+			distance = Math.sqrt((Math.pow(lotPointX-pointCoordX, 2))+(Math.pow(lotPointY-pointCoordY, 2)));
+		} else {
+			// edge solution (Randloesung)
+			double distanceToFromNode = Math.sqrt((Math.pow(fromCoordX-pointCoordX, 2))+(Math.pow(fromCoordY-pointCoordY, 2)));
+			double distanceToToNode = Math.sqrt((Math.pow(toCoordX-pointCoordX, 2))+(Math.pow(toCoordY-pointCoordY, 2)));
+			if (distanceToFromNode > distanceToToNode) {
+				distance = distanceToToNode;
+			} else {
+				distance = distanceToFromNode;
 			}
-			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY()) < yCoordMinLinkNode) {
-				yCoordMinLinkNode = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY();
-			}
-			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX()) > xCoordMaxLinkNode) {
-				xCoordMaxLinkNode = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX();
-			}
-			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY()) > yCoordMaxLinkNode) {
-				yCoordMaxLinkNode = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY();
-			}
-		}		
+		}
+		return distance;
+	}
+
+	/**
+	 * @param coord
+	 * @return
+	 */
+	private Tuple<Integer, Integer>[] getZoneTuplesForLinks(Coord coord) {
+		Tuple<Integer, Integer> zoneTuple = getZoneTupleForLinks(coord);
+		int x = zoneTuple.getFirst();
+		int y = zoneTuple.getSecond();
+		return new Tuple[] {
+				zoneTuple,
+				new Tuple<Integer, Integer>(x-1, y-1),
+				new Tuple<Integer, Integer>(x, y-1),
+				new Tuple<Integer, Integer>(x+1, y-1),
+				new Tuple<Integer, Integer>(x-1, y),
+				new Tuple<Integer, Integer>(x+1, y),
+				new Tuple<Integer, Integer>(x-1, y+1),
+				new Tuple<Integer, Integer>(x, y+1),
+				new Tuple<Integer, Integer>(x+1, y+1)
+		};
+	}
+
+	private void setLinksMinMax() {
+		log.info("compute network bounding box");
+		double[] bb = NetworkUtils.getBoundingBox(scenario.getNetwork().getNodes().values());
+		xCoordMinLinkNode = bb[0];
+//		yCoordMinLinkNode = bb[1];
+//		xCoordMaxLinkNode = bb[2];
+		yCoordMaxLinkNode = bb[3];
 	}
 	
 	private void setLinksToZones() {
-		
-		for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()){
+		Counter cnt = new Counter("set links to zones #");
+		for (Link link : scenario.getNetwork().getLinks().values()){
 			
 			// split up the link into link segments with the following length
 			double partLength = 0.25 * noiseParams.getRelevantRadius();
-			int parts = (int) ((scenario.getNetwork().getLinks().get(linkId).getLength())/(partLength));
+			int parts = (int) (link.getLength()/partLength);
 
-			double fromX = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX();
-			double fromY = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY();
-			double toX = scenario.getNetwork().getLinks().get(linkId).getToNode().getCoord().getX();
-			double toY = scenario.getNetwork().getLinks().get(linkId).getToNode().getCoord().getY();
+			double fromX = link.getFromNode().getCoord().getX();
+			double fromY = link.getFromNode().getCoord().getY();
+			double toX = link.getToNode().getCoord().getX();
+			double toY = link.getToNode().getCoord().getY();
 			double vectorX = toX - fromX;
 			double vectorY = toY - fromY;
 			
 			// collect the coordinates of this link
-			List<Coord> coords = new ArrayList<Coord>();
-			coords.add(scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord());
-			coords.add(scenario.getNetwork().getLinks().get(linkId).getToNode().getCoord());
+			Set<Coord> coords = new HashSet<Coord>();
+			coords.add(link.getFromNode().getCoord());
+			coords.add(link.getToNode().getCoord());
 			for (int i = 1 ; i<parts ; i++) {
 				double x = fromX + (i*((1./(parts))*vectorX));
 				double y = fromY + (i*((1./(parts))*vectorY));
@@ -356,27 +347,23 @@ public class NoiseContext {
 			}
 			
 			// get zone grid cells for these coordinates
-			List<Tuple<Integer,Integer>> relevantTuples = new ArrayList<Tuple<Integer,Integer>>();
+			Set<Tuple<Integer,Integer>> relevantTuples = new HashSet<Tuple<Integer,Integer>>();
 			for (Coord coord : coords) {
-				Tuple<Integer,Integer> tupleTmp = getZoneTupleForLinks(coord);
-				if (!(relevantTuples.contains(tupleTmp))) {
-					relevantTuples.add(tupleTmp);
-				}
+				relevantTuples.add(getZoneTupleForLinks(coord));
 			}
 			
 			// go through these zone grid cells and save the link Id 			
 			for(Tuple<Integer,Integer> tuple : relevantTuples) {
-				if(zoneTuple2listOfLinkIds.containsKey(tuple)) {
-					List<Id<Link>> linkIds = zoneTuple2listOfLinkIds.get(tuple);
-					linkIds.add(linkId);
-					zoneTuple2listOfLinkIds.put(tuple, linkIds);
-				} else {
-					List<Id<Link>> linkIds = new ArrayList<>();
-					linkIds.add(linkId);
+				List<Id<Link>> linkIds = zoneTuple2listOfLinkIds.get(tuple);
+				if(linkIds == null) {
+					linkIds = new ArrayList<>();
 					zoneTuple2listOfLinkIds.put(tuple, linkIds);
 				}
+				linkIds.add(link.getId());
 			}
+			cnt.incCounter();
 		}
+		cnt.printCounter();
 	}
 	
 	private Tuple<Integer,Integer> getZoneTupleForLinks(Coord coord) {

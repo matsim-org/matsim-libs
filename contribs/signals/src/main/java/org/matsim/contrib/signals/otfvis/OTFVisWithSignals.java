@@ -41,6 +41,7 @@ import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.qsim.AgentTracker;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
@@ -83,20 +84,20 @@ public class OTFVisWithSignals {
 
 	public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {
 		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events, qSim);
-		if (config.transit().isUseTransit()) {
-			Network network = scenario.getNetwork();
-			TransitSchedule transitSchedule = scenario.getTransitSchedule();
-			TransitQSimEngine transitEngine = qSim.getTransitEngine();
-			TransitStopAgentTracker agentTracker = transitEngine.getAgentTracker();
+		Network network = scenario.getNetwork();
+		TransitSchedule transitSchedule = scenario.getTransitSchedule();
+//			TransitQSimEngine transitEngine = qSim.getTransitEngine();
+//			TransitStopAgentTracker agentTracker = transitEngine.getAgentTracker();
 
 //			AgentSnapshotInfoFactory snapshotInfoFactory = qSim.getVisNetwork().getAgentSnapshotInfoFactory();
-			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-			linkWidthCalculator.setLinkWidthForVis( config.qsim().getLinkWidthForVis() );
-			if (! Double.isNaN(network.getEffectiveLaneWidth())){
-				linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
-			}
-			AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+		linkWidthCalculator.setLinkWidthForVis( config.qsim().getLinkWidthForVis() );
+		if (! Double.isNaN(network.getEffectiveLaneWidth())){
+			linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
+		}
+		AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 
+		for( AgentTracker agentTracker : qSim.getAgentTrackers() ) {
 			FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(network, transitSchedule, agentTracker, snapshotInfoFactory);
 			server.addAdditionalElement(facilityWriter);
 		}

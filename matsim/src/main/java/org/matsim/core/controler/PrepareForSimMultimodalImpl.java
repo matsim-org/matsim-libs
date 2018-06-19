@@ -1,19 +1,17 @@
 package org.matsim.core.controler;
 
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -32,6 +30,13 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public final class PrepareForSimMultimodalImpl implements PrepareForSim {
 
@@ -136,10 +141,10 @@ public final class PrepareForSimMultimodalImpl implements PrepareForSim {
 								}
 
 								// so here we have a vehicle id, now try to find or create a physical vehicle:
-								Vehicle vehicle = createAndAddVehicleIfNotPresent( vehicleId, modeVehicleTypes.get(leg.getMode()));
+								createAndAddVehicleIfNotPresent( vehicleId, modeVehicleTypes.get(leg.getMode()));
 								seenModes.put(leg.getMode(), vehicleId);
 							} else {
-								if (vehicleId == null && route != null) {
+								if (vehicleId == null) {
 									vehicleId = seenModes.get(leg.getMode());
 									route.setVehicleId(vehicleId);
 								}
@@ -176,11 +181,11 @@ public final class PrepareForSimMultimodalImpl implements PrepareForSim {
 		Collection<StrategyConfigGroup.StrategySettings> strategySettings = scenario.getConfig().strategy().getStrategySettings();
 		for (StrategyConfigGroup.StrategySettings strategySetting : strategySettings) {
 			String name = strategySetting.getStrategyName();
-			if ( name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.name())
-					|| name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeTripMode.name())
+			if ( name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.toString())
+					|| name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeTripMode.toString())
 					) {
 				isModeChoicePresent = true;
-			} else if (name.equals(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name())) {
+			} else if (name.equals(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.toString())) {
 				isModeChoicePresent = true;
 				log.warn("Creating one vehicle corresponding to each network mode for every agent and parking it to the departure link. \n" +
 						"If this is undesirable, then write a new PrepareForSim +" +

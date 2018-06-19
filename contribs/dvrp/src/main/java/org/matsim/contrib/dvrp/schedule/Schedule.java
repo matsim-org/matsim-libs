@@ -20,6 +20,7 @@
 package org.matsim.contrib.dvrp.schedule;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * A Schedule contains Tasks. <br/>
@@ -45,6 +46,11 @@ public interface Schedule {
 	 * Tasks in the schedule.
 	 */
 	List<? extends Task> getTasks();// unmodifiableList
+
+	/**
+	 * Stream of tasks in the schedule.
+	 */
+	Stream<? extends Task> tasks();
 
 	/**
 	 * Shortcut to getTasks().size()

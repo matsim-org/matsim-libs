@@ -24,12 +24,14 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -38,10 +40,9 @@ import org.matsim.core.utils.misc.Time;
 import javax.inject.Inject;
 
 public class ActivityEngine implements MobsimEngine, ActivityHandler {
+	private static final Logger log = Logger.getLogger( ActivityEngine.class ) ;
 
 	private EventsManager eventsManager;
-	private AgentCounter agentCounter;
-
 	@Inject
 	public ActivityEngine(EventsManager eventsManager) {
 		this.eventsManager = eventsManager;
@@ -49,7 +50,6 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 
 	public ActivityEngine(EventsManager eventsManager, AgentCounter agentCounter) {
 		this.eventsManager = eventsManager;
-		this.agentCounter = agentCounter;
 	}
 
 	/**
@@ -163,7 +163,8 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 			internalInterface.arrangeNextAgentState(agent) ;
 		} else {
 			// The agent commences an activity on this link.
-			activityEndsList.add(new AgentEntry(agent, agent.getActivityEndTime()));
+			final AgentEntry agentEntry = new AgentEntry(agent, agent.getActivityEndTime());
+			activityEndsList.add(agentEntry);
 			internalInterface.registerAdditionalAgentOnLink(agent);
 		}
 		// Why beforeFirstSimStep matters:
@@ -187,7 +188,13 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	 *
 	 * @param agent The agent.
 	 */
-	void rescheduleActivityEnd(final MobsimAgent agent) {
+	@Override
+	public void rescheduleActivityEnd(final MobsimAgent agent) {
+		if ( agent.getState()!=State.ACTIVITY ) {
+			return ;
+		}
+		
+		
 		double newActivityEndTime = agent.getActivityEndTime();
 		AgentEntry oldEntry = removeAgentFromQueue(agent);
 

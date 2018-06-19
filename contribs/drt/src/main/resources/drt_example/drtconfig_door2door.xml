@@ -1,0 +1,121 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+
+	<module name="drt" >
+
+		<!-- If true, the startLink is changed to last link in the current schedule, so the taxi starts the next day at the link where it stopped operating the day before. False by default. -->
+		<param name="changeStartLinkToLastLinkInSchedule" value="false" />
+		<!-- Beeline distance factor for DRT. Used in analyis and in plans file. The default value is 1.3. -->
+		<param name="estimatedBeelineDistanceFactor" value="1.3" />
+		<!-- Beeline-speed estimate for DRT. Used in analysis, optimisation constraints and in plans file, [m/s]. The default value is 25 km/h -->
+		<param name="estimatedDrtSpeed" value="8.333333333333334" />
+		<!-- Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Alpha should not be smaller than 1. -->
+		<param name="maxTravelTimeAlpha" value="1.5" />
+		<!-- Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. Beta should not be smaller than 0. -->
+		<param name="maxTravelTimeBeta" value="1200.0" />
+		<!-- Max wait time for the bus to come (optimisation constraint). -->
+		<param name="maxWaitTime" value="1200.0" />
+
+		<!-- Operational Scheme, either door2door or stopbased. door2door by default -->
+		<param name="operationalScheme" value="door2door" />
+
+		<!-- Bus stop duration. -->
+		<param name="stopDuration" value="60.0" />
+
+		<!-- An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd -->
+		<param name="vehiclesFile" value="drtvehicles.xml" />
+
+		<!-- Writes out detailed DRT customer stats in each iteration. True by default. -->
+		<param name="writeDetailedCustomerStats" value="true" />
+
+		<!-- Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration. False by default. -->
+		<param name="writeDetailedVehicleStats" value="false" />
+
+		<parameterset type="minCostFlowRebalancing">
+			<param name="targetAlpha" value="0.5"/>
+			<param name="targetBeta" value="0.5"/>
+			<param name="cellSize" value="2000"/>
+		</parameterset>
+	</module>
+	
+	<module name="dvrp" >
+
+		<!-- Mode which will be handled by PassengerEngine and VrpOptimizer (passengers'/customers' perspective) -->
+		<param name="mode" value="drt" />
+
+		<!-- Mode of which the network will be used for routing vehicles, calculating trave times, etc. (fleet operator's perspective). If null, no mode filtering is done; the standard network (Scenario.getNetwork()) is used -->
+		<param name="networkMode" value="null" />
+
+		<!-- Used for estimation of travel times for VrpOptimizer by means of the exponential moving average. The weighting decrease, alpha, must be in (0,1]. We suggest small values of alpha, e.g. 0.05. The averaging starts from the initial travel time estimates. If not provided, the free-speed TTs is used as the initial estimates For more info see comments in: VrpTravelTimeEstimator, VrpTravelTimeModules, DvrpModule. -->
+		<param name="travelTimeEstimationAlpha" value="0.05" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="network.xml.gz" />
+		<!-- param name="timeVariantNetwork" value="false" / if timeVariantNetwork -->
+		<!-- param name="inputChangeEventsFile" value=""/ if timeVariantNetwork -->
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="cb-drtplans.xml.gz" />
+	</module>
+
+	<module name="qsim">
+		<param name="simStarttimeInterpretation" value="onlyUseStarttime" />
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="24:00:00" />
+		<param name="insertingWaitingVehiclesBeforeDrivingVehicles"
+			value="true" />
+		<param name="snapshotStyle" value="queue" />
+	</module>
+
+	<module name="otfvis">
+		<param name="coloringScheme" value="taxicab" />
+		<param name="drawNonMovingItems" value="true" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="output/drt_door2door" />
+		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="0" />
+	</module>
+
+	<module name="planCalcScore">
+		<parameterset type="activityParams">
+			<param name="activityType" value="work" />
+			<param name="typicalDuration" value="08:00:00" />
+			<param name="openingTime" value="06:00:00" />
+			<param name="latestStartTime" value="09:00:00" />
+			<param name="closingTime" value="17:00:00" />
+		</parameterset>
+
+		<parameterset type="activityParams">
+			<param name="activityType" value="home" />
+			<param name="typicalDuration" value="12:00:00" />
+		</parameterset>
+
+		<parameterset type="modeParams">
+			<param name="constant" value="0.0" />
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="0.0" />
+			<param name="mode" value="drt" />
+			<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+
+	</module>
+
+	<module name="strategy">
+		<param name="fractionOfIterationsToDisableInnovation" value="0.8" />
+
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="TimeAllocationMutator" />
+			<param name="weight" value="0.1" />
+		</parameterset>
+	</module>
+	<module name="TimeAllocationMutator">
+		<param name="mutationRange" value="900.0" />
+
+	</module>
+</config>

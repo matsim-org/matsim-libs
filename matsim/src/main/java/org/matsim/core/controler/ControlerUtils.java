@@ -66,10 +66,10 @@ public final class ControlerUtils {
 	    log.info("Checking consistency of config done.");
 	}
 
-	public static void initializeOutputLogging() {
-		    OutputDirectoryLogging.catchLogEntries();
-		    Gbl.printSystemInfo();
-		    Gbl.printBuildInfo();
-	    }
+	@Deprecated // use 	OutputDirectoryLogging.catchLogEntries() directly.  kai, mar'18
+	public static final void initializeOutputLogging() {
+		OutputDirectoryLogging.catchLogEntries();
+	}
 
+	
 }

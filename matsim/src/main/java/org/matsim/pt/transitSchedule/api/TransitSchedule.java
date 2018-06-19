@@ -25,6 +25,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * Stores a complete transit schedules with multiple lines, multiple routes per line, all the time data
@@ -32,33 +33,34 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * 
  * @author mrieser
  */
-public interface TransitSchedule extends MatsimToplevelContainer {
+public interface TransitSchedule extends MatsimToplevelContainer, Attributable {
 
-	public abstract void addTransitLine(final TransitLine line);
+	void addTransitLine(final TransitLine line);
 	
 	/**
-	 * @param line
+	 * @param line the transit line to be removed
 	 * @return <code>true</code> if the transit line was successfully removed from the transit schedule.
 	 */
-	public abstract boolean removeTransitLine(final TransitLine line);
+	boolean removeTransitLine(final TransitLine line);
 
-	public abstract void addStopFacility(final TransitStopFacility stop);
+	void addStopFacility(final TransitStopFacility stop);
 
-	public abstract Map<Id<TransitLine>, TransitLine> getTransitLines();
+	Map<Id<TransitLine>, TransitLine> getTransitLines();
 
-	public abstract Map<Id<TransitStopFacility>, TransitStopFacility> getFacilities();
+	Map<Id<TransitStopFacility>, TransitStopFacility> getFacilities();
 	
 	/**
-	 * @param route
+	 * @param stop the stop facility to be removed
 	 * @return <code>true</code> if the transit stop facility was successfully removed from the transit schedule.
 	 */
-	public abstract boolean removeStopFacility(final TransitStopFacility stop);
+	boolean removeStopFacility(final TransitStopFacility stop);
 	
 	@Override
-	public abstract TransitScheduleFactory getFactory();
+	TransitScheduleFactory getFactory();
 
-	public abstract ObjectAttributes getTransitLinesAttributes();
+	ObjectAttributes getTransitLinesAttributes();
 	
-	public abstract ObjectAttributes getTransitStopsAttributes();
-	
+	ObjectAttributes getTransitStopsAttributes();
+
+	MinimalTransferTimes getMinimalTransferTimes();
 }

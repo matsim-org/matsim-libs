@@ -45,6 +45,8 @@ public abstract class Gbl {
 
 	public static final String CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE = "This class wants to overwrite createRoutingAlgorithm(), which is no longer possible.  Making createRoutingAlgorithm() non-final would not help since, after recent code changes, it is only used during initialization but not in replanning.  kai, may'13.  Aborting ...";
 	
+	public static final String NOT_IMPLEMENTED = "not implemented" ;
+	
 	public static final void printMemoryUsage() {
 		long totalMem = Runtime.getRuntime().totalMemory();
 		long freeMem = Runtime.getRuntime().freeMemory();
@@ -202,6 +204,9 @@ public abstract class Gbl {
 		if ( obj==null ) {
 			throw new RuntimeException( "Object is null; follow stack trace" ) ;
 		}
+	}
+	public static void fail() {
+		throw new RuntimeException("failure; follow stack trace") ;
 	}
 
 	public final static String RUN_MOB_SIM_NO_LONGER_POSSIBLE = "overriding runMobSim() no longer possible.  use the following syntax instead:\n"

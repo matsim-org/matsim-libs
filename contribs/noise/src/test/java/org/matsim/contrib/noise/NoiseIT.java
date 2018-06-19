@@ -145,6 +145,7 @@ public class NoiseIT {
 		// start a simple MATSim run with a single iteration
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Config config = ConfigUtils.loadConfig(configFile ) ;
+		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
 		runTest2a( config ) ;
 	}
@@ -153,6 +154,7 @@ public class NoiseIT {
 		// start a simple MATSim run with a single iteration
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Config config = ConfigUtils.loadConfig(configFile ) ;
+		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 		runTest2a( config ) ;
 	}
@@ -936,6 +938,7 @@ public class NoiseIT {
 		// start a simple MATSim run with a single iteration
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Config runConfig = ConfigUtils.loadConfig( configFile ) ;
+		runConfig.controler().setOutputDirectory(testUtils.getOutputDirectory());
 
 		runConfig.plansCalcRoute().setInsertingAccessEgressWalk(false);
 		// I made test2a test both versions, but I don't really want to do that work again myself. kai, feb'16 
@@ -1029,6 +1032,7 @@ public class NoiseIT {
 		// start a simple MATSim run with a single iteration
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Controler controler = new Controler(configFile);
+		controler.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		controler.run();
 		

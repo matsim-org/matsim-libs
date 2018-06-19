@@ -290,7 +290,7 @@ public class TransitDriverTest {
 		assertEquals(2, queueVehicle.getPassengers().size());
 		assertEquals("driver must not proceed in stop list when persons entered.",
 				stop1, driver.getNextTransitStop());
-		assertEquals(0, tracker.getAgentsAtStop(stop1.getId()).size());
+		assertEquals(0, tracker.getAgentsAtFacility(stop1.getId()).size());
 		assertEquals("stop time must be 0 when nobody enters or leaves",
 				0.0, driver.handleTransitStop(stop1, 60), MatsimTestCase.EPSILON);
 		assertEquals(2, queueVehicle.getPassengers().size());
@@ -303,7 +303,7 @@ public class TransitDriverTest {
 		double stoptime1 = driver.handleTransitStop(stop2, 150);
 		assertTrue(stoptime1 > 0);
 		assertEquals(3, queueVehicle.getPassengers().size());
-		assertEquals(0, tracker.getAgentsAtStop(stop2.getId()).size());
+		assertEquals(0, tracker.getAgentsAtFacility(stop2.getId()).size());
 		tracker.addAgentToStop(152, agent4, stop2.getId());
 		double stoptime2 = driver.handleTransitStop(stop2, 160);
 		assertTrue(stoptime2 > 0);

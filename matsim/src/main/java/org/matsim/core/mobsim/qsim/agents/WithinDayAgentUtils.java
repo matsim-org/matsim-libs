@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 
 /**
@@ -55,40 +56,75 @@ import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
  * @author cdobler
  */
 public class WithinDayAgentUtils {
-//	private WithinDayAgentUtils(){} // do not instantiate: static methods only
-	
+	//	private WithinDayAgentUtils(){} // do not instantiate: static methods only
+
 	private static final Logger log = Logger.getLogger( WithinDayAgentUtils.class );
 
 	public static final Integer getCurrentPlanElementIndex(MobsimAgent agent) {
-		if (agent instanceof PersonDriverAgentImpl) {
-			return ((PersonDriverAgentImpl) agent).getCurrentPlanElementIndex() ;			
+		//		if (agent instanceof PersonDriverAgentImpl) {
+		//			return ((PersonDriverAgentImpl) agent).getCurrentPlanElementIndex() ;
+		//		} else
+
+		// commenting out the above so the new code runs through the existing tests.  kai, nov'17
+
+		if ( agent instanceof PlanAgent ) {
+			return ((PlanAgent)agent).getCurrentPlan().getPlanElements().indexOf( ((PlanAgent)agent).getCurrentPlanElement() ) ;
 		} else {
 			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
 					" which does not support getCurrentPlanElementIndex(...). Aborting!");
 		}
 	}
-
+	
+	/** NOTES:
+	 * () The current link index does not point to where the agent is, but one ahead.
+	 * () It does that even if there is nothing there in the underlying list.  I keep forgetting the convention, but I think that the
+	 *     arrival link is not in the list, and so for the arrival link special treatment is necessary.
+	 * () Routes may have loops, in which case the "indexOf" approach does not work.
+	 */
 	public static final Integer getCurrentRouteLinkIdIndex(MobsimAgent agent) {
-		if (agent instanceof PersonDriverAgentImpl) {
-			return ((PersonDriverAgentImpl) agent).getCurrentLinkIndex();			
-		} else {
-			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
-					" which does not support getCurrentRouteLinkIdIndex(...). Aborting!");
-		}
+
+		if (agent instanceof HasModifiablePlan) {
+
+			return ((HasModifiablePlan) agent).getCurrentLinkIndex();
+
+//		} else if ( agent instanceof PlanAgent ) {
+//			
+//			// the following does not work because of loop routes, see above
+//				Leg currentLeg = (Leg) ((PlanAgent)agent).getCurrentPlanElement() ;
+//				if ( ! (currentLeg.getRoute() instanceof NetworkRoute ) ) {
+//					throw new RuntimeException("agent currently not on network route; asking for link id index does not make sense") ;
+//				}
+//				NetworkRoute route = (NetworkRoute) currentLeg.getRoute();
+//				int index = route.getLinkIds().indexOf( agent.getCurrentLinkId() );
+//
+//				// if agent is on arrival link, we need special treatment:
+//				if ( index==-1 && agent.getCurrentLinkId().equals( route.getEndLinkId() ) ) {
+//					index = route.getLinkIds().size() ;
+//				}
+//
+//				// and in the end it points even one further (always points to the _next_ entry, if there is any)
+//				index++ ;
+//
+//				return index ;
+
+			} else {
+				throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+						" which does not support getCurrentRouteLinkIdIndex(...). Aborting!");
+			}
 	}
 
-//	public static final void calculateAndSetDepartureTime(MobsimAgent agent, Activity act) {
-//		if (agent instanceof PersonDriverAgentImpl) {
-//			((PersonDriverAgentImpl) agent).calculateAndSetDepartureTime(act);			
-//		} else {
-//			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
-//					" which does not support calculateAndSetDepartureTime(...). Aborting!");
-//		}
-//	}
+	//	public static final void calculateAndSetDepartureTime(MobsimAgent agent, Activity act) {
+	//		if (agent instanceof PersonDriverAgentImpl) {
+	//			((PersonDriverAgentImpl) agent).calculateAndSetDepartureTime(act);			
+	//		} else {
+	//			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+	//					" which does not support calculateAndSetDepartureTime(...). Aborting!");
+	//		}
+	//	}
 
 	public static final void resetCaches(MobsimAgent agent) {
-		if (agent instanceof PersonDriverAgentImpl) {
-			((PersonDriverAgentImpl) agent).resetCaches();			
+		if (agent instanceof HasModifiablePlan) {
+			((HasModifiablePlan) agent).resetCaches();			
 		} else {
 			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
 					" which does not support resetCaches(...). Aborting!");
@@ -101,51 +137,41 @@ public class WithinDayAgentUtils {
 			throw new RuntimeException("mobsim does not support activity end rescheduling; aborting ...") ;
 		}
 	}
-	
+
 	public static final Leg getModifiableCurrentLeg(MobsimAgent agent) {
-		if (agent instanceof PersonDriverAgentImpl) {
-			PlanElement currentPlanElement = getCurrentPlanElement(agent);
-			if (!(currentPlanElement instanceof Leg)) {
-				return null;
-			}
-			return (Leg) currentPlanElement;
-		} else {
-			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
-					" which does not support getCurrentLeg(...). Aborting!");
+		PlanElement currentPlanElement = getCurrentPlanElement(agent);
+		if (!(currentPlanElement instanceof Leg)) {
+			return null;
 		}
+		return (Leg) currentPlanElement;
 	}
-	
+
 	public static final Plan getModifiablePlan(MobsimAgent agent) {
-		if (agent instanceof PersonDriverAgentImpl) {
-			return ((PersonDriverAgentImpl) agent).getModifiablePlan();
+		if (agent instanceof HasModifiablePlan) {
+			return ((HasModifiablePlan) agent).getModifiablePlan();
 		} else {
 			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
 					" which does not support getModifiablePlan(...). Aborting!");
 		}
 	}
-	
+
 	public static final PlanElement getCurrentPlanElement(MobsimAgent agent) {
-		if (agent instanceof PersonDriverAgentImpl) {
-			return getModifiablePlan(agent).getPlanElements().get(getCurrentPlanElementIndex(agent));
-		} else {
-			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
-					" which does not support getCurrentPlanElement(...). Aborting!");
-		}
+		return getModifiablePlan(agent).getPlanElements().get(getCurrentPlanElementIndex(agent));
 	}
 
-	public static boolean isReplannableCarLeg(MobsimAgent agent) {
-	//		if (plan == null) {
-	//			log.info( " we don't have a modifiable plan; returning ... ") ;
-	//			return false;
-	//		}
-			if ( !(getCurrentPlanElement(agent) instanceof Leg) ) {
-				log.info( "agent not on leg; returning ... ") ;
-				return false ;
-			}
-			if (!((Leg) getCurrentPlanElement(agent)).getMode().equals(TransportMode.car)) {
-				log.info( "not a car leg; can only replan car legs; returning ... ") ;
-				return false;
-			}
-			return true ;
+	public static boolean isOnReplannableCarLeg(MobsimAgent agent) {
+		//		if (plan == null) {
+		//			log.info( " we don't have a modifiable plan; returning ... ") ;
+		//			return false;
+		//		}
+		if ( !(getCurrentPlanElement(agent) instanceof Leg) ) {
+			log.info( "agent not on leg; returning ... ") ;
+			return false ;
 		}
+		if (!((Leg) getCurrentPlanElement(agent)).getMode().equals(TransportMode.car)) {
+			log.info( "not a car leg; can only replan car legs; returning ... ") ;
+			return false;
+		}
+		return true ;
+	}
 }

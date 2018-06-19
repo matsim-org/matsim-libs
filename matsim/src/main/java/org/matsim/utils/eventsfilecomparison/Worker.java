@@ -74,7 +74,8 @@ public class Worker extends Thread implements BasicEventHandler{
 				throw new ComparatorInterruptedException(e1);
 			}
 		} catch (ComparatorInterruptedException e1) {
-			log.info("events-comparator got interrupted", e1);
+//			log.info("events-comparator got interrupted", e1);
+			log.info("events-comparator got interrupted");
 		}
 	}
 

@@ -22,15 +22,21 @@ package org.matsim.contrib.dvrp.passenger;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
 public class PassengerEngine implements MobsimEngine, DepartureHandler {
 	private final String mode;
@@ -123,6 +129,11 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 		}
 
 		return !request.isRejected();
+	}
+
+	public void rejectRequest(PassengerRequest request, double now) {
+		request.getPassenger().setStateToAbort(now);
+		internalInterface.arrangeNextAgentState(request.getPassenger());
 	}
 
 	// ================ REQUESTS CREATION

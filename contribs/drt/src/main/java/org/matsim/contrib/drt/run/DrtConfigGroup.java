@@ -20,13 +20,24 @@
 package org.matsim.contrib.drt.run;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.Map;
 
-import org.matsim.core.config.*;
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+
+import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class DrtConfigGroup extends ReflectiveConfigGroup {
+
 	public static final String GROUP_NAME = "drt";
-	public static final String DRT_MODE = "drt";
 
 	@SuppressWarnings("deprecation")
 	public static DrtConfigGroup get(Config config) {
@@ -34,60 +45,111 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	public static final String STOP_DURATION = "stopDuration";
+	static final String STOP_DURATION_EXP = "Bus stop duration.";
+
 	public static final String MAX_WAIT_TIME = "maxWaitTime";
+	static final String MAX_WAIT_TIME_EXP = "Max wait time for the bus to come (optimisation constraint).";
+
 	public static final String MAX_TRAVEL_TIME_ALPHA = "maxTravelTimeAlpha";
+	static final String MAX_TRAV_ALPHA_EXP = "Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "
+			+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
+			+ "Alpha should not be smaller than 1.";
+
 	public static final String MAX_TRAVEL_TIME_BETA = "maxTravelTimeBeta";
-	public static final String A_STAR_EUCLIDEAN_OVERDO_FACTOR = "AStarEuclideanOverdoFactor";
+	static final String MAX_TRAVEL_TIME_BETA_EXP = "Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. "
+			+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
+			+ "Beta should not be smaller than 0.";
+
 	public static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE = "changeStartLinkToLastLinkInSchedule";
+	static final String CHANGE_START_EXP = "If true, the startLink is changed to last link in the current schedule, so the taxi starts the next "
+			+ "day at the link where it stopped operating the day before. False by default.";
 
-	public static final String REBALANCING_INTERVAL = "rebalancingInterval";
 	public static final String IDLE_VEHICLES_RETURN_TO_DEPOTS = "idleVehiclesReturnToDepots";
-	private static final String OPERATIONAL_SCHEME = "operationalScheme";
+	static final String IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP = "Idle vehicles return to the nearest of all start links. See: Vehicle.getStartLink()";
 
-	private static final String MAX_WALK_DISTANCE = "maxWalkDistance";
-	private static final String ESTIMATED_DRT_SPEED = "estimatedDrtSpeed";
-	private static final String ESTIMATED_BEELINE_DISTANCE_FACTOR = "estimatedBeelineDistanceFactor";
+	public static final String OPERATIONAL_SCHEME = "operationalScheme";
+	static final String OP_SCHEME_EXP = "Operational Scheme, either door2door or stopbased. door2door by default";
+
+	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
+	static final String MAX_WALK_EXP = "Maximum walk distance (in meters) to next stop location in stopbased system.";
+
+	public static final String ESTIMATED_DRT_SPEED = "estimatedDrtSpeed";
+	static final String ESTIMATED_DRT_SPEED_EXP = "Beeline-speed estimate for DRT. Used in analysis, optimisation constraints "
+			+ "and in plans file, [m/s]. The default value is 25 km/h";
+
+	public static final String ESTIMATED_BEELINE_DISTANCE_FACTOR = "estimatedBeelineDistanceFactor";
+	static final String ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP = "Beeline distance factor for DRT. Used in analyis and in plans file. The default value is 1.3.";
 
 	public static final String VEHICLES_FILE = "vehiclesFile";
-	private static final String TRANSIT_STOP_FILE = "transitStopFile";
-	private static final String PLOT_CUST_STATS = "writeDetailedCustomerStats";
-	private static final String PLOT_VEH_STATS = "writeDetailedVehicleStats";
-	private static final String PRINT_WARNINGS = "plotDetailedWarnings";
-	private static final String NUMBER_OF_THREADS = "numberOfThreads";
-	private static final String K_NEAREST_VEHICLES = "kNearestVehiclesToFilter";
+	static final String VEH_FILE_EXP = "An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd";
 
+	public static final String TRANSIT_STOP_FILE = "transitStopFile";
+	static final String TRANSIT_STOP_FILE_EXP = "Stop locations file (transit schedule format, but without lines) for DRT stops. "
+			+ "Used only for the stopbased mode";
+
+	public static final String PLOT_CUST_STATS = "writeDetailedCustomerStats";
+	static final String CUST_STATS_EXP = "Writes out detailed DRT customer stats in each iteration. True by default.";
+
+	public static final String PLOT_VEH_STATS = "writeDetailedVehicleStats";
+	static final String VEH_STATS_EXP = "Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration. "
+			+ "False by default.";
+
+	public static final String PRINT_WARNINGS = "plotDetailedWarnings";
+	static final String PRINT_WARNINGS_EXP = "Prints detailed warnings for DRT customers that cannot be served or routed. Default is false.";
+
+	public static final String NUMBER_OF_THREADS = "numberOfThreads";
+	static final String NUMBER_OF_THREADS_EXP = "Number of threads used for parallel evaluation of request insertion into existing schedules."
+			+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
+			+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
+
+	@PositiveOrZero
 	private double stopDuration = Double.NaN;// seconds
+
+	@PositiveOrZero
 	private double maxWaitTime = Double.NaN;// seconds
 
 	// max arrival time defined as:
 	// maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) + maxTravelTimeBeta,
 	// where unshared_ride_travel_time(fromLink, toLink) is calculated with FastAStarEuclidean
 	// (hence AStarEuclideanOverdoFactor needs to be specified)
-	private double maxTravelTimeAlpha = Double.NaN;// [-], >= 1.0
-	private double maxTravelTimeBeta = Double.NaN;// [s], >= 0.0
-	private double AStarEuclideanOverdoFactor = 1.;// >= 1.0
+	@Min(1)
+	private double maxTravelTimeAlpha = Double.NaN;// [-]
+
+	@PositiveOrZero
+	private double maxTravelTimeBeta = Double.NaN;// [s]
+
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
-	private int rebalancingInterval = 0;// [s], if 0 then no rebalancing
 	private boolean idleVehiclesReturnToDepots = false;
+
+	@NotNull
 	private OperationalScheme operationalScheme = OperationalScheme.door2door;
 
-	private double maxWalkDistance = Double.NaN;// [m]; only for stationbased DRT scheme
+	@PositiveOrZero // used only for stopbased DRT scheme
+	private double maxWalkDistance = 0;// [m];
+
+	@PositiveOrZero
 	private double estimatedDrtSpeed = 25. / 3.6;// [m/s]
+
+	@Min(1)
 	private double estimatedBeelineDistanceFactor = 1.3;// [-]
 
+	@NotNull
 	private String vehiclesFile = null;
-	private String transitStopFile = null; // only for stationbased DRT scheme
+
+	// used only for stopbased DRT scheme
+	private String transitStopFile = null; // only for stopbased DRT scheme
 
 	private boolean plotDetailedCustomerStats = true;
 	private boolean plotDetailedVehicleStats = false;
-	private boolean printDetailedWarnings = false;
-	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
+	private boolean printDetailedWarnings = true;
 
-	private int kNearestVehicles = 0;
+	@Positive
+	private int numberOfThreads = Math.min(Runtime.getRuntime().availableProcessors(),
+			ParallelPathDataProvider.MAX_THREADS);
 
 	public enum OperationalScheme {
-		stationbased, door2door
+		stopbased, door2door
 	}
 
 	public DrtConfigGroup() {
@@ -97,254 +159,323 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
-		map.put(STOP_DURATION, "Bus stop duration.");
-		map.put(MAX_WAIT_TIME, "Max wait time for the bus to come (optimisation constraint).");
-		map.put(MAX_TRAVEL_TIME_ALPHA,
-				"Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "
-						+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
-						+ "Alpha should not be smaller than 1.");
-		map.put(MAX_TRAVEL_TIME_BETA,
-				"Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. "
-						+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
-						+ "Beta should not be smaller than 0.");
-		map.put(A_STAR_EUCLIDEAN_OVERDO_FACTOR,
-				"Used in AStarEuclidean for shortest path search for unshared (== optimistic) rides. "
-						+ "Default value is 1.0. Values above 1.0 (typically, 1.5 to 3.0) speed up search, "
-						+ "but at the cost of obtaining longer paths");
-		map.put(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE,
-				"If true, the startLink is changed to last link in the current schedule, so the taxi starts the next "
-						+ "day at the link where it stopped operating the day before. False by default.");
-		map.put(VEHICLES_FILE,
-				"An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd");
-		map.put(PLOT_CUST_STATS, "Writes out detailed DRT customer stats in each iteration. True by default.");
-		map.put(PLOT_VEH_STATS,
-				"Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration. "
-						+ "False by default.");
-		map.put(REBALANCING_INTERVAL,
-				"Specifies how often empty vehicle rebalancing is executed. 0 means no rebalancing (the default).");
-		map.put(IDLE_VEHICLES_RETURN_TO_DEPOTS,
-				"Idle vehicles return to the nearest of all start links. See: Vehicle.getStartLink()");
-		map.put(OPERATIONAL_SCHEME, "Operational Scheme, either door2door or stationbased. door2door by default");
-		map.put(MAX_WALK_DISTANCE, "Maximum walk distance (in meters) to next stop location in stationbased system.");
-		map.put(TRANSIT_STOP_FILE, "Stop locations file (transit schedule format, but without lines) for DRT stops. "
-				+ "Used only for the stationbased mode");
-		map.put(ESTIMATED_DRT_SPEED, "Beeline-speed estimate for DRT. Used in analysis, optimisation constraints "
-				+ "and in plans file, [m/s]. The default value is 25 km/h");
-		map.put(ESTIMATED_BEELINE_DISTANCE_FACTOR,
-				"Beeline distance factor for DRT. Used in analyis and in plans file. The default value is 1.3.");
-		map.put(NUMBER_OF_THREADS,
-				"Number of threads used for parallel evaluation of request insertion into existing schedules. "
-						+ "If unset, the number of threads is equal to the number of logical cores available to JVM.");
-		map.put(PRINT_WARNINGS,
-				"Prints detailed warnings for DRT customers that cannot be served or routed. Default is false.");
-		map.put(K_NEAREST_VEHICLES,
-				"Filters the k nearest vehicles to the request. Speeds up simulation with big fleets, but could lead to a worse solution. Default: k==0 (no filtering used)");
+		map.put(STOP_DURATION, STOP_DURATION_EXP);
+		map.put(MAX_WAIT_TIME, MAX_WAIT_TIME_EXP);
+		map.put(MAX_TRAVEL_TIME_ALPHA, MAX_TRAV_ALPHA_EXP);
+		map.put(MAX_TRAVEL_TIME_BETA, MAX_TRAVEL_TIME_BETA_EXP);
+		map.put(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE, CHANGE_START_EXP);
+		map.put(VEHICLES_FILE, VEH_FILE_EXP);
+		map.put(PLOT_CUST_STATS, CUST_STATS_EXP);
+		map.put(PLOT_VEH_STATS, VEH_STATS_EXP);
+		map.put(IDLE_VEHICLES_RETURN_TO_DEPOTS, IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP);
+		map.put(OPERATIONAL_SCHEME, OP_SCHEME_EXP);
+		map.put(MAX_WALK_DISTANCE, MAX_WALK_EXP);
+		map.put(TRANSIT_STOP_FILE, TRANSIT_STOP_FILE_EXP);
+		map.put(ESTIMATED_DRT_SPEED, ESTIMATED_DRT_SPEED_EXP);
+		map.put(ESTIMATED_BEELINE_DISTANCE_FACTOR, ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP);
+		map.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_EXP);
+		map.put(PRINT_WARNINGS, PRINT_WARNINGS_EXP);
 		return map;
 	}
 
+	/**
+	 * @return -- {@value #STOP_DURATION_EXP}
+	 */
 	@StringGetter(STOP_DURATION)
 	public double getStopDuration() {
 		return stopDuration;
 	}
 
+	/**
+	 * @param --
+	 *            {@value #STOP_DURATION_EXP}
+	 */
 	@StringSetter(STOP_DURATION)
 	public void setStopDuration(double stopDuration) {
 		this.stopDuration = stopDuration;
 	}
 
+	/**
+	 * @return -- {@value #MAX_WAIT_TIME_EXP}
+	 */
 	@StringGetter(MAX_WAIT_TIME)
 	public double getMaxWaitTime() {
 		return maxWaitTime;
 	}
 
+	/**
+	 * @param --
+	 *            {@value #MAX_WAIT_TIME_EXPP}
+	 */
 	@StringSetter(MAX_WAIT_TIME)
 	public void setMaxWaitTime(double maxWaitTime) {
 		this.maxWaitTime = maxWaitTime;
 	}
 
+	/**
+	 * @return -- {@value #MAX_TRAV_ALPHA_EXP}
+	 */
 	@StringGetter(MAX_TRAVEL_TIME_ALPHA)
 	public double getMaxTravelTimeAlpha() {
 		return maxTravelTimeAlpha;
 	}
 
+	/**
+	 * @param maxTravelTimeAlpha
+	 *            {@value #MAX_TRAV_ALPHA_EXP}
+	 */
 	@StringSetter(MAX_TRAVEL_TIME_ALPHA)
 	public void setMaxTravelTimeAlpha(double maxTravelTimeAlpha) {
 		this.maxTravelTimeAlpha = maxTravelTimeAlpha;
 	}
 
+	/**
+	 * @return -- {@value #MAX_TRAV_BETA_EXP}
+	 */
 	@StringGetter(MAX_TRAVEL_TIME_BETA)
 	public double getMaxTravelTimeBeta() {
 		return maxTravelTimeBeta;
 	}
 
+	/**
+	 * @param maxTravelTimeAlpha
+	 *            -- {@value #MAX_TRAV_BETA_EXP}
+	 */
 	@StringSetter(MAX_TRAVEL_TIME_BETA)
 	public void setMaxTravelTimeBeta(double maxTravelTimeBeta) {
 		this.maxTravelTimeBeta = maxTravelTimeBeta;
 	}
 
-	@StringGetter(A_STAR_EUCLIDEAN_OVERDO_FACTOR)
-	public double getAStarEuclideanOverdoFactor() {
-		return AStarEuclideanOverdoFactor;
-	}
-
-	@StringSetter(A_STAR_EUCLIDEAN_OVERDO_FACTOR)
-	public void setAStarEuclideanOverdoFactor(double aStarEuclideanOverdoFactor) {
-		AStarEuclideanOverdoFactor = aStarEuclideanOverdoFactor;
-	}
-
+	/**
+	 * @return -- {@value #CHANGE_START_EXP}
+	 */
 	@StringGetter(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE)
 	public boolean isChangeStartLinkToLastLinkInSchedule() {
 		return changeStartLinkToLastLinkInSchedule;
 	}
 
 	/**
-	 * @return the kNearestVehicles
+	 * @param changeStartLinkToLastLinkInSchedule
+	 *            -- {@value #CHANGE_START_EXP}
 	 */
-	@StringGetter(K_NEAREST_VEHICLES)
-	public int getKNearestVehicles() {
-		return kNearestVehicles;
-	}
-
-	/**
-	 * @param kNearestVehicles
-	 *            the kNearestVehicles to set
-	 */
-	@StringSetter(K_NEAREST_VEHICLES)
-	public void setkNearestVehicles(int kNearestVehicles) {
-		this.kNearestVehicles = kNearestVehicles;
-	}
-
 	@StringSetter(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE)
 	public void setChangeStartLinkToLastLinkInSchedule(boolean changeStartLinkToLastLinkInSchedule) {
 		this.changeStartLinkToLastLinkInSchedule = changeStartLinkToLastLinkInSchedule;
 	}
 
+	/**
+	 * @return -- {@value #VEH_FILE_EXP}
+	 */
 	@StringGetter(VEHICLES_FILE)
 	public String getVehiclesFile() {
 		return vehiclesFile;
 	}
 
+	/**
+	 * @param vehiclesFile
+	 *            -- {@value #VEH_FILE_EXP}
+	 */
 	@StringSetter(VEHICLES_FILE)
 	public void setVehiclesFile(String vehiclesFile) {
 		this.vehiclesFile = vehiclesFile;
 	}
 
+	/**
+	 * @return -- {@value #VEH_FILE_EXP}
+	 */
 	public URL getVehiclesFileUrl(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.vehiclesFile);
 	}
 
-	@StringGetter(REBALANCING_INTERVAL)
-	public int getRebalancingInterval() {
-		return rebalancingInterval;
-	}
-
-	@StringSetter(REBALANCING_INTERVAL)
-	public void setRebalancingInterval(int rebalancingInterval) {
-		this.rebalancingInterval = rebalancingInterval;
-	}
-
+	/**
+	 * @return -- {@value #IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP}}
+	 */
 	@StringGetter(IDLE_VEHICLES_RETURN_TO_DEPOTS)
 	public boolean getIdleVehiclesReturnToDepots() {
 		return idleVehiclesReturnToDepots;
 	}
 
+	/**
+	 * @param idleVehiclesReturnToDepots
+	 *            -- {@value #IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP}
+	 */
 	@StringSetter(IDLE_VEHICLES_RETURN_TO_DEPOTS)
 	public void setIdleVehiclesReturnToDepots(boolean idleVehiclesReturnToDepots) {
 		this.idleVehiclesReturnToDepots = idleVehiclesReturnToDepots;
 	}
 
+	/**
+	 * @return -- {@value #OP_SCHEME_EXP}
+	 */
 	@StringGetter(OPERATIONAL_SCHEME)
 	public OperationalScheme getOperationalScheme() {
 		return operationalScheme;
 	}
 
+	/**
+	 * @param operationalScheme
+	 *            -- {@value #OP_SCHEME_EXP}
+	 */
 	@StringSetter(OPERATIONAL_SCHEME)
 	public void setOperationalScheme(String operationalScheme) {
 
 		this.operationalScheme = OperationalScheme.valueOf(operationalScheme);
 	}
 
+	/**
+	 * @return -- {@value #TRANSIT_STOP_FILE_EXP}
+	 */
 	@StringGetter(TRANSIT_STOP_FILE)
 	public String getTransitStopFile() {
 		return transitStopFile;
 	}
 
+	/**
+	 * @return -- {@value #TRANSIT_STOP_FILE_EXP}
+	 */
 	public URL getTransitStopsFileUrl(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.transitStopFile);
 	}
 
+	/**
+	 * @param-- {@value #TRANSIT_STOP_FILE_EXP}
+	 */
 	@StringSetter(TRANSIT_STOP_FILE)
 	public void setTransitStopFile(String transitStopFile) {
 		this.transitStopFile = transitStopFile;
 	}
 
+	/**
+	 * @return -- {@value #MAX_WALK_EXP}
+	 */
 	@StringGetter(MAX_WALK_DISTANCE)
 	public double getMaxWalkDistance() {
 		return maxWalkDistance;
 	}
 
+	/**
+	 * @param-- {@value #MAX_WALK_EXP}
+	 */
 	@StringSetter(MAX_WALK_DISTANCE)
 	public void setMaxWalkDistance(double maximumWalkDistance) {
 		this.maxWalkDistance = maximumWalkDistance;
 	}
 
+	/**
+	 * 
+	 * @return -- {@value #ESTIMATED_DRT_SPEED_EXP}
+	 */
 	@StringGetter(ESTIMATED_DRT_SPEED)
 	public double getEstimatedDrtSpeed() {
 		return estimatedDrtSpeed;
 	}
 
+	/**
+	 * @param-- {@value #ESTIMATED_DRT_SPEED_EXP}
+	 */
 	@StringSetter(ESTIMATED_DRT_SPEED)
 	public void setEstimatedSpeed(double estimatedSpeed) {
 		this.estimatedDrtSpeed = estimatedSpeed;
 	}
 
+	/**
+	 * @return -- {@value #ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP}
+	 */
 	@StringGetter(ESTIMATED_BEELINE_DISTANCE_FACTOR)
 	public double getEstimatedBeelineDistanceFactor() {
 		return estimatedBeelineDistanceFactor;
 	}
 
+	/**
+	 * @param-- {@value #ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP}
+	 */
 	@StringSetter(ESTIMATED_BEELINE_DISTANCE_FACTOR)
 	public void setEstimatedBeelineDistanceFactor(double estimatedBeelineDistanceFactor) {
 		this.estimatedBeelineDistanceFactor = estimatedBeelineDistanceFactor;
 	}
 
+	/**
+	 * @return -- {@value #CUST_STATS_EXP}
+	 */
 	@StringGetter(PLOT_CUST_STATS)
 	public boolean isPlotDetailedCustomerStats() {
 		return plotDetailedCustomerStats;
 	}
 
+	/**
+	 * @param --
+	 *            {@value #CUST_STATS_EXP}
+	 */
 	@StringSetter(PLOT_CUST_STATS)
 	public void setPlotDetailedCustomerStats(boolean plotDetailedCustomerStats) {
 		this.plotDetailedCustomerStats = plotDetailedCustomerStats;
 	}
 
+	/**
+	 * @return -- {@value #VEH_STATS_EXP}
+	 */
 	@StringGetter(PLOT_VEH_STATS)
 	public boolean isPlotDetailedVehicleStats() {
 		return plotDetailedVehicleStats;
 	}
 
+	/**
+	 * @param-- {@value #VEH_STATS_EXP}
+	 */
 	@StringSetter(PLOT_VEH_STATS)
 	public void setPlotDetailedVehicleStats(boolean plotDetailedVehicleStats) {
 		this.plotDetailedVehicleStats = plotDetailedVehicleStats;
 	}
 
+	/**
+	 * @return -- {@value #NUMBER_OF_THREADS_EXP}
+	 */
 	@StringGetter(NUMBER_OF_THREADS)
 	public int getNumberOfThreads() {
 		return numberOfThreads;
 	}
 
+	/**
+	 * @param-- {@value #NUMBER_OF_THREADS_EXP}
+	 */
 	@StringSetter(NUMBER_OF_THREADS)
 	public void setNumberOfThreads(final int numberOfThreads) {
 		this.numberOfThreads = numberOfThreads;
 	}
 
+	/**
+	 * @return -- {@value #PRINT_WARNINGS_EXP}
+	 */
 	@StringGetter(PRINT_WARNINGS)
 	public boolean isPrintDetailedWarnings() {
 		return printDetailedWarnings;
 	}
 
+	/**
+	 * @param --
+	 *            {@value #PRINT_WARNINGS_EXP}
+	 */
 	@StringSetter(PRINT_WARNINGS)
 	public void setPrintDetailedWarnings(boolean printDetailedWarnings) {
 		this.printDetailedWarnings = printDetailedWarnings;
+	}
+
+	/**
+	 * 
+	 * @return 'minCostFlowRebalancing' parameter set defined in the DRT config or null if the parameters were not
+	 *         specified
+	 */
+	@Valid
+	public MinCostFlowRebalancingParams getMinCostFlowRebalancing() {
+		Collection<? extends ConfigGroup> parameterSets = getParameterSets(MinCostFlowRebalancingParams.SET_NAME);
+		return parameterSets.isEmpty() ? null : (MinCostFlowRebalancingParams)parameterSets.iterator().next();
+	}
+
+	@Override
+	public ConfigGroup createParameterSet(String type) {
+		if (type.startsWith(MinCostFlowRebalancingParams.SET_NAME)) {
+			return new MinCostFlowRebalancingParams();
+		}
+		return super.createParameterSet(type);
 	}
 }

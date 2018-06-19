@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext.ActivityFacilityWithIndex;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
@@ -40,12 +40,12 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 	private final ActivityFacilityWithIndex[] typedFacilities;
 	private final DestinationScoring scorer;
 	private final DestinationSampler sampler;
-	private final DestinationChoiceBestResponseContext lcContext;
+	private final DestinationChoiceContext lcContext;
 	private final Id<Link> dummyLinkId = Id.createLinkId(1);
 	private final DummyActivity dummyActivity = new DummyActivity(this.dummyLinkId); 
 	
 	public ComputeMaxDCScorePlanAlgo(final String type, final ActivityFacilityWithIndex[] typedFacilities,
-			final DestinationScoring scorer, final DestinationSampler sampler, final DestinationChoiceBestResponseContext lcContext) {		
+			final DestinationScoring scorer, final DestinationSampler sampler, final DestinationChoiceContext lcContext) {
 		this.type = type;
 		this.typedFacilities = typedFacilities;
 		this.scorer = scorer;

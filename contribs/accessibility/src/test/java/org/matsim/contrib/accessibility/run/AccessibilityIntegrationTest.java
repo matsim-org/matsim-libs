@@ -45,15 +45,17 @@ import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityOption;
-import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -65,45 +67,88 @@ public class AccessibilityIntegrationTest {
 
 	private static final Logger LOG = Logger.getLogger(AccessibilityIntegrationTest.class);
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-
-	@SuppressWarnings("static-method")
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();	
+	
 	@Test
-	public void testMainMethod() {
-		Config config = ConfigUtils.createConfig();
-		final AccessibilityConfigGroup acg = new AccessibilityConfigGroup();
-		acg.setCellSizeCellBasedAccessibility(100);
-		config.addModule(acg);
+	public void testRunAccessibilityExample() {
+		Config config = ConfigUtils.loadConfig("./examples/RunAccessibilityExample/config.xml");
+		
+		AccessibilityConfigGroup accConfig = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		org.matsim.contrib.accessibility.run.RunAccessibilityExample.run(scenario);
+		
+		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
+		tabFileParserConfig.setFileName("./output/work/accessibilities.csv");
+		tabFileParserConfig.setDelimiterRegex(",");
+        new TabularFileParser().parse(tabFileParserConfig, new TabularFileHandler() {
+        	double x, y, value;
 
-		config.controler().setLastIteration(1);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-
-		Network network = CreateTestNetwork.createTestNetwork();
-
-		ScenarioUtils.ScenarioBuilder builder = new ScenarioUtils.ScenarioBuilder(config) ;
-		builder.setNetwork(network);
-		Scenario sc = builder.build() ;
-
-		// creating test opportunities (facilities)
-		ActivityFacilities opportunities = sc.getActivityFacilities();
-		for ( Link link : sc.getNetwork().getLinks().values() ) {
-			Id<ActivityFacility> id = Id.create(link.getId(), ActivityFacility.class);
-			Coord coord = link.getCoord();
-			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
-			{
-				ActivityOption option = new ActivityOptionImpl("w") ;
-				facility.addActivityOption(option);
-			}
-			{
-				ActivityOption option = new ActivityOptionImpl("h") ;
-				facility.addActivityOption(option);
-			}
-			opportunities.addActivityFacility(facility);
-		}
-
-		org.matsim.contrib.accessibility.run.RunAccessibilityExample.run(sc);
+            public void startRow(String[] row) {
+            	if (row.length == 3) {
+	            	x = Double.parseDouble(row[0]);
+	            	x = Double.parseDouble(row[1]);
+	            	value = Double.parseDouble(row[2]);
+	            	
+	            	if (x == 50) {
+	            		if (y == 50) {
+	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", value, 2.1486094237531126, utils.EPSILON);
+	            		} else if (y == 150){
+	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", value, 2.1766435716006005, utils.EPSILON);
+	            		} 
+	            	} else if (x == 150) {
+	            		if (y == 50) {
+	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", value, 2.1486094237531126, utils.EPSILON);
+	            		} else if (y == 150){
+	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", value, 2.2055702759681273, utils.EPSILON);
+	            		}
+	            	}
+            	}
+            }
+        });
 	}
+	
+	
+	@Test
+	public void testWithBoundingBoxConfigFile() {
+		Config config = ConfigUtils.loadConfig(utils.getInputDirectory() + "config.xml");
 
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, true);
+
+		ModeParams ptParams = new ModeParams(TransportMode.transit_walk);
+		config.planCalcScore().addModeParams(ptParams);
+		
+		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class) ;
+		
+		final Scenario sc = ScenarioUtils.loadScenario(config);
+		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
+		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
+		
+		Controler controler = new Controler(sc);
+
+		final AccessibilityModule module = new AccessibilityModule();
+		final EvaluateTestResults evaluateListener = new EvaluateTestResults(false);
+		module.addSpatialGridDataExchangeListener(evaluateListener);
+		controler.addOverridingModule(module);
+		controler.addOverridingModule(new AbstractModule() {			
+			@Override
+			public void install() {
+				bind(PtMatrix.class).toInstance(ptMatrix);
+			}
+		});
+		controler.run();
+
+		// Compare some results -> done in EvaluateTestResults. Check here that this was done at all
+		Assert.assertTrue( evaluateListener.isDone() ) ;
+	}
+	
 
 	@Test
 	public void testWithBoundingBox() {
@@ -344,6 +389,7 @@ public class AccessibilityIntegrationTest {
 			ActivityFacility facility = opportunities.getFactory().createActivityFacility(Id.create(link.getId(), ActivityFacility.class), link.getCoord());
 			opportunities.addActivityFacility(facility);
 		}
+		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.setInScenario);
 		return scenario;
 	}
 	
@@ -358,6 +404,7 @@ public class AccessibilityIntegrationTest {
 			facility.getCustomAttributes().put("weight", 2.);
 			opportunities.addActivityFacility(facility);
 		}
+		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.setInScenario);
 		return scenario;
 	}
 

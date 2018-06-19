@@ -19,21 +19,19 @@
 
 package org.matsim.core.config;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Iterator;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
+import org.matsim.core.config.ConfigWriter.Verbosity;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.File;
+import java.net.URL;
+import java.util.Iterator;
 
 /**
  * @author mrieser
@@ -44,11 +42,8 @@ import org.matsim.core.utils.io.UncheckedIOException;
  */
 public abstract class ConfigUtils implements MatsimExtensionPoint {
 
-	public static Config createConfig(final String filename) {
-		// are there systematic arguments against such a method?  otherwise, users will return to new Controler( filename ), since that
-		// is easier to memorize. kai, jul'16
-		
-		URL url = IOUtils.getUrlFromFileOrResource(filename) ;
+	public static Config createConfig(final String context) {
+		URL url = IOUtils.getUrlFromFileOrResource(context) ;
 		return createConfig( url ) ;
 	}
 
@@ -104,9 +99,27 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	 */
 	public static void loadConfig(final Config config, final String filename) throws UncheckedIOException {
 		if (config.global() == null) {
+			// if the config does not exist yet, we interpret the file name as is:
 			config.addCoreModules();
+			new ConfigReader(config).readFile(filename);
+		} else {
+			// if the config does already exist, this can be used to read a second config file to override
+			// settings from before, e.g. using a base config and then several case study configs.
+			// In this case, using the above syntax generates inconsistent behavior between
+			// gui and command line: command line takes the config file from the java root,
+			// while the gui takes it from the config file root.  The following syntax should
+			// now also take it from the config file root when it is called from the command line
+			// (same as in other places: we are making the command line behavior
+			// and GUI behavior consistent).
+			// kai, jan'18
+//			URL url = ConfigGroup.getInputFileURL(config.getContext(), filename);;
+//			new ConfigReader(config).parse(url) ;
+			// yyyyyy the above probably works, but has ramifications across many test
+			// cases.  Need to discuss first (and then find some time again).
+			// See MATSIM-776 and MATSIM-777.  kai, feb'18
+			
+			new ConfigReader(config).readFile(filename);
 		}
-		new ConfigReader(config).readFile(filename);
 	}
 
 	public static void loadConfig(final Config config, final URL url) throws UncheckedIOException {
@@ -187,8 +200,11 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	
 	
 	/** 
-	 * Convenience method to all addOrGetModule with only two arguments.  
-	 * 
+	 * Convenience method to all addOrGetModule with only two arguments.
+	 * <br/>
+	 * Notes:<ul>
+	 * <li>Seems to be really slow, so don't use in inner loop.</li>
+	 * </ul>
 	 * @param config
 	 * @param moduleClass
 	 * @return instance of moduleClass inside config
@@ -209,6 +225,10 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	 * method with
 	 * ConfigUtils.addOrGetModule(this, VspExperimentalConfigGroup.GROUP_NAME, VspExperimentalConfigGroup.class)
 	 * and then hit Refactor/Inline.
+	 * <br/>
+	 * Notes:<ul>
+	 * <li>Seems to be really slow, so don't use in inner loop.</li>
+	 * </ul>
 	 */
 	public static <T extends ConfigGroup> T addOrGetModule(Config config, String groupName, Class<T> moduleClass) {
 		ConfigGroup module = config.getModule(groupName);
@@ -229,5 +249,12 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
+	}
+	
+	public static void writeConfig( final Config config, String filename ) {
+		new ConfigWriter(config).write(filename);
+	}
+	public static void writeMinimalConfig( final Config config, String filename ) {
+		new ConfigWriter(config,Verbosity.minimal).write(filename);
 	}
 }

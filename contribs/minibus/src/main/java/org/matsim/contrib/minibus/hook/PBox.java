@@ -47,8 +47,8 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -259,7 +259,7 @@ public final class PBox implements POperators {
 	}
 
 	private void writeScheduleToFile(TransitSchedule schedule, String iterationFilename) {
-		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(schedule);
-		writer.write(iterationFilename);		
+		TransitScheduleWriter writer = new TransitScheduleWriter(schedule);
+		writer.writeFile(iterationFilename);
 	}
 }

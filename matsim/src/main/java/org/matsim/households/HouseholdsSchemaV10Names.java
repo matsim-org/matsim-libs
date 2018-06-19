@@ -35,5 +35,7 @@ public interface HouseholdsSchemaV10Names {
 	public final static String PERIOD = "period";
 	public final static String VEHICLEDEFINITIONID = "vehicleDefinitionId";
 	public final static String VEHICLES = "vehicles";
-	
+	public final static String ATTRIBUTES = "attributes";
+	public final static String ATTRIBUTE = "attribute";
+
 }

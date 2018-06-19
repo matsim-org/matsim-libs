@@ -74,6 +74,8 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingWalk is > 0. This values specifies a utility. " +
 			"Typically, this should be a disutility, i.e. have a negative value.");
 		}
+		
+			
 		ActivityParams ptAct = c.planCalcScore().getActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE) ;
 		if ( ptAct != null ) {
 //			if ( ptAct.getClosingTime()!=0. && ptAct.getClosingTime()!=Time.UNDEFINED_TIME ) {
@@ -89,6 +91,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 				}
 			}
 		}
+		
 	}
 
 	private static void checkEventsFormatLanesSignals(final Config c) {

@@ -5,9 +5,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorImpl;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
-import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
+import org.matsim.contrib.pseudosimulation.mobsim.PSimProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -34,9 +34,9 @@ import java.util.Collection;
 public class ChoiceGenerationControler implements BeforeMobsimListener{
 
         final WaitTimeStuckCalculator waitTimeCalculator;
-        final StopStopTimeCalculator stopStopTimeCalculator;
+        final StopStopTimeCalculatorImpl stopStopTimeCalculator;
         final TravelTimeCalculator travelTimeCalculator;
-    private final PSimFactory pSimFactory;
+    private PSimProvider pSimProvider;
     Config config;
         Controler controler;
         Scenario scenario;
@@ -53,7 +53,7 @@ public ChoiceGenerationControler(String[] args) {
             controler.getScenario().getTransitSchedule(),
             controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(),
             (int) (controler.getConfig().qsim().getEndTime() - controler.getConfig().qsim().getStartTime()));
-    stopStopTimeCalculator = new StopStopTimeCalculator(
+    stopStopTimeCalculator = new StopStopTimeCalculatorImpl(
             controler.getScenario().getTransitSchedule(),
             controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(),
             (int) (controler.getConfig().qsim().getEndTime() - controler.getConfig().qsim().getStartTime()));
@@ -61,8 +61,8 @@ public ChoiceGenerationControler(String[] args) {
         @Override
         public void install() {
             bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(),
-                    waitTimeCalculator.getWaitTimes(),
-                    stopStopTimeCalculator.getStopStopTimes()));
+                    waitTimeCalculator.get(),
+                    stopStopTimeCalculator.get()));
         }
     });
     //    controler.setScoringFunctionFactory(
@@ -77,14 +77,13 @@ public ChoiceGenerationControler(String[] args) {
     eventsManager.addHandler(travelTimeCalculator);
     reader.readFile(args[1]);
 
-    pSimFactory = new PSimFactory(scenario, eventsManager);
     controler.addOverridingModule(new AbstractModule() {
         @Override
         public void install() {
             bindMobsim().toProvider(new Provider<Mobsim>() {
                 @Override
                 public Mobsim get() {
-                    return pSimFactory.createMobsim(controler.getScenario(), controler.getEvents());
+                    return pSimProvider.createMobsim(controler.getScenario(), controler.getEvents());
                 }
             });
         }
@@ -106,9 +105,8 @@ public ChoiceGenerationControler(String[] args) {
         for(Person person:controler.getScenario().getPopulation().getPersons().values()){
             plans.add(person.getSelectedPlan());
         }
-        pSimFactory.setWaitTime(waitTimeCalculator.getWaitTimes());
-        pSimFactory.setTravelTime(travelTimeCalculator.getLinkTravelTimes());
-        pSimFactory.setStopStopTime(stopStopTimeCalculator.getStopStopTimes());
-        pSimFactory.setPlans(plans);
+        pSimProvider.setWaitTime(waitTimeCalculator.get());
+        pSimProvider.setTravelTime(travelTimeCalculator.getLinkTravelTimes());
+        pSimProvider.setStopStopTime(stopStopTimeCalculator.get());
     }
 }

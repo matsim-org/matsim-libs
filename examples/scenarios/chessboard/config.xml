@@ -12,6 +12,7 @@
 
 	<module name="facilities">
 		<param name="inputFacilitiesFile" value="facilities.xml" />
+		<param name="facilitiesSource" value="fromFile"/>
 	</module>
 
 	<module name="plans">

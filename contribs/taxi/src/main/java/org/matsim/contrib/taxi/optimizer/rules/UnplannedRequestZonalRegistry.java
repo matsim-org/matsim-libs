@@ -19,10 +19,10 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
@@ -71,20 +71,10 @@ public class UnplannedRequestZonalRegistry {
 		requestCount--;
 	}
 
-	public List<TaxiRequest> findNearestRequests(Node node, int minCount) {
-		Zone zone = zonalSystem.getZone(node);
-		Iterable<? extends Zone> zonesByDistance = zonesSortedByDistance.get(zone.getId());
-		List<TaxiRequest> nearestReqs = new ArrayList<>();
-
-		for (Zone z : zonesByDistance) {
-			nearestReqs.addAll(requestsInZones.get(z.getId()).values());
-
-			if (nearestReqs.size() >= minCount) {
-				return nearestReqs;
-			}
-		}
-
-		return nearestReqs;
+	public Stream<TaxiRequest> findNearestRequests(Node node, int minCount) {
+		return zonesSortedByDistance.get(zonalSystem.getZone(node).getId()).stream()//
+				.flatMap(z -> requestsInZones.get(z.getId()).values().stream())//
+				.limit(minCount);
 	}
 
 	private Id<Zone> getZoneId(TaxiRequest request) {

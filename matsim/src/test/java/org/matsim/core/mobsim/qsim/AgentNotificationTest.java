@@ -32,7 +32,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.utils.EventsCollector;
@@ -41,6 +40,7 @@ import org.matsim.vehicles.Vehicle;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -241,22 +241,18 @@ public class AgentNotificationTest {
 		plugins.add(new AbstractQSimPlugin(scenario.getConfig()) {
 			@Override
 			public Collection<? extends AbstractModule> modules() {
-				Collection<AbstractModule> result = new ArrayList<>();
-				result.add(new AbstractModule() {
+				return Collections.singletonList(new AbstractModule() {
 					@Override
 					public void configure() {
 						bind(PopulationAgentSource.class).asEagerSingleton();
 						bind(AgentFactory.class).to(MyAgentFactory.class).asEagerSingleton();
 					}
 				});
-				return result;
 			}
 
 			@Override
 			public Collection<Class<? extends AgentSource>> agentSources() {
-				Collection<Class<? extends AgentSource>> result = new ArrayList<>();
-				result.add(PopulationAgentSource.class);
-				return result;
+				return Collections.singletonList(PopulationAgentSource.class);
 			}
 		});
 		EventsManager eventsManager = EventsUtils.createEventsManager();

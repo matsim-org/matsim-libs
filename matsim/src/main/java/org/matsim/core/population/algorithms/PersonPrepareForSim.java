@@ -21,7 +21,6 @@
 package org.matsim.core.population.algorithms;
 
 import java.util.HashSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,6 +34,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.facilities.ActivityFacilities;
 
 /**
  * Performs several checks that persons are ready for a mobility simulation.
@@ -53,6 +53,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	private final PlanAlgorithm router;
 	private final XY2Links xy2links;
 	private final Network network;
+	private final ActivityFacilities activityFacilities;
 
 	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
 
@@ -69,6 +70,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			throw new RuntimeException("Expected carOnlyNetwork not to be multi-modal. Aborting!");
 		}
 		this.xy2links = new XY2Links(carOnlyNetwork, scenario.getActivityFacilities());
+		this.activityFacilities = scenario.getActivityFacilities();
 	}
 	
 	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario) {
@@ -85,6 +87,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			filter.filter(net, modes);
 		}
 		this.xy2links = new XY2Links(net, scenario.getActivityFacilities());
+		this.activityFacilities = scenario.getActivityFacilities();
 	}
 
 	@Override
@@ -104,10 +107,10 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
-					if (act.getLinkId() == null) {
-						needsXY2Links = true;
-						needsReRoute = true;
-						break;
+					if ( act.getLinkId() == null ) {
+					    	needsXY2Links = true;
+							needsReRoute = true;
+							break;
 					}
 				} else if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;

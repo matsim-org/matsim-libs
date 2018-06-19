@@ -16,25 +16,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import jsprit.core.problem.Location;
-import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.VehicleRoutingProblem.FleetSize;
-import jsprit.core.problem.cost.VehicleRoutingActivityCosts;
-import jsprit.core.problem.cost.VehicleRoutingTransportCosts;
-import jsprit.core.problem.job.Service;
-import jsprit.core.problem.job.Service.Builder;
-import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import jsprit.core.problem.solution.route.VehicleRoute;
-import jsprit.core.problem.solution.route.activity.PickupService;
-import jsprit.core.problem.solution.route.activity.ServiceActivity;
-import jsprit.core.problem.solution.route.activity.TourActivity;
-import jsprit.core.problem.solution.route.activity.TourActivity.JobActivity;
-import jsprit.core.problem.vehicle.Vehicle;
-import jsprit.core.problem.vehicle.VehicleImpl;
-import jsprit.core.problem.vehicle.VehicleType;
-import jsprit.core.problem.vehicle.VehicleTypeImpl;
-import jsprit.core.util.Coordinate;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -53,6 +34,26 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
+
+import com.graphhopper.jsprit.core.problem.Location;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem.FleetSize;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
+import com.graphhopper.jsprit.core.problem.job.Service;
+import com.graphhopper.jsprit.core.problem.job.Service.Builder;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.PickupService;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.ServiceActivity;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivities;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity.JobActivity;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
+import com.graphhopper.jsprit.core.util.Coordinate;
 
 
 /**
@@ -82,7 +83,7 @@ public class MatsimJspritFactory {
 		Builder serviceBuilder = Service.Builder.newInstance(carrierService.getId().toString());
 		serviceBuilder.addSizeDimension(0, carrierService.getCapacityDemand());
 		serviceBuilder.setLocation(location).setServiceTime(carrierService.getServiceDuration())
-			.setTimeWindow(jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(carrierService.getServiceStartTimeWindow().getStart(), carrierService.getServiceStartTimeWindow().getEnd()));
+			.setTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(carrierService.getServiceStartTimeWindow().getStart(), carrierService.getServiceStartTimeWindow().getEnd()));
 		return serviceBuilder.build();
 	}
 	
@@ -157,7 +158,7 @@ public class MatsimJspritFactory {
 	static CarrierVehicleType createCarrierVehicleType(VehicleType type){
 		CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create(type.getTypeId(), org.matsim.vehicles.VehicleType.class));
 		typeBuilder.setCapacity(type.getCapacityDimensions().get(0));
-		typeBuilder.setCostPerDistanceUnit(type.getVehicleCostParams().perDistanceUnit).setCostPerTimeUnit(type.getVehicleCostParams().perTimeUnit)
+		typeBuilder.setCostPerDistanceUnit(type.getVehicleCostParams().perDistanceUnit).setCostPerTimeUnit(type.getVehicleCostParams().perTransportTimeUnit)
 		.setFixCost(type.getVehicleCostParams().fix);
 		typeBuilder.setMaxVelocity(type.getMaxVelocity());
 		return typeBuilder.build();
@@ -172,7 +173,7 @@ public class MatsimJspritFactory {
 		VehicleTypeImpl.Builder typeBuilder = VehicleTypeImpl.Builder.newInstance(carrierVehicleType.getId().toString());
 		typeBuilder.addCapacityDimension(0, carrierVehicleType.getCarrierVehicleCapacity());
 		typeBuilder.setCostPerDistance(carrierVehicleType.getVehicleCostInformation().perDistanceUnit);
-		typeBuilder.setCostPerTime(carrierVehicleType.getVehicleCostInformation().perTimeUnit);
+		typeBuilder.setCostPerTransportTime(carrierVehicleType.getVehicleCostInformation().perTimeUnit);
 		typeBuilder.setFixedCost(carrierVehicleType.getVehicleCostInformation().fix);
 		typeBuilder.setMaxVelocity(carrierVehicleType.getMaximumVelocity());
 		return typeBuilder.build();
@@ -187,12 +188,12 @@ public class MatsimJspritFactory {
 	 */
 	public static ScheduledTour createTour(VehicleRoute route) {
 		assert route.getDepartureTime() == route.getStart().getEndTime() : "at this point route.getDepartureTime and route.getStart().getEndTime() must be equal";
-		jsprit.core.problem.solution.route.activity.TourActivities tour = route.getTourActivities();
+		TourActivities tour = route.getTourActivities();
 		CarrierVehicle carrierVehicle = createCarrierVehicle(route.getVehicle());	
 		double depTime = route.getStart().getEndTime();
  
 		Tour.Builder tourBuilder = Tour.Builder.newInstance();
-		tourBuilder.scheduleStart(Id.create(route.getStart().getLocationId(), Link.class));
+		tourBuilder.scheduleStart(Id.create(route.getStart().getLocation().getId(), Link.class));
 		for (TourActivity act : tour.getActivities()) {
 			if(act instanceof ServiceActivity || act instanceof PickupService){
 				Service job = (Service) ((JobActivity) act).getJob();				 
@@ -205,7 +206,7 @@ public class MatsimJspritFactory {
 			}
 		}
 		tourBuilder.addLeg(new Leg());
-		tourBuilder.scheduleEnd(Id.create(route.getEnd().getLocationId(), Link.class));
+		tourBuilder.scheduleEnd(Id.create(route.getEnd().getLocation().getId(), Link.class));
 		org.matsim.contrib.freight.carrier.Tour vehicleTour = tourBuilder.build();
 		ScheduledTour sTour = ScheduledTour.newInstance(vehicleTour, carrierVehicle, depTime);
 		assert route.getDepartureTime() == sTour.getDeparture() : "departureTime of both route and scheduledTour must be equal";
@@ -233,11 +234,11 @@ public class MatsimJspritFactory {
 		CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 		double depTime = scheduledTour.getDeparture();
 		Tour tour = scheduledTour.getTour();
-        Id vehicleId = carrierVehicle.getVehicleId();
+        Id<org.matsim.vehicles.Vehicle> vehicleId = carrierVehicle.getVehicleId();
         Vehicle jspritVehicle = getVehicle(vehicleId.toString(),vehicleRoutingProblem);
 		if(jspritVehicle == null) throw new IllegalStateException("jsprit-vehicle to id=" + vehicleId.toString() + " is missing");
 
-		jsprit.core.problem.solution.route.VehicleRoute.Builder routeBuilder = VehicleRoute.Builder.newInstance(jspritVehicle);
+		VehicleRoute.Builder routeBuilder = VehicleRoute.Builder.newInstance(jspritVehicle);
 		routeBuilder.setJobActivityFactory(vehicleRoutingProblem.getJobActivityFactory());
         routeBuilder.setDepartureTime(depTime);
 

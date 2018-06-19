@@ -4,7 +4,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
@@ -23,28 +23,22 @@ public class PassengerEnginePlugin extends AbstractQSimPlugin {
 
 	@Override
 	public Collection<? extends Module> modules() {
-		Collection<Module> result = new ArrayList<>();
-		result.add(new AbstractModule() {
+		return Collections.singletonList(new AbstractModule() {
 			@Override
 			public void configure() {
 				bind(PassengerEngine.class).toProvider(new PassengerEngineProvider(mode)).asEagerSingleton();
 			}
 		});
-		return result;
 	}
 
 	@Override
 	public Collection<Class<? extends DepartureHandler>> departureHandlers() {
-		Collection<Class<? extends DepartureHandler>> result = new ArrayList<>();
-		result.add(PassengerEngine.class);
-		return result;
+		return Collections.singletonList(PassengerEngine.class);
 	}
 
 	@Override
 	public Collection<Class<? extends MobsimEngine>> engines() {
-		Collection<Class<? extends MobsimEngine>> result = new ArrayList<>();
-		result.add(PassengerEngine.class);
-		return result;
+		return Collections.singletonList(PassengerEngine.class);
 	}
 
 	public static class PassengerEngineProvider implements Provider<PassengerEngine> {
@@ -57,7 +51,7 @@ public class PassengerEnginePlugin extends AbstractQSimPlugin {
 		@Inject
 		private VrpOptimizer optimizer;
 		@Inject
-		@Named(DvrpModule.DVRP_ROUTING)
+		@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
 		private Network network;
 
 		public PassengerEngineProvider(String mode) {

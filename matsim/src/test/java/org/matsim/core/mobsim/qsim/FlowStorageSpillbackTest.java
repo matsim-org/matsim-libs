@@ -200,7 +200,11 @@ public class FlowStorageSpillbackTest {
 		act2.setEndTime(99);
 		plan2.addActivity(act2);
 		plan2.addLeg(leg_2_4);
-		plan2.addActivity(lastActLink4);
+
+		Activity lastActLink4_testAgent2 = popFactory.createActivityFromLinkId("work", linkId4);
+		PopulationUtils.copyFromTo(lastActLink4, lastActLink4_testAgent2);
+
+		plan2.addActivity(lastActLink4_testAgent2);
 		person2.addPlan(plan2);
 		population.addPerson(person2);			
 		
@@ -226,7 +230,11 @@ public class FlowStorageSpillbackTest {
 		act4.setEndTime(100);
 		plan4.addActivity(act4);
 		plan4.addLeg(leg_1_3_testAgent4);
-		plan4.addActivity(lastActLink3);	
+
+		Activity lastActLink3_testAgent4 = popFactory.createActivityFromLinkId("work", linkId3);
+		PopulationUtils.copyFromTo(lastActLink3, lastActLink3_testAgent4);
+
+		plan4.addActivity(lastActLink3_testAgent4);
 		person4.addPlan(plan4);
 		population.addPerson(person4);
 

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.io;
 
-import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml.v_2_2_0.PlacemarkType;
 
 /**
  * A KMLObjectDetail allows to add further attributes to a placemark (e.g. that

@@ -20,19 +20,25 @@
 
 package org.matsim.pt.router;
 
+import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
+import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.*;
 
 /**
  * This class is based on and similar to org.matsim.pt.router.MultiNodeDijkstra
@@ -181,6 +187,136 @@ public class TransitLeastCostPathTree {
 	}
 
 	/**
+	 * Method to request the passenger route from the (cached) fromNodes to the passed toNodes.
+	 * Should only be requested after calling createTransitLeastCostPathTree().
+	 *
+	 * @param toNodes
+	 *          The nodes that are the next stops to the toCoord and you like to route to.
+	 *
+	 * @return
+	 *          the transitPassengerRoute between the fromNode and the toNode.
+	 *          Will be null if the route could not be found.
+	 */
+	public TransitPassengerRoute getTransitPassengerRoute(final Map<Node, InitialNode> toNodes) {
+		//find the best node
+		double minCost = Double.POSITIVE_INFINITY;
+		Node minCostNode = null;
+		for (Map.Entry<Node,InitialNode> e : toNodes.entrySet()) {
+			Node currentNode = e.getKey();
+			DijkstraNodeData r = this.nodeData.get(currentNode.getId());
+			if (r == null) {
+				expandNodeData(toNodes);
+			}
+			DijkstraNodeData data = getData(currentNode);
+			InitialNode initData = e.getValue();
+			double cost = data.getCost() + initData.initialCost;
+			if (data.getCost() != 0.0 || fromNodes.containsKey(currentNode)) {
+				if (cost < minCost) {
+					minCost = cost;
+					minCostNode = currentNode;
+				}
+			}
+		}
+
+		if (minCostNode == null) {
+			return null;
+		}
+
+		// now construct route segments, which are required for TransitPassengerRoute
+		List<RouteSegment> routeSegments = new ArrayList<>();
+
+		TransitRouterNetworkLink link = (TransitRouterNetworkLink) getData(minCostNode).getPrevLink();
+		TransitRouterNetworkLink downstreamLink = null;
+		Node previousFromNode = minCostNode;
+		double transferCost = 0.;
+
+		while (link != null) {
+			TransitRouterNetworkNode fromNode = link.fromNode;
+			TransitRouterNetworkNode toNode = link.toNode;
+
+			double travelTime = getData(toNode).getTime() - getData(fromNode).getTime();
+			Id<TransitLine> transitLineId = null;
+			Id<TransitRoute> routeId = null;
+
+			boolean isTransferLeg = false;
+			if (link.line==null) isTransferLeg = true;
+			else {
+				transitLineId = link.line.getId();
+				routeId = link.route.getId();
+			}
+
+			if (downstreamLink==null && isTransferLeg) {
+				// continuous transfers: see TransitRouterImplTest.testDoubleWalk.
+				// Another possibility is that trip start with transfer itself, see TransitRouterImplTest.testDoubleWalkOnly.
+				double tempTravelTime = 0.;
+				TransitStopFacility toStop = null;
+
+				if (routeSegments.size()==0) { // very first leg starts with transfer
+					toStop = toNode.stop.getStopFacility();
+				} else {
+					RouteSegment routeSegment = routeSegments.remove(0);
+					travelTime = routeSegment.travelTime;
+					toStop = routeSegment.toStop;
+				}
+
+				routeSegments.add(0,
+						new RouteSegment(fromNode.stop.getStopFacility(),
+						toStop,
+						tempTravelTime+travelTime,
+						transitLineId,
+						routeId));
+				//not sure, if transferCost will be included for every transfer or not. Currently, transfer cost will be accumulated for every transfer. Amit Sep'17
+			} else if (downstreamLink == null // very first pt leg or first pt leg after transfer
+					|| isTransferLeg ) {
+				routeSegments.add(0, new RouteSegment( fromNode.stop.getStopFacility(),
+						toNode.stop.getStopFacility(),
+						travelTime,
+						transitLineId,
+						routeId
+				));
+			} else if (downstreamLink.line.getId() == link.line.getId() && downstreamLink.route.getId() == link.route.getId() ){
+				//same route --> update the top routeSegment
+				RouteSegment routeSegment = routeSegments.remove(0);
+				routeSegments.add(0, new RouteSegment(fromNode.stop.getStopFacility(),
+						routeSegment.toStop,
+						routeSegment.travelTime+travelTime,
+						transitLineId,
+						routeId));
+			}
+
+			if (isTransferLeg) {
+				// transfer cost
+				if ( ! (this.costFunction instanceof  TransitRouterNetworkTravelTimeAndDisutility) ) {
+					throw new RuntimeException("TransitTravelDisutility is not instance of "+TransitRouterNetworkTravelTimeAndDisutility.class.getSimpleName()
+					+". An acc ");
+				}
+
+				transferCost += ((TransitRouterNetworkTravelTimeAndDisutility) this.costFunction).defaultTransferCost(link,
+						Time.UNDEFINED_TIME,null,null);
+
+				downstreamLink = null;
+			} else {
+				downstreamLink = link;
+			}
+
+			previousFromNode = fromNode;
+			link = (TransitRouterNetworkLink) getData(fromNode).getPrevLink();
+		}
+
+		DijkstraNodeData startNodeData = getData(previousFromNode);
+		DijkstraNodeData toNodeData = getData(minCostNode);
+
+		double cost = toNodeData.getCost() - startNodeData.getCost()
+				+ this.fromNodes.get(previousFromNode).initialCost
+				+ toNodes.get(minCostNode).initialCost
+				+ transferCost;
+
+		// if there is no connection found, getPath(...) return a path with nothing in it, however, I (and AN) think that it should throw null. Amit Sep'17
+		if (routeSegments.size()==0) return null;
+		else return new TransitPassengerRoute(cost, routeSegments);
+	}
+
+	/**
 	 * Method to request the path from the (cached) fromNodes to the passed toNodes.
 	 * Should only be requested after calling createTransitLeastCostPathTree().
 	 *
@@ -197,13 +333,14 @@ public class TransitLeastCostPathTree {
 		//find the best node
 		double minCost = Double.POSITIVE_INFINITY;
 		Node minCostNode = null;
-		for (Node currentNode: toNodes.keySet()) {
+		for (Map.Entry<Node, InitialNode> e : toNodes.entrySet()) {
+			Node currentNode = e.getKey();
 			DijkstraNodeData r = this.nodeData.get(currentNode.getId());
 			if (r == null) {
 				expandNodeData(toNodes);
 			}
 			DijkstraNodeData data = getData(currentNode);
-			InitialNode initData = toNodes.get(currentNode);
+			InitialNode initData = e.getValue();
 			double cost = data.getCost() + initData.initialCost;
 			if (data.getCost() != 0.0 || fromNodes.containsKey(currentNode)) {
 				if (cost < minCost) {
@@ -370,15 +507,6 @@ public class TransitLeastCostPathTree {
 	 */
 	private double getPriority(final DijkstraNodeData data) {
 		return data.getCost();
-	}
-
-	public static class InitialNode {
-		public final double initialCost;
-		public final double initialTime;
-		public InitialNode(final double initialCost, final double initialTime) {
-			this.initialCost = initialCost;
-			this.initialTime = initialTime;
-		}
 	}
 
 	/**

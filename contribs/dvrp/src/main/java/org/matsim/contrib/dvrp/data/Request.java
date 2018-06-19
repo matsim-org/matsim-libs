@@ -22,24 +22,13 @@ package org.matsim.contrib.dvrp.data;
 import org.matsim.api.core.v01.Identifiable;
 
 /**
+ * Represents a general request in DVRP.
+ * 
+ * For request rejection - adapt isRejected()
+ * 
  * @author michalm
  */
 public interface Request extends Identifiable<Request> {
-
-	/**
-	 * @return the amount of people/goods to serve/transport (see: {@link Vehicle#getCapacity()})
-	 */
-	double getQuantity();
-
-	/**
-	 * @return begining of the time window (inclusive) - earliest time when the request can be served
-	 */
-	double getEarliestStartTime();
-
-	/**
-	 * @return end of the time window (exclusive) - time by which the request should be served
-	 */
-	double getLatestStartTime();
 
 	/**
 	 * @return time at which the request was submitted
@@ -49,5 +38,12 @@ public interface Request extends Identifiable<Request> {
 	/**
 	 * @return indicates whether the request has been rejected by the service provider (optimizer/dispatcher)
 	 */
-	boolean isRejected();
+	default boolean isRejected() {
+		return false;
+	}
+
+	static String toString(Request request) {
+		return "[id=" + request.getId() + "][submissionTime=" + request.getSubmissionTime() + "][rejected="
+				+ request.isRejected() + "]";
+	}
 }

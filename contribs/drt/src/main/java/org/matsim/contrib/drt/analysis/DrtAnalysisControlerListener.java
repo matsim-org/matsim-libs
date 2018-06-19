@@ -31,6 +31,7 @@ import java.util.Locale;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -60,15 +61,17 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private boolean vheaderWritten = false;
 	private final String runId;
 	private final DecimalFormat format = new DecimalFormat();
+	private final int maxcap ;
+
 
 	/**
 	 * 
 	 */
 	@Inject
-	public DrtAnalysisControlerListener(Config config) {
+	public DrtAnalysisControlerListener(Config config, Fleet fleet) {
 		drtgroup = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
 		runId = config.controler().getRunId();
-		
+		maxcap = DynModeTripsAnalyser.findMaxCap(fleet);
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 		format.setMinimumIntegerDigits(1);
 		format.setMaximumFractionDigits(2);
@@ -102,7 +105,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		writeIterationPassengerStats(tripsSummarize+";"+drtRequestAnalyzer.getRejections().size()+";"+format.format(rejectionRate), event.getIteration());
 		double l_d= DynModeTripsAnalyser.getTotalDistance(drtPassengerStats.getVehicleDistances()) / (trips.size()*directDistanceMean);
 		String vehStats = DynModeTripsAnalyser.summarizeVehicles(drtPassengerStats.getVehicleDistances(), ";")+";"+format.format(l_d);
-		writeIterationVehicleStats(vehStats,
+		String occStats = DynModeTripsAnalyser.summarizeDetailedOccupancyStats(drtPassengerStats.getVehicleDistances(), ";", maxcap);
+		writeIterationVehicleStats(vehStats,occStats,
 				event.getIteration());
 		if (drtgroup.isPlotDetailedCustomerStats()) {
 			DynModeTripsAnalyser.collection2Text(trips,
@@ -111,8 +115,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		}
 		DynModeTripsAnalyser.writeVehicleDistances(drtPassengerStats.getVehicleDistances(),
 				matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleDistanceStats.csv"));
-		DynModeTripsAnalyser.analyseDetours(network, trips, drtgroup.getEstimatedBeelineDistanceFactor(),
-				drtgroup.getEstimatedDrtSpeed(),
+		DynModeTripsAnalyser.analyseDetours(network, trips, drtgroup,
 				matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "drt_detours"));
 		DynModeTripsAnalyser.analyseWaitTimes(
 				matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitStats"), trips, 1800);
@@ -145,14 +148,15 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	 * @param summarizeTrips
 	 * @param iteration
 	 */
-	private void writeIterationVehicleStats(String summarizeVehicles, int it) {
+	private void writeIterationVehicleStats(String summarizeVehicles,String vehOcc, int it) {
 		BufferedWriter bw = IOUtils
 				.getAppendingBufferedWriter(matsimServices.getControlerIO().getOutputFilename("drt_vehicle_stats.csv"));
 		try {
 			if (!vheaderWritten) {
-				vheaderWritten = true;
 				bw.write(
-						"runId;iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance;d_r/d_t;l_det");
+						"runId;iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance;d_r/d_t");
+				
+				bw.write(";l_det");
 
 			}
 			bw.newLine();
@@ -160,7 +164,26 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		BufferedWriter bw2 = IOUtils
+				.getAppendingBufferedWriter(matsimServices.getControlerIO().getOutputFilename("drt_detailed_distanceStats.csv"));
+		try {
+			if (!vheaderWritten) {
+				vheaderWritten = true;
+				bw2.write(
+						"runId;iteration");
+				for (int i = 0; i<=maxcap; i++) {
+					bw2.write(";"+i+" pax distance_m");
+				}
+
+			}
+			bw2.newLine();
+			bw2.write(runId+";"+ it + vehOcc);
+			bw2.flush();
+			bw2.close();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

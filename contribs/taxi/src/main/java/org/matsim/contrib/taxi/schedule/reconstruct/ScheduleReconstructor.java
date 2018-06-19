@@ -20,17 +20,22 @@
 package org.matsim.contrib.taxi.schedule.reconstruct;
 
 import java.nio.channels.IllegalSelectorException;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.data.FleetImpl;
+import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.*;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -49,7 +54,8 @@ public class ScheduleReconstructor {
 	private final RequestRecorder requestRecorder;
 
 	@Inject
-	public ScheduleReconstructor(@Named(DvrpModule.DVRP_ROUTING) Network network, EventsManager eventsManager) {
+	public ScheduleReconstructor(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
+			EventsManager eventsManager) {
 		links = network.getLinks();
 
 		driveRecorder = new DriveRecorder(this);
@@ -58,7 +64,7 @@ public class ScheduleReconstructor {
 		stayRecorder = new StayRecorder(this);
 		eventsManager.addHandler(stayRecorder);
 
-		requestRecorder = new RequestRecorder(this, TaxiModule.TAXI_MODE);
+		requestRecorder = new RequestRecorder(this, TransportMode.taxi);
 		eventsManager.addHandler(requestRecorder);
 	}
 

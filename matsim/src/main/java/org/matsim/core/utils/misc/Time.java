@@ -25,6 +25,10 @@ import org.matsim.core.router.util.TravelTime;
 
 
 public class Time {
+	// yy there is now java.time, which integrates joda.time into the standard
+	// jdk.  should we consider looking into this?  kai, dec'17
+	
+	
 	private Time() {} // namespace only, do not instantiate
 
 	/** 
@@ -36,6 +40,8 @@ public class Time {
 	 * time is given as {@link Time#UNDEFINED_TIME} then {@link Path#travelTime}
 	 * will return {@link Double#NaN}, even though the {@link TravelTime#getLinkTravelTime}
 	 * is independent of the start time. */
+	@Deprecated // rather use Time.isUndefinedTime( time ), since that opens up the path to a later change
+	// of the convention.  kai, nov'17
 	public final static double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
 	/**
 	 * The end of a day in MATSim in seconds
@@ -51,6 +57,19 @@ public class Time {
 	private static String defaultTimeFormat = TIMEFORMAT_HHMMSS;
 
 	private final static String[] timeElements;
+	
+	public static boolean isUndefinedTime( final double time ) {
+		// give the option to change the convention at some point in time.  kai, nov'17
+		return time==UNDEFINED_TIME ;
+	}
+	public static double getUndefinedTime() {
+		// give the option to change the convention at some point in time.  kai, nov'17
+		return UNDEFINED_TIME ;
+	}
+	public static double getVeryLargeTime() {
+		// give the option to change the convention at some point in time.  kai, nov'17
+		return Long.MAX_VALUE ;
+	}
 
 	static {
 		timeElements = new String[60];
@@ -177,7 +196,7 @@ public class Time {
 		if (strings.length == 1) {
 			seconds = Math.abs(Double.parseDouble(strings[0]));
 		} else if (strings.length == 2) {
-			int h = Integer.parseInt(strings[0]);
+			long h = Long.parseLong(strings[0]);
 			int m = Integer.parseInt(strings[1]);
 
 			if ((m < 0) || (m > 59)) {
@@ -186,7 +205,7 @@ public class Time {
 
 			seconds = Math.abs(h) * 3600 + m * 60;
 		} else if (strings.length == 3) {
-			int h = Integer.parseInt(strings[0]);
+			long h = Long.parseLong(strings[0]);
 			int m = Integer.parseInt(strings[1]);
 			double s = Double.parseDouble(strings[2]);
 

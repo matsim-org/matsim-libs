@@ -38,17 +38,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.matsim4urbansim.utils.io.HeaderParser;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.TransitStopFacilityImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -65,7 +64,7 @@ public class VISUM2TransitScheduleConverter {
 	private BufferedReader zoneAttributeReader;
 	private BufferedReader reiseZeitenReader;
 	private BufferedReader startWarteZeitenReader;
-	private TransitScheduleWriterV1 writer;
+	private TransitScheduleWriter writer;
 	
 //	private Dijkstra dijkstra;
 	
@@ -423,8 +422,8 @@ public class VISUM2TransitScheduleConverter {
 		}
 		
 		log.info("Writing TransitSchedule ...");
-		writer = new TransitScheduleWriterV1(transitSchedule);
-		writer.write(destinationFile);
+		writer = new TransitScheduleWriter(transitSchedule);
+		writer.writeFile(destinationFile);
 		log.info("Writing done!");
 	}
 

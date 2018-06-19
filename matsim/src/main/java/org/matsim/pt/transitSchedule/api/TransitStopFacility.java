@@ -24,17 +24,18 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * A facility (infrastructure) describing a public transport stop.
  *
  * @author mrieser
  */
-public interface TransitStopFacility extends Facility<TransitStopFacility> {
+public interface TransitStopFacility extends Facility<TransitStopFacility>, Attributable {
 
 	boolean getIsBlockingLane();
 
-	public void setLinkId(final Id<Link> linkId);
+	void setLinkId(final Id<Link> linkId);
 
 	/**
 	 * Sets a human name for the stop facility, e.g. to be displayed
@@ -43,17 +44,17 @@ public interface TransitStopFacility extends Facility<TransitStopFacility> {
 	 *
 	 * @param name
 	 */
-	public void setName(final String name);
+	void setName(final String name);
 
 	/**
 	 * @return name of the stop facility. Can be <code>null</code>.
 	 */
-	public String getName();
+	String getName();
 
-	public String getStopPostAreaId();
+	Id<TransitStopArea> getStopAreaId();
 
-	public void setStopPostAreaId(String stopPostAreaId);
+	void setStopAreaId(Id<TransitStopArea> stopAreaId);
 
-	public void setCoord(Coord coord);
+	void setCoord(Coord coord);
 	
 }

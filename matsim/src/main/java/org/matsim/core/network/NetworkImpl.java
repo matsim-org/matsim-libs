@@ -31,13 +31,15 @@ import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * Design thoughts:<ul>
@@ -72,8 +74,17 @@ import java.util.Map;
 
 	private NetworkFactory factory;
 
-	private final Collection<NetworkChangeEvent> networkChangeEvents = new ArrayList<>();
-
+//	private final Collection<NetworkChangeEvent> networkChangeEvents = new ArrayList<>();
+	
+	private final Queue<NetworkChangeEvent> networkChangeEvents
+//			= new PriorityQueue<>(11, new Comparator<NetworkChangeEvent>() {
+//		@Override
+//		public int compare(NetworkChangeEvent arg0, NetworkChangeEvent arg1) {
+//			return Double.compare(arg0.getStartTime(), arg1.getStartTime()) ;
+//		}
+//	});
+			= new PriorityQueue<>(11, new NetworkChangeEvent.StartTimeComparator() ) ;
+	
 	private String name = null;
 
 	private int counter=0;
@@ -140,7 +151,7 @@ import java.util.Map;
 		// show counter
 		this.counter++;
 		if (this.counter % this.nextMsg == 0) {
-			this.nextMsg *= 2;
+			this.nextMsg *= 4;
 			printLinksCount();
 		}
 		if ( this.locked && link instanceof Lockable ) {
@@ -188,12 +199,12 @@ import java.util.Map;
 		// show counter
 		this.counter2++;
 		if (this.counter2 % this.nextMsg2 == 0) {
-			this.nextMsg2 *= 2;
+			this.nextMsg2 *= 4;
 			printNodesCount();
 		}
 
-		if ( this.locked && node instanceof Lockable ) {
-			((Lockable)node).setLocked() ;
+		if ( this.locked && nn instanceof Lockable ) {
+			((Lockable)nn).setLocked() ;
 		}
 	}
 	// ////////////////////////////////////////////////////////////////////
@@ -303,7 +314,13 @@ import java.util.Map;
 			if (link instanceof TimeVariantLinkImpl) {
 				((TimeVariantLinkImpl)link).applyEvent(event);
 			} else {
-				throw new IllegalArgumentException("Link " + link.getId().toString() + " is not TimeVariant.");
+				throw new IllegalArgumentException("Link " + link.getId().toString() + " is not timeVariant. "
+						+ "Did you make the network factory time variant?  The easiest way to achieve this is "
+						+ "either in the config file, or syntax of the type\n"
+						+ "config.network().setTimeVariantNetwork(true);\n"
+						+ "Scenario scenario = ScenarioUtils.load/createScenario(config);\n"
+						+ "Note that the scenario needs to be created _after_ the config option is set, otherwise"
+						+ "the factory will already be there.");
 			}
 		}
 	}
@@ -358,7 +375,7 @@ import java.util.Map;
 	}
 
 	@Override
-	public Collection<NetworkChangeEvent> getNetworkChangeEvents() {
+	public Queue<NetworkChangeEvent> getNetworkChangeEvents() {
 		return this.networkChangeEvents;
 	}
 	@Override
@@ -486,9 +503,13 @@ import java.util.Map;
 			throw new RuntimeException( "Network is locked; too late to do this.  See comments in code.") ;
 		}
 	}
-
-	@Override
-	public Attributes getAttributes() {
+	@Override public Attributes getAttributes() {
 		return attributes;
+	}
+	@Override public final LinkQuadTree getLinkQuadTree() {
+		return this.linkQuadTree ;
+	}
+	@Override public final QuadTree<Node> getNodeQuadTree() {
+		return this.nodeQuadTree ;
 	}
 }

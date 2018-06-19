@@ -20,6 +20,7 @@
 
 package org.matsim.vis.otfvis.interfaces;
 
+import org.matsim.core.mobsim.framework.PlayPauseSimulationControlI;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 
 /**

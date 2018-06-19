@@ -41,6 +41,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+import roadTypeMapping.HbefaRoadTypeMapping;
 
 
 /**
@@ -50,7 +51,7 @@ import org.matsim.vehicles.Vehicle;
 public class WarmEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
 
-	private final Map<Integer, String> roadTypeMapping;
+	private final HbefaRoadTypeMapping roadTypeMapping;
 
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
@@ -77,13 +78,13 @@ public class WarmEmissionAnalysisModule {
 
 	public static class WarmEmissionAnalysisModuleParameter {
 
-		public final Map<Integer, String> roadTypeMapping;
+		public final HbefaRoadTypeMapping roadTypeMapping;
 		public final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 		public final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 		private final EmissionsConfigGroup ecg;
 
 		public WarmEmissionAnalysisModuleParameter(
-				Map<Integer, String> roadTypeMapping,
+				HbefaRoadTypeMapping roadTypeMapping,
 				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
 				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable, EmissionsConfigGroup emissionsConfigGroup) {
 			this.roadTypeMapping = roadTypeMapping;
@@ -143,7 +144,7 @@ public class WarmEmissionAnalysisModule {
 
 	public Map<WarmPollutant, Double> checkVehicleInfoAndCalculateWarmEmissions(
 			Vehicle vehicle,
-			int roadType,
+			String roadType,
 			double freeVelocity,
 			double linkLength,
 			double travelTime) {
@@ -202,14 +203,14 @@ public class WarmEmissionAnalysisModule {
 	private Map<WarmPollutant, Double> calculateWarmEmissions(
 			Id<Vehicle> vehicleId,
 			double travelTime,
-			int roadType,
+			String roadType,
 			double freeVelocity,
 			double linkLength,
 			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
 
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = new HashMap<>();
 
-		String hbefaRoadTypeName = this.roadTypeMapping.get(roadType);
+		String hbefaRoadTypeName = this.roadTypeMapping.get(roadType, freeVelocity);
 
 		HbefaWarmEmissionFactorKey keyFreeFlow = new HbefaWarmEmissionFactorKey();
 		HbefaWarmEmissionFactorKey keyStopAndGo = new HbefaWarmEmissionFactorKey();

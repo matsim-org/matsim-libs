@@ -35,8 +35,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -57,12 +59,14 @@ import java.util.TreeSet;
 public final class NetworkSimplifier {
 
 	private static final Logger log = Logger.getLogger(NetworkSimplifier.class);
-	private boolean mergeLinkStats = false;
+	private boolean mergeLinksWithDifferentAttributes = false;
 	private Collection<Integer> nodeTopoToMerge = Arrays.asList( NetworkCalcTopoType.PASS1WAY , NetworkCalcTopoType.PASS2WAY );
 
 	private Set<Id<Node>> nodesNotToMerge = new HashSet<Id<Node>>();
-	
-	
+
+	private final Map<Id<Link>,List<Node>> mergedLinksToIntermediateNodes = new HashMap<>();
+
+
 	/**
 	 * Merges all qualifying links, ignoring length threshold.
 	 * @param network
@@ -74,16 +78,21 @@ public final class NetworkSimplifier {
 	
 	/**
 	 * Merges all qualifying links while ensuring no link is shorter than the
-	 * given threshold. 
+	 * given threshold.
+	 * <br/>
+	 * Comments:<ul>
+	 *     <li>I would argue against setting the thresholdLength to anything different from POSITIVE_INFINITY, since
+	 *     the result of the method depends on the sequence in which the algorithm goes through the nodes.  </li>
+	 * </ul>
 	 * @param network
 	 * @param thresholdLength
 	 */
+	@Deprecated
 	public void run(final Network network, double thresholdLength){
 		run(network, thresholdLength, thresholdExceeded.BOTH);
 		run(network, thresholdLength, thresholdExceeded.EITHER);
 	}
-	
-	
+
 	/**
 	 * Specifies a set of nodes of which all outgoing and ingoing links should not be merged.
 	 * Should probably not be used if nodes of type {@link NetworkCalcTopoType.INTERSECTION} are to be merged.
@@ -122,9 +131,9 @@ public final class NetworkSimplifier {
 						Link outLink = (Link) oL;
 
 						if(inLink != null && outLink != null){
-							if(!outLink.getToNode().equals(inLink.getFromNode())){
-
-								if(this.mergeLinkStats){
+//							if(!outLink.getToNode().equals(inLink.getFromNode())){
+							if(  areLinksMergeable(inLink, outLink) ){
+								if(this.mergeLinksWithDifferentAttributes){
 
 									// Only merge if threshold criteria is met.  
 									boolean criteria = false;
@@ -138,6 +147,16 @@ public final class NetworkSimplifier {
 									default:
 										break;
 									}
+									
+									// yyyy The approach here depends on the sequence in which this goes through the nodes:
+									// * in the "EITHER" situation, a long link may gobble up short neighboring links
+									// until it hits another long link doing the same.
+									// * In the "BOTH" situation, something like going through nodes randomly will often merge
+									// the neighboring links, while going through the nodes along some path will mean that it will
+									// gobble up until the threshold is met.
+									// I would strongly advise against setting thresholdLength to anything other than POSITIVE_INFINITY.
+									// kai, feb'18
+									
 									if(criteria){
 										// Try to merge both links by guessing the resulting links attributes
 										Link link = network.getFactory().createLink(
@@ -166,7 +185,8 @@ public final class NetworkSimplifier {
 //									inLink.getOrigId() + "-" + outLink.getOrigId(),
 										network.addLink(link);
 										network.removeLink(inLink.getId());
-										(network).removeLink(outLink.getId());
+										network.removeLink(outLink.getId());
+										collectMergedLinkNodeInfo(inLink, outLink, link.getId());
 									}
 								} else {
 
@@ -174,25 +194,26 @@ public final class NetworkSimplifier {
 									if(bothLinksHaveSameLinkStats(inLink, outLink)){
 										
 										// Only merge if threshold criteria is met.  
-										boolean criteria = false;
+										boolean isHavingShortLinks = false;
 										switch (type) {
 										case BOTH:
-											criteria = bothLinksAreShorterThanThreshold(inLink, outLink, thresholdLength);
+											isHavingShortLinks = bothLinksAreShorterThanThreshold(inLink, outLink, thresholdLength);
 											break;
 										case EITHER:
-											criteria = eitherLinkIsShorterThanThreshold(inLink, outLink, thresholdLength);
+											isHavingShortLinks = eitherLinkIsShorterThanThreshold(inLink, outLink, thresholdLength);
 											break;
 										default:
 											break;
 										}
 																				
-										if(criteria){
+										if(isHavingShortLinks){
 											Link newLink = NetworkUtils.createAndAddLink(((Network) network),Id.create(inLink.getId() + "-" + outLink.getId(), Link.class), inLink.getFromNode(), outLink.getToNode(), inLink.getLength() + outLink.getLength(), inLink.getFreespeed(), inLink.getCapacity(), inLink.getNumberOfLanes(), NetworkUtils.getOrigId( inLink ) + "-" + NetworkUtils.getOrigId( outLink ), null);
 											
 											newLink.setAllowedModes(inLink.getAllowedModes());
 											
 											network.removeLink(inLink.getId());
 											network.removeLink(outLink.getId());
+											collectMergedLinkNodeInfo(inLink, outLink, newLink.getId());
 										}
 									}
 								}
@@ -211,6 +232,32 @@ public final class NetworkSimplifier {
 		nodeTopo = new NetworkCalcTopoType();
 		nodeTopo.run(network);
 	}
+
+	private boolean areLinksMergeable(Link inLink, Link outLink) {
+		List<Node> fromNodes = this.mergedLinksToIntermediateNodes.get(inLink.getId());
+		if (fromNodes==null) fromNodes = new ArrayList<>();
+		fromNodes.add(inLink.getFromNode());
+
+		List<Node> toNodes = this.mergedLinksToIntermediateNodes.get(outLink.getId());
+		if(toNodes==null) toNodes = new ArrayList<>();
+		toNodes.add(outLink.getToNode());
+
+		for(Node n :fromNodes) {
+			if (toNodes.contains(n)) return false;
+		}
+		return true;
+	}
+
+	private void collectMergedLinkNodeInfo(Link inLink, Link outLink, Id<Link> mergedLinkId) {
+		List<Node> nodes = new ArrayList<>();
+		if (this.mergedLinksToIntermediateNodes.containsKey(inLink.getId())) nodes.addAll(this.mergedLinksToIntermediateNodes
+				.remove(inLink.getId()));
+		if (this.mergedLinksToIntermediateNodes.containsKey(outLink.getId())) nodes.addAll(this.mergedLinksToIntermediateNodes
+				.remove(outLink.getId()));
+		nodes.add(inLink.getToNode());
+
+		this.mergedLinksToIntermediateNodes.put(mergedLinkId, nodes);
+	}
 	
 
 	/**
@@ -225,12 +272,12 @@ public final class NetworkSimplifier {
 
 	/**
 	 *
-	 * @param mergeLinkStats If set true, links will be merged despite their different attributes.
+	 * @param mergeLinksWithDifferentAttributes If set true, links will be merged despite their different attributes.
 	 *  If set false, only links with the same attributes will be merged, thus preserving as much information as possible.
 	 *  Default is set false.
 	 */
-	public void setMergeLinkStats(boolean mergeLinkStats){
-		this.mergeLinkStats = mergeLinkStats;
+	public void setMergeLinkStats(boolean mergeLinksWithDifferentAttributes){
+		this.mergeLinksWithDifferentAttributes = mergeLinksWithDifferentAttributes;
 	}
 
 	// helper

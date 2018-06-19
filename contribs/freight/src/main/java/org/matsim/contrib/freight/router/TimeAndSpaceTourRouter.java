@@ -38,7 +38,7 @@ public class TimeAndSpaceTourRouter {
 		}
 
 		@Override
-		public Id getId() {
+		public Id<Vehicle> getId() {
 			return carrierVehicle.getVehicleId();
 		}
 
@@ -87,7 +87,7 @@ public class TimeAndSpaceTourRouter {
 	public void route(ScheduledTour tour) {
 		MatsimVehicleAdapter matsimVehicle = new MatsimVehicleAdapter(tour.getVehicle());
 		double currTime = tour.getDeparture();
-		Id prevLink = tour.getTour().getStartLinkId();
+		Id<Link> prevLink = tour.getTour().getStartLinkId();
 		Leg prevLeg = null;
 		for(TourElement e : tour.getTour().getTourElements()){
 			if(e instanceof Leg){
@@ -104,11 +104,11 @@ public class TimeAndSpaceTourRouter {
 				prevLink = act.getLocation();
 			}
 		}
-		Id endLink = tour.getTour().getEndLinkId();
+		Id<Link> endLink = tour.getTour().getEndLinkId();
 		route(prevLeg,prevLink,endLink, null, matsimVehicle);
 	}
 	
-	private void route(Leg prevLeg, Id fromLinkId, Id toLinkId, Person person, Vehicle vehicle) {
+	private void route(Leg prevLeg, Id<Link> fromLinkId, Id<Link> toLinkId, Person person, Vehicle vehicle) {
 		if(fromLinkId.equals(toLinkId)){
 			prevLeg.setExpectedTransportTime(0);
 			NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(fromLinkId, toLinkId);
@@ -132,7 +132,7 @@ public class TimeAndSpaceTourRouter {
 		prevLeg.setRoute(route);
 	}
 	
-	private NetworkRoute createRoute(Id fromLink, Path path, Id toLink) {
+	private NetworkRoute createRoute(Id<Link> fromLink, Path path, Id<Link> toLink) {
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(fromLink, toLink);
 		route.setLinkIds(fromLink, getLinkIds(path.links), toLink);
 		return route;

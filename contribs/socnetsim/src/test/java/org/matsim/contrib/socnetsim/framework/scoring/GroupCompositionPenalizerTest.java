@@ -44,7 +44,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -236,7 +236,7 @@ public class GroupCompositionPenalizerTest {
 		qSim.addActivityHandler(activityEngine);
 
         //QNetsimEngineModule.configure(qSim);
-		qSim.addMobsimEngine( new TeleportationEngine(sc, events) );
+		qSim.addMobsimEngine( new DefaultTeleportationEngine(sc, events) );
 
 		AgentFactory agentFactory = new DefaultAgentFactory( qSim );
 

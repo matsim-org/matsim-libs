@@ -155,48 +155,51 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 8, ActivityEndEvent.EVENT_TYPE + " " + event.getActType());
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), Number.ActivityEnd.ordinal(), ActivityEndEvent.EVENT_TYPE + " " + event.getActType());
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 7, ActivityStartEvent.EVENT_TYPE + " " + event.getActType());
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), Number.ActivityStart.ordinal(), ActivityStartEvent.EVENT_TYPE + " " + event.getActType());
 	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 0, PersonArrivalEvent.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), Number.PersonArrival.ordinal(), PersonArrivalEvent.EVENT_TYPE);
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 6, PersonDepartureEvent.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), Number.PersonDeparture.ordinal(), PersonDepartureEvent.EVENT_TYPE);
 	}
+	
+	public enum Number{ /*0:*/ PersonArrival, dummy, LinkLeave, PersonStuck, /*4:*/ VehicleEntersTraffic,
+		/*5:*/ LinkEnter, PersonDeparture, ActivityStart, ActivityEnd, /*9:*/ PersonMoney } ;
 	
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 3, PersonStuckEvent.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), Number.PersonStuck.ordinal(), PersonStuckEvent.EVENT_TYPE);
 	}
 
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), null, 9, "agentMoney" + "\t" + event.getAmount());
+		writeLine(event.getTime(), event.getPersonId(), null, Number.PersonMoney.ordinal(), "agentMoney" + "\t" + event.getAmount());
 	}
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 4, VehicleEntersTrafficEvent.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), Number.VehicleEntersTraffic.ordinal(), VehicleEntersTrafficEvent.EVENT_TYPE);
 		
 		vehicleToDriverMap.put(event.getVehicleId(), event.getPersonId());
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		writeLine(event.getTime(), vehicleToDriverMap.get(event.getVehicleId()), event.getLinkId(), 5, LinkEnterEvent.EVENT_TYPE);
+		writeLine(event.getTime(), vehicleToDriverMap.get(event.getVehicleId()), event.getLinkId(), Number.LinkEnter.ordinal(), LinkEnterEvent.EVENT_TYPE);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		writeLine(event.getTime(), vehicleToDriverMap.get(event.getVehicleId()), event.getLinkId(), 2, LinkLeaveEvent.EVENT_TYPE);
+		writeLine(event.getTime(), vehicleToDriverMap.get(event.getVehicleId()), event.getLinkId(), Number.LinkLeave.ordinal(), LinkLeaveEvent.EVENT_TYPE);
 	}
 }

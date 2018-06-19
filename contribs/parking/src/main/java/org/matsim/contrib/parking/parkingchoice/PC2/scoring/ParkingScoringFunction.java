@@ -24,9 +24,9 @@ import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
 public class ParkingScoringFunction implements BasicScoring{
 	double score=0;
 	private Plan plan;
-	private ParkingScoreManager parkingScoreManager;
+	private ParkingScore parkingScoreManager;
 
-	public ParkingScoringFunction(Plan plan, ParkingScoreManager parkingScoreManager) {
+	public ParkingScoringFunction(Plan plan, ParkingScore parkingScoreManager) {
 		super();
 		this.plan = plan;
 		this.parkingScoreManager = parkingScoreManager;

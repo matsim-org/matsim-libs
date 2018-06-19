@@ -1,75 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-targetNamespace="http://www.matsim.org/files/dtd"
-xmlns="http://www.matsim.org/files/dtd" elementFormDefault="qualified"
-xml:lang="en">
-<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
-<!-- This xml schema contains xml definitions for household information in the MATSim framework  -->
+           targetNamespace="http://www.matsim.org/files/dtd"
+           xmlns="http://www.matsim.org/files/dtd" elementFormDefault="qualified"
+           xml:lang="en">
+    <!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
+    <!-- This xml schema contains xml definitions for household information in the MATSim framework  -->
 
-<xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
-<!--<xs:include schemaLocation="http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd"/>-->
+    <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+    <!--<xs:include schemaLocation="http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd"/>-->
 
-<xs:element name="household" type="householdType"/>
+    <xs:element name="household" type="householdType"/>
 
-<xs:element name="households">
-  <xs:complexType>
-    <xs:sequence>
-      <xs:element ref="household" minOccurs="0" maxOccurs="unbounded"></xs:element>
-    </xs:sequence>  
-  </xs:complexType>
-</xs:element>
-
-<xs:complexType name="householdIdType">
-  <xs:complexContent>
-    <xs:extension base="idRefType"/>
-  </xs:complexContent>
-</xs:complexType>
-
-<xs:complexType name="householdType">
-  <xs:annotation>
-    <xs:documentation>This type contains all information to describe a MATSim household.</xs:documentation>
-  </xs:annotation>
-  <xs:complexContent>
-    <xs:extension base="matsimObjectType">
-    <xs:sequence>
-      <xs:element name="members" minOccurs="0" maxOccurs="1">
+    <xs:element name="households">
         <xs:complexType>
-          <xs:sequence>
-            <xs:element name="personId" type="idRefType" minOccurs="1" maxOccurs="unbounded"/>
-          </xs:sequence>
+            <xs:sequence>
+                <xs:element ref="household" minOccurs="0" maxOccurs="unbounded"></xs:element>
+            </xs:sequence>
         </xs:complexType>
-      </xs:element>
-      <xs:element name="vehicles" minOccurs="0" maxOccurs="1">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="vehicleDefinitionId"  type="idRefType" minOccurs="1" maxOccurs="unbounded" />
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-			<xs:element name="income" type="incomeType" minOccurs="0" maxOccurs="1"/>
-    </xs:sequence>
-    </xs:extension>
-  </xs:complexContent>
-</xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="householdIdType">
+        <xs:complexContent>
+            <xs:extension base="idRefType"/>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="householdType">
+        <xs:annotation>
+            <xs:documentation>This type contains all information to describe a MATSim household.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="matsimObjectType">
+                <xs:sequence>
+                    <xs:element name="members" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="personId" type="idRefType" minOccurs="1" maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="vehicles" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="vehicleDefinitionId"  type="idRefType" minOccurs="1" maxOccurs="unbounded" />
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="income" type="incomeType" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="attributes" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="attributeType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="name" type="xs:string"/>
+                <xs:attribute name="class" type="xs:string"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
 
 
-<xs:complexType name="incomeType">
-  <xs:simpleContent>
-	  <xs:extension base="xs:decimal">
-      <xs:attribute name="currency" type="xs:string" use="optional" />
-      <xs:attribute name="period" type="incomePeriodType" use="required" />
-		</xs:extension>
-  </xs:simpleContent>
-</xs:complexType>
+    <xs:complexType name="incomeType">
+        <xs:simpleContent>
+            <xs:extension base="xs:decimal">
+                <xs:attribute name="currency" type="xs:string" use="optional" />
+                <xs:attribute name="period" type="incomePeriodType" use="required" />
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
 
-<xs:simpleType name="incomePeriodType">
-	<xs:restriction base="xs:string">
-	  <xs:enumeration value="year" />
-	  <xs:enumeration value="month" />
-    <xs:enumeration value="week" />
-	  <xs:enumeration value="day" />
-	  <xs:enumeration value="hour" />
-	  <xs:enumeration value="second" />
-	</xs:restriction>
-</xs:simpleType>
+    <xs:simpleType name="incomePeriodType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="year" />
+            <xs:enumeration value="month" />
+            <xs:enumeration value="week" />
+            <xs:enumeration value="day" />
+            <xs:enumeration value="hour" />
+            <xs:enumeration value="second" />
+        </xs:restriction>
+    </xs:simpleType>
 </xs:schema>

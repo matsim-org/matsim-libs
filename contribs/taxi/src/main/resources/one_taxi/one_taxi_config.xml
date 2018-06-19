@@ -29,8 +29,6 @@
 
 	<module name="network">
 		<param name="inputNetworkFile" value="grid_network.xml" />
-		<!-- param name="timeVariantNetwork" value="false" / if timeVariantNetwork -->
-		<!-- param name="inputChangeEventsFile" value=""/ if timeVariantNetwork -->
 	</module>
 
 	<module name="plans">
@@ -52,7 +50,7 @@
 		<param name="outputDirectory" value="test/output/one_taxi" />
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="2" />
+		<param name="lastIteration" value="0" />
 	</module>
 
 	<module name="planCalcScore">

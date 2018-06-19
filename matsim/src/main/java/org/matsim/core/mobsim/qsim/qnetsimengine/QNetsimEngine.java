@@ -41,7 +41,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -71,32 +70,24 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
  * @author dgrether
  * @author dstrippgen
  */
-public class QNetsimEngine implements MobsimEngine {
+public class QNetsimEngine implements MobsimEngine, NetsimEngine {
+
 	public interface NetsimInternalInterface {
-
 		QNetwork getNetsimNetwork();
-
 		void arrangeNextAgentState(MobsimAgent pp);
-
 		void letVehicleArrive(QVehicle veh);
 	}
-	NetsimInternalInterface ii = new NetsimInternalInterface(){
 
-		@Override
-		public QNetwork getNetsimNetwork() {
+	NetsimInternalInterface ii = new NetsimInternalInterface(){
+		@Override public QNetwork getNetsimNetwork() {
 			return network ;
 		}
-
-		@Override
-		public void arrangeNextAgentState(MobsimAgent driver) {
+		@Override public void arrangeNextAgentState(MobsimAgent driver) {
 			QNetsimEngine.this.arrangeNextAgentState(driver);
 		}
-
-		@Override
-		public void letVehicleArrive(QVehicle veh) {
+		@Override public void letVehicleArrive(QVehicle veh) {
 			QNetsimEngine.this.letVehicleArrive( veh ) ;
 		}
-		
 	} ;
 
 	private static final Logger log = Logger.getLogger(QNetsimEngine.class);
@@ -178,8 +169,6 @@ public class QNetsimEngine implements MobsimEngine {
 		} else {
 			Scenario scenario = sim.getScenario();
 			EventsManager events = sim.getEventsManager() ;
-			QSimConfigGroup qsimConfig = sim.getScenario().getConfig().qsim() ;
-			Network net = scenario.getNetwork() ;
 			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario );
 			MobsimTimer mobsimTimer = sim.getSimTimer() ;
 			AgentCounter agentCounter = sim.getAgentCounter() ;
@@ -404,6 +393,9 @@ public class QNetsimEngine implements MobsimEngine {
 		Id<Link> linkId = planAgent.getCurrentLinkId(); 
 		if (linkId != null) { // may be bushwacking
 			QLinkI qLink = this.network.getNetsimLink(linkId);
+			if ( qLink==null ) {
+				throw new RuntimeException("netsim link lookup failed; agentId=" + planAgent.getId() + "; linkId=" + linkId ) ;
+			}
 			qLink.registerAdditionalAgentOnLink(planAgent);
 		}
 	}

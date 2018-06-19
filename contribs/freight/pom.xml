@@ -2,7 +2,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>0.10.0-SNAPSHOT</version>
+		<version>0.11.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim.contrib</groupId>
@@ -68,39 +68,56 @@
 			<scope>compile</scope>
 		</dependency>
 	 
-	 <dependency>
-   		<groupId>jsprit</groupId>
-  		<artifactId>jsprit-core</artifactId>
-   		<version>1.6.1</version>
-	</dependency>
+		<dependency>
+		    <groupId>com.graphhopper</groupId>
+		    <artifactId>jsprit-core</artifactId>
+		    <version>1.7.2</version>
+		 </dependency>
+		 
+		 <dependency>
+		    <groupId>com.graphhopper</groupId>
+		    <artifactId>jsprit-io</artifactId>
+		    <version>1.7.2</version>
+		 </dependency>
+				 
+		<dependency>
+		    <groupId>com.graphhopper</groupId>
+		    <artifactId>jsprit-analysis</artifactId>
+	    	<version>1.7.2</version>
+		</dependency>
 	
-	<dependency>
-   		<groupId>jsprit</groupId>
-  		<artifactId>jsprit-analysis</artifactId>
-   		<version>1.6.1</version>
-	</dependency>
+		<dependency>
+	  		<groupId>org.matsim.contrib</groupId>
+			<artifactId>roadpricing</artifactId>
+			<version>0.11.0-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+	  		<groupId>org.matsim.contrib</groupId>
+			<artifactId>otfvis</artifactId>
+			<version>0.11.0-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.5</version>
+			<scope>test</scope>
+		</dependency>
 
-	<dependency>
-  		<groupId>org.matsim.contrib</groupId>
-		<artifactId>roadpricing</artifactId>
-		<version>0.10.0-SNAPSHOT</version>
-	</dependency>
-	
-	<dependency>
-  		<groupId>org.matsim.contrib</groupId>
-		<artifactId>otfvis</artifactId>
-		<version>0.10.0-SNAPSHOT</version>
-	</dependency>
-	
-	<dependency>
-		<groupId>org.mockito</groupId>
-		<artifactId>mockito-all</artifactId>
-		<version>1.9.5</version>
-		<scope>test</scope>
-	</dependency>
-  	
-  </dependencies>
-  
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.21</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.21</version>
+		</dependency> 
+		
+	</dependencies>
+	 	
   <repositories>
    	<repository>
     		<id>jsprit-releases</id>

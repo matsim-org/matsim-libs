@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -62,6 +63,7 @@ public class FacilitiesReprojectionIOTest {
 
 		final Config config = ConfigUtils.createConfig();
 		config.facilities().setInputFile( IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml").toString() );
+		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
 
 		config.facilities().setInputCRS(TransformationFactory.CH1903_LV03_GT );
 		// web mercator. This would be a pretty silly choice for simulation,

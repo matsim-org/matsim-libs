@@ -19,105 +19,129 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ForkJoinPool;
 
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.data.DrtRequest;
-import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
+import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
-import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author michalm
  */
-public class ParallelMultiVehicleInsertionProblem {
-	private static class TaskGroup {
-		private final List<Entry> vEntries = new ArrayList<>();
-		private final MultiVehicleInsertionProblem multiInsertionProblem;
+public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
+	private final PrecalculablePathDataProvider pathDataProvider;
+	private final DrtConfigGroup drtCfg;
+	private final MobsimTimer timer;
+	private final InsertionCostCalculator insertionCostCalculator;
+	private final ForkJoinPool forkJoinPool;
+	private final DetourLinksStats detourLinksStats = new DetourLinksStats();
 
-		private TaskGroup(SingleVehicleInsertionProblem singleInsertionProblem) {
-			this.multiInsertionProblem = new MultiVehicleInsertionProblem(singleInsertionProblem);
-		}
-
-		private BestInsertion findBestInsertion(DrtRequest drtRequest) {
-			BestInsertion bestInsertion = multiInsertionProblem.findBestInsertion(drtRequest, vEntries);
-			vEntries.clear();
-			return bestInsertion;
-		}
+	public ParallelMultiVehicleInsertionProblem(PrecalculablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
+			MobsimTimer timer, ForkJoinPool forkJoinPool) {
+		this.pathDataProvider = pathDataProvider;
+		this.drtCfg = drtCfg;
+		this.timer = timer;
+		this.forkJoinPool = forkJoinPool;
+		insertionCostCalculator = new InsertionCostCalculator(drtCfg, timer);
 	}
 
-	private final int threads;
-	private final TaskGroup[] taskGroups;
-	private final ExecutorService executorService;
-	private final DrtVehicleFilter filter;
+	@Override
+	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
+		DetourLinksProvider detourLinksProvider = new DetourLinksProvider(drtCfg, timer, drtRequest);
+		detourLinksProvider.findInsertionsAndLinks(forkJoinPool, vEntries);
 
-	public ParallelMultiVehicleInsertionProblem(SingleVehicleInsertionProblem[] singleInsertionProblems,
-			DrtVehicleFilter filter) {
-		threads = singleInsertionProblems.length;
-		this.filter = filter;
-		this.taskGroups = new TaskGroup[threads];
-		for (int i = 0; i < threads; i++) {
-			taskGroups[i] = new TaskGroup(singleInsertionProblems[i]);
-		}
-		executorService = Executors.newFixedThreadPool(threads);
-	}
-
-	public BestInsertion findBestInsertion(DrtRequest drtRequest, VehicleData vData) {
-		List<Entry> filteredVehicles = filter.applyFilter(drtRequest, vData);
-		divideTasksIntoGroups(filteredVehicles);
-		return findBestInsertion(submitTasks(drtRequest));
-	}
-
-	private void divideTasksIntoGroups(List<Entry> filteredVehicles) {
-		Iterator<Entry> vEntryIter = filteredVehicles.iterator();
-		int div = filteredVehicles.size() / threads;
-		int mod = filteredVehicles.size() % threads;
-
-		for (int i = 0; i < threads; i++) {
-			int count = div + (i < mod ? 1 : 0);
-			for (int j = 0; j < count; j++) {
-				taskGroups[i].vEntries.add(vEntryIter.next());
-			}
+		detourLinksStats.updateStats(vEntries, detourLinksProvider);
+		Map<Entry, List<Insertion>> filteredInsertions = detourLinksProvider.getFilteredInsertions();
+		if (filteredInsertions.isEmpty()) {
+			return Optional.empty();
 		}
 
-		if (vEntryIter.hasNext()) {
-			throw new RuntimeException();
-		}
-	}
+		pathDataProvider.precalculatePathData(drtRequest, detourLinksProvider.getDetourLinksSet());
 
-	private List<Future<BestInsertion>> submitTasks(final DrtRequest drtRequest) {
-		List<Future<BestInsertion>> bestInsertionFutures = new ArrayList<>();
-		for (int i = 0; i < threads; i++) {
-			final TaskGroup taskGroup = taskGroups[i];
-			bestInsertionFutures.add(executorService.submit(new Callable<BestInsertion>() {
-				public BestInsertion call() {
-					return taskGroup.findBestInsertion(drtRequest);
-				}
-			}));
-		}
-
-		return bestInsertionFutures;
-	}
-
-	private BestInsertion findBestInsertion(List<Future<BestInsertion>> bestInsertionFutures) {
-		double minCost = Double.MAX_VALUE;
-		BestInsertion fleetBestInsertion = null;
-		for (Future<BestInsertion> bestInsertionFuture : bestInsertionFutures) {
-			try {
-				BestInsertion bestInsertion = bestInsertionFuture.get();
-				if (bestInsertion != null && bestInsertion.cost < minCost) {
-					fleetBestInsertion = bestInsertion;
-					minCost = bestInsertion.cost;
-				}
-			} catch (InterruptedException | ExecutionException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		return fleetBestInsertion;
+		return forkJoinPool.submit(() -> filteredInsertions.entrySet().parallelStream()//
+				.map(e -> new SingleVehicleInsertionProblem(pathDataProvider, insertionCostCalculator)
+						.findBestInsertion(drtRequest, e.getKey(), e.getValue()))//
+				.filter(Optional::isPresent)//
+				.map(Optional::get)//
+				.min(Comparator.comparing(i -> i.cost)))//
+				.join();
 	}
 
 	public void shutdown() {
-		executorService.shutdown();
+		forkJoinPool.shutdown();
+		detourLinksStats.printStats();
+	}
+
+	private static class DetourLinksStats {
+		private static final Logger log = Logger.getLogger(DetourLinksStats.class);
+
+		private final SummaryStatistics toPickupStats = new SummaryStatistics();
+		private final SummaryStatistics fromPickupStats = new SummaryStatistics();
+		private final SummaryStatistics toDropoffStats = new SummaryStatistics();
+		private final SummaryStatistics fromDropoffStats = new SummaryStatistics();
+		private final SummaryStatistics vEntriesStats = new SummaryStatistics();
+		private final SummaryStatistics insertionStats = new SummaryStatistics();
+		private final SummaryStatistics insertionAtEndStats = new SummaryStatistics();
+		private final SummaryStatistics insertionAtEndWhenNoStopsStats = new SummaryStatistics();
+
+		private void updateStats(Collection<Entry> vEntries, DetourLinksProvider detourLinksProvider) {
+			addSet(detourLinksProvider.getDetourLinksSet(), vEntries.size());
+			updateInsertionStats(vEntries, detourLinksProvider.getFilteredInsertions());
+		}
+
+		private void addSet(DetourLinksSet set, int vEntriesCount) {
+			toPickupStats.addValue(set.pickupDetourStartLinks.size());
+			fromPickupStats.addValue(set.pickupDetourEndLinks.size());
+			toDropoffStats.addValue(set.dropoffDetourStartLinks.size());
+			fromDropoffStats.addValue(set.dropoffDetourEndLinks.size());
+			vEntriesStats.addValue(vEntriesCount);
+		}
+
+		private void updateInsertionStats(Collection<Entry> vEntries,
+				Map<Entry, List<Insertion>> filteredInsertionsPerVehicle) {
+			int insertionCount = 0;
+			int insertionAtEndCount = 0;
+			int insertionAtEndToEmptyCount = 0;
+
+			for (java.util.Map.Entry<Entry, List<Insertion>> e : filteredInsertionsPerVehicle.entrySet()) {
+				List<Insertion> insertions = e.getValue();
+				insertionCount += insertions.size();
+
+				Insertion lastInsertion = insertions.get(insertions.size() - 1);
+				if (lastInsertion.pickupIdx == lastInsertion.dropoffIdx
+						&& lastInsertion.pickupIdx == e.getKey().stops.size()) {
+					insertionAtEndCount++;
+					if (lastInsertion.pickupIdx == 0) {
+						insertionAtEndToEmptyCount++;
+					}
+				}
+			}
+
+			insertionStats.addValue(insertionCount);
+			insertionAtEndStats.addValue(insertionAtEndCount);
+			insertionAtEndWhenNoStopsStats.addValue(insertionAtEndToEmptyCount);
+		}
+
+		private void printStats() {
+			log.debug("toPickupStats:\n" + toPickupStats);
+			log.debug("fromPickupStats:\n" + fromPickupStats);
+			log.debug("toDropoffStats:\n" + toDropoffStats);
+			log.debug("fromDropoffStats:\n" + fromDropoffStats);
+			log.debug("vEntriesStats:\n" + vEntriesStats);
+			log.debug("insertionStats:\n" + insertionStats);
+			log.debug("insertionAtEndStats:\n" + insertionAtEndStats);
+			log.debug("insertionAtEndWhenNoStopsStats:\n" + insertionAtEndWhenNoStopsStats);
+		}
 	}
 }

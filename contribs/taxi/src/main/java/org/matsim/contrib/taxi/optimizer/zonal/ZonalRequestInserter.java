@@ -19,12 +19,12 @@
 package org.matsim.contrib.taxi.optimizer.zonal;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -127,7 +127,7 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 				continue;
 			}
 
-			Iterable<Vehicle> filteredVehs = Collections.singleton(idleVehsInZone.peek());
+			Stream<Vehicle> filteredVehs = Stream.of(idleVehsInZone.peek());
 			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestVehicleForRequest(req, filteredVehs);
 
 			if (best != null) {

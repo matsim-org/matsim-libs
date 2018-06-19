@@ -26,20 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.FolderType;
-import net.opengis.kml._2.IconStyleType;
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.LinkType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.PlacemarkType;
-import net.opengis.kml._2.PointType;
-import net.opengis.kml._2.ScreenOverlayType;
-import net.opengis.kml._2.StyleType;
-import net.opengis.kml._2.TimeSpanType;
-import net.opengis.kml._2.UnitsEnumType;
-import net.opengis.kml._2.Vec2Type;
-
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -56,10 +42,23 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
 import org.matsim.pt.counts.PtCountsLoadCurveGraphCreator;
-import org.matsim.pt.counts.obsolete.PtCountSimComparisonWriter.PtCountsType;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.matsim.vis.kml.NetworkFeatureFactory;
+
+import net.opengis.kml.v_2_2_0.DocumentType;
+import net.opengis.kml.v_2_2_0.FolderType;
+import net.opengis.kml.v_2_2_0.IconStyleType;
+import net.opengis.kml.v_2_2_0.KmlType;
+import net.opengis.kml.v_2_2_0.LinkType;
+import net.opengis.kml.v_2_2_0.ObjectFactory;
+import net.opengis.kml.v_2_2_0.PlacemarkType;
+import net.opengis.kml.v_2_2_0.PointType;
+import net.opengis.kml.v_2_2_0.ScreenOverlayType;
+import net.opengis.kml.v_2_2_0.StyleType;
+import net.opengis.kml.v_2_2_0.TimeSpanType;
+import net.opengis.kml.v_2_2_0.UnitsEnumType;
+import net.opengis.kml.v_2_2_0.Vec2Type;
 
 @Deprecated // we should try to rather make CountSimComparisonKMLWriter more general. kai, dec'13
 public final class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {

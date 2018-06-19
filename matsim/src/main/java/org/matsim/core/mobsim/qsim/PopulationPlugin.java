@@ -1,7 +1,7 @@
 package org.matsim.core.mobsim.qsim;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -20,8 +20,7 @@ public class PopulationPlugin extends AbstractQSimPlugin {
 
 	@Override
 	public Collection<? extends Module> modules() {
-		Collection<Module> result = new ArrayList<>();
-		result.add(new com.google.inject.AbstractModule() {
+		return Collections.singletonList(new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
 				bind(PopulationAgentSource.class).asEagerSingleton();
@@ -32,13 +31,10 @@ public class PopulationPlugin extends AbstractQSimPlugin {
 				}
 			}
 		});
-		return result;
 	}
 
 	@Override
 	public Collection<Class<? extends AgentSource>> agentSources() {
-		Collection<Class<? extends AgentSource>> result = new ArrayList<>();
-		result.add(PopulationAgentSource.class);
-		return result;
+		return Collections.singletonList(PopulationAgentSource.class);
 	}
 }

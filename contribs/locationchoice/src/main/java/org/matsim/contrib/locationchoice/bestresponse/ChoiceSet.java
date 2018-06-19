@@ -372,12 +372,11 @@ public class ChoiceSet {
 			return createEmptyChoiceMap(facilityIdWithLargestScore);
 		}
 	}
-	
 	private TreeMap<Double, Id<ActivityFacility>> createEmptyChoiceMap(Id<ActivityFacility> facilityIdWithLargestScore) {
 		TreeMap<Double, Id<ActivityFacility>> mapTmp = new TreeMap<Double, Id<ActivityFacility>>();
 		mapTmp.put(1.1, facilityIdWithLargestScore);
 		return mapTmp;
-	}
+		}
 	
 //	private double getTotalScore(ArrayList<ScoredAlternative> list) {
 //		double totalScore = 0.0;

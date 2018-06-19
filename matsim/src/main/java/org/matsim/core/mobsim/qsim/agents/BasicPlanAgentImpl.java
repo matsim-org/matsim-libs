@@ -37,7 +37,7 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
-public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<Person>, HasPerson, VehicleUsingAgent {
+public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPerson, VehicleUsingAgent, HasModifiablePlan {
 	
 	private static final Logger log = Logger.getLogger(BasicPlanAgentImpl.class);
 	private static int finalActHasDpTimeWrnCnt = 0;
@@ -139,6 +139,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 				noRouteWrnCnt++ ;
 			}
 			this.setState(MobsimAgent.State.ABORT) ;
+//			throw new RuntimeException("no route in leg") ;
 		} 
 	}
 
@@ -179,8 +180,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 		// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
 		advancePlan(now);
 	}
-	
-	final void resetCaches() {
+	@Override 
+	public final void resetCaches() {
 		if ( this.getCurrentPlanElement() instanceof Activity ) {
 			Activity act = (Activity) this.getCurrentPlanElement() ;
 			this.calculateAndSetDepartureTime(act);
@@ -195,6 +196,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 	 * This agent retains the copied plan and forgets the original one.  However, the original plan remains in the population file
 	 * (and will be scored).  This is deliberate behavior!
 	 */
+	@Override
 	public final Plan getModifiablePlan() {
 		// yy MZ suggests, and I agree, to always give the agent a full plan, and consume that plan as the agent goes.  kai, nov'14
 		if (firstTimeToGetModifiablePlan) {
@@ -210,12 +212,9 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 		NetworkRoute route = (NetworkRoute) this.getCurrentLeg().getRoute(); // if casts fail: illegal state.
 		if (route.getVehicleId() != null) {
 			return route.getVehicleId();
-		} else {
-	        if (!getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
-	            throw new IllegalStateException("NetworkRoute without a specified vehicle id.");
-	        }
-			return Id.create(this.getId(), Vehicle.class); // we still assume the vehicleId is the agentId if no vehicleId is given.
 		}
+		Gbl.assertIf( scenario.getConfig().qsim().getUsePersonIdForMissingVehicleId() );
+		return Id.create(this.getId(), Vehicle.class); // we still assume the vehicleId is the agentId if no vehicleId is given.
 	}
 	@Override
 	public final String getMode() {
@@ -364,8 +363,10 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 	final Leg getCurrentLeg() {
 		return (Leg) this.getCurrentPlanElement() ;
 	}
-
-	final int getCurrentLinkIndex() {
+	@Override
+	public final int getCurrentLinkIndex() {
+		// Other then getPlanElementIndex, it seems that this one here has to be accessible, since routes may contain loops, in which
+		// case an indexOf search fails.  kai, nov'17
 		return currentLinkIndex;
 	}
 	

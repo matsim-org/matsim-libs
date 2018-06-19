@@ -22,14 +22,13 @@
  */
 package org.matsim.contrib.parking.parkingsearch.sim;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 
 import com.google.inject.Module;
 
@@ -41,28 +40,19 @@ public class ParkingSearchPopulationPlugin extends AbstractQSimPlugin {
 	public ParkingSearchPopulationPlugin(Config config) { super(config); }
 	@Override 
 	public Collection<? extends Module> modules() {
-		Collection<Module> result = new ArrayList<>();
-		result.add(new com.google.inject.AbstractModule() {
+		return Collections.singletonList(new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
 				if (getConfig().transit().isUseTransit()) {
 					throw new RuntimeException("parking search together with transit is not implemented (should not be difficult)") ;
 				} 
 				bind(AgentFactory.class).to(ParkingAgentFactory.class).asEagerSingleton(); // (**)
-				
-
 				bind(ParkingPopulationAgentSource.class).asEagerSingleton();
-
 			}
 		});
-		return result;
 	}
 	@Override 
 	public Collection<Class<? extends AgentSource>> agentSources() {
-		Collection<Class<? extends AgentSource>> result = new ArrayList<>();
-		
-		
-		result.add(ParkingPopulationAgentSource.class);
-		return result;
+		return Collections.singletonList(ParkingPopulationAgentSource.class);
 	}
 }

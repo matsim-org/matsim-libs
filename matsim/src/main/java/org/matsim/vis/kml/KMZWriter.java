@@ -35,14 +35,14 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.LinkType;
-import net.opengis.kml._2.NetworkLinkType;
-import net.opengis.kml._2.ObjectFactory;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimSomeWriter;
+
+import net.opengis.kml.v_2_2_0.KmlType;
+import net.opengis.kml.v_2_2_0.LinkType;
+import net.opengis.kml.v_2_2_0.NetworkLinkType;
+import net.opengis.kml.v_2_2_0.ObjectFactory;
 
 /**
  * A writer for complex keyhole markup files used by Google Earth. It supports
@@ -68,7 +68,7 @@ public class KMZWriter implements MatsimSomeWriter {
 
 	static {
 		try {
-			JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.kml._2");
+			JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.kml.v_2_2_0");
 			marshaller = jaxbContext.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		} catch (JAXBException e) {

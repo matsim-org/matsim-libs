@@ -28,6 +28,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
@@ -92,7 +93,7 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 //		qSim.addDepartureHandler(cae.getDepartureHandler());
 
 
-		TeleportationEngine teleportationEngine = new TeleportationEngine(this.sc, this.em);
+		TeleportationEngine teleportationEngine = new DefaultTeleportationEngine(this.sc, this.em);
 		qSim.addMobsimEngine(teleportationEngine);
 
 		AgentFactory agentFactory;
@@ -108,7 +109,7 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 			agentFactory = new DefaultAgentFactory(qSim);
 		}
 		if (this.sc.getConfig().network().isTimeVariantNetwork()) {
-			qSim.addMobsimEngine(new NetworkChangeEventsEngine());
+			qSim.addMobsimEngine(NetworkChangeEventsEngine.createNetworkChangeEventsEngine());
 		}
 		PopulationAgentSource agentSource = new PopulationAgentSource(
 				this.sc.getPopulation(), agentFactory, qSim);

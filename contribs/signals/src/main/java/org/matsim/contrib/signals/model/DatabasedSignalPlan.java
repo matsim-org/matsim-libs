@@ -37,7 +37,7 @@ public class DatabasedSignalPlan implements SignalPlan {
 //	private static final Logger log = Logger.getLogger(DatabasedSignalPlan.class);
 	
 	private SignalPlanData data;
-	private int cylce;
+	private int cycle;
 	
 	private Map<Integer, List<Id<SignalGroup>>> secondInPlanOnsetsMap = new HashMap<>();
 
@@ -50,7 +50,7 @@ public class DatabasedSignalPlan implements SignalPlan {
 	
 	private void init(){
 		if (this.data.getCycleTime() != null){
-			this.cylce = data.getCycleTime();
+			this.cycle = data.getCycleTime();
 		}
 		else {
 			throw new IllegalStateException("This implementation of SignalPlan works only with a cycle time");
@@ -65,9 +65,9 @@ public class DatabasedSignalPlan implements SignalPlan {
 //			log.error("  SignalGroup " +  sgdata.getSignalGroupId());
 			//do nothing if onset == dropping or all time green is set
 			if (! ( (sgdata.getOnset() == sgdata.getDropping()) || 
-					(sgdata.getOnset() % this.cylce == 0 && sgdata.getDropping() % this.cylce == 0))){
+					(sgdata.getOnset() % this.cycle == 0 && sgdata.getDropping() % this.cycle == 0))){
 				int onset = sgdata.getOnset();
-				onset = (onset + offset) % this.cylce;
+				onset = getPositiveModuloByCycleTime(offset+onset);
 				//onsets
 				List<Id<SignalGroup>> onsetsSgIds = this.secondInPlanOnsetsMap.get(onset);
 				if (onsetsSgIds == null){
@@ -77,7 +77,7 @@ public class DatabasedSignalPlan implements SignalPlan {
 				onsetsSgIds.add(sgdata.getSignalGroupId());
 				//dropping
 				int dropping = sgdata.getDropping();
-				dropping = (dropping + offset) % this.cylce;
+				dropping = getPositiveModuloByCycleTime(offset+dropping);
 				List<Id<SignalGroup>> droppingSgIds = this.secondInPlanDroppingsMap.get(dropping);
 				if (droppingSgIds == null){
 					droppingSgIds = new ArrayList<>();
@@ -87,17 +87,23 @@ public class DatabasedSignalPlan implements SignalPlan {
 			}
 		}
 	}
+
+	private int getPositiveModuloByCycleTime(int dividend) {
+		int modulo = dividend % this.cycle;
+		if (modulo < 0) modulo += this.cycle;
+		return modulo;
+	}
 	
 
 	@Override
 	public List<Id<SignalGroup>> getDroppings(double timeSeconds) {
-		Integer currentSecondInPlan = ((int) (timeSeconds % this.cylce));
+		Integer currentSecondInPlan = ((int) (timeSeconds % this.cycle));
 		return this.secondInPlanDroppingsMap.get(currentSecondInPlan);
 	}
 
 	@Override
 	public List<Id<SignalGroup>> getOnsets(double timeSeconds) {
-		Integer currentSecondInPlan = ((int) (timeSeconds  % this.cylce));
+		Integer currentSecondInPlan = ((int) (timeSeconds  % this.cycle));
 		return this.secondInPlanOnsetsMap.get(currentSecondInPlan);
 	}
 

@@ -41,6 +41,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopArea;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -135,7 +136,7 @@ public class CreatePseudoNetwork {
 				}
 				Id<TransitStopFacility> newId = Id.create(toFacility.getId().toString() + "." + Integer.toString(copies.size() + 1), TransitStopFacility.class);
 				TransitStopFacility newFacility = this.schedule.getFactory().createTransitStopFacility(newId, toFacility.getCoord(), toFacility.getIsBlockingLane());
-				newFacility.setStopPostAreaId(toFacility.getId().toString());
+				newFacility.setStopAreaId(Id.create(toFacility.getId(), TransitStopArea.class));
 				newFacility.setLinkId(link.getId());
 				newFacility.setName(toFacility.getName());
 				copies.add(newFacility);

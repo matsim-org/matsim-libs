@@ -51,9 +51,6 @@ public final class PopulationAgentSource implements AgentSource {
 
 	@Inject
 	public PopulationAgentSource(Population population, AgentFactory agentFactory, QSim qsim ) {
-		Vehicles vehicles = qsim.getScenario().getVehicles() ;
-		QSimConfigGroup qsimConfig = qsim.getScenario().getConfig().qsim() ;
-		
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
@@ -72,6 +69,9 @@ public final class PopulationAgentSource implements AgentSource {
 	}
 
 	private void insertVehicles(Person p) {
+		// this is called in every iteration.  So if a route without a vehicle id is found (e.g. after mode choice),
+		// then the id is generated here.  kai/amit, may'18
+		
 		Plan plan = p.getSelectedPlan();
 		Map<String,Id<Vehicle>> seenModes = new HashMap<>();
 		for (PlanElement planElement : plan.getPlanElements()) {
@@ -89,7 +89,13 @@ public final class PopulationAgentSource implements AgentSource {
 						if (vehicleId == null) {
 							// if mode choice is allowed, it is possible that a new mode is assigned to an agent and then the route does not have the vehicle
 							// but scenario must have that vehicle; however, in order to find the vehicle, we need to identify the vehicle id. Amit July'17
-							vehicleId = createAutomaticVehicleId (p.getId(), leg.getMode());
+							vehicleId = createAutomaticVehicleId(p.getId(), leg.getMode());
+
+							Gbl.assertNotNull(route);
+							// yyyy most execution paths through this method hedge against route==null, but this one does not. I
+							// haven't investigated why this is the case, and if it could be changed.  Would need to understand the
+							// logic of those conditionals first.  kai, may'18
+
 							route.setVehicleId(vehicleId);
 						}
 

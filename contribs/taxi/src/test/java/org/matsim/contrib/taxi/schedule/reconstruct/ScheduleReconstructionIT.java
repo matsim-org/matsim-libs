@@ -57,6 +57,7 @@ public class ScheduleReconstructionIT {
 		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setDumpDataAtEnd(false);
 
 		Controler controler = RunTaxiBenchmark.createControler(config, 1);
 		controler.addOverridingModule(new AbstractModule() {
@@ -139,7 +140,6 @@ public class ScheduleReconstructionIT {
 			// introduced
 			Assert.assertEquals(o.getFromLink(), r.getFromLink());
 			Assert.assertEquals(o.getToLink(), r.getToLink());
-			Assert.assertEquals(o.getQuantity(), r.getQuantity(), 0);
 			Assert.assertEquals(o.getSubmissionTime(), r.getSubmissionTime(), 0);
 			Assert.assertEquals(o.getEarliestStartTime(), r.getEarliestStartTime(), 0);
 			Assert.assertEquals(o.getLatestStartTime(), r.getLatestStartTime(), 0);

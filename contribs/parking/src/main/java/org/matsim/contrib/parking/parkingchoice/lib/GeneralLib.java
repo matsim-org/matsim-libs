@@ -90,9 +90,9 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.vis.kml.KMZWriter;
 import org.xml.sax.SAXException;
 
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml.v_2_2_0.DocumentType;
+import net.opengis.kml.v_2_2_0.KmlType;
+import net.opengis.kml.v_2_2_0.ObjectFactory;
 
 public class GeneralLib {
 

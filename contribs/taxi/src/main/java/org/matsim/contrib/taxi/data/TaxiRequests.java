@@ -19,16 +19,13 @@
 
 package org.matsim.contrib.taxi.data;
 
-import java.util.Collection;
+import java.util.stream.Stream;
 
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 
-import com.google.common.collect.Iterables;
-
 public class TaxiRequests {
-	@SuppressWarnings("unchecked")
-	public static int countRequestsWithStatus(Iterable<? extends Request> requests, TaxiRequestStatus status) {
-		return Iterables.size(Iterables.filter((Collection<TaxiRequest>)requests, req -> req.getStatus() == status));
+	public static long countRequestsWithStatus(Stream<? extends Request> requests, TaxiRequestStatus status) {
+		return requests.filter(r -> ((TaxiRequest)r).getStatus() == status).count();
 	}
 }

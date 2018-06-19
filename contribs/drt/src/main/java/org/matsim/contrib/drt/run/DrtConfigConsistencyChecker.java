@@ -20,9 +20,14 @@
 package org.matsim.contrib.drt.run;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParamsConsistencyChecker;
+import org.matsim.contrib.drt.run.DrtConfigGroup.OperationalScheme;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
+import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
+import org.matsim.core.utils.misc.Time;
 
 public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
 	private static final Logger log = Logger.getLogger(DrtConfigConsistencyChecker.class);
@@ -32,14 +37,32 @@ public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
 		new DvrpConfigConsistencyChecker().checkConsistency(config);
 
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
-		if (drtCfg.getMaxTravelTimeAlpha() < 1) {
-			log.warn(DrtConfigGroup.MAX_TRAVEL_TIME_ALPHA + " is below 1.0! See comments in the DrtConfigGroup");
+		if (Time.isUndefinedTime(config.qsim().getEndTime())
+				&& config.qsim().getSimEndtimeInterpretation() != EndtimeInterpretation.onlyUseEndtime) {
+			// Not an issue if all request rejections are immediate (i.e. happen during request submission)
+			log.warn("qsim.endTime should be specified and qsim.simEndtimeInterpretation should be 'onlyUseEndtime'"
+					+ " if postponed request rejection is allowed. Otherwise, rejected passengers"
+					+ " (who are stuck endlessly waiting for a DRT vehicle) will prevent QSim from stopping");
 		}
-		if (drtCfg.getMaxTravelTimeBeta() < 0) {
-			log.warn(DrtConfigGroup.MAX_TRAVEL_TIME_BETA + " is below 0.0! See comments in the DrtConfigGroup");
+		if (drtCfg.getMaxWaitTime() < drtCfg.getStopDuration()) {
+			throw new RuntimeException(
+					DrtConfigGroup.MAX_WAIT_TIME + " must not be smaller than " + DrtConfigGroup.STOP_DURATION);
 		}
-		if (drtCfg.getMaxWaitTime() < 0) {
-			log.warn(DrtConfigGroup.MAX_WAIT_TIME + " is below 0.0! See comments in the DrtConfigGroup");
+		if (drtCfg.getOperationalScheme() == OperationalScheme.stopbased && drtCfg.getTransitStopFile() == null) {
+			throw new RuntimeException(DrtConfigGroup.TRANSIT_STOP_FILE + " must not be null when "
+					+ DrtConfigGroup.OPERATIONAL_SCHEME + " is " + DrtConfigGroup.OperationalScheme.stopbased);
 		}
+		if (drtCfg.getNumberOfThreads() > Runtime.getRuntime().availableProcessors()) {
+			throw new RuntimeException(
+					DrtConfigGroup.NUMBER_OF_THREADS + " is higher than the number of logical cores available to JVM");
+		}
+		if (config.qsim().getNumberOfThreads() != 1) {
+			throw new RuntimeException("Only a single-threaded QSim allowed");
+		}
+
+		if (drtCfg.getParameterSets(MinCostFlowRebalancingParams.SET_NAME).size() > 1) {
+			throw new RuntimeException("More then one rebalancing parameter sets is specified");
+		}
+		new MinCostFlowRebalancingParamsConsistencyChecker().checkConsistency(config);
 	}
 }

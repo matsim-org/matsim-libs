@@ -39,6 +39,9 @@ public class NoiseComputationModule extends AbstractModule {
 	private final Scenario scenario;
 
 	public NoiseComputationModule(Scenario scenario) {
+		// yy passing "scenario" is maybe not such a problem, but in general one idea of the guice approach is to try to get
+		// away without passing arguments (and, in consequence, not use constructors).  kai, feb'18
+
 		this.scenario = scenario;
 	}
 

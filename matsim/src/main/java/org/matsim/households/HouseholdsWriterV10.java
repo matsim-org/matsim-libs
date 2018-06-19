@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package org.matsim.households;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
@@ -29,7 +26,16 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.algorithms.HouseholdAlgorithm;
+import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 import org.matsim.vehicles.Vehicle;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author dgrether
@@ -37,11 +43,20 @@ import org.matsim.vehicles.Vehicle;
  */
 public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlgorithm{
 
-	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+	private List<Tuple<String, String>> atts = new ArrayList<>();
 	private Households households;
+	private final Map<Class<?>,AttributeConverter<?>> attributeConverters = new HashMap<>();
 
 	public HouseholdsWriterV10(Households households) {
 		this.households = households;
+	}
+
+	public <T> void putAttributeConverter(Class<T> clazz, AttributeConverter<T> converter) {
+		this.attributeConverters.put( clazz , converter );
+	}
+
+	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
+		this.attributeConverters.putAll( converters );
 	}
 
 	public void writeFile(String filename) throws UncheckedIOException {
@@ -49,7 +64,11 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 		this.writeHouseholds(this.households);
 		this.writeEndAndCloseFile();
 	}
-	
+
+	public void writeV1(String filename) {
+
+	}
+
 	/*package*/ void openFileAndWritePreamble(String filename){
 		this.openFile(filename);
 		this.writeXmlHead();
@@ -65,9 +84,9 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 	
 	private void writeHeader(){
 		atts.clear();
-		atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
-		atts.add(this.createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
-		atts.add(this.createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "households_v1.0.xsd"));
+		atts.add(createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
+		atts.add(createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
+		atts.add(createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "households_v1.0.xsd"));
 		this.writeStartTag(HouseholdsSchemaV10Names.HOUSEHOLDS, atts);
 	}
 	
@@ -82,7 +101,7 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 
 	/*package*/ void writeHousehold(Household h) throws UncheckedIOException {
 		this.atts.clear();
-		atts.add(this.createTuple(HouseholdsSchemaV10Names.ID, h.getId().toString()));
+		atts.add(createTuple(HouseholdsSchemaV10Names.ID, h.getId().toString()));
 		this.writeStartTag(HouseholdsSchemaV10Names.HOUSEHOLD, atts);
 		if ((h.getMemberIds() != null) && !h.getMemberIds().isEmpty()){
 			this.writeMembers(h.getMemberIds());
@@ -91,7 +110,7 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 			this.writeStartTag(HouseholdsSchemaV10Names.VEHICLES, null);
 			for (Id<Vehicle> id : h.getVehicleIds()){
 				atts.clear();
-				atts.add(this.createTuple(HouseholdsSchemaV10Names.REFID, id.toString()));
+				atts.add(createTuple(HouseholdsSchemaV10Names.REFID, id.toString()));
 				this.writeStartTag(HouseholdsSchemaV10Names.VEHICLEDEFINITIONID, atts, true);
 			}
 			this.writeEndTag(HouseholdsSchemaV10Names.VEHICLES);
@@ -99,15 +118,25 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 		if (h.getIncome() != null){
 			this.writeIncome(h.getIncome());
 		}
+
+		AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
+		attributesWriter.putAttributeConverters(this.attributeConverters);
+		try {
+			this.writer.write(NL);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		attributesWriter.writeAttributes( "\t\t" , this.writer , h.getAttributes() );
+
 		this.writeEndTag(HouseholdsSchemaV10Names.HOUSEHOLD);
 	}
 
 	private void writeIncome(Income income) throws UncheckedIOException {
 		atts.clear();
 		if (income.getCurrency() != null) {
-			atts.add(this.createTuple(HouseholdsSchemaV10Names.CURRENCY,income.getCurrency()));
+			atts.add(createTuple(HouseholdsSchemaV10Names.CURRENCY,income.getCurrency()));
 		}
-		atts.add(this.createTuple(HouseholdsSchemaV10Names.PERIOD, income.getIncomePeriod().toString()));
+		atts.add(createTuple(HouseholdsSchemaV10Names.PERIOD, income.getIncomePeriod().toString()));
 		this.writeStartTag(HouseholdsSchemaV10Names.INCOME, atts);
 		this.writeContent(Double.toString(income.getIncome()), true);
 		this.writeEndTag(HouseholdsSchemaV10Names.INCOME);
@@ -117,7 +146,7 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 		this.writeStartTag(HouseholdsSchemaV10Names.MEMBERS, null);
 		for (Id<Person> id : memberIds){
 			atts.clear();
-			atts.add(this.createTuple(HouseholdsSchemaV10Names.REFID, id.toString()));
+			atts.add(createTuple(HouseholdsSchemaV10Names.REFID, id.toString()));
 			this.writeStartTag(HouseholdsSchemaV10Names.PERSONID, atts, true);
 		}
 		this.writeEndTag(HouseholdsSchemaV10Names.MEMBERS);

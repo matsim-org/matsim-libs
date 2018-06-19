@@ -37,7 +37,8 @@ public class LoadScenarioByHTTPIT {
 
 	@Test
 	public void testLoadingScenarioFromURLWorks() throws MalformedURLException {
-		Config config = ConfigUtils.loadConfig(new URL("https://raw.githubusercontent.com/matsim-org/matsimExamples/master/tutorial/lesson-3/config.xml"));
+//		Config config = ConfigUtils.loadConfig(new URL("https://raw.githubusercontent.com/matsim-org/matsimExamples/master/tutorial/lesson-3/config.xml"));
+		Config config = ConfigUtils.loadConfig(new URL("https://github.com/matsim-org/matsim/raw/master/examples/scenarios/lesson-3/config.xml"));
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		assertThat("Network has expected size.", scenario.getNetwork().getLinks().size(), equalTo(12940));
 		assertThat("Population has expected size.", scenario.getPopulation().getPersons().size(), equalTo(8760));

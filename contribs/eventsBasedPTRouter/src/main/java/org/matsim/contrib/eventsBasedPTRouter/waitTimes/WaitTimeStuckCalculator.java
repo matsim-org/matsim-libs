@@ -24,6 +24,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -36,6 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
@@ -53,8 +57,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * 
  * @author sergioo
  */
-
-public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler {
+@Singleton
+public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler, WaitTimeCalculator {
 	
 	//Attributes
 	private final double timeSlot;
@@ -65,8 +69,10 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 	private final Population population;
 
 	//Constructors
-	public WaitTimeStuckCalculator(final Population population, final TransitSchedule transitSchedule, final Config config) {
+	@Inject
+	public WaitTimeStuckCalculator(final Population population, final TransitSchedule transitSchedule, final Config config, final EventsManager eventsManager) {
 		this(population, transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
+		eventsManager.addHandler(this);
 	}
 	public WaitTimeStuckCalculator(final Population population, final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
 		this.population = population;
@@ -108,22 +114,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 	}
 
 	//Methods
-	public WaitTime getWaitTimes() {
-		return new WaitTime() {
-			
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
-				return WaitTimeStuckCalculator.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
-			}
-		
-		};
-	}
-	private double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
+	public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
 		Tuple<Id<TransitLine>, Id<TransitRoute>> key = new Tuple<Id<TransitLine>, Id<TransitRoute>>(lineId, routeId);
 		WaitTimeData waitTimeData = waitTimes.get(key).get(stopId);
 		if(waitTimeData.getNumData((int) (time/timeSlot))==0) {
@@ -205,5 +196,21 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 		}
 	}
 
+	@Override
+	public WaitTime get() {
+		return new WaitTime() {
+
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
+				return WaitTimeStuckCalculator.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
+			}
+
+		};
+	}
 }
 

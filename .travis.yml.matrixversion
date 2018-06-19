@@ -1,0 +1,70 @@
+language: java
+jdk: oraclejdk8
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
+
+
+# For the following, see
+# https://blog.travis-ci.com/2017-09-12-build-stages-order-and-conditions.
+# Note that you cannot get rid of the "test" stage, and it is the only
+# stage that does get matrix-expanded.  So the IT tests need to be run
+# in stage called "test", and that is the end to it.  kai, dec'17
+
+# define the order of the stages:
+stages:
+  - package
+  - test
+
+# this is the script run in the "test" stage:
+script: cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
+
+# this defines all other stages.
+jobs:
+  include:
+    - stage: package
+      script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
+
+cache:
+  directories:
+  - $HOME/.m2
+env:
+  global:
+    - MAVEN_OPTS="-Xmx2g"
+  matrix:
+    - MODULE=matsim                        
+    - MODULE=contribs/accessibility        
+    - MODULE=contribs/av                   
+    - MODULE=contribs/analysis             
+    - MODULE=contribs/cadytsIntegration    
+    - MODULE=contribs/carsharing           
+    - MODULE=contribs/drt                  
+    - MODULE=contribs/dvrp                 
+    - MODULE=contribs/taxi                 
+    - MODULE=contribs/emissions            
+    - MODULE=contribs/freight              
+    - MODULE=contribs/signals              
+    - MODULE=contribs/locationchoice       
+    - MODULE=contribs/matsim4urbansim      
+    - MODULE=contribs/minibus              
+    - MODULE=contribs/networkEditor        
+    - MODULE=contribs/otfvis               
+    - MODULE=contribs/matrixbasedptrouter  
+    - MODULE=contribs/parking              
+    - MODULE=contribs/socnetsim            
+    - MODULE=contribs/socnetgen            
+    - MODULE=contribs/transEnergySim       
+    - MODULE=contribs/roadpricing            
+    - MODULE=contribs/multimodal           
+    - MODULE=contribs/integration          
+    - MODULE=contribs/wagonSim             
+    - MODULE=contribs/pseudosimulation     
+    - MODULE=contribs/common               
+    - MODULE=contribs/eventsBasedPTRouter  
+    - MODULE=contribs/travelsummary        
+    - MODULE=contribs/deprecated           
+    - MODULE=contribs/protobuf             
+    - MODULE=contribs/hybridsim            
+    - MODULE=contribs/noise                
+    - MODULE=contribs/bicycle              

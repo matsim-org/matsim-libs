@@ -39,8 +39,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.common.collect.Iterables;
-
 /**
  * @author michalm
  */
@@ -80,11 +78,10 @@ public class AssignmentRequestInserter implements UnplannedRequestInserter {
 	@Override
 	public void scheduleUnplannedRequests(Collection<TaxiRequest> unplannedRequests) {
 		// advance request not considered => horizon==0
-		AssignmentRequestData rData = new AssignmentRequestData(timer.getTimeOfDay(), 0, unplannedRequests);
+		AssignmentRequestData rData = AssignmentRequestData.create(timer.getTimeOfDay(), 0, unplannedRequests);
 		if (rData.getSize() == 0) {
 			return;
 		}
-
 		VehicleData vData = initVehicleData(rData);
 		if (vData.getSize() == 0) {
 			return;
@@ -100,9 +97,10 @@ public class AssignmentRequestInserter implements UnplannedRequestInserter {
 	}
 
 	private VehicleData initVehicleData(AssignmentRequestData rData) {
-		int idleVehs = Iterables.size(Iterables.filter(fleet.getVehicles().values(), scheduler::isIdle));
+		long idleVehs = fleet.getVehicles().values().stream().filter(scheduler::isIdle).count();
 		double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ? //
 				params.vehPlanningHorizonUndersupply : params.vehPlanningHorizonOversupply;
-		return new VehicleData(timer.getTimeOfDay(), scheduler, fleet.getVehicles().values(), vehPlanningHorizon);
+		return new VehicleData(timer.getTimeOfDay(), scheduler, fleet.getVehicles().values().stream(),
+				vehPlanningHorizon);
 	}
 }

@@ -84,10 +84,17 @@ public final class XY2Links extends AbstractPersonAlgorithm implements PlanAlgor
 					// more specific constructor. kai, feb'16
 					
 					if (act.getFacilityId() != null) {
-						ActivityFacility facility = facilities.getFacilities().get(act.getFacilityId()); 
+						ActivityFacility facility = facilities.getFacilities().get(act.getFacilityId());
 
-						if (facility != null) act.setLinkId(facility.getLinkId());
-						// yy facility.getLinkId may be null, in particular since linkId is not even part of the facilities DTD. kai, feb'16
+						if (facility != null) {
+							act.setLinkId(facility.getLinkId());
+							// yy facility.getLinkId may be null, in particular since linkId is not even part of the facilities DTD. kai, feb'16
+
+							if (act.getLinkId() == null && act.getCoord()==null){
+								// for FacilitiesSource.onePerActivityLocationInPlansFile, one can opt to keep coords in facility only. Amit Jan'18
+								act.setCoord(facility.getCoord());
+							}
+						}
 					}
 				}
 				

@@ -27,6 +27,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.router.util.ArrayRoutingNetworkFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -42,10 +44,12 @@ import org.matsim.core.router.util.TravelTime;
  */
 @Singleton
 public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory {
-
+	
 	private final RoutingNetworkFactory routingNetworkFactory;
 	private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();
 	private final Map<Network, PreProcessLandmarks> preProcessData = new HashMap<>();
+	
+	@Inject GlobalConfigGroup globalConfig ;
 
 	@Inject
 	public FastAStarLandmarksFactory() {
@@ -74,7 +78,12 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 			
 			if (preProcessLandmarks == null) {
 				preProcessLandmarks = new PreProcessLandmarks(travelCosts);
-				preProcessLandmarks.setNumberOfThreads(8);
+				if ( globalConfig==null ) {
+					preProcessLandmarks.setNumberOfThreads(8);
+					// (if used without injection.  not so beautiful. kai, nov'17)
+				} else {
+					preProcessLandmarks.setNumberOfThreads(globalConfig.getNumberOfThreads());
+				}
 				preProcessLandmarks.run(network);
 				this.preProcessData.put(network, preProcessLandmarks);
 				
