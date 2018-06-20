@@ -24,6 +24,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 
 /**
+ * This class extends the DefaultTurnAcceptanceLogic by also checking for signal states: 
+ * It only accepts a turn, if the corresponding signal shows green. If not, it returns AcceptTurn.WAIT.
+ * 
  * @author tthunig
  */
 final class SignalTurnAcceptanceLogic implements TurnAcceptanceLogic {
