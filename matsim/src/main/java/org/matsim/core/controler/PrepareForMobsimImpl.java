@@ -1,15 +1,11 @@
 package org.matsim.core.controler;
 
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
@@ -36,15 +32,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim {
+public final class PrepareForMobsimImpl implements PrepareForMobsim {
 	// I think it is ok to have this public final.  Since one may want to use it as a delegate.  kai, may'18
 	// yyyyyy but how should that work with a non-public constructor? kai, jun'18
 	
 	// yyyy There is currently a lot of overlap between PrepareForSimImpl and PrepareForMobsimImpl.
 	// This should be removed.  kai, jun'18
-
-	private static Logger log = Logger.getLogger(PrepareForSim.class);
-
+	
+	private static Logger log = Logger.getLogger(PrepareForMobsimImpl.class);
+	
 	private final GlobalConfigGroup globalConfigGroup;
 	private final Scenario scenario;
 	private final Network network;
@@ -53,9 +49,9 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final Provider<TripRouter> tripRouterProvider;
 	private final QSimConfigGroup qSimConfigGroup;
 	private final FacilitiesConfigGroup facilitiesConfigGroup;
-
+	
 	@Inject
-	PrepareForSimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network,
+	PrepareForMobsimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network,
 				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider,
 				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup) {
 		this.globalConfigGroup = globalConfigGroup;
@@ -67,8 +63,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		this.qSimConfigGroup = qSimConfigGroup;
 		this.facilitiesConfigGroup = facilitiesConfigGroup;
 	}
-
-
+	
+	
 	@Override
 	public void run() {
 		/*
@@ -87,7 +83,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		} else {
 			net = network;
 		}
-
+		
 		//matsim-724
 		switch(this.facilitiesConfigGroup.getFacilitiesSource()){
 			case none:
@@ -111,7 +107,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			default:
 				throw new RuntimeException("Facilities source '"+this.facilitiesConfigGroup.getFacilitiesSource()+"' is not implemented yet.");
 		}
-
+		
 		// make sure all routes are calculated.
 		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
 				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
@@ -120,15 +116,15 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, net);
 					}
 				});
-
+		
 		// though the vehicles should be created before creating a route, however,
 		// as of now, it is not clear how to provide (store) vehicle id to the route afterwards. Amit may'17
-
+		
 		// yyyyyy from a behavioral perspective, the vehicle must be somehow linked to
 		// the person (maybe via the household).  We also have the problem that it
 		// is not possible to switch to a mode that was not in the initial plans ...
 		// since there will be no vehicle for it.  Needs to be fixed somehow.  kai, feb'18
-
+		
 		Map<String, VehicleType> modeVehicleTypes = getMode2VehicleType();
 //		for(Person person : scenario.getPopulation().getPersons().values()) {
 //			for (Plan plan : person.getPlans()) { // go through with all plans ( when it was in population agent source, then going through only with selected plan was sufficient.) Amit May'17
@@ -168,13 +164,13 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 //				}
 //			}
 //		}
-
+		
 		// create vehicles and add to scenario if using mode choice. Amit July'17
 		// creating vehicles for every network mode. Amit Dec'17
 //		if (qSimConfigGroup.isCreatingVehiclesForAllNetworkModes()) {
-			if (qSimConfigGroup.getVehiclesSource() != QSimConfigGroup.VehiclesSource.fromVehiclesData){
-				createAndAddVehiclesForEveryNetworkMode(modeVehicleTypes);
-			} // don't create vehicle if vehicles are provided in vehicles file.
+		if (qSimConfigGroup.getVehiclesSource() != QSimConfigGroup.VehiclesSource.fromVehiclesData){
+			createAndAddVehiclesForEveryNetworkMode(modeVehicleTypes);
+		} // don't create vehicle if vehicles are provided in vehicles file.
 //		} else {
 //			if (qSimConfigGroup.getVehiclesSource() != QSimConfigGroup.VehiclesSource.fromVehiclesData){
 //			log.warn("Creating one vehicle corresponding to each network mode for every agent is disabled and " +
@@ -185,12 +181,12 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 //		}
 		
 		// yy Could now set the vehicle IDs in the routes.  But can as well also do this later (currently in PopulationAgentSource).  kai, jun'18
-
+		
 		if (scenario instanceof Lockable) {
 			((Lockable)scenario).setLocked();
 			// see comment in ScenarioImpl. kai, sep'14
 		}
-
+		
 		if (population instanceof Lockable) {
 			((Lockable) population).setLocked();
 		}
@@ -198,14 +194,14 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		if ( network instanceof Lockable ) {
 			((Lockable) network).setLocked();
 		}
-
+		
 		if (activityFacilities instanceof  Lockable) {
 			((Lockable) activityFacilities).setLocked();
 		}
-
+		
 		// (yyyy means that if someone replaces prepareForSim and does not add the above lines, the containers are not locked.  kai, nov'16)
 	}
-
+	
 	private void createAndAddVehiclesForEveryNetworkMode(final Map<String, VehicleType> modeVehicleTypes) {
 		for (Id<Person> personId : scenario.getPopulation().getPersons().keySet()) {
 			for (String mode : scenario.getConfig().qsim().getMainModes()) {
@@ -214,7 +210,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			}
 		}
 	}
-
+	
 	private  Map<String, VehicleType> getMode2VehicleType(){
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<>();
 		switch ( this.qSimConfigGroup.getVehiclesSource() ) {
@@ -243,11 +239,11 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		}
 		return modeVehicleTypes;
 	}
-
+	
 	private void createAndAddVehicleIfNotPresent(Id<Vehicle> vehicleId, VehicleType vehicleType) {
 		// try to get vehicle from the vehicles container:
 		Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
-
+		
 		if ( vehicle==null ) {
 			// if it was not found, next step depends on config:
 			switch ( qSimConfigGroup.getVehiclesSource() ) {
@@ -268,13 +264,13 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			}
 		}
 	}
-
+	
 	public static Id<Vehicle> createAndSetAutomaticVehicleId(Id<Person> personId, String mode, NetworkRoute route, QSimConfigGroup config) {
 		// yyyy cf. PopulationAgentSource.createAutomaticVehicleId (gone now)
 		
 		Id<Vehicle> vehicleId ;
 		if (config.getUsePersonIdForMissingVehicleId()) {
-
+			
 			// yyyy my strong preference would be to do away with this "car_" exception and to just
 			// use <mode>_personId across the board.  kai, may'18
 			
