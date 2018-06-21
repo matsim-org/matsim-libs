@@ -43,7 +43,6 @@ import com.google.inject.Inject;
 
 public class DrtRoutingModule implements RoutingModule {
 	private final DrtConfigGroup drtconfig;
-	private StageActivityTypes stageActivityTypes;
 	private final Network network;
 
 	@Inject
@@ -81,16 +80,9 @@ public class DrtRoutingModule implements RoutingModule {
 		return Collections.singletonList(leg);
 	}
 
-	/**
-	 * @param stageActivityTypes
-	 *            the stageActivityTypes to set
-	 */
-	public void setStageActivityTypes(StageActivityTypes stageActivityTypes) {
-		this.stageActivityTypes = stageActivityTypes;
-	}
 
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
-		return this.stageActivityTypes != null ? this.stageActivityTypes : EmptyStageActivityTypes.INSTANCE;
+		return EmptyStageActivityTypes.INSTANCE;
 	}
 }
