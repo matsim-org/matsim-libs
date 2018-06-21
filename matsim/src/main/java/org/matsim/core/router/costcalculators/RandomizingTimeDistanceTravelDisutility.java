@@ -96,8 +96,6 @@ final class RandomizingTimeDistanceTravelDisutility implements TravelDisutility 
 			// do not use custom attributes in core??  but what would be a better solution here?? kai, mar'15
 			// Is this actually used anywhere? As far as I can see, this is at least no used in this class... td, Oct'15
 			person.getCustomAttributes().put("logNormalRnd", logNormalRnd ) ;
-			person.getAttributes().putAttribute("logNormalRnd", logNormalRnd); // now using new attributables
-			// test stage to use this for utility computation that delegates to this class here; dz, feb'18
 		} else {
 			logNormalRnd = 1. ;
 		}

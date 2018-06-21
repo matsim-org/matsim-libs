@@ -67,14 +67,14 @@ public final class TransportModeNetworkFilter {
 	 */
 	public void filter(final Network subNetwork, final Set<String> extractModes) {	
 		NetworkFactory factory = subNetwork.getFactory();
-		
+
 		// first, clone all nodes to ensure their order is not changed
 		for (Node node : this.fullNetwork.getNodes().values()) {
 			Node newNode = factory.createNode(node.getId(), node.getCoord());
 			AttributesUtils.copyAttributesFromTo(node, newNode);
 			subNetwork.addNode(newNode);
 		}
-		
+
 		// second, create clones of the links allowing the extracted modes
 		Set<Id<Node>> nodesToInclude = new HashSet<>();
 		for (Link link : this.fullNetwork.getLinks().values()) {
