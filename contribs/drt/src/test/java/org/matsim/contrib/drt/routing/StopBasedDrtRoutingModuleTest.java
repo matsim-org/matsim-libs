@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.drt.routing;
 
@@ -38,17 +38,19 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TeleportationRoutingModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 /**
- * @author  jbischoff
- *
+ * @author jbischoff
  */
 public class StopBasedDrtRoutingModuleTest {
 
@@ -62,8 +64,11 @@ public class StopBasedDrtRoutingModuleTest {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(scenario.getConfig());
 		AccessEgressStopFinder stopFinder = new DefaultAccessEgressStopFinder(scenario.getTransitSchedule(), drtCfg,
 				scenario.getConfig().plansCalcRoute(), scenario.getNetwork());
+		DrtRoutingModule drtRoutingModule = new DrtRoutingModule(drtCfg, scenario.getNetwork(),
+				new FreeSpeedTravelTime(), TimeAsTravelDisutility::new, scenario.getPopulation().getFactory(),
+				walkRouter);
 		StopBasedDrtRoutingModule stopBasedDRTRoutingModule = new StopBasedDrtRoutingModule(
-				scenario.getPopulation().getFactory(), walkRouter, stopFinder, drtCfg);
+				scenario.getPopulation().getFactory(), drtRoutingModule, walkRouter, stopFinder, drtCfg);
 
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
 		Activity h = (Activity)p1.getSelectedPlan().getPlanElements().get(0);
