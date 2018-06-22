@@ -15,47 +15,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.contrib.drt.routing;
 
-package org.matsim.contrib.dvrp.trafficmonitoring;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Binder;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.population.routes.RouteFactory;
 
 /**
- * @author michalm
+ * @author michalm (Michal Maciejewski)
  */
-public class DvrpTravelDisutilityProvider implements Provider<TravelDisutility> {
-	public static void bindTravelDisutilityForOptimizer(Binder binder, String annotation) {
-		binder.bind(TravelDisutility.class).annotatedWith(Names.named(annotation))
-				.toProvider(new DvrpTravelDisutilityProvider(annotation)).asEagerSingleton();
-	}
-
-	@Inject
-	private Injector injector;
-
-	@Inject
-	@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-	private TravelTime travelTime;
-
-	private final String annotation;
-
-	public DvrpTravelDisutilityProvider(String annotation) {
-		this.annotation = annotation;
+public class DrtRouteFactory implements RouteFactory {
+	@Override
+	public Route createRoute(Id<Link> startLinkId, Id<Link> endLinkId) {
+		return new DrtRoute(startLinkId, endLinkId);
 	}
 
 	@Override
-	public TravelDisutility get() {
-		return injector.getInstance(Key.get(TravelDisutilityFactory.class, Names.named(annotation)))
-				.createTravelDisutility(travelTime);
+	public String getCreatedRouteType() {
+		return DrtRoute.ROUTE_TYPE;
 	}
 }
