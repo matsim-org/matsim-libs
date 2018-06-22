@@ -28,6 +28,8 @@ import org.matsim.core.population.routes.AbstractRoute;
  * <li>{@code directRideTime} is the time of an unshared ride</li>
  * <li>{@code travelTime} is the maximum travel (wait+ride) time (excluding walk to/from the stop)</li>
  * </ul>
+ *
+ * @author michalm (Michal Maciejewski)
  */
 public class DrtRoute extends AbstractRoute {
 	final static String ROUTE_TYPE = "drt";

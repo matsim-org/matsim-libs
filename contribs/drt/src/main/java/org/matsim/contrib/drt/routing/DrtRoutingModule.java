@@ -50,6 +50,10 @@ import org.matsim.facilities.Facility;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+/**
+ * @author jbischoff
+ * @author michalm (Michal Maciejewski)
+ */
 public class DrtRoutingModule implements RoutingModule {
 	private static final Logger LOGGER = Logger.getLogger(DrtRoutingModule.class);
 
