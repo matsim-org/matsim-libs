@@ -130,59 +130,11 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// since there will be no vehicle for it.  Needs to be fixed somehow.  kai, feb'18
 
 		Map<String, VehicleType> modeVehicleTypes = getMode2VehicleType();
-//		for(Person person : scenario.getPopulation().getPersons().values()) {
-//			for (Plan plan : person.getPlans()) { // go through with all plans ( when it was in population agent source, then going through only with selected plan was sufficient.) Amit May'17
-//				Map<String, Id<Vehicle>> seenModes = new HashMap<>();
-//				for (PlanElement planElement : plan.getPlanElements()) {
-//					if (planElement instanceof Leg) {
-//						Leg leg = (Leg) planElement;
-//						if (qSimConfigGroup.getMainModes().contains(leg.getMode())) {// only simulated modes get vehicles
-//							NetworkRoute route = (NetworkRoute) leg.getRoute();
-//							Id<Vehicle> vehicleId = null;
-//							if (route != null) {
-//								vehicleId = route.getVehicleId(); // may be null!
-//							} else {
-//								throw new RuntimeException("Route not found.  Possible reason: leg did not have "
-//										+ "activities with locations at both ends (e.g. plan ends with leg).");
-//							}
-//
-//							if (!seenModes.keySet().contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
-//
-//								if (vehicleId == null) {
-//									vehicleId = createAndSetAutomaticVehicleId(person.getId(), leg.getMode(), route,this.qSimConfigGroup);
-//									// yyyy Not so clear if we need this here.  Should be sufficient in PopulationAgentSource.  kai, jun'18
-//								}
-//
-//								// so here we have a vehicle id, now try to find or create a physical vehicle:
-//								createAndAddVehicleIfNotPresent( vehicleId, modeVehicleTypes.get(leg.getMode()));
-//								seenModes.put(leg.getMode(), vehicleId);
-//							} else {
-//								if (vehicleId == null) {
-//									vehicleId = seenModes.get(leg.getMode());
-//									route.setVehicleId(vehicleId);
-//								}
-//							}
-//
-//						}
-//					}
-//				}
-//			}
-//		}
 
-		// create vehicles and add to scenario if using mode choice. Amit July'17
 		// creating vehicles for every network mode. Amit Dec'17
-//		if (qSimConfigGroup.isCreatingVehiclesForAllNetworkModes()) {
-			if (qSimConfigGroup.getVehiclesSource() != QSimConfigGroup.VehiclesSource.fromVehiclesData){
-				createAndAddVehiclesForEveryNetworkMode(modeVehicleTypes);
-			} // don't create vehicle if vehicles are provided in vehicles file.
-//		} else {
-//			if (qSimConfigGroup.getVehiclesSource() != QSimConfigGroup.VehiclesSource.fromVehiclesData){
-//			log.warn("Creating one vehicle corresponding to each network mode for every agent is disabled and " +
-//					"vehicleSource is not " + QSimConfigGroup.VehiclesSource.fromVehiclesData.toString() + ". " +
-//					"\n Simulation should run without a problem if it does not include mode choice. " +
-//					"Please provide vehicles file or set 'creatingVehiclesForAllNetworkModes' to true if this is not the case.");
-//			}
-//		}
+		if (qSimConfigGroup.getVehiclesSource() != QSimConfigGroup.VehiclesSource.fromVehiclesData){
+			createAndAddVehiclesForEveryNetworkMode(modeVehicleTypes);
+		} // don't create vehicle if vehicles are provided in vehicles file.
 		
 		// yy Could now set the vehicle IDs in the routes.  But can as well also do this later (currently in PopulationAgentSource).  kai, jun'18
 
