@@ -24,13 +24,15 @@ import org.matsim.core.population.routes.AbstractRoute;
 /**
  * Assumptions:
  * <ul>
- * <li>{@code directRideTime} is an optimistic estimate equal to the time of an unshared ride</li>
+ * <li>{@code maxWaitTime} is the maximum wait time</li>
+ * <li>{@code directRideTime} is the time of an unshared ride</li>
  * <li>{@code travelTime} is the maximum travel (wait+ride) time (excluding walk to/from the stop)</li>
  * </ul>
  */
 public class DrtRoute extends AbstractRoute {
 	final static String ROUTE_TYPE = "drt";
 
+	private double maxWaitTime;
 	private double directRideTime;
 
 	public DrtRoute(Id<Link> startLinkId, Id<Link> endLinkId) {
@@ -41,18 +43,28 @@ public class DrtRoute extends AbstractRoute {
 		return directRideTime;
 	}
 
+	public double getMaxWaitTime() {
+		return maxWaitTime;
+	}
+
 	public void setUnsharedRideTime(double directRideTime) {
 		this.directRideTime = directRideTime;
 	}
 
+	public void setMaxWaitTime(double maxWaitTime) {
+		this.maxWaitTime = maxWaitTime;
+	}
+
 	@Override
 	public String getRouteDescription() {
-		return Double.toString(directRideTime);
+		return maxWaitTime + " " + directRideTime;
 	}
 
 	@Override
 	public void setRouteDescription(String routeDescription) {
-		directRideTime = Double.parseDouble(routeDescription);
+		String[] values = routeDescription.split(" ");
+		maxWaitTime = requiresZeroOrPositive(Double.parseDouble(values[0]));
+		directRideTime = requiresZeroOrPositive(Double.parseDouble(values[1]));
 	}
 
 	@Override
@@ -63,5 +75,12 @@ public class DrtRoute extends AbstractRoute {
 	@Override
 	public DrtRoute clone() {
 		return (DrtRoute)super.clone();
+	}
+
+	private double requiresZeroOrPositive(double value) {
+		if (value >= 0 || value <= Double.MAX_VALUE) {
+			return value;
+		}
+		throw new IllegalArgumentException("Value: " + value + " must be zero or positive");
 	}
 }

@@ -100,6 +100,7 @@ public class DrtRoutingModule implements RoutingModule {
 		route.setDistance(unsharedDistance);
 		route.setTravelTime(maxTravelTime);
 		route.setUnsharedRideTime(unsharedRideTime);
+		route.setMaxWaitTime(drtCfg.getMaxWaitTime());
 
 		Leg drtLeg = populationFactory.createLeg(TransportMode.drt);
 		drtLeg.setDepartureTime(departureTime);
