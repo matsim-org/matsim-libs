@@ -35,11 +35,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -107,7 +106,7 @@ public class StopBasedDrtRoutingModuleTest {
 		drtConfigGroup.setTransitStopFile("./src/test/resources/cottbus/stops-schedule.xml.gz");
 		config.addModule(drtConfigGroup);
 
-		Scenario scenario = ScenarioUtils.createScenario(config);
+		Scenario scenario = DrtControlerCreator.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("./src/test/resources/cottbus/network.xml.gz");
 		new TransitScheduleReader(scenario).readFile(drtConfigGroup.getTransitStopFile());
 		createSomeAgents(scenario);
