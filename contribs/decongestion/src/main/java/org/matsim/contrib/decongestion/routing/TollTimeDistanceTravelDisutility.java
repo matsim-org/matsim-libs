@@ -31,6 +31,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 import org.matsim.contrib.decongestion.data.DecongestionInfo;
+import org.matsim.contrib.decongestion.data.LinkInfo;
 
 /**
  * A cost calculator which respects time, distance and decongestion tolls. 
@@ -70,9 +71,16 @@ public final class TollTimeDistanceTravelDisutility implements TravelDisutility 
 
 		// adjust the travel disutility for the toll
 		double toll = 0.;
-		if (info.getlinkInfos().containsKey(link.getId()) && info.getlinkInfos().get(link.getId()).getTime2toll().containsKey(timeBin)) {
-			toll = info.getlinkInfos().get(link.getId()).getTime2toll().get(timeBin);
+		
+		LinkInfo linkInfo = info.getlinkInfos().get(link.getId());
+		if (linkInfo != null) {
+			
+			Double linkInfoTimeBinToll = linkInfo.getTime2toll().get(timeBin);	
+			if (linkInfoTimeBinToll != null) {
+				toll = linkInfoTimeBinToll;
+			}
 		}
+		
 		double tollAdjustedLinkTravelDisutility = Double.NEGATIVE_INFINITY;
 		tollAdjustedLinkTravelDisutility = timeDistanceTravelDisutilityFromDelegate + logNormalRnd * cnScoringGroup.getMarginalUtilityOfMoney() * toll;
 		
