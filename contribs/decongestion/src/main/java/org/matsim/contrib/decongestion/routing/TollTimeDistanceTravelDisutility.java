@@ -55,7 +55,7 @@ public final class TollTimeDistanceTravelDisutility implements TravelDisutility 
 		builder.setSigma(sigma);
 		this.delegate = builder.createTravelDisutility(timeCalculator);
 
-		log.info("Using the toll-adjusted travel disutility in the decongestion package.");
+		log.info("Using the toll-adjusted travel disutility in the decongestion package (improved version).");
 	}
 
 	@Override
