@@ -84,8 +84,7 @@ public final class TollTimeDistanceTravelDisutility implements TravelDisutility 
 			}
 		}
 		
-		double tollAdjustedLinkTravelDisutility = timeDistanceTravelDisutilityFromDelegate + logNormalRnd * marginalUtilityOfMoney * toll;
-		
+		double tollAdjustedLinkTravelDisutility = timeDistanceTravelDisutilityFromDelegate + logNormalRnd * marginalUtilityOfMoney * toll;		
 		return tollAdjustedLinkTravelDisutility;
 	}
 
