@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data;
+package org.matsim.lanes;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -36,7 +36,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.jaxb.lanedefinitions20.*;
 import org.matsim.utils.objectattributes.ObjectAttributesConverter;
-import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
 /**
  * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
@@ -44,7 +43,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegat
  * @author dgrether
  *
  */
-public class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
+public final class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
 
 	private static final Logger log = Logger
 			.getLogger(LanesWriter.class);

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.lanes.data;
+package org.matsim.lanes;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 /**
  * @author dgrether
  */
-class LanesToLinkAssignmentImpl implements LanesToLinkAssignment {
+final class LanesToLinkAssignmentImpl implements LanesToLinkAssignment {
 
 	private final Id<Link> linkId;
 

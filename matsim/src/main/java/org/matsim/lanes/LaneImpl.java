@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.lanes.data;
+package org.matsim.lanes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 /**
  * @author dgrether
  */
-class LaneImpl implements Lane {
+final class LaneImpl implements Lane {
 
 	private Id<Lane> id;
 	/**

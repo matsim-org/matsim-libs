@@ -20,7 +20,7 @@
 package org.matsim.contrib.signals.otfvis;
 
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
-import org.matsim.lanes.vis.VisSignal;
+import org.matsim.lanes.VisSignal;
 
 import java.util.HashMap;
 import java.util.Map;

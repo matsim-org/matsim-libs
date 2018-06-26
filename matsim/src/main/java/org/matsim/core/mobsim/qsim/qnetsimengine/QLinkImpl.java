@@ -36,8 +36,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLink
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.lanes.vis.VisLaneModelBuilder;
-import org.matsim.lanes.vis.VisLinkWLanes;
+import org.matsim.lanes.VisLaneModelBuilder;
+import org.matsim.lanes.VisLinkWLanes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;

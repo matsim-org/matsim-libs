@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.lanes.vis.VisLaneModelBuilder;
-import org.matsim.lanes.vis.VisLinkWLanes;
+import org.matsim.lanes.VisLaneModelBuilder;
+import org.matsim.lanes.VisLinkWLanes;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 

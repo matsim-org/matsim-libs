@@ -43,10 +43,10 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.Lane;
-import org.matsim.lanes.data.Lanes;
-import org.matsim.lanes.data.LanesFactory;
-import org.matsim.lanes.data.LanesToLinkAssignment;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.Lanes;
+import org.matsim.lanes.LanesFactory;
+import org.matsim.lanes.LanesToLinkAssignment;
 
 /**
  * Creates a simple test network, properties:

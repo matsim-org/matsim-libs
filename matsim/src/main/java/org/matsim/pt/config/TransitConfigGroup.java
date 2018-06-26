@@ -192,4 +192,12 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	public void setBoardingAcceptance(BoardingAcceptance boardingAcceptance) {
 		this.boardingAcceptance = boardingAcceptance;
 	}
+	
+	private boolean usingTransitInMobsim = true ;
+	public final void setUsingTransitInMobsim( boolean val ) {
+		usingTransitInMobsim = val ;
+	}
+	public final boolean isUsingTransitInMobsim(){
+		return usingTransitInMobsim ;
+	}
 }

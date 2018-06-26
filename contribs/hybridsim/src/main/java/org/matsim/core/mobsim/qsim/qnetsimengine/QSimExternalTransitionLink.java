@@ -32,7 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 

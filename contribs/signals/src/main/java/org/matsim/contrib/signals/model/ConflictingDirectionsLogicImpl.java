@@ -41,8 +41,8 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.lanes.data.Lane;
-import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.Lanes;
 
 
 /**

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicLaneDefinitions
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +16,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data;
+
+package org.matsim.lanes;
 
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 /**
+ * Top level container for lanes within MATSim. See package-info for documentation.
  * @author dgrether
+ *
  */
-public class LanesImpl implements Lanes {
+public interface Lanes extends MatsimToplevelContainer {
+	String ELEMENT_NAME = "laneDefinition20";
 
-	private SortedMap<Id<Link>, LanesToLinkAssignment> lanesToLinkAssignments =  new TreeMap<>();
+	/**
+	 *
+	 * @return Map with Link Ids as keys and assignments as values
+	 */
+	SortedMap<Id<Link>, LanesToLinkAssignment> getLanesToLinkAssignments();
 
-	private LanesFactory builder = new LanesFactoryImpl();
-
-	LanesImpl(){}
-
+	/**
+	 * Adds a LanesToLinkAssignment to the container.
+	 * @param assignment
+	 */
+	void addLanesToLinkAssignment(LanesToLinkAssignment assignment);
+	/**
+	 * Get the factory to create container content.
+	 */
 	@Override
-	public SortedMap<Id<Link>, LanesToLinkAssignment> getLanesToLinkAssignments() {
-		return this.lanesToLinkAssignments;
-	}
-
-	@Override
-	public void addLanesToLinkAssignment(LanesToLinkAssignment assignment) {
-		this.lanesToLinkAssignments.put(assignment.getLinkId(), assignment);
-	}
-
-	@Override
-	public LanesFactory getFactory(){
-		return this.builder;
-	}
+	LanesFactory getFactory();
 
 }
