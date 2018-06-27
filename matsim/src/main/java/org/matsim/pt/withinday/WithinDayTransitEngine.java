@@ -74,7 +74,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.withinday.PlanSegments.PlanSegment;
 
-import com.google.common.io.Files;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -124,14 +123,20 @@ public class WithinDayTransitEngine implements MobsimEngine {
 			// Do nothing for now
 		}
 		else if (behavior.equals("greedy")) {
+			// Greedy behavior always enters the vehicle if it brings the agent to their current destination
 			this.scriptedBehavior = ScriptedTransitBehavior.greedyBehavior();
 		}
 		else if (behavior.startsWith("flexible(") && behavior.endsWith(")")) {
+			// Flexible behavior enters the vehicle if it brings the agent to their current destination and it
+			// the different travel time does not exceed the given amount of time.
 			String timeStr = behavior.substring(9,behavior.length()-1).trim();
 			double time = Time.parseTime(timeStr);
 			this.scriptedBehavior = ScriptedTransitBehavior.thresholdBehavior(time);
 		}
 		else if (behavior.toLowerCase().endsWith(".js")) {
+			// Javascript behavior uses an external script to decide the behavior of the agent.
+			// Java does fancy JIT compilation of these kinds of stuff, but it probably results in some
+			// additional overhead.
 			URL url = ConfigGroup.getInputFileURL(config.getContext(), behavior);
 			StringBuilder sb = new StringBuilder();
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(IOUtils.getInputStream(url), StandardCharsets.UTF_8))) {
@@ -153,20 +158,28 @@ public class WithinDayTransitEngine implements MobsimEngine {
 	
 	@Override
 	public void doSimStep(double time) {
+		
+		List<XMLDisruption> newDisruptions = new ArrayList<>();
+		int newCount = 0;
+		StringBuilder sb = new StringBuilder();
 		// Check whether there are disruptions queued up that should be executed now
 		while (!pending.isEmpty() && time >= pending.peek().getStartTime()) {
 			XMLDisruption disruption = pending.pop();
 			active.add(disruption);
-			
-			if (log.isInfoEnabled()) {
-				log.info("Disruption was triggered. Running the replanner for " + describe(disruption));
-			}
-			
+			newDisruptions.add(disruption);
 			currentSchedule = reduceSchedule(currentSchedule, disruption);
-			TransitRouter router = getRouter(currentSchedule);
-			
-			doReplan(router, disruption);
+			newCount ++;
+			sb.append("\n\t");
+			sb.append(describe(disruption));
 		}
+		
+		if (newCount > 0 && log.isInfoEnabled()) {
+				log.info(newCount+" new disruptions were triggered. Running the replanner for " + sb.toString());
+		}
+			
+		TransitRouter router = getRouter(currentSchedule);
+			
+		doReplan(router, newDisruptions);
 	}
 	
 	public ScriptedTransitBehavior getBehavior() {
@@ -219,20 +232,20 @@ public class WithinDayTransitEngine implements MobsimEngine {
 	/**
 	 * Scans through the agents in the simulation and calls replanAgent on them
 	 * @param router the router to use for affected agents
-	 * @param disruption the disruption that triggers the replanning
+	 * @param disruptions a list of new disruptions that triggered the replanning
 	 */
-	private void doReplan(TransitRouter router, XMLDisruption disruption) {
+	private void doReplan(TransitRouter router, List<XMLDisruption> disruptions) {
 		QSim qsim = (QSim) internalInterface.getMobsim();
-		qsim.getAgents().values().forEach(agent -> replanAgent(agent, router, disruption));		
+		qsim.getAgents().values().forEach(agent -> replanAgent(agent, router, disruptions));		
 	}
 	
 	/**
 	 * Replan an agent
 	 * @param agent the agent to replan
 	 * @param router the update router to use during replanning
-	 * @param disruption the disruption that triggered this replanning call
+	 * @param disruptions a list of the disruptions that triggered this replanning call
 	 */
-	private void replanAgent(MobsimAgent agent, TransitRouter router, XMLDisruption disruption) {
+	private void replanAgent(MobsimAgent agent, TransitRouter router, List<XMLDisruption> disruptions) {
 		if (agent instanceof HasModifiablePlan) {
 			HasModifiablePlan hmp = (HasModifiablePlan) agent;
 			Person person = scenario.getPopulation().getPersons().get(agent.getId());
@@ -242,7 +255,7 @@ public class WithinDayTransitEngine implements MobsimEngine {
 			PlanElement current = WithinDayAgentUtils.getCurrentPlanElement(agent);
 			List<PlanElement> remainingElements = dropUntil(planElements, current);
 			
-			if (!checkAffected(disruption, remainingElements)) {
+			if (!checkAffected(disruptions, remainingElements)) {
 				// This agent's plan is not affected by this disruption. Do nothing.
 				return;
 			}
@@ -263,7 +276,7 @@ public class WithinDayTransitEngine implements MobsimEngine {
 			log.info("Segments: "+segments);
 			
 			// Replan the remaining part of the agent's plan
-			List<PlanElement> newPlan = replanFromActivity(disruption, remainingElements, router, person);
+			List<PlanElement> newPlan = replanFromActivity(disruptions, remainingElements, router, person);
 			int index = planElements.indexOf(current);
 			while(index < planElements.size() - 1) {
 				planElements.remove(planElements.size()-1);
@@ -274,13 +287,13 @@ public class WithinDayTransitEngine implements MobsimEngine {
 	
 	/**
 	 * Takes the remaining plan of an agent which should start at an activity and replans it
-	 * @param disruption the disruption that triggered this replanning action
+	 * @param disruption a list the disruptions that triggered this replanning action
 	 * @param elements the remaining plan of the agent
 	 * @param router the updated router to use during replanning
 	 * @param person the person whose plan is affected
 	 * @return a replanned plan generated using the updated router
 	 */
-	private List<PlanElement> replanFromActivity(XMLDisruption disruption, List<PlanElement> elements, TransitRouter router, Person person) {
+	private List<PlanElement> replanFromActivity(List<XMLDisruption> disruption, List<PlanElement> elements, TransitRouter router, Person person) {
 		List<PlanElement> newPlan = new ArrayList<>();
 		if (elements.size() < 3) {
 			newPlan.addAll(elements);
@@ -488,24 +501,34 @@ public class WithinDayTransitEngine implements MobsimEngine {
 	
 	/**
 	 * Checks whether a plan is affected by a give disruption
-	 * @param disruption the disruption to check for
+	 * @param disruptions a list of disruptions to check for
 	 * @param pes the plan to check
 	 * @return whether the plan is (possibly) affected by this disruption
 	 */
-	private boolean checkAffected(XMLDisruption disruption, List<PlanElement> pes) {
+	private boolean checkAffected(List<XMLDisruption> disruptions, List<PlanElement> pes) {
 		for (PlanElement pe : pes) {
 			if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;
 				Route route = leg.getRoute();
 				if (route instanceof ExperimentalTransitRoute) {
 					ExperimentalTransitRoute etr = (ExperimentalTransitRoute) route;
-					if (checkTransitRouteAffected(disruption, etr)) {
+					if (checkTransitRouteAffected(disruptions, etr)) {
 						return true;
 					}
 				}
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Checks whether a transit route is affected by one of the disruption
+	 * @param disruptions the list of disruptions to check for
+	 * @param route the transit route to check
+	 * @return whether the transit route contains lines or routes that are affected by one of the disruptions
+	 */
+	private boolean checkTransitRouteAffected(List<XMLDisruption> disruptions, ExperimentalTransitRoute route) {
+		return disruptions.stream().anyMatch(disruption -> checkTransitRouteAffected(disruption, route));
 	}
 	
 	/**
