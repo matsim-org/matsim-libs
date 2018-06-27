@@ -54,5 +54,5 @@ public class WithinDayTransitConfigGroup extends ReflectiveConfigGroup {
 	public String getBehavior() {
 		return behavior;
 	}
-	
+
 }

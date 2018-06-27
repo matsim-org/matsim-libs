@@ -84,6 +84,7 @@ public class WithinDayTransitEngine implements MobsimEngine {
 	
 	private final Config config;
 	private final Scenario scenario;
+	private final WithinDayTransitConfigGroup cfg;
 	
 	//private final double disruptionStart;
 	private List<XMLDisruption> disruptions;
@@ -101,8 +102,7 @@ public class WithinDayTransitEngine implements MobsimEngine {
 	public WithinDayTransitEngine(Config config, Scenario scenario) {
 		this.scenario = scenario;
 		this.config = config;
-		
-		WithinDayTransitConfigGroup cfg = ConfigUtils.addOrGetModule(config, WithinDayTransitConfigGroup.class);
+		this.cfg = ConfigUtils.addOrGetModule(config, WithinDayTransitConfigGroup.class);
 		
 		this.disruptions = new ArrayList<>();
 		try {
@@ -167,19 +167,22 @@ public class WithinDayTransitEngine implements MobsimEngine {
 			XMLDisruption disruption = pending.pop();
 			active.add(disruption);
 			newDisruptions.add(disruption);
-			currentSchedule = reduceSchedule(currentSchedule, disruption);
 			newCount ++;
-			sb.append("\n\t");
-			sb.append(describe(disruption));
+			if (log.isInfoEnabled()) {
+				sb.append("\n\t");
+				sb.append(describe(disruption));
+			}
 		}
 		
 		if (newCount > 0 && log.isInfoEnabled()) {
 				log.info(newCount+" new disruptions were triggered. Running the replanner for " + sb.toString());
 		}
 			
-		TransitRouter router = getRouter(currentSchedule);
-			
-		doReplan(router, newDisruptions);
+		if (newCount > 0) {
+			currentSchedule = reduceSchedule(currentSchedule, disruptions);
+			TransitRouter router = getRouter(currentSchedule);
+			doReplan(router, newDisruptions);
+		}
 	}
 	
 	public ScriptedTransitBehavior getBehavior() {
@@ -270,10 +273,11 @@ public class WithinDayTransitEngine implements MobsimEngine {
 				return;
 			}
 
-			log.info("New plan computed for person "+person.getId());
-			
 			List<PlanSegment> segments = PlanSegments.segmentize(remainingElements);
-			log.info("Segments: "+segments);
+			if (log.isInfoEnabled()) {
+				log.info("New plan computed for person "+person.getId());
+				log.info("Segments: "+segments);
+			}
 			
 			// Replan the remaining part of the agent's plan
 			List<PlanElement> newPlan = replanFromActivity(disruptions, remainingElements, router, person);
@@ -457,10 +461,10 @@ public class WithinDayTransitEngine implements MobsimEngine {
 	 * This filters routes, lines and departures from a TransitSchedule according to the
 	 * definition of a disruption. This is basically a rather involved semi deep-cloning method.
 	 * @param base the original TransitSchedule
-	 * @param disruption the disruption that should be used to filter the schedule
+	 * @param disruptions the disruptions that should be used to filter the schedule
 	 * @return the reduced schedule from which disrupted services are removed
 	 */
-	private TransitSchedule reduceSchedule(TransitSchedule base, XMLDisruption disruption) {
+	private TransitSchedule reduceSchedule(TransitSchedule base, List<XMLDisruption> disruptions) {
 		// TODO: maybe it is important to copy the other attributes as well? - pcbouman may'18		
 		TransitScheduleFactory fac = new TransitScheduleFactoryImpl();
 		TransitSchedule result = fac.createTransitSchedule();
@@ -475,12 +479,14 @@ public class WithinDayTransitEngine implements MobsimEngine {
 				boolean addRoute = false;
 				TransitRoute newRoute = fac.createTransitRoute(route.getId(), route.getRoute(), route.getStops(), route.getTransportMode());
 				for (Departure dep : route.getDepartures().values()) {
-					if (checkDeparture(disruption, line, route, dep)) {
+					if (checkDeparture(disruptions, line, route, dep)) {
 						newRoute.addDeparture(dep);
 						addRoute = true;
 					}
 					else {
-						log.info("Removing departure at "+Time.writeTime(dep.getDepartureTime())+" of route '"+route.getId()+"' of line '"+line.getId()+"'");
+						if (log.isInfoEnabled()) {
+							log.info("Removing departure at "+Time.writeTime(dep.getDepartureTime())+" of route '"+route.getId()+"' of line '"+line.getId()+"'");
+						}
 					}
 				}
 				if (addRoute) {
@@ -492,7 +498,9 @@ public class WithinDayTransitEngine implements MobsimEngine {
 				result.addTransitLine(newLine);
 			}
 			else {
-				log.info("No routes left in line '"+line.getName()+"'. Removing it from the TransitSchedule.");
+				if (log.isInfoEnabled()) {
+					log.info("No routes left in line '"+line.getName()+"'. Removing it from the TransitSchedule.");
+				}
 			}
 			
 		}
@@ -545,6 +553,18 @@ public class WithinDayTransitEngine implements MobsimEngine {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * Checks whether a departure is affected by a disruption
+	 * @param disruptions a list of disruptions to check for
+	 * @param line the line of this departure
+	 * @param route the route of this departure
+	 * @param dep the actual departure
+	 * @return whether the departure is affected by any of the disruptions
+	 */
+	private boolean checkDeparture(List<XMLDisruption> disruptions, TransitLine line, TransitRoute route, Departure dep) {
+		return disruptions.stream().anyMatch(disruption -> checkDeparture(disruption,line,route,dep));
 	}
 	
 	/**

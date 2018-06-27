@@ -66,7 +66,9 @@ public class ScriptedTransitAgent implements MobsimDriverPassengerAgent, PlanAge
 		basicAgentDelegate.endLegAndComputeNextState(now);
 		String post = basicAgentDelegate.getCurrentPlanElement().toString();
 		String posteriorState = basicAgentDelegate.getState().toString() + "("+post+")";
-		log.info("Agent "+id+" end leg: "+priorState+" -> "+posteriorState);
+		if (log.isDebugEnabled()) {
+			log.debug("Agent "+id+" end leg: "+priorState+" -> "+posteriorState);
+		}
 	}
 	@Override
 	public final void setStateToAbort(double now) {
@@ -84,7 +86,9 @@ public class ScriptedTransitAgent implements MobsimDriverPassengerAgent, PlanAge
 		basicAgentDelegate.endActivityAndComputeNextState(now);
 		String post = basicAgentDelegate.getCurrentPlanElement().toString();
 		String posteriorState = basicAgentDelegate.getState().toString() + "("+post+")";
-		log.info("Agent "+id+" end activity: "+priorState+" -> "+posteriorState);
+		if (log.isDebugEnabled()) {
+			log.debug("Agent "+id+" end activity: "+priorState+" -> "+posteriorState);
+		}
 	}
 	@Override
 	public final Id<Vehicle> getPlannedVehicleId() {
