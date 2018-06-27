@@ -26,15 +26,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -45,7 +49,9 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class WithinDayTransitModuleTest {
 
-	private Map<String,String> observations = new HashMap<>();
+	private Map<String,String> vehicleObservations = new HashMap<>();
+	private Map<String,String> firstActivities = new HashMap<>();
+	private Map<String,String> lastActivities = new HashMap<>();
 
 	private static Logger log = Logger.getLogger(WithinDayTransitModuleTest.class);
 	
@@ -74,21 +80,47 @@ public class WithinDayTransitModuleTest {
 		runTest("flexible(00:00:00)", this::regularCheckEnterEvent);
 		// This is the scenario with flexible behavior that should be equivalent to greedy behavior (in this scenario)
 		runTest("flexible(02:00:00)", this::greedyCheckEnterEvent);
+		
+		
+		// If the purple line is disrupted all day and the yellow line starting at 5:15,
+		// the greedy behavior should be equal to the regular behavior
+		runTest("greedy", "disruptions2.xml", this::regularCheckEnterEvent);
+		
 	}
-
-    
-    public Controler getControler(String behavior, PersonEntersVehicleEventHandler handler) {
+	
+	public Controler getControler(String behavior, String disruptionsFile, PersonEntersVehicleEventHandler handler) {
     	Config config = utils.loadConfig("test/scenarios/pt-withinday/config.xml", new WithinDayTransitConfigGroup());
 		if (behavior != null) {
 			WithinDayTransitConfigGroup cfg = ConfigUtils.addOrGetModule(config, WithinDayTransitConfigGroup.class);
 			cfg.setBehavior(behavior);
 		}
+		if (disruptionsFile != null) {
+			WithinDayTransitConfigGroup cfg = ConfigUtils.addOrGetModule(config, WithinDayTransitConfigGroup.class);
+			cfg.setDisruptionsFile(disruptionsFile);
+		}
 		config.controler().setLastIteration(0);
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new WithinDayTransitModule(config));
 		controler.getEvents().addHandler(handler);
+		
+		ActivityStartEventHandler actStart = this::activityStartEvent;
+		ActivityEndEventHandler actEnd = this::activityEndEvent;
+		controler.getEvents().addHandler(actStart);
+		controler.getEvents().addHandler(actEnd);
+		
 		return controler;
     }
+	
+	private void activityStartEvent(ActivityStartEvent event) {
+		lastActivities.put(event.getPersonId().toString(), event.getActType());
+	}
+	
+	private void activityEndEvent(ActivityEndEvent event) {
+		String pid = event.getPersonId().toString();
+		if (!firstActivities.containsKey(pid)) {
+			firstActivities.put(pid, event.getActType());
+		}
+	}
 	
 	private void regularCheckEnterEvent(PersonEntersVehicleEvent event) {
 		if (event.getPersonId().equals(Id.createPersonId(1))) {
@@ -99,16 +131,27 @@ public class WithinDayTransitModuleTest {
 			// This person should be rerouted to the red line e.g. vehicle 3000
 			assertEquals("Person 2 should take the red line after within-day replanning", Id.createVehicleId(3000), event.getVehicleId());
 		}
-		observations.put(event.getPersonId().toString(), event.getVehicleId().toString());
+		vehicleObservations.put(event.getPersonId().toString(), event.getVehicleId().toString());
 		log.info("The test handler detected that person "+event.getPersonId()+" enters vehicle "+event.getVehicleId());
 	}
 	
 	public void runTest(String behavior, PersonEntersVehicleEventHandler handler) {
-		Controler controler = getControler(behavior, handler);
-		observations.clear();
+		runTest(behavior, null, handler);
+	}
+	
+	public void runTest(String behavior, String disruptionsFile, PersonEntersVehicleEventHandler handler) {
+		Controler controler = getControler(behavior, disruptionsFile, handler);
+		vehicleObservations.clear();
+		firstActivities.clear();
+		lastActivities.clear();
 		controler.run();
-		assertTrue("Person 1 did enter a vehicle", observations.containsKey("1"));
-		assertTrue("Person 2 did enter a vehicle", observations.containsKey("2"));	
+		assertTrue("Person 1 did enter a vehicle", vehicleObservations.containsKey("1"));
+		assertTrue("Person 2 did enter a vehicle", vehicleObservations.containsKey("2"));	
+		for (Entry<String,String> entry : firstActivities.entrySet()) {
+			String pid = entry.getKey();
+			String type = entry.getValue();
+			assertEquals("Person "+pid+" has equal start and end activity types", type, lastActivities.get(pid));
+		}
 		File output = new File(utils.getOutputDirectory());
 		deleteTree(output);
 	}
@@ -131,7 +174,7 @@ public class WithinDayTransitModuleTest {
 			// This person should be rerouted to the purple line e.g. vehicle 5000 (or 4000 or 6000)
 			assertEquals("Person 2 should take the purple line after within-day replanning", Id.createVehicleId(5000), event.getVehicleId());
 		}
-		observations.put(event.getPersonId().toString(), event.getVehicleId().toString());
+		vehicleObservations.put(event.getPersonId().toString(), event.getVehicleId().toString());
 		log.info("The test handler detected that person "+event.getPersonId()+" enters vehicle "+event.getVehicleId());
 	}
 

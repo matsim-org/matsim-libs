@@ -72,6 +72,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.withinday.PlanSegments.PlanSegment;
 
 import com.google.common.io.Files;
 import com.google.inject.Inject;
@@ -258,6 +259,9 @@ public class WithinDayTransitEngine implements MobsimEngine {
 
 			log.info("New plan computed for person "+person.getId());
 			
+			List<PlanSegment> segments = PlanSegments.segmentize(remainingElements);
+			log.info("Segments: "+segments);
+			
 			// Replan the remaining part of the agent's plan
 			List<PlanElement> newPlan = replanFromActivity(disruption, remainingElements, router, person);
 			int index = planElements.indexOf(current);
@@ -370,6 +374,7 @@ public class WithinDayTransitEngine implements MobsimEngine {
 			result.add(leg);
 			if (i < legs.size()-1) {
 				Activity act = PopulationUtils.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, route.getEndLinkId());
+				act.setMaximumDuration(0);
 				result.add(act);
 			}
 		}
