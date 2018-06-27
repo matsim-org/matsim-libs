@@ -19,6 +19,15 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.utils;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -28,9 +37,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 
-import java.util.*;
-import java.util.Map.Entry;
-
 
 /**
  * @author ikaddoura, benjamin
@@ -38,6 +44,18 @@ import java.util.Map.Entry;
  */
 public class EmissionUtils {
 	private static final Logger logger = Logger.getLogger(EmissionUtils.class);
+
+	public static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
+
+	public static void setHbefaRoadType(Link link, String type){
+		if (type!=null){
+			link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);
+		}
+	}
+
+	public static String getHbefaRoadType (Link link) {
+		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
+	}
 
 	private final SortedSet<String> listOfPollutants;
 

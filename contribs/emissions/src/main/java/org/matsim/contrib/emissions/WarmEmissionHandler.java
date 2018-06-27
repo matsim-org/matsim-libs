@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -33,16 +35,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -149,7 +148,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		linkLeaveCnt++;
 
 		Double freeVelocity = link.getFreespeed();
-		String roadTypeString = NetworkUtils.getType(link);
+		String roadTypeString = EmissionUtils.getHbefaRoadType(link);
 
 
 		if (roadTypeString==null || roadTypeString.isEmpty()){

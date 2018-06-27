@@ -41,9 +41,8 @@
  * <h2>Input files</h2>
  * Required files are:
  * <ul>
- * <li>roadTypeMappingFile: This file needs to map road types in your network to HBEFA 3.1 road types. 
- * See the parser {@link org.matsim.contrib.emissions.EmissionModule#createRoadTypeMapping createRoadTypeMapping} 
- * at the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule} 
+ * <li>roadTypeMappingFile: This file needs to map road types in your network to HBEFA 3.1 road types.
+ * Update (June'2018) one can now directly add HBEFA road type to link attributes using {@link org.matsim.contrib.emissions.utils.EmissionUtils#setHbefaRoadType(org.matsim.api.core.v01.network.Link, java.lang.String) setHbefaRoadType}
  * or see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup} for a detailed description.
  * 
  * <li>emissionVehicleFile: This data type is defined in the EmissionsConfigGroup,
