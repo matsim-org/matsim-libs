@@ -108,7 +108,11 @@ public class CreateEmissionConfig {
 		// define emission tool input files	
 	        EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
 	        controler.getConfig().addModule(ecg);
+
+			// one can now directly set the hbefa road types as link attributes
 	        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
+			ecg.setHbefaRoadTypeSource(EmissionsConfigGroup.HbefaRoadTypeSource.fromFile);
+
 	        // emission vehicles are now set in the default vehicle container
 	        config.vehicles().setVehiclesFile(emissionVehicleFile);
 
