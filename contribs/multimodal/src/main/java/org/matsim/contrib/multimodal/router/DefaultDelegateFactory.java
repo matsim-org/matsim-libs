@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.RouteFactories;
@@ -75,7 +76,7 @@ import javax.inject.Provider;
  * 
  * @author cdobler
  */
-public class DefaultDelegateFactory implements Provider<TripRouter> {
+class DefaultDelegateFactory implements Provider<TripRouter> {
 
 	private static final Logger log = Logger.getLogger(DefaultDelegateFactory.class);
 	
@@ -98,8 +99,9 @@ public class DefaultDelegateFactory implements Provider<TripRouter> {
 	@Override
 	public TripRouter get() {
         
-		TripRouter tripRouter = new TripRouter();
-
+//		TripRouter tripRouter = new TripRouter();
+		TripRouter tripRouter = new TripRouter.Builder( scenario.getConfig() ).build() ;
+		
 		TravelTime travelTime = travelTimes.get("car");
 		TravelDisutility travelDisutility = travelDisutilityFactories.get("car").createTravelDisutility(travelTimes.get("car"));
 
@@ -139,7 +141,8 @@ public class DefaultDelegateFactory implements Provider<TripRouter> {
 			RoutingModule legRouterWrapper = DefaultRoutingModules.createPseudoTransitRouter(mode, populationFactory, 
 					scenario.getNetwork(), routeAlgoPtFreeFlow, 
 					routeConfigGroup.getModeRoutingParams().get( mode ) ) ;
-			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
+//			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
+			throw new RuntimeException(Gbl.ABSORBED_INTO_CORE ) ;
        }
 
         for (String mode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
@@ -153,12 +156,13 @@ public class DefaultDelegateFactory implements Provider<TripRouter> {
 			RoutingModule legRouterWrapper = DefaultRoutingModules.createTeleportationRouter(mode, populationFactory, 
 					routeConfigGroup.getModeRoutingParams().get( mode )
 					); 
-			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
-        	
-            if (old != null) {
-                log.error("inconsistent router configuration for mode " + mode);
-                throw new RuntimeException("there was already a module set when trying to set teleporting routing module for mode "+ mode + ": " + old);
-            }
+
+			//			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
+//            if (old != null) {
+//                log.error("inconsistent router configuration for mode " + mode);
+//                throw new RuntimeException("there was already a module set when trying to set teleporting routing module for mode "+ mode + ": " + old);
+//            }
+		  throw new RuntimeException(Gbl.ABSORBED_INTO_CORE);
         }
 
         for (String mode : routeConfigGroup.getNetworkModes()) {
@@ -181,12 +185,12 @@ public class DefaultDelegateFactory implements Provider<TripRouter> {
 			
 			LeastCostPathCalculator routeAlgo = this.leastCostPathCalculatorFactory.createPathCalculator(subNetwork, travelDisutility, travelTime);
 			RoutingModule legRouterWrapper = DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, subNetwork, routeAlgo ); 
-			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
-        	
-            if (old != null) {
-                log.error("inconsistent router configuration for mode " + mode);
-                throw new RuntimeException("there was already a module set when trying to set network routing module for mode "+ mode + ": " + old);
-            }
+//			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
+//            if (old != null) {
+//                log.error("inconsistent router configuration for mode " + mode);
+//                throw new RuntimeException("there was already a module set when trying to set network routing module for mode "+ mode + ": " + old);
+//            }
+		  throw new RuntimeException( Gbl.ABSORBED_INTO_CORE ) ;
         }
         
         return tripRouter;

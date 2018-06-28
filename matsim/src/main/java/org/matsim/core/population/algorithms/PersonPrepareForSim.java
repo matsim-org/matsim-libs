@@ -116,8 +116,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 					Leg leg = (Leg) pe;
 					if (leg.getRoute() == null) {
 						needsReRoute = true;
-					}
-					else if (Double.isNaN(leg.getRoute().getDistance())){
+					} else if (Double.isNaN(leg.getRoute().getDistance())){
 						Double dist = null;
 						if (leg.getRoute() instanceof NetworkRoute){
 							/* So far, 1.0 is always used as relative position on start and end link. 

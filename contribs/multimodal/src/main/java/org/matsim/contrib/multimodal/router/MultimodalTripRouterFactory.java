@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.RoutingModule;
@@ -47,7 +48,7 @@ import javax.inject.Provider;
 /**
  * @author cdobler
  */
-public class MultimodalTripRouterFactory implements Provider<TripRouter> {
+class MultimodalTripRouterFactory implements Provider<TripRouter> {
 	
 	private static final Logger log = Logger.getLogger(MultimodalTripRouterFactory.class);
 	
@@ -121,7 +122,8 @@ public class MultimodalTripRouterFactory implements Provider<TripRouter> {
 			TravelDisutility travelDisutility = this.travelDisutilityFactory.createTravelDisutility(travelTime);		
 			LeastCostPathCalculator routeAlgo = this.leastCostPathCalculatorFactory.createPathCalculator(subNetwork, travelDisutility, travelTime);
 			RoutingModule legRouterWrapper = DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, subNetwork, routeAlgo ); 
-			instance.setRoutingModule(mode, legRouterWrapper);
+//			instance.setRoutingModule(mode, legRouterWrapper);
+			throw new RuntimeException(Gbl.ABSORBED_INTO_CORE) ;
 		}
 
 		return instance;

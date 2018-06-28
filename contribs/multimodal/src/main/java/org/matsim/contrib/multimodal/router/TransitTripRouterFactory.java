@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TransitRouterWrapper;
@@ -42,7 +43,7 @@ import javax.inject.Provider;
 /**
  * @author cdobler
  */
-public class TransitTripRouterFactory implements Provider<TripRouter> {
+class TransitTripRouterFactory implements Provider<TripRouter> {
 	
 	private static final Logger log = Logger.getLogger(TransitTripRouterFactory.class);
 		
@@ -85,7 +86,8 @@ public class TransitTripRouterFactory implements Provider<TripRouter> {
         			scenario.getNetwork(), transitWalkRoutingModule);
         	
             for (String mode : scenario.getConfig().transit().getTransitModes()) {
-                tripRouter.setRoutingModule(mode, routingModule);
+//                tripRouter.setRoutingModule(mode, routingModule);
+			throw new RuntimeException(Gbl.ABSORBED_INTO_CORE ) ;
             }
 		}
 		

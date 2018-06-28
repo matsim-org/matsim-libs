@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -75,7 +74,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 	public static final class Builder {
 		private final Config config;
 		private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
-		private Map<String, Provider<RoutingModule>> routingModules = new LinkedHashMap<>() ;
+		private Map<String, Provider<RoutingModule>> routingModuleProviders = new LinkedHashMap<>() ;
 		public Builder( Config config ) {
 			this.config = config ;
 		}
@@ -83,26 +82,33 @@ public final class TripRouter implements MatsimExtensionPoint {
 			this.mainModeIdentifier = identifier ;
 			return this ;
 		}
-		public Builder putRoutingModule( String mainMode, Provider<RoutingModule> routingModuleProvider ) {
-			this.routingModules.put( mainMode, routingModuleProvider ) ;
+		public Builder setRoutingModule(String mainMode, RoutingModule routingModule ) {
+			// the initial API accepted routing modules.  injection, however, takes routing module providers.  (why?)
+			// trying to bring these two into line here.  maybe some other approach would be preferred, don't know.  kai, jun'18
+			this.routingModuleProviders.put( mainMode, new Provider<RoutingModule>(){
+				@Override public RoutingModule get() {
+					return routingModule ;
+				}
+			} ) ;
 			return this ;
 		}
-		TripRouter builder() {
-			return new TripRouter( routingModules, mainModeIdentifier, config ) ;
+		public TripRouter build() {
+			return new TripRouter( routingModuleProviders, mainModeIdentifier, config ) ;
 		}
 	}
-	@Deprecated // use the Builder instead.  kai, oct'17
-	public TripRouter() {}
-	// yyyyyy I guess this is meant as a way to create the trip router without injection, and to set its internals afterwards.  But
-	// is it so sensible to have this in this way?  The injection stuff states that the material is immutable after injection; here we introduce a
-	// way to get around that again, and even to change the injected material later.  
-	// I would expect a Builder instead. 
-	// kai, sep'16
+
+//	@Deprecated // use the Builder instead.  kai, oct'17
+//	public TripRouter() {}
+//	// yyyyyy I guess this is meant as a way to create the trip router without injection, and to set its internals afterwards.  But
+//	// is it so sensible to have this in this way?  The injection stuff states that the material is immutable after injection; here we introduce a
+//	// way to get around that again, and even to change the injected material later.
+//	// I would expect a Builder instead.
+//	// kai, sep'16
 
 	@Inject
-	TripRouter(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier,
-			Config config ) {
-		for (Map.Entry<String, Provider<RoutingModule>> entry : routingModules.entrySet()) {
+	TripRouter(Map<String, Provider<RoutingModule>> routingModuleProviders, MainModeIdentifier mainModeIdentifier, Config config ) {
+		
+		for (Map.Entry<String, Provider<RoutingModule>> entry : routingModuleProviders.entrySet()) {
 			setRoutingModule(entry.getKey(), entry.getValue().get());
 		}
 		setMainModeIdentifier(mainModeIdentifier);
@@ -123,7 +129,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * @return the previously registered {@link RoutingModule} for this mode if any, null otherwise.
 	 */
 	@Deprecated // use the Builder instead.  kai, oct'17
-	public RoutingModule setRoutingModule(
+	/* package-private */ RoutingModule setRoutingModule(
 			final String mainMode,
 			final RoutingModule module) {
 		RoutingModule old = routingModules.put( mainMode , module );
@@ -172,7 +178,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * @return the previous registered instance
 	 */
 	@Deprecated // use the Builder instead.  kai, oct'17
-	public MainModeIdentifier setMainModeIdentifier(final MainModeIdentifier newIdentifier) {
+	/* package-private */ MainModeIdentifier setMainModeIdentifier(final MainModeIdentifier newIdentifier) {
 		final MainModeIdentifier old = this.mainModeIdentifier;
 		this.mainModeIdentifier = newIdentifier;
 		return old;
