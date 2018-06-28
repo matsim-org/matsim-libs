@@ -42,25 +42,24 @@ import org.matsim.contrib.emissions.types.WarmPollutant;
  * @author ikaddoura, benjamin
  *
  */
-public class EmissionUtils {
+public final class EmissionUtils {
 	private static final Logger logger = Logger.getLogger(EmissionUtils.class);
 
-	public static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
+	private EmissionUtils(){}
 
+	public static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
 	public static void setHbefaRoadType(Link link, String type){
 		if (type!=null){
 			link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);
 		}
 	}
-
 	public static String getHbefaRoadType (Link link) {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
 
-	private final SortedSet<String> listOfPollutants;
+	public static SortedSet<String> getListOfPollutants() {
+		SortedSet<String> listOfPollutants = new TreeSet<>();
 
-	public EmissionUtils(){
-		
 		listOfPollutants = new TreeSet<>();
 		for(WarmPollutant wp : WarmPollutant.values()){
 			listOfPollutants.add(wp.toString());
@@ -68,15 +67,16 @@ public class EmissionUtils {
 		for(ColdPollutant cp : ColdPollutant.values()){
 			listOfPollutants.add(cp.toString());
 		}
+		return listOfPollutants;
 	}
 
-	public SortedMap<String, Double> sumUpEmissions(Map<WarmPollutant, Double> warmEmissions, Map<ColdPollutant, Double> coldEmissions) {
+	public static SortedMap<String, Double> sumUpEmissions(Map<WarmPollutant, Double> warmEmissions, Map<ColdPollutant, Double> coldEmissions) {
 		SortedMap<String, Double> pollutant2sumOfEmissions = new TreeMap<>();
 		SortedMap<String, Double> warmPollutant2emissions = convertWarmPollutantMap2String(warmEmissions);
 		SortedMap<String, Double> coldPollutant2emissions = convertColdPollutantMap2String(coldEmissions);
 		double sumOfPollutant;
 	
-		for(String pollutant : listOfPollutants){
+		for(String pollutant : getListOfPollutants()){
 			if(warmPollutant2emissions.containsKey(pollutant)){
 				if(coldPollutant2emissions.containsKey(pollutant)){
 					sumOfPollutant = warmPollutant2emissions.get(pollutant) + coldPollutant2emissions.get(pollutant);
@@ -95,7 +95,7 @@ public class EmissionUtils {
 		return pollutant2sumOfEmissions;
 	}
 	
-	public <T> Map<Id<T>, SortedMap<String, Double>> sumUpEmissionsPerId(
+	public static <T> Map<Id<T>, SortedMap<String, Double>> sumUpEmissionsPerId(
 			Map<Id<T>, Map<WarmPollutant, Double>> warmEmissions,
 			Map<Id<T>, Map<ColdPollutant, Double>> coldEmissions) {
 
@@ -121,7 +121,7 @@ public class EmissionUtils {
 		return totalEmissions;
 	}
 
-	public Map<Id<Person>, SortedMap<String, Double>> setNonCalculatedEmissionsForPopulation(Population population, Map<Id<Person>, SortedMap<String, Double>> totalEmissions) {
+	public static Map<Id<Person>, SortedMap<String, Double>> setNonCalculatedEmissionsForPopulation(Population population, Map<Id<Person>, SortedMap<String, Double>> totalEmissions) {
 		Map<Id<Person>, SortedMap<String, Double>> personId2Emissions = new HashMap<>();
 
 		for(Person person : population.getPersons().values()){
@@ -129,12 +129,12 @@ public class EmissionUtils {
 			SortedMap<String, Double> emissionType2Value;
 			if(totalEmissions.get(personId) == null){ // person not in map (e.g. pt user)
 				emissionType2Value = new TreeMap<>();
-				for(String pollutant : listOfPollutants){
+				for(String pollutant : getListOfPollutants()){
 					emissionType2Value.put(pollutant, 0.0);
 				}
 			} else { // person in map, but some emissions are not set; setting these to 0.0 
 				emissionType2Value = totalEmissions.get(personId);
-				for(String pollutant : listOfPollutants){ 
+				for(String pollutant : getListOfPollutants()){
 					if(emissionType2Value.get(pollutant) == null){
 						emissionType2Value.put(pollutant, 0.0);
 					} // else do nothing
@@ -145,7 +145,7 @@ public class EmissionUtils {
 		return personId2Emissions;
 	}
 	
-	public Map<Id<Link>, SortedMap<String, Double>> setNonCalculatedEmissionsForNetwork(Network network, Map<Id<Link>, SortedMap<String, Double>> totalEmissions) {
+	public static Map<Id<Link>, SortedMap<String, Double>> setNonCalculatedEmissionsForNetwork(Network network, Map<Id<Link>, SortedMap<String, Double>> totalEmissions) {
 		Map<Id<Link>, SortedMap<String, Double>> linkId2Emissions = new HashMap<>();
 
 		for(Link link: network.getLinks().values()){
@@ -154,12 +154,12 @@ public class EmissionUtils {
 			
 			if(totalEmissions.get(linkId) == null){
 				emissionType2Value = new TreeMap<>();
-				for(String pollutant : listOfPollutants){
+				for(String pollutant : getListOfPollutants()){
 					emissionType2Value.put(pollutant, 0.0);
 				}
 			} else {
 				emissionType2Value = totalEmissions.get(linkId);
-				for(String pollutant : listOfPollutants){ 
+				for(String pollutant : getListOfPollutants()){
 					if(emissionType2Value.get(pollutant) == null){
 						emissionType2Value.put(pollutant, 0.0);
 					} else {
@@ -172,7 +172,7 @@ public class EmissionUtils {
 		return linkId2Emissions;
 	}
 
-	public <T> SortedMap<String, Double> getTotalEmissions(Map<Id<T>, SortedMap<String, Double>> person2TotalEmissions) {
+	public static <T> SortedMap<String, Double> getTotalEmissions(Map<Id<T>, SortedMap<String, Double>> person2TotalEmissions) {
 		SortedMap<String, Double> totalEmissions = new TreeMap<>();
 
 		for(Id<T> personId : person2TotalEmissions.keySet()){
@@ -190,11 +190,7 @@ public class EmissionUtils {
 		return totalEmissions;
 	}
 
-	public SortedSet<String> getListOfPollutants() {
-		return listOfPollutants;
-	}
-
-	public SortedMap<String, Double> convertWarmPollutantMap2String(Map<WarmPollutant, Double> warmEmissions) {
+	public static SortedMap<String, Double> convertWarmPollutantMap2String(Map<WarmPollutant, Double> warmEmissions) {
 		SortedMap<String, Double> warmPollutantString2Values = new TreeMap<>();
 		for (Entry<WarmPollutant, Double> entry: warmEmissions.entrySet()){
 			String pollutant = entry.getKey().toString();
@@ -204,7 +200,7 @@ public class EmissionUtils {
 		return warmPollutantString2Values;
 	}
 
-	public SortedMap<String, Double> convertColdPollutantMap2String(Map<ColdPollutant, Double> coldEmissions) {
+	public static SortedMap<String, Double> convertColdPollutantMap2String(Map<ColdPollutant, Double> coldEmissions) {
 		SortedMap<String, Double> coldPollutantString2Values = new TreeMap<>();
 		for (Entry<ColdPollutant, Double> entry: coldEmissions.entrySet()){
 			String pollutant = entry.getKey().toString();
