@@ -67,6 +67,7 @@
       <param name="priority"        value="1" />
       <param name="typicalDuration" value="08:00:00" />
     </parameterset>
+    </parameterset>
 
   </module>
 
