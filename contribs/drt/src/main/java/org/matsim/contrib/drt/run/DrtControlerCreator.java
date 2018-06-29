@@ -37,6 +37,8 @@ import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.PrecalculablePathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
+import org.matsim.contrib.drt.routing.DrtRoute;
+import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
@@ -57,6 +59,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -65,9 +68,18 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public final class DrtControlerCreator {
 
+	public static Scenario createScenario(Config config) {
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
+		routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
+		return scenario;
+	}
+
+
 	public static Controler createControler(Config config, boolean otfvis) {
 		adjustConfig(config);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = createScenario(config);
+		ScenarioUtils.loadScenario(scenario);
 		Controler controler = new Controler(scenario);
 		addDrtToControler(controler, otfvis);
 		return controler;

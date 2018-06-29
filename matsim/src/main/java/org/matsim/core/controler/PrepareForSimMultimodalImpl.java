@@ -181,11 +181,11 @@ public final class PrepareForSimMultimodalImpl implements PrepareForSim {
 		Collection<StrategyConfigGroup.StrategySettings> strategySettings = scenario.getConfig().strategy().getStrategySettings();
 		for (StrategyConfigGroup.StrategySettings strategySetting : strategySettings) {
 			String name = strategySetting.getStrategyName();
-			if ( name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.name())
-					|| name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeTripMode.name())
+			if ( name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.toString())
+					|| name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeTripMode.toString())
 					) {
 				isModeChoicePresent = true;
-			} else if (name.equals(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name())) {
+			} else if (name.equals(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.toString())) {
 				isModeChoicePresent = true;
 				log.warn("Creating one vehicle corresponding to each network mode for every agent and parking it to the departure link. \n" +
 						"If this is undesirable, then write a new PrepareForSim +" +

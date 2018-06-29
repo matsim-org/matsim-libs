@@ -47,6 +47,7 @@ import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
@@ -556,9 +557,16 @@ public final class Config implements MatsimExtensionPoint {
 	public final VehiclesConfigGroup vehicles() {
 		return vehicles;
 	}
-
+	
 	public void setContext(URL context) {
-		log.info( "setting context to [" + context + "]" ) ;
+		if ( this.context==null  ||  !(context.toString().equals( this.context.toString() ) ) ) {
+			log.info("setting context to" + context + "]");
+			// ConfigUtils.createConfig() is used at several places, e.g. when generating an empty
+			// scenario to obtain the default factories.  This will evidently produce output here,
+			// and in some sense the wrong output, since the relevant context is probably set from
+			// some config file path and in fact _not_ changed since this here will be a different
+			// ``throwaway'' config instance.  :-(  kai, jun'18
+		}
 		this.context = context;
 	}
 

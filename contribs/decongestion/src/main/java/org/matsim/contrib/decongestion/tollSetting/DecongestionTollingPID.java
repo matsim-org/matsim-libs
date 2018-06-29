@@ -232,16 +232,17 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 		// store the current link information for the next toll computation
 		
 		linkId2infoPreviousTollComputation = new HashMap<>();
-		for (Id<Link> linkId : this.congestionInfo.getlinkInfos().keySet()) {
-
+		for ( Map.Entry<Id<Link>,LinkInfo> entry : this.congestionInfo.getlinkInfos().entrySet()) {
+			LinkInfo linkInfo = entry.getValue();;
+			
 			Map<Integer, Double> time2previousDelay = new HashMap<>();
-			for (Integer intervalNr : this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().keySet()) {
-				time2previousDelay.put(intervalNr, this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().get(intervalNr));
+			for (Integer intervalNr : linkInfo.getTime2avgDelay().keySet()) {
+				time2previousDelay.put(intervalNr, linkInfo.getTime2avgDelay().get(intervalNr));
 			}
 			
-			LinkInfo linkInfoPreviousTollComputation = new LinkInfo(linkId);
+			LinkInfo linkInfoPreviousTollComputation = new LinkInfo(linkInfo.getLink());
 			linkInfoPreviousTollComputation.setTime2avgDelay(time2previousDelay);
-			linkId2infoPreviousTollComputation.put(linkId, linkInfoPreviousTollComputation);
+			linkId2infoPreviousTollComputation.put(linkInfo.getLink().getId(), linkInfoPreviousTollComputation);
 		}
 	}
 

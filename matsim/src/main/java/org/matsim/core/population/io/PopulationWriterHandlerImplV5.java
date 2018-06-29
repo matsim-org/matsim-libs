@@ -22,6 +22,7 @@ package org.matsim.core.population.io;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -30,6 +31,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
@@ -248,6 +250,14 @@ import java.io.IOException;
 		out.write(" distance=\"");
 		out.write(Double.toString(route.getDistance()));
 		out.write("\"");
+		
+		// yyyy would be good if we could make the following stuff automatic.  kai, jun'18
+		
+		if ( route instanceof NetworkRoute ) {
+			out.write(" vehicleRefId=\"");
+			out.write(Id.writeId( ((NetworkRoute) route).getVehicleId() ) );
+			out.write("\"");
+		}
 		out.write(">");
 		String rd = route.getRouteDescription();
 		if (rd != null) {
