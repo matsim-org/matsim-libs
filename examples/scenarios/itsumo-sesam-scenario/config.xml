@@ -51,7 +51,6 @@
 				<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
 			</parameterset>
 			<parameterset type="modeParams">
-				<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
 				<param name="mode" value="pt"/>
 			</parameterset>
 
