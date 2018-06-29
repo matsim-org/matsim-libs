@@ -169,6 +169,14 @@
 				<param name="scoringThisActivityAtAll" value="true" />
 			</parameterset>
 
+			<parameterset type="modeParams">
+				<param name="mode" value="car"/>
+			</parameterset>
+
+			<parameterset type="modeParams">
+				<param name="mode" value="pt"/>
+			</parameterset>
+
 		</parameterset>
 
 	</module>
