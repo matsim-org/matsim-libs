@@ -6,10 +6,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
@@ -17,11 +14,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
-import org.matsim.core.population.algorithms.PersonPrepareForSim;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.facilities.ActivityFacilities;
@@ -76,17 +68,17 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		 * own single-mode network. However, this assumes that the main mode is car - which PersonPrepareForSim also does. Should
 		 * be probably adapted in a way that other main modes are possible as well. cdobler, oct'15.
 		 */
-		final Network net;
-		if (NetworkUtils.isMultimodal(network)) {
-			log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
-			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-			net = NetworkUtils.createNetwork();
-			HashSet<String> modes = new HashSet<>();
-			modes.add(TransportMode.car);
-			filter.filter(net, modes);
-		} else {
-			net = network;
-		}
+//		final Network net;
+//		if (NetworkUtils.isMultimodal(network)) {
+//			log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
+//			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+//			net = NetworkUtils.createNetwork();
+//			HashSet<String> modes = new HashSet<>();
+//			modes.add(TransportMode.car);
+//			filter.filter(net, modes);
+//		} else {
+//			net = network;
+//		}
 
 		//matsim-724
 		switch(this.facilitiesConfigGroup.getFacilitiesSource()){
@@ -107,37 +99,38 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing(facilitiesConfigGroup.isAssigningLinksToFacilitiesIfMissing(), network);
 				facilitiesFromPopulation.assignOpeningTimes(facilitiesConfigGroup.isAssigningOpeningTime(), scenario.getConfig().planCalcScore());
 				facilitiesFromPopulation.run(population);
+				// Note that location choice, when switched on, should now either use the facilities generated here,
+				// or come with explicit pre-existing facilities.  kai, jul'18
 				break;
 			default:
 				throw new RuntimeException("Facilities source '"+this.facilitiesConfigGroup.getFacilitiesSource()+"' is not implemented yet.");
 		}
 
-		// make sure all routes are calculated.
-		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
-				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
-					@Override
-					public AbstractPersonAlgorithm getPersonAlgorithm() {
-						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, net);
-					}
-				});
+//		// make sure all routes are calculated.
+//		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
+//				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
+//					@Override
+//					public AbstractPersonAlgorithm getPersonAlgorithm() {
+//						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, net);
+//					}
+//				}
+//		);
 
-		// though the vehicles should be created before creating a route, however,
-		// as of now, it is not clear how to provide (store) vehicle id to the route afterwards. Amit may'17
-
-		// yyyyyy from a behavioral perspective, the vehicle must be somehow linked to
-		// the person (maybe via the household).  We also have the problem that it
-		// is not possible to switch to a mode that was not in the initial plans ...
-		// since there will be no vehicle for it.  Needs to be fixed somehow.  kai, feb'18
-
-		Map<String, VehicleType> modeVehicleTypes = getMode2VehicleType();
-
-		// creating vehicles for every network mode. Amit Dec'17
-		if (qSimConfigGroup.getVehiclesSource() != QSimConfigGroup.VehiclesSource.fromVehiclesData){
-			createAndAddVehiclesForEveryNetworkMode(modeVehicleTypes);
-		} // don't create vehicle if vehicles are provided in vehicles file.
+		// yyyy from a behavioral perspective, the vehicle must be somehow linked to
+		// the person (maybe via the household).    kai, feb'18
 		
-		// yy Could now set the vehicle IDs in the routes.  But can as well also do this later (currently in PopulationAgentSource).  kai, jun'18
-
+		switch( qSimConfigGroup.getVehiclesSource() ) {
+			case defaultVehicle:
+			case modeVehicleTypesFromVehiclesData:
+				createAndAddVehiclesForEveryNetworkMode( getMode2VehicleType() );
+				break;
+			case fromVehiclesData:
+				// don't do anything
+				break;
+			default:
+				throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
+		}
+		
 		if (scenario instanceof Lockable) {
 			((Lockable)scenario).setLocked();
 			// see comment in ScenarioImpl. kai, sep'14
@@ -161,7 +154,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private void createAndAddVehiclesForEveryNetworkMode(final Map<String, VehicleType> modeVehicleTypes) {
 		for (Id<Person> personId : scenario.getPopulation().getPersons().keySet()) {
 			for (String mode : scenario.getConfig().qsim().getMainModes()) {
-				Id<Vehicle> vehicleId = createAndSetAutomaticVehicleId(personId, mode, null, this.qSimConfigGroup);
+				Id<Vehicle> vehicleId = obtainAutomaticVehicleId(personId, mode, this.qSimConfigGroup);
 				createAndAddVehicleIfNotPresent(vehicleId, modeVehicleTypes.get(mode));
 			}
 		}
@@ -221,8 +214,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		}
 	}
 
-	public static Id<Vehicle> createAndSetAutomaticVehicleId(Id<Person> personId, String mode, NetworkRoute route, QSimConfigGroup config) {
-		// yyyy cf. PopulationAgentSource.createAutomaticVehicleId (gone now)
+	public static Id<Vehicle> obtainAutomaticVehicleId( Id<Person> personId, String mode, QSimConfigGroup config ) {
 		
 		Id<Vehicle> vehicleId ;
 		if (config.getUsePersonIdForMissingVehicleId()) {
@@ -237,8 +229,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 					break;
 				case modeVehicleTypesFromVehiclesData:
 					if(! mode.equals(TransportMode.car)) {
-						String vehIdString = personId.toString() + "_" + mode ;
-						vehicleId = Id.create(vehIdString, Vehicle.class);
+						vehicleId = Id.createVehicleId( personId.toString() + "_" + mode );
 					} else {
 						vehicleId = Id.createVehicleId(personId);
 					}
@@ -246,9 +237,9 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				default:
 					throw new RuntimeException("not implemented") ;
 			}
-			if(route!=null) route.setVehicleId(vehicleId);
 		} else {
 			throw new IllegalStateException("Found a network route without a vehicle id.");
+			// yyyyyy condition not really logical here. kai, jul'18
 		}
 		return vehicleId;
 	}

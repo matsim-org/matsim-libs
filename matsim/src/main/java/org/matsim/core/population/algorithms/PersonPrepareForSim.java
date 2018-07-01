@@ -62,30 +62,36 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	 * create multiple copies of a car-only-network. Instead, we can create that network once in
 	 * the Controller and re-use it for each new instance. cdobler, sep'15
 	 */
-	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario, final Network carOnlyNetwork) {
-		super();
-		this.router = router;
-		this.network = scenario.getNetwork();
-		if (NetworkUtils.isMultimodal(carOnlyNetwork)) {
-			throw new RuntimeException("Expected carOnlyNetwork not to be multi-modal. Aborting!");
-		}
-		this.xy2links = new XY2Links(carOnlyNetwork, scenario.getActivityFacilities());
-		this.activityFacilities = scenario.getActivityFacilities();
-	}
+//	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario, final Network carOnlyNetwork) {
+//		// yyyyyy This prepared network is only used for computing the distance.  So the full network would
+//		// actually be better than the car-only network, without doing damage elsewhere.  No?  kai, jul'18
+//
+//		super();
+//		this.router = router;
+//		this.network = scenario.getNetwork();
+//		if (NetworkUtils.isMultimodal(carOnlyNetwork)) {
+//			throw new RuntimeException("Expected carOnlyNetwork not to be multi-modal. Aborting!");
+//		}
+//		this.xy2links = new XY2Links(carOnlyNetwork, scenario.getActivityFacilities());
+//		this.activityFacilities = scenario.getActivityFacilities();
+//	}
 	
 	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario) {
 		super();
 		this.router = router;
 		this.network = scenario.getNetwork();
 		Network net = this.network;
-		if (NetworkUtils.isMultimodal(network)) {
-			log.info("Network seems to be multimodal. XY2Links will only use car links.");
-			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-			net = NetworkUtils.createNetwork();
-			HashSet<String> modes = new HashSet<String>();
-			modes.add(TransportMode.car);
-			filter.filter(net, modes);
-		}
+//		if (NetworkUtils.isMultimodal(network)) {
+//			log.info("Network seems to be multimodal. XY2Links will only use car links.");
+//			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+//			net = NetworkUtils.createNetwork();
+//			HashSet<String> modes = new HashSet<String>();
+//			modes.add(TransportMode.car);
+//			filter.filter(net, modes);
+//		}
+		// yyyyyy This prepared network is only used for computing the distance.  So the full network would
+		// actually be better than the car-only network, without doing damage elsewhere.  No?  kai, jul'18
+		
 		this.xy2links = new XY2Links(net, scenario.getActivityFacilities());
 		this.activityFacilities = scenario.getActivityFacilities();
 	}

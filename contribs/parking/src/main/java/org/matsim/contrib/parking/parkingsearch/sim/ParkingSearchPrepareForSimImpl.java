@@ -40,6 +40,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.facilities.ActivityFacilities;
 
+@Deprecated // what is this class doing that is not done by the central infrastructure?  kai, jul'18
 public class ParkingSearchPrepareForSimImpl implements PrepareForSim {
     private static Logger log = Logger.getLogger(PrepareForSim.class);
 
@@ -68,24 +69,24 @@ public class ParkingSearchPrepareForSimImpl implements PrepareForSim {
 		 * own single-mode network. However, this assumes that the main mode is car - which PersonPrepareForSim also does. Should
 		 * be probably adapted in a way that other main modes are possible as well. cdobler, oct'15.
 		 */
-        final Network net;
-        if (NetworkUtils.isMultimodal(network)) {
-            log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
-            TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-            net = NetworkUtils.createNetwork();
-            HashSet<String> modes = new HashSet<>();
-            modes.add(TransportMode.car);
-            filter.filter(net, modes);
-        } else {
-            net = network;
-        }
+//        final Network net;
+//        if (NetworkUtils.isMultimodal(network)) {
+//            log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
+//            TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+//            net = NetworkUtils.createNetwork();
+//            HashSet<String> modes = new HashSet<>();
+//            modes.add(TransportMode.car);
+//            filter.filter(net, modes);
+//        } else {
+//            net = network;
+//        }
 
         // make sure all routes are calculated.
         ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
                 new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
                     @Override
                     public AbstractPersonAlgorithm getPersonAlgorithm() {
-                        return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, net);
+                        return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario);
                     }
                 });
 

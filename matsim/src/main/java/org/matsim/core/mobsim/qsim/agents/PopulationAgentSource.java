@@ -84,7 +84,10 @@ public final class PopulationAgentSource implements AgentSource {
 				vehicleId = route.getVehicleId();
 			}
 			if (vehicleId == null) {
-				vehicleId = PrepareForSimImpl.createAndSetAutomaticVehicleId(person.getId(), leg.getMode(), route, qsim.getScenario().getConfig().qsim() );
+				vehicleId = PrepareForSimImpl.obtainAutomaticVehicleId(person.getId(), leg.getMode(), qsim.getScenario().getConfig().qsim() );
+				if(route!=null) {
+					route.setVehicleId( vehicleId );
+				}
 			}
 			
 			// determine the vehicle (not the same as just its ID):

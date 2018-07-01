@@ -72,86 +72,34 @@ public final class PrepareForMobsimImpl implements PrepareForMobsim {
 		 * own single-mode network. However, this assumes that the main mode is car - which PersonPrepareForSim also does. Should
 		 * be probably adapted in a way that other main modes are possible as well. cdobler, oct'15.
 		 */
-		final Network net;
-		if (NetworkUtils.isMultimodal(network)) {
-			log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
-			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-			net = NetworkUtils.createNetwork();
-			HashSet<String> modes = new HashSet<>();
-			modes.add(TransportMode.car);
-			filter.filter(net, modes);
-		} else {
-			net = network;
-		}
+//		final Network net;
+//		if (NetworkUtils.isMultimodal(network)) {
+//			log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
+//			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+//			net = NetworkUtils.createNetwork();
+//			HashSet<String> modes = new HashSet<>();
+//			modes.add(TransportMode.car);
+//			filter.filter(net, modes);
+//		} else {
+//			net = network;
+//		}
+		// yyyyyy This prepared network is only used for computing the distance.  So the full network would
+		// actually be better than the car-only network, without doing damage elsewhere.  No?  kai, jul'18
 		
 		// make sure all routes are calculated.
 		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
 				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
-						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, net);
+						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario);
 					}
-				});
-		
-		// though the vehicles should be created before creating a route, however,
-		// as of now, it is not clear how to provide (store) vehicle id to the route afterwards. Amit may'17
-		
-		// yyyyyy from a behavioral perspective, the vehicle must be somehow linked to
-		// the person (maybe via the household).  We also have the problem that it
-		// is not possible to switch to a mode that was not in the initial plans ...
-		// since there will be no vehicle for it.  Needs to be fixed somehow.  kai, feb'18
+					// yyyyyy This prepared network is only used for computing the distance.  So the full network would
+					// actually be better than the car-only network, without doing damage elsewhere.  No?  kai, jul'18
+				}
+		);
 		
 		// yy Could now set the vehicle IDs in the routes.  But can as well also do this later (currently in PopulationAgentSource).  kai, jun'18
 		
-		if (scenario instanceof Lockable) {
-			((Lockable)scenario).setLocked();
-			// see comment in ScenarioImpl. kai, sep'14
-		}
-		
-		if (population instanceof Lockable) {
-			((Lockable) population).setLocked();
-		}
-		
-		if ( network instanceof Lockable ) {
-			((Lockable) network).setLocked();
-		}
-		
-		if (activityFacilities instanceof  Lockable) {
-			((Lockable) activityFacilities).setLocked();
-		}
-		
-		// (yyyy means that if someone replaces prepareForSim and does not add the above lines, the containers are not locked.  kai, nov'16)
 	}
 	
-	public static Id<Vehicle> createAndSetAutomaticVehicleId(Id<Person> personId, String mode, NetworkRoute route, QSimConfigGroup config) {
-		// yyyy cf. PopulationAgentSource.createAutomaticVehicleId (gone now)
-		
-		Id<Vehicle> vehicleId ;
-		if (config.getUsePersonIdForMissingVehicleId()) {
-			
-			// yyyy my strong preference would be to do away with this "car_" exception and to just
-			// use <mode>_personId across the board.  kai, may'18
-			
-			switch (config.getVehiclesSource()) {
-				case defaultVehicle:
-				case fromVehiclesData:
-					vehicleId = Id.createVehicleId(personId);
-					break;
-				case modeVehicleTypesFromVehiclesData:
-					if(! mode.equals(TransportMode.car)) {
-						String vehIdString = personId.toString() + "_" + mode ;
-						vehicleId = Id.create(vehIdString, Vehicle.class);
-					} else {
-						vehicleId = Id.createVehicleId(personId);
-					}
-					break;
-				default:
-					throw new RuntimeException("not implemented") ;
-			}
-			if(route!=null) route.setVehicleId(vehicleId);
-		} else {
-			throw new IllegalStateException("Found a network route without a vehicle id.");
-		}
-		return vehicleId;
-	}
 }
