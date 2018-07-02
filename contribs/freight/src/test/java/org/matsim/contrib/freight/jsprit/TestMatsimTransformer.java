@@ -15,6 +15,7 @@ import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.job.Service;
+import com.graphhopper.jsprit.core.problem.job.Shipment;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
@@ -128,6 +129,61 @@ public class TestMatsimTransformer {
 		assertTrue(service != service2);
 		assertTrue(service.equals(service2));
 	}
+	
+	@Test
+	public void whenTransforming_matsimShipment2jspritShipment_isMadeCorrectly(){
+		CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(Id.create("ShipmentId", CarrierShipment.class), Id.createLinkId("PickupLocationId"), Id.createLinkId("DeliveryLocationId"), 50)
+				.setPickupServiceTime(30.0)
+				.setPickupTimeWindow(TimeWindow.newInstance(10.0, 20.0))
+				.setDeliveryServiceTime(40.0)
+				.setDeliveryTimeWindow(TimeWindow.newInstance(50.0, 60.0))
+				.build();
+		Shipment shipment = MatsimJspritFactory.createShipment(carrierShipment);
+		assertNotNull(shipment);
+		assertEquals("PickupLocationId", shipment.getPickupLocation().getId());
+		assertEquals(30.0 , shipment.getPickupServiceTime(), 0.01);
+		assertEquals(10.0, shipment.getPickupTimeWindow().getStart(),0.01);
+		assertEquals(20.0, shipment.getPickupTimeWindow().getEnd(),0.01);
+		assertEquals("DeliveryLocationId", shipment.getDeliveryLocation().getId());
+		assertEquals(40.0 , shipment.getDeliveryServiceTime(), 0.01);
+		assertEquals(50.0, shipment.getDeliveryTimeWindow().getStart(),0.01);
+		assertEquals(60.0, shipment.getDeliveryTimeWindow().getEnd(),0.01);
+		assertEquals(50, shipment.getSize().get(0));
+	
+		
+		Shipment shipment2 = MatsimJspritFactory.createShipment(carrierShipment);
+		assertTrue(shipment != shipment2);
+		assertTrue(shipment.equals(shipment2));
+	}
+	
+	@Test
+	public void whenTransforming_jspritShipment2matsimShipment_isMadeCorrectly(){
+		Shipment shipment = Shipment.Builder.newInstance("shipmentId").addSizeDimension(0, 50)
+				.setPickupLocation(Location.newInstance("PickupLocationId"))
+				.setPickupServiceTime(30.0)
+				.setPickupTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(10.0, 20.0))
+				.setDeliveryLocation(Location.newInstance("DeliveryLocationId"))
+				.setDeliveryServiceTime(40.0)
+				.setDeliveryTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(50.0, 60.0))
+				.build();
+		
+		CarrierShipment carrierShipment = MatsimJspritFactory.createCarrierShipment(shipment);
+		assertNotNull(carrierShipment);
+		assertEquals("PickupLocationId", carrierShipment.getFrom().toString());
+		assertEquals(30.0 , carrierShipment.getPickupServiceTime(), 0.01);
+		assertEquals(10.0, carrierShipment.getPickupTimeWindow().getStart(),0.01);
+		assertEquals(20.0, carrierShipment.getPickupTimeWindow().getEnd(),0.01);
+		assertEquals("DeliveryLocationId", carrierShipment.getTo().toString());
+		assertEquals(40.0 , carrierShipment.getDeliveryServiceTime(), 0.01);
+		assertEquals(50.0, carrierShipment.getDeliveryTimeWindow().getStart(),0.01);
+		assertEquals(60.0, carrierShipment.getDeliveryTimeWindow().getEnd(),0.01);
+		assertEquals(50, carrierShipment.getSize());
+		
+		CarrierShipment carrierShipment2 = MatsimJspritFactory.createCarrierShipment(shipment);
+		assertTrue(carrierShipment != carrierShipment2);
+		assertTrue(carrierShipment.equals(carrierShipment2));
+	}
+		
 	
 	@Test
 	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_routeStartMustBe15(){
