@@ -66,12 +66,27 @@ public class MatsimJspritFactory {
 
 	private static Logger log = Logger.getLogger(MatsimJspritFactory.class);
 	
-	static CarrierShipment createCarrierShipment(Service service, String depotLink){
+	//TODO: static CarrierShipment createCarrierShipment (Shipment)  //  MATSim -> jsprit
+
+	//How to deal with a multi-depot VRP? Which depotLink should be used?  kmt jul/18
+	/**
+	 * Creates a (MATSim) CarrierShipment from a (jsprit) service
+	 * 
+	 * @param service to be transformed to Shipment
+	 * @param depotLink as from-link for Shipment
+	 * @return CarrierShipment
+	 * @see CarrierShipment, Service
+	 */
+	static CarrierShipment createCarrierShipmentFromService(Service service, String depotLink){
 		return CarrierShipment.Builder.newInstance(Id.create(depotLink, Link.class),
 				Id.create(service.getLocation().getId(), Link.class), service.getSize().get(0)).
 				setDeliveryServiceTime(service.getServiceDuration()).
 				setDeliveryTimeWindow(TimeWindow.newInstance(service.getTimeWindow().getStart(),service.getTimeWindow().getEnd())).build();
 	}
+	
+	//TODO: static CarrierShipment createCarrierShipment (Shipment)  //  MATSim -> jsprit
+	
+	//TODO: static Shipment createShipment (CarrierShipment)  // jsprit -> MATSim
 	
 	static Service createService(CarrierService carrierService, Coord locationCoord) {
 		Location.Builder locationBuilder = Location.Builder.newInstance();
