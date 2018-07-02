@@ -39,7 +39,7 @@ public class CongestionDetectionEventHandler implements LinkEnterEventHandler,
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Link link = network.getLinks().get( event.getLinkId() ) ;
-		double linkTravelTime = link.getFreespeed( event.getTime() ) / link.getLength() ; 
+		double linkTravelTime = link.getLength() / link.getFreespeed( event.getTime() ); 
 		this.earliestLinkExitTime.put( event.getVehicleId(), event.getTime() + linkTravelTime ) ;
 	}
 
