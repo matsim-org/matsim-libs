@@ -23,6 +23,8 @@ public final class CarrierShipment {
 	public static class Builder {
 		
 		/**
+		 * @Deprecated Please use Builder newInstance(Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) instead.
+		 * 
 		 * Returns a new shipment builder.
 		 * 
 		 * <p> The builder is init with the shipment's origin (from), destination (to) and with the shipment's size.
@@ -33,6 +35,7 @@ public final class CarrierShipment {
 		 * @param size
 		 * @return the builder
 		 */
+		@Deprecated
 		public static Builder newInstance(Id<Link> from, Id<Link> to, int size){
 			return new Builder(from,to,size);
 		}
@@ -62,6 +65,10 @@ public final class CarrierShipment {
 		double pickServiceTime = 0.0;
 		double delServiceTime = 0.0;
 		
+		/**
+		 * @Deprecated Please use Builder (Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) instead.
+		 */
+		@Deprecated 
 		public Builder(Id<Link> from, Id<Link> to, int size) {
 			super();
 			this.from = from;
