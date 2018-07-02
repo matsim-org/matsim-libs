@@ -77,7 +77,7 @@ public class MatsimJspritFactory {
 	 * @see CarrierShipment, Service
 	 */
 	static CarrierShipment createCarrierShipmentFromService(Service service, String depotLink){
-		return CarrierShipment.Builder.newInstance(Id.create(depotLink, Link.class),
+		return CarrierShipment.Builder.newInstance(Id.create(service.getId(), CarrierShipment.class), Id.create(depotLink, Link.class),
 				Id.create(service.getLocation().getId(), Link.class), service.getSize().get(0)).
 				setDeliveryServiceTime(service.getServiceDuration()).
 				setDeliveryTimeWindow(TimeWindow.newInstance(service.getTimeWindow().getStart(),service.getTimeWindow().getEnd())).build();
@@ -91,7 +91,7 @@ public class MatsimJspritFactory {
 	 * @see CarrierShipment, Shipment
 	 */
 	static CarrierShipment createCarrierShipment(Shipment shipment) {
-		return CarrierShipment.Builder.newInstance(Id.createLinkId(shipment.getPickupLocation().getId()), 
+		return CarrierShipment.Builder.newInstance(Id.create(shipment.getId(), CarrierShipment.class), Id.createLinkId(shipment.getPickupLocation().getId()), 
 				Id.createLinkId(shipment.getDeliveryLocation().getId()), shipment.getSize().get(0))	
 				.setDeliveryServiceTime(shipment.getDeliveryServiceTime())
 				.setDeliveryTimeWindow(TimeWindow.newInstance(shipment.getDeliveryTimeWindow().getStart(), shipment.getDeliveryTimeWindow().getEnd()))
