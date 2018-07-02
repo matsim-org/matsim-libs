@@ -42,6 +42,7 @@ import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.job.Service;
 import com.graphhopper.jsprit.core.problem.job.Service.Builder;
+import com.graphhopper.jsprit.core.problem.job.Shipment;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.PickupService;
@@ -66,11 +67,9 @@ public class MatsimJspritFactory {
 
 	private static Logger log = Logger.getLogger(MatsimJspritFactory.class);
 	
-	//TODO: static CarrierShipment createCarrierShipment (Shipment)  //  MATSim -> jsprit
-
 	//How to deal with a multi-depot VRP? Which depotLink should be used?  kmt jul/18
 	/**
-	 * Creates a (MATSim) CarrierShipment from a (jsprit) service
+	 * Creates (MATSim) CarrierShipment from a (jsprit) service
 	 * 
 	 * @param service to be transformed to Shipment
 	 * @param depotLink as from-link for Shipment
@@ -83,10 +82,43 @@ public class MatsimJspritFactory {
 				setDeliveryServiceTime(service.getServiceDuration()).
 				setDeliveryTimeWindow(TimeWindow.newInstance(service.getTimeWindow().getStart(),service.getTimeWindow().getEnd())).build();
 	}
+		
+	/**
+	 * Creates (MATSim) {@link CarrierShipment} from a (jsprit) {@link Shipment}
+	 * 
+	 * @param shipment to be transformed to MATSim
+	 * @return CarrierShipment
+	 * @see CarrierShipment, Shipment
+	 */
+	static CarrierShipment createCarrierShipment(Shipment shipment) {
+		return CarrierShipment.Builder.newInstance(Id.createLinkId(shipment.getPickupLocation().getId()), 
+				Id.createLinkId(shipment.getDeliveryLocation().getId()), shipment.getSize().get(0))	
+				.setDeliveryServiceTime(shipment.getDeliveryServiceTime())
+				.setDeliveryTimeWindow(TimeWindow.newInstance(shipment.getDeliveryTimeWindow().getStart(), shipment.getDeliveryTimeWindow().getEnd()))
+				.setPickupServiceTime(shipment.getPickupServiceTime())
+				.setPickupTimeWindow(TimeWindow.newInstance(shipment.getPickupTimeWindow().getStart(), shipment.getPickupTimeWindow().getEnd()))
+				.build();
+	}
 	
-	//TODO: static CarrierShipment createCarrierShipment (Shipment)  //  MATSim -> jsprit
 	
-	//TODO: static Shipment createShipment (CarrierShipment)  // jsprit -> MATSim
+	/**
+	 * Creates (jsprit) {@link Shipment} from a (MATSim) {@link CarrierShipment}
+	 * 
+	 * @param carrierShipment to be transformed to jsprit
+	 * @return Shipment
+	 * @see CarrierShipment, Shipment
+	 */
+	static Shipment createShipment (CarrierShipment carrierShipment) {
+		return Shipment.Builder.newInstance(carrierShipment.getId().toString())
+				.setDeliveryLocation(Location.newInstance(carrierShipment.getTo().toString()))
+				.setDeliveryServiceTime(carrierShipment.getDeliveryServiceTime())
+				.setDeliveryTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(carrierShipment.getDeliveryTimeWindow().getStart(), carrierShipment.getDeliveryTimeWindow().getEnd()))
+				.setPickupServiceTime(carrierShipment.getPickupServiceTime())
+				.setPickupLocation(Location.newInstance(carrierShipment.getFrom().toString()))
+				.setPickupTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(carrierShipment.getPickupTimeWindow().getStart(), carrierShipment.getPickupTimeWindow().getEnd()))
+				.addSizeDimension(0, carrierShipment.getSize())
+				.build();
+	}
 	
 	static Service createService(CarrierService carrierService, Coord locationCoord) {
 		Location.Builder locationBuilder = Location.Builder.newInstance();
