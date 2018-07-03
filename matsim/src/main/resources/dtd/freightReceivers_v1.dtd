@@ -27,15 +27,10 @@
         descr               CDATA           #IMPLIED
         weight              CDATA           #IMPLIED>
 
-<!ELEMENT receiver 			(attributes?, timeWindow*, product*, plan?)>
+<!ELEMENT receiver 			(attributes?, product*, plan?)>
 <!ATTLIST receiver
         id                  CDATA           #REQUIRED
         linkId              CDATA           #IMPLIED>
-		
-<!ELEMENT timeWindow        (#PCDATA)>
-<!ATTLIST timeWindow
-        start               CDATA           #REQUIRED
-        end                 CDATA           #REQUIRED>
 		
 <!ELEMENT product           (reorderPolicy?, order*)>
 <!ATTLIST product
@@ -46,10 +41,16 @@
 <!ATTLIST reorderPolicy
         name                CDATA           #REQUIRED>
 
-<!ELEMENT plan			(order*)>
+<!ELEMENT plan			(timeWindow*, order*)>
 <!ATTLIST plan
 		score				CDATA			#IMPLIED
 		selected			CDATA			#REQUIRED>
+
+<!ELEMENT timeWindow        (#PCDATA)>
+<!ATTLIST timeWindow
+        start               CDATA           #REQUIRED
+        end                 CDATA           #REQUIRED>
+		
 
 <!ELEMENT order             (item*)>
 <!ATTLIST order
