@@ -370,8 +370,12 @@ public class TestMatsimTransformer {
 	}
 
 	private CarrierShipment getMatsimShipment(String id, String from, String to, int size) {
-		return CarrierShipment.Builder.newInstance(Id.create(id, CarrierShipment.class), Id.create(from, Link.class), Id.create(to, Link.class), size).setDeliveryServiceTime(30.0).
-				setDeliveryTimeWindow(TimeWindow.newInstance(10.0, 20.0)).build();
+		return CarrierShipment.Builder.newInstance(Id.create(id, CarrierShipment.class), Id.create(from, Link.class), Id.create(to, Link.class), size)
+				.setDeliveryServiceTime(30.0)
+				.setDeliveryTimeWindow(TimeWindow.newInstance(10.0, 20.0))
+				.setPickupServiceTime(15.0)
+				.setPickupTimeWindow(TimeWindow.newInstance(1.0, 5.0))
+				.build();
 	}
 	
 	@Test
@@ -412,6 +416,7 @@ public class TestMatsimTransformer {
 		assertTrue(jobS1 instanceof Service );
 		Service service1 = (Service) jobS1;
 		assertEquals(20, service1.getSize().get(0));
+		assertEquals(10.0, service1.getServiceDuration(), 0.0);
 		assertEquals("i(7,4)R", service1.getLocation().getId().toString());
 		
 		Job jobS2 = vrp.getJobs().get("serviceId2");
@@ -421,6 +426,7 @@ public class TestMatsimTransformer {
 		assertTrue(jobS2 instanceof Service );
 		Service service2 = (Service) jobS2;
 		assertEquals(10, service2.getSize().get(0));
+		assertEquals(20.0, service2.getServiceDuration(), 0.0);
 		assertEquals("i(3,9)", service2.getLocation().getId().toString());		
 	}
 	
@@ -431,15 +437,56 @@ public class TestMatsimTransformer {
 	
 	
 	@Test
-	@Ignore		//Set to ignore due to not implemented functionality of Shipments in MatsimJspritFactory
+//	@Ignore		//Set to ignore due to not implemented functionality of Shipments in MatsimJspritFactory
 	public void createVehicleRoutingProblemBuilderWithShipments_isMadeCorrectly() {
 		Carrier carrier =  createCarrierWithShipments();
 		Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(testUtils.getClassInputDirectory() + "grid-network.xml");
 		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
 		VehicleRoutingProblem vrp = vrpBuilder.build();	
-		
+
+		//check vehicle (type) data
+		Vehicle vehicle = vrp.getVehicles().iterator().next();
 		assertNotNull(vrp);
+		assertEquals(com.graphhopper.jsprit.core.problem.VehicleRoutingProblem.FleetSize.INFINITE, vrp.getFleetSize());
+		assertEquals(1, vrp.getVehicles().size());
+		assertEquals("matsimVehicle", vehicle.getId());
+		assertEquals("i(6,0)", vehicle.getStartLocation().getId());
+		assertEquals(10.0, vehicle.getEarliestDeparture(), 0.0);
+		assertEquals(20.0, vehicle.getLatestArrival(), 0.0);
+		assertEquals("matsimType", vehicle.getType().getTypeId().toString());
+		assertEquals(10.0, vehicle.getType().getVehicleCostParams().perDistanceUnit, 0.0);
+		assertEquals(5.0, vehicle.getType().getVehicleCostParams().perTransportTimeUnit, 0.0);
+		assertEquals(100.0, vehicle.getType().getVehicleCostParams().fix, 0.0);
+		//assertEquals(FuelType.diesel, vehicle. ...);											//TODO
+		//assertEquals(15, FuelConsumption ...);												//TODO
+		assertEquals(13.8, vehicle.getType().getMaxVelocity(),0.0);
+		
+		//check service data
+		Job jobS1 = vrp.getJobs().get("shipment1");
+		assertNotNull(jobS1);
+		assertEquals("shipment1", jobS1.getId());
+		assertEquals(10, jobS1.getSize().get(0));
+		assertTrue(jobS1 instanceof Shipment );
+		Shipment shipment1 = (Shipment) jobS1;
+		assertEquals(10, shipment1.getSize().get(0));
+		assertEquals("i(6,0)", shipment1.getPickupLocation().getId());
+		assertEquals(15.0, shipment1.getPickupServiceTime(), 0.0);
+		assertEquals(1.0, shipment1.getPickupTimeWindow().getStart(), 0.0);
+		assertEquals(5.0, shipment1.getPickupTimeWindow().getEnd(), 0.0);
+		assertEquals("i(7,4)R", shipment1.getDeliveryLocation().getId());
+		assertEquals(30.0, shipment1.getDeliveryServiceTime(), 0.0);
+		assertEquals(10.0, shipment1.getDeliveryTimeWindow().getStart(), 0.0);
+		assertEquals(20.0, shipment1.getDeliveryTimeWindow().getEnd(), 0.0);
+		
+		Job jobS2 = vrp.getJobs().get("shipment2");
+		assertNotNull(jobS2);
+		assertEquals("shipment2", jobS2.getId());
+		assertEquals(20, jobS2.getSize().get(0));
+		assertTrue(jobS2 instanceof Shipment );
+		Shipment shipment2 = (Shipment) jobS2;
+		assertEquals(20, shipment2.getSize().get(0));
+		assertEquals("i(3,9)", shipment2.getDeliveryLocation().getId().toString());
 	}
 
 	private Carrier createCarrierWithServices() {
@@ -449,8 +496,8 @@ public class TestMatsimTransformer {
 				.addVehicle(getMatsimVehicle("matsimVehicle", "i(6,0)", matsimType))
 				.setFleetSize(FleetSize.INFINITE);				
 		carrier.setCarrierCapabilities(ccBuilder.build());
-		carrier.getServices().add(CarrierService.Builder.newInstance(Id.create("serviceId", CarrierService.class),Id.create("i(7,4)R", Link.class)).setCapacityDemand(20).build());
-		carrier.getServices().add(CarrierService.Builder.newInstance(Id.create("serviceId2", CarrierService.class),Id.create("i(3,9)", Link.class)).setCapacityDemand(10).build());
+		carrier.getServices().add(CarrierService.Builder.newInstance(Id.create("serviceId", CarrierService.class),Id.create("i(7,4)R", Link.class)).setCapacityDemand(20).setServiceDuration(10.0).build());
+		carrier.getServices().add(CarrierService.Builder.newInstance(Id.create("serviceId2", CarrierService.class),Id.create("i(3,9)", Link.class)).setCapacityDemand(10).setServiceDuration(20.0).build());
 		return carrier;
 	}
 	
