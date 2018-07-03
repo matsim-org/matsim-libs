@@ -364,7 +364,39 @@ public class MatsimJspritFactory {
 			vrpBuilder.addJob(createService(service, coordinate));
 		}
 		
-		for(@SuppressWarnings("unused") CarrierShipment s : carrier.getShipments()) throw new IllegalStateException("this is not supported yet.");
+		//Copied from service, see directly above.
+		//TODO: Which coordinate to use here ? From or to or both or no one? // Is it necessary to set uo coordinate here? kmt jul/18
+//		for(CarrierShipment carrierShipment : carrier.getShipments()) {
+//			Coord fromCoordinate = null;
+//			Coord toCoordinate = null;
+//			if(network != null){
+//				Link fromLink = network.getLinks().get(carrierShipment.getFrom());
+//				Link toLink = network.getLinks().get(carrierShipment.getTo());
+//				if(fromLink == null) {
+//					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getFrom() + " does not exists in network.");
+//				}
+//				else fromCoordinate = fromLink.getCoord();
+//				if(toLink == null) {
+//					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getTo() + " does not exists in network.");
+//				}
+//				else toCoordinate = toLink.getCoord();
+//			}
+//			vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
+//		}
+		
+		for(CarrierShipment carrierShipment : carrier.getShipments()) {
+			if(network != null){
+				Link fromLink = network.getLinks().get(carrierShipment.getFrom());
+				Link toLink = network.getLinks().get(carrierShipment.getTo());
+				if(fromLink == null) {
+					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getFrom() + " does not exists in network.");
+				}
+				if(toLink == null) {
+					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getTo() + " does not exists in network.");
+				}
+			}
+			vrpBuilder.addJob(createShipment(carrierShipment));
+		}	
 		
 		if(transportCosts != null) vrpBuilder.setRoutingCost(transportCosts);
 		if(activityCosts != null) vrpBuilder.setActivityCosts(activityCosts);
@@ -415,7 +447,39 @@ public class MatsimJspritFactory {
 			vrpBuilder.addJob(createService(service, coordinate));
 		}
 		
-		for(@SuppressWarnings("unused") CarrierShipment s : carrier.getShipments()) throw new IllegalStateException("this is not supported yet.");
+		//Copied from service, see directly above.
+		//TODO: Which coordinate to use here ? From or to or both or no one? // Is it necessary to set uo coordinate here? kmt jul/18
+//		for(CarrierShipment carrierShipment : carrier.getShipments()) {
+//			Coord fromCoordinate = null;
+//			Coord toCoordinate = null;
+//			if(network != null){
+//				Link fromLink = network.getLinks().get(carrierShipment.getFrom());
+//				Link toLink = network.getLinks().get(carrierShipment.getTo());
+//				if(fromLink == null) {
+//					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getFrom() + " does not exists in network.");
+//				}
+//				else fromCoordinate = fromLink.getCoord();
+//				if(toLink == null) {
+//					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getTo() + " does not exists in network.");
+//				}
+//				else toCoordinate = toLink.getCoord();
+//			}
+//			vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
+//		}
+		
+		for(CarrierShipment carrierShipment : carrier.getShipments()) {
+			if(network != null){
+				Link fromLink = network.getLinks().get(carrierShipment.getFrom());
+				Link toLink = network.getLinks().get(carrierShipment.getTo());
+				if(fromLink == null) {
+					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getFrom() + " does not exists in network.");
+				}
+				if(toLink == null) {
+					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getTo() + " does not exists in network.");
+				}
+			}
+			vrpBuilder.addJob(createShipment(carrierShipment));
+		}
 		
 		return vrpBuilder;
 	}
