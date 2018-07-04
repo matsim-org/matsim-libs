@@ -35,6 +35,7 @@ import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
+import com.graphhopper.jsprit.core.problem.AbstractJob;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem.FleetSize;
@@ -118,6 +119,32 @@ public class MatsimJspritFactory {
 				.setPickupTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(carrierShipment.getPickupTimeWindow().getStart(), carrierShipment.getPickupTimeWindow().getEnd()))
 				.addSizeDimension(0, carrierShipment.getSize())
 				.build();
+	}
+	
+	static Shipment createShipment(CarrierShipment carrierShipment, Coord fromCoord, Coord toCoord) {
+		Location.Builder fromLocationBuilder = Location.Builder.newInstance();
+		fromLocationBuilder.setId(carrierShipment.getFrom().toString());
+		if(fromCoord != null) {
+			fromLocationBuilder.setCoordinate(Coordinate.newInstance(fromCoord.getX(), fromCoord.getY()));
+		}
+		Location fromLocation = fromLocationBuilder.build();
+		
+		Location.Builder toLocationBuilder = Location.Builder.newInstance();
+		toLocationBuilder.setId(carrierShipment.getTo().toString());
+		if(toCoord != null) {
+			toLocationBuilder.setCoordinate(Coordinate.newInstance(toCoord.getX(), toCoord.getY()));
+		}
+		Location toLocation = toLocationBuilder.build();
+		
+		return Shipment.Builder.newInstance(carrierShipment.getId().toString())
+		.setDeliveryLocation(toLocation)
+		.setDeliveryServiceTime(carrierShipment.getDeliveryServiceTime())
+		.setDeliveryTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(carrierShipment.getDeliveryTimeWindow().getStart(), carrierShipment.getDeliveryTimeWindow().getEnd()))
+		.setPickupServiceTime(carrierShipment.getPickupServiceTime())
+		.setPickupLocation(fromLocation)
+		.setPickupTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(carrierShipment.getPickupTimeWindow().getStart(), carrierShipment.getPickupTimeWindow().getEnd()))
+		.addSizeDimension(0, carrierShipment.getSize())
+		.build();
 	}
 	
 	static Service createService(CarrierService carrierService, Coord locationCoord) {
@@ -364,39 +391,24 @@ public class MatsimJspritFactory {
 			vrpBuilder.addJob(createService(service, coordinate));
 		}
 		
-		//Copied from service, see directly above.
-		//TODO: Which coordinate to use here ? From or to or both or no one? // Is it necessary to set uo coordinate here? kmt jul/18
-//		for(CarrierShipment carrierShipment : carrier.getShipments()) {
-//			Coord fromCoordinate = null;
-//			Coord toCoordinate = null;
-//			if(network != null){
-//				Link fromLink = network.getLinks().get(carrierShipment.getFrom());
-//				Link toLink = network.getLinks().get(carrierShipment.getTo());
-//				if(fromLink == null) {
-//					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getFrom() + " does not exists in network.");
-//				}
-//				else fromCoordinate = fromLink.getCoord();
-//				if(toLink == null) {
-//					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getTo() + " does not exists in network.");
-//				}
-//				else toCoordinate = toLink.getCoord();
-//			}
-//			vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
-//		}
-		
 		for(CarrierShipment carrierShipment : carrier.getShipments()) {
+			Coord fromCoordinate = null;
+			Coord toCoordinate = null;
 			if(network != null){
 				Link fromLink = network.getLinks().get(carrierShipment.getFrom());
 				Link toLink = network.getLinks().get(carrierShipment.getTo());
 				if(fromLink == null) {
 					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getFrom() + " does not exists in network.");
 				}
+				else fromCoordinate = fromLink.getCoord();
 				if(toLink == null) {
 					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getTo() + " does not exists in network.");
 				}
+				else toCoordinate = toLink.getCoord();
 			}
-			vrpBuilder.addJob(createShipment(carrierShipment));
-		}	
+			vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
+		}
+		
 		
 		if(transportCosts != null) vrpBuilder.setRoutingCost(transportCosts);
 		if(activityCosts != null) vrpBuilder.setActivityCosts(activityCosts);
@@ -447,43 +459,30 @@ public class MatsimJspritFactory {
 			vrpBuilder.addJob(createService(service, coordinate));
 		}
 		
-		//Copied from service, see directly above.
-		//TODO: Which coordinate to use here ? From or to or both or no one? // Is it necessary to set uo coordinate here? kmt jul/18
-//		for(CarrierShipment carrierShipment : carrier.getShipments()) {
-//			Coord fromCoordinate = null;
-//			Coord toCoordinate = null;
-//			if(network != null){
-//				Link fromLink = network.getLinks().get(carrierShipment.getFrom());
-//				Link toLink = network.getLinks().get(carrierShipment.getTo());
-//				if(fromLink == null) {
-//					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getFrom() + " does not exists in network.");
-//				}
-//				else fromCoordinate = fromLink.getCoord();
-//				if(toLink == null) {
-//					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getTo() + " does not exists in network.");
-//				}
-//				else toCoordinate = toLink.getCoord();
-//			}
-//			vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
-//		}
 		
 		for(CarrierShipment carrierShipment : carrier.getShipments()) {
+			Coord fromCoordinate = null;
+			Coord toCoordinate = null;
 			if(network != null){
 				Link fromLink = network.getLinks().get(carrierShipment.getFrom());
 				Link toLink = network.getLinks().get(carrierShipment.getTo());
 				if(fromLink == null) {
 					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getFrom() + " does not exists in network.");
 				}
+				else fromCoordinate = fromLink.getCoord();
 				if(toLink == null) {
 					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getTo() + " does not exists in network.");
 				}
+				else toCoordinate = toLink.getCoord();
 			}
-			vrpBuilder.addJob(createShipment(carrierShipment));
+			vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
 		}
 		
 		return vrpBuilder;
 	}
 	
+
+
 	/**
 	 * Creates a {@link VehicleRoutingProblemSolution} from {@link CarrierPlan}.
 	 * 
