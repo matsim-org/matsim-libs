@@ -14,6 +14,10 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
+import org.matsim.core.population.algorithms.PersonPrepareForSim;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.facilities.ActivityFacilities;
@@ -106,15 +110,17 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				throw new RuntimeException("Facilities source '"+this.facilitiesConfigGroup.getFacilitiesSource()+"' is not implemented yet.");
 		}
 
-//		// make sure all routes are calculated.
-//		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
-//				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
-//					@Override
-//					public AbstractPersonAlgorithm getPersonAlgorithm() {
-//						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, net);
-//					}
-//				}
-//		);
+		// make sure all routes are calculated.
+		// At least xy2links is needed here, i.e. earlier than PrepareForMobsimImpl.  It could, however, presumably be separated out
+		// (i.e. we introduce a separate PersonPrepareForMobsim).  kai, jul'18
+		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
+				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
+					@Override
+					public AbstractPersonAlgorithm getPersonAlgorithm() {
+						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario);
+					}
+				}
+		);
 
 		// yyyy from a behavioral perspective, the vehicle must be somehow linked to
 		// the person (maybe via the household).    kai, feb'18

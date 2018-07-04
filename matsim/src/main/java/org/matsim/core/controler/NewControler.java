@@ -117,8 +117,8 @@ class NewControler extends AbstractController implements ControlerI {
 	
 	@Override
 	protected final void prepareForMobsim() {
-//		this.prepareForMobsim.run() ;
-		this.prepareForSim.run() ;
+		this.prepareForMobsim.run() ;
+//		this.prepareForSim.run() ;
 	}
 
 	@Override
