@@ -72,17 +72,17 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		 * own single-mode network. However, this assumes that the main mode is car - which PersonPrepareForSim also does. Should
 		 * be probably adapted in a way that other main modes are possible as well. cdobler, oct'15.
 		 */
-//		final Network net;
-//		if (NetworkUtils.isMultimodal(network)) {
-//			log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
-//			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-//			net = NetworkUtils.createNetwork();
-//			HashSet<String> modes = new HashSet<>();
-//			modes.add(TransportMode.car);
-//			filter.filter(net, modes);
-//		} else {
-//			net = network;
-//		}
+		final Network carOnlyNetwork;
+		if (NetworkUtils.isMultimodal(network)) {
+			log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
+			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+			carOnlyNetwork = NetworkUtils.createNetwork();
+			HashSet<String> modes = new HashSet<>();
+			modes.add(TransportMode.car);
+			filter.filter(carOnlyNetwork, modes);
+		} else {
+			carOnlyNetwork = network;
+		}
 
 		//matsim-724
 		switch(this.facilitiesConfigGroup.getFacilitiesSource()){
@@ -120,7 +120,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
-						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario);
+						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, carOnlyNetwork);
 					}
 				}
 		);

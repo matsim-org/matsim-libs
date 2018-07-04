@@ -37,6 +37,10 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.PrepareForMobsim;
+import org.matsim.core.controler.PrepareForMobsimImpl;
+import org.matsim.core.controler.PrepareForSim;
+import org.matsim.core.controler.PrepareForSimImpl;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.DefaultMobsimModule;
@@ -109,6 +113,8 @@ public class ChangeTripModeIntegrationTest extends MatsimTestCase {
 				install(new TripRouterModule());
 				install(new TravelTimeCalculatorModule());
 				install(new TravelDisutilityModule());
+				bind( PrepareForSim.class ).to( PrepareForSimImpl.class ) ;
+				bind( PrepareForMobsim.class ).to( PrepareForMobsimImpl.class ) ;
 			}
 		});
 		final StrategyManager manager = injector.getInstance(StrategyManager.class);

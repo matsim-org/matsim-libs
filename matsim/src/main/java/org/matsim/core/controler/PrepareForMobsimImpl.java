@@ -71,27 +71,27 @@ public final class PrepareForMobsimImpl implements PrepareForMobsim {
 		 * Create single-mode network here and hand it over to PersonPrepareForSim. Otherwise, each instance would create its
 		 * own single-mode network. However, this assumes that the main mode is car - which PersonPrepareForSim also does. Should
 		 * be probably adapted in a way that other main modes are possible as well. cdobler, oct'15.
+		 * This is now only used for xy2links, which is the "street address" of the activity location of facility, and here for the time being we indeed
+		 *  assume that it can be reached by car.  kai, jul'18
 		 */
-//		final Network net;
-//		if (NetworkUtils.isMultimodal(network)) {
-//			log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
-//			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-//			net = NetworkUtils.createNetwork();
-//			HashSet<String> modes = new HashSet<>();
-//			modes.add(TransportMode.car);
-//			filter.filter(net, modes);
-//		} else {
-//			net = network;
-//		}
-		// yyyyyy This prepared network is only used for computing the distance.  So the full network would
-		// actually be better than the car-only network, without doing damage elsewhere.  No?  kai, jul'18
+		final Network carOnlyNetwork;
+		if (NetworkUtils.isMultimodal(network)) {
+			log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
+			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+			carOnlyNetwork = NetworkUtils.createNetwork();
+			HashSet<String> modes = new HashSet<>();
+			modes.add(TransportMode.car);
+			filter.filter(carOnlyNetwork, modes);
+		} else {
+			carOnlyNetwork = network;
+		}
 		
 		// make sure all routes are calculated.
 		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
 				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
-						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario);
+						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, carOnlyNetwork );
 					}
 					// yyyyyy This prepared network is only used for computing the distance.  So the full network would
 					// actually be better than the car-only network, without doing damage elsewhere.  No?  kai, jul'18
