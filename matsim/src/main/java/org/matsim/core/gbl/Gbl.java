@@ -48,6 +48,7 @@ public abstract class Gbl {
 	public static final String NOT_IMPLEMENTED = "not implemented" ;
 	
 	public static final String ABSORBED_INTO_CORE="This execution path is no longer supported.  The functionality has been absorbed into the core." ;
+	public static final String INVALID = "invalid";
 	
 	public static final void printMemoryUsage() {
 		long totalMem = Runtime.getRuntime().totalMemory();
