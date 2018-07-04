@@ -46,8 +46,6 @@ public final class ControlerDefaultsModule extends AbstractModule {
         install(new CharyparNagelScoringFunctionModule());
         install(new TripRouterModule());
         install(new StrategyManagerModule());
-        bind(PrepareForSim.class).to(PrepareForSimImpl.class);
-        bind(PrepareForMobsim.class).to(PrepareForMobsimImpl.class);
     
         // I think that the ones coming here are all for analysis only, and thus not central to the iterations. kai, apr'18
         install(new ExperiencedPlansModule());
