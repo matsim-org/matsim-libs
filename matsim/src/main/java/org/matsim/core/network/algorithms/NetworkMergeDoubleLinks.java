@@ -39,6 +39,13 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 		ADDITIVE,
 		/** max merge (max cap, max freespeed, max langes, max length */
 		MAXIMUM }
+	
+	public enum LogInfoLevel {
+		/** do not print any info on merged links */
+		NOINFO,
+		/** print info for every merged link */
+		MAXIMUM
+	}
 
 	private final static Logger log = Logger.getLogger(NetworkMergeDoubleLinks.class);
 
@@ -47,17 +54,23 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 	//////////////////////////////////////////////////////////////////////
 
 	private final MergeType mergetype;
+	private final LogInfoLevel logInfoLevel;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
 	public NetworkMergeDoubleLinks() {
-		this(MergeType.MAXIMUM);
+		this(MergeType.MAXIMUM, LogInfoLevel.MAXIMUM);
 	}
 
 	public NetworkMergeDoubleLinks(final MergeType mergetype) {
+		this(mergetype, LogInfoLevel.MAXIMUM);
+	}
+	
+	public NetworkMergeDoubleLinks(final MergeType mergetype, final LogInfoLevel logInfoLevel) {
 		this.mergetype = mergetype;
+		this.logInfoLevel = logInfoLevel;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -67,12 +80,18 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 	private void mergeLink2IntoLink1(Link link1, Link link2, Network network) {
 		switch (this.mergetype) {
 			case REMOVE:
-				log.info("        Link id=" + link2.getId() + " removed because of Link id=" + link1.getId());
+				if (logInfoLevel.equals(LogInfoLevel.MAXIMUM)) {
+					log.info("        Link id=" + link2.getId() + " removed because of Link id=" + link1.getId());
+				}
+				
 				network.removeLink(link2.getId());
 				break;
 			case ADDITIVE:
 			{
-				log.info("        Link id=" + link2.getId() + " merged (additive) into Link id=" + link1.getId());
+				if (logInfoLevel.equals(LogInfoLevel.MAXIMUM)) {
+					log.info("        Link id=" + link2.getId() + " merged (additive) into Link id=" + link1.getId());
+				}
+
 				double cap = link1.getCapacity() + link2.getCapacity();
 				double fs = Math.max(link1.getFreespeed(),link2.getFreespeed());
 				int lanes = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link1) + NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link2);
@@ -86,7 +105,10 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 			}
 			break;
 			case MAXIMUM:
-				log.info("        Link id=" + link2.getId() + " merged (maximum) into Link id=" + link1.getId());
+				if (logInfoLevel.equals(LogInfoLevel.MAXIMUM)) {
+					log.info("        Link id=" + link2.getId() + " merged (maximum) into Link id=" + link1.getId());
+				}
+
 				{
 					double cap = Math.max(link1.getCapacity(),link2.getCapacity());
 					double fs = Math.max(link1.getFreespeed(),link2.getFreespeed());
@@ -120,7 +142,10 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 					Link l2 = l2_it.next();
 					if (!l2.equals(l1)) {
 						if (l2.getToNode().equals(l1.getToNode())) {
-							System.out.println("      Node id=" + n.getId());
+							if (logInfoLevel.equals(LogInfoLevel.MAXIMUM)) {
+								log.info("      Node id=" + n.getId());
+							}
+
 							this.mergeLink2IntoLink1(l1, l2, network);
 							// restart
 							l1_it = n.getOutLinks().values().iterator();
