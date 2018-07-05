@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkLanesImpl;
-import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.Lane;
 
 import com.google.inject.Inject;
 

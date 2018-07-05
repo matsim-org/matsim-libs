@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data.consistency;
+package org.matsim.lanes;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -26,16 +26,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.lanes.data.Lane;
-import org.matsim.lanes.data.Lanes;
-import org.matsim.lanes.data.LanesToLinkAssignment;
 
 
 /**
  * 
  * @author dgrether, tthunig
  */
-public class LanesConsistencyChecker {
+public final class LanesConsistencyChecker {
   
 	private static final Logger log = Logger.getLogger(LanesConsistencyChecker.class);
 	private Network network;

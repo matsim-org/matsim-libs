@@ -21,7 +21,7 @@ package org.matsim.contrib.signals.data.consistency;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.lanes.data.consistency.LanesConsistencyChecker;
+import org.matsim.lanes.LanesConsistencyChecker;
 
 /**
  * @author tthunig

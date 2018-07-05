@@ -47,8 +47,8 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.lanes.data.Lane;
-import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.Lanes;
 
 /**
  * Write a csv file for visualizing signals in via based on the events.

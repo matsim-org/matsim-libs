@@ -43,7 +43,7 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactor
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
-import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.Lane;
 
 /**
  * @author dgrether
