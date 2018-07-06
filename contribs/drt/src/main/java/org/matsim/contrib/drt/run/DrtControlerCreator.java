@@ -22,8 +22,6 @@
  */
 package org.matsim.contrib.drt.run;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -62,6 +60,8 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import java.util.Arrays;
+
 /**
  * @author jbischoff
  *
@@ -88,6 +88,8 @@ public final class DrtControlerCreator {
 	public static Controler createControler(Scenario scenario, boolean otfvis) {
 		// yy I know that this one breaks the sequential loading of the building blocks, but I would like to be able
 		// to modify the scenario before I pass it to the controler. kai, oct'17
+		RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
+		routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
 		adjustConfig(scenario.getConfig());
 		Controler controler = new Controler(scenario);
 		addDrtToControler(controler, otfvis);
