@@ -31,7 +31,7 @@ public class QSimModule extends com.google.inject.AbstractModule {
 		} else {
 			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
 		}
-		if ( config.transit().isUseTransit() ) {
+		if ( config.transit().isUseTransit() && config.transit().isUsingTransitInMobsim() ) {
 			bind( TransitStopHandlerFactory.class ).to( ComplexTransitStopHandlerFactory.class ) ;
 		}
 		// yy see MATSIM-756
@@ -47,7 +47,7 @@ public class QSimModule extends com.google.inject.AbstractModule {
 		if (config1.network().isTimeVariantNetwork()) {
 			plugins.add(new NetworkChangeEventsPlugin(config1));
 		}
-		if (config1.transit().isUseTransit()) {
+		if (config1.transit().isUseTransit() && config1.transit().isUsingTransitInMobsim() ) {
 			plugins.add(new TransitEnginePlugin(config1));
 		}
 		plugins.add(new TeleportationPlugin(config1));

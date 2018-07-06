@@ -50,12 +50,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.LanesUtils;
-import org.matsim.lanes.data.Lane;
-import org.matsim.lanes.data.Lanes;
-import org.matsim.lanes.data.LanesFactory;
-import org.matsim.lanes.data.LanesToLinkAssignment;
-import org.matsim.lanes.data.LanesWriter;
+import org.matsim.lanes.LanesUtils;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.Lanes;
+import org.matsim.lanes.LanesFactory;
+import org.matsim.lanes.LanesToLinkAssignment;
+import org.matsim.lanes.LanesWriter;
 
 /**
  * Example for how to create signal input files for a scenario with lanes from code.

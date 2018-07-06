@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
-import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.Lanes;
 import org.matsim.pt.transitSchedule.api.Transit;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;

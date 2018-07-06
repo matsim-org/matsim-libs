@@ -24,7 +24,9 @@ import java.util.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
-import org.matsim.lanes.data.*;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.Lanes;
+import org.matsim.lanes.LanesToLinkAssignment;
 
 import com.google.inject.Inject;
 

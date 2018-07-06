@@ -1,10 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicLaneDefinitions
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +15,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data;
-
-import java.util.SortedMap;
-import java.util.TreeMap;
+package org.matsim.contrib.drt.routing;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.population.routes.RouteFactory;
 
 /**
- * @author dgrether
+ * @author michalm (Michal Maciejewski)
  */
-public class LanesImpl implements Lanes {
-
-	private SortedMap<Id<Link>, LanesToLinkAssignment> lanesToLinkAssignments =  new TreeMap<>();
-
-	private LanesFactory builder = new LanesFactoryImpl();
-
-	LanesImpl(){}
-
+public class DrtRouteFactory implements RouteFactory {
 	@Override
-	public SortedMap<Id<Link>, LanesToLinkAssignment> getLanesToLinkAssignments() {
-		return this.lanesToLinkAssignments;
+	public Route createRoute(Id<Link> startLinkId, Id<Link> endLinkId) {
+		return new DrtRoute(startLinkId, endLinkId);
 	}
 
 	@Override
-	public void addLanesToLinkAssignment(LanesToLinkAssignment assignment) {
-		this.lanesToLinkAssignments.put(assignment.getLinkId(), assignment);
+	public String getCreatedRouteType() {
+		return DrtRoute.ROUTE_TYPE;
 	}
-
-	@Override
-	public LanesFactory getFactory(){
-		return this.builder;
-	}
-
 }

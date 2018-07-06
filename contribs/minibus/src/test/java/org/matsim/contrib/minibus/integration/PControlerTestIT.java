@@ -40,7 +40,6 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.testcases.MatsimTestUtils;
 
-
 /**
  * Integration test of the minibus package
  * 

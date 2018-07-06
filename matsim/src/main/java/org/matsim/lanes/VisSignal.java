@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.vis;
+package org.matsim.lanes;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
  * @author dgrether
  *
  */
-public class VisSignal implements Serializable {
+public final class VisSignal implements Serializable {
 
 	private String id;
 	private SignalGroupState state;

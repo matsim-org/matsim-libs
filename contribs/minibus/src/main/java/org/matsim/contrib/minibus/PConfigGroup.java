@@ -100,7 +100,6 @@ public final class PConfigGroup extends ConfigGroup{
 	private static final String TRANSIT_SCHEDULE_TO_START_WITH = "transitScheduleToStartWith";
 	private static final String MERGE_TRANSIT_LINE = "mergeTransitLine";
 	private static final String PT_ENABLER = "ptEnabler";
-	private static final String PT_ROUTER = "ptRouter";
 	private static final String OPERATIONMODE = "OperationMode";
 	private static final String TOPOTYPESFORSTOPS = "TopoTypesForStops";
 	private static final String MIN_CAPACITY_FOR_STOPS = "minCapacityForStops";
@@ -160,7 +159,6 @@ public final class PConfigGroup extends ConfigGroup{
 	private String transitScheduleToStartWith = null;
 	private boolean mergeTransitLine = false;
 	private String ptEnabler = null;
-	private String ptRouter = "none set";
 	private String operationMode = TransportMode.pt;
 	private String topoTypesForStops = null;
 	private double minCapacityForStops = 0.0;
@@ -279,8 +277,6 @@ public final class PConfigGroup extends ConfigGroup{
 			this.mergeTransitLine = Boolean.parseBoolean(value);
 		} else if (PT_ENABLER.equals(key)){
 			this.ptEnabler = value;
-		} else if (PT_ROUTER.equals(key)){
-			this.ptRouter = value;
 		} else if (OPERATIONMODE.equals(key)){
 			this.operationMode = value;
 		} else if (TOPOTYPESFORSTOPS.equals(key)){
@@ -362,7 +358,6 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(PASSENGERS_BOARD_EVERY_LINE, Boolean.toString(this.passengersBoardEveryLine));
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, this.transitScheduleToStartWith);
 		map.put(MERGE_TRANSIT_LINE, Boolean.toString(this.mergeTransitLine));
-		map.put(PT_ROUTER, this.ptRouter);
 		map.put(OPERATIONMODE, this.operationMode);
 		map.put(TOPOTYPESFORSTOPS, this.topoTypesForStops);
 		map.put(MIN_CAPACITY_FOR_STOPS, Double.toString(this.minCapacityForStops));
@@ -428,7 +423,6 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(PASSENGERS_BOARD_EVERY_LINE, "Agents will board every vehicles serving the destination (stop), if set to true. Set to false, to force agents to take only vehicles of the line planned. Default is false.");
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, "Will initialize one operator for each transit line with the given time of operation and number of vehicles");
 		map.put(MERGE_TRANSIT_LINE, "Merges all routes of a transit line that have the same sequence of stops. Does not respect the time profile of the routes. Default is false.");
-		map.put(PT_ROUTER, "Uses a experimental connection scan algorithm for routing if set to 'raptor'. Defaults to MATSim standard router.");
 		map.put(OPERATIONMODE, "the mode of transport in which the paratransit operates");
 		map.put(TOPOTYPESFORSTOPS, "comma separated integer-values, as used in NetworkCalcTopoTypes");
 		map.put(MIN_CAPACITY_FOR_STOPS, "Link cannot serve as paratransit stop, if its capacity is lower than the limit set here. Default is 0.");
@@ -624,10 +618,6 @@ public final class PConfigGroup extends ConfigGroup{
 	
 	public String getPtEnabler() {
 		return this.ptEnabler;
-	}
-	
-	public String getPtRouter() {
-		return this.ptRouter;
 	}
 
 	public String getMode() {

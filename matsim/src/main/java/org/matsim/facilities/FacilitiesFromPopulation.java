@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 
 /**
@@ -53,7 +54,7 @@ public class FacilitiesFromPopulation {
 	private final static Logger log = Logger.getLogger(FacilitiesFromPopulation.class);
 
 	private final ActivityFacilities facilities;
-	private boolean oneFacilityPerLink = true;
+	private boolean oneFacilityPerLink ;
 	private String idPrefix = "";
 	private Network network = null;
 	private boolean removeLinksAndCoordinates = true;
@@ -66,10 +67,16 @@ public class FacilitiesFromPopulation {
 
 	public FacilitiesFromPopulation(final ActivityFacilities facilities, final FacilitiesConfigGroup facilityConfigGroup) {
 		this(facilities);
-		this.oneFacilityPerLink = facilityConfigGroup.isOneFacilityPerLink();
 		this.idPrefix = facilityConfigGroup.getIdPrefix();
 		this.removeLinksAndCoordinates = facilityConfigGroup.isRemovingLinksAndCoordinates();
 		this.addEmptyActivityOptions = facilityConfigGroup.isAddEmptyActivityOption();
+		if ( facilityConfigGroup.getFacilitiesSource()== FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile ) {
+			oneFacilityPerLink = true;
+		} else if ( facilityConfigGroup.getFacilitiesSource()== FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile ) {
+			oneFacilityPerLink = false;
+		} else {
+			throw new RuntimeException( Gbl.INVALID );
+		}
 	}
 
 	/**
@@ -98,6 +105,8 @@ public class FacilitiesFromPopulation {
 	 * @param network
 	 */
 	public void setAssignLinksToFacilitiesIfMissing(final boolean doAssignment, final Network network) {
+		// (yy not sure if the false setting makes sense at all. kai, jul'18)
+		
 		if (doAssignment && network == null) {
 			throw new IllegalArgumentException("Network cannot be null if assignment should be done.");
 		}

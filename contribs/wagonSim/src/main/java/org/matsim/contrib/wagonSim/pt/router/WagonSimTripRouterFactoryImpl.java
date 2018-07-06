@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
@@ -60,7 +61,8 @@ public final class WagonSimTripRouterFactoryImpl implements Provider<TripRouter>
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
 			.getLogger(WagonSimTripRouterFactoryImpl.class);
-//	private TripRouterFactoryImpl delegate;
+	private final Config config;
+	//	private TripRouterFactoryImpl delegate;
 	private RoutingModule walkRouter;
 	private TransitSchedule transitSchedule;
 	private Provider<TransitRouter> routerFactory;
@@ -80,6 +82,7 @@ public final class WagonSimTripRouterFactoryImpl implements Provider<TripRouter>
 		this.network = scenario.getNetwork();
 		this.walkRouter = createWalkRouter(scenario.getPopulation().getFactory(), scenario.getConfig().plansCalcRoute());
 		this.minShuntingTimes = minShuntingTimes;
+		this.config = scenario.getConfig() ;
 	}
 	
 	private RoutingModule createWalkRouter(PopulationFactory populationFactory, PlansCalcRouteConfigGroup routeConfigGroup){
@@ -89,11 +92,9 @@ public final class WagonSimTripRouterFactoryImpl implements Provider<TripRouter>
 
 	@Override
 	public TripRouter get() {
-//		TripRouter tripRouter = this.delegate.get();
-		TripRouter tripRouter = new TripRouter();
-		tripRouter.setRoutingModule(TransportMode.pt, 
-				new WagonSimRouterWrapper(routerFactory.get(), transitSchedule, network, walkRouter, minShuntingTimes));
-		return tripRouter;
+		TripRouter.Builder builder = new TripRouter.Builder( config ) ;
+		builder.setRoutingModule(TransportMode.pt,  new WagonSimRouterWrapper(routerFactory.get(), transitSchedule, network, walkRouter, minShuntingTimes) ) ;
+		return builder.build() ;
 	}
 	
 	private static class WagonSimRouterWrapper implements RoutingModule{
@@ -118,10 +119,6 @@ public final class WagonSimTripRouterFactoryImpl implements Provider<TripRouter>
 			return duplicateStageActivities(pe);
 		}
 
-		/**
-		 * @param pe
-		 * @return
-		 */
 		private List<? extends PlanElement> duplicateStageActivities(List<? extends PlanElement> oldElements) {
 			List<PlanElement> pe = new ArrayList<PlanElement>();
 			for(int i = 1; i < oldElements.size() ; i += 2){

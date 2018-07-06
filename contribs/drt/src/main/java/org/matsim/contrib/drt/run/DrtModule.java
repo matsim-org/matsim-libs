@@ -29,6 +29,10 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import com.google.inject.name.Names;
 
+/**
+ * @author jbischoff
+ * @author michalm (Michal Maciejewski)
+ */
 public final class DrtModule extends AbstractModule {
 
 	@Override
@@ -39,7 +43,7 @@ public final class DrtModule extends AbstractModule {
 		bind(DrtRequestValidator.class).to(DefaultDrtRequestValidator.class);
 		bind(DepotFinder.class).to(NearestStartLinkAsDepot.class);
 		bind(TravelDisutilityFactory.class).annotatedWith(Names.named(DefaultDrtOptimizer.DRT_OPTIMIZER))
-				.toInstance(timeCalculator -> new TimeAsTravelDisutility(timeCalculator));
+				.toInstance(TimeAsTravelDisutility::new);
 
 		if (MinCostFlowRebalancingParams.isRebalancingEnabled(drtCfg.getMinCostFlowRebalancing())) {
 			install(new MinCostFlowRebalancingModule());
@@ -49,7 +53,7 @@ public final class DrtModule extends AbstractModule {
 
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:
-				addRoutingModuleBinding(TransportMode.drt).to(DrtRoutingModule.class).asEagerSingleton();
+				addRoutingModuleBinding(TransportMode.drt).to(DrtRoutingModule.class);
 				break;
 
 			case stopbased:
@@ -59,7 +63,8 @@ public final class DrtModule extends AbstractModule {
 				bind(TransitSchedule.class).annotatedWith(Names.named(TransportMode.drt))
 						.toInstance(scenario2.getTransitSchedule());
 				bind(MainModeIdentifier.class).to(DrtMainModeIdentifier.class).asEagerSingleton();
-				addRoutingModuleBinding(TransportMode.drt).to(StopBasedDrtRoutingModule.class).asEagerSingleton();
+				bind(DrtRoutingModule.class);
+				addRoutingModuleBinding(TransportMode.drt).to(StopBasedDrtRoutingModule.class);
 				bind(AccessEgressStopFinder.class).to(DefaultAccessEgressStopFinder.class).asEagerSingleton();
 				break;
 

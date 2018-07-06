@@ -117,7 +117,11 @@ public class ControlerEventsTest extends MatsimTestCase {
 		protected void prepareForSim() {
 
 		}
-
+		
+		@Override
+		protected void prepareForMobsim() {
+		}
+		
 		@Override
 		protected boolean continueIterations(int iteration) {
 			return iteration <= config.controler().getLastIteration();
