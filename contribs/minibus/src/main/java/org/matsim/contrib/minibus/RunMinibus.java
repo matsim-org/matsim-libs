@@ -54,7 +54,6 @@ public final class RunMinibus {
 
 		controler.addOverridingModule(new PModule()) ;
 
-
 		controler.run();
 	}		
 }
