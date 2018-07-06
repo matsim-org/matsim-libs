@@ -8,10 +8,13 @@ public final class NewControlerModule extends AbstractModule {
 		bind(ControlerI.class).to(NewControler.class).asEagerSingleton();
 		bind(ControlerListenerManagerImpl.class).asEagerSingleton();
 		bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
-		bind(PrepareForSim.class).to(PrepareForSimImpl.class);
+		
 		bind(IterationStopWatch.class).asEagerSingleton();
 		bind(OutputDirectoryHierarchy.class).asEagerSingleton();
 		bind(TerminationCriterion.class).to(TerminateAtFixedIterationNumber.class);
 		bind(MatsimServices.class).to(MatsimServicesImpl.class);
+
+		bind(PrepareForSim.class).to(PrepareForSimImpl.class);
+		bind(PrepareForMobsim.class).to(PrepareForMobsimImpl.class);
 	}
 }

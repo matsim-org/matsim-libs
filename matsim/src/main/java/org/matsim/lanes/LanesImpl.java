@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFLaneReader2
+ * BasicLaneDefinitions
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,49 +17,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.otfvis;
+package org.matsim.lanes;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
-import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.lanes.VisLaneModelBuilder;
-import org.matsim.lanes.VisLinkWLanes;
-import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.interfaces.OTFDataReader;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 
 /**
  * @author dgrether
- *
  */
-public class OTFLaneReader extends OTFDataReader {
-	
-	protected OTFLaneSignalDrawer drawer = new OTFLaneSignalDrawer();
+ final class LanesImpl implements Lanes {
 
-	private VisLaneModelBuilder laneModelBuilder = new VisLaneModelBuilder();
-	
-	public OTFLaneReader(){
-	}
-	
+	private SortedMap<Id<Link>, LanesToLinkAssignment> lanesToLinkAssignments =  new TreeMap<>();
+
+	private LanesFactory builder = new LanesFactoryImpl();
+
+	LanesImpl(){}
+
 	@Override
-	public void readConstData(ByteBuffer in) throws IOException {
-		int noLinks = in.getInt();
-		for (int i = 0; i < noLinks; i++){
-			//read link data
-			VisLinkWLanes lanesLinkData = (VisLinkWLanes) ByteBufferUtils.getObject(in);
-			this.drawer.addLaneLinkData(lanesLinkData);
-		}
-		this.laneModelBuilder.connect(this.drawer.getLanesLinkData());
-	}
-	
-	@Override
-	public void invalidate(SceneGraph graph) {
-		this.drawer.addToSceneGraph(graph);
+	public SortedMap<Id<Link>, LanesToLinkAssignment> getLanesToLinkAssignments() {
+		return this.lanesToLinkAssignments;
 	}
 
 	@Override
-	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		// nothing to do as lanes are non dynamical data
+	public void addLanesToLinkAssignment(LanesToLinkAssignment assignment) {
+		this.lanesToLinkAssignments.put(assignment.getLinkId(), assignment);
 	}
+
+	@Override
+	public LanesFactory getFactory(){
+		return this.builder;
+	}
+
 }

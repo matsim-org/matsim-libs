@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.vis;
+package org.matsim.lanes;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * @author dgrether
  */
-public class VisLane implements Serializable {
+public final class VisLane implements Serializable {
 	
 	private String id = null;
 	private double endPosition;

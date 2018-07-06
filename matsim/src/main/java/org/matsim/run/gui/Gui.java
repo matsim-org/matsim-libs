@@ -498,4 +498,14 @@ public class Gui extends JFrame {
 			}
 		}
 	}
+	
+	public final JMenu getToolsMenu() {
+		// Is it a problem to make this available?  If so, why?  kai, jun'18
+		return this.mnTools ;
+	}
+	public final void addToMenuBar(JMenu menuItem) {
+		// Is it a problem to make this available?  If so, why?  kai, jun'18
+		this.menuBar.add(menuItem) ;
+	}
+	
 }

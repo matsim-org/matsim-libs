@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -57,14 +58,15 @@ import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 public class JointPlanRouterTest {
 	@Test
 	public void testDriverIdIsKept() throws Exception {
-        final PopulationFactory populationFactory =
+		final Config config = ConfigUtils.createConfig();
+		final PopulationFactory populationFactory =
                 ScenarioUtils.createScenario(
-		        ConfigUtils.createConfig()).getPopulation().getFactory();
+				    config).getPopulation().getFactory();
 
 		final JointPlanRouter testee =
 			new JointPlanRouter(
 					createTripRouter(
-						populationFactory),
+						populationFactory, config),
 					null);
 
 		final Id<Link> linkId = Id.create( "some_link" , Link.class );
@@ -108,14 +110,15 @@ public class JointPlanRouterTest {
 
 	@Test
 	public void testPassengerIdIsKept() throws Exception {
-        final PopulationFactory populationFactory =
+		final Config config = ConfigUtils.createConfig();
+		final PopulationFactory populationFactory =
                 ScenarioUtils.createScenario(
-		        ConfigUtils.createConfig()).getPopulation().getFactory();
+				    config).getPopulation().getFactory();
 
 		final JointPlanRouter testee =
 			new JointPlanRouter(
 					createTripRouter(
-						populationFactory),
+						populationFactory, config),
 					null);
 
 		final Id<Link> linkId = Id.create( "some_link" , Link.class );
@@ -165,10 +168,10 @@ public class JointPlanRouterTest {
 					newRoute.getPassengersIds() ));
 	}
 
-	private static TripRouter createTripRouter(final PopulationFactory populationFactory) {
-		final TripRouter instance = new TripRouter();
-
-		instance.setRoutingModule(
+	private static TripRouter createTripRouter(final PopulationFactory populationFactory, Config config) {
+		final TripRouter.Builder builder = new TripRouter.Builder(config) ;
+		
+		builder.setRoutingModule(
 				JointActingTypes.DRIVER,
 				new DriverRoutingModule(
 					JointActingTypes.DRIVER,
@@ -189,14 +192,14 @@ public class JointPlanRouterTest {
 							return EmptyStageActivityTypes.INSTANCE;
 						}
 					}));
-
-		instance.setRoutingModule(
+		
+		builder.setRoutingModule(
 				JointActingTypes.PASSENGER,
 				new PassengerRoutingModule(
 					JointActingTypes.PASSENGER,
 					populationFactory));
 
-		return instance;
+		return builder.build() ;
 	}
 }
 
