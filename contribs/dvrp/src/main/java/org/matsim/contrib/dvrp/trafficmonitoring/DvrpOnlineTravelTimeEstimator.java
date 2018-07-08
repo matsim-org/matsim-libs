@@ -24,7 +24,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vehicles.Vehicle;
@@ -38,7 +40,8 @@ import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
  * 
  * @author michalm
  */
-public class DvrpOnlineTravelTimeEstimator implements DvrpTravelTimeEstimator, MobsimInitializedListener {
+public class DvrpOnlineTravelTimeEstimator
+		implements DvrpTravelTimeEstimator, MobsimInitializedListener, MobsimBeforeCleanupListener {
 	private final WithinDayTravelTime withinDayTT;
 	private final DvrpOfflineTravelTimeEstimator offlineTTEstimator;
 	private MobsimTimer mobsimTimer;
@@ -58,10 +61,14 @@ public class DvrpOnlineTravelTimeEstimator implements DvrpTravelTimeEstimator, M
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+		double offlineTT = offlineTTEstimator.getLinkTravelTime(link, time, person, vehicle);
+		if (mobsimTimer == null) {//called before/after QSim ==> no online estimation
+			return offlineTT;
+		}
+
 		double currentTime = mobsimTimer.getTimeOfDay();
 		double correction = Math.min(1, Math.max(0, 1 - (time - currentTime) / beta));
 		double currentTT = withinDayTT.getLinkTravelTime(link, currentTime, person, vehicle);
-		double offlineTT = offlineTTEstimator.getLinkTravelTime(link, time, person, vehicle);
 		return correction * currentTT + (1 - correction) * offlineTT;
 
 		// XXX Alternatively:
@@ -72,5 +79,10 @@ public class DvrpOnlineTravelTimeEstimator implements DvrpTravelTimeEstimator, M
 	@Override
 	public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e) {
 		mobsimTimer = ((QSim)e.getQueueSimulation()).getSimTimer();
+	}
+
+	@Override
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
+		mobsimTimer = null;
 	}
 }
