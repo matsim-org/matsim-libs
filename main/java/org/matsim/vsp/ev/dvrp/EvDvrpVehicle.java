@@ -56,7 +56,7 @@ public class EvDvrpVehicle implements Vehicle {
 	}
 
 	@Override
-	public double getCapacity() {
+	public int getCapacity() {
 		return vehicle.getCapacity();
 	}
 
