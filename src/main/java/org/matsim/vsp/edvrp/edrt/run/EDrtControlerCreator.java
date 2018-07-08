@@ -18,6 +18,8 @@
 
 package org.matsim.vsp.edvrp.edrt.run;
 
+import java.util.Arrays;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
@@ -29,8 +31,6 @@ import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.PrecalculablePathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
-import org.matsim.contrib.drt.routing.DrtRoute;
-import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.DrtModule;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
@@ -49,16 +49,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.population.routes.RouteFactories;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vsp.edvrp.edrt.EDrtActionCreator;
 import org.matsim.vsp.edvrp.edrt.optimizer.EDrtOptimizer;
 import org.matsim.vsp.edvrp.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.vsp.edvrp.edrt.optimizer.depot.NearestChargerAsDepot;
 import org.matsim.vsp.edvrp.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.vsp.edvrp.edrt.scheduler.EmptyVehicleChargingScheduler;
-
-import java.util.Arrays;
 
 /**
  * @author michalm
