@@ -90,7 +90,11 @@ public final class DrtControlerCreator {
 	 * @return
 	 */
 	public static Controler createControler(Config config, boolean otfvis) {
-		return createControler(config, otfvis, DrtControlerCreator::createScenarioWithDrtRouteFactory);
+		return createControler(config, otfvis, cfg -> {
+			Scenario scenario = createScenarioWithDrtRouteFactory(cfg);
+			ScenarioUtils.loadScenario(scenario);
+			return scenario;
+		});
 	}
 
 	/**
@@ -98,12 +102,12 @@ public final class DrtControlerCreator {
 	 *
 	 * @param config
 	 * @param otfvis
-	 * @param scenarioCreator
+	 * @param scenarioLoader
 	 * @return
 	 */
-	public static Controler createControler(Config config, boolean otfvis, Function<Config, Scenario> scenarioCreator) {
+	public static Controler createControler(Config config, boolean otfvis, Function<Config, Scenario> scenarioLoader) {
 		adjustDrtConfig(config);
-		Scenario scenario = scenarioCreator.apply(config);
+		Scenario scenario = scenarioLoader.apply(config);
 		Controler controler = new Controler(scenario);
 		addDrtToControler(controler);
 		if (otfvis) {
