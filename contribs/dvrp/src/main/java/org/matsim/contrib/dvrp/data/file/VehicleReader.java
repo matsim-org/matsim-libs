@@ -58,7 +58,7 @@ public class VehicleReader extends MatsimXmlParser {
 
 	private Vehicle createVehicle(Attributes atts) {
 		Id<Vehicle> id = Id.create(atts.getValue("id"), Vehicle.class);
-		Link startLink = links.get(Id.createLinkId(atts.getValue("start_link")));
+		Link startLink = Objects.requireNonNull(links.get(Id.createLinkId(atts.getValue("start_link"))));
 		int capacity = ReaderUtils.getInt(atts, "capacity", DEFAULT_CAPACITY);
 		double t0 = ReaderUtils.getDouble(atts, "t_0", DEFAULT_T_0);
 		double t1 = ReaderUtils.getDouble(atts, "t_1", DEFAULT_T_1);
