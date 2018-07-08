@@ -49,6 +49,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vsp.edvrp.edrt.EDrtActionCreator;
 import org.matsim.vsp.edvrp.edrt.optimizer.EDrtOptimizer;
 import org.matsim.vsp.edvrp.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
@@ -64,6 +65,7 @@ public class EDrtControlerCreator {
 	public static Controler createControler(Config config, boolean otfvis) {
 		DrtControlerCreator.adjustDrtConfig(config);
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
+		ScenarioUtils.loadScenario(scenario);
 		Controler controler = new Controler(scenario);
 		addEDrtToController(controler);
 		if (otfvis) {
