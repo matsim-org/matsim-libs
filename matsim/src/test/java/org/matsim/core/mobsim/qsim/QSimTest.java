@@ -205,7 +205,7 @@ public class QSimTest {
 		QSim sim = null ;
 		try {
 			sim = createQSim(f, events);
-			Assert.fail("should not get to here");
+//			Assert.fail("should not get to here");
 		} catch( Exception ee ) {
 			// this is the expected behavior, so stop here
 		}
@@ -213,14 +213,21 @@ public class QSimTest {
 		 /* What happens is the following: The last leg is not routed ... it would not be 
 		  * possible even if desired since we do not know where to go. It does fail,
 		  * however, in the vehicle generation part of PrepareForSim, since when there
-		  * is no route, it does not know where to put the vehicle. */      
+		  * is no route, it does not know where to put the vehicle. */
+		 // yy The above is no longer correct, but I am leaving the comment since vehicle
+		// creation is not fully sorted out.
 
-//		sim.run();
+		 try {
+			 sim.run();
+//			 Assert.fail("should not get to here");
+		 } catch( Exception ee ) {
+			 // this is the expected behavior, so stop here
+		 }
 //
 //		/* finish */
-//		Assert.assertEquals("wrong number of link enter events.", 2, collector.events.size());
-//		Assert.assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestCase.EPSILON);
-//		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong number of link enter events.", 2, collector.events.size());
+		Assert.assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestCase.EPSILON);
 	}
 
 	/**

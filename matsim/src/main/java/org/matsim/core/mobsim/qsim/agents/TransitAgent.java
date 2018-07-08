@@ -35,6 +35,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.facilities.Facility;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -61,7 +62,7 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 		basicAgentDelegate = new BasicPlanAgentImpl( p.getSelectedPlan(), simulation.getScenario(), simulation.getEventsManager(), 
 				simulation.getSimTimer() ) ;
 		driverAgentDelegate = new PlanBasedDriverAgentImpl( basicAgentDelegate ) ;
-		transitAgentDelegate = new TransitAgentImpl( basicAgentDelegate );
+		transitAgentDelegate = new TransitAgentImpl( basicAgentDelegate, simulation.getScenario().getConfig().transit().getBoardingAcceptance() );
 	}
 
 	@Override

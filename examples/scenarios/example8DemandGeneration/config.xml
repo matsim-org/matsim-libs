@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 
 
@@ -24,14 +24,22 @@
 
 
 	<module name="planCalcScore">
-		<param name="activityType_0"            value="h" />
-		<param name="activityTypicalDuration_0" value="12:00:00" />
-	
-		<param name="activityType_1"            value="w" />
-		<param name="activityTypicalDuration_1" value="08:00:00" />
-		
-		<param name="activityType_2"            value="l" />
-		<param name="activityTypicalDuration_2" value="02:00:00" />
+
+		<parameterset type="activityParams">
+			<param name="activityType"    value="h" />
+			<param name="typicalDuration" value="12:00:00" />
+		</parameterset>
+
+		<parameterset type="activityParams">
+			<param name="activityType"    value="w" />
+			<param name="typicalDuration" value="08:00:00" />
+		</parameterset>
+
+		<parameterset type="activityParams">
+			<param name="activityType"    value="l" />
+			<param name="typicalDuration" value="02:00:00" />
+		</parameterset>
+
 	</module>
 	
 

@@ -29,7 +29,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.matsim.lanes.data.LanesReader;
+import org.matsim.lanes.LanesReader;
 
 /**
  * @author mrieser

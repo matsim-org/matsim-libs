@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
-import org.matsim.contrib.carsharing.router.CarsharingRoute;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -26,6 +25,7 @@ import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.facilities.Facility;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -49,7 +49,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		this.scenario = simulation.getScenario() ;
 		this.carsharingManager = carsharingManager;
 		this.basicAgentDelegate = new BasicPlanAgentImpl( plan, scenario, simulation.getEventsManager(), simulation.getSimTimer() ) ;
-		this.transitAgentDelegate = new TransitAgentImpl( this.basicAgentDelegate ) ;
+		this.transitAgentDelegate = new TransitAgentImpl( this.basicAgentDelegate, TransitConfigGroup.BoardingAcceptance.checkLineAndStop) ;
 		this.driverAgentDelegate = new PlanBasedDriverAgentImpl( this.basicAgentDelegate ) ;
 		this.originalPlan = this.scenario.getPopulation().getPersons().get(this.basicAgentDelegate.getId()).getSelectedPlan();
 		//this should work with multiple qsim threads now since different instances of router are used sep '17 mb

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFSignalPosition
+ * BasicLaneDefinitions
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,56 +17,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.vis;
+package org.matsim.lanes;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
-import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 
 /**
  * @author dgrether
- *
  */
-public class VisSignal implements Serializable {
+ final class LanesImpl implements Lanes {
 
-	private String id;
-	private SignalGroupState state;
-	private List<VisLinkWLanes> turningMoveRestrictions = null;
-	private String systemId;
-	
-	public VisSignal(String systemId, String signalId) {
-		this.systemId = systemId;
-		this.id = signalId;
-	}
+	private SortedMap<Id<Link>, LanesToLinkAssignment> lanesToLinkAssignments =  new TreeMap<>();
 
-	public String getId(){
-		return this.id;
+	private LanesFactory builder = new LanesFactoryImpl();
+
+	LanesImpl(){}
+
+	@Override
+	public SortedMap<Id<Link>, LanesToLinkAssignment> getLanesToLinkAssignments() {
+		return this.lanesToLinkAssignments;
 	}
 
-	public String getSignalSystemId(){
-		return this.systemId;
-	}
-	
-	public void setState(SignalGroupState state){
-		this.state = state;
-	}
-	
-	public SignalGroupState getSignalGroupState(){
-		return this.state;
-	}
-	
-	public List<VisLinkWLanes> getTurningMoveRestrictions(){
-		return this.turningMoveRestrictions;
+	@Override
+	public void addLanesToLinkAssignment(LanesToLinkAssignment assignment) {
+		this.lanesToLinkAssignments.put(assignment.getLinkId(), assignment);
 	}
 
-	public void addTurningMoveRestriction(VisLinkWLanes toLink) {
-		if (this.turningMoveRestrictions == null){
-			this.turningMoveRestrictions = new ArrayList<VisLinkWLanes>();
-		}
-		this.turningMoveRestrictions.add(toLink);
+	@Override
+	public LanesFactory getFactory(){
+		return this.builder;
 	}
 
 }

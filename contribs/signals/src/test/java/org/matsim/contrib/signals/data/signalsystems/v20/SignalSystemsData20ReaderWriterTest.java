@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.Lane;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 

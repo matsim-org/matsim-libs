@@ -1,10 +1,10 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * BasicLaneDefinitionsBuilderImpl
- *                                                                         *
+/* **********************************import java.util.List;
+
+import org.matsim.interfaces.basic.v01.Id;
+                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data;
+
+package org.matsim.lanes;
+
+import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-
-
 /**
- * 
+ *
  * @author dgrether
- * @see org.matsim.lanes.data.LanesFactory
+ *
  */
-class LanesFactoryImpl implements LanesFactory {
-	/**
-	 * @see org.matsim.lanes.data.LanesFactory#createLanesToLinkAssignment(org.matsim.api.core.v01.Id)
-	 */
-	@Override
-	public LanesToLinkAssignment createLanesToLinkAssignment(Id<Link> linkIdReference) {
-		return new LanesToLinkAssignmentImpl(linkIdReference);
-	}
-	/**
-	 * @see org.matsim.lanes.data.LanesFactory#createLane(org.matsim.api.core.v01.Id)
-	 */
-	@Override
-	public Lane createLane(Id<Lane> id) {
-		return new LaneImpl(id);
-	}
+public interface LanesToLinkAssignment {
+
+	SortedMap<Id<Lane>, Lane> getLanes();
+
+	void addLane(Lane lane);
+
+	Id<Link> getLinkId();
+
 }

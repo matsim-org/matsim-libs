@@ -44,11 +44,11 @@ public final class ControlerDefaultsModule extends AbstractModule {
         install(new TravelTimeCalculatorModule());
         install(new TravelDisutilityModule());
         install(new CharyparNagelScoringFunctionModule());
-        install(new ExperiencedPlansModule());
         install(new TripRouterModule());
         install(new StrategyManagerModule());
-
+    
         // I think that the ones coming here are all for analysis only, and thus not central to the iterations. kai, apr'18
+        install(new ExperiencedPlansModule());
         install(new LinkStatsModule());
         install(new VolumesAnalyzerModule());
         install(new LegHistogramModule());
