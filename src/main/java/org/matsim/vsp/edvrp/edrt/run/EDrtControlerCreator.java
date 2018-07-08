@@ -66,27 +66,17 @@ import java.util.Arrays;
 public class EDrtControlerCreator {
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		DrtControlerCreator.adjustConfig(config);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-        RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
-        routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
-		return createControlerImpl(otfvis, scenario);
+		DrtControlerCreator.adjustDrtConfig(config);
+		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
+		Controler controler = new Controler(scenario);
+		addEDrtToController(controler);
+		if (otfvis) {
+			controler.addOverridingModule(new OTFVisLiveModule());
+		}
+		return controler;
 	}
 
-    public static Controler createControler(Scenario scenario, boolean otfvis) {
-        DrtControlerCreator.adjustConfig(scenario.getConfig());
-        RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
-        routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
-        return createControlerImpl(otfvis, scenario);
-    }
-
-    private static Controler createControlerImpl(boolean otfvis, Scenario scenario) {
-        Controler controler = new Controler(scenario);
-        addEDrtToController(otfvis, controler);
-        return controler;
-    }
-
-    public static void addEDrtToController(boolean otfvis, Controler controler) {
+    public static void addEDrtToController(Controler controler) {
         controler.addOverridingModule(new DvrpModule(EDrtControlerCreator::createModuleForQSimPlugin, Arrays
                 .asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class, ParallelPathDataProvider.class)));
         controler.addOverridingModule(new DrtModule());
@@ -97,9 +87,6 @@ public class EDrtControlerCreator {
                 bind(DepotFinder.class).to(NearestChargerAsDepot.class);
             }
         });
-        if (otfvis) {
-            controler.addOverridingModule(new OTFVisLiveModule());
-        }
     }
 
 	public static com.google.inject.Module createModuleForQSimPlugin(Config config) {
