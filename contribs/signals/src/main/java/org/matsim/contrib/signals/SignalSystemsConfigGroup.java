@@ -212,12 +212,12 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 		this.useSignalSystems = useSignalSystems;
 	}
 	
-	@StringGetter( USE_SIGNALSYSTEMS )
+	@StringGetter( INTERSECTION_LOGIC )
 	public IntersectionLogic getIntersectionLogic() {
 		return intersectionLogic;
 	}
 
-	@StringSetter( USE_SIGNALSYSTEMS )
+	@StringSetter( INTERSECTION_LOGIC )
 	public void setIntersectionLogic(IntersectionLogic intersectionLogic) {
 		this.intersectionLogic = intersectionLogic;
 	}
