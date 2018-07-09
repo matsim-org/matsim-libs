@@ -52,9 +52,11 @@ public class UnprotectedLeftTurnLogicTest {
 		
 		double leftTurnDelayWTurnRestriction = restrictedLeftTurns.getLeftTurnDelay();
 		double leftTurnDelayWoTurnRestriction = unrestrictedLeftTurns.getLeftTurnDelay();
+		System.out.println("delay wTurn: " + leftTurnDelayWTurnRestriction);
+		System.out.println("delay w/oTurn: " + leftTurnDelayWoTurnRestriction);
 		Assert.assertTrue("Delay without restriction should be less than with restricted left turns.", 2 * leftTurnDelayWoTurnRestriction < leftTurnDelayWTurnRestriction);
 		Assert.assertEquals("Delay value for the case without turn restrictions is not as expected!", 21120, leftTurnDelayWoTurnRestriction, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Delay value for the case with turn restrictions is not as expected!", 75575, leftTurnDelayWTurnRestriction, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Delay value for the case with turn restrictions is not as expected!", 80845, leftTurnDelayWTurnRestriction, MatsimTestUtils.EPSILON);
 	}
 
 	private AnalyzeSingleIntersectionLeftTurnDelays createControler(IntersectionLogic conflictingDirectionsAndTurnRestrictions) {
