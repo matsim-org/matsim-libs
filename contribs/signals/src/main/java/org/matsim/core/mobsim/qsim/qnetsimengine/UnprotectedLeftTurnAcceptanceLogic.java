@@ -25,8 +25,8 @@ import org.matsim.contrib.signals.data.conflicts.ConflictData;
 import org.matsim.contrib.signals.data.conflicts.Direction;
 import org.matsim.contrib.signals.data.conflicts.IntersectionDirections;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
-import org.matsim.lanes.data.Lane;
-import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.Lanes;
 
 /**
  * This class extends the SignalTurnAcceptanceLogic by also checking for oncoming traffic:

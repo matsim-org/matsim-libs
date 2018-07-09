@@ -32,8 +32,8 @@ import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
-import org.matsim.lanes.data.Lane;
-import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.Lanes;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
