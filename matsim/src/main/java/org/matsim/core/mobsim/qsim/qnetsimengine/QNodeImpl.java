@@ -255,7 +255,7 @@ final class QNodeImpl implements QNodeI {
 		Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = veh.getCurrentLink();
 		
-		AcceptTurn turn = turnAcceptanceLogic.isAcceptingTurn(currentLink, fromLaneBuffer, nextLinkId, veh, this.netsimEngine.getNetsimNetwork());
+		AcceptTurn turn = turnAcceptanceLogic.isAcceptingTurn(currentLink, fromLaneBuffer, nextLinkId, veh, this.netsimEngine.getNetsimNetwork(), now);
 		if ( turn.equals(AcceptTurn.ABORT) ) {
 			moveVehicleFromInlinkToAbort( veh, fromLaneBuffer, now, currentLink.getId() ) ;
 			return true ;

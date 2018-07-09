@@ -18,7 +18,7 @@ public final class DefaultTurnAcceptanceLogic implements TurnAcceptanceLogic {
 	
 	@Override
 	/** We need qNetwork to get the next QLink, because the link lookup may lead to a NullPointer otherwise */
-	public AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork){
+	public AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork, double now){
 		if (nextLinkId == null) {
 			log.error( "Agent has no or wrong route! agentId=" + veh.getDriver().getId()
 					+ " currentLink=" + currentLink.getId().toString()

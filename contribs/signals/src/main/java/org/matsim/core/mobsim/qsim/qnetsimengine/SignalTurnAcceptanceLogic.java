@@ -34,8 +34,8 @@ final class SignalTurnAcceptanceLogic implements TurnAcceptanceLogic {
 	private final TurnAcceptanceLogic delegate = new DefaultTurnAcceptanceLogic();
 	
 	@Override
-	public AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork) {
-		AcceptTurn defaultTurn = delegate.isAcceptingTurn(currentLink, currentLane, nextLinkId, veh, qNetwork);
+	public AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork, double now) {
+		AcceptTurn defaultTurn = delegate.isAcceptingTurn(currentLink, currentLane, nextLinkId, veh, qNetwork, now);
 		if ( defaultTurn.equals(AcceptTurn.ABORT) ) {
 			return defaultTurn;
 		}
