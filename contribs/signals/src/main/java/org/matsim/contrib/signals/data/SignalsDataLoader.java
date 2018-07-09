@@ -66,7 +66,7 @@ public class SignalsDataLoader {
 		if (this.signalConfig.isUseIntergreenTimes()){
 			this.loadIntergreenTimes(data);
 		}
-		if (this.signalConfig.isUseConflictingDirections()) {
+		if (this.signalConfig.getIntersectionLogic().toString().startsWith("CONFLICTING_DIRECTIONS")) {
 			this.loadConflicts(data);
 		}
 		return data;
