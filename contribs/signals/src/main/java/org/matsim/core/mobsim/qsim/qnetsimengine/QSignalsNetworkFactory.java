@@ -86,7 +86,7 @@ public class QSignalsNetworkFactory extends QNetworkFactory{
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		if (signalsConfigGroup.getIntersectionLogic().equals(IntersectionLogic.CONFLICTING_DIRECTIONS_AND_TURN_RESTRICTIONS)) {
 			builder.setTurnAcceptanceLogic(new UnprotectedLeftTurnAcceptanceLogic(
-					((SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getConflictingDirectionsData()));
+					((SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getConflictingDirectionsData(), scenario.getLanes()));
 		} else {
 			builder.setTurnAcceptanceLogic(new SignalTurnAcceptanceLogic());
 		}
