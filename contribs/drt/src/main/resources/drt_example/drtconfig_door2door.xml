@@ -29,9 +29,6 @@
 		<!-- Writes out detailed DRT customer stats in each iteration. True by default. -->
 		<param name="writeDetailedCustomerStats" value="true" />
 
-		<!-- Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration. False by default. -->
-		<param name="writeDetailedVehicleStats" value="false" />
-
 		<parameterset type="minCostFlowRebalancing">
 			<param name="targetAlpha" value="0.5"/>
 			<param name="targetBeta" value="0.5"/>
@@ -44,8 +41,8 @@
 		<!-- Mode which will be handled by PassengerEngine and VrpOptimizer (passengers'/customers' perspective) -->
 		<param name="mode" value="drt" />
 
-		<!-- Mode of which the network will be used for routing vehicles, calculating trave times, etc. (fleet operator's perspective). If null, no mode filtering is done; the standard network (Scenario.getNetwork()) is used -->
-		<param name="networkMode" value="null" />
+		<!-- Mode of which the network will be used for routing vehicles, calculating travel times, etc. (fleet operator's perspective). If null, no mode filtering is done; the standard network (Scenario.getNetwork()) is used -->
+		<param name="networkMode" value="car" />
 
 		<!-- Used for estimation of travel times for VrpOptimizer by means of the exponential moving average. The weighting decrease, alpha, must be in (0,1]. We suggest small values of alpha, e.g. 0.05. The averaging starts from the initial travel time estimates. If not provided, the free-speed TTs is used as the initial estimates For more info see comments in: VrpTravelTimeEstimator, VrpTravelTimeModules, DvrpModule. -->
 		<param name="travelTimeEstimationAlpha" value="0.05" />

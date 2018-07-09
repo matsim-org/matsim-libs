@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.PlanRouter;
@@ -57,7 +57,8 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 	@Test
 	public void testVehicleIdsAreKeptIfSomething() throws Exception {
-        final PopulationFactory factory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
+		final Config config = ConfigUtils.createConfig();
+		final PopulationFactory factory = ScenarioUtils.createScenario(config).getPopulation().getFactory();
 
 		final Id<Link> linkId = Id.create( "the_link" , Link.class );
 		final Id<Person> personId = Id.create( "somebody" , Person.class );
@@ -79,7 +80,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 		plan.addActivity( factory.createActivityFromLinkId( "h" , linkId ) );
 
-		final TripRouter tripRouter = createTripRouter( factory );
+		final TripRouter tripRouter = createTripRouter( factory, config);
 
 		final PlanRouterWithVehicleRessources router =
 			new PlanRouterWithVehicleRessources(
@@ -97,11 +98,11 @@ public class PlanRouterWithVehicleRessourcesTest {
 		}
 	}
 
-	private static TripRouter createTripRouter(final PopulationFactory factory) {
+	private static TripRouter createTripRouter(final PopulationFactory factory, Config config) {
 		// create some stages to check the behavior with that
 		final String stage = "realize that actually, you did't forget to close the window, and go again";
-		final TripRouter tripRouter = new TripRouter();
-		tripRouter.setRoutingModule(
+		final TripRouter.Builder builder = new TripRouter.Builder(config) ;
+		builder.setRoutingModule(
 				TransportMode.car,
 				new RoutingModule() {
 					@Override
@@ -132,7 +133,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 						return new StageActivityTypesImpl( stage );
 					}
 				});
-		return tripRouter;
+		return builder.build() ;
 	}
 }
 

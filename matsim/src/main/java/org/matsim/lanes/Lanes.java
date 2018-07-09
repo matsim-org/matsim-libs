@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.lanes.data;
+package org.matsim.lanes;
 
 import java.util.SortedMap;
 

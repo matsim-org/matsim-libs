@@ -24,7 +24,7 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 

@@ -130,7 +130,7 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 
 	/**
 	 * Simplified version. For something more advanced, see
-	 * {@link org.matsim.contrib.taxi.scheduler.TaxiScheduler#updateBeforeNextTask(Schedule)} in the taxi contrib
+	 * {@link org.matsim.contrib.taxi.scheduler.TaxiScheduler#updateBeforeNextTask(Vehicle)} in the taxi contrib
 	 */
 	private void updateTimings() {
 		Schedule schedule = vehicle.getSchedule();

@@ -50,6 +50,7 @@ import org.matsim.core.config.ConfigUtils;
 import com.google.inject.Inject;
 
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * @author dgrether
@@ -94,6 +95,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 			SignalGroup group = new SignalGroupImpl(signalGroupData.getId());
 			for (Id<Signal> signalId : signalGroupData.getSignalIds()){
 				Signal signal = system.getSignals().get(signalId);
+				Gbl.assertNotNull(signal);
 				group.addSignal(signal);
 			}
 			system.addSignalGroup(group);

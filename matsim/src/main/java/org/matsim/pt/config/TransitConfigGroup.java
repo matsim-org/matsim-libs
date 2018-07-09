@@ -20,7 +20,6 @@
 
 package org.matsim.pt.config;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,7 +30,6 @@ import java.util.Set;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
@@ -183,5 +181,23 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( SCHEDULE_CRS )
 	public void setInputScheduleCRS(String inputScheduleCRS) {
 		this.inputScheduleCRS = inputScheduleCRS;
+	}
+	
+	public static final String BOARDING_ACCEPTANCE_CMT="under which conditions agent boards transit vehicle" ;
+	public enum BoardingAcceptance { checkLineAndStop, checkStopOnly }
+	private BoardingAcceptance boardingAcceptance = BoardingAcceptance.checkLineAndStop ;
+	public BoardingAcceptance getBoardingAcceptance() {
+		return this.boardingAcceptance;
+	}
+	public void setBoardingAcceptance(BoardingAcceptance boardingAcceptance) {
+		this.boardingAcceptance = boardingAcceptance;
+	}
+	
+	private boolean usingTransitInMobsim = true ;
+	public final void setUsingTransitInMobsim( boolean val ) {
+		usingTransitInMobsim = val ;
+	}
+	public final boolean isUsingTransitInMobsim(){
+		return usingTransitInMobsim ;
 	}
 }

@@ -18,12 +18,13 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.drt.routing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
@@ -35,13 +36,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -50,8 +47,11 @@ import com.google.inject.name.Named;
 
 /**
  * @author jbischoff
+ * @author michalm (Michal Maciejewski)
  */
 public class StopBasedDrtRoutingModule implements RoutingModule {
+	private static final Logger LOGGER = Logger.getLogger(StopBasedDrtRoutingModule.class);
+
 	public interface AccessEgressStopFinder {
 		Pair<TransitStopFacility, TransitStopFacility> findStops(Facility<?> fromFacility, Facility<?> toFacility);
 	}
@@ -60,84 +60,80 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	private final PopulationFactory populationFactory;
 	private final RoutingModule walkRouter;
 	private final AccessEgressStopFinder stopFinder;
-	private final DrtConfigGroup drtconfig;
+	private final DrtConfigGroup drtCfg;
+	private final DrtRoutingModule drtRoutingModule;
 
 	@Inject
-	public StopBasedDrtRoutingModule(PopulationFactory populationFactory,
+	public StopBasedDrtRoutingModule(PopulationFactory populationFactory, DrtRoutingModule drtRoutingModule,
 			@Named(TransportMode.walk) RoutingModule walkRouter, AccessEgressStopFinder stopFinder,
 			DrtConfigGroup drtCfg) {
 		this.populationFactory = populationFactory;
+		this.drtRoutingModule = drtRoutingModule;
 		this.walkRouter = walkRouter;
 		this.stopFinder = stopFinder;
-		this.drtconfig = drtCfg;
+		this.drtCfg = drtCfg;
 	}
 
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility<?> fromFacility, Facility<?> toFacility, double departureTime,
 			Person person) {
-		List<PlanElement> legList = new ArrayList<>();
 		Pair<TransitStopFacility, TransitStopFacility> stops = stopFinder.findStops(fromFacility, toFacility);
+
 		TransitStopFacility accessFacility = stops.getLeft();
 		if (accessFacility == null) {
-			if (drtconfig.isPrintDetailedWarnings()) {
-				Logger.getLogger(getClass())
-						.error("No access stop found, agent will walk. Agent Id:\t" + person.getId());
-			}
+			printError(() -> "No access stop found, agent will walk. Agent Id:\t" + person.getId());
 			return (walkRouter.calcRoute(fromFacility, toFacility, departureTime, person));
 		}
+
 		TransitStopFacility egressFacility = stops.getRight();
 		if (egressFacility == null) {
-			if (drtconfig.isPrintDetailedWarnings()) {
-				Logger.getLogger(getClass())
-						.error("No egress stop found, agent will walk. Agent Id:\t" + person.getId());
-			}
+			printError(() -> "No egress stop found, agent will walk. Agent Id:\t" + person.getId());
 			return (walkRouter.calcRoute(fromFacility, toFacility, departureTime, person));
 		}
-		legList.addAll(walkRouter.calcRoute(fromFacility, accessFacility, departureTime, person));
-		Leg walkLeg = (Leg)legList.get(0);
-		Activity drtInt1 = populationFactory.createActivityFromCoord(DrtStageActivityType.DRT_STAGE_ACTIVITY,
-				accessFacility.getCoord());
-		drtInt1.setMaximumDuration(1);
-		drtInt1.setLinkId(accessFacility.getLinkId());
-		legList.add(drtInt1);
 
-		Route drtRoute = RouteUtils.createGenericRouteImpl(accessFacility.getLinkId(), egressFacility.getLinkId());
-		drtRoute.setDistance(drtconfig.getEstimatedBeelineDistanceFactor()
-				* CoordUtils.calcEuclideanDistance(accessFacility.getCoord(), egressFacility.getCoord()));
-		drtRoute.setTravelTime(drtRoute.getDistance() / drtconfig.getEstimatedDrtSpeed());
-
-		if (drtRoute.getStartLinkId() == drtRoute.getEndLinkId()) {
-			if (drtconfig.isPrintDetailedWarnings()) {
-				Logger.getLogger(getClass())
-						.error("Start and end stop are the same, agent will walk. Agent Id:\t" + person.getId());
-			}
+		if (accessFacility.getLinkId() == egressFacility.getLinkId()) {
+			printError(() -> "Start and end stop are the same, agent will walk. Agent Id:\t" + person.getId());
 			return (walkRouter.calcRoute(fromFacility, toFacility, departureTime, person));
-
 		}
 
-		Leg drtLeg = PopulationUtils.createLeg(TransportMode.drt);
-		drtLeg.setDepartureTime(departureTime + walkLeg.getTravelTime() + 1);
-		drtLeg.setTravelTime(drtRoute.getTravelTime());
-		drtLeg.setRoute(drtRoute);
+		List<PlanElement> trip = new ArrayList<>();
 
-		legList.add(drtLeg);
+		Leg walkToAccessStopLeg = createDrtWalkLeg(fromFacility, accessFacility, departureTime, person);
+		trip.add(walkToAccessStopLeg);
 
-		Activity drtInt2 = populationFactory.createActivityFromCoord(DrtStageActivityType.DRT_STAGE_ACTIVITY,
-				egressFacility.getCoord());
-		drtInt2.setMaximumDuration(1);
-		drtInt2.setLinkId(egressFacility.getLinkId());
-		legList.add(drtInt2);
-		legList.addAll(walkRouter.calcRoute(egressFacility, toFacility,
-				drtLeg.getDepartureTime() + drtLeg.getTravelTime() + 1, person));
-		for (PlanElement pE : legList) {
-			if (pE instanceof Leg) {
-				if (((Leg)pE).getMode().equals(TransportMode.walk)) {
-					((Leg)pE).setMode(DrtStageActivityType.DRT_WALK);
-				}
-			}
+		trip.add(createDrtStageActivity(accessFacility));
+
+		double drtLegStartTime = departureTime + walkToAccessStopLeg.getTravelTime() + 1;
+		Leg drtLeg = (Leg)drtRoutingModule.calcRoute(accessFacility, egressFacility, drtLegStartTime, person).get(0);
+		trip.add(drtLeg);
+
+		trip.add(createDrtStageActivity(egressFacility));
+
+		double walkFromStopStartTime = drtLeg.getDepartureTime() + drtLeg.getTravelTime() + 1;
+		trip.add(createDrtWalkLeg(egressFacility, toFacility, walkFromStopStartTime, person));
+
+		return trip;
+	}
+
+	private Leg createDrtWalkLeg(Facility<?> fromFacility, Facility<?> toFacility, double departureTime,
+			Person person) {
+		Leg leg = (Leg)walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
+		leg.setMode(DrtStageActivityType.DRT_WALK);
+		return leg;
+	}
+
+	private Activity createDrtStageActivity(Facility<?> stopFacility) {
+		Activity activity = populationFactory
+				.createActivityFromCoord(DrtStageActivityType.DRT_STAGE_ACTIVITY, stopFacility.getCoord());
+		activity.setMaximumDuration(1);
+		activity.setLinkId(stopFacility.getLinkId());
+		return activity;
+	}
+
+	private void printError(Supplier<String> supplier) {
+		if (drtCfg.isPrintDetailedWarnings()) {
+			Logger.getLogger(getClass()).error(supplier.get());
 		}
-
-		return legList;
 	}
 
 	@Override
