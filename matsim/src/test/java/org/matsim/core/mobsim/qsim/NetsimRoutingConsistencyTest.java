@@ -21,7 +21,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.LinkWrapperFacility;
@@ -174,6 +179,94 @@ public class NetsimRoutingConsistencyTest {
 			Assert.assertEquals(adjustedRoutingTravelTime, 202.0, 1e-3);
 		}
 
+		@Test
+		/*
+		 * The same test as above, but here the full stack MATSim setup is used (i.e. the 
+		 * NetworkRoutingModule, etc. are created implicitly by the Controler).
+		 */
+		public void testRoutingVsSimulationFullStack() {
+			Config config = ConfigUtils.createConfig();
+			
+			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			config.controler().setLastIteration(0);
+			
+			ActivityParams activityParams = new ActivityParams("A");
+			activityParams.setTypicalDuration(100.0);
+			config.planCalcScore().addActivityParams(activityParams);
+			
+			Scenario scenario = ScenarioUtils.createScenario(config);
+			Network network = scenario.getNetwork();
+
+			Node node1 = network.getFactory().createNode(Id.createNodeId("N1"), new Coord(0.0, 0.0));
+			Node node2 = network.getFactory().createNode(Id.createNodeId("N2"), new Coord(0.0, 0.0));
+			Node node3 = network.getFactory().createNode(Id.createNodeId("N3"), new Coord(0.0, 0.0));
+			Node node4 = network.getFactory().createNode(Id.createNodeId("N4"), new Coord(0.0, 0.0));
+			Node node5 = network.getFactory().createNode(Id.createNodeId("N5"), new Coord(0.0, 0.0));
+
+			Link link12 = network.getFactory().createLink(Id.createLinkId("L12"), node1, node2);
+			Link link23 = network.getFactory().createLink(Id.createLinkId("L23"), node2, node3);
+			Link link34 = network.getFactory().createLink(Id.createLinkId("L34"), node3, node4);
+			Link link45 = network.getFactory().createLink(Id.createLinkId("L45"), node4, node5);
+
+			network.addNode(node1);
+			network.addNode(node2);
+			network.addNode(node3);
+			network.addNode(node4);
+			network.addNode(node5);
+
+			network.addLink(link12);
+			network.addLink(link23);
+			network.addLink(link34);
+			network.addLink(link45);
+
+			Arrays.asList(link12, link23, link34, link45).forEach(l -> l.setAllowedModes(Collections.singleton("car")));
+			Arrays.asList(link12, link23, link34, link45).forEach(l -> l.setLength(1000.0));
+			Arrays.asList(link12, link23, link34, link45).forEach(l -> l.setFreespeed(10.0));
+
+			Vehicle vehicle = scenario.getVehicles().getFactory().createVehicle(Id.createVehicleId("P"),
+					VehicleUtils.getDefaultVehicleType());
+			scenario.getVehicles().addVehicleType(VehicleUtils.getDefaultVehicleType());
+			scenario.getVehicles().addVehicle(vehicle);
+
+			Population population = scenario.getPopulation();
+
+			Activity startActivity = population.getFactory().createActivityFromLinkId("A", Id.createLinkId("L12"));
+			startActivity.setEndTime(0.0);
+			Activity endActivity = population.getFactory().createActivityFromLinkId("A", Id.createLinkId("L45"));
+
+			Person person = population.getFactory().createPerson(Id.createPersonId("P"));
+			population.addPerson(person);
+
+			Plan plan = population.getFactory().createPlan();
+			person.addPlan(plan);
+			
+			plan.addActivity(startActivity);
+			plan.addLeg(population.getFactory().createLeg("car"));
+			plan.addActivity(endActivity);
+			
+			DepartureArrivalListener listener = new DepartureArrivalListener();
+
+			Controler controler = new Controler(scenario);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addEventHandlerBinding().toInstance(listener);
+				}
+			});
+			
+			controler.run();
+
+			double netsimTravelTime = listener.arrivalTime - listener.departureTime;
+			double routingTravelTime = ((Leg) plan.getPlanElements().get(1)).getTravelTime();
+
+			// Travel times are rounded up in the Netsim, so we knowingly add an additional
+			// +1s per link
+			double adjustedRoutingTravelTime = routingTravelTime + 2.0;
+
+			Assert.assertEquals(netsimTravelTime, 303.0, 1e-3);
+			Assert.assertEquals(adjustedRoutingTravelTime, 202.0, 1e-3);
+		}
+		
 		class DepartureArrivalListener implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 			public double departureTime = Double.NaN;
 			public double arrivalTime = Double.NaN;
