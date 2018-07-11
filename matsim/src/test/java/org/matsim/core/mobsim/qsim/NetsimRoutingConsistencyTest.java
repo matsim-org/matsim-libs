@@ -44,7 +44,8 @@ public class NetsimRoutingConsistencyTest {
 		 * 
 		 * The scenario is as follows:
 		 * 
-		 * N1 ----- N2 ----- N3 ----- N4 ----- N5 L12 L23 L34 L45
+		 * N1 ----- N2 ----- N3 ----- N4 ----- N5 
+		 *     L12      L23      L34      L45
 		 * 
 		 * There are nodes Ni and connecting links Lij. There is one agent P who wants
 		 * to depart at L12 and arrive at L45. He has a plan with an activity at L12 and
@@ -58,14 +59,14 @@ public class NetsimRoutingConsistencyTest {
 		 * Accordingly, the NetworkRoutingModule produces a Leg for the agent with a
 		 * travel time of
 		 * 
-		 * routingTravelTime = 200.0
+		 *    routingTravelTime = 200.0
 		 * 
 		 * because link L23 and L45 are taken into account. As expected the routing goes
 		 * from the end node of the departure link to the start node of the arrival
 		 * link. We already know that this will not be the true Netsim simulated time,
 		 * because traversal times are rounded up. So we would expect a
 		 * 
-		 * adjustedRoutingTravelTime = 202.0
+		 *    adjustedRoutingTravelTime = 202.0
 		 * 
 		 * because we need to add 1s per traversed link.
 		 * 
@@ -74,7 +75,7 @@ public class NetsimRoutingConsistencyTest {
 		 * the simulation (which is produced by the leg of the agent). The travel time
 		 * can be computed an we get:
 		 * 
-		 * netsimTravelTime = 303.0
+		 *    netsimTravelTime = 303.0
 		 * 
 		 * Apparently, looking at QueueWithBuffer::moveQueueToBuffer , the agent needs
 		 * to traverse the arrival link before he can arrive there. This leads to a
