@@ -82,11 +82,11 @@ public class NetsimRoutingConsistencyTest {
 		 * travel time that is higher than expected by the router and so predictions
 		 * done by the NetworkRoutingModule are inconsistent.
 		 * 
-		 * Not sure, what to do about that. Possible options: - Adjust Netsim such that
-		 * agents arrive before they traverse the arrival link - Adjust the car routing
-		 * such that the travel time of the final link is added - Adjust the car routing
-		 * such that the routing goes to the end node of the arrival link - Explicitly
-		 * document this behaviour somewhere
+		 * Not sure, what to do about that. Possible options: 
+		 * - Adjust Netsim such that agents arrive before they traverse the arrival link 
+		 * - Adjust the car routing such that the travel time of the final link is added 
+		 * - Adjust the car routing such that the routing goes to the end node of the arrival link 
+		 * - Explicitly document this behaviour somewhere
 		 * 
 		 * I guess usually this should not make such a big difference for MATSim,
 		 * because the shortest path is found anyway. However, if one wants to predict
