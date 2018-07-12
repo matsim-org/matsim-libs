@@ -20,6 +20,8 @@
 
 package org.matsim.facilities;
 
+import java.util.Map;
+import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -32,9 +34,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.Attributes;
-
-import java.util.Map;
-import java.util.Stack;
 
 /**
  * A reader for facilities-files of MATSim according to <code>facilities_v1.dtd</code>.
@@ -124,18 +123,38 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
     }
 
     private void startFacility(final Attributes atts) {
-        this.currfacility =
-                this.factory.createActivityFacility(
-                        Id.create(atts.getValue("id"), ActivityFacility.class),
-                        coordinateTransformation.transform(
-                                new Coord(
-                                        Double.parseDouble(atts.getValue("x")),
-                                        Double.parseDouble(atts.getValue("y")))));
-        this.facilities.addActivityFacility(this.currfacility);
-        String value = atts.getValue("linkId");
-        if (value != null) {
-            ((ActivityFacilityImpl) this.currfacility).setLinkId(Id.create(value, Link.class));
+        if ( atts.getValue("x") !=null && atts.getValue("y") !=null ) {
+            if (atts.getValue("linkId") !=null) { //both coord and link present
+                this.currfacility =
+                        this.factory.createActivityFacility(
+                                Id.create(atts.getValue("id"), ActivityFacility.class),
+                                coordinateTransformation.transform(
+                                        new Coord(
+                                                Double.parseDouble(atts.getValue("x")),
+                                                Double.parseDouble(atts.getValue("y")))),
+                                Id.create(atts.getValue("linkId"),Link.class));
+            } else { // only coord present
+                this.currfacility =
+                        this.factory.createActivityFacility(
+                                Id.create(atts.getValue("id"), ActivityFacility.class),
+                                coordinateTransformation.transform(
+                                        new Coord(
+                                                Double.parseDouble(atts.getValue("x")),
+                                                Double.parseDouble(atts.getValue("y")))));
+            }
+        } else {
+            if (atts.getValue("linkId") !=null) { //only link present
+            this.currfacility =
+                    this.factory.createActivityFacility(
+                            Id.create(atts.getValue("id"), ActivityFacility.class),
+                            Id.create(atts.getValue("linkId"),Link.class));
+            } else { //neither coord nor link present
+                this.currfacility =
+                        this.factory.createActivityFacility(Id.create(atts.getValue("id"), ActivityFacility.class), null,null);
+            }
         }
+
+        this.facilities.addActivityFacility(this.currfacility);
         ((ActivityFacilityImpl) this.currfacility).setDesc(atts.getValue("desc"));
     }
 
