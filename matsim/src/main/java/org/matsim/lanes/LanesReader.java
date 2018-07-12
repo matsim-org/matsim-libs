@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data;
+package org.matsim.lanes;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,13 +42,12 @@ import org.matsim.jaxb.lanedefinitions20.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions20.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions20.XMLLanesToLinkAssignmentType;
 import org.matsim.utils.objectattributes.ObjectAttributesConverter;
-import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
  */
-public class LanesReader implements MatsimReader {
+public final class LanesReader implements MatsimReader {
 	
 	private static final Logger log = Logger.getLogger(LanesReader.class);
 	

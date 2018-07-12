@@ -36,10 +36,9 @@ public interface Vehicle extends Identifiable<Vehicle> {
 	void setStartLink(Link link);
 
 	/**
-	 * @return the amount of people/goods that can be served/transported at the same time (see:
-	 *         {@link Request#getQuantity()})
+	 * @return the amount of people/goods that can be served/transported at the same time
 	 */
-	double getCapacity();
+	int getCapacity();
 
 	/**
 	 * @return (desired) time when the vehicle should start operating (inclusive); can be different from

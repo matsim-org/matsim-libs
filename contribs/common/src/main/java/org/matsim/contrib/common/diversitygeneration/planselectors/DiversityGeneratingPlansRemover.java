@@ -81,15 +81,15 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 			this.network = network;
 			return this ;
 		}
-		public final Builder setActTypeWeight ( double val ) {
+		public final Builder setSameActivityTypePenalty( double val ) {
 			this.actTypeWeight = val ;
 			return this ;
 		}
-		public final Builder setLocationWeight( double val ) {
+		public final Builder setSameLocationPenalty( double val ) {
 			this.locationWeight = val ;
 			return this ;
 		}
-		public final Builder setActTimeParameter( double val) {
+		public final Builder setSameActivityEndTimePenalty( double val) {
 			this.actTimeParameter = val ;
 			return this ;
 		}

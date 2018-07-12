@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.vis;
+package org.matsim.lanes;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -35,7 +35,7 @@ import java.util.Map;
  * @author dgrether
  *
  */
-public class VisLinkWLanes implements Serializable{
+public final class VisLinkWLanes implements Serializable{
 
 	private Point2D.Double linkStart = null;
 	private Point2D.Double linkEnd = null;

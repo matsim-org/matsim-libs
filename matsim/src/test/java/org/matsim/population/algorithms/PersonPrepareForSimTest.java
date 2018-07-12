@@ -53,7 +53,7 @@ public class PersonPrepareForSimTest {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Network net = sc.getNetwork();
-		Link l1;
+		Link link1;
 		{
 			NetworkFactory nf = net.getFactory();
 			Set<String> modes = new HashSet<String>();
@@ -63,41 +63,41 @@ public class PersonPrepareForSimTest {
 			net.addNode(n1);
 			net.addNode(n2);
 			net.addNode(n3);
-			l1 = nf.createLink(Id.create("1", Link.class), n1, n2);
+			link1 = nf.createLink(Id.create("1", Link.class), n1, n2);
 			modes.add(TransportMode.car);
-			l1.setAllowedModes(modes);
+			link1.setAllowedModes(modes);
 			Link l2 = nf.createLink(Id.create("2", Link.class), n2, n3);
 			modes.clear();
 			modes.add(TransportMode.pt);
 			l2.setAllowedModes(modes);
-			net.addLink(l1);
+			net.addLink(link1);
 			net.addLink(l2);
 		}
 
 		Population pop = sc.getPopulation();
 		Person person;
-		Activity a1;
-		Activity a2;
+		Activity activity1;
+		Activity activity2;
 		{
 			PopulationFactory pf = pop.getFactory();
 			person = pf.createPerson(Id.create("1", Person.class));
 			Plan p = pf.createPlan();
 			double y1 = -10;
-			a1 = pf.createActivityFromCoord("h", new Coord((double) 10, y1));
+			activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, y1));
 			Leg l = pf.createLeg(TransportMode.walk);
 			double y = -10;
-			a2 = pf.createActivityFromCoord("w", new Coord((double) 1900, y));
-			p.addActivity(a1);
+			activity2 = pf.createActivityFromCoord("w", new Coord((double) 1900, y));
+			p.addActivity(activity1);
 			p.addLeg(l);
-			p.addActivity(a2);
+			p.addActivity(activity2);
 			person.addPlan(p);
 			pop.addPerson(person);
 		}
 
 		new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 
-		Assert.assertEquals(l1.getId(), a1.getLinkId());
-		Assert.assertEquals(l1.getId(), a2.getLinkId()); // must also be linked to l1, as l2 has no car mode
+		Assert.assertEquals(link1.getId(), activity1.getLinkId());
+		Assert.assertEquals(link1.getId(), activity2.getLinkId()); // must also be linked to l1, as l2 has no car mode
 	}
 
 	@Test

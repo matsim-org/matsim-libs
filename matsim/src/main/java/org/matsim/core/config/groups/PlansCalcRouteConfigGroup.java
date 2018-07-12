@@ -82,7 +82,8 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 	public static class ModeRoutingParams extends ReflectiveConfigGroup implements MatsimParameters {
 		public static final String SET_TYPE = "teleportedModeParameters";
-
+		public static final String MODE = "mode";
+		
 		private String mode = null;
 
 		// beeline teleportation:
@@ -154,12 +155,12 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			this.teleportedModeFreespeedLimit = teleportedModeFreespeedLimit;
 		}
 
-		@StringGetter( "mode" )
+		@StringGetter(MODE)
 		public String getMode() {
 			return mode;
 		}
 
-		@StringSetter( "mode" )
+		@StringSetter(MODE)
 		public void setMode(String mode) {
 			testForLocked() ;
 			this.mode = mode;

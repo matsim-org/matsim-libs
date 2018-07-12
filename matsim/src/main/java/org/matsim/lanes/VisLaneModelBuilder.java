@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.vis;
+package org.matsim.lanes;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.lanes.data.ModelLane;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.vecmathutils.VectorUtils;
@@ -37,7 +36,7 @@ import org.matsim.vis.vecmathutils.VectorUtils;
 /**
  * @author dgrether
  */
-public class VisLaneModelBuilder {
+public final class VisLaneModelBuilder {
 	
 //	private static final Logger log = Logger.getLogger(VisLaneModelBuilder.class);
 

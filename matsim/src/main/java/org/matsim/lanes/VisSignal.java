@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * OTFSignalPosition
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,38 +17,56 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.lanes;
 
-package org.matsim.lanes.data;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.SortedMap;
+import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 /**
- * Top level container for lanes within MATSim. See package-info for documentation.
  * @author dgrether
  *
  */
-public interface Lanes extends MatsimToplevelContainer {
-	String ELEMENT_NAME = "laneDefinition20";
+public final class VisSignal implements Serializable {
 
-	/**
-	 *
-	 * @return Map with Link Ids as keys and assignments as values
-	 */
-	SortedMap<Id<Link>, LanesToLinkAssignment> getLanesToLinkAssignments();
+	private String id;
+	private SignalGroupState state;
+	private List<VisLinkWLanes> turningMoveRestrictions = null;
+	private String systemId;
+	
+	public VisSignal(String systemId, String signalId) {
+		this.systemId = systemId;
+		this.id = signalId;
+	}
 
-	/**
-	 * Adds a LanesToLinkAssignment to the container.
-	 * @param assignment
-	 */
-	void addLanesToLinkAssignment(LanesToLinkAssignment assignment);
-	/**
-	 * Get the factory to create container content.
-	 */
-	@Override
-	LanesFactory getFactory();
+	public String getId(){
+		return this.id;
+	}
+
+	public String getSignalSystemId(){
+		return this.systemId;
+	}
+	
+	public void setState(SignalGroupState state){
+		this.state = state;
+	}
+	
+	public SignalGroupState getSignalGroupState(){
+		return this.state;
+	}
+	
+	public List<VisLinkWLanes> getTurningMoveRestrictions(){
+		return this.turningMoveRestrictions;
+	}
+
+	public void addTurningMoveRestriction(VisLinkWLanes toLink) {
+		if (this.turningMoveRestrictions == null){
+			this.turningMoveRestrictions = new ArrayList<VisLinkWLanes>();
+		}
+		this.turningMoveRestrictions.add(toLink);
+	}
 
 }

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data;
+package org.matsim.lanes;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;

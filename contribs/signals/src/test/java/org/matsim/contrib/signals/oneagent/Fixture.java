@@ -48,7 +48,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.Lane;
 import org.matsim.testcases.MatsimTestUtils;
 
 

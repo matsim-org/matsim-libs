@@ -20,6 +20,7 @@
 
 package org.matsim.pt.router;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -34,26 +35,37 @@ import javax.inject.Singleton;
 public class TransitRouterImplFactory implements Provider<TransitRouter> {
 
 	private final TransitRouterConfig config;
-	private final TransitRouterNetwork routerNetwork;
-	private final PreparedTransitSchedule preparedTransitSchedule;
+	private final TransitSchedule transitSchedule;
+	private TransitRouterNetwork routerNetwork;
+	private PreparedTransitSchedule preparedTransitSchedule;
 
 	@Inject
-	TransitRouterImplFactory(final TransitSchedule schedule, final Config config) {
+	TransitRouterImplFactory(final TransitSchedule schedule, final EventsManager events, final Config config) {
 		this(schedule, new TransitRouterConfig(
 				config.planCalcScore(),
 				config.plansCalcRoute(),
 				config.transitRouter(),
 				config.vspExperimental()));
+		events.addHandler((TransitScheduleChangedEventHandler) event -> {
+			routerNetwork = null;
+			preparedTransitSchedule = null;
+		});
 	}
 
 	public TransitRouterImplFactory(final TransitSchedule schedule, final TransitRouterConfig config) {
 		this.config = config;
-		this.routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, this.config.getBeelineWalkConnectionDistance());
-		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
+		this.transitSchedule = schedule;
 	}
 
 	@Override
 	public TransitRouter get() {
+		if (this.routerNetwork == null) {
+			this.routerNetwork = TransitRouterNetwork.createFromSchedule(transitSchedule, this.config.getBeelineWalkConnectionDistance());
+		}
+		if (this.preparedTransitSchedule == null) {
+			this.preparedTransitSchedule = new PreparedTransitSchedule(transitSchedule);
+		}
+
 		TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.config, this.preparedTransitSchedule);
 		return new TransitRouterImpl(this.config, this.preparedTransitSchedule, this.routerNetwork, ttCalculator, ttCalculator);
 	}

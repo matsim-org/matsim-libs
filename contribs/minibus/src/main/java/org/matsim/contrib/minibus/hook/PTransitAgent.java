@@ -73,7 +73,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 		if(containsId(stopsToCome, route.getEgressStopId())){
 			if (route.getRouteId().toString().equalsIgnoreCase(transitRoute.getId().toString())) {
 				LinkedList<TransitRouteStop> tempStopsToCome = new LinkedList<>(stopsToCome);
-				tempStopsToCome.removeLast();
+				tempStopsToCome.removeLast(); // yy why?
 				boolean egressStopFound = false;
 				for (TransitRouteStop stop : tempStopsToCome) {
 					if (route.getEgressStopId().equals(stop.getStopFacility().getId())) {

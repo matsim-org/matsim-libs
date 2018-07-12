@@ -42,20 +42,20 @@ import java.util.List;
  * @author thibautd
  */
 public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
-	private final TripRouter routingHandler;
+	private final TripRouter tripRouter;
 	private final ActivityFacilities facilities;
 
 	/**
 	 * Initialises an instance.
-	 * @param routingHandler the {@link TripRouter} to use to route individual trips
+	 * @param tripRouter the {@link TripRouter} to use to route individual trips
 	 * @param facilities the {@link ActivityFacilities} to which activities are refering.
 	 * May be <tt>null</tt>: in this case, the router will be given facilities wrapping the
 	 * origin and destination activity.
 	 */
 	public PlanRouter(
-			final TripRouter routingHandler,
+			final TripRouter tripRouter,
 			final ActivityFacilities facilities) {
-		this.routingHandler = routingHandler;
+		this.tripRouter = tripRouter;
 		this.facilities = facilities;
 	}
 
@@ -75,20 +75,20 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	 */
 	@Deprecated // get TripRouter out of injection instead. kai, feb'16
 	public TripRouter getTripRouter() {
-		return routingHandler;
+		return tripRouter;
 	}
 
 	@Override
 	public void run(final Plan plan) {
-		final List<Trip> trips = TripStructureUtils.getTrips( plan , routingHandler.getStageActivityTypes() );
+		final List<Trip> trips = TripStructureUtils.getTrips( plan , tripRouter.getStageActivityTypes() );
 
 		for (Trip oldTrip : trips) {
 			final List<? extends PlanElement> newTrip =
-					routingHandler.calcRoute(
-							routingHandler.getMainModeIdentifier().identifyMainMode( oldTrip.getTripElements() ),
+					tripRouter.calcRoute(
+							tripRouter.getMainModeIdentifier().identifyMainMode( oldTrip.getTripElements() ),
 							toFacility( oldTrip.getOriginActivity() ),
 							toFacility( oldTrip.getDestinationActivity() ),
-							calcEndOfActivity( oldTrip.getOriginActivity() , plan, routingHandler.getConfig() ),
+							calcEndOfActivity( oldTrip.getOriginActivity() , plan, tripRouter.getConfig() ),
 							plan.getPerson() );
 			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
 			TripRouter.insertTrip(
