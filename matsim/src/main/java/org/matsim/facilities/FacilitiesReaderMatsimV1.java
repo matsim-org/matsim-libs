@@ -149,8 +149,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
                             Id.create(atts.getValue("id"), ActivityFacility.class),
                             Id.create(atts.getValue("linkId"),Link.class));
             } else { //neither coord nor link present
-                this.currfacility =
-                        this.factory.createActivityFacility(Id.create(atts.getValue("id"), ActivityFacility.class), null,null);
+                throw new RuntimeException("Neither coordinate nor linkId are available for facility id "+ atts.getValue("id")+". Aborting....");
             }
         }
 
