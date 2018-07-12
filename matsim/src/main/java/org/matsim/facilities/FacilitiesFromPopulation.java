@@ -173,6 +173,7 @@ public class FacilitiesFromPopulation {
 							if (facility == null) {
 								facility = factory.createActivityFacility(Id.create(this.idPrefix + idxCounter++, ActivityFacility.class), c, linkId);
 								this.facilities.addActivityFacility(facility);
+								// TODO: !bug! all activities without coord will have same facility id. Amit Jul'18
 								facilitiesPerCoordinate.put(c, facility);
 							}
 						}
