@@ -120,11 +120,11 @@ public class ActivityFacilitiesSourceTest {
 				}
 				break;
 			case onePerActivityLocationInPlansFile:
-				// TODO fix this
-//				Assert.assertEquals("wrong number of facilities", 4, getFacilities(scenario.getConfig().controler().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON);
-//				for (ActivityFacility af : activityFacilities.getFacilities().values()){
-//					Assert.assertNotNull(af.getCoord());
-//				}
+				Assert.assertEquals("wrong number of facilities", 2, getFacilities(scenario.getConfig().controler().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON);
+				for (ActivityFacility af : activityFacilities.getFacilities().values()){
+					Assert.assertNotNull(af.getCoord());
+					Assert.assertNotNull(af.getLinkId());
+				}
 				break;
 		}
 	}
@@ -209,7 +209,9 @@ public class ActivityFacilitiesSourceTest {
 			person.addPlan(plan);
 			scenario.getPopulation().addPerson(person);
 		}
-		{ // activity from link only
+
+		// activity from link only
+		if (! this.facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile)){
 			Person person = populationFactory.createPerson(Id.createPersonId("1"));
 			Plan plan = populationFactory.createPlan();
 			Activity home = populationFactory.createActivityFromLinkId("h", Id.createLinkId("1"));
@@ -245,6 +247,11 @@ public class ActivityFacilitiesSourceTest {
 			plan.addActivity(home);
 			plan.addLeg(populationFactory.createLeg(mode));
 			Activity work = populationFactory.createActivityFromLinkId("w", Id.createLinkId("20"));
+
+			if ( this.facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile)){
+				work.setCoord(new Coord(10000.0, 0.0));
+			}
+
 			if (assignFacilityIdToActivity(facilitiesSource)) {
 				work.setFacilityId(Id.create("2", ActivityFacility.class));
 			}

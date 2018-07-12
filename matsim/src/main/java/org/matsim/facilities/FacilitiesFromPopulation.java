@@ -170,7 +170,7 @@ public class FacilitiesFromPopulation {
 							}
 						} else {
 							if (c == null)  {
-								throw new RuntimeException("Coordinate for the facility "+facility.getId()+" is null, cannot collect facilities per coordinate. " +
+								throw new RuntimeException("Coordinate for the activity "+a+" is null, cannot collect facilities per coordinate. " +
 										"Probably, use " + FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile + " instead and collect facilities per link.");
 							}
 
