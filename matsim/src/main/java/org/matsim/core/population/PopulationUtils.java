@@ -517,11 +517,16 @@ public final class PopulationUtils {
 			if ( route1 instanceof NetworkRoute ) {
 				nr1 = (NetworkRoute) route1 ;
 			} else {
+				simil += sameModeReward ;
+				// ("no route" is interpreted as "same route".  One reason is that otherwise plans
+				// with routes always receive higher penalties than plans without routes in the diversity
+				// increasing plans remover, which clearly is not what one wants. kai, jul'18)
 				continue ; // next leg
 			}
 			if ( route2 instanceof NetworkRoute ) {
 				nr2 = (NetworkRoute) route2 ;
 			} else {
+				simil += sameModeReward ;
 				continue ; // next leg
 			}
 			simil += sameRouteReward * RouteUtils.calculateCoverage(nr1, nr2, network) ;
