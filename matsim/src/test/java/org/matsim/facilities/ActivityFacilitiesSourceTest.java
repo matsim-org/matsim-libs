@@ -98,14 +98,14 @@ public class ActivityFacilitiesSourceTest {
 				break;
 			case fromFile:
 				for (ActivityFacility af : activityFacilities.getFacilities().values()){
-					Assert.assertNull(af.getLinkId());
+					Assert.assertNotNull(af.getLinkId());
 				}
 				break;
 			case setInScenario:
 				Assert.assertEquals("wrong number of facilities", 2, activityFacilities.getFacilities().size(), MatsimTestUtils.EPSILON);
 				if (facilitiesWithCoordOnly) {
 					for (ActivityFacility af : activityFacilities.getFacilities().values()){
-						Assert.assertNull(af.getLinkId());
+						Assert.assertNotNull(af.getLinkId());
 					}
 				} else {
 					for (ActivityFacility af : activityFacilities.getFacilities().values()){
