@@ -114,8 +114,6 @@ public class WeightedRandomSelectionTest {
 	private void assertIndexOutOfBoundsException(double nextDouble, int index) {
 		randomDouble.setValue(nextDouble);
 		assertThatThrownBy(() -> weightedRandomSelection.select())//
-				.isExactlyInstanceOf(IndexOutOfBoundsException.class)//
-				.hasMessage("Index: " + index + ", Size: " + index);
-
+				.isExactlyInstanceOf(IndexOutOfBoundsException.class);
 	}
 }

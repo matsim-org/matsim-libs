@@ -44,7 +44,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TeleportationRoutingModule;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
@@ -106,7 +105,7 @@ public class StopBasedDrtRoutingModuleTest {
 		drtConfigGroup.setTransitStopFile("./src/test/resources/cottbus/stops-schedule.xml.gz");
 		config.addModule(drtConfigGroup);
 
-		Scenario scenario = DrtControlerCreator.createScenario(config);
+		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("./src/test/resources/cottbus/network.xml.gz");
 		new TransitScheduleReader(scenario).readFile(drtConfigGroup.getTransitStopFile());
 		createSomeAgents(scenario);

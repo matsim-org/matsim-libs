@@ -90,10 +90,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public static final String PLOT_CUST_STATS = "writeDetailedCustomerStats";
 	static final String CUST_STATS_EXP = "Writes out detailed DRT customer stats in each iteration. True by default.";
 
-	public static final String PLOT_VEH_STATS = "writeDetailedVehicleStats";
-	static final String VEH_STATS_EXP = "Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration. "
-			+ "False by default.";
-
 	public static final String PRINT_WARNINGS = "plotDetailedWarnings";
 	static final String PRINT_WARNINGS_EXP = "Prints detailed warnings for DRT customers that cannot be served or routed. Default is false.";
 
@@ -166,7 +162,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 		map.put(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE, CHANGE_START_EXP);
 		map.put(VEHICLES_FILE, VEH_FILE_EXP);
 		map.put(PLOT_CUST_STATS, CUST_STATS_EXP);
-		map.put(PLOT_VEH_STATS, VEH_STATS_EXP);
 		map.put(IDLE_VEHICLES_RETURN_TO_DEPOTS, IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP);
 		map.put(OPERATIONAL_SCHEME, OP_SCHEME_EXP);
 		map.put(MAX_WALK_DISTANCE, MAX_WALK_EXP);
@@ -205,7 +200,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 
 	/**
 	 * @param --
-	 *            {@value #MAX_WAIT_TIME_EXPP}
+	 *            {@value #MAX_WAIT_TIME_EXP}
 	 */
 	@StringSetter(MAX_WAIT_TIME)
 	public void setMaxWaitTime(double maxWaitTime) {
@@ -230,7 +225,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return -- {@value #MAX_TRAV_BETA_EXP}
+	 * @return -- {@value #MAX_TRAVEL_TIME_BETA_EXP}
 	 */
 	@StringGetter(MAX_TRAVEL_TIME_BETA)
 	public double getMaxTravelTimeBeta() {
@@ -238,8 +233,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param maxTravelTimeAlpha
-	 *            -- {@value #MAX_TRAV_BETA_EXP}
+	 * @param maxTravelTimeBeta
+	 *            -- {@value #MAX_TRAVEL_TIME_BETA_EXP}
 	 */
 	@StringSetter(MAX_TRAVEL_TIME_BETA)
 	public void setMaxTravelTimeBeta(double maxTravelTimeBeta) {
@@ -409,22 +404,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(PLOT_CUST_STATS)
 	public void setPlotDetailedCustomerStats(boolean plotDetailedCustomerStats) {
 		this.plotDetailedCustomerStats = plotDetailedCustomerStats;
-	}
-
-	/**
-	 * @return -- {@value #VEH_STATS_EXP}
-	 */
-	@StringGetter(PLOT_VEH_STATS)
-	public boolean isPlotDetailedVehicleStats() {
-		return plotDetailedVehicleStats;
-	}
-
-	/**
-	 * @param-- {@value #VEH_STATS_EXP}
-	 */
-	@StringSetter(PLOT_VEH_STATS)
-	public void setPlotDetailedVehicleStats(boolean plotDetailedVehicleStats) {
-		this.plotDetailedVehicleStats = plotDetailedVehicleStats;
 	}
 
 	/**
