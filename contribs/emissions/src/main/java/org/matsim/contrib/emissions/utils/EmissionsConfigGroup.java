@@ -63,13 +63,13 @@ extends ReflectiveConfigGroup
 	private static final String CONSIDERING_CO2_COSTS = "consideringCO2Costs";
 	private boolean consideringCO2Costs = false;
 
-	static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED: mapping from input road types to HBEFA 3.1 road type strings";
-	static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors";
-	static final String EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average cold emission factors";
-	static final String USING_DETAILED_EMISSION_CALCULATION_CMT = "if true then detailed emission factor files must be provided!";
-	static final String EMISSION_FACTORS_WARM_FILE_DETAILED_CMT = "OPTIONAL: file with HBEFA 3.1 detailed warm emission factors";
-	static final String EMISSION_FACTORS_COLD_FILE_DETAILED_CMT = "OPTIONAL: file with HBEFA 3.1 detailed cold emission factors";
-	static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT = "The vehicle information (or vehicles file) should be passed to the scenario." +
+	private static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED: mapping from input road types to HBEFA 3.1 road type strings";
+	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors";
+	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average cold emission factors";
+	private static final String USING_DETAILED_EMISSION_CALCULATION_CMT = "if true then detailed emission factor files must be provided!";
+	private static final String EMISSION_FACTORS_WARM_FILE_DETAILED_CMT = "OPTIONAL: file with HBEFA 3.1 detailed warm emission factors";
+	private static final String EMISSION_FACTORS_COLD_FILE_DETAILED_CMT = "OPTIONAL: file with HBEFA 3.1 detailed cold emission factors";
+	private static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT = "The vehicle information (or vehicles file) should be passed to the scenario." +
 			"The definition of emission specifications:" +  "\n\t\t" +
 			" - REQUIRED: it must start with the respective HbefaVehicleCategory followed by `;'" + "\n\t\t" +
 			" - OPTIONAL: if detailed emission calculation is switched on, the emission specifications should aditionally contain" +
@@ -80,13 +80,13 @@ extends ReflectiveConfigGroup
 			"The emission specifications of a vehicle type should be surrounded by emission specification markers i.e."+
 			EmissionSpecificationMarker.BEGIN_EMISSIONS + " and " + EmissionSpecificationMarker.END_EMISSIONS + "." ;
 
-	static final String WRITING_EMISSIONS_EVENTS_CMT = "if false, emission events will not appear in the events file.";
+	private static final String WRITING_EMISSIONS_EVENTS_CMT = "if false, emission events will not appear in the events file.";
 
-	static final String EMISSION_EFFICIENCY_FACTOR_CMT = "A factor to include efficiency of the vehicles; the factor is applied to the whole fleet. ";
+	private static final String EMISSION_EFFICIENCY_FACTOR_CMT = "A factor to include efficiency of the vehicles; the factor is applied to the whole fleet. ";
 
-	static final String EMISSION_COST_MULTIPLICATION_FACTOR_CMT = "A factor, by which the emission cost factors from literature (Maibach et al. (2008)) are increased.";
+	private static final String EMISSION_COST_MULTIPLICATION_FACTOR_CMT = "A factor, by which the emission cost factors from literature (Maibach et al. (2008)) are increased.";
 
-	static final String CONSIDERING_CO2_COSTS_CMT = "if true, only flat emissions will be considered irrespective of pricing either flat air pollution or exposure of air pollution.";
+	private static final String CONSIDERING_CO2_COSTS_CMT = "if true, only flat emissions will be considered irrespective of pricing either flat air pollution or exposure of air pollution.";
 
 	@Override
 	public Map<String, String> getComments() {
