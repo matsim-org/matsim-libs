@@ -88,10 +88,14 @@ public class TripStructureUtilsSubtoursTest {
 			final String type,
 			final Id<?> loc) {
 		final Id<Link> linkLoc = anchorAtFacilities ? Id.create( "nowhere", Link.class ) : Id.create(loc, Link.class);
-		final Id<ActivityFacility> facLoc = anchorAtFacilities ? Id.create(loc, ActivityFacility.class) : Id.create( "nowhere", ActivityFacility.class );
 
 		final Activity act = fact.createActivityFromLinkId( type , linkLoc );
-		((Activity) act).setFacilityId( facLoc );
+
+		if (anchorAtFacilities) {
+			final Id<ActivityFacility> facLoc = Id.create(loc, ActivityFacility.class) ;
+			((Activity) act).setFacilityId( facLoc );
+		}
+
 		return act;
 	}
 	
