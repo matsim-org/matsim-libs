@@ -52,9 +52,11 @@ public class XY2LinksForFacilities {
                     linkNullWarn++;
                 }
                 Link link = NetworkUtils.getNearestLink(network, activityFacility.getCoord());
-                if (link==null) throw new RuntimeException("No nearest link is found for coord "+activityFacility.getCoord());
-
-                ((ActivityFacilityImpl)activityFacility).setLinkId(link.getId());
+                if (link==null) {
+                    LOGGER.warn("No nearest link is found for coord "+activityFacility.getCoord());
+                } else{
+                    ((ActivityFacilityImpl)activityFacility).setLinkId(link.getId());
+                }
 
             } else if (activityFacility.getCoord()==null){
                 if (coordNullWarn==0) {
