@@ -30,16 +30,24 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
-import org.matsim.contrib.emissions.types.*;
+import org.matsim.contrib.emissions.types.ColdPollutant;
+import org.matsim.contrib.emissions.types.HbefaColdEmissionFactor;
+import org.matsim.contrib.emissions.types.HbefaColdEmissionFactorKey;
+import org.matsim.contrib.emissions.types.HbefaTrafficSituation;
+import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
+import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
+import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactor;
+import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
+import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
-import roadTypeMapping.HbefaRoadTypeMapping;
-import roadTypeMapping.VisumHbefaRoadTypeMapping;
 
 
 /**
@@ -54,7 +62,7 @@ public class EmissionModule {
 	private ColdEmissionHandler coldEmissionHandler;
 
 	private final EventsManager eventsManager;
-	private final EmissionsConfigGroup ecg;
+	private final EmissionsConfigGroup emissionConfigGroup;
 
 	//===
 	private static String roadTypeMappingFile;
@@ -66,7 +74,6 @@ public class EmissionModule {
 	private static String detailedColdEmissionFactorsFile;
 	
 	//===
-    private HbefaRoadTypeMapping roadTypeMapping;
 	private Vehicles vehicles;
 	
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
@@ -79,9 +86,9 @@ public class EmissionModule {
 	public EmissionModule(final Scenario scenario, final EventsManager eventsManager) {
 		this.scenario = scenario;
 
-		this.ecg = (EmissionsConfigGroup) scenario.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
+		this.emissionConfigGroup = (EmissionsConfigGroup) scenario.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
 
-		if ( !ecg.isWritingEmissionsEvents() ) {
+		if ( !emissionConfigGroup.isWritingEmissionsEvents() ) {
 			logger.warn("Emission events are excluded from events file. A new events manager is created.");
 			this.eventsManager = EventsUtils.createEventsManager();
 		} else {
@@ -100,8 +107,18 @@ public class EmissionModule {
 		logger.info("entering createLookupTables");
 		
 		getInputFiles();
-		
-		roadTypeMapping = createVisumRoadTypeMapping(roadTypeMappingFile);
+
+		switch (this.emissionConfigGroup.getHbefaRoadTypeSource()) {
+			case fromFile:
+				logger.warn("It is recommended to directly set the HBEFA road types to link attributes and then chose HbefaRoadTypeSource: "+ EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes );
+				putHBEFARoadTypeFromFileToLinkAttributes(roadTypeMappingFile);
+				break;
+			case fromLinkAttributes:
+				//nothing to do, take directly from link
+				break;
+			default:
+				throw new RuntimeException(this.emissionConfigGroup.getHbefaRoadTypeSource()+ " is not implemented yet.");
+		}
 
 		vehicles = scenario.getVehicles();
 
@@ -128,7 +145,7 @@ public class EmissionModule {
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
 		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
 
-		if(ecg.isUsingDetailedEmissionCalculation()){
+		if(emissionConfigGroup.isUsingDetailedEmissionCalculation()){
 			detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
 			detailedHbefaColdTable = createDetailedHbefaColdTable(detailedColdEmissionFactorsFile);
 		}
@@ -141,14 +158,14 @@ public class EmissionModule {
 	private void getInputFiles() {
 		URL context = scenario.getConfig().getContext();
 
-		roadTypeMappingFile = ecg.getEmissionRoadTypeMappingFileURL(context).getFile();
+		roadTypeMappingFile = emissionConfigGroup.getEmissionRoadTypeMappingFileURL(context).getFile();
 
-		averageFleetWarmEmissionFactorsFile = ecg.getAverageWarmEmissionFactorsFileURL(context).getFile();
-		averageFleetColdEmissionFactorsFile = ecg.getAverageColdEmissionFactorsFileURL(context).getFile();
+		averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(context).getFile();
+		averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL(context).getFile();
 		
-		if(ecg.isUsingDetailedEmissionCalculation()) {
-			detailedWarmEmissionFactorsFile = ecg.getDetailedWarmEmissionFactorsFileURL(context).getFile();
-			detailedColdEmissionFactorsFile = ecg.getDetailedColdEmissionFactorsFileURL(context).getFile();
+		if(emissionConfigGroup.isUsingDetailedEmissionCalculation()) {
+			detailedWarmEmissionFactorsFile = emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(context).getFile();
+			detailedColdEmissionFactorsFile = emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(context).getFile();
 		}
 	}
 
@@ -157,19 +174,25 @@ public class EmissionModule {
 		
 		Network network = scenario.getNetwork() ;
 
-		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg );
-		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable, ecg);
+		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, detailedHbefaWarmTable,
+				emissionConfigGroup);
+		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable,
+				emissionConfigGroup);
 		
-		warmEmissionHandler = new WarmEmissionHandler(vehicles,	network, parameterObject, eventsManager, ecg.getEmissionEfficiencyFactor());
-		coldEmissionHandler = new ColdEmissionHandler(vehicles, network, parameterObject2, eventsManager, ecg.getEmissionEfficiencyFactor());
+		warmEmissionHandler = new WarmEmissionHandler(vehicles,	network, parameterObject, eventsManager, emissionConfigGroup
+				.getEmissionEfficiencyFactor());
+		coldEmissionHandler = new ColdEmissionHandler(vehicles, network, parameterObject2, eventsManager, emissionConfigGroup
+				.getEmissionEfficiencyFactor());
 		logger.info("leaving createEmissionHandler");
 	}
 
-	private HbefaRoadTypeMapping createVisumRoadTypeMapping(String filename){
-		logger.info("entering createRoadTypeMapping ...") ;
-		
-		VisumHbefaRoadTypeMapping mapping = new VisumHbefaRoadTypeMapping();
-		try{
+	private void putHBEFARoadTypeFromFileToLinkAttributes(String filename){
+
+		logger.info("reading road type mapping info from "+filename) ;
+		logger.info("The information is directly added to the link attributes now.") ;
+		Map<String, String> mapper = new HashMap<>();
+
+		try {
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
 			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
@@ -180,14 +203,20 @@ public class EmissionModule {
 				String[] inputArray = strLine.split(";");
 				String visumRtNr = inputArray[indexFromKey.get("VISUM_RT_NR")];
 				String hbefaRtName = (inputArray[indexFromKey.get("HBEFA_RT_NAME")]);
-				
-				mapping.put(visumRtNr, hbefaRtName);
+
+				mapper.put(visumRtNr, hbefaRtName);
 			}
+			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		logger.info("leaving createRoadTypeMapping ...") ;
-		return mapping;
+
+		logger.info("The information is directly added to the link attributes now.") ;
+		scenario.getNetwork()
+				.getLinks()
+				.values().forEach(l -> EmissionUtils.setHbefaRoadType(l, mapper.get(NetworkUtils.getType(l))));
+
+//		logger.info("leaving createRoadTypeMapping ...") ;
 	}
 	
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(String filename){
