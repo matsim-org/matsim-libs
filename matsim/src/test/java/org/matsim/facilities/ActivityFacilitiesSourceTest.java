@@ -20,11 +20,13 @@
 package org.matsim.facilities;
 
 import java.io.File;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
+import java.util.Arrays;
+import java.util.Collection;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,43 +49,95 @@ import org.matsim.testcases.MatsimTestUtils;
  * Created by amit on 05.02.18.
  */
 
-@RunWith(JUnitParamsRunner.class)
+@RunWith(Parameterized.class)
 public class ActivityFacilitiesSourceTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
 	private final String mode = TransportMode.car;
 //    private static final String outDir = "test/output/"+ActivityFacilitiesSourceTest.class.getCanonicalName().replace('.','/')+"/";
-	
+
+	private final FacilitiesConfigGroup.FacilitiesSource facilitiesSource;
+	private final boolean facilitiesWithCoordOnly ;
+
+	public ActivityFacilitiesSourceTest(FacilitiesConfigGroup.FacilitiesSource facilitiesSource, boolean facilitiesWithCoordOnly) {
+		this.facilitiesSource = facilitiesSource;
+		this.facilitiesWithCoordOnly = facilitiesWithCoordOnly;
+	}
+
+	@Parameterized.Parameters(name = "{index}: FacilitiesSource - {0}; facilitiesWithCoordOnly - {1}")
+	public static Collection<Object[]> parametersForFacilitiesSourceTest() {
+		// it is not clear to me why/how this works.  The documentation of JUnitParamsRunner says that such
+		// implicit behavior ("dirty tricks") should no longer be necessary when using it.  kai, jul'18
+		return Arrays.asList(
+				new Object[]{FacilitiesConfigGroup.FacilitiesSource.none, true} // true/false doen't matter here
+				,new Object[]{FacilitiesConfigGroup.FacilitiesSource.fromFile, true}// true/false doen't matter here
+				,new Object[]{FacilitiesConfigGroup.FacilitiesSource.setInScenario, true}
+				,new Object[]{FacilitiesConfigGroup.FacilitiesSource.setInScenario, false}
+				,new Object[]{FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile, true} // true/false doen't matter here
+				,new Object[]{FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile, true} // true/false doen't matter here
+		);
+	}
+
 	@Test
-	@Parameters
-	public void facilitiesSourceTest(FacilitiesConfigGroup.FacilitiesSource facilitiesSource, boolean facilitiesWithCoordOnly) {
+	public void test(){
 		String outDir = utils.getOutputDirectory() ;
 		String testOutDir = outDir + "/" + facilitiesSource.toString() + "_facilitiesWithCoordOnly_" + String
-																			     .valueOf(facilitiesWithCoordOnly) + "/";
+				.valueOf(facilitiesWithCoordOnly) + "/";
 		new File(testOutDir).mkdirs();
-		
-		Scenario scenario = prepareScenario(facilitiesSource, facilitiesWithCoordOnly);
+
+		Scenario scenario = prepareScenario();
 		scenario.getConfig().controler().setOutputDirectory(testOutDir);
 		scenario.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		new Controler(scenario).run();
+
+		// checks
+		ActivityFacilities activityFacilities = getFacilities(scenario.getConfig().controler().getOutputDirectory());
+		switch (this.facilitiesSource) {
+			case none:
+				break;
+			case fromFile:
+				for (ActivityFacility af : activityFacilities.getFacilities().values()){
+					Assert.assertNotNull(af.getLinkId());
+				}
+				break;
+			case setInScenario:
+				Assert.assertEquals("wrong number of facilities", 2, activityFacilities.getFacilities().size(), MatsimTestUtils.EPSILON);
+				if (facilitiesWithCoordOnly) {
+					for (ActivityFacility af : activityFacilities.getFacilities().values()){
+						Assert.assertNotNull(af.getLinkId());
+					}
+				} else {
+					for (ActivityFacility af : activityFacilities.getFacilities().values()){
+						Assert.assertNull(af.getCoord());
+					}
+				}
+				break;
+			case onePerActivityLinkInPlansFile:
+				Assert.assertEquals("wrong number of facilities", 4, getFacilities(scenario.getConfig().controler().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON);
+				for (ActivityFacility af : activityFacilities.getFacilities().values()){
+					Assert.assertNotNull(af.getLinkId());
+				}
+				break;
+			case onePerActivityLocationInPlansFile:
+				Assert.assertEquals("wrong number of facilities", 2, getFacilities(scenario.getConfig().controler().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON);
+				for (ActivityFacility af : activityFacilities.getFacilities().values()){
+					Assert.assertNotNull(af.getCoord());
+					Assert.assertNotNull(af.getLinkId());
+				}
+				break;
+		}
 	}
-	
-	private Object[] parametersForFacilitiesSourceTest() {
-		// it is not clear to me why/how this works.  The documentation of JUnitParamsRunner says that such
-		// implicit behavior ("dirty tricks") should no longer be necessary when using it.  kai, jul'18
-		return new Object[]{
-				new Object[]{FacilitiesConfigGroup.FacilitiesSource.none, true}, // true/false doen't matter with 'none'
-				new Object[]{FacilitiesConfigGroup.FacilitiesSource.fromFile, true},// true/false doen't matter with 'fromFile'
-				new Object[]{FacilitiesConfigGroup.FacilitiesSource.setInScenario, true},
-				new Object[]{FacilitiesConfigGroup.FacilitiesSource.setInScenario, false},
-				new Object[]{FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile, true},
-				new Object[]{FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile, false}
-		};
+
+	private ActivityFacilities getFacilities(String outputDir){
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
+		new FacilitiesReaderMatsimV1(scenario).readFile(outputDir+"/output_facilities.xml.gz");
+		return scenario.getActivityFacilities();
 	}
+
 	
 	// create basic scenario
-	private Scenario prepareScenario(FacilitiesConfigGroup.FacilitiesSource facilitiesSource, boolean facilitiesWithCoordOnly) {
+	private Scenario prepareScenario() {
 		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.plans().setInputFile(null);
 		config.controler().setLastIteration(0);
@@ -155,7 +209,9 @@ public class ActivityFacilitiesSourceTest {
 			person.addPlan(plan);
 			scenario.getPopulation().addPerson(person);
 		}
-		{ // activity from link only
+
+		// activity from link only
+		if (! this.facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile)){
 			Person person = populationFactory.createPerson(Id.createPersonId("1"));
 			Plan plan = populationFactory.createPlan();
 			Activity home = populationFactory.createActivityFromLinkId("h", Id.createLinkId("1"));
@@ -190,7 +246,12 @@ public class ActivityFacilitiesSourceTest {
 			home.setEndTime(7.8 * 3600.0);
 			plan.addActivity(home);
 			plan.addLeg(populationFactory.createLeg(mode));
-			Activity work = populationFactory.createActivityFromCoord("w", new Coord(10000.0, 0.0));
+			Activity work = populationFactory.createActivityFromLinkId("w", Id.createLinkId("20"));
+
+			if ( this.facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile)){
+				work.setCoord(new Coord(10000.0, 0.0));
+			}
+
 			if (assignFacilityIdToActivity(facilitiesSource)) {
 				work.setFacilityId(Id.create("2", ActivityFacility.class));
 			}

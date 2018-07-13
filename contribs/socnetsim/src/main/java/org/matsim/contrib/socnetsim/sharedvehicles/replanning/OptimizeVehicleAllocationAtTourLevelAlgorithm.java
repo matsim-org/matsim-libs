@@ -65,8 +65,6 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 	private final boolean allowNullRoutes;
 	private final VehicleRessources vehicleRessources;
 
-	private boolean anchorAtFacilities = false;
-
 	public OptimizeVehicleAllocationAtTourLevelAlgorithm(
 			final StageActivityTypes stageActivitiesForSubtourDetection,
 			final Random random,
@@ -187,8 +185,8 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 			final Collection<Subtour> subtours =
 				TripStructureUtils.getSubtours(
 						p,
-						stageActs,
-						anchorAtFacilities );
+						stageActs
+                );
 			for ( final Subtour s : subtours ) {
 				if ( s.getParent() != null ) continue; // is not a root tour
 				boolean isFirstTrip = true;
@@ -217,7 +215,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 		for ( final SubtourRecord record : vehicularTours ) {
 			final Subtour s = record.subtour;
 			assert s.getParent() == null;
-			final Id anchor = anchorAtFacilities ?
+			final Id anchor = s.getTrips().get( 0 ).getOriginActivity().getFacilityId()!=null ?
 				s.getTrips().get( 0 ).getOriginActivity().getFacilityId() :
 				s.getTrips().get( 0 ).getOriginActivity().getLinkId();
 

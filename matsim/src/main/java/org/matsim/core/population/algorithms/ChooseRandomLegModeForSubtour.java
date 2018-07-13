@@ -20,6 +20,14 @@
 
 package org.matsim.core.population.algorithms;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
@@ -33,15 +41,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
 
 /**
  * Changes the transportation mode of one random non-empty subtour in a plan to a randomly chosen
@@ -79,8 +78,6 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private PermissibleModesCalculator permissibleModesCalculator;
 
-	private boolean anchorAtFacilities = false;
-	
 	private final double probaForChangeSingleTripMode;
 	private TripsToLegsAlgorithm tripsToLegs = null ;
 	private ChooseRandomSingleLegMode changeSingleLegMode = null ;
@@ -144,7 +141,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			return;
 		}
 
-		final Id<? extends BasicLocation> homeLocation = anchorAtFacilities ?
+		final Id<? extends BasicLocation> homeLocation = ((Activity) plan.getPlanElements().get(0)).getFacilityId()!=null ?
 			((Activity) plan.getPlanElements().get(0)).getFacilityId() :
 			((Activity) plan.getPlanElements().get(0)).getLinkId();
 
@@ -158,8 +155,8 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 							TripStructureUtils.getTrips(plan, stageActivityTypes),
 							TripStructureUtils.getSubtours(
 									plan,
-									stageActivityTypes,
-									anchorAtFacilities),
+									stageActivityTypes
+							),
 							permissibleModesForThisPlan);
 			
 			if (!choiceSet.isEmpty()) {
@@ -184,7 +181,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			}
 
 			final Set<String> usableChainBasedModes = new LinkedHashSet<>();
-			final Id<? extends BasicLocation> subtourStartLocation = anchorAtFacilities ?
+			final Id<? extends BasicLocation> subtourStartLocation = subtour.getTrips().get( 0 ).getOriginActivity().getFacilityId()!=null ?
 				subtour.getTrips().get( 0 ).getOriginActivity().getFacilityId() :
 				subtour.getTrips().get( 0 ).getOriginActivity().getLinkId();
 			
@@ -274,14 +271,14 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	}
 
 	private Id<? extends BasicLocation> getLocationId(Activity activity) {
-		return anchorAtFacilities ?
+		return activity.getFacilityId()!=null ?
 			activity.getFacilityId() :
 			activity.getLinkId();
 	}
 	
 	private boolean atSameLocation(Activity firstLegUsingMode,
 			Activity lastLegUsingMode) {
-		return anchorAtFacilities ?
+		return firstLegUsingMode.getFacilityId()!=null ?
 			firstLegUsingMode.getFacilityId().equals(
 					lastLegUsingMode.getFacilityId() ) :
 			firstLegUsingMode.getLinkId().equals(
@@ -336,11 +333,6 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 						trip.getDestinationActivity());
 			}
 
-	}
-
-	public void setAnchorSubtoursAtFacilitiesInsteadOfLinks(
-			final boolean anchorAtFacilities) {
-		this.anchorAtFacilities = anchorAtFacilities;
 	}
 
 }

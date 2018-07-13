@@ -169,6 +169,11 @@ public class FacilitiesFromPopulation {
 								facilitiesPerLinkId.put(linkId, facility);
 							}
 						} else {
+							if (c == null)  {
+								throw new RuntimeException("Coordinate for the activity "+a+" is null, cannot collect facilities per coordinate. " +
+										"Probably, use " + FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile + " instead and collect facilities per link.");
+							}
+
 							facility = facilitiesPerCoordinate.get(c);
 							if (facility == null) {
 								facility = factory.createActivityFacility(Id.create(this.idPrefix + idxCounter++, ActivityFacility.class), c, linkId);

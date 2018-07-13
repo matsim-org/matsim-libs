@@ -20,6 +20,11 @@
 
 package org.matsim.facilities;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.SortedSet;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -28,12 +33,6 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.SortedSet;
 
 /**
  * @author mrieser / Senozon AG
@@ -143,9 +142,11 @@ import java.util.SortedSet;
         if (facility.getLinkId() != null) {
             out.write(" linkId=\"" + facility.getLinkId().toString() + "\"");
         }
-        final Coord coord = coordinateTransformation.transform(facility.getCoord());
-        out.write(" x=\"" + coord.getX() + "\"");
-        out.write(" y=\"" + coord.getY() + "\"");
+        if (facility.getCoord()!=null) {
+            final Coord coord = coordinateTransformation.transform(facility.getCoord());
+            out.write(" x=\"" + coord.getX() + "\"");
+            out.write(" y=\"" + coord.getY() + "\"");
+        }
         if (facility.getDesc() != null) {
             out.write(" desc=\"" + facility.getDesc() + "\"");
         }
