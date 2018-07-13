@@ -23,7 +23,6 @@ package org.matsim.contrib.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -41,7 +40,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
-import roadTypeMapping.HbefaRoadTypeMapping;
 
 
 /**
@@ -51,7 +49,7 @@ import roadTypeMapping.HbefaRoadTypeMapping;
 public class WarmEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
 
-	private final HbefaRoadTypeMapping roadTypeMapping;
+//	private final HbefaRoadTypeMapping roadTypeMapping;
 
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
@@ -78,24 +76,24 @@ public class WarmEmissionAnalysisModule {
 
 	public static class WarmEmissionAnalysisModuleParameter {
 
-		public final HbefaRoadTypeMapping roadTypeMapping;
+//		public final HbefaRoadTypeMapping roadTypeMapping;
 		public final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 		public final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 		private final EmissionsConfigGroup ecg;
 
 		public WarmEmissionAnalysisModuleParameter(
-				HbefaRoadTypeMapping roadTypeMapping,
+//				HbefaRoadTypeMapping roadTypeMapping,
 				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
 				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable, EmissionsConfigGroup emissionsConfigGroup) {
-			this.roadTypeMapping = roadTypeMapping;
+//			this.roadTypeMapping = roadTypeMapping;
 			this.avgHbefaWarmTable = avgHbefaWarmTable;
 			this.detailedHbefaWarmTable = detailedHbefaWarmTable;
 			this.ecg = emissionsConfigGroup;
 			// check if all needed tables are non-null
-			if(roadTypeMapping == null){
-				 logger.error("Road type mapping not set. Aborting...");
-				 System.exit(0);
-			}
+//			if(roadTypeMapping == null){
+//				 logger.error("Road type mapping not set. Aborting...");
+//				 System.exit(0);
+//			}
 			if(avgHbefaWarmTable == null && detailedHbefaWarmTable == null){
 				 logger.error("Neither average nor detailed table vor Hbefa warm emissions set. Aborting...");
 				 System.exit(0);
@@ -115,7 +113,7 @@ public class WarmEmissionAnalysisModule {
 			logger.error("Event manager not set. Please check the configuration of your scenario. Aborting..." );
 			System.exit(0);
 		}
-		this.roadTypeMapping = parameterObject.roadTypeMapping;
+//		this.roadTypeMapping = parameterObject.roadTypeMapping;
 		this.avgHbefaWarmTable = parameterObject.avgHbefaWarmTable;
 		this.detailedHbefaWarmTable = parameterObject.detailedHbefaWarmTable;
 		this.eventsManager = emissionEventsManager;
@@ -210,7 +208,8 @@ public class WarmEmissionAnalysisModule {
 
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = new HashMap<>();
 
-		String hbefaRoadTypeName = this.roadTypeMapping.get(roadType, freeVelocity);
+//		String hbefaRoadTypeName = this.roadTypeMapping.get(roadType, freeVelocity);
+		String hbefaRoadTypeName = roadType;
 
 		HbefaWarmEmissionFactorKey keyFreeFlow = new HbefaWarmEmissionFactorKey();
 		HbefaWarmEmissionFactorKey keyStopAndGo = new HbefaWarmEmissionFactorKey();
