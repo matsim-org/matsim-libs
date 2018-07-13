@@ -67,9 +67,14 @@ public final class ChooseRandomTripMode implements PlanAlgorithm {
 		}
 		
 		//don't change the trips between the same links
-		if (!trips.get(rndIdx).getOriginActivity().getLinkId().toString().equals(trips.get(rndIdx).getDestinationActivity().getLinkId().toString()))
-			setRandomTripMode(trips.get(rndIdx), plan, ffcard, owcard);
-		else return;
+		if (trips.get(rndIdx).getOriginActivity().getFacilityId()!=null) {
+			if (! trips.get(rndIdx).getOriginActivity().getFacilityId().toString().equals(trips.get(rndIdx).getDestinationActivity().getFacilityId().toString()))
+				setRandomTripMode(trips.get(rndIdx), plan, ffcard, owcard);
+		} else{
+			if (! trips.get(rndIdx).getOriginActivity().getLinkId().toString().equals(trips.get(rndIdx).getDestinationActivity().getLinkId().toString()))
+				setRandomTripMode(trips.get(rndIdx), plan, ffcard, owcard);
+		}
+
 	}
 	
 	private void setRandomTripMode(final Trip trip, final Plan plan, boolean ffcard, boolean owcard) {
