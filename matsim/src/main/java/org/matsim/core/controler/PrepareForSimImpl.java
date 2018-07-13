@@ -113,6 +113,10 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				throw new RuntimeException("Facilities source '"+this.facilitiesConfigGroup.getFacilitiesSource()+"' is not implemented yet.");
 		}
 
+		// get links for facilities
+		// using car only network to get the links for facilities. Amit July'18
+		XY2LinksForFacilities.run(carOnlyNetwork, this.activityFacilities);
+
 		// make sure all routes are calculated.
 		// At least xy2links is needed here, i.e. earlier than PrepareForMobsimImpl.  It could, however, presumably be separated out
 		// (i.e. we introduce a separate PersonPrepareForMobsim).  kai, jul'18
