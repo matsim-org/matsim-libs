@@ -225,7 +225,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		return map ;
 	}
 
-	private double similarity( Plan plan1, Plan plan2 ) {
+	/* package-private, for testing */ double similarity( Plan plan1, Plan plan2 ) {
 		double simil = 0. ;
 		{
 			List<Activity> activities1 = TripStructureUtils.getActivities(plan1, stageActivities) ;
