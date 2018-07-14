@@ -18,6 +18,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -39,6 +40,7 @@ import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -258,6 +260,10 @@ public class AgentNotificationTest {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsCollector handler = new EventsCollector();
 		eventsManager.addHandler(handler);
+		
+		QSimConfigGroup config = scenario.getConfig().qsim();
+		config.getActiveMobsimEngines().remove("NetsimEngine");
+		config.getActiveDepartureHandlers().remove("NetsimEngine");
 		
 		QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins);
 

@@ -15,11 +15,6 @@ public class ComponentRegistry<T> {
 	private final Map<String, Class<? extends T>> components = new HashMap<>();
 	private final String componentTypeDescription;
 
-	public ComponentRegistry() {
-		this.componentTypeDescription = (new TypeLiteral<T>() {
-		}).getRawType().toString();
-	}
-
 	public ComponentRegistry(String componentTypeDescription) {
 		this.componentTypeDescription = componentTypeDescription;
 	}

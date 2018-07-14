@@ -49,6 +49,10 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 	public void testTransitRouteCopy() {
 		Config config = super.loadConfig(null);
 		config.transit().setUseTransit(true);
+		config.qsim().getActiveMobsimEngines().add("TransitEngine");
+		config.qsim().getActiveDepartureHandlers().add("TransitEngine");
+		config.qsim().getActiveAgentSources().add("TransitEngine");
+		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		Id<Node> nodeId1 = Id.create("1", Node.class);

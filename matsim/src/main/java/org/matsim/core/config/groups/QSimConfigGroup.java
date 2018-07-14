@@ -23,6 +23,8 @@ package org.matsim.core.config.groups;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -55,6 +57,10 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation";
 	private static final String USE_PERSON_ID_FOR_MISSING_VEHICLE_ID = "usePersonIdForMissingVehicleId";
 	private static final String SIM_ENDTIME_INTERPRETATION = "simEndtimeInterpretation";
+	private static final String ACTIVE_MOBSIM_ENGINES = "activeMobsimEngines";
+	private static final String ACTIVE_ACTIVITY_HANDLERS = "activeActivityHandlers";
+	private static final String ACTIVE_DEPATURE_HANDLERS = "activeDepartureHandlers";
+	private static final String ACTIVE_AGENT_SOURCES = "activeAgentSources";
 	
 	public static enum TrafficDynamics { queue, withHoles,
 		kinematicWaves //  MATSim-630; previously, the switch was InflowConstraint.maxflowFromFdiag. Amit Jan 2017.
@@ -144,6 +150,27 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	private EndtimeInterpretation simEndtimeInterpretation;
 	// ---
+	
+	private final static List<String> DEFAULT_MOBSIM_ENGINES = Arrays.asList( 
+			"ActivityEngine", "NetsimEngine", "TeleportationEngine"
+			);
+	
+	private final static List<String> DEFAULT_ACTIVITY_HANDLERS = Arrays.asList( 
+			"ActivityEngine"
+			);
+	
+	private final static List<String> DEFAULT_DEPARTURE_HANDLERS = Arrays.asList( 
+			"NetsimEngine" //, "TeleportationEngine"
+			);
+	
+	private final static List<String> DEFAULT_AGENT_SOURCES = Arrays.asList( 
+			"PopulationSource"
+			);
+	
+	private List<String> activeMobsimEngines = new LinkedList<>(DEFAULT_MOBSIM_ENGINES);
+	private List<String> activeActivityHandlers = new LinkedList<>(DEFAULT_ACTIVITY_HANDLERS);
+	private List<String> activeDepartureHandlers = new LinkedList<>(DEFAULT_DEPARTURE_HANDLERS);
+	private List<String> activeAgentSources = new LinkedList<>(DEFAULT_AGENT_SOURCES);
 	
 	public QSimConfigGroup() {
 		super(GROUP_NAME);
@@ -600,4 +627,77 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 //		// yyyy do we really need this switch?  Quite in general, please try to avoid boolean switches.  kai, may'18
 //		this.creatingVehiclesForAllNetworkModes = creatingVehiclesForAllNetworkModes;
 //	}
+	
+	
+	public List<String> getActiveMobsimEngines() {
+		return activeMobsimEngines;
+	}
+	
+	public void setActiveMobsimEngines(List<String> activeMobsimEngines) {
+		this.activeMobsimEngines = activeMobsimEngines;
+	}
+	
+	@StringGetter(ACTIVE_MOBSIM_ENGINES)
+	public String getActiveMobsimEnginesAsString() {
+		return String.join(",", activeMobsimEngines);
+	}
+	
+	@StringSetter(ACTIVE_MOBSIM_ENGINES)
+	public void setActiveMobsimEnginesAsString(String activeMobsimEngines) {
+		this.activeActivityHandlers = Arrays.asList(activeMobsimEngines.split(","));
+	}
+	
+	public List<String> getActiveActivityHandlers() {
+		return activeActivityHandlers;
+	}
+	
+	public void setActiveActivityHandlers(List<String> activeActivityHandlers) {
+		this.activeActivityHandlers = activeActivityHandlers;
+	}
+	
+	@StringGetter(ACTIVE_ACTIVITY_HANDLERS)
+	public String getActiveActivityHandlersAsString() {
+		return String.join(",", activeActivityHandlers);
+	}
+	
+	@StringSetter(ACTIVE_ACTIVITY_HANDLERS)
+	public void setActiveActivityHandlersAsString(String activeActivityHandlers) {
+		this.activeActivityHandlers = Arrays.asList(activeActivityHandlers.split(","));
+	}
+	
+	public List<String> getActiveDepartureHandlers() {
+		return activeDepartureHandlers;
+	}
+	
+	public void setActiveDepartureHandlers(List<String> activeDepartureHandlers) {
+		this.activeDepartureHandlers = activeDepartureHandlers;
+	}
+	
+	@StringGetter(ACTIVE_DEPATURE_HANDLERS)
+	public String getActiveDepartureHandlersAsString() {
+		return String.join(",", activeDepartureHandlers);
+	}
+	
+	@StringSetter(ACTIVE_DEPATURE_HANDLERS)
+	public void setActiveDepartureHandlersAsString(String activeDepartureHandlers) {
+		this.activeDepartureHandlers = Arrays.asList(activeDepartureHandlers.split(","));
+	}
+	
+	public List<String> getActiveAgentSources() {
+		return activeAgentSources;
+	}
+	
+	public void setActiveAgentSources(List<String> activeAgentSources) {
+		this.activeAgentSources = activeAgentSources;
+	}
+	
+	@StringGetter(ACTIVE_AGENT_SOURCES)
+	public String getActiveAgentSourcesAsString() {
+		return String.join(",", activeAgentSources);
+	}
+	
+	@StringSetter(ACTIVE_AGENT_SOURCES)
+	public void setActiveAgentSourcesAsString(String activeAgentSources) {
+		this.activeAgentSources = Arrays.asList(activeAgentSources.split(","));
+	}
 }
