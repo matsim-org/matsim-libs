@@ -9,8 +9,10 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 public class TransitEnginePlugin extends AbstractQSimPlugin {
+	public final static String TRANSIT_ENGINE_NAME = "TransitEngine";
 
 	public TransitEnginePlugin(Config config) {
 		super(config);
@@ -28,17 +30,17 @@ public class TransitEnginePlugin extends AbstractQSimPlugin {
 	}
 
 	@Override
-	public Collection<Class<? extends DepartureHandler>> departureHandlers() {
-		return Collections.singletonList(TransitQSimEngine.class);
+	public Map<String, Class<? extends DepartureHandler>> departureHandlers() {
+		return Collections.singletonMap(TRANSIT_ENGINE_NAME, TransitQSimEngine.class);
 	}
 
 	@Override
-	public Collection<Class<? extends AgentSource>> agentSources() {
-		return Collections.singletonList(TransitQSimEngine.class);
+	public Map<String, Class<? extends AgentSource>> agentSources() {
+		return Collections.singletonMap(TRANSIT_ENGINE_NAME, TransitQSimEngine.class);
 	}
 
 	@Override
-	public Collection<Class<? extends MobsimEngine>> engines() {
-		return Collections.singletonList(TransitQSimEngine.class);
+	public Map<String, Class<? extends MobsimEngine>> engines() {
+		return Collections.singletonMap(TRANSIT_ENGINE_NAME, TransitQSimEngine.class);
 	}
 }

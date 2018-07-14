@@ -251,8 +251,8 @@ public class AgentNotificationTest {
 			}
 
 			@Override
-			public Collection<Class<? extends AgentSource>> agentSources() {
-				return Collections.singletonList(PopulationAgentSource.class);
+			public Map<String, Class<? extends AgentSource>> agentSources() {
+				return Collections.singletonMap(PopulationPlugin.POPULATION_SOURCE_NAME, PopulationAgentSource.class);
 			}
 		});
 		EventsManager eventsManager = EventsUtils.createEventsManager();
