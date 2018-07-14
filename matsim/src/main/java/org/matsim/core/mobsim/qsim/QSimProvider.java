@@ -24,6 +24,8 @@ package org.matsim.core.mobsim.qsim;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -72,43 +74,28 @@ public class QSimProvider implements Provider<QSim> {
         QSim qSim = qSimLocalInjector.getInstance(QSim.class);
 //        qSim.setChildInjector( qSimLocalInjector ) ;
         
-        Map<String, Class<? extends MobsimEngine>> availableMobimEngines = new HashMap<>();
-        Map<String, Class<? extends ActivityHandler>> availableActivityHandlers = new HashMap<>();
-        Map<String, Class<? extends DepartureHandler>> availableDepartureHandlers = new HashMap<>();
-        Map<String, Class<? extends AgentSource>> availableAgentSources = new HashMap<>();
+        ComponentRegistry<MobsimEngine> mobsimEngineRegistry = new ComponentRegistry<>();
+        ComponentRegistry<ActivityHandler> activityHandlerRegister = new ComponentRegistry<>();
+        ComponentRegistry<DepartureHandler> departureHandlerRegistry = new ComponentRegistry<>();
+        ComponentRegistry<AgentSource> agentSourceRegistry = new ComponentRegistry<>();
         
         for (AbstractQSimPlugin plugin : plugins) {
-        	availableMobimEngines.putAll(plugin.engines());
-        	availableActivityHandlers.putAll(plugin.activityHandlers());
-        	availableDepartureHandlers.putAll(plugin.departureHandlers());
-        	availableAgentSources.putAll(plugin.agentSources());
+        	plugin.engines().forEach(mobsimEngineRegistry::register);
+        	plugin.activityHandlers().forEach(activityHandlerRegister::register);
+        	plugin.departureHandlers().forEach(departureHandlerRegistry::register);
+        	plugin.agentSources().forEach(agentSourceRegistry::register);
         }
         
+        List<String> mobsimEngineOrdering = new LinkedList<>();
+        List<String> activityHandlerOrdering = new LinkedList<>();
+        List<String> departureHandlerOrdering = new LinkedList<>();
+        List<String> agentSourceOrdering = new LinkedList<>();
         
+        mobsimEngineRegistry.getOrderedComponents(mobsimEngineOrdering).stream().map(qSimLocalInjector::getInstance).forEach(qSim::addMobsimEngine);
+        activityHandlerRegister.getOrderedComponents(activityHandlerOrdering).stream().map(qSimLocalInjector::getInstance).forEach(qSim::addActivityHandler);
+        departureHandlerRegistry.getOrderedComponents(departureHandlerOrdering).stream().map(qSimLocalInjector::getInstance).forEach(qSim::addDepartureHandler);
+        agentSourceRegistry.getOrderedComponents(agentSourceOrdering).stream().map(qSimLocalInjector::getInstance).forEach(qSim::addAgentSource);
         
-        
-        for (AbstractQSimPlugin plugin : plugins) {
-	  		// add each plugin's mobsim engines:
-			for (Map.Entry<String, Class<? extends MobsimEngine>> mobsimEngine : plugin.engines().entrySet()) {
-				qSim.addMobsimEngine(qSimLocalInjector.getInstance(mobsimEngine));
-			}
-	  		// add each plugin's activity handlers:
-			for (Map.Entry<String, Class<? extends ActivityHandler>> activityHandler : plugin.activityHandlers().entrySet()) {
-				qSim.addActivityHandler(qSimLocalInjector.getInstance(activityHandler));
-			}
-	  		// add each plugin's departure handlers:
-			for (Map.Entry<String, Class<? extends DepartureHandler>> mobsimEngine : plugin.departureHandlers().entrySet()) {
-				qSim.addDepartureHandler(qSimLocalInjector.getInstance(mobsimEngine));
-			}
-	  		// add each plugin's mobsim listeners:
-			for (Class<? extends MobsimListener> mobsimListener : plugin.listeners()) {
-				qSim.addQueueSimulationListeners(qSimLocalInjector.getInstance(mobsimListener));
-			}
-	  		// add each plugin's agent sources:
-			for (Map.Entry<String, Class<? extends AgentSource>> agentSource : plugin.agentSources().entrySet()) {
-				qSim.addAgentSource(qSimLocalInjector.getInstance(agentSource));
-			}
-		}
         return qSim;
     }
 
