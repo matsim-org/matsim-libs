@@ -26,6 +26,11 @@
 		<param name="endTime" value="2:15:00" />
 		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
 		<param name="snapshotStyle" value="queue" />
+		
+		<param name="activeMobsimEngines" value="DynActivityEngine,NetsimEngine,PassengerEngine,TeleportationEngine" />
+		<param name="activeActivityHandlers" value="DynActivityEngine" />
+		<param name="activeDepartureHandlers" value="+PassengerEngine" />
+		<param name="activeAgentSources" value="+VrpAgentSource" />
 	</module>
 	
 	<module name="otfvis">

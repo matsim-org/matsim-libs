@@ -14,7 +14,7 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import com.google.inject.Module;
 
 public class PopulationPlugin extends AbstractQSimPlugin {
-	public final static String POPULATION_SOURCE_NAME = "PopulationSource";
+	public final static String POPULATION_SOURCE_NAME = "PopulationAgentSource";
 
 	public PopulationPlugin(Config config) {
 		super(config);

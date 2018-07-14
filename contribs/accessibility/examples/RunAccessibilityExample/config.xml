@@ -38,5 +38,4 @@
 	<module name="network" >
 		<param name="inputNetworkFile" value="network.xml" />
 	</module>
-<!-- ====================================================================== -->
 </config>

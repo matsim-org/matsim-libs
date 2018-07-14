@@ -20,6 +20,8 @@
 package org.matsim.contrib.dvrp.run;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.dvrp.passenger.PassengerEnginePlugin;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourcePlugin;
 import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
@@ -44,8 +46,21 @@ public class DvrpConfigConsistencyChecker implements ConfigConsistencyChecker {
 			log.warn(" 'QSim.insertingWaitingVehiclesBeforeDrivingVehicles' should be true in order to get"
 					+ " more precise travel time estimates. See comments in DvrpConfigConsistencyChecker");
 		}
+		
 		if (config.qsim().isRemoveStuckVehicles()) {
 			throw new RuntimeException("Stuck DynAgents cannot be removed from simulation");
+		}
+		
+		if (!config.qsim().getActiveMobsimEngines().contains(PassengerEnginePlugin.PASSENGER_ENGINE_NAME)) {
+			log.warn("DVRP is used, but PassengerEngine is not included in the QSim MobsimEngines");
+		}
+		
+		if (!config.qsim().getActiveDepartureHandlers().contains(PassengerEnginePlugin.PASSENGER_ENGINE_NAME)) {
+			log.warn("DVRP is used, but PassengerEngine is not included in the QSim DepartureHandlers");
+		}
+		
+		if (!config.qsim().getActiveAgentSources().contains(VrpAgentSourcePlugin.VRP_AGENT_SOURCE_NAME)) {
+			log.warn("DVRP is used, but VrpAgentSource is not included in the QSim AgentSources");
 		}
 	}
 }

@@ -96,6 +96,10 @@ public class RandomizingTransitRouterIT {
 		config.transit().setTransitScheduleFile("transitschedule.xml");
 		config.transit().setVehiclesFile("transitVehicles.xml");
 		config.transit().setUseTransit(true);
+		config.qsim().getActiveMobsimEngines().add("TransitEngine");
+		config.qsim().getActiveDepartureHandlers().add("TransitEngine");
+		config.qsim().getActiveAgentSources().add("TransitEngine");
+		
 		
 		config.controler().setOutputDirectory( outputDir );
 		config.controler().setLastIteration(20);

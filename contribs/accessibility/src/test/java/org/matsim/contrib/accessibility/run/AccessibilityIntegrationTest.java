@@ -357,6 +357,9 @@ public class AccessibilityIntegrationTest {
 		config.network().setInputFile(networkFile);
 
 		config.transit().setUseTransit(true);
+		config.qsim().getActiveMobsimEngines().add("TransitEngine");
+		config.qsim().getActiveDepartureHandlers().add("TransitEngine");
+		config.qsim().getActiveAgentSources().add("TransitEngine");
 //		config.transit().setTransitScheduleFile(utils.getClassInputDirectory() + "schedule.xml");
 		config.transit().setTransitScheduleFile(utils.getClassInputDirectory() + "schedule2.xml");
 		config.transit().setVehiclesFile(utils.getClassInputDirectory() + "vehicles.xml");
