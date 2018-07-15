@@ -409,6 +409,9 @@ public class QSimIntegrationTest {
 			// setup: config
 			final Config config = ConfigUtils.createConfig();
 			config.transit().setUseTransit(true);	
+			config.qsim().getActiveMobsimEngines().add("TransitEngine");
+			config.qsim().getActiveDepartureHandlers().add("TransitEngine");
+			config.qsim().getActiveAgentSources().add("TransitEngine");
 			config.qsim().setEndTime(8.0*3600);
 
 			this.scenario = (MutableScenario) ScenarioUtils.createScenario(config);
