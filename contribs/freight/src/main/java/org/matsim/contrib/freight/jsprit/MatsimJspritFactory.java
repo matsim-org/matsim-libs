@@ -15,7 +15,6 @@ package org.matsim.contrib.freight.jsprit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -35,7 +34,6 @@ import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
-import com.graphhopper.jsprit.core.problem.AbstractJob;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem.FleetSize;
@@ -46,7 +44,9 @@ import com.graphhopper.jsprit.core.problem.job.Service.Builder;
 import com.graphhopper.jsprit.core.problem.job.Shipment;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.DeliverShipment;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.PickupService;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.PickupShipment;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.ServiceActivity;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivities;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
@@ -270,14 +270,28 @@ public class MatsimJspritFactory {
 		tourBuilder.scheduleStart(Id.create(route.getStart().getLocation().getId(), Link.class));
 		for (TourActivity act : tour.getActivities()) {
 			if(act instanceof ServiceActivity || act instanceof PickupService){
+				log.debug("Found ServiceActivity or PickupService : " + act.getName() + " at location " +  act.getLocation().getId() + " : " + act.getLocation().getCoordinate() );
 				Service job = (Service) ((JobActivity) act).getJob();				 
 				CarrierService carrierService = createCarrierService(job);
 				tourBuilder.addLeg(new Leg());
 				tourBuilder.scheduleService(carrierService);
 			}
-			else {
-				throw new IllegalStateException("unknown tourActivity occurred. this cannot be");
+			else if (act instanceof DeliverShipment){
+				log.debug("Found DeliveryShipment: " + act.getName() + " at location " +  act.getLocation().getId() + " : " + act.getLocation().getCoordinate() );
+				Shipment job = (Shipment) ((JobActivity) act).getJob();
+				CarrierShipment carrierShipment = createCarrierShipment(job); 
+				tourBuilder.addLeg(new Leg());
+				tourBuilder.scheduleDelivery(carrierShipment);
+			} 
+			else if (act instanceof PickupShipment){
+				log.debug("Found PickupShipment: " + act.getName() + " at location " +  act.getLocation().getId() + " : " + act.getLocation().getCoordinate() );
+				Shipment job = (Shipment) ((JobActivity) act).getJob();
+				CarrierShipment carrierShipment = createCarrierShipment(job);
+				tourBuilder.addLeg(new Leg());
+				tourBuilder.schedulePickup(carrierShipment);
 			}
+			else
+				throw new IllegalStateException("unknown tourActivity occurred. this cannot be");
 		}
 		tourBuilder.addLeg(new Leg());
 		tourBuilder.scheduleEnd(Id.create(route.getEnd().getLocation().getId(), Link.class));

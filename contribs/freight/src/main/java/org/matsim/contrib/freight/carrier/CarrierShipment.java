@@ -186,7 +186,7 @@ public final class CarrierShipment {
 
 	@Override
 	public String toString() {
-		return "[from=" + from.toString() + "][to=" + to.toString() + "][size=" + size + "][pickupServiceTime=" + pickupServiceTime + "]" +
+		return "[id= "+ id.toString() + "][hash=" + this.hashCode() + "][from=" + from.toString() + "][to=" + to.toString() + "][size=" + size + "][pickupServiceTime=" + pickupServiceTime + "]" +
 				"[deliveryServiceTime="+deliveryServiceTime+"][pickupTimeWindow="+pickupTimeWindow+"][deliveryTimeWindow="+deliveryTimeWindow+"]";
 	}
 

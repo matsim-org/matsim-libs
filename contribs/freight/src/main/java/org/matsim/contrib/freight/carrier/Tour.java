@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
@@ -172,6 +173,7 @@ public class Tour {
 		 */
 		public Builder schedulePickup(CarrierShipment shipment) {
 			assertIsNotNull(shipment);
+			Log.debug("Pickup to get scheduled: " + shipment.toString());
 			boolean wasNew = openPickups.add(shipment);
 			if (!wasNew) {
 				throw new IllegalStateException("Trying to deliver something which was already picked up.");
@@ -200,6 +202,13 @@ public class Tour {
 		 */
 		public Builder scheduleDelivery(CarrierShipment shipment) {
 			assertIsNotNull(shipment);
+			Log.debug("Delivery to get scheduled: " + shipment.toString());
+			Log.debug("OpenPickups: " + openPickups.toString());
+			for (CarrierShipment s : openPickups) {
+				if (s.equals(shipment)) {
+					shipment = s;
+				};
+			}
 			boolean wasOpen = openPickups.remove(shipment);
 			if (!wasOpen) {
 				throw new IllegalStateException("Trying to deliver something which was not picked up.");
