@@ -96,8 +96,7 @@ final class UnprotectedLeftTurnAcceptanceLogic implements TurnAcceptanceLogic {
 					 * nodes happens in parallel, such that the sequence of how links are processed
 					 * causes situations where vehicles that must yield can always go, although the
 					 * conflicting queue contains vehicles, because the buffer has already emptied
-					 * for this time step. 
-					 * 
+					 * before this time step. 
 					 * theresa, jun'18
 					 */
 					if (rightOfWayQLane instanceof SignalizeableItem
