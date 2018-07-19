@@ -93,7 +93,11 @@ private static final Logger log = Logger.getLogger(ConflictingDirectionsLogicImp
 				setOfDirectionsPerGroup.put(group.getId(), new HashSet<>());
 				for (Id<Signal> signalIdOfThisGroup : signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(signalSystem.getId()).get(group.getId()).getSignalIds()) {
 					for (Tuple<Id<Link>, Id<Link>> from2toLink : setOfLinkTuplesPerSignal.get(signalIdOfThisGroup)) {
-						setOfDirectionsPerGroup.get(group.getId()).add(conflictsOfThisSystem.getDirection(from2toLink.getFirst(), from2toLink.getSecond()));
+						Direction direction = conflictsOfThisSystem.getDirection(from2toLink.getFirst(), from2toLink.getSecond());
+						// direction is null, if it does not exist (e.g. for u-turns in the cottbus scenario)
+						if (direction != null) {
+							setOfDirectionsPerGroup.get(group.getId()).add(direction);
+						}
 					}
 				}
 				log.info("Group " + group.getId() + " corresponds to " + setOfDirectionsPerGroup.get(group.getId()).size() + " directions.");
@@ -133,7 +137,7 @@ private static final Logger log = Logger.getLogger(ConflictingDirectionsLogicImp
 			for (Direction greenDirection : setOfDirectionsPerGroup.get(greenGroupId)) {
 				for (Direction directionToSwitchGreen : setOfDirectionsPerGroup.get(event.getSignalGroupId())) {
 					if (greenDirection.getConflictingDirections().contains(directionToSwitchGreen.getId()) || directionToSwitchGreen.getConflictingDirections().contains(greenDirection.getId())) {
-						String conflictingDirectionViolation = "Signal Group " + event.getSignalGroupId() + " is switched to green although " + greenGroupId 
+						String conflictingDirectionViolation = "Sek: " + event.getTime() + ". Signal Group " + event.getSignalGroupId() + " is switched to green although " + greenGroupId 
 								+ " already shows green. This is not allowed due to the conflicting directions data defined in the scenario because direction " 
 								+ greenDirection.getId() + " from link " + greenDirection.getFromLink() + " to link " + greenDirection.getToLink() 
 								+ " is conflicting to direction " + directionToSwitchGreen.getId() + " from link " + directionToSwitchGreen.getFromLink()
