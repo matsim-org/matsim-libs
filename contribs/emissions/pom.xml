@@ -6,7 +6,7 @@
   </parent>
   
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.matsim.contrib</groupId>
+  <groupId>org.matsim</groupId>
   <artifactId>emissions</artifactId>
   <name>emissions</name>
   

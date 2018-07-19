@@ -5,7 +5,7 @@
 		<version>0.11.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.matsim.contrib</groupId>
+	<groupId>org.matsim</groupId>
 	<artifactId>parking</artifactId>
 	<name>parking</name>
 	<build>
@@ -17,17 +17,17 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>org.matsim.contrib</groupId>
+			<groupId>org.matsim</groupId>
 			<artifactId>multimodal</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.matsim.contrib</groupId>
+			<groupId>org.matsim</groupId>
 			<artifactId>otfvis</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
 			<dependency>
-			<groupId>org.matsim.contrib</groupId>
+			<groupId>org.matsim</groupId>
 			<artifactId>dvrp</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>

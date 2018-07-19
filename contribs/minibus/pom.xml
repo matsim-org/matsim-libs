@@ -5,7 +5,7 @@
     <version>0.11.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.matsim.contrib</groupId>
+  <groupId>org.matsim</groupId>
   <artifactId>minibus</artifactId>
   <name>minibus</name>
   <build>
@@ -18,7 +18,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <classpathPrefix>libs/</classpathPrefix>
-              <mainClass>org.matsim.contrib.minibus.PMain</mainClass>
+              <mainClass>org.matsim.minibus.PMain</mainClass>
             </manifest>
           </archive>
         </configuration>

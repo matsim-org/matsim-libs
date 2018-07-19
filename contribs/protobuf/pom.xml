@@ -6,7 +6,7 @@
         <version>0.11.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.matsim.contrib</groupId>
+    <groupId>org.matsim</groupId>
     <artifactId>protobuf</artifactId>
     <name>protobuf</name>
     <properties>

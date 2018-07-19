@@ -5,7 +5,7 @@
     <version>0.11.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.matsim.contrib</groupId>
+  <groupId>org.matsim</groupId>
   <artifactId>accessibility</artifactId>
   <name>accessibility</name>
   <build>
@@ -32,12 +32,12 @@
   </build>
   <dependencies>
   	<dependency>
-  		<groupId>org.matsim.contrib</groupId>
+  		<groupId>org.matsim</groupId>
   		<artifactId>matrixbasedptrouter</artifactId>
   		<version>0.11.0-SNAPSHOT</version>
   	</dependency>
   	<dependency>
-  		<groupId>org.matsim.contrib</groupId>
+  		<groupId>org.matsim</groupId>
   		<artifactId>roadpricing</artifactId>
   		<version>0.11.0-SNAPSHOT</version>
   	</dependency>
@@ -57,7 +57,7 @@
 			<version>0.45</version>
 		</dependency>
 		<dependency>
-			<groupId>org.matsim.contrib</groupId>
+			<groupId>org.matsim</groupId>
 			<artifactId>analysis</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
