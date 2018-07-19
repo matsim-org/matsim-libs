@@ -19,17 +19,16 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Helps to work on plans with complex trips.
@@ -141,30 +140,12 @@ public class TripStructureUtils {
 	}
 
 	public static Collection<Subtour> getSubtours(
-			final Plan plan,
-			final StageActivityTypes stageActivityTypes) {
+            final Plan plan,
+            final StageActivityTypes stageActivityTypes) {
 		return getSubtours(
 				plan.getPlanElements(),
-				stageActivityTypes);
-	}
-
-	public static Collection<Subtour> getSubtours(
-			final List<? extends PlanElement> plan,
-			final StageActivityTypes stageActivityTypes) {
-		return getSubtours(
-				plan,
-				stageActivityTypes,
-				false );
-	}
-
-	public static Collection<Subtour> getSubtours(
-			final Plan plan,
-			final StageActivityTypes stageActivityTypes,
-			final boolean useFacilitiesInsteadOfLinks) {
-		return getSubtours(
-				plan.getPlanElements(),
-				stageActivityTypes,
-				useFacilitiesInsteadOfLinks );
+				stageActivityTypes
+        );
 	}
 
 	/**
@@ -196,9 +177,8 @@ public class TripStructureUtils {
 	 * sequence
 	 */
 	public static Collection<Subtour> getSubtours(
-			final List<? extends PlanElement> planElements,
-			final StageActivityTypes stageActivityTypes,
-			final boolean useFacilitiesInsteadOfLinks) {
+            final List<? extends PlanElement> planElements,
+            final StageActivityTypes stageActivityTypes) {
 		final List<Subtour> subtours = new ArrayList<>();
 
 		Id<?> destinationId = null;
@@ -206,30 +186,32 @@ public class TripStructureUtils {
 		final List<Trip> trips = getTrips( planElements , stageActivityTypes );
 		final List<Trip> nonAllocatedTrips = new ArrayList<>( trips );
 		for (Trip trip : trips) {
-			final Id<?> originId = useFacilitiesInsteadOfLinks ?
-					trip.getOriginActivity().getFacilityId() :
-						trip.getOriginActivity().getLinkId();
+            final Id<?> originId;
+            //use facilities if available
+		    if (trip.getOriginActivity().getFacilityId()!=null ) {
+		        originId = trip.getOriginActivity().getFacilityId();
+            } else {
+		        originId = trip.getOriginActivity().getLinkId();
+            }
 
 					if ( originId == null ) {
-						throw new NullPointerException( "the "+
-								(useFacilitiesInsteadOfLinks ? "facility " : "link " )+
-								"id for origin activity "+trip.getOriginActivity()+
-								" is null!" );
+						throw new NullPointerException( "Both facility id and link id for origin activity "+trip.getOriginActivity()+
+								" are null!" );
 					}
 
 					if (destinationId != null && !originId.equals( destinationId )) {
 						throw new RuntimeException( "unconsistent trip location sequence: "+destinationId+" != "+originId );
 					}
 
-					destinationId = useFacilitiesInsteadOfLinks ?
-							trip.getDestinationActivity().getFacilityId() :
-								trip.getDestinationActivity().getLinkId();
+            if (trip.getDestinationActivity().getFacilityId()!=null ) {
+                destinationId = trip.getDestinationActivity().getFacilityId();
+            } else {
+                destinationId = trip.getDestinationActivity().getLinkId();
+            }
 
 							if ( destinationId == null ) {
-								throw new NullPointerException( "the "+
-										(useFacilitiesInsteadOfLinks ? "facility " : "link " )+
-										"id for destination activity "+trip.getDestinationActivity()+
-										" is null!" );
+								throw new NullPointerException( "Both facility id and link id for destination activity "+trip.getDestinationActivity()+
+										" are null!" );
 							}
 
 							originIds.add( originId );

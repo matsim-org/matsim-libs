@@ -20,6 +20,12 @@
 
 package org.matsim.contrib.emissions.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -38,8 +44,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.*;
 
 
 /*
@@ -69,8 +73,7 @@ public class TestEmissionUtils {
     private final String pm="PM";
     private final String so="SO2";
 	private String message;
-    private EmissionUtils eu;
-	
+
 	private Map<Id<Person>, SortedMap<String, Double>> totalEmissions;
     private Population pop;
 	private PopulationFactory populationFactory;
@@ -81,8 +84,7 @@ public class TestEmissionUtils {
 	public final void testInternList(){		
 		//make sure the above list of pollutants matches the actual enums warmPollutant and coldPollutant
 		//if this fails, the list of pollutants' strings above must be rewritten
-		eu =  new EmissionUtils();
-		pollsFromEU = eu.getListOfPollutants();
+		pollsFromEU = EmissionUtils.getListOfPollutants();
 		
 		message ="this test assumes that there are nine types of pollutants. One is missing with EmissionUtils.getListOfPollutants";
 		Assert.assertTrue(message, pollsFromEU.contains(co));
@@ -102,8 +104,7 @@ public class TestEmissionUtils {
 	public final void testConstructor(){
 		// the list of pollutants returned by getListOfPollutants should match
 		// the enums WarmPollutant and ColdPollutant
-		eu = new EmissionUtils();
-		SortedSet<String> pollsFromEU = eu.getListOfPollutants();
+		SortedSet<String> pollsFromEU = EmissionUtils.getListOfPollutants();
 		SortedSet<String> pollsFromEnum = new TreeSet<>();
 		
 		for(WarmPollutant wp: WarmPollutant.values()){
@@ -127,8 +128,7 @@ public class TestEmissionUtils {
 	public final void testSumUpEmissions(){
 		// test the method EmissionUtils.sumUpEmissions for a complete list of pollutants
 		// missing data is not tested here
-		eu = new EmissionUtils();
-		
+
 		Map<WarmPollutant, Double> warmEmissions = new HashMap<>();
 		Map<ColdPollutant, Double> coldEmissions = new HashMap<>();
 		
@@ -156,7 +156,7 @@ public class TestEmissionUtils {
 		coldEmissions.put(ColdPollutant.NOX, cnxv);
 		coldEmissions.put(ColdPollutant.PM, cpmv);
 		
-		SortedMap<String, Double> sum = eu.sumUpEmissions(warmEmissions, coldEmissions);
+		SortedMap<String, Double> sum = EmissionUtils.sumUpEmissions(warmEmissions, coldEmissions);
 
 		Double cov = sum.get(co);
 		Double c2v = sum.get(c2);
@@ -181,7 +181,6 @@ public class TestEmissionUtils {
 	
 	@Test 
 	public final void testSumUpEmissionsPerId(){
-		eu = new EmissionUtils();
 		Map<Id<Person>, Map<WarmPollutant, Double>> warmEmissions = new HashMap<>();
 		Map<Id<Person>, Map<ColdPollutant, Double>> coldEmissions = new HashMap<>();
 		
@@ -255,7 +254,7 @@ public class TestEmissionUtils {
 		coldEmissions.put(Id.create("id1", Person.class), mapCold1);
 		coldEmissions.put(Id.create("id2", Person.class), mapCold2);
 		
-		Map<Id<Person>, SortedMap<String, Double>> sums = eu.sumUpEmissionsPerId(warmEmissions, coldEmissions);
+		Map<Id<Person>, SortedMap<String, Double>> sums = EmissionUtils.sumUpEmissionsPerId(warmEmissions, coldEmissions);
 		
 		//actual numbers of person1
 		double a1co = sums.get(Id.create("id1", Person.class)).get("CO");
@@ -304,10 +303,9 @@ public class TestEmissionUtils {
 	
 	@Test
 	public final void testGetTotalEmissions_nullInput(){
-		eu = new EmissionUtils();
 
 		try{
-			SortedMap<String, Double> totalEmissions = eu.getTotalEmissions(null);
+			SortedMap<String, Double> totalEmissions = EmissionUtils.getTotalEmissions(null);
 			Assert.fail("Expected NullPointerException, got none.");
 		}
 		catch(NullPointerException e){
@@ -318,21 +316,19 @@ public class TestEmissionUtils {
 	@Test
 	public final void testGetTotalEmissions_emptyList(){
 		//test an empty list as input
-		eu = new EmissionUtils();
-		
+
 		SortedMap<String, Double> totalEmissions = new TreeMap<>();
 		Map<Id<Person>, SortedMap<String, Double>> persons2emissions = new HashMap<>();
 		
 		//test empty list as input		
-		totalEmissions = eu.getTotalEmissions(persons2emissions);
+		totalEmissions = EmissionUtils.getTotalEmissions(persons2emissions);
 		Assert.assertEquals("this map should be empty", 0, totalEmissions.size());
 	}
 	
 	@Test
 	public final void testGetTotalEmissions_completeData(){
 		//test getTotalEmissions for complete data
-		eu = new EmissionUtils();
-		SortedSet<String> pollsFromEU = eu.getListOfPollutants();
+		SortedSet<String> pollsFromEU = EmissionUtils.getListOfPollutants();
 		
 		SortedMap<String, Double> totalEmissions = new TreeMap<>();
 		Map<Id<Person>, SortedMap<String, Double>> persons2emissions = new HashMap<>();
@@ -387,7 +383,7 @@ public class TestEmissionUtils {
 		persons2emissions.put(p1Id, allEmissionsP1);
 		persons2emissions.put(p2Id, allEmissionsp2);
 		persons2emissions.put(p3Id, allEmissionsp3);
-		totalEmissions = eu.getTotalEmissions(persons2emissions);
+		totalEmissions = EmissionUtils.getTotalEmissions(persons2emissions);
 		
 		Assert.assertEquals(co+" values are not correct", p1co+p2co+p3co, totalEmissions.get(co), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(c2+" values are not correct", p1c2+p2c2+p3c2, totalEmissions.get(c2), MatsimTestUtils.EPSILON);
@@ -465,7 +461,7 @@ public class TestEmissionUtils {
 		pop.addPerson(p2);
 		totalEmissions.put(idp2, p2Emissions);
 		
-		Map<Id<Person>, SortedMap<String, Double>> finalMap = eu.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
+		Map<Id<Person>, SortedMap<String, Double>> finalMap = EmissionUtils.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
 		
 		//check: all persons added to the population are contained in the finalMap
 		Assert.assertTrue("the calculated map should contain person 1", finalMap.containsKey(idp1));
@@ -526,7 +522,7 @@ public class TestEmissionUtils {
 				Id<Person> idp3 = Id.create("p3", Person.class);
 				Person p3 = populationFactory.createPerson(idp3);
 				pop.addPerson(p3);
-				Map<Id<Person>, SortedMap<String, Double>> finalMap = eu.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
+				Map<Id<Person>, SortedMap<String, Double>> finalMap = EmissionUtils.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
 				
 				//check: person 3 is contained in the finalMap
 				Assert.assertTrue("the calculated map should contain person 3", finalMap.containsKey(idp3));				
@@ -556,7 +552,7 @@ public class TestEmissionUtils {
 		
 		setUpForNonCaculatedEmissions();
 		
-		Map<Id<Person>, SortedMap<String, Double>> finalMap = eu.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
+		Map<Id<Person>, SortedMap<String, Double>> finalMap = EmissionUtils.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
 		
 		//person 4 in totalEmissions but not in population
 					Double cov4=.0008, c2v4= .004, fcv4 = .07, hcv4=.9, nmv4=1., n2v4=50., nxv4=700., pmv4 =4000., sov4=30000.;
@@ -576,7 +572,7 @@ public class TestEmissionUtils {
 					Id<Person> idp4 = Id.create("p4", Person.class);
 					totalEmissions.put(idp4, p4Emissions);
 					
-					finalMap = eu.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
+					finalMap = EmissionUtils.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
 					
 					//check: all persons added to the population are contained in the finalMap
 					Assert.assertFalse("the calculated map should not contain person 4", finalMap.containsKey(idp4));				
@@ -588,13 +584,12 @@ public class TestEmissionUtils {
 	
 	private void setUpForNonCaculatedEmissions() {
 		//intern method to set some parameters
-		eu = new EmissionUtils();
 		totalEmissions = new TreeMap<>();
         Config config = ConfigUtils.createConfig();
         Scenario sc = ScenarioUtils.createScenario(config);
 		pop = sc.getPopulation();
 		populationFactory = pop.getFactory();
-		pollsFromEU = eu.getListOfPollutants();
+		pollsFromEU = EmissionUtils.getListOfPollutants();
 		nullPointerEx = false;
 	}
 	
@@ -611,7 +606,7 @@ public class TestEmissionUtils {
 		pop.addPerson(p6);
 
 		//empty emissions map
-		Map<Id<Person>, SortedMap<String, Double>> finalMap = eu.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
+		Map<Id<Person>, SortedMap<String, Double>> finalMap = EmissionUtils.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
 		
 		//check: all persons added to the population are contained in the finalMap
 		Assert.assertTrue("the calculated map should contain person 5", finalMap.containsKey(idp5));
@@ -657,7 +652,7 @@ public class TestEmissionUtils {
 
 		try {
 		//empty emissions map
-		Map<Id<Person>, SortedMap<String, Double>> finalMap = eu.setNonCalculatedEmissionsForPopulation(pop, null);
+		Map<Id<Person>, SortedMap<String, Double>> finalMap = EmissionUtils.setNonCalculatedEmissionsForPopulation(pop, null);
 		} catch (NullPointerException e) {
 			nullPointerEx = true;
 		}
@@ -687,7 +682,7 @@ public class TestEmissionUtils {
 		totalEmissions.put(idp7, p7Emissions);
 		
 		//empty population
-		Map<Id<Person>, SortedMap<String, Double>> finalMap = eu.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
+		Map<Id<Person>, SortedMap<String, Double>> finalMap = EmissionUtils.setNonCalculatedEmissionsForPopulation(pop, totalEmissions);
 		
 		//nothing in the finalMap
 		message = "the calculated map should contain "+ pop.getPersons().size()+ " person(s) but contains "+ finalMap.keySet().size() + "person(s)." ;
@@ -712,13 +707,12 @@ public class TestEmissionUtils {
 		//OUT: map <linkId, SpecificEmissionMap>
 		//SpecificEmissionMap= <pollutant, value>
 		
-		eu = new EmissionUtils();
-		
+
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network network = sc.getNetwork();
 		addLinksToNetwork(sc);
-		pollsFromEU = eu.getListOfPollutants();
+		pollsFromEU = EmissionUtils.getListOfPollutants();
 		
 		Map<Id<Link>, SortedMap<String, Double>> totalEmissions = new HashMap<>();
 	
@@ -763,7 +757,7 @@ public class TestEmissionUtils {
 		//not put into totalEmissionsMap - link 34
 		Id<Link> link34id = Id.create("link34", Link.class);
 		
-		Map<Id<Link>, SortedMap<String, Double>> totalEmissionsFilled = eu.setNonCalculatedEmissionsForNetwork(network, totalEmissions);
+		Map<Id<Link>, SortedMap<String, Double>> totalEmissionsFilled = EmissionUtils.setNonCalculatedEmissionsForNetwork(network, totalEmissions);
 		//each link of the network and each type of emission
 		for(Link link: network.getLinks().values()){
 			
@@ -861,8 +855,7 @@ public class TestEmissionUtils {
 	@Test
 	public final void testConvertWarmPollutantMap2String(){
 		// test convertWarmPollutantMap2String for a complete map of warm emissions
-		eu = new EmissionUtils();
-		
+
 		Map<WarmPollutant, Double> warmEmissions = new HashMap<>();
 		//warm pollutants: CO, CO2_TOTAL, FC, HC, NMHC, NO2, NOX, PM, SO2
 		//values for warm polls
@@ -879,7 +872,7 @@ public class TestEmissionUtils {
 		warmEmissions.put(WarmPollutant.PM, pmv);
 		warmEmissions.put(WarmPollutant.SO2, sov);
 		
-		SortedMap<String, Double> convertedWarmMap = eu.convertWarmPollutantMap2String(warmEmissions);
+		SortedMap<String, Double> convertedWarmMap = EmissionUtils.convertWarmPollutantMap2String(warmEmissions);
 		
 		Assert.assertEquals(co + " values do not match", cov,convertedWarmMap.get(co), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(c2 + " values do not match", c2v,convertedWarmMap.get(c2), MatsimTestUtils.EPSILON);
@@ -899,8 +892,7 @@ public class TestEmissionUtils {
 	@Test
 	public final void testConvertColdPollutantMap2String(){
 		// test convertWarmPollutantMap2String for a complete map of warm emissions
-		eu = new EmissionUtils();
-		
+
 		Map<ColdPollutant, Double> coldEmissions = new HashMap<>();
 		//values for cold polls
 		Double cov=.0005, fcv = .01, hcv=.2, nmv=1., n2v=30., nxv=200., pmv =7000.;
@@ -914,7 +906,7 @@ public class TestEmissionUtils {
 		coldEmissions.put(ColdPollutant.NOX, nxv);
 		coldEmissions.put(ColdPollutant.PM, pmv);
 	
-		SortedMap<String, Double> convertedColdMap = eu.convertColdPollutantMap2String(coldEmissions);
+		SortedMap<String, Double> convertedColdMap = EmissionUtils.convertColdPollutantMap2String(coldEmissions);
 		
 		Assert.assertEquals(co + " values do not match", cov,convertedColdMap.get(co), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(fc + " values do not match", fcv,convertedColdMap.get(fc), MatsimTestUtils.EPSILON);

@@ -7,6 +7,7 @@ import java.util.Map;
  * Created by molloyj on 01.12.2017.
  * class to mimic the old roadTypeMapping that berlin uses with VISUM
  */
+@Deprecated
 public class VisumHbefaRoadTypeMapping implements HbefaRoadTypeMapping {
 
     Map<String, String> mapping = new HashMap<>();
