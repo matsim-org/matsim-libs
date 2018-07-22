@@ -75,10 +75,15 @@ public class QSimUtils {
 	
 	public static QSim createQSim( final Scenario scenario, final EventsManager eventsManager,
 								   final List<AbstractModule> overrides, final Collection<AbstractQSimPlugin> plugins ) {
+		// First, load standard QSim module
 		AbstractModule module = new StandaloneQSimModule(scenario, eventsManager);
-		for ( AbstractModule override : overrides ) {
+		
+		// Add all overrides
+		for (AbstractModule override : overrides ) {
 			module = org.matsim.core.controler.AbstractModule.override(Collections.singleton(module), override) ;
 		}
+		
+		// Overide plugins
 		final AbstractModule override = AbstractModule.override(Collections.singleton(module),
 				new AbstractModule() {
 					@Override
@@ -87,6 +92,8 @@ public class QSimUtils {
 						}).toInstance(plugins);
 					}
 				});
+		
+		// Build QSim
 		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(), override);
 		return (QSim) injector.getInstance(Mobsim.class);
 	}
