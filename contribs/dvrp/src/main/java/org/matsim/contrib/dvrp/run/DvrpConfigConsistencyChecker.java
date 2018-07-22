@@ -20,13 +20,9 @@
 package org.matsim.contrib.dvrp.run;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.dvrp.passenger.PassengerEnginePlugin;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourcePlugin;
-import org.matsim.contrib.dynagent.run.DynActivityEnginePlugin;
 import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 
 public class DvrpConfigConsistencyChecker implements ConfigConsistencyChecker {
 	private static final Logger log = Logger.getLogger(DvrpConfigConsistencyChecker.class);

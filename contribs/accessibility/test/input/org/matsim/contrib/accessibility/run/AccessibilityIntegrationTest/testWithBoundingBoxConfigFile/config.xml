@@ -55,4 +55,5 @@
 		<param name="usingPtStops" value="true" />
 		<param name="usingTravelTimesAndDistances" value="true" />
 	</module>
+<!-- ====================================================================== -->
 </config>

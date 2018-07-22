@@ -408,7 +408,7 @@ public class QSimIntegrationTest {
 		public Fixture() throws SAXException, ParserConfigurationException, IOException {
 			// setup: config
 			final Config config = ConfigUtils.createConfig();
-			config.transit().setUseTransit(true);
+			config.transit().setUseTransit(true);	
 			config.qsim().setEndTime(8.0*3600);
 
 			this.scenario = (MutableScenario) ScenarioUtils.createScenario(config);
