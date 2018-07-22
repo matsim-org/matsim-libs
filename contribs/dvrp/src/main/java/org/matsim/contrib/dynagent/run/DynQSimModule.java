@@ -19,37 +19,31 @@
 
 package org.matsim.contrib.dynagent.run;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
+import org.matsim.core.mobsim.qsim.PopulationPlugin;
+import org.matsim.core.mobsim.qsim.TeleportationPlugin;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
+import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
 import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
 
 import com.google.inject.Provides;
 
-public class DynQSimModule<T extends Mobsim> extends AbstractModule {
-	private final Class<? extends javax.inject.Provider<? extends T>> providerClass;
-
-	public DynQSimModule(Class<? extends javax.inject.Provider<? extends T>> providerClass) {
-		this.providerClass = providerClass;
-	}
-
+public class DynQSimModule extends AbstractModule {
 	@Override
 	public void install() {
-		bindMobsim().toProvider(providerClass);
+
 	}
 
 	@Provides
-	private Collection<AbstractQSimPlugin> provideQSimPlugins(Config config) {
-		return createQSimPlugins(config);
-	}
-
-	public static Collection<AbstractQSimPlugin> createQSimPlugins(Config config) {
+	public Collection<AbstractQSimPlugin> provideQSimPlugins(Config config) {
 		final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
 		plugins.add(new MessageQueuePlugin(config));
 		plugins.add(new DynActivityEnginePlugin(config));
@@ -63,5 +57,13 @@ public class DynQSimModule<T extends Mobsim> extends AbstractModule {
 		plugins.add(new TeleportationPlugin(config));
 		plugins.add(new PopulationPlugin(config));
 		return plugins;
+	}
+
+	@Provides
+	private QSimComponents provideQSimComponents(Config config) {
+		QSimComponents components = new QSimComponents();
+		new StandardQSimComponentsConfigurator(config).configure(components);
+		new DynAgentQSimComponentsConfiurator().configure(components);
+		return components;
 	}
 }

@@ -14,6 +14,11 @@ public class QSimComponentsFromConfigConfigurator {
 				.get(QSimComponentsConfigGroup.GROUP_NAME);
 
 		if (componentsConfig != null) {
+			components.activeMobsimEngines.clear();
+			components.activeActivityHandlers.clear();
+			components.activeDepartureHandlers.clear();
+			components.activeAgentSources.clear();
+
 			components.activeMobsimEngines.addAll(componentsConfig.getActiveMobsimEngines());
 			components.activeActivityHandlers.addAll(componentsConfig.getActiveActivityHandlers());
 			components.activeDepartureHandlers.addAll(componentsConfig.getActiveDepartureHandlers());

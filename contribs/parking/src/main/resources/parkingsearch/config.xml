@@ -32,7 +32,6 @@
 		<param name="storageCapacityFactor" value="1.0"/>
 		<param name="stuckTime" value="10"/>
 		<param name="removeStuckVehicles" value="yes"/>
-		<param name="activeAgentSources" value="ParkingSearchAgentSource" />
 		
 	</module>
 	<module name="strategy">

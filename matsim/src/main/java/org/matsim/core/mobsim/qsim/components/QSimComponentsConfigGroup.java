@@ -35,8 +35,8 @@ public class QSimComponentsConfigGroup extends ConfigGroup {
 	private List<String> activeDepartureHandlers = new LinkedList<>(DEFAULT_DEPARTURE_HANDLERS);
 	private List<String> activeAgentSources = new LinkedList<>(DEFAULT_AGENT_SOURCES);
 
-	public QSimComponentsConfigGroup(String name) {
-		super(name);
+	public QSimComponentsConfigGroup() {
+		super(GROUP_NAME);
 	}
 
 	@Override

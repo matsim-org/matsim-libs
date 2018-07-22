@@ -55,11 +55,6 @@
 		<param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
 	
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		
-		<param name="activeMobsimEngines" value="DynActivityEngine,NetsimEngine,PassengerEngine,TeleportationEngine" />
-		<param name="activeActivityHandlers" value="DynActivityEngine" />
-		<param name="activeDepartureHandlers" value="+PassengerEngine" />
-		<param name="activeAgentSources" value="+VrpAgentSource" />
 	</module>
 
 	<module name="planCalcScore">
