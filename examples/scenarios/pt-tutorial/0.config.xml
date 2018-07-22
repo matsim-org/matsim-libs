@@ -29,9 +29,6 @@
 		<param name="endTime" value="30:00:00" />
 	
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name="activeMobsimEngines" value="+TransitEngine" />
-		<param name="activeDepartureHandlers" value="+TransitEngine" />
-		<param name="activeAgentSources" value="+TransitEngine" />
 	</module>
 
 	<module name="planCalcScore">

@@ -59,10 +59,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation";
 	private static final String USE_PERSON_ID_FOR_MISSING_VEHICLE_ID = "usePersonIdForMissingVehicleId";
 	private static final String SIM_ENDTIME_INTERPRETATION = "simEndtimeInterpretation";
-	private static final String ACTIVE_MOBSIM_ENGINES = "activeMobsimEngines";
-	private static final String ACTIVE_ACTIVITY_HANDLERS = "activeActivityHandlers";
-	private static final String ACTIVE_DEPATURE_HANDLERS = "activeDepartureHandlers";
-	private static final String ACTIVE_AGENT_SOURCES = "activeAgentSources";
 	
 	public static enum TrafficDynamics { queue, withHoles,
 		kinematicWaves //  MATSim-630; previously, the switch was InflowConstraint.maxflowFromFdiag. Amit Jan 2017.
@@ -152,27 +148,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	private EndtimeInterpretation simEndtimeInterpretation;
 	// ---
-	
-	private final static List<String> DEFAULT_MOBSIM_ENGINES = Arrays.asList( 
-			"ActivityEngine", "NetsimEngine", "TeleportationEngine"
-			);
-	
-	private final static List<String> DEFAULT_ACTIVITY_HANDLERS = Arrays.asList( 
-			"ActivityEngine"
-			);
-	
-	private final static List<String> DEFAULT_DEPARTURE_HANDLERS = Arrays.asList( 
-			"NetsimEngine" //, "TeleportationEngine"
-			);
-	
-	private final static List<String> DEFAULT_AGENT_SOURCES = Arrays.asList( 
-			"PopulationAgentSource"
-			);
-	
-	private List<String> activeMobsimEngines = new LinkedList<>(DEFAULT_MOBSIM_ENGINES);
-	private List<String> activeActivityHandlers = new LinkedList<>(DEFAULT_ACTIVITY_HANDLERS);
-	private List<String> activeDepartureHandlers = new LinkedList<>(DEFAULT_DEPARTURE_HANDLERS);
-	private List<String> activeAgentSources = new LinkedList<>(DEFAULT_AGENT_SOURCES);
 	
 	public QSimConfigGroup() {
 		super(GROUP_NAME);
@@ -309,11 +284,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		map.put(IS_RESTRICTING_SEEPAGE, "If link dynamics is set as "+ LinkDynamics.SeepageQ+", set to false if all seep modes should perform seepage. Default is true (better option).");
 //		map.put(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES, "If set to true, creates a vehicle for each person corresponding to every network mode. However, " +
 //				"this will be overridden if vehicle source is "+ VehiclesSource.fromVehiclesData+".");
-		
-		map.put(ACTIVE_MOBSIM_ENGINES, "Defines which MobsimEngines are active and in which order they are registered. Depending on which extensions and contribs you use, it may be necessary to define additional components here. Default is: " + String.join(", ", DEFAULT_MOBSIM_ENGINES));
-		map.put(ACTIVE_ACTIVITY_HANDLERS, "Defines which ActivityHandlers are active and in which order they are registered. Depending on which extensions and contribs you use, it may be necessary to define additional components here.  Default is: " + String.join(", ", DEFAULT_ACTIVITY_HANDLERS));
-		map.put(ACTIVE_DEPATURE_HANDLERS, "Defines which DepartureHandlers are active and in which order they are registered. Depending on which extensions and contribs you use, it may be necessary to define additional components here.  Default is: " + String.join(", ", DEFAULT_DEPARTURE_HANDLERS));
-		map.put(ACTIVE_AGENT_SOURCES, "Defines which AgentSources are active and in which order they are registered. Depending on which extensions and contribs you use, it may be necessary to define additional components here.  Default is: " + String.join(", ", DEFAULT_AGENT_SOURCES));
 		
 		return map;
 	}
@@ -636,112 +606,4 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 //		this.creatingVehiclesForAllNetworkModes = creatingVehiclesForAllNetworkModes;
 //	}
 	
-	
-	public List<String> getActiveMobsimEngines() {
-		return activeMobsimEngines;
-	}
-	
-	public void setActiveMobsimEngines(List<String> activeMobsimEngines) {
-		this.activeMobsimEngines = activeMobsimEngines;
-	}
-	
-	@StringGetter(ACTIVE_MOBSIM_ENGINES)
-	public String getActiveMobsimEnginesAsString() {
-		return String.join(", ", activeMobsimEngines);
-	}
-	
-	@StringSetter(ACTIVE_MOBSIM_ENGINES)
-	public void setActiveMobsimEnginesAsString(String activeMobsimEngines) {
-		this.activeMobsimEngines = interpretQSimComponents(this.activeMobsimEngines, activeMobsimEngines);
-	}
-	
-	public List<String> getActiveActivityHandlers() {
-		return activeActivityHandlers;
-	}
-	
-	public void setActiveActivityHandlers(List<String> activeActivityHandlers) {
-		this.activeActivityHandlers = activeActivityHandlers;
-	}
-	
-	@StringGetter(ACTIVE_ACTIVITY_HANDLERS)
-	public String getActiveActivityHandlersAsString() {
-		return String.join(", ", activeActivityHandlers);
-	}
-	
-	@StringSetter(ACTIVE_ACTIVITY_HANDLERS)
-	public void setActiveActivityHandlersAsString(String activeActivityHandlers) {
-		this.activeActivityHandlers = interpretQSimComponents(this.activeActivityHandlers, activeActivityHandlers);
-	}
-	
-	public List<String> getActiveDepartureHandlers() {
-		return activeDepartureHandlers;
-	}
-	
-	public void setActiveDepartureHandlers(List<String> activeDepartureHandlers) {
-		this.activeDepartureHandlers = activeDepartureHandlers;
-	}
-	
-	@StringGetter(ACTIVE_DEPATURE_HANDLERS)
-	public String getActiveDepartureHandlersAsString() {
-		return String.join(", ", activeDepartureHandlers);
-	}
-	
-	@StringSetter(ACTIVE_DEPATURE_HANDLERS)
-	public void setActiveDepartureHandlersAsString(String activeDepartureHandlers) {
-		this.activeDepartureHandlers = interpretQSimComponents(this.activeDepartureHandlers, activeDepartureHandlers);
-	}
-	
-	public List<String> getActiveAgentSources() {
-		return activeAgentSources;
-	}
-	
-	public void setActiveAgentSources(List<String> activeAgentSources) {
-		this.activeAgentSources = activeAgentSources;
-	}
-	
-	@StringGetter(ACTIVE_AGENT_SOURCES)
-	public String getActiveAgentSourcesAsString() {
-		return String.join(", ", activeAgentSources);
-	}
-	
-	@StringSetter(ACTIVE_AGENT_SOURCES)
-	public void setActiveAgentSourcesAsString(String activeAgentSources) {
-		this.activeAgentSources = interpretQSimComponents(this.activeAgentSources, activeAgentSources);
-	}
-	
-	private List<String> interpretQSimComponents(List<String> initial, String config) {
-		List<String> elements = Arrays.asList(config.split(",")).stream().map(String::trim).collect(Collectors.toList());
-		
-		if (elements.size() == 1 && elements.get(0).length() == 0) {
-			return new LinkedList<>();
-		}
-		
-		if (!elements.get(0).startsWith("+") && !elements.get(0).startsWith("-")) {
-			// We're in absolute mode
-			return elements;
-		}
-		
-		List<String> result = new LinkedList<>(initial);
-		
-		for (String element : elements) {
-			String operator = element.substring(0, 1);
-			String name = element.substring(1, element.length());
-			
-			switch (operator) {
-			case "+":
-				result.add(name);
-				break;
-			case "-":
-				result.remove(name);
-				break;
-			default:
-				throw new IllegalArgumentException("Wrongly formatted QSim component list: " + config);
-			}
-		}
-		
-		return result;
-		
-		
-		
-	}
 }

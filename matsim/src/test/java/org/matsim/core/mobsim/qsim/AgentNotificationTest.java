@@ -1,6 +1,9 @@
 package org.matsim.core.mobsim.qsim;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
@@ -29,6 +32,8 @@ import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
@@ -43,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -257,15 +263,27 @@ public class AgentNotificationTest {
 				return Collections.singletonMap(PopulationPlugin.POPULATION_SOURCE_NAME, PopulationAgentSource.class);
 			}
 		});
+		
+		List<org.matsim.core.controler.AbstractModule> modules = new ArrayList<>();
+		modules.add(new org.matsim.core.controler.AbstractModule() {
+			@Override
+			public void install() {}
+			
+			@Provides @Singleton
+			public QSimComponents provideQSimComponents(Config config) {
+				QSimComponents components = new QSimComponents();
+				new StandardQSimComponentsConfigurator(config).configure(components);
+				components.activeMobsimEngines.remove("NetsimEngine");
+				components.activeDepartureHandlers.remove("NetsimEngine");
+				return components;
+			}
+		});
+		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsCollector handler = new EventsCollector();
 		eventsManager.addHandler(handler);
 		
-		QSimConfigGroup config = scenario.getConfig().qsim();
-		config.getActiveMobsimEngines().remove("NetsimEngine");
-		config.getActiveDepartureHandlers().remove("NetsimEngine");
-		
-		QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins);
+		QSim qSim = QSimUtils.createQSim(scenario, eventsManager, modules, plugins);
 
 		qSim.run();
 		// yyyyyy I can comment out the above line and the test still passes (will say: "skipped"). ?????? kai, feb'16

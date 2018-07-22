@@ -28,7 +28,7 @@ public class ComponentRegistry<T> {
 		this.components.put(name, component);
 
 		log.info(String.format("Registered %s with name '%s' to %s", componentTypeDescription, name,
-				component.getClass().toString()));
+				component));
 	}
 	
 	public Class<? extends T> getComponent(String name) {

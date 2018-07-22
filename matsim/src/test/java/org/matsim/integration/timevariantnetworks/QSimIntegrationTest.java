@@ -74,7 +74,6 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	public void testFreespeed() {
 		Config config = loadConfig(null);
 		config.network().setTimeVariantNetwork(true);
-		config.qsim().getActiveMobsimEngines().add(NetworkChangeEventsPlugin.NETWORK_CHANGE_EVENTS_ENGINE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
 		Network network = createNetwork(scenario);
@@ -122,7 +121,6 @@ public class QSimIntegrationTest extends MatsimTestCase {
 
 		Config config = loadConfig(null);
 		config.network().setTimeVariantNetwork(true);
-		config.qsim().getActiveMobsimEngines().add(NetworkChangeEventsPlugin.NETWORK_CHANGE_EVENTS_ENGINE);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		Network network = createNetwork(scenario);
@@ -191,7 +189,6 @@ public class QSimIntegrationTest extends MatsimTestCase {
 
 		Config config = loadConfig(null);
 		config.network().setTimeVariantNetwork(true);
-		config.qsim().getActiveMobsimEngines().add(NetworkChangeEventsPlugin.NETWORK_CHANGE_EVENTS_ENGINE);
 		config.qsim().setStartTime(0.0);
 		final double simEndTime = 7200.0;
 		config.qsim().setEndTime(simEndTime);

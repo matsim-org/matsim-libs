@@ -45,11 +45,6 @@ public class RunRandomDynAgentExample {
 		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		
-		config.qsim().getActiveMobsimEngines().remove("ActivityEngine");
-		config.qsim().getActiveActivityHandlers().remove("ActivityEngine");
-		config.qsim().getActiveMobsimEngines().add("DynActivityEngine");
-		config.qsim().getActiveActivityHandlers().add("DynActivityEngine");
-		
 		config.network().setInputFile(netFile);
 		config.controler().setOutputDirectory("./test/output/");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);

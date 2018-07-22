@@ -621,9 +621,6 @@ public class CadytsPtIT {
 		config.plans().setInputFile(inputDir + "4plans.xml") ;
 		// ---
 		config.transit().setUseTransit(true) ;
-		config.qsim().getActiveMobsimEngines().add("TransitEngine");
-		config.qsim().getActiveDepartureHandlers().add("TransitEngine");
-		config.qsim().getActiveAgentSources().add("TransitEngine");
 		// ---
 		config.controler().setFirstIteration(1) ;
 		config.controler().setLastIteration(10) ;

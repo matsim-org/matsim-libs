@@ -26,6 +26,7 @@ import org.matsim.contrib.dynagent.run.DynActivityEnginePlugin;
 import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 
 public class DvrpConfigConsistencyChecker implements ConfigConsistencyChecker {
 	private static final Logger log = Logger.getLogger(DvrpConfigConsistencyChecker.class);
@@ -50,26 +51,6 @@ public class DvrpConfigConsistencyChecker implements ConfigConsistencyChecker {
 		
 		if (config.qsim().isRemoveStuckVehicles()) {
 			throw new RuntimeException("Stuck DynAgents cannot be removed from simulation");
-		}
-		
-		if (!config.qsim().getActiveMobsimEngines().contains(DynActivityEnginePlugin.DYN_ACTIVITY_ENGINE_NAME)) {
-			log.warn("DVRP is used, but DynActivityEngine is not included in the QSim MobsimEngines");
-		}
-		
-		if (!config.qsim().getActiveActivityHandlers().contains(DynActivityEnginePlugin.DYN_ACTIVITY_ENGINE_NAME)) {
-			log.warn("DVRP is used, but DynActivityEngine is not included in the QSim ActivityHandlers");
-		}
-		
-		if (!config.qsim().getActiveMobsimEngines().contains(PassengerEnginePlugin.PASSENGER_ENGINE_NAME)) {
-			log.warn("DVRP is used, but PassengerEngine is not included in the QSim MobsimEngines");
-		}
-		
-		if (!config.qsim().getActiveDepartureHandlers().contains(PassengerEnginePlugin.PASSENGER_ENGINE_NAME)) {
-			log.warn("DVRP is used, but PassengerEngine is not included in the QSim DepartureHandlers");
-		}
-		
-		if (!config.qsim().getActiveAgentSources().contains(VrpAgentSourcePlugin.VRP_AGENT_SOURCE_NAME)) {
-			log.warn("DVRP is used, but VrpAgentSource is not included in the QSim AgentSources");
 		}
 	}
 }

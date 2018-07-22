@@ -53,7 +53,6 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 		ConfigConsistencyCheckerImpl.checkLaneDefinitionRoutingConfiguration(config);
 		ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
 		ConfigConsistencyCheckerImpl.checkTransit(config);
-		ConfigConsistencyCheckerImpl.checkTimeVariantNetworkConfiguration(config);
 	}
 
 	/*package*/ static void checkPlanCalcScore(final Config c) {
@@ -161,24 +160,5 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 		if ( config.transit().isUseTransit() && config.transit().getVehiclesFile()==null ) {
 			log.warn("Your are using Transit but have not provided a transit vehicles file. This most likely won't work.");
 		}
-		
-		if ( config.transit().isUseTransit() && !config.qsim().getActiveMobsimEngines().contains(TransitEnginePlugin.TRANSIT_ENGINE_NAME) ) {
-			log.warn("Your are using Transit but have not added TransitEngine to the active QSim MobsimEngines");			
-		}
-		
-		if ( config.transit().isUseTransit() && !config.qsim().getActiveDepartureHandlers().contains(TransitEnginePlugin.TRANSIT_ENGINE_NAME) ) {
-			log.warn("Your are using Transit but have not added TransitEngine to the active QSim DepartureHandlers");			
-		}
-		
-		if ( config.transit().isUseTransit() && !config.qsim().getActiveAgentSources().contains(TransitEnginePlugin.TRANSIT_ENGINE_NAME) ) {
-			log.warn("Your are using Transit but have not added TransitEngine to the active QSim AgentSources");			
-		}
 	}
-	
-	private static void checkTimeVariantNetworkConfiguration(final Config config) {
-		if ( config.network().isTimeVariantNetwork() && !config.qsim().getActiveMobsimEngines().contains(NetworkChangeEventsPlugin.NETWORK_CHANGE_EVENTS_ENGINE) ) {
-			log.warn("Your are using a time variant network but have not added NetworkChangeEventsEngine to the active QSim MobsimEngines");			
-		}
-	}
-
 }

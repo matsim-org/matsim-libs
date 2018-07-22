@@ -45,10 +45,6 @@
 		<!--<param name="flowCapacityFactor" value="1.0" />-->
 		<!--<param name="storageCapacityFactor" value="1.0" />-->
 		<param name="snapshotStyle" value="queue" />
-		
-		<param name="activeMobsimEngines" value="+TransitEngine" />
-		<param name="activeDepartureHandlers" value="+TransitEngine" />
-		<param name="activeAgentSources" value="+TransitEngine" />
 	</module>
 
 	<module name="planCalcScore">
