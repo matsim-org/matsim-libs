@@ -204,11 +204,6 @@ public class Tour {
 			assertIsNotNull(shipment);
 			Log.debug("Delivery to get scheduled: " + shipment.toString());
 			Log.debug("OpenPickups: " + openPickups.toString());
-			for (CarrierShipment s : openPickups) {
-				if (s.equals(shipment)) {
-					shipment = s;
-				};
-			}
 			boolean wasOpen = openPickups.remove(shipment);
 			if (!wasOpen) {
 				throw new IllegalStateException("Trying to deliver something which was not picked up.");
