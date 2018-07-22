@@ -73,14 +73,15 @@ public class QSimUtils {
 	
 	public static QSim createQSim( final Scenario scenario, final EventsManager eventsManager,
 								   final Collection<AbstractModule> overrides, final Collection<AbstractQSimPlugin> plugins ) {
-		// yy I patched the following together from the two (original ones) above.  But I cannot say why in the first case it is
-		// sufficient to override the module, while in the second case the output from the AbstractModule.override(...) method needs
-		// to be taken.  Maybe it does not matter, maybe it does, it would be nice to be certain.  kai, feb'18
+		// First, load standard QSim module
+		AbstractModule module = new StandaloneQSimModule(scenario, eventsManager);
 		
-		final StandaloneQSimModule module = new StandaloneQSimModule(scenario, eventsManager);
-		for ( AbstractModule override : overrides ) {
-			org.matsim.core.controler.AbstractModule.override(Collections.singleton(module), override) ;
+		// Add all overrides
+		for (AbstractModule override : overrides ) {
+			module = org.matsim.core.controler.AbstractModule.override(Collections.singleton(module), override) ;
 		}
+		
+		// Overide plugins
 		final AbstractModule override = AbstractModule.override(Collections.singleton(module),
 				new AbstractModule() {
 					@Override
@@ -89,6 +90,8 @@ public class QSimUtils {
 						}).toInstance(plugins);
 					}
 				});
+		
+		// Build QSim
 		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(), override);
 		return (QSim) injector.getInstance(Mobsim.class);
 	}
