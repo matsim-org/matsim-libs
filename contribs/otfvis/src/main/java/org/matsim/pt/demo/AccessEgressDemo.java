@@ -22,6 +22,7 @@ package org.matsim.pt.demo;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -199,7 +200,7 @@ public class AccessEgressDemo {
 		RouteTimeDiagram diagram = new RouteTimeDiagram();
 		events.addHandler(diagram);
 
-		Collection<AbstractModule> overrides = new ArrayList<>() ;
+		List<AbstractModule> overrides = new ArrayList<>() ;
 		overrides.add( new AbstractModule() {
 			@Override public void install() {
 				bind(TransitStopHandlerFactory.class).to(SimpleTransitStopHandlerFactory.class).asEagerSingleton();

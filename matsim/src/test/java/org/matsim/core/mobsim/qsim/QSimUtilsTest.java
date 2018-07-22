@@ -1,7 +1,7 @@
 package org.matsim.core.mobsim.qsim;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -20,16 +20,16 @@ public class QSimUtilsTest {
 	public void testOverrides() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		
-		Collection<AbstractModule> overrides = Collections.singleton(new AbstractModule() {
+
+		List<AbstractModule> overrides = Collections.singletonList(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(Key.get(Integer.class, Names.named("test"))).toInstance(100);
 			}
 		});
-		
+
 		QSim qsim = QSimUtils.createDefaultQSimWithOverrides(scenario, eventsManager, overrides);
-		
+
 		Assert.equals(100, qsim.getChildInjector().getInstance(Key.get(Integer.class, Names.named("test"))));
 	}
 }

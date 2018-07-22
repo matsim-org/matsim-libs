@@ -24,6 +24,8 @@ package org.matsim.core.mobsim.qsim;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
@@ -45,7 +47,7 @@ public class QSimUtils {
 	}
 	
 	public static QSim createDefaultQSimWithOverrides( final Scenario scenario, final EventsManager eventsManager, 
-			Collection<AbstractModule> overrides ) {
+			List<AbstractModule> overrides ) {
 //		final StandaloneQSimModule module = new StandaloneQSimModule(scenario, eventsManager);
 //		for ( AbstractModule override : overrides ) {
 //			org.matsim.core.controler.AbstractModule.override(Collections.singleton(module), override) ;
@@ -72,7 +74,7 @@ public class QSimUtils {
 	}
 	
 	public static QSim createQSim( final Scenario scenario, final EventsManager eventsManager,
-								   final Collection<AbstractModule> overrides, final Collection<AbstractQSimPlugin> plugins ) {
+								   final List<AbstractModule> overrides, final Collection<AbstractQSimPlugin> plugins ) {
 		// First, load standard QSim module
 		AbstractModule module = new StandaloneQSimModule(scenario, eventsManager);
 		
