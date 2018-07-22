@@ -90,8 +90,6 @@ public class QSimProvider implements Provider<QSim> {
 			plugin.agentSources().forEach(agentSourceRegistry::register);
 		}
 		
-		System.err.println(components.activeDepartureHandlers);
-
 		mobsimEngineRegistry.getOrderedComponents(components.activeMobsimEngines).stream()
 				.map(qSimLocalInjector::getInstance).forEach(qSim::addMobsimEngine);
 		activityHandlerRegister.getOrderedComponents(components.activeActivityHandlers).stream()

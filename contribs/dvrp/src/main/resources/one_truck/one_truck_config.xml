@@ -9,8 +9,6 @@
 		<param name="simStarttimeInterpretation" value="onlyUseStarttime" />
 		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
 		<param name="snapshotStyle" value="queue" />
-		<param name="activeMobsimEngines" value="DynActivityEngine,NetsimEngine,TeleportationEngine" />
-		<param name="activeActivityHandlers" value="DynActivityEngine" />
 	</module>
 	
 	<module name="otfvis">

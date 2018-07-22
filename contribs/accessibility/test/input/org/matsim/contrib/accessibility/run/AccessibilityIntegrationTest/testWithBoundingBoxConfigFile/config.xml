@@ -55,10 +55,4 @@
 		<param name="usingPtStops" value="true" />
 		<param name="usingTravelTimesAndDistances" value="true" />
 	</module>
-<!-- ====================================================================== -->
-	<module name="qsim">
-		<param name="activeMobsimEngines" value="+TransitEngine" />
-		<param name="activeDepartureHandlers" value="+TransitEngine" />
-		<param name="activeAgentSources" value="+TransitEngine" />
-	</module>
 </config>
