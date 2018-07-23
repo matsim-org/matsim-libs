@@ -115,8 +115,14 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
-//					if ( act.getLinkId() == null ) {
-					if ( PopulationUtils.decideOnLinkIdForActivity( act, scenario ) == null ) {
+					if ( act.getLinkId() == null // neither activity nor facility has a link
+							&&
+							//this check is necessary here, else, XY2Links will put the link/coord back to activity which is clear violation of facilitiesConfigGroup.removingLinksAndCoordinates =true. Amit July'18
+							( act.getFacilityId() == null
+									|| this.activityFacilities.getFacilities().isEmpty()
+									|| this.activityFacilities.getFacilities().get(act.getFacilityId()) == null
+									|| this.activityFacilities.getFacilities().get(act.getFacilityId()).getLinkId() == null)
+							) {
 					    	needsXY2Links = true;
 							needsReRoute = true;
 							break;

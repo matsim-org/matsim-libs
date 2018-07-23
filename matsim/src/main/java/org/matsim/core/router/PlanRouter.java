@@ -19,8 +19,13 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
+import java.util.List;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -31,8 +36,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.List;
 
 /**
  * {@link PlanAlgorithm} responsible for routing all trips of a plan.
@@ -143,15 +146,23 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
 	private Facility toFacility(final Activity act) {
-		if (  (act.getLinkId() == null && act.getCoord() == null)  // yyyy this used to be || instead of && --???  kai, jun'16
-				&& facilities != null
-				&& !facilities.getFacilities().isEmpty()) {
-			// use facilities only if the activity does not provide the required fields.
-			// yyyyyy Seems to me that the Access/EgressRoutingModule only needs either link or coord to start from.  So we only go
-			// to facilities if neither is provided.  --  This may, however, be at odds of how it is done in the AccessEgressRoutingModule, so we 
-			// need to conceptually sort this out!!  kai, jun'16
+//		if (  (act.getLinkId() == null && act.getCoord() == null)  // yyyy this used to be || instead of && --???  kai, jun'16
+//				&& facilities != null
+//				&& !facilities.getFacilities().isEmpty()) {
+//			// use facilities only if the activity does not provide the required fields.
+//			// yyyyyy Seems to me that the Access/EgressRoutingModule only needs either link or coord to start from.  So we only go
+//			// to facilities if neither is provided.  --  This may, however, be at odds of how it is done in the AccessEgressRoutingModule, so we
+//			// need to conceptually sort this out!!  kai, jun'16
+//			return facilities.getFacilities().get( act.getFacilityId() );
+//		}
+
+		// use facility first if available i.e. reversing the logic above Amit July'18
+		if (	facilities != null &&
+				! facilities.getFacilities().isEmpty() &&
+				act.getFacilityId() != null ) {
 			return facilities.getFacilities().get( act.getFacilityId() );
 		}
+
 		return new ActivityWrapperFacility( act );
 	}
 

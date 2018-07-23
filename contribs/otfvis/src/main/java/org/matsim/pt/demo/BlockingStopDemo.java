@@ -292,7 +292,7 @@ public class BlockingStopDemo {
 		TravelTimeCalculator ttc = new TravelTimeCalculator(this.scenario.getNetwork(), 120, 7*3600+1800, new TravelTimeCalculatorConfigGroup());
 		events.addHandler(ttc);
 
-		Collection<AbstractModule> overrides = new ArrayList<>() ;
+		List<AbstractModule> overrides = new ArrayList<>() ;
 		overrides.add( new AbstractModule() {
 			@Override public void install() {
 				bind(TransitStopHandlerFactory.class).to(SimpleTransitStopHandlerFactory.class).asEagerSingleton();

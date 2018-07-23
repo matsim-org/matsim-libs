@@ -115,7 +115,6 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 						this.modes,
 						this.chainBasedModes,
 						MatsimRandom.getLocalInstance(), behavior, probaForChangeSingleTripMode);
-		chooseRandomLegMode.setAnchorSubtoursAtFacilitiesInsteadOfLinks( false );
 		return chooseRandomLegMode;
 	}
 
