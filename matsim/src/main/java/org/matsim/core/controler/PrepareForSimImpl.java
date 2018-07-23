@@ -34,7 +34,10 @@ import java.util.Map;
 
 public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim {
 	// I think it is ok to have this public final.  Since one may want to use it as a delegate.  kai, may'18
-	// yyyyyy but how should that work with a non-public constructor? kai, jun'18
+	// but how should that work with a non-public constructor? kai, jun'18
+	// Well, I guess it can be injected as well?!
+	// bind( PrepareForSimImpl.class ) ;
+	// bind( PrepareForSim.class ).to( MyPrepareForSimImpl.class ) ;
 	
 	// yyyy There is currently a lot of overlap between PrepareForSimImpl and PrepareForMobsimImpl.
 	// This should be removed.  kai, jun'18
@@ -90,7 +93,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 //				Gbl.assertIf( this.activityFacilities.getFacilities().isEmpty() );
 				// I have at least one use case where people use the facilities as some kind
 				// of database for stuff, but don't run the activities off them.  I have thus
-				// disabled the above check.  We need to think about what we want to
+				// disabled the above check.  yy We need to think about what we want to
 				// do in such cases; might want to auto-generate our facilities as below
 				// and _add_ them to the existing facilities.  kai, feb'18
 				break;

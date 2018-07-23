@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -103,6 +104,9 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			log.warn("Person " + person.getId() + " has no plans!");
 			return;
 		}
+		
+		// yyyyyy need to find out somewhere here if the access/egress legs of the incoming plans
+		// are consistent with the config setting.  Otherwise need to re-route all of them. kai, jul'18
 
 		// make sure all the plans have valid act-locations and valid routes
 		for (Plan plan : person.getPlans()) {
@@ -111,7 +115,8 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
-					if ( act.getLinkId() == null ) {
+//					if ( act.getLinkId() == null ) {
+					if ( PopulationUtils.decideOnLinkIdForActivity( act, scenario ) == null ) {
 					    	needsXY2Links = true;
 							needsReRoute = true;
 							break;

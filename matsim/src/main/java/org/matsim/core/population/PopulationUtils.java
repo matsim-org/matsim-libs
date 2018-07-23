@@ -35,6 +35,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -529,7 +530,7 @@ public final class PopulationUtils {
 				simil += sameModeReward ;
 				continue ; // next leg
 			}
-			simil += sameRouteReward * RouteUtils.calculateCoverage(nr1, nr2, network) ;
+			simil += sameRouteReward * (RouteUtils.calculateCoverage(nr1, nr2, network) + RouteUtils.calculateCoverage(nr2, nr1, network) ) / 2 ;
 		}
 		return simil ;
 	}
@@ -1003,5 +1004,28 @@ public final class PopulationUtils {
 	
 	public static void writePopulation( Population population, String filename ) {
 		new PopulationWriter( population).write( filename ); 
+	}
+	
+	public static Id<Link> decideOnLinkIdForActivity( Activity act, Scenario sc ) {
+		if ( act.getFacilityId() !=null ) {
+			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get( act.getFacilityId() );;
+			if ( facility==null ) {
+				throw new RuntimeException("facility ID given but not in facilities container") ;
+			}
+			Gbl.assertNotNull( facility.getLinkId() );
+			return facility.getLinkId();
+		}
+		Gbl.assertNotNull( act.getLinkId() );
+		return act.getLinkId() ;
+	}
+	public static Coord decideOnCoordForActivity( Activity act, Scenario sc ) {
+		if ( act.getFacilityId() !=null ) {
+			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get( act.getFacilityId() );;
+			Gbl.assertNotNull( facility  );
+			Gbl.assertNotNull( facility.getCoord() ) ;
+			return facility.getCoord() ;
+		}
+		Gbl.assertNotNull( act.getCoord() ) ;
+		return act.getCoord() ;
 	}
 }

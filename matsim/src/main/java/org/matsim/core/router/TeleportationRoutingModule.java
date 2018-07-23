@@ -21,12 +21,14 @@ package org.matsim.core.router;
 import java.util.Arrays;
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 
@@ -89,7 +91,11 @@ public class TeleportationRoutingModule implements RoutingModule {
 
 	/* package */ double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		// make simple assumption about distance and walking speed
-		double dist = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord());
+		final Coord fromActCoord = fromAct.getCoord();
+		Gbl.assertNotNull( fromActCoord );
+		final Coord toActCoord = toAct.getCoord();
+		Gbl.assertNotNull( toActCoord );
+		double dist = CoordUtils.calcEuclideanDistance( fromActCoord, toActCoord );
 		// create an empty route, but with realistic travel time
 		Route route = this.populationFactory.getRouteFactories().createRoute(Route.class, fromAct.getLinkId(), toAct.getLinkId());
 		double estimatedNetworkDistance = dist * this.beelineDistanceFactor;
