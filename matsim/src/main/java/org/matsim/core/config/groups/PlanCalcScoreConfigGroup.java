@@ -86,7 +86,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		{
 			ActivityParams params = new ActivityParams("dummy");
 			params.setTypicalDuration(2. * 3600.);
-			params.setScoringThisActivityAtAll(false);
+//			params.setScoringThisActivityAtAll(false); // no longer minimal when included here. kai, jun'18
 			this.addActivityParams(params);
 			// (this is there so that an empty config prints out at least one
 			// activity type,
@@ -710,7 +710,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		// getters. kai, jun'15
 
 		public final static String SET_TYPE = "activityParams";
-
+		
 		// ---
 
 		private static final String TYPICAL_DURATION_SCORE_COMPUTATION = "typicalDurationScoreComputation";
@@ -785,7 +785,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private double latestStartTime = Time.UNDEFINED_TIME;
 		private double earliestEndTime = Time.UNDEFINED_TIME;
 		private double closingTime = Time.UNDEFINED_TIME;
-		private boolean scoringThisActivityAtAll = true;
 
 		public ActivityParams() {
 			super(SET_TYPE);
@@ -945,12 +944,18 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.closingTime = closingTime;
 		}
 
-		@StringGetter("scoringThisActivityAtAll")
+		// ---
+		
+		public static final String SCORING_THIS_ACTIVITY_AT_ALL = "scoringThisActivityAtAll";
+
+		private boolean scoringThisActivityAtAll = true;
+
+		@StringGetter(SCORING_THIS_ACTIVITY_AT_ALL)
 		public boolean isScoringThisActivityAtAll() {
 			return scoringThisActivityAtAll;
 		}
 
-		@StringSetter("scoringThisActivityAtAll")
+		@StringSetter(SCORING_THIS_ACTIVITY_AT_ALL)
 		public void setScoringThisActivityAtAll(boolean scoringThisActivityAtAll) {
 			testForLocked();
 			this.scoringThisActivityAtAll = scoringThisActivityAtAll;
@@ -960,14 +965,15 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	public static class ModeParams extends ReflectiveConfigGroup implements MatsimParameters {
 
 		public final static String SET_TYPE = "modeParams";
-
+		
 		private static final String MONETARY_DISTANCE_RATE = "monetaryDistanceRate";
 		private static final String MONETARY_DISTANCE_RATE_CMT = "[unit_of_money/m] conversion of distance into money. Normally negative.";
 
 		private static final String MARGINAL_UTILITY_OF_TRAVELING = "marginalUtilityOfTraveling_util_hr";
 
 		private static final String CONSTANT = "constant";
-
+		public static final String MODE = "mode";
+		
 		private String mode = null;
 		private double traveling = -6.0;
 		private double distance = 0.0;
@@ -1007,13 +1013,13 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			return map;
 		}
 
-		@StringSetter("mode")
+		@StringSetter(MODE)
 		public void setMode(final String mode) {
 			testForLocked();
 			this.mode = mode;
 		}
 
-		@StringGetter("mode")
+		@StringGetter(MODE)
 		public String getMode() {
 			return mode;
 		}

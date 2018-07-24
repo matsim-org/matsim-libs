@@ -19,8 +19,13 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
+import java.util.List;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -32,8 +37,6 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.List;
-
 /**
  * {@link PlanAlgorithm} responsible for routing all trips of a plan.
  * Activity times are not updated, even if the previous trip arrival time
@@ -42,20 +45,20 @@ import java.util.List;
  * @author thibautd
  */
 public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
-	private final TripRouter routingHandler;
+	private final TripRouter tripRouter;
 	private final ActivityFacilities facilities;
 
 	/**
 	 * Initialises an instance.
-	 * @param routingHandler the {@link TripRouter} to use to route individual trips
+	 * @param tripRouter the {@link TripRouter} to use to route individual trips
 	 * @param facilities the {@link ActivityFacilities} to which activities are refering.
 	 * May be <tt>null</tt>: in this case, the router will be given facilities wrapping the
 	 * origin and destination activity.
 	 */
 	public PlanRouter(
-			final TripRouter routingHandler,
+			final TripRouter tripRouter,
 			final ActivityFacilities facilities) {
-		this.routingHandler = routingHandler;
+		this.tripRouter = tripRouter;
 		this.facilities = facilities;
 	}
 
@@ -75,20 +78,20 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	 */
 	@Deprecated // get TripRouter out of injection instead. kai, feb'16
 	public TripRouter getTripRouter() {
-		return routingHandler;
+		return tripRouter;
 	}
 
 	@Override
 	public void run(final Plan plan) {
-		final List<Trip> trips = TripStructureUtils.getTrips( plan , routingHandler.getStageActivityTypes() );
+		final List<Trip> trips = TripStructureUtils.getTrips( plan , tripRouter.getStageActivityTypes() );
 
 		for (Trip oldTrip : trips) {
 			final List<? extends PlanElement> newTrip =
-					routingHandler.calcRoute(
-							routingHandler.getMainModeIdentifier().identifyMainMode( oldTrip.getTripElements() ),
+					tripRouter.calcRoute(
+							tripRouter.getMainModeIdentifier().identifyMainMode( oldTrip.getTripElements() ),
 							toFacility( oldTrip.getOriginActivity() ),
 							toFacility( oldTrip.getDestinationActivity() ),
-							calcEndOfActivity( oldTrip.getOriginActivity() , plan, routingHandler.getConfig() ),
+							calcEndOfActivity( oldTrip.getOriginActivity() , plan, tripRouter.getConfig() ),
 							plan.getPerson() );
 			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
 			TripRouter.insertTrip(
@@ -143,15 +146,23 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
 	private Facility toFacility(final Activity act) {
-		if (  (act.getLinkId() == null && act.getCoord() == null)  // yyyy this used to be || instead of && --???  kai, jun'16
-				&& facilities != null
-				&& !facilities.getFacilities().isEmpty()) {
-			// use facilities only if the activity does not provide the required fields.
-			// yyyyyy Seems to me that the Access/EgressRoutingModule only needs either link or coord to start from.  So we only go
-			// to facilities if neither is provided.  --  This may, however, be at odds of how it is done in the AccessEgressRoutingModule, so we 
-			// need to conceptually sort this out!!  kai, jun'16
+//		if (  (act.getLinkId() == null && act.getCoord() == null)  // yyyy this used to be || instead of && --???  kai, jun'16
+//				&& facilities != null
+//				&& !facilities.getFacilities().isEmpty()) {
+//			// use facilities only if the activity does not provide the required fields.
+//			// yyyyyy Seems to me that the Access/EgressRoutingModule only needs either link or coord to start from.  So we only go
+//			// to facilities if neither is provided.  --  This may, however, be at odds of how it is done in the AccessEgressRoutingModule, so we
+//			// need to conceptually sort this out!!  kai, jun'16
+//			return facilities.getFacilities().get( act.getFacilityId() );
+//		}
+
+		// use facility first if available i.e. reversing the logic above Amit July'18
+		if (	facilities != null &&
+				! facilities.getFacilities().isEmpty() &&
+				act.getFacilityId() != null ) {
 			return facilities.getFacilities().get( act.getFacilityId() );
 		}
+
 		return new ActivityWrapperFacility( act );
 	}
 

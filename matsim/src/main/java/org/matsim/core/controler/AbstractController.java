@@ -39,7 +39,7 @@ import org.matsim.core.gbl.MatsimRandom;
     /**
      * This is deliberately not even protected.  kai, jul'12
      */
-    ControlerListenerManagerImpl controlerListenerManagerImpl;
+    private ControlerListenerManagerImpl controlerListenerManagerImpl;
 
 
     private Integer thisIteration = null;
@@ -94,6 +94,8 @@ import org.matsim.core.gbl.MatsimRandom;
     protected abstract void runMobSim();
 
     protected abstract void prepareForSim();
+    
+    protected abstract void prepareForMobsim() ;
 
     /**
      * Stopping criterion for iterations.  Design thoughts:<ul>
@@ -179,6 +181,14 @@ import org.matsim.core.gbl.MatsimRandom;
                     controlerListenerManagerImpl.fireControlerBeforeMobsimEvent(iteration);
                 }
             });
+            
+            iterationStep( "prepareForMobsim", new Runnable(){
+                    @Override
+                public void run() {
+                        prepareForMobsim() ;
+                        // todo: make replacable
+                }
+            }) ;
 
             iterationStep("mobsim", new Runnable() {
                 @Override

@@ -44,7 +44,7 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 			+ "(passengers'/customers' perspective)";
 
 	public static final String NETWORK_MODE = "networkMode";
-	static final String NETWORK_MODE_EXP = "Mode of which the network will be used for routing vehicles, calculating trave times, "
+	static final String NETWORK_MODE_EXP = "Mode of which the network will be used for routing vehicles, calculating travel times, "
 			+ "etc. (fleet operator's perspective). " + "Default is car.";
 
 	public static final String TRAVEL_TIME_ESTIMATION_ALPHA = "travelTimeEstimationAlpha";

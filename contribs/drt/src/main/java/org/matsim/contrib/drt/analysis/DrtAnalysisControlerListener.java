@@ -47,8 +47,6 @@ import com.google.inject.Inject;
 public class DrtAnalysisControlerListener implements IterationEndsListener {
 
 	@Inject
-	DrtVehicleOccupancyEvaluator vehicleOccupancyEvaluator;
-	@Inject
 	DynModePassengerStats drtPassengerStats;
 	@Inject
 	MatsimServices matsimServices;
@@ -88,12 +86,6 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
-		vehicleOccupancyEvaluator.calcAndWriteFleetStats(
-				matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleOccupancy"),drtgroup.isPlotDetailedVehicleStats());
-		if (drtgroup.isPlotDetailedVehicleStats()) {
-			vehicleOccupancyEvaluator.writeDetailedOccupancyFiles(
-					matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleStats_"));
-		}
 		drtRequestAnalyzer.writeAndPlotWaitTimeEstimateComparison(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitTimeComparison.png"), matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitTimeComparison.csv"));
 		List<DynModeTrip> trips = drtPassengerStats.getDrtTrips();
 
@@ -123,7 +115,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 
 	/**
 	 * @param summarizeTrips
-	 * @param iteration
+	 * @param it iteration
 	 */
 	private void writeIterationPassengerStats(String summarizeTrips, int it) {
 		BufferedWriter bw = IOUtils.getAppendingBufferedWriter(
@@ -145,8 +137,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	}
 
 	/**
-	 * @param summarizeTrips
-	 * @param iteration
+	 * @param summarizeVehicles
+	 * @param it iteration
 	 */
 	private void writeIterationVehicleStats(String summarizeVehicles,String vehOcc, int it) {
 		BufferedWriter bw = IOUtils

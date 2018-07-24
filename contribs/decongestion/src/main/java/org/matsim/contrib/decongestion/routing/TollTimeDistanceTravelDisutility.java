@@ -31,6 +31,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 import org.matsim.contrib.decongestion.data.DecongestionInfo;
+import org.matsim.contrib.decongestion.data.LinkInfo;
 
 /**
  * A cost calculator which respects time, distance and decongestion tolls. 
@@ -41,25 +42,28 @@ public final class TollTimeDistanceTravelDisutility implements TravelDisutility 
 	private static final Logger log = Logger.getLogger(TollTimeDistanceTravelDisutility.class);
 
 	private final TravelDisutility delegate;
-	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	private final DecongestionInfo info;
 	private final double sigma;
+	private final double timeBinSize;
+	private final double marginalUtilityOfMoney;
 
 	TollTimeDistanceTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, double sigma, DecongestionInfo info) {
 		this.info = info;
-		this.cnScoringGroup = cnScoringGroup;
+		this.marginalUtilityOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
 		this.sigma = sigma;
 		
 		final RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, cnScoringGroup );
 		builder.setSigma(sigma);
 		this.delegate = builder.createTravelDisutility(timeCalculator);
 
-		log.info("Using the toll-adjusted travel disutility in the decongestion package.");
+		this.timeBinSize = info.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
+		
+		log.info("Using the toll-adjusted travel disutility (improved version) in the decongestion package.");
 	}
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		int timeBin = (int) (time / info.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+		int timeBin = (int) (time / timeBinSize);
 
 		double timeDistanceTravelDisutilityFromDelegate = this.delegate.getLinkTravelDisutility(link, time, person, vehicle);
 				
@@ -70,12 +74,17 @@ public final class TollTimeDistanceTravelDisutility implements TravelDisutility 
 
 		// adjust the travel disutility for the toll
 		double toll = 0.;
-		if (info.getlinkInfos().containsKey(link.getId()) && info.getlinkInfos().get(link.getId()).getTime2toll().containsKey(timeBin)) {
-			toll = info.getlinkInfos().get(link.getId()).getTime2toll().get(timeBin);
-		}
-		double tollAdjustedLinkTravelDisutility = Double.NEGATIVE_INFINITY;
-		tollAdjustedLinkTravelDisutility = timeDistanceTravelDisutilityFromDelegate + logNormalRnd * cnScoringGroup.getMarginalUtilityOfMoney() * toll;
 		
+		LinkInfo linkInfo = info.getlinkInfos().get(link.getId());
+		if (linkInfo != null) {
+			
+			Double linkInfoTimeBinToll = linkInfo.getTime2toll().get(timeBin);	
+			if (linkInfoTimeBinToll != null) {
+				toll = linkInfoTimeBinToll;
+			}
+		}
+		
+		double tollAdjustedLinkTravelDisutility = timeDistanceTravelDisutilityFromDelegate + logNormalRnd * marginalUtilityOfMoney * toll;		
 		return tollAdjustedLinkTravelDisutility;
 	}
 

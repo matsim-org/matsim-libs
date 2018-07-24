@@ -70,7 +70,8 @@ public class JointTripInsertionWithSocialNetworkTest {
 						random,
 						sn,
 						new JointTripInsertorConfigGroup(),
-						new TripRouter() );
+//						new TripRouter() );
+					new TripRouter.Builder( scenario.getConfig() ).build() ) ;
 
 			final JointPlan jp = groupAllPlansInJointPlan( scenario.getPopulation() );
 
