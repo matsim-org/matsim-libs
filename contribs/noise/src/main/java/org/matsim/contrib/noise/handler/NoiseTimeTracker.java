@@ -101,7 +101,8 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 						+ "This message is only given once.");
 				cWarn1++;
 			}
-			
+			this.noiseContext.getNotConsideredTransitVehicleIDs().add(event.getVehicleId());
+
 		} else {
 			boolean isBus = false;
 			for (String busIdPrefix : this.noiseContext.getNoiseParams().getBusIdIdentifierSet()) {
