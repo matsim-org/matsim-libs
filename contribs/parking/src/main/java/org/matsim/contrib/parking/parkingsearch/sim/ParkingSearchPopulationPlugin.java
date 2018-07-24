@@ -24,6 +24,7 @@ package org.matsim.contrib.parking.parkingsearch.sim;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -37,6 +38,8 @@ import com.google.inject.Module;
  *
  */
 public class ParkingSearchPopulationPlugin extends AbstractQSimPlugin {
+	public final static String PARKING_SEARCH_AGENT_SOURCE = "ParkingSearchAgentSource";
+	
 	public ParkingSearchPopulationPlugin(Config config) { super(config); }
 	@Override 
 	public Collection<? extends Module> modules() {
@@ -52,7 +55,7 @@ public class ParkingSearchPopulationPlugin extends AbstractQSimPlugin {
 		});
 	}
 	@Override 
-	public Collection<Class<? extends AgentSource>> agentSources() {
-		return Collections.singletonList(ParkingPopulationAgentSource.class);
+	public Map<String, Class<? extends AgentSource>> agentSources() {
+		return Collections.singletonMap(PARKING_SEARCH_AGENT_SOURCE, ParkingPopulationAgentSource.class);
 	}
 }

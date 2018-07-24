@@ -7,8 +7,11 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 public class TeleportationPlugin extends AbstractQSimPlugin {
+	public final static String TELEPORATION_ENGINE_NAME = "TeleportationEngine";
+	
 	public TeleportationPlugin(Config config) {
 		super(config);
 	}
@@ -24,7 +27,7 @@ public class TeleportationPlugin extends AbstractQSimPlugin {
 	}
 
 	@Override
-	public Collection<Class<? extends MobsimEngine>> engines() {
-		return Collections.singletonList( DefaultTeleportationEngine.class );
+	public Map<String, Class<? extends MobsimEngine>> engines() {
+		return Collections.singletonMap(TELEPORATION_ENGINE_NAME, DefaultTeleportationEngine.class );
 	}
 }

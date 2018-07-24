@@ -9,8 +9,10 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 public class QNetsimEnginePlugin extends AbstractQSimPlugin {
+	public final static String NETSIM_ENGINE_NAME = "NetsimEngine";
 
 	public QNetsimEnginePlugin(Config config) {
 		super(config);
@@ -28,12 +30,12 @@ public class QNetsimEnginePlugin extends AbstractQSimPlugin {
 	}
 
 	@Override
-	public Collection<Class<? extends DepartureHandler>> departureHandlers() {
-		return Collections.singletonList(VehicularDepartureHandler.class);
+	public Map<String, Class<? extends DepartureHandler>> departureHandlers() {
+		return Collections.singletonMap(NETSIM_ENGINE_NAME, VehicularDepartureHandler.class);
 	}
 
 	@Override
-	public Collection<Class<? extends MobsimEngine>> engines() {
-		return Collections.singletonList(QNetsimEngine.class);
+	public Map<String, Class<? extends MobsimEngine>> engines() {
+		return Collections.singletonMap(NETSIM_ENGINE_NAME, QNetsimEngine.class);
 	}
 }

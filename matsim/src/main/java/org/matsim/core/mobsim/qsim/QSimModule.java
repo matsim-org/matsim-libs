@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsModule;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
@@ -25,6 +26,8 @@ public class QSimModule extends com.google.inject.AbstractModule {
 	
 	@Override
 	protected void configure() {
+		install(new QSimComponentsModule());
+		
 		bind(Mobsim.class).toProvider(QSimProvider.class);
 		if ( config.qsim().isUseLanes() ) { 
 			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ) ;

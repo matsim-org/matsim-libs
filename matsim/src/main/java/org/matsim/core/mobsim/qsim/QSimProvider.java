@@ -22,37 +22,45 @@
 
 package org.matsim.core.mobsim.qsim;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.components.QSimComponents;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-
+import org.matsim.core.config.Config;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Provider;
 
 public class QSimProvider implements Provider<QSim> {
-	private static final Logger log = Logger.getLogger( QSimProvider.class ) ;
-	
+	private static final Logger log = Logger.getLogger(QSimProvider.class);
+
 	private Injector injector;
 	private Collection<AbstractQSimPlugin> plugins;
+	private QSimComponents components;
 
 	@Inject
-    QSimProvider(Injector injector, Collection<AbstractQSimPlugin> plugins) {
-        this.injector = injector;
+	QSimProvider(Injector injector, Collection<AbstractQSimPlugin> plugins, QSimComponents components) {
+		this.injector = injector;
 		this.plugins = plugins;
-    }
+		this.components = components;
+	}
 
-    @Override
-    public QSim get() {
-	    com.google.inject.AbstractModule module = new com.google.inject.AbstractModule() {
+	@Override
+	public QSim get() {
+		com.google.inject.AbstractModule module = new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
 				for (AbstractQSimPlugin plugin : plugins) {
@@ -65,33 +73,37 @@ public class QSimProvider implements Provider<QSim> {
 				bind(Netsim.class).to(QSim.class);
 			}
 		};
-        Injector qSimLocalInjector = injector.createChildInjector(module);
-        org.matsim.core.controler.Injector.printInjector( qSimLocalInjector, log ) ;
-        QSim qSim = qSimLocalInjector.getInstance(QSim.class);
+		Injector qSimLocalInjector = injector.createChildInjector(module);
+		org.matsim.core.controler.Injector.printInjector(qSimLocalInjector, log);
+		QSim qSim = qSimLocalInjector.getInstance(QSim.class);
 //        qSim.setChildInjector( qSimLocalInjector ) ;
-        for (AbstractQSimPlugin plugin : plugins) {
-	  		// add each plugin's mobsim engines:
-			for (Class<? extends MobsimEngine> mobsimEngine : plugin.engines()) {
-				qSim.addMobsimEngine(qSimLocalInjector.getInstance(mobsimEngine));
-			}
-	  		// add each plugin's activity handlers:
-			for (Class<? extends ActivityHandler> activityHandler : plugin.activityHandlers()) {
-				qSim.addActivityHandler(qSimLocalInjector.getInstance(activityHandler));
-			}
-	  		// add each plugin's departure handlers:
-			for (Class<? extends DepartureHandler> mobsimEngine : plugin.departureHandlers()) {
-				qSim.addDepartureHandler(qSimLocalInjector.getInstance(mobsimEngine));
-			}
-	  		// add each plugin's mobsim listeners:
-			for (Class<? extends MobsimListener> mobsimListener : plugin.listeners()) {
-				qSim.addQueueSimulationListeners(qSimLocalInjector.getInstance(mobsimListener));
-			}
-	  		// add each plugin's agent sources:
-			for (Class<? extends AgentSource> agentSource : plugin.agentSources()) {
-				qSim.addAgentSource(qSimLocalInjector.getInstance(agentSource));
-			}
+
+		ComponentRegistry<MobsimEngine> mobsimEngineRegistry = new ComponentRegistry<>("MobsimEngine");
+		ComponentRegistry<ActivityHandler> activityHandlerRegister = new ComponentRegistry<>("ActivityHandler");
+		ComponentRegistry<DepartureHandler> departureHandlerRegistry = new ComponentRegistry<>("DepartureHandler");
+		ComponentRegistry<AgentSource> agentSourceRegistry = new ComponentRegistry<>("AgentSource");
+
+		for (AbstractQSimPlugin plugin : plugins) {
+			plugin.engines().forEach(mobsimEngineRegistry::register);
+			plugin.activityHandlers().forEach(activityHandlerRegister::register);
+			plugin.departureHandlers().forEach(departureHandlerRegistry::register);
+			plugin.agentSources().forEach(agentSourceRegistry::register);
 		}
-        return qSim;
-    }
+		
+		mobsimEngineRegistry.getOrderedComponents(components.activeMobsimEngines).stream()
+				.map(qSimLocalInjector::getInstance).forEach(qSim::addMobsimEngine);
+		activityHandlerRegister.getOrderedComponents(components.activeActivityHandlers).stream()
+				.map(qSimLocalInjector::getInstance).forEach(qSim::addActivityHandler);
+		departureHandlerRegistry.getOrderedComponents(components.activeDepartureHandlers).stream()
+				.map(qSimLocalInjector::getInstance).forEach(qSim::addDepartureHandler);
+		agentSourceRegistry.getOrderedComponents(components.activeAgentSources).stream()
+				.map(qSimLocalInjector::getInstance).forEach(qSim::addAgentSource);
+
+		for (AbstractQSimPlugin plugin : plugins) {
+			plugin.listeners().stream().map(qSimLocalInjector::getInstance).forEach(qSim::addQueueSimulationListeners);
+		}
+
+		return qSim;
+	}
 
 }
