@@ -44,6 +44,7 @@ public class DvrpConfigConsistencyChecker implements ConfigConsistencyChecker {
 			log.warn(" 'QSim.insertingWaitingVehiclesBeforeDrivingVehicles' should be true in order to get"
 					+ " more precise travel time estimates. See comments in DvrpConfigConsistencyChecker");
 		}
+		
 		if (config.qsim().isRemoveStuckVehicles()) {
 			throw new RuntimeException("Stuck DynAgents cannot be removed from simulation");
 		}

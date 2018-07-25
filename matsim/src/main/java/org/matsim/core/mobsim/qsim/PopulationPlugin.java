@@ -2,6 +2,7 @@ package org.matsim.core.mobsim.qsim;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -13,6 +14,7 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import com.google.inject.Module;
 
 public class PopulationPlugin extends AbstractQSimPlugin {
+	public final static String POPULATION_SOURCE_NAME = "PopulationAgentSource";
 
 	public PopulationPlugin(Config config) {
 		super(config);
@@ -34,7 +36,7 @@ public class PopulationPlugin extends AbstractQSimPlugin {
 	}
 
 	@Override
-	public Collection<Class<? extends AgentSource>> agentSources() {
-		return Collections.singletonList(PopulationAgentSource.class);
+	public Map<String, Class<? extends AgentSource>> agentSources() {
+		return Collections.singletonMap(POPULATION_SOURCE_NAME, PopulationAgentSource.class);
 	}
 }

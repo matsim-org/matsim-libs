@@ -2,6 +2,7 @@ package org.matsim.contrib.dvrp.passenger;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -20,6 +21,8 @@ import com.google.inject.Module;
 import com.google.inject.name.Named;
 
 public class PassengerEnginePlugin extends AbstractQSimPlugin {
+	public final static String PASSENGER_ENGINE_NAME = "PassengerEngine";
+	
 	private final String mode;
 
 	public PassengerEnginePlugin(Config config, String mode) {
@@ -38,13 +41,13 @@ public class PassengerEnginePlugin extends AbstractQSimPlugin {
 	}
 
 	@Override
-	public Collection<Class<? extends DepartureHandler>> departureHandlers() {
-		return Collections.singletonList(PassengerEngine.class);
+	public Map<String, Class<? extends DepartureHandler>> departureHandlers() {
+		return Collections.singletonMap(PASSENGER_ENGINE_NAME, PassengerEngine.class);
 	}
 
 	@Override
-	public Collection<Class<? extends MobsimEngine>> engines() {
-		return Collections.singletonList(PassengerEngine.class);
+	public Map<String, Class<? extends MobsimEngine>> engines() {
+		return Collections.singletonMap(PASSENGER_ENGINE_NAME, PassengerEngine.class);
 	}
 
 	public static class PassengerEngineProvider implements Provider<PassengerEngine> {

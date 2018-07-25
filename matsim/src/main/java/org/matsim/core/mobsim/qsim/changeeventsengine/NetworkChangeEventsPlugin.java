@@ -8,8 +8,10 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 public class NetworkChangeEventsPlugin extends AbstractQSimPlugin {
+	public final static String NETWORK_CHANGE_EVENTS_ENGINE = "NetworkChangeEventsEngine";
 
 	public NetworkChangeEventsPlugin(Config config) {
 		super(config);
@@ -26,7 +28,7 @@ public class NetworkChangeEventsPlugin extends AbstractQSimPlugin {
 	}
 
 	@Override
-	public Collection<Class<? extends MobsimEngine>> engines() {
-		return Collections.singletonList(NewNetworkChangeEventsEngine.class);
+	public Map<String, Class<? extends MobsimEngine>> engines() {
+		return Collections.singletonMap(NETWORK_CHANGE_EVENTS_ENGINE, NewNetworkChangeEventsEngine.class);
 	}
 }

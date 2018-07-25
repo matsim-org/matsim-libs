@@ -54,7 +54,7 @@ public class QSimUtils {
 //		}
 //		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(), module );
 //		return (QSim) injector.getInstance(Mobsim.class);
-		return createQSim( scenario, eventsManager, overrides, Collections.emptyList() ) ;
+		return createQSim( scenario, eventsManager, overrides, null ) ;
 	}
 
 	public static QSim createQSim(final Scenario scenario, final EventsManager eventsManager, final Collection<AbstractQSimPlugin> plugins) {
@@ -77,24 +77,26 @@ public class QSimUtils {
 								   final List<AbstractModule> overrides, final Collection<AbstractQSimPlugin> plugins ) {
 		// First, load standard QSim module
 		AbstractModule module = new StandaloneQSimModule(scenario, eventsManager);
-		
+	
 		// Add all overrides
 		for (AbstractModule override : overrides ) {
 			module = org.matsim.core.controler.AbstractModule.override(Collections.singleton(module), override) ;
 		}
 		
 		// Overide plugins
-		final AbstractModule override = AbstractModule.override(Collections.singleton(module),
-				new AbstractModule() {
-					@Override
-					public void install() {
-						bind(new TypeLiteral<Collection<AbstractQSimPlugin>>() {
-						}).toInstance(plugins);
-					}
-				});
+		if (plugins != null) {
+			module = AbstractModule.override(Collections.singleton(module),
+					new AbstractModule() {
+						@Override
+						public void install() {
+							bind(new TypeLiteral<Collection<AbstractQSimPlugin>>() {
+							}).toInstance(plugins);
+						}
+					});
+		}
 		
 		// Build QSim
-		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(), override);
+		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(), module);
 		return (QSim) injector.getInstance(Mobsim.class);
 	}
 
