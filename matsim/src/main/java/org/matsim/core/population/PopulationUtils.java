@@ -509,6 +509,10 @@ public final class PopulationUtils {
 			Leg leg2 = it2.next() ;
 			if ( leg1.getMode().equals( leg2.getMode() ) ) {
 				simil += sameModeReward ;
+			} else {
+				continue ;
+				// don't look for route overlap if different mode.  Makes sense for totally different modes,
+				// but maybe not so obvious for similar modes such as "car" and "ride".  kai, jul'18
 			}
 			// the easy way for the route is to not go along the links but just check for overlap.
 			Route route1 = leg1.getRoute() ;
@@ -530,7 +534,7 @@ public final class PopulationUtils {
 				simil += sameModeReward ;
 				continue ; // next leg
 			}
-			simil += sameRouteReward * (RouteUtils.calculateCoverage(nr1, nr2, network) + RouteUtils.calculateCoverage(nr2, nr1, network) ) / 2 ;
+			simil += sameRouteReward * ( RouteUtils.calculateCoverage(nr1, nr2, network) + RouteUtils.calculateCoverage(nr2, nr1, network) ) / 2 ;
 		}
 		return simil ;
 	}
