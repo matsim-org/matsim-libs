@@ -242,50 +242,35 @@ public class AgentNotificationTest {
 	@Test
 	public void testAgentNotification() {
 		Scenario scenario = createSimpleScenario();
-		final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
-		plugins.add(new MessageQueuePlugin(scenario.getConfig()));
-		plugins.add(new ActivityEnginePlugin(scenario.getConfig()));
-		plugins.add(new TeleportationPlugin(scenario.getConfig()));
-		plugins.add(new AbstractQSimPlugin(scenario.getConfig()) {
-			@Override
-			public Collection<? extends AbstractModule> modules() {
-				return Collections.singletonList(new AbstractModule() {
-					@Override
-					public void configure() {
-						bind(PopulationAgentSource.class).asEagerSingleton();
-						bind(AgentFactory.class).to(MyAgentFactory.class).asEagerSingleton();
-					}
-				});
-			}
-
-			@Override
-			public Map<String, Class<? extends AgentSource>> agentSources() {
-				return Collections.singletonMap(PopulationPlugin.POPULATION_SOURCE_NAME, PopulationAgentSource.class);
-			}
-		});
-		
-		List<org.matsim.core.controler.AbstractModule> modules = new ArrayList<>();
-		modules.add(new org.matsim.core.controler.AbstractModule() {
-			@Override
-			public void install() {}
-			
-			@Provides @Singleton
-			public QSimComponents provideQSimComponents(Config config) {
-				QSimComponents components = new QSimComponents();
-				new StandardQSimComponentsConfigurator(config).configure(components);
-				components.activeMobsimEngines.remove("NetsimEngine");
-				components.activeDepartureHandlers.remove("NetsimEngine");
-				return components;
-			}
-		});
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsCollector handler = new EventsCollector();
 		eventsManager.addHandler(handler);
 		
-		QSim qSim = QSimUtils.createQSim(scenario, eventsManager, modules, plugins);
-
-		qSim.run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.configurePlugins(plugins -> {
+				plugins.removeIf(PopulationPlugin.class::isInstance);
+			}) //
+			.addPlugin(new PopulationPlugin(scenario.getConfig()) {
+				@Override
+				public Collection<? extends AbstractModule> modules() {
+					return Collections.singletonList(new AbstractModule() {
+						@Override
+						public void configure() {
+							bind(PopulationAgentSource.class).asEagerSingleton();
+							bind(AgentFactory.class).to(MyAgentFactory.class).asEagerSingleton();
+						}
+					});
+				}
+			}) //
+			.configureComponents(components -> {
+				components.activeMobsimEngines.remove("NetsimEngine");
+				components.activeDepartureHandlers.remove("NetsimEngine");
+			}) //
+			.build(scenario, eventsManager) //
+			.run();
+		
 		// yyyyyy I can comment out the above line and the test still passes (will say: "skipped"). ?????? kai, feb'16
 		
 		assumeThat(handler.getEvents(), hasItem(
