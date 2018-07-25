@@ -27,6 +27,8 @@ import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
+import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -159,5 +161,4 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 			log.warn("Your are using Transit but have not provided a transit vehicles file. This most likely won't work.");
 		}
 	}
-
 }

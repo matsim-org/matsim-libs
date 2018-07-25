@@ -10,6 +10,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 public abstract class AbstractQSimPlugin {
 
@@ -26,20 +27,20 @@ public abstract class AbstractQSimPlugin {
 	public Collection<? extends Module> modules() {
 		return Collections.emptyList();
 	}
-	public Collection<Class<? extends MobsimEngine>> engines() {
-		return Collections.emptyList();
+	public Map<String, Class<? extends MobsimEngine>> engines() {
+		return Collections.emptyMap();
 	}
 	public Collection<Class<? extends MobsimListener>> listeners() {
 		return Collections.emptyList();
 	}
-	public Collection<Class<? extends AgentSource>> agentSources() {
-		return Collections.emptyList();
+	public Map<String, Class<? extends AgentSource>> agentSources() {
+		return Collections.emptyMap();
 	}
-	public Collection<Class<? extends DepartureHandler>> departureHandlers() {
-		return Collections.emptyList();
+	public Map<String, Class<? extends DepartureHandler>> departureHandlers() {
+		return Collections.emptyMap();
 	}
-	public Collection<Class<? extends ActivityHandler>> activityHandlers() {
-		return Collections.emptyList();
+	public Map<String, Class<? extends ActivityHandler>> activityHandlers() {
+		return Collections.emptyMap();
 	}
 
 }

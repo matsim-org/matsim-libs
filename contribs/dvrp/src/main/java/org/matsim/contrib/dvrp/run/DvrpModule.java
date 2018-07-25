@@ -32,9 +32,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
+import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
 import com.google.inject.Module;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 
@@ -47,6 +51,15 @@ public final class DvrpModule extends AbstractModule {
 
 	public DvrpModule(DvrpQSimPluginsProviderFactory qSimPluginProviderFactory) {
 		this.qSimPluginProviderFactory = qSimPluginProviderFactory;
+	}
+
+	@Provides
+	@Singleton
+	public QSimComponents provideQSimComponents(Config config) {
+		QSimComponents components = new QSimComponents();
+		new StandardQSimComponentsConfigurator(config).configure(components);
+		new DvrpQSimComponentsConfigurator().configure(components);
+		return components;
 	}
 
 	@Override
@@ -63,7 +76,7 @@ public final class DvrpModule extends AbstractModule {
 		bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))
 				.toProvider(DvrpRoutingNetworkProvider.class).asEagerSingleton();
 
-		bind(new TypeLiteral<Collection<AbstractQSimPlugin>>() {})
-				.toProvider(qSimPluginProviderFactory.create(getConfig()));
+		bind(new TypeLiteral<Collection<AbstractQSimPlugin>>() {
+		}).toProvider(qSimPluginProviderFactory.create(getConfig()));
 	}
 }
