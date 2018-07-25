@@ -71,6 +71,7 @@ public class QSimComponentsTest {
 		MockEngine mockEngine = new MockEngine();
 
 		new QSimBuilder(config) //
+				.useDefaults() //
 				.addPlugin(new AbstractQSimPlugin(config) {
 					public Collection<? extends Module> modules() {
 						return Collections.singleton(new AbstractModule() {
