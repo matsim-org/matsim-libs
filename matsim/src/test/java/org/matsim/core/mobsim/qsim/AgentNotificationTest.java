@@ -248,11 +248,11 @@ public class AgentNotificationTest {
 		eventsManager.addHandler(handler);
 		
 		new QSimBuilder(scenario.getConfig()) //
-			.addQSimPlugin(new MessageQueuePlugin(scenario.getConfig())) //
-			.addQSimPlugin(new ActivityEnginePlugin(scenario.getConfig())) //
-			.addQSimPlugin(new TeleportationPlugin(scenario.getConfig())) //
-			.addQSimPlugin(new MessageQueuePlugin(scenario.getConfig())) //
-			.addQSimPlugin(new PopulationPlugin(scenario.getConfig()) {
+			.addPlugin(new MessageQueuePlugin(scenario.getConfig())) //
+			.addPlugin(new ActivityEnginePlugin(scenario.getConfig())) //
+			.addPlugin(new TeleportationPlugin(scenario.getConfig())) //
+			.addPlugin(new MessageQueuePlugin(scenario.getConfig())) //
+			.addPlugin(new PopulationPlugin(scenario.getConfig()) {
 				@Override
 				public Collection<? extends AbstractModule> modules() {
 					return Collections.singletonList(new AbstractModule() {

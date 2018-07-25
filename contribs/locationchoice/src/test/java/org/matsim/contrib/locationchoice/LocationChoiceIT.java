@@ -20,6 +20,10 @@
 
 package org.matsim.contrib.locationchoice;
 
+import java.util.Random;
+
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -50,7 +54,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategy;
@@ -72,9 +76,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
-import javax.inject.Provider;
-import java.util.Random;
 
 public class LocationChoiceIT extends MatsimTestCase {
 
@@ -412,7 +413,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 	class FactoryForMobsimWithOTFVis implements MobsimFactory {
 		@Override
 		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-			QSim qSim = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
+			QSim qSim = new QSimBuilder(sc.getConfig()).addDefaultPlugins().build(sc, eventsManager);
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
 			OTFClientLive.run(sc.getConfig(), server);
 			return qSim ;

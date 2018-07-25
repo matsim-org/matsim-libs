@@ -28,18 +28,20 @@
 
 package org.matsim.contrib.freight.mobsim;
 
-import com.google.inject.Provider;
+import java.util.Collection;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.CarrierConfig;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 
-import javax.inject.Inject;
-import java.util.Collection;
+import com.google.inject.Provider;
 
 
 public class FreightQSimFactory implements Provider<Mobsim> {
@@ -64,7 +66,7 @@ public class FreightQSimFactory implements Provider<Mobsim> {
 			throw new NullPointerException(
 					"There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
-		final QSim sim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		final QSim sim = new QSimBuilder(scenario.getConfig()).addDefaultPlugins().build(scenario, eventsManager);
 		Collection<MobSimVehicleRoute> vRoutes = carrierAgentTracker.createPlans();
 		FreightAgentSource agentSource = new FreightAgentSource(vRoutes, new DefaultAgentFactory(sim), sim);
 		sim.addAgentSource(agentSource);

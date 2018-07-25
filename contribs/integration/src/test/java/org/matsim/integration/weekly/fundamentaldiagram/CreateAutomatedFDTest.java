@@ -20,7 +20,17 @@ package org.matsim.integration.weekly.fundamentaldiagram;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -52,19 +62,15 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -228,16 +234,13 @@ public class CreateAutomatedFDTest {
 			globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator(mode2FlowData);
 			events.addHandler(globalFlowDynamicsUpdator);
 			
-			List<AbstractModule> modules = Collections.singletonList(new AbstractModule() {
-				@Override
-				public void install() {
-					QSimComponents components = new QSimComponents();
-					new StandardQSimComponentsConfigurator(config).configure(components);
-					components.activeAgentSources.clear();
-				}
-			});
-
-			final QSim qSim = QSimUtils.createDefaultQSimWithOverrides(scenario, events, modules);
+			final QSim qSim = new QSimBuilder(config) //
+					.addDefaultPlugins()
+					.configureComponents(components -> {
+						new StandardQSimComponentsConfigurator(config).configure(components);
+						components.activeAgentSources.clear();
+					})
+					.build(scenario, events);
 
 			final Map<String, VehicleType> travelModesTypes = new HashMap<>();
 

@@ -30,7 +30,7 @@ public class QSimComponentsTest {
 		MockEngine mockEngine = new MockEngine();
 
 		new QSimBuilder(config) //
-				.addQSimPlugin(new AbstractQSimPlugin(config) {
+				.addPlugin(new AbstractQSimPlugin(config) {
 					public Collection<? extends Module> modules() {
 						return Collections.singleton(new AbstractModule() {
 							@Override
@@ -71,7 +71,7 @@ public class QSimComponentsTest {
 		MockEngine mockEngine = new MockEngine();
 
 		new QSimBuilder(config) //
-				.addQSimPlugin(new AbstractQSimPlugin(config) {
+				.addPlugin(new AbstractQSimPlugin(config) {
 					public Collection<? extends Module> modules() {
 						return Collections.singleton(new AbstractModule() {
 							@Override

@@ -42,13 +42,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
@@ -146,8 +140,10 @@ public class GroupCompositionPenalizerTest {
 		eventsToScore.beginIteration( 1 );
 		events.initProcessing();
 
-		final QSim qsim = QSimUtils.createDefaultQSim(sc, events);
-		qsim.run();
+		new QSimBuilder(sc.getConfig()) //
+				.addDefaultPlugins()
+				.build(sc, events)
+				.run();
 
 		eventsToScore.finish();
 		events.finishProcessing();

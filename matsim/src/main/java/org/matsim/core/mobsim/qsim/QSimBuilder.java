@@ -61,8 +61,13 @@ public class QSimBuilder {
 		configurator.accept(components.get());
 		return this;
 	}
+	
+	public QSimBuilder configurePlugins(Consumer<Collection<AbstractQSimPlugin>> configurator) {
+		configurator.accept(plugins);
+		return this;
+	}
 
-	public QSimBuilder addQSimPlugin(AbstractQSimPlugin plugin) {
+	public QSimBuilder addPlugin(AbstractQSimPlugin plugin) {
 		this.plugins.add(plugin);
 		return this;
 	}

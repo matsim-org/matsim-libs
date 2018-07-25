@@ -32,7 +32,7 @@ import javax.inject.Provider;
 import java.util.Arrays;
 import java.util.Map;
 
-public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
+public class ControlerDefaultsWithMultiModalModule2 extends AbstractModule {
 
     private MultiModalModule delegate = new MultiModalModule();
 

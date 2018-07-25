@@ -19,46 +19,23 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.qsim;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.ActivityEnginePlugin;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.mobsim.qsim.TeleportationPlugin;
-import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
-import org.matsim.core.mobsim.qsim.PopulationPlugin;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
-import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-
-import org.matsim.contrib.socnetsim.qsim.NetsimWrappingQVehicleProvider;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
-import org.matsim.contrib.socnetsim.sharedvehicles.qsim.PopulationAgentSourceWithVehicles;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author thibautd
@@ -102,83 +79,23 @@ public class JointQSimFactory implements MobsimFactory, Provider<QSim> {
 			ms.add( JointActingTypes.DRIVER );
 			conf.setMainModes( ms );
 		}
-
-		/* // default initialisation
-		final QSim qSim = new QSim( sc1 , eventsManager );
-
-		final ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
-		qSim.addMobsimEngine( activityEngine );
-		qSim.addActivityHandler( activityEngine );
-
-        final QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
-		qSim.addMobsimEngine( netsimEngine );
-		// DO NOT ADD DEPARTURE HANDLER: it is done by the joint departure handler
-
-		final JointModesDepartureHandler jointDepHandler = new JointModesDepartureHandler( netsimEngine );
-		qSim.addDepartureHandler( jointDepHandler );
-		qSim.addMobsimEngine( jointDepHandler );
-
-		final DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(sc1, eventsManager);
-		qSim.addMobsimEngine( teleportationEngine );
-
-        if (sc1.getConfig().transit().isUseTransit()) {
-            final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-            qSim.addDepartureHandler(transitEngine);
-            qSim.addAgentSource(transitEngine);
-            qSim.addMobsimEngine(transitEngine);
-        }
-
-		final PassengerUnboardingAgentFactory passAgentFactory =
-					new PassengerUnboardingAgentFactory(
-						sc1.getConfig().transit().isUseTransit() ?
-							new TransitAgentFactory(qSim) :
-							new DefaultAgentFactory(qSim) ,
-						new NetsimWrappingQVehicleProvider(
-							netsimEngine) );
-        final AgentSource agentSource =
-			new PopulationAgentSourceWithVehicles(
-					sc1.getPopulation(),
-					passAgentFactory,
-					qSim);
-		qSim.addMobsimEngine( passAgentFactory );
-        qSim.addAgentSource(agentSource);*/
 		
-		final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
-		plugins.add(new MessageQueuePlugin(config));
-		plugins.add(new ActivityEnginePlugin(config));
-		plugins.add(new QNetsimEnginePlugin(config));
-		if (config.network().isTimeVariantNetwork()) {
-			plugins.add(new NetworkChangeEventsPlugin(config));
-		}
-		if (config.transit().isUseTransit() && config.transit().isUsingTransitInMobsim() ) {
-			plugins.add(new TransitEnginePlugin(config));
-		}
-		plugins.add(new TeleportationPlugin(config));
-		plugins.add(new PopulationPlugin(config));
-		plugins.add(new JointQSimPlugin(config));
-		
-		List<AbstractModule> modules = Collections.singletonList(new AbstractModule() {
-			@Override
-			public void install() {
-				QSimComponents components = new QSimComponents();
-				new StandardQSimComponentsConfigurator(config).configure(components);
-				
-				components.activeDepartureHandlers.clear();
-				components.activeDepartureHandlers.add(JointQSimPlugin.JOINT_MODES_DEPARTURE_HANDLER);
-				
-				components.activeMobsimEngines.add(JointQSimPlugin.JOINT_MODES_DEPARTURE_HANDLER);
-				components.activeMobsimEngines.add(JointQSimPlugin.JOINT_PASSENGER_UNBOARDING);
-				
-				components.activeAgentSources.clear();
-				components.activeAgentSources.add(JointQSimPlugin.AGENTS_SOURCE_WITH_VEHICLES);
-				
-				bind(QSimComponents.class).toInstance(components);
-			}
-		});
-		
-		QSim qSim = QSimUtils.createQSim(sc1, eventsManager, modules, plugins);
-        return qSim;
+		return new QSimBuilder(config) //
+				.addDefaultPlugins() //
+				.addPlugin(new JointQSimPlugin(config)) //
+				.configureComponents(components -> {
+					new StandardQSimComponentsConfigurator(config).configure(components);
+					
+					components.activeDepartureHandlers.clear();
+					components.activeDepartureHandlers.add(JointQSimPlugin.JOINT_MODES_DEPARTURE_HANDLER);
+					
+					components.activeMobsimEngines.add(JointQSimPlugin.JOINT_MODES_DEPARTURE_HANDLER);
+					components.activeMobsimEngines.add(JointQSimPlugin.JOINT_PASSENGER_UNBOARDING);
+					
+					components.activeAgentSources.clear();
+					components.activeAgentSources.add(JointQSimPlugin.AGENTS_SOURCE_WITH_VEHICLES);
+				})
+				.build(sc1, eventsManager);
 	}
 }
 
