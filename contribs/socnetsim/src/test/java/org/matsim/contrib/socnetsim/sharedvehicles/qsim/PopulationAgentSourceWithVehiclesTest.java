@@ -34,23 +34,18 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.socnetsim.sharedvehicles.qsim.PopulationAgentSourceWithVehicles.InconsistentVehiculeSpecificationsException;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.contrib.socnetsim.jointtrips.qsim.JointQSimPlugin;
-import org.matsim.contrib.socnetsim.sharedvehicles.qsim.PopulationAgentSourceWithVehicles.InconsistentVehiculeSpecificationsException;
 
 /**
  * @author thibautd
@@ -103,7 +98,9 @@ public class PopulationAgentSourceWithVehiclesTest {
 		planWithoutVeh.addLeg( legWithoutVeh );
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		QSim qSim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim qSim = new QSimBuilder(scenario.getConfig()) //
+				.addDefaultPlugins()
+				.build(scenario, eventsManager);
 
 		final PopulationAgentSourceWithVehicles testee =
 			new PopulationAgentSourceWithVehicles(
@@ -182,7 +179,9 @@ public class PopulationAgentSourceWithVehiclesTest {
 		planWithoutVeh.addLeg( legWithoutVeh );
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		QSim qSim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim qSim = new QSimBuilder(scenario.getConfig()) //
+				.addDefaultPlugins()
+				.build(scenario, eventsManager);
 		
 		final PopulationAgentSourceWithVehicles testee =
 			new PopulationAgentSourceWithVehicles(

@@ -19,10 +19,6 @@
 
 package org.matsim.contrib.wagonSim.mobsim.qsim;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -34,18 +30,10 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
@@ -93,17 +81,16 @@ public class WagonSimQSimFactory implements MobsimFactory {
 				scenario.getPopulation().getPersonAttributes(),
 				vehicleLinkSpeedAttributes);
 		
-		List<AbstractModule> modules = Collections.singletonList(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(QNetworkFactory.class).toInstance(networkFactory);
-				bind(TransitStopHandlerFactory.class).toInstance(stopHandlerFactory);
-			}
-		});
-
-		QSim qSim = QSimUtils.createDefaultQSimWithOverrides(scenario, eventsManager, modules);
-
-		return qSim;
+		return new QSimBuilder(scenario.getConfig()) //
+				.addDefaultPlugins() //
+				.addOverridingModule(new AbstractModule() {
+					@Override
+					public void install() {
+						bind(QNetworkFactory.class).toInstance(networkFactory);
+						bind(TransitStopHandlerFactory.class).toInstance(stopHandlerFactory);
+					}
+				}) //
+				.build(scenario, eventsManager);
 	}
 	
 	static class LocomotiveLinkSpeedCalculator implements LinkSpeedCalculator {
