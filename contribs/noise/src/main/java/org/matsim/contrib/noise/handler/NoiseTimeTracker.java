@@ -659,19 +659,23 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 					
 					if (amount != 0.) {
 						
-						NoiseEventCaused noiseEvent = new NoiseEventCaused(
+						if (this.noiseContext.getNotConsideredTransitVehicleIDs().contains(vehicleId)) {
+							// skip
+						} else {
+							NoiseEventCaused noiseEvent = new NoiseEventCaused(
 									eventTime, 
 									currentTimeBinEndTime, 
 									this.noiseContext.getLinkId2vehicleId2lastEnterTime().get(linkId).get(vehicleId), 
 									this.noiseContext.getVehicleId2PersonId().get(vehicleId), 
 									vehicleId, amount, linkId);
-						events.processEvent(noiseEvent);
+							events.processEvent(noiseEvent);
 						
-						if (this.collectNoiseEvents) {
-							this.noiseEventsCaused.add(noiseEvent);
+							if (this.collectNoiseEvents) {
+								this.noiseEventsCaused.add(noiseEvent);
+							}
+						
+							totalCausedNoiseCost = totalCausedNoiseCost + amount;
 						}
-						
-						totalCausedNoiseCost = totalCausedNoiseCost + amount;
 					}
 				}
 			}
@@ -904,7 +908,7 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 
 	public void computeFinalTimeIntervals() {
 		
-		while (this.noiseContext.getCurrentTimeBinEndTime() <= 30 * 3600.) {
+		while (this.noiseContext.getCurrentTimeBinEndTime() <= this.noiseContext.getScenario().getConfig().qsim().getEndTime()) {
 			processTimeBin();			
 		}
 	}
