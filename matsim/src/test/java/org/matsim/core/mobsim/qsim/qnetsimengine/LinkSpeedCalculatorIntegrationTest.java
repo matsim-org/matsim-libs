@@ -76,7 +76,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 		new QSimBuilder(f.scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(f.scenario, f.events) //
 			.run();
 		

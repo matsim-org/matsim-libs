@@ -152,7 +152,7 @@ public class SeepageTest {
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 
 		new QSimBuilder(sc.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(sc, manager) //
 				.run();
 

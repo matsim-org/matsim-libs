@@ -102,7 +102,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(scenario, events) //
 			.run();
 
@@ -169,7 +169,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		events.addHandler(ttcalc);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(scenario, events) //
 			.run();
 		/*
@@ -258,7 +258,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(scenario, events) //
 			.run();
 	}

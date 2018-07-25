@@ -413,7 +413,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 	class FactoryForMobsimWithOTFVis implements MobsimFactory {
 		@Override
 		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-			QSim qSim = new QSimBuilder(sc.getConfig()).addDefaultPlugins().build(sc, eventsManager);
+			QSim qSim = new QSimBuilder(sc.getConfig()).useDefaults().build(sc, eventsManager);
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
 			OTFClientLive.run(sc.getConfig(), server);
 			return qSim ;

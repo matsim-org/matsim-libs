@@ -81,11 +81,9 @@ public class JointQSimFactory implements MobsimFactory, Provider<QSim> {
 		}
 		
 		return new QSimBuilder(config) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.addPlugin(new JointQSimPlugin(config)) //
 				.configureComponents(components -> {
-					new StandardQSimComponentsConfigurator(config).configure(components);
-					
 					components.activeDepartureHandlers.clear();
 					components.activeDepartureHandlers.add(JointQSimPlugin.JOINT_MODES_DEPARTURE_HANDLER);
 					

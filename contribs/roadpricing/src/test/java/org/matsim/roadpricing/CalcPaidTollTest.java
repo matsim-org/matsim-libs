@@ -209,7 +209,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(scenario, events)
 			.run();
 

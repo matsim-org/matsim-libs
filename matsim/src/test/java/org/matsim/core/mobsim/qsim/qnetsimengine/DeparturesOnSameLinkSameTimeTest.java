@@ -120,7 +120,7 @@ public class DeparturesOnSameLinkSameTimeTest {
 
 		PrepareForSimUtils.createDefaultPrepareForSim(inputs.scenario).run();
 		new QSimBuilder(inputs.scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(inputs.scenario, events) //
 			.run();
 

@@ -164,7 +164,7 @@ public class OTFVis {
 		EventsManager events = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim qSim = new QSimBuilder(scenario.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(scenario, events);
 
 		OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(),scenario, events, qSim);

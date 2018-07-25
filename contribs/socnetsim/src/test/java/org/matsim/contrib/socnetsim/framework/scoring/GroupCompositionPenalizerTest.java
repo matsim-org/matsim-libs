@@ -141,7 +141,7 @@ public class GroupCompositionPenalizerTest {
 		events.initProcessing();
 
 		new QSimBuilder(sc.getConfig()) //
-				.addDefaultPlugins()
+				.useDefaults()
 				.build(sc, events)
 				.run();
 

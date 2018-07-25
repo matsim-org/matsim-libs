@@ -113,7 +113,7 @@ public class OccupancyAnalyzerTest {
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 		new QSimBuilder(f.scenario.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(f.scenario, eventsManager) //
 				.run();
 

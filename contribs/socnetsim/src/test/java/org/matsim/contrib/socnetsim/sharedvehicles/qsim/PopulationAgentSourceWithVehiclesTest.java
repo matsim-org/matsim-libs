@@ -99,7 +99,7 @@ public class PopulationAgentSourceWithVehiclesTest {
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		QSim qSim = new QSimBuilder(scenario.getConfig()) //
-				.addDefaultPlugins()
+				.useDefaults()
 				.build(scenario, eventsManager);
 
 		final PopulationAgentSourceWithVehicles testee =
@@ -180,7 +180,7 @@ public class PopulationAgentSourceWithVehiclesTest {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		QSim qSim = new QSimBuilder(scenario.getConfig()) //
-				.addDefaultPlugins()
+				.useDefaults()
 				.build(scenario, eventsManager);
 		
 		final PopulationAgentSourceWithVehicles testee =

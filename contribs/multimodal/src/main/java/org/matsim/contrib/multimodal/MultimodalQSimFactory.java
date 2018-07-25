@@ -50,10 +50,9 @@ public class MultimodalQSimFactory implements Provider<Mobsim> {
 	@Override
 	public Mobsim get() {
 		return new QSimBuilder(scenario.getConfig()) //
-				.addDefaultPlugins()
+				.useDefaults()
 				.addPlugin(new MultiModalQSimPlugin(scenario.getConfig(), multiModalTravelTimes))
 				.configureComponents(components -> {
-					new StandardQSimComponentsConfigurator(scenario.getConfig()).configure(components);
 					components.activeMobsimEngines.add(MultiModalQSimPlugin.MULTIMODAL_ENGINE);
 					components.activeDepartureHandlers.add(MultiModalQSimPlugin.MULTIMODAL_DEPARTURE_HANDLER);
 				}) //

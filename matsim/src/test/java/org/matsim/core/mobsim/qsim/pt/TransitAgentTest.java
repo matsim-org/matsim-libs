@@ -99,7 +99,7 @@ public class TransitAgentTest extends TestCase {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim sim = new QSimBuilder(scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(scenario, eventsManager);
 		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
 		sim.insertAgentIntoMobsim(agent);
@@ -145,7 +145,7 @@ public class TransitAgentTest extends TestCase {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim sim = new QSimBuilder(scenario.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(scenario, eventsManager);
 		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
 		sim.insertAgentIntoMobsim(agent);

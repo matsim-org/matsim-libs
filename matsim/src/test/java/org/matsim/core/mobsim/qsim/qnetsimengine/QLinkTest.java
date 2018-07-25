@@ -327,7 +327,7 @@ public final class QLinkTest extends MatsimTestCase {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim qsim = new QSimBuilder(scenario.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(scenario, eventsManager);
 		NetsimNetwork queueNetwork = qsim.getNetsimNetwork();
 		dummify((QNetwork) queueNetwork);
@@ -569,7 +569,7 @@ public final class QLinkTest extends MatsimTestCase {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim sim = new QSimBuilder(scenario.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(scenario, eventsManager);
 
 		EventsCollector collector = new EventsCollector();
@@ -623,7 +623,7 @@ public final class QLinkTest extends MatsimTestCase {
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 			sim = new QSimBuilder(scenario.getConfig()) //
-					.addDefaultPlugins() //
+					.useDefaults() //
 					.build(scenario, eventsManager);
 			this.queueNetwork = (QNetwork) sim.getNetsimNetwork();
 

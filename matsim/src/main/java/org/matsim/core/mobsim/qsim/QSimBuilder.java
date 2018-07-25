@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.matsim.api.core.v01.Scenario;
@@ -12,11 +11,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
 import org.matsim.core.mobsim.qsim.components.QSimComponents;
-import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
-import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
+import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 import com.google.inject.Injector;
@@ -27,14 +23,15 @@ public class QSimBuilder {
 
 	private final List<AbstractModule> overridingModules = new LinkedList<>();
 	private final Collection<AbstractQSimPlugin> plugins = new LinkedList<>();
-	private Optional<QSimComponents> components = Optional.empty();
+	private final QSimComponents components = new QSimComponents();
 
 	public QSimBuilder(Config config) {
 		this.config = config;
 	}
 
-	public QSimBuilder addDefaultPlugins() {
-		plugins.addAll(QSimModule.getDefaultQSimPlugins(config));
+	public QSimBuilder useDefaults() {
+		useDefaultComponents();
+		useDefaultPlugins();
 		return this;
 	}
 
@@ -48,20 +45,28 @@ public class QSimBuilder {
 		return this;
 	}
 
-	public QSimBuilder setComponents(QSimComponents components) {
-		this.components = Optional.of(components);
+	public QSimBuilder useDefaultComponents() {
+		components.activeActivityHandlers.clear();
+		components.activeAgentSources.clear();
+		components.activeDepartureHandlers.clear();
+		components.activeMobsimEngines.clear();
+
+		new StandardQSimComponentsConfigurator(config).configure(components);
+
 		return this;
 	}
 
 	public QSimBuilder configureComponents(Consumer<QSimComponents> configurator) {
-		if (!components.isPresent()) {
-			components = Optional.of(new QSimComponents());
-		}
-
-		configurator.accept(components.get());
+		configurator.accept(components);
 		return this;
 	}
-	
+
+	public QSimBuilder useDefaultPlugins() {
+		plugins.clear();
+		plugins.addAll(QSimModule.getDefaultQSimPlugins(config));
+		return this;
+	}
+
 	public QSimBuilder configurePlugins(Consumer<Collection<AbstractQSimPlugin>> configurator) {
 		configurator.accept(plugins);
 		return this;
@@ -69,11 +74,6 @@ public class QSimBuilder {
 
 	public QSimBuilder addPlugin(AbstractQSimPlugin plugin) {
 		this.plugins.add(plugin);
-		return this;
-	}
-
-	public QSimBuilder addQSimPlugins(Collection<AbstractQSimPlugin> plugins) {
-		this.plugins.addAll(plugins);
 		return this;
 	}
 
@@ -96,14 +96,12 @@ public class QSimBuilder {
 		});
 
 		// Override components
-		if (components.isPresent()) {
-			module = AbstractModule.override(Collections.singleton(module), new AbstractModule() {
-				@Override
-				public void install() {
-					bind(QSimComponents.class).toInstance(components.get());
-				}
-			});
-		}
+		module = AbstractModule.override(Collections.singleton(module), new AbstractModule() {
+			@Override
+			public void install() {
+				bind(QSimComponents.class).toInstance(components);
+			}
+		});
 
 		// Build QSim
 		Injector injector = org.matsim.core.controler.Injector.createInjector(config, module);

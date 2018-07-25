@@ -212,7 +212,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		events.addHandler(simulatedCapacity);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(scenario, events) //
 			.run();
 		
@@ -241,7 +241,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(scenario, events) //
 			.run();
 				
@@ -271,7 +271,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		events.addHandler(simulatedCapacity);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(scenario, events) //
 			.run();
 		
@@ -303,7 +303,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		events.addHandler(simulatedCapacity);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(scenario, events) //
 			.run();
 		

@@ -117,7 +117,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim tqsim = new QSimBuilder(scenario.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(scenario, eventsManager);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
@@ -184,7 +184,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim tqsim = new QSimBuilder(scenario.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(scenario, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -215,7 +215,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim tqsim = new QSimBuilder(scenario.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(scenario, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -263,7 +263,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		QSim tqsim = new QSimBuilder(sc.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -339,7 +339,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		QSim tqsim = new QSimBuilder(sc.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine) ;
@@ -404,7 +404,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		QSim tqsim = new QSimBuilder(sc.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine) ;
@@ -447,7 +447,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		QSim tqsim = new QSimBuilder(sc.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
@@ -501,7 +501,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		QSim tqsim = new QSimBuilder(sc.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -554,7 +554,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		QSim tqsim = new QSimBuilder(sc.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);

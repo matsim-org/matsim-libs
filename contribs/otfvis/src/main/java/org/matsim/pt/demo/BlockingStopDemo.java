@@ -291,7 +291,7 @@ public class BlockingStopDemo {
 		events.addHandler(ttc);
 
 		final QSim sim = new QSimBuilder(scenario.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {

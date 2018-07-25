@@ -112,7 +112,7 @@ public class QSimTest {
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 
 		return new QSimBuilder(scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(scenario, events);
 	}
 
@@ -121,7 +121,7 @@ public class QSimTest {
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 
 		return new QSimBuilder(f.scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(f.scenario, events);
 	}
 

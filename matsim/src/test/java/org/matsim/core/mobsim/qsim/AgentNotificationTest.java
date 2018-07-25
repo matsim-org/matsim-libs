@@ -248,10 +248,10 @@ public class AgentNotificationTest {
 		eventsManager.addHandler(handler);
 		
 		new QSimBuilder(scenario.getConfig()) //
-			.addPlugin(new MessageQueuePlugin(scenario.getConfig())) //
-			.addPlugin(new ActivityEnginePlugin(scenario.getConfig())) //
-			.addPlugin(new TeleportationPlugin(scenario.getConfig())) //
-			.addPlugin(new MessageQueuePlugin(scenario.getConfig())) //
+			.useDefaults() //
+			.configurePlugins(plugins -> {
+				plugins.removeIf(PopulationPlugin.class::isInstance);
+			}) //
 			.addPlugin(new PopulationPlugin(scenario.getConfig()) {
 				@Override
 				public Collection<? extends AbstractModule> modules() {
@@ -265,7 +265,6 @@ public class AgentNotificationTest {
 				}
 			}) //
 			.configureComponents(components -> {
-				new StandardQSimComponentsConfigurator(scenario.getConfig()).configure(components);
 				components.activeMobsimEngines.remove("NetsimEngine");
 				components.activeDepartureHandlers.remove("NetsimEngine");
 			}) //

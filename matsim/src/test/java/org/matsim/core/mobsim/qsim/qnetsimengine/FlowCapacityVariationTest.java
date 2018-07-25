@@ -94,7 +94,7 @@ public class FlowCapacityVariationTest {
 
 		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario).run();
 		new QSimBuilder(net.scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(net.scenario, manager) //
 			.run();
 

@@ -82,7 +82,7 @@ public class WagonSimQSimFactory implements MobsimFactory {
 				vehicleLinkSpeedAttributes);
 		
 		return new QSimBuilder(scenario.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {

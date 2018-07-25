@@ -72,7 +72,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim qSim = new QSimBuilder(scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(scenario, events);
 
 		log.info("START testOnePercent10s SIM");
@@ -115,7 +115,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim qSim = new QSimBuilder(scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(scenario, eventsManager);
 		
 		log.info("START testOnePercent10s SIM");

@@ -341,7 +341,7 @@ public class TwoLinesDemo {
 		events.addHandler(analysis2);
 
 		QSim sim = new QSimBuilder(scenario.getConfig()) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.build(scenario, events);
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);

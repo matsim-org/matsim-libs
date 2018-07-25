@@ -235,9 +235,8 @@ public class CreateAutomatedFDTest {
 			events.addHandler(globalFlowDynamicsUpdator);
 			
 			final QSim qSim = new QSimBuilder(config) //
-					.addDefaultPlugins()
+					.useDefaults()
 					.configureComponents(components -> {
-						new StandardQSimComponentsConfigurator(config).configure(components);
 						components.activeAgentSources.clear();
 					})
 					.build(scenario, events);

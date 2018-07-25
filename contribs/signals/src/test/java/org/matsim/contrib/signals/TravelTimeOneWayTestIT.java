@@ -129,7 +129,7 @@ public class TravelTimeOneWayTestIT {
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(scenario, events)
 			.run();
 		MeasurementPoint resultsWoSignals = eventHandler.beginningOfLink2;

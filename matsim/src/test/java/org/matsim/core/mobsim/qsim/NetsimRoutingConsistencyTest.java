@@ -166,7 +166,7 @@ public class NetsimRoutingConsistencyTest {
 			eventsManager.addHandler(listener);
 
 			new QSimBuilder(scenario.getConfig()) //
-					.addDefaultPlugins() //
+					.useDefaults() //
 					.build(scenario, eventsManager) //
 					.run();
 

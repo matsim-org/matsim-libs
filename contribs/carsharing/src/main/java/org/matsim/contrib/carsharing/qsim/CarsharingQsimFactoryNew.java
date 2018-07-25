@@ -29,13 +29,12 @@ public class CarsharingQsimFactoryNew implements Provider<Mobsim>{
 	@Override
 	public Mobsim get() {
 		return new QSimBuilder(config) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.configurePlugins(plugins -> {
 					plugins.removeIf(PopulationPlugin.class::isInstance);
 				}) //
 				.addPlugin(new CarSharingQSimPlugin(config, carsharingSupply, carsharingManager)) //
 				.configureComponents(components -> {
-					new StandardQSimComponentsConfigurator(config).configure(components);
 					components.activeAgentSources.add(CarSharingQSimPlugin.CARSHARING_PARKING_VEHICLES_SOURCE);
 				}) //
 				.build(scenario, eventsManager);

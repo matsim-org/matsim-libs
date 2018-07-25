@@ -54,10 +54,9 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 		Config config = this.sc.getConfig();
 		
 		return new QSimBuilder(config) //
-				.addDefaultPlugins() //
+				.useDefaults() //
 				.addPlugin(new HybridQSimPlugin(config)) //
 				.configureComponents(components -> {
-					new StandardQSimComponentsConfigurator(config).configure(components);
 					components.activeMobsimEngines.add(HybridQSimPlugin.HYBRID_EXTERNAL_ENGINE);
 				}) //
 				.build(sc, em);

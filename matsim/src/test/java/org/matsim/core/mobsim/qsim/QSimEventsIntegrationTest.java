@@ -10,10 +10,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -43,7 +39,7 @@ public class QSimEventsIntegrationTest {
 			}
 		});
 		QSim qSim = new QSimBuilder(config)//
-				.addDefaultPlugins()
+				.useDefaults()
 				.build(scenario, events);
 		try {
 			qSim.run();

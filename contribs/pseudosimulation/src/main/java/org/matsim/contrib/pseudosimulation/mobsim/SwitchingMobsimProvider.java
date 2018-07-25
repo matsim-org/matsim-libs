@@ -53,7 +53,7 @@ public class SwitchingMobsimProvider implements Provider<Mobsim> {
                 return new JDEQSimulation(ConfigUtils.addOrGetModule(scenario.getConfig(), JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class), scenario, eventsManager);
             } else {
                 return new QSimBuilder(scenario.getConfig()) //
-        			.addDefaultPlugins() //
+        			.useDefaults() //
         			.build(scenario, eventsManager);
             }
         } else {

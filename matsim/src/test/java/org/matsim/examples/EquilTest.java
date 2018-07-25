@@ -90,7 +90,7 @@ public class EquilTest extends MatsimTestCase {
 		//		SimulationTimer.setTime(0); // I don't think this is needed. kai, may'10
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig()) //
-			.addDefaultPlugins() //
+			.useDefaults() //
 			.build(scenario, events) //
 			.run();
 

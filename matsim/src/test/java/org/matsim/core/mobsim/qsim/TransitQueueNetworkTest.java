@@ -1076,7 +1076,7 @@ public class TransitQueueNetworkTest extends TestCase {
             EventsManager eventsManager = EventsUtils.createEventsManager();
             
             this.qsim = new QSimBuilder(scenario.getConfig()) //
-					.addDefaultPlugins() //
+					.useDefaults() //
 					.build(scenario, eventsManager);
             TransitQSimEngine transitEngine = qsim.getChildInjector().getInstance(TransitQSimEngine.class);
             this.simEngine = qsim.getChildInjector().getInstance(QNetsimEngine.class);
