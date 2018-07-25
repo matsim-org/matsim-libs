@@ -20,41 +20,41 @@
 
 package org.matsim.contrib.hybridsim.simulation;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
+import org.matsim.core.mobsim.qsim.ActivityEnginePlugin;
+import org.matsim.core.mobsim.qsim.PopulationPlugin;
+import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.TeleportationPlugin;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
+import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
+import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
+import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
+
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.hybridsim.utils.IdIntMapper;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
 public class HybridMobsimProvider implements Provider<Mobsim>{
 	
 	private final Scenario sc;
 	private final EventsManager em;
-	private final HybridNetworkFactory netFac;
-    private final IdIntMapper mapper;
-
 
     @Inject
-    HybridMobsimProvider(Scenario sc, EventsManager eventsManager, HybridNetworkFactory netFac, IdIntMapper mapper) {
+    HybridMobsimProvider(Scenario sc, EventsManager eventsManager) {
         this.sc = sc;
 		this.em = eventsManager;
-		this.netFac = netFac;
-        this.mapper = mapper;
 
     }
 
@@ -65,56 +65,37 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 			throw new NullPointerException(
 					"There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
-
-
-		QSim qSim = new QSim(this.sc, this.em);
-		ActivityEngine activityEngine = new ActivityEngine(this.em, qSim.getAgentCounter());
-		qSim.addMobsimEngine(activityEngine);
-		qSim.addActivityHandler(activityEngine);
-
-        ExternalEngine e = new ExternalEngine(this.em, qSim, mapper);
-        this.netFac.setExternalEngine(e);
-//		HybridQSimExternalNetworkFactory eFac = new HybridQSimExternalNetworkFactory(e);
-//		this.netFac.putNetsimNetworkFactory("2ext", eFac);
-//		this.netFac.putNetsimNetworkFactory("ext2", eFac);
 		
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, this.netFac );
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-
-
-		qSim.addMobsimEngine(e);
-
-
+		Config config = this.sc.getConfig();
 		
-//		CANetworkFactory fac = new CAMultiLaneNetworkFactory();
-//		CANetsimEngine cae = new CANetsimEngine(qSim, fac);
-//		qSim.addMobsimEngine(cae);
-//		qSim.addDepartureHandler(cae.getDepartureHandler());
-
-
-		TeleportationEngine teleportationEngine = new DefaultTeleportationEngine(this.sc, this.em);
-		qSim.addMobsimEngine(teleportationEngine);
-
-		AgentFactory agentFactory;
-		if (this.sc.getConfig().transit().isUseTransit()) {
-			agentFactory = new TransitAgentFactory(qSim);
-			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-			transitEngine
-					.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-			qSim.addDepartureHandler(transitEngine);
-			qSim.addAgentSource(transitEngine);
-			qSim.addMobsimEngine(transitEngine);
-		} else {
-			agentFactory = new DefaultAgentFactory(qSim);
+		final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
+		plugins.add(new MessageQueuePlugin(config));
+		plugins.add(new ActivityEnginePlugin(config));
+		plugins.add(new QNetsimEnginePlugin(config));
+		if (config.network().isTimeVariantNetwork()) {
+		    plugins.add(new NetworkChangeEventsPlugin(config));
 		}
-		if (this.sc.getConfig().network().isTimeVariantNetwork()) {
-			qSim.addMobsimEngine(NetworkChangeEventsEngine.createNetworkChangeEventsEngine());
+		if (config.transit().isUseTransit() && config.transit().isUsingTransitInMobsim() ) {
+		    plugins.add(new TransitEnginePlugin(config));
 		}
-		PopulationAgentSource agentSource = new PopulationAgentSource(
-				this.sc.getPopulation(), agentFactory, qSim);
-		qSim.addAgentSource(agentSource);
-		return qSim;
+		plugins.add(new TeleportationPlugin(config));
+		plugins.add(new PopulationPlugin(config));
+		plugins.add(new HybridQSimPlugin(config));
+		
+
+		List<AbstractModule> modules = Collections.singletonList(new AbstractModule() {
+			@Override
+			public void install() {
+				QSimComponents components = new QSimComponents();
+				new StandardQSimComponentsConfigurator(config).configure(components);
+				
+				components.activeMobsimEngines.add(HybridQSimPlugin.HYBRID_EXTERNAL_ENGINE);
+				
+				bind(QSimComponents.class).toInstance(components);
+			}
+		});
+		
+		return  QSimUtils.createQSim(sc, em, modules, plugins);
 	}
 
 }
