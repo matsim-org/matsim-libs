@@ -8,3 +8,4 @@
 matsimExamples
 **/target
 /log_projects.log
+*.orig

@@ -185,9 +185,10 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				continue;
 			}
 
-			final Id<? extends BasicLocation> subtourStartLocation = anchorAtFacilities ?
-				subtour.getTrips().get( 0 ).getOriginActivity().getFacilityId() :
-				subtour.getTrips().get( 0 ).getOriginActivity().getLinkId();
+			final Id<? extends BasicLocation> subtourStartLocation =
+//					anchorAtFacilities ?
+				subtour.getTrips().get( 0 ).getOriginActivity().getFacilityId() ;
+//				subtour.getTrips().get( 0 ).getOriginActivity().getLinkId();
 			
 			final Collection<String> testingModes =
 				subtour.getTrips().size() == 1 ?
