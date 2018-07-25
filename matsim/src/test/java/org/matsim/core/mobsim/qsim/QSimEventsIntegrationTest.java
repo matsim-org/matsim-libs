@@ -42,14 +42,7 @@ public class QSimEventsIntegrationTest {
 
 			}
 		});
-		QSim qSim = new QSim(scenario, events);
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-		qSim.addAgentSource(agentSource);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
-		qSim.addMobsimEngine(activityEngine);
-		qSim.addActivityHandler(activityEngine);
-		QNetsimEngineModule.configure(qSim);
+		QSim qSim = QSimUtils.createDefaultQSim(scenario, events);
 		try {
 			qSim.run();
 		} catch (RuntimeException e) {

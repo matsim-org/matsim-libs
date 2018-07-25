@@ -94,18 +94,7 @@ public class QSimTest {
 		// vehicles are moved to prepareForSim, thus, this must be explicitly called before qsim. Amit May'17
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 
-		QSim qSim1 = new QSim(scenario, events);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngineModule.configure(qSim1);
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events);
-		qSim1.addMobsimEngine(teleportationEngine);
-		QSim qSim = qSim1;
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-		qSim.addAgentSource(agentSource);
-		return qSim;
+		return QSimUtils.createDefaultQSim(scenario, events);
 	}
 
 	private static QSim createQSim(Fixture f, EventsManager events) {
@@ -113,18 +102,7 @@ public class QSimTest {
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 
 		Scenario sc = f.scenario;
-		QSim qSim1 = new QSim(sc, events);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngineModule.configure(qSim1);
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(sc, events);
-		qSim1.addMobsimEngine(teleportationEngine);
-		QSim qSim = qSim1;
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-		qSim.addAgentSource(agentSource);
-		return qSim;
+		return QSimUtils.createDefaultQSim(f.scenario, events);
 	}
 
 	/**

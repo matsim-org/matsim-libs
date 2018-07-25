@@ -257,23 +257,10 @@ public class TransitQueueSimulationTest {
 
         // run simulation
         EventsManager events = EventsUtils.createEventsManager();
-		QSim qSim1 = new QSim(scenario, events);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-        QNetsimEngineModule.configure(qSim1);
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events);
-		qSim1.addMobsimEngine(teleportationEngine);
-        QSim qSim = qSim1;
-        AgentFactory agentFactory = new TransitAgentFactory(qSim);
-        TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-        transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-        qSim.addDepartureHandler(transitEngine);
-        qSim.addAgentSource(transitEngine);
-        qSim.addMobsimEngine(transitEngine);
-        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-        qSim.addAgentSource(agentSource);
+		QSim qSim = QSimUtils.createDefaultQSim(scenario, events);
         qSim.run();
+        
+        TransitQSimEngine transitEngine = qSim.getChildInjector().getInstance(TransitQSimEngine.class);
 
         // check everything
         assertEquals(1, transitEngine.getAgentTracker().getAgentsAtFacility(stop1.getId()).size());
@@ -522,25 +509,10 @@ public class TransitQueueSimulationTest {
             this.line = line;
             this.route = route;
             this.departure = departure;
-			QSim qSim2 = new QSim(scenario, events);
-			ActivityEngine activityEngine = new ActivityEngine(events, qSim2.getAgentCounter());
-			qSim2.addMobsimEngine(activityEngine);
-			qSim2.addActivityHandler(activityEngine);
-            QNetsimEngine netsimEngine = new QNetsimEngine(qSim2);
-			qSim2.addMobsimEngine(netsimEngine);
-			qSim2.addDepartureHandler(netsimEngine.getDepartureHandler());
-			DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events);
-			qSim2.addMobsimEngine(teleportationEngine);
-            QSim qSim1 = qSim2;
-            AgentFactory agentFactory = new TransitAgentFactory(qSim1);
-            final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim1);
-            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-            qSim1.addDepartureHandler(transitEngine);
-            qSim1.addAgentSource(transitEngine);
-            qSim1.addMobsimEngine(transitEngine);
-            PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim1);
-            qSim1.addAgentSource(agentSource);
-            qSim = qSim1;
+			this.qSim = QSimUtils.createDefaultQSim(scenario, events);
+
+			TransitQSimEngine transitEngine = qSim.getChildInjector().getInstance(TransitQSimEngine.class);
+			
             qSim.addAgentSource(new AgentSource() {
                 @Override
                 public void insertAgentsIntoMobsim() {

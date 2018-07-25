@@ -49,6 +49,7 @@ import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
@@ -74,7 +75,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		f.events.addHandler(new EventsLogger());
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
-		QSim qsim = configureQSim(f, null);
+		QSim qsim = QSimUtils.createDefaultQSim(f.scenario, f.events);
 		qsim.run();
 		
 		List<Event> events = collector.getEvents();
@@ -198,27 +199,6 @@ public class LinkSpeedCalculatorIntegrationTest {
 		
 		// the link should take 5 seconds to travel along, plus 1 second in the buffer, makes total of 6 seconds
 		Assert.assertEquals(6, lle.getTime() - lee.getTime(), 1e-8);
-	}
-	
-	private static QSim configureQSim(Fixture f, LinkSpeedCalculator linkSpeedCalculator) {
-		QSim qsim = new QSim(f.scenario, f.events);
-		
-		// handle activities
-		ActivityEngine activityEngine = new ActivityEngine(f.events, qsim.getAgentCounter());
-		qsim.addMobsimEngine(activityEngine);
-		qsim.addActivityHandler(activityEngine);
-
-        QNetsimEngine netsimEngine = new QNetsimEngine(qsim);
-		if (linkSpeedCalculator != null) {
-			throw new RuntimeException( "does not work like this any more") ;
-		}
-		qsim.addMobsimEngine(netsimEngine);
-		qsim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		
-		PopulationAgentSource agentSource = new PopulationAgentSource(f.scenario.getPopulation(), new DefaultAgentFactory(qsim), qsim);
-		qsim.addAgentSource(agentSource);
-		
-		return qsim;
 	}
 	
 	static class CustomLinkSpeedCalculator implements LinkSpeedCalculator {
