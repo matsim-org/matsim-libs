@@ -52,6 +52,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -59,6 +60,9 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkUtils;
@@ -223,20 +227,17 @@ public class CreateAutomatedFDTest {
 			EventsManager events = EventsUtils.createEventsManager();
 			globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator(mode2FlowData);
 			events.addHandler(globalFlowDynamicsUpdator);
+			
+			List<AbstractModule> modules = Collections.singletonList(new AbstractModule() {
+				@Override
+				public void install() {
+					QSimComponents components = new QSimComponents();
+					new StandardQSimComponentsConfigurator(config).configure(components);
+					components.activeAgentSources.clear();
+				}
+			});
 
-			final QSim qSim = new QSim(scenario, events);
-			ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
-			qSim.addMobsimEngine(activityEngine);
-			qSim.addActivityHandler(activityEngine);
-			QNetsimEngine netsimEngine;
-//			if ( config.qsim().getTrafficDynamics()==TrafficDynamics.assignmentEmulating ) {
-//				QNetworkFactory networkFactory = new AssignmentEmulatingQLaneNetworkFactory(scenario,events) ;
-//				netsimEngine = new QNetsimEngine( qSim, networkFactory ) ;
-//			} else {
-				 netsimEngine = new QNetsimEngine(qSim);
-//			}
-			qSim.addMobsimEngine(netsimEngine);
-			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+			final QSim qSim = QSimUtils.createDefaultQSimWithOverrides(scenario, events, modules);
 
 			final Map<String, VehicleType> travelModesTypes = new HashMap<>();
 
