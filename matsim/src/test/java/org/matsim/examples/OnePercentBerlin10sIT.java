@@ -30,7 +30,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -71,7 +71,9 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		events.addHandler(writer);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim qSim = QSimUtils.createDefaultQSim(scenario,events);
+		QSim qSim = new QSimBuilder(scenario.getConfig()) //
+			.addDefaultPlugins() //
+			.build(scenario, events);
 
 		log.info("START testOnePercent10s SIM");
 		qSim.run();
@@ -112,8 +114,10 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		eventsManager.addHandler(writer);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim qSim = QSimUtils.createDefaultQSim(scenario,eventsManager);
-
+		QSim qSim = new QSimBuilder(scenario.getConfig()) //
+			.addDefaultPlugins() //
+			.build(scenario, eventsManager);
+		
 		log.info("START testOnePercent10s SIM");
 		qSim.run();
 		log.info("STOP testOnePercent10s SIM");

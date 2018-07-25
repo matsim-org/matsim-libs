@@ -23,7 +23,7 @@ public class QSimEventsIntegrationTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Rule
-	public Timeout globalTimeout= new Timeout(2000);
+	public Timeout globalTimeout= new Timeout(20000);
 
 	@Test
 	public void netsimEngineHandlesExceptionCorrectly() {
@@ -42,7 +42,9 @@ public class QSimEventsIntegrationTest {
 
 			}
 		});
-		QSim qSim = QSimUtils.createDefaultQSim(scenario, events);
+		QSim qSim = new QSimBuilder(config)//
+				.addDefaultPlugins()
+				.build(scenario, events);
 		try {
 			qSim.run();
 		} catch (RuntimeException e) {

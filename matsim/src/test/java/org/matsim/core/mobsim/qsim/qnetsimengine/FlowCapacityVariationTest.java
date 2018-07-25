@@ -41,7 +41,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -93,8 +93,10 @@ public class FlowCapacityVariationTest {
 		manager.addHandler(new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTimes));
 
 		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario).run();
-		QSim qSim = QSimUtils.createDefaultQSim(net.scenario, manager);
-		qSim.run();
+		new QSimBuilder(net.scenario.getConfig()) //
+			.addDefaultPlugins() //
+			.build(net.scenario, manager) //
+			.run();
 
 		Map<Id<Link>, double[]> times1 = vehicleLinkTravelTimes.get(Id.create("1", Vehicle.class));
 		Map<Id<Link>, double[]> times2 = vehicleLinkTravelTimes.get(Id.create("2", Vehicle.class));

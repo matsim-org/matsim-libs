@@ -43,7 +43,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -211,8 +211,10 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		SimulatedCapacityHandler simulatedCapacity = new SimulatedCapacityHandler();
 		events.addHandler(simulatedCapacity);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim queueSim = QSimUtils.createDefaultQSim(scenario, events);
-		queueSim.run();
+		new QSimBuilder(scenario.getConfig()) //
+			.addDefaultPlugins() //
+			.build(scenario, events) //
+			.run();
 		
 		// check simulated capacity values
 		assertEquals(1800, simulatedCapacity.getSimulatedLinkCapacity(), MatsimTestUtils.EPSILON);
@@ -238,8 +240,10 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		events.addHandler(simulatedCapacity);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim queueSim = QSimUtils.createDefaultQSim(scenario, events);
-		queueSim.run();
+		new QSimBuilder(scenario.getConfig()) //
+			.addDefaultPlugins() //
+			.build(scenario, events) //
+			.run();
 				
 		// check simulated capacity values
 		assertEquals(simulatedCapacity.getSimulatedLaneCapacity(Id.create("1", Lane.class)), simulatedCapacity.getSimulatedLinkCapacity(), MatsimTestUtils.EPSILON);
@@ -266,8 +270,10 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		SimulatedCapacityHandler simulatedCapacity = new SimulatedCapacityHandler();
 		events.addHandler(simulatedCapacity);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim queueSim = QSimUtils.createDefaultQSim(scenario, events);
-		queueSim.run();
+		new QSimBuilder(scenario.getConfig()) //
+			.addDefaultPlugins() //
+			.build(scenario, events) //
+			.run();
 		
 		// check simulated capacity values
 		assertEquals(simulatedCapacity.getSimulatedLaneCapacity(Id.create("1", Lane.class)), simulatedCapacity.getSimulatedLinkCapacity(), MatsimTestUtils.EPSILON);
@@ -296,8 +302,10 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		SimulatedCapacityHandler simulatedCapacity = new SimulatedCapacityHandler();
 		events.addHandler(simulatedCapacity);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim queueSim = QSimUtils.createDefaultQSim(scenario, events);
-		queueSim.run();
+		new QSimBuilder(scenario.getConfig()) //
+			.addDefaultPlugins() //
+			.build(scenario, events) //
+			.run();
 		
 		// check simulated capacity values
 		double lane1Cap = simulatedCapacity.getSimulatedLaneCapacity(Id.create("1", Lane.class));

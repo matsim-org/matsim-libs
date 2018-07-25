@@ -22,7 +22,11 @@
 
 package org.matsim.withinday.controller;
 
-import com.google.inject.Provides;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Named;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -37,9 +41,7 @@ import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTimeModule;
 
-import javax.inject.Named;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.inject.Provides;
 
 public class WithinDayModule extends AbstractModule {
     @Override
@@ -63,5 +65,4 @@ public class WithinDayModule extends AbstractModule {
         earliestLinkExitTravelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
         return earliestLinkExitTravelTimes;
     }
-
 }

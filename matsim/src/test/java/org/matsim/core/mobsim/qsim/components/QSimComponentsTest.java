@@ -2,7 +2,6 @@ package org.matsim.core.mobsim.qsim.components;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -14,8 +13,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -31,33 +29,26 @@ public class QSimComponentsTest {
 
 		MockEngine mockEngine = new MockEngine();
 
-		Collection<AbstractQSimPlugin> plugins = Collections.singleton(new AbstractQSimPlugin(config) {
-			public Collection<? extends Module> modules() {
-				return Collections.singleton(new AbstractModule() {
-					@Override
-					protected void configure() {
-						bind(MockEngine.class).toInstance(mockEngine);
+		new QSimBuilder(config) //
+				.addQSimPlugin(new AbstractQSimPlugin(config) {
+					public Collection<? extends Module> modules() {
+						return Collections.singleton(new AbstractModule() {
+							@Override
+							protected void configure() {
+								bind(MockEngine.class).toInstance(mockEngine);
+							}
+						});
 					}
-				});
-			}
 
-			public Map<String, Class<? extends MobsimEngine>> engines() {
-				return Collections.singletonMap("MockEngine", MockEngine.class);
-			}
-		});
-
-		List<org.matsim.core.controler.AbstractModule> modules = Collections
-				.singletonList(new org.matsim.core.controler.AbstractModule(config) {
-					@Override
-					public void install() {
-						QSimComponents components = new QSimComponents();
-						components.activeMobsimEngines.add("MockEngine");
-						bind(QSimComponents.class).toInstance(components);
+					public Map<String, Class<? extends MobsimEngine>> engines() {
+						return Collections.singletonMap("MockEngine", MockEngine.class);
 					}
-				});
-
-		QSim qsim = QSimUtils.createQSim(scenario, eventsManager, modules, plugins);
-		qsim.run();
+				}) //
+				.configureComponents(components -> {
+					components.activeMobsimEngines.add("MockEngine");
+				}) //
+				.build(scenario, eventsManager) //
+				.run();
 
 		Assert.assertTrue(mockEngine.isCalled);
 	}
@@ -79,23 +70,23 @@ public class QSimComponentsTest {
 
 		MockEngine mockEngine = new MockEngine();
 
-		Collection<AbstractQSimPlugin> plugins = Collections.singleton(new AbstractQSimPlugin(config) {
-			public Collection<? extends Module> modules() {
-				return Collections.singleton(new AbstractModule() {
-					@Override
-					protected void configure() {
-						bind(MockEngine.class).toInstance(mockEngine);
+		new QSimBuilder(config) //
+				.addQSimPlugin(new AbstractQSimPlugin(config) {
+					public Collection<? extends Module> modules() {
+						return Collections.singleton(new AbstractModule() {
+							@Override
+							protected void configure() {
+								bind(MockEngine.class).toInstance(mockEngine);
+							}
+						});
 					}
-				});
-			}
 
-			public Map<String, Class<? extends MobsimEngine>> engines() {
-				return Collections.singletonMap("MockEngine", MockEngine.class);
-			}
-		});
-
-		QSim qsim = QSimUtils.createQSim(scenario, eventsManager, plugins);
-		qsim.run();
+					public Map<String, Class<? extends MobsimEngine>> engines() {
+						return Collections.singletonMap("MockEngine", MockEngine.class);
+					}
+				}) //
+				.build(scenario, eventsManager) //
+				.run();
 
 		Assert.assertTrue(mockEngine.isCalled);
 	}

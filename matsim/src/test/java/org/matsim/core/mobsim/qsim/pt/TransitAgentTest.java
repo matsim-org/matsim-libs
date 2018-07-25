@@ -22,27 +22,37 @@ package org.matsim.core.mobsim.qsim.pt;
 
 import java.util.Arrays;
 import java.util.Collections;
-import junit.framework.TestCase;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.agents.TransitAgent;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import junit.framework.TestCase;
 
 
 /**
@@ -88,7 +98,9 @@ public class TransitAgentTest extends TestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim sim = new QSimBuilder(scenario.getConfig()) //
+			.addDefaultPlugins() //
+			.build(scenario, eventsManager);
 		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
 		sim.insertAgentIntoMobsim(agent);
 		agent.endActivityAndComputeNextState(10);
@@ -132,7 +144,9 @@ public class TransitAgentTest extends TestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim sim = new QSimBuilder(scenario.getConfig()) //
+				.addDefaultPlugins() //
+				.build(scenario, eventsManager);
 		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
 		sim.insertAgentIntoMobsim(agent);
 		agent.endActivityAndComputeNextState(10);

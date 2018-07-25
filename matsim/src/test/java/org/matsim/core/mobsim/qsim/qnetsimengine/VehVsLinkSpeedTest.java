@@ -43,7 +43,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -111,8 +111,10 @@ public class VehVsLinkSpeedTest {
 		net.scenario.getVehicles().addVehicleType(car);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario).run();
-		QSim qSim = QSimUtils.createDefaultQSim(net.scenario, manager);
-		qSim.run();
+		new QSimBuilder(net.scenario.getConfig()) //
+			.addDefaultPlugins() //
+			.build(net.scenario, manager) //
+			.run();
 
 		Map<Id<Link>, Double> travelTime1 = vehicleLinkTravelTime.get(Id.create("0", Vehicle.class));
 	

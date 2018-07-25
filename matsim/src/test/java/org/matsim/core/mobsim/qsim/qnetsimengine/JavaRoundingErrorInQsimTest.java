@@ -42,7 +42,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -90,8 +90,10 @@ public class JavaRoundingErrorInQsimTest {
 		manager.addHandler(new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTime));
 
 		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario).run();
-		QSim qSim = QSimUtils.createDefaultQSim(net.scenario, manager);
-		qSim.run();
+		new QSimBuilder(net.scenario.getConfig()) //
+			.addDefaultPlugins() //
+			.build(net.scenario, manager) //
+			.run();
 
 		//agent 2 is departed first so will have free speed time = 1000/25 +1 = 41 sec
 		Assert.assertEquals( "Wrong travel time for on link 2 for vehicle 2" , 41.0 , vehicleLinkTravelTime.get(Id.createVehicleId(2))  , MatsimTestUtils.EPSILON);

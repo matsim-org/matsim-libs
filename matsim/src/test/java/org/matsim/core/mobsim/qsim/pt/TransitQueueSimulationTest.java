@@ -185,7 +185,9 @@ public class TransitQueueSimulationTest {
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        QSim sim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim sim = new QSimBuilder(scenario.getConfig()) //
+				.addDefaultPlugins() //
+				.build(scenario, eventsManager);
         sim.run();
         List<MobsimAgent> agents = new ArrayList<>(sim.getAgents().values());
         Collections.sort(agents, new Comparator<MobsimAgent>() {
@@ -257,7 +259,9 @@ public class TransitQueueSimulationTest {
 
         // run simulation
         EventsManager events = EventsUtils.createEventsManager();
-		QSim qSim = QSimUtils.createDefaultQSim(scenario, events);
+		QSim qSim = new QSimBuilder(scenario.getConfig()) //
+				.addDefaultPlugins() //
+				.build(scenario, events);
         qSim.run();
         
         TransitQSimEngine transitEngine = qSim.getChildInjector().getInstance(TransitQSimEngine.class);
@@ -329,8 +333,10 @@ public class TransitQueueSimulationTest {
         // run simulation
         EventsManager events = EventsUtils.createEventsManager();
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        QSim simulation = QSimUtils.createDefaultQSim(scenario, events);
-        simulation.run();
+		new QSimBuilder(scenario.getConfig()) //
+				.addDefaultPlugins() //
+				.build(scenario, events) //
+				.run();
     }
 
     /**
@@ -509,7 +515,9 @@ public class TransitQueueSimulationTest {
             this.line = line;
             this.route = route;
             this.departure = departure;
-			this.qSim = QSimUtils.createDefaultQSim(scenario, events);
+			this.qSim = new QSimBuilder(scenario.getConfig()) //
+				.addDefaultPlugins() //
+				.build(scenario, events);
 
 			TransitQSimEngine transitEngine = qSim.getChildInjector().getInstance(TransitQSimEngine.class);
 			
@@ -644,8 +652,10 @@ public class TransitQueueSimulationTest {
 
         // first test without special settings
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        QSim sim = QSimUtils.createDefaultQSim(scenario, events);
-        sim.run();
+		new QSimBuilder(scenario.getConfig()) //
+				.addDefaultPlugins() //
+				.build(scenario, events) //
+				.run();
         assertEquals(depTime, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
         assertEquals(depTime + 101.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
         collector.reset(0);
@@ -655,8 +665,10 @@ public class TransitQueueSimulationTest {
         config.qsim().setEndTime(depTime + 90.0);
 
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        sim = QSimUtils.createDefaultQSim(scenario, events);
-        sim.run();
+		new QSimBuilder(scenario.getConfig()) //
+			.addDefaultPlugins() //
+			.build(scenario, events) //
+			.run();
         assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
         assertEquals(depTime + 90.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
     }
@@ -772,7 +784,10 @@ public class TransitQueueSimulationTest {
         EventsCollector collector = new EventsCollector();
         events.addHandler(collector);
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        QSimUtils.createDefaultQSim(scenario, events).run();
+		new QSimBuilder(scenario.getConfig()) //
+			.addDefaultPlugins() //
+			.build(scenario, events) //
+			.run();
         List<Event> allEvents = collector.getEvents();
 
         for (Event event : allEvents) {

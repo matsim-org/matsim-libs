@@ -49,7 +49,7 @@ import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
@@ -75,8 +75,10 @@ public class LinkSpeedCalculatorIntegrationTest {
 		f.events.addHandler(new EventsLogger());
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
-		QSim qsim = QSimUtils.createDefaultQSim(f.scenario, f.events);
-		qsim.run();
+		new QSimBuilder(f.scenario.getConfig()) //
+			.addDefaultPlugins() //
+			.build(f.scenario, f.events) //
+			.run();
 		
 		List<Event> events = collector.getEvents();
 		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
