@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -165,18 +166,24 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 
 		int rr=0 ;
 		for ( Plan plan1 : plans ) {
+//			log.info( "rr=" + rr + "; utils=" + utils[rr]) ;
 			for ( Plan plan2 : plans ) {
 				// yyyy there is really no need to compare the plan with itself.  kai/johan, mar'14, should not happen anymore... ihab, may'14
 				if (plan1 == plan2) {
 					// same plan
 				} else {
 					utils[rr] -= similarity( plan1, plan2 ) ;
+//					log.info( "rr=" + rr + "; utils=" + utils[rr]) ;
 
 					if ( Double.isNaN(utils[rr]) ) {
 						log.warn( "utils is NaN; id: " + plan1.getPerson().getId() ) ;
 					}
 				}	
 			}
+//			for ( PlanElement pe : plan1.getPlanElements() ) {
+//				log.info( pe.toString() ) ;
+//			}
+//			log.info("") ;
 			rr++ ;
 		}
 
@@ -225,7 +232,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		return map ;
 	}
 
-	private double similarity( Plan plan1, Plan plan2 ) {
+	/* package-private, for testing */ double similarity( Plan plan1, Plan plan2 ) {
 		double simil = 0. ;
 		{
 			List<Activity> activities1 = TripStructureUtils.getActivities(plan1, stageActivities) ;
