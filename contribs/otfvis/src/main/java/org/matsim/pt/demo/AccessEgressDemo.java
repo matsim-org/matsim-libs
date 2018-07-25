@@ -21,8 +21,6 @@
 package org.matsim.pt.demo;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -44,7 +42,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -52,6 +50,7 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.analysis.RouteTimeDiagram;
 import org.matsim.pt.analysis.TransitRouteAccessEgressAnalysis;
+import org.matsim.pt.analysis.VehicleTracker;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -67,8 +66,6 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
-import org.matsim.pt.analysis.VehicleTracker;
 
 public class AccessEgressDemo {
 
@@ -200,17 +197,16 @@ public class AccessEgressDemo {
 		RouteTimeDiagram diagram = new RouteTimeDiagram();
 		events.addHandler(diagram);
 
-		List<AbstractModule> overrides = new ArrayList<>() ;
-		overrides.add( new AbstractModule() {
-			@Override public void install() {
-				bind(TransitStopHandlerFactory.class).to(SimpleTransitStopHandlerFactory.class).asEagerSingleton();
-			}
-		} ) ;
-		final QSim sim = QSimUtils.createDefaultQSimWithOverrides(this.scenario, events, overrides);
-//		QSim sim = QSimUtils.createDefaultQSim(this.scenario, events);
-//		sim.getTransitEngine().setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
-		// ... but I think it is not working anyways because there is some problem to find the relevant part of the network in otfvis ...
-		// kai, nov'17
+		final QSim sim = new QSimBuilder(scenario.getConfig()) //
+				.useDefaults() //
+				.addOverridingModule(new AbstractModule() {
+					@Override
+					public void install() {
+						bind(TransitStopHandlerFactory.class).to(SimpleTransitStopHandlerFactory.class)
+								.asEagerSingleton();
+					}
+				}) //
+				.build(scenario, events);
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenario.getConfig(), this.scenario, events, sim);
 		OTFClientLive.run(this.scenario.getConfig(), server);

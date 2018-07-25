@@ -54,6 +54,7 @@ import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitQVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
@@ -1073,28 +1074,13 @@ public class TransitQueueNetworkTest extends TestCase {
             tRoute.addDeparture(dep);
             tLine.addRoute(tRoute);
             EventsManager eventsManager = EventsUtils.createEventsManager();
-            QSim qSim = new QSim(scenario, eventsManager);
-			ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
-			qSim.addMobsimEngine(activityEngine);
-			qSim.addActivityHandler(activityEngine);
-            QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
-		  qSim.addMobsimEngine(netsimEngine);
-		  qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		  this.simEngine = netsimEngine ;
-			DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager);
-			qSim.addMobsimEngine(teleportationEngine);
-
-            // setup: simulation
-            AgentFactory agentFactory = new TransitAgentFactory(qSim);
-            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-            qSim.addDepartureHandler(transitEngine);
-            qSim.addAgentSource(transitEngine);
-            qSim.addMobsimEngine(transitEngine);
-
-            PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-            qSim.addAgentSource(agentSource);
-            qsim = qSim;
+            
+            this.qsim = new QSimBuilder(scenario.getConfig()) //
+					.useDefaults() //
+					.build(scenario, eventsManager);
+            TransitQSimEngine transitEngine = qsim.getChildInjector().getInstance(TransitQSimEngine.class);
+            this.simEngine = qsim.getChildInjector().getInstance(QNetsimEngine.class);
+            
             NetsimNetwork qnet = qsim.getNetsimNetwork();
             this.qlink1 = (QLinkImpl) qnet.getNetsimLink(linkId1);
             this.qlink2 = (QLinkImpl) qnet.getNetsimLink(linkId2);
