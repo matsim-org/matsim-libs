@@ -41,13 +41,17 @@ import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.*;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -124,7 +128,10 @@ public class TravelTimeOneWayTestIT {
 		events.addHandler(eventHandler);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSimUtils.createDefaultQSim(scenario, events).run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events)
+			.run();
 		MeasurementPoint resultsWoSignals = eventHandler.beginningOfLink2;
 		if (resultsWoSignals != null) {
 			log.debug("tF = 60s, " + resultsWoSignals.numberOfVehPassedDuringTimeToMeasure + ", " + resultsWoSignals.numberOfVehPassed + ", "

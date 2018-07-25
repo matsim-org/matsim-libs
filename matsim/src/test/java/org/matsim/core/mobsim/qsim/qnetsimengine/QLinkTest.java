@@ -50,7 +50,7 @@ import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
@@ -326,7 +326,9 @@ public final class QLinkTest extends MatsimTestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim qsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim qsim = new QSimBuilder(scenario.getConfig()) //
+				.useDefaults() //
+				.build(scenario, eventsManager);
 		NetsimNetwork queueNetwork = qsim.getNetsimNetwork();
 		dummify((QNetwork) queueNetwork);
 		QLinkImpl qlink = (QLinkImpl) queueNetwork.getNetsimLink(Id.create("1", Link.class));
@@ -566,7 +568,9 @@ public final class QLinkTest extends MatsimTestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim sim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim sim = new QSimBuilder(scenario.getConfig()) //
+				.useDefaults() //
+				.build(scenario, eventsManager);
 
 		EventsCollector collector = new EventsCollector();
 		sim.getEventsManager().addHandler(collector);
@@ -618,7 +622,9 @@ public final class QLinkTest extends MatsimTestCase {
 			this.link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0 );
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-			sim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+			sim = new QSimBuilder(scenario.getConfig()) //
+					.useDefaults() //
+					.build(scenario, eventsManager);
 			this.queueNetwork = (QNetwork) sim.getNetsimNetwork();
 
             this.qlink1 = (QLinkImpl) this.queueNetwork.getNetsimLink(Id.create("1", Link.class));

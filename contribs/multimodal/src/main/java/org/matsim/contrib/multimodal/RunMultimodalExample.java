@@ -44,7 +44,7 @@ public class RunMultimodalExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		PrepareMultiModalScenario.run(scenario);
 		Controler controler = new Controler(scenario);
-		controler.setModules(new ControlerDefaultsWithMultiModalModule());
+		controler.addOverridingModule(new MultiModalModule());
 		controler.run();
 	}
 
