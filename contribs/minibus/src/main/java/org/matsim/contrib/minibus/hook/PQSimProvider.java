@@ -57,9 +57,7 @@ class PQSimProvider implements Provider<Mobsim> {
 		
 		return new QSimBuilder(config) //
 				.useDefaults()
-				.configurePlugins(plugins -> {
-					plugins.removeIf(PopulationPlugin.class::isInstance);
-				}) //
+				.removePlugin(PopulationPlugin.class) //
 				.addPlugin(new MinibusPopulationPlugin(config))
 				.build(scenario, eventsManager);
 	}

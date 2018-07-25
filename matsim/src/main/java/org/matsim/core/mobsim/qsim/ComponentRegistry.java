@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
-import com.google.inject.TypeLiteral;
-
 public class ComponentRegistry<T> {
 	private final static Logger log = Logger.getLogger(ComponentRegistry.class);
 
@@ -27,10 +25,9 @@ public class ComponentRegistry<T> {
 
 		this.components.put(name, component);
 
-		log.info(String.format("Registered %s with name '%s' to %s", componentTypeDescription, name,
-				component));
+		log.info(String.format("Registered %s with name '%s' to %s", componentTypeDescription, name, component));
 	}
-	
+
 	public Class<? extends T> getComponent(String name) {
 		if (components.containsKey(name)) {
 			return components.get(name);
