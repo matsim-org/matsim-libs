@@ -45,7 +45,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author mrieser
  */
-public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent, HasPerson {
+public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent, HasPerson, HasModifiablePlan {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(TransitAgent.class);
 
@@ -192,6 +192,22 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 	@Override
 	public Facility<? extends Facility<?>> getDestinationFacility() {
 		return this.basicAgentDelegate.getDestinationFacility();
+	}
+
+	@Override
+	public Plan getModifiablePlan() {
+		return this.basicAgentDelegate.getModifiablePlan();
+	}
+
+	@Override
+	public void resetCaches() {
+		this.basicAgentDelegate.resetCaches();
+		this.driverAgentDelegate.resetCaches();
+	}
+
+	@Override
+	public int getCurrentLinkIndex() {
+		return this.basicAgentDelegate.getCurrentLinkIndex();
 	}
 
 }
