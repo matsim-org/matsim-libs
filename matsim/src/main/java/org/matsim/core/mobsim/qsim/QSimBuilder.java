@@ -18,6 +18,35 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 
+/**
+ * Builds a new QSim. By default, the QSim is completely empty, i.e. there are
+ * no plugins registered and there are not engines, handlers or agent sources
+ * activated.
+ * 
+ * The default settings can be added via a couple of methods:
+ * 
+ * <ul>
+ * <li>{@link #useDefaultPlugins()} loads the default QSim plugins for
+ * MATSim</li>
+ * <li>{@link #useDefaultComponents()} registers the default components for
+ * MATSim</li>
+ * <li>{@link #useDefaults()} adds both the default plugins and components</li>
+ * </ul>
+ * 
+ * Usage example:
+ * 
+ * <pre>
+ * QSim qsim = new QSimBuilder(config) //
+ * 		.useDefaults() //
+ * 		.addPlugin(new MyCustomQSimPlugin(config)) //
+ * 		.configureComponents(components -> {
+ * 			components.activeMobsimEngines.add("MyCustomMobsimEngine");
+ * 		}) //
+ * 		.build(scenario, eventsManager);
+ * </pre>
+ * 
+ * @author Sebastian Hörl <sebastian.hoerl@ivt.baug.ethz.ch>
+ */
 public class QSimBuilder {
 	private final Config config;
 
@@ -29,22 +58,29 @@ public class QSimBuilder {
 		this.config = config;
 	}
 
+	/**
+	 * Adds the default plugins and components to the QSim.
+	 * 
+	 * @see {@link #useDefaultComponents()} and {@link #useDefaultPlugins()}
+	 */
 	public QSimBuilder useDefaults() {
 		useDefaultComponents();
 		useDefaultPlugins();
 		return this;
 	}
 
+	/**
+	 * Adds a module that overrides existing bindings from MATSim (i.e. mainly those
+	 * from the {@link StandaloneQSimModule} and derived stages).
+	 */
 	public QSimBuilder addOverridingModule(AbstractModule module) {
-		this.overridingModules.add(module);
+		overridingModules.add(module);
 		return this;
 	}
 
-	public QSimBuilder addOverridingModules(List<AbstractModule> modules) {
-		modules.forEach(this.overridingModules::add);
-		return this;
-	}
-
+	/**
+	 * Resets the active QSim components to the standard ones defined by MATSim.
+	 */
 	public QSimBuilder useDefaultComponents() {
 		components.activeActivityHandlers.clear();
 		components.activeAgentSources.clear();
@@ -56,27 +92,52 @@ public class QSimBuilder {
 		return this;
 	}
 
+	/**
+	 * Configures the current active QSim components.
+	 */
 	public QSimBuilder configureComponents(Consumer<QSimComponents> configurator) {
 		configurator.accept(components);
 		return this;
 	}
 
+	/**
+	 * Resets the registered plugins to the default ones provided by MATSim.
+	 */
 	public QSimBuilder useDefaultPlugins() {
 		plugins.clear();
 		plugins.addAll(QSimModule.getDefaultQSimPlugins(config));
 		return this;
 	}
 
+	/**
+	 * Configures the registered plugins via callback.
+	 */
 	public QSimBuilder configurePlugins(Consumer<Collection<AbstractQSimPlugin>> configurator) {
 		configurator.accept(plugins);
 		return this;
 	}
 
+	/**
+	 * Adds a plugin for the QSim to the existing list of plugins.
+	 */
 	public QSimBuilder addPlugin(AbstractQSimPlugin plugin) {
-		this.plugins.add(plugin);
+		plugins.add(plugin);
 		return this;
 	}
 
+	/**
+	 * Removes a QSim plugin with a specific type form the list of registered
+	 * plugins.
+	 */
+	public QSimBuilder removePlugin(Class<? extends AbstractQSimPlugin> pluginType) {
+		plugins.removeIf(pluginType::isInstance);
+		return this;
+	}
+
+	/**
+	 * Builds a new QSim with the registered plugins and the defined active
+	 * components.
+	 */
 	public QSim build(Scenario scenario, EventsManager eventsManager) {
 		// First, load standard QSim module
 		AbstractModule module = new StandaloneQSimModule(scenario, eventsManager);

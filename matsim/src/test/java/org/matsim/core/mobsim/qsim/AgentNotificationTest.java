@@ -249,9 +249,7 @@ public class AgentNotificationTest {
 		
 		new QSimBuilder(scenario.getConfig()) //
 			.useDefaults() //
-			.configurePlugins(plugins -> {
-				plugins.removeIf(PopulationPlugin.class::isInstance);
-			}) //
+			.removePlugin(PopulationPlugin.class) //
 			.addPlugin(new PopulationPlugin(scenario.getConfig()) {
 				@Override
 				public Collection<? extends AbstractModule> modules() {
