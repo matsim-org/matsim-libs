@@ -37,9 +37,9 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 /**
  * @author nagel
  */
-public class QSimUtils {
+public class QSimUtils2 {
 	 // should only contain static methods; should thus not be instantiated
-	private QSimUtils() {}
+	private QSimUtils2() {}
 
 	public static QSim createDefaultQSim(final Scenario scenario, final EventsManager eventsManager) {
 		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(), new StandaloneQSimModule(scenario, eventsManager));

@@ -6,23 +6,31 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
  * Created by michaelzilske on 19/03/14.
  */
-public class JDEQSimModuleTest extends MatsimTestCase {
+public class JDEQSimPluginTest extends MatsimTestCase {
+	private QSim prepareQSim(Scenario scenario, EventsManager eventsManager) {
+        return new QSimBuilder(scenario.getConfig()) //
+        	.addPlugin(new JDEQSimPlugin(scenario.getConfig())) //
+        	.configureComponents(components -> {
+        		components.activeMobsimEngines.add(JDEQSimPlugin.JDEQ_ENGINE);
+        		components.activeActivityHandlers.add(JDEQSimPlugin.JDEQ_ENGINE);
+        	}) //
+        	.build(scenario, eventsManager);
+	}
 
     public void testRunsAtAll() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
         eventsManager.initProcessing();
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        QSim qsim = new QSim(scenario, eventsManager);
-        JDEQSimModule.configure(qsim);
+        
+        QSim qsim = prepareQSim(scenario, eventsManager);
         qsim.run();
     }
 
@@ -31,10 +39,8 @@ public class JDEQSimModuleTest extends MatsimTestCase {
         EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
         eventsManager.initProcessing();
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        QSim qsim = new QSim(scenario, eventsManager);
-        JDEQSimModule.configure(qsim);
-        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), new DefaultAgentFactory(qsim), qsim);
-        qsim.addAgentSource(agentSource);
+        
+        QSim qsim = prepareQSim(scenario, eventsManager);
         qsim.run();
     }
 

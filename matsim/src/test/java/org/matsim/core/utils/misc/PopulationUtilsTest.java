@@ -56,8 +56,14 @@ public class PopulationUtilsTest {
 		List<Leg> legs2 = PopulationUtils.getLegs(f.plan2);
 		List<Leg> legs3 = PopulationUtils.getLegs(f.plan3);
 		
-		Assert.assertEquals( 2., PopulationUtils.calculateSimilarity( legs1, legs2, null, 1., 1. ) , 0.001 ) ;
-		Assert.assertEquals( 1., PopulationUtils.calculateSimilarity( legs1, legs3, null, 1., 1. ) , 0.001 ) ;
+//		Assert.assertEquals( 2., PopulationUtils.calculateSimilarity( legs1, legs2, null, 1., 1. ) , 0.001 ) ;
+		Assert.assertEquals( 4., PopulationUtils.calculateSimilarity( legs1, legs2, null, 1., 1. ) , 0.001 ) ;
+		// (no route is now counted as "same route" and thus reaps the reward. kai, jul'18)
+		
+//		Assert.assertEquals( 1., PopulationUtils.calculateSimilarity( legs1, legs3, null, 1., 1. ) , 0.001 ) ;
+		Assert.assertEquals( 2., PopulationUtils.calculateSimilarity( legs1, legs3, null, 1., 1. ) , 0.001 ) ;
+		// (no route is now counted as "same route" and thus reaps the reward. kai, jul'18)
+
 	}
 	
 	@Test

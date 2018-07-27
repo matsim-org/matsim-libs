@@ -165,8 +165,10 @@ public class NetsimRoutingConsistencyTest {
 			DepartureArrivalListener listener = new DepartureArrivalListener();
 			eventsManager.addHandler(listener);
 
-			QSim qsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
-			qsim.run();
+			new QSimBuilder(scenario.getConfig()) //
+					.useDefaults() //
+					.build(scenario, eventsManager) //
+					.run();
 
 			double netsimTravelTime = listener.arrivalTime - listener.departureTime;
 			double routingTravelTime = leg.getTravelTime();

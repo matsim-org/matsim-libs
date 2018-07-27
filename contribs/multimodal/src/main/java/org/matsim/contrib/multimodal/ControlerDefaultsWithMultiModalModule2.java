@@ -1,11 +1,11 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * QNetsimEngineModule.java
+ *  * MultiModalModule.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
- *  * copyright       : (C) 2014 by the members listed in the COPYING, *
+ *  * copyright       : (C) 2015 by the members listed in the COPYING, *
  *  *                   LICENSE and WARRANTY file.                            *
  *  * email           : info at matsim dot org                                *
  *  *                                                                         *
@@ -20,16 +20,34 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.contrib.multimodal;
 
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.router.util.TravelTime;
 
-public class QNetsimEngineModule {
+import javax.inject.Provider;
+import java.util.Arrays;
+import java.util.Map;
 
-    public static void configure(QSim qsim) {
-        QNetsimEngine netsimEngine = new QNetsimEngine(qsim);
-        qsim.addMobsimEngine(netsimEngine);
-        qsim.addDepartureHandler(netsimEngine.getDepartureHandler());
+public class ControlerDefaultsWithMultiModalModule2 extends AbstractModule {
+
+    private MultiModalModule delegate = new MultiModalModule();
+
+    @Override
+    public void install() {
+        install(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), delegate));
     }
+
+    public void setLinkSlopes(Map<Id<Link>, Double> linkSlopes) {
+        this.delegate.setLinkSlopes(linkSlopes);
+    }
+
+    public void addAdditionalTravelTimeFactory(String mode, Provider<TravelTime> travelTimeFactory) {
+        this.delegate.addAdditionalTravelTimeFactory(mode, travelTimeFactory);
+    }
+
 
 }
