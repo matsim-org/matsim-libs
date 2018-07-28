@@ -1,4 +1,4 @@
-package roadTypeMapping;
+package org.matsim.contrib.emissions.types;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import roadTypeMapping.OsmHbefaMapping;
 
 public class EmissionsConfigGroup
 extends ReflectiveConfigGroup

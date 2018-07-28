@@ -78,7 +78,7 @@ public class ColdEmissionAnalysisModule {
 	private int vehAttributesNotSpecifiedCnt = 0;
 	private static final int maxWarnCnt = 3;
 	private int vehInfoWarnMotorCylceCnt = 0;
-
+	
 	public static class ColdEmissionAnalysisModuleParameter {
 		public final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
 		public final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
@@ -110,12 +110,12 @@ public class ColdEmissionAnalysisModule {
 		vehAttributesNotSpecifiedCnt = 0;
 	}
 
-	public void calculateColdEmissionsAndThrowEvent(
+	void calculateColdEmissionsAndThrowEvent(
 			Id<Link> coldEmissionEventLinkId,
 			Vehicle vehicle,
 			double eventTime,
 			double parkingDuration,
-			int distance_km) {
+			int distance_km ) {
 
 		if(this.ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
 			if(vehicle.getType().getDescription()==null) { // emission specification is in vehicle type id
@@ -226,34 +226,33 @@ public class ColdEmissionAnalysisModule {
         key.setHbefaComponent(coldPollutant);
 
         if(this.detailedHbefaColdTable != null){ // check if detailed emission factors file is set in config
-            HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-            hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
-            hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationTuple.getSecond().getHbefaSizeClass());
-            hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationTuple.getSecond().getHbefaEmConcept());
-            key.setHbefaVehicleAttributes(hbefaVehicleAttributes);
+//		  HbefaVehicleAttributes hbefaVehicleAttributes = createHbefaVehicleAttributes( vehicleInformationTuple.getSecond() );
+		  key.setHbefaVehicleAttributes(vehicleInformationTuple.getSecond());
 
             if(this.detailedHbefaColdTable.containsKey(key)){
                 generatedEmissions = this.detailedHbefaColdTable.get(key).getColdEmissionFactor();
             } else {
-                generatedEmissions = this.avgHbefaColdTable.get(key).getColdEmissionFactor();
+			if(vehAttributesNotSpecifiedCnt < maxWarnCnt) {
+				vehAttributesNotSpecifiedCnt++;
+				logger.warn("No detailed entry (for vehicle `" + vehicleId + "') corresponds to `" + vehicleInformationTuple.getSecond() + "'. Falling back on fleet average values.");
+				if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
 
-                if(vehAttributesNotSpecifiedCnt < maxWarnCnt) {
-                    vehAttributesNotSpecifiedCnt++;
-                    logger.warn("Detailed vehicle attributes are not specified correctly for vehicle " + vehicleId + ": " +
-                            "`" + vehicleInformationTuple.getSecond() + "'. Using fleet average values instead.");
-                    if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-                }
+                generatedEmissions = this.avgHbefaColdTable.get(key).getColdEmissionFactor();
             }
         } else {
             generatedEmissions = this.avgHbefaColdTable.get(key).getColdEmissionFactor();
         }
         return generatedEmissions;
+	    
+	    // yy when thinking about the above, it is actually not so clear what that "fallback" actually means ... since
+	    // the exact key now just needs to be in the avg table.  So it is not really a fallback, but rather just
+	    // another lookup in another table. ---???  kai, jul'18
     }
-
-    private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple(String vehicleDescription) {
+	
+	private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple(String vehicleDescription) {
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
 		HbefaVehicleCategory hbefaVehicleCategory = null;
-		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 
 		int startIndex = vehicleDescription.indexOf(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
 		int endIndex = vehicleDescription.lastIndexOf(EmissionSpecificationMarker.END_EMISSIONS.toString());
@@ -265,7 +264,8 @@ public class ColdEmissionAnalysisModule {
 				hbefaVehicleCategory = vehCat;
 			}
 		}
-
+		
+		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 		if(vehicleInformationArray.length == 4){
 			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationArray[1]);
 			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationArray[2]);
@@ -275,5 +275,20 @@ public class ColdEmissionAnalysisModule {
 		vehicleInformationTuple = new Tuple<>(hbefaVehicleCategory, hbefaVehicleAttributes);
 		return vehicleInformationTuple;
 	}
-
+	
+	static HbefaVehicleAttributes createHbefaVehicleAttributes( final String hbefaTechnology, final String hbefaSizeClass, final String hbefaEmConcept ) {
+		HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
+		vehAtt.setHbefaTechnology( hbefaTechnology );
+		vehAtt.setHbefaSizeClass( hbefaSizeClass );
+		vehAtt.setHbefaEmConcept( hbefaEmConcept );
+		return vehAtt;
+	}
+	
+//	private static HbefaVehicleAttributes createHbefaVehicleAttributes( final HbefaVehicleAttributes hbefaVehicleAttributes ) {
+//		// yyyy is this copy really necessary?  kai, jul'18
+//		return createHbefaVehicleAttributes( hbefaVehicleAttributes.getHbefaTechnology(), hbefaVehicleAttributes.getHbefaSizeClass(), hbefaVehicleAttributes.getHbefaEmConcept() ) ;
+//	}
+	
+	
+	
 }

@@ -1,4 +1,4 @@
-package roadTypeMapping;
+package org.matsim.contrib.emissions.types;
 
 /**
  * Created by molloyj on 01.12.2017.

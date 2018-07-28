@@ -180,6 +180,8 @@ public final class Controler implements ControlerI, MatsimServices {
 		this.overrides = scenario == null ?
 				new ScenarioByConfigModule() :
 				new ScenarioByInstanceModule(this.scenario);
+		
+		this.config.setLocked( true );
 	}
 
 	/**

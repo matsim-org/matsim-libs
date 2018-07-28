@@ -137,9 +137,12 @@ public class EmissionModule {
 		}
 
 		if(scenario.getConfig().qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.defaultVehicle)) {
-			logger.warn("Vehicle source in the QSim is "+ QSimConfigGroup.VehiclesSource.defaultVehicle.name()+", however a vehicle file or vehicle information is provided. \n" +
+			logger.warn("Vehicle source in the QSim is "+ QSimConfigGroup.VehiclesSource.defaultVehicle.name()+
+							", however a vehicle file or vehicle information is provided. \n" +
 					"Therefore, switching to "+ QSimConfigGroup.VehiclesSource.fromVehiclesData.name()+".");
 			scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
+			// yyyyyy code should not silently switch config options. kai, jul'18
+			logger.error("code should not silently switch config options; needs to be modified.  kai, jul'18") ;
 		}
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
@@ -272,8 +275,8 @@ public class EmissionModule {
 				key.setHbefaDistance(mapAmbientCondPattern2Distance(array[indexFromKey.get("AmbientCondPattern")]));
 				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
 
-				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor();
-				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
+				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
+//				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
 				
 				avgColdTable.put(key, value);
 			}
@@ -344,8 +347,8 @@ public class EmissionModule {
 				hbefaVehicleAttributes.setHbefaEmConcept(array[indexFromKey.get("EmConcept")]);
 				key.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 
-				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor();
-				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA")]));
+				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA")]));
+//				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA")]));
 				
 				hbefaColdTableDetailed.put(key, value);
 			}
