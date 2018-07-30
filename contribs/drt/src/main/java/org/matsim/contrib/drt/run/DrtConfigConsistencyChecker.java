@@ -59,6 +59,10 @@ public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
 		if (config.qsim().getNumberOfThreads() != 1) {
 			throw new RuntimeException("Only a single-threaded QSim allowed");
 		}
+		if (config.global().getNumberOfThreads() < drtCfg.getNumberOfThreads()) {
+			log.warn("Consider increasing global.numberOfThreads to at least the value of drt.numberOfThreads"
+					+ " in order to speed up the DRT route update during the replanning phase.");
+		}
 
 		if (drtCfg.getParameterSets(MinCostFlowRebalancingParams.SET_NAME).size() > 1) {
 			throw new RuntimeException("More then one rebalancing parameter sets is specified");
