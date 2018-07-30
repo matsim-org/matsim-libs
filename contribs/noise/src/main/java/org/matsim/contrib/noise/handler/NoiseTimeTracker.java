@@ -905,12 +905,12 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 	}
 
 	public void computeFinalTimeIntervals() {
-		
-		while (this.noiseContext.getCurrentTimeBinEndTime() <= this.noiseContext.getScenario().getConfig().qsim().getEndTime()) {
+
+		while (this.noiseContext.getCurrentTimeBinEndTime() <= Math.max(24. * 3600., this.noiseContext.getScenario().getConfig().qsim().getEndTime())) {
 			processTimeBin();			
 		}
 	}
-
+	
 	public List<NoiseEventCaused> getNoiseEventsCaused() {
 		return noiseEventsCaused;
 	}
