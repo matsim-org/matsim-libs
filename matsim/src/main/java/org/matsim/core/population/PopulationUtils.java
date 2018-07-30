@@ -35,6 +35,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -508,6 +509,10 @@ public final class PopulationUtils {
 			Leg leg2 = it2.next() ;
 			if ( leg1.getMode().equals( leg2.getMode() ) ) {
 				simil += sameModeReward ;
+			} else {
+				continue ;
+				// don't look for route overlap if different mode.  Makes sense for totally different modes,
+				// but maybe not so obvious for similar modes such as "car" and "ride".  kai, jul'18
 			}
 			// the easy way for the route is to not go along the links but just check for overlap.
 			Route route1 = leg1.getRoute() ;
@@ -517,14 +522,19 @@ public final class PopulationUtils {
 			if ( route1 instanceof NetworkRoute ) {
 				nr1 = (NetworkRoute) route1 ;
 			} else {
+				simil += sameModeReward ;
+				// ("no route" is interpreted as "same route".  One reason is that otherwise plans
+				// with routes always receive higher penalties than plans without routes in the diversity
+				// increasing plans remover, which clearly is not what one wants. kai, jul'18)
 				continue ; // next leg
 			}
 			if ( route2 instanceof NetworkRoute ) {
 				nr2 = (NetworkRoute) route2 ;
 			} else {
+				simil += sameModeReward ;
 				continue ; // next leg
 			}
-			simil += sameRouteReward * RouteUtils.calculateCoverage(nr1, nr2, network) ;
+			simil += sameRouteReward * ( RouteUtils.calculateCoverage(nr1, nr2, network) + RouteUtils.calculateCoverage(nr2, nr1, network) ) / 2 ;
 		}
 		return simil ;
 	}
@@ -998,5 +1008,28 @@ public final class PopulationUtils {
 	
 	public static void writePopulation( Population population, String filename ) {
 		new PopulationWriter( population).write( filename ); 
+	}
+	
+	public static Id<Link> decideOnLinkIdForActivity( Activity act, Scenario sc ) {
+		if ( act.getFacilityId() !=null ) {
+			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get( act.getFacilityId() );;
+			if ( facility==null ) {
+				throw new RuntimeException("facility ID given but not in facilities container") ;
+			}
+			Gbl.assertNotNull( facility.getLinkId() );
+			return facility.getLinkId();
+		}
+		Gbl.assertNotNull( act.getLinkId() );
+		return act.getLinkId() ;
+	}
+	public static Coord decideOnCoordForActivity( Activity act, Scenario sc ) {
+		if ( act.getFacilityId() !=null ) {
+			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get( act.getFacilityId() );;
+			Gbl.assertNotNull( facility  );
+			Gbl.assertNotNull( facility.getCoord() ) ;
+			return facility.getCoord() ;
+		}
+		Gbl.assertNotNull( act.getCoord() ) ;
+		return act.getCoord() ;
 	}
 }

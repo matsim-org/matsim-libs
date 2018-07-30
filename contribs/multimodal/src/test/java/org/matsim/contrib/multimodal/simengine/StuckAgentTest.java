@@ -20,6 +20,10 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -32,8 +36,12 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.multimodal.ControlerDefaultsWithMultiModalModule;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.multimodal.MultiModalModule;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -48,10 +56,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class StuckAgentTest {
 
@@ -147,8 +151,7 @@ public class StuckAgentTest {
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		
-		// controler listener that initializes the multi-modal simulation
-        controler.setModules(new ControlerDefaultsWithMultiModalModule());
+        controler.addOverridingModule(new MultiModalModule());
 
         EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
