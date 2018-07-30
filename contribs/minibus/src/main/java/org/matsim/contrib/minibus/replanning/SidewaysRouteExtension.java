@@ -26,7 +26,6 @@ import com.vividsolutions.jts.operation.buffer.BufferOp;
 import com.vividsolutions.jts.operation.buffer.BufferParameters;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.operator.Operator;
 import org.matsim.contrib.minibus.operator.PPlan;
@@ -74,10 +73,10 @@ public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 		ArrayList<TransitStopFacility> currentStopsToBeServed = oldPlan.getStopsToBeServed();
 		
 		TransitStopFacility baseStop = currentStopsToBeServed.get(0);
-		TransitStopFacility remoteStop = this.findStopWithLargestDistance(currentStopsToBeServed);
-		double bufferSizeBasedOnRatio = CoordUtils.calcEuclideanDistance(baseStop.getCoord(), remoteStop.getCoord()) * this.ratio;
+		int remoteStopIndex = this.findStopIndexWithLargestDistance(currentStopsToBeServed);
+		double bufferSizeBasedOnRatio = CoordUtils.calcEuclideanDistance(baseStop.getCoord(), currentStopsToBeServed.get(remoteStopIndex).getCoord()) * this.ratio;
 		
-		List<Geometry> lineStrings = this.createGeometryFromStops(currentStopsToBeServed, remoteStop);
+		List<Geometry> lineStrings = this.createGeometryFromStops(currentStopsToBeServed, remoteStopIndex);
 		Geometry buffer = this.createBuffer(lineStrings, Math.max(this.bufferSize, bufferSizeBasedOnRatio), this.excludeTermini);
 		
 		Set<Id<TransitStopFacility>> stopsUsed = this.getStopsUsed(oldPlan.getLine().getRoutes().values());
@@ -87,7 +86,7 @@ public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 			return null;
 		}
 		
-		ArrayList<TransitStopFacility> newStopsToBeServed = this.addStopToExistingStops(baseStop, remoteStop, currentStopsToBeServed, newStop);
+		ArrayList<TransitStopFacility> newStopsToBeServed = this.addStopToExistingStops(0, remoteStopIndex, currentStopsToBeServed, newStop);
 		
 		// create new plan
 		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName(), oldPlan.getId());
@@ -102,12 +101,12 @@ public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 	}
 
 
-	private ArrayList<TransitStopFacility> addStopToExistingStops(TransitStopFacility baseStop, TransitStopFacility remoteStop, ArrayList<TransitStopFacility> currentStopsToBeServed, TransitStopFacility newStop) {
-		List<TransitStopFacility> markerStops = new LinkedList<>();
-		markerStops.add(baseStop);
-		markerStops.add(remoteStop);
+	private ArrayList<TransitStopFacility> addStopToExistingStops(int baseStopIndex, int remoteStopIndex, ArrayList<TransitStopFacility> currentStopsToBeServed, TransitStopFacility newStop) {
+		List<Integer> markerStopIndexes = new LinkedList<>();
+		markerStopIndexes.add(baseStopIndex);
+		markerStopIndexes.add(remoteStopIndex);
 		
-		List<ArrayList<TransitStopFacility>> subRoutes = this.cutRouteIntoSubRoutes(markerStops, currentStopsToBeServed);
+		List<ArrayList<TransitStopFacility>> subRoutes = this.cutRouteIntoSubRoutes(markerStopIndexes, currentStopsToBeServed);
 		for (ArrayList<TransitStopFacility> subRoute : subRoutes) {
 			this.addNewStopBetweenTwoNearestExistingStops(subRoute, newStop);
 		}
@@ -144,12 +143,13 @@ public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 		stops.add(index + 1, stop);
 	}
 
-	private List<ArrayList<TransitStopFacility>> cutRouteIntoSubRoutes(List<TransitStopFacility> markerStops, ArrayList<TransitStopFacility> stops) {
+	private List<ArrayList<TransitStopFacility>> cutRouteIntoSubRoutes(List<Integer> markerStopIndexes, ArrayList<TransitStopFacility> stops) {
 		List<ArrayList<TransitStopFacility>> subRoutes = null;
 		ArrayList<TransitStopFacility> subRoute = null;
 		
-		for (TransitStopFacility stop : stops) {
-			if (markerStops.contains(stop)) {
+		for (int i = 0; i < stops.size(); i++) {
+			TransitStopFacility stop = stops.get(i);
+			if (markerStopIndexes.contains(i)) {
 				if (subRoutes == null) {
 					// very first sub route
 					subRoutes = new LinkedList<>();
@@ -170,18 +170,40 @@ public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 		return subRoutes;
 	}
 
-	private TransitStopFacility findStopWithLargestDistance(ArrayList<TransitStopFacility> stops) {
-		Coord startCoord = stops.get(0).getCoord();
-		double largestDistance = 0;
-		TransitStopFacility stopWithLargestDistance = stops.get(0);
-		for (TransitStopFacility transitStopFacility : stops) {
-			double currentDistance = CoordUtils.calcEuclideanDistance(startCoord, transitStopFacility.getCoord());
-			if (currentDistance > largestDistance) {
-				largestDistance = currentDistance;
-				stopWithLargestDistance = transitStopFacility;
+	/**
+	 * Returns stop index instead of the stop, in order to cater for stops which are served multiple times
+	 * 
+	 * @param stops
+	 * @return index of the stop which is half way on the route from start stop over all stops back to the start stop
+	 */
+	private int findStopIndexWithLargestDistance(ArrayList<TransitStopFacility> stops) {
+		double totatDistance = 0;
+		Map<Integer, Double> distFromStart2StopIndex = new HashMap<>();
+		TransitStopFacility previousStop = stops.get(0);
+		
+		for (int i = 0; i < stops.size(); i++) {
+			TransitStopFacility currentStop = stops.get(i);
+			totatDistance = totatDistance + CoordUtils.calcEuclideanDistance(previousStop.getCoord(), currentStop.getCoord());
+			distFromStart2StopIndex.put(i, totatDistance);
+			previousStop = currentStop;
+		}
+		// add leg from last to first stop
+		totatDistance = totatDistance + CoordUtils.calcEuclideanDistance(previousStop.getCoord(), stops.get(0).getCoord());
+		
+		// first terminus is first stop in stops, other terminus is stop half way on the
+		// circular route beginning at the first stop
+		for (int i = 1; i < stops.size(); i++) {
+			if (distFromStart2StopIndex.get(i) >= totatDistance / 2) {
+				if ( Math.abs(totatDistance / 2 - distFromStart2StopIndex.get(i - 1)) > 
+					 Math.abs(totatDistance / 2 - distFromStart2StopIndex.get(i)) ) {
+					return i;
+				} else {
+					return i - 1;
+				}
 			}
 		}
-		return stopWithLargestDistance;
+
+		return 0;
 	}
 
 	private Set<Id<TransitStopFacility>> getStopsUsed(Collection<TransitRoute> routes) {
@@ -234,12 +256,13 @@ public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 	}
 
 
-	private List<Geometry> createGeometryFromStops(ArrayList<TransitStopFacility> stops, TransitStopFacility remoteStop) {
+	private List<Geometry> createGeometryFromStops(ArrayList<TransitStopFacility> stops, int remoteStopIndex) {
 		List<Geometry> geometries = new LinkedList<>();
 		
 		ArrayList<Coordinate> coords = new ArrayList<>();
-		for (TransitStopFacility stop : stops) {
-			if (stop.equals(remoteStop)) {
+		for (int i = 0; i < stops.size(); i++) {
+			TransitStopFacility stop = stops.get(i);
+			if (i == remoteStopIndex) {
 				// terminate current line string
 				coords.add(new Coordinate(stop.getCoord().getX(), stop.getCoord().getY(), 0.0));
 				Coordinate[] coordinates = coords.toArray(new Coordinate[coords.size()]);
