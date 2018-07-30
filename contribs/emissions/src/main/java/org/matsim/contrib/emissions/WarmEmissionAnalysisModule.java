@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
+import org.matsim.contrib.emissions.types.HbefaRoadTypeMapping;
 import org.matsim.contrib.emissions.types.HbefaTrafficSituation;
 import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
@@ -208,8 +209,12 @@ public class WarmEmissionAnalysisModule {
 
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = new HashMap<>();
 
-//		String hbefaRoadTypeName = this.roadTypeMapping.get(roadType, freeVelocity);
-		String hbefaRoadTypeName = roadType;
+		final String hbefaRoadTypeName ;
+//		if ( ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
+			hbefaRoadTypeName = roadType;
+//		} else {
+//			hbefaRoadTypeName = this.roadTypeMapping.get( roadType, freeVelocity );
+//		}
 
 		HbefaWarmEmissionFactorKey keyFreeFlow = new HbefaWarmEmissionFactorKey();
 		HbefaWarmEmissionFactorKey keyStopAndGo = new HbefaWarmEmissionFactorKey();
@@ -249,7 +254,7 @@ public class WarmEmissionAnalysisModule {
 		double freeFlowSpeed_kmh = freeVelocity * 3.6;
 		double averageSpeed_kmh = linkLength_km / travelTime_h;
 		
-		double freeFlowSpeedFromTable_kmh;
+//		double freeFlowSpeedFromTable_kmh;
 		double stopGoSpeedFromTable_kmh;
 		double efFreeFlow_gpkm;
 		double efStopGo_gpkm;
@@ -261,18 +266,20 @@ public class WarmEmissionAnalysisModule {
 			keyStopAndGo.setHbefaComponent(warmPollutant);
 			
 			if(this.detailedHbefaWarmTable != null){
+//				logger.warn("keyFreeFlow=" + keyFreeFlow ) ;
+//				logger.warn("keyStopAndGo=" + keyStopAndGo ) ;
 				if(this.detailedHbefaWarmTable.get(keyFreeFlow) != null && this.detailedHbefaWarmTable.get(keyStopAndGo) != null){
 					stopGoSpeedFromTable_kmh = this.detailedHbefaWarmTable.get(keyStopAndGo).getSpeed();
 					efFreeFlow_gpkm = this.detailedHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 					efStopGo_gpkm = this.detailedHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
-					freeFlowSpeedFromTable_kmh = this.detailedHbefaWarmTable.get(keyFreeFlow).getSpeed();
+//					freeFlowSpeedFromTable_kmh = this.detailedHbefaWarmTable.get(keyFreeFlow).getSpeed();
 
 				} else {
 					vehAttributesNotSpecifiedCnt++;
 					stopGoSpeedFromTable_kmh = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
 					efFreeFlow_gpkm = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 					efStopGo_gpkm = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
-					freeFlowSpeedFromTable_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
+//					freeFlowSpeedFromTable_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
 
                     int maxWarnCnt = 3;
                     if(vehAttributesNotSpecifiedCnt <= maxWarnCnt) {
@@ -286,7 +293,7 @@ public class WarmEmissionAnalysisModule {
 				stopGoSpeedFromTable_kmh = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
 				efFreeFlow_gpkm = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 				efStopGo_gpkm = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
-				freeFlowSpeedFromTable_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
+//				freeFlowSpeedFromTable_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
 //				vehAttributesNotSpecified.add(personId);
 			}
 			

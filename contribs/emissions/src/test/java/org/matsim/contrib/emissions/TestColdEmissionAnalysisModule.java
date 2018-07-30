@@ -118,7 +118,7 @@ public class TestColdEmissionAnalysisModule {
 		
 		ArrayList<Object> testCase1 = new ArrayList<>(), testCase2 = new ArrayList<>();
 		ArrayList<Object> testCase3 = new ArrayList<>(), testCase4 = new ArrayList<>();
-		ArrayList<Object> testCase5 = new ArrayList<>(), testCase6 = new ArrayList<>();
+		ArrayList<Object> testCase6 = new ArrayList<>();
 		
 		// first case: complete data
 		// corresponding entry in average table

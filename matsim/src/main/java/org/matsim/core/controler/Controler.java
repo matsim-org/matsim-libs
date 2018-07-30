@@ -181,7 +181,9 @@ public final class Controler implements ControlerI, MatsimServices {
 				new ScenarioByConfigModule() :
 				new ScenarioByInstanceModule(this.scenario);
 		
-		this.config.setLocked( true );
+		this.config.qsim().setLocked();
+		// yy this is awfully ad-hoc.  kai, jul'18
+		// yy should probably come even earlier, before the scenario is generated. kai, jul'18
 	}
 
 	/**

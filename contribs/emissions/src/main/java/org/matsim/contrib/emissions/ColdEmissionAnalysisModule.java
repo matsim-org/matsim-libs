@@ -248,6 +248,9 @@ public class ColdEmissionAnalysisModule {
 	    // yy when thinking about the above, it is actually not so clear what that "fallback" actually means ... since
 	    // the exact key now just needs to be in the avg table.  So it is not really a fallback, but rather just
 	    // another lookup in another table. ---???  kai, jul'18
+	    // (It may implicitly work from convertVehicleDescription2VehicleInformationTuple, which essentially generates an empty vehicle
+	    // description if nothing specific is available.  And thus the "average" table should contain "empty" entries, different
+	    // from what the tests imply. kai, jul'18)
     }
 	
 	private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple(String vehicleDescription) {

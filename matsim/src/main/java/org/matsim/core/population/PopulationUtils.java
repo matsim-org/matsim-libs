@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -51,6 +52,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
@@ -1031,5 +1033,11 @@ public final class PopulationUtils {
 		}
 		Gbl.assertNotNull( act.getCoord() ) ;
 		return act.getCoord() ;
+	}
+	public static void sampleDown( Population pop, double sample ) {
+		final Random rnd = MatsimRandom.getLocalInstance();;
+		log.info( "population size before downsampling=" + pop.getPersons().size() ) ;
+		pop.getPersons().values().removeIf( person ->  rnd.nextDouble() >= sample ) ;
+		log.info( "population size after downsampling=" + pop.getPersons().size() ) ;
 	}
 }

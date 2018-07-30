@@ -502,6 +502,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( VEHICLES_SOURCE)
 	public final void setVehiclesSource( VehiclesSource source ) {
+		testForLocked();
 		this.vehiclesSource = source ;
 	}
 	@StringGetter( VEHICLES_SOURCE )
