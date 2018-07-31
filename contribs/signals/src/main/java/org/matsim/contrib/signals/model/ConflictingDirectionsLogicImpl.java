@@ -21,8 +21,6 @@ package org.matsim.contrib.signals.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,8 +31,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup.ActionOnSignalSpecsViolation;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.conflicts.IntersectionDirections;
 import org.matsim.contrib.signals.data.conflicts.Direction;
+import org.matsim.contrib.signals.data.conflicts.IntersectionDirections;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
@@ -57,7 +55,7 @@ private static final Logger log = Logger.getLogger(ConflictingDirectionsLogicImp
 	private Map<Id<Signal>, Set<Tuple<Id<Link>, Id<Link>>>> setOfLinkTuplesPerSignal = new HashMap<>();
 	private Map<Id<SignalGroup>, Set<Direction>> setOfDirectionsPerGroup = new HashMap<>();
 	
-	private Map<Id<SignalSystem>, List<Id<SignalGroup>>> greenSignalsPerSystem = new HashMap<>();
+	private Map<Id<SignalSystem>, Set<Id<SignalGroup>>> greenSignalsPerSystem = new HashMap<>();
 
 	public ConflictingDirectionsLogicImpl(Network network, Lanes lanes, SignalsData signalsData, ActionOnSignalSpecsViolation actionOnConflictingDirectionsViolation) {
 		this.actionOnConflictingDirectionsViolation = actionOnConflictingDirectionsViolation;
@@ -115,7 +113,7 @@ private static final Logger log = Logger.getLogger(ConflictingDirectionsLogicImp
 		if (SignalGroupState.GREEN.equals(event.getNewState())){
 			// register system if necessary
 			if (!greenSignalsPerSystem.containsKey(event.getSignalSystemId())) {
-				greenSignalsPerSystem.put(event.getSignalSystemId(), new LinkedList<>());
+				greenSignalsPerSystem.put(event.getSignalSystemId(), new HashSet<>());
 			}
 			
 			// check whether a conflicting direction already shows green
