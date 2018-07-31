@@ -80,18 +80,9 @@ final class UnprotectedLeftTurnAcceptanceLogic implements TurnAcceptanceLogic {
 						}
 					} // no lanes exist or the lane leads to the correct link
 
+					QVehicle firstVehOnLink = rightOfWayQLane.getFirstVehicle();
 					/*
-					 * Get the first vehicle on the link by taking the first vehicle of the
-					 * collection returned by 'getAllVehicles'. This only works, because
-					 * getAllVehicles keeps the order of the vehicles on the link. It would be
-					 * easier if one could access vehQueue.peek() in QueueWithBuffer, e.g. with a
-					 * method getFirstVehicleInQueue() directly.
-					 */
-					QVehicle firstVehOnLink = rightOfWayQLane.getAllVehicles()!=null && rightOfWayQLane.getAllVehicles().iterator().hasNext()? 
-							(QVehicle) rightOfWayQLane.getAllVehicles().iterator().next() 
-							: null;
-					/*
-					 * Just checking for the first vehicle in the buffer (not the whole link) does
+					 * Note: Checking for the first vehicle in the buffer (not the whole link) does
 					 * not work properly. Probably, checking for conflicts and moving vehicles over
 					 * nodes happens in parallel, such that the sequence of how links are processed
 					 * causes situations where vehicles that must yield can always go, although the
@@ -101,8 +92,6 @@ final class UnprotectedLeftTurnAcceptanceLogic implements TurnAcceptanceLogic {
 					 */
 					if (rightOfWayQLane instanceof SignalizeableItem
 							&& ((SignalizeableItem) rightOfWayQLane).hasGreenForAllToLinks()
-//							&& !rightOfWayQLane.isNotOfferingVehicle() // this only considers the buffer of the link (see argument above)
-//							&& rightOfWayQLane.getFirstVehicle() != null && rightOfWayQLane.getFirstVehicle().getEarliestLinkExitTime() <= now // this only considers the buffer of the link (see argument above)
 							&& firstVehOnLink != null && firstVehOnLink.getEarliestLinkExitTime() <= now
 							) {
 						/* vehicles have to wait if at least one lane with right of way is 'offering vehicles' and shows green.
