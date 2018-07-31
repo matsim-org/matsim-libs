@@ -19,19 +19,23 @@
 
 package taxibus.run;
 
-import org.junit.*;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.core.config.*;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.testcases.MatsimTestUtils;
 
 import taxibus.run.configuration.TaxibusConfigGroup;
-import taxibus.run.examples.*;
+import taxibus.run.examples.RunTaxibusExample;
 
 public class RunTaxibusScenarioIT {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
+	@Ignore
 	@Test
 	public void testRunTaxibusJspritExample() {
 		String configFile = "./src/main/resources/taxibus_example/configClustered.xml";
@@ -41,6 +45,7 @@ public class RunTaxibusScenarioIT {
 		new RunTaxibusExample().run(config, false);
 	}
 
+	@Ignore
 	@Test
 	public void testRunTaxibusClusteredExample() {
 		String configFile = "./src/main/resources/taxibus_example/configJsprit.xml";
