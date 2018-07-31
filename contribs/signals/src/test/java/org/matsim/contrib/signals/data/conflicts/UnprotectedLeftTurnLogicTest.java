@@ -49,12 +49,16 @@ public class UnprotectedLeftTurnLogicTest {
 		// run scenarios from files
 		AnalyzeSingleIntersectionLeftTurnDelays restrictedLeftTurns = createControler(IntersectionLogic.CONFLICTING_DIRECTIONS_AND_TURN_RESTRICTIONS);
 		AnalyzeSingleIntersectionLeftTurnDelays unrestrictedLeftTurns = createControler(IntersectionLogic.CONFLICTING_DIRECTIONS_NO_TURN_RESTRICTIONS);
+		AnalyzeSingleIntersectionLeftTurnDelays noLogic = createControler(IntersectionLogic.NONE);
 		
 		double leftTurnDelayWTurnRestriction = restrictedLeftTurns.getLeftTurnDelay();
 		double leftTurnDelayWoTurnRestriction = unrestrictedLeftTurns.getLeftTurnDelay();
+		double leftTurnDelayWithoutLogic = noLogic.getLeftTurnDelay();
 		System.out.println("delay wTurn: " + leftTurnDelayWTurnRestriction);
 		System.out.println("delay w/oTurn: " + leftTurnDelayWoTurnRestriction);
+		System.out.println("delay w/oLogic: " + leftTurnDelayWithoutLogic);
 		Assert.assertTrue("Delay without restriction should be less than with restricted left turns.", 2 * leftTurnDelayWoTurnRestriction < leftTurnDelayWTurnRestriction);
+		Assert.assertEquals("Delay without turn restriction should be equal to the case without conflicting data.", leftTurnDelayWoTurnRestriction, leftTurnDelayWithoutLogic, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Delay value for the case without turn restrictions is not as expected!", 21120, leftTurnDelayWoTurnRestriction, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Delay value for the case with turn restrictions is not as expected!", 80845, leftTurnDelayWTurnRestriction, MatsimTestUtils.EPSILON);
 	}
