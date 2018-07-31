@@ -8,8 +8,10 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 public final class ActivityEnginePlugin extends AbstractQSimPlugin {
+	public static final String ACTIVITY_ENGINE_NAME = "ActivityEngine";
 
 	public ActivityEnginePlugin(Config config) {
 		super(config);
@@ -26,12 +28,12 @@ public final class ActivityEnginePlugin extends AbstractQSimPlugin {
 	}
 
 	@Override
-	public Collection<Class<? extends ActivityHandler>> activityHandlers() {
-		return Collections.singletonList(ActivityEngine.class);
+	public Map<String, Class<? extends ActivityHandler>> activityHandlers() {
+		return Collections.singletonMap(ACTIVITY_ENGINE_NAME, ActivityEngine.class);
 	}
 
 	@Override
-	public Collection<Class<? extends MobsimEngine>> engines() {
-		return Collections.singletonList(ActivityEngine.class);
+	public Map<String, Class<? extends MobsimEngine>> engines() {
+		return Collections.singletonMap(ACTIVITY_ENGINE_NAME, ActivityEngine.class);
 	}
 }

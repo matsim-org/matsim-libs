@@ -83,6 +83,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	public static class ModeRoutingParams extends ReflectiveConfigGroup implements MatsimParameters {
 		public static final String SET_TYPE = "teleportedModeParameters";
 		public static final String MODE = "mode";
+		public static final String TELEPORTED_MODE_FREESPEED_FACTOR = "teleportedModeFreespeedFactor";
 		
 		private String mode = null;
 
@@ -132,7 +133,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			map.put( "teleportedModeSpeed" ,
 					"Speed for a teleported mode. " +
 					"Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode.");
-			map.put( "teleportedModeFreespeedFactor", TELEPORTED_MODE_FREESPEED_FACTOR_CMT);
+			map.put( TELEPORTED_MODE_FREESPEED_FACTOR, TELEPORTED_MODE_FREESPEED_FACTOR_CMT);
 
 			return map;
 		}
@@ -179,13 +180,19 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			}
 			this.teleportedModeSpeed = teleportedModeSpeed;
 		}
-
-		@StringGetter( "teleportedModeFreespeedFactor" )
+		
+		/**
+		 * @return {@value #TELEPORTED_MODE_FREESPEED_FACTOR_CMT}
+		 */
+		@StringGetter(TELEPORTED_MODE_FREESPEED_FACTOR)
 		public Double getTeleportedModeFreespeedFactor() {
 			return teleportedModeFreespeedFactor;
 		}
-
-		@StringSetter( "teleportedModeFreespeedFactor" )
+		
+		/**
+		 * @param teleportedModeFreespeedFactor -- {@value #TELEPORTED_MODE_FREESPEED_FACTOR_CMT}
+		 */
+		@StringSetter(TELEPORTED_MODE_FREESPEED_FACTOR)
 		public void setTeleportedModeFreespeedFactor(
 				Double teleportedModeFreespeedFactor) {
 			testForLocked() ;

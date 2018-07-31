@@ -45,7 +45,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -100,8 +101,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		events.addHandler(ttcalc);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
-		qsim.run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
 
 		// check that we get the expected result
 		assertEquals("Person 1 should travel for 11 seconds.", 10.0 + 1.0, ttcalc.person1leaveTime - ttcalc.person1enterTime, EPSILON);
@@ -165,8 +168,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1.getId(), person2.getId(), link2.getId());
 		events.addHandler(ttcalc);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
-        qsim.run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
 		/*
 		 * The last person of the first wave should have taken 20 s to travel
 		 * link 3 (because of the spill-back). The last person of the second
@@ -252,9 +257,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		});
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
-        qsim.run();
-
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
 	}
 
 	

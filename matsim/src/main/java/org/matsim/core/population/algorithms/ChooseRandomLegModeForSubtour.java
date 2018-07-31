@@ -135,7 +135,10 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		if (plan.getPlanElements().size() <= 1) {
 			return;
 		}
+		// with certain proba, do standard single leg mode choice for not-chain-based modes:
 		if ( this.changeSingleLegMode!=null && rng.nextDouble() < this.probaForChangeSingleTripMode ) {
+			// (the null check is for computational efficiency)
+			
 			this.tripsToLegs.run(plan);
 			this.changeSingleLegMode.run(plan);
 			return;
@@ -149,7 +152,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		// (modes that agent can in principle use; e.g. cannot use car sharing if not member)
 		
 			
-			List<Candidate> choiceSet =
+		List<Candidate> choiceSet =
 					determineChoiceSet(
 							homeLocation,
 							TripStructureUtils.getTrips(plan, stageActivityTypes),
@@ -159,10 +162,12 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 							),
 							permissibleModesForThisPlan);
 			
-			if (!choiceSet.isEmpty()) {
+		if (!choiceSet.isEmpty()) {
 				Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
+				// (means that in the end we are changing modes only for one subtour)
+				
 				applyChange(whatToDo, plan);
-			}
+		}
 	}
 
 	private List<Candidate> determineChoiceSet(
@@ -180,16 +185,20 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				continue;
 			}
 
-			final Set<String> usableChainBasedModes = new LinkedHashSet<>();
-			final Id<? extends BasicLocation> subtourStartLocation = subtour.getTrips().get( 0 ).getOriginActivity().getFacilityId()!=null ?
-				subtour.getTrips().get( 0 ).getOriginActivity().getFacilityId() :
-				subtour.getTrips().get( 0 ).getOriginActivity().getLinkId();
+			final Id<? extends BasicLocation> subtourStartLocation =
+//					anchorAtFacilities ?
+					subtour.getTrips().get( 0 ).getOriginActivity().getFacilityId() !=null ?
+							subtour.getTrips().get( 0 ).getOriginActivity().getFacilityId() :
+							subtour.getTrips().get( 0 ).getOriginActivity().getLinkId();
 			
 			final Collection<String> testingModes =
 				subtour.getTrips().size() == 1 ?
 					singleTripSubtourModes :
 					chainBasedModes;
-
+			// I am not sure what the singleTripSubtourModes thing means.  But apart from that ...
+			
+			// ... test whether a vehicle was brought to the subtourStartLocation:
+			final Set<String> usableChainBasedModes = new LinkedHashSet<>();
 			for (String mode : testingModes) {
 				Id<? extends BasicLocation> vehicleLocation = homeLocation;
 				Activity lastDestination =
@@ -203,24 +212,30 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				}
 				if (vehicleLocation.equals(subtourStartLocation)) {
 					usableChainBasedModes.add(mode);
+					// can have more than one mode here when subtour starts at home.
 				}
 			}
+			// yy My intuition is that with the above condition, a switch of an all-car plan with at least
+			// one explicit sub-tour could switch to an all-bicycle plan only via first changing the
+			// explicit sub-tour first to a non-chain-based mode.  kai, jul'18
 			
 			Set<String> usableModes = new LinkedHashSet<>();
 			if (isMassConserving(subtour)) { // We can only replace a subtour if it doesn't itself move a vehicle from one place to another
 				for (String candidate : permissibleModesForThisPerson) {
 					if (chainBasedModes.contains(candidate)) {
+						// for chain-based modes, only add if vehicle is available:
 						if (usableChainBasedModes.contains(candidate)) {
 							usableModes.add(candidate);
 						}
 					} else {
+						// for non-chain-based modes, always add:
 						usableModes.add(candidate);
 					}
 				} 
 			}
 			
 			usableModes.remove(getTransportMode(subtour));
-			// (remove current mode so we don't get it again)
+			// (remove current mode so we don't get it again; note that the parent plan is kept anyways)
 			
 			for (String transportMode : usableModes) {
 				choiceSet.add(

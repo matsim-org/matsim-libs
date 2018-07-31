@@ -24,6 +24,8 @@ package org.matsim.core.mobsim.qsim;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
@@ -35,9 +37,9 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 /**
  * @author nagel
  */
-public class QSimUtils {
+public class QSimUtils2 {
 	 // should only contain static methods; should thus not be instantiated
-	private QSimUtils() {}
+	private QSimUtils2() {}
 
 	public static QSim createDefaultQSim(final Scenario scenario, final EventsManager eventsManager) {
 		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(), new StandaloneQSimModule(scenario, eventsManager));
@@ -45,14 +47,14 @@ public class QSimUtils {
 	}
 	
 	public static QSim createDefaultQSimWithOverrides( final Scenario scenario, final EventsManager eventsManager, 
-			Collection<AbstractModule> overrides ) {
+			List<AbstractModule> overrides ) {
 //		final StandaloneQSimModule module = new StandaloneQSimModule(scenario, eventsManager);
 //		for ( AbstractModule override : overrides ) {
 //			org.matsim.core.controler.AbstractModule.override(Collections.singleton(module), override) ;
 //		}
 //		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(), module );
 //		return (QSim) injector.getInstance(Mobsim.class);
-		return createQSim( scenario, eventsManager, overrides, Collections.emptyList() ) ;
+		return createQSim( scenario, eventsManager, overrides, null ) ;
 	}
 
 	public static QSim createQSim(final Scenario scenario, final EventsManager eventsManager, final Collection<AbstractQSimPlugin> plugins) {
@@ -72,24 +74,29 @@ public class QSimUtils {
 	}
 	
 	public static QSim createQSim( final Scenario scenario, final EventsManager eventsManager,
-								   final Collection<AbstractModule> overrides, final Collection<AbstractQSimPlugin> plugins ) {
-		// yy I patched the following together from the two (original ones) above.  But I cannot say why in the first case it is
-		// sufficient to override the module, while in the second case the output from the AbstractModule.override(...) method needs
-		// to be taken.  Maybe it does not matter, maybe it does, it would be nice to be certain.  kai, feb'18
-		
-		final StandaloneQSimModule module = new StandaloneQSimModule(scenario, eventsManager);
-		for ( AbstractModule override : overrides ) {
-			org.matsim.core.controler.AbstractModule.override(Collections.singleton(module), override) ;
+								   final List<AbstractModule> overrides, final Collection<AbstractQSimPlugin> plugins ) {
+		// First, load standard QSim module
+		AbstractModule module = new StandaloneQSimModule(scenario, eventsManager);
+	
+		// Add all overrides
+		for (AbstractModule override : overrides ) {
+			module = org.matsim.core.controler.AbstractModule.override(Collections.singleton(module), override) ;
 		}
-		final AbstractModule override = AbstractModule.override(Collections.singleton(module),
-				new AbstractModule() {
-					@Override
-					public void install() {
-						bind(new TypeLiteral<Collection<AbstractQSimPlugin>>() {
-						}).toInstance(plugins);
-					}
-				});
-		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(), override);
+		
+		// Overide plugins
+		if (plugins != null) {
+			module = AbstractModule.override(Collections.singleton(module),
+					new AbstractModule() {
+						@Override
+						public void install() {
+							bind(new TypeLiteral<Collection<AbstractQSimPlugin>>() {
+							}).toInstance(plugins);
+						}
+					});
+		}
+		
+		// Build QSim
+		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(), module);
 		return (QSim) injector.getInstance(Mobsim.class);
 	}
 

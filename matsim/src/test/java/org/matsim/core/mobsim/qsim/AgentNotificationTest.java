@@ -1,6 +1,9 @@
 package org.matsim.core.mobsim.qsim;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
@@ -18,6 +21,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -28,6 +32,8 @@ import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
@@ -39,8 +45,10 @@ import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -234,34 +242,33 @@ public class AgentNotificationTest {
 	@Test
 	public void testAgentNotification() {
 		Scenario scenario = createSimpleScenario();
-		final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
-		plugins.add(new MessageQueuePlugin(scenario.getConfig()));
-		plugins.add(new ActivityEnginePlugin(scenario.getConfig()));
-		plugins.add(new TeleportationPlugin(scenario.getConfig()));
-		plugins.add(new AbstractQSimPlugin(scenario.getConfig()) {
-			@Override
-			public Collection<? extends AbstractModule> modules() {
-				return Collections.singletonList(new AbstractModule() {
-					@Override
-					public void configure() {
-						bind(PopulationAgentSource.class).asEagerSingleton();
-						bind(AgentFactory.class).to(MyAgentFactory.class).asEagerSingleton();
-					}
-				});
-			}
-
-			@Override
-			public Collection<Class<? extends AgentSource>> agentSources() {
-				return Collections.singletonList(PopulationAgentSource.class);
-			}
-		});
+		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsCollector handler = new EventsCollector();
 		eventsManager.addHandler(handler);
 		
-		QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins);
-
-		qSim.run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.removePlugin(PopulationPlugin.class) //
+			.addPlugin(new PopulationPlugin(scenario.getConfig()) {
+				@Override
+				public Collection<? extends AbstractModule> modules() {
+					return Collections.singletonList(new AbstractModule() {
+						@Override
+						public void configure() {
+							bind(PopulationAgentSource.class).asEagerSingleton();
+							bind(AgentFactory.class).to(MyAgentFactory.class).asEagerSingleton();
+						}
+					});
+				}
+			}) //
+			.configureComponents(components -> {
+				components.activeMobsimEngines.remove("NetsimEngine");
+				components.activeDepartureHandlers.remove("NetsimEngine");
+			}) //
+			.build(scenario, eventsManager) //
+			.run();
+		
 		// yyyyyy I can comment out the above line and the test still passes (will say: "skipped"). ?????? kai, feb'16
 		
 		assumeThat(handler.getEvents(), hasItem(

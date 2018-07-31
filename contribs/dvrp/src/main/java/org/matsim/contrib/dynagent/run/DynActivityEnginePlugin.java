@@ -2,6 +2,7 @@ package org.matsim.contrib.dynagent.run;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
@@ -12,6 +13,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 
 public class DynActivityEnginePlugin extends AbstractQSimPlugin {
+	public final static String DYN_ACTIVITY_ENGINE_NAME = "DynActivityEngine";
+	
 	public DynActivityEnginePlugin(Config config) {
 		super(config);
 	}
@@ -27,12 +30,12 @@ public class DynActivityEnginePlugin extends AbstractQSimPlugin {
 	}
 
 	@Override
-	public Collection<Class<? extends ActivityHandler>> activityHandlers() {
-		return Collections.singletonList(DynActivityEngine.class);
+	public Map<String, Class<? extends ActivityHandler>> activityHandlers() {
+		return Collections.singletonMap(DYN_ACTIVITY_ENGINE_NAME, DynActivityEngine.class);
 	}
 
 	@Override
-	public Collection<Class<? extends MobsimEngine>> engines() {
-		return Collections.singletonList(DynActivityEngine.class);
+	public Map<String, Class<? extends MobsimEngine>> engines() {
+		return Collections.singletonMap(DYN_ACTIVITY_ENGINE_NAME, DynActivityEngine.class);
 	}
 }

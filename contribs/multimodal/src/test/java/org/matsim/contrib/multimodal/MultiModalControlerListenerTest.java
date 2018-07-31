@@ -168,7 +168,7 @@ public class MultiModalControlerListenerTest {
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		// controler listener that initializes the multi-modal simulation
-        controler.setModules(new ControlerDefaultsWithMultiModalModule());
+        controler.addOverridingModule(new MultiModalModule());
 
         LinkModeChecker linkModeChecker = new LinkModeChecker(scenario.getNetwork());
 		controler.getEvents().addHandler(linkModeChecker);

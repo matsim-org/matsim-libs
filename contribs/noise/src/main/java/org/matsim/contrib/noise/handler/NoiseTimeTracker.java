@@ -46,11 +46,9 @@ import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.data.NoiseLink;
 import org.matsim.contrib.noise.data.NoiseReceiverPoint;
 import org.matsim.contrib.noise.data.PersonActivityInfo;
-import org.matsim.contrib.noise.data.ReceiverPoint;
 import org.matsim.contrib.noise.events.NoiseEventAffected;
 import org.matsim.contrib.noise.events.NoiseEventCaused;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -101,7 +99,8 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 						+ "This message is only given once.");
 				cWarn1++;
 			}
-			
+			this.noiseContext.getNotConsideredTransitVehicleIDs().add(event.getVehicleId());
+
 		} else {
 			boolean isBus = false;
 			for (String busIdPrefix : this.noiseContext.getNoiseParams().getBusIdIdentifierSet()) {
@@ -658,19 +657,23 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 					
 					if (amount != 0.) {
 						
-						NoiseEventCaused noiseEvent = new NoiseEventCaused(
+						if (this.noiseContext.getNotConsideredTransitVehicleIDs().contains(vehicleId)) {
+							// skip
+						} else {
+							NoiseEventCaused noiseEvent = new NoiseEventCaused(
 									eventTime, 
 									currentTimeBinEndTime, 
 									this.noiseContext.getLinkId2vehicleId2lastEnterTime().get(linkId).get(vehicleId), 
 									this.noiseContext.getVehicleId2PersonId().get(vehicleId), 
 									vehicleId, amount, linkId);
-						events.processEvent(noiseEvent);
+							events.processEvent(noiseEvent);
 						
-						if (this.collectNoiseEvents) {
-							this.noiseEventsCaused.add(noiseEvent);
+							if (this.collectNoiseEvents) {
+								this.noiseEventsCaused.add(noiseEvent);
+							}
+						
+							totalCausedNoiseCost = totalCausedNoiseCost + amount;
 						}
-						
-						totalCausedNoiseCost = totalCausedNoiseCost + amount;
 					}
 				}
 			}
@@ -902,12 +905,12 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 	}
 
 	public void computeFinalTimeIntervals() {
-		
-		while (this.noiseContext.getCurrentTimeBinEndTime() <= 30 * 3600.) {
+
+		while (this.noiseContext.getCurrentTimeBinEndTime() <= Math.max(24. * 3600., this.noiseContext.getScenario().getConfig().qsim().getEndTime())) {
 			processTimeBin();			
 		}
 	}
-
+	
 	public List<NoiseEventCaused> getNoiseEventsCaused() {
 		return noiseEventsCaused;
 	}

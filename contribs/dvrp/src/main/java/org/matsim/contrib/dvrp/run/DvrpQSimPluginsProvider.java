@@ -68,16 +68,16 @@ public class DvrpQSimPluginsProvider implements Provider<Collection<AbstractQSim
 		this.addPassengerEnginePlugin = addPassengerEnginePlugin;
 		return this;
 	}
-
+	
 	@Override
 	public Collection<AbstractQSimPlugin> get() {
-		final Collection<AbstractQSimPlugin> plugins = DynQSimModule.createQSimPlugins(config);
+		final List<AbstractQSimPlugin> plugins = new ArrayList<>(DynQSimModule.provideQSimPlugins(config));
 		if (addPassengerEnginePlugin) {
 			plugins.add(new PassengerEnginePlugin(config, DvrpConfigGroup.get(config).getMode()));
 		}
 		plugins.add(new VrpAgentSourcePlugin(config));
 		plugins.add(new QSimPlugin(config));
-		return plugins;
+		return Collections.unmodifiableList(plugins);
 	}
 
 	private class QSimPlugin extends AbstractQSimPlugin {
