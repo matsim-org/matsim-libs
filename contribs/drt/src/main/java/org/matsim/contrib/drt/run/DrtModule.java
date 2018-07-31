@@ -12,7 +12,9 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.routing.DefaultAccessEgressStopFinder;
+import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtMainModeIdentifier;
+import org.matsim.contrib.drt.routing.DrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
@@ -58,8 +60,8 @@ public final class DrtModule extends AbstractModule {
 
 			case stopbased:
 				final Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-				new TransitScheduleReader(scenario2)
-						.readFile(drtCfg.getTransitStopsFileUrl(getConfig().getContext()).getFile());
+				new TransitScheduleReader(scenario2).readFile(
+						drtCfg.getTransitStopsFileUrl(getConfig().getContext()).getFile());
 				bind(TransitSchedule.class).annotatedWith(Names.named(TransportMode.drt))
 						.toInstance(scenario2.getTransitSchedule());
 				bind(MainModeIdentifier.class).to(DrtMainModeIdentifier.class).asEagerSingleton();
@@ -71,5 +73,9 @@ public final class DrtModule extends AbstractModule {
 			default:
 				throw new IllegalStateException();
 		}
+
+		bind(DefaultDrtRouteUpdater.class).asEagerSingleton();
+		bind(DrtRouteUpdater.class).to(DefaultDrtRouteUpdater.class).asEagerSingleton();
+		addControlerListenerBinding().to(DrtRouteUpdater.class);
 	}
 }
