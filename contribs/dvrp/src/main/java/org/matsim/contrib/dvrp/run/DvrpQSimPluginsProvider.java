@@ -27,7 +27,8 @@ import java.util.function.Function;
 import javax.inject.Provider;
 
 import org.matsim.contrib.dvrp.passenger.PassengerEnginePlugin;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourcePlugin;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
+import org.matsim.contrib.dynagent.run.DynAgentSourcePlugin;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -75,7 +76,7 @@ public class DvrpQSimPluginsProvider implements Provider<Collection<AbstractQSim
 		if (addPassengerEnginePlugin) {
 			plugins.add(new PassengerEnginePlugin(config, DvrpConfigGroup.get(config).getMode()));
 		}
-		plugins.add(new VrpAgentSourcePlugin(config));
+		plugins.add(new DynAgentSourcePlugin(config, VrpAgentSource.class));
 		plugins.add(new QSimPlugin(config));
 		return Collections.unmodifiableList(plugins);
 	}
