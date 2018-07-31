@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import org.matsim.core.mobsim.qsim.ActivityEnginePlugin;
 import org.matsim.core.mobsim.qsim.QSimModule;
@@ -34,28 +35,37 @@ import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator
 import com.google.inject.Provides;
 
 public class DynQSimModule extends AbstractModule {
+	private final Class<? extends AgentSource> agentSourceClass;
+
+	public DynQSimModule(Class<? extends AgentSource> agentSourceClass) {
+		this.agentSourceClass = agentSourceClass;
+	}
+
 	@Override
 	public void install() {
 	}
 
 	@Provides
 	public Collection<AbstractQSimPlugin> provideDynQSimPlugins(Config config) {
-		return provideQSimPlugins(config);
+		return provideQSimPlugins(config, agentSourceClass);
 	}
 
-	public static Collection<AbstractQSimPlugin> provideQSimPlugins(Config config) {
+	public static Collection<AbstractQSimPlugin> provideQSimPlugins(Config config,
+			Class<? extends AgentSource> agentSourceClass) {
 		//use the standard plugins, but replace ActivityEnginePlugin with DynActivityEnginePlugin
-		return QSimModule.getDefaultQSimPlugins(config)
+		Collection<AbstractQSimPlugin> plugins = QSimModule.getDefaultQSimPlugins(config)
 				.stream()
 				.map(p -> p instanceof ActivityEnginePlugin ? new DynActivityEnginePlugin(config) : p)
-				.collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+				.collect(Collectors.toList());
+		plugins.add(new DynAgentSourcePlugin(config, agentSourceClass));
+		return Collections.unmodifiableCollection(plugins);
 	}
 
 	@Provides
 	private QSimComponents provideQSimComponents(Config config) {
 		QSimComponents components = new QSimComponents();
 		new StandardQSimComponentsConfigurator(config).configure(components);
-		new DynAgentQSimComponentsConfigurator().configure(components);
+		new DynQSimComponentsConfigurator().configure(components);
 		return components;
 	}
 }
