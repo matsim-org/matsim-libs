@@ -24,11 +24,15 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponentsConfigurator;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.*;
+import org.matsim.contrib.dynagent.run.DynQSimComponentsConfigurator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.core.router.util.*;
 
 import com.google.inject.*;
@@ -72,7 +76,11 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 
 	@Override
 	public QSim get() {
-		QSim qSim = QSimUtils.createQSim(scenario, events, plugins);
+		final QSimBuilder qSimBuilder = new QSimBuilder(scenario.getConfig());
+		plugins.forEach(qSimBuilder::addPlugin);
+		qSimBuilder.useDefaultComponents();
+		qSimBuilder.configureComponents(new DynQSimComponentsConfigurator()::configure);
+		QSim  qSim = qSimBuilder.build(scenario, events);
 
 		TaxibusOptimizer optimizer = createTaxibusOptimizer(qSim);
 		qSim.addQueueSimulationListeners(optimizer);

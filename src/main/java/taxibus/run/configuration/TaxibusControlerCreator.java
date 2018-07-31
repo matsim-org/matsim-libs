@@ -25,6 +25,7 @@ import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
 import org.matsim.contrib.dynagent.run.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
@@ -62,11 +63,12 @@ public class TaxibusControlerCreator {
 		
 
 		controler.addOverridingModule(new DvrpTravelTimeModule());
-		controler.addOverridingModule(new DynQSimModule<>(TaxibusQSimProvider.class));
+		controler.addOverridingModule(new DynQSimModule(VrpAgentSource.class));
 		controler.addOverridingModule(new AbstractModule() {
 
 			@Override
 			public void install() {
+				bindMobsim().toProvider(TaxibusQSimProvider.class);
 				
 				if (tbcg.getStopsfile()==null) {
 					bind(OrderManager.class).to(TaxibusPassengerOrderManager.class).asEagerSingleton();
