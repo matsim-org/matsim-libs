@@ -31,8 +31,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import peoplemover.ClosestStopBasedDrtRoutingModule;
-
 /**
  * @author axer
  */
@@ -68,8 +66,6 @@ public class RunDrtScenario2Batch {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					addRoutingModuleBinding(DvrpConfigGroup.get(config).getMode())
-							.to(ClosestStopBasedDrtRoutingModule.class);
 					DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.3);
 					
 				}
