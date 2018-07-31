@@ -34,7 +34,7 @@
 	</module>
 	<module name="signalsystems" >
 		<!-- Possible values: WARN, EXCEPTION -->
-		<param name="actionOnConflictingDirectionViolation" value="WARN" />
+		<param name="actionOnConflictingDirectionViolation" value="EXCEPTION" />
 		<!-- Possible values: WARN, EXCEPTION -->
 		<param name="actionOnIntergreenViolation" value="WARN" />
 		<param name="ambertimes" value="null" />
