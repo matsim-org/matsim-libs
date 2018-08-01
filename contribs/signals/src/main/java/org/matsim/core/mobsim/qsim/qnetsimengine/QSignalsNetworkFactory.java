@@ -24,7 +24,11 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup.IntersectionLogic;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
@@ -76,8 +80,17 @@ public class QSignalsNetworkFactory extends QNetworkFactory{
 	@Override
 	QNodeI createNetsimNode(Node node) {
 		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
-		builder.setTurnAcceptanceLogic( new SignalTurnAcceptanceLogic() ) ;
-		return builder.build( node ) ;
+		
+		// check whether turn acceptance logic is enabled
+		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
+				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		if (signalsConfigGroup.getIntersectionLogic().equals(IntersectionLogic.CONFLICTING_DIRECTIONS_AND_TURN_RESTRICTIONS)) {
+			builder.setTurnAcceptanceLogic(new UnprotectedLeftTurnAcceptanceLogic(
+					((SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getConflictingDirectionsData(), scenario.getLanes()));
+		} else {
+			builder.setTurnAcceptanceLogic(new SignalTurnAcceptanceLogic());
+		}
+		return builder.build(node);
 	}
 
 	@Override
