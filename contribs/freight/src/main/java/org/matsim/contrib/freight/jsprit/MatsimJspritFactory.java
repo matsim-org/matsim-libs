@@ -34,11 +34,14 @@ import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
+import com.graphhopper.jsprit.core.problem.AbstractJob;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem.FleetSize;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
+import com.graphhopper.jsprit.core.problem.job.Delivery;
+import com.graphhopper.jsprit.core.problem.job.Pickup;
 import com.graphhopper.jsprit.core.problem.job.Service;
 import com.graphhopper.jsprit.core.problem.job.Service.Builder;
 import com.graphhopper.jsprit.core.problem.job.Shipment;
@@ -145,6 +148,16 @@ public class MatsimJspritFactory {
 		.setPickupTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(carrierShipment.getPickupTimeWindow().getStart(), carrierShipment.getPickupTimeWindow().getEnd()))
 		.addSizeDimension(0, carrierShipment.getSize())
 		.build();
+	}
+	
+	private static Delivery createDelivery(CarrierShipment carrierShipment,  Coord toCoordinate) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static Pickup createPickup(CarrierShipment carrierShipment, Coord fromCoordinate) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	static Service createService(CarrierService carrierService, Coord locationCoord) {
@@ -364,9 +377,9 @@ public class MatsimJspritFactory {
 	 * 
 	 * <p>For creation it takes only the information needed to setup the problem (not the solution, i.e. predefined plans are ignored). 
 	 * <p>The network is required to retrieve coordinates of locations.
-	 * <p>Note that currently only services ({@link Service}) are supported.
+	 * <p>Note that currently only services ({@link Service}) and Shipments ({@link Shipment}) are supported.
+     * <p>Pickups and deliveries can be defined as shipments with only one location (toLocation for delivery and fromLocation for pickup). Implementation follows
 	 *
-	 * @throws IllegalStateException if shipments are involved.
 	 */
 	public static VehicleRoutingProblem createRoutingProblem(Carrier carrier, Network network, VehicleRoutingTransportCosts transportCosts, VehicleRoutingActivityCosts activityCosts){
 		VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
@@ -405,20 +418,27 @@ public class MatsimJspritFactory {
 			vrpBuilder.addJob(createService(service, coordinate));
 		}
 		
+		
 		for(CarrierShipment carrierShipment : carrier.getShipments()) {
 			Coord fromCoordinate = null;
 			Coord toCoordinate = null;
 			if(network != null){
 				Link fromLink = network.getLinks().get(carrierShipment.getFrom());
 				Link toLink = network.getLinks().get(carrierShipment.getTo());
-				if(fromLink == null) {
-					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getFrom() + " does not exists in network.");
-				}
-				else fromCoordinate = fromLink.getCoord();
-				if(toLink == null) {
-					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getTo() + " does not exists in network.");
-				}
-				else toCoordinate = toLink.getCoord();
+
+				if(fromLink != null && toLink != null) { //Shipment to be delivered from specified location to specified location
+					fromCoordinate = fromLink.getCoord();
+					toCoordinate = toLink.getCoord();
+					vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
+				} else if (fromLink != null && toLink== null) { 	//Pickup to be delivered from specified location to depot TODO: Use Pickup also in MATSim freight contrib?? kmt aug/18
+					fromCoordinate = fromLink.getCoord();
+					vrpBuilder.addJob(createPickup(carrierShipment, fromCoordinate));
+				} else if (fromLink == null && toLink != null) { 	//Delivery to be delivered from depot to specified location TODO: Use Delivery also in MATSim freight contrib?? kmt aug/18
+					toCoordinate = toLink.getCoord();
+					vrpBuilder.addJob(createDelivery(carrierShipment, toCoordinate));
+				} else 
+					throw new IllegalStateException("cannot create shipment since neither fromLinkId " + carrierShipment.getTo() + " nor toLinkId " + carrierShipment.getTo() + " exists in network.");
+					
 			}
 			vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
 		}
@@ -429,15 +449,16 @@ public class MatsimJspritFactory {
 		return vrpBuilder.build();
 	}
 	
+
 	/**
 	 * Creates {@link VehicleRoutingProblem.Builder} from {@link Carrier} for later building of the {@link VehicleRoutingProblem}. This is required if you need to
 	 * add stuff to the problem later, e.g. because it cannot solely be retrieved from network and carrier such as {@link NetworkBasedTransportCosts}.
 	 * 
 	 * <p>For creation it takes only the information needed to setup the problem (not the solution, i.e. predefined plans are ignored). 
 	 * <p>The network is required to retrieve coordinates of locations.
-	 * <p>Note that currently only services ({@link Service}) are supported.
+	 * <p>Note that currently only services ({@link Service}) and Shipments ({@link Shipment}) are supported.
+     * <p>Pickups and deliveries can be defined as shipments with only one location (toLocation for delivery and fromLocation for pickup). Implementation follows
 	 *
-	 * @throws IllegalStateException if shipments are involved.
 	 */
 	public static VehicleRoutingProblem.Builder createRoutingProblemBuilder(Carrier carrier, Network network){
 		VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
@@ -475,19 +496,29 @@ public class MatsimJspritFactory {
 		
 		
 		for(CarrierShipment carrierShipment : carrier.getShipments()) {
+//			log.debug("Handle CarrierShipment: " + carrierShipment.toString());
 			Coord fromCoordinate = null;
 			Coord toCoordinate = null;
 			if(network != null){
 				Link fromLink = network.getLinks().get(carrierShipment.getFrom());
 				Link toLink = network.getLinks().get(carrierShipment.getTo());
-				if(fromLink == null) {
-					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getFrom() + " does not exists in network.");
-				}
-				else fromCoordinate = fromLink.getCoord();
-				if(toLink == null) {
-					throw new IllegalStateException("cannot create shipment since linkId " + carrierShipment.getTo() + " does not exists in network.");
-				}
-				else toCoordinate = toLink.getCoord();
+
+				if(fromLink != null && toLink != null) { //Shipment to be delivered from specified location to specified location
+					log.debug("Shipment identified as Shipment: " + carrierShipment.getId().toString());
+					fromCoordinate = fromLink.getCoord();
+					toCoordinate = toLink.getCoord();
+					vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
+				} else if (fromLink != null && toLink == null) { 	//Pickup to be delivered from specified location to depot TODO: Use Pickup also in MATSim freight contrib?? kmt aug/18
+					log.debug("Shipment identified as Pickup: " + carrierShipment.getId().toString());
+					fromCoordinate = fromLink.getCoord();
+					vrpBuilder.addJob(createPickup(carrierShipment, fromCoordinate));
+				} else if (fromLink == null && toLink != null) { 	//Delivery to be delivered from depot to specified location TODO: Use Delivery also in MATSim freight contrib?? kmt aug/18
+					log.debug("Shipment identified as Delivery: " + carrierShipment.getId().toString());
+					toCoordinate = toLink.getCoord();
+					vrpBuilder.addJob(createDelivery(carrierShipment, toCoordinate));
+				} else 
+					throw new IllegalStateException("cannot create shipment " + carrierShipment.getId().toString() + " since neither fromLinkId " + carrierShipment.getTo() + " nor toLinkId " + carrierShipment.getTo() + " exists in network.");
+					
 			}
 			vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
 		}
