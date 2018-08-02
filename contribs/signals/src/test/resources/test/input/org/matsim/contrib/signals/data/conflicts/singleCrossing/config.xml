@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<module name="controler" >
+		<!-- Sets whether graphs showing some analyses should automatically be generated during the simulation. The generation of graphs usually takes a small amount of time that does not have any weight in big simulations, but add a significant overhead in smaller runs or in test cases where the graphical output is not even requested. -->
+		<param name="createGraphs" value="false" />
+		<!-- true if at the end of a run, plans, network, config etc should be dumped to a file -->
+		<param name="dumpDataAtEnd" value="false" />
+		<!-- Default=false. If enabled, the router takes travel times needed for turning moves into account. Cannot be used if the (Fast)AStarLandmarks routing or TravelTimeCalculator.separateModes is enabled. -->
+		<param name="enableLinkToLinkRouting" value="true" />
+		<!-- Default=0;  -->
+		<param name="firstIteration" value="0" />
+		<!-- Default=1000;  -->
+		<param name="lastIteration" value="0" />
+		<param name="outputDirectory" value="output/" />
+		<!-- Possible values: failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists -->
+		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
+	</module>
+	<module name="network" >
+		<param name="inputNetworkFile" value="network.xml" />
+		<param name="laneDefinitionsFile" value="lanes.xml" />
+	</module>
+	
+	<module name="plans" >
+		<param name="inputPlansFile" value="plans.xml" />
+	</module>
+	<module name="qsim" >
+		<!-- time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move. -->
+		<param name="stuckTime" value="86400.0" />
+		<!-- Set this parameter to true if lanes should be used, false if not. -->
+		<param name="useLanes" value="true" />
+		<!-- If false, the qsim accumulates fractional flows up to one flow unit in every time step.  If true, flows are updated only if an agent wants to enter the link or an agent is added to buffer. Default is true. -->
+		<param name="usingFastCapacityUpdate" value="false" />
+	</module>
+	<module name="signalsystems" >
+		<!-- Possible values: WARN, EXCEPTION -->
+		<param name="actionOnConflictingDirectionViolation" value="EXCEPTION" />
+		<!-- Possible values: WARN, EXCEPTION -->
+		<param name="actionOnIntergreenViolation" value="WARN" />
+		<param name="ambertimes" value="null" />
+		<param name="conflictingDirections" value="conflictData.xml" />
+		<param name="intergreentimes" value="null" />
+		<!-- Possible values: NONE, CONFLICTING_DIRECTIONS_NO_TURN_RESTRICTIONS, CONFLICTING_DIRECTIONS_AND_TURN_RESTRICTIONS -->
+		<param name="intersectionLogic" value="CONFLICTING_DIRECTIONS_NO_TURN_RESTRICTIONS" />
+		<param name="signalcontrol" value="signalControl.xml" />
+		<param name="signalgroups" value="signalGroups.xml" />
+		<param name="signalsystems" value="signalSystems.xml" />
+		<param name="useAmbertimes" value="false" />
+		<param name="useIntergreentimes" value="false" />
+		<param name="useSignalsystems" value="true" />
+	</module>
+	<module name="travelTimeCalculator" >
+		<param name="calculateLinkToLinkTravelTimes" value="true" />
+		<param name="calculateLinkTravelTimes" value="true" />
+	</module>
+
+</config>

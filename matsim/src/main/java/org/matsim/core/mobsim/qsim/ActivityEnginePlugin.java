@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.Map;
 
 public final class ActivityEnginePlugin extends AbstractQSimPlugin {
-	public final String ACTIVITY_ENGINE_NAME = "ActivityEngine";
+	public static final String ACTIVITY_ENGINE_NAME = "ActivityEngine";
 
 	public ActivityEnginePlugin(Config config) {
 		super(config);

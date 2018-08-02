@@ -41,6 +41,6 @@ public class RunOneSharedTaxiExample {
 	}
 
 	public static void main(String[] args) {
-		run(false, 0); // switch to 'true' to turn on visualisation
+		run(false, 2); // switch to 'true' to turn on visualisation
 	}
 }

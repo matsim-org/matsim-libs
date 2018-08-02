@@ -44,7 +44,6 @@ public class RunRandomDynAgentExample {
 		Config config = ConfigUtils.createConfig(otfvisConfig);
 		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
-		
 		config.network().setInputFile(netFile);
 		config.controler().setOutputDirectory("./test/output/");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -55,7 +54,7 @@ public class RunRandomDynAgentExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DynQSimModule());
+		controler.addOverridingModule(new DynQSimModule(RandomDynAgentSource.class));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

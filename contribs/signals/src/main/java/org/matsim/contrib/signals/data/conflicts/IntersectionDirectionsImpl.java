@@ -64,7 +64,12 @@ public class IntersectionDirectionsImpl implements IntersectionDirections {
 				return d;
 			}
 		}
-		throw new RuntimeException("SignalSystem " + signalSystemId + " has no direction with from-Link " + fromLink + " and to-link " + toLink);
+//		throw new RuntimeException("SignalSystem " + signalSystemId + " has no direction with from-Link " + fromLink + " and to-link " + toLink);
+		/* rather return null when the direction does not exist instead of throwing an exception. 
+		 * with this one does not have to specify all directions of intersections when one does 
+		 * not need them (e.g. u-turns in the cottbus scenario).
+		 * theresa, jul'18 */
+		return null;
 	}
 
 	@Override
