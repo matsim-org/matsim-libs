@@ -37,7 +37,7 @@ import org.matsim.testcases.MatsimTestUtils;
 /**
  *
  */
-public class RunTransEnergySimExampleText {
+public class RunTransEnergySimExampleTest {
 
 	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 

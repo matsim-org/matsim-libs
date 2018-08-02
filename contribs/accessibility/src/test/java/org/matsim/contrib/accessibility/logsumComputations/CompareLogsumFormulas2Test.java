@@ -30,7 +30,7 @@ import org.matsim.testcases.MatsimTestCase;
  * @author thomas
  *
  */
-public class CompareLogsumFormulas2 extends MatsimTestCase {
+public class CompareLogsumFormulas2Test extends MatsimTestCase {
 	
 	@Test
 	public void testLogsumFormulas(){

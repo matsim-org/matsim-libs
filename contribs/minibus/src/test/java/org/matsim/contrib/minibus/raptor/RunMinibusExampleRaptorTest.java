@@ -25,15 +25,21 @@ import org.junit.Test;
 import org.matsim.contrib.minibus.RunMinibus;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class RunMinibusExampleRaptor {
+public class RunMinibusExampleRaptorTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
-	@Ignore
+//	@Ignore // why?  Maybe running time too long?  kai, aug'18
 	@Test
     public final void testRunScenarioWithRaptor() {
 		String[] args = {"test/input/org/matsim/contrib/minibus/example-scenario/config_raptor_minibus.xml"};
-		RunMinibus.main(args);
+
+		final RunMinibus minibus = new RunMinibus( args );;
+
+		minibus.getConfig().controler().setLastIteration(1) ;
+		minibus.getConfig().controler().setOutputDirectory( utils.getOutputDirectory() ) ;
+
+		minibus.run() ;
 	}
 
 }

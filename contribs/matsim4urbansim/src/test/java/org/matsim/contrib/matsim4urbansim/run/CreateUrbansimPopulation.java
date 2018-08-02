@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.core.utils.io.IOUtils;
 
-public class CreateTestUrbansimPopulation {
+public class CreateUrbansimPopulation {
 	
 //	@Test // I don' think this is a test ... since it actually does not "test" anything.  Rather, it is a helper method for
 	// other test classes. kai

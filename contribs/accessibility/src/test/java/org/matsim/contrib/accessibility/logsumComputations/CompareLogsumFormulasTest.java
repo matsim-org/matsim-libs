@@ -30,7 +30,7 @@ import org.matsim.testcases.MatsimTestCase;
  * @author thomas
  *
  */
-public class CompareLogsumFormulas extends MatsimTestCase{
+public class CompareLogsumFormulasTest extends MatsimTestCase{
 	
 	/**
 	 * underlying network
