@@ -215,7 +215,11 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 			}
 			writer.write( indent );
 			writer.write("\t\t<"+PARAMETER+" name=\"" + entry.getKey() + "\" value=\"" + actual + "\" />");
-			writer.write( this.newline );
+			if ( !ActivityParams.SET_TYPE.equals( moduleName ) ) {
+				// (attempt to write activity paramshorizontally since there are often lots of them and then
+				// one has to scroll a lot. Can't say if this is a good idea. kai, jul'18)
+				writer.write( this.newline );
+			}
 		}
 		return headerHasBeenWritten;
 	}
