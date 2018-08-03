@@ -324,8 +324,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		else if (Arrays
 				.asList(LATE_ARRIVAL, EARLY_DEPARTURE, PERFORMING, MARGINAL_UTL_OF_MONEY, UTL_OF_LINE_SWITCH, WAITING)
 				.contains(key)) {
-			log.warn( msg );
-			usesDeprecatedSyntax = true ;
+//			log.warn( msg );
+//			usesDeprecatedSyntax = true ;
+			// this is the stuff with the default subpopulation
+			
 			getScoringParameters(null).addParam(key, value);
 		}
 
