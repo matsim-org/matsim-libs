@@ -29,7 +29,7 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
 
 	public static final String GROUP_NAME = "global";
-	private boolean insistingOnDeprecatedConfigVersion = false ;
+	private boolean insistingOnDeprecatedConfigVersion = true ;
 	
 	public GlobalConfigGroup() {
 		super(GROUP_NAME);
