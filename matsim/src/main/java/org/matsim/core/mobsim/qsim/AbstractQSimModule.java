@@ -34,19 +34,19 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule {
 		configureQSim();
 	}
 
-	protected LinkedBindingBuilder<MobsimEngine> addMobsimEngine(String name) {
+	protected LinkedBindingBuilder<MobsimEngine> addMobsimEngineBinding(String name) {
 		return binder().bind(Key.get(MobsimEngine.class, Names.named(name)));
 	}
 
-	protected LinkedBindingBuilder<ActivityHandler> addActivityHandler(String name) {
+	protected LinkedBindingBuilder<ActivityHandler> addActivityHandlerBinding(String name) {
 		return binder().bind(Key.get(ActivityHandler.class, Names.named(name)));
 	}
 
-	protected LinkedBindingBuilder<DepartureHandler> addDepartureHandler(String name) {
+	protected LinkedBindingBuilder<DepartureHandler> addDepartureHandlerBinding(String name) {
 		return binder().bind(Key.get(DepartureHandler.class, Names.named(name)));
 	}
 
-	protected LinkedBindingBuilder<AgentSource> addAgentSource(String name) {
+	protected LinkedBindingBuilder<AgentSource> addAgentSourceBinding(String name) {
 		return binder().bind(Key.get(AgentSource.class, Names.named(name)));
 	}
 

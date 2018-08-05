@@ -15,6 +15,6 @@ public class DynAgentSourceModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(agentSourceClass).asEagerSingleton();
-		addAgentSource(DYN_AGENT_SOURCE_NAME).to(agentSourceClass);
+		addAgentSourceBinding(DYN_AGENT_SOURCE_NAME).to(agentSourceClass);
 	}
 }

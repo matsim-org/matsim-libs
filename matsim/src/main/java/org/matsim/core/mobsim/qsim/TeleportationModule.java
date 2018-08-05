@@ -6,6 +6,6 @@ public class TeleportationModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(DefaultTeleportationEngine.class).asEagerSingleton();
-		addMobsimEngine(TELEPORATION_ENGINE_NAME).to(DefaultTeleportationEngine.class);
+		addMobsimEngineBinding(TELEPORATION_ENGINE_NAME).to(DefaultTeleportationEngine.class);
 	}
 }

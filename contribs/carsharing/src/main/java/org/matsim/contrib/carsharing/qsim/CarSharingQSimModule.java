@@ -28,8 +28,8 @@ public class CarSharingQSimModule extends AbstractQSimModule {
 	protected void configureQSim() {
 		bind(PopulationAgentSource.class).asEagerSingleton();
 
-		addAgentSource(PopulationModule.POPULATION_AGENT_SOURCE_NAME).to(PopulationAgentSource.class);
-		addAgentSource(CARSHARING_PARKING_VEHICLES_SOURCE).to(ParkCSVehicles.class);
+		addAgentSourceBinding(PopulationModule.POPULATION_AGENT_SOURCE_NAME).to(PopulationAgentSource.class);
+		addAgentSourceBinding(CARSHARING_PARKING_VEHICLES_SOURCE).to(ParkCSVehicles.class);
 	}
 
 	@Provides

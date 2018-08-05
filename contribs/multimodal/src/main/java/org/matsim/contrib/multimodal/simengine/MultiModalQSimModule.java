@@ -21,8 +21,8 @@ public class MultiModalQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		addMobsimEngine(MULTIMODAL_ENGINE).to(MultiModalSimEngine.class);
-		addDepartureHandler(MULTIMODAL_DEPARTURE_HANDLER).to(MultiModalDepartureHandler.class);
+		addMobsimEngineBinding(MULTIMODAL_ENGINE).to(MultiModalSimEngine.class);
+		addDepartureHandlerBinding(MULTIMODAL_DEPARTURE_HANDLER).to(MultiModalDepartureHandler.class);
 	}
 
 	@Provides

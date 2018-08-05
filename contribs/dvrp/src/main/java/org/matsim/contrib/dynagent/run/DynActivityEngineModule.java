@@ -9,7 +9,7 @@ public class DynActivityEngineModule extends AbstractQSimModule {
 	protected void configureQSim() {
 		bind(DynActivityEngine.class).asEagerSingleton();
 
-		addMobsimEngine(DYN_ACTIVITY_ENGINE_NAME).to(DynActivityEngine.class);
-		addActivityHandler(DYN_ACTIVITY_ENGINE_NAME).to(DynActivityEngine.class);
+		addMobsimEngineBinding(DYN_ACTIVITY_ENGINE_NAME).to(DynActivityEngine.class);
+		addActivityHandlerBinding(DYN_ACTIVITY_ENGINE_NAME).to(DynActivityEngine.class);
 	}
 }
