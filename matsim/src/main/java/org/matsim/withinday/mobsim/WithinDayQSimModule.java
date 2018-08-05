@@ -26,8 +26,8 @@ public class WithinDayQSimModule extends AbstractQSimModule {
 		bind(FixedOrderSimulationListener.class).toInstance(fixedOrderSimulationListener);
 		bind(WithinDayTravelTime.class).toInstance(withinDayTravelTime);
 
-		addMobsimListenerBinding(FIXED_ORDER_SIMULATION_LISTENER).to(FixedOrderSimulationListener.class);
-		addMobsimListenerBinding(WITHIN_TRAVEL_TIME_NAME).to(WithinDayTravelTime.class);
-		addMobsimEngineBinding(WITHIN_DAY_ENGINE_NAME).to(WithinDayEngine.class);
+		bindMobsimListener(FIXED_ORDER_SIMULATION_LISTENER).to(FixedOrderSimulationListener.class);
+		bindMobsimListener(WITHIN_TRAVEL_TIME_NAME).to(WithinDayTravelTime.class);
+		bindMobsimEngine(WITHIN_DAY_ENGINE_NAME).to(WithinDayEngine.class);
 	}
 }

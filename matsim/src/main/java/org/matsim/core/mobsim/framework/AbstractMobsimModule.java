@@ -8,7 +8,7 @@ import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.name.Names;
 
 public abstract class AbstractMobsimModule extends AbstractModule {
-	protected LinkedBindingBuilder<MobsimListener> addMobsimListenerBinding(String name) {
+	protected LinkedBindingBuilder<MobsimListener> bindMobsimListener(String name) {
 		return binder().bind(Key.get(MobsimListener.class, Names.named(name)));
 	}
 

@@ -14,8 +14,8 @@ public class JDEQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		addMobsimEngineBinding(JDEQ_ENGINE_NAME).to(JDEQSimEngine.class);
-		addActivityHandlerBinding(JDEQ_ENGINE_NAME).to(JDEQSimEngine.class);
+		bindMobsimEngine(JDEQ_ENGINE_NAME).to(JDEQSimEngine.class);
+		bindActivityHandler(JDEQ_ENGINE_NAME).to(JDEQSimEngine.class);
 	}
 
 	@Provides

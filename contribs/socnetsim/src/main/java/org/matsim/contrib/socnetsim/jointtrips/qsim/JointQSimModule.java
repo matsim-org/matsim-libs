@@ -20,11 +20,11 @@ public class JointQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		addMobsimEngineBinding(JOINT_MODES_DEPARTURE_HANDLER).to(JointModesDepartureHandler.class);
-		addMobsimEngineBinding(JOINT_PASSENGER_UNBOARDING).to(PassengerUnboardingAgentFactory.class);
+		bindMobsimEngine(JOINT_MODES_DEPARTURE_HANDLER).to(JointModesDepartureHandler.class);
+		bindMobsimEngine(JOINT_PASSENGER_UNBOARDING).to(PassengerUnboardingAgentFactory.class);
 
-		addDepartureHandlerBinding(JOINT_MODES_DEPARTURE_HANDLER).to(JointModesDepartureHandler.class);
-		addAgentSourceBinding(AGENTS_SOURCE_WITH_VEHICLES).to(PopulationAgentSourceWithVehicles.class);
+		bindDepartureHandler(JOINT_MODES_DEPARTURE_HANDLER).to(JointModesDepartureHandler.class);
+		bindAgentSource(AGENTS_SOURCE_WITH_VEHICLES).to(PopulationAgentSourceWithVehicles.class);
 	}
 
 	@Provides

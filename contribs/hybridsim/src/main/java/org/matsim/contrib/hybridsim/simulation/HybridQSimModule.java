@@ -14,7 +14,7 @@ public class HybridQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		addMobsimEngineBinding(HYBRID_EXTERNAL_ENGINE_NAME).to(ExternalEngine.class);
+		bindMobsimEngine(HYBRID_EXTERNAL_ENGINE_NAME).to(ExternalEngine.class);
 	}
 
 	@Provides

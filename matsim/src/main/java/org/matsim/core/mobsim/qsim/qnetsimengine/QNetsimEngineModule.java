@@ -11,7 +11,7 @@ public class QNetsimEngineModule extends AbstractQSimModule {
 		bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class)
 				.asEagerSingleton();
 
-		addDepartureHandlerBinding(NETSIM_ENGINE_NAME).to(VehicularDepartureHandler.class);
-		addMobsimEngineBinding(NETSIM_ENGINE_NAME).to(QNetsimEngine.class);
+		bindDepartureHandler(NETSIM_ENGINE_NAME).to(VehicularDepartureHandler.class);
+		bindMobsimEngine(NETSIM_ENGINE_NAME).to(QNetsimEngine.class);
 	}
 }

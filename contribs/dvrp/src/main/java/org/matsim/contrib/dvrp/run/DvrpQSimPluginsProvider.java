@@ -86,7 +86,7 @@ public class DvrpQSimPluginsProvider implements Provider<Collection<AbstractQSim
 
 			for (Class<? extends MobsimListener> listener : listeners) {
 				String listenerName = String.format("DVRP_%d_%s", index, listener.getClass().toString());
-				addMobsimListenerBinding(listenerName).to(listener);
+				bindMobsimListener(listenerName).to(listener);
 				index++;
 			}
 

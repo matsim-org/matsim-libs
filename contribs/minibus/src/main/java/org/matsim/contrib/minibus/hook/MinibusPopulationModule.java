@@ -21,7 +21,7 @@ public class MinibusPopulationModule extends AbstractQSimModule {
 			bind(AgentFactory.class).to(DefaultAgentFactory.class).asEagerSingleton();
 		}
 
-		addAgentSourceBinding(PopulationModule.POPULATION_AGENT_SOURCE_NAME).to(PopulationAgentSource.class);
+		bindAgentSource(PopulationModule.POPULATION_AGENT_SOURCE_NAME).to(PopulationAgentSource.class);
 	}
 
 	@Provides

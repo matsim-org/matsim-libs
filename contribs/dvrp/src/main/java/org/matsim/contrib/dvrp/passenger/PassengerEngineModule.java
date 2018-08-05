@@ -24,8 +24,8 @@ public class PassengerEngineModule extends AbstractQSimModule {
 	protected void configureQSim() {
 		bind(PassengerEngine.class).toProvider(new PassengerEngineProvider(mode)).asEagerSingleton();
 
-		addDepartureHandlerBinding(PASSENGER_ENGINE_NAME).to(PassengerEngine.class);
-		addMobsimEngineBinding(PASSENGER_ENGINE_NAME).to(PassengerEngine.class);
+		bindDepartureHandler(PASSENGER_ENGINE_NAME).to(PassengerEngine.class);
+		bindMobsimEngine(PASSENGER_ENGINE_NAME).to(PassengerEngine.class);
 	}
 
 	public static class PassengerEngineProvider implements Provider<PassengerEngine> {

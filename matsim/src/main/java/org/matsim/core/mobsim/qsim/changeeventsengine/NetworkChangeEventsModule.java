@@ -8,6 +8,6 @@ public class NetworkChangeEventsModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(NewNetworkChangeEventsEngine.class).asEagerSingleton();
-		addMobsimEngineBinding(NETWORK_CHANGE_EVENTS_ENGINE_NAME).to(NewNetworkChangeEventsEngine.class);
+		bindMobsimEngine(NETWORK_CHANGE_EVENTS_ENGINE_NAME).to(NewNetworkChangeEventsEngine.class);
 	}
 }

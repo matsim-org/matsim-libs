@@ -7,7 +7,7 @@ public class ActivityEngineModule extends AbstractQSimModule {
 	protected void configureQSim() {
 		bind(ActivityEngine.class).asEagerSingleton();
 
-		addActivityHandlerBinding(ACTIVITY_ENGINE_NAME).to(ActivityEngine.class);
-		addMobsimEngineBinding(ACTIVITY_ENGINE_NAME).to(ActivityEngine.class);
+		bindActivityHandler(ACTIVITY_ENGINE_NAME).to(ActivityEngine.class);
+		bindMobsimEngine(ACTIVITY_ENGINE_NAME).to(ActivityEngine.class);
 	}
 }
