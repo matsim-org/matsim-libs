@@ -61,15 +61,20 @@ import java.util.Map;
  * @author nagel, ikaddoura
  */
 public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector {
+	// According to what I have tried (with equil and pt mode choice), the penalties should rather be somewhere
+	// between 0.1 and 0.3.  1 already is too much; what essentially happens is that agents end up spending
+	// too much time on evaluating mutations of plans that already have a low base score, but remain in the
+	// choice set because they are so different.  One should re-run this with one of the "reserved space"
+	// examples (airplanes; evacuation shelters). kai, aug'18
 
 	public static final class Builder implements Provider<PlanSelector<Plan, Person>> {
 
 		private Network network;
-		private double actTypeWeight = 1.;
-		private double locationWeight = 1.;
-		private double actTimeParameter = 1.;
-		private double sameRoutePenalty = 1.;
-		private double sameModePenalty = 1.;
+		private double actTypeWeight = 0.1;
+		private double locationWeight = 0.3;
+		private double actTimeParameter = 0.3;
+		private double sameRoutePenalty = 0.3;
+		private double sameModePenalty = 0.3;
 
 		private StageActivityTypes stageActivities = new StageActivityTypes() {
 			@Override
