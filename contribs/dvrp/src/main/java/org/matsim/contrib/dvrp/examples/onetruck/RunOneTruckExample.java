@@ -37,7 +37,7 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponents;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -70,8 +70,8 @@ public final class RunOneTruckExample {
 				addTravelTimeBinding(DvrpTravelTimeModule.DVRP_ESTIMATED).to(networkTravelTime());
 				bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))
 						.to(Network.class);
-				bind(new TypeLiteral<Collection<AbstractQSimPlugin>>() {})
-						.toProvider(createQSimPluginsProvider(getConfig()));
+				bind(new TypeLiteral<Collection<AbstractQSimModule>>() {
+				}).toProvider(createQSimPluginsProvider(getConfig()));
 				bind(QSimComponents.class).toInstance(createQSimComponents(config));
 			}
 		});
@@ -88,9 +88,9 @@ public final class RunOneTruckExample {
 
 	private static DvrpQSimPluginsProvider createQSimPluginsProvider(Config config) {
 		return new DvrpQSimPluginsProvider(config, cfg -> {
-			return new com.google.inject.AbstractModule() {
+			return new AbstractQSimModule() {
 				@Override
-				protected void configure() {
+				protected void configureQSim() {
 					bind(OneTruckRequestCreator.class).asEagerSingleton();
 					bind(VrpOptimizer.class).to(OneTruckOptimizer.class).asEagerSingleton();
 					bind(DynActionCreator.class).to(OneTruckActionCreator.class).asEagerSingleton();
@@ -99,7 +99,7 @@ public final class RunOneTruckExample {
 		}).addListener(OneTruckRequestCreator.class)//
 				.setAddPassengerEnginePlugin(false);
 	}
-	
+
 	private static QSimComponents createQSimComponents(Config config) {
 		QSimComponents components = new QSimComponents();
 		new StandardQSimComponentsConfigurator(config).configure(components);

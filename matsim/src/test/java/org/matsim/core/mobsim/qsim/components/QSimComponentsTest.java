@@ -1,8 +1,6 @@
 package org.matsim.core.mobsim.qsim.components;
 
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -11,14 +9,11 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Module;
 
 public class QSimComponentsTest {
 	@Test
@@ -30,18 +25,10 @@ public class QSimComponentsTest {
 		MockEngine mockEngine = new MockEngine();
 
 		new QSimBuilder(config) //
-				.addPlugin(new AbstractQSimPlugin(config) {
-					public Collection<? extends Module> modules() {
-						return Collections.singleton(new AbstractModule() {
-							@Override
-							protected void configure() {
-								bind(MockEngine.class).toInstance(mockEngine);
-							}
-						});
-					}
-
-					public Map<String, Class<? extends MobsimEngine>> engines() {
-						return Collections.singletonMap("MockEngine", MockEngine.class);
+				.addModule(new AbstractQSimModule() {
+					@Override
+					protected void configureQSim() {
+						addMobsimEngine("MockEngine").toInstance(mockEngine);
 					}
 				}) //
 				.configureComponents(components -> {
@@ -72,18 +59,10 @@ public class QSimComponentsTest {
 
 		new QSimBuilder(config) //
 				.useDefaults() //
-				.addPlugin(new AbstractQSimPlugin(config) {
-					public Collection<? extends Module> modules() {
-						return Collections.singleton(new AbstractModule() {
-							@Override
-							protected void configure() {
-								bind(MockEngine.class).toInstance(mockEngine);
-							}
-						});
-					}
-
-					public Map<String, Class<? extends MobsimEngine>> engines() {
-						return Collections.singletonMap("MockEngine", MockEngine.class);
+				.addModule(new AbstractQSimModule() {
+					@Override
+					protected void configureQSim() {
+						addMobsimEngine("MockEngine").toInstance(mockEngine);
 					}
 				}) //
 				.build(scenario, eventsManager) //
@@ -92,7 +71,7 @@ public class QSimComponentsTest {
 		Assert.assertTrue(mockEngine.isCalled);
 	}
 
-	private class MockEngine implements MobsimEngine {
+	private static class MockEngine implements MobsimEngine {
 		public boolean isCalled = false;
 
 		@Override

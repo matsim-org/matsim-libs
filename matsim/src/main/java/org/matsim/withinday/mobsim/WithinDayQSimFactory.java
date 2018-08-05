@@ -29,7 +29,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
-import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
 
 import com.google.inject.Provider;
@@ -61,10 +60,9 @@ public class WithinDayQSimFactory implements Provider<Mobsim> {
 		log.info("Adding WithinDayEngine to Mobsim.");
 		return new QSimBuilder(config) //
 				.useDefaults() //
-				.addPlugin(new WithinDayQSimPlugin(config, withinDayEngine,
-						fixedOrderSimulationListener, withinDayTravelTime)) //
+				.addModule(new WithinDayQSimModule(withinDayEngine, fixedOrderSimulationListener, withinDayTravelTime)) //
 				.configureComponents(components -> {
-					components.activeMobsimEngines.add(WithinDayQSimPlugin.WITHIN_DAY_ENGINE);
+					components.activeMobsimEngines.add(WithinDayQSimModule.WITHIN_DAY_ENGINE_NAME);
 				})//
 				.build(scenario, eventsManager);
 	}
