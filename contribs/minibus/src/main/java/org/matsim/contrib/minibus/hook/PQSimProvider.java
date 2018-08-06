@@ -28,7 +28,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.PopulationPlugin;
+import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
@@ -57,8 +57,8 @@ class PQSimProvider implements Provider<Mobsim> {
 		
 		return new QSimBuilder(config) //
 				.useDefaults()
-				.removePlugin(PopulationPlugin.class) //
-				.addPlugin(new MinibusPopulationPlugin(config))
+				.removeModule(PopulationModule.class) //
+				.addModule(new MinibusPopulationModule())
 				.build(scenario, eventsManager);
 	}
 }

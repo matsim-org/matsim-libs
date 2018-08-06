@@ -34,6 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -57,9 +58,9 @@ public final class RunOneTaxiExample {
 		// setup controler
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule(//
-				cfg -> new com.google.inject.AbstractModule() {
+				cfg -> new AbstractQSimModule() {
 					@Override
-					protected void configure() {
+					protected void configureQSim() {
 						// optimizer that dispatches taxis
 						bind(VrpOptimizer.class).to(OneTaxiOptimizer.class).asEagerSingleton();
 						// converts departures of the "taxi" mode into taxi requests

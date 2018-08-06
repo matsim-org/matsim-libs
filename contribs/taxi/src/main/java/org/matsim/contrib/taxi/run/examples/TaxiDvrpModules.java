@@ -32,6 +32,7 @@ import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 import com.google.inject.Module;
 import com.google.inject.Provider;
@@ -49,10 +50,10 @@ public class TaxiDvrpModules {
 				Collections.singleton(TaxiOptimizer.class));
 	}
 
-	public static Module createModuleForQSimPlugin(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
-		return new com.google.inject.AbstractModule() {
+	public static AbstractQSimModule createModuleForQSimPlugin(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
+		return new AbstractQSimModule() {
 			@Override
-			protected void configure() {
+			protected void configureQSim() {
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
 						DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);

@@ -60,6 +60,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -154,10 +155,10 @@ public final class DrtControlerCreator {
 		config.checkConsistency();
 	}
 
-	public static com.google.inject.Module createModuleForQSimPlugin(Config config) {
-		return new com.google.inject.AbstractModule() {
+	public static AbstractQSimModule createModuleForQSimPlugin(Config config) {
+		return new AbstractQSimModule() {
 			@Override
-			protected void configure() {
+			protected void configureQSim() {
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
 						DefaultDrtOptimizer.DRT_OPTIMIZER);

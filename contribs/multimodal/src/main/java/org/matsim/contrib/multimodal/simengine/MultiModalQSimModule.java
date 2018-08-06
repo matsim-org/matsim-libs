@@ -1,49 +1,40 @@
-/*
- *  *********************************************************************** *
- *  * project: org.matsim.*
- *  * MultiModalQSimModule.java
- *  *                                                                         *
- *  * *********************************************************************** *
- *  *                                                                         *
- *  * copyright       : (C) 2014 by the members listed in the COPYING, *
- *  *                   LICENSE and WARRANTY file.                            *
- *  * email           : info at matsim dot org                                *
- *  *                                                                         *
- *  * *********************************************************************** *
- *  *                                                                         *
- *  *   This program is free software; you can redistribute it and/or modify  *
- *  *   it under the terms of the GNU General Public License as published by  *
- *  *   the Free Software Foundation; either version 2 of the License, or     *
- *  *   (at your option) any later version.                                   *
- *  *   See also COPYING, LICENSE and WARRANTY file                           *
- *  *                                                                         *
- *  * ***********************************************************************
- */
-
 package org.matsim.contrib.multimodal.simengine;
 
 import java.util.Map;
 
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.router.util.TravelTime;
 
-public class MultiModalQSimModule {
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 
-    private final Config config;
-    private final Map<String, TravelTime> multiModalTravelTimes;
+public class MultiModalQSimModule extends AbstractQSimModule {
+	static public String MULTIMODAL_ENGINE = "MultimodalEngine";
+	static public String MULTIMODAL_DEPARTURE_HANDLER = "MultimodalDepartureHandler";
 
-    public MultiModalQSimModule(Config config, Map<String, TravelTime> multiModalTravelTimes) {
-        this.config = config;
-        this.multiModalTravelTimes = multiModalTravelTimes;
-    }
+	private final Map<String, TravelTime> multiModalTravelTimes;
 
-    public void configure(QSim qSim) {
-        MultiModalConfigGroup multiModalConfigGroup = ConfigUtils.addOrGetModule(this.config, MultiModalConfigGroup.GROUP_NAME, MultiModalConfigGroup.class);
-        MultiModalSimEngine multiModalEngine = new MultiModalSimEngine(this.multiModalTravelTimes, multiModalConfigGroup);
-        qSim.addMobsimEngine(multiModalEngine);
-        qSim.addDepartureHandler(new MultiModalDepartureHandler(multiModalEngine, multiModalConfigGroup));
-    }
+	public MultiModalQSimModule(Map<String, TravelTime> multiModalTravelTimes) {
+		this.multiModalTravelTimes = multiModalTravelTimes;
+	}
+
+	@Override
+	protected void configureQSim() {
+		bindMobsimEngine(MULTIMODAL_ENGINE).to(MultiModalSimEngine.class);
+		bindDepartureHandler(MULTIMODAL_DEPARTURE_HANDLER).to(MultiModalDepartureHandler.class);
+	}
+
+	@Provides
+	@Singleton
+	MultiModalSimEngine provideMultiModalSimEngine(MultiModalConfigGroup multiModalConfigGroup) {
+		return new MultiModalSimEngine(multiModalTravelTimes, multiModalConfigGroup);
+	}
+
+	@Provides
+	@Singleton
+	MultiModalDepartureHandler provideMultiModalDepartureHandler(MultiModalSimEngine multiModalEngine,
+			MultiModalConfigGroup multiModalConfigGroup) {
+		return new MultiModalDepartureHandler(multiModalEngine, multiModalConfigGroup);
+	}
 }
