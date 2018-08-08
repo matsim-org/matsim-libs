@@ -181,7 +181,7 @@ public class SignalUtils {
 	}
 	
 	// TODO adapt this to more general use cases, e.g. four-arm intersection no groups etc
-	public static void fillIntersectionDirectionsForComplexCrossingScenario(
+	public static void fillIntersectionDirectionsForSingleCrossingScenario(
 			IntersectionDirections directionsForTheIntersection, Id<SignalSystem> signalSystemId,
 			ConflictData conflictData) {
 		// WE straight
