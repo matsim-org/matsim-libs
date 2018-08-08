@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
-import org.matsim.core.mobsim.qsim.ActivityEnginePlugin;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.ActivityEngineModule;
 import org.matsim.core.mobsim.qsim.QSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponents;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
@@ -46,18 +46,18 @@ public class DynQSimModule extends AbstractModule {
 	}
 
 	@Provides
-	public Collection<AbstractQSimPlugin> provideDynQSimPlugins(Config config) {
+	public Collection<AbstractQSimModule> provideDynQSimPlugins(Config config) {
 		return provideQSimPlugins(config, agentSourceClass);
 	}
 
-	public static Collection<AbstractQSimPlugin> provideQSimPlugins(Config config,
+	public static Collection<AbstractQSimModule> provideQSimPlugins(Config config,
 			Class<? extends AgentSource> agentSourceClass) {
 		//use the standard plugins, but replace ActivityEnginePlugin with DynActivityEnginePlugin
-		Collection<AbstractQSimPlugin> plugins = QSimModule.getDefaultQSimPlugins(config)
+		Collection<AbstractQSimModule> plugins = QSimModule.getDefaultQSimModules()
 				.stream()
-				.map(p -> p instanceof ActivityEnginePlugin ? new DynActivityEnginePlugin(config) : p)
+				.map(p -> p instanceof ActivityEngineModule ? new DynActivityEngineModule() : p)
 				.collect(Collectors.toList());
-		plugins.add(new DynAgentSourcePlugin(config, agentSourceClass));
+		plugins.add(new DynAgentSourceModule(agentSourceClass));
 		return Collections.unmodifiableCollection(plugins);
 	}
 
