@@ -30,6 +30,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.pt.PtConstants;
 
@@ -52,7 +53,7 @@ import java.util.Map;
  * <p></p>
  * This class has <i>not</i> yet been extensively tested and so it is not clear if it contains bugs, how well it works, or if parameters
  * should be set differently.  If someone wants to experiment, the class presumably should be made configurable (or copied before 
- * modification). 
+ * modification).
  * <p></p>
  * There is also material in playground.vsp .
  * <p></p>
@@ -69,23 +70,18 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 
 	public static final class Builder implements Provider<PlanSelector<Plan, Person>> {
 
-		private Network network;
-		private double actTypeWeight = 0.1;
+		private double actTypeWeight = 0.3;
 		private double locationWeight = 0.3;
 		private double actTimeParameter = 0.3;
 		private double sameRoutePenalty = 0.3;
 		private double sameModePenalty = 0.3;
 
-		private StageActivityTypes stageActivities = new StageActivityTypes() {
-			@Override
-			public boolean isStageActivity(String activityType) {
-				return activityType.equals(PtConstants.TRANSIT_ACTIVITY_TYPE);
-			}
-		};
+		private StageActivityTypes stageActivities ;
+		private Network network;
 
-		@Inject final Builder setNetwork(Network network) {
+		@Inject final void setNetwork(Network network) {
+			// (not user settable)
 			this.network = network;
-			return this ;
 		}
 		public final Builder setSameActivityTypePenalty( double val ) {
 			this.actTypeWeight = val ;
@@ -107,9 +103,9 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 			this.sameModePenalty = val;
 			return this ;
 		}
-		public final Builder setStageActivityTypes( StageActivityTypes val) {
-			this.stageActivities = val;
-			return this ;
+		@Inject final void setTripRouter( TripRouter val ) {
+			// (not user settable)
+			stageActivities = val.getStageActivityTypes() ;
 		}
 		@Override
 		public final DiversityGeneratingPlansRemover get() {
