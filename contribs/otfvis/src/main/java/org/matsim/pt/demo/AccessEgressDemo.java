@@ -199,7 +199,7 @@ public class AccessEgressDemo {
 
 		final QSim sim = new QSimBuilder(scenario.getConfig()) //
 				.useDefaults() //
-				.addOverridingModule(new AbstractModule() {
+				.addOverridingControllerModule(new AbstractModule() {
 					@Override
 					public void install() {
 						bind(TransitStopHandlerFactory.class).to(SimpleTransitStopHandlerFactory.class)

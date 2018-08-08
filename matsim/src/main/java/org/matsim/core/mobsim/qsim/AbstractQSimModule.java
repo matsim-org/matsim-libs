@@ -1,34 +1,22 @@
 package org.matsim.core.mobsim.qsim;
 
-import java.util.Optional;
+import java.util.Collection;
+import java.util.List;
 
-import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.AbstractMobsimModule;
 import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import com.google.inject.Key;
+import com.google.inject.Module;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.name.Names;
+import com.google.inject.util.Modules;
 
 public abstract class AbstractQSimModule extends AbstractMobsimModule {
-	private Optional<Config> config;
-
-	public void setConfig(Config config) {
-		this.config = Optional.of(config);
-	}
-
-	protected Config getConfig() {
-		if (!config.isPresent()) {
-			throw new IllegalStateException(
-					"No config set. Did you try to use the module outside of the QSim initialization process?");
-		}
-
-		return config.get();
-	}
-
 	@Override
 	protected final void configureMobsim() {
 		configureQSim();
@@ -50,5 +38,26 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule {
 		return binder().bind(Key.get(AgentSource.class, Names.named(name)));
 	}
 
+	protected LinkedBindingBuilder<MobsimListener> bindMobsimListener(String name) {
+		return binder().bind(Key.get(MobsimListener.class, Names.named(name)));
+	}
+
 	protected abstract void configureQSim();
+
+	public static AbstractQSimModule overrideQSimModules(Collection<AbstractQSimModule> base,
+			List<AbstractQSimModule> overrides) {
+		Module composite = Modules.override(base).with(overrides);
+
+		AbstractQSimModule wrapper = new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				install(composite);
+			}
+		};
+
+		base.forEach(m -> m.setParent(wrapper));
+		overrides.forEach(m -> m.setParent(wrapper));
+
+		return wrapper;
+	}
 }
