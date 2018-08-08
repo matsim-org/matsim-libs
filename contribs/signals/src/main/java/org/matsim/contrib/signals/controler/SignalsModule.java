@@ -41,11 +41,18 @@ import org.matsim.core.replanning.ReplanningContext;
 import com.google.inject.Provides;
 
 /**
- * Add this module if you want to simulate fixed-time signals. It also works without signals.
+ * Add this module if you want to simulate signals. It also works without
+ * signals. By default, it works with signal implementations of fixed-time
+ * signals, traffic-actuated signals called SYLVIA and traffic-adaptive signals
+ * based on Laemmer. If you want to add other signal controllers, you can add a
+ * respective provider by calling the method addSignalControlProvider. It is
+ * also possible to use different control schemes in one scenario at different
+ * intersections (i.e. signal systems).
  * 
  * @author tthunig
  */
 public class SignalsModule extends AbstractModule {
+	
 	@Override
 	public void install() {
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
