@@ -1,5 +1,6 @@
 package tutorial.adaptiveSignals;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
@@ -14,13 +15,29 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
+/**
+ * This example starts the simulation of a single crossing scenario where the
+ * intersection is signalized by traffic-adaptive signals. The logic of the
+ * traffic-adaptive signals is based on the basic version of Stefan Laemmer from
+ * his phd from 2007 and can be found in LaemmerSignalController.
+ * 
+ * If you want to use other implementations of traffic-adaptive signals you have
+ * to adjust the identifiers in the signal control file and add a provider class
+ * for your specific implementation to the SignalsModule (see comment below).
+ * 
+ * @author tthunig
+ */
 public class RunAdaptiveSignalsExample {
+	
+	private static final Logger log = Logger.getLogger(RunAdaptiveSignalsExample.class);
 
 	public static void main(String[] args) {
-		if (args == null || args.length == 0) {
-			throw new RuntimeException("Please provide a config file name as first argument");
+		String configFileName = "./examples/tutorial/singleCrossingScenario/config.xml";
+		if (args != null && args.length != 0) {
+			log.info("Your config file " + args[0] + " will be loaded and run with signals and otfvis-visualization.");
+			configFileName = args[0];
 		}
-		run(args[0], "runAdaptiveSignalsExampleOutput/", true);
+		run(configFileName, "runAdaptiveSignalsExampleOutput/", true);
 	}
 	
 	public static void run(String configFileName, String outputDir, boolean visualize) {
@@ -49,9 +66,9 @@ public class RunAdaptiveSignalsExample {
 		// add the signals module if signal systems are used
 		if (signalsConfigGroup.isUseSignalSystems()) {
 			/*
-			 * The combined signals module binds everything that is necessary for the
-			 * simulation with signals. If you like to use your own signal controller you
-			 * can add it to the signals module by the method addSignalControlProvider.
+			 * The signals module binds everything that is necessary for the simulation with
+			 * signals. If you like to use your own signal controller you can add it to the
+			 * signals module by the method addSignalControlProvider.
 			 */
 			controler.addOverridingModule(new SignalsModule());
 		}
