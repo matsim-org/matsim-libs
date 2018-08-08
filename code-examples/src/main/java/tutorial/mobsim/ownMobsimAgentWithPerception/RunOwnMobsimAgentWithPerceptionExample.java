@@ -20,7 +20,10 @@
 
 package tutorial.mobsim.ownMobsimAgentWithPerception;
 
-import com.google.inject.Provider;
+import java.net.URL;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -33,9 +36,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -44,8 +46,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
-import javax.inject.Inject;
-import java.net.URL;
+import com.google.inject.Provider;
 
 /**
  * Untested code.  Idea is that an observer notes the traffic congestion, and returns the "best" of all outgoing links to the vehicle.
@@ -88,7 +89,7 @@ public class RunOwnMobsimAgentWithPerceptionExample {
 					@Inject EventsManager eventsManager ;
 					@Override
 					public Mobsim get() {
-						final QSim qsim = QSimUtils.createDefaultQSim(sc, eventsManager);
+						final QSim qsim = new QSimBuilder(getConfig()).useDefaults().build(sc, eventsManager);
 						
 						// Why agent source instead of inserting them directly?  Inserting agents into activities is, in fact possible just
 						// after the QSim constructor.  However, inserting vehicles or agents into links is not.  Agentsource makes

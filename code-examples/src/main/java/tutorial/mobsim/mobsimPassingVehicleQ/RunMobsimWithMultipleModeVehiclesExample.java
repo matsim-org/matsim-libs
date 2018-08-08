@@ -13,6 +13,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -98,8 +99,14 @@ class RunMobsimWithMultipleModeVehiclesExample {
 			if (conf == null) {
 				throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 			}
+			
+			
+			
+			return new QSimBuilder(scenario.getConfig()) //
+					.useDefaults() //
+					.build(scenario, eventsManager);
 
-			// construct the QSim:
+			/*// construct the QSim:
 			QSim qSim = new QSim(scenario, eventsManager);
 
 			// add the activity engine:
@@ -120,7 +127,7 @@ class RunMobsimWithMultipleModeVehiclesExample {
 			PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
 			qSim.addAgentSource(agentSource);
 
-			return qSim ;
+			return qSim ;*/
 		}
 	}
 }
