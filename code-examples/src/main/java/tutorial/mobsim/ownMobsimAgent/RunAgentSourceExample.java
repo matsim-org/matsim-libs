@@ -35,7 +35,7 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
@@ -64,7 +64,7 @@ public class RunAgentSourceExample {
 					@Inject Scenario scenario ;
 					@Inject EventsManager events ;
 					@Override public Mobsim get() {
-						final QSim qsim = QSimUtils.createDefaultQSim( scenario, events );
+						final QSim qsim = new QSimBuilder(getConfig()).useDefaults().build(scenario, events);
 						qsim.addAgentSource(new AgentSource() {
 							@Override
 							public void insertAgentsIntoMobsim() {

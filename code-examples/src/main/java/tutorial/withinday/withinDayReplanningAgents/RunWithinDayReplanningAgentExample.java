@@ -19,7 +19,10 @@
 
 package tutorial.withinday.withinDayReplanningAgents;
 
-import com.google.inject.Provider;
+import java.net.URL;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,7 +42,7 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
@@ -51,8 +54,7 @@ import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 
-import javax.inject.Inject;
-import java.net.URL;
+import com.google.inject.Provider;
 
 public class RunWithinDayReplanningAgentExample {
 
@@ -84,7 +86,7 @@ public class RunWithinDayReplanningAgentExample {
 					@Override
 					public Mobsim get() {
 						// take the default mobsim, but since the population is empty, it will not be filled with demand:
-						final QSim qsim = QSimUtils.createDefaultQSim(sc, ev);
+						final QSim qsim = new QSimBuilder(getConfig()).useDefaults().build(sc, ev);
 
 						// add my own agent(s):
 						qsim.addAgentSource(new AgentSource() {

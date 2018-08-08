@@ -20,7 +20,8 @@
 
 package tutorial.mobsim.ownMobsimAgentUsingRouter;
 
-import com.google.inject.Provider;
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -30,14 +31,13 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.router.TripRouter;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
-import javax.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * Untested code.  Idea is that an observer notes the traffic congestion, and returns the "best" of all outgoing links to the vehicle.
@@ -61,7 +61,7 @@ public class RunOwnMobsimAgentUsingRouterExample {
 						scenario.getConfig().qsim().setEndTime(25 * 60 * 60);
 						scenario.getConfig().controler().setLastIteration(0);
 						scenario.getPopulation().getPersons().clear();
-						final QSim qsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+						final QSim qsim = new QSimBuilder(getConfig()).useDefaults().build(scenario, eventsManager);
 						qsim.addAgentSource(new AgentSource() {
 							@Override
 							public void insertAgentsIntoMobsim() {
