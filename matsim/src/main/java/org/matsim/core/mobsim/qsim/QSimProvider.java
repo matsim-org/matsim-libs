@@ -31,6 +31,7 @@ import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.components.NamedComponentUtils;
@@ -56,14 +57,18 @@ public class QSimProvider implements Provider<QSim> {
 	private Config config;
 	private Collection<AbstractQSimModule> modules;
 	private QSimComponents components;
-
+	private final IterationCounter iterationCounter;
+	
 	@Inject
-	QSimProvider(Injector injector, Config config, Collection<AbstractQSimModule> modules,
-			QSimComponents components) {
+	QSimProvider( Injector injector, Config config, Collection<AbstractQSimModule> modules,
+			  QSimComponents components, IterationCounter iterationCounter) {
 		this.injector = injector;
 		this.modules = modules;
+		// (these are the implementations)
 		this.config = config;
 		this.components = components;
+		// (components are some collections of strings)
+		this.iterationCounter = iterationCounter;
 	}
 
 	@Override
@@ -82,7 +87,10 @@ public class QSimProvider implements Provider<QSim> {
 		};
 
 		Injector qSimLocalInjector = injector.createChildInjector(module);
-		org.matsim.core.controler.Injector.printInjector(qSimLocalInjector, log);
+		if ( config.controler().getFirstIteration() == iterationCounter.getIterationNumber() ) {
+			// (print only once)
+			org.matsim.core.controler.Injector.printInjector( qSimLocalInjector, log );
+		}
 		QSim qSim = qSimLocalInjector.getInstance(QSim.class);
 //        qSim.setChildInjector( qSimLocalInjector ) ;
 
