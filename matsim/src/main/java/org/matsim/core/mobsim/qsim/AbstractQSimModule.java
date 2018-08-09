@@ -43,6 +43,11 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule {
 	}
 
 	protected abstract void configureQSim();
+	
+	protected void install(AbstractQSimModule module) {
+		module.setParent(this);
+		super.install(module);
+	}
 
 	public static AbstractQSimModule overrideQSimModules(Collection<AbstractQSimModule> base,
 			List<AbstractQSimModule> overrides) {
