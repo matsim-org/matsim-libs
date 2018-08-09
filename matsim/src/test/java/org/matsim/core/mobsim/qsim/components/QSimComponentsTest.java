@@ -25,7 +25,7 @@ public class QSimComponentsTest {
 		MockEngine mockEngine = new MockEngine();
 
 		new QSimBuilder(config) //
-				.addModule(new AbstractQSimModule() {
+				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
 						bindMobsimEngine("MockEngine").toInstance(mockEngine);
@@ -59,7 +59,7 @@ public class QSimComponentsTest {
 
 		new QSimBuilder(config) //
 				.useDefaults() //
-				.addModule(new AbstractQSimModule() {
+				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
 						bindMobsimEngine("MockEngine").toInstance(mockEngine);

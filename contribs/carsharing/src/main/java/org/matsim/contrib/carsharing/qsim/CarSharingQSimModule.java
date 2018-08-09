@@ -7,6 +7,7 @@ import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.components.QSimComponents;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import com.google.inject.Provides;
@@ -43,5 +44,8 @@ public class CarSharingQSimModule extends AbstractQSimModule {
 	AgentFactory provideAgentFactory(Netsim netsim) {
 		return new CSAgentFactory(netsim, carsharingManager);
 	}
-
+	
+	static public void configureComponents(QSimComponents components) {
+		components.activeAgentSources.add(CarSharingQSimModule.CARSHARING_PARKING_VEHICLES_SOURCE);
+	}
 }

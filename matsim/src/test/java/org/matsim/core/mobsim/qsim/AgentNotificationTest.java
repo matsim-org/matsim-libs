@@ -247,7 +247,7 @@ public class AgentNotificationTest {
 		new QSimBuilder(scenario.getConfig()) //
 			.useDefaults() //
 			.removeModule(PopulationModule.class) //
-			.addModule(new AbstractQSimModule() {
+			.addQSimModule(new AbstractQSimModule() {
 				@Override
 				protected void configureQSim() {
 					bind(PopulationAgentSource.class).asEagerSingleton();

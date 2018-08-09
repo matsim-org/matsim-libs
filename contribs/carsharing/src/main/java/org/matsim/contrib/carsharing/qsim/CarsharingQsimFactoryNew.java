@@ -30,10 +30,8 @@ public class CarsharingQsimFactoryNew implements Provider<Mobsim>{
 		return new QSimBuilder(config) //
 				.useDefaults() //
 				.removeModule(PopulationModule.class) //
-				.addModule(new CarSharingQSimModule(carsharingSupply, carsharingManager)) //
-				.configureComponents(components -> {
-					components.activeAgentSources.add(CarSharingQSimModule.CARSHARING_PARKING_VEHICLES_SOURCE);
-				}) //
+				.addQSimModule(new CarSharingQSimModule(carsharingSupply, carsharingManager)) //
+				.configureComponents(CarSharingQSimModule::configureComponents) //
 				.build(scenario, eventsManager);
 	}
 

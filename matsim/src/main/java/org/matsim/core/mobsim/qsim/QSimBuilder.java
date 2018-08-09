@@ -12,6 +12,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
@@ -115,8 +116,8 @@ public class QSimBuilder {
 	/**
 	 * Configures the current active QSim components.
 	 */
-	public QSimBuilder configureComponents(Consumer<QSimComponents> configurator) {
-		configurator.accept(components);
+	public QSimBuilder configureComponents(QSimComponentsConfigurator configurator) {
+		configurator.configure(components);
 		return this;
 	}
 
@@ -134,14 +135,6 @@ public class QSimBuilder {
 	 */
 	public QSimBuilder configureModules(Consumer<Collection<AbstractQSimModule>> configurator) {
 		configurator.accept(qsimModules);
-		return this;
-	}
-
-	/**
-	 * Adds a module for the QSim to the existing list of modules.
-	 */
-	public QSimBuilder addModule(AbstractQSimModule module) {
-		qsimModules.add(module);
 		return this;
 	}
 

@@ -58,7 +58,7 @@ class PQSimProvider implements Provider<Mobsim> {
 		return new QSimBuilder(config) //
 				.useDefaults()
 				.removeModule(PopulationModule.class) //
-				.addModule(new MinibusPopulationModule())
+				.addQSimModule(new MinibusPopulationModule())
 				.build(scenario, eventsManager);
 	}
 }
