@@ -54,7 +54,8 @@ public class RunRandomDynAgentExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DynQSimModule(RandomDynAgentSource.class));
+		controler.addOverridingQSimModule(new DynQSimModule(RandomDynAgentSource.class));
+		controler.configureQSimComponents(new DynQSimComponentsConfigurator());
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

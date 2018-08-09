@@ -8,6 +8,7 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
+import org.matsim.core.mobsim.qsim.components.QSimComponents;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
 import com.google.inject.Provides;
@@ -47,5 +48,16 @@ public class JointQSimModule extends AbstractQSimModule {
 		return new PassengerUnboardingAgentFactory(
 				config.transit().isUseTransit() ? new TransitAgentFactory(qsim) : new DefaultAgentFactory(qsim),
 				new NetsimWrappingQVehicleProvider(netsimEngine));
+	}
+	
+	static public void configureComponents(QSimComponents components) {
+		components.activeDepartureHandlers.clear();
+		components.activeDepartureHandlers.add(JOINT_MODES_DEPARTURE_HANDLER);
+		
+		components.activeMobsimEngines.add(JOINT_MODES_DEPARTURE_HANDLER);
+		components.activeMobsimEngines.add(JOINT_PASSENGER_UNBOARDING);
+		
+		components.activeAgentSources.clear();
+		components.activeAgentSources.add(AGENTS_SOURCE_WITH_VEHICLES);
 	}
 }

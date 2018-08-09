@@ -12,4 +12,5 @@ final public class QSimComponents {
 	final public List<String> activeDepartureHandlers = new LinkedList<>();
 	final public List<String> activeActivityHandlers = new LinkedList<>();
 	final public List<String> activeAgentSources = new LinkedList<>();
+	final public List<String> activeMobsimListeners = new LinkedList<>();
 }

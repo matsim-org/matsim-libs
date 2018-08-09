@@ -60,10 +60,9 @@ public class WithinDayQSimFactory implements Provider<Mobsim> {
 		log.info("Adding WithinDayEngine to Mobsim.");
 		return new QSimBuilder(config) //
 				.useDefaults() //
-				.addModule(new WithinDayQSimModule(withinDayEngine, fixedOrderSimulationListener, withinDayTravelTime)) //
-				.configureComponents(components -> {
-					components.activeMobsimEngines.add(WithinDayQSimModule.WITHIN_DAY_ENGINE_NAME);
-				})//
+				.addQSimModule(
+						new WithinDayQSimModule(withinDayEngine, fixedOrderSimulationListener, withinDayTravelTime)) //
+				.configureComponents(WithinDayQSimModule::configureComponents) //
 				.build(scenario, eventsManager);
 	}
 }

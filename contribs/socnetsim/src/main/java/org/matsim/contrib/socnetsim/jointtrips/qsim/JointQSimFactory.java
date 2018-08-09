@@ -82,17 +82,8 @@ public class JointQSimFactory implements MobsimFactory, Provider<QSim> {
 		
 		return new QSimBuilder(config) //
 				.useDefaults() //
-				.addModule(new JointQSimModule()) //
-				.configureComponents(components -> {
-					components.activeDepartureHandlers.clear();
-					components.activeDepartureHandlers.add(JointQSimModule.JOINT_MODES_DEPARTURE_HANDLER);
-					
-					components.activeMobsimEngines.add(JointQSimModule.JOINT_MODES_DEPARTURE_HANDLER);
-					components.activeMobsimEngines.add(JointQSimModule.JOINT_PASSENGER_UNBOARDING);
-					
-					components.activeAgentSources.clear();
-					components.activeAgentSources.add(JointQSimModule.AGENTS_SOURCE_WITH_VEHICLES);
-				})
+				.addQSimModule(new JointQSimModule()) //
+				.configureComponents(JointQSimModule::configureComponents) //
 				.build(sc1, eventsManager);
 	}
 }
