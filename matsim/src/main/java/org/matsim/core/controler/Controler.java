@@ -471,6 +471,15 @@ public final class Controler implements ControlerI, MatsimServices {
     	overridingQSimModules.add(qsimModule);
     }
     
+    public final void addQSimModule(AbstractQSimModule qsimModule) {
+    	this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				installQSimModule(qsimModule);
+			}
+		});
+    }
+    
     public final void configureQSimComponents(QSimComponentsConfigurator configurator) {
     	this.addOverridingModule(new AbstractModule() {
 			@Override

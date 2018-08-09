@@ -72,7 +72,7 @@ public final class RunOneTruckExample {
 			}
 		});
 
-		controler.addOverridingQSimModule(builder.build(config));
+		controler.addQSimModule(builder.build(config));
 		controler.configureQSimComponents(builder::configureComponents);
 
 		controler.addOverridingModule(
