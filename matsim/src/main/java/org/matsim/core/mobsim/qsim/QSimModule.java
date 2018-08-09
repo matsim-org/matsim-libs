@@ -31,7 +31,10 @@ public class QSimModule extends com.google.inject.AbstractModule {
 	@Override
 	protected void configure() {
 		install(new QSimComponentsModule());
+
 		bind(new TypeLiteral<Collection<AbstractQSimModule>>() {}).toInstance(getDefaultQSimModules());
+		// (this defines all the default QSimComponents.  The TypeLiteral is, I think only necessary because
+		//  otherwise there is type erasure and then we only have an untyped collection)
 		
 		bind(Mobsim.class).toProvider(QSimProvider.class);
 		if ( config.qsim().isUseLanes() ) { 
@@ -51,10 +54,10 @@ public class QSimModule extends com.google.inject.AbstractModule {
 
 	static public Collection<AbstractQSimModule> getDefaultQSimModules() {
 		return Arrays.asList(
-				new MessageQueueModule(),
-				new ActivityEngineModule(),
-				new QNetsimEngineModule(),
-				new TeleportationModule(),
+				new MessageQueueModule(),  // defines "MessageQueueEngine"
+				new ActivityEngineModule(), // defines "ActivityEngine"
+				new QNetsimEngineModule(), // defines "NetsimEngine"
+				new TeleportationModule(), // etc.
 				new PopulationModule(),
 				new NetworkChangeEventsModule(),
 				new TransitEngineModule()
