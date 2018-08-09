@@ -83,7 +83,7 @@ public class WagonSimQSimFactory implements MobsimFactory {
 		
 		return new QSimBuilder(scenario.getConfig()) //
 				.useDefaults() //
-				.addOverridingModule(new AbstractModule() {
+				.addOverridingControllerModule(new AbstractModule() {
 					@Override
 					public void install() {
 						bind(QNetworkFactory.class).toInstance(networkFactory);

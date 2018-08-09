@@ -16,21 +16,23 @@ import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 
 /**
  * Builds a new QSim. By default, the QSim is completely empty, i.e. there are
- * no plugins registered and there are not engines, handlers or agent sources
+ * no modules registered and there are not engines, handlers or agent sources
  * activated.
  * 
  * The default settings can be added via a couple of methods:
  * 
  * <ul>
- * <li>{@link #useDefaultPlugins()} loads the default QSim plugins for
+ * <li>{@link #useDefaultModules()} loads the default QSim modules for
  * MATSim</li>
  * <li>{@link #useDefaultComponents()} registers the default components for
  * MATSim</li>
- * <li>{@link #useDefaults()} adds both the default plugins and components</li>
+ * <li>{@link #useDefaults()} adds both the default modules and components</li>
  * </ul>
  * 
  * Usage example:
@@ -38,7 +40,7 @@ import com.google.inject.TypeLiteral;
  * <pre>
  * QSim qsim = new QSimBuilder(config) //
  * 		.useDefaults() //
- * 		.addPlugin(new MyCustomQSimPlugin(config)) //
+ * 		.addQSimModule(new MyCustomQSimModule()) //
  * 		.configureComponents(components -> {
  * 			components.activeMobsimEngines.add("MyCustomMobsimEngine");
  * 		}) //
@@ -50,9 +52,11 @@ import com.google.inject.TypeLiteral;
 public class QSimBuilder {
 	private final Config config;
 
-	private final List<AbstractModule> overridingModules = new LinkedList<>();
-	private final Collection<AbstractQSimModule> modules = new LinkedList<>();
+	private final Collection<AbstractQSimModule> qsimModules = new LinkedList<>();
 	private final QSimComponents components = new QSimComponents();
+
+	private final List<AbstractModule> overridingControllerModules = new LinkedList<>();
+	private final List<AbstractQSimModule> overridingQSimModules = new LinkedList<>();
 
 	public QSimBuilder(Config config) {
 		this.config = config;
@@ -73,8 +77,8 @@ public class QSimBuilder {
 	 * Adds a module that overrides existing bindings from MATSim (i.e. mainly those
 	 * from the {@link StandaloneQSimModule} and derived stages).
 	 */
-	public QSimBuilder addOverridingModule(AbstractModule module) {
-		overridingModules.add(module);
+	public QSimBuilder addOverridingControllerModule(AbstractModule module) {
+		overridingControllerModules.add(module);
 		return this;
 	}
 
@@ -82,7 +86,15 @@ public class QSimBuilder {
 	 * Adds a QSim module.
 	 */
 	public QSimBuilder addQSimModule(AbstractQSimModule module) {
-		this.modules.add(module);
+		this.qsimModules.add(module);
+		return this;
+	}
+
+	/**
+	 * Adds a QSim module that overrides previously defined elements.
+	 */
+	public QSimBuilder addOverridingQSimModule(AbstractQSimModule module) {
+		this.overridingQSimModules.add(module);
 		return this;
 	}
 
@@ -112,8 +124,8 @@ public class QSimBuilder {
 	 * Resets the registered QSim modules to the default ones provided by MATSim.
 	 */
 	public QSimBuilder useDefaultQSimModules() {
-		modules.clear();
-		modules.addAll(QSimModule.getDefaultQSimModules());
+		qsimModules.clear();
+		qsimModules.addAll(QSimModule.getDefaultQSimModules());
 		return this;
 	}
 
@@ -121,7 +133,7 @@ public class QSimBuilder {
 	 * Configures the registered modules via callback.
 	 */
 	public QSimBuilder configureModules(Consumer<Collection<AbstractQSimModule>> configurator) {
-		configurator.accept(modules);
+		configurator.accept(qsimModules);
 		return this;
 	}
 
@@ -129,7 +141,7 @@ public class QSimBuilder {
 	 * Adds a module for the QSim to the existing list of modules.
 	 */
 	public QSimBuilder addModule(AbstractQSimModule module) {
-		modules.add(module);
+		qsimModules.add(module);
 		return this;
 	}
 
@@ -138,7 +150,7 @@ public class QSimBuilder {
 	 * modules.
 	 */
 	public QSimBuilder removeModule(Class<? extends AbstractQSimModule> moduleType) {
-		modules.removeIf(moduleType::isInstance);
+		qsimModules.removeIf(moduleType::isInstance);
 		return this;
 	}
 
@@ -148,29 +160,30 @@ public class QSimBuilder {
 	 */
 	public QSim build(Scenario scenario, EventsManager eventsManager) {
 		// First, load standard QSim module
-		AbstractModule module = new StandaloneQSimModule(scenario, eventsManager);
+		AbstractModule controllerModule = new StandaloneQSimModule(scenario, eventsManager);
 
 		// Add all overrides
-		for (AbstractModule override : overridingModules) {
-			module = org.matsim.core.controler.AbstractModule.override(Collections.singleton(module), override);
+		for (AbstractModule override : overridingControllerModules) {
+			controllerModule = AbstractModule.override(Collections.singleton(controllerModule), override);
 		}
 
 		// Override components and modules
-		module = AbstractModule.override(Collections.singleton(module), new AbstractModule() {
+		controllerModule = AbstractModule.override(Collections.singleton(controllerModule), new AbstractModule() {
 			@Override
 			public void install() {
 				bind(QSimComponents.class).toInstance(components);
-				bind(new TypeLiteral<Collection<AbstractQSimModule>>() {
-				}).toInstance(modules);
+				qsimModules.forEach(this::installQSimModule);
+				bind(Key.get(new TypeLiteral<List<AbstractQSimModule>>() {
+				}, Names.named("overrides"))).toInstance(overridingQSimModules);
 			}
 		});
 
 		// Build QSim
-		Injector injector = org.matsim.core.controler.Injector.createInjector(config, module);
+		Injector injector = org.matsim.core.controler.Injector.createInjector(config, controllerModule);
 		return (QSim) injector.getInstance(Mobsim.class);
 	}
 
-	private static class StandaloneQSimModule extends org.matsim.core.controler.AbstractModule {
+	private static class StandaloneQSimModule extends AbstractModule {
 		private final Scenario scenario;
 		private final EventsManager eventsManager;
 
@@ -183,7 +196,7 @@ public class QSimBuilder {
 		public void install() {
 			install(new ScenarioByInstanceModule(scenario));
 			bind(EventsManager.class).toInstance(eventsManager);
-			install(new QSimModule());
+			install(new QSimModule(false));
 		}
 	}
 }

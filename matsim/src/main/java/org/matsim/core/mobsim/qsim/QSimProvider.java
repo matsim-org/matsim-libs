@@ -23,9 +23,7 @@
 package org.matsim.core.mobsim.qsim;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -41,14 +39,10 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
-import com.google.inject.Binding;
+import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.Module;
 import com.google.inject.Provider;
-import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 public class QSimProvider implements Provider<QSim> {
 	private static final Logger log = Logger.getLogger(QSimProvider.class);
@@ -56,69 +50,65 @@ public class QSimProvider implements Provider<QSim> {
 	private Injector injector;
 	private Config config;
 	private Collection<AbstractQSimModule> modules;
+	private List<AbstractQSimModule> overridingModules;
 	private QSimComponents components;
 	private final IterationCounter iterationCounter;
 	
 	@Inject
-	QSimProvider( Injector injector, Config config, Collection<AbstractQSimModule> modules,
-			  QSimComponents components, IterationCounter iterationCounter) {
+	QSimProvider(Injector injector, Config config, Collection<AbstractQSimModule> modules,
+			QSimComponents components, @Named("overrides") List<AbstractQSimModule> overridingModules) {
 		this.injector = injector;
 		this.modules = modules;
 		// (these are the implementations)
 		this.config = config;
 		this.components = components;
-		// (components are some collections of strings)
-		this.iterationCounter = iterationCounter;
+		this.overridingModules = overridingModules;
 	}
 
 	@Override
 	public QSim get() {
 		modules.forEach(m -> m.setConfig(config));
+		
+		AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, overridingModules);
 
-		com.google.inject.AbstractModule module = new com.google.inject.AbstractModule() {
+		AbstractModule module = new AbstractModule() {
 			@Override
 			protected void configure() {
-				for (AbstractQSimModule module : modules) {
-					install(module);
-				}
+				install(qsimModule);
 				bind(QSim.class).asEagerSingleton();
 				bind(Netsim.class).to(QSim.class);
 			}
 		};
 
-		Injector qSimLocalInjector = injector.createChildInjector(module);
-		if ( config.controler().getFirstIteration() == iterationCounter.getIterationNumber() ) {
-			// (print only once)
-			org.matsim.core.controler.Injector.printInjector( qSimLocalInjector, log );
-		}
-		QSim qSim = qSimLocalInjector.getInstance(QSim.class);
-//        qSim.setChildInjector( qSimLocalInjector ) ;
+		Injector qsimInjector = injector.createChildInjector(module);
+		org.matsim.core.controler.Injector.printInjector(qsimInjector, log);
+		QSim qSim = qsimInjector.getInstance(QSim.class);
 
 		ComponentRegistry<MobsimEngine> mobsimEngineRegistry = new ComponentRegistry<>("MobsimEngine");
 		ComponentRegistry<ActivityHandler> activityHandlerRegister = new ComponentRegistry<>("ActivityHandler");
 		ComponentRegistry<DepartureHandler> departureHandlerRegistry = new ComponentRegistry<>("DepartureHandler");
 		ComponentRegistry<AgentSource> agentSourceRegistry = new ComponentRegistry<>("AgentSource");
 
-		NamedComponentUtils.find(qSimLocalInjector, MobsimEngine.class)
+		NamedComponentUtils.find(qsimInjector, MobsimEngine.class)
 				.forEach(mobsimEngineRegistry::register);
-		NamedComponentUtils.find(qSimLocalInjector, ActivityHandler.class)
+		NamedComponentUtils.find(qsimInjector, ActivityHandler.class)
 				.forEach(activityHandlerRegister::register);
-		NamedComponentUtils.find(qSimLocalInjector, DepartureHandler.class)
+		NamedComponentUtils.find(qsimInjector, DepartureHandler.class)
 				.forEach(departureHandlerRegistry::register);
-		NamedComponentUtils.find(qSimLocalInjector, AgentSource.class)
+		NamedComponentUtils.find(qsimInjector, AgentSource.class)
 				.forEach(agentSourceRegistry::register);
 
 		mobsimEngineRegistry.getOrderedComponents(components.activeMobsimEngines).stream()
-				.map(qSimLocalInjector::getInstance).forEach(qSim::addMobsimEngine);
+				.map(qsimInjector::getInstance).forEach(qSim::addMobsimEngine);
 		activityHandlerRegister.getOrderedComponents(components.activeActivityHandlers).stream()
-				.map(qSimLocalInjector::getInstance).forEach(qSim::addActivityHandler);
+				.map(qsimInjector::getInstance).forEach(qSim::addActivityHandler);
 		departureHandlerRegistry.getOrderedComponents(components.activeDepartureHandlers).stream()
-				.map(qSimLocalInjector::getInstance).forEach(qSim::addDepartureHandler);
+				.map(qsimInjector::getInstance).forEach(qSim::addDepartureHandler);
 		agentSourceRegistry.getOrderedComponents(components.activeAgentSources).stream()
-				.map(qSimLocalInjector::getInstance).forEach(qSim::addAgentSource);
+				.map(qsimInjector::getInstance).forEach(qSim::addAgentSource);
 
-		NamedComponentUtils.find(qSimLocalInjector, MobsimListener.class).forEach((name, component) -> {
-			qSim.addQueueSimulationListeners(qSimLocalInjector.getInstance(component));
+		NamedComponentUtils.find(qsimInjector, MobsimListener.class).forEach((name, component) -> {
+			qSim.addQueueSimulationListeners(qsimInjector.getInstance(component));
 		});
 
 		return qSim;

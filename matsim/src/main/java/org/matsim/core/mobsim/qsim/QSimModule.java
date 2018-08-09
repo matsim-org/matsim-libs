@@ -1,14 +1,16 @@
 package org.matsim.core.mobsim.qsim;
 
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsModule;
@@ -22,20 +24,38 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QLanesNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 
-import com.google.inject.Provides;
+import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 
-public class QSimModule extends com.google.inject.AbstractModule {
+public class QSimModule extends AbstractModule {
 	@Inject Config config ;
 	
+	private final boolean addDefaultQSimModules;
+	
+	public QSimModule() {
+		this(true);
+	}
+	
+	public QSimModule(boolean addDefaultQSimModules) {
+		this.addDefaultQSimModules = addDefaultQSimModules;
+	}
+	
 	@Override
-	protected void configure() {
+	public void install() {
 		install(new QSimComponentsModule());
-
-		bind(new TypeLiteral<Collection<AbstractQSimModule>>() {}).toInstance(getDefaultQSimModules());
-		// (this defines all the default QSimComponents.  The TypeLiteral is, I think only necessary because
-		//  otherwise there is type erasure and then we only have an untyped collection)
 		
+		if (addDefaultQSimModules) {		
+			getDefaultQSimModules().forEach(this::installQSimModule);
+		}
+		
+		bind(Key.get(new TypeLiteral<List<AbstractQSimModule>>() {
+		}, Names.named("overrides"))).toInstance(Collections.emptyList());
+		
+		bind(new TypeLiteral<Collection<AbstractQSimModule>>() {
+		}).to(new TypeLiteral<Set<AbstractQSimModule>>() {
+		});
+
 		bind(Mobsim.class).toProvider(QSimProvider.class);
 		if ( config.qsim().isUseLanes() ) { 
 			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ) ;
