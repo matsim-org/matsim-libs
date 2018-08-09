@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package org.matsim.contrib.signals;
+package org.matsim.contrib.signals.model;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
