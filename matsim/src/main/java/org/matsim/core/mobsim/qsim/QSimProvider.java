@@ -56,13 +56,15 @@ public class QSimProvider implements Provider<QSim> {
 	
 	@Inject
 	QSimProvider(Injector injector, Config config, Collection<AbstractQSimModule> modules,
-			QSimComponents components, @Named("overrides") List<AbstractQSimModule> overridingModules) {
+			QSimComponents components, @Named("overrides") List<AbstractQSimModule> overridingModules,
+			 IterationCounter iterationCounter ) {
 		this.injector = injector;
 		this.modules = modules;
 		// (these are the implementations)
 		this.config = config;
 		this.components = components;
 		this.overridingModules = overridingModules;
+		this.iterationCounter = iterationCounter;
 	}
 
 	@Override
@@ -81,7 +83,9 @@ public class QSimProvider implements Provider<QSim> {
 		};
 
 		Injector qsimInjector = injector.createChildInjector(module);
-		org.matsim.core.controler.Injector.printInjector(qsimInjector, log);
+		if ( config.controler().getFirstIteration() == iterationCounter.getIterationNumber() ) {
+			org.matsim.core.controler.Injector.printInjector( qsimInjector, log );
+		}
 		QSim qSim = qsimInjector.getInstance(QSim.class);
 
 		ComponentRegistry<MobsimEngine> mobsimEngineRegistry = new ComponentRegistry<>("MobsimEngine");
