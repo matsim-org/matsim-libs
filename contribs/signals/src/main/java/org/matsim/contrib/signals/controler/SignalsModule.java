@@ -22,15 +22,20 @@
 
 package org.matsim.contrib.signals.controler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
-import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
+import org.matsim.contrib.signals.builder.SignalModelFactoryImpl;
 import org.matsim.contrib.signals.builder.SignalSystemsModelBuilder;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
+import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.contrib.signals.router.NetworkWithSignalsTurnInfoBuilder;
+import org.matsim.contrib.signals.sensor.LinkSensorManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
@@ -38,6 +43,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QSignalsNetworkFactory;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 import org.matsim.core.replanning.ReplanningContext;
 
+import com.google.inject.Provider;
 import com.google.inject.Provides;
 
 /**
@@ -53,13 +59,17 @@ import com.google.inject.Provides;
  */
 public class SignalsModule extends AbstractModule {
 	
+	private Map<String, Provider<SignalController>> signalControlProvider = new HashMap<>();
+	
 	@Override
 	public void install() {
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
-			// bindings for fixed-time signals
-			bind(SignalModelFactory.class).to(DefaultSignalModelFactory.class);
-			addControlerListenerBinding().to(DefaultSignalControlerListener.class);
-
+			// bindings for sensor-based signals (also works for fixed-time signals)
+			SignalModelFactory signalFac = new SignalModelFactoryImpl(signalControlProvider);
+			bind(SignalModelFactory.class).toInstance(signalFac);
+			addControlerListenerBinding().to(SensorBasedSignalControlerListener.class);
+			bind(LinkSensorManager.class).asEagerSingleton();
+			
 			// general signal bindings
 			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
 			addMobsimListenerBinding().to(QSimSignalEngine.class);
@@ -85,5 +95,9 @@ public class SignalsModule extends AbstractModule {
 		SignalSystemsManager signalSystemsManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		signalSystemsManager.resetModel(replanningContext.getIteration());
 		return signalSystemsManager;
+	}
+	
+	public void addSignalControlProvider(String controllerIdentifier, Provider<SignalController> signalControlProvider) {
+		this.signalControlProvider.put(controllerIdentifier, signalControlProvider);
 	}
 }
