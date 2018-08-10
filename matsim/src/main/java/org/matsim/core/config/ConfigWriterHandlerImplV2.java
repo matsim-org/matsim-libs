@@ -68,7 +68,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 	 */
 	private final Verbosity verbosity;
 	
-	private static final Set<String> commentsAlreadyWritten = new HashSet<>() ;
+	private final Set<String> commentsAlreadyWritten = new HashSet<>() ;
 	
 	ConfigWriterHandlerImplV2( Verbosity verbosity ) {
 		this.verbosity = verbosity ;
