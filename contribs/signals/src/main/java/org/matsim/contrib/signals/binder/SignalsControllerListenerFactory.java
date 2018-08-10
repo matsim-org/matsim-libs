@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalSystem
+ * SignalsControllerListenerFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,45 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.model;
+package org.matsim.contrib.signals.binder;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.contrib.signals.controller.SignalController;
 
 
 /**
- * @author dgrether, tthunig
+ * @author dgrether
  *
  */
-public interface SignalSystem extends Identifiable<SignalSystem> {
-	
-	public void setSignalSystemsManager(SignalSystemsManager signalManager);
+public interface SignalsControllerListenerFactory {
 
-	public void updateState(double now);
-
-	public void setSignalSystemController(SignalController controller);
-
-	public void addSignal(Signal signal);
-	
-	public Map<Id<Signal>, Signal> getSignals();
-
-	public void addSignalGroup(SignalGroup group);
-	
-	public Map<Id<SignalGroup>, SignalGroup> getSignalGroups();
-
-	public void scheduleDropping(double now, Id<SignalGroup> signalGroupId);
-
-	public void scheduleOnset(double now, Id<SignalGroup> signalGroupId);
-
-	public SignalController getSignalController();
-
-	public void simulationInitialized(double now);
-	
-	public void switchOff(double now);
-	
-	public void startPlan(double now);
+	public SignalControlerListener createSignalsControllerListener();
 	
 }

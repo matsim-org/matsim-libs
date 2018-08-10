@@ -11,5 +11,5 @@
  * 
  * @author dgrether
  */
-package org.matsim.contrib.signals.controler;
+package org.matsim.contrib.signals.binder;
 

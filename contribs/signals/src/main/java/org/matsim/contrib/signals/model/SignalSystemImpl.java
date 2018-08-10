@@ -26,6 +26,7 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.controller.SignalController;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 
@@ -36,7 +37,7 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
  */
 public class SignalSystemImpl implements SignalSystem {
 
-	/*package*/ static final int SWITCH_OFF_SEQUENCE_LENGTH = 5;
+	public static final int SWITCH_OFF_SEQUENCE_LENGTH = 5;
 	
 	private SignalController signalController;
 	private Map<Id<SignalGroup>, SignalGroup> signalGroups = new HashMap<>();

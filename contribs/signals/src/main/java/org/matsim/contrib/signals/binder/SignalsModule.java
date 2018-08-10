@@ -20,7 +20,7 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.contrib.signals.controler;
+package org.matsim.contrib.signals.binder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,8 +31,10 @@ import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalModelFactoryImpl;
 import org.matsim.contrib.signals.builder.SignalSystemsModelBuilder;
+import org.matsim.contrib.signals.controller.SignalController;
+import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfig;
+import org.matsim.contrib.signals.controller.sylvia.SylviaConfig;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.contrib.signals.router.NetworkWithSignalsTurnInfoBuilder;
 import org.matsim.contrib.signals.sensor.DownstreamSensor;
@@ -60,17 +62,20 @@ import com.google.inject.Provides;
  */
 public class SignalsModule extends AbstractModule {
 	
-	private Map<String, Provider<SignalController>> signalControlProvider = new HashMap<>();
+	private SylviaConfig sylviaConfig = new SylviaConfig();
+	private LaemmerConfig laemmerConfig = new LaemmerConfig();
 	
 	@Override
 	public void install() {
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			// bindings for sensor-based signals (also works for fixed-time signals)
-			SignalModelFactory signalFac = new SignalModelFactoryImpl(signalControlProvider);
-			bind(SignalModelFactory.class).toInstance(signalFac);
+			bind(SignalModelFactory.class).to(SignalModelFactoryImpl.class);
 			addControlerListenerBinding().to(SensorBasedSignalControlerListener.class);
 			bind(LinkSensorManager.class).asEagerSingleton();
 			bind(DownstreamSensor.class).asEagerSingleton();
+			// bind configs for special signal controller
+			bind(SylviaConfig.class).toInstance(sylviaConfig);
+			bind(LaemmerConfig.class).toInstance(laemmerConfig);
 			
 			// general signal bindings
 			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
@@ -99,7 +104,11 @@ public class SignalsModule extends AbstractModule {
 		return signalSystemsManager;
 	}
 	
-	public void addSignalControlProvider(String controllerIdentifier, Provider<SignalController> signalControlProvider) {
-		this.signalControlProvider.put(controllerIdentifier, signalControlProvider);
+	public void setSylviaConfig(SylviaConfig sylviaConfig) {
+		this.sylviaConfig = sylviaConfig;
+	}
+
+	public void setLaemmerConfig(LaemmerConfig laemmerConfig) {
+		this.laemmerConfig = laemmerConfig;
 	}
 }

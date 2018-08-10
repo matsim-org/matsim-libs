@@ -21,7 +21,7 @@
 package org.matsim.contrib.signals.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.signals.controler.SignalsModule;
+import org.matsim.contrib.signals.binder.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.config.Config;
