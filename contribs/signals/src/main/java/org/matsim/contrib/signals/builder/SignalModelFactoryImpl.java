@@ -41,6 +41,7 @@ import org.matsim.contrib.signals.model.SignalSystemImpl;
 import org.matsim.contrib.signals.sensor.DownstreamSensor;
 import org.matsim.contrib.signals.sensor.LinkSensorManager;
 
+import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 
@@ -54,6 +55,7 @@ public final class SignalModelFactoryImpl implements SignalModelFactory {
 	
 	private final Map<String, Provider<SignalController>> signalControlProvider = new HashMap<>();
 	
+	@Inject
 	public SignalModelFactoryImpl(Scenario scenario, LaemmerConfig laemmerConfig, SylviaConfig sylviaConfig, 
 			LinkSensorManager sensorManager, DownstreamSensor downstreamSensor) {
 		signalControlProvider.put(SylviaSignalController.IDENTIFIER, new SylviaSignalController.SignalControlProvider(sylviaConfig, sensorManager, downstreamSensor));
