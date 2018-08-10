@@ -162,22 +162,52 @@ public class SignalUtils {
 			SignalSystemControllerData newSystemControl = new SignalSystemControllerDataImpl(oldSystemControl.getSignalSystemId());
 			newSystemControl.setControllerIdentifier(oldSystemControl.getControllerIdentifier());
 			for (SignalPlanData oldPlan : oldSystemControl.getSignalPlanData().values()) {
-				SignalPlanData newPlan = new SignalPlanDataImpl(oldPlan.getId());
-				newPlan.setStartTime(oldPlan.getStartTime());
-				newPlan.setEndTime(oldPlan.getEndTime());
-				newPlan.setCycleTime(oldPlan.getCycleTime());
-				newPlan.setOffset(oldPlan.getOffset());
-				for (SignalGroupSettingsData oldGroupSetting : oldPlan.getSignalGroupSettingsDataByGroupId().values()) {
-					SignalGroupSettingsData newGroupSettings = new SignalGroupSettingsDataImpl(oldGroupSetting.getSignalGroupId());
-					newGroupSettings.setOnset(oldGroupSetting.getOnset());
-					newGroupSettings.setDropping(oldGroupSetting.getDropping());
-					newPlan.addSignalGroupSettings(newGroupSettings);
-				}
-				newSystemControl.addSignalPlanData(newPlan);
+				newSystemControl.addSignalPlanData(copySignalPlanData(oldPlan, oldPlan.getId()));
 			}
 			newSignalControlData.addSignalSystemControllerData(newSystemControl);
 		}
 		return newSignalControlData;
+	}
+	
+	/**
+	 * Clones the SignalPlanData given as argument and returns a new instance of SignalPlanData with the same content.
+	 */
+	public static SignalPlanData copySignalPlanData(final SignalPlanData oldPlan, final Id<SignalPlan> newPlanId) {
+		SignalPlanData newPlan = new SignalPlanDataImpl(newPlanId);
+		newPlan.setStartTime(oldPlan.getStartTime());
+		newPlan.setEndTime(oldPlan.getEndTime());
+		newPlan.setCycleTime(oldPlan.getCycleTime());
+		newPlan.setOffset(oldPlan.getOffset());
+		for (SignalGroupSettingsData oldGroupSetting : oldPlan.getSignalGroupSettingsDataByGroupId().values()) {
+			SignalGroupSettingsData newGroupSettings = new SignalGroupSettingsDataImpl(oldGroupSetting.getSignalGroupId());
+			newGroupSettings.setOnset(oldGroupSetting.getOnset());
+			newGroupSettings.setDropping(oldGroupSetting.getDropping());
+			newPlan.addSignalGroupSettings(newGroupSettings);
+		}
+		return newPlan;
+	}
+	
+	/**
+	 * Clones the SignalGroupSettingsData given as argument and returns a new instance of SignalGroupSettingsData with the same content.
+	 */
+	public static SignalGroupSettingsData copySignalGroupSettingsData(final SignalGroupSettingsData signalGroupSettings, final SignalControlDataFactory fac){
+		SignalGroupSettingsData newSettings = fac.createSignalGroupSettingsData(signalGroupSettings.getSignalGroupId());
+		newSettings.setOnset(signalGroupSettings.getOnset());
+		newSettings.setDropping(signalGroupSettings.getDropping());
+		return newSettings;
+	}
+	
+	public static int calculateGreenTimeSeconds(SignalGroupSettingsData settings, int cylceTimeSeconds){
+		int on = settings.getOnset();
+		int off = settings.getDropping();
+		int green = 0;
+		if (on < off){
+			green = off - on;
+		}
+		else {
+			green = off + cylceTimeSeconds - on;
+		}
+		return green;
 	}
 	
 	// TODO adapt this to more general use cases, e.g. four-arm intersection no groups etc

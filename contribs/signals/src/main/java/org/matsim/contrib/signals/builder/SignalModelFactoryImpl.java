@@ -19,16 +19,27 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.builder;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.signals.controller.SignalController;
+import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
+import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfig;
+import org.matsim.contrib.signals.controller.laemmerFix.LaemmerSignalController;
+import org.matsim.contrib.signals.controller.sylvia.SylviaConfig;
+import org.matsim.contrib.signals.controller.sylvia.SylviaPreprocessData;
+import org.matsim.contrib.signals.controller.sylvia.SylviaSignalController;
+import org.matsim.contrib.signals.controller.sylvia.SylviaSignalPlan;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.DatabasedSignalPlan;
-import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemImpl;
+import org.matsim.contrib.signals.sensor.DownstreamSensor;
+import org.matsim.contrib.signals.sensor.LinkSensorManager;
 
 import com.google.inject.Provider;
 
@@ -41,10 +52,13 @@ public final class SignalModelFactoryImpl implements SignalModelFactory {
 	
 	private static final Logger log = Logger.getLogger(SignalModelFactoryImpl.class);
 	
-	private final Map<String, Provider<SignalController>> signalControlProvider;
+	private final Map<String, Provider<SignalController>> signalControlProvider = new HashMap<>();
 	
-	public SignalModelFactoryImpl(Map<String, Provider<SignalController>> signalControlProvider) {
-		this.signalControlProvider = signalControlProvider;
+	public SignalModelFactoryImpl(Scenario scenario, LaemmerConfig laemmerConfig, SylviaConfig sylviaConfig, 
+			LinkSensorManager sensorManager, DownstreamSensor downstreamSensor) {
+		signalControlProvider.put(SylviaSignalController.IDENTIFIER, new SylviaSignalController.SignalControlProvider(sylviaConfig, sensorManager, downstreamSensor));
+		signalControlProvider.put(LaemmerSignalController.IDENTIFIER, new LaemmerSignalController.SignalControlProvider(laemmerConfig, sensorManager, scenario, downstreamSensor));
+		signalControlProvider.put(DefaultPlanbasedSignalSystemController.IDENTIFIER, new DefaultPlanbasedSignalSystemController.SignalControlProvider());
 	}
 	
 	@Override
@@ -66,11 +80,10 @@ public final class SignalModelFactoryImpl implements SignalModelFactory {
 
 	@Override
 	public SignalPlan createSignalPlan(SignalPlanData planData) {
-//		DatabasedSignalPlan plan = new DatabasedSignalPlan(planData);
-//		if (planData.getId().toString().startsWith(SylviaPreprocessData.SYLVIA_PREFIX)) {
-//			return new SylviaSignalPlan(plan);
-//		}
-//		return plan;
-		return new DatabasedSignalPlan(planData);
+		DatabasedSignalPlan plan = new DatabasedSignalPlan(planData);
+		if (planData.getId().toString().startsWith(SylviaPreprocessData.SYLVIA_PREFIX)) {
+			return new SylviaSignalPlan(plan);
+		}
+		return plan;
 	}
 }

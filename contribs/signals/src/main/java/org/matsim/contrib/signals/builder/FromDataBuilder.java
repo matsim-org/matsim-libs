@@ -39,7 +39,6 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.model.AmberLogic;
 import org.matsim.contrib.signals.model.IntergreensLogic;
 import org.matsim.contrib.signals.model.Signal;
-import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -50,6 +49,7 @@ import org.matsim.core.config.ConfigUtils;
 import com.google.inject.Inject;
 
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.controller.SignalController;
 import org.matsim.core.gbl.Gbl;
 
 /**

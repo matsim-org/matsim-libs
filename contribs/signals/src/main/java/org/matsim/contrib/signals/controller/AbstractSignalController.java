@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalSystemController
+ * DgAbstractSignalController
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.model;
+package org.matsim.contrib.signals.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.contrib.signals.model.SignalSystem;
 
 /**
- * <ul>
- * 		<li></li>
- * 		<li></li>
- * </ul>
+ * 
  * @author dgrether
+ *
  */
-public interface SignalController {
-	
-	/**
-	 * Is called every timestep to notify that the controller may update the state of the signal groups
-	 * @param timeSeconds
-	 */
-	public void updateState(double timeSeconds);
+public abstract class AbstractSignalController implements SignalController {
 
-	public void addPlan(SignalPlan plan);
+	protected SignalSystem system ;
+	protected Map<Id<SignalPlan>, SignalPlan> signalPlans = new HashMap<>();
 
-	public void reset(Integer iterationNumber);
+	@Override
+	public void addPlan(SignalPlan plan) {
+		this.signalPlans.put(plan.getId(), plan);
+	}
 
-	public void simulationInitialized(double simStartTimeSeconds);
-	
-	public void setSignalSystem(SignalSystem signalSystem);
-	
+	@Override
+	public void setSignalSystem(SignalSystem signalSystem) {
+		this.system = signalSystem;
+	}
 }

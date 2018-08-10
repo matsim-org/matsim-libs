@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.model;
+package org.matsim.contrib.signals.controller.fixedTime;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -27,6 +27,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.controller.AbstractSignalController;
+import org.matsim.contrib.signals.controller.SignalController;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.contrib.signals.model.SignalSystemImpl;
+
+import com.google.inject.Provider;
 
 
 /**
@@ -46,6 +53,17 @@ public class DefaultPlanbasedSignalSystemController extends AbstractSignalContro
 	private LinkedList<SignalPlan> planQueue = null;
 	private SignalPlan activePlan = null;
 	private double nextActivePlanCheckTime;
+	
+	public final static class SignalControlProvider implements Provider<SignalController> {
+        @Override
+        public SignalController get() {
+            return new DefaultPlanbasedSignalSystemController();
+        }
+    }
+	
+	private DefaultPlanbasedSignalSystemController() {
+		super();
+	}
 	
 	@Override
 	public void updateState(double timeSeconds) {

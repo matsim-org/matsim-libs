@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalsControlerListener
+ * DgSylviaSignalControlerListener
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.controler;
+package org.matsim.contrib.signals.binder;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.sensor.LinkSensorManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
+
+import com.google.inject.Inject;
 
 
 /**
- * SignalControllerListener implementation for the MATSim default implementation for traffic light control, 
- * i.e. a fixed-time traffic signal control that can be specified completely by xml input data.
- * @author dgrether
- *
+ * also works without sensor-based signals, i.e. plan-based signals and also without signals at all.
+ * 
+ * @author dgrether, tthunig
  */
-final class DefaultSignalControlerListener implements SignalControlerListener, ShutdownListener {
+public final class SensorBasedSignalControlerListener implements SignalControlerListener, IterationStartsListener,
+		ShutdownListener {
+
+	@Inject(optional = true) SignalSystemsManager signalManager = null;
+	@Inject(optional = true) LinkSensorManager sensorManager = null;
 	
 	@Override
-	public final void notifyShutdown(ShutdownEvent event) {
-		writeData(event.getServices().getScenario(), event.getServices().getControlerIO());
-	}
-	
-	private static void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
-		new SignalsScenarioWriter(controlerIO).writeSignalsData(sc);
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		if (this.signalManager != null) 
+			this.signalManager.resetModel(event.getIteration());
+		if (this.sensorManager != null)
+			this.sensorManager.reset(event.getIteration());
 	}
 
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		this.writeData(event.getServices().getScenario(), event.getServices().getControlerIO());
+	}
+	
+	private void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
+		new SignalsScenarioWriter(controlerIO).writeSignalsData(sc);
+	}	
+	
 }
