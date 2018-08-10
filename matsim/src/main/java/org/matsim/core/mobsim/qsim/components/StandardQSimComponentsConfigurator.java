@@ -4,13 +4,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsQSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimComponentsConfigurator;
 
-public class StandardQSimComponentsConfigurator {
+public class StandardQSimComponentsConfigurator implements QSimComponentsConfigurator {
 	final private Config config;
 
 	public StandardQSimComponentsConfigurator(Config config) {
 		this.config = config;
 	}
 
+	@Override
 	public void configure(QSimComponents components) {
 		
 		new DefaultQSimComponentsConfigurator().configure(components);

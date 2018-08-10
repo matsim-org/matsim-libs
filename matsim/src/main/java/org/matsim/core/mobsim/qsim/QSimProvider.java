@@ -89,31 +89,32 @@ public class QSimProvider implements Provider<QSim> {
 		QSim qSim = qsimInjector.getInstance(QSim.class);
 
 		ComponentRegistry<MobsimEngine> mobsimEngineRegistry = new ComponentRegistry<>("MobsimEngine");
-		ComponentRegistry<ActivityHandler> activityHandlerRegister = new ComponentRegistry<>("ActivityHandler");
+		ComponentRegistry<ActivityHandler> activityHandlerRegistry = new ComponentRegistry<>("ActivityHandler");
 		ComponentRegistry<DepartureHandler> departureHandlerRegistry = new ComponentRegistry<>("DepartureHandler");
 		ComponentRegistry<AgentSource> agentSourceRegistry = new ComponentRegistry<>("AgentSource");
+		ComponentRegistry<MobsimListener> listenerRegistry = new ComponentRegistry<>("MobsimListener");
 
 		NamedComponentUtils.find(qsimInjector, MobsimEngine.class)
 				.forEach(mobsimEngineRegistry::register);
 		NamedComponentUtils.find(qsimInjector, ActivityHandler.class)
-				.forEach(activityHandlerRegister::register);
+				.forEach(activityHandlerRegistry::register);
 		NamedComponentUtils.find(qsimInjector, DepartureHandler.class)
 				.forEach(departureHandlerRegistry::register);
 		NamedComponentUtils.find(qsimInjector, AgentSource.class)
 				.forEach(agentSourceRegistry::register);
+		NamedComponentUtils.find(qsimInjector, MobsimListener.class)
+				.forEach(listenerRegistry::register);
 
 		mobsimEngineRegistry.getOrderedComponents(components.activeMobsimEngines).stream()
 				.map(qsimInjector::getInstance).forEach(qSim::addMobsimEngine);
-		activityHandlerRegister.getOrderedComponents(components.activeActivityHandlers).stream()
+		activityHandlerRegistry.getOrderedComponents(components.activeActivityHandlers).stream()
 				.map(qsimInjector::getInstance).forEach(qSim::addActivityHandler);
 		departureHandlerRegistry.getOrderedComponents(components.activeDepartureHandlers).stream()
 				.map(qsimInjector::getInstance).forEach(qSim::addDepartureHandler);
 		agentSourceRegistry.getOrderedComponents(components.activeAgentSources).stream()
 				.map(qsimInjector::getInstance).forEach(qSim::addAgentSource);
-
-		NamedComponentUtils.find(qsimInjector, MobsimListener.class).forEach((name, component) -> {
-			qSim.addQueueSimulationListeners(qsimInjector.getInstance(component));
-		});
+		listenerRegistry.getOrderedComponents(components.activeMobsimListeners).stream()
+				.map(qsimInjector::getInstance).forEach(qSim::addQueueSimulationListeners);
 
 		return qSim;
 	}
