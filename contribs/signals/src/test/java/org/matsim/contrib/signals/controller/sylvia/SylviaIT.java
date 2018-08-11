@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.analysis.SignalAnalysisTool;
 import org.matsim.contrib.signals.binder.SignalsModule;
 import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -70,8 +71,6 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import analysis.signals.TtSignalAnalysisTool;
-
 /**
  * Test sylvia logic at an intersection with four incoming links and one signal each.
  * No lanes are used.
@@ -95,7 +94,7 @@ public class SylviaIT {
 	@Test
 	public void testDemandAB() {
 		double[] noPersons = { 3600, 3600 };
-		TtSignalAnalysisTool signalAnalyzer = runScenario(noPersons);
+		SignalAnalysisTool signalAnalyzer = runScenario(noPersons);
 
 		// check signal results
 		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); // should be more or less equal (OW direction is always favored as the first phase)
@@ -122,7 +121,7 @@ public class SylviaIT {
 	@Test
 	public void testDemandA() {
 		double[] noPersons = { 3600, 0 };
-		TtSignalAnalysisTool signalAnalyzer = runScenario(noPersons);
+		SignalAnalysisTool signalAnalyzer = runScenario(noPersons);
 
 		// check signal results
 		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); // group 1 should have more total green time than group 2
@@ -142,7 +141,7 @@ public class SylviaIT {
 		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), 1);
 	}
 
-	private TtSignalAnalysisTool runScenario(double[] noPersons) {
+	private SignalAnalysisTool runScenario(double[] noPersons) {
 		Config config = defineConfig();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -156,7 +155,7 @@ public class SylviaIT {
 		controler.addOverridingModule(new SignalsModule());
 
 		// add signal analysis tool
-		TtSignalAnalysisTool signalAnalyzer = new TtSignalAnalysisTool();
+		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
