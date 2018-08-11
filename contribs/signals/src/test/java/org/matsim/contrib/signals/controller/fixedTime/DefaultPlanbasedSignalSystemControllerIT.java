@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package org.matsim.contrib.signals.model;
+package org.matsim.contrib.signals.controller.fixedTime;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
