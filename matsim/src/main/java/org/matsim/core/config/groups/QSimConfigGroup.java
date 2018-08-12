@@ -551,6 +551,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	// ---
 	@StringGetter(IS_SEEP_MODE_STORAGE_FREE)
 	public boolean isSeepModeStorageFree() {
+		// yyyyyy replace boolean by something more expressive.  kai, aug'18
 		return isSeepModeStorageFree;
 	}
 	@StringSetter(IS_SEEP_MODE_STORAGE_FREE)
@@ -562,6 +563,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private boolean isRestrictingSeepage = true;
 	@StringGetter(IS_RESTRICTING_SEEPAGE)
 	public boolean isRestrictingSeepage() {
+		// yyyyyy replace boolean by something more expressive.  kai, aug'18
 		return isRestrictingSeepage;
 	}
 	@StringSetter(IS_RESTRICTING_SEEPAGE)
