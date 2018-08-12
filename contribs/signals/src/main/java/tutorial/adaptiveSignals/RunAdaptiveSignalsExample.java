@@ -37,7 +37,7 @@ public class RunAdaptiveSignalsExample {
 			log.info("Your config file " + args[0] + " will be loaded and run with signals and otfvis-visualization.");
 			configFileName = args[0];
 		}
-		run(configFileName, "runAdaptiveSignalsExampleOutput/", true);
+		run(configFileName, "output/runAdaptiveSignalsExampleOutput/", true);
 	}
 	
 	public static void run(String configFileName, String outputDir, boolean visualize) {
