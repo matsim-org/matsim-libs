@@ -328,9 +328,9 @@ public class LaemmerIT {
 		}
 		Assert.assertTrue("the stabilizing regime should satisfy the maximum cycle time", avgCycleTimePerSystemStab.get(signalSystemId) < maxCycleTime);
 		// stabilizing regime only shows green when number of vehicles beyond a critical number, i.e. some of the cycle time is given away (all signals show red)
-		Assert.assertTrue("stab: sum of green times per cycle plus 10 seconds intergreen time should be more than 10 seconds less than the avg cycle time", 
+		Assert.assertTrue("stab: sum of green times per cycle plus 10 seconds intergreen time should be more than 9 seconds less than the avg cycle time", 
 				avgSignalGreenTimePerCycleStab.get(signalGroupId1) + avgSignalGreenTimePerCycleStab.get(signalGroupId2) + cycleIntergreenTime 
-				< avgCycleTimePerSystemStab.get(signalSystemId) - 10);
+				< avgCycleTimePerSystemStab.get(signalSystemId) - 9);
 		
 		// Test Optimizing Regime:
 		Assert.assertTrue("avg delay for NS-direction should be very high for the optimizing regime with high demand", avgDelayPerLinkOpt.get(Id.createLinkId("7_3")) > maxCycleTime);
