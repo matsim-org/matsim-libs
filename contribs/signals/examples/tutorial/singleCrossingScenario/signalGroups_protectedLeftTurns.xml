@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<signalGroups xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalGroups_v2.0.xsd" xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <signalSystem refId="SignalSystem1">
+        <signalGroup id="SignalGroup1">
+            <signal refId="Signal2_3_2_3.r"/>
+            <signal refId="Signal4_3_4_3.r"/>
+            <signal refId="Signal2_3_2_3.l"/>
+            <signal refId="Signal4_3_4_3.l"/>
+        </signalGroup>
+        <signalGroup id="SignalGroup2">
+            <signal refId="Signal7_3_7_3.ol"/>
+            <signal refId="Signal8_3_8_3.ol"/>
+        </signalGroup>
+    </signalSystem>
+</signalGroups>

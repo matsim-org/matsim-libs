@@ -47,9 +47,9 @@ public class UnprotectedLeftTurnLogicTest {
 	@Test
 	public void testSingleIntersectionScenarioWithLeftTurns() {
 		// run scenarios from files
-		AnalyzeSingleIntersectionLeftTurnDelays restrictedLeftTurns = createControler(IntersectionLogic.CONFLICTING_DIRECTIONS_AND_TURN_RESTRICTIONS);
-		AnalyzeSingleIntersectionLeftTurnDelays unrestrictedLeftTurns = createControler(IntersectionLogic.CONFLICTING_DIRECTIONS_NO_TURN_RESTRICTIONS);
-		AnalyzeSingleIntersectionLeftTurnDelays noLogic = createControler(IntersectionLogic.NONE);
+		AnalyzeSingleIntersectionLeftTurnDelays restrictedLeftTurns = runSimulation(IntersectionLogic.CONFLICTING_DIRECTIONS_AND_TURN_RESTRICTIONS);
+		AnalyzeSingleIntersectionLeftTurnDelays unrestrictedLeftTurns = runSimulation(IntersectionLogic.CONFLICTING_DIRECTIONS_NO_TURN_RESTRICTIONS);
+		AnalyzeSingleIntersectionLeftTurnDelays noLogic = runSimulation(IntersectionLogic.NONE);
 		
 		double leftTurnDelayWTurnRestriction = restrictedLeftTurns.getLeftTurnDelay();
 		double leftTurnDelayWoTurnRestriction = unrestrictedLeftTurns.getLeftTurnDelay();
@@ -63,14 +63,13 @@ public class UnprotectedLeftTurnLogicTest {
 		Assert.assertEquals("Delay value for the case with turn restrictions is not as expected!", 80845, leftTurnDelayWTurnRestriction, MatsimTestUtils.EPSILON);
 	}
 
-	private AnalyzeSingleIntersectionLeftTurnDelays createControler(IntersectionLogic conflictingDirectionsAndTurnRestrictions) {
-//		Config config = ConfigUtils.loadConfig(testUtils.getPackageInputDirectory() + "singleCrossing/config.xml") ;
+	private AnalyzeSingleIntersectionLeftTurnDelays runSimulation(IntersectionLogic intersectionLogic) {
 		Config config = ConfigUtils.loadConfig("./examples/tutorial/singleCrossingScenario/config.xml");
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		signalsConfigGroup.setSignalControlFile("signalControlFixedTime.xml");
-		signalsConfigGroup.setIntersectionLogic(conflictingDirectionsAndTurnRestrictions);
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory() + conflictingDirectionsAndTurnRestrictions + "/");
+		signalsConfigGroup.setIntersectionLogic(intersectionLogic);
+		config.controler().setOutputDirectory(testUtils.getOutputDirectory() + intersectionLogic + "/");
 		
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
