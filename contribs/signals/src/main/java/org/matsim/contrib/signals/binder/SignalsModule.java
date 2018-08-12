@@ -28,6 +28,7 @@ import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalModelFactoryImpl;
 import org.matsim.contrib.signals.builder.SignalSystemsModelBuilder;
+import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfigGroup;
 import org.matsim.contrib.signals.controller.sylvia.SylviaConfig;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
@@ -68,6 +69,8 @@ public class SignalsModule extends AbstractModule {
 			bind(DownstreamSensor.class).asEagerSingleton();
 			// bind configs for special signal controller
 			bind(SylviaConfig.class).toInstance(sylviaConfig);
+			bind(LaemmerConfigGroup.class).toInstance((LaemmerConfigGroup) ConfigUtils.addOrGetModule(getConfig(),
+					LaemmerConfigGroup.GROUP_NAME, LaemmerConfigGroup.class));
 			
 			// general signal bindings
 			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
