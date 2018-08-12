@@ -85,12 +85,12 @@ public final class SylviaSignalController extends AbstractSignalController imple
 	private int secondInCycle = -1; //used for debug output
 	private SylviaExtensionPoint currentExtensionPoint;
 
-	private final SylviaConfig sylviaConfig;
+	private final SylviaConfigGroup sylviaConfig;
 	private final LinkSensorManager sensorManager;
 	private final DownstreamSensor downstreamSensor;
 
 	private SylviaSignalController(Scenario scenario, LinkSensorManager sensorManager, DownstreamSensor downstreamSensor) {
-		this.sylviaConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), SylviaConfig.class);
+		this.sylviaConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), SylviaConfigGroup.class);
 		this.sensorManager = sensorManager;
 		this.downstreamSensor = downstreamSensor;
 		this.init();

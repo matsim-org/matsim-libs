@@ -27,11 +27,11 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  * @author dgrether, tthunig
  *
  */
-public final class SylviaConfig extends ReflectiveConfigGroup {
+public final class SylviaConfigGroup extends ReflectiveConfigGroup {
 	
 	public static final String GROUP_NAME = "actuatedSylviaSignals";
 	
-	public SylviaConfig() {
+	public SylviaConfigGroup() {
 		super(GROUP_NAME);
 	}
 	
