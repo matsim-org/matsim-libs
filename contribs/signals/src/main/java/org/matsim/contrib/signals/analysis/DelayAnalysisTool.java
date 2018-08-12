@@ -21,16 +21,22 @@
 package org.matsim.contrib.signals.analysis;
 
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -40,17 +46,27 @@ import org.matsim.vehicles.Vehicle;
 import com.google.inject.Inject;
 
 /**
+ * Calculate total delay and delay per link. 
+ * Delay of stucked agents can be considered (call considerDelayOfStuckedAgents()).
+ * Delay occurring between PersonDeparture and VehicleEntersTraffic event is included 
+ * (that is why it is not enough to consider only vehicle events).
+ * Delay of all passengers (not only the driver) is considered.
+ * 
  * @author tthunig
  */
-public class DelayAnalysisTool implements VehicleEntersTrafficEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
+public class DelayAnalysisTool implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler {
 
-	private double totalDelay = 0.0;
-	private Map<Id<Link>, Double> totalDelayPerLink = new HashMap<>();
-	private Map<Id<Link>, Integer> numberOfVehPerLink = new HashMap<>();
-	private Map<Id<Link>,LinkedList<Id<Person>>> agentsStuckedAtLink = new HashMap<>();
-	private Map<Id<Vehicle>, Double> veh2earliestLinkExitTime = new HashMap<>();
+	private static final Logger LOG = Logger.getLogger(DelayAnalysisTool.class);
 	
 	private final Network network;
+	private boolean considerStuckedAgents = false;
+	
+	private double totalDelay = 0.0;
+	private Map<Id<Link>, Double> totalDelayPerLink = new HashMap<>();
+	private Map<Id<Link>, Integer> numberOfAgentsPerLink = new HashMap<>();
+	
+	private Map<Id<Person>, Double> earliestLinkExitTimePerAgent = new HashMap<>();
+	private Map<Id<Vehicle>, Set<Id<Person>>> vehicleIdToPassengerIds = new HashMap<>();
 	
 	public DelayAnalysisTool(Network network) {
 		this.network = network;
@@ -65,16 +81,26 @@ public class DelayAnalysisTool implements VehicleEntersTrafficEventHandler, Link
 	@Override
 	public void reset(int iteration) {
 		this.totalDelay = 0.0;
-		this.veh2earliestLinkExitTime.clear();
+		this.earliestLinkExitTimePerAgent.clear();
+		this.vehicleIdToPassengerIds.clear();
 		this.totalDelayPerLink.clear();
-		this.numberOfVehPerLink.clear();
-		this.agentsStuckedAtLink.clear();
+		this.numberOfAgentsPerLink.clear();
 	}
 	
 	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		// for the first link every vehicle needs one second without delay
-		veh2earliestLinkExitTime.put(event.getVehicleId(), event.getTime() + 1);
+		earliestLinkExitTimePerAgent.put(event.getPersonId(), event.getTime() + 1);
+	}
+
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (!vehicleIdToPassengerIds.containsKey(event.getVehicleId())){
+			// register empty vehicle
+			vehicleIdToPassengerIds.put(event.getVehicleId(), new HashSet<Id<Person>>());
+		}
+		// add passenger
+		vehicleIdToPassengerIds.get(event.getVehicleId()).add(event.getPersonId());
 	}
 	
 	@Override
@@ -84,7 +110,9 @@ public class DelayAnalysisTool implements VehicleEntersTrafficEventHandler, Link
 		double freespeedTt = currentLink.getLength() / currentLink.getFreespeed();
 		// this is the earliest time where matsim sets the agent to the next link
 		double matsimFreespeedTT = Math.floor(freespeedTt + 1);	
-		veh2earliestLinkExitTime.put(event.getVehicleId(), event.getTime() + matsimFreespeedTT);
+		for (Id<Person> passengerId : vehicleIdToPassengerIds.get(event.getVehicleId())){
+			this.earliestLinkExitTimePerAgent.put(passengerId, event.getTime() + matsimFreespeedTT);
+		}
 	}
 
 	@Override
@@ -92,21 +120,42 @@ public class DelayAnalysisTool implements VehicleEntersTrafficEventHandler, Link
 		// initialize link based analysis data structure
 		if (!totalDelayPerLink.containsKey(event.getLinkId())) {
 			totalDelayPerLink.put(event.getLinkId(), 0.0);
-			numberOfVehPerLink.put(event.getLinkId(), 0);
+			numberOfAgentsPerLink.put(event.getLinkId(), 0);
 		}
-		// calculate delay
-		double currentDelay = event.getTime() - veh2earliestLinkExitTime.get(event.getVehicleId());
-		totalDelayPerLink.put(event.getLinkId(), totalDelayPerLink.get(event.getLinkId()) + currentDelay);
-		totalDelay += currentDelay;
-
-		int vehCount = numberOfVehPerLink.get(event.getLinkId());
-		numberOfVehPerLink.put(event.getLinkId(), ++vehCount);
+		
+		for (Id<Person> passengerId : vehicleIdToPassengerIds.get(event.getVehicleId())) {
+			// calculate delay for every passenger
+			double currentDelay = event.getTime() - this.earliestLinkExitTimePerAgent.remove(passengerId);
+			totalDelayPerLink.put(event.getLinkId(), totalDelayPerLink.get(event.getLinkId()) + currentDelay);
+			totalDelay += currentDelay;
+			// increase agent counter
+			numberOfAgentsPerLink.put(event.getLinkId(), numberOfAgentsPerLink.get(event.getLinkId()) +1 );
+		}
 	}
 	
+	@Override
+	public void handleEvent(PersonStuckEvent event) {
+		if (this.considerStuckedAgents) {
+			if (!totalDelayPerLink.containsKey(event.getLinkId())) {
+				// initialize link based analysis data structure
+				totalDelayPerLink.put(event.getLinkId(), 0.0);
+				numberOfAgentsPerLink.put(event.getLinkId(), 0);
+			}
+			
+			double stuckDelay = event.getTime() - this.earliestLinkExitTimePerAgent.remove(event.getPersonId());
+			LOG.warn("Add delay " + stuckDelay + " of agent " + event.getPersonId() + " that stucked on link "
+					+ event.getLinkId());
+			totalDelayPerLink.put(event.getLinkId(), totalDelayPerLink.get(event.getLinkId()) + stuckDelay);
+			this.totalDelay += stuckDelay;
+			// increase agent counter
+			numberOfAgentsPerLink.put(event.getLinkId(), numberOfAgentsPerLink.get(event.getLinkId()) + 1);
+		}
+	}
+
 	public double getTotalDelay(){
 		return totalDelay;
 	}
-	
+
 	public Map<Id<Link>, Double> getTotalDelayPerLink(){
 		return totalDelayPerLink;
 	}
@@ -114,9 +163,13 @@ public class DelayAnalysisTool implements VehicleEntersTrafficEventHandler, Link
 	public Map<Id<Link>, Double> getAvgDelayPerLink(){
 		Map<Id<Link>, Double> avgDelayMap = new HashMap<>();
 		for (Id<Link> linkId : totalDelayPerLink.keySet()){
-			avgDelayMap.put(linkId, totalDelayPerLink.get(linkId) / numberOfVehPerLink.get(linkId));
+			avgDelayMap.put(linkId, totalDelayPerLink.get(linkId) / numberOfAgentsPerLink.get(linkId));
 		}
 		return avgDelayMap;
+	}
+
+	public void considerDelayOfStuckedAgents() {
+		this.considerStuckedAgents = true;
 	}
 
 	
