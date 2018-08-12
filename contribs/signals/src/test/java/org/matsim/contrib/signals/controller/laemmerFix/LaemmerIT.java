@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.DelayAnalysisTool;
 import org.matsim.contrib.signals.analysis.SignalAnalysisTool;
 import org.matsim.contrib.signals.binder.SignalsModule;
