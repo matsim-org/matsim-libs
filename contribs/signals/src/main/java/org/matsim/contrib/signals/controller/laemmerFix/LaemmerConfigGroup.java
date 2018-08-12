@@ -1,7 +1,9 @@
 package org.matsim.contrib.signals.controller.laemmerFix;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 //import com.sun.istack.internal.NotNull;
 //import com.sun.istack.internal.Nullable;
@@ -36,6 +38,85 @@ public final class LaemmerConfigGroup extends ReflectiveConfigGroup {
     private static final String MIN_GREEN_TIME = "minimalGreenTime";
     private double minGreenTime = 5.0;
     
+	private static final String ACTIVE_REGIME_CMT = "Regime that is used for the laemmer control. "
+			+ "The options are: " + Arrays.stream(Regime.values()).
+			map(regime -> " " + regime.toString()).collect(Collectors.joining())
+			+ ". Default is " + Regime.COMBINED;
+	private static final String DESIRED_CYCLE_TIME_CMT = "Cycle time that is aimed by the stabilizing regime.";
+    private static final String MAX_CYCLE_TIME_CMT = "Maximal cycle time that is allowed by the stabilizing regime.";
+	private static final String INTERGREEN_TIME_CMT = "Red time that has to be ensured between the green phases of two conflicting directions (exluding amber time).";
+	private static final String MIN_GREEN_TIME_CMT = "Minimal time that a signal has to show green once it is switched to green.";
+	
+	@Override
+	public Map<String, String> getComments() {
+		Map<String, String> map = super.getComments();
+		
+		map.put(ACTIVE_REGIME, ACTIVE_REGIME_CMT);
+		map.put(DESIRED_CYCLE_TIME, DESIRED_CYCLE_TIME_CMT);
+		map.put(MAX_CYCLE_TIME, MAX_CYCLE_TIME_CMT);
+		map.put(INTERGREEN_TIME, INTERGREEN_TIME_CMT);
+		map.put(MIN_GREEN_TIME, MIN_GREEN_TIME_CMT);
+		
+		return map;
+	}
+	
+	@StringSetter(ACTIVE_REGIME)
+	public void setActiveRegime(Regime activeRegime) {
+		this.activeRegime = activeRegime;
+	}
+	@StringGetter(ACTIVE_REGIME)
+	public Regime getActiveRegime() {
+        return activeRegime;
+    }
+
+    /**
+	 * @param desiredCycleTime -- {@value #DESIRED_CYCLE_TIME_CMT}
+	 */
+	@StringSetter(DESIRED_CYCLE_TIME)
+    public void setDesiredCycleTime(double desiredCycleTime) {
+        this.desiredCycleTime = desiredCycleTime;
+    }
+	@StringGetter(DESIRED_CYCLE_TIME)
+	public double getDesiredCycleTime() {
+		return desiredCycleTime;
+	}
+	
+	/**
+	 * @param maximumCycleTime -- {@value #MAX_CYCLE_TIME_CMT}
+	 */
+	@StringSetter(MAX_CYCLE_TIME)
+	public void setMaxCycleTime(double maxCycleTime) {
+		this.maxCycleTime = maxCycleTime;
+	}
+	@StringGetter(MAX_CYCLE_TIME)
+	public double getMaxCycleTime() {
+		return maxCycleTime;
+	}
+
+    /**
+	 * @param intergreenTime -- {@value #INTERGREEN_TIME_CMT}
+	 */
+	@StringSetter(INTERGREEN_TIME)
+	public void setIntergreenTime(double intergreen) {
+        this.intergreenTime = intergreen;
+    }
+	@StringGetter(INTERGREEN_TIME)
+    public double getIntergreenTime() {
+        return intergreenTime;
+    }
+	
+	/**
+	 * @param minimumGreenTime -- {@value #MIN_GREEN_TIME_CMT}
+	 */
+	@StringSetter(MIN_GREEN_TIME)
+	public void setMinGreenTime(double minGreenTime) {
+        this.minGreenTime = minGreenTime;
+    }
+	@StringGetter(MIN_GREEN_TIME)
+	public double getMinGreenTime() {
+        return minGreenTime;
+    }
+	
     public enum StabilizationStrategy {USE_MAX_LANECOUNT, PRIORIZE_HIGHER_POSITIONS, COMBINE_SIMILAR_REGULATIONTIME, HEURISTIC}; 
     private StabilizationStrategy activeStabilizationStrategy = StabilizationStrategy.HEURISTIC;
     
@@ -53,7 +134,7 @@ public final class LaemmerConfigGroup extends ReflectiveConfigGroup {
 	private boolean isRemoveSubPhases = true;
 	
 	/** if there exist queues but arrivalRate for this link/lane is 0, the queue will never emptied.
-	 * with tMinForNotGrowingQueues setten to true it will be get at least the minium green time
+	 * with tMinForNotGrowingQueues set to true it will be get at least the minium green time
 	 */
 	private boolean minGreenTimeForNonGrowingQueues = true;
 	
@@ -67,7 +148,7 @@ public final class LaemmerConfigGroup extends ReflectiveConfigGroup {
 	private boolean determineMaxLoadForTIdleGroupedBySignals = true;
 
 	/**
-	 * if a signals showed green during intergreenTime, stabilizationtime will be reduced after intergreenTime
+	 * if a signals showed green during intergreenTime, stabilization time will be reduced after intergreenTime
 	 */
 	private boolean shortenStabilizationTimeAfterIntergreenTime = true;
 
@@ -79,14 +160,6 @@ public final class LaemmerConfigGroup extends ReflectiveConfigGroup {
         }
     }
 
-    public double getMinGreenTime() {
-        return minGreenTime;
-    }
-
-    public void setMinGreenTime(double minGreenTime) {
-        this.minGreenTime = minGreenTime;
-    }
-    
     public StabilizationStrategy getActiveStabilizationStrategy() {
 		return activeStabilizationStrategy;
 	}
@@ -95,15 +168,7 @@ public final class LaemmerConfigGroup extends ReflectiveConfigGroup {
 		this.activeStabilizationStrategy = activeStabilizationStrategy;
 	}
 
-	public Regime getActiveRegime() {
-        return activeRegime;
-    }
-
-    public void setActiveRegime(Regime activeRegime) {
-        this.activeRegime = activeRegime;
-    }
-
-    public void addArrivalRateForLink(Id<Link> linkId, double arrivalRate) {
+	public void addArrivalRateForLink(Id<Link> linkId, double arrivalRate) {
         this.linkArrivalRates.put(linkId, arrivalRate);
     }
 
@@ -117,31 +182,7 @@ public final class LaemmerConfigGroup extends ReflectiveConfigGroup {
         }
         this.laneArrivalRates.get(linkId).put(laneId, arrivalRate);
     }
-
-    public double getMaxCycleTime() {
-        return maxCycleTime;
-    }
-
-    public void setMaxCycleTime(double maxCycleTime) {
-        this.maxCycleTime = maxCycleTime;
-    }
-
-    public double getDesiredCycleTime() {
-        return desiredCycleTime;
-    }
-
-    public void setDesiredCycleTime(double desiredCycleTime) {
-        this.desiredCycleTime = desiredCycleTime;
-    }
-
-    public double getIntergreenTime() {
-        return intergreenTime;
-    }
-
-    public void setIntergreenTime(double intergreen) {
-        this.intergreenTime = intergreen;
-    }
-	
+    
 	public void setCheckDownstream(boolean checkDownstream) {
 		this.checkDownstream = checkDownstream;
 	}
