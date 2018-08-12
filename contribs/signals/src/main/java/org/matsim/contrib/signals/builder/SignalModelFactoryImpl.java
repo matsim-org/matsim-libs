@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.controller.SignalController;
 import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.controller.laemmerFix.LaemmerSignalController;
-import org.matsim.contrib.signals.controller.sylvia.SylviaConfig;
 import org.matsim.contrib.signals.controller.sylvia.SylviaPreprocessData;
 import org.matsim.contrib.signals.controller.sylvia.SylviaSignalController;
 import org.matsim.contrib.signals.controller.sylvia.SylviaSignalPlan;
@@ -55,8 +54,8 @@ public final class SignalModelFactoryImpl implements SignalModelFactory {
 	private final Map<String, Provider<SignalController>> signalControlProvider = new HashMap<>();
 	
 	@Inject
-	public SignalModelFactoryImpl(Scenario scenario, SylviaConfig sylviaConfig, LinkSensorManager sensorManager, DownstreamSensor downstreamSensor) {
-		signalControlProvider.put(SylviaSignalController.IDENTIFIER, new SylviaSignalController.SignalControlProvider(sylviaConfig, sensorManager, downstreamSensor));
+	public SignalModelFactoryImpl(Scenario scenario, LinkSensorManager sensorManager, DownstreamSensor downstreamSensor) {
+		signalControlProvider.put(SylviaSignalController.IDENTIFIER, new SylviaSignalController.SignalControlProvider(scenario, sensorManager, downstreamSensor));
 		signalControlProvider.put(LaemmerSignalController.IDENTIFIER, new LaemmerSignalController.SignalControlProvider(sensorManager, scenario, downstreamSensor));
 		signalControlProvider.put(DefaultPlanbasedSignalSystemController.IDENTIFIER, new DefaultPlanbasedSignalSystemController.SignalControlProvider());
 	}
