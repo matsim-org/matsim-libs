@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.binder.SignalsModule;
+import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfigGroup;
+import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfigGroup.Regime;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.otfvis.OTFVisWithSignalsLiveModule;
@@ -59,6 +61,14 @@ public class RunAdaptiveSignalsExample {
 		if (signalsConfigGroup.isUseSignalSystems()) {
 			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		}
+		
+		// here are some examples how to change parameters of the laemmer control
+		LaemmerConfigGroup laemmerConfigGroup = ConfigUtils.addOrGetModule(config,
+				LaemmerConfigGroup.GROUP_NAME, LaemmerConfigGroup.class);
+		laemmerConfigGroup.setActiveRegime(Regime.COMBINED);
+		laemmerConfigGroup.setDesiredCycleTime(90);
+		laemmerConfigGroup.setMinGreenTime(5);
+		// ...
 		
 		Controler controler = new Controler( scenario );
         
