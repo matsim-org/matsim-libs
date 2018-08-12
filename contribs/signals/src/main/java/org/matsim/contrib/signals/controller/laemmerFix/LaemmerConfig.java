@@ -26,7 +26,6 @@ public final class LaemmerConfig {
     private double desiredCycleTime = 120;
 
     private double defaultIntergreenTime = 5.0;
-    //I think this shouldn't default to 0.0, pschade Jan'18
     private double minGreenTime = 5.0;
     
     //size of timeBuckets for LaneSensor and LinkSensor
