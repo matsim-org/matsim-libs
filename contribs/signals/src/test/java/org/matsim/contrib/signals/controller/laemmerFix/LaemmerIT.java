@@ -417,6 +417,13 @@ public class LaemmerIT {
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		if (doubled) config.qsim().setFlowCapFactor(2.0);
 		
+		LaemmerConfigGroup laemmerConfigGroup = ConfigUtils.addOrGetModule(config,
+				LaemmerConfigGroup.GROUP_NAME, LaemmerConfigGroup.class);
+		laemmerConfigGroup.setMinGreenTime(minG);
+		laemmerConfigGroup.setActiveRegime(regime);
+		laemmerConfigGroup.setDesiredCycleTime(60);
+		laemmerConfigGroup.setMaxCycleTime(90);
+		
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		// create a population
@@ -432,14 +439,7 @@ public class LaemmerIT {
 		Controler controler = new Controler( scenario );
 		
 		// add the signals module
-		SignalsModule signalsModule = new SignalsModule();
-		LaemmerConfigGroup laemmerConfig = new LaemmerConfigGroup();
-		laemmerConfig.setMinGreenTime(minG);
-		laemmerConfig.setActiveRegime(regime);
-		laemmerConfig.setDesiredCycleTime(60);
-        laemmerConfig.setMaxCycleTime(90);
-		signalsModule.setLaemmerConfig(laemmerConfig);
-		controler.addOverridingModule(signalsModule);
+		controler.addOverridingModule(new SignalsModule());
 		
 		// add signal analysis tool
 		controler.addOverridingModule(new AbstractModule() {
