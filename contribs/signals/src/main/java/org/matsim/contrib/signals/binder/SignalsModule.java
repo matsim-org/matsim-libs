@@ -22,17 +22,12 @@
 
 package org.matsim.contrib.signals.binder;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalModelFactoryImpl;
 import org.matsim.contrib.signals.builder.SignalSystemsModelBuilder;
-import org.matsim.contrib.signals.controller.SignalController;
-import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfigGroup;
 import org.matsim.contrib.signals.controller.sylvia.SylviaConfig;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
@@ -46,7 +41,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QSignalsNetworkFactory;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 import org.matsim.core.replanning.ReplanningContext;
 
-import com.google.inject.Provider;
 import com.google.inject.Provides;
 
 /**
@@ -63,7 +57,6 @@ import com.google.inject.Provides;
 public class SignalsModule extends AbstractModule {
 	
 	private SylviaConfig sylviaConfig = new SylviaConfig();
-	private LaemmerConfigGroup laemmerConfig = new LaemmerConfigGroup();
 	
 	@Override
 	public void install() {
@@ -75,7 +68,6 @@ public class SignalsModule extends AbstractModule {
 			bind(DownstreamSensor.class).asEagerSingleton();
 			// bind configs for special signal controller
 			bind(SylviaConfig.class).toInstance(sylviaConfig);
-			bind(LaemmerConfigGroup.class).toInstance(laemmerConfig);
 			
 			// general signal bindings
 			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
@@ -106,9 +98,5 @@ public class SignalsModule extends AbstractModule {
 	
 	public void setSylviaConfig(SylviaConfig sylviaConfig) {
 		this.sylviaConfig = sylviaConfig;
-	}
-
-	public void setLaemmerConfig(LaemmerConfigGroup laemmerConfig) {
-		this.laemmerConfig = laemmerConfig;
 	}
 }
