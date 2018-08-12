@@ -11,19 +11,18 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.lanes.Lane;
 
 /**
- * @author nkuehnel, tthunig
+ * @author nkuehnel, tthunig, pschade
  */
 public final class LaemmerConfig {
 	
-    //Probably consider to try also a combination of simmilar outflow rates
     public enum StabilizationStrategy {USE_MAX_LANECOUNT, PRIORIZE_HIGHER_POSITIONS, COMBINE_SIMILAR_REGULATIONTIME, HEURISTIC}; 
     private StabilizationStrategy activeStabilizationStrategy = StabilizationStrategy.HEURISTIC;
     
     public enum Regime {COMBINED, OPTIMIZING, STABILIZING};
     private Regime activeRegime = Regime.COMBINED;
 
-    private double maxCycleTime = 180;
-    private double desiredCycleTime = 120;
+    private double maxCycleTime = 135;
+    private double desiredCycleTime = 90;
 
     private double defaultIntergreenTime = 5.0;
     private double minGreenTime = 5.0;
