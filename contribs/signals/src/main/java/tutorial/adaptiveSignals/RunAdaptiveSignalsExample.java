@@ -49,7 +49,6 @@ public class RunAdaptiveSignalsExample {
 		// adjustments for live visualization
 		OTFVisConfigGroup otfvisConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.class);
 		otfvisConfig.setDrawTime(true);
-		otfvisConfig.setAgentSize(80f);
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.withHoles);
 		
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
