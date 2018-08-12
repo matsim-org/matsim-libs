@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.signals.analysis.DelayAnalysisTool;
 import org.matsim.contrib.signals.analysis.SignalAnalysisTool;
 import org.matsim.contrib.signals.binder.SignalsModule;
-import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfig.Regime;
+import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfigGroup.Regime;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.model.SignalGroup;
@@ -433,7 +433,7 @@ public class LaemmerIT {
 		
 		// add the signals module
 		SignalsModule signalsModule = new SignalsModule();
-		LaemmerConfig laemmerConfig = new LaemmerConfig();
+		LaemmerConfigGroup laemmerConfig = new LaemmerConfigGroup();
 		laemmerConfig.setMinGreenTime(minG);
 		laemmerConfig.setActiveRegime(regime);
 		laemmerConfig.setDesiredCycleTime(60);

@@ -32,7 +32,7 @@ import org.matsim.contrib.signals.builder.SignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalModelFactoryImpl;
 import org.matsim.contrib.signals.builder.SignalSystemsModelBuilder;
 import org.matsim.contrib.signals.controller.SignalController;
-import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfig;
+import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfigGroup;
 import org.matsim.contrib.signals.controller.sylvia.SylviaConfig;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
@@ -63,7 +63,7 @@ import com.google.inject.Provides;
 public class SignalsModule extends AbstractModule {
 	
 	private SylviaConfig sylviaConfig = new SylviaConfig();
-	private LaemmerConfig laemmerConfig = new LaemmerConfig();
+	private LaemmerConfigGroup laemmerConfig = new LaemmerConfigGroup();
 	
 	@Override
 	public void install() {
@@ -75,7 +75,7 @@ public class SignalsModule extends AbstractModule {
 			bind(DownstreamSensor.class).asEagerSingleton();
 			// bind configs for special signal controller
 			bind(SylviaConfig.class).toInstance(sylviaConfig);
-			bind(LaemmerConfig.class).toInstance(laemmerConfig);
+			bind(LaemmerConfigGroup.class).toInstance(laemmerConfig);
 			
 			// general signal bindings
 			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
@@ -108,7 +108,7 @@ public class SignalsModule extends AbstractModule {
 		this.sylviaConfig = sylviaConfig;
 	}
 
-	public void setLaemmerConfig(LaemmerConfig laemmerConfig) {
+	public void setLaemmerConfig(LaemmerConfigGroup laemmerConfig) {
 		this.laemmerConfig = laemmerConfig;
 	}
 }

@@ -61,9 +61,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
     private final Network network;
     private final Lanes lanes;
     private final Config config;
-    private final LaemmerConfig laemmerConfig;
-
-    private final double DEFAULT_INTERGREEN;
+    private final LaemmerConfigGroup laemmerConfig;
     
     private double tIdle;
     // TODO this should be a constant. can be calculated once in simulationInitialized. tt, dez'17
@@ -71,12 +69,12 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 
 
     public final static class SignalControlProvider implements Provider<SignalController> {
-        private final LaemmerConfig laemmerConfig;
+        private final LaemmerConfigGroup laemmerConfig;
         private final LinkSensorManager sensorManager;
 		private final DownstreamSensor downstreamSensor;
 		private final Scenario scenario;
 
-        public SignalControlProvider(LaemmerConfig laemmerConfig, LinkSensorManager sensorManager, Scenario scenario, DownstreamSensor downstreamSensor) {
+        public SignalControlProvider(LaemmerConfigGroup laemmerConfig, LinkSensorManager sensorManager, Scenario scenario, DownstreamSensor downstreamSensor) {
             this.laemmerConfig = laemmerConfig;
             this.sensorManager = sensorManager;
             this.scenario = scenario;
@@ -90,17 +88,12 @@ public final class LaemmerSignalController extends AbstractSignalController impl
     }
 
 
-    private LaemmerSignalController(LaemmerConfig laemmerConfig, LinkSensorManager sensorManager, Scenario scenario, DownstreamSensor downstreamSensor) {
+    private LaemmerSignalController(LaemmerConfigGroup laemmerConfig, LinkSensorManager sensorManager, Scenario scenario, DownstreamSensor downstreamSensor) {
         this.laemmerConfig = laemmerConfig;
         this.sensorManager = sensorManager;
         this.network = scenario.getNetwork();
         this.lanes = scenario.getLanes();
         this.config = scenario.getConfig();
-		if (laemmerConfig.isUseDefaultIntergreenTime()) {
-			DEFAULT_INTERGREEN = laemmerConfig.getDefaultIntergreenTime();
-		} else {
-			throw new UnsupportedOperationException("Laemmer with signal specific intergreen times is not yet implemented.");
-		}
         this.downstreamSensor = downstreamSensor;
     }
 
@@ -118,7 +111,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
     @Override
     public void updateState(double now) {
         updateRepresentativeDriveways(now);
-        if (!laemmerConfig.getActiveRegime().equals(LaemmerConfig.Regime.OPTIMIZING)) {
+        if (!laemmerConfig.getActiveRegime().equals(LaemmerConfigGroup.Regime.OPTIMIZING)) {
             updateActiveRegulation(now);
         }
         for (LaemmerSignal signal : laemmerSignals) {
@@ -158,7 +151,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 
     private LaemmerSignal selectSignal() {
         LaemmerSignal max = null;
-		if (!laemmerConfig.getActiveRegime().equals(LaemmerConfig.Regime.OPTIMIZING)) {
+		if (!laemmerConfig.getActiveRegime().equals(LaemmerConfigGroup.Regime.OPTIMIZING)) {
 			max = regulationQueue.peek();
 			/*
 			 * TODO peek the first element for which the stabilization criterion is still active.
@@ -173,7 +166,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 //				max = regulationQueue.peek();
 //			}
         }
-        if (!laemmerConfig.getActiveRegime().equals(LaemmerConfig.Regime.STABILIZING)) {
+        if (!laemmerConfig.getActiveRegime().equals(LaemmerConfigGroup.Regime.STABILIZING)) {
             if (max == null) {
                 double index = 0;
                 for (LaemmerSignal signal : laemmerSignals) {
@@ -203,7 +196,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
         }
 
 		if (activeRequest == null && max != null) {
-			activeRequest = new Request(now + DEFAULT_INTERGREEN, max);
+			activeRequest = new Request(now + laemmerConfig.getIntergreenTime(), max);
 		}
 		
 		if (activeRequest != null && activeRequest.isDue(now)) {
@@ -223,7 +216,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
         for (LaemmerSignal signal : laemmerSignals) {
             signal.determineRepresentativeDriveway(now);
             systemOutflowCapacity += signal.signalOutflowCapacity;
-            tIdle -= Math.max(signal.determiningLoad * laemmerConfig.getDesiredCycleTime() + DEFAULT_INTERGREEN, laemmerConfig.getMinGreenTime());
+            tIdle -= Math.max(signal.determiningLoad * laemmerConfig.getDesiredCycleTime() + laemmerConfig.getIntergreenTime(), laemmerConfig.getMinGreenTime());
         }
         tIdle = Math.max(0, tIdle);
     }
@@ -310,7 +303,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
         private double abortionPenalty = 0;
         private boolean stabilize = false;
 
-        private double a = DEFAULT_INTERGREEN;
+        private double a = laemmerConfig.getIntergreenTime();
         private double regulationTime = 0;
 
         private Id<Lane> determiningLane;
@@ -361,7 +354,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
         private void update(double now) {
             updateAbortionPenalty(now);
 
-            if (!laemmerConfig.getActiveRegime().equals(LaemmerConfig.Regime.OPTIMIZING)) {
+            if (!laemmerConfig.getActiveRegime().equals(LaemmerConfigGroup.Regime.OPTIMIZING)) {
                 updateStabilization(now);
             }
 			if (!this.stabilize) {
@@ -374,7 +367,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
             if (activeRequest != null && this.equals(activeRequest.signal)) {
                 double waitingTimeSum = 0;
                 double remainingInBetweenTime = Math.max(activeRequest.onsetTime - now, 0);
-                for (double i = remainingInBetweenTime; i < DEFAULT_INTERGREEN; i++) {
+                for (double i = remainingInBetweenTime; i < laemmerConfig.getIntergreenTime(); i++) {
                     for (Signal signal : group.getSignals().values()) {
                         if (signal.getLaneIds() != null && !signal.getLaneIds().isEmpty()) {
                             for (Id<Lane> laneId : signal.getLaneIds()) {
@@ -389,10 +382,10 @@ public final class LaemmerSignalController extends AbstractSignalController impl
                 for (Signal signal : group.getSignals().values()) {
                     if (signal.getLaneIds() != null && !signal.getLaneIds().isEmpty()) {
                         for (Id<Lane> laneId : signal.getLaneIds()) {
-                            n += getNumberOfExpectedVehiclesOnLane(now + DEFAULT_INTERGREEN, signal.getLinkId(), laneId);
+                            n += getNumberOfExpectedVehiclesOnLane(now + laemmerConfig.getIntergreenTime(), signal.getLinkId(), laneId);
                         }
                     } else {
-                        n += getNumberOfExpectedVehiclesOnLink(now + DEFAULT_INTERGREEN, signal.getLinkId());
+                        n += getNumberOfExpectedVehiclesOnLink(now + laemmerConfig.getIntergreenTime(), signal.getLinkId());
                     }
                 }
                 if (n > 0) {
@@ -406,7 +399,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
             if (activeRequest != null && activeRequest.signal == this) {
                 double remainingInBetweenTime = Math.max(activeRequest.onsetTime - now, 0);
                 double remainingMinG = Math.max(activeRequest.onsetTime - now + laemmerConfig.getMinGreenTime() - remainingInBetweenTime, 0);
-                for (double i = remainingInBetweenTime; i <= DEFAULT_INTERGREEN; i++) {
+                for (double i = remainingInBetweenTime; i <= laemmerConfig.getIntergreenTime(); i++) {
                     double nExpected = 0;
                     double reqGreenTime = remainingMinG;
                     for (Signal signal : this.group.getSignals().values()) {
@@ -444,7 +437,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
                 for (Signal signal : this.group.getSignals().values()) {
                     if (signal.getLaneIds() != null && !signal.getLaneIds().isEmpty()) {
                         for (Id<Lane> laneId : signal.getLaneIds()) {
-                            double nTemp = getNumberOfExpectedVehiclesOnLane(now + DEFAULT_INTERGREEN + laemmerConfig.getMinGreenTime(), signal.getLinkId(), laneId);
+                            double nTemp = getNumberOfExpectedVehiclesOnLane(now + laemmerConfig.getIntergreenTime() + laemmerConfig.getMinGreenTime(), signal.getLinkId(), laneId);
                             nExpected += nTemp;
                             double laneFlow = lanes.getLanesToLinkAssignments().get(signal.getLinkId()).getLanes().get(laneId).getCapacityVehiclesPerHour() * config.qsim().getFlowCapFactor() / 3600;
                             double tempGreenTime = nTemp / laneFlow;
@@ -453,7 +446,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
                             }
                         }
                     } else {
-                        double nTemp = getNumberOfExpectedVehiclesOnLink(now + DEFAULT_INTERGREEN + laemmerConfig.getMinGreenTime(), signal.getLinkId());
+                        double nTemp = getNumberOfExpectedVehiclesOnLink(now + laemmerConfig.getIntergreenTime() + laemmerConfig.getMinGreenTime(), signal.getLinkId());
                         nExpected += nTemp;
                         double linkFlow = network.getLinks().get(signal.getLinkId()).getCapacity() * config.qsim().getFlowCapFactor() / 3600;
                         double tempGreenTime = nTemp / linkFlow;
@@ -466,7 +459,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
                 if (activeRequest != null) {
                     penalty = activeRequest.signal.abortionPenalty;
                 }
-                index = nExpected / (penalty + DEFAULT_INTERGREEN + reqGreenTime);
+                index = nExpected / (penalty + laemmerConfig.getIntergreenTime() + reqGreenTime);
             }
         }
 
@@ -484,7 +477,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
             }
 
             if (n == 0) {
-                a = DEFAULT_INTERGREEN;
+                a = laemmerConfig.getIntergreenTime();
             } else {
             		// TODO: a should be time dependent and not dependent on the simulation time step size as it is now. tt, jan'18
                 a++;
