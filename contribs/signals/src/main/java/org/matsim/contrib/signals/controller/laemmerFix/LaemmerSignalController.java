@@ -35,6 +35,7 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.sensor.DownstreamSensor;
 import org.matsim.contrib.signals.sensor.LinkSensorManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.Lanes;
@@ -69,13 +70,11 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 
 
     public final static class SignalControlProvider implements Provider<SignalController> {
-        private final LaemmerConfigGroup laemmerConfig;
         private final LinkSensorManager sensorManager;
 		private final DownstreamSensor downstreamSensor;
 		private final Scenario scenario;
 
-        public SignalControlProvider(LaemmerConfigGroup laemmerConfig, LinkSensorManager sensorManager, Scenario scenario, DownstreamSensor downstreamSensor) {
-            this.laemmerConfig = laemmerConfig;
+        public SignalControlProvider(LinkSensorManager sensorManager, Scenario scenario, DownstreamSensor downstreamSensor) {
             this.sensorManager = sensorManager;
             this.scenario = scenario;
             this.downstreamSensor = downstreamSensor;
@@ -83,18 +82,18 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 
         @Override
         public SignalController get() {
-            return new LaemmerSignalController(laemmerConfig, sensorManager, scenario, downstreamSensor);
+            return new LaemmerSignalController(sensorManager, scenario, downstreamSensor);
         }
     }
 
 
-    private LaemmerSignalController(LaemmerConfigGroup laemmerConfig, LinkSensorManager sensorManager, Scenario scenario, DownstreamSensor downstreamSensor) {
-        this.laemmerConfig = laemmerConfig;
+    private LaemmerSignalController(LinkSensorManager sensorManager, Scenario scenario, DownstreamSensor downstreamSensor) {
         this.sensorManager = sensorManager;
         this.network = scenario.getNetwork();
         this.lanes = scenario.getLanes();
         this.config = scenario.getConfig();
         this.downstreamSensor = downstreamSensor;
+        this.laemmerConfig = ConfigUtils.addOrGetModule(config, LaemmerConfigGroup.class);
     }
 
     @Override

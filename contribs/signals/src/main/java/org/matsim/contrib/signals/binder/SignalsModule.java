@@ -69,8 +69,6 @@ public class SignalsModule extends AbstractModule {
 			bind(DownstreamSensor.class).asEagerSingleton();
 			// bind configs for special signal controller
 			bind(SylviaConfig.class).toInstance(sylviaConfig);
-			bind(LaemmerConfigGroup.class).toInstance((LaemmerConfigGroup) ConfigUtils.addOrGetModule(getConfig(),
-					LaemmerConfigGroup.GROUP_NAME, LaemmerConfigGroup.class));
 			
 			// general signal bindings
 			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
