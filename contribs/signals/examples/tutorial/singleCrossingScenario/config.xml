@@ -43,7 +43,7 @@
 		<!-- Possible values: NONE, CONFLICTING_DIRECTIONS_NO_TURN_RESTRICTIONS, CONFLICTING_DIRECTIONS_AND_TURN_RESTRICTIONS -->
 		<param name="intersectionLogic" value="CONFLICTING_DIRECTIONS_NO_TURN_RESTRICTIONS" />
 		<param name="signalcontrol" value="signalControlLaemmer.xml" />
-		<param name="signalgroups" value="signalGroups_protectedLeftTurns.xml" />
+		<param name="signalgroups" value="signalGroups.xml" />
 		<param name="signalsystems" value="signalSystems.xml" />
 		<param name="useAmbertimes" value="false" />
 		<param name="useIntergreentimes" value="false" />

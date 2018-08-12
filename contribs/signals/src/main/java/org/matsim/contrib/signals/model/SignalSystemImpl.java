@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.controller.SignalController;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
@@ -36,6 +37,8 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
  *
  */
 public class SignalSystemImpl implements SignalSystem {
+	
+	private static final Logger log = Logger.getLogger(SignalSystemImpl.class);
 
 	public static final int SWITCH_OFF_SEQUENCE_LENGTH = 5;
 	
