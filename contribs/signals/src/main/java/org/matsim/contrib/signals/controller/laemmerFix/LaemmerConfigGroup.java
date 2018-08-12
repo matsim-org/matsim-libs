@@ -8,24 +8,36 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.lanes.Lane;
 
 /**
  * @author nkuehnel, tthunig, pschade
  */
-public final class LaemmerConfig {
+public final class LaemmerConfigGroup extends ReflectiveConfigGroup {
 	
-    public enum StabilizationStrategy {USE_MAX_LANECOUNT, PRIORIZE_HIGHER_POSITIONS, COMBINE_SIMILAR_REGULATIONTIME, HEURISTIC}; 
-    private StabilizationStrategy activeStabilizationStrategy = StabilizationStrategy.HEURISTIC;
-    
+	public static final String GROUP_NAME = "adaptiveLaemmerSignals";
+	
+	public LaemmerConfigGroup() {
+		super(GROUP_NAME);
+	}
+	
+	private static final String ACTIVE_REGIME = "activeRegime";
     public enum Regime {COMBINED, OPTIMIZING, STABILIZING};
     private Regime activeRegime = Regime.COMBINED;
 
-    private double maxCycleTime = 135;
+    private static final String DESIRED_CYCLE_TIME = "desiredCycleTime";
     private double desiredCycleTime = 90;
+    private static final String MAX_CYCLE_TIME = "maximalCycleTime";
+    private double maxCycleTime = 135;
 
-    private double defaultIntergreenTime = 5.0;
+    private static final String INTERGREEN_TIME = "intergreenTime";
+    private double intergreenTime = 5.0;
+    private static final String MIN_GREEN_TIME = "minimalGreenTime";
     private double minGreenTime = 5.0;
+    
+    public enum StabilizationStrategy {USE_MAX_LANECOUNT, PRIORIZE_HIGHER_POSITIONS, COMBINE_SIMILAR_REGULATIONTIME, HEURISTIC}; 
+    private StabilizationStrategy activeStabilizationStrategy = StabilizationStrategy.HEURISTIC;
     
     //size of timeBuckets for LaneSensor and LinkSensor
     private double timeBucketSize = Double.POSITIVE_INFINITY; //15.0; 5.0*60.0; 1.5*60.0;  
@@ -34,8 +46,6 @@ public final class LaemmerConfig {
 
     private Map<Id<Link>, Double> linkArrivalRates = new HashMap<>();
     private Map<Id<Link>, Map<Id<Lane>,Double>> laneArrivalRates = new HashMap<>();
-
-    private boolean useDefaultIntergreenTime = true;
     
 	/** activate the phase only if downstream links are empty. */
 	private boolean checkDownstream = false;
@@ -61,7 +71,6 @@ public final class LaemmerConfig {
 	 */
 	private boolean shortenStabilizationTimeAfterIntergreenTime = true;
 
-    //    @Nullable
     public Double getLaneArrivalRate(Id<Link> linkId, Id<Lane> laneId) {
         if(laneArrivalRates.containsKey(linkId)) {
             return this.laneArrivalRates.get(linkId).get(laneId);
@@ -98,7 +107,6 @@ public final class LaemmerConfig {
         this.linkArrivalRates.put(linkId, arrivalRate);
     }
 
-//    @Nullable
     public Double getLinkArrivalRate(Id<Link> linkId) {
         return linkArrivalRates.get(linkId);
     }
@@ -126,20 +134,12 @@ public final class LaemmerConfig {
         this.desiredCycleTime = desiredCycleTime;
     }
 
-    public boolean isUseDefaultIntergreenTime() {
-        return useDefaultIntergreenTime;
+    public double getIntergreenTime() {
+        return intergreenTime;
     }
 
-    public void setUseDefaultIntergreenTime(boolean useDefaulttIntergreenTime) {
-        this.useDefaultIntergreenTime = useDefaulttIntergreenTime;
-    }
-
-    public double getDefaultIntergreenTime() {
-        return defaultIntergreenTime;
-    }
-
-    public void setDefaultIntergreenTime(double intergreen) {
-        this.defaultIntergreenTime = intergreen;
+    public void setIntergreenTime(double intergreen) {
+        this.intergreenTime = intergreen;
     }
 	
 	public void setCheckDownstream(boolean checkDownstream) {
