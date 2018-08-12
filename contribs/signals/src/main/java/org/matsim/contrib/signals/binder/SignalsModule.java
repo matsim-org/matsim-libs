@@ -28,8 +28,6 @@ import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalModelFactoryImpl;
 import org.matsim.contrib.signals.builder.SignalSystemsModelBuilder;
-import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfigGroup;
-import org.matsim.contrib.signals.controller.sylvia.SylviaConfig;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.contrib.signals.router.NetworkWithSignalsTurnInfoBuilder;
@@ -57,8 +55,6 @@ import com.google.inject.Provides;
  */
 public class SignalsModule extends AbstractModule {
 	
-	private SylviaConfig sylviaConfig = new SylviaConfig();
-	
 	@Override
 	public void install() {
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
@@ -67,8 +63,6 @@ public class SignalsModule extends AbstractModule {
 			addControlerListenerBinding().to(SensorBasedSignalControlerListener.class);
 			bind(LinkSensorManager.class).asEagerSingleton();
 			bind(DownstreamSensor.class).asEagerSingleton();
-			// bind configs for special signal controller
-			bind(SylviaConfig.class).toInstance(sylviaConfig);
 			
 			// general signal bindings
 			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
@@ -95,9 +89,5 @@ public class SignalsModule extends AbstractModule {
 		SignalSystemsManager signalSystemsManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		signalSystemsManager.resetModel(replanningContext.getIteration());
 		return signalSystemsManager;
-	}
-	
-	public void setSylviaConfig(SylviaConfig sylviaConfig) {
-		this.sylviaConfig = sylviaConfig;
 	}
 }

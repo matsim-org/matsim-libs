@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.controller.AbstractSignalController;
 import org.matsim.contrib.signals.controller.SignalController;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
@@ -37,6 +38,7 @@ import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.sensor.DownstreamSensor;
 import org.matsim.contrib.signals.sensor.LinkSensorManager;
 import org.matsim.contrib.signals.utils.SignalUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.Lane;
 
@@ -56,19 +58,19 @@ public final class SylviaSignalController extends AbstractSignalController imple
 	private static int sylviaPlanDumpCount = 0;
 	
 	public final static class SignalControlProvider implements Provider<SignalController>{
-		private SylviaConfig sylviaConfig;
+		private Scenario scenario;
 		private LinkSensorManager sensorManager;
 		private DownstreamSensor downstreamSensor;
 		
-		public SignalControlProvider(SylviaConfig sylviaConfig, LinkSensorManager sensorManager, DownstreamSensor downstreamSensor) {
-			this.sylviaConfig = sylviaConfig;
+		public SignalControlProvider(Scenario scenario, LinkSensorManager sensorManager, DownstreamSensor downstreamSensor) {
+			this.scenario = scenario;
 			this.sensorManager = sensorManager;
 			this.downstreamSensor = downstreamSensor;
 		}
 		
 		@Override
 		public SylviaSignalController get() {
-			return new SylviaSignalController(sylviaConfig, sensorManager, downstreamSensor);
+			return new SylviaSignalController(scenario, sensorManager, downstreamSensor);
 		}
 	}
 	
@@ -87,8 +89,8 @@ public final class SylviaSignalController extends AbstractSignalController imple
 	private final LinkSensorManager sensorManager;
 	private final DownstreamSensor downstreamSensor;
 
-	private SylviaSignalController(SylviaConfig sylviaConfig, LinkSensorManager sensorManager, DownstreamSensor downstreamSensor) {
-		this.sylviaConfig = sylviaConfig;
+	private SylviaSignalController(Scenario scenario, LinkSensorManager sensorManager, DownstreamSensor downstreamSensor) {
+		this.sylviaConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), SylviaConfig.class);
 		this.sensorManager = sensorManager;
 		this.downstreamSensor = downstreamSensor;
 		this.init();
