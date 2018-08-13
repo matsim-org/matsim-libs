@@ -24,7 +24,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * his phd from 2007 and can be found in LaemmerSignalController.
  * 
  * If you want to use other implementations of traffic-adaptive signals you have
- * to adjust the identifiers in the signal control file and add a provider class
+ * to adjust the identifiers in the signal control file and add a factory class
  * for your specific implementation to the SignalsModule (see comment below).
  * 
  * @author tthunig
@@ -62,7 +62,7 @@ public class RunAdaptiveSignalsExample {
 			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		}
 		
-		// here are some examples how to change parameters of the laemmer control
+		// here are some examples how to change parameters for the laemmer control
 		LaemmerConfigGroup laemmerConfigGroup = ConfigUtils.addOrGetModule(config,
 				LaemmerConfigGroup.GROUP_NAME, LaemmerConfigGroup.class);
 		laemmerConfigGroup.setActiveRegime(Regime.COMBINED);
@@ -74,12 +74,13 @@ public class RunAdaptiveSignalsExample {
         
 		// add the signals module if signal systems are used
 		if (signalsConfigGroup.isUseSignalSystems()) {
+			controler.addOverridingModule(new SignalsModule());
 			/*
 			 * The signals module binds everything that is necessary for the simulation with
 			 * signals. If you like to use your own signal controller you can add it to the
-			 * signals module by the method addSignalControlProvider.
+			 * signals module by the method addSignalControllerFactory, e.g. like this:
+			 * signalsModule.addSignalControllerFactory().to(LaemmerSignalController.LaemmerFactory.class)
 			 */
-			controler.addOverridingModule(new SignalsModule());
 		}
 		
 		// add live visualization module
