@@ -21,6 +21,7 @@ package org.matsim.contrib.signals.builder;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,6 +39,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemImpl;
 import org.matsim.contrib.signals.sensor.DownstreamSensor;
 import org.matsim.contrib.signals.sensor.LinkSensorManager;
+import org.matsim.core.events.handler.EventHandler;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -51,13 +53,13 @@ public final class SignalModelFactoryImpl implements SignalModelFactory {
 	
 	private static final Logger log = Logger.getLogger(SignalModelFactoryImpl.class);
 	
-	private final Map<String, Provider<SignalController>> signalControlProvider = new HashMap<>();
+	private final Map<String, Provider<SignalController>> signalControlProviderMap = new HashMap<>();
 	
 	@Inject
-	public SignalModelFactoryImpl(Scenario scenario, LinkSensorManager sensorManager, DownstreamSensor downstreamSensor) {
-		signalControlProvider.put(SylviaSignalController.IDENTIFIER, new SylviaSignalController.SignalControlProvider(scenario, sensorManager, downstreamSensor));
-		signalControlProvider.put(LaemmerSignalController.IDENTIFIER, new LaemmerSignalController.SignalControlProvider(sensorManager, scenario, downstreamSensor));
-		signalControlProvider.put(DefaultPlanbasedSignalSystemController.IDENTIFIER, new DefaultPlanbasedSignalSystemController.SignalControlProvider());
+	public SignalModelFactoryImpl(Scenario scenario, Set<Provider<SignalController>> signalControlProvidersDeclaredByModules) {
+		for (Provider<SignalController> signalControlProvider : signalControlProvidersDeclaredByModules) {
+			signalControlProvider.put(signalControlProvider.IDENTIFIER, signalControlProvider);
+		}
 	}
 	
 	@Override
@@ -67,9 +69,9 @@ public final class SignalModelFactoryImpl implements SignalModelFactory {
 
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
-		if (signalControlProvider.containsKey(controllerIdentifier)) {
+		if (signalControlProviderMap.containsKey(controllerIdentifier)) {
 			log.info("Creating " + controllerIdentifier);
-			SignalController signalControl = signalControlProvider.get(controllerIdentifier).get();
+			SignalController signalControl = signalControlProviderMap.get(controllerIdentifier).get();
 			signalControl.setSignalSystem(signalSystem);
 			return signalControl;
 		}
