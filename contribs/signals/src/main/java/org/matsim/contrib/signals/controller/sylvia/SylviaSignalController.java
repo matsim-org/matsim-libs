@@ -30,11 +30,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.controller.AbstractSignalController;
 import org.matsim.contrib.signals.controller.SignalController;
+import org.matsim.contrib.signals.controller.SignalControllerFactory;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.sensor.DownstreamSensor;
 import org.matsim.contrib.signals.sensor.LinkSensorManager;
 import org.matsim.contrib.signals.utils.SignalUtils;
@@ -42,7 +44,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.Lane;
 
-import com.google.inject.Provider;
+import com.google.inject.Inject;
 
 
 /**
@@ -56,24 +58,25 @@ public final class SylviaSignalController extends AbstractSignalController imple
 	public final static String IDENTIFIER = "SylviaSignalControl";
 
 	private static int sylviaPlanDumpCount = 0;
-	
-	public final static class SignalControlProvider implements Provider<SignalController>{
-		private Scenario scenario;
-		private LinkSensorManager sensorManager;
-		private DownstreamSensor downstreamSensor;
-		
-		public SignalControlProvider(Scenario scenario, LinkSensorManager sensorManager, DownstreamSensor downstreamSensor) {
-			this.scenario = scenario;
-			this.sensorManager = sensorManager;
-			this.downstreamSensor = downstreamSensor;
-		}
-		
+
+	public final static class SylviaFactory implements SignalControllerFactory {
+		@Inject private LinkSensorManager sensorManager;
+		@Inject private DownstreamSensor downstreamSensor;
+		@Inject private Scenario scenario;
+
 		@Override
-		public SylviaSignalController get() {
-			return new SylviaSignalController(scenario, sensorManager, downstreamSensor);
+		public SignalController createSignalSystemController(SignalSystem signalSystem) {
+			SignalController controller = new SylviaSignalController(scenario, sensorManager, downstreamSensor);
+			controller.setSignalSystem(signalSystem);
+			return controller;
+		}
+
+		@Override
+		public String getIdentifier() {
+			return IDENTIFIER;
 		}
 	}
-	
+
 	private SylviaSignalPlan activeSylviaPlan = null;
 	private boolean extensionActive = false;
 	private boolean forcedExtensionActive = false;

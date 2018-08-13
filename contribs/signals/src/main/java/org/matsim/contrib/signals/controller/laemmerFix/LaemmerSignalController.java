@@ -30,8 +30,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.controller.AbstractSignalController;
 import org.matsim.contrib.signals.controller.SignalController;
+import org.matsim.contrib.signals.controller.SignalControllerFactory;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.sensor.DownstreamSensor;
 import org.matsim.contrib.signals.sensor.LinkSensorManager;
 import org.matsim.core.config.Config;
@@ -40,7 +42,7 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.Lanes;
 
-import com.google.inject.Provider;
+import com.google.inject.Inject;
 
 
 /**
@@ -68,24 +70,23 @@ public final class LaemmerSignalController extends AbstractSignalController impl
     // TODO this should be a constant. can be calculated once in simulationInitialized. tt, dez'17
     private double systemOutflowCapacity;
 
+	public final static class LaemmerFactory implements SignalControllerFactory {
+    		@Inject private LinkSensorManager sensorManager;
+    		@Inject private DownstreamSensor downstreamSensor;
+    		@Inject private Scenario scenario;
+    	
+		@Override
+		public SignalController createSignalSystemController(SignalSystem signalSystem) {
+			SignalController controller = new LaemmerSignalController(sensorManager, scenario, downstreamSensor);
+			controller.setSignalSystem(signalSystem);
+			return controller;
+		}
 
-    public final static class SignalControlProvider implements Provider<SignalController> {
-        private final LinkSensorManager sensorManager;
-		private final DownstreamSensor downstreamSensor;
-		private final Scenario scenario;
-
-        public SignalControlProvider(LinkSensorManager sensorManager, Scenario scenario, DownstreamSensor downstreamSensor) {
-            this.sensorManager = sensorManager;
-            this.scenario = scenario;
-            this.downstreamSensor = downstreamSensor;
-        }
-
-        @Override
-        public SignalController get() {
-            return new LaemmerSignalController(sensorManager, scenario, downstreamSensor);
-        }
-    }
-
+		@Override
+		public String getIdentifier() {
+			return IDENTIFIER;
+		}
+	}
 
     private LaemmerSignalController(LinkSensorManager sensorManager, Scenario scenario, DownstreamSensor downstreamSensor) {
         this.sensorManager = sensorManager;

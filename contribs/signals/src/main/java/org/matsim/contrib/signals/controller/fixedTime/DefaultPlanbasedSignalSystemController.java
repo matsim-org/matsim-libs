@@ -29,11 +29,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.controller.AbstractSignalController;
 import org.matsim.contrib.signals.controller.SignalController;
+import org.matsim.contrib.signals.controller.SignalControllerFactory;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemImpl;
-
-import com.google.inject.Provider;
 
 
 /**
@@ -54,12 +54,19 @@ public class DefaultPlanbasedSignalSystemController extends AbstractSignalContro
 	private SignalPlan activePlan = null;
 	private double nextActivePlanCheckTime;
 	
-	public final static class SignalControlProvider implements Provider<SignalController> {
-        @Override
-        public SignalController get() {
-            return new DefaultPlanbasedSignalSystemController();
-        }
-    }
+	public final static class FixedTimeFactory implements SignalControllerFactory {
+		@Override
+		public SignalController createSignalSystemController(SignalSystem signalSystem) {
+			SignalController controller = new DefaultPlanbasedSignalSystemController();
+			controller.setSignalSystem(signalSystem);
+			return controller;
+		}
+
+		@Override
+		public String getIdentifier() {
+			return IDENTIFIER;
+		}
+	}
 	
 	private DefaultPlanbasedSignalSystemController() {
 		super();

@@ -27,22 +27,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.controller.SignalController;
-import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
-import org.matsim.contrib.signals.controller.laemmerFix.LaemmerSignalController;
+import org.matsim.contrib.signals.controller.SignalControllerFactory;
 import org.matsim.contrib.signals.controller.sylvia.SylviaPreprocessData;
-import org.matsim.contrib.signals.controller.sylvia.SylviaSignalController;
 import org.matsim.contrib.signals.controller.sylvia.SylviaSignalPlan;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemImpl;
-import org.matsim.contrib.signals.sensor.DownstreamSensor;
-import org.matsim.contrib.signals.sensor.LinkSensorManager;
-import org.matsim.core.events.handler.EventHandler;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 
 /**
@@ -53,12 +47,12 @@ public final class SignalModelFactoryImpl implements SignalModelFactory {
 	
 	private static final Logger log = Logger.getLogger(SignalModelFactoryImpl.class);
 	
-	private final Map<String, Provider<SignalController>> signalControlProviderMap = new HashMap<>();
+	private final Map<String, SignalControllerFactory> signalControllerFactories = new HashMap<>();
 	
 	@Inject
-	public SignalModelFactoryImpl(Scenario scenario, Set<Provider<SignalController>> signalControlProvidersDeclaredByModules) {
-		for (Provider<SignalController> signalControlProvider : signalControlProvidersDeclaredByModules) {
-			signalControlProvider.put(signalControlProvider.IDENTIFIER, signalControlProvider);
+	public SignalModelFactoryImpl(Scenario scenario, Set<SignalControllerFactory> signalControllerFactoriesDeclaredByModules) {
+		for (SignalControllerFactory signalControllerFactory : signalControllerFactoriesDeclaredByModules) {
+			signalControllerFactories.put(signalControllerFactory.getIdentifier(), signalControllerFactory);
 		}
 	}
 	
@@ -69,14 +63,12 @@ public final class SignalModelFactoryImpl implements SignalModelFactory {
 
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
-		if (signalControlProviderMap.containsKey(controllerIdentifier)) {
+		if (signalControllerFactories.containsKey(controllerIdentifier)) {
 			log.info("Creating " + controllerIdentifier);
-			SignalController signalControl = signalControlProviderMap.get(controllerIdentifier).get();
-			signalControl.setSignalSystem(signalSystem);
-			return signalControl;
+			return signalControllerFactories.get(controllerIdentifier).createSignalSystemController(signalSystem);
 		}
 		throw new RuntimeException("Signal controller " + controllerIdentifier + " not specified. "
-				+ "Add a respective provider to the SignalsModule by calling the method addSignalControlProvider.");
+				+ "Add a respective factory to the SignalsModule by calling the method addSignalControllerFactory.");
 	}
 
 	@Override
