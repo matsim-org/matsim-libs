@@ -77,7 +77,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
     	
 		@Override
 		public SignalController createSignalSystemController(SignalSystem signalSystem) {
-			SignalController controller = new LaemmerSignalController(sensorManager, scenario, downstreamSensor);
+			SignalController controller = new LaemmerSignalController(scenario, sensorManager, downstreamSensor);
 			controller.setSignalSystem(signalSystem);
 			return controller;
 		}
@@ -88,7 +88,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 		}
 	}
 
-    private LaemmerSignalController(LinkSensorManager sensorManager, Scenario scenario, DownstreamSensor downstreamSensor) {
+    private LaemmerSignalController(Scenario scenario, LinkSensorManager sensorManager, DownstreamSensor downstreamSensor) {
         this.sensorManager = sensorManager;
         this.network = scenario.getNetwork();
         this.lanes = scenario.getLanes();
