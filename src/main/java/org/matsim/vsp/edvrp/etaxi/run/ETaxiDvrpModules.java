@@ -19,8 +19,6 @@
 
 package org.matsim.vsp.edvrp.etaxi.run;
 
-import java.util.Collections;
-
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -34,19 +32,22 @@ import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.vsp.edvrp.etaxi.ETaxiActionCreator;
 import org.matsim.vsp.edvrp.etaxi.ETaxiScheduler;
 import org.matsim.vsp.edvrp.etaxi.optimizer.ETaxiOptimizerProvider;
+
+import java.util.Collections;
 
 public class ETaxiDvrpModules {
 	public static AbstractModule create() {
 		return new DvrpModule(ETaxiDvrpModules::createModuleForQSimPlugin, Collections.singleton(TaxiOptimizer.class));
 	}
 
-	private static com.google.inject.AbstractModule createModuleForQSimPlugin(Config cfg) {
-		return new com.google.inject.AbstractModule() {
+	private static AbstractQSimModule createModuleForQSimPlugin(Config cfg) {
+		return new AbstractQSimModule() {
 			@Override
-			protected void configure() {
+			protected void configureQSim() {
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
 						DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);

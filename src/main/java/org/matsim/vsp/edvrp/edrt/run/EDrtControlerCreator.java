@@ -18,8 +18,6 @@
 
 package org.matsim.vsp.edvrp.edrt.run;
 
-import java.util.Arrays;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
@@ -49,6 +47,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vsp.edvrp.edrt.EDrtActionCreator;
 import org.matsim.vsp.edvrp.edrt.optimizer.EDrtOptimizer;
@@ -56,6 +55,8 @@ import org.matsim.vsp.edvrp.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehic
 import org.matsim.vsp.edvrp.edrt.optimizer.depot.NearestChargerAsDepot;
 import org.matsim.vsp.edvrp.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.vsp.edvrp.edrt.scheduler.EmptyVehicleChargingScheduler;
+
+import java.util.Arrays;
 
 /**
  * @author michalm
@@ -87,10 +88,10 @@ public class EDrtControlerCreator {
         });
     }
 
-	public static com.google.inject.Module createModuleForQSimPlugin(Config config) {
-		return new com.google.inject.AbstractModule() {
+	public static AbstractQSimModule createModuleForQSimPlugin(Config config) {
+		return new AbstractQSimModule() {
 			@Override
-			protected void configure() {
+			protected void configureQSim() {
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
 						DefaultDrtOptimizer.DRT_OPTIMIZER);
