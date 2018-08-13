@@ -78,7 +78,7 @@ public class SignalsModule extends AbstractModule {
 	public void install() {
 		this.signalControllerFactoryMultibinder = Multibinder.newSetBinder(this.binder(), SignalControllerFactory.class);
 		
-		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
+		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			// bindings for sensor-based signals (also works for fixed-time signals)
 			bind(SignalModelFactory.class).to(SignalModelFactoryImpl.class);
 			addControlerListenerBinding().to(SensorBasedSignalControlerListener.class);

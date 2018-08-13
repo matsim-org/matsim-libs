@@ -55,13 +55,13 @@ public class InvertedNetworkRoutingSignalsFixture extends InvertedNetworkRouting
 		super(doCreateModes, doCreateLanes, doCreateSignals);
 		if (doCreateSignals){
 		    scenario.getConfig().qsim().setUsingFastCapacityUpdate(false);
-			ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
+			ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 			createSignals();
 		}
 	}
 	
 	private void createSignals() {
-		SignalsData signalsData = new SignalsDataImpl(ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
+		SignalsData signalsData = new SignalsDataImpl(ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class));
 		this.scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
 		SignalSystemsData ssd = signalsData.getSignalSystemsData();
 		SignalSystemsDataFactory f = ssd.getFactory();

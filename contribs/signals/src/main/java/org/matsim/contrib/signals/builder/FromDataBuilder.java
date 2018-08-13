@@ -118,23 +118,23 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	
 	private void createAndAddAmberLogic(SignalSystemsManager manager){
 		//process information of AmberTimesData object
-		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseAmbertimes()){
+		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).isUseAmbertimes()){
 			AmberLogic amberLogic = new AmberLogicImpl(this.signalsData.getAmberTimesData());
 			manager.setAmberLogic(amberLogic);
 		}
 	}
 	
 	private void createAndAddIntergreenTimesLogic(SignalSystemsManager manager){
-		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseIntergreenTimes()){
-			IntergreensLogic intergreensLogic = new IntergreensLogicImpl(this.signalsData.getIntergreenTimesData(), ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
+		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).isUseIntergreenTimes()){
+			IntergreensLogic intergreensLogic = new IntergreensLogicImpl(this.signalsData.getIntergreenTimesData(), ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class));
 			this.events.addHandler(intergreensLogic);
 		}
 	}
 	
 	private void createAndAddConflictingDirectionsLogic(SignalSystemsManager manager) {
-		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).getIntersectionLogic().toString().startsWith("CONFLICTING_DIRECTIONS")){
+		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).getIntersectionLogic().toString().startsWith("CONFLICTING_DIRECTIONS")){
 			ConflictingDirectionsLogic conflictLogic = new ConflictingDirectionsLogicImpl(this.scenario.getNetwork(), this.scenario.getLanes(), this.signalsData, 
-					ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).getActionOnConflictingDirectionViolation());
+					ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).getActionOnConflictingDirectionViolation());
 			this.events.addHandler(conflictLogic);
 		}
 	}
