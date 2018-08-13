@@ -30,6 +30,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author tthunig
  */
 public class RunAdaptiveSignalsExample {
+	// do not change name of class; EWGT-paper (ThunigKuehnelNagel2018...) refers to it.  theresa, aug'18
 	
 	private static final Logger log = Logger.getLogger(RunAdaptiveSignalsExample.class);
 
@@ -39,7 +40,7 @@ public class RunAdaptiveSignalsExample {
 			log.info("Your config file " + args[0] + " will be loaded and run with signals and otfvis-visualization.");
 			configFileName = args[0];
 		}
-		run(configFileName, "output/runAdaptiveSignalsExampleOutput/", true);
+		run(configFileName, "output/runAdaptiveSignalsExampleOutput/", true); // The run method is extracted so that a test can operate on it.
 	}
 	
 	public static void run(String configFileName, String outputDir, boolean visualize) {
