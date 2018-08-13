@@ -98,7 +98,7 @@ public class TravelTimeOneWayTestIT {
 		conf.qsim().setRemoveStuckVehicles(false);
 		conf.qsim().setUsingFastCapacityUpdate(false);
 
-		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		signalsConfig.setUseSignalSystems(true);
 		if (useLanes) {
 			conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");

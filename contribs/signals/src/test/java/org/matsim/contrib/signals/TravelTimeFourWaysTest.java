@@ -80,7 +80,7 @@ public class TravelTimeFourWaysTest {
 		conf.qsim().setUseLanes(true);
 	    conf.qsim().setUsingFastCapacityUpdate(false);
 	    
-		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		signalsConfig.setUseSignalSystems(true);
 		signalsConfig.setSignalSystemFile("testSignalSystems_v2.0.xml");
 		signalsConfig.setSignalGroupsFile("testSignalGroups_v2.0.xml");

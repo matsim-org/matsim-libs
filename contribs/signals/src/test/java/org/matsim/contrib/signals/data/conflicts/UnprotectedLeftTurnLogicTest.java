@@ -66,7 +66,7 @@ public class UnprotectedLeftTurnLogicTest {
 	private AnalyzeSingleIntersectionLeftTurnDelays runSimulation(IntersectionLogic intersectionLogic) {
 		Config config = ConfigUtils.loadConfig("./examples/tutorial/singleCrossingScenario/config.xml");
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
-				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+				SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		signalsConfigGroup.setSignalControlFile("signalControlFixedTime.xml");
 		signalsConfigGroup.setIntersectionLogic(intersectionLogic);
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory() + intersectionLogic + "/");

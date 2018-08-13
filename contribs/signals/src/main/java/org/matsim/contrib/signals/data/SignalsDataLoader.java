@@ -52,7 +52,7 @@ public class SignalsDataLoader {
 	public SignalsDataLoader(Config config){
 		this.config = config;
 		this.signalConfig = ConfigUtils.addOrGetModule(config,
-				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+				SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 	}
 
 	public SignalsData loadSignalsData() {

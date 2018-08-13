@@ -194,7 +194,7 @@ public class CreateSignalInputWithLanesExample {
 		
 		// add the signal config group to the config file
 		SignalSystemsConfigGroup signalSystemsConfigGroup = 
-				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		
 		/* the following makes the contrib load the signal input files, but not to do anything with them
 		 * (this switch will eventually go away) */

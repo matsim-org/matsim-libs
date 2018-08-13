@@ -107,7 +107,7 @@ public class RunSimpleResponsiveSignalExample {
 	private static Scenario defineScenario(Config config) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		// add missing scenario elements
-		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 
 		createNetwork(scenario);
@@ -263,7 +263,7 @@ public class RunSimpleResponsiveSignalExample {
 		config.qsim().setEndTime(3600 * 5);
         config.qsim().setUsingFastCapacityUpdate(false);
 		
-		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		signalConfigGroup.setUseSignalSystems(true);
 
 		ActivityParams dummyAct = new ActivityParams("dummy");
