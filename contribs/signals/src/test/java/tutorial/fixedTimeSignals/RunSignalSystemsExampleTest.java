@@ -21,7 +21,6 @@ package tutorial.fixedTimeSignals;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.signals.run.RunSignalSystemsExample;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
