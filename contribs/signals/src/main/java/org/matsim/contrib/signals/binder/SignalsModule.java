@@ -52,7 +52,7 @@ import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
 
 /**
- * Add this module if you want to simulate signals. It also works without
+ * Add this module if you want to simulate signals. It does not work without
  * signals. By default, it works with signal implementations of fixed-time
  * signals, traffic-actuated signals called SYLVIA and traffic-adaptive signals
  * based on Laemmer. If you want to add other signal controllers, you can add a
