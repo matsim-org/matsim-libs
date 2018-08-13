@@ -56,7 +56,7 @@ import com.google.inject.multibindings.Multibinder;
  * signals. By default, it works with signal implementations of fixed-time
  * signals, traffic-actuated signals called SYLVIA and traffic-adaptive signals
  * based on Laemmer. If you want to add other signal controllers, you can add a
- * respective provider by calling the method addSignalControlProvider. It is
+ * respective factory by calling the method addSignalControllerFactory. It is
  * also possible to use different control schemes in one scenario at different
  * intersections (i.e. signal systems).
  * 
