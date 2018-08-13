@@ -16,10 +16,10 @@ import org.matsim.testcases.MatsimTestCase;
 public class JDEQSimPluginTest extends MatsimTestCase {
 	private QSim prepareQSim(Scenario scenario, EventsManager eventsManager) {
         return new QSimBuilder(scenario.getConfig()) //
-        	.addPlugin(new JDEQSimPlugin(scenario.getConfig())) //
+        	.addQSimModule(new JDEQSimModule()) //
         	.configureComponents(components -> {
-        		components.activeMobsimEngines.add(JDEQSimPlugin.JDEQ_ENGINE);
-        		components.activeActivityHandlers.add(JDEQSimPlugin.JDEQ_ENGINE);
+        		components.activeMobsimEngines.add(JDEQSimModule.JDEQ_ENGINE_NAME);
+        		components.activeActivityHandlers.add(JDEQSimModule.JDEQ_ENGINE_NAME);
         	}) //
         	.build(scenario, eventsManager);
 	}

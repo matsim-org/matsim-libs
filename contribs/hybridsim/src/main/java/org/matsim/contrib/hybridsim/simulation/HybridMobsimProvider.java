@@ -26,22 +26,21 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
-import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-public class HybridMobsimProvider implements Provider<Mobsim>{
-	
+public class HybridMobsimProvider implements Provider<Mobsim> {
+
 	private final Scenario sc;
 	private final EventsManager em;
 
-    @Inject
-    HybridMobsimProvider(Scenario sc, EventsManager eventsManager) {
-        this.sc = sc;
+	@Inject
+	HybridMobsimProvider(Scenario sc, EventsManager eventsManager) {
+		this.sc = sc;
 		this.em = eventsManager;
 
-    }
+	}
 
 	@Override
 	public Mobsim get() {
@@ -50,15 +49,13 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 			throw new NullPointerException(
 					"There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
-		
+
 		Config config = this.sc.getConfig();
-		
+
 		return new QSimBuilder(config) //
 				.useDefaults() //
-				.addPlugin(new HybridQSimPlugin(config)) //
-				.configureComponents(components -> {
-					components.activeMobsimEngines.add(HybridQSimPlugin.HYBRID_EXTERNAL_ENGINE);
-				}) //
+				.addQSimModule(new HybridQSimModule()) //
+				.configureComponents(HybridQSimModule::configureComponents) //
 				.build(sc, em);
 	}
 

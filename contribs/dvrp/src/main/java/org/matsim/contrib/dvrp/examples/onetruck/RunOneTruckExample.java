@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.dvrp.examples.onetruck;
 
-import java.util.Collection;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
@@ -28,7 +26,7 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponentsConfigurator;
-import org.matsim.contrib.dvrp.run.DvrpQSimPluginsProvider;
+import org.matsim.contrib.dvrp.run.DvrpQSimModuleBuilder;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -37,13 +35,10 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
-import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 
 /**
@@ -63,20 +58,25 @@ public final class RunOneTruckExample {
 		// load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		// set up DVRP
+		DvrpQSimModuleBuilder builder = createQSimModuleBuilder();
+
 		// setup controler
 		Controler controler = new Controler(scenario);
+
 		controler.addOverridingModule(new AbstractModule() {
 			public void install() {
 				addTravelTimeBinding(DvrpTravelTimeModule.DVRP_ESTIMATED).to(networkTravelTime());
 				bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))
 						.to(Network.class);
-				bind(new TypeLiteral<Collection<AbstractQSimPlugin>>() {})
-						.toProvider(createQSimPluginsProvider(getConfig()));
-				bind(QSimComponents.class).toInstance(createQSimComponents(config));
 			}
 		});
+
+		controler.addQSimModule(builder.build(config));
+		controler.configureQSimComponents(builder::configureComponents);
+
 		controler.addOverridingModule(
-				FleetProvider.createModule(ConfigGroup.getInputFileURL(config.getContext(), TRUCK_FILE)));
+				FleetProvider.createModule(ConfigGroup.getInputFileURL(config.getContext(), TRUCK_FILE)));		
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation
@@ -86,11 +86,11 @@ public final class RunOneTruckExample {
 		controler.run();
 	}
 
-	private static DvrpQSimPluginsProvider createQSimPluginsProvider(Config config) {
-		return new DvrpQSimPluginsProvider(config, cfg -> {
-			return new com.google.inject.AbstractModule() {
+	private static DvrpQSimModuleBuilder createQSimModuleBuilder() {
+		return new DvrpQSimModuleBuilder(cfg -> {
+			return new AbstractQSimModule() {
 				@Override
-				protected void configure() {
+				protected void configureQSim() {
 					bind(OneTruckRequestCreator.class).asEagerSingleton();
 					bind(VrpOptimizer.class).to(OneTruckOptimizer.class).asEagerSingleton();
 					bind(DynActionCreator.class).to(OneTruckActionCreator.class).asEagerSingleton();
@@ -98,13 +98,6 @@ public final class RunOneTruckExample {
 			};
 		}).addListener(OneTruckRequestCreator.class)//
 				.setAddPassengerEnginePlugin(false);
-	}
-	
-	private static QSimComponents createQSimComponents(Config config) {
-		QSimComponents components = new QSimComponents();
-		new StandardQSimComponentsConfigurator(config).configure(components);
-		new DvrpQSimComponentsConfigurator(false).configure(components);
-		return components;
 	}
 
 	public static void main(String... args) {

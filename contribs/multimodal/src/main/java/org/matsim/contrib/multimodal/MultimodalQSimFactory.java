@@ -25,11 +25,10 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.multimodal.simengine.MultiModalQSimPlugin;
+import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
-import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Provider;
@@ -51,11 +50,8 @@ public class MultimodalQSimFactory implements Provider<Mobsim> {
 	public Mobsim get() {
 		return new QSimBuilder(scenario.getConfig()) //
 				.useDefaults()
-				.addPlugin(new MultiModalQSimPlugin(scenario.getConfig(), multiModalTravelTimes))
-				.configureComponents(components -> {
-					components.activeMobsimEngines.add(MultiModalQSimPlugin.MULTIMODAL_ENGINE);
-					components.activeDepartureHandlers.add(MultiModalQSimPlugin.MULTIMODAL_DEPARTURE_HANDLER);
-				}) //
+				.addQSimModule(new MultiModalQSimModule(multiModalTravelTimes))
+				.configureComponents(MultiModalQSimModule::configureComponents) //
 				.build(scenario, eventsManager);
 	}
 }
