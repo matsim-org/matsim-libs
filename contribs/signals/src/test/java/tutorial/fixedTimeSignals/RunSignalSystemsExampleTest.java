@@ -54,7 +54,7 @@ public class RunSignalSystemsExampleTest {
 			config.controler().setLastIteration(0);
 			config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 			
-			RunSignalSystemsExample.run(config);
+			RunSignalSystemsExample.run(config, false);
 		} catch (Exception ee ) {
 			ee.printStackTrace();
 			Assert.fail("something went wrong: " + ee.getMessage()) ;
