@@ -18,7 +18,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package org.matsim.contrib.signals.run;
+package tutorial.fixedTimeSignals;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.binder.SignalsModule;
