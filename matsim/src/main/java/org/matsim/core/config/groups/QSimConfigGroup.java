@@ -114,9 +114,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String MAIN_MODE = "mainMode";
 	private Collection<String> mainModes = Arrays.asList(TransportMode.car);
 
-	// ---
-	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES = "insertingWaitingVehiclesBeforeDrivingVehicles";
-	private boolean insertingWaitingVehiclesBeforeDrivingVehicles = false;
 
 	// ---
 	public static enum LinkDynamics { FIFO, PassingQ, SeepageQ }
@@ -253,8 +250,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		map.put(MAIN_MODE, "[comma-separated list] Defines which modes are congested modes. Technically, these are the modes that " +
 				"the departure handler of the netsimengine handles.  Effective cell size, effective lane width, flow capacity " +
 				"factor, and storage capacity factor need to be set with diligence.  Need to be vehicular modes to make sense.");
-		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, 
-				"decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false"); 
+		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES,
+				INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES_CMT );
 		map.put(NODE_OFFSET, "Shortens a link in the visualization, i.e. its start and end point are moved into towards the center. Does not affect traffic flow. ");
 		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values. This is used only for visualisation.");
 		{
@@ -449,17 +446,26 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	public Collection<String> getMainModes() {
 		return mainModes;
 	}
-
+	// ---
+	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES = "insertingWaitingVehiclesBeforeDrivingVehicles";
+	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES_CMT =
+			"decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false";
+	private boolean insertingWaitingVehiclesBeforeDrivingVehicles = false;
+	/**
+	 * @return {@value #INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES_CMT}
+	 */
 	@StringGetter(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES)
 	public boolean isInsertingWaitingVehiclesBeforeDrivingVehicles() {
 		return this.insertingWaitingVehiclesBeforeDrivingVehicles;
 	}
-
+	/**
+	 * @param {@value {@link #INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES_CMT}}
+	 */
 	@StringSetter(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES)
 	public void setInsertingWaitingVehiclesBeforeDrivingVehicles(boolean val) {
 		this.insertingWaitingVehiclesBeforeDrivingVehicles = val;
 	}
-
+	// ---
 	@StringGetter(NODE_OFFSET)
 	public double getNodeOffset() {
 		return nodeOffset;
