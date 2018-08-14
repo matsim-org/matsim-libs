@@ -1,6 +1,9 @@
 MATSim - Multi Agent Transport Simulation
 ===============================================================================
-
+Release "Summer 2018" (version 0.10.1)
+- Switch to Java 8
+- Most MATSim Objects are now Attributable
+- several new contributions available, check the extensions page!
 
 Release "unknown yet" (version 0.7.0)
 -------------------------------------------------------------------------------
