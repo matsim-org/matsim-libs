@@ -406,6 +406,14 @@ public class LaemmerIT {
 		Assert.assertEquals("total delay for doubled demand should be doubled", 2, generalAnalyzerFlowCap2.getTotalDelay()/generalAnalyzerFlowCap1.getTotalDelay(), 0.1);
 	}
 	
+	// TODO test iterations. variables should reset and algo should work for every iteration
+	// TODO test stochasticity (laemmer better than fixed-time; different than for constant demand)
+	// TODO test temporarily overcrowded situations (no exeption; signal is able to resolve congestion; like fixed-time schedule; cycle times get longer when overload continues)
+	// TODO test liveArrivalRate vs. exact data (the second results in more precise green times?!; liveArrivalRates are determined correctly)
+	// TODO test grouping
+	// TODO test lanes
+	// ...
+	
 	private DelayAnalysisTool runSingleCrossingScenario(double flowNS, double flowWE, double minG, SignalAnalysisTool signalAnalyzer, Regime regime) {
 		return runSingleCrossingScenario(flowNS, flowWE, minG, false, signalAnalyzer, regime);
 	}
@@ -512,12 +520,5 @@ public class LaemmerIT {
 				Id.createLinkId(toLinkId));
 		plan.addActivity(drainAct);
 	}
-	
-	// TODO test stochasticity (laemmer better than fixed-time; different than for constant demand)
-	// TODO test temporarily overcrowded situations (no exeption; signal is able to resolve congestion; like fixed-time schedule)
-	// TODO test liveArrivalRate vs. exact data (the second results in more precise green times?!; liveArrivalRates are determined correctly)
-	// TODO test grouping
-	// TODO test lanes
-	// ...
 
 }
