@@ -38,10 +38,6 @@ public final class LaemmerConfigGroup extends ReflectiveConfigGroup {
     private static final String MIN_GREEN_TIME = "minimalGreenTime";
     private double minGreenTime = 5.0;
     
-	private static final String ACTIVE_REGIME_CMT = "Regime that is used for the laemmer control. "
-			+ "The options are: " + Arrays.stream(Regime.values()).
-			map(regime -> " " + regime.toString()).collect(Collectors.joining())
-			+ ". Default is " + Regime.COMBINED;
 	private static final String DESIRED_CYCLE_TIME_CMT = "Cycle time that is aimed by the stabilizing regime.";
     private static final String MAX_CYCLE_TIME_CMT = "Maximal cycle time that is allowed by the stabilizing regime.";
 	private static final String INTERGREEN_TIME_CMT = "Red time that has to be ensured between the green phases of two conflicting directions (exluding amber time).";
@@ -50,7 +46,16 @@ public final class LaemmerConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
-		
+
+		/*
+		 * lamda expressions are not allowed in static final fields. thats why we have
+		 * to set the variable here. stackoverflow says it is a bug and will be resolved
+		 * in java 9... theresa, aug'18
+		 */
+		final String ACTIVE_REGIME_CMT = "Regime that is used for the laemmer control. "
+				+ "The options are: " + Arrays.stream(Regime.values()).
+				map(regime -> " " + regime.toString()).collect(Collectors.joining())
+				+ ". Default is " + Regime.COMBINED;
 		map.put(ACTIVE_REGIME, ACTIVE_REGIME_CMT);
 		map.put(DESIRED_CYCLE_TIME, DESIRED_CYCLE_TIME_CMT);
 		map.put(MAX_CYCLE_TIME, MAX_CYCLE_TIME_CMT);
