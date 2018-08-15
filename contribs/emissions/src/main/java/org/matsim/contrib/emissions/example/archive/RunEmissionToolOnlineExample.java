@@ -46,23 +46,30 @@ public class RunEmissionToolOnlineExample {
 
 	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config_v2.xml";
 	
-	private final Config config ;
-	
-	public RunEmissionToolOnlineExample( String[] args ) {
+	public static Config prepareConfig( String[] args ) {
 
 		// following is only for backward compatibility in which vehicle description is null;
 		// for the new scenarios, setting vehicle description should be preferred.; Amit, sep 2016.
 		EmissionsConfigGroup emissionsConfigGroup = new EmissionsConfigGroup();
 		emissionsConfigGroup.setUsingVehicleTypeIdAsVehicleDescription(true);
+		
+		Config config ;
 
 		if ( args==null || args.length==0 ) {
 			config = ConfigUtils.loadConfig(configFile, emissionsConfigGroup);
 		} else {
 			config = ConfigUtils.loadConfig( args[0], emissionsConfigGroup);
 		}
-	}	
-	public final void run() {
+		
+		return config ;
+	}
+	
+	public static Scenario prepareScenario( Config config ) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		return scenario ;
+	}
+	
+	public static final void run( Scenario scenario, AbstractModule... overrides ) {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -70,13 +77,15 @@ public class RunEmissionToolOnlineExample {
 				bind(EmissionModule.class).asEagerSingleton();
 			}
 		});
+		for ( AbstractModule module : overrides ) {
+			controler.addOverridingModule( module );
+		}
 		controler.run();
 	}
 	public static void main(String[] args) {
-		new RunEmissionToolOnlineExample(args).run();
-	}
-	public final Config getConfig() {
-		return this.config;
+		Config config = prepareConfig( args ) ;
+		Scenario scenario = prepareScenario( config ) ;
+		run(scenario) ;
 	}
 
 }

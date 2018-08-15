@@ -66,7 +66,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		if (trip == null) return false;
 		
 		String mainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
-		double departureTime = EditTrips.getDepartureTime(trip);
+		double departureTime = TripStructureUtils.getDepartureTime(trip);
 		new EditTrips(this.tripRouter, scenario).replanFutureTrip(trip, executedPlan, mainMode, departureTime);
 		
 		return true;

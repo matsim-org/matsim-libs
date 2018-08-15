@@ -30,27 +30,46 @@ public class HbefaVehicleAttributes {
 	
 	public HbefaVehicleAttributes(){
 	}
-
+	
+	private static final String TECHNOLOGY_CMT="Normally something like |diesel| or |petrol|." ;
+	/**
+	 * @return {@value #TECHNOLOGY_CMT}
+	 */
 	public String getHbefaTechnology(){
 		return this.hbefaTechnology;
 	}
-	
+	/**
+	 * @param hbefaTechnology - {@value #TECHNOLOGY_CMT}
+	 */
 	public void setHbefaTechnology(String hbefaTechnology) {
 		this.hbefaTechnology = hbefaTechnology;		
 	}
 	
+	
+	private static final String SIZE_CLASS_CMT="Normally something like |<1,4L| or |>=2L|." ;
+	/**
+	 * @return {@value #SIZE_CLASS_CMT}
+	 */
 	public String getHbefaSizeClass(){
 		return this.hbefaSizeClass;
 	}
-
+	/**
+	 * @param hbefaSizeClass - {@value #SIZE_CLASS_CMT}
+	 */
 	public void setHbefaSizeClass(String hbefaSizeClass) {
 		this.hbefaSizeClass = hbefaSizeClass;
 	}
 
+	private static final String EM_CONCEPT_CMT="Normally something like PC-P/D-Euro-X." ;
+	/**
+	 * @return {@value #EM_CONCEPT_CMT}
+	 */
 	public String getHbefaEmConcept(){
 		return this.hbefaEmConcept;
 	}
-	
+	/**
+	 * @param hbefaEmConcept - {@value #EM_CONCEPT_CMT}
+	 */
 	public void setHbefaEmConcept(String hbefaEmConcept) {
 		this.hbefaEmConcept = hbefaEmConcept;
 	}

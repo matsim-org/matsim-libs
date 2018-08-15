@@ -19,7 +19,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import com.google.inject.Provider;
 
-public interface MatsimServices {
+public interface MatsimServices extends IterationCounter {
 
 	IterationStopWatch getStopwatch();
 
@@ -54,6 +54,5 @@ public interface MatsimServices {
 	OutputDirectoryHierarchy getControlerIO();
 
 	void addControlerListener(ControlerListener controlerListener);
-
-	Integer getIterationNumber();
+	
 }
