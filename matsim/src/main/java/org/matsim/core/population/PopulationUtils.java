@@ -452,14 +452,22 @@ public final class PopulationUtils {
 			// yy sorry about this mess, I am just trying to make explicit which seems to have been the logic so far implicitly.  kai, feb'16
 		}
 	}
-
-	/**
-	 * @param config  
-	 */
+	
+	@Deprecated // use "decideOnCoord..."
 	public static Coord computeCoordFromActivity( Activity act, ActivityFacilities facs, Config config ) {
+		return computeCoordFromActivity( act, facs, null, config ) ;
+	}
+	@Deprecated // use "decideOnCoord..."
+	public static Coord computeCoordFromActivity( Activity act, ActivityFacilities facs, Network network, Config config ) {
 		// the following might eventually become configurable by config. kai, feb'16
 		if ( act.getFacilityId()==null ) {
-			return act.getCoord() ; // if not available, fall back on coord of link?
+			if ( act.getCoord()!=null ) {
+				return act.getCoord() ;
+			} else {
+				Gbl.assertNotNull( network );
+				Link link = network.getLinks().get( act.getLinkId() ) ;
+				return link.getCoord() ;
+			}
 		} else {
 			Gbl.assertIf( facs!=null ) ;
 			ActivityFacility facility = facs.getFacilities().get( act.getFacilityId() ) ;
@@ -1031,8 +1039,14 @@ public final class PopulationUtils {
 			Gbl.assertNotNull( facility.getCoord() ) ;
 			return facility.getCoord() ;
 		}
-		Gbl.assertNotNull( act.getCoord() ) ;
-		return act.getCoord() ;
+		if ( act.getCoord()!=null ) {
+			return act.getCoord() ;
+		} else {
+			Gbl.assertNotNull( sc.getNetwork() );
+			Link link = sc.getNetwork().getLinks().get( act.getLinkId() ) ;
+			Gbl.assertNotNull( link );
+			return link.getCoord() ;
+		}
 	}
 	public static void sampleDown( Population pop, double sample ) {
 		final Random rnd = MatsimRandom.getLocalInstance();;

@@ -29,16 +29,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  * @author mrieser / Senozon AG
  */
 public class Gui extends JFrame {
-
+	
 	private static final long serialVersionUID = 1L;
 	
 	private static final JLabel lblFilepaths = new JLabel("Filepaths must either be absolute or relative to the location of the config file.") ;
@@ -59,11 +57,13 @@ public class Gui extends JFrame {
 	
 	private JButton btnStartMatsim;
 	private JProgressBar progressBar;
+	
 	private JTextArea textStdOut;
 	private JScrollPane scrollPane;
 	private JButton btnEdit;
 	
-	Map<String,JButton> additionalButtons = new LinkedHashMap<>(  ) ;
+	Map<String,JButton> preprocessButtons = new LinkedHashMap<>(  ) ;
+	Map<String,JButton> postprocessButtons = new LinkedHashMap<>(  ) ;
 
 	private ExeRunner exeRunner = null;
 	private JMenuBar menuBar;
@@ -98,7 +98,10 @@ public class Gui extends JFrame {
 		btnStartMatsim = new JButton( "Start MATSim" );
 		btnStartMatsim.setEnabled( false );
 		
-		for ( JButton button : additionalButtons.values() ) {
+		for ( JButton button : preprocessButtons.values() ) {
+			button.setEnabled( false );
+		}
+		for ( JButton button : postprocessButtons.values() ) {
 			button.setEnabled( false );
 		}
 		
@@ -221,11 +224,17 @@ public class Gui extends JFrame {
 		
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		
-		final GroupLayout.SequentialGroup buttonsSequentialGroup = groupLayout.createSequentialGroup();
-		final GroupLayout.ParallelGroup buttonsParallelGroup = groupLayout.createParallelGroup() ;
-		for ( JButton button : additionalButtons.values() ) {
-			buttonsSequentialGroup.addComponent( button ) ;
-			buttonsParallelGroup.addComponent( button ) ;
+		final GroupLayout.SequentialGroup prebuttonsSequentialGroup = groupLayout.createSequentialGroup();
+		final GroupLayout.ParallelGroup prebuttonsParallelGroup = groupLayout.createParallelGroup() ;
+		for ( JButton button : preprocessButtons.values() ) {
+			prebuttonsSequentialGroup.addComponent( button ) ;
+			prebuttonsParallelGroup.addComponent( button ) ;
+		}
+		final GroupLayout.SequentialGroup postbuttonsSequentialGroup = groupLayout.createSequentialGroup();
+		final GroupLayout.ParallelGroup postbuttonsParallelGroup = groupLayout.createParallelGroup() ;
+		for ( JButton button : postprocessButtons.values() ) {
+			postbuttonsSequentialGroup.addComponent( button ) ;
+			postbuttonsParallelGroup.addComponent( button ) ;
 		}
 		
 		groupLayout.setHorizontalGroup(
@@ -236,7 +245,8 @@ public class Gui extends JFrame {
 							// a bunch of stuff that can in principle stretch from left to right (although most of it won't):
 						.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
 						.addComponent( lblFilepaths ) // "Filepaths must either ..."
-						.addGroup( buttonsSequentialGroup )
+						.addGroup( prebuttonsSequentialGroup )
+						.addGroup( postbuttonsSequentialGroup )
 						.addGroup(groupLayout.createSequentialGroup()
 							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 									// some stuff that stretches from left to somewhere1:
@@ -311,11 +321,13 @@ public class Gui extends JFrame {
 						.addComponent(txtRam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblMb))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup( buttonsParallelGroup )
+					.addGroup( prebuttonsParallelGroup )
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnStartMatsim)
 						.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup( postbuttonsParallelGroup )
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
 					.addContainerGap())
@@ -479,7 +491,10 @@ public class Gui extends JFrame {
 		
 		btnStartMatsim.setEnabled(true);
 		btnEdit.setEnabled(true);
-		for ( JButton button : additionalButtons.values() ) {
+		for ( JButton button : preprocessButtons.values() ) {
+			button.setEnabled( true );
+		}
+		for ( JButton button : postprocessButtons.values() ) {
 			button.setEnabled( true );
 		}
 	}
@@ -535,16 +550,41 @@ public class Gui extends JFrame {
 		}
 	}
 	
-	public final JMenu getToolsMenu() {
+	// Is it a problem to make the following available to the outside?  If so, why?  Would it
+	// be better to rather copy/paste the above code and start from there?  kai, jun/aug'18
+	
+	final JMenu getToolsMenu() {
 		// Is it a problem to make this available?  If so, why?  kai, jun'18
 		return this.mnTools ;
 	}
-	public final void addToMenuBar(JMenu menuItem) {
-		// Is it a problem to make this available?  If so, why?  kai, jun'18
+	final void addToMenuBar(JMenu menuItem) {
 		this.menuBar.add(menuItem) ;
 	}
-	public final void addButton( String str, JButton button ) {
-		this.additionalButtons.put( str, button );
+	final void addPreprocessButton( String str, JButton button ) {
+		this.preprocessButtons.put( str, button );
 	}
+	final void addPostprocessButton( String str, JButton button ) {
+		this.postprocessButtons.put( str, button );
+	}
+	JTextArea getTextStdOut() {
+		return textStdOut;
+	}
+	JTextArea getTextErrOut() {
+		return textErrOut;
+	}
+	JTextField getTxtJvmlocation() {
+		return txtJvmlocation ;
+	}
+	JTextField getTxtRam() {
+		return this.txtRam ;
+	}
+	@Deprecated // this should not be necessary. kai, aug'18
+	String getMainClass() {
+		return this.mainClass ;
+	}
+	JTextField getTxtConfigfilename() {
+		return this.txtConfigfilename ;
+	}
+	
 	
 }
