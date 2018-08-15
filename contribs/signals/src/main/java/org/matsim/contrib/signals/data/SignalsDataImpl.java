@@ -61,7 +61,7 @@ public class SignalsDataImpl implements SignalsData {
 		if (signalConfig.isUseIntergreenTimes()) {
 			this.intergreensdata = new IntergreenTimesDataImpl();
 		}
-		if (signalConfig.isUseConflictingDirections()) {
+		if (signalConfig.getIntersectionLogic().toString().startsWith("CONFLICTING_DIRECTIONS")) {
 			this.conflictData = new ConflictDataImpl();
 		}
 	}
