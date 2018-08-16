@@ -19,6 +19,8 @@
 
 package electric.edrt.run;
 
+import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
+import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
@@ -40,9 +42,8 @@ import org.matsim.vsp.ev.charging.FixedSpeedChargingStrategy;
 import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
 import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
 import org.matsim.vsp.ev.dvrp.EvDvrpIntegrationModule;
-
-import electric.edrt.energyconsumption.VwAVAuxEnergyConsumption;
-import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
+import org.matsim.vsp.ev.temperature.TemperatureChangeConfigGroup;
+import org.matsim.vsp.ev.temperature.TemperatureChangeModule;
 
 public class RunEDrtScenario {
 	private static final double CHARGING_SPEED_FACTOR = 1.; // full speed
@@ -53,13 +54,17 @@ public class RunEDrtScenario {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(inputPath+"edrt-config.xml", new DrtConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup(), new EvConfigGroup());
+				new OTFVisConfigGroup(), new EvConfigGroup(), new TemperatureChangeConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.plans().setInputFile("population/vw219_it_1_sampleRate0.1replaceRate_bs_drt.xml.gz");
 		config.controler().setLastIteration(1); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(1); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(1); // Write Plan file every x-Iterations
 		config.network().setInputFile("network/modifiedNetwork.xml.gz");
+
+		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup) config.getModules().get(TemperatureChangeConfigGroup.GROUP_NAME);
+		tcg.setTempFile("temperatures.csv");
+
 		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 
 		// Use custom stop duration
@@ -79,14 +84,14 @@ public class RunEDrtScenario {
 		config.qsim().setFlowCapFactor(0.12);
 		config.qsim().setStorageCapFactor(0.24);
 
-		config.controler().setOutputDirectory(inputPath+"../output/" + runId); 
-		
-		
+		config.controler().setOutputDirectory(inputPath + "../output/" + runId);
 		createControler(config).run();
 	}
 
 	public static Controler createControler(Config config) {
 		Controler controler = EDrtControlerCreator.createControler(config, false);
+		controler.addOverridingModule(new TemperatureChangeModule());
+
 		controler.addOverridingModule(new EvModule());
 		controler.addOverridingModule(createEvDvrpIntegrationModule());
 		controler.addOverridingModule(new AbstractModule() {
@@ -95,7 +100,7 @@ public class RunEDrtScenario {
 				bind(EDrtVehicleDataEntryFactoryProvider.class)
 						.toInstance(new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
 				bind(DriveEnergyConsumption.class).to(VwDrtDriveEnergyConsumption.class);
-				bind(AuxEnergyConsumption.class).to(VwAVAuxEnergyConsumption.class);
+				bind(AuxEnergyConsumption.class).to(VwAVAuxEnergyConsumptionWithTemperatures.class);
 			}
 		});
 
