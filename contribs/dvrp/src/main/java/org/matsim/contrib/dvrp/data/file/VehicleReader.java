@@ -19,13 +19,18 @@
 
 package org.matsim.contrib.dvrp.data.file;
 
-import java.util.*;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.FleetImpl;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.Stack;
 
 /**
  * @author michalm
@@ -59,7 +64,12 @@ public class VehicleReader extends MatsimXmlParser {
 	private Vehicle createVehicle(Attributes atts) {
 		Id<Vehicle> id = Id.create(atts.getValue("id"), Vehicle.class);
 		Link startLink = Objects.requireNonNull(links.get(Id.createLinkId(atts.getValue("start_link"))));
-		int capacity = ReaderUtils.getInt(atts, "capacity", DEFAULT_CAPACITY);
+        double cap = ReaderUtils.getDouble(atts, "capacity", DEFAULT_CAPACITY);
+        int capacity = (int) cap;
+        if (capacity != cap) {
+            throw new IllegalArgumentException("capacity must be an Integer value");
+        }
+		//for backwards compatibility when reading files. capacity used be double
 		double t0 = ReaderUtils.getDouble(atts, "t_0", DEFAULT_T_0);
 		double t1 = ReaderUtils.getDouble(atts, "t_1", DEFAULT_T_1);
 		return createVehicle(id, startLink, capacity, t0, t1, atts);
