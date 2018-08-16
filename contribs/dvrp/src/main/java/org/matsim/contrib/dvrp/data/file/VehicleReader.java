@@ -64,7 +64,11 @@ public class VehicleReader extends MatsimXmlParser {
 	private Vehicle createVehicle(Attributes atts) {
 		Id<Vehicle> id = Id.create(atts.getValue("id"), Vehicle.class);
 		Link startLink = Objects.requireNonNull(links.get(Id.createLinkId(atts.getValue("start_link"))));
-		int capacity = (int) ReaderUtils.getDouble(atts, "capacity", DEFAULT_CAPACITY);
+        double cap = ReaderUtils.getDouble(atts, "capacity", DEFAULT_CAPACITY);
+        int capacity = (int) cap;
+        if (capacity != cap) {
+            throw new IllegalArgumentException("capacity must be an Integer value");
+        }
 		//for backwards compatibility when reading files. capacity used be double
 		double t0 = ReaderUtils.getDouble(atts, "t_0", DEFAULT_T_0);
 		double t1 = ReaderUtils.getDouble(atts, "t_1", DEFAULT_T_1);
