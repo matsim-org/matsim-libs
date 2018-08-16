@@ -35,7 +35,7 @@ public class TemperatureServiceImpl implements TemperatureService, TemperatureCh
 
     private Network network;
     private Map<Link, Double> temperatures = new HashMap<>();
-
+    double lastRecordedTemperature = Double.NaN;
     @Inject
     TemperatureServiceImpl(EventsManager events, Network network) {
         this.network = network;
@@ -61,9 +61,15 @@ public class TemperatureServiceImpl implements TemperatureService, TemperatureCh
     }
 
     @Override
+    public double getCurrentTemperature() {
+        return lastRecordedTemperature;
+    }
+
+    @Override
     public void handleEvent(TemperatureChangeEvent event) {
         Link l = network.getLinks().get(event.getLinkId());
         temperatures.put(l, event.getNewTemperatureC());
+        lastRecordedTemperature = event.getNewTemperatureC();
     }
 
     @Override
