@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,20 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.ev;
-
-/**
- * All values used in this package use SI base and derived units. In particular:
- * <ul>
- * <li>distance - meter [m]</li>
- * <li>time - second [s]</li>
- * <li>energy - joule [J]</li>
- * <li>power - watt [W]</li>
- * <li>Temperature - degree Celsius [°C]</li>
- * </ul>
- * <p>
- * In particular, the use of [kWh] and [s] generates confusion and leads to bugs, as 1 kWh = 1,000 J * 3,600 s
- * <p>
- * Consequently, energy consumption is measured in [J/m], rather than [kWh/100km] or [Wh/km], as typically done in
- * transport.
+package org.matsim.vsp.ev.temperature;/*
+ * created by jbischoff, 15.08.2018
  */
+
+import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
+import org.matsim.core.controler.AbstractModule;
+
+public class TemperatureChangeModule extends AbstractModule {
+    @Override
+    public void install() {
+        new DynQSimConfigConsistencyChecker().checkConsistency(getConfig());
+        addMobsimListenerBinding().to(TemperatureManager.class).asEagerSingleton();
+        bind(TemperatureService.class).to(TemperatureServiceImpl.class).asEagerSingleton();
+    }
+}
