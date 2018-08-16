@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup.ActionOnSignalSpecsViolation;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup.IntersectionLogic;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.conflicts.IntersectionDirections;
@@ -48,7 +49,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.Lane;
 import org.matsim.testcases.MatsimTestUtils;
 
 
@@ -127,7 +128,7 @@ public class Fixture {
 	public Scenario createAndLoadTestScenarioTwoSignals(boolean useConflictData) {
 		Config config = createConfigOneSignal(false);
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		signalsConfig.setUseConflictingDirections(useConflictData);
+		signalsConfig.setIntersectionLogic(IntersectionLogic.CONFLICTING_DIRECTIONS_NO_TURN_RESTRICTIONS);
 		signalsConfig.setActionOnConflictingDirectionViolation(ActionOnSignalSpecsViolation.EXCEPTION);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);

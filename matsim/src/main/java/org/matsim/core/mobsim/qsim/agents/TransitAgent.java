@@ -35,6 +35,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.facilities.Facility;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -44,7 +45,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author mrieser
  */
-public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent, HasPerson {
+public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent, HasPerson, HasModifiablePlan {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(TransitAgent.class);
 
@@ -61,7 +62,7 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 		basicAgentDelegate = new BasicPlanAgentImpl( p.getSelectedPlan(), simulation.getScenario(), simulation.getEventsManager(), 
 				simulation.getSimTimer() ) ;
 		driverAgentDelegate = new PlanBasedDriverAgentImpl( basicAgentDelegate ) ;
-		transitAgentDelegate = new TransitAgentImpl( basicAgentDelegate );
+		transitAgentDelegate = new TransitAgentImpl( basicAgentDelegate, simulation.getScenario().getConfig().transit().getBoardingAcceptance() );
 	}
 
 	@Override
@@ -191,6 +192,22 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 	@Override
 	public Facility<? extends Facility<?>> getDestinationFacility() {
 		return this.basicAgentDelegate.getDestinationFacility();
+	}
+
+	@Override
+	public Plan getModifiablePlan() {
+		return this.basicAgentDelegate.getModifiablePlan();
+	}
+
+	@Override
+	public void resetCaches() {
+		this.basicAgentDelegate.resetCaches();
+		this.driverAgentDelegate.resetCaches();
+	}
+
+	@Override
+	public int getCurrentLinkIndex() {
+		return this.basicAgentDelegate.getCurrentLinkIndex();
 	}
 
 }

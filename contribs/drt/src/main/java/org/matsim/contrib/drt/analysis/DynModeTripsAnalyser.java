@@ -22,25 +22,6 @@
  */
 package org.matsim.contrib.drt.analysis;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
@@ -53,7 +34,9 @@ import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYSeries;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
@@ -61,6 +44,17 @@ import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
+
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * @author jbischoff
@@ -94,6 +88,51 @@ public class DynModeTripsAnalyser {
 
 		return splitTrips;
 
+	}
+
+	public static void analyzeBoardingsAndDeboardings(List<DynModeTrip> trips, String delimiter, double startTime, double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
+		Map<Id<Link>, int[]> boardings = new HashMap<>();
+		Map<Id<Link>, int[]> deboardings = new HashMap<>();
+		int bins = (int) ((endTime - startTime) / timeBinSize);
+
+		for (DynModeTrip trip : trips) {
+			int[] board = boardings.getOrDefault(trip.getFromLinkId(), new int[bins]);
+			int startTimeBin = (int) ((trip.getDepartureTime() - startTime) / timeBinSize);
+			if (startTimeBin < bins) {
+				board[startTimeBin]++;
+				boardings.put(trip.getFromLinkId(), board);
+			}
+			int[] deboard = deboardings.getOrDefault(trip.getToLinkId(), new int[bins]);
+			int arrivalTimeBin = (int) ((trip.getArrivalTime() - startTime) / timeBinSize);
+			if (arrivalTimeBin < bins) {
+				deboard[arrivalTimeBin]++;
+				deboardings.put(trip.getFromLinkId(), deboard);
+			}
+		}
+		writeBoardings(boardingsFile, network, boardings, startTime, timeBinSize, bins, delimiter);
+		writeBoardings(deboardingsFile, network, deboardings, startTime, timeBinSize, bins, delimiter);
+	}
+
+	private static void writeBoardings(String filename, Network network, Map<Id<Link>, int[]> boardings, double startTime, double timeBinSize, int bins, String delimiter) {
+		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+		try {
+			bw.write("Link" + delimiter + "x" + delimiter + "y");
+			for (int i = 0; i < bins; i++) {
+				bw.write(delimiter + Time.writeTime(startTime + i * timeBinSize));
+			}
+			for (Entry<Id<Link>, int[]> e : boardings.entrySet()) {
+				bw.newLine();
+				Coord coord = network.getLinks().get(e.getKey()).getCoord();
+				bw.write(e.getKey().toString() + delimiter + coord.getY() + delimiter + coord.getY());
+				for (int i = 0; i < e.getValue().length; i++) {
+					bw.write(delimiter + e.getValue()[i]);
+				}
+			}
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static String summarizeTrips(List<DynModeTrip> trips, String delimiter) {
@@ -351,8 +390,8 @@ public class DynModeTripsAnalyser {
 	}
 
 	/**
-	 * @param vehicleDistances
-	 * @param string
+	 * @param vehicleDistances Map of vehicle distances
+	 * @param del Delimiter tag
 	 * @return
 	 */
 	public static String summarizeVehicles(Map<Id<Vehicle>, double[]> vehicleDistances, String del) {

@@ -20,43 +20,27 @@
 
 package org.matsim.contrib.hybridsim.simulation;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.hybridsim.utils.IdIntMapper;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 
-public class HybridMobsimProvider implements Provider<Mobsim>{
-	
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+
+public class HybridMobsimProvider implements Provider<Mobsim> {
+
 	private final Scenario sc;
 	private final EventsManager em;
-	private final HybridNetworkFactory netFac;
-    private final IdIntMapper mapper;
 
-
-    @Inject
-    HybridMobsimProvider(Scenario sc, EventsManager eventsManager, HybridNetworkFactory netFac, IdIntMapper mapper) {
-        this.sc = sc;
+	@Inject
+	HybridMobsimProvider(Scenario sc, EventsManager eventsManager) {
+		this.sc = sc;
 		this.em = eventsManager;
-		this.netFac = netFac;
-        this.mapper = mapper;
 
-    }
+	}
 
 	@Override
 	public Mobsim get() {
@@ -66,55 +50,13 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 					"There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
 
+		Config config = this.sc.getConfig();
 
-		QSim qSim = new QSim(this.sc, this.em);
-		ActivityEngine activityEngine = new ActivityEngine(this.em, qSim.getAgentCounter());
-		qSim.addMobsimEngine(activityEngine);
-		qSim.addActivityHandler(activityEngine);
-
-        ExternalEngine e = new ExternalEngine(this.em, qSim, mapper);
-        this.netFac.setExternalEngine(e);
-//		HybridQSimExternalNetworkFactory eFac = new HybridQSimExternalNetworkFactory(e);
-//		this.netFac.putNetsimNetworkFactory("2ext", eFac);
-//		this.netFac.putNetsimNetworkFactory("ext2", eFac);
-		
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, this.netFac );
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-
-
-		qSim.addMobsimEngine(e);
-
-
-		
-//		CANetworkFactory fac = new CAMultiLaneNetworkFactory();
-//		CANetsimEngine cae = new CANetsimEngine(qSim, fac);
-//		qSim.addMobsimEngine(cae);
-//		qSim.addDepartureHandler(cae.getDepartureHandler());
-
-
-		TeleportationEngine teleportationEngine = new DefaultTeleportationEngine(this.sc, this.em);
-		qSim.addMobsimEngine(teleportationEngine);
-
-		AgentFactory agentFactory;
-		if (this.sc.getConfig().transit().isUseTransit()) {
-			agentFactory = new TransitAgentFactory(qSim);
-			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-			transitEngine
-					.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-			qSim.addDepartureHandler(transitEngine);
-			qSim.addAgentSource(transitEngine);
-			qSim.addMobsimEngine(transitEngine);
-		} else {
-			agentFactory = new DefaultAgentFactory(qSim);
-		}
-		if (this.sc.getConfig().network().isTimeVariantNetwork()) {
-			qSim.addMobsimEngine(NetworkChangeEventsEngine.createNetworkChangeEventsEngine());
-		}
-		PopulationAgentSource agentSource = new PopulationAgentSource(
-				this.sc.getPopulation(), agentFactory, qSim);
-		qSim.addAgentSource(agentSource);
-		return qSim;
+		return new QSimBuilder(config) //
+				.useDefaults() //
+				.addQSimModule(new HybridQSimModule()) //
+				.configureComponents(HybridQSimModule::configureComponents) //
+				.build(sc, em);
 	}
 
 }

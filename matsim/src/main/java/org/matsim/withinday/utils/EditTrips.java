@@ -264,34 +264,9 @@ public final class EditTrips {
 	public StageActivityTypes getStageActivities() {
 		return tripRouter.getStageActivityTypes() ;
 	}
-	/**
-	 * @param trip
-	 * @return the departure time of the first leg of the trip
-	 */
-	public static double getDepartureTime(Trip trip) {
-		// does this always make sense?
-		Leg leg = (Leg) trip.getTripElements().get(0);
-		return leg.getDepartureTime();
+	
+	public Trip findTripAfterActivity( Plan plan, Activity activity ) {
+		return TripStructureUtils.findTripStartingAtActivity( activity, plan, tripRouter.getStageActivityTypes() ) ;
 	}
-	/**
-		 * @param plan
-		 * @param activity
-		 * @param tripRouter
-		 * @return the Trip that starts at the given activity or null, if no trip was found
-		 */
-		public static Trip findTripAfterActivity(Plan plan, Activity activity, TripRouter tripRouter) {
-			return TripStructureUtils.findTripStartingAtActivity(activity, plan, tripRouter.getStageActivityTypes() ) ;
-	//		List<Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes());
-	//
-	//		for (Trip trip : trips) {
-	//			if (trip.getOriginActivity() == fromActivity) return trip;
-	//		}
-	//
-	//		// no matching trip was found
-	//		return null;
-		}
-		public Trip findTripAfterActivity( Plan plan, Activity activity ) {
-			return findTripAfterActivity(plan, activity, tripRouter) ;
-		}
 
 }

@@ -88,10 +88,14 @@ public class TripStructureUtilsSubtoursTest {
 			final String type,
 			final Id<?> loc) {
 		final Id<Link> linkLoc = anchorAtFacilities ? Id.create( "nowhere", Link.class ) : Id.create(loc, Link.class);
-		final Id<ActivityFacility> facLoc = anchorAtFacilities ? Id.create(loc, ActivityFacility.class) : Id.create( "nowhere", ActivityFacility.class );
 
 		final Activity act = fact.createActivityFromLinkId( type , linkLoc );
-		((Activity) act).setFacilityId( facLoc );
+
+		if (anchorAtFacilities) {
+			final Id<ActivityFacility> facLoc = Id.create(loc, ActivityFacility.class) ;
+			((Activity) act).setFacilityId( facLoc );
+		}
+
 		return act;
 	}
 	
@@ -790,8 +794,8 @@ public class TripStructureUtilsSubtoursTest {
 		final Collection<Subtour> subtours =
 			TripStructureUtils.getSubtours(
 					fixture.plan,
-					CHECKER,
-					fixture.useFacilitiesAsAnchorPoint);
+					CHECKER
+            );
 
 		assertEquals(
 				"[anchorAtFacilities="+fixture.useFacilitiesAsAnchorPoint+"] "+
@@ -815,8 +819,8 @@ public class TripStructureUtilsSubtoursTest {
 		try {
 			TripStructureUtils.getSubtours(
 					fixture.plan,
-					CHECKER,
-					fixture.useFacilitiesAsAnchorPoint);
+					CHECKER
+            );
 		}
 		catch (RuntimeException e) {
 			hadException = true;
@@ -835,8 +839,8 @@ public class TripStructureUtilsSubtoursTest {
 			final Collection<Subtour> subtours =
 				TripStructureUtils.getSubtours(
 						f.plan,
-						CHECKER,
-						f.useFacilitiesAsAnchorPoint);
+						CHECKER
+                );
 			int countTrips = 0;
 
 			for (Subtour s : subtours) {
@@ -854,7 +858,7 @@ public class TripStructureUtilsSubtoursTest {
 	@Test
 	public void testFatherhood() throws Exception {
 		for (Fixture f : allFixtures( useFacilitiesAsAnchorPoint )) {
-			final Collection<Subtour> subtours = TripStructureUtils.getSubtours( f.plan , CHECKER , f.useFacilitiesAsAnchorPoint );
+			final Collection<Subtour> subtours = TripStructureUtils.getSubtours( f.plan , CHECKER);
 
 			for (Subtour s : subtours) {
 				for ( Subtour child : s.getChildren() ) {

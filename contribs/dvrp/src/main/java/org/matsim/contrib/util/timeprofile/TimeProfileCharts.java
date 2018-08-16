@@ -35,12 +35,16 @@ public class TimeProfileCharts {
 
 	public static JFreeChart chartProfile(String[] series, List<Double> times, List<Object[]> timeProfile,
 			ChartType type) {
-		DefaultTableXYDataset dataset = createXYDataset(series, times, timeProfile);
+		return chartProfile(createXYDataset(series, times, timeProfile), type);
+	}
+
+	public static JFreeChart chartProfile(DefaultTableXYDataset dataset, ChartType type) {
 		JFreeChart chart;
 		switch (type) {
 			case Line:
-				chart = ChartFactory.createXYLineChart("TimeProfile", "Time [h]", "Values", dataset,
-						PlotOrientation.VERTICAL, true, false, false);
+				chart = ChartFactory
+						.createXYLineChart("TimeProfile", "Time [h]", "Values", dataset, PlotOrientation.VERTICAL, true,
+								false, false);
 				break;
 
 			case StackedArea:
@@ -64,7 +68,7 @@ public class TimeProfileCharts {
 		yAxis.setAutoRange(true);
 
 		XYItemRenderer renderer = plot.getRenderer();
-		for (int s = 0; s < series.length; s++) {
+		for (int s = 0; s < dataset.getSeriesCount(); s++) {
 			renderer.setSeriesStroke(s, new BasicStroke(2));
 		}
 
@@ -73,7 +77,6 @@ public class TimeProfileCharts {
 
 	public static DefaultTableXYDataset createXYDataset(String[] series, List<Double> times,
 			List<Object[]> timeProfile) {
-		DefaultTableXYDataset dataset = new DefaultTableXYDataset();
 		XYSeries[] seriesArray = new XYSeries[series.length];
 		for (int s = 0; s < series.length; s++) {
 			seriesArray[s] = new XYSeries(series[s], false, false);
@@ -87,10 +90,10 @@ public class TimeProfileCharts {
 			}
 		}
 
+		DefaultTableXYDataset dataset = new DefaultTableXYDataset();
 		for (int s = 0; s < series.length; s++) {
 			dataset.addSeries(seriesArray[s]);
 		}
-
 		return dataset;
 	}
 

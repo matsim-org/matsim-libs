@@ -41,11 +41,11 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCa
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.lanes.data.ModelLane;
-import org.matsim.lanes.data.Lane;
-import org.matsim.lanes.vis.VisLane;
-import org.matsim.lanes.vis.VisLaneModelBuilder;
-import org.matsim.lanes.vis.VisLinkWLanes;
+import org.matsim.lanes.ModelLane;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.VisLane;
+import org.matsim.lanes.VisLaneModelBuilder;
+import org.matsim.lanes.VisLinkWLanes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -351,13 +351,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			if (nextQueue != null) {
 				if (nextQueue.isAcceptingFromUpstream()) {
 					((QueueWithBuffer) qlane).popFirstVehicle();
-//					context .getEventsManager() .processEvent(
-//									new LaneLeaveEvent(now, veh.getId(), this.getLink()
-//											.getId(), ((QueueWithBuffer) qlane).getId()));
 					nextQueue.addFromUpstream(veh);
-//					context .getEventsManager() .processEvent(
-//									new LaneEnterEvent(now, veh.getId(), this.getLink()
-//											.getId(), ((QueueWithBuffer) nextQueue).getId()));
 				} else {
 					break;
 				}

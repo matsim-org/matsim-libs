@@ -34,9 +34,6 @@
 		<!-- Writes out detailed DRT customer stats in each iteration. True by default. -->
 		<param name="writeDetailedCustomerStats" value="true" />
 
-		<!-- Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration. False by default. -->
-		<param name="writeDetailedVehicleStats" value="false" />
-
 		<parameterset type="minCostFlowRebalancing">
 			<param name="targetAlpha" value="0.5"/>
 			<param name="targetBeta" value="0.5"/>

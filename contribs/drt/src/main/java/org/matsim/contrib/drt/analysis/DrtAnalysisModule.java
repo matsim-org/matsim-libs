@@ -22,6 +22,7 @@
  */
 package org.matsim.contrib.drt.analysis;
 
+import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileWriter;
 import org.matsim.core.controler.AbstractModule;
 
 /**
@@ -37,10 +38,9 @@ public class DrtAnalysisModule extends AbstractModule {
 	 */
 	@Override
 	public void install() {
-		bind(DrtVehicleOccupancyEvaluator.class).asEagerSingleton();
 		bind(DynModePassengerStats.class).asEagerSingleton();
 		bind(DrtRequestAnalyzer.class).asEagerSingleton();
 		addControlerListenerBinding().to(DrtAnalysisControlerListener.class).asEagerSingleton();
+		addMobsimListenerBinding().to(DrtVehicleOccupancyProfileWriter.class);
 	}
-
 }

@@ -20,6 +20,14 @@
 
 package org.matsim.contrib.otfvis;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,9 +45,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AgentTracker;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -52,11 +58,14 @@ import org.matsim.vis.otfvis.OTFEvent2MVI;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 import org.matsim.vis.otfvis.handler.FacilityDrawer;
-import org.matsim.vis.snapshotwriters.*;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.*;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+import org.matsim.vis.snapshotwriters.VisData;
+import org.matsim.vis.snapshotwriters.VisLink;
+import org.matsim.vis.snapshotwriters.VisMobsim;
+import org.matsim.vis.snapshotwriters.VisNetwork;
+import org.matsim.vis.snapshotwriters.VisVehicle;
 
 /**
  * A generic starter for the OnTheFly Visualizer that supports
@@ -154,7 +163,9 @@ public class OTFVis {
 	public static void playScenario(Scenario scenario){
 		EventsManager events = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim qSim = QSimUtils.createDefaultQSim(scenario, events);
+		QSim qSim = new QSimBuilder(scenario.getConfig()) //
+				.useDefaults() //
+				.build(scenario, events);
 
 		OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(),scenario, events, qSim);
 		OTFClientLive.run(scenario.getConfig(), server);

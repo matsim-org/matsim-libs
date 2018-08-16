@@ -86,11 +86,16 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		transitDriverFactory = new DefaultTransitDriverAgentFactory(internalInterface, agentTracker);
 	}
 
-	@Inject
 	public TransitQSimEngine(QSim queueSimulation) {
+		this(queueSimulation, new SimpleTransitStopHandlerFactory());
+	}
+	
+	@Inject
+	public TransitQSimEngine(QSim queueSimulation, TransitStopHandlerFactory stopHandlerFactory) {
 		this.qSim = queueSimulation;
 		this.schedule = queueSimulation.getScenario().getTransitSchedule();
 		this.agentTracker = new TransitStopAgentTracker(this.qSim.getEventsManager());
+		this.stopHandlerFactory = stopHandlerFactory;
 	}
 
 	// For tests (which create an Engine, and externally create Agents as well).
@@ -197,7 +202,6 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		return agentTracker;
 	}
 
-	@Inject
 	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
 		this.stopHandlerFactory = stopHandlerFactory;
 	}

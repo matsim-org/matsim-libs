@@ -36,7 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -112,8 +112,10 @@ public class OccupancyAnalyzerTest {
 		eventsManager.addHandler(oa);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
-		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
-		sim.run();
+		new QSimBuilder(f.scenario.getConfig()) //
+				.useDefaults() //
+				.build(f.scenario, eventsManager) //
+				.run();
 
 		Set<Id<TransitStopFacility>> enterStops = oa.getBoardStopIds();
 		Assert.assertEquals(1, enterStops.size());

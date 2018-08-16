@@ -23,6 +23,7 @@
 package org.matsim.contrib.drt.run;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -59,6 +60,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -68,43 +70,61 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public final class DrtControlerCreator {
 
-	public static Scenario createScenario(Config config) {
+	/**
+	 * Creates a standard scenario and adds a DRT route factory to the default route factories.
+	 *
+	 * @param config
+	 * @return
+	 */
+	public static Scenario createScenarioWithDrtRouteFactory(Config config) {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
 		routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
 		return scenario;
 	}
 
-
+	/**
+	 * Creates a controller in one step.
+	 *
+	 * @param config
+	 * @param otfvis
+	 * @return
+	 */
 	public static Controler createControler(Config config, boolean otfvis) {
-		adjustConfig(config);
-		Scenario scenario = createScenario(config);
-		ScenarioUtils.loadScenario(scenario);
+		return createControler(config, otfvis, cfg -> {
+			Scenario scenario = createScenarioWithDrtRouteFactory(cfg);
+			ScenarioUtils.loadScenario(scenario);
+			return scenario;
+		});
+	}
+
+	/**
+	 * Creates a controller in one step. Allows for customised scenario creation.
+	 *
+	 * @param config
+	 * @param otfvis
+	 * @param scenarioLoader
+	 * @return
+	 */
+	public static Controler createControler(Config config, boolean otfvis, Function<Config, Scenario> scenarioLoader) {
+		adjustDrtConfig(config);
+		Scenario scenario = scenarioLoader.apply(config);
 		Controler controler = new Controler(scenario);
-		addDrtToControler(controler, otfvis);
+		addDrtToControler(controler);
+		if (otfvis) {
+			controler.addOverridingModule(new OTFVisLiveModule());
+		}
 		return controler;
 	}
 
-	public static Controler createControler(Scenario scenario, boolean otfvis) {
-		// yy I know that this one breaks the sequential loading of the building blocks, but I would like to be able
-		// to modify the scenario before I pass it to the controler. kai, oct'17
-		adjustConfig(scenario.getConfig());
-		Controler controler = new Controler(scenario);
-		addDrtToControler(controler, otfvis);
-		return controler;
-	}
-
-	public static void addDrtToControler(Controler controler, boolean otfvis) {
+	public static void addDrtToControler(Controler controler) {
 		controler.addOverridingModule(new DvrpModule(DrtControlerCreator::createModuleForQSimPlugin, Arrays
 				.asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class, ParallelPathDataProvider.class)));
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
 	}
 
-	public static void adjustConfig(Config config) {
+	public static void adjustDrtConfig(Config config) {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased)) {
 			if (config.planCalcScore().getActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY) == null) {
@@ -135,10 +155,10 @@ public final class DrtControlerCreator {
 		config.checkConsistency();
 	}
 
-	public static com.google.inject.Module createModuleForQSimPlugin(Config config) {
-		return new com.google.inject.AbstractModule() {
+	public static AbstractQSimModule createModuleForQSimPlugin(Config config) {
+		return new AbstractQSimModule() {
 			@Override
-			protected void configure() {
+			protected void configureQSim() {
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
 						DefaultDrtOptimizer.DRT_OPTIMIZER);

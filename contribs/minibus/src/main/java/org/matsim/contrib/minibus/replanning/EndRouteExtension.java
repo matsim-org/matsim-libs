@@ -19,22 +19,15 @@
 
 package org.matsim.contrib.minibus.replanning;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.operation.buffer.BufferOp;
-import com.vividsolutions.jts.operation.buffer.BufferParameters;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.operator.Operator;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.*;
@@ -76,9 +69,9 @@ public final class EndRouteExtension extends AbstractPStrategyModule {
 		 * terminus stops. So we only know one terminus stop, the base stop, and try to find the other terminus, the other end 
 		 * of the route, by scanning the stops on the TransitRoute for the stop which has the largest distance from the base stop.
 		 */
-		TransitStopFacility remoteStop = this.findStopWithLargestDistance(currentStopsToBeServed);
+		int remoteStopIndex = this.findStopIndexWithLargestDistance(currentStopsToBeServed);
 		
-		if (baseStop.equals(remoteStop)) {
+		if (baseStop.equals(currentStopsToBeServed.get(remoteStopIndex))) {
 			/*
 			 * TODO:
 			 * findStopWithLargestDistance() should never return a remote stop which equals the base stop unless the input 
@@ -90,13 +83,13 @@ public final class EndRouteExtension extends AbstractPStrategyModule {
 					"EndRouteExtension replanning is skipped for TransitLine "
 							+ operator.getCurrentTransitLine().getId()
 							+ ", because base stop and remote stop returned by findStopWithLargestDistance() are equal. This"
-							+ " should not happen. Base stop: " + baseStop.getId() + ". Remote stop: " + remoteStop.getId());
+							+ " should not happen. Base stop: " + baseStop.getId() + ". Remote stop index: " + remoteStopIndex);
 			return null;
 		}
 
-		double bufferSizeBasedOnRatio = CoordUtils.calcEuclideanDistance(baseStop.getCoord(), remoteStop.getCoord()) * this.ratio;
+		double bufferSizeBasedOnRatio = CoordUtils.calcEuclideanDistance(baseStop.getCoord(), currentStopsToBeServed.get(remoteStopIndex).getCoord()) * this.ratio;
 		
-		List<Geometry> lineStrings = this.createGeometryFromStops(currentStopsToBeServed, remoteStop);
+		List<Geometry> lineStrings = this.createGeometryFromStops(currentStopsToBeServed, remoteStopIndex);
 		Geometry bufferWithoutEndCaps = this.createBuffer(lineStrings, Math.max(this.bufferSize, bufferSizeBasedOnRatio), true);
 		Geometry bufferWithEndCaps = this.createBuffer(lineStrings, Math.max(this.bufferSize, bufferSizeBasedOnRatio), false);
 		Geometry buffer = bufferWithEndCaps.difference(bufferWithoutEndCaps);
@@ -108,7 +101,7 @@ public final class EndRouteExtension extends AbstractPStrategyModule {
 			return null;
 		}
 		
-		ArrayList<TransitStopFacility> newStopsToBeServed = this.addStopToExistingStops(baseStop, remoteStop, currentStopsToBeServed, newStop);
+		ArrayList<TransitStopFacility> newStopsToBeServed = this.addStopToExistingStops(baseStop, currentStopsToBeServed.get(remoteStopIndex), currentStopsToBeServed, newStop);
 		
 		// create new plan
 		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName(), oldPlan.getId());
@@ -138,30 +131,6 @@ public final class EndRouteExtension extends AbstractPStrategyModule {
 		return newStopsToBeServed;
 	}
 
-	private TransitStopFacility findStopWithLargestDistance(ArrayList<TransitStopFacility> stops) {
-		Coord startCoord = stops.get(0).getCoord();
-		double largestDistance = 0;
-		TransitStopFacility stopWithLargestDistance = stops.get(0);
-		for (TransitStopFacility transitStopFacility : stops) {
-			double currentDistance = CoordUtils.calcEuclideanDistance(startCoord, transitStopFacility.getCoord());
-			if (currentDistance > largestDistance) {
-				largestDistance = currentDistance;
-				stopWithLargestDistance = transitStopFacility;
-			}
-		}
-		return stopWithLargestDistance;
-	}
-
-	private Set<Id<TransitStopFacility>> getStopsUsed(Collection<TransitRoute> routes) {
-		Set<Id<TransitStopFacility>> stopsUsed = new TreeSet<>();
-		for (TransitRoute route : routes) {
-			for (TransitRouteStop stop : route.getStops()) {
-				stopsUsed.add(stop.getStopFacility().getId());
-			}
-		}
-		return stopsUsed;
-	}
-
 	private TransitStopFacility drawRandomStop(Geometry buffer, PRouteProvider pRouteProvider, Set<Id<TransitStopFacility>> stopsUsed) {
 		List<TransitStopFacility> choiceSet = new LinkedList<>();
 		
@@ -175,57 +144,6 @@ public final class EndRouteExtension extends AbstractPStrategyModule {
 		}
 		
 		return pRouteProvider.drawRandomStopFromList(choiceSet);
-	}
-
-
-	private Geometry createBuffer(List<Geometry> lineStrings, double bufferSize, boolean excludeTermini) {
-		BufferParameters bufferParameters = new BufferParameters();
-		
-		if (excludeTermini) {
-			bufferParameters.setEndCapStyle(BufferParameters.CAP_FLAT);
-		} else {
-			bufferParameters.setEndCapStyle(BufferParameters.CAP_ROUND);
-		}
-		
-		Geometry union = null;
-		
-		for (Geometry lineString : lineStrings) {
-			Geometry buffer = BufferOp.bufferOp(lineString, bufferSize, bufferParameters);
-			if (union == null) {
-				union = buffer;
-			} else {
-				union = union.union(buffer);
-			}
-		}
-		
-		return union;
-	}
-
-	private List<Geometry> createGeometryFromStops(ArrayList<TransitStopFacility> stops, TransitStopFacility remoteStop) {
-		List<Geometry> geometries = new LinkedList<>();
-		
-		ArrayList<Coordinate> coords = new ArrayList<>();
-		for (TransitStopFacility stop : stops) {
-			if (stop.equals(remoteStop)) {
-				// terminate current line string
-				coords.add(new Coordinate(stop.getCoord().getX(), stop.getCoord().getY(), 0.0));
-				Coordinate[] coordinates = coords.toArray(new Coordinate[coords.size()]);
-				Geometry lineString = new GeometryFactory().createLineString(coordinates);
-				geometries.add(lineString);
-				// create new line string
-				coords = new ArrayList<>();
-				coords.add(new Coordinate(stop.getCoord().getX(), stop.getCoord().getY(), 0.0));
-			} else {
-				coords.add(new Coordinate(stop.getCoord().getX(), stop.getCoord().getY(), 0.0));
-			}
-		}
-		// add first stop to close the circle
-		coords.add(new Coordinate(stops.get(0).getCoord().getX(), stops.get(0).getCoord().getY(), 0.0));
-		
-		Coordinate[] coordinates = coords.toArray(new Coordinate[coords.size()]);
-		Geometry lineString = new GeometryFactory().createLineString(coordinates);
-		geometries.add(lineString);
-		return geometries;
 	}
 
 	public String getStrategyName() {

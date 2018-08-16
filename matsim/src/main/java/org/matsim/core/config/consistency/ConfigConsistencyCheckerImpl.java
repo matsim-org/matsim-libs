@@ -159,5 +159,4 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 			log.warn("Your are using Transit but have not provided a transit vehicles file. This most likely won't work.");
 		}
 	}
-
 }

@@ -10,10 +10,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -23,7 +19,7 @@ public class QSimEventsIntegrationTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Rule
-	public Timeout globalTimeout= new Timeout(2000);
+	public Timeout globalTimeout= new Timeout(20000);
 
 	@Test
 	public void netsimEngineHandlesExceptionCorrectly() {
@@ -42,14 +38,9 @@ public class QSimEventsIntegrationTest {
 
 			}
 		});
-		QSim qSim = new QSim(scenario, events);
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-		qSim.addAgentSource(agentSource);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
-		qSim.addMobsimEngine(activityEngine);
-		qSim.addActivityHandler(activityEngine);
-		QNetsimEngineModule.configure(qSim);
+		QSim qSim = new QSimBuilder(config)//
+				.useDefaults()
+				.build(scenario, events);
 		try {
 			qSim.run();
 		} catch (RuntimeException e) {

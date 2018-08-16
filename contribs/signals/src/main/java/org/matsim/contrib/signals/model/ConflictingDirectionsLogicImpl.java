@@ -21,8 +21,6 @@ package org.matsim.contrib.signals.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,16 +31,16 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup.ActionOnSignalSpecsViolation;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.conflicts.IntersectionDirections;
 import org.matsim.contrib.signals.data.conflicts.Direction;
+import org.matsim.contrib.signals.data.conflicts.IntersectionDirections;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.lanes.data.Lane;
-import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.Lanes;
 
 
 /**
@@ -57,7 +55,7 @@ private static final Logger log = Logger.getLogger(ConflictingDirectionsLogicImp
 	private Map<Id<Signal>, Set<Tuple<Id<Link>, Id<Link>>>> setOfLinkTuplesPerSignal = new HashMap<>();
 	private Map<Id<SignalGroup>, Set<Direction>> setOfDirectionsPerGroup = new HashMap<>();
 	
-	private Map<Id<SignalSystem>, List<Id<SignalGroup>>> greenSignalsPerSystem = new HashMap<>();
+	private Map<Id<SignalSystem>, Set<Id<SignalGroup>>> greenSignalsPerSystem = new HashMap<>();
 
 	public ConflictingDirectionsLogicImpl(Network network, Lanes lanes, SignalsData signalsData, ActionOnSignalSpecsViolation actionOnConflictingDirectionsViolation) {
 		this.actionOnConflictingDirectionsViolation = actionOnConflictingDirectionsViolation;
@@ -93,7 +91,11 @@ private static final Logger log = Logger.getLogger(ConflictingDirectionsLogicImp
 				setOfDirectionsPerGroup.put(group.getId(), new HashSet<>());
 				for (Id<Signal> signalIdOfThisGroup : signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(signalSystem.getId()).get(group.getId()).getSignalIds()) {
 					for (Tuple<Id<Link>, Id<Link>> from2toLink : setOfLinkTuplesPerSignal.get(signalIdOfThisGroup)) {
-						setOfDirectionsPerGroup.get(group.getId()).add(conflictsOfThisSystem.getDirection(from2toLink.getFirst(), from2toLink.getSecond()));
+						Direction direction = conflictsOfThisSystem.getDirection(from2toLink.getFirst(), from2toLink.getSecond());
+						// direction is null, if it does not exist (e.g. for u-turns in the cottbus scenario)
+						if (direction != null) {
+							setOfDirectionsPerGroup.get(group.getId()).add(direction);
+						}
 					}
 				}
 				log.info("Group " + group.getId() + " corresponds to " + setOfDirectionsPerGroup.get(group.getId()).size() + " directions.");
@@ -111,7 +113,7 @@ private static final Logger log = Logger.getLogger(ConflictingDirectionsLogicImp
 		if (SignalGroupState.GREEN.equals(event.getNewState())){
 			// register system if necessary
 			if (!greenSignalsPerSystem.containsKey(event.getSignalSystemId())) {
-				greenSignalsPerSystem.put(event.getSignalSystemId(), new LinkedList<>());
+				greenSignalsPerSystem.put(event.getSignalSystemId(), new HashSet<>());
 			}
 			
 			// check whether a conflicting direction already shows green
@@ -133,7 +135,7 @@ private static final Logger log = Logger.getLogger(ConflictingDirectionsLogicImp
 			for (Direction greenDirection : setOfDirectionsPerGroup.get(greenGroupId)) {
 				for (Direction directionToSwitchGreen : setOfDirectionsPerGroup.get(event.getSignalGroupId())) {
 					if (greenDirection.getConflictingDirections().contains(directionToSwitchGreen.getId()) || directionToSwitchGreen.getConflictingDirections().contains(greenDirection.getId())) {
-						String conflictingDirectionViolation = "Signal Group " + event.getSignalGroupId() + " is switched to green although " + greenGroupId 
+						String conflictingDirectionViolation = "Sek: " + event.getTime() + ". Signal Group " + event.getSignalGroupId() + " is switched to green although " + greenGroupId 
 								+ " already shows green. This is not allowed due to the conflicting directions data defined in the scenario because direction " 
 								+ greenDirection.getId() + " from link " + greenDirection.getFromLink() + " to link " + greenDirection.getToLink() 
 								+ " is conflicting to direction " + directionToSwitchGreen.getId() + " from link " + directionToSwitchGreen.getFromLink()

@@ -20,7 +20,9 @@
 package org.matsim.contrib.emissions.utils;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -63,7 +65,11 @@ extends ReflectiveConfigGroup
 	private static final String CONSIDERING_CO2_COSTS = "consideringCO2Costs";
 	private boolean consideringCO2Costs = false;
 
-	static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED: mapping from input road types to HBEFA 3.1 road type strings";
+	public enum HbefaRoadTypeSource { fromFile, fromLinkAttributes}
+	private static final String Hbefa_ROADTYPE_SOURCE = "hbefaRoadTypeSource";
+	private HbefaRoadTypeSource hbefaRoadTypeSource = HbefaRoadTypeSource.fromFile; // fromFile is to support backward compatibility
+
+	static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED if source of the HBEFA road type is set to "+HbefaRoadTypeSource.fromFile +". It maps from input road types to HBEFA 3.1 road type strings";
 	static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors";
 	static final String EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average cold emission factors";
 	static final String USING_DETAILED_EMISSION_CALCULATION_CMT = "if true then detailed emission factor files must be provided!";
@@ -80,20 +86,30 @@ extends ReflectiveConfigGroup
 			"The emission specifications of a vehicle type should be surrounded by emission specification markers i.e."+
 			EmissionSpecificationMarker.BEGIN_EMISSIONS + " and " + EmissionSpecificationMarker.END_EMISSIONS + "." ;
 
-	static final String WRITING_EMISSIONS_EVENTS_CMT = "if false, emission events will not appear in the events file.";
+	private static final String WRITING_EMISSIONS_EVENTS_CMT = "if false, emission events will not appear in the events file.";
 
-	static final String EMISSION_EFFICIENCY_FACTOR_CMT = "A factor to include efficiency of the vehicles; the factor is applied to the whole fleet. ";
+	private static final String EMISSION_EFFICIENCY_FACTOR_CMT = "A factor to include efficiency of the vehicles; the factor is applied to the whole fleet. ";
 
-	static final String EMISSION_COST_MULTIPLICATION_FACTOR_CMT = "A factor, by which the emission cost factors from literature (Maibach et al. (2008)) are increased.";
+	private static final String EMISSION_COST_MULTIPLICATION_FACTOR_CMT = "A factor, by which the emission cost factors from literature (Maibach et al. (2008)) are increased.";
 
-	static final String CONSIDERING_CO2_COSTS_CMT = "if true, only flat emissions will be considered irrespective of pricing either flat air pollution or exposure of air pollution.";
+	private static final String CONSIDERING_CO2_COSTS_CMT = "if true, only flat emissions will be considered irrespective of pricing either flat air pollution or exposure of air pollution.";
+
 
 	@Override
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 
-
 		map.put(EMISSION_ROADTYPE_MAPPING_FILE, EMISSION_ROADTYPE_MAPPING_FILE_CMT);
+
+		{
+			String Hbefa_ROADTYPE_SOURCE_CMT = "Source of the HBEFFA road type. The options are:"+ Arrays.stream(HbefaRoadTypeSource.values())
+																							 .map(source -> " " + source.toString())
+																							 .collect(Collectors.joining()) +"."+
+			"\n"+HbefaRoadTypeSource.fromLinkAttributes+" is default i.e. put HBEFA road type directly to the link attributes.";
+
+			map.put(Hbefa_ROADTYPE_SOURCE, Hbefa_ROADTYPE_SOURCE_CMT);
+		}
+
 
 		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT);
 
@@ -272,5 +288,15 @@ extends ReflectiveConfigGroup
 	@StringSetter(CONSIDERING_CO2_COSTS)
 	public void setConsideringCO2Costs(boolean consideringCO2Costs) {
 		this.consideringCO2Costs = consideringCO2Costs;
+	}
+
+	@StringGetter(Hbefa_ROADTYPE_SOURCE)
+	public HbefaRoadTypeSource getHbefaRoadTypeSource() {
+		return hbefaRoadTypeSource;
+	}
+
+	@StringSetter(Hbefa_ROADTYPE_SOURCE)
+	public void setHbefaRoadTypeSource(HbefaRoadTypeSource hbefaRoadTypeSource) {
+		this.hbefaRoadTypeSource = hbefaRoadTypeSource;
 	}
 }

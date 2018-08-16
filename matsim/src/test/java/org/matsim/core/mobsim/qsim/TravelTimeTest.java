@@ -62,7 +62,10 @@ public class TravelTimeTest {
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSimUtils.createDefaultQSim(scenario, events).run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
 
 		Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
 		Assert.assertEquals(360.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
@@ -72,6 +75,101 @@ public class TravelTimeTest {
 		Assert.assertEquals(360.0, travelTimes.get(Id.create(21, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1260.0, travelTimes.get(Id.create(22, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(360.0, travelTimes.get(Id.create(23, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+	}
+	
+	@Test
+	/**
+	 * This test shows that the Netsim always rounds up link travel times. 
+	 * Please note that a computed link travel time of 400.0s is treated the same, 
+	 * i.e. it is rounded up to 401s.
+	 */
+	public void testEquilOneAgentTravelTimeRounding() {
+		Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes = new HashMap<>();
+
+		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
+		MatsimRandom.reset(config.global().getRandomSeed());
+		Scenario scenario = ScenarioUtils.createScenario(config);
+
+		String popFileName = "plans1.xml";
+		config.plans().setInputFile(popFileName);
+
+		ScenarioUtils.loadScenario(scenario);
+
+		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler(new EventTestHandler(agentTravelTimes));
+		
+		// Travel time 359.9712023038
+		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.78);
+
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
+
+		Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
+		Assert.assertEquals(360.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		
+		// Travel time 359.9712023038
+		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.85);
+
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
+
+		travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
+		Assert.assertEquals(360.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		
+		// Travel time 359.066427289
+		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.85);
+
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
+		
+		travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
+		Assert.assertEquals(360.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		
+		// Travel time 358.4229390681
+		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.9);
+
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
+		
+		travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
+		Assert.assertEquals(359.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		
+		// Travel time 360.3603603604
+		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.75);
+
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
+		
+		travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
+		Assert.assertEquals(361.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		
+		// Travel time 400.0
+		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setLength(10000.0);
+		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(25.0);
+
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
+		
+		travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
+		Assert.assertEquals(401.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -91,7 +189,10 @@ public class TravelTimeTest {
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSimUtils.createDefaultQSim(scenario, events).run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
 
 		Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
 		Assert.assertEquals(360.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);

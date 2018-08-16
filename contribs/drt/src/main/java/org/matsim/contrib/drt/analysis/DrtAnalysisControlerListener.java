@@ -22,13 +22,7 @@
  */
 package org.matsim.contrib.drt.analysis;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.List;
-import java.util.Locale;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
@@ -38,7 +32,12 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 
-import com.google.inject.Inject;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author jbischoff
@@ -46,8 +45,6 @@ import com.google.inject.Inject;
  */
 public class DrtAnalysisControlerListener implements IterationEndsListener {
 
-	@Inject
-	DrtVehicleOccupancyEvaluator vehicleOccupancyEvaluator;
 	@Inject
 	DynModePassengerStats drtPassengerStats;
 	@Inject
@@ -57,6 +54,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	@Inject
 	DrtRequestAnalyzer drtRequestAnalyzer;
 	private final DrtConfigGroup drtgroup;
+    private final Config config;
 	private boolean headerWritten = false;
 	private boolean vheaderWritten = false;
 	private final String runId;
@@ -69,6 +67,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	 */
 	@Inject
 	public DrtAnalysisControlerListener(Config config, Fleet fleet) {
+        this.config = config;
 		drtgroup = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
 		runId = config.controler().getRunId();
 		maxcap = DynModeTripsAnalyser.findMaxCap(fleet);
@@ -88,12 +87,6 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
-		vehicleOccupancyEvaluator.calcAndWriteFleetStats(
-				matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleOccupancy"),drtgroup.isPlotDetailedVehicleStats());
-		if (drtgroup.isPlotDetailedVehicleStats()) {
-			vehicleOccupancyEvaluator.writeDetailedOccupancyFiles(
-					matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleStats_"));
-		}
 		drtRequestAnalyzer.writeAndPlotWaitTimeEstimateComparison(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitTimeComparison.png"), matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitTimeComparison.csv"));
 		List<DynModeTrip> trips = drtPassengerStats.getDrtTrips();
 
@@ -119,11 +112,14 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 				matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "drt_detours"));
 		DynModeTripsAnalyser.analyseWaitTimes(
 				matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitStats"), trips, 1800);
+        if (drtgroup.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased)) {
+            DynModeTripsAnalyser.analyzeBoardingsAndDeboardings(trips, ";", config.qsim().getStartTime(), config.qsim().getEndTime(), 3600, matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "drt_boardings.csv"), matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "drt_alightments.csv"), network);
+        }
 	}
 
 	/**
 	 * @param summarizeTrips
-	 * @param iteration
+	 * @param it iteration
 	 */
 	private void writeIterationPassengerStats(String summarizeTrips, int it) {
 		BufferedWriter bw = IOUtils.getAppendingBufferedWriter(
@@ -145,8 +141,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	}
 
 	/**
-	 * @param summarizeTrips
-	 * @param iteration
+	 * @param summarizeVehicles
+	 * @param it iteration
 	 */
 	private void writeIterationVehicleStats(String summarizeVehicles,String vehOcc, int it) {
 		BufferedWriter bw = IOUtils

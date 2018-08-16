@@ -31,14 +31,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.Lane;
-import org.matsim.lanes.data.Lanes;
-import org.matsim.lanes.data.LanesFactory;
-import org.matsim.lanes.data.LanesToLinkAssignment;
+import org.matsim.lanes.Lane;
+import org.matsim.lanes.Lanes;
+import org.matsim.lanes.LanesFactory;
+import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -132,7 +132,9 @@ public class QLinkLanesTest extends MatsimTestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim queueSim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim queueSim = new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, eventsManager);
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
 		
 		QLinkImpl ql = (QLinkImpl) queueNetwork.getNetsimLink(Id.create(1, Link.class));
@@ -148,7 +150,9 @@ public class QLinkLanesTest extends MatsimTestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim queueSim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim queueSim = new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, eventsManager);
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
 
 		// check link
@@ -181,7 +185,9 @@ public class QLinkLanesTest extends MatsimTestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim queueSim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim queueSim = new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, eventsManager);
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
 		
 		// check link
@@ -216,7 +222,9 @@ public class QLinkLanesTest extends MatsimTestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim queueSim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim queueSim = new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, eventsManager);
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
 		
 		// check link

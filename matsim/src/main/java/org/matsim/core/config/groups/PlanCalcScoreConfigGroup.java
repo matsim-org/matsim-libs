@@ -70,6 +70,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch";
 
 	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
+	
+	private boolean usesDeprecatedSyntax = false ;
 
 	public PlanCalcScoreConfigGroup() {
 		super(GROUP_NAME);
@@ -86,7 +88,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		{
 			ActivityParams params = new ActivityParams("dummy");
 			params.setTypicalDuration(2. * 3600.);
-			params.setScoringThisActivityAtAll(false);
+//			params.setScoringThisActivityAtAll(false); // no longer minimal when included here. kai, jun'18
 			this.addActivityParams(params);
 			// (this is there so that an empty config prints out at least one
 			// activity type,
@@ -155,7 +157,13 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	public String getValue(final String key) {
 		throw new IllegalArgumentException(key + ": getValue access disabled; use direct getter");
 	}
-
+	
+	private static final String msg = " is deprecated config syntax; please use the more " +
+								    "modern hierarchical format; your output_config.xml " +
+								    "will be in the correct version; the old version will fail eventually, since we want to reduce the " +
+								    "workload on this backwards compatibility (look into " +
+								    "PlanCalcScoreConfigGroup or PlanCalcRouteConfigGroup if you want to know what we mean).";
+	
 	@Override
 	public void addParam(final String key, final String value) {
 		if (key.startsWith("monetaryDistanceCostRate")) {
@@ -167,89 +175,148 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		// backward compatibility: underscored
 		else if (key.startsWith("activityType_")) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
+			
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityType_".length()));
 
 			actParams.setActivityType(value);
 			getScoringParameters(null).removeParameterSet(actParams);
 			addActivityParams(actParams);
 		} else if (key.startsWith("activityPriority_")) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityPriority_".length()));
 			actParams.setPriority(Double.parseDouble(value));
 		} else if (key.startsWith("activityTypicalDuration_")) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityTypicalDuration_".length()));
 			actParams.setTypicalDuration(Time.parseTime(value));
 		} else if (key.startsWith("activityMinimalDuration_")) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityMinimalDuration_".length()));
 			actParams.setMinimalDuration(Time.parseTime(value));
 		} else if (key.startsWith("activityOpeningTime_")) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityOpeningTime_".length()));
 			actParams.setOpeningTime(Time.parseTime(value));
 		} else if (key.startsWith("activityLatestStartTime_")) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityLatestStartTime_".length()));
 			actParams.setLatestStartTime(Time.parseTime(value));
 		} else if (key.startsWith("activityEarliestEndTime_")) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityEarliestEndTime_".length()));
 			actParams.setEarliestEndTime(Time.parseTime(value));
 		} else if (key.startsWith("activityClosingTime_")) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityClosingTime_".length()));
 			actParams.setClosingTime(Time.parseTime(value));
 		} else if (key.startsWith("scoringThisActivityAtAll_")) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("scoringThisActivityAtAll_".length()));
 			actParams.setScoringThisActivityAtAll(Boolean.parseBoolean(value));
 		} else if (key.startsWith("traveling_")) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			ModeParams modeParams = getOrCreateModeParams(key.substring("traveling_".length()));
 			modeParams.setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if (key.startsWith("marginalUtlOfDistance_")) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			ModeParams modeParams = getOrCreateModeParams(key.substring("marginalUtlOfDistance_".length()));
 			modeParams.setMarginalUtilityOfDistance(Double.parseDouble(value));
 		} else if (key.startsWith("monetaryDistanceRate_")) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			ModeParams modeParams = getOrCreateModeParams(key.substring("monetaryDistanceRate_".length()));
 			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
 		} else if ("monetaryDistanceRateCar".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			ModeParams modeParams = getOrCreateModeParams(TransportMode.car);
 			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
 		} else if ("monetaryDistanceRatePt".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			ModeParams modeParams = getOrCreateModeParams(TransportMode.pt);
 			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
 		} else if (key.startsWith("constant_")) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			ModeParams modeParams = getOrCreateModeParams(key.substring("constant_".length()));
 			modeParams.setConstant(Double.parseDouble(value));
 		}
 
 		// backward compatibility: "typed" traveling
 		else if ("traveling".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			this.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingPt".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			this.getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingWalk".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			this.getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingOther".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			this.getModes().get(TransportMode.other).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		} else if ("travelingBike".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			this.getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(Double.parseDouble(value));
 		}
 
 		// backward compatibility: "typed" util of distance
 		else if ("marginalUtlOfDistanceCar".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			this.getModes().get(TransportMode.car).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		} else if ("marginalUtlOfDistancePt".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			this.getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		} else if ("marginalUtlOfDistanceWalk".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			this.getModes().get(TransportMode.walk).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		} else if ("marginalUtlOfDistanceOther".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			this.getModes().get(TransportMode.other).setMarginalUtilityOfDistance(Double.parseDouble(value));
 		}
 
 		// backward compatibility: "typed" constants
 		else if ("constantCar".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			getModes().get(TransportMode.car).setConstant(Double.parseDouble(value));
 		} else if ("constantWalk".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			getModes().get(TransportMode.walk).setConstant(Double.parseDouble(value));
 		} else if ("constantOther".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			getModes().get(TransportMode.other).setConstant(Double.parseDouble(value));
 		} else if ("constantPt".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			getModes().get(TransportMode.pt).setConstant(Double.parseDouble(value));
 		} else if ("constantBike".equals(key)) {
+			log.warn( key + msg );
+			usesDeprecatedSyntax = true ;
 			getModes().get(TransportMode.bike).setConstant(Double.parseDouble(value));
 		}
 
@@ -257,6 +324,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		else if (Arrays
 				.asList(LATE_ARRIVAL, EARLY_DEPARTURE, PERFORMING, MARGINAL_UTL_OF_MONEY, UTL_OF_LINE_SWITCH, WAITING)
 				.contains(key)) {
+//			log.warn( key + msg );
+//			usesDeprecatedSyntax = true ;
+			// this is the stuff with the default subpopulation
+			
 			getScoringParameters(null).addParam(key, value);
 		}
 
@@ -517,6 +588,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	@Override
 	protected final void checkConsistency(final Config config) {
 		super.checkConsistency(config);
+		
+		if ( usesDeprecatedSyntax && !config.global().isInsistingOnDeprecatedConfigVersion() ) {
+			throw new RuntimeException( msg ) ;
+		}
+		
 		if (getScoringParametersPerSubpopulation().size()>1){
 			if (!getScoringParametersPerSubpopulation().containsKey(PlanCalcScoreConfigGroup.DEFAULT_SUBPOPULATION)){
 				throw new RuntimeException("Using several subpopulations in "+PlanCalcScoreConfigGroup.GROUP_NAME+" requires defining a \""+PlanCalcScoreConfigGroup.DEFAULT_SUBPOPULATION+" \" subpopulation."
@@ -710,7 +786,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		// getters. kai, jun'15
 
 		public final static String SET_TYPE = "activityParams";
-
+		
 		// ---
 
 		private static final String TYPICAL_DURATION_SCORE_COMPUTATION = "typicalDurationScoreComputation";
@@ -785,7 +861,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private double latestStartTime = Time.UNDEFINED_TIME;
 		private double earliestEndTime = Time.UNDEFINED_TIME;
 		private double closingTime = Time.UNDEFINED_TIME;
-		private boolean scoringThisActivityAtAll = true;
 
 		public ActivityParams() {
 			super(SET_TYPE);
@@ -945,12 +1020,18 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.closingTime = closingTime;
 		}
 
-		@StringGetter("scoringThisActivityAtAll")
+		// ---
+		
+		public static final String SCORING_THIS_ACTIVITY_AT_ALL = "scoringThisActivityAtAll";
+
+		private boolean scoringThisActivityAtAll = true;
+
+		@StringGetter(SCORING_THIS_ACTIVITY_AT_ALL)
 		public boolean isScoringThisActivityAtAll() {
 			return scoringThisActivityAtAll;
 		}
 
-		@StringSetter("scoringThisActivityAtAll")
+		@StringSetter(SCORING_THIS_ACTIVITY_AT_ALL)
 		public void setScoringThisActivityAtAll(boolean scoringThisActivityAtAll) {
 			testForLocked();
 			this.scoringThisActivityAtAll = scoringThisActivityAtAll;
@@ -960,14 +1041,15 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	public static class ModeParams extends ReflectiveConfigGroup implements MatsimParameters {
 
 		public final static String SET_TYPE = "modeParams";
-
+		
 		private static final String MONETARY_DISTANCE_RATE = "monetaryDistanceRate";
 		private static final String MONETARY_DISTANCE_RATE_CMT = "[unit_of_money/m] conversion of distance into money. Normally negative.";
 
 		private static final String MARGINAL_UTILITY_OF_TRAVELING = "marginalUtilityOfTraveling_util_hr";
 
 		private static final String CONSTANT = "constant";
-
+		public static final String MODE = "mode";
+		
 		private String mode = null;
 		private double traveling = -6.0;
 		private double distance = 0.0;
@@ -1007,13 +1089,13 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			return map;
 		}
 
-		@StringSetter("mode")
+		@StringSetter(MODE)
 		public void setMode(final String mode) {
 			testForLocked();
 			this.mode = mode;
 		}
 
-		@StringGetter("mode")
+		@StringGetter(MODE)
 		public String getMode() {
 			return mode;
 		}

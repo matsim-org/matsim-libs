@@ -38,7 +38,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -119,8 +119,10 @@ public class DeparturesOnSameLinkSameTimeTest {
 		});
 
 		PrepareForSimUtils.createDefaultPrepareForSim(inputs.scenario).run();
-		QSim qsim = QSimUtils.createDefaultQSim(inputs.scenario,events);
-		qsim.run();
+		new QSimBuilder(inputs.scenario.getConfig()) //
+			.useDefaults() //
+			.build(inputs.scenario, events) //
+			.run();
 
 		return linkLeaveTimes;
 	}

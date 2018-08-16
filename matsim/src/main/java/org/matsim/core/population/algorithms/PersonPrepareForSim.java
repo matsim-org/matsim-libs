@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -52,11 +53,12 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 	private final PlanAlgorithm router;
 	private final XY2Links xy2links;
-	private final Network network;
+	private final Network carOnlyNetwork;
 	private final ActivityFacilities activityFacilities;
 
 	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
-
+	private final Scenario scenario;
+	
 	/*
 	 * To be used by the controller which creates multiple instances of this class which would
 	 * create multiple copies of a car-only-network. Instead, we can create that network once in
@@ -65,29 +67,32 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario, final Network carOnlyNetwork) {
 		super();
 		this.router = router;
-		this.network = scenario.getNetwork();
+		this.carOnlyNetwork = carOnlyNetwork ;
 		if (NetworkUtils.isMultimodal(carOnlyNetwork)) {
 			throw new RuntimeException("Expected carOnlyNetwork not to be multi-modal. Aborting!");
 		}
 		this.xy2links = new XY2Links(carOnlyNetwork, scenario.getActivityFacilities());
 		this.activityFacilities = scenario.getActivityFacilities();
+		this.scenario = scenario ;
 	}
 	
 	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario) {
 		super();
 		this.router = router;
-		this.network = scenario.getNetwork();
-		Network net = this.network;
-		if (NetworkUtils.isMultimodal(network)) {
+		this.carOnlyNetwork = scenario.getNetwork();
+		Network net = this.carOnlyNetwork;
+		if (NetworkUtils.isMultimodal( carOnlyNetwork )) {
 			log.info("Network seems to be multimodal. XY2Links will only use car links.");
-			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+			TransportModeNetworkFilter filter = new TransportModeNetworkFilter( carOnlyNetwork );
 			net = NetworkUtils.createNetwork();
 			HashSet<String> modes = new HashSet<String>();
 			modes.add(TransportMode.car);
 			filter.filter(net, modes);
 		}
+		
 		this.xy2links = new XY2Links(net, scenario.getActivityFacilities());
 		this.activityFacilities = scenario.getActivityFacilities();
+		this.scenario = scenario ;
 	}
 
 	@Override
@@ -99,6 +104,9 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			log.warn("Person " + person.getId() + " has no plans!");
 			return;
 		}
+		
+		// yyyyyy need to find out somewhere here if the access/egress legs of the incoming plans
+		// are consistent with the config setting.  Otherwise need to re-route all of them. kai, jul'18
 
 		// make sure all the plans have valid act-locations and valid routes
 		for (Plan plan : person.getPlans()) {
@@ -107,7 +115,14 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
-					if ( act.getLinkId() == null ) {
+					if ( act.getLinkId() == null // neither activity nor facility has a link
+							&&
+							//this check is necessary here, else, XY2Links will put the link/coord back to activity which is clear violation of facilitiesConfigGroup.removingLinksAndCoordinates =true. Amit July'18
+							( act.getFacilityId() == null
+									|| this.activityFacilities.getFacilities().isEmpty()
+									|| this.activityFacilities.getFacilities().get(act.getFacilityId()) == null
+									|| this.activityFacilities.getFacilities().get(act.getFacilityId()).getLinkId() == null)
+							) {
 					    	needsXY2Links = true;
 							needsReRoute = true;
 							break;
@@ -116,8 +131,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 					Leg leg = (Leg) pe;
 					if (leg.getRoute() == null) {
 						needsReRoute = true;
-					}
-					else if (Double.isNaN(leg.getRoute().getDistance())){
+					} else if (Double.isNaN(leg.getRoute().getDistance())){
 						Double dist = null;
 						if (leg.getRoute() instanceof NetworkRoute){
 							/* So far, 1.0 is always used as relative position on start and end link. 
@@ -126,7 +140,9 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 							 */
 							double relativePositionStartLink = 1.0;
 							double relativePositionEndLink  = 1.0;
-							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, this.network);
+//							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, this.network);
+							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, scenario.getNetwork() );
+							// using the full network for the distance calculation.  kai, jul'18
 						}
 						if (dist != null){
 							leg.getRoute().setDistance(dist);

@@ -192,11 +192,11 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	 *
 	 */
 	@Inject
-	public QSim(final Scenario sc, EventsManager events, Injector childInjector ) {
+	private QSim(final Scenario sc, EventsManager events, Injector childInjector ) {
 		this( sc, events ) ;
 		this.childInjector = childInjector ;
 	}
-	public QSim(final Scenario sc, EventsManager events ) {
+	private QSim(final Scenario sc, EventsManager events ) {
 		this.scenario = sc;
 		if (sc.getConfig().qsim().getNumberOfThreads() > 1) {
 			this.events = EventsUtils.getParallelFeedableInstance(events);
