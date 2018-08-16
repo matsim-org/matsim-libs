@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -41,15 +42,15 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 		Activity newActivity = PopulationUtils.createActivityFromCoord("s", new Coord((double) 200, (double) 200));
 		
 		// expect rpe to return false if the plan or one of the activities is null
-		assertEquals(EditPlans.replaceActivityBlindly(null, oldActivity, newActivity), false);
-		assertEquals(EditPlans.replaceActivityBlindly(plan, null, newActivity), false);
-		assertEquals(EditPlans.replaceActivityBlindly(plan, oldActivity, null), false);
+		assertEquals( WithinDayAgentUtils.replaceActivityBlindly(null, oldActivity, newActivity), false);
+		assertEquals( WithinDayAgentUtils.replaceActivityBlindly(plan, null, newActivity), false);
+		assertEquals( WithinDayAgentUtils.replaceActivityBlindly(plan, oldActivity, null), false);
 		
 		// old activity has to be part of the plan
-		assertEquals(EditPlans.replaceActivityBlindly(plan, newActivity, newActivity), false);
+		assertEquals( WithinDayAgentUtils.replaceActivityBlindly(plan, newActivity, newActivity), false);
 
 		// replace activity successful
-		assertEquals(EditPlans.replaceActivityBlindly(plan, oldActivity, newActivity), true);
+		assertEquals( WithinDayAgentUtils.replaceActivityBlindly(plan, oldActivity, newActivity), true);
 		
 		// check whether activity has really be replaced
 		assertEquals(plan.getPlanElements().get(0).equals(newActivity), true);
@@ -64,15 +65,15 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 		Leg newLeg = PopulationUtils.createLeg(TransportMode.walk);
 		
 		// expect rpe to return false if the plan or one of the legs is null
-		assertEquals(EditPlans.replaceLegBlindly(null, oldLeg, newLeg), false);
-		assertEquals(EditPlans.replaceLegBlindly(plan, null, newLeg), false);
-		assertEquals(EditPlans.replaceLegBlindly(plan, oldLeg, null), false);
+		assertEquals( WithinDayAgentUtils.replaceLegBlindly(null, oldLeg, newLeg), false);
+		assertEquals( WithinDayAgentUtils.replaceLegBlindly(plan, null, newLeg), false);
+		assertEquals( WithinDayAgentUtils.replaceLegBlindly(plan, oldLeg, null), false);
 		
 		// old leg has to be part of the plan
-		assertEquals(EditPlans.replaceLegBlindly(plan, newLeg, newLeg), false);
+		assertEquals( WithinDayAgentUtils.replaceLegBlindly(plan, newLeg, newLeg), false);
 		
 		// replace leg successful
-		assertEquals(EditPlans.replaceLegBlindly(plan, oldLeg, newLeg), true);
+		assertEquals( WithinDayAgentUtils.replaceLegBlindly(plan, oldLeg, newLeg), true);
 		
 		// check whether leg has really be replaced
 		assertEquals(plan.getPlanElements().get(1).equals(newLeg), true);

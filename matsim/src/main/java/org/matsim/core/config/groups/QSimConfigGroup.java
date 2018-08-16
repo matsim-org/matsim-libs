@@ -23,7 +23,11 @@ package org.matsim.core.config.groups;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -110,9 +114,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String MAIN_MODE = "mainMode";
 	private Collection<String> mainModes = Arrays.asList(TransportMode.car);
 
-	// ---
-	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES = "insertingWaitingVehiclesBeforeDrivingVehicles";
-	private boolean insertingWaitingVehiclesBeforeDrivingVehicles = false;
 
 	// ---
 	public static enum LinkDynamics { FIFO, PassingQ, SeepageQ }
@@ -249,8 +250,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		map.put(MAIN_MODE, "[comma-separated list] Defines which modes are congested modes. Technically, these are the modes that " +
 				"the departure handler of the netsimengine handles.  Effective cell size, effective lane width, flow capacity " +
 				"factor, and storage capacity factor need to be set with diligence.  Need to be vehicular modes to make sense.");
-		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, 
-				"decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false"); 
+		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES,
+				INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES_CMT );
 		map.put(NODE_OFFSET, "Shortens a link in the visualization, i.e. its start and end point are moved into towards the center. Does not affect traffic flow. ");
 		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values. This is used only for visualisation.");
 		{
@@ -280,6 +281,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		map.put(IS_RESTRICTING_SEEPAGE, "If link dynamics is set as "+ LinkDynamics.SeepageQ+", set to false if all seep modes should perform seepage. Default is true (better option).");
 //		map.put(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES, "If set to true, creates a vehicle for each person corresponding to every network mode. However, " +
 //				"this will be overridden if vehicle source is "+ VehiclesSource.fromVehiclesData+".");
+		
 		return map;
 	}
 
@@ -444,17 +446,26 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	public Collection<String> getMainModes() {
 		return mainModes;
 	}
-
+	// ---
+	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES = "insertingWaitingVehiclesBeforeDrivingVehicles";
+	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES_CMT =
+			"decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false";
+	private boolean insertingWaitingVehiclesBeforeDrivingVehicles = false;
+	/**
+	 * @return {@value #INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES_CMT}
+	 */
 	@StringGetter(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES)
 	public boolean isInsertingWaitingVehiclesBeforeDrivingVehicles() {
 		return this.insertingWaitingVehiclesBeforeDrivingVehicles;
 	}
-
+	/**
+	 * @param {@value {@link #INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES_CMT}}
+	 */
 	@StringSetter(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES)
 	public void setInsertingWaitingVehiclesBeforeDrivingVehicles(boolean val) {
 		this.insertingWaitingVehiclesBeforeDrivingVehicles = val;
 	}
-
+	// ---
 	@StringGetter(NODE_OFFSET)
 	public double getNodeOffset() {
 		return nodeOffset;
@@ -497,6 +508,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( VEHICLES_SOURCE)
 	public final void setVehiclesSource( VehiclesSource source ) {
+		testForLocked();
 		this.vehiclesSource = source ;
 	}
 	@StringGetter( VEHICLES_SOURCE )
@@ -545,6 +557,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	// ---
 	@StringGetter(IS_SEEP_MODE_STORAGE_FREE)
 	public boolean isSeepModeStorageFree() {
+		// yyyyyy replace boolean by something more expressive.  kai, aug'18
 		return isSeepModeStorageFree;
 	}
 	@StringSetter(IS_SEEP_MODE_STORAGE_FREE)
@@ -556,6 +569,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private boolean isRestrictingSeepage = true;
 	@StringGetter(IS_RESTRICTING_SEEPAGE)
 	public boolean isRestrictingSeepage() {
+		// yyyyyy replace boolean by something more expressive.  kai, aug'18
 		return isRestrictingSeepage;
 	}
 	@StringSetter(IS_RESTRICTING_SEEPAGE)
@@ -600,4 +614,5 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 //		// yyyy do we really need this switch?  Quite in general, please try to avoid boolean switches.  kai, may'18
 //		this.creatingVehiclesForAllNetworkModes = creatingVehiclesForAllNetworkModes;
 //	}
+	
 }

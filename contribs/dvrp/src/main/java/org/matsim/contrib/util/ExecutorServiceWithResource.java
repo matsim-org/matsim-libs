@@ -18,6 +18,7 @@
 
 package org.matsim.contrib.util;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -41,25 +42,25 @@ public class ExecutorServiceWithResource<R> {
 		void run(R resource);
 	}
 
-	private final BlockingQueue<R> resources = new LinkedBlockingQueue<>();
+	private final BlockingQueue<R> resourceQueue = new LinkedBlockingQueue<>();
 	private final ExecutorService executorService;
 
-	public ExecutorServiceWithResource(Iterable<R> resources) {
-		resources.forEach(this.resources::add);
-		executorService = Executors.newFixedThreadPool(this.resources.size());
+	public ExecutorServiceWithResource(Collection<R> resources) {
+		resourceQueue.addAll(resources);
+		executorService = Executors.newFixedThreadPool(resourceQueue.size());
 	}
 
 	public <V> Future<V> submitCallable(CallableWithResource<V, R> task) {
 		return executorService.submit(() -> {
-			R resource = resources.remove();
+			R resource = resourceQueue.remove();
 			V value = task.call(resource);
-			resources.add(resource);
+			resourceQueue.add(resource);
 			return value;
 		});
 	}
 
 	public <V> List<Future<V>> submitCallables(Stream<CallableWithResource<V, R>> tasks) {
-		return tasks.map(t -> this.submitCallable(t)).collect(Collectors.toList());
+		return tasks.map(t -> submitCallable(t)).collect(Collectors.toList());
 	}
 
 	public <V> List<V> submitCallablesAndGetResults(Stream<CallableWithResource<V, R>> tasks) {
@@ -68,14 +69,14 @@ public class ExecutorServiceWithResource<R> {
 
 	public Future<?> submitRunnable(RunnableWithResource<R> task) {
 		return executorService.submit(() -> {
-			R resource = resources.remove();
+			R resource = resourceQueue.remove();
 			task.run(resource);
-			resources.add(resource);
+			resourceQueue.add(resource);
 		});
 	}
 
 	public List<Future<?>> submitRunnables(Stream<RunnableWithResource<R>> tasks) {
-		return tasks.map(t -> this.submitRunnable(t)).collect(Collectors.toList());
+		return tasks.map(t -> submitRunnable(t)).collect(Collectors.toList());
 	}
 
 	public void submitRunnablesAndWait(Stream<RunnableWithResource<R>> tasks) {

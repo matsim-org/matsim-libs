@@ -53,7 +53,7 @@ public class RunTransEnergySimExample {
 	private Scenario sc;
 	
 	private static final Logger log = Logger.getLogger(RunTransEnergySimExample.class);
-	private static final String CONFIG = "test/input/org/matsim/contrib/transEnergySim/controllers/TestInductiveChargingController/config.xml";
+	private static final String CONFIG = "test/input/org/matsim/contrib/transEnergySim/controllers/InductiveChargingControllerIT/config.xml";
 	private static  String outputDir =  "output/"; // Simulation output 
 	private static  String estats ;
 	
