@@ -41,7 +41,7 @@ public class TemperatureChangeModuleIntegrationTest {
 
     @Test
     public void testTemperatureChangeModule() {
-        Config config = ConfigUtils.loadConfig("test/org/matsim/vsp/ev/temperature/config.xml", new TemperatureChangeConfigGroup());
+        Config config = ConfigUtils.loadConfig("test/input/org/matsim/vsp/ev/temperature/config.xml", new TemperatureChangeConfigGroup());
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
         Scenario scenario = ScenarioUtils.loadScenario(config);
