@@ -93,7 +93,8 @@ public class DynModeTripsAnalyser {
 	public static void analyzeBoardingsAndDeboardings(List<DynModeTrip> trips, String delimiter, double startTime, double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
 		Map<Id<Link>, int[]> boardings = new HashMap<>();
 		Map<Id<Link>, int[]> deboardings = new HashMap<>();
-		int bins = (int) ((endTime - startTime) / timeBinSize);
+		double actualstartTime = Math.max(startTime, 0.0);
+		int bins = (int) ((endTime - actualstartTime) / timeBinSize);
 
 		for (DynModeTrip trip : trips) {
 			int[] board = boardings.getOrDefault(trip.getFromLinkId(), new int[bins]);
