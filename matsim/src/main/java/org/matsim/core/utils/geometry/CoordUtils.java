@@ -32,6 +32,10 @@ public abstract class CoordUtils {
 		return new Coordinate( coord.getX(), coord.getY() ) ;
 	}
 	
+	public static Coord createCoord( final Coordinate coordinate ) {
+		return new Coord( coordinate.x, coordinate.y ) ;
+	}
+	
 	public static Coord createCoord( final double xx, final double yy ) {
 		return new Coord(xx, yy);
 	}
