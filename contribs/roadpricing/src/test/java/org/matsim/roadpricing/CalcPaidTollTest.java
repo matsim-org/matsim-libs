@@ -21,6 +21,7 @@
 package org.matsim.roadpricing;
 
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,13 +31,11 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -209,8 +208,10 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		scoring.beginIteration(0);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
-		sim.run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events)
+			.run();
 
 
 		scoring.finish();

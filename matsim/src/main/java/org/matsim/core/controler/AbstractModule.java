@@ -23,7 +23,9 @@
 package org.matsim.core.controler;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import com.google.inject.multibindings.MapBinder;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,6 +37,7 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -80,6 +83,7 @@ public abstract class AbstractModule implements Module {
 	private Multibinder<MobsimListener> mobsimListenerMultibinder;
 	private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
 	private MapBinder<Class<?>, AttributeConverter<?>> attributeConverterMapBinder;
+	private Multibinder<AbstractQSimModule> qsimModulesMultibinder;
 
 	@Inject
 	com.google.inject.Injector bootstrapInjector;
@@ -110,6 +114,7 @@ public abstract class AbstractModule implements Module {
 						this.binder,
 						new TypeLiteral<Class<?>>(){},
 						new TypeLiteral<AttributeConverter<?>>() {} );
+		this.qsimModulesMultibinder = Multibinder.newSetBinder(this.binder, AbstractQSimModule.class);
 		this.install();
 	}
 
@@ -127,7 +132,11 @@ public abstract class AbstractModule implements Module {
 	protected final LinkedBindingBuilder<EventHandler> addEventHandlerBinding() {
 		return eventHandlerMultibinder.addBinding();
 	}
-
+	
+	protected final void installQSimModule(AbstractQSimModule qsimModule) {
+		qsimModulesMultibinder.addBinding().toInstance(qsimModule);
+	}
+	
 	/**
 	 * See {@link tutorial.programming.example07ControlerListener.RunControlerListenerExample} for an example.
 	 * 

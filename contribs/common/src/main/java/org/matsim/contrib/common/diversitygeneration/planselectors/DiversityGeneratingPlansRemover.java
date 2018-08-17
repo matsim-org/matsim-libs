@@ -25,10 +25,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.pt.PtConstants;
 
@@ -51,7 +53,7 @@ import java.util.Map;
  * <p></p>
  * This class has <i>not</i> yet been extensively tested and so it is not clear if it contains bugs, how well it works, or if parameters
  * should be set differently.  If someone wants to experiment, the class presumably should be made configurable (or copied before 
- * modification). 
+ * modification).
  * <p></p>
  * There is also material in playground.vsp .
  * <p></p>
@@ -60,26 +62,26 @@ import java.util.Map;
  * @author nagel, ikaddoura
  */
 public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector {
+	// According to what I have tried (with equil and pt mode choice), the penalties should rather be somewhere
+	// between 0.1 and 0.3.  1 already is too much; what essentially happens is that agents end up spending
+	// too much time on evaluating mutations of plans that already have a low base score, but remain in the
+	// choice set because they are so different.  One should re-run this with one of the "reserved space"
+	// examples (airplanes; evacuation shelters). kai, aug'18
 
 	public static final class Builder implements Provider<PlanSelector<Plan, Person>> {
 
+		private double actTypeWeight = 0.3;
+		private double locationWeight = 0.3;
+		private double actTimeParameter = 0.3;
+		private double sameRoutePenalty = 0.3;
+		private double sameModePenalty = 0.3;
+
+		private StageActivityTypes stageActivities ;
 		private Network network;
-		private double actTypeWeight = 1.;
-		private double locationWeight = 1.;
-		private double actTimeParameter = 1.;
-		private double sameRoutePenalty = 1.;
-		private double sameModePenalty = 1.;
 
-		private StageActivityTypes stageActivities = new StageActivityTypes() {
-			@Override
-			public boolean isStageActivity(String activityType) {
-				return activityType.equals(PtConstants.TRANSIT_ACTIVITY_TYPE);
-			}
-		};
-
-		@Inject final Builder setNetwork(Network network) {
+		@Inject final void setNetwork(Network network) {
+			// (not user settable)
 			this.network = network;
-			return this ;
 		}
 		public final Builder setSameActivityTypePenalty( double val ) {
 			this.actTypeWeight = val ;
@@ -101,9 +103,9 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 			this.sameModePenalty = val;
 			return this ;
 		}
-		public final Builder setStageActivityTypes( StageActivityTypes val) {
-			this.stageActivities = val;
-			return this ;
+		@Inject final void setTripRouter( TripRouter val ) {
+			// (not user settable)
+			stageActivities = val.getStageActivityTypes() ;
 		}
 		@Override
 		public final DiversityGeneratingPlansRemover get() {
@@ -165,18 +167,24 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 
 		int rr=0 ;
 		for ( Plan plan1 : plans ) {
+//			log.info( "rr=" + rr + "; utils=" + utils[rr]) ;
 			for ( Plan plan2 : plans ) {
 				// yyyy there is really no need to compare the plan with itself.  kai/johan, mar'14, should not happen anymore... ihab, may'14
 				if (plan1 == plan2) {
 					// same plan
 				} else {
 					utils[rr] -= similarity( plan1, plan2 ) ;
+//					log.info( "rr=" + rr + "; utils=" + utils[rr]) ;
 
 					if ( Double.isNaN(utils[rr]) ) {
 						log.warn( "utils is NaN; id: " + plan1.getPerson().getId() ) ;
 					}
 				}	
 			}
+//			for ( PlanElement pe : plan1.getPlanElements() ) {
+//				log.info( pe.toString() ) ;
+//			}
+//			log.info("") ;
 			rr++ ;
 		}
 
@@ -225,7 +233,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		return map ;
 	}
 
-	private double similarity( Plan plan1, Plan plan2 ) {
+	/* package-private, for testing */ double similarity( Plan plan1, Plan plan2 ) {
 		double simil = 0. ;
 		{
 			List<Activity> activities1 = TripStructureUtils.getActivities(plan1, stageActivities) ;

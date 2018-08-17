@@ -111,13 +111,13 @@ public class EmissionModule {
 		switch (this.emissionConfigGroup.getHbefaRoadTypeSource()) {
 			case fromFile:
 				logger.warn("It is recommended to directly set the HBEFA road types to link attributes and then chose HbefaRoadTypeSource: "+ EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes );
-				putHBEFARoadTypeFromFileToLinkAttributes(roadTypeMappingFile);
+				putHBEFARoadTypeFromFileToLinkAttributes(roadTypeMappingFile,scenario.getNetwork());
 				break;
 			case fromLinkAttributes:
 				//nothing to do, take directly from link
 				break;
 			default:
-				throw new RuntimeException(this.emissionConfigGroup.getHbefaRoadTypeSource()+ " is not implemented yet.");
+				throw new RuntimeException(this.emissionConfigGroup.getHbefaRoadTypeSource()+ " is not implemented.");
 		}
 
 		vehicles = scenario.getVehicles();
@@ -136,11 +136,14 @@ public class EmissionModule {
 			}
 		}
 
-		if(scenario.getConfig().qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.defaultVehicle)) {
-			logger.warn("Vehicle source in the QSim is "+ QSimConfigGroup.VehiclesSource.defaultVehicle.name()+", however a vehicle file or vehicle information is provided. \n" +
-					"Therefore, switching to "+ QSimConfigGroup.VehiclesSource.fromVehiclesData.name()+".");
-			scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
-		}
+//		if(scenario.getConfig().qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.defaultVehicle)) {
+//			logger.warn("Vehicle source in the QSim is "+ QSimConfigGroup.VehiclesSource.defaultVehicle.name()+
+//							", however a vehicle file or vehicle information is provided. \n" +
+//					"Therefore, switching to "+ QSimConfigGroup.VehiclesSource.fromVehiclesData.name()+".");
+//			scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
+//			// yyyyyy code should not silently switch config options. kai, jul'18
+//			logger.error("code should not silently switch config options; needs to be modified.  kai, jul'18") ;
+//		}
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
 		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
@@ -186,7 +189,7 @@ public class EmissionModule {
 		logger.info("leaving createEmissionHandler");
 	}
 
-	private void putHBEFARoadTypeFromFileToLinkAttributes(String filename){
+	public static void putHBEFARoadTypeFromFileToLinkAttributes(String filename, Network network){
 
 		logger.info("reading road type mapping info from "+filename) ;
 		logger.info("The information is directly added to the link attributes now.") ;
@@ -212,7 +215,7 @@ public class EmissionModule {
 		}
 
 		logger.info("The information is directly added to the link attributes now.") ;
-		scenario.getNetwork()
+		network
 				.getLinks()
 				.values().forEach(l -> EmissionUtils.setHbefaRoadType(l, mapper.get(NetworkUtils.getType(l))));
 
@@ -272,8 +275,8 @@ public class EmissionModule {
 				key.setHbefaDistance(mapAmbientCondPattern2Distance(array[indexFromKey.get("AmbientCondPattern")]));
 				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
 
-				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor();
-				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
+				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
+//				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
 				
 				avgColdTable.put(key, value);
 			}
@@ -344,8 +347,8 @@ public class EmissionModule {
 				hbefaVehicleAttributes.setHbefaEmConcept(array[indexFromKey.get("EmConcept")]);
 				key.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 
-				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor();
-				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA")]));
+				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA")]));
+//				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA")]));
 				
 				hbefaColdTableDetailed.put(key, value);
 			}
@@ -356,7 +359,7 @@ public class EmissionModule {
 		return hbefaColdTableDetailed;
 	}
 
-	private Map<String, Integer> createIndexFromKey(String strLine) {
+	private static Map<String, Integer> createIndexFromKey(String strLine) {
 		String[] keys = strLine.split(";") ;
 
 		Map<String, Integer> indexFromKey = new HashMap<>() ;

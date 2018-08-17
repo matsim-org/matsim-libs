@@ -249,7 +249,7 @@ public class JointTravelingSimulationIntegrationTest {
 				}
 			});
 
-			final JointQSimFactory factory = new JointQSimFactory( );
+			final JointQSimFactory factory = new JointQSimFactory();
 			final QSim qsim = factory.createMobsim( sc , events );
 			try {
 				qsim.run();

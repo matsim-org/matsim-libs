@@ -40,6 +40,8 @@ import org.matsim.contrib.parking.parkingsearch.routing.WithinDayParkingRouter;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.PrepareForSim;
+import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.core.router.StageActivityTypes;
 
 import com.google.inject.name.Names;
@@ -81,6 +83,19 @@ public class SetupParking {
 				addControlerListenerBinding().to(ParkingListener.class);
 				bind(ParkingRouter.class).to(WithinDayParkingRouter.class);
 				bind(VehicleTeleportationLogic.class).to(VehicleTeleportationToNearbyParking.class);
+			}
+		});
+		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				QSimComponents components = new QSimComponents();
+				
+				new StandardQSimComponentsConfigurator(controler.getConfig()).configure(components);
+				components.activeAgentSources.clear();
+				components.activeAgentSources.add("ParkingSearchAgentSource");
+				
+				bind(QSimComponents.class).toInstance(components);
 			}
 		});
 

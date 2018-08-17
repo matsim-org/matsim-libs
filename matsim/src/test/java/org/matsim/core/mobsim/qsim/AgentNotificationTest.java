@@ -1,6 +1,16 @@
 package org.matsim.core.mobsim.qsim;
 
-import com.google.inject.AbstractModule;
+import static org.hamcrest.CoreMatchers.both;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeThat;
+
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
@@ -13,13 +23,19 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -30,22 +46,11 @@ import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
-
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assume.assumeThat;
 
 
 public class AgentNotificationTest {
@@ -234,34 +239,29 @@ public class AgentNotificationTest {
 	@Test
 	public void testAgentNotification() {
 		Scenario scenario = createSimpleScenario();
-		final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
-		plugins.add(new MessageQueuePlugin(scenario.getConfig()));
-		plugins.add(new ActivityEnginePlugin(scenario.getConfig()));
-		plugins.add(new TeleportationPlugin(scenario.getConfig()));
-		plugins.add(new AbstractQSimPlugin(scenario.getConfig()) {
-			@Override
-			public Collection<? extends AbstractModule> modules() {
-				return Collections.singletonList(new AbstractModule() {
-					@Override
-					public void configure() {
-						bind(PopulationAgentSource.class).asEagerSingleton();
-						bind(AgentFactory.class).to(MyAgentFactory.class).asEagerSingleton();
-					}
-				});
-			}
-
-			@Override
-			public Collection<Class<? extends AgentSource>> agentSources() {
-				return Collections.singletonList(PopulationAgentSource.class);
-			}
-		});
+		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsCollector handler = new EventsCollector();
 		eventsManager.addHandler(handler);
 		
-		QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins);
-
-		qSim.run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.removeModule(PopulationModule.class) //
+			.addQSimModule(new AbstractQSimModule() {
+				@Override
+				protected void configureQSim() {
+					bind(PopulationAgentSource.class).asEagerSingleton();
+					bindAgentSource(PopulationModule.POPULATION_AGENT_SOURCE_NAME).to(PopulationAgentSource.class);
+					bind(AgentFactory.class).to(MyAgentFactory.class).asEagerSingleton();
+				}
+			})
+			.configureComponents(components -> {
+				components.activeMobsimEngines.remove("NetsimEngine");
+				components.activeDepartureHandlers.remove("NetsimEngine");
+			}) //
+			.build(scenario, eventsManager) //
+			.run();
+		
 		// yyyyyy I can comment out the above line and the test still passes (will say: "skipped"). ?????? kai, feb'16
 		
 		assumeThat(handler.getEvents(), hasItem(
