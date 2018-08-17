@@ -29,7 +29,9 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
 
 	public static final String GROUP_NAME = "global";
+
 	private boolean insistingOnDeprecatedConfigVersion = true ;
+	// yyyy this should be set to false eventually.  kai, aug'18
 	
 	public GlobalConfigGroup() {
 		super(GROUP_NAME);

@@ -68,7 +68,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 	 */
 	private final Verbosity verbosity;
 	
-	private static final Set<String> commentsAlreadyWritten = new HashSet<>() ;
+	private final Set<String> commentsAlreadyWritten = new HashSet<>() ;
 	
 	ConfigWriterHandlerImplV2( Verbosity verbosity ) {
 		this.verbosity = verbosity ;
@@ -199,8 +199,9 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 				writeHeader(writer, indent, moduleTag, moduleNameAtt, moduleName, newline);
 			}
 
-			if (comments.get(entry.getKey()) != null && !commentsAlreadyWritten.contains( entry.getKey() )) {
-				commentsAlreadyWritten.add( entry.getKey() ) ;
+			String key = entry.getKey() + "." + moduleName ;
+			if (comments.get( entry.getKey() ) != null && !commentsAlreadyWritten.contains( key )) {
+				commentsAlreadyWritten.add( key ) ;
 
 //					writer.write( this.newline );
 				writer.write( indent );

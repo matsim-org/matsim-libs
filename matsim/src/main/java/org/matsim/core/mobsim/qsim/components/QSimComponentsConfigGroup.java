@@ -10,6 +10,11 @@ import java.util.stream.Collectors;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
+import org.matsim.core.mobsim.qsim.ActivityEngineModule;
+import org.matsim.core.mobsim.qsim.PopulationModule;
+import org.matsim.core.mobsim.qsim.TeleportationModule;
+import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueueModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 
 public class QSimComponentsConfigGroup extends ConfigGroup {
 	public static final String GROUP_NAME = "qsim_components";
@@ -18,22 +23,27 @@ public class QSimComponentsConfigGroup extends ConfigGroup {
 	public static final String ACTIVE_ACTIVITY_HANDLERS = "activeActivityHandlers";
 	public static final String ACTIVE_DEPATURE_HANDLERS = "activeDepartureHandlers";
 	public static final String ACTIVE_AGENT_SOURCES = "activeAgentSources";
+	public static final String ACTIVE_MOBSIM_LISTENERS = "activeMobsimListeners";
 
-	public final static List<String> DEFAULT_MOBSIM_ENGINES = Arrays.asList("ActivityEngine", "NetsimEngine",
-			"TeleportationEngine");
+	public final static List<String> DEFAULT_MOBSIM_ENGINES = Arrays.asList(ActivityEngineModule.ACTIVITY_ENGINE_NAME,
+			QNetsimEngineModule.NETSIM_ENGINE_NAME, TeleportationModule.TELEPORATION_ENGINE_NAME);
 
-	public final static List<String> DEFAULT_ACTIVITY_HANDLERS = Arrays.asList("ActivityEngine");
+	public final static List<String> DEFAULT_ACTIVITY_HANDLERS = Arrays
+			.asList(ActivityEngineModule.ACTIVITY_ENGINE_NAME);
 
-	public final static List<String> DEFAULT_DEPARTURE_HANDLERS = Arrays.asList("NetsimEngine" // ,
-																								// "TeleportationEngine"
-	);
+	public final static List<String> DEFAULT_DEPARTURE_HANDLERS = Arrays.asList(QNetsimEngineModule.NETSIM_ENGINE_NAME);
 
-	public final static List<String> DEFAULT_AGENT_SOURCES = Arrays.asList("PopulationAgentSource");
+	public final static List<String> DEFAULT_AGENT_SOURCES = Arrays
+			.asList(PopulationModule.POPULATION_AGENT_SOURCE_NAME);
+
+	public final static List<String> DEFAULT_MOBSIM_LISTENERS = Arrays
+			.asList(MessageQueueModule.MESSAGE_QUEUE_ENGINE_NAME);
 
 	private List<String> activeMobsimEngines = new LinkedList<>(DEFAULT_MOBSIM_ENGINES);
 	private List<String> activeActivityHandlers = new LinkedList<>(DEFAULT_ACTIVITY_HANDLERS);
 	private List<String> activeDepartureHandlers = new LinkedList<>(DEFAULT_DEPARTURE_HANDLERS);
 	private List<String> activeAgentSources = new LinkedList<>(DEFAULT_AGENT_SOURCES);
+	private List<String> activeMobsimListeners = new LinkedList<>(DEFAULT_MOBSIM_LISTENERS);
 
 	public QSimComponentsConfigGroup() {
 		super(GROUP_NAME);
@@ -55,6 +65,9 @@ public class QSimComponentsConfigGroup extends ConfigGroup {
 		map.put(ACTIVE_AGENT_SOURCES,
 				"Defines which AgentSources are active and in which order they are registered. Depending on which extensions and contribs you use, it may be necessary to define additional components here.  Default is: "
 						+ String.join(", ", DEFAULT_AGENT_SOURCES));
+		map.put(ACTIVE_MOBSIM_LISTENERS,
+				"Defines which MobsimListeners are active and in which order they are registered. Depending on which extensions and contribs you use, it may be necessary to define additional components here.  Default is: "
+						+ String.join(", ", DEFAULT_MOBSIM_LISTENERS));
 
 		return map;
 	}
@@ -129,6 +142,24 @@ public class QSimComponentsConfigGroup extends ConfigGroup {
 	@StringSetter(ACTIVE_AGENT_SOURCES)
 	public void setActiveAgentSourcesAsString(String activeAgentSources) {
 		this.activeAgentSources = interpretQSimComponents(this.activeAgentSources, activeAgentSources);
+	}
+
+	public List<String> getActiveMobsimListeners() {
+		return activeMobsimListeners;
+	}
+
+	public void setActiveMobsimListeners(List<String> activeMobsimListeners) {
+		this.activeMobsimListeners = activeMobsimListeners;
+	}
+
+	@StringGetter(ACTIVE_MOBSIM_LISTENERS)
+	public String getActiveMobsimListenersAsString() {
+		return String.join(", ", activeMobsimListeners);
+	}
+
+	@StringSetter(ACTIVE_MOBSIM_LISTENERS)
+	public void setActiveMobsimListenersAsString(String activeMobsimListeners) {
+		this.activeMobsimListeners = interpretQSimComponents(this.activeMobsimListeners, activeMobsimListeners);
 	}
 
 	private List<String> interpretQSimComponents(List<String> initial, String config) {

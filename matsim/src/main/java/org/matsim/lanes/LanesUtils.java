@@ -242,4 +242,13 @@ public final class LanesUtils {
 		LanesWriter writerDelegate = new LanesWriter(lanes);
 		writerDelegate.write(lanes20OutputFilename);
 	}
+	
+	public static void overwriteLaneCapacitiesByNetworkCapacities(Network net, Lanes lanes) {
+		for (LanesToLinkAssignment linkLanes : lanes.getLanesToLinkAssignments().values()) {
+			double linkCap = net.getLinks().get(linkLanes.getLinkId()).getCapacity();
+			for (Lane lane : linkLanes.getLanes().values()) {
+				lane.setCapacityVehiclesPerHour(linkCap);
+			}
+		}
+	}
 }

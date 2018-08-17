@@ -1,8 +1,7 @@
 package org.matsim.contrib.dvrp.run;
 
-import org.matsim.contrib.dvrp.passenger.PassengerEnginePlugin;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourcePlugin;
-import org.matsim.contrib.dynagent.run.DynAgentQSimComponentsConfigurator;
+import org.matsim.contrib.dvrp.passenger.PassengerEngineModule;
+import org.matsim.contrib.dynagent.run.DynQSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.components.QSimComponents;
 
 public class DvrpQSimComponentsConfigurator {
@@ -17,13 +16,11 @@ public class DvrpQSimComponentsConfigurator {
 	}
 
 	public void configure(QSimComponents components) {
-		new DynAgentQSimComponentsConfigurator().configure(components);
+		new DynQSimComponentsConfigurator().configure(components);
 
 		if (addPassengerEngine) {
-			components.activeMobsimEngines.add(PassengerEnginePlugin.PASSENGER_ENGINE_NAME);
-			components.activeDepartureHandlers.add(PassengerEnginePlugin.PASSENGER_ENGINE_NAME);
+			components.activeMobsimEngines.add(PassengerEngineModule.PASSENGER_ENGINE_NAME);
+			components.activeDepartureHandlers.add(PassengerEngineModule.PASSENGER_ENGINE_NAME);
 		}
-
-		components.activeAgentSources.add(VrpAgentSourcePlugin.VRP_AGENT_SOURCE_NAME);
 	}
 }

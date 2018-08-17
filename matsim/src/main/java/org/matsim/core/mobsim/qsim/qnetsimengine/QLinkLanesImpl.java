@@ -351,13 +351,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			if (nextQueue != null) {
 				if (nextQueue.isAcceptingFromUpstream()) {
 					((QueueWithBuffer) qlane).popFirstVehicle();
-//					context .getEventsManager() .processEvent(
-//									new LaneLeaveEvent(now, veh.getId(), this.getLink()
-//											.getId(), ((QueueWithBuffer) qlane).getId()));
 					nextQueue.addFromUpstream(veh);
-//					context .getEventsManager() .processEvent(
-//									new LaneEnterEvent(now, veh.getId(), this.getLink()
-//											.getId(), ((QueueWithBuffer) nextQueue).getId()));
 				} else {
 					break;
 				}

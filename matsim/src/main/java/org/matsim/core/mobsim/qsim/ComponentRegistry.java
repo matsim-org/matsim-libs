@@ -7,10 +7,12 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
+import com.google.inject.Key;
+
 public class ComponentRegistry<T> {
 	private final static Logger log = Logger.getLogger(ComponentRegistry.class);
 
-	private final Map<String, Class<? extends T>> components = new HashMap<>();
+	private final Map<String, Key<? extends T>> components = new HashMap<>();
 	private final String componentTypeDescription;
 
 	public ComponentRegistry(String componentTypeDescription) {
@@ -18,6 +20,10 @@ public class ComponentRegistry<T> {
 	}
 
 	public void register(String name, Class<? extends T> component) {
+		register(name, Key.get(component));
+	}
+
+	public void register(String name, Key<? extends T> component) {
 		if (components.containsKey(name)) {
 			throw new IllegalArgumentException(
 					String.format("A %s with name '%s' is already registered", componentTypeDescription, name));
@@ -28,7 +34,7 @@ public class ComponentRegistry<T> {
 		log.info(String.format("Registered %s with name '%s' to %s", componentTypeDescription, name, component));
 	}
 
-	public Class<? extends T> getComponent(String name) {
+	public Key<? extends T> getComponent(String name) {
 		if (components.containsKey(name)) {
 			return components.get(name);
 		} else {
@@ -37,7 +43,7 @@ public class ComponentRegistry<T> {
 		}
 	}
 
-	public List<Class<? extends T>> getOrderedComponents(List<String> ordering) {
+	public List<Key<? extends T>> getOrderedComponents(List<String> ordering) {
 		return ordering.stream().map(this::getComponent).collect(Collectors.toList());
 	}
 }

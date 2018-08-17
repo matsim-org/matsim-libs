@@ -54,7 +54,7 @@ public class MATSim4UrbanSimParcelIT {
 	public void test() {
 		String path = utils.getOutputDirectory() ;
 		
-		CreateTestUrbansimPopulation.createUrbanSimTestPopulation(path, 1) ;
+		CreateUrbansimPopulation.createUrbanSimTestPopulation(path, 1) ;
 		
 		NetworkWriter writer = new NetworkWriter( CreateTestNetwork.createTestNetwork() ) ;
 		final String networkFilename = path + "/network.xml.gz";

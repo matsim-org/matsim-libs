@@ -547,9 +547,15 @@ public final class Config implements MatsimExtensionPoint {
 	private void checkIfLocked() {
 		if ( this.isLocked() ) {
 			log.error("too late in execution sequence to set config items. Use");
-			log.error("Config config = ConfigUtils.loadConfig(filename); ");
-			log.error("config.xxx().setYyy(...); ");
-			log.error("Controler ctrl = new Controler( config );");
+			log.error("   Config config = ConfigUtils.loadConfig(filename); ");
+			log.error("   config.xxx().setYyy(...); ");
+			log.error("   Controler ctrl = new Controler( config );");
+			log.error("or") ;
+			log.error("   Config config = ConfigUtils.loadConfig(filename); ");
+			log.error("   config.xxx().setYyy(...); ");
+			log.error("   Scenario scenario = ScenarioUtils.loadScenario(config);") ;
+			log.error("   // do something with scenario") ;
+			log.error("   Controler ctrl = new Controler( scenario );");
 			log.error("This will be changed to an abortive error in the future."); // kai, feb'13
 		}
 	}

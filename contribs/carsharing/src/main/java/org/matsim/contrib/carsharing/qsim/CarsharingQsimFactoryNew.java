@@ -8,9 +8,8 @@ import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.PopulationPlugin;
+import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
-import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 
 import com.google.inject.Provider;
 
@@ -30,11 +29,9 @@ public class CarsharingQsimFactoryNew implements Provider<Mobsim>{
 	public Mobsim get() {
 		return new QSimBuilder(config) //
 				.useDefaults() //
-				.removePlugin(PopulationPlugin.class) //
-				.addPlugin(new CarSharingQSimPlugin(config, carsharingSupply, carsharingManager)) //
-				.configureComponents(components -> {
-					components.activeAgentSources.add(CarSharingQSimPlugin.CARSHARING_PARKING_VEHICLES_SOURCE);
-				}) //
+				.removeModule(PopulationModule.class) //
+				.addQSimModule(new CarSharingQSimModule(carsharingSupply, carsharingManager)) //
+				.configureComponents(CarSharingQSimModule::configureComponents) //
 				.build(scenario, eventsManager);
 	}
 

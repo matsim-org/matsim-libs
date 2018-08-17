@@ -72,11 +72,17 @@ import java.util.Stack;
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (MODULE.equals(name)) {
+			
 			if (GlobalConfigGroup.GROUP_NAME.equals(name) ) {
 				if (!config.global().isInsistingOnDeprecatedConfigVersion()) {
 					throw new RuntimeException(msg);
 				}
 			}
+			// the idea here was to wait until the global config group is read because only then we can
+			// decide if the user is insisting on it.  However, this clearly does not work in full since the condition
+			// will never be triggered when the global config group is not used at all in the file.
+			// :-( kai, aug'18
+			
 			this.currmodule = null;
 		}
 	}

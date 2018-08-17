@@ -21,7 +21,9 @@ package org.matsim.contrib.emissions.example;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.example.archive.RunEmissionToolOnlineExample;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
 /**
@@ -37,12 +39,17 @@ public class RunEmissionToolOnlineExampleIT {
 	@Test
 	public final void testMain() {
 		try {
-			RunEmissionToolOnlineExampleV2 tool = new RunEmissionToolOnlineExampleV2(null) ;
+			Config config = RunEmissionToolOnlineExampleV2.prepareConfig( null ) ;
 
-			tool.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 			// otherwise the test fails on jenkins
+			
+			config.controler().setLastIteration( 1 );
+			
+			Scenario scenario = RunEmissionToolOnlineExampleV2.prepareScenario( config ) ;
+			
+			RunEmissionToolOnlineExampleV2.run( scenario ) ;
 
-			tool.run();
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
 			fail("something did not work" ) ;
