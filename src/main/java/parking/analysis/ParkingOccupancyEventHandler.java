@@ -105,7 +105,7 @@ public class ParkingOccupancyEventHandler implements PersonDepartureEventHandler
 			if (lastAct.equals("car interaction")) {
 				ParkingZone zone = parkingInfo.getParkingZone(network.getLinks().get(event.getLinkId()));
 				if (zone != null) {
-					this.zoneoccupancyPerBin.get(zone.getId())[getBin(event.getTime())]++;
+					this.zoneoccupancyPerBin.get(zone.getId())[getBin(event.getTime())]--;
 				}
 			}
 		} else if (event.getLegMode().equals(TransportMode.egress_walk)) {
@@ -113,7 +113,7 @@ public class ParkingOccupancyEventHandler implements PersonDepartureEventHandler
 			if (lastAct.equals("car interaction")) {
 				ParkingZone zone = parkingInfo.getParkingZone(network.getLinks().get(event.getLinkId()));
 				if (zone != null) {
-					this.zoneoccupancyPerBin.get(zone.getId())[getBin(event.getTime())]--;
+					this.zoneoccupancyPerBin.get(zone.getId())[getBin(event.getTime())]++;
 				}
 
 			}
