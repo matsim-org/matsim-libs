@@ -37,10 +37,12 @@ import java.util.Set;
  * @author meisterk
  *
  */
+@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
 public class CharyparNagelOpenTimesActivityScoring extends CharyparNagelActivityScoring {
 
 	private final ActivityFacilities facilities;
-
+	
+	@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
 	public CharyparNagelOpenTimesActivityScoring(final ScoringParameters params, final ActivityFacilities facilities) {
 		super(params);
 		this.facilities = facilities;
