@@ -22,6 +22,7 @@ package org.matsim.deprecated.scoring.functions;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
@@ -34,8 +35,10 @@ import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ActivityScoring;
  * @author rashid_waraich
  */
 @Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
-public class CharyparNagelActivityScoring implements ActivityScoring {
+public class CharyparNagelActivityScoring implements ActivityScoring, SumScoringFunction.ActivityScoring {
 	// yy should be final.  kai, oct'14
+	// yyyy "implements SumScoringFunction.ActivityScoring" is needed somewhere in location choice ... where this
+	// really should be changed to delegation.  kai, aug'18
 
 	protected double score;
 	private double currentActivityStartTime;
@@ -327,26 +330,26 @@ public class CharyparNagelActivityScoring implements ActivityScoring {
 		this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
 	}
 
-//	@Override
-//	public void handleFirstActivity(Activity act) {
-//		assert act != null;
-//		this.firstActivityEndTime = act.getEndTime();
-//		this.firstActivity = act;
-//		this.firstAct = false;
-//
-//	}
-//
-//	@Override
-//	public void handleActivity(Activity act) {
-//		this.score += calcActScore(act.getStartTime(), act.getEndTime(), act);
-//	}
-//
-//	@Override
-//	public void handleLastActivity(Activity act) {
-//		this.currentActivityStartTime = act.getStartTime();
-//		this.handleOvernightActivity(act);
-//		this.firstActivity = null;
-//	}
+	@Override
+	public void handleFirstActivity(Activity act) {
+		assert act != null;
+		this.firstActivityEndTime = act.getEndTime();
+		this.firstActivity = act;
+		this.firstAct = false;
+
+	}
+
+	@Override
+	public void handleActivity(Activity act) {
+		this.score += calcActScore(act.getStartTime(), act.getEndTime(), act);
+	}
+
+	@Override
+	public void handleLastActivity(Activity act) {
+		this.currentActivityStartTime = act.getStartTime();
+		this.handleOvernightActivity(act);
+		this.firstActivity = null;
+	}
 
 }
 
