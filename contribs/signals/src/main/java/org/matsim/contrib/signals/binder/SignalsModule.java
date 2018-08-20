@@ -30,7 +30,6 @@ import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalModelFactoryImpl;
-import org.matsim.contrib.signals.builder.SignalSystemsModelBuilder;
 import org.matsim.contrib.signals.controller.SignalControllerFactory;
 import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.controller.laemmerFix.LaemmerSignalController;
@@ -45,9 +44,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QSignalsNetworkFactory;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
-import org.matsim.core.replanning.ReplanningContext;
 
-import com.google.inject.Provides;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
 
@@ -90,7 +87,7 @@ public class SignalsModule extends AbstractModule {
 			}
 			
 			// general signal bindings
-			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
+			bind(SignalSystemsManager.class).toProvider(FromDataBuilder.class);
 			addMobsimListenerBinding().to(QSimSignalEngine.class);
 			bind(QNetworkFactory.class).to(QSignalsNetworkFactory.class);
 
@@ -107,13 +104,6 @@ public class SignalsModule extends AbstractModule {
 			//michalm, jan'17
 			bind(NetworkTurnInfoBuilderI.class).to(NetworkWithSignalsTurnInfoBuilder.class);
 		}
-	}
-
-	@Provides
-	SignalSystemsManager provideSignalSystemsManager(ReplanningContext replanningContext, SignalSystemsModelBuilder modelBuilder) {
-		SignalSystemsManager signalSystemsManager = modelBuilder.createAndInitializeSignalSystemsManager();
-		signalSystemsManager.resetModel(replanningContext.getIteration());
-		return signalSystemsManager;
 	}
 	
 	/**
