@@ -508,16 +508,8 @@ public class MatsimJspritFactory {
 					fromCoordinate = fromLink.getCoord();
 					toCoordinate = toLink.getCoord();
 					vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
-				} else if (fromLink != null && toLink == null) { 	//Pickup to be delivered from specified location to depot TODO: Use Pickup also in MATSim freight contrib?? kmt aug/18
-					log.debug("Shipment identified as Pickup: " + carrierShipment.getId().toString());
-					fromCoordinate = fromLink.getCoord();
-					vrpBuilder.addJob(createPickup(carrierShipment, fromCoordinate));
-				} else if (fromLink == null && toLink != null) { 	//Delivery to be delivered from depot to specified location TODO: Use Delivery also in MATSim freight contrib?? kmt aug/18
-					log.debug("Shipment identified as Delivery: " + carrierShipment.getId().toString());
-					toCoordinate = toLink.getCoord();
-					vrpBuilder.addJob(createDelivery(carrierShipment, toCoordinate));
-				} else 
-					throw new IllegalStateException("cannot create shipment " + carrierShipment.getId().toString() + " since neither fromLinkId " + carrierShipment.getTo() + " nor toLinkId " + carrierShipment.getTo() + " exists in network.");
+				}  else 
+					throw new IllegalStateException("cannot create shipment " + carrierShipment.getId().toString() + " since either fromLinkId " + carrierShipment.getTo() + " or toLinkId " + carrierShipment.getTo() + " exists in network.");
 					
 			}
 			vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
