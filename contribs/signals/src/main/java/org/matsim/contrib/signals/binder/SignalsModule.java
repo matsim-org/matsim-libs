@@ -85,6 +85,11 @@ public class SignalsModule extends AbstractModule {
 			for (Class<? extends SignalControllerFactory> signalControllerFactoryClassName : signalControllerFactoryClassNames) {
 				addSignalControllerFactoryBinding().to(signalControllerFactoryClassName);
 			}
+//			// bind default signal controller
+//			binder().bind(SignalControllerFactory.class).annotatedWith(Names.named(DefaultPlanbasedSignalSystemController.IDENTIFIER)).to(DefaultPlanbasedSignalSystemController.FixedTimeFactory.class);
+//			binder().bind(SignalControllerFactory.class).annotatedWith(Names.named(SylviaSignalController.IDENTIFIER)).to(SylviaSignalController.SylviaFactory.class);
+//			binder().bind(SignalControllerFactory.class).annotatedWith(Names.named(LaemmerSignalController.IDENTIFIER)).to(LaemmerSignalController.LaemmerFactory.class);
+
 			
 			// general signal bindings
 			bind(SignalSystemsManager.class).toProvider(FromDataBuilder.class);

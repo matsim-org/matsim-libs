@@ -47,6 +47,9 @@ public final class SignalModelFactoryImpl implements SignalModelFactory {
 	
 	private static final Logger log = Logger.getLogger(SignalModelFactoryImpl.class);
 	
+//	@Inject
+//	Map<String, SignalControllerFactory> signalControllerFactories;
+	
 	private final Map<String, SignalControllerFactory> signalControllerFactories = new HashMap<>();
 	
 	@Inject
