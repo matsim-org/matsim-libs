@@ -483,6 +483,7 @@ public class MatsimJspritFactory {
 		}
 		
 		for(CarrierService service : carrier.getServices()){
+			log.debug("Handle CarrierService: " + service.toString());
 			Coord coordinate = null;
 			if(network != null){
 				Link link = network.getLinks().get(service.getLocationLinkId());
@@ -496,7 +497,7 @@ public class MatsimJspritFactory {
 		
 		
 		for(CarrierShipment carrierShipment : carrier.getShipments()) {
-//			log.debug("Handle CarrierShipment: " + carrierShipment.toString());
+			log.debug("Handle CarrierShipment: " + carrierShipment.toString());
 			Coord fromCoordinate = null;
 			Coord toCoordinate = null;
 			if(network != null){
@@ -507,7 +508,6 @@ public class MatsimJspritFactory {
 					log.debug("Shipment identified as Shipment: " + carrierShipment.getId().toString());
 					fromCoordinate = fromLink.getCoord();
 					toCoordinate = toLink.getCoord();
-					vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
 				}  else 
 					throw new IllegalStateException("cannot create shipment " + carrierShipment.getId().toString() + " since either fromLinkId " + carrierShipment.getTo() + " or toLinkId " + carrierShipment.getTo() + " exists in network.");
 					
