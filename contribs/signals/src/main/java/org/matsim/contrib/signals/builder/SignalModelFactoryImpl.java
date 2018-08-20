@@ -47,17 +47,7 @@ public final class SignalModelFactoryImpl implements SignalModelFactory {
 	
 	private static final Logger log = Logger.getLogger(SignalModelFactoryImpl.class);
 	
-//	@Inject
-//	Map<String, SignalControllerFactory> signalControllerFactories;
-	
-	private final Map<String, SignalControllerFactory> signalControllerFactories = new HashMap<>();
-	
-	@Inject
-	public SignalModelFactoryImpl(Scenario scenario, Set<SignalControllerFactory> signalControllerFactoriesDeclaredByModules) {
-		for (SignalControllerFactory signalControllerFactory : signalControllerFactoriesDeclaredByModules) {
-			signalControllerFactories.put(signalControllerFactory.getIdentifier(), signalControllerFactory);
-		}
-	}
+	@Inject private final Map<String, SignalControllerFactory> signalControllerFactoriesDeclaredByModules = new HashMap<>();
 	
 	@Override
 	public SignalSystem createSignalSystem(Id<SignalSystem> id) {
@@ -66,9 +56,9 @@ public final class SignalModelFactoryImpl implements SignalModelFactory {
 
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
-		if (signalControllerFactories.containsKey(controllerIdentifier)) {
+		if (signalControllerFactoriesDeclaredByModules.containsKey(controllerIdentifier)) {
 			log.info("Creating " + controllerIdentifier);
-			return signalControllerFactories.get(controllerIdentifier).createSignalSystemController(signalSystem);
+			return signalControllerFactoriesDeclaredByModules.get(controllerIdentifier).createSignalSystemController(signalSystem);
 		}
 		throw new RuntimeException("Signal controller " + controllerIdentifier + " not specified. "
 				+ "Add a respective factory to the SignalsModule by calling the method addSignalControllerFactory.");

@@ -22,8 +22,8 @@
 
 package org.matsim.contrib.signals.binder;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
@@ -45,35 +45,36 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QSignalsNetworkFactory;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 
+import com.google.inject.TypeLiteral;
 import com.google.inject.binder.LinkedBindingBuilder;
-import com.google.inject.multibindings.Multibinder;
+import com.google.inject.multibindings.MapBinder;
 
 /**
  * Add this module if you want to simulate signals. It does not work without
- * signals. By default, it works with signal implementations of fixed-time
- * signals, traffic-actuated signals called SYLVIA and traffic-adaptive signals
- * based on Laemmer. If you want to add other signal controllers, you can add a
- * respective factory by calling the method addSignalControllerFactory. It is
- * also possible to use different control schemes in one scenario at different
- * intersections (i.e. signal systems).
+ * signals. By default, it works with without signals and with signal
+ * implementations of fixed-time signals, traffic-actuated signals called SYLVIA
+ * and traffic-adaptive signals based on Laemmer. If you want to add other
+ * signal controllers, you can add a respective factory by calling the method
+ * addSignalControllerFactory. It is also possible to use different control
+ * schemes in one scenario at different intersections (i.e. signal systems).
  * 
  * @author tthunig
  */
 public class SignalsModule extends AbstractModule {
 	
-	private Multibinder<SignalControllerFactory> signalControllerFactoryMultibinder;
-	private Set<Class<? extends SignalControllerFactory>> signalControllerFactoryClassNames = new HashSet<>();
-	
+	private MapBinder<String, SignalControllerFactory> signalControllerFactoryMultibinder;
+	private Map<String, Class<? extends SignalControllerFactory>> signalControllerFactoryClassNames = new HashMap<>();
+//	
 	public SignalsModule() {
-		// specify default signal controller. you can add your own by calling addSignalControlProvider (see method java-doc below)
-		signalControllerFactoryClassNames.add(DefaultPlanbasedSignalSystemController.FixedTimeFactory.class);
-		signalControllerFactoryClassNames.add(SylviaSignalController.SylviaFactory.class);
-		signalControllerFactoryClassNames.add(LaemmerSignalController.LaemmerFactory.class);
+		// specify default signal controller. you can add your own by calling addSignalControllerFactory (see method java-doc below)
+		signalControllerFactoryClassNames.put(DefaultPlanbasedSignalSystemController.IDENTIFIER, DefaultPlanbasedSignalSystemController.FixedTimeFactory.class);
+		signalControllerFactoryClassNames.put(SylviaSignalController.IDENTIFIER, SylviaSignalController.SylviaFactory.class);
+		signalControllerFactoryClassNames.put(LaemmerSignalController.IDENTIFIER, LaemmerSignalController.LaemmerFactory.class);
 	}
 	
 	@Override
 	public void install() {
-		this.signalControllerFactoryMultibinder = Multibinder.newSetBinder(this.binder(), SignalControllerFactory.class);
+		this.signalControllerFactoryMultibinder = MapBinder.newMapBinder(binder(), new TypeLiteral<String>() {}, new TypeLiteral<SignalControllerFactory>() {});
 		
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			// bindings for sensor-based signals (also works for fixed-time signals)
@@ -81,15 +82,13 @@ public class SignalsModule extends AbstractModule {
 			addControlerListenerBinding().to(SensorBasedSignalControlerListener.class);
 			bind(LinkSensorManager.class).asEagerSingleton();
 			bind(DownstreamSensor.class).asEagerSingleton();
-			// bind factory for all specified signal controller
-			for (Class<? extends SignalControllerFactory> signalControllerFactoryClassName : signalControllerFactoryClassNames) {
-				addSignalControllerFactoryBinding().to(signalControllerFactoryClassName);
+//			// bind factory for all specified signal controller
+			for (String identifier : signalControllerFactoryClassNames.keySet()) {
+				/* note: This cannot be called before (e.g. in the constructor or from outside),
+				 * as the binder in AbstractModule that is needed here is only created in method
+				 * configure()... theresa, aug'18 */
+				signalControllerFactoryMultibinder.addBinding(identifier).to(signalControllerFactoryClassNames.get(identifier));
 			}
-//			// bind default signal controller
-//			binder().bind(SignalControllerFactory.class).annotatedWith(Names.named(DefaultPlanbasedSignalSystemController.IDENTIFIER)).to(DefaultPlanbasedSignalSystemController.FixedTimeFactory.class);
-//			binder().bind(SignalControllerFactory.class).annotatedWith(Names.named(SylviaSignalController.IDENTIFIER)).to(SylviaSignalController.SylviaFactory.class);
-//			binder().bind(SignalControllerFactory.class).annotatedWith(Names.named(LaemmerSignalController.IDENTIFIER)).to(LaemmerSignalController.LaemmerFactory.class);
-
 			
 			// general signal bindings
 			bind(SignalSystemsManager.class).toProvider(FromDataBuilder.class);
@@ -116,14 +115,7 @@ public class SignalsModule extends AbstractModule {
 	 * 
 	 * @param signalControllerFactoryClassName
 	 */
-	public final void addSignalControllerFactory(Class<? extends SignalControllerFactory> signalControllerFactoryClassName) {
-		this.signalControllerFactoryClassNames.add(signalControllerFactoryClassName);
-	}
-	
-	// note: This cannot be called from outside, as the binder in AbstractModule
-	// that is needed here is only created in method configure() that is final...
-	// that is why method addSignalControllerFactory (above) is necessary
-	private final LinkedBindingBuilder<SignalControllerFactory> addSignalControllerFactoryBinding() {
-		return signalControllerFactoryMultibinder.addBinding();
+	public final void addSignalControllerFactory(String key, Class<? extends SignalControllerFactory> signalControllerFactoryClassName) {
+		this.signalControllerFactoryClassNames.put(key, signalControllerFactoryClassName);
 	}
 }
