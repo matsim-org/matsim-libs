@@ -79,8 +79,10 @@ public class RunAdaptiveSignalsExample {
 			/*
 			 * The signals module binds everything that is necessary for the simulation with
 			 * signals. If you like to use your own signal controller you can add it to the
-			 * signals module by the method addSignalControllerFactory, e.g. like this:
-			 * signalsModule.addSignalControllerFactory().to(LaemmerSignalController.LaemmerFactory.class)
+			 * signals module by calling the method addSignalControllerFactory, e.g. like
+			 * this:
+			 * signalsModule.addSignalControllerFactory(LaemmerSignalController.IDENTIFIER,
+			 * LaemmerSignalController.LaemmerFactory.class);
 			 */
 		}
 		
