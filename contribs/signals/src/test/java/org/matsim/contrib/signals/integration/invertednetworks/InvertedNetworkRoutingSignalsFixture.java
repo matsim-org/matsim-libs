@@ -22,7 +22,6 @@ package org.matsim.contrib.signals.integration.invertednetworks;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.data.SignalsDataImpl;
-import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
@@ -43,6 +42,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.integration.invertednetworks.InvertedNetworkRoutingTestFixture;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
 
 /**
  * @author dgrether
@@ -55,13 +55,13 @@ public class InvertedNetworkRoutingSignalsFixture extends InvertedNetworkRouting
 		super(doCreateModes, doCreateLanes, doCreateSignals);
 		if (doCreateSignals){
 		    scenario.getConfig().qsim().setUsingFastCapacityUpdate(false);
-			ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
+			ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 			createSignals();
 		}
 	}
 	
 	private void createSignals() {
-		SignalsData signalsData = new SignalsDataImpl(ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
+		SignalsData signalsData = new SignalsDataImpl(ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class));
 		this.scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
 		SignalSystemsData ssd = signalsData.getSignalSystemsData();
 		SignalSystemsDataFactory f = ssd.getFactory();

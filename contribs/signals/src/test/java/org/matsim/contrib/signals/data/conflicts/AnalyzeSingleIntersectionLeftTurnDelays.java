@@ -41,7 +41,7 @@ import com.google.inject.Inject;
 /**
  * @author tthunig
  */
-public class AnalyzeSingleIntersectionLeftTurnDelays implements LaneEnterEventHandler, LaneLeaveEventHandler, PersonStuckEventHandler {
+class AnalyzeSingleIntersectionLeftTurnDelays implements LaneEnterEventHandler, LaneLeaveEventHandler, PersonStuckEventHandler {
 
 	@Inject
 	private Network network;

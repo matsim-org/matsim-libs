@@ -19,25 +19,36 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.builder;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.signals.controller.SignalController;
+import org.matsim.contrib.signals.controller.SignalControllerFactory;
+import org.matsim.contrib.signals.controller.sylvia.SylviaPreprocessData;
+import org.matsim.contrib.signals.controller.sylvia.SylviaSignalPlan;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.DatabasedSignalPlan;
-import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
-import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemImpl;
 
+import com.google.inject.Inject;
+
 
 /**
  * 
- * @author dgrether
+ * @author tthunig
  */
-public final class DefaultSignalModelFactory implements SignalModelFactory {
+public final class SignalModelFactoryImpl implements SignalModelFactory {
 	
-	private static final Logger log = Logger.getLogger(DefaultSignalModelFactory.class);
-
+	private static final Logger log = Logger.getLogger(SignalModelFactoryImpl.class);
+	
+	@Inject private final Map<String, SignalControllerFactory> signalControllerFactoriesDeclaredByModules = new HashMap<>();
+	
 	@Override
 	public SignalSystem createSignalSystem(Id<SignalSystem> id) {
 		return new SignalSystemImpl(id);
@@ -45,20 +56,20 @@ public final class DefaultSignalModelFactory implements SignalModelFactory {
 
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
-		if (DefaultPlanbasedSignalSystemController.IDENTIFIER.equals(controllerIdentifier)){
-			log.info("Created SignalController: " + DefaultPlanbasedSignalSystemController.IDENTIFIER);
-			DefaultPlanbasedSignalSystemController signalControl = new DefaultPlanbasedSignalSystemController();
-			signalControl.setSignalSystem(signalSystem);
-			return signalControl;
+		if (signalControllerFactoriesDeclaredByModules.containsKey(controllerIdentifier)) {
+			log.info("Creating " + controllerIdentifier);
+			return signalControllerFactoriesDeclaredByModules.get(controllerIdentifier).createSignalSystemController(signalSystem);
 		}
-		//TODO improve error message and consider creation by class name
-		throw new IllegalArgumentException("Controller " + controllerIdentifier + " not known.");
+		throw new RuntimeException("Signal controller " + controllerIdentifier + " not specified. "
+				+ "Add a respective factory to the SignalsModule by calling the method addSignalControllerFactory.");
 	}
 
 	@Override
 	public SignalPlan createSignalPlan(SignalPlanData planData) {
-		return new DatabasedSignalPlan(planData);
+		DatabasedSignalPlan plan = new DatabasedSignalPlan(planData);
+		if (planData.getId().toString().startsWith(SylviaPreprocessData.SYLVIA_PREFIX)) {
+			return new SylviaSignalPlan(plan);
+		}
+		return plan;
 	}
-	
-	
 }
