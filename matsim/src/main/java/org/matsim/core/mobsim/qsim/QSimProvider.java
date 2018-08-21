@@ -25,10 +25,11 @@ package org.matsim.core.mobsim.qsim;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.components.NamedComponentUtils;
@@ -51,12 +52,14 @@ public class QSimProvider implements Provider<QSim> {
 	private Collection<AbstractQSimModule> modules;
 	private List<AbstractQSimModule> overridingModules;
 	private QSimComponents components;
-
+	@Inject(optional=true) private IterationCounter iterationCounter;
+	
 	@Inject
 	QSimProvider(Injector injector, Config config, Collection<AbstractQSimModule> modules,
-			QSimComponents components, @Named("overrides") List<AbstractQSimModule> overridingModules) {
+			QSimComponents components, @Named("overrides") List<AbstractQSimModule> overridingModules ) {
 		this.injector = injector;
 		this.modules = modules;
+		// (these are the implementations)
 		this.config = config;
 		this.components = components;
 		this.overridingModules = overridingModules;
@@ -78,7 +81,10 @@ public class QSimProvider implements Provider<QSim> {
 		};
 
 		Injector qsimInjector = injector.createChildInjector(module);
-		org.matsim.core.controler.Injector.printInjector(qsimInjector, log);
+		if ( iterationCounter==null || config.controler().getFirstIteration() == iterationCounter.getIterationNumber() ) {
+			// trying to somewhat reduce logfile verbosity. kai, aug'18
+			org.matsim.core.controler.Injector.printInjector( qsimInjector, log );
+		}
 		QSim qSim = qsimInjector.getInstance(QSim.class);
 
 		ComponentRegistry<MobsimEngine> mobsimEngineRegistry = new ComponentRegistry<>("MobsimEngine");

@@ -275,7 +275,17 @@ public class TripStructureUtils {
 		}
 		subtours.add( newSubtour );
 	}
-
+	
+	/**
+	 * @param trip
+	 * @return the departure time of the first leg of the trip
+	 */
+	public static double getDepartureTime(Trip trip) {
+		// does this always make sense?
+		Leg leg = (Leg) trip.getTripElements().get(0);
+		return leg.getDepartureTime();
+	}
+	
 	/**
 	 * Represents a trip, that is, the longest sequence of
 	 * {@link PlanElement}s consisting only of legs and "dummy"

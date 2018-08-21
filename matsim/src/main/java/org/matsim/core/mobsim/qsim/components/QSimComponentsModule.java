@@ -10,7 +10,10 @@ public class QSimComponentsModule extends AbstractModule {
 	@Provides
 	@Singleton
 	public QSimComponents provideDefaultQSimComponentsConfiguration(Config config) {
+
+		// container for Strings that determine MobsimEngines, DepartureHandlers, ActivityEngines, AgentSources:
 		QSimComponents components = new QSimComponents();
+		
 		new StandardQSimComponentsConfigurator(config).configure(components);
 		return components;
 	}
