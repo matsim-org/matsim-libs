@@ -81,11 +81,6 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 			controller.setSignalSystem(signalSystem);
 			return controller;
 		}
-
-		@Override
-		public String getIdentifier() {
-			return IDENTIFIER;
-		}
 	}
 
     private LaemmerSignalController(Scenario scenario, LinkSensorManager sensorManager, DownstreamSensor downstreamSensor) {

@@ -61,11 +61,6 @@ public class DefaultPlanbasedSignalSystemController extends AbstractSignalContro
 			controller.setSignalSystem(signalSystem);
 			return controller;
 		}
-
-		@Override
-		public String getIdentifier() {
-			return IDENTIFIER;
-		}
 	}
 	
 	private DefaultPlanbasedSignalSystemController() {

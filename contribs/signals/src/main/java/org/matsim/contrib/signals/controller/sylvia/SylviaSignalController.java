@@ -70,11 +70,6 @@ public final class SylviaSignalController extends AbstractSignalController imple
 			controller.setSignalSystem(signalSystem);
 			return controller;
 		}
-
-		@Override
-		public String getIdentifier() {
-			return IDENTIFIER;
-		}
 	}
 
 	private SylviaSignalPlan activeSylviaPlan = null;

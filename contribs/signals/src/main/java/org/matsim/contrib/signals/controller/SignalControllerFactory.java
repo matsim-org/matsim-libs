@@ -28,6 +28,4 @@ import org.matsim.contrib.signals.model.SignalSystem;
 public interface SignalControllerFactory {
 
 	public SignalController createSignalSystemController(SignalSystem signalSystem);
-	
-	public String getIdentifier();
 }
