@@ -80,7 +80,7 @@ public class CreateIntergreensExample {
 		// read in the existing scenario and add the intergreens data
 		Config config = ConfigUtils.loadConfig(INPUT_DIR + "config.xml");
 		SignalSystemsConfigGroup signalSystemsConfigGroup = 
-				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		signalSystemsConfigGroup.setUseIntergreenTimes(true);
 		SignalsDataLoader signalsDataLoader = new SignalsDataLoader(config);
 		SignalsData signalsData = signalsDataLoader.loadSignalsData();

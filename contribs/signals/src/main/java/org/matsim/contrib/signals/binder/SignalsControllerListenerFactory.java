@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgAbstractSignalController
+ * SignalsControllerListenerFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.model;
+package org.matsim.contrib.signals.binder;
 
-import java.util.HashMap;
-import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
 
 /**
- * 
  * @author dgrether
  *
  */
-public abstract class AbstractSignalController implements SignalController {
+public interface SignalsControllerListenerFactory {
 
-	protected SignalSystem system ;
-	protected Map<Id<SignalPlan>, SignalPlan> signalPlans = new HashMap<>();
-
-	@Override
-	public void addPlan(SignalPlan plan) {
-		this.signalPlans.put(plan.getId(), plan);
-	}
-
-	@Override
-	public void setSignalSystem(SignalSystem signalSystem) {
-		this.system = signalSystem;
-	}
+	public SignalControlerListener createSignalsControllerListener();
+	
 }

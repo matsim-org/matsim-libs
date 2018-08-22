@@ -105,7 +105,7 @@ public class Fixture {
 		conf.qsim().setStuckTime(1000);
 		conf.qsim().setStartTime(0.0);
 		conf.qsim().setUsingFastCapacityUpdate(false);
-		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		signalsConfig.setUseSignalSystems(true);
 		
 		if (useIntergreens) {
@@ -127,7 +127,7 @@ public class Fixture {
 
 	public Scenario createAndLoadTestScenarioTwoSignals(boolean useConflictData) {
 		Config config = createConfigOneSignal(false);
-		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		signalsConfig.setIntersectionLogic(IntersectionLogic.CONFLICTING_DIRECTIONS_NO_TURN_RESTRICTIONS);
 		signalsConfig.setActionOnConflictingDirectionViolation(ActionOnSignalSpecsViolation.EXCEPTION);
 		

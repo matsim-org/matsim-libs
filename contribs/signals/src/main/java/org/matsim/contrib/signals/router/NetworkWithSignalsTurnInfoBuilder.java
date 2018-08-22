@@ -64,7 +64,7 @@ public class NetworkWithSignalsTurnInfoBuilder implements NetworkTurnInfoBuilder
 			Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = delegate.createAllowedTurnInfos();
 
 			final SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(
-					scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME,
+					scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME,
 					SignalSystemsConfigGroup.class);
 
 			if (signalsConfig.isUseSignalSystems()) {
