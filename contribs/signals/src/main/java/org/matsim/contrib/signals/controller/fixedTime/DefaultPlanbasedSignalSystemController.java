@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.model;
+package org.matsim.contrib.signals.controller.fixedTime;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -27,6 +27,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.controller.AbstractSignalController;
+import org.matsim.contrib.signals.controller.SignalController;
+import org.matsim.contrib.signals.controller.SignalControllerFactory;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.SignalSystemImpl;
 
 
 /**
@@ -46,6 +53,19 @@ public class DefaultPlanbasedSignalSystemController extends AbstractSignalContro
 	private LinkedList<SignalPlan> planQueue = null;
 	private SignalPlan activePlan = null;
 	private double nextActivePlanCheckTime;
+	
+	public final static class FixedTimeFactory implements SignalControllerFactory {
+		@Override
+		public SignalController createSignalSystemController(SignalSystem signalSystem) {
+			SignalController controller = new DefaultPlanbasedSignalSystemController();
+			controller.setSignalSystem(signalSystem);
+			return controller;
+		}
+	}
+	
+	private DefaultPlanbasedSignalSystemController() {
+		super();
+	}
 	
 	@Override
 	public void updateState(double timeSeconds) {

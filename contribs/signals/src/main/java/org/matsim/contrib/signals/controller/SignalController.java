@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalsControllerListenerFactory
+ * SignalSystemController
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,16 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.controler;
+package org.matsim.contrib.signals.controller;
 
-
+import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.contrib.signals.model.SignalSystem;
 
 /**
+ * <ul>
+ * 		<li></li>
+ * 		<li></li>
+ * </ul>
  * @author dgrether
- *
  */
-public interface SignalsControllerListenerFactory {
+public interface SignalController {
+	
+	/**
+	 * Is called every timestep to notify that the controller may update the state of the signal groups
+	 * @param timeSeconds
+	 */
+	public void updateState(double timeSeconds);
 
-	public SignalControlerListener createSignalsControllerListener();
+	public void addPlan(SignalPlan plan);
+
+	public void reset(Integer iterationNumber);
+
+	public void simulationInitialized(double simStartTimeSeconds);
+	
+	public void setSignalSystem(SignalSystem signalSystem);
 	
 }

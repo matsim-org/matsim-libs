@@ -20,8 +20,8 @@
 package org.matsim.contrib.signals.builder;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.controller.SignalController;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 
