@@ -18,16 +18,20 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package org.matsim.contrib.signals.run;
+package tutorial.fixedTimeSignals;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.signals.controler.SignalsModule;
+import org.matsim.contrib.signals.binder.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
+import org.matsim.contrib.signals.otfvis.OTFVisWithSignalsLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
  * Minimal example how to start your matsim run with traffic signals
@@ -40,17 +44,28 @@ public class RunSignalSystemsExample {
 	/**
 	 * @param args the path to your config file
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) {		
+		Config config;
 		if (args.length==0 || args.length>1) {
-			throw new RuntimeException("Please provide exactly one argument -- the path to your config.xml file.") ;
+			// --- create a config for the example scenario
+			config = ConfigUtils.loadConfig("./examples/tutorial/example90TrafficLights/useSignalInput/withLanes/config.xml");
+			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			config.controler().setLastIteration(0);
+			config.controler().setOutputDirectory("output/runSignalSystemsExample/");
+		} else {
+			// --- create a config from the arguments you provided
+			config = ConfigUtils.loadConfig(args[0]);
 		}
-		// --- create the config
-		Config config = ConfigUtils.loadConfig(args[0]);
-
-		run(config); // The run method is extracted so that a test can operate on it.
+			
+		run(config, true); // The run method is extracted so that a test can operate on it.
 	}
 	
-	public static void run(Config config) {
+	public static void run(Config config, boolean visualize) {
+		// adjustments for live visualization
+		OTFVisConfigGroup otfvisConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.class);
+		otfvisConfig.setDrawTime(true);
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.withHoles);
+		
 		// --- create the scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		// load the information about signals data (i.e. fill the SignalsData object) and add it to the scenario as scenario element
@@ -61,6 +76,11 @@ public class RunSignalSystemsExample {
 		// add the signals module to the simulation such that SignalsData is not only contained in the scenario but also used in the simulation
 		c.addOverridingModule(new SignalsModule());
 
+		// add live visualization module
+		if (visualize) {
+			c.addOverridingModule(new OTFVisWithSignalsLiveModule());
+		}
+		
 		// --- run the simulation
 		c.run();
 	}

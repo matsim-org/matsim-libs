@@ -76,7 +76,7 @@
  * @see org.matsim.contrib.signals.model
  * @see org.matsim.contrib.signals.builder
  * @see org.matsim.contrib.signals.mobsim
- * @see org.matsim.contrib.signals.controler
+ * @see org.matsim.contrib.signals.binder
  */
 package org.matsim.contrib.signals;
 

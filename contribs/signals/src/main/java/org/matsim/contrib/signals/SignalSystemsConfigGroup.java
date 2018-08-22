@@ -30,7 +30,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  */
 public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUPNAME = "signalsystems";
+	public static final String GROUP_NAME = "signalsystems";
 	public static final String USE_SIGNALSYSTEMS = "useSignalsystems";
 	public static final String SIGNALSYSTEM_FILE = "signalsystems";
 	public static final String SIGNALCONTROL_FILE = "signalcontrol";
@@ -71,7 +71,7 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	private ActionOnSignalSpecsViolation actionOnConflictingDirectionViolation = ActionOnSignalSpecsViolation.WARN;
 	
 	public SignalSystemsConfigGroup() {
-		super(GROUPNAME);
+		super(GROUP_NAME);
 	}
 
 	@Override
