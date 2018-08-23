@@ -29,8 +29,12 @@ public class ChargerImpl implements Charger {
 	private final double power;
 	private final int plugs;
 	private final Link link;
-
+	private final Coord coord;
+	private final String chargerType;
 	private ChargingLogic logic;
+
+	public static final String DEFAULT_CHARGER_TYPE = "default";
+
 
 	/**
 	 * 
@@ -48,6 +52,17 @@ public class ChargerImpl implements Charger {
 		this.power = power_w;
 		this.plugs = plugs;
 		this.link = link;
+		this.chargerType = DEFAULT_CHARGER_TYPE;
+		this.coord = link.getCoord();
+	}
+
+	public ChargerImpl(Id<Charger> id, double power_w, int plugs, Link link, Coord coord, String chargerType) {
+		this.id = id;
+		this.power = power_w;
+		this.plugs = plugs;
+		this.link = link;
+		this.coord = coord;
+		this.chargerType = chargerType;
 	}
 
 	@Override
@@ -58,6 +73,11 @@ public class ChargerImpl implements Charger {
 	@Override
 	public void setLogic(ChargingLogic logic) {
 		this.logic = logic;
+	}
+
+	@Override
+	public String getChargerType() {
+		return chargerType;
 	}
 
 	@Override
@@ -82,6 +102,6 @@ public class ChargerImpl implements Charger {
 
 	@Override
 	public Coord getCoord() {
-		return link.getCoord();
+		return coord;
 	}
 }

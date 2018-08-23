@@ -28,6 +28,9 @@ public interface Charger extends BasicLocation<Charger> {
 
 	void setLogic(ChargingLogic logic);
 
+	String getChargerType();
+
+
 	Link getLink();
 
 	/**
