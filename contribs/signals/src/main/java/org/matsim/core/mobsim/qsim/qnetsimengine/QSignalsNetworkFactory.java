@@ -83,7 +83,7 @@ public class QSignalsNetworkFactory extends QNetworkFactory{
 		
 		// check whether turn acceptance logic is enabled
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
-				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+				SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		if (signalsConfigGroup.getIntersectionLogic().equals(IntersectionLogic.CONFLICTING_DIRECTIONS_AND_TURN_RESTRICTIONS)) {
 			builder.setTurnAcceptanceLogic(new UnprotectedLeftTurnAcceptanceLogic(
 					((SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getConflictingDirectionsData(), scenario.getLanes()));

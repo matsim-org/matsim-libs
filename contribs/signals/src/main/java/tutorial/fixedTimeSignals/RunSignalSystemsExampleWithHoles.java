@@ -21,7 +21,7 @@ package tutorial.fixedTimeSignals;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.controler.SignalsModule;
+import org.matsim.contrib.signals.binder.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.otfvis.OTFVisWithSignalsLiveModule;
@@ -69,7 +69,7 @@ public class RunSignalSystemsExampleWithHoles {
 		
 		// add the signal config group to the config file
 		SignalSystemsConfigGroup signalConfig = 
-				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class ) ;
+				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class ) ;
 		
 		// the following makes the contrib load the signal input files, but not to do anything with them
 		// (this switch will eventually go away)

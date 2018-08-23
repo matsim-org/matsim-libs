@@ -48,7 +48,7 @@ public class SignalUtilsTest {
 		Id<SignalGroup> idSg3 = Id.create("3", SignalGroup.class);
 		Id<Signal> idS1 = Id.create("1", Signal.class);
 		Id<Signal> idS3 = Id.create("3", Signal.class);
-		SignalsData signals = new SignalsDataImpl(ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
+		SignalsData signals = new SignalsDataImpl(ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class));
 		SignalSystemsDataFactory fac = signals.getSignalSystemsData().getFactory();
 		SignalSystemData system = fac.createSignalSystemData(id1);
 		SignalData signal = fac.createSignalData(Id.create(id1, Signal.class));

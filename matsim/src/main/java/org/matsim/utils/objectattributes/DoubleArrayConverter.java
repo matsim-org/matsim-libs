@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalSystemsModelBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +16,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.builder;
 
-import org.matsim.contrib.signals.model.SignalSystemsManager;
-
-
-/**
- * @author dgrether
- *
+package org.matsim.utils.objectattributes;/*
+ * created by jbischoff, 22.08.2018
  */
-public interface SignalSystemsModelBuilder {
 
-	public SignalSystemsManager createAndInitializeSignalSystemsManager();
+import org.apache.log4j.Logger;
+
+public class DoubleArrayConverter implements AttributeConverter<double[]> {
+
+    private static String DELIMITER = ",";
+
+
+    @Override
+    public double[] convert(String value) {
+        String[] values = value.split(DELIMITER);
+        double[] result = new double[values.length];
+        for (int i = 0; i < values.length; i++) {
+            result[i] = Double.parseDouble(values[i]);
+        }
+        return result;
+    }
+
+    @Override
+    public String convertToString(Object o) {
+        if (!(o instanceof double[])) {
+            Logger.getLogger(getClass()).error("Object is not of type double[] " + o.getClass().toString());
+            return null;
+        }
+        double[] s = (double[]) o;
+        String result = "";
+        for (int i = 0; i < s.length; i++) {
+            result = result + Double.toString(s[i]);
+            if (i < s.length - 1) {
+                result = result + DELIMITER;
+            }
+        }
+        return result;
+    }
 }
