@@ -14,6 +14,7 @@ import org.geotools.geometry.jts.GeometryBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.utils.geometry.geotools.MGC;
 
 /**
  * @author kainagel
@@ -72,14 +73,14 @@ public class GeometryUtils {
 	 * @return
 	 */
 	public static LineString createGeotoolsLineString(Link link) {
-		Coordinate fromCoord = CoordUtils.createGeotoolsCoordinate( link.getFromNode().getCoord() ) ;
-		Coordinate toCoord = CoordUtils.createGeotoolsCoordinate( link.getToNode().getCoord() ) ;
+		Coordinate fromCoord = MGC.coord2Coordinate( link.getFromNode().getCoord() ) ;
+		Coordinate toCoord = MGC.coord2Coordinate( link.getToNode().getCoord() ) ;
 		LineString theSegment = new GeometryFactory().createLineString(new Coordinate[]{ fromCoord, toCoord });
 		return theSegment;
 	}
 	
 	public static Point createGeotoolsPoint(Coord coord ) {
-		Coordinate coordinate = CoordUtils.createGeotoolsCoordinate(coord) ;
+		Coordinate coordinate = MGC.coord2Coordinate(coord) ;
 		Point point = new GeometryFactory().createPoint( coordinate ) ;
 		return point ;
 	}
