@@ -99,8 +99,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.freespeed = freespeed;
 		this.checkFreespeedSemantics();
 		this.capacity = capacity;
-		this.checkCapacitiySemantics();
-		this.checkCapacitiySemantics();
+		this.checkCapacitySemantics();
 		this.nofLanes = lanes;
 		this.checkNumberOfLanesSemantics();
 		if (this.from.equals(this.to) && (loopWarnCnt < maxLoopWarnCnt)) {
@@ -111,7 +110,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		}
 	}
 
-	private void checkCapacitiySemantics() {
+	private void checkCapacitySemantics() {
 		/*
 		 * I see no reason why a freespeed and a capacity of zero should not be
 		 * allowed! joh 9may2008
@@ -194,7 +193,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public void setCapacity(double capacityPerNetworkCapcityPeriod){
 		this.capacity = capacityPerNetworkCapcityPeriod;
-		this.checkCapacitiySemantics();
+		this.checkCapacitySemantics();
 	}
 
 	@Override
