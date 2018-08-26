@@ -1555,5 +1555,4 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 	}
-
 }
