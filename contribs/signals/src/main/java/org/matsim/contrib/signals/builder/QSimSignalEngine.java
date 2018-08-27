@@ -68,6 +68,7 @@ class QSimSignalEngine implements SignalEngine {
 		NetsimNetwork net = qSim.getNetsimNetwork();
 		for (SignalSystem system : this.signalManager.getSignalSystems().values()){
 			for (Signal signal : system.getSignals().values()){
+				signal.getSignalizeableItems().clear();
 				log.debug("initializing signal " + signal.getId() + " on link " + signal.getLinkId());
 				NetsimLink link = net.getNetsimLinks().get(signal.getLinkId());
 				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){

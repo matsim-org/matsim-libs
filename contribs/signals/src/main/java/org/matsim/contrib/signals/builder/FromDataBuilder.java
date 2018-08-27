@@ -166,8 +166,6 @@ class FromDataBuilder implements Provider<SignalSystemsManager>{
 		// 6.) ConflictingDirectionsLogic
 		this.createAndAddConflictingDirectionsLogic(manager);
 
-		manager.resetModel(replanningContext.getIteration());
-
 		return manager;
 	}
 }

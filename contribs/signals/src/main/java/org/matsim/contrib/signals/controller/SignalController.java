@@ -39,8 +39,6 @@ public interface SignalController {
 
 	public void addPlan(SignalPlan plan);
 
-	public void reset(Integer iterationNumber);
-
 	public void simulationInitialized(double simStartTimeSeconds);
 	
 	public void setSignalSystem(SignalSystem signalSystem);

@@ -45,8 +45,6 @@ final class SensorBasedSignalControlerListener implements SignalControlerListene
 	
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if (this.signalManager != null) 
-			this.signalManager.resetModel(event.getIteration());
 		if (this.sensorManager != null)
 			this.sensorManager.reset(event.getIteration());
 	}
