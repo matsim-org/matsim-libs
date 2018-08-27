@@ -29,7 +29,7 @@ class NewNetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 
 	@Override
 	public void onPrepareSim() {
-		Queue<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(network);
+		Queue<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(this.network);
 		for (final NetworkChangeEvent changeEvent : changeEvents) {
 			addNetworkChangeEventToMessageQ(changeEvent);
 		}
@@ -48,12 +48,12 @@ class NewNetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 			}
 		};
 		m.setMessageArrivalTime(changeEvent.getStartTime());
-		messageQueue.putMessage(m);
+		this.messageQueue.putMessage(m);
 	}
 	
 	private void applyTheChangeEvent(NetworkChangeEvent changeEvent) {
 		for (Link link : changeEvent.getLinks()) {
-			final NetsimLink netsimLink = internalInterface.getMobsim().getNetsimNetwork().getNetsimLink(link.getId());
+			final NetsimLink netsimLink = this.internalInterface.getMobsim().getNetsimNetwork().getNetsimLink(link.getId());
 			if ( netsimLink instanceof TimeVariantLink) {
 				((TimeVariantLink) netsimLink).recalcTimeVariantAttributes();
 			} else {
@@ -64,8 +64,6 @@ class NewNetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 	}
 	
 	public final void addNetworkChangeEvent( NetworkChangeEvent event ) {
-		// used (and thus implicitly tested) by bdi-abm-integration project.  A separate core test would be good. kai, feb'18
-		
 		log.warn("add within-day network change event:" + event);
 		
 		final Queue<NetworkChangeEvent> centralNetworkChangeEvents =
