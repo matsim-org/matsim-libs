@@ -48,7 +48,6 @@ import org.matsim.contrib.signals.model.SignalSystemsManagerImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.replanning.ReplanningContext;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -64,19 +63,17 @@ import com.google.inject.Provider;
  */
 class FromDataBuilder implements Provider<SignalSystemsManager>{
 
-	private SignalsData signalsData;
-	private SignalModelFactory factory;
-	private EventsManager events;
-	private Scenario scenario;
-	private ReplanningContext replanningContext;
+	private final SignalsData signalsData;
+	private final SignalModelFactory factory;
+	private final EventsManager events;
+	private final Scenario scenario;
 
 	@Inject
-	private FromDataBuilder(Scenario scenario, SignalModelFactory factory, EventsManager events, ReplanningContext replanningContext){
+	private FromDataBuilder(Scenario scenario, SignalModelFactory factory, EventsManager events){
 		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		this.scenario = scenario;
 		this.factory = factory;
 		this.events = events;
-		this.replanningContext = replanningContext;
 	}
 	
 	private void createAndAddSignals(SignalSystem system){
