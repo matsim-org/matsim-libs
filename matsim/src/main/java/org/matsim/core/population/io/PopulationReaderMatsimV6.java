@@ -20,6 +20,7 @@
 package org.matsim.core.population.io;
 
 import com.google.inject.Inject;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -34,6 +35,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
@@ -54,6 +56,7 @@ import java.util.Stack;
  * @author balmermi
  */
 /* deliberately package */ class PopulationReaderMatsimV6 extends MatsimXmlParser implements MatsimReader {
+    private static final Logger log = Logger.getLogger(PopulationReaderMatsimV6.class);
 
 	private final static String POPULATION = "population";
 	private final static String PERSON = "person";
@@ -89,7 +92,6 @@ import java.util.Stack;
 	private final static String VALUE_NO = "no";
 	private final static String VALUE_UNDEF = "undef";
 
-	private final CoordinateTransformation coordinateTransformation;
 	// TODO: infrastructure to configure converters
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 
@@ -104,15 +106,34 @@ import java.util.Stack;
 	private String routeDescription = null;
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes = null;
 
+	private final String targetCRS;
+	private CoordinateTransformation coordinateTransformation;
+
 	private Activity prevAct = null;
 
 	public PopulationReaderMatsimV6(final Scenario scenario) {
-		this( new IdentityTransformation() , scenario );
+		this( scenario.getConfig().global().getCoordinateSystem(),
+				null,
+				scenario );
+	}
+
+	public PopulationReaderMatsimV6(
+			final String targetCRS,
+			final Scenario scenario) {
+		this(targetCRS, null, scenario);
 	}
 
 	public PopulationReaderMatsimV6(
 			final CoordinateTransformation coordinateTransformation,
 			final Scenario scenario) {
+		this(null, coordinateTransformation, scenario);
+	}
+
+    private PopulationReaderMatsimV6(
+    		final String targetCRS,
+			final CoordinateTransformation coordinateTransformation,
+			final Scenario scenario) {
+		this.targetCRS = targetCRS;
 		this.coordinateTransformation = coordinateTransformation;
 		this.scenario = scenario;
 		this.plans = scenario.getPopulation();
@@ -187,6 +208,22 @@ import java.util.Stack;
 			case ATTRIBUTE:
 				this.attributesReader.endTag( name , content , context );
 				break;
+			case ATTRIBUTES:
+				if (context.peek().equals(POPULATION)) {
+					String inputCrs = (String) scenario.getPopulation().getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT);
+					if (inputCrs == null) {
+						if (coordinateTransformation == null) {
+							coordinateTransformation = new IdentityTransformation();
+						}
+						break;
+					}
+					if (coordinateTransformation != null) {
+						// warn or crash?
+						log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
+					}
+					coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCrs, targetCRS);
+				}
+			    break;
 			case PLAN:
 				if (this.currplan.getPlanElements() instanceof ArrayList<?>) {
 					((ArrayList<?>) this.currplan.getPlanElements()).trimToSize();
