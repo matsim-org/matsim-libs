@@ -20,6 +20,7 @@
 
 package org.matsim.core.network;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -101,6 +102,20 @@ public class NetworkChangeEventsParserWriterTest {
 		parser.readFile(fileName);
 
 		assertThat(inputEvents, hasItem(event));
+	}
+
+	@Test // see MATSIM-770
+	public void testWriteReadZeroChangeEvents() {
+		final String fileName = this.utils.getOutputDirectory() + "zeroChanges.xml";
+		List<NetworkChangeEvent> changeEvents = new ArrayList<>();
+		new NetworkChangeEventsWriter().write(fileName, changeEvents);
+
+		Network network = NetworkUtils.createNetwork();
+		List<NetworkChangeEvent> changeEvents2 = new ArrayList<>();
+		new NetworkChangeEventsParser(network, changeEvents2).readFile(fileName);
+
+		// the main test is that there is no exception
+		Assert.assertTrue(changeEvents2.isEmpty());
 	}
 
 }

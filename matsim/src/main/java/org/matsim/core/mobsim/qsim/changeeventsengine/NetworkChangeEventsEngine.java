@@ -21,11 +21,9 @@
 package org.matsim.core.mobsim.qsim.changeeventsengine;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
@@ -62,9 +60,10 @@ public final class NetworkChangeEventsEngine implements NetworkChangeEventsEngin
 
 	@Override
 	public void onPrepareSim() {
-		Queue<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(this.mobsim.getScenario().getNetwork());
-		if ((changeEvents != null) && (changeEvents.size() > 0)) {
-			this.networkChangeEventsQueue = new PriorityQueue<>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
+		Scenario scenario = this.mobsim.getScenario();
+		Queue<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(scenario.getNetwork());
+		if (scenario.getConfig().network().isTimeVariantNetwork() && changeEvents != null) {
+			this.networkChangeEventsQueue = new PriorityQueue<>(Math.max(32, changeEvents.size()), new NetworkChangeEvent.StartTimeComparator());
 			this.networkChangeEventsQueue.addAll(changeEvents);
 		}
 
@@ -88,7 +87,8 @@ public final class NetworkChangeEventsEngine implements NetworkChangeEventsEngin
 			handleNetworkChangeEvent(event);
 		}
 	}
-	
+
+	@Override
 	public final void addNetworkChangeEvent( NetworkChangeEvent event ) {
 		// used (and thus implicitly tested) by bdi-abm-integration project.  A separate core test would be good. kai, feb'18
 		
