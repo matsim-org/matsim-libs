@@ -37,6 +37,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkChangeEventsParser;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -216,6 +217,11 @@ class ScenarioLoaderImpl {
 				final PopulationReader reader = new PopulationReader(transformation , this.scenario);
 				reader.putAttributeConverters( attributeConverters );
 				reader.parse( populationFileName );
+
+				if (scenario.getPopulation().getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT) == null) {
+				    // put attribute in the population if was not here
+					scenario.getPopulation().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, inputCRS);
+				}
 			}
 
 			PopulationUtils.printPlansCount(this.scenario.getPopulation()) ;
