@@ -203,7 +203,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param osmFilename
 	 * @throws UncheckedIOException
 	 */
-	public void parse(final String osmFilename) {
+	public final void parse(final String osmFilename) {
 		parse(osmFilename, null);
 	}
 
@@ -213,7 +213,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param stream
 	 * @throws UncheckedIOException
 	 */
-	public void parse(final InputStream stream) throws UncheckedIOException {
+	public final void parse(final InputStream stream) throws UncheckedIOException {
 		parse(null, stream);
 	}
 
@@ -284,7 +284,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 *
 	 * @see <a href="http://wiki.openstreetmap.org/wiki/Map_Features#Highway">http://wiki.openstreetmap.org/wiki/Map_Features#Highway</a>
 	 */
-	public void setHighwayDefaults(final int hierarchy , final String highwayType, final double lanesPerDirection, final double freespeed, final double freespeedFactor, final double laneCapacity_vehPerHour) {
+	public final void setHighwayDefaults(final int hierarchy , final String highwayType, final double lanesPerDirection, final double freespeed, final double freespeedFactor, final double laneCapacity_vehPerHour) {
 		setHighwayDefaults(hierarchy, highwayType, lanesPerDirection, freespeed, freespeedFactor, laneCapacity_vehPerHour, false);
 	}
 
@@ -299,7 +299,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param laneCapacity_vehPerHour the capacity per lane [veh/h]
 	 * @param oneway <code>true</code> to say that this road is a oneway road
 	 */
-	public void setHighwayDefaults(final int hierarchy, final String highwayType, final double lanesPerDirection, final double freespeed,
+	public final void setHighwayDefaults(final int hierarchy, final String highwayType, final double lanesPerDirection, final double freespeed,
 			final double freespeedFactor, final double laneCapacity_vehPerHour, final boolean oneway) {
         this.highwayDefaults.put(highwayType, new OsmHighwayDefaults(hierarchy, lanesPerDirection, freespeed, freespeedFactor, laneCapacity_vehPerHour, oneway));
     }
@@ -315,7 +315,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 *
 	 * @param keepPaths <code>true</code> to keep all details of the OSM roads
 	 */
-	public void setKeepPaths(final boolean keepPaths) {
+	public final void setKeepPaths(final boolean keepPaths) {
 		this.keepPaths = keepPaths;
 	}
 
@@ -328,7 +328,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param scaleMaxSpeed <code>true</code> to scale the speed limit down by the value specified by the
 	 * {@link #setHighwayDefaults(int, String, double, double, double, double) defaults}.
 	 */
-	public void setScaleMaxSpeed(final boolean scaleMaxSpeed) {
+	public final void setScaleMaxSpeed(final boolean scaleMaxSpeed) {
 		this.scaleMaxSpeed = scaleMaxSpeed;
 	}
 
@@ -341,10 +341,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param coordSEEasting The longitude of the south eastern corner of the rectangle.
 	 * @param hierarchy Layer specifying the hierarchy of the layers starting with 1 as the top layer.
 	 */
-	public void setHierarchyLayer(final double coordNWNorthing, final double coordNWEasting, final double coordSENorthing, final double coordSEEasting, final int hierarchy) {
+	public final void setHierarchyLayer(final double coordNWNorthing, final double coordNWEasting, final double coordSENorthing, final double coordSEEasting, final int hierarchy) {
 		this.hierarchyLayers.add(new OsmFilterImpl(this.transform.transform(new Coord(coordNWEasting, coordNWNorthing)), this.transform.transform(new Coord(coordSEEasting, coordSENorthing)), hierarchy));
 	}
-	public void setHierarchyLayer(final int hierarchy) {
+	public final void setHierarchyLayer(final int hierarchy) {
 		this.hierarchyLayers.add(new GeographicallyNonrestrictingOsmFilterImpl(hierarchy));
 	}
 
@@ -352,7 +352,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * Adds a new filter to hierarchy layer.
 	 * @param osmFilter
 	 */
-	public void addOsmFilter(final OsmFilter osmFilter) {
+	public final void addOsmFilter(final OsmFilter osmFilter) {
 		this.hierarchyLayers.add(osmFilter);
 	}
 
@@ -363,11 +363,11 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 *
 	 * @param memoryEnabled
 	 */
-	public void setMemoryOptimization(final boolean memoryEnabled) {
+	public final void setMemoryOptimization(final boolean memoryEnabled) {
 		this.slowButLowMemory = memoryEnabled;
 	}
 	
-	public void setNodeIDsToKeep(Set<Long> nodeIDsToKeep){
+	public final void setNodeIDsToKeep(Set<Long> nodeIDsToKeep){
 		if(nodeIDsToKeep != null && !nodeIDsToKeep.isEmpty()){
 			this.nodeIDsToKeep = nodeIDsToKeep;
 		}
