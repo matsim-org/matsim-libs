@@ -18,12 +18,21 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.run;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.bicycle.BicycleConfigGroup;
+import org.matsim.contrib.bicycle.BicycleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -34,40 +43,102 @@ import org.matsim.vehicles.VehicleUtils;
  * @author dziemke
  */
 public class RunBicycleExample {
+	private static final Logger LOG = Logger.getLogger(RunBicycleExample.class);
 
 	public static void main(String[] args) {
-		// This works when the data is stored under "/matsim/contribs/bicycle/src/main/resurces/bicycle_example"
-		Config config = ConfigUtils.loadConfig("bicycle_example/config.xml", new BicycleConfigGroup());
-		new RunBicycleExample().run(config);
+		Config config;
+		if (args.length == 1) {
+			LOG.info("A user-specified config.xml file was provided. Using it...");
+			config = ConfigUtils.loadConfig(args[0], new BicycleConfigGroup());
+			fillConfigWithBicycleStandardValues(config);
+		} else if (args.length == 0) {
+			LOG.info("No config.xml file was provided. Using 'standard' example files given in this contrib's resources folder.");
+			// Setting the context like this works when the data is stored under "/matsim/contribs/bicycle/src/main/resources/bicycle_example"
+			config = ConfigUtils.createConfig("bicycle_example/");
+			config.addModule(new BicycleConfigGroup());
+			fillConfigWithBicycleStandardValues(config);
+			
+			config.network().setInputFile("network_lane.xml"); // Modify this
+			config.plans().setInputFile("population_1200.xml");
+		} else {
+			throw new RuntimeException("More than one argument was provided. There is no procedure for this situation. Thus aborting!"
+					+ " Provide either (1) only a suitable config file or (2) no argument at all to run example with given example of resources folder.");
+		}
+		config.controler().setLastIteration(100); // Modify if motorized interaction is used
+		boolean considerMotorizedInteraction = false;
+		
+		new RunBicycleExample().run(config, considerMotorizedInteraction);
 	}
 
-	public void run(Config config) {
-//		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+	public void run(Config config, boolean considerMotorizedInteraction) {
 		config.global().setNumberOfThreads(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(0);
 		
-		// New, yet to be applied
-		config.plansCalcRoute().setRoutingRandomness(0.2);
-		//
+		config.plansCalcRoute().setRoutingRandomness(3.);
 				
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
-		car.setMaximumVelocity(60.0/3.6);
-		car.setPcuEquivalents(1.0);
 		scenario.getVehicles().addVehicleType(car);
 
 		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
-		bicycle.setMaximumVelocity(30.0/3.6);
-		bicycle.setPcuEquivalents(0.0);
+		bicycle.setMaximumVelocity(20.0/3.6);
+		bicycle.setPcuEquivalents(0.25);
 		scenario.getVehicles().addVehicleType(bicycle);
 
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new BicycleModule());
+		BicycleModule bicycleModule = new BicycleModule();
+		if (considerMotorizedInteraction) {
+			bicycleModule.setConsiderMotorizedInteraction(true);
+		}
+		controler.addOverridingModule(bicycleModule);
 		
 		controler.run();
+	}
+	
+	public static void fillConfigWithBicycleStandardValues(Config config) {
+		config.controler().setWriteEventsInterval(1);
+		
+		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME);
+		bicycleConfigGroup.addParam("marginalUtilityOfInfrastructure_m", "-0.0002");
+		bicycleConfigGroup.addParam("marginalUtilityOfComfort_m", "-0.0002");
+		bicycleConfigGroup.addParam("marginalUtilityOfGradient_m_100m", "-0.02");
+		
+		List<String> mainModeList = new ArrayList<>();
+		mainModeList.add("bicycle");
+		mainModeList.add(TransportMode.car);
+		config.qsim().setMainModes(mainModeList);
+		
+		config.strategy().setMaxAgentPlanMemorySize(5);
+		{
+			StrategySettings strategySettings = new StrategySettings();
+			strategySettings.setStrategyName("ChangeExpBeta");
+			strategySettings.setWeight(0.8);
+			config.strategy().addStrategySettings(strategySettings);
+		}{
+			StrategySettings strategySettings = new StrategySettings();
+			strategySettings.setStrategyName("ReRoute");
+			strategySettings.setWeight(0.2);
+			config.strategy().addStrategySettings(strategySettings);
+		}
+		
+		ActivityParams homeActivity = new ActivityParams("home");
+		homeActivity.setTypicalDuration(12*60*60);
+		config.planCalcScore().addActivityParams(homeActivity);
+		
+		ActivityParams workActivity = new ActivityParams("work");
+		workActivity.setTypicalDuration(8*60*60);
+		config.planCalcScore().addActivityParams(workActivity);
+		
+		ModeParams bicycle = new ModeParams("bicycle");
+		bicycle.setConstant(0.);
+		bicycle.setMarginalUtilityOfDistance(-0.0004); // util/m
+		bicycle.setMarginalUtilityOfTraveling(-6.0); // util/h
+		bicycle.setMonetaryDistanceRate(0.);
+		config.planCalcScore().addModeParams(bicycle);
+		
+		config.plansCalcRoute().setNetworkModes(mainModeList);
 	}
 }
