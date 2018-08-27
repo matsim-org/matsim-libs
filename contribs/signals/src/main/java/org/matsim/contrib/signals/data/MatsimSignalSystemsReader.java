@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalsControlerListener
+ * MatsimSignalSystemsReader
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.binder;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.signals.data.SignalsScenarioWriter;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.listener.ShutdownListener;
+package org.matsim.contrib.signals.data;
 
 
 /**
- * SignalControllerListener implementation for the MATSim default implementation for traffic light control, 
- * i.e. a fixed-time traffic signal control that can be specified completely by xml input data.
+ * A place for constants to xml schemata
  * @author dgrether
- *
  */
-final class DefaultSignalControlerListener implements SignalControlerListener, ShutdownListener {
-	
-	@Override
-	public final void notifyShutdown(ShutdownEvent event) {
-		writeData(event.getServices().getScenario(), event.getServices().getControlerIO());
-	}
-	
-	private static void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
-		new SignalsScenarioWriter(controlerIO).writeSignalsData(sc);
-	}
+public class MatsimSignalSystemsReader {
 
+	public static final String SIGNALSYSTEMS20 = "http://www.matsim.org/files/dtd/signalSystems_v2.0.xsd";
+
+	public static final String SIGNALGROUPS20 = "http://www.matsim.org/files/dtd/signalGroups_v2.0.xsd";
+
+	public static final String SIGNALCONTROL20 = "http://www.matsim.org/files/dtd/signalControl_v2.0.xsd";
+	
 }

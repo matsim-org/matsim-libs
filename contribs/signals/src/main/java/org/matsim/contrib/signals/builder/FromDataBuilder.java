@@ -62,7 +62,7 @@ import com.google.inject.Provider;
  * @author dgrether
  *
  */
-public class FromDataBuilder implements Provider<SignalSystemsManager>{
+class FromDataBuilder implements Provider<SignalSystemsManager>{
 
 	private SignalsData signalsData;
 	private SignalModelFactory factory;

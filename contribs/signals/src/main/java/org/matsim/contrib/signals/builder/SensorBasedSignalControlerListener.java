@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.binder;
+package org.matsim.contrib.signals.builder;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
@@ -37,7 +37,7 @@ import com.google.inject.Inject;
  * 
  * @author dgrether, tthunig
  */
-public final class SensorBasedSignalControlerListener implements SignalControlerListener, IterationStartsListener,
+final class SensorBasedSignalControlerListener implements SignalControlerListener, IterationStartsListener,
 		ShutdownListener {
 
 	@Inject(optional = true) SignalSystemsManager signalManager = null;
