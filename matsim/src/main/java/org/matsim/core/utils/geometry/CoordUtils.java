@@ -20,6 +20,7 @@
 
 package org.matsim.core.utils.geometry;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 

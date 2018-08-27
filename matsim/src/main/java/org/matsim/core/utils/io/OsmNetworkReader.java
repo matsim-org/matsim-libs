@@ -87,8 +87,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private final static String TAG_HIGHWAY = "highway";
 	private final static String TAG_MAXSPEED = "maxspeed";
 	private final static String TAG_JUNCTION = "junction";
-    private final static String TAG_ONEWAY = "oneway";
-    private final static String TAG_ACCESS = "access";
+	private final static String TAG_ONEWAY = "oneway";
+	private final static String TAG_ACCESS = "access";
 	private static List<String> allTags = new LinkedList<>(Arrays.asList(TAG_LANES, TAG_LANES_FORWARD,
 			TAG_LANES_BACKWARD, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS));
 
