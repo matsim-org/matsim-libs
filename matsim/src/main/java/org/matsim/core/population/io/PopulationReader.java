@@ -70,7 +70,8 @@ public final class PopulationReader extends MatsimXmlParser {
 	
 	/*deliberately package*/ PopulationReader(
 				final String targetCRS,
-				final Scenario scenario, boolean streaming ) {
+				final Scenario scenario,
+				boolean streaming ) {
 		if ( !streaming && scenario.getPopulation() instanceof StreamingPopulation ) {
 			throw new RuntimeException("MatsimPopulationReader called directly with an instance of StreamingPopulation "
 					+ "in scenario.  Call via StreamingPopulationReader or ask for help.  kai, jul'16") ;

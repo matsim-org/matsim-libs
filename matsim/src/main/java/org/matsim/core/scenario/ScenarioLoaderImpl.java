@@ -198,21 +198,12 @@ class ScenarioLoaderImpl {
 			URL populationFileName = this.config.plans().getInputFileURL(this.config.getContext());
 			log.info("loading population from " + populationFileName);
 
-			if ( config.plans().getInputCRS() == null ) {
-				final PopulationReader reader = new PopulationReader(this.scenario);
-				reader.putAttributeConverters( attributeConverters );
-				reader.parse( populationFileName );
-			}
-			else {
-				final String inputCRS = config.plans().getInputCRS();
-				final String internalCRS = config.global().getCoordinateSystem();
+            final String targetCRS = config.global().getCoordinateSystem();
 
-				log.info( "re-projecting population from "+inputCRS+" to "+internalCRS+" for import" );
+            final PopulationReader reader = new PopulationReader(targetCRS , this.scenario);
+            reader.putAttributeConverters( attributeConverters );
+            reader.parse( populationFileName );
 
-				final PopulationReader reader = new PopulationReader(inputCRS , this.scenario);
-				reader.putAttributeConverters( attributeConverters );
-				reader.parse( populationFileName );
-			}
             scenario.getPopulation().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, config.global().getCoordinateSystem());
 
 			PopulationUtils.printPlansCount(this.scenario.getPopulation()) ;
@@ -220,6 +211,7 @@ class ScenarioLoaderImpl {
 		else {
 			log.info("no population file set in config, not able to load population");
 		}
+
 		if ((this.config.plans() != null) && (this.config.plans().getInputPersonAttributeFile() != null)) {
 			URL personAttributesURL = this.config.plans().getInputPersonAttributeFileURL(this.config.getContext());
 			log.info("loading person attributes from " + personAttributesURL);
