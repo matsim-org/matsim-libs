@@ -25,7 +25,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  * @author mrieser / Simunto GmbH
  */
-public class NewNetworkChangeEventsEngineTest {
+public class NetworkChangeEventsEngineTest {
 
 	@Test
 	public void testActivation_inactive() {
@@ -44,7 +44,7 @@ public class NewNetworkChangeEventsEngineTest {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		QSim qsim = new QSimBuilder(config).useDefaults().build(scenario, eventsManager);
 
-		NewNetworkChangeEventsEngine engine = new NewNetworkChangeEventsEngine(scenario.getNetwork(), new MessageQueue());
+		NetworkChangeEventsEngine engine = new NetworkChangeEventsEngine(scenario.getNetwork(), new MessageQueue());
 		qsim.addMobsimEngine(engine);
 
 		engine.onPrepareSim();
@@ -80,7 +80,7 @@ public class NewNetworkChangeEventsEngineTest {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		QSim qsim = new QSimBuilder(config).useDefaults().build(scenario, eventsManager);
 
-		NewNetworkChangeEventsEngine engine = new NewNetworkChangeEventsEngine(scenario.getNetwork(), new MessageQueue());
+		NetworkChangeEventsEngine engine = new NetworkChangeEventsEngine(scenario.getNetwork(), new MessageQueue());
 		engine.setInternalInterface(new DummyInternalInterfaceImpl(qsim));
 
 		engine.onPrepareSim();
@@ -116,7 +116,7 @@ public class NewNetworkChangeEventsEngineTest {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		QSim qsim = new QSimBuilder(config).useDefaults().build(scenario, eventsManager);
 
-		NewNetworkChangeEventsEngine engine = new NewNetworkChangeEventsEngine(scenario.getNetwork(), new MessageQueue());
+		NetworkChangeEventsEngine engine = new NetworkChangeEventsEngine(scenario.getNetwork(), new MessageQueue());
 		engine.setInternalInterface(new DummyInternalInterfaceImpl(qsim));
 
 		engine.onPrepareSim();

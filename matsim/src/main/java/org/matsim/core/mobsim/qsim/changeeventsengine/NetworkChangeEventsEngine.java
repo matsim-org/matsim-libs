@@ -14,15 +14,15 @@ import org.matsim.core.network.NetworkUtils;
 import javax.inject.Inject;
 import java.util.Queue;
 
-class NewNetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
-	private static final Logger log = Logger.getLogger( NewNetworkChangeEventsEngine.class ) ;
+class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
+	private static final Logger log = Logger.getLogger( NetworkChangeEventsEngine.class ) ;
 
 	private final MessageQueue messageQueue;
 	private final Network network;
 	private InternalInterface internalInterface;
 
 	@Inject
-	NewNetworkChangeEventsEngine(Network network, MessageQueue messageQueue) {
+	NetworkChangeEventsEngine(Network network, MessageQueue messageQueue) {
 		this.network = network;
 		this.messageQueue = messageQueue;
 	}
