@@ -23,8 +23,6 @@ package org.matsim.core.utils.geometry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
 public abstract class CoordUtils {
 	final private static Logger LOG = Logger.getLogger(CoordUtils.class);
 	
