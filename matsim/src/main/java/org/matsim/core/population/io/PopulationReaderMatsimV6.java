@@ -97,6 +97,7 @@ import java.util.Stack;
 
 	private final Scenario scenario;
 	private final Population plans;
+	private final String externalInputCRS;
 
 	private Person currperson = null;
 	private Plan currplan = null;
@@ -111,30 +112,21 @@ import java.util.Stack;
 
 	private Activity prevAct = null;
 
-	public PopulationReaderMatsimV6(final Scenario scenario) {
-		this( scenario.getConfig().global().getCoordinateSystem(),
-				null,
-				scenario );
-	}
-
 	public PopulationReaderMatsimV6(
 			final String targetCRS,
 			final Scenario scenario) {
-		this(targetCRS, null, scenario);
-	}
-
-	public PopulationReaderMatsimV6(
-			final CoordinateTransformation coordinateTransformation,
-			final Scenario scenario) {
-		this(null, coordinateTransformation, scenario);
-	}
-
-    private PopulationReaderMatsimV6(
-    		final String targetCRS,
-			final CoordinateTransformation coordinateTransformation,
-			final Scenario scenario) {
+	    this.externalInputCRS = null;
 		this.targetCRS = targetCRS;
-		this.coordinateTransformation = coordinateTransformation;
+		this.scenario = scenario;
+		this.plans = scenario.getPopulation();
+	}
+
+    PopulationReaderMatsimV6(
+            final String inputCRS,
+			final String targetCRS,
+			final Scenario scenario) {
+		this.externalInputCRS = inputCRS;
+		this.targetCRS = targetCRS;
 		this.scenario = scenario;
 		this.plans = scenario.getPopulation();
 	}
@@ -210,18 +202,24 @@ import java.util.Stack;
 				break;
 			case ATTRIBUTES:
 				if (context.peek().equals(POPULATION)) {
-					String inputCrs = (String) scenario.getPopulation().getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT);
-					if (inputCrs == null) {
-						if (coordinateTransformation == null) {
+					String inputCRS = (String) scenario.getPopulation().getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT);
+					if (inputCRS == null) {
+						if (externalInputCRS != null) {
+							coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
+							scenario.getPopulation().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+						}
+						else {
 							coordinateTransformation = new IdentityTransformation();
 						}
-						break;
 					}
-					if (coordinateTransformation != null) {
-						// warn or crash?
-						log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
+					else {
+						if (externalInputCRS != null) {
+							// warn or crash?
+							log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
+						}
+						coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
+						scenario.getPopulation().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
 					}
-					coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCrs, targetCRS);
 				}
 			    break;
 			case PLAN:

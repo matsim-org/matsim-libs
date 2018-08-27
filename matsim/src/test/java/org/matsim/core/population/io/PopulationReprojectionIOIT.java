@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -120,6 +121,7 @@ public class PopulationReprojectionIOIT {
 	}
 
 	@Test
+    @Ignore("data is not reprojected anymore")
 	public void testWithControlerAndConfigParameters() {
 		// accept a rounding error of 1 cm.
 		// this is used both to compare equality and non-equality, so the more we accept difference between input
@@ -234,7 +236,7 @@ public class PopulationReprojectionIOIT {
 		new MatsimNetworkReader(reprojectedScenario.getNetwork()).parse(network);
 
 		new PopulationReader(originalScenario).readFile(inputFile);
-		new PopulationReader(new Transformation(), reprojectedScenario).readFile(inputFile);
+		new PopulationReader( "EPSG:3857", reprojectedScenario).readFile(inputFile);
 
 		final Population originalPopulation = originalScenario.getPopulation();
 		final Population reprojectedPopulation = reprojectedScenario.getPopulation();
@@ -281,15 +283,18 @@ public class PopulationReprojectionIOIT {
 	}
 
 	private void assertIsCorrectlyTransformed( final Coord original , final Coord transformed ) {
+	    CoordinateTransformation reverseTransform = TransformationFactory.getCoordinateTransformation("EPSG:3857", "Atlantis");
+
+	    Coord retransformed = reverseTransform.transform(transformed);
 		Assert.assertEquals(
 				"wrong reprojected X value",
-				original.getX() + 1000 ,
-				transformed.getX(),
+				original.getX() ,
+				retransformed.getX(),
 				MatsimTestUtils.EPSILON );
 		Assert.assertEquals(
 				"wrong reprojected Y value",
-				original.getY() + 1000 ,
-				transformed.getY(),
+				original.getY() ,
+				retransformed.getY(),
 				MatsimTestUtils.EPSILON );
 	}
 

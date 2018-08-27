@@ -209,12 +209,7 @@ class ScenarioLoaderImpl {
 
 				log.info( "re-projecting population from "+inputCRS+" to "+internalCRS+" for import" );
 
-				final CoordinateTransformation transformation =
-						TransformationFactory.getCoordinateTransformation(
-								inputCRS,
-								internalCRS );
-
-				final PopulationReader reader = new PopulationReader(transformation , this.scenario);
+				final PopulationReader reader = new PopulationReader(inputCRS , this.scenario);
 				reader.putAttributeConverters( attributeConverters );
 				reader.parse( populationFileName );
 			}

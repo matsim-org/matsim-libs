@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.population.io.StreamingPopulationReader.StreamingPopulation;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.xml.sax.Attributes;
@@ -48,7 +49,7 @@ public final class PopulationReader extends MatsimXmlParser {
 	private final static String POPULATION_V5 = "population_v5.dtd";
 	private final static String POPULATION_V6 = "population_v6.dtd";
 
-	private final CoordinateTransformation coordinateTransformation;
+	private final String targetCRS;
 
 	private MatsimXmlParser delegate = null;
 	private final Scenario scenario;
@@ -58,23 +59,23 @@ public final class PopulationReader extends MatsimXmlParser {
 	private static final Logger log = Logger.getLogger(PopulationReader.class);
 
 	public PopulationReader(final Scenario scenario) {
-		this( new IdentityTransformation() , scenario );
+		this( null , scenario );
 	}
 
 	public PopulationReader(
-			final CoordinateTransformation coordinateTransformation,
+	        final String targetCRS,
 			final Scenario scenario ) {
-		this( coordinateTransformation, scenario, false ) ;
+		this( targetCRS, scenario, false ) ;
 	}
 	
 	/*deliberately package*/ PopulationReader(
-				final CoordinateTransformation coordinateTransformation,
+				final String targetCRS,
 				final Scenario scenario, boolean streaming ) {
 		if ( !streaming && scenario.getPopulation() instanceof StreamingPopulation ) {
 			throw new RuntimeException("MatsimPopulationReader called directly with an instance of StreamingPopulation "
 					+ "in scenario.  Call via StreamingPopulationReader or ask for help.  kai, jul'16") ;
 		}
-		this.coordinateTransformation = coordinateTransformation;
+		this.targetCRS = targetCRS;
 		this.scenario = scenario;
 	}
 
@@ -99,11 +100,21 @@ public final class PopulationReader extends MatsimXmlParser {
 	@Override
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);
+
+		final String inputCRS = scenario.getConfig().plans().getInputCRS();
+		final CoordinateTransformation transformation =
+				inputCRS == null ?
+						new IdentityTransformation() :
+						TransformationFactory.getCoordinateTransformation(
+								inputCRS,
+								targetCRS );
+
 		switch ( doctype ) {
 			case POPULATION_V6:
 				this.delegate =
 						new PopulationReaderMatsimV6(
-								coordinateTransformation,
+						        inputCRS,
+						        targetCRS,
 								this.scenario);
 				((PopulationReaderMatsimV6) delegate).putAttributeConverters( attributeConverters );
 				log.info("using population_v6-reader.");
@@ -111,7 +122,7 @@ public final class PopulationReader extends MatsimXmlParser {
 			case POPULATION_V5:
 				this.delegate =
 						new PopulationReaderMatsimV5(
-								coordinateTransformation,
+						        transformation,
 								this.scenario);
 				log.info("using population_v5-reader.");
 				break;
@@ -119,14 +130,14 @@ public final class PopulationReader extends MatsimXmlParser {
 				// Replaced non-parallel reader with parallel implementation. cdobler, mar'12.
 				this.delegate =
 						new ParallelPopulationReaderMatsimV4(
-								coordinateTransformation,
+						        transformation,
 								this.scenario);
 				log.info("using plans_v4-reader.");
 				break;
 			case PLANS_V1:
 				this.delegate =
 						new PopulationReaderMatsimV1(
-								coordinateTransformation,
+						        transformation,
 								this.scenario);
 				log.info("using plans_v1-reader.");
 				break;
@@ -134,7 +145,7 @@ public final class PopulationReader extends MatsimXmlParser {
 			case PLANS:
 				this.delegate =
 						new PopulationReaderMatsimV0(
-								coordinateTransformation,
+						        transformation,
 								this.scenario);
 				log.info("using plans_v0-reader.");
 				break;
