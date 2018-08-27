@@ -38,6 +38,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -309,34 +310,16 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private void dumpPlans() {
 		// dump plans
 
-		final String inputCRS = config.plans().getInputCRS();
-		final String internalCRS = config.global().getCoordinateSystem();
-
-		if ( inputCRS == null ) {
-			final PopulationWriter writer = new PopulationWriter(population, network);
-			writer.putAttributeConverters( attributeConverters );
-			writer.write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_POPULATION));
-		}
-		else {
-			log.info( "re-projecting population from "+internalCRS+" back to "+inputCRS+" for export" );
-
-			final CoordinateTransformation transformation =
-					TransformationFactory.getCoordinateTransformation(
-							internalCRS,
-							inputCRS );
-
-			final PopulationWriter writer = new PopulationWriter(transformation , population, network);
-			writer.putAttributeConverters( attributeConverters );
-			writer.write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_POPULATION));
-
-		}
+		final PopulationWriter writer = new PopulationWriter(population, network);
+		writer.putAttributeConverters( attributeConverters );
+		writer.write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_POPULATION));
 
 		final ObjectAttributes personAttributes = population.getPersonAttributes();
 		if ( personAttributes!=null ) {
-			ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(personAttributes) ;
-			writer.setPrettyPrint(true);
-			writer.putAttributeConverters( attributeConverters );
-			writer.writeFile( controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_PERSON_ATTRIBUTES ) );
+			ObjectAttributesXmlWriter attributesXmlWriter = new ObjectAttributesXmlWriter(personAttributes) ;
+			attributesXmlWriter.setPrettyPrint(true);
+			attributesXmlWriter.putAttributeConverters( attributeConverters );
+			attributesXmlWriter.writeFile( controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_PERSON_ATTRIBUTES ) );
 		}
 	}
 

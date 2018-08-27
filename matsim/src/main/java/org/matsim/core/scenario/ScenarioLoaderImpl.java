@@ -217,12 +217,8 @@ class ScenarioLoaderImpl {
 				final PopulationReader reader = new PopulationReader(transformation , this.scenario);
 				reader.putAttributeConverters( attributeConverters );
 				reader.parse( populationFileName );
-
-				if (scenario.getPopulation().getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT) == null) {
-				    // put attribute in the population if was not here
-					scenario.getPopulation().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, inputCRS);
-				}
 			}
+            scenario.getPopulation().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, config.global().getCoordinateSystem());
 
 			PopulationUtils.printPlansCount(this.scenario.getPopulation()) ;
 		}
