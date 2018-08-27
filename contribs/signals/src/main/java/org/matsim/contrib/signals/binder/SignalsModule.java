@@ -96,8 +96,8 @@ public class SignalsModule extends AbstractModule {
 			bind(QNetworkFactory.class).to(QSignalsNetworkFactory.class);
 
 			// bind tool to write information about signal states for via
-			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
-			/* asEagerSingleton is necessary to force creation of the SignalEvents2ViaCSVWriter class as it is never used somewhere else. theresa dec'16 */
+			addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
+			addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
 
 			if (getConfig().qsim().isUsingFastCapacityUpdate()) {
 				throw new RuntimeException("Fast flow capacity update does not support signals");
