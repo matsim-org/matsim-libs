@@ -14,7 +14,7 @@ For more information, see the project website at http://www.matsim.org/.
 
 ## Questions
 
-Have any questions? Visit https://matsim.atlassian.net/wiki/questions
+Have any questions? Visit https://github.com/matsim-org/matsim-code-examples/issues
 and see if it has already been answered. If not, post a new question.
 
 ## Development
