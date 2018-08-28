@@ -68,7 +68,7 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 
 	private final static Logger log = Logger.getLogger(NetworkReaderMatsimV2.class);
 
-	public NetworkReaderMatsimV2(
+	NetworkReaderMatsimV2(
 	        final String inputCRS,
 			final String targetCRS,
 			final Network network) {
