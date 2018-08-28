@@ -113,7 +113,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				// or come with explicit pre-existing facilities.  kai, jul'18
 				break;
 			default:
-				throw new RuntimeException("Facilities source '"+this.facilitiesConfigGroup.getFacilitiesSource()+"' is not implemented yet.");
+				throw new RuntimeException("Facilities source '"+this.facilitiesConfigGroup.getFacilitiesSource()+"' is not implemented.");
 		}
 
 		// get links for facilities

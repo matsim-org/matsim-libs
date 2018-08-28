@@ -29,13 +29,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author mrieser / Senozon AG
  */
 public class Gui extends JFrame {
-
+	
 	private static final long serialVersionUID = 1L;
+	
+	private static final JLabel lblFilepaths = new JLabel("Filepaths must either be absolute or relative to the location of the config file.") ;
+	private static final JLabel lblJavaLocation = new JLabel("Java Location:");
+	private static final JLabel lblConfigurationFile = new JLabel("Configuration file:");
+	private static final JLabel lblOutputDirectory = new JLabel("Output Directory:");
+	private static final JLabel lblMemory = new JLabel("Memory:");
+	private static final JLabel lblMb = new JLabel("MB");
+	private static final JLabel lblYouAreUsingJavaVersion = new JLabel("You are using Java version:");
+	private static final JLabel lblYouAreUsingMATSimVersion = new JLabel("You are using MATSim version:");
 	
 	private JTextField txtConfigfilename;
 	private JTextField txtMatsimversion;
@@ -43,13 +54,16 @@ public class Gui extends JFrame {
 	private JTextField txtJvmversion;
 	private JTextField txtJvmlocation;
 	private JTextField txtOutput;
-	private JLabel lblWorkDirectory;
 	
 	private JButton btnStartMatsim;
 	private JProgressBar progressBar;
+	
 	private JTextArea textStdOut;
 	private JScrollPane scrollPane;
 	private JButton btnEdit;
+	
+	Map<String,JButton> preprocessButtons = new LinkedHashMap<>(  ) ;
+	Map<String,JButton> postprocessButtons = new LinkedHashMap<>(  ) ;
 
 	private ExeRunner exeRunner = null;
 	private JMenuBar menuBar;
@@ -67,174 +81,192 @@ public class Gui extends JFrame {
 	private File lastUsedDirectory;
 	private ConfigEditor editor = null;
 	
+	
 	private Gui(final String title, final Class<?> mainClass) {
-		setTitle(title);
+		setTitle( title );
 		this.mainClass = mainClass.getCanonicalName();
+	}
+	
+	private void createLayout() {
 		
-		this.lastUsedDirectory = new File(".");
-		
-		JLabel lblConfigurationFile = new JLabel("Configuration file:");
+		this.lastUsedDirectory = new File( "." );
 		
 		txtConfigfilename = new JTextField();
-		txtConfigfilename.setText("");
-		txtConfigfilename.setColumns(10);
+		txtConfigfilename.setText( "" );
+		txtConfigfilename.setColumns( 10 );
 		
-		btnStartMatsim = new JButton("Start MATSim");
-		btnStartMatsim.setEnabled(false);
-
-		this.lblWorkDirectory = new JLabel("Filepaths must either be absolute or relative to the location of the config file.");
+		btnStartMatsim = new JButton( "Start MATSim" );
+		btnStartMatsim.setEnabled( false );
 		
-		JButton btnChoose = new JButton("Choose");
-		btnChoose.addActionListener(new ActionListener() {
+		for ( JButton button : preprocessButtons.values() ) {
+			button.setEnabled( false );
+		}
+		for ( JButton button : postprocessButtons.values() ) {
+			button.setEnabled( false );
+		}
+		
+		JButton btnChoose = new JButton( "Choose" );
+		btnChoose.addActionListener( new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed( ActionEvent e ) {
 				JFileChooser chooser = new JFileChooser();
-				chooser.setCurrentDirectory(Gui.this.lastUsedDirectory);
-				int result = chooser.showOpenDialog(null);
-				if (result == JFileChooser.APPROVE_OPTION) {
+				chooser.setCurrentDirectory( Gui.this.lastUsedDirectory );
+				int result = chooser.showOpenDialog( null );
+				if ( result == JFileChooser.APPROVE_OPTION ) {
 					File f = chooser.getSelectedFile();
 					Gui.this.lastUsedDirectory = f.getParentFile();
-					loadConfigFile(f);
-					if (Gui.this.editor != null) {
+					loadConfigFile( f );
+					if ( Gui.this.editor != null ) {
 						Gui.this.editor.closeEditor();
 						Gui.this.editor = null;
 					}
 				}
 			}
-		});
-
-		this.btnEdit = new JButton("Edit…");
-		this.btnEdit.setEnabled(false);
-		this.btnEdit.addActionListener(e -> {
-			if (Gui.this.editor == null) {
-				this.editor = new ConfigEditor(Gui.this.configFile, Gui.this::loadConfigFile);
+		} );
+		
+		this.btnEdit = new JButton( "Edit…" );
+		this.btnEdit.setEnabled( false );
+		this.btnEdit.addActionListener( e -> {
+			if ( Gui.this.editor == null ) {
+				this.editor = new ConfigEditor( Gui.this.configFile, Gui.this::loadConfigFile );
 			}
 			Gui.this.editor.showEditor();
 			Gui.this.editor.toFront();
-		});
-
-		JLabel lblYouAreRunning = new JLabel("You are using MATSim version:");
+		} );
 		
 		txtMatsimversion = new JTextField();
-		txtMatsimversion.setEditable(false);
-		txtMatsimversion.setText(Gbl.getBuildInfoString());
-		txtMatsimversion.setColumns(10);
+		txtMatsimversion.setEditable( false );
+		txtMatsimversion.setText( Gbl.getBuildInfoString() );
+		txtMatsimversion.setColumns( 10 );
 		
-		JLabel lblOutputDirectory = new JLabel("Output Directory:");
-		
-		JLabel lblMemory = new JLabel("Memory:");
 		
 		txtRam = new JTextField();
-		txtRam.setText("1024");
-		txtRam.setColumns(10);
+		txtRam.setText( "1024" );
+		txtRam.setColumns( 10 );
 		
-		JLabel lblMb = new JLabel("MB");
-		
-		JLabel lblYouAreUsing = new JLabel("You are using Java version:");
-		
-		String javaVersion = System.getProperty("java.version") + "; "
-				+ System.getProperty("java.vm.vendor") + "; "
-				+ System.getProperty("java.vm.info") + "; "
-				+ System.getProperty("sun.arch.data.model") + "-bit";
+		String javaVersion = System.getProperty( "java.version" ) + "; "
+							   + System.getProperty( "java.vm.vendor" ) + "; "
+							   + System.getProperty( "java.vm.info" ) + "; "
+							   + System.getProperty( "sun.arch.data.model" ) + "-bit";
 		
 		txtJvmversion = new JTextField();
-		txtJvmversion.setEditable(false);
-		txtJvmversion.setText(javaVersion);
-		txtJvmversion.setColumns(10);
-		
-		JLabel lblJavaLocation = new JLabel("Java Location:");
+		txtJvmversion.setEditable( false );
+		txtJvmversion.setText( javaVersion );
+		txtJvmversion.setColumns( 10 );
 		
 		String jvmLocation;
-		if (System.getProperty("os.name").startsWith("Win")) {
-			jvmLocation = System.getProperties().getProperty("java.home") + File.separator + "bin" + File.separator + "java.exe";
+		if ( System.getProperty( "os.name" ).startsWith( "Win" ) ) {
+			jvmLocation = System.getProperties().getProperty( "java.home" ) + File.separator + "bin" + File.separator + "java.exe";
 		} else {
-			jvmLocation = System.getProperties().getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+			jvmLocation = System.getProperties().getProperty( "java.home" ) + File.separator + "bin" + File.separator + "java";
 		}
 		
 		txtJvmlocation = new JTextField();
-		txtJvmlocation.setEditable(false);
-		txtJvmlocation.setText(jvmLocation);
-		txtJvmlocation.setColumns(10);
+		txtJvmlocation.setEditable( false );
+		txtJvmlocation.setText( jvmLocation );
+		txtJvmlocation.setColumns( 10 );
 		
 		txtOutput = new JTextField();
-		txtOutput.setEditable(false);
-		txtOutput.setText("");
-		txtOutput.setColumns(10);
+		txtOutput.setEditable( false );
+		txtOutput.setText( "" );
+		txtOutput.setColumns( 10 );
 		
 		progressBar = new JProgressBar();
-		progressBar.setEnabled(false);
-		progressBar.setIndeterminate(true);
-		progressBar.setVisible(false);
+		progressBar.setEnabled( false );
+		progressBar.setIndeterminate( true );
+		progressBar.setVisible( false );
 		
-		btnStartMatsim.addActionListener(new ActionListener() {
+		btnStartMatsim.addActionListener( new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (exeRunner == null) {
+			public void actionPerformed( ActionEvent e ) {
+				if ( exeRunner == null ) {
 					startMATSim();
 				} else {
 					stopMATSim();
 				}
 			}
-		});
+		} );
 		
-		JButton btnOpen = new JButton("Open");
-		btnOpen.addActionListener(new ActionListener() {
+		JButton btnOpen = new JButton( "Open" );
+		btnOpen.addActionListener( new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (!Gui.this.txtOutput.getText().isEmpty()) {
+			public void actionPerformed( ActionEvent e ) {
+				if ( !Gui.this.txtOutput.getText().isEmpty() ) {
 					try {
-						File f = new File(Gui.this.txtOutput.getText());
-						Desktop.getDesktop().open(f);
-					} catch (IOException ex) {
+						File f = new File( Gui.this.txtOutput.getText() );
+						Desktop.getDesktop().open( f );
+					} catch ( IOException ex ) {
 						ex.printStackTrace();
 					}
 				}
 			}
-		});
+		} );
 		
-		JButton btnDelete = new JButton("Delete");
-		btnDelete.addActionListener(new ActionListener() {
+		JButton btnDelete = new JButton( "Delete" );
+		btnDelete.addActionListener( new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (!Gui.this.txtOutput.getText().isEmpty()) {
-					int i = JOptionPane.showOptionDialog(Gui.this, "Do you really want to delete the output directory? This action cannot be undone.", "Delete Output Directory", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, new String[] {"Cancel", "Delete"}, "Cancel");
-					if (i == 1) {
+			public void actionPerformed( ActionEvent e ) {
+				if ( !Gui.this.txtOutput.getText().isEmpty() ) {
+					int i = JOptionPane.showOptionDialog( Gui.this, "Do you really want to delete the output directory? This action cannot be undone.", "Delete Output Directory", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, new String[]{"Cancel", "Delete"}, "Cancel" );
+					if ( i == 1 ) {
 						try {
-							IOUtils.deleteDirectoryRecursively(new File(Gui.this.txtOutput.getText()).toPath());
-						} catch (Exception ex) {
+							IOUtils.deleteDirectoryRecursively( new File( Gui.this.txtOutput.getText() ).toPath() );
+						} catch ( Exception ex ) {
 							ex.printStackTrace();
 						}
 					}
 				}
 			}
-		});
-		
+		} );
+
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 //		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
+		
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
+		
+		final GroupLayout.SequentialGroup prebuttonsSequentialGroup = groupLayout.createSequentialGroup();
+		final GroupLayout.ParallelGroup prebuttonsParallelGroup = groupLayout.createParallelGroup() ;
+		for ( JButton button : preprocessButtons.values() ) {
+			prebuttonsSequentialGroup.addComponent( button ) ;
+			prebuttonsParallelGroup.addComponent( button ) ;
+		}
+		final GroupLayout.SequentialGroup postbuttonsSequentialGroup = groupLayout.createSequentialGroup();
+		final GroupLayout.ParallelGroup postbuttonsParallelGroup = groupLayout.createParallelGroup() ;
+		for ( JButton button : postprocessButtons.values() ) {
+			postbuttonsSequentialGroup.addComponent( button ) ;
+			postbuttonsParallelGroup.addComponent( button ) ;
+		}
+		
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+							// a bunch of stuff that can in principle stretch from left to right (although most of it won't):
 						.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
-						.addComponent(lblWorkDirectory)
-						.addComponent(lblJavaLocation)
-						.addComponent(lblConfigurationFile)
-						.addComponent(lblOutputDirectory)
+						.addComponent( lblFilepaths ) // "Filepaths must either ..."
+						.addGroup( prebuttonsSequentialGroup )
+						.addGroup( postbuttonsSequentialGroup )
 						.addGroup(groupLayout.createSequentialGroup()
 							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblYouAreRunning)
-								.addComponent(lblYouAreUsing)
+									// some stuff that stretches from left to somewhere1:
+								.addComponent( lblYouAreUsingMATSimVersion )
+								.addComponent( lblYouAreUsingJavaVersion )
+								.addComponent(lblJavaLocation)
+								.addComponent(lblConfigurationFile)
+								.addComponent(lblOutputDirectory)
 								.addComponent(lblMemory)
-								.addComponent(btnStartMatsim))
+								.addComponent(btnStartMatsim)
+							)
+								// a gap from somewhere1 to somewhere2:
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+									// stuff that stretches from somewhere2 to right:
 								.addGroup(groupLayout.createSequentialGroup()
 									.addComponent(txtRam, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(lblMb))
+									.addComponent(lblMb)
+								)
 								.addComponent(txtMatsimversion, GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
 								.addComponent(txtJvmversion, GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
 								.addComponent(txtJvmlocation, GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
@@ -259,11 +291,11 @@ public class Gui extends JFrame {
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblYouAreRunning)
+						.addComponent( lblYouAreUsingMATSimVersion )
 						.addComponent(txtMatsimversion, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblYouAreUsing)
+						.addComponent( lblYouAreUsingJavaVersion )
 						.addComponent(txtJvmversion, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
@@ -276,7 +308,7 @@ public class Gui extends JFrame {
 						.addComponent(btnChoose)
 						.addComponent(btnEdit))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lblWorkDirectory)
+					.addComponent( lblFilepaths )
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblOutputDirectory)
@@ -289,9 +321,13 @@ public class Gui extends JFrame {
 						.addComponent(txtRam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblMb))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup( prebuttonsParallelGroup )
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnStartMatsim)
 						.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup( postbuttonsParallelGroup )
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
 					.addContainerGap())
@@ -455,6 +491,12 @@ public class Gui extends JFrame {
 		
 		btnStartMatsim.setEnabled(true);
 		btnEdit.setEnabled(true);
+		for ( JButton button : preprocessButtons.values() ) {
+			button.setEnabled( true );
+		}
+		for ( JButton button : postprocessButtons.values() ) {
+			button.setEnabled( true );
+		}
 	}
 
 	public void stopMATSim() {
@@ -480,13 +522,22 @@ public class Gui extends JFrame {
 	}
 	
 	public static Gui show(final String title, final Class<?> mainClass) {
-		System.setProperty("apple.laf.useScreenMenuBar", "true");
-
-		Gui gui = new Gui(title, mainClass);
-		gui.pack();
-		gui.setLocationByPlatform(true);
-		gui.setVisible(true);
+		Gui gui = create( title, mainClass );
+		gui.run() ;
 		return gui;
+	}
+	
+	public  void run(  ) {
+		this.createLayout();
+		this.pack();
+		this.setLocationByPlatform(true);
+		this.setVisible(true);
+	}
+	
+	public static Gui create( final String title, final Class<?> mainClass ) {
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
+		
+		return new Gui(title, mainClass);
 	}
 	
 	public static void main(String[] args) {
@@ -499,13 +550,41 @@ public class Gui extends JFrame {
 		}
 	}
 	
-	public final JMenu getToolsMenu() {
+	// Is it a problem to make the following available to the outside?  If so, why?  Would it
+	// be better to rather copy/paste the above code and start from there?  kai, jun/aug'18
+	
+	final JMenu getToolsMenu() {
 		// Is it a problem to make this available?  If so, why?  kai, jun'18
 		return this.mnTools ;
 	}
-	public final void addToMenuBar(JMenu menuItem) {
-		// Is it a problem to make this available?  If so, why?  kai, jun'18
+	final void addToMenuBar(JMenu menuItem) {
 		this.menuBar.add(menuItem) ;
 	}
+	final void addPreprocessButton( String str, JButton button ) {
+		this.preprocessButtons.put( str, button );
+	}
+	final void addPostprocessButton( String str, JButton button ) {
+		this.postprocessButtons.put( str, button );
+	}
+	JTextArea getTextStdOut() {
+		return textStdOut;
+	}
+	JTextArea getTextErrOut() {
+		return textErrOut;
+	}
+	JTextField getTxtJvmlocation() {
+		return txtJvmlocation ;
+	}
+	JTextField getTxtRam() {
+		return this.txtRam ;
+	}
+	@Deprecated // this should not be necessary. kai, aug'18
+	String getMainClass() {
+		return this.mainClass ;
+	}
+	JTextField getTxtConfigfilename() {
+		return this.txtConfigfilename ;
+	}
+	
 	
 }

@@ -44,6 +44,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.ReplanningUtils;
 import org.matsim.core.router.util.TravelTime;
@@ -193,7 +194,10 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 			
 			double monetizedUserBenefits = 0.;
 			for (Person person : this.congestionInfo.getScenario().getPopulation().getPersons().values()) {
-				monetizedUserBenefits = monetizedUserBenefits + person.getSelectedPlan().getScore() / this.congestionInfo.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney();
+				if ( person.getSelectedPlan().getScore()==null ) {
+					throw new RuntimeException( "score is null; don't know how to continue.") ;
+				}
+				monetizedUserBenefits += person.getSelectedPlan().getScore() / this.congestionInfo.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney();
 			}
 			this.iteration2userBenefits.put(event.getIteration(), monetizedUserBenefits);
 			

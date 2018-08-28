@@ -74,10 +74,10 @@ public class QSimModule extends AbstractModule {
 
 	static public Collection<AbstractQSimModule> getDefaultQSimModules() {
 		return Arrays.asList(
-				new MessageQueueModule(),
-				new ActivityEngineModule(),
-				new QNetsimEngineModule(),
-				new TeleportationModule(),
+				new MessageQueueModule(),  // defines "MessageQueueEngine"
+				new ActivityEngineModule(), // defines "ActivityEngine"
+				new QNetsimEngineModule(), // defines "NetsimEngine"
+				new TeleportationModule(), // etc.
 				new PopulationModule(),
 				new NetworkChangeEventsModule(),
 				new TransitEngineModule()

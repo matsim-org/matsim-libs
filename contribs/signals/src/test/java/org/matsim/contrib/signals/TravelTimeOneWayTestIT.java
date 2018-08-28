@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.contrib.signals.controler.SignalsModule;
+import org.matsim.contrib.signals.binder.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
@@ -98,7 +98,7 @@ public class TravelTimeOneWayTestIT {
 		conf.qsim().setRemoveStuckVehicles(false);
 		conf.qsim().setUsingFastCapacityUpdate(false);
 
-		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		signalsConfig.setUseSignalSystems(true);
 		if (useLanes) {
 			conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");

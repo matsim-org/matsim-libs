@@ -20,6 +20,8 @@ package org.matsim.contrib.emissions.example.archive;
 
 import static org.junit.Assert.fail;
 import org.junit.Test;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
 /**
@@ -35,12 +37,16 @@ public class RunEmissionToolOnlineExampleIT {
 	@Test
 	public final void testMain() {
 		try {
-			RunEmissionToolOnlineExample tool = new RunEmissionToolOnlineExample(null) ;
+			Config config = RunEmissionToolOnlineExample.prepareConfig( null ) ;
 
-			tool.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 			// otherwise the test fails on jenkins
-
-			tool.run();
+			
+			config.controler().setLastIteration( 1 );
+			
+			Scenario scenario = RunEmissionToolOnlineExample.prepareScenario( config ) ;
+			
+			RunEmissionToolOnlineExample.run( scenario ) ;
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
 			fail("something did not work" ) ;

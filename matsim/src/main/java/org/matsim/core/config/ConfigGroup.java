@@ -236,7 +236,7 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	
 	public final void testForLocked() {
 		if ( locked ) {
-			throw new RuntimeException( "This config group is locked since material from this config group has already been used.") ;
+			throw new RuntimeException( "Too late to change this ...") ;
 		}
 	}
 
