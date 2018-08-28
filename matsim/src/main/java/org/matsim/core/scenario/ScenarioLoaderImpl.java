@@ -237,19 +237,7 @@ class ScenarioLoaderImpl {
 			final String inputCRS = config.transit().getInputScheduleCRS();
 			final String internalCRS = config.global().getCoordinateSystem();
 
-			if ( inputCRS == null ) {
-				new TransitScheduleReader(this.scenario).readURL(this.config.transit().getTransitScheduleFileURL(this.config.getContext()));
-			}
-			else {
-				log.info( "re-projecting transit schedule from "+inputCRS+" to "+internalCRS+" for import" );
-
-				final CoordinateTransformation transformation =
-						TransformationFactory.getCoordinateTransformation(
-								inputCRS,
-								internalCRS );
-
-				new TransitScheduleReader( transformation , this.scenario).readURL(transitScheduleFile);
-			}
+            new TransitScheduleReader( inputCRS, internalCRS, this.scenario).readURL(transitScheduleFile);
 		}
 		else {
 			log.info("no transit schedule file set in config, not loading any transit schedule");
