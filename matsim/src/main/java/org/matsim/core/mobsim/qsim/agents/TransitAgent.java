@@ -185,12 +185,12 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 	}
 
 	@Override
-	public Facility<? extends Facility<?>> getCurrentFacility() {
+	public Facility getCurrentFacility() {
 		return this.basicAgentDelegate.getCurrentFacility();
 	}
 
 	@Override
-	public Facility<? extends Facility<?>> getDestinationFacility() {
+	public Facility getDestinationFacility() {
 		return this.basicAgentDelegate.getDestinationFacility();
 	}
 

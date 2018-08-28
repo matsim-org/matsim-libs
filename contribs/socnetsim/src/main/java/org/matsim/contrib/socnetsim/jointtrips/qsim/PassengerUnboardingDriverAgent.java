@@ -320,11 +320,11 @@ public class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAg
 		return this.planDelegate.getPreviousPlanElement();
 	}
 
-	public Facility<? extends Facility<?>> getCurrentFacility() {
+	public Facility getCurrentFacility() {
 		return this.delegate.getCurrentFacility();
 	}
 
-	public Facility<? extends Facility<?>> getDestinationFacility() {
+	public Facility getDestinationFacility() {
 		return this.delegate.getDestinationFacility();
 	}
 }

@@ -276,8 +276,8 @@ public final class EditPlans {
 		}
 		return prevAct;
 	}
-	//	private Facility<?> asFacility(Activity activity) {
-	//		Facility<?> hereFacility = new ActivityWrapperFacility( activity ) ;
+	//	private Facility asFacility(Activity activity) {
+	//		Facility hereFacility = new ActivityWrapperFacility( activity ) ;
 	//		if ( activity.getFacilityId()!=null ) {
 	//			ActivityFacility facility = this.mobsim.getScenario().getActivityFacilities().getFacilities().get( activity.getFacilityId() ) ;
 	//			if ( facility != null ) {

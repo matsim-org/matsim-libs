@@ -22,6 +22,7 @@ package org.matsim.pt.transitSchedule.api;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributable;
@@ -31,7 +32,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  *
  * @author mrieser
  */
-public interface TransitStopFacility extends Facility<TransitStopFacility>, Attributable {
+public interface TransitStopFacility extends Facility, Identifiable<TransitStopFacility>, Attributable {
 
 	boolean getIsBlockingLane();
 
