@@ -54,6 +54,7 @@ import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import com.google.inject.Inject;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import org.matsim.facilities.MatsimFacilitiesReader;
 
 /**
  * @author dziemke
@@ -123,7 +124,7 @@ public final class AccessibilityModule extends AbstractModule {
 					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
 					Scenario measuringPointsSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 					String measuringPointsFile = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class ).getMeasuringPointsFile() ;
-					new FacilitiesReaderMatsimV1(measuringPointsSc).readFile(measuringPointsFile);
+					new MatsimFacilitiesReader(measuringPointsSc).readFile(measuringPointsFile);
 					measuringPoints = (ActivityFacilitiesImpl) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(measuringPointsSc, activityType);
 					LOG.info("Using measuring points from file: " + measuringPointsFile);
 				
