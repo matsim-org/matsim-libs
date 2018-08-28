@@ -138,8 +138,6 @@ class ScenarioLoaderImpl {
             reader.putAttributeConverters( attributeConverters );
             reader.parse(networkUrl);
 
-			scenario.getNetwork().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, config.global().getCoordinateSystem());
-
 			if ((this.config.network().getChangeEventsInputFile()!= null) && this.config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + this.config.network().getChangeEventsInputFileUrl(this.config.getContext()).getFile());
 				Network network = this.scenario.getNetwork();
@@ -190,8 +188,6 @@ class ScenarioLoaderImpl {
             final PopulationReader reader = new PopulationReader(targetCRS , this.scenario);
             reader.putAttributeConverters( attributeConverters );
             reader.parse( populationFileName );
-
-            scenario.getPopulation().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, config.global().getCoordinateSystem());
 
 			PopulationUtils.printPlansCount(this.scenario.getPopulation()) ;
 		}

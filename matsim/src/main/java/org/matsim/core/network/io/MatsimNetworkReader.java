@@ -26,12 +26,14 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * A reader for network-files of MATSim. This reader recognizes the format of the network-file and uses
@@ -85,6 +87,18 @@ public final class MatsimNetworkReader extends MatsimXmlParser {
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		this.delegate.endTag(name, content, context);
+	}
+
+	@Override
+	public void endDocument() {
+		try {
+			this.delegate.endDocument();
+		} catch (SAXException e) {
+		    throw new RuntimeException(e);
+		}
+		if (targetCRS != null) {
+			network.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+		}
 	}
 
 	@Override
