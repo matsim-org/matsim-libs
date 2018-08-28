@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.oneagent;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.util.Collections;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -42,14 +38,9 @@ import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.controler.Injector;
-import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.PrepareForSimUtils;
-import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.scenario.ScenarioByInstanceModule;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -108,8 +99,8 @@ public class QSimSignalTest implements
 	/**
 	 * Tests the setup with a traffic light that shows red less than the specified intergreen time of five seconds.
 	 */
-	@Test
-	public void testIntergreensAbortOneAgentDriving() { // throws RuntimeException {
+	@Test(expected = RuntimeException.class)
+	public void testIntergreensAbortOneAgentDriving() {
 		//configure and load standard scenario
 		Scenario scenario = new Fixture().createAndLoadTestScenarioOneSignal(true);
 		// modify scenario
@@ -122,15 +113,11 @@ public class QSimSignalTest implements
 		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(Fixture.signalGroupId100);
 		groupData.setOnset(0);
 		groupData.setDropping(59);	
+		
+		runQSimWithSignals(scenario, false);
 
-		assertThatThrownBy(() -> runQSimWithSignals(scenario, false)) //
-			.isExactlyInstanceOf(RuntimeException.class) //
-			.hasMessage("Exception while processing events. Cannot guarantee that all events have been fully processed." );
-		/* another intergreen specific exception should also be thrown, but I do not know how to test for it. theresa, apr'18 :
-		 * "SignalSystem Id 2 SignalGroup Id 100 is switched to green at second 60.0 . "
-		 *		+ "This is a intergreen conflict with SignalGroup Id 100 switched red/yellow/off at second 59.0 i.e. the intergreen lasts 1.0 seconds.  "
-		 *		+ "The minimal intergreen required is, however, 5 seconds." 
-		 */
+		// if this code is reached, no exception has been thrown
+		Assert.fail("The simulation should abort because of intergreens violation.");
 	}
 	
 	/**
@@ -185,27 +172,49 @@ public class QSimSignalTest implements
 
 	
 	
-	private void runQSimWithSignals(final Scenario scenario, boolean handleEvents) throws RuntimeException{
-		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override(Collections.singleton(new AbstractModule() {
-			@Override
-			public void install() {
-				// defaults
-				install(new NewControlerModule());
-				install(new ControlerDefaultCoreListenersModule());
-				install(new ControlerDefaultsModule());
-				install(new ScenarioByInstanceModule(scenario));
-			}
-		}), new SignalsModule()));
-	
-		EventsManager events = injector.getInstance(EventsManager.class);
+	private void runQSimWithSignals(final Scenario scenario, boolean handleEvents) throws RuntimeException {
+//		/*
+//		 * this is the old version how to build an injector without a controler and
+//		 * still be able to add a SignalsModule. A new version using Sebastians
+//		 * QSimBuilder can be found below. theresa, aug'18
+//		 */
+//		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override(Collections.singleton(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				// defaults
+//				install(new NewControlerModule());
+//				install(new ControlerDefaultCoreListenersModule());
+//				install(new ControlerDefaultsModule());
+//				install(new ScenarioByInstanceModule(scenario));
+//			}
+//		}), new SignalsModule()));
+//	
+//		EventsManager events = injector.getInstance(EventsManager.class);
+//		if (handleEvents){
+//			events.addHandler(this);
+//		}
+//
+//		// vehicles are moved to prepareForSim, thus, this must be explicitly called before qsim.
+//		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+//
+//		Mobsim mobsim = injector.getInstance(Mobsim.class);
+//		mobsim.run();
+
+		/*
+		 * new version how to create a qsim without a controler and still be able to add
+		 * the SignalsModule. see comment above.
+		 */
+		EventsManager events = EventsUtils.createEventsManager();
 		if (handleEvents){
 			events.addHandler(this);
 		}
-
+		// vehicles are moved to prepareForSim, thus, this must be explicitly called before qsim.
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-
-		Mobsim mobsim = injector.getInstance(Mobsim.class);
-		mobsim.run();
+		new QSimBuilder(scenario.getConfig())
+				.useDefaults()
+				.addOverridingControllerModule(new SignalsModule())
+				.build(scenario, events)
+				.run();
 	}
 
 
