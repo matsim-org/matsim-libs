@@ -99,7 +99,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final static String ORIG_ID = "origid";
 	private final static String TYPE = "type";
 	private final static String TO_LINKS_ANGLES = "toLinksAngles";
-	private final static String IS_ORIG_LANE = "isOrigLane";
 	private final static String TO_LINK_REFERENCE = "toLinkReference";
 	private final static String NON_CRIT_LANES = "non_critical_lane";
 	private final static String CRIT_LANES = "critical_lane";
@@ -517,7 +516,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				double olCapacity = 0;
 				for (Lane lane : this.lanes.getLanesToLinkAssignments().get(lvec.getLink().getId()).getLanes()
 						.values()) {
-					if (lane.getAttributes().getAttribute(IS_ORIG_LANE).equals(false)) {
+					if (!lane.getId().toString().endsWith("ol")) {
 						lane.setCapacityVehiclesPerHour(SIGNAL_LANES_CAPACITY * lane.getNumberOfRepresentedLanes());
 						if (this.useRadiusReduction) {
 							Long key = Long.valueOf(lvec.getLink().getToNode().getId().toString());
@@ -1188,63 +1187,54 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	private void setConflictingAndNonConflictingLanesToLanes(Link firstLink, Link secondLink,
 			List<Lane> criticalSignalLanes) {
-		if (firstLink == null)
+		if (firstLink == null || secondLink == null)
 			return;
+		
 		LanesToLinkAssignment l2l = lanes.getLanesToLinkAssignments().get(firstLink.getId());
-		LanesToLinkAssignment otherl2l = null;
-		if (secondLink != null)
-			otherl2l = lanes.getLanesToLinkAssignments().get(secondLink.getId());
+		LanesToLinkAssignment otherl2l = lanes.getLanesToLinkAssignments().get(secondLink.getId());
 		List<Lane> firstLanes = new ArrayList<Lane>();
 		List<Lane> secondLanes = new ArrayList<Lane>();
 		if (l2l != null) {
 			for (Lane lane : l2l.getLanes().values()) {
-				if (!((boolean) lane.getAttributes().getAttribute(IS_ORIG_LANE)))
+				if (!lane.getId().toString().endsWith("ol"))
 					firstLanes.add(lane);
 			}
 		}
-
 		if (otherl2l != null) {
 			for (Lane lane : otherl2l.getLanes().values()) {
-				if (!((boolean) lane.getAttributes().getAttribute(IS_ORIG_LANE)))
+				if (!lane.getId().toString().endsWith("ol"))
 					secondLanes.add(lane);
 			}
 		}
 
-		if (l2l != null) {
-			for (Lane lane : l2l.getLanes().values()) {
-				if (!((boolean) lane.getAttributes().getAttribute(IS_ORIG_LANE))) {
-					List<Id<Lane>> nonCritLanes = new ArrayList<Id<Lane>>();
-					List<Id<Lane>> critLanes = new ArrayList<Id<Lane>>();
-					for (Lane otherLane : firstLanes) {
-						if (!otherLane.equals(lane))
-							nonCritLanes.add(otherLane.getId());
-					}
-					if (otherl2l != null) {
-						for (Lane otherLane : secondLanes) {
-							if (criticalSignalLanes != null && criticalSignalLanes.contains(otherLane))
-								critLanes.add(otherLane.getId());
-							else
-								nonCritLanes.add(otherLane.getId());
-						}
-					}
-					this.nonCritLanes.put(lane.getId(), nonCritLanes);
-					int i = 1;
-					for (Id<Lane> laneId : nonCritLanes) {
-						lane.getAttributes().putAttribute(NON_CRIT_LANES + "_" + i, laneId.toString());
-						i++;
-					}
-					if (!critLanes.isEmpty()) {
-						i = 1;
-						this.critLanes.put(lane.getId(), critLanes);
-						for (Id<Lane> laneId : critLanes) {
-							lane.getAttributes().putAttribute(CRIT_LANES + "_" + i, laneId.toString());
-							i++;
-						}
-					}
+		for (Lane lane : firstLanes) {
+			List<Id<Lane>> nonCritLanes = new ArrayList<Id<Lane>>();
+			List<Id<Lane>> critLanes = new ArrayList<Id<Lane>>();
+			for (Lane otherLane : firstLanes) {
+				if (!otherLane.equals(lane))
+					nonCritLanes.add(otherLane.getId());
+			}
+			for (Lane otherLane : secondLanes) {
+				if (criticalSignalLanes != null && criticalSignalLanes.contains(otherLane)) 
+					critLanes.add(otherLane.getId());
+				else
+					nonCritLanes.add(otherLane.getId());
+			}
+			this.nonCritLanes.put(lane.getId(), nonCritLanes);
+			int i = 1;
+			for (Id<Lane> laneId : nonCritLanes) {
+				lane.getAttributes().putAttribute(NON_CRIT_LANES + "_" + i, laneId.toString());
+				i++;
+			}
+			if (!critLanes.isEmpty()) {
+				i = 1;
+				this.critLanes.put(lane.getId(), critLanes);
+				for (Id<Lane> laneId : critLanes) {
+					lane.getAttributes().putAttribute(CRIT_LANES + "_" + i, laneId.toString());
+					i++;
 				}
 			}
 		}
-
 	}
 
 	private void createOnePhase(int groupNumber, SignalSystemData signalSystem, Tuple<LinkVector, LinkVector> pair,
@@ -1405,28 +1395,21 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private void simplifyLanesAndAddOrigLane(Link link) {
 		Lane origLane = lanes.getFactory().createLane(Id.create("Lane" + link.getId() + ".ol", Lane.class));
 		lanes.getLanesToLinkAssignments().get(link.getId()).addLane(origLane);
-		origLane.setCapacityVehiclesPerHour(0);
 		origLane.setStartsAtMeterFromLinkEnd(link.getLength());
 		origLane.setNumberOfRepresentedLanes(link.getNumberOfLanes());
+		// lane capacity has not been set yet. i.e. ol-lane capacity is also set later 
 
 		Lane rightLane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
 				.get(Id.create("Lane" + link.getId() + "." + ((int) link.getNumberOfLanes()), Lane.class));
-		rightLane.getAttributes().putAttribute(IS_ORIG_LANE, false);
 		origLane.addToLaneId(rightLane.getId());
-		origLane.setCapacityVehiclesPerHour(
-				origLane.getCapacityVehiclesPerHour() + rightLane.getCapacityVehiclesPerHour());
-		origLane.getAttributes().putAttribute(IS_ORIG_LANE, true);
 		for (int i = (int) link.getNumberOfLanes() - 1; i > 0; i--) {
 			Lane leftLane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
 					.get(Id.create("Lane" + link.getId() + "." + i, Lane.class));
 			origLane.addToLaneId(leftLane.getId());
-			origLane.setCapacityVehiclesPerHour(
-					origLane.getCapacityVehiclesPerHour() + leftLane.getCapacityVehiclesPerHour());
+			// TODO this is meant to remove duplicated lanes but does not do this properly -> move it to the laneSimplflier!
 			if (rightLane.getToLinkIds().equals(leftLane.getToLinkIds())) {
 				leftLane.setNumberOfRepresentedLanes(
 						leftLane.getNumberOfRepresentedLanes() + rightLane.getNumberOfRepresentedLanes());
-				leftLane.setCapacityVehiclesPerHour(
-						leftLane.getCapacityVehiclesPerHour() + rightLane.getCapacityVehiclesPerHour());
 				// log.info("Put together Lane " +
 				// leftLane.getId().toString() + " and Lane " +
 				// rightLane.getId().toString());
@@ -1435,7 +1418,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				linkLanes.getLanes().remove(rightLane.getId());
 			}
 			rightLane = leftLane;
-			rightLane.getAttributes().putAttribute(IS_ORIG_LANE, false);
 		}
 	}
 
