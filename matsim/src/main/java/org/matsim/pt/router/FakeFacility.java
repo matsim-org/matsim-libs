@@ -14,12 +14,6 @@ public final class FakeFacility implements Facility {
 	}
 
 	@Override
-	public Id getId() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented") ;
-	}
-
-	@Override
 	public Map<String, Object> getCustomAttributes() {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;

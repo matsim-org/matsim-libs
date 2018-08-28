@@ -156,8 +156,8 @@ public final class EditRoutes {
 		Link fromLink = network.getLinks().get(fromLinkId);
 		Link toLink = network.getLinks().get(toLinkId);
 
-		Facility<ActivityFacility> fromFacility = new LinkWrapperFacility(fromLink);
-		Facility<ActivityFacility> toFacility = new LinkWrapperFacility(toLink);
+		Facility fromFacility = new LinkWrapperFacility(fromLink);
+		Facility toFacility = new LinkWrapperFacility(toLink);
 
 		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, leg.getDepartureTime(), person);
 

@@ -100,7 +100,7 @@ public class TransitRouterVariableImpl implements TransitRouter {
 			return new HashMap<>();
 	}
 	    @Override
-	public List<Leg> calcRoute(final Facility<?> fromFacility, final Facility<?> toFacility, final double departureTime, final Person person) {
+	public List<Leg> calcRoute(final Facility fromFacility, final Facility toFacility, final double departureTime, final Person person) {
 		// find possible start stops
 		Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person, fromFacility.getCoord(), departureTime);
 		// find possible end stops
