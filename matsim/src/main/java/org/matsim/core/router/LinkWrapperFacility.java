@@ -1,17 +1,18 @@
 package org.matsim.core.router;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
 
+import java.util.Map;
+
 /*
  * Wraps a Link into a Facility.
  */
-public final class LinkWrapperFacility implements Facility<ActivityFacility> {
+public final class LinkWrapperFacility implements Facility, Identifiable<ActivityFacility> {
 	
 	private final Link wrapped;
 

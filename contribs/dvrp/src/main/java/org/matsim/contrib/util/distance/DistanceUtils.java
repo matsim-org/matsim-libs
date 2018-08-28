@@ -4,11 +4,11 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 
 public class DistanceUtils {
-	public static double calculateDistance(BasicLocation<?> fromLocation, BasicLocation<?> toLocation) {
+	public static double calculateDistance(BasicLocation fromLocation, BasicLocation toLocation) {
 		return calculateDistance(fromLocation.getCoord(), toLocation.getCoord());
 	}
 
-	public static double calculateSquaredDistance(BasicLocation<?> fromLocation, BasicLocation<?> toLocation) {
+	public static double calculateSquaredDistance(BasicLocation fromLocation, BasicLocation toLocation) {
 		return calculateSquaredDistance(fromLocation.getCoord(), toLocation.getCoord());
 	}
 

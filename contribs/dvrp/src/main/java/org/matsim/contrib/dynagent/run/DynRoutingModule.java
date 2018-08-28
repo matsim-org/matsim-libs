@@ -37,8 +37,8 @@ public class DynRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(Facility<?> fromFacility, Facility<?> toFacility, double departureTime,
-			Person person) {
+	public List<? extends PlanElement> calcRoute( Facility fromFacility, Facility toFacility, double departureTime,
+								    Person person) {
 		Route route = RouteUtils.createGenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
 		route.setDistance(Double.NaN);
 		route.setTravelTime(Double.NaN);

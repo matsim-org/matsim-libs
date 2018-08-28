@@ -142,8 +142,8 @@ public final class EditTrips {
 			MobsimAgent agent, Person person, Scenario scenario) {
 		log.debug("entering newTripToNewActivity") ;
 		Link currentLink = scenario.getNetwork().getLinks().get( agent.getCurrentLinkId() ) ;
-		Facility<?> fromFacility = new LinkWrapperFacility( currentLink ) ; 
-		Facility<?> toFacility = scenario.getActivityFacilities().getFacilities().get( newAct.getFacilityId() ) ;
+		Facility fromFacility = new LinkWrapperFacility( currentLink ) ;
+		Facility toFacility = scenario.getActivityFacilities().getFacilities().get( newAct.getFacilityId() ) ;
 		if ( toFacility == null ) {
 			toFacility = new ActivityWrapperFacility( newAct ) ;
 		}
@@ -235,8 +235,8 @@ public final class EditTrips {
 	public static boolean replanFutureTrip(Trip trip, Plan plan, String routingMode, double departureTime, TripRouter tripRouter) {
 		Person person = plan.getPerson();
 
-		Facility<?> fromFacility = new ActivityWrapperFacility( trip.getOriginActivity() ) ;
-		Facility<?> toFacility = new ActivityWrapperFacility( trip.getDestinationActivity() ) ;
+		Facility fromFacility = new ActivityWrapperFacility( trip.getOriginActivity() ) ;
+		Facility toFacility = new ActivityWrapperFacility( trip.getDestinationActivity() ) ;
 
 		final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, person);
 		

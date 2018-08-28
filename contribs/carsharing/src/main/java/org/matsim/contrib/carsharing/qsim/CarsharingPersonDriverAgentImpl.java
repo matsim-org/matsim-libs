@@ -265,11 +265,11 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		return this.driverAgentDelegate.chooseNextLinkId() ;
 	}
 
-	public Facility<? extends Facility<?>> getCurrentFacility() {
+	public Facility getCurrentFacility() {
 		return this.basicAgentDelegate.getCurrentFacility();
 	}
 
-	public Facility<? extends Facility<?>> getDestinationFacility() {
+	public Facility getDestinationFacility() {
 		return this.basicAgentDelegate.getDestinationFacility();
 	}
 

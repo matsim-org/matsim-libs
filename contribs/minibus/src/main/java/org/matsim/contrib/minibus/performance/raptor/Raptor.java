@@ -90,7 +90,7 @@ public class Raptor extends AbstractTransitRouter implements TransitRouter {
 	}
 
 	@Override
-	public List<Leg> calcRoute(final Facility<?> fromFacility, final Facility<?> toFacility, final double departureTime, final Person person) {
+	public List<Leg> calcRoute(final Facility fromFacility, final Facility toFacility, final double departureTime, final Person person) {
 		// find possible start stops
 		Map<TransitStopFacility, InitialNode> fromStops = this.locateWrappedNearestTransitStops(person, fromFacility.getCoord(), departureTime);
 		// find possible end stops
