@@ -20,10 +20,11 @@
 package org.matsim.vsp.ev.data;
 
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vsp.ev.charging.ChargingLogic;
 
-public interface Charger extends BasicLocation<Charger> {
+public interface Charger extends BasicLocation, Identifiable<Charger> {
 	ChargingLogic getLogic();
 
 	void setLogic(ChargingLogic logic);
