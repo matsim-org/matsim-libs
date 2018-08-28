@@ -51,13 +51,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
-			<artifactId>deprecated</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
-			<type>zip</type>
-			<classifier>release</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 			<type>zip</type>
@@ -107,13 +100,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
-			<artifactId>matsim4urbansim</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
-			<type>zip</type>
-			<classifier>release</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
 			<artifactId>minibus</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 			<type>zip</type>
@@ -122,13 +108,6 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>multimodal</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
-			<type>zip</type>
-			<classifier>release</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>networkEditor</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 			<type>zip</type>
 			<classifier>release</classifier>
@@ -184,13 +163,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
-			<artifactId>socnetgen</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
-			<type>zip</type>
-			<classifier>release</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
 			<artifactId>socnetsim</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 			<type>zip</type>
@@ -203,27 +175,7 @@
 			<type>zip</type>
 			<classifier>release</classifier>
 		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>transEnergySim</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
-			<type>zip</type>
-			<classifier>release</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>travelsummary</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
-			<type>zip</type>
-			<classifier>release</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>wagonSim</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
-			<type>zip</type>
-			<classifier>release</classifier>
-		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>
