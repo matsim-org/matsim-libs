@@ -27,8 +27,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
@@ -46,7 +48,7 @@ import java.util.Stack;
  *
  * @author mrieser
  */
-public final class NetworkReaderMatsimV2 extends MatsimXmlParser {
+final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 
 	private final static String NETWORK = "network";
 	private final static String LINKS = "links";
@@ -60,19 +62,18 @@ public final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 	private final AttributesXmlReaderDelegate attributesDelegate = new AttributesXmlReaderDelegate();
 	private org.matsim.utils.objectattributes.attributable.Attributes currentAttributes = null;
 
-	// final or settable?
-	private final CoordinateTransformation transformation;
+	private final String externalInputCRS;
+	private final String targetCRS;
+	private CoordinateTransformation coordinateTransformation;
 
 	private final static Logger log = Logger.getLogger(NetworkReaderMatsimV2.class);
 
-	public NetworkReaderMatsimV2(Network network) {
-		this( new IdentityTransformation() , network );
-	}
-
 	public NetworkReaderMatsimV2(
-			final CoordinateTransformation transformation,
+	        final String inputCRS,
+			final String targetCRS,
 			final Network network) {
-		this.transformation = transformation;
+		this.externalInputCRS = inputCRS;
+		this.targetCRS = targetCRS;
 		this.network = network;
 	}
 
@@ -102,6 +103,26 @@ public final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		switch( name ) {
 			case ATTRIBUTES:
+                if (context.peek().equals(NETWORK)) {
+					String inputCRS = (String) network.getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT);
+					if (inputCRS == null) {
+						if (externalInputCRS != null) {
+							coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
+							network.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+						}
+						else {
+							coordinateTransformation = new IdentityTransformation();
+						}
+					}
+					else {
+						if (externalInputCRS != null) {
+							// warn or crash?
+							log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
+						}
+						coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
+						network.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+					}
+				}
 			case ATTRIBUTE:
 				attributesDelegate.endTag(name, content, context);
 				break;
@@ -185,7 +206,7 @@ public final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 						Double.parseDouble(atts.getValue("x")),
 						Double.parseDouble(atts.getValue("y")),
 						Double.parseDouble(atts.getValue("z")));
-		return transformation.transform( c );
+		return coordinateTransformation.transform( c );
 	}
 
 	private void startLink(final Attributes atts) {
