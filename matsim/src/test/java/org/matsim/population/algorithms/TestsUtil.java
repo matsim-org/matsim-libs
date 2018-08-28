@@ -43,7 +43,7 @@ public class TestsUtil {
 		Plan plan = PopulationUtils.createPlan(person);
 		String[] locationIdSequence = facString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
-			BasicLocation location = layer.getFacilities().get(Id.create(locationIdSequence[aa], ActivityFacility.class));
+			ActivityFacility location = layer.getFacilities().get(Id.create(locationIdSequence[aa], ActivityFacility.class));
 			Activity act;
 			act = PopulationUtils.createAndAddActivity(plan, "actAtFacility" + locationIdSequence[aa]);
 			act.setFacilityId(location.getId());
@@ -59,7 +59,7 @@ public class TestsUtil {
 		Plan plan = PopulationUtils.createPlan(person);
 		String[] locationIdSequence = linkString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
-			BasicLocation location = layer.getLinks().get(Id.create(locationIdSequence[aa], Link.class));
+			Link location = layer.getLinks().get(Id.create(locationIdSequence[aa], Link.class));
 			Activity act;
 			act = PopulationUtils.createAndAddActivityFromLinkId(plan, "actOnLink" + locationIdSequence[aa], (Id<Link>) location.getId());
 			act.setEndTime(10*3600);
