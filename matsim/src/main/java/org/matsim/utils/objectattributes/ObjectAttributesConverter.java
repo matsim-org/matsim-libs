@@ -32,6 +32,7 @@ public class ObjectAttributesConverter {
 		this.converters.put(Double.class.getCanonicalName(), new DoubleConverter() );
 		this.converters.put(Boolean.class.getCanonicalName(), new BooleanConverter() );
 		this.converters.put(Long.class.getCanonicalName(), new LongConverter() );
+		this.converters.put(double[].class.getCanonicalName(), new DoubleArrayConverter());
 	}
 
 	public Object convert(String className, String value) {
