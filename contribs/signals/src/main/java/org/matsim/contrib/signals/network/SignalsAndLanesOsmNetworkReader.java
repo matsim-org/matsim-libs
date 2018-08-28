@@ -322,7 +322,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				} else {
 					Long toNodeId = Long.valueOf(link.getToNode().getId().toString());
 					Set<OsmRelation> restrictions = osmNodeRestrictions.get(toNodeId);
-					if (!restrictions.isEmpty() && (this.bbox == null || this.bbox.contains(nodes.get(toNodeId).coord))) {
+					if (restrictions != null && !restrictions.isEmpty() && (this.bbox == null || this.bbox.contains(nodes.get(toNodeId).coord))) {
 						// if there exists an Restriction in the ToNode, we want to
 						// create a Lane to represent the restriction,
 						// as the toLinks cannot be restricted otherwise
@@ -330,15 +330,19 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						createLanes(link, lanes, 1);
 						removeRestrictedLinks(link, outLinks);
 						LanesToLinkAssignment l2l = lanes.getLanesToLinkAssignments().get(link.getId());
-						Id<Lane> LaneId = Id.create("Lane" + link.getId() + ".1", Lane.class);
+						Id<Lane> laneId = Id.create("Lane" + link.getId() + ".1", Lane.class);
 						for (LinkVector lvec : outLinks) {
 							Id<Link> toLink = lvec.getLink().getId();
-							Lane lane = l2l.getLanes().get(LaneId);
+							Lane lane = l2l.getLanes().get(laneId);
 							lane.addToLinkId(toLink);
 						}
-					}
+					} 
 				}
-			} else if (lanes.getLanesToLinkAssignments().containsKey(link.getId())) {
+			}
+				
+			if (lanes.getLanesToLinkAssignments().containsKey(link.getId()) 
+					&& lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().isEmpty() ) {
+				// no lanes needed on this link -> delete the lane container for this link
 				lanes.getLanesToLinkAssignments().remove(link.getId());
 			}
 		}
@@ -1526,24 +1530,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		// create a List of all toLinks
 		List<LinkVector> linkVectors = constructOrderedOutLinkVectors(link);
 
-		// checker if List is empty, if so remove the existing Lanes
-		if (linkVectors.isEmpty()) {
-			// remove all lanes of the link
-			List<Lane> lanes2remove = new ArrayList<Lane>();
-			for (Lane lane : lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().values()) {
-				lanes2remove.add(lane);
-			}
-			for (Lane lane : lanes2remove) {
-				lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().remove(lane.getId());
-			}
-			// remove LanesToLinkAssignment
-			lanes.getLanesToLinkAssignments().remove(link.getId());
-			LOG.warn("toLinks.isEmpty() @ " + link.getId().toString());
-			return;
+		if (osmNodeRestrictions.containsKey(Long.valueOf(link.getToNode().getId().toString()))) {
+			// remove restricted toLinks from List
+			removeRestrictedLinks(link, linkVectors);
 		}
-
-		// removes restricted toLinks from List
-		removeRestrictedLinks(link, linkVectors);
 
 		// if a LaneStack exists, fill Lanes with turn:lane informations,
 		// otherwise fill by default
