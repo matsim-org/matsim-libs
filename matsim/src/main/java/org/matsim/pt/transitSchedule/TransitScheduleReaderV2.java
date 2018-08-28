@@ -72,7 +72,7 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 	private final AttributesXmlReaderDelegate attributesDelegate = new AttributesXmlReaderDelegate();
 	private org.matsim.utils.objectattributes.attributable.Attributes currentAttributes = null;
 
-	private CoordinateTransformation coordinateTransformation;
+	private CoordinateTransformation coordinateTransformation = new IdentityTransformation();
 	private final StringCache cache = new StringCache();
 
 	public TransitScheduleReaderV2(final TransitSchedule schedule, final RouteFactories routeFactory) {
@@ -233,9 +233,6 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 					if (externalInputCRS != null) {
 						coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
 						currentAttributes.putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
-					}
-					else {
-						coordinateTransformation = new IdentityTransformation();
 					}
 				}
 				else {

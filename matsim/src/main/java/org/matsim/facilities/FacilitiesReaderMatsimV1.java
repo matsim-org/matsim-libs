@@ -63,7 +63,7 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 
     private final String externalInputCRS;
     private final String targetCRS;
-    private CoordinateTransformation coordinateTransformation;
+    private CoordinateTransformation coordinateTransformation = new IdentityTransformation();
 
     FacilitiesReaderMatsimV1(
             final String externalInputCRS,
@@ -116,9 +116,6 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
                     if (externalInputCRS != null) {
                         coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
                         currAttributes.putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
-                    }
-                    else {
-                        coordinateTransformation = new IdentityTransformation();
                     }
                 }
                 else {

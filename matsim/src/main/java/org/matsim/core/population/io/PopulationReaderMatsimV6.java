@@ -108,7 +108,7 @@ import java.util.Stack;
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes = null;
 
 	private final String targetCRS;
-	private CoordinateTransformation coordinateTransformation;
+	private CoordinateTransformation coordinateTransformation = new IdentityTransformation();
 
 	private Activity prevAct = null;
 
@@ -207,9 +207,6 @@ import java.util.Stack;
 						if (externalInputCRS != null) {
 							coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
 							scenario.getPopulation().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
-						}
-						else {
-							coordinateTransformation = new IdentityTransformation();
 						}
 					}
 					else {

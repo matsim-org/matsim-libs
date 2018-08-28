@@ -64,7 +64,7 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 
 	private final String externalInputCRS;
 	private final String targetCRS;
-	private CoordinateTransformation coordinateTransformation;
+	private CoordinateTransformation coordinateTransformation = new IdentityTransformation();
 
 	private final static Logger log = Logger.getLogger(NetworkReaderMatsimV2.class);
 
@@ -109,9 +109,6 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 						if (externalInputCRS != null) {
 							coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
 							network.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
-						}
-						else {
-							coordinateTransformation = new IdentityTransformation();
 						}
 					}
 					else {
