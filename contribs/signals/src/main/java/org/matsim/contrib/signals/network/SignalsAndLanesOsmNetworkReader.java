@@ -71,6 +71,8 @@ import org.matsim.lanes.data.LanesToLinkAssignment;
 import org.matsim.lanes.data.LanesWriter;
 import org.xml.sax.Attributes;
 
+import com.vividsolutions.jts.util.Assert;
+
 /**
  * @author tthunig, nschirrmacher
  */
@@ -1537,16 +1539,13 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 		// if a LaneStack exists, fill Lanes with turn:lane informations,
 		// otherwise fill by default
-		Id<Link> id = link.getId();
-		if (laneStacks.containsKey(id)) {
-			Stack<Stack<Integer>> laneStack = laneStacks.get(id);
-			boolean leftLane = false;
+		Stack<Stack<Integer>> laneStack = laneStacks.get(link.getId());
+		if (laneStack != null && !laneStack.isEmpty()) {
+			Assert.equals(laneStack.size(), (int)link.getNumberOfLanes());
 			for (int i = (int) link.getNumberOfLanes(); i > 0; i--) {
 				Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
 						.get(Id.create("Lane" + link.getId() + "." + i, Lane.class));
-				if (laneStack.size() == 1)
-					leftLane = true;
-				setToLinksForLaneWithTurnLanes(lane, laneStack.pop(), linkVectors, leftLane);
+				setToLinksForLaneWithTurnLanes(lane, laneStack.pop(), linkVectors, (laneStack.size() == 1));
 			}
 		} else {
 			setToLinksForLanesDefault(link, linkVectors);
@@ -1697,7 +1696,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	// Fills Lanes with turn:lane informations
 	private void setToLinksForLaneWithTurnLanes(Lane lane, Stack<Integer> laneStack, List<LinkVector> toLinks,
-			boolean leftLane) {
+			boolean singleLaneOfTheLink) {
 		lane.getAttributes().putAttribute(TO_LINK_REFERENCE, "OSM-Information");
 		int alignmentAnte;
 		LinkVector throughLink = toLinks.get(0);
@@ -1783,7 +1782,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				} else if (tempLinks.size() == 2) {
 					if (tempDir == 1) { // lane direction: "left"
 						for (LinkVector lvec : tempLinks)
-							if (!lvec.equals(reverseLink) || leftLane || !this.allowUTurnAtLeftLaneOnly)
+							// TODO does this make sense? it means:
+							// add link as to-link, if it is not the reverse link OR the link has only one lane OR u-turn is allowed at any lane
+							if (!lvec.equals(reverseLink) || singleLaneOfTheLink || !this.allowUTurnAtLeftLaneOnly)
 								lane.addToLinkId(lvec.getLink().getId());
 					}
 					if (tempDir == 2) { // lane direction: "slight_left"
@@ -1796,7 +1797,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						lane.addToLinkId(tempLinks.get(1).getLink().getId());
 				} else if (tempLinks.size() > 2) {
 					for (LinkVector lvec : tempLinks)
-						if (!lvec.equals(reverseLink) || leftLane || !this.allowUTurnAtLeftLaneOnly)
+						if (!lvec.equals(reverseLink) || singleLaneOfTheLink || !this.allowUTurnAtLeftLaneOnly)
 							lane.addToLinkId(lvec.getLink().getId());
 				} else {
 					lane.addToLinkId(toLinks.get(toLinks.size() - 1).getLink().getId());
