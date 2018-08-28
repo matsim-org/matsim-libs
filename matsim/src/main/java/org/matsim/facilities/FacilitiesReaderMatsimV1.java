@@ -41,7 +41,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  * @author balmermi
  */
-public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
+final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 
     private final static String FACILITIES = "facilities";
     private final static String FACILITY = "facility";
@@ -53,10 +53,10 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 
     private final ActivityFacilities facilities;
     private final ActivityFacilitiesFactory factory;
-    private final AttributesXmlReaderDelegate attributesReader;
+    private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
     private ActivityFacility currfacility = null;
     private ActivityOption curractivity = null;
-    private org.matsim.utils.objectattributes.attributable.Attributes currAttributes;
+    private org.matsim.utils.objectattributes.attributable.Attributes currAttributes = null;
 
     private final CoordinateTransformation coordinateTransformation;
 
@@ -70,8 +70,6 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
         this.coordinateTransformation = coordinateTransformation;
         this.facilities = scenario.getActivityFacilities();
         this.factory = this.facilities.getFactory();
-        this.attributesReader = new AttributesXmlReaderDelegate();
-        this.currAttributes = null;
     }
 
     public void putAttributeConverter(Class<?> clazz, AttributeConverter<?> converter) {
@@ -117,6 +115,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 
     private void startFacilities(final Attributes atts) {
         this.facilities.setName(atts.getValue("name"));
+        this.currAttributes = facilities.getAttributes();
         if (atts.getValue("aggregation_layer") != null) {
             Logger.getLogger(FacilitiesReaderMatsimV1.class).warn("aggregation_layer is deprecated.");
         }
