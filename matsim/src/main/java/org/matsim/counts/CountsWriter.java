@@ -26,6 +26,7 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
@@ -54,36 +55,50 @@ public class CountsWriter extends MatsimXmlWriter implements MatsimWriter {
 	public final void write(final String filename) {
 		try {
 			openFile(filename);
-
-			// write custom header
-			writeXmlHead();
-
-			this.handler.startCounts(this.counts, this.writer);
-			this.handler.writeSeparator(this.writer);
-			
-			List<Count> countsTemp = new Vector<Count>();
-			countsTemp.addAll(this.counts.getCounts().values());
-			Collections.sort(countsTemp, new CountComparator());
-
-            for (Count c : countsTemp) {
-                List<Volume> volumesTemp = new Vector<Volume>();
-                volumesTemp.addAll(c.getVolumes().values());
-                Collections.sort(volumesTemp, new VolumeComparator());
-                this.handler.startCount(c, this.writer);
-                for (Volume v : volumesTemp) {
-                    this.handler.startVolume(v, this.writer);
-                    this.handler.endVolume(this.writer);
-                }
-                this.handler.endCount(this.writer);
-                this.handler.writeSeparator(this.writer);
-                this.writer.flush();
-            }
-			this.handler.endCounts(this.writer);
+			doTheWriting();
 			close();
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public final void write(final OutputStream stream) {
+		try {
+			openOutputStream(stream);
+			doTheWriting();
+			close();
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void doTheWriting() throws IOException {
+		// write custom header
+		writeXmlHead();
+
+		this.handler.startCounts(this.counts, this.writer);
+		this.handler.writeSeparator(this.writer);
+
+		List<Count> countsTemp = new Vector<Count>();
+		countsTemp.addAll(this.counts.getCounts().values());
+		Collections.sort(countsTemp, new CountComparator());
+
+					for (Count c : countsTemp) {
+							List<Volume> volumesTemp = new Vector<Volume>();
+							volumesTemp.addAll(c.getVolumes().values());
+							Collections.sort(volumesTemp, new VolumeComparator());
+							this.handler.startCount(c, this.writer);
+							for (Volume v : volumesTemp) {
+									this.handler.startVolume(v, this.writer);
+									this.handler.endVolume(this.writer);
+							}
+							this.handler.endCount(this.writer);
+							this.handler.writeSeparator(this.writer);
+							this.writer.flush();
+					}
+		this.handler.endCounts(this.writer);
 	}
 
 	@Override
