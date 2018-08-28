@@ -96,7 +96,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final static int CYCLE_TIME = 90;
 	private final int minimalTimeForPair = 2 * INTERGREENTIME + 2 * MIN_GREENTIME;
 
-	private final static String ORIG_ID = "origId";
+	private final static String ORIG_ID = "origid";
 	private final static String TYPE = "type";
 	private final static String TO_LINKS_ANGLES = "toLinksAngles";
 	private final static String IS_ORIG_LANE = "isOrigLane";
