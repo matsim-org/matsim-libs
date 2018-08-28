@@ -82,7 +82,7 @@ public class DrtRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(Facility<?> fromFacility, Facility<?> toFacility, double departureTime,
+	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
 			Person person) {
 		Link fromLink = getLink(fromFacility);
 		Link toLink = getLink(toFacility);
@@ -113,7 +113,7 @@ public class DrtRoutingModule implements RoutingModule {
 		return Collections.singletonList(drtLeg);
 	}
 
-	private Link getLink(Facility<?> facility) {
+	private Link getLink(Facility facility) {
 		Link link = network.getLinks().get(facility.getLinkId());
 		return link != null ? link : NetworkUtils.getNearestLink(network, facility.getCoord());
 	}

@@ -288,7 +288,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	}
 
 	@Override
-	public Facility<? extends Facility<?>> getCurrentFacility() {
+	public Facility getCurrentFacility() {
 		PlanElement pe = this.getCurrentPlanElement() ;
 		Activity activity ;
 		if ( pe instanceof Activity ) {
@@ -310,7 +310,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	}
 
 	@Override
-	public Facility<? extends Facility<?>> getDestinationFacility() {
+	public Facility getDestinationFacility() {
 		PlanElement pe = this.getCurrentPlanElement() ;
 		if ( pe instanceof Leg ) {
 			Activity activity = (Activity)this.getNextPlanElement() ;

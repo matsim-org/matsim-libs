@@ -22,6 +22,7 @@ package org.matsim.api.core.v01.network;
 import java.util.Set;
 
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
@@ -31,7 +32,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  * the context.
  * (This becomes clear if you think about a nodeId/linkId given by person.)
  */
-public interface Link extends BasicLocation<Link>, Attributable {
+public interface Link extends BasicLocation, Attributable, Identifiable<Link> {
 
 
 	/**

@@ -217,12 +217,12 @@ public class AgentNotificationTest {
 			}
 
 			@Override
-			public Facility<? extends Facility<?>> getCurrentFacility() {
+			public Facility getCurrentFacility() {
 				return delegate.getCurrentFacility() ;
 			}
 
 			@Override
-			public Facility<? extends Facility<?>> getDestinationFacility() {
+			public Facility getDestinationFacility() {
 				return delegate.getDestinationFacility() ;
 			}
 
