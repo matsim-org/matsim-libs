@@ -41,6 +41,6 @@ public interface Facility extends BasicLocation, Customizable {
 
 	public static final String FACILITY_NO_LONGER_IDENTIFIABLE = "After refactoring, facility " +
 													 "does not longer automatically " +
-										     "implement Identifiable.  Don't know what to do.";
-
+													 "implement Identifiable.  Don't know what to do.";
+	
 }
