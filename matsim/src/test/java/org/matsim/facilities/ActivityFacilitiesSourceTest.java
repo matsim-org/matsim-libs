@@ -131,7 +131,7 @@ public class ActivityFacilitiesSourceTest {
 
 	private ActivityFacilities getFacilities(String outputDir){
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
-		new FacilitiesReaderMatsimV1(scenario).readFile(outputDir+"/output_facilities.xml.gz");
+		new FacilitiesReaderMatsimV1(null, null, scenario).readFile(outputDir+"/output_facilities.xml.gz");
 		return scenario.getActivityFacilities();
 	}
 

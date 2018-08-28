@@ -1,4 +1,4 @@
-package org.matsim.core.network;
+package org.matsim.core.network.io;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -35,18 +36,7 @@ public class NetworkReprojectionIOTest {
 
 		final Network readNetwork = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(
-				new CoordinateTransformation() {
-					@Override
-					public Coord transform(Coord coord) {
-						double elevation;
-						try{
-							elevation = coord.getZ();
-							return new Coord( 1000 , 1000 , elevation);
-						} catch (Exception e){
-							return new Coord( 1000 , 1000 );
-						}
-					}
-				},
+				null, null,
 				readNetwork ).readFile( networkFile );
 
 		Assert.assertEquals(

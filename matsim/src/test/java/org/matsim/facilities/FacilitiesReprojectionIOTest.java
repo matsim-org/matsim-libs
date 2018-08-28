@@ -31,7 +31,7 @@ public class FacilitiesReprojectionIOTest {
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
-		new MatsimFacilitiesReader( new Transformation() , reprojectedScenario ).parse(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
+		new MatsimFacilitiesReader( null, null , reprojectedScenario ).parse(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
 
 		assertScenarioReprojectedCorrectly(originalScenario, reprojectedScenario);
 	}

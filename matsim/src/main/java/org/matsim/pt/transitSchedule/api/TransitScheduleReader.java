@@ -117,7 +117,7 @@ public class TransitScheduleReader implements MatsimReader {
 						externalInputCRS != null ?
 								TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS) :
 								new IdentityTransformation(),
-						, this.scenario);
+						this.scenario);
 			} else {
 				throw new IllegalArgumentException("Unsupported doctype: " + doctype);
 			}

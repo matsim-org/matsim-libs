@@ -40,7 +40,7 @@ import org.matsim.contrib.wagonSim.demand.WagonDataContainer;
 import org.matsim.contrib.wagonSim.demand.WagonDataParser;
 import org.matsim.contrib.wagonSim.demand.WagonToMatsimDemandConverter;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -155,7 +155,7 @@ public class WagonToDemandConverterMain {
 
 		Config config = Utils.getDefaultWagonSimConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(scheduleNetworkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(scheduleNetworkFile);
 		new TransitScheduleReader(scenario).readFile(scheduleFile);
 		ObjectAttributes transitVehicleAttributes = new ObjectAttributes();
 		new ObjectAttributesXmlReader(transitVehicleAttributes).readFile(transitVehicleAttributesFile);

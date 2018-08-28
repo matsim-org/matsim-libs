@@ -133,7 +133,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
         super.setDoctype(doctype);
         // Currently the only facilities-type is v1
         if (FACILITIES_V1.equals(doctype)) {
-            this.delegate = new FacilitiesReaderMatsimV1(coordinateTransformation, scenario);
+            this.delegate = new FacilitiesReaderMatsimV1(externalInputCRS, targetCRS, scenario);
             ((FacilitiesReaderMatsimV1)this.delegate).putAttributeConverters(this.attributeConverters);
             log.info("using facilities_v1-reader.");
         } else {

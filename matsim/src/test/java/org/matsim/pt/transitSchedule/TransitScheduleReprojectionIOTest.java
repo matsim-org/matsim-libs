@@ -37,7 +37,7 @@ public class TransitScheduleReprojectionIOTest {
 		new TransitScheduleReader( originalScenario ).readURL(transitSchedule);
 
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReader(new Transformation(), reprojectedScenario).readURL(transitSchedule);
+		new TransitScheduleReader(null, null, reprojectedScenario).readURL(transitSchedule);
 
 		assertCorrectlyReprojected( originalScenario.getTransitSchedule() , reprojectedScenario.getTransitSchedule() );
 	}
