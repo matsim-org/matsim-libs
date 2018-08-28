@@ -27,8 +27,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
@@ -42,6 +44,7 @@ import org.xml.sax.Attributes;
  * @author balmermi
  */
 final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
+    private static Logger log = Logger.getLogger(FacilitiesReaderMatsimV1.class);
 
     private final static String FACILITIES = "facilities";
     private final static String FACILITY = "facility";
@@ -58,16 +61,16 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
     private ActivityOption curractivity = null;
     private org.matsim.utils.objectattributes.attributable.Attributes currAttributes = null;
 
-    private final CoordinateTransformation coordinateTransformation;
+    private final String externalInputCRS;
+    private final String targetCRS;
+    private CoordinateTransformation coordinateTransformation;
 
-    public FacilitiesReaderMatsimV1(final Scenario scenario) {
-        this(new IdentityTransformation(), scenario);
-    }
-
-    public FacilitiesReaderMatsimV1(
-            final CoordinateTransformation coordinateTransformation,
+    FacilitiesReaderMatsimV1(
+            final String externalInputCRS,
+            final String targetCRS,
             final Scenario scenario) {
-        this.coordinateTransformation = coordinateTransformation;
+        this.externalInputCRS = externalInputCRS;
+        this.targetCRS = targetCRS;
         this.facilities = scenario.getActivityFacilities();
         this.factory = this.facilities.getFactory();
     }
@@ -107,6 +110,26 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
         } else if (ACTIVITY.equals(name)) {
             this.curractivity = null;
         } else if (ATTRIBUTES.equalsIgnoreCase(name)) {
+            if (context.peek().equals(FACILITIES)) {
+                String inputCRS = (String) currAttributes.getAttribute(CoordUtils.INPUT_CRS_ATT);
+                if (inputCRS == null) {
+                    if (externalInputCRS != null) {
+                        coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
+                        currAttributes.putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+                    }
+                    else {
+                        coordinateTransformation = new IdentityTransformation();
+                    }
+                }
+                else {
+                    if (externalInputCRS != null) {
+                        // warn or crash?
+                        log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
+                    }
+                    coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
+                    currAttributes.putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+                }
+            }
             this.currAttributes = null;
         } else if (ATTRIBUTE.equalsIgnoreCase(name)) {
             this.attributesReader.endTag(name, content, context);

@@ -159,19 +159,10 @@ class ScenarioLoaderImpl {
 			final String inputCRS = config.facilities().getInputCRS();
 			final String internalCRS = config.global().getCoordinateSystem();
 
-			if ( inputCRS == null ) {
-				new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
-			}
-			else {
-				log.info( "re-projecting facilities from "+inputCRS+" to "+internalCRS+" for import" );
+            MatsimFacilitiesReader reader = new MatsimFacilitiesReader(inputCRS, internalCRS, this.scenario);
+            reader.putAttributeConverters(attributeConverters);
+            reader.parse(facilitiesFileName);
 
-				final CoordinateTransformation transformation =
-						TransformationFactory.getCoordinateTransformation(
-								inputCRS,
-								internalCRS );
-
-				new MatsimFacilitiesReader(transformation , this.scenario).parse(facilitiesFileName);
-			}
 			log.info("loaded " + this.scenario.getActivityFacilities().getFacilities().size() + " facilities from " + facilitiesFileName);
 		}
 		else {
