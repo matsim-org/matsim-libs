@@ -19,7 +19,15 @@
 
 package org.matsim.contrib.signals.network;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -33,28 +41,34 @@ import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.data.consistency.LanesAndSignalsCleaner;
-import org.matsim.contrib.signals.data.consistency.SignalControlDataConsistencyChecker;
-import org.matsim.contrib.signals.data.consistency.SignalGroupsDataConsistencyChecker;
-import org.matsim.contrib.signals.data.consistency.SignalSystemsDataConsistencyChecker;
-import org.matsim.contrib.signals.data.signalgroups.v20.*;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.contrib.signals.model.*;
+import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.OsmNetworkReader;
-import org.matsim.core.utils.misc.Counter;
-import org.matsim.lanes.data.*;
-import org.matsim.lanes.data.consistency.LanesConsistencyChecker;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesFactory;
+import org.matsim.lanes.data.LanesToLinkAssignment;
+import org.matsim.lanes.data.LanesWriter;
 import org.xml.sax.Attributes;
 
 /**
@@ -88,13 +102,18 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final static String NON_CRIT_LANES = "non_critical_lane";
 	private final static String CRIT_LANES = "critical_lane";
 
-	// TODO make enum out of it
-	private final static String LANES_ESTIMATION = "StVO_free";
-	// private final static String LANES_ESTIMATION = "StVO_restricted";
-	// private final static String LANES_ESTIMATION = "StVO_very_restricted";
-	// private final static String LANES_ESTIMATION = "realistic_free";
-	// private final static String LANES_ESTIMATION = "realistic_restricted";
-	// private final static String LANES_ESTIMATION = "realistic_very_restricted";
+	// specify turn restrictions of lanes without turn:lanes information on OSM
+	private final MiddleLaneRestriction MIDDLE_LANE_TYPE = MiddleLaneRestriction.REALISTIC;
+	private final OuterLaneRestriction OUTER_LANE_TYPE = OuterLaneRestriction.RESTRICTIVE;
+	public enum MiddleLaneRestriction {
+		REGULATION_BASED, // all turns are allowed from middle lanes, except u-turns
+		REALISTIC // only straight traffic allowed from middle lanes
+	}
+	public enum OuterLaneRestriction {
+		VERY_RESTRICTIVE, // only left and u-turns at the left most lane, only right turns at the right most lane
+		RESTRICTIVE, // only left and u-turns at the left most lane, right and straight turns at the right most lane
+		NON_RESTRICTIVE // left, u- and straight turns at the left most lane, right and straight turns at the right most lane
+	}
 
 	private final Map<Id<Link>, Stack<Stack<Integer>>> laneStacks = new HashMap<>();
 	private final Map<Long, OsmNode> roundaboutNodes = new HashMap<>();
@@ -116,13 +135,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private boolean allowUTurnAtLeftLaneOnly = true;
 	private boolean makePedestrianSignals = false;
 	private boolean acceptFourPlusCrossings = false;
-
-	private String usedLanesEstimation;
-
-	// TODO enum: externalLanes: very restrictive, restrictive, free
-	// middleLanes: stvo, realistic
-	private int modeMidLanes = 1;
-	private int modeOutLanes = 1;
 
 	private final SignalSystemsData systems;
 	private final SignalGroupsData groups;
@@ -164,8 +176,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				false, // use radius reduction
 				true, // allow U-turn at left lane only
 				true, // make pedestrian signals
-				false, // accept 4+ crossings
-				"realistic_very_restricted");// set lanes estimation modes
+				false); // accept 4+ crossings
 		reader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
 																	// (south,west,north,east)
 		reader.parse(inputOSM);
@@ -216,63 +227,22 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		LOG.info("MATSim: # signals created: " + this.systems.getSignalSystemData().size());
 	}
 
-	// TODO rename 'mode' as it is to similiar to 'transport mode' (s.o.)
-	/**
-	 * @param modeOutLanes
-	 *            The mode in which ToLinks are determined in case of missing lane
-	 *            directions on the "Out"-lanes (farthest left and right lane). 1 :
-	 *            only right/left-turn (and reverse on left lane) 2 :
-	 *            right/left-turn and straight (and reverse on left lane) 3 : only
-	 *            left-turn on left lane; right-turn and straight on right lane
-	 * @param modeMidLanes
-	 *            The mode in which ToLinks are determined in case of missing lane
-	 *            directions on the "Mid"-lanes (all lanes except the farthest left
-	 *            and right lane). 1 : only straight 2 : straight, left and right
-	 *            (if existing and not reverse)
-	 */
-	public void setModesForDefaultLanes(int modeOutLanes, int modeMidLanes) {
-		this.modeOutLanes = modeOutLanes;
-		this.modeMidLanes = modeMidLanes;
-	}
-
-	public void setModesForDefaultLanes(String lanesEstimation) {
-		this.usedLanesEstimation = lanesEstimation;
-		if (lanesEstimation.equals("StVO_free")) {
-			setModesForDefaultLanes(2, 2);
-		} else if (lanesEstimation.equals("StVO_restricted")) {
-			setModesForDefaultLanes(3, 2);
-		} else if (lanesEstimation.equals("StVO_very_restricted")) {
-			setModesForDefaultLanes(1, 2);
-		} else if (lanesEstimation.equals("realistic_free")) {
-			setModesForDefaultLanes(2, 1);
-		} else if (lanesEstimation.equals("realistic_restricted")) {
-			setModesForDefaultLanes(3, 1);
-		} else if (lanesEstimation.equals("realistic_very_restricted")) {
-			setModesForDefaultLanes(1, 1);
-		} else {
-			setModesForDefaultLanes(2, 1);
-			LOG.warn("String LANES_ESTIMATION : '" + LANES_ESTIMATION
-					+ "' could not be read. Mode 'realistic_free' has been set by default!!!");
-			this.usedLanesEstimation = LANES_ESTIMATION;
-		}
-	}
-
 	public void setBoundingBox(double south, double west, double north, double east) {
 		Coord nw = this.transform.transform(new Coord(west, north));
 		Coord se = this.transform.transform(new Coord(east, south));
 		this.bbox = new BoundingBox(se.getY(), nw.getX(), nw.getY(), se.getX());
 	}
 
+	// TODO single setters for all
 	public void setAssumptions(boolean minimizeSmallRoundabouts, boolean mergeOnewaySignalSystems,
 			boolean useRadiusReduction, boolean allowUTurnAtLeftLaneOnly, boolean makePedestrianSignals,
-			boolean acceptFourPlusCrossings, String lanesEstimation) {
+			boolean acceptFourPlusCrossings) {
 		this.minimizeSmallRoundabouts = minimizeSmallRoundabouts;
 		this.mergeOnewaySignalSystems = mergeOnewaySignalSystems;
 		this.useRadiusReduction = mergeOnewaySignalSystems;
 		this.allowUTurnAtLeftLaneOnly = allowUTurnAtLeftLaneOnly;
 		this.makePedestrianSignals = makePedestrianSignals;
 		this.acceptFourPlusCrossings = acceptFourPlusCrossings;
-		setModesForDefaultLanes(lanesEstimation);
 	}
 
 	/**
@@ -1632,7 +1602,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 
 		if (lanes.getLanesToLinkAssignments().containsKey(link.getId()) && toLinks.size() > 1) {
-			if (modeOutLanes == 1 || modeOutLanes == 2 || modeOutLanes == 3) {
+			{
+				// add right turn
 				Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
 						.get(Id.create("Lane" + link.getId() + "." + ((int) link.getNumberOfLanes()), Lane.class));
 				if (reverseLink != 0)
@@ -1640,7 +1611,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				else
 					lane.addToLinkId(toLinks.get(1).getLink().getId());
 				lane.setAlignment(-2);
-				lane.getAttributes().putAttribute(TO_LINK_REFERENCE, "Estimation_based_on_" + this.usedLanesEstimation);
+				lane.getAttributes().putAttribute(TO_LINK_REFERENCE, OUTER_LANE_TYPE);
+				
+				// add left turn
 				lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
 						.get(Id.create("Lane" + link.getId() + "." + "1", Lane.class));
 				if (reverseLink != -1)
@@ -1650,10 +1623,11 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				else
 					lane.addToLinkId(toLinks.get(toLinks.size() - 1).getLink().getId());
 				lane.setAlignment(2);
-				lane.getAttributes().putAttribute(TO_LINK_REFERENCE, "Estimation_based_on_" + this.usedLanesEstimation);
+				lane.getAttributes().putAttribute(TO_LINK_REFERENCE, OUTER_LANE_TYPE);
 			}
 
-			if (modeOutLanes == 2 || modeOutLanes == 3) {
+			if (!OUTER_LANE_TYPE.equals(OuterLaneRestriction.RESTRICTIVE)) {
+				// add straight turn to right lane
 				Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
 						.get(Id.create("Lane" + link.getId() + "." + ((int) link.getNumberOfLanes()), Lane.class));
 				if (reverseLink != 0)
@@ -1661,7 +1635,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				else if (straightLink != 1)
 					lane.addToLinkId(toLinks.get(2).getLink().getId());
 				lane.setAlignment(-1);
-				if (modeOutLanes != 3) {
+				if (OUTER_LANE_TYPE.equals(OuterLaneRestriction.NON_RESTRICTIVE)) {
+					// add straight turn to left lane
 					lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
 							.get(Id.create("Lane" + link.getId() + "." + "1", Lane.class));
 					if (straightLink < toLinks.size() - 2) {
@@ -1687,7 +1662,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			}
 
 			int midLink = -1;
-			if (modeMidLanes == 1 || modeMidLanes == 2) {
+			{
+				// add straight turns to middle lanes
 				for (int i = (int) link.getNumberOfLanes() - 1; i > 1; i--) {
 					Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
 							.get(Id.create("Lane" + link.getId() + "." + i, Lane.class));
@@ -1698,12 +1674,12 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						lane.addToLinkId(toLinks.get(straightestLink).getLink().getId());
 						midLink = straightestLink;
 					}
-					lane.getAttributes().putAttribute(TO_LINK_REFERENCE,
-							"Estimation_based_on_" + this.usedLanesEstimation);
+					lane.getAttributes().putAttribute(TO_LINK_REFERENCE, MIDDLE_LANE_TYPE);
 				}
 			}
 
-			if (modeMidLanes == 2) {
+			if (MIDDLE_LANE_TYPE.equals(MiddleLaneRestriction.REGULATION_BASED)) {
+				// add all other out-links except u-turn to middle lanes
 				for (int i = (int) link.getNumberOfLanes() - 1; i > 1; i--) {
 					Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
 							.get(Id.create("Lane" + link.getId() + "." + i, Lane.class));
@@ -1761,18 +1737,18 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			// log.info("Trying to Fill " + lane.getId().toString() + " with
 			// Direction: " + tempDir + " with #ofToLinks: " + toLinks.size() );
 			if (tempDir == null) { // no direction for lane available
-				if (this.modeMidLanes == 1)
+				if (MIDDLE_LANE_TYPE.equals(MiddleLaneRestriction.REALISTIC))
+					// only add straight to-link
 					lane.addToLinkId(throughLink.getLink().getId());
 				else {
 					for (LinkVector lvec : toLinks) {
+						// add all to-links except u-turn
 						if (!lvec.equals(reverseLink) || !this.allowUTurnAtLeftLaneOnly)
 							lane.addToLinkId(lvec.getLink().getId());
 					}
-					if (lane.getToLinkIds() == null)
-						lane.addToLinkId(throughLink.getLink().getId());
 				}
 				lane.setAlignment(0);
-				lane.getAttributes().putAttribute(TO_LINK_REFERENCE, "Estimation_based_on_" + this.usedLanesEstimation);
+				lane.getAttributes().putAttribute(TO_LINK_REFERENCE, MIDDLE_LANE_TYPE);
 				break;
 			}
 			if (tempDir < 0 && tempDir > -5) { // all right directions (right,
