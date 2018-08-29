@@ -60,6 +60,15 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 			+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
 			+ "Beta should not be smaller than 0.";
 
+	public static final String REQUEST_REJECTION = "requestRejection";
+	static final String REQUEST_REJECTION_EXP = "If true, the max travel and wait times of a submitted request"
+			+ " are considered hard constraints (the request gets rejected if one of the constraints is violated)."
+			+ " If false, the max travel and wait times are considered soft constraints (insertion of a request that"
+			+ " violates one of the constraints is allowed, but its cost is increased by additional penalty to make"
+			+ " it relatively less attractive). Penalisation of insertions can be customised by injecting a customised"
+			+ " InsertionCostCalculator.PenaltyCalculator";
+
+
 	public static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE = "changeStartLinkToLastLinkInSchedule";
 	static final String CHANGE_START_EXP = "If true, the startLink is changed to last link in the current schedule, so the taxi starts the next "
 			+ "day at the link where it stopped operating the day before. False by default.";
@@ -114,6 +123,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	@PositiveOrZero
 	private double maxTravelTimeBeta = Double.NaN;// [s]
 
+	private boolean requestRejection = true;
+
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
 	private boolean idleVehiclesReturnToDepots = false;
@@ -137,7 +148,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private String transitStopFile = null; // only for stopbased DRT scheme
 
 	private boolean plotDetailedCustomerStats = true;
-	private boolean plotDetailedVehicleStats = false;
 	private boolean printDetailedWarnings = true;
 
 	@Positive
@@ -239,6 +249,23 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(MAX_TRAVEL_TIME_BETA)
 	public void setMaxTravelTimeBeta(double maxTravelTimeBeta) {
 		this.maxTravelTimeBeta = maxTravelTimeBeta;
+	}
+
+	/**
+	 * @return -- {@value #REQUEST_REJECTION_EXP}
+	 */
+	@StringGetter(REQUEST_REJECTION)
+	public boolean isRequestRejection() {
+		return requestRejection;
+	}
+
+	/**
+	 * @param requestRejection
+	 *            -- {@value #REQUEST_REJECTION_EXP}
+	 */
+	@StringSetter(REQUEST_REJECTION)
+	public void setRequestRejection(boolean requestRejection) {
+		this.requestRejection = requestRejection;
 	}
 
 	/**
