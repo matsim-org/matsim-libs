@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.mobsim;
+package org.matsim.contrib.signals.builder;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -41,8 +41,8 @@ import org.matsim.contrib.signals.model.SignalSystemsManager;
 /**
  * @author dgrether
  *
- */
-public class QSimSignalEngine implements SignalEngine {
+ */ 
+class QSimSignalEngine implements SignalEngine {
 
 	private static final Logger log = Logger.getLogger(QSimSignalEngine.class);
 
@@ -68,6 +68,7 @@ public class QSimSignalEngine implements SignalEngine {
 		NetsimNetwork net = qSim.getNetsimNetwork();
 		for (SignalSystem system : this.signalManager.getSignalSystems().values()){
 			for (Signal signal : system.getSignals().values()){
+				signal.getSignalizeableItems().clear();
 				log.debug("initializing signal " + signal.getId() + " on link " + signal.getLinkId());
 				NetsimLink link = net.getNetsimLinks().get(signal.getLinkId());
 				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){

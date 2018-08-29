@@ -39,8 +39,8 @@ import org.matsim.jaxb.signalsystems20.XMLSignalSystems;
 import org.matsim.jaxb.signalsystems20.XMLSignalType;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLLane;
 import org.matsim.lanes.Lane;
+import org.matsim.contrib.signals.data.MatsimSignalSystemsReader;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
-import org.matsim.contrib.signals.MatsimSignalSystemsReader;
 
 
 /**

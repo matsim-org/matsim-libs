@@ -45,11 +45,11 @@ import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType.XMLStart;
 import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType.XMLStop;
 import org.matsim.jaxb.signalcontrol20.XMLSignalSystemControllerType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalSystemType;
+import org.matsim.contrib.signals.data.MatsimSignalSystemsReader;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
-import org.matsim.contrib.signals.MatsimSignalSystemsReader;
 
 
 /**

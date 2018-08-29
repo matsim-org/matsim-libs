@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -37,7 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.signals.analysis.DelayAnalysisTool;
 import org.matsim.contrib.signals.analysis.SignalAnalysisTool;
-import org.matsim.contrib.signals.binder.SignalsModule;
+import org.matsim.contrib.signals.builder.SignalsModule;
 import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfigGroup.Regime;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
@@ -45,8 +46,10 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LanesToLinkAssignment;
@@ -74,8 +77,9 @@ public class LaemmerIT {
 	 */
 	@Test
 	public void testSingleCrossingScenarioDemandNS() {
+		Fixture fixture = new Fixture(1800, 0, 5.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
-		DelayAnalysisTool generalAnalyzer = runSingleCrossingScenario(1800, 0, 5.0, signalAnalyzer, Regime.COMBINED);
+		DelayAnalysisTool generalAnalyzer = fixture.run(signalAnalyzer);
 
 		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); // NS should show a lot more green than WE
 		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerFlexibleCycle(); // WE should be almost 0
@@ -104,8 +108,9 @@ public class LaemmerIT {
 	 */
 	@Test
 	public void testSingleCrossingScenarioLowVsHighDemandWithMinG(){
+		Fixture fixture = new Fixture(90, 1800, 5.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
-		DelayAnalysisTool generalAnalyzer = runSingleCrossingScenario(90, 1800, 5.0, signalAnalyzer, Regime.COMBINED);
+		DelayAnalysisTool generalAnalyzer = fixture.run(signalAnalyzer);
 		
 		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); 
 		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerFlexibleCycle(); 
@@ -136,8 +141,9 @@ public class LaemmerIT {
 	 */
 	@Test
 	public void testSingleCrossingScenarioLowVsHighDemandWoMinG(){
+		Fixture fixture = new Fixture(90, 1800, 0.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
-		DelayAnalysisTool generalAnalyzer = runSingleCrossingScenario(90, 1800, 0.0, signalAnalyzer, Regime.COMBINED);
+		DelayAnalysisTool generalAnalyzer = fixture.run(signalAnalyzer);
 		
 		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); 
 		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerFlexibleCycle(); 
@@ -166,8 +172,9 @@ public class LaemmerIT {
 	 */
 	@Test
 	public void testSingleCrossingScenarioEqualDemandCapacityRatio(){
+		Fixture fixture = new Fixture(900, 1800, 0.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
-		DelayAnalysisTool generalAnalyzer = runSingleCrossingScenario(900, 1800, 0.0, signalAnalyzer, Regime.COMBINED);
+		DelayAnalysisTool generalAnalyzer = fixture.run(signalAnalyzer);
 		
 		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); 
 		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerFlexibleCycle(); 
@@ -195,14 +202,17 @@ public class LaemmerIT {
 	 */
 	@Test
 	public void testSingleCrossingScenarioStabilizingVsOptimizingRegimeLowDemand(){
+		Fixture fixtureStab = new Fixture(360, 1440, 0.0, Regime.STABILIZING);
 		SignalAnalysisTool signalAnalyzerStab = new SignalAnalysisTool();
-		DelayAnalysisTool generalAnalyzerStab = runSingleCrossingScenario(360, 1440, 0.0, signalAnalyzerStab, Regime.STABILIZING);
-		
+		DelayAnalysisTool generalAnalyzerStab = fixtureStab.run(signalAnalyzerStab);
+
+		Fixture fixtureOpt = new Fixture(360, 1440, 0.0, Regime.OPTIMIZING);
 		SignalAnalysisTool signalAnalyzerOpt = new SignalAnalysisTool();
-		DelayAnalysisTool generalAnalyzerOpt = runSingleCrossingScenario(360, 1440, 0.0, signalAnalyzerOpt, Regime.OPTIMIZING);
-		
+		DelayAnalysisTool generalAnalyzerOpt = fixtureOpt.run(signalAnalyzerOpt);
+
+		Fixture fixtureComb = new Fixture(360, 1440, 0.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzerComb = new SignalAnalysisTool();
-		DelayAnalysisTool generalAnalyzerComb = runSingleCrossingScenario(360, 1440, 0.0, signalAnalyzerComb, Regime.COMBINED);
+		DelayAnalysisTool generalAnalyzerComb = fixtureComb.run(signalAnalyzerComb);
 		
 		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycleStab = signalAnalyzerStab.calculateAvgSignalGreenTimePerFlexibleCycle(); 
 		Map<Id<SignalSystem>, Double> avgCycleTimePerSystemStab = signalAnalyzerStab.calculateAvgFlexibleCycleTimePerSignalSystem(); 
@@ -279,14 +289,17 @@ public class LaemmerIT {
 	 */
 	@Test
 	public void testSingleCrossingScenarioStabilizingVsOptimizingRegimeHighDemand(){
+		Fixture fixtureStab = new Fixture(360, 1800, 0.0, Regime.STABILIZING);
 		SignalAnalysisTool signalAnalyzerStab = new SignalAnalysisTool();
-		DelayAnalysisTool generalAnalyzerStab = runSingleCrossingScenario(360, 1800, 0.0, signalAnalyzerStab, Regime.STABILIZING);
-		
+		DelayAnalysisTool generalAnalyzerStab = fixtureStab.run(signalAnalyzerStab);
+
+		Fixture fixtureOpt = new Fixture(360, 1800, 0.0, Regime.OPTIMIZING);
 		SignalAnalysisTool signalAnalyzerOpt = new SignalAnalysisTool();
-		DelayAnalysisTool generalAnalyzerOpt = runSingleCrossingScenario(360, 1800, 0.0, signalAnalyzerOpt, Regime.OPTIMIZING);
-		
+		DelayAnalysisTool generalAnalyzerOpt = fixtureOpt.run(signalAnalyzerOpt);
+
+		Fixture fixtureComb = new Fixture(360, 1800, 0.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzerComb = new SignalAnalysisTool();
-		DelayAnalysisTool generalAnalyzerComb = runSingleCrossingScenario(360, 1800, 0.0, signalAnalyzerComb, Regime.COMBINED);
+		DelayAnalysisTool generalAnalyzerComb = fixtureComb.run(signalAnalyzerComb);
 		
 		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycleStab = signalAnalyzerStab.calculateAvgSignalGreenTimePerFlexibleCycle(); 
 		Map<Id<SignalSystem>, Double> avgCycleTimePerSystemStab = signalAnalyzerStab.calculateAvgFlexibleCycleTimePerSignalSystem(); 
@@ -357,11 +370,14 @@ public class LaemmerIT {
 	 */
 	@Test
 	public void testSingleCrossingScenarioWithDifferentFlowCapacityFactors(){
+		Fixture fixtureFlowCap1 = new Fixture(360, 1800, 0.0, Regime.COMBINED);
 		SignalAnalysisTool signalAnalyzerFlowCap1 = new SignalAnalysisTool();
-		DelayAnalysisTool generalAnalyzerFlowCap1 = runSingleCrossingScenario(360, 1800, 0.0, false, signalAnalyzerFlowCap1, Regime.COMBINED);
+		DelayAnalysisTool generalAnalyzerFlowCap1 = fixtureFlowCap1.run(signalAnalyzerFlowCap1);
 		
+		Fixture fixtureFlowCap2 = new Fixture(360, 1800, 0.0, Regime.COMBINED);
+		fixtureFlowCap2.doublePopulation();
 		SignalAnalysisTool signalAnalyzerFlowCap2 = new SignalAnalysisTool();
-		DelayAnalysisTool generalAnalyzerFlowCap2 = runSingleCrossingScenario(360, 1800, 0.0, true, signalAnalyzerFlowCap2, Regime.COMBINED);
+		DelayAnalysisTool generalAnalyzerFlowCap2 = fixtureFlowCap2.run(signalAnalyzerFlowCap2);
 		
 		Map<Id<SignalGroup>, Double> totalSignalGreenTimesFlowCap2 = signalAnalyzerFlowCap2.getTotalSignalGreenTime(); 
 		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycleFlowCap2 = signalAnalyzerFlowCap2.calculateAvgSignalGreenTimePerFlexibleCycle(); 
@@ -406,7 +422,38 @@ public class LaemmerIT {
 		Assert.assertEquals("total delay for doubled demand should be doubled", 2, generalAnalyzerFlowCap2.getTotalDelay()/generalAnalyzerFlowCap1.getTotalDelay(), 0.1);
 	}
 	
-	// TODO test iterations. variables should reset and algo should work for every iteration
+	/**
+	 * Test Laemmer with multiple iterations (some variables have to be reset after iterations).
+	 */
+	@Test
+	@Ignore
+	public void testMultipleIterations() {
+		//TODO why does this work even if reset is not implemented??
+		Fixture fixture = new Fixture(500, 2000, 5.0, Regime.COMBINED);
+		fixture.setLastIteration(1);
+		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
+		DelayAnalysisTool generalAnalyzer = fixture.run(signalAnalyzer);
+
+		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime();
+		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerFlexibleCycle();
+		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = signalAnalyzer.calculateAvgFlexibleCycleTimePerSignalSystem();
+		Map<Id<Link>, Double> avgDelayPerLink = generalAnalyzer.getAvgDelayPerLink();
+		Double avgDelayWE = avgDelayPerLink.get(Id.createLinkId("2_3"));
+		Double avgDelayNS = avgDelayPerLink.get(Id.createLinkId("7_3"));
+		
+		log.info("total signal green times: " + totalSignalGreenTimes.get(signalGroupId1) + ", "
+				+ totalSignalGreenTimes.get(signalGroupId2));
+		log.info("avg signal green times per cycle: " + avgSignalGreenTimePerCycle.get(signalGroupId1) + ", "
+				+ avgSignalGreenTimePerCycle.get(signalGroupId2));
+		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
+		log.info("avg delay per link: " + avgDelayWE + ", " + avgDelayNS);
+
+		Assert.assertEquals("total green time of signal group 1 should be the same as in the first iteration", 3172.0, totalSignalGreenTimes.get(signalGroupId1), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("total green time of signal group 2 should be the same as in the first iteration", 1504.0, totalSignalGreenTimes.get(signalGroupId2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("avg green time of signal group 1 should be the same as in the first iteration", 41.736, avgSignalGreenTimePerCycle.get(signalGroupId1), .01);
+		Assert.assertEquals("avg green time of signal group 2 should be the same as in the first iteration", 19.789, avgSignalGreenTimePerCycle.get(signalGroupId2), .01);
+	}
+	
 	// TODO test stochasticity (laemmer better than fixed-time; different than for constant demand)
 	// TODO test temporarily overcrowded situations (no exeption; signal is able to resolve congestion; like fixed-time schedule; cycle times get longer when overload continues)
 	// TODO test liveArrivalRate vs. exact data (the second results in more precise green times?!; liveArrivalRates are determined correctly)
@@ -414,111 +461,133 @@ public class LaemmerIT {
 	// TODO test lanes
 	// ...
 	
-	private DelayAnalysisTool runSingleCrossingScenario(double flowNS, double flowWE, double minG, SignalAnalysisTool signalAnalyzer, Regime regime) {
-		return runSingleCrossingScenario(flowNS, flowWE, minG, false, signalAnalyzer, regime);
-	}
-	
-	private DelayAnalysisTool runSingleCrossingScenario(double flowNS, double flowWE, double minG, boolean doubled, SignalAnalysisTool signalAnalyzer, Regime regime) {
+	private class Fixture {
 		
-		Config config = ConfigUtils.loadConfig("./examples/tutorial/singleCrossingScenario/config.xml");
-		config.plans().setInputFile(null);
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		if (doubled) config.qsim().setFlowCapFactor(2.0);
+		private Scenario scenario;
+		private double flowNS;
+		private double flowWE;
 		
-		LaemmerConfigGroup laemmerConfigGroup = ConfigUtils.addOrGetModule(config,
-				LaemmerConfigGroup.GROUP_NAME, LaemmerConfigGroup.class);
-		laemmerConfigGroup.setMinGreenTime(minG);
-		laemmerConfigGroup.setActiveRegime(regime);
-		laemmerConfigGroup.setDesiredCycleTime(60);
-		laemmerConfigGroup.setMaxCycleTime(90);
-		
-		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
-		// create a population
-		createSimplePopulationWithoutLeftTurns(scenario.getPopulation(), flowNS, flowWE, doubled);
-		// modify lanes (such that only one lane leads straight with a capacity of 3600 veh. this make especially the flow capacity test more clear.)
-		LanesToLinkAssignment lanesOfLink23 = scenario.getLanes().getLanesToLinkAssignments().get(Id.createLinkId("2_3"));
-		LanesToLinkAssignment lanesOfLink43 = scenario.getLanes().getLanesToLinkAssignments().get(Id.createLinkId("4_3"));
-		lanesOfLink23.getLanes().get(Id.create("2_3.r", Lane.class)).getToLinkIds().remove(Id.createLinkId("3_4"));
-		lanesOfLink23.getLanes().get(Id.create("2_3.s", Lane.class)).setCapacityVehiclesPerHour(3600);
-		lanesOfLink43.getLanes().get(Id.create("4_3.r", Lane.class)).getToLinkIds().remove(Id.createLinkId("3_2"));
-		lanesOfLink43.getLanes().get(Id.create("4_3.s", Lane.class)).setCapacityVehiclesPerHour(3600);
-		
-		Controler controler = new Controler( scenario );
-		
-		// add the signals module
-		controler.addOverridingModule(new SignalsModule());
-		
-		// add signal analysis tool
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				this.addEventHandlerBinding().toInstance(signalAnalyzer);
-				this.addControlerListenerBinding().toInstance(signalAnalyzer);
-			}
-		});
-		// add general analysis tools
-		DelayAnalysisTool delayAnalysis = new DelayAnalysisTool(controler.getScenario().getNetwork());
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				this.addEventHandlerBinding().toInstance(delayAnalysis);
-			}
-		});
-	
-		// run the simulation
-		controler.run();
-		
-		return delayAnalysis;
-	}
-	
-	private void createSimplePopulationWithoutLeftTurns(Population pop, double flowNS, double flowWE, boolean doublePersons) {
-        String[] linksNS = {"6_7-8_9", "9_8-7_6"};
-        String[] linksWE = {"5_4-2_1", "1_2-4_5"};
+		Fixture(double flowNS, double flowWE, double minG, Regime regime) {
+			this.flowWE = flowWE;
+			this.flowNS = flowNS;
+			
+			// create Config
+			Config config = ConfigUtils.loadConfig("./examples/tutorial/singleCrossingScenario/config.xml");
+			config.plans().setInputFile(null);
+			config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+			
+			LaemmerConfigGroup laemmerConfigGroup = ConfigUtils.addOrGetModule(config,
+					LaemmerConfigGroup.GROUP_NAME, LaemmerConfigGroup.class);
+			laemmerConfigGroup.setMinGreenTime(minG);
+			laemmerConfigGroup.setActiveRegime(regime);
+			laemmerConfigGroup.setDesiredCycleTime(60);
+			laemmerConfigGroup.setMaxCycleTime(90);
 
-        createPopulationForRelation(flowNS, pop, linksNS, doublePersons);
-        createPopulationForRelation(flowWE, pop, linksWE, doublePersons);
-    }
-	
-	private void createPopulationForRelation(double flow, Population population, String[] links, boolean doublePersons) {
-		if (flow == 0) {
-			return;
+			// create scenario
+			scenario = ScenarioUtils.loadScenario( config ) ;
+			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
+			// create a population
+			createSimplePopulationWithoutLeftTurns(scenario.getPopulation(), flowNS, flowWE, "-1");
+			// modify lanes (such that only one lane leads straight with a capacity of 3600 veh. this make especially the flow capacity test more clear.)
+			LanesToLinkAssignment lanesOfLink23 = scenario.getLanes().getLanesToLinkAssignments().get(Id.createLinkId("2_3"));
+			LanesToLinkAssignment lanesOfLink43 = scenario.getLanes().getLanesToLinkAssignments().get(Id.createLinkId("4_3"));
+			lanesOfLink23.getLanes().get(Id.create("2_3.r", Lane.class)).getToLinkIds().remove(Id.createLinkId("3_4"));
+			lanesOfLink23.getLanes().get(Id.create("2_3.s", Lane.class)).setCapacityVehiclesPerHour(3600);
+			lanesOfLink43.getLanes().get(Id.create("4_3.r", Lane.class)).getToLinkIds().remove(Id.createLinkId("3_2"));
+			lanesOfLink43.getLanes().get(Id.create("4_3.s", Lane.class)).setCapacityVehiclesPerHour(3600);
 		}
-
-		for (String od : links) {
-			String fromLinkId = od.split("-")[0];
-			String toLinkId = od.split("-")[1];
-
-			double nthSecond = (3600 / flow);
-			for (double i = 0; i < 5400; i += nthSecond) {
-				createPerson(population, fromLinkId, toLinkId, i, Id.createPersonId(od + "_" + i));
-				if (doublePersons) createPerson(population, fromLinkId, toLinkId, i, Id.createPersonId(od + "_" + i + "-2"));
-			}
+		
+		void doublePopulation() {
+			scenario.getConfig().qsim().setFlowCapFactor(2.0);
+			createSimplePopulationWithoutLeftTurns(scenario.getPopulation(), flowNS, flowWE, "-2");
 		}
-    }
+		
+		void setLastIteration(int lastIteration) {
+			scenario.getConfig().controler().setLastIteration(lastIteration);
+			// add replanning strategy
+			StrategySettings strat = new StrategySettings();
+			strat.setStrategyName(DefaultSelector.KeepLastSelected.toString());
+			strat.setWeight(1.);
+			scenario.getConfig().strategy().addStrategySettings(strat);
+		}
+		
+		DelayAnalysisTool run(SignalAnalysisTool signalAnalyzer) {
+			Controler controler = new Controler( scenario );
+			
+			// add the signals module
+			controler.addOverridingModule(new SignalsModule());
+			
+			// add signal analysis tool
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					this.addEventHandlerBinding().toInstance(signalAnalyzer);
+					this.addControlerListenerBinding().toInstance(signalAnalyzer);
+				}
+			});
+			// add general analysis tools
+			DelayAnalysisTool delayAnalysis = new DelayAnalysisTool(controler.getScenario().getNetwork());
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					this.addEventHandlerBinding().toInstance(delayAnalysis);
+				}
+			});
+		
+			// run the simulation
+			controler.run();
+			
+			return delayAnalysis;
+		}
+		
+		private void createSimplePopulationWithoutLeftTurns(Population pop, double flowNS, double flowWE, String idPostFix) {
+	        String[] linksNS = {"6_7-8_9", "9_8-7_6"};
+	        String[] linksWE = {"5_4-2_1", "1_2-4_5"};
 
-	private void createPerson(Population population, String fromLinkId, String toLinkId, double time, Id<Person> id) {
-		Person person = population.getFactory().createPerson(id);
-		population.addPerson(person);
+	        createPopulationForRelation(flowNS, pop, linksNS, idPostFix);
+	        createPopulationForRelation(flowWE, pop, linksWE, idPostFix);
+	    }
+		
+		private void createPopulationForRelation(double flow, Population population, String[] links, String idPostFix) {
+			if (flow == 0) {
+				return;
+			}
 
-		// create a plan for the person that contains all this information
-		Plan plan = population.getFactory().createPlan();
-		person.addPlan(plan);
+			for (String od : links) {
+				String fromLinkId = od.split("-")[0];
+				String toLinkId = od.split("-")[1];
 
-		// create a start activity at the from link
-		Activity startAct = population.getFactory().createActivityFromLinkId("dummy",
-				Id.createLinkId(fromLinkId));
-		// distribute agents uniformly during one hour.
-		startAct.setEndTime(time);
-		plan.addActivity(startAct);
+				double nthSecond = (3600 / flow);
+				for (double i = 0; i < 5400; i += nthSecond) {
+					createPerson(population, fromLinkId, toLinkId, i, Id.createPersonId(od + "_" + i + idPostFix));
+				}
+			}
+	    }
 
-		// create a dummy leg
-		plan.addLeg(population.getFactory().createLeg(TransportMode.car));
+		private void createPerson(Population population, String fromLinkId, String toLinkId, double time, Id<Person> id) {
+			Person person = population.getFactory().createPerson(id);
+			population.addPerson(person);
 
-		// create a drain activity at the to link
-		Activity drainAct = population.getFactory().createActivityFromLinkId("dummy",
-				Id.createLinkId(toLinkId));
-		plan.addActivity(drainAct);
+			// create a plan for the person that contains all this information
+			Plan plan = population.getFactory().createPlan();
+			person.addPlan(plan);
+
+			// create a start activity at the from link
+			Activity startAct = population.getFactory().createActivityFromLinkId("dummy",
+					Id.createLinkId(fromLinkId));
+			// distribute agents uniformly during one hour.
+			startAct.setEndTime(time);
+			plan.addActivity(startAct);
+
+			// create a dummy leg
+			plan.addLeg(population.getFactory().createLeg(TransportMode.car));
+
+			// create a drain activity at the to link
+			Activity drainAct = population.getFactory().createActivityFromLinkId("dummy",
+					Id.createLinkId(toLinkId));
+			plan.addActivity(drainAct);
+		}
+		
 	}
 
 }
