@@ -35,5 +35,4 @@ public final class BicycleLabels {
 	private BicycleLabels() {
 		// Don't allow to create instances of this class
 	}
-
 }

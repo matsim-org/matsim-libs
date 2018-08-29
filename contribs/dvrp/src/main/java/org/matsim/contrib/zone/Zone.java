@@ -24,7 +24,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
-public class Zone implements BasicLocation<Zone> {
+public class Zone implements BasicLocation, Identifiable<Zone> {
 	private final Id<Zone> id;
 	private final String type;
 

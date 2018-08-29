@@ -16,12 +16,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.bicycle.run;
+package org.matsim.contrib.bicycle;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.bicycle.BicycleLabels;
-import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
@@ -40,8 +38,11 @@ public class BicycleTravelTime implements TravelTime {
 		double cyclingInfrastructureSpeed = computeMinimumCyclingInfrastructureSpeed(type,
 				cycleway, minimumSpeedForDedicatedCyclingInfrastructure);
 		double infrastructureSpeed = Math.max(link.getFreespeed(), cyclingInfrastructureSpeed);
-
-		double vehicleLinkSpeed = Math.min(infrastructureSpeed, BicycleUtils.getSpeed("bicycle"));
+		
+		// This is not yet available, but might be at some point, see https://matsim.atlassian.net/browse/MATSIM-700
+		// double bicycleVelocity = vehicle.getType().getMaximumVelocity()
+		// ... until then, use this workaround:
+		double vehicleLinkSpeed = Math.min(infrastructureSpeed, BicycleSpeedUtils.getSpeed("bicycle"));
 
 		double gradientSpeed = computeGradientSpeed(link, vehicleLinkSpeed);
 

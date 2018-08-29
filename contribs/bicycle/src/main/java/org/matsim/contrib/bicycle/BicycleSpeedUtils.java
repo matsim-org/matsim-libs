@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,29 +16,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.bicycle.run;
-
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Inject;
+package org.matsim.contrib.bicycle;
 
 /**
- * @author smetzler, dziemke
+ * This is just an intermediate solution until 
+ * <a href="https://matsim.atlassian.net/browse/MATSIM-700">https://matsim.atlassian.net/browse/MATSIM-700</a>
+ * is fixed.
+ * 
+ * @author dziemke based on amit
  */
-public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
-
-	@Inject	BicycleConfigGroup bicycleConfigGroup;
-	@Inject	PlanCalcScoreConfigGroup cnScoringGroup;
-	@Inject	PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
-	@Inject Network network; // TODO only needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
-	
-	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		return new BicycleTravelDisutility(bicycleConfigGroup, cnScoringGroup, plansCalcRouteConfigGroup, timeCalculator, network);
+@Deprecated
+public class BicycleSpeedUtils {
+	public static double getSpeed(final String travelMode){
+		double speed;
+		if (travelMode == "bicycle") {
+			speed = 20.0/3.6;
+		} else {
+			throw new RuntimeException("No speed is set for travel mode " + travelMode + ".");
+		}
+		return speed;
 	}
 }
