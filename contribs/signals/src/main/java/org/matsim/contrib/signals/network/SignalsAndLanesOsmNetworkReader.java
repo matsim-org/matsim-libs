@@ -71,12 +71,12 @@ import org.matsim.lanes.data.LanesToLinkAssignment;
 import org.matsim.lanes.data.LanesWriter;
 import org.xml.sax.Attributes;
 
-import com.vividsolutions.jts.util.Assert;
-
 /**
+ * Osm reader that extends the basic OSMNetworkReader and in addition reads in signals and lanes information.
+ * This tool is based on the master thesis of Nils Schirrmacher from 2017 at VSP.
+ * 
  * @author tthunig, nschirrmacher
  */
-
 public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	private final static Logger LOG = Logger.getLogger(SignalsAndLanesOsmNetworkReader.class);
@@ -1523,7 +1523,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		// otherwise fill by default
 		Stack<Stack<Integer>> laneStack = laneStacks.get(link.getId());
 		if (laneStack != null && !laneStack.isEmpty()) {
-			Assert.equals(laneStack.size(), (int)link.getNumberOfLanes());
+			if (laneStack.size() != (int)link.getNumberOfLanes()) {
+				throw new RuntimeException("the turn:lanes tag has a different number of lanes than the lanes tag");
+			}
 			for (int i = (int) link.getNumberOfLanes(); i > 0; i--) {
 				Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
 						.get(Id.create("Lane" + link.getId() + "." + i, Lane.class));

@@ -69,45 +69,11 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 
 /**
- * Reads in an OSM-File, exported from
- * <a href="http://openstreetmap.org/" target="_blank">OpenStreetMap</a>, and
- * extracts information about roads to generate a MATSim-Network.
- *
- * OSM-Files can be obtained:
- * <ul>
- * <li>byf
- * <a href="http://openstreetmap.org/export" target="_blank">exporting</a> the
- * data directly from OpenStreetMap. This works only for smaller regions.</li>
- * <li>by <a href="http://wiki.openstreetmap.org/wiki/Getting_Data" target=
- * "_blank">downloading</a> the requested data from OpenStreetMap.
- * <li>by extracting the corresponding data from
- * <a href="http://planet.openstreetmap.org/" target="_blank">Planet.osm</a>.
- * Planet.osm contains the <em>complete</em> data from OpenStreetMap and is
- * huge! Thus, you must extract a subset of data to be able to process it. For
- * some countries, there are
- * <a href="http://wiki.openstreetmap.org/wiki/Planet.osm#Extracts" target=
- * "_blank">Extracts</a> available containing only the data of a single
- * country.</li>
- * </ul>
- *
- * OpenStreetMap only contains limited information regarding traffic flow in the
- * streets. The most valuable attribute of OSM data is a
- * <a href="http://wiki.openstreetmap.org/wiki/Map_Features#Highway" target=
- * "_blank">categorization</a> of "ways". This reader allows to set
- * {@link #setHighwayDefaults(int, String, double, double, double, double)
- * defaults} how those categories should be interpreted to create a network with
- * suitable attributes for traffic simulation. For the most common
- * highway-types, some basic defaults can be loaded automatically (see code),
- * but they can be overwritten if desired. If the optional attributes
- * <code>lanes</code> and <code>oneway</code> are set in the osm data, they
- * overwrite the default values. Using
- * {@link #setHierarchyLayer(double, double, double, double, int) hierarchy
- * layers}, multiple overlapping areas can be specified, each with a different
- * denseness, e.g. one only containing motorways, a second one containing every
- * link down to footways.
+ * Copy of the general OsmNetworkReader and edited by Nils Schirrmacher to also read in signals and lanes information.
  *
  * @author mrieser, aneumann, nschirrmacher
  */
+@Deprecated // use SignalsAndLanesOsmNetworkReader that extends the general OsmNetworkReader
 public class OsmNetworkWithLanesAndSignalsReader implements MatsimSomeReader {
 
 	private final static Logger log = Logger.getLogger(OsmNetworkWithLanesAndSignalsReader.class);
