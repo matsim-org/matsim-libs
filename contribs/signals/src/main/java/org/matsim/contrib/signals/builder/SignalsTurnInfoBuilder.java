@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals;
+package org.matsim.contrib.signals.builder;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -37,7 +37,7 @@ import java.util.*;
  * @author dgrether
  *
  */
-public class SignalsTurnInfoBuilder {
+class SignalsTurnInfoBuilder {
 	
 	private static final Logger log = Logger.getLogger(SignalsTurnInfoBuilder.class);
 

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.binder;
+package org.matsim.contrib.signals.builder;
 
 import org.matsim.core.controler.listener.ControlerListener;
 
