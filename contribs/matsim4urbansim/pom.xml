@@ -34,7 +34,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>1.0</version>
+				<version>1.4</version>
 				<executions>
 					<execution>
 						<phase>validate</phase>
@@ -102,7 +102,4 @@
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
-	<properties>
-		<svnRevision>${buildNumber}</svnRevision>
-	</properties>
 </project>
