@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNode;
@@ -63,7 +64,9 @@ public class QNetwork implements NetsimNetwork {
 		this.simEngine = simEngine1;
 		this.queueNetworkFactory.initializeFactory( agentCounter, simTimer, simEngine1.ii );
 		for (Node n : network.getNodes().values()) {
-			this.nodes.put(n.getId(), this.queueNetworkFactory.createNetsimNode(n));
+			if ( (boolean) n.getAttributes().getAttribute( QSim.IS_LOCAL_ATTRIBUTE ) ) {
+				this.nodes.put( n.getId(), this.queueNetworkFactory.createNetsimNode( n ) );
+			}
 		}
 		for (Link l : network.getLinks().values()) {
 			final QLinkI qlink = this.queueNetworkFactory.createNetsimLink(l, this.nodes.get(l.getToNode().getId()));

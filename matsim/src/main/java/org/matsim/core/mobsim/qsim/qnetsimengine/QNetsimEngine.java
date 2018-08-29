@@ -321,12 +321,16 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 				for (Future<Boolean> future : pool.invokeAll(this.engines)) {
 					future.get();
 				}
+				sendAvailableBufferSpacesUpstream() ;
+				receiveAvailableBufferSpacesFromDownstream() ;
 				for (QNetsimEngineRunner engine : this.engines) {
 					engine.setMovingNodes(false);
 				}
 				for (Future<Boolean> future : pool.invokeAll(this.engines)) {
 					future.get();
 				}
+				sendVehiclesDownstream() ;
+				receiveVehiclesFromUpstream() ;
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e) ;
 			} catch (ExecutionException e) {

@@ -88,7 +88,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author knagel
  */
 public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEndRescheduler {
-
+	
+	public static final String CPN_ATTRIBUTE = "CPN";
 	final private static Logger log = Logger.getLogger(QSim.class);
 
 	/** time since last "info" */
@@ -121,7 +122,8 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private final Map<Id<Person>, MobsimAgent> agents = new LinkedHashMap<>();
 	private final Map<Id<Vehicle>,MobsimVehicle> vehicles = new LinkedHashMap<>() ;
 	private final List<AgentSource> agentSources = new ArrayList<>();
-
+	public static final String IS_LOCAL_ATTRIBUTE = "isLocal";
+	
 	// for detailed run time analysis
 	public static boolean analyzeRunTimes = false;
 	private long startTime = 0;
