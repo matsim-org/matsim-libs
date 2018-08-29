@@ -29,12 +29,12 @@ import org.matsim.contrib.util.XYDataCollector.XYDataCalculator;
  * @author michalm
  */
 public class XYDataCollectors {
-	public static <T extends BasicLocation<T>> XYDataCalculator<T> createCalculator(String[] header,
+	public static <T extends BasicLocation> XYDataCalculator<T> createCalculator(String[] header,
 			Function<T, Object[]> valueCalculator) {
 		return createCalculator(header, BasicLocation::getCoord, valueCalculator);
 	}
 
-	public static <T extends Identifiable<T>> XYDataCalculator<T> createCalculator(String[] header,
+	public static <T extends BasicLocation> XYDataCalculator<T> createCalculator(String[] header,
 			Function<T, Coord> coordGetter, Function<T, Object[]> valueCalculator) {
 		return new XYDataCalculator<T>() {
 			@Override

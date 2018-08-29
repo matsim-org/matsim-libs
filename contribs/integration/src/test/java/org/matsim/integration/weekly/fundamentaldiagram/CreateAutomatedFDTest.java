@@ -453,12 +453,12 @@ public class CreateAutomatedFDTest {
 		}
 
 		@Override
-		public Facility<? extends Facility<?>> getCurrentFacility() {
+		public Facility getCurrentFacility() {
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		public Facility<? extends Facility<?>> getDestinationFacility() {
+		public Facility getDestinationFacility() {
 			throw new RuntimeException("not implemented") ;
 		}
 	}

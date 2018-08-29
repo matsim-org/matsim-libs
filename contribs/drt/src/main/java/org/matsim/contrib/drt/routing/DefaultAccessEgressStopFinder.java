@@ -62,7 +62,7 @@ public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 	}
 
 	@Override
-	public Pair<TransitStopFacility, TransitStopFacility> findStops(Facility<?> fromFacility, Facility<?> toFacility) {
+	public Pair<TransitStopFacility, TransitStopFacility> findStops( Facility fromFacility, Facility toFacility) {
 		TransitStopFacility accessFacility = findAccessFacility(fromFacility, toFacility);
 		if (accessFacility == null) {
 			return new ImmutablePair<>(null, null);
@@ -77,7 +77,7 @@ public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 	 * @param toFacility
 	 * @return
 	 */
-	private TransitStopFacility findAccessFacility(Facility<?> fromFacility, Facility<?> toFacility) {
+	private TransitStopFacility findAccessFacility(Facility fromFacility, Facility toFacility) {
 		Coord fromCoord = StopBasedDrtRoutingModule.getFacilityCoord(fromFacility, network);
 		Coord toCoord = StopBasedDrtRoutingModule.getFacilityCoord(toFacility, network);
 		Set<TransitStopFacility> stopCandidates = findStopCandidates(fromCoord);
@@ -102,7 +102,7 @@ public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 		return accessFacility;
 	}
 
-	private TransitStopFacility findEgressFacility(TransitStopFacility fromStopFacility, Facility<?> toFacility) {
+	private TransitStopFacility findEgressFacility(TransitStopFacility fromStopFacility, Facility toFacility) {
 		Coord fromCoord = fromStopFacility.getCoord();
 		Coord toCoord = StopBasedDrtRoutingModule.getFacilityCoord(toFacility, network);
 		Set<TransitStopFacility> stopCandidates = findStopCandidates(toCoord);

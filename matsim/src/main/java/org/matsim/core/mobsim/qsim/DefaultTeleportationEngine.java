@@ -68,8 +68,8 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		Double travelTime = agent.getExpectedTravelTime() ;
 		if ( withTravelTimeCheck ) {
 			Double speed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( agent.getMode() ) ;
-			Facility<?> dpfac = agent.getCurrentFacility() ;
-			Facility<?> arfac = agent.getDestinationFacility() ;
+			Facility dpfac = agent.getCurrentFacility() ;
+			Facility arfac = agent.getDestinationFacility() ;
 			travelTime = DefaultTeleportationEngine.travelTimeCheck(travelTime, speed, dpfac, arfac);
 		}
     	
@@ -143,7 +143,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		this.internalInterface = internalInterface;
 	}
 
-	private static Double travelTimeCheck(Double travelTime, Double speed, Facility<?> dpfac, Facility<?> arfac) {
+	private static Double travelTimeCheck(Double travelTime, Double speed, Facility dpfac, Facility arfac) {
 		if ( speed==null ) {
 			// if we don't have a bushwhacking speed, the only thing we can do is trust the router
 			return travelTime ;
