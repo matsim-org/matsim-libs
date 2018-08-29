@@ -30,6 +30,6 @@ import org.matsim.facilities.Facility;
  */
 public interface TransitRouter {
 
-	public abstract List<Leg> calcRoute(final Facility<?> fromFacility, final Facility<?> toFacility, final double departureTime, final Person person);
+	public abstract List<Leg> calcRoute(final Facility fromFacility, final Facility toFacility, final double departureTime, final Person person);
 
 }

@@ -36,7 +36,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  * the context.
  * (This becomes clear if you think about a nodeId/linkId given by person.)
  */
-public interface Node extends BasicLocation<Node>, Identifiable<Node>, Attributable {
+public interface Node extends BasicLocation, Identifiable<Node>, Attributable {
 
 	/**
 	 * Adds a non-<code>null</code> link to this node's set of ingoing links.
