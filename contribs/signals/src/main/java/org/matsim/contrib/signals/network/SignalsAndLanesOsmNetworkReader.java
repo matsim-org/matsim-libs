@@ -1393,31 +1393,39 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	}
 
 	private void simplifyLanesAndAddOrigLane(Link link) {
+		// create 'original' lane, i.e. first lane of the link
 		Lane origLane = lanes.getFactory().createLane(Id.create("Lane" + link.getId() + ".ol", Lane.class));
-		lanes.getLanesToLinkAssignments().get(link.getId()).addLane(origLane);
 		origLane.setStartsAtMeterFromLinkEnd(link.getLength());
 		origLane.setNumberOfRepresentedLanes(link.getNumberOfLanes());
-		// lane capacity has not been set yet. i.e. ol-lane capacity is also set later 
+		// note: lane capacities are set later 
 
-		Lane rightLane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
-				.get(Id.create("Lane" + link.getId() + "." + ((int) link.getNumberOfLanes()), Lane.class));
-		origLane.addToLaneId(rightLane.getId());
-		for (int i = (int) link.getNumberOfLanes() - 1; i > 0; i--) {
-			Lane leftLane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
-					.get(Id.create("Lane" + link.getId() + "." + i, Lane.class));
-			origLane.addToLaneId(leftLane.getId());
-			// TODO this is meant to remove duplicated lanes but does not do this properly -> move it to the laneSimplflier!
-			if (rightLane.getToLinkIds().equals(leftLane.getToLinkIds())) {
-				leftLane.setNumberOfRepresentedLanes(
-						leftLane.getNumberOfRepresentedLanes() + rightLane.getNumberOfRepresentedLanes());
-				// log.info("Put together Lane " +
-				// leftLane.getId().toString() + " and Lane " +
-				// rightLane.getId().toString());
-				LanesToLinkAssignment linkLanes = lanes.getLanesToLinkAssignments().get(link.getId());
-				origLane.getToLaneIds().remove(rightLane.getId());
-				linkLanes.getLanes().remove(rightLane.getId());
+		// merge duplicated lanes (lanes with same to-links)
+		Set<Id<Lane>> lanesToBeRemoved = new HashSet<>();
+		for (int indexLane1 = 1; indexLane1 <= lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().size(); indexLane1++) {
+			Lane lane1 = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().get(Id.create("Lane" + link.getId() + "." + indexLane1, Lane.class));
+			// only consider lanes that are not already marked as to be removed
+			if (!lanesToBeRemoved.contains(lane1.getId())) {
+				origLane.addToLaneId(lane1.getId());
+				// check for other lanes with same outgoing links
+				mergeCheck: 
+				for (int indexLane2 = indexLane1+1; indexLane2 <= lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().size(); indexLane2++) {
+					Lane lane2 = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().get(Id.create("Lane" + link.getId() + "." + indexLane2, Lane.class));
+					if (lane1.getToLinkIds().size() == lane2.getToLinkIds().size()) {
+						for (int i = 0; i < lane1.getToLinkIds().size(); i++) {
+							if (!lane1.getToLaneIds().get(i).equals(lane2.getToLinkIds().get(i))) {
+								break mergeCheck; // the lanes have not the same to-links
+							}
+						}
+						// lane2 has the same outgoing links as lane1. save it as to be merged
+						lanesToBeRemoved.add(lane2.getId());
+						lane1.setNumberOfRepresentedLanes(lane1.getNumberOfRepresentedLanes()+1);
+					}
+				}
 			}
-			rightLane = leftLane;
+		}
+		lanes.getLanesToLinkAssignments().get(link.getId()).addLane(origLane);
+		for (Id<Lane> laneToBeRemoved : lanesToBeRemoved) {
+			lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().remove(laneToBeRemoved);
 		}
 	}
 
