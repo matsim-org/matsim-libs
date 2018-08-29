@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalEngine
+ * MatsimSignalSystemsReader
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,17 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.mobsim;
-
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+package org.matsim.contrib.signals.data;
 
 
 /**
+ * A place for constants to xml schemata
  * @author dgrether
- *
  */
-public interface SignalEngine extends MobsimInitializedListener, MobsimBeforeSimStepListener{
+public class MatsimSignalSystemsReader {
 
+	public static final String SIGNALSYSTEMS20 = "http://www.matsim.org/files/dtd/signalSystems_v2.0.xsd";
+
+	public static final String SIGNALGROUPS20 = "http://www.matsim.org/files/dtd/signalGroups_v2.0.xsd";
+
+	public static final String SIGNALCONTROL20 = "http://www.matsim.org/files/dtd/signalControl_v2.0.xsd";
 	
 }

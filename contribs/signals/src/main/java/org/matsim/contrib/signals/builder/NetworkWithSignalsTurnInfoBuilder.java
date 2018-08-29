@@ -16,17 +16,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.router;
+package org.matsim.contrib.signals.builder;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.signals.*;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
@@ -43,7 +44,7 @@ import com.google.inject.Inject;
  *
  * @author nagel, michalm
  */
-public class NetworkWithSignalsTurnInfoBuilder implements NetworkTurnInfoBuilderI {
+class NetworkWithSignalsTurnInfoBuilder implements NetworkTurnInfoBuilderI {
 
 	NetworkTurnInfoBuilder delegate ;
 	private Scenario scenario;

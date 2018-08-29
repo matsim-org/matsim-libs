@@ -82,10 +82,8 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 	Scenario scenario;
 
 	@Inject
-	public SignalEvents2ViaCSVWriter(Scenario scenario, ControlerListenerManager clm, EventsManager em) {
+	public SignalEvents2ViaCSVWriter(Scenario scenario) {
 		this.scenario = scenario;
-		clm.addControlerListener(this);
-		em.addHandler(this);
 	}
 
 	private Map<Id<Signal>, Coord> signal2Coord = new HashMap<>();
