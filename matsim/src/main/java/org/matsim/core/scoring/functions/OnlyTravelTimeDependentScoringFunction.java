@@ -23,6 +23,7 @@ package org.matsim.core.scoring.functions;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**
@@ -52,6 +53,11 @@ public class OnlyTravelTimeDependentScoringFunction implements ScoringFunction {
 
 	@Override
 	public void agentStuck(final double time) {
+	}
+
+	@Override
+	public void handleTrip( final TripStructureUtils.Trip trip ) {
+		throw new RuntimeException( "not implemented" );
 	}
 
 	@Override

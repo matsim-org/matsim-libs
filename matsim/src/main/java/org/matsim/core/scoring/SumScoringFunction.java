@@ -4,6 +4,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.router.priorityqueue.BinaryMinHeap;
 import org.matsim.core.utils.misc.Time;
 
 import java.util.ArrayList;
@@ -23,6 +26,10 @@ public final class SumScoringFunction implements ScoringFunction {
 
 	public interface LegScoring extends BasicScoring {
 		void handleLeg(final Leg leg);
+	}
+
+	public interface TripScoring extends BasicScoring{
+		void handleTrip(final Trip trip) ;
 	}
 
 	public interface MoneyScoring extends BasicScoring {
@@ -53,7 +60,8 @@ public final class SumScoringFunction implements ScoringFunction {
 	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();
 	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<ActivityScoring>();
 	private ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<MoneyScoring>();
-	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<LegScoring>();
+	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<>();
+	private ArrayList<TripScoring> tripScoringFunctions = new ArrayList<>();
 	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<AgentStuckScoring>();
 	private ArrayList<ArbitraryEventScoring> arbtraryEventScoringFunctions = new ArrayList<ArbitraryEventScoring>() ;
 
@@ -82,6 +90,13 @@ public final class SumScoringFunction implements ScoringFunction {
 	public final void handleLeg(Leg leg) {
 		for (LegScoring legScoringFunction : legScoringFunctions) {
 			legScoringFunction.handleLeg(leg);
+		}
+	}
+
+	@Override
+	public final void handleTrip(Trip trip) {
+		for (TripScoring tripScoringFunction : tripScoringFunctions) {
+			tripScoringFunction.handleTrip(trip);
 		}
 	}
 
@@ -147,6 +162,10 @@ public final class SumScoringFunction implements ScoringFunction {
 
 		if (scoringFunction instanceof LegScoring) {
 			legScoringFunctions.add((LegScoring) scoringFunction);
+		}
+
+		if (scoringFunction instanceof TripScoring) {
+			tripScoringFunctions.add((TripScoring) scoringFunction);
 		}
 
 		if (scoringFunction instanceof MoneyScoring) {

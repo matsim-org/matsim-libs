@@ -15,6 +15,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationSco
 import org.matsim.core.controler.ControlerListenerManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
@@ -33,7 +34,15 @@ public class ScoringFunctionsForPopulationStressIT {
 		EventsManager events = EventsUtils.createEventsManager(config);
 		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
 		ScoringFunctionFactory throwingScoringFunctionFactory = new ThrowingScoringFunctionFactory();
-		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(controlerListenerManager, events, new EventsToActivities(controlerListenerManager, events), new EventsToLegs(scenario.getNetwork(), events), scenario.getPopulation(), throwingScoringFunctionFactory);
+		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
+				controlerListenerManager,
+				events,
+				new EventsToActivities(controlerListenerManager, events),
+				new EventsToLegs(scenario.getNetwork(), events),
+				scenario.getPopulation(),
+				throwingScoringFunctionFactory,
+				null
+		);
 		controlerListenerManager.fireControlerIterationStartsEvent(0);
 		events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4));
 		scoringFunctionsForPopulation.finishScoringFunctions();
@@ -57,7 +66,12 @@ public class ScoringFunctionsForPopulationStressIT {
 				public void agentStuck(double time) {
 					throw new RuntimeException();
 				}
-
+				
+				@Override
+				public void handleTrip( final TripStructureUtils.Trip trip ) {
+					throw new RuntimeException( "not implemented" );
+				}
+				
 				@Override
 				public void addMoney(double amount) {
 					throw new RuntimeException();
@@ -129,7 +143,12 @@ public class ScoringFunctionsForPopulationStressIT {
 					public void agentStuck(double time) {
 						delegateFunction.agentStuck(time);
 					}
-
+					
+					@Override
+					public void handleTrip( final TripStructureUtils.Trip trip ) {
+						throw new RuntimeException( "not implemented" );
+					}
+					
 					@Override
 					public void addMoney(double amount) {
 						delegateFunction.addMoney(amount);
@@ -152,7 +171,15 @@ public class ScoringFunctionsForPopulationStressIT {
 				};
 			}
 		};
-		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(controlerListenerManager, events, new EventsToActivities(controlerListenerManager, events), new EventsToLegs(scenario.getNetwork(), events), scenario.getPopulation(), scoringFunctionFactory);
+		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
+				controlerListenerManager,
+				events,
+				new EventsToActivities(controlerListenerManager, events),
+				new EventsToLegs(scenario.getNetwork(), events),
+				scenario.getPopulation(),
+				scoringFunctionFactory,
+				null
+		);
 		controlerListenerManager.fireControlerIterationStartsEvent(0);
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {
@@ -227,7 +254,12 @@ public class ScoringFunctionsForPopulationStressIT {
 						}
 						delegateFunction.agentStuck(time);
 					}
-
+					
+					@Override
+					public void handleTrip( final TripStructureUtils.Trip trip ) {
+						throw new RuntimeException( "not implemented" );
+					}
+					
 					@Override
 					public void addMoney(double amount) {
 						try {
@@ -266,7 +298,15 @@ public class ScoringFunctionsForPopulationStressIT {
 			}
 		};
 		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
-		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(controlerListenerManager, events, new EventsToActivities(controlerListenerManager, events), new EventsToLegs(scenario.getNetwork(), events), scenario.getPopulation(), scoringFunctionFactory);
+		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
+				controlerListenerManager,
+				events,
+				new EventsToActivities(controlerListenerManager, events),
+				new EventsToLegs(scenario.getNetwork(), events),
+				scenario.getPopulation(),
+				scoringFunctionFactory,
+				null
+		);
 		controlerListenerManager.fireControlerIterationStartsEvent(0);
 		int MAX = 10;
 		events.initProcessing();

@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
@@ -39,6 +40,7 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
@@ -47,7 +49,14 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.pt.PtConstants;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -55,6 +64,8 @@ import com.google.inject.Inject;
 import gnu.trove.TDoubleCollection;
 import gnu.trove.iterator.TDoubleIterator;
 import gnu.trove.list.array.TDoubleArrayList;
+
+import static org.matsim.core.router.TripStructureUtils.*;
 
 /**
  * This class helps EventsToScore by keeping ScoringFunctions for the entire Population - one per Person -, and dispatching Activities
@@ -73,6 +84,9 @@ import gnu.trove.list.array.TDoubleArrayList;
 	private final static Logger log = Logger.getLogger(ScoringFunctionsForPopulation.class);
 	private final Population population;
 	private final ScoringFunctionFactory scoringFunctionFactory;
+	
+	private final Map<Id<Person>, Plan> tripRecords = new HashMap<>() ;
+	private final StageActivityTypes stageActivityTypes;
 
 	/*
 	 * Replaced TreeMaps with (Linked)HashMaps since they should perform much better. For 'partialScores'
@@ -97,8 +111,8 @@ import gnu.trove.list.array.TDoubleArrayList;
 	private Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
 
 	@Inject
-	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
-								  Population population, ScoringFunctionFactory scoringFunctionFactory) {
+	ScoringFunctionsForPopulation( ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
+						 Population population, ScoringFunctionFactory scoringFunctionFactory, TripRouter tripRouter ) {
 		controlerListenerManager.addControlerListener(new IterationStartsListener() {
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
@@ -113,6 +127,8 @@ import gnu.trove.list.array.TDoubleArrayList;
 //		if ( passLinkEventsToPerson ) {
 			eventsManager.addHandler(vehicles2Drivers);
 //		}
+//		stageActivityTypes = tripRouter.getStageActivityTypes() ;
+		stageActivityTypes = new StageActivityTypesImpl( new String [] {PtConstants.TRANSIT_ACTIVITY_TYPE} ) ;
 	}
 
 	private void init() {
@@ -184,6 +200,13 @@ import gnu.trove.list.array.TDoubleArrayList;
 			TDoubleCollection partialScoresForAgent = partialScores.get(agentId);
 			partialScoresForAgent.add(scoringFunction.getScore());
 		}
+		Plan plan = tripRecords.get( agentId ) ; // as container for trip
+		if ( plan==null ) {
+			plan = PopulationUtils.createPlan() ;
+			tripRecords.put( agentId, plan ) ;
+		}
+		plan.addLeg( leg );
+		
 	}
 
 	@Override
@@ -195,6 +218,24 @@ import gnu.trove.list.array.TDoubleArrayList;
 			scoringFunction.handleActivity(activity);
 			TDoubleCollection partialScoresForAgent = partialScores.get(agentId);
 			partialScoresForAgent.add(scoringFunction.getScore());
+		}
+		Plan plan = tripRecords.get( agentId ); // as container for trip
+		if ( stageActivityTypes.isStageActivity( activity.getType() ) ) {
+			Gbl.assertNotNull( plan );
+			plan.addActivity( activity );
+		} else if ( plan != null ) {
+			Gbl.assertNotNull( stageActivityTypes );
+			final List<Trip> trips = TripStructureUtils.getTrips( plan, stageActivityTypes );
+			
+			log.warn( "trips.size=" + trips.size() ) ;
+			
+			log.warn( "trip=" + trips ) ;
+			
+			Gbl.assertIf( trips.size()==1 );
+			final Trip trip = trips.get( 0 );
+			Gbl.assertNotNull( trip );
+			scoringFunction.handleTrip( trip );
+			tripRecords.remove( agentId ) ;
 		}
 	}
 

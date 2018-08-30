@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.router.TripStructureUtils;
 
 /**
  * A scoring function calculates the score for one plan of an agent.  The score
@@ -67,6 +68,8 @@ public interface ScoringFunction {
 	 * simulation.
 	 */
 	public void agentStuck(final double time);
+
+	void handleTrip( TripStructureUtils.Trip trip );
 
 	/**
 	 * Adds the specified amount of utility to the agent's score. This is mostly
