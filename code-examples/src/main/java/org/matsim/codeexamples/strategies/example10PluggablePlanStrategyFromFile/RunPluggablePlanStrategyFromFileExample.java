@@ -34,7 +34,7 @@ public class RunPluggablePlanStrategyFromFileExample {
 		
 		Config config;
 		if ( args.length==0 ) {
-			config = ConfigUtils.loadConfig( "scenarios/equil/pluggablePlanStrategy-config.xml" ) ;
+			config = ConfigUtils.loadConfig( "scenarios/equil/config-with-pluggablePlanStrategy.xml" ) ;
 		} else {
 			config = ConfigUtils.loadConfig(args[0]);
 		}

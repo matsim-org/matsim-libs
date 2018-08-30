@@ -15,7 +15,8 @@ public class RunAddLinkIDsToFacilitiesExample {
 	
 	public static void main( String [] args ) {
 	
-		Config config = ConfigUtils.loadConfig( args[0] ) ;
+//		Config config = ConfigUtils.loadConfig( args[0] ) ;
+		Config config = ConfigUtils.loadConfig( "scenarios/equil/config.xml" ) ;
 		
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		
@@ -28,8 +29,6 @@ public class RunAddLinkIDsToFacilitiesExample {
 				((ActivityFacilityImpl)fac).setLinkId( link.getId() );
 			}
 		}
-		
-		
 	}
 
 }
