@@ -149,8 +149,8 @@ public class PopulationReprojectionIOIT {
 		new PopulationReader(originalScenario).parse(IOUtils.newUrl(berlin, BASE_FILE));
 		final Config config = ConfigUtils.createConfig(berlin);
 
-		originalScenario.getNetwork().getAttributes().putAttribute(ProjectionUtils.INPUT_CRS_ATT, INITIAL_CRS);
-		originalScenario.getPopulation().getAttributes().putAttribute(ProjectionUtils.INPUT_CRS_ATT, INITIAL_CRS);
+		ProjectionUtils.putCRS(originalScenario.getNetwork(), INITIAL_CRS);
+		ProjectionUtils.putCRS(originalScenario.getPopulation(), INITIAL_CRS);
 
 		new PopulationWriter(originalScenario.getPopulation()).write(utils.getOutputDirectory()+BASE_FILE);
 		new NetworkWriter(originalScenario.getNetwork()).write(utils.getOutputDirectory()+NET_FILE);
@@ -191,7 +191,7 @@ public class PopulationReprojectionIOIT {
 		Assert.assertEquals(
 				"wrong CRS information after loading",
 				TARGET_CRS,
-				scenario.getPopulation().getAttributes().getAttribute(ProjectionUtils.INPUT_CRS_ATT));
+				ProjectionUtils.getCRS(scenario.getPopulation()));
 
 		// do not perform ANY mobsim run
 		config.controler().setLastIteration( -1 );

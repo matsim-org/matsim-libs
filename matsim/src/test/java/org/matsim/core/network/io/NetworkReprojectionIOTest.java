@@ -93,7 +93,7 @@ public class NetworkReprojectionIOTest {
 		final String networkFile = utils.getOutputDirectory()+"/network.xml";
 
 		final Network initialNetwork = createInitialNetwork();
-		initialNetwork.getAttributes().putAttribute(ProjectionUtils.INPUT_CRS_ATT, INITIAL_CRS);
+		ProjectionUtils.putCRS(initialNetwork, INITIAL_CRS);
 
 		new NetworkWriter( initialNetwork ).write( networkFile );
 
@@ -120,7 +120,7 @@ public class NetworkReprojectionIOTest {
 		Assert.assertEquals(
 				"wrong CRS information after loading",
 				TARGET_CRS,
-				scenario.getNetwork().getAttributes().getAttribute(ProjectionUtils.INPUT_CRS_ATT));
+				ProjectionUtils.getCRS(scenario.getNetwork()));
 
 		config.controler().setLastIteration( 0 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";

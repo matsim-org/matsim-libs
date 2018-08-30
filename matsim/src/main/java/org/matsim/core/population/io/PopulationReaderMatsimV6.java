@@ -124,7 +124,7 @@ import java.util.Stack;
 		this.plans = scenario.getPopulation();
 	    if (targetCRS != null && externalInputCRS !=null) {
 		    this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
-		    this.plans.getAttributes().putAttribute(ProjectionUtils.INPUT_CRS_ATT, targetCRS);
+		    ProjectionUtils.putCRS(this.plans, targetCRS);
 	    }
 	}
 
@@ -199,7 +199,7 @@ import java.util.Stack;
 				break;
 			case ATTRIBUTES:
 				if (context.peek().equals(POPULATION)) {
-					String inputCRS = (String) scenario.getPopulation().getAttributes().getAttribute(ProjectionUtils.INPUT_CRS_ATT);
+					String inputCRS = ProjectionUtils.getCRS(scenario.getPopulation());
 
 					if (inputCRS != null && targetCRS != null) {
 						if (externalInputCRS != null) {
@@ -207,7 +207,7 @@ import java.util.Stack;
 							log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
 						}
 						coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
-						scenario.getPopulation().getAttributes().putAttribute(ProjectionUtils.INPUT_CRS_ATT, targetCRS);
+						ProjectionUtils.putCRS(scenario.getPopulation(), targetCRS);
 					}
 				}
 			    break;

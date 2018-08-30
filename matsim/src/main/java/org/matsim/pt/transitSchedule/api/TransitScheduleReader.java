@@ -131,7 +131,7 @@ public class TransitScheduleReader implements MatsimReader {
 				throw new RuntimeException(e);
 			}
 			if (targetCRS != null) {
-				scenario.getTransitSchedule().getAttributes().putAttribute(ProjectionUtils.INPUT_CRS_ATT, targetCRS);
+				ProjectionUtils.putCRS(scenario.getTransitSchedule(), targetCRS);
 			}
 		}
 	}

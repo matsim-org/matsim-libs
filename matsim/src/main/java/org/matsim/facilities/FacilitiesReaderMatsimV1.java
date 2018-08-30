@@ -75,7 +75,7 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
         this.factory = this.facilities.getFactory();
         if (externalInputCRS != null && targetCRS != null) {
             this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
-            this.facilities.getAttributes().putAttribute(ProjectionUtils.INPUT_CRS_ATT, targetCRS);
+            ProjectionUtils.putCRS(this.facilities, targetCRS);
         }
     }
 

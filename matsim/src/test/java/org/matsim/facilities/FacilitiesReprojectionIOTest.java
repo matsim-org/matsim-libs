@@ -68,7 +68,7 @@ public class FacilitiesReprojectionIOTest {
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
 
-		originalScenario.getActivityFacilities().getAttributes().putAttribute(ProjectionUtils.INPUT_CRS_ATT, INITIAL_CRS);
+		ProjectionUtils.putCRS(originalScenario.getActivityFacilities(), INITIAL_CRS);
 		new FacilitiesWriter(originalScenario.getActivityFacilities()).write(utils.getOutputDirectory()+"/facilities.xml");
 
 		// write scenario and re-read it
@@ -91,7 +91,7 @@ public class FacilitiesReprojectionIOTest {
 		Assert.assertEquals(
 				"wrong CRS information after loading",
 				TARGET_CRS,
-				scenario.getActivityFacilities().getAttributes().getAttribute(ProjectionUtils.INPUT_CRS_ATT));
+				ProjectionUtils.getCRS(scenario.getActivityFacilities()));
 
 		config.controler().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";

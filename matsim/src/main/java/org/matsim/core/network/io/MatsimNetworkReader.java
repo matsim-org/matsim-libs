@@ -96,7 +96,7 @@ public final class MatsimNetworkReader extends MatsimXmlParser {
 		    throw new RuntimeException(e);
 		}
 		if (targetCRS != null) {
-			network.getAttributes().putAttribute(ProjectionUtils.INPUT_CRS_ATT, targetCRS);
+			ProjectionUtils.putCRS(network, targetCRS);
 		}
 	}
 

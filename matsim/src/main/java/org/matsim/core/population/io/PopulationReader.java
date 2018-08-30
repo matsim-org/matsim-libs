@@ -165,7 +165,7 @@ public final class PopulationReader extends MatsimXmlParser {
 		    throw new RuntimeException(e);
 		}
 		if (targetCRS != null) {
-			scenario.getPopulation().getAttributes().putAttribute(ProjectionUtils.INPUT_CRS_ATT, targetCRS);
+			ProjectionUtils.putCRS(scenario.getPopulation(), targetCRS);
 		}
 	}
 }

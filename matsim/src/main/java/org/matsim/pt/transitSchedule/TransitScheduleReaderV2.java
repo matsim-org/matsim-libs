@@ -97,7 +97,7 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 		this.routeFactory = routeFactory;
 		if (externalInputCRS != null && targetCRS != null) {
 			this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
-			this.schedule.getAttributes().putAttribute(ProjectionUtils.INPUT_CRS_ATT, targetCRS);
+			ProjectionUtils.putCRS(this.schedule, targetCRS);
 		}
 	}
 
