@@ -71,11 +71,6 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 		}
 	}
 
-	@Deprecated
-	public void init(final String outfilename) {
-		throw new RuntimeException("Please create a new instance.");
-	}
-
 	@Override
 	public void reset(final int iter) {
 	}
