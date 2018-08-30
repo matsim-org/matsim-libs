@@ -189,6 +189,11 @@ public class PopulationReprojectionIOIT {
 			}
 		}
 
+		Assert.assertEquals(
+				"wrong CRS information after loading",
+				TARGET_CRS,
+				scenario.getPopulation().getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT));
+
 		// do not perform ANY mobsim run
 		config.controler().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";

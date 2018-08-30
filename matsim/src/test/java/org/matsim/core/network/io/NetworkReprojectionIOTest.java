@@ -117,6 +117,11 @@ public class NetworkReprojectionIOTest {
 					internalCoord);
 		}
 
+		Assert.assertEquals(
+				"wrong CRS information after loading",
+				TARGET_CRS,
+				scenario.getNetwork().getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT));
+
 		config.controler().setLastIteration( 0 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
 		config.controler().setOutputDirectory( outputDirectory );

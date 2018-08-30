@@ -11,21 +11,30 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.File;
 import java.net.URL;
 
 /**
  * @author thibautd
  */
 public class TransitScheduleReprojectionIOTest {
+	private static final String INITIAL_CRS = TransformationFactory.CH1903_LV03_GT;
+	private static final String TARGET_CRS = "EPSG:3857";
+	private static final CoordinateTransformation transformation =
+			TransformationFactory.getCoordinateTransformation(
+					INITIAL_CRS,
+					TARGET_CRS);
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -37,7 +46,7 @@ public class TransitScheduleReprojectionIOTest {
 		new TransitScheduleReader( originalScenario ).readURL(transitSchedule);
 
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReader(null, null, reprojectedScenario).readURL(transitSchedule);
+		new TransitScheduleReader(INITIAL_CRS, TARGET_CRS, reprojectedScenario).readURL(transitSchedule);
 
 		assertCorrectlyReprojected( originalScenario.getTransitSchedule() , reprojectedScenario.getTransitSchedule() );
 	}
@@ -49,7 +58,7 @@ public class TransitScheduleReprojectionIOTest {
 		new TransitScheduleReader(originalScenario).readURL(transitSchedule);
 
 		final String file = utils.getOutputDirectory()+"/schedule.xml";
-		new TransitScheduleWriterV1( new Transformation() , originalScenario.getTransitSchedule() ).write( file );
+		new TransitScheduleWriterV1( transformation , originalScenario.getTransitSchedule() ).write( file );
 
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(reprojectedScenario).readFile(file);
@@ -59,12 +68,6 @@ public class TransitScheduleReprojectionIOTest {
 
 	@Test
 	public void testWithControlerAndConfigParameters() {
-		// accept a rounding error of 1 cm.
-		// this is used both to compare equality and non-equality, so the more we accept difference between input
-		// and output coordinates, the more we require the internally reprojected coordinates to be different.
-		// It is thus OK to use a reasonably "high" tolerance compared to usual double comparisons.
-		final double epsilon = 0.01;
-
 		final Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("pt-tutorial"));
 
 		final Scenario originalScenario = ScenarioUtils.createScenario(config);
@@ -73,11 +76,8 @@ public class TransitScheduleReprojectionIOTest {
 		config.transit().setTransitScheduleFile("transitschedule.xml");
 
 		config.transit().setUseTransit( true );
-		config.transit().setInputScheduleCRS( TransformationFactory.CH1903_LV03_GT );
-		// web mercator. This would be a pretty silly choice for simulation,
-		// but does not matter for tests. Just makes sure that (almost) every
-		// coordinate can be projected
-		config.global().setCoordinateSystem(  "EPSG:3857" );
+		config.transit().setInputScheduleCRS( INITIAL_CRS );
+		config.global().setCoordinateSystem( TARGET_CRS );
 
 		// TODO: test also with loading from Controler C'tor?
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
@@ -85,16 +85,10 @@ public class TransitScheduleReprojectionIOTest {
 			final Coord originalCoord = originalScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 			final Coord internalCoord = scenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 
-			Assert.assertNotEquals(
+			Assert.assertEquals(
 					"No coordinates transform performed!",
-					originalCoord.getX(),
-					internalCoord.getX(),
-					epsilon );
-			Assert.assertNotEquals(
-					"No coordinates transform performed!",
-					originalCoord.getY(),
-					internalCoord.getY(),
-					epsilon );
+					transformation.transform(originalCoord),
+					internalCoord);
 		}
 
 		config.controler().setLastIteration( -1 );
@@ -107,19 +101,67 @@ public class TransitScheduleReprojectionIOTest {
 		new TransitScheduleReader( dumpedScenario ).readFile( outputDirectory+"/output_transitSchedule.xml.gz" );
 
 		for ( Id<TransitStopFacility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
-			final Coord originalCoord = originalScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
+			final Coord internalCoord = scenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 			final Coord dumpedCoord = dumpedScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 
 			Assert.assertEquals(
-					"coordinates were not reprojected for dump",
-					originalCoord.getX(),
-					dumpedCoord.getX(),
-					epsilon );
+					"coordinates were reprojected for dump",
+					internalCoord,
+					dumpedCoord);
+		}
+	}
+
+	@Test
+	public void testWithControlerAndAttributes() {
+		final Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("pt-tutorial"));
+
+		final Scenario originalScenario = ScenarioUtils.createScenario(config);
+		new TransitScheduleReader( originalScenario ).readURL(ConfigGroup.getInputFileURL(config.getContext(), "transitschedule.xml"));
+
+		final String withAttributes = new File(utils.getOutputDirectory()).getAbsolutePath()+"transitschedule.xml";
+		originalScenario.getTransitSchedule().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, INITIAL_CRS);
+		new TransitScheduleWriter(originalScenario.getTransitSchedule()).writeFile(withAttributes);
+
+		config.transit().setTransitScheduleFile(withAttributes);
+
+		config.transit().setUseTransit( true );
+		config.transit().setInputScheduleCRS( INITIAL_CRS );
+		config.global().setCoordinateSystem( TARGET_CRS );
+
+		// TODO: test also with loading from Controler C'tor?
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		for ( Id<TransitStopFacility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
+			final Coord originalCoord = originalScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
+			final Coord internalCoord = scenario.getTransitSchedule().getFacilities().get( id ).getCoord();
+
 			Assert.assertEquals(
-					"coordinates were not reprojected for dump",
-					originalCoord.getY(),
-					dumpedCoord.getY(),
-					epsilon );
+					"No coordinates transform performed!",
+					transformation.transform(originalCoord),
+					internalCoord);
+		}
+
+		Assert.assertEquals(
+				"wrong CRS information after loading",
+				TARGET_CRS,
+				scenario.getTransitSchedule().getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT));
+
+		config.controler().setLastIteration( -1 );
+		final String outputDirectory = utils.getOutputDirectory()+"/output/";
+		config.controler().setOutputDirectory( outputDirectory );
+		final Controler controler = new Controler( scenario );
+		controler.run();
+
+		final Scenario dumpedScenario = ScenarioUtils.createScenario( config );
+		new TransitScheduleReader( dumpedScenario ).readFile( outputDirectory+"/output_transitSchedule.xml.gz" );
+
+		for ( Id<TransitStopFacility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
+			final Coord internalCoord = scenario.getTransitSchedule().getFacilities().get( id ).getCoord();
+			final Coord dumpedCoord = dumpedScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
+
+			Assert.assertEquals(
+					"coordinates were reprojected for dump",
+					internalCoord,
+					dumpedCoord);
 		}
 	}
 
@@ -137,27 +179,9 @@ public class TransitScheduleReprojectionIOTest {
 
 			Assert.assertEquals(
 					"wrong reprojected X value",
-					original.getX() + 1000 ,
-					transformed.getX(),
-					MatsimTestUtils.EPSILON );
-			Assert.assertEquals(
-					"wrong reprojected Y value",
-					original.getY() + 1000 ,
-					transformed.getY(),
-					MatsimTestUtils.EPSILON );
+					transformation.transform(original),
+					transformed);
 		}
 	}
 
-	private static class Transformation implements CoordinateTransformation {
-		@Override
-		public Coord transform(Coord coord) {
-			double elevation;
-			try{
-				elevation = coord.getZ();
-				return new Coord( coord.getX() + 1000 , coord.getY() + 1000 , elevation);
-			} catch (Exception e){
-				return new Coord( coord.getX() + 1000 , coord.getY() + 1000 );
-			}
-		}
-	}
 }
