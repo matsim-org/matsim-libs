@@ -49,7 +49,7 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
     
     private boolean cacheTree;
     private TransitLeastCostPathTree tree;
-	private Facility<?> previousFromFacility;
+	private Facility previousFromFacility;
 
     public TransitRouterImpl(final TransitRouterConfig trConfig, final TransitSchedule schedule) {
         super(trConfig);
@@ -109,7 +109,7 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
     }
 
     @Override
-    public List<Leg> calcRoute(final Facility<?> fromFacility, final Facility<?> toFacility, final double departureTime, final Person person) {
+    public List<Leg> calcRoute( final Facility fromFacility, final Facility toFacility, final double departureTime, final Person person) {
         // find possible start stops
         Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person,
                 fromFacility.getCoord(),

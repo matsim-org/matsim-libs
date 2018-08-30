@@ -21,11 +21,9 @@ package org.matsim.contrib.signals.builder;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.controller.SignalController;
 import org.matsim.contrib.signals.controller.SignalControllerFactory;
 import org.matsim.contrib.signals.controller.sylvia.SylviaPreprocessData;
@@ -43,7 +41,7 @@ import com.google.inject.Inject;
  * 
  * @author tthunig
  */
-public final class SignalModelFactoryImpl implements SignalModelFactory {
+final class SignalModelFactoryImpl implements SignalModelFactory {
 	
 	private static final Logger log = Logger.getLogger(SignalModelFactoryImpl.class);
 	

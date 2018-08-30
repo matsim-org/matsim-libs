@@ -53,7 +53,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	private static final Logger LOGGER = Logger.getLogger(StopBasedDrtRoutingModule.class);
 
 	public interface AccessEgressStopFinder {
-		Pair<TransitStopFacility, TransitStopFacility> findStops(Facility<?> fromFacility, Facility<?> toFacility);
+		Pair<TransitStopFacility, TransitStopFacility> findStops(Facility fromFacility, Facility toFacility);
 	}
 
 	private final StageActivityTypes drtStageActivityType = new DrtStageActivityType();
@@ -75,8 +75,8 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(Facility<?> fromFacility, Facility<?> toFacility, double departureTime,
-			Person person) {
+	public List<? extends PlanElement> calcRoute( Facility fromFacility, Facility toFacility, double departureTime,
+								    Person person) {
 		Pair<TransitStopFacility, TransitStopFacility> stops = stopFinder.findStops(fromFacility, toFacility);
 
 		TransitStopFacility accessFacility = stops.getLeft();
@@ -115,14 +115,14 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		return trip;
 	}
 
-	private Leg createDrtWalkLeg(Facility<?> fromFacility, Facility<?> toFacility, double departureTime,
-			Person person) {
+	private Leg createDrtWalkLeg( Facility fromFacility, Facility toFacility, double departureTime,
+						Person person) {
 		Leg leg = (Leg)walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
 		leg.setMode(DrtStageActivityType.DRT_WALK);
 		return leg;
 	}
 
-	private Activity createDrtStageActivity(Facility<?> stopFacility) {
+	private Activity createDrtStageActivity(Facility stopFacility) {
 		Activity activity = populationFactory
 				.createActivityFromCoord(DrtStageActivityType.DRT_STAGE_ACTIVITY, stopFacility.getCoord());
 		activity.setMaximumDuration(1);
@@ -141,7 +141,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		return drtStageActivityType;
 	}
 
-	static Coord getFacilityCoord(Facility<?> facility, Network network) {
+	static Coord getFacilityCoord(Facility facility, Network network) {
 		Coord coord = facility.getCoord();
 		if (coord == null) {
 			coord = network.getLinks().get(facility.getLinkId()).getCoord();

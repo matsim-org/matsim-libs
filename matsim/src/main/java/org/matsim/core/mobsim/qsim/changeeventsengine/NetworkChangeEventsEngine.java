@@ -1,134 +1,104 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * NetworkChangeEventsEngine
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
 package org.matsim.core.mobsim.qsim.changeeventsengine;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.mobsim.jdeqsim.Message;
+import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
 
-import java.util.PriorityQueue;
+import javax.inject.Inject;
 import java.util.Queue;
 
-/**
- * @author dgrether
- */
-public final class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
-	private static final Logger log = Logger.getLogger(NetworkChangeEventsEngine.class) ;
-	
-	private Queue<NetworkChangeEvent> networkChangeEventsQueue = null;
-	private Netsim mobsim;
-	
-	private NetworkChangeEventsEngine() {}
-	
-	public static NetworkChangeEventsEngineI createNetworkChangeEventsEngine() {
-		return new NetworkChangeEventsEngine();
-	}
-	
-	@Override
-	public void setInternalInterface( InternalInterface internalInterface ) {
-		this.mobsim = internalInterface.getMobsim();
-	}
+class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
+	private static final Logger log = Logger.getLogger( NetworkChangeEventsEngine.class ) ;
 
-	@Override
-	public void afterSim() {
-		
+	private final MessageQueue messageQueue;
+	private final Network network;
+	private InternalInterface internalInterface;
+
+	@Inject
+	NetworkChangeEventsEngine(Network network, MessageQueue messageQueue) {
+		this.network = network;
+		this.messageQueue = messageQueue;
 	}
 
 	@Override
 	public void onPrepareSim() {
-		Queue<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(this.mobsim.getScenario().getNetwork());
-		if ((changeEvents != null) && (changeEvents.size() > 0)) {
-			this.networkChangeEventsQueue = new PriorityQueue<>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
-			this.networkChangeEventsQueue.addAll(changeEvents);
-		}
-
-		// one could replace the above lines by
-//		this.networkChangeEventsQueue = NetworkUtils.getNetworkChangeEvents(this.mobsim.getScenario().getNetwork()) ;
-		// This also passes at least the core tests.  However, the code below "consumes" the network change events queue.
-		// It seems that we should rather not do this.
-
-	}
-
-	@Override
-	public void doSimStep(double time) {
-		if ((this.networkChangeEventsQueue != null) && (this.networkChangeEventsQueue.size() > 0)) {
-			handleNetworkChangeEvents(time);
-		}
-	}
-
-	private void handleNetworkChangeEvents(final double time) {
-		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)) {
-			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
-			handleNetworkChangeEvent(event);
+		Queue<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(this.network);
+		for (final NetworkChangeEvent changeEvent : changeEvents) {
+			addNetworkChangeEventToMessageQ(changeEvent);
 		}
 	}
 	
-	public final void addNetworkChangeEvent( NetworkChangeEvent event ) {
-		// used (and thus implicitly tested) by bdi-abm-integration project.  A separate core test would be good. kai, feb'18
-		
-		log.warn("add change event coming from external (i.e. not in network change events data structure):" + event);
-		this.networkChangeEventsQueue.add(event);
-		final Queue<NetworkChangeEvent> centralNetworkChangeEvents = NetworkUtils.getNetworkChangeEvents(this.mobsim.getScenario().getNetwork());
-		if ( !centralNetworkChangeEvents.contains( event ) ) {
-			centralNetworkChangeEvents.add( event ) ;
-			// need to add this here since otherwise speed lookup in mobsim does not work. And need to hedge against
-			// code that may already have added it by itself.  kai, feb'18
-		}
+	private void addNetworkChangeEventToMessageQ(NetworkChangeEvent changeEvent) {
+		Message m = new Message() {
+			@Override
+			public void processEvent() {
 
-		handleNetworkChangeEvent(event);
+			}
+
+			@Override
+			public void handleMessage() {
+				applyTheChangeEvent(changeEvent);
+			}
+		};
+		m.setMessageArrivalTime(changeEvent.getStartTime());
+		this.messageQueue.putMessage(m);
 	}
 	
-	private void handleNetworkChangeEvent(NetworkChangeEvent event) {
-		for (Link link : event.getLinks()) {
-			final NetsimLink netsimLink = this.mobsim.getNetsimNetwork().getNetsimLink(link.getId());
+	private void applyTheChangeEvent(NetworkChangeEvent changeEvent) {
+		for (Link link : changeEvent.getLinks()) {
+			final NetsimLink netsimLink = this.internalInterface.getMobsim().getNetsimNetwork().getNetsimLink(link.getId());
 			if ( netsimLink instanceof TimeVariantLink) {
 				((TimeVariantLink) netsimLink).recalcTimeVariantAttributes();
 			} else {
 				throw new RuntimeException("link not time variant") ;
 			}
+
 		}
 	}
 	
-//	public void rereadNetworkChangeEvents() {
-		// not sure if this is the way to go since this would mean re-reading everything from the beginning.  Could instead just
-		// insert it.  Issue then is that it needs to be inserted both int
-		// (1) networkChangEventsQueue of present class
-		// (2) networkChangeEvents data of scenario
-		// Reason is that (1) only only triggers the reCalcTimeDep method in the QSim, but the actual new values
-		// are in (2). kai, feb'18
-		// --> yy might consider to get rid of (2), since (1) is now also time-sorted (since sometimes 2017/18). kai, feb'18
-
-		// Note that it _would_ be possible to add flowCap/nLanes change events into the mobsim w/o adding them to the central
-		// network change events, since those are pushed into the mobsim.  It would, however, not work with freeSpeed change events,
-		// since these are pulled from the mobsim.  For consistency, thus, I opt for running all added network change events through
-		// the central network change events.  kai, feb'18
+	public final void addNetworkChangeEvent( NetworkChangeEvent event ) {
+		log.warn("add within-day network change event:" + event);
 		
-//		throw new RuntimeException(Gbl.NOT_IMPLEMENTED ) ;
-//	}
+		final Queue<NetworkChangeEvent> centralNetworkChangeEvents =
+				NetworkUtils.getNetworkChangeEvents(this.internalInterface.getMobsim().getScenario().getNetwork());
+		if ( centralNetworkChangeEvents.contains( event ) ) {
+			log.warn("network change event already in central data structure; not adding it again") ;
+		} else {
+			log.warn("network change event not yet in central data structure; adding it") ;
+//			centralNetworkChangeEvents.add( event ) ;
+			NetworkUtils.addNetworkChangeEvent(this.internalInterface.getMobsim().getScenario().getNetwork(), event);
+			// need to add this here since otherwise speed lookup in mobsim does not work. And need to hedge against
+			// code that may already have added it by itself.  kai, feb'18
+		}
+		
+		if ( event.getStartTime()<= this.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ) {
+			this.applyTheChangeEvent(event);
+		} else {
+			this.addNetworkChangeEventToMessageQ(event);
+		}
+		
+	}
+	
+	
+	@Override
+	public void afterSim() {
+
+	}
+
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
+		this.internalInterface = internalInterface;
+	}
+
+	@Override
+	public void doSimStep(double time) {
+
+	}
 }

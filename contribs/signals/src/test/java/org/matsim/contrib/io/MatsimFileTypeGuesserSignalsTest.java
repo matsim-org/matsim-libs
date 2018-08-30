@@ -26,7 +26,7 @@ import static org.junit.Assert.assertNull;
 import java.io.IOException;
 
 import org.junit.Test;
-import org.matsim.contrib.signals.MatsimSignalSystemsReader;
+import org.matsim.contrib.signals.data.MatsimSignalSystemsReader;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 
 /**

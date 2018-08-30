@@ -299,11 +299,6 @@ public final class SylviaSignalController extends AbstractSignalController imple
 		}		
 		return false;
 	}
-
-	@Override
-	public void reset(Integer iterationNumber) {
-		this.init();
-	}
 	
 	/**
 	 * Is called when mobsim is initialized.
@@ -316,6 +311,7 @@ public final class SylviaSignalController extends AbstractSignalController imple
 	 */
 	@Override
 	public void simulationInitialized(double simStartTimeSeconds) {
+		this.init();
 		Tuple<SignalPlan, SylviaSignalPlan> plans = this.searchActivePlans();
 		this.activeSylviaPlan = plans.getSecond();
 		this.activeSylviaPlan.setFixedTimeCycle(plans.getFirst().getCycleTime());

@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.binder.SignalsModule;
+import org.matsim.contrib.signals.builder.SignalsModule;
 import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
@@ -464,7 +464,79 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		}
 	}
 	
-	// TODO Test plan with negative offset
+	@Test
+	public void testNegativeOffset() {
+		//plan1 is valid all day
+		ScenarioRunner sr = new ScenarioRunner(0.0, 0.0, null, null);
+		int offset1 = -3;
+		
+		sr.setOffsetPlan1(offset1);		
+		SignalEventAnalyzer signalAnalyzer = sr.run();
+
+		// in this case, the first event should be a RED-switch at second 57
+		log.info("Offset " + offset1 + " leads to the first signal event at second: " + signalAnalyzer.getFirstSignalEventTime());		
+		Assert.assertEquals("The first signal event should be at the first second after simulation start corresponding to offset, "
+				+ "cycle time and plan start time. Also if the offset is negative!", 60+offset1 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON);		
+	}
+	
+	@Test
+	public void testNegativeOffsetEqualCycleTime() {
+		//plan1 is valid all day
+		ScenarioRunner sr = new ScenarioRunner(0.0, 0.0, null, null);
+		int offset1 = -120;
+		
+		sr.setOffsetPlan1(offset1);		
+		SignalEventAnalyzer signalAnalyzer = sr.run();
+				
+		// in this case, the first event should be a GREEN-switch at second 0
+		log.info("Offset " + offset1 + " leads to the first signal event at second: " + signalAnalyzer.getFirstSignalEventTime());		
+		Assert.assertEquals("The first signal event should be at the first second after simulation start corresponding to offset, "
+				+ "cycle time and plan start time. Also if the offset is negative!", 120+offset1 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON);		
+	}
+	
+	@Test
+	public void testTwoPlansWithNegativeOffsets(){
+		ScenarioRunner sr = new ScenarioRunner(0.0*3600, 1.0*3600, 1.0*3600, 2.*3600 );
+		
+		int offset1 = -3;
+		int offset2 = -5;
+		
+		sr.setOffsetPlan1(offset1);
+		sr.setOffsetPlan2(offset2);
+		
+		//Simulation starts 1h late
+		int simStart_s = 3600;
+		sr.setSimStart_h(simStart_s/3600);
+		
+		SignalEventAnalyzer signalAnalyzer = sr.run();
+		
+		// in this case, the first event should be a RED-switch at second 3625
+		log.info("Offsets " + offset1 + " and " + offset2 + " with a simulation start at second " + simStart_s + " lead to the first signal event at second: " + signalAnalyzer.getFirstSignalEventTime());
+ 		Assert.assertEquals("The first signal event should be at the first second after simulation start corresponding to offset, "
+				+ "cycle time and plan start time. Also if the offset is negative!", simStart_s+30+offset2 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON);		
+	}
+	
+	@Test
+	public void testTwoPlansWithNegativeOffsetsEqualCycleTime(){
+		ScenarioRunner sr = new ScenarioRunner(0.0*3600, 1.0*3600, 1.0*3600, 2.*3600 );
+		
+		int offset1 = -3;
+		int offset2 = -60;
+		
+		sr.setOffsetPlan1(offset1);
+		sr.setOffsetPlan2(offset2);
+		
+		//Simulation starts 1h late
+		int simStart_s = 3600;
+		sr.setSimStart_h(simStart_s/3600);
+		
+		SignalEventAnalyzer signalAnalyzer = sr.run();
+		
+		// in this case, the first event should be a GREEN-switch at second 3600
+		log.info("Offsets " + offset1 + " and " + offset2 + " with a simulation start at second " + simStart_s + " lead to the first signal event at second: " + signalAnalyzer.getFirstSignalEventTime());
+ 		Assert.assertEquals("The first signal event should be at the first second after simulation start corresponding to offset, "
+				+ "cycle time and plan start time. Also if the offset is negative!", simStart_s+60+offset2 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON);		
+	}
 	
 	private class ScenarioRunner{
 		
@@ -474,6 +546,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		private Double plan2EndTime;
 		private int noSimHours = 2;
 		private int simStart_h= 0;
+		private int offsetPlan1 = 0;
+		private int offsetPlan2 = 0;
 		
 		private Scenario scenario;
 		
@@ -494,6 +568,14 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		
 		/* package */ void setSimStart_h(int simStart_h) {
 			this.simStart_h = simStart_h;
+		}
+		
+		/* package */ void setOffsetPlan1(int offset) {
+			this.offsetPlan1 = offset;
+		}
+		
+		/* package */ void setOffsetPlan2(int offset) {
+			this.offsetPlan2 = offset;
 		}
 		
 		/* package */ SignalEventAnalyzer run() {
@@ -618,21 +700,19 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 			signalControl.addSignalSystemControllerData(signalSystemControl);
 			
 			// create a first plan for the signal system (with cycle time 120)
-			SignalPlanData signalPlan1 = SignalUtils.createSignalPlan(conFac, 120, 0, Id.create("SignalPlan1", SignalPlan.class));
+			SignalPlanData signalPlan1 = SignalUtils.createSignalPlan(conFac, 120, offsetPlan1, Id.create("SignalPlan1", SignalPlan.class));
 			if (plan1StartTime != null) signalPlan1.setStartTime(plan1StartTime);
 			if (plan1EndTime != null) signalPlan1.setEndTime(plan1EndTime);
 			signalSystemControl.addSignalPlanData(signalPlan1);
 			signalPlan1.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, 60));
-			signalPlan1.setOffset(0);
 			
 			if (plan2StartTime != null && plan2EndTime != null) {
 				// create a second plan for the signal system (with cycle time 60) if start and end times are not null
-				SignalPlanData signalPlan2 = SignalUtils.createSignalPlan(conFac, 60, 0, Id.create("SignalPlan2", SignalPlan.class));
+				SignalPlanData signalPlan2 = SignalUtils.createSignalPlan(conFac, 60, offsetPlan2, Id.create("SignalPlan2", SignalPlan.class));
 				signalPlan2.setStartTime(plan2StartTime);
 				signalPlan2.setEndTime(plan2EndTime);
 				signalSystemControl.addSignalPlanData(signalPlan2);
 				signalPlan2.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, 30));
-				signalPlan2.setOffset(0);
 			}
 		}
 

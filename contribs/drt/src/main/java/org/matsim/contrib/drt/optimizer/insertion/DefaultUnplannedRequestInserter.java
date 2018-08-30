@@ -59,7 +59,8 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	@Inject
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
-			VehicleData.EntryFactory vehicleDataEntryFactory, PrecalculablePathDataProvider pathDataProvider) {
+			VehicleData.EntryFactory vehicleDataEntryFactory, PrecalculablePathDataProvider pathDataProvider,
+			InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
@@ -69,7 +70,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 
 		forkJoinPool = new ForkJoinPool(drtCfg.getNumberOfThreads());
 		insertionProblem = new ParallelMultiVehicleInsertionProblem(pathDataProvider, drtCfg, mobsimTimer,
-				forkJoinPool);
+				forkJoinPool, penaltyCalculator);
 		insertionScheduler.initSchedules(drtCfg.isChangeStartLinkToLastLinkInSchedule());
 	}
 

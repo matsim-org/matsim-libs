@@ -93,14 +93,18 @@ public final class LaemmerSignalController extends AbstractSignalController impl
     }
 
     @Override
-    public void simulationInitialized(double simStartTimeSeconds) {
-        this.initializeSensoring();
-        for (SignalGroup group : this.system.getSignalGroups().values()) {
-            this.system.scheduleDropping(simStartTimeSeconds, group.getId());
-            LaemmerSignal laemmerSignal = new LaemmerSignal(group);
-            laemmerSignals.add(laemmerSignal);
-        }
-    }
+	public void simulationInitialized(double simStartTimeSeconds) {
+		laemmerSignals.clear();
+		activeRequest = null;
+		regulationQueue.clear();
+
+		this.initializeSensoring();
+		for (SignalGroup group : this.system.getSignalGroups().values()) {
+			this.system.scheduleDropping(simStartTimeSeconds, group.getId());
+			LaemmerSignal laemmerSignal = new LaemmerSignal(group);
+			laemmerSignals.add(laemmerSignal);
+		}
+	}
 
 
     @Override
@@ -246,14 +250,6 @@ public final class LaemmerSignalController extends AbstractSignalController impl
         } else {
             return getAverageArrivalRate(now, linkId);
         }
-    }
-
-
-    @Override
-    public void reset(Integer iterationNumber) {
-		laemmerSignals.clear();
-		activeRequest = null;
-		regulationQueue.clear();
     }
 
     private void initializeSensoring() {

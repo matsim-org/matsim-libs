@@ -55,8 +55,8 @@ public interface RoutingModule {
 	 * @return a list of {@link PlanElement}, in proper order, representing the trip.
 	 */
 	public List<? extends PlanElement> calcRoute(
-			Facility<?> fromFacility,
-			Facility<?> toFacility,
+			Facility fromFacility,
+			Facility toFacility,
 			double departureTime,
 			Person person);
 
