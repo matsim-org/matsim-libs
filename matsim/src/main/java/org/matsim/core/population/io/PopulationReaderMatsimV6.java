@@ -112,14 +112,6 @@ import java.util.Stack;
 
 	private Activity prevAct = null;
 
-	public PopulationReaderMatsimV6(
-			final String targetCRS,
-			final Scenario scenario) {
-	    this.externalInputCRS = null;
-		this.targetCRS = targetCRS;
-		this.scenario = scenario;
-		this.plans = scenario.getPopulation();
-	}
 
     PopulationReaderMatsimV6(
             final String inputCRS,
@@ -129,6 +121,10 @@ import java.util.Stack;
 		this.targetCRS = targetCRS;
 		this.scenario = scenario;
 		this.plans = scenario.getPopulation();
+	    if (targetCRS != null && externalInputCRS !=null) {
+		    this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
+		    this.plans.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+	    }
 	}
 
 	public void putAttributeConverter( final Class<?> clazz , AttributeConverter<?> converter ) {
@@ -203,13 +199,8 @@ import java.util.Stack;
 			case ATTRIBUTES:
 				if (context.peek().equals(POPULATION)) {
 					String inputCRS = (String) scenario.getPopulation().getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT);
-					if (inputCRS == null) {
-						if (externalInputCRS != null) {
-							coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
-							scenario.getPopulation().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
-						}
-					}
-					else {
+
+					if (inputCRS != null && targetCRS != null) {
 						if (externalInputCRS != null) {
 							// warn or crash?
 							log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");

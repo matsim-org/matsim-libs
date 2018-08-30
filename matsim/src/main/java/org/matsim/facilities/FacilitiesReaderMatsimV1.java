@@ -73,6 +73,10 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
         this.targetCRS = targetCRS;
         this.facilities = scenario.getActivityFacilities();
         this.factory = this.facilities.getFactory();
+        if (externalInputCRS != null && targetCRS != null) {
+            this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
+            this.facilities.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+        }
     }
 
     public void putAttributeConverter(Class<?> clazz, AttributeConverter<?> converter) {
@@ -98,7 +102,7 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
         } else if (ATTRIBUTE.equals(name)) {
             this.attributesReader.startTag(name, atts, context, this.currAttributes);
         } else if (ATTRIBUTES.equals(name)) {
-            currAttributes = this.currfacility.getAttributes();
+            currAttributes = context.peek().equals(FACILITIES) ? this.facilities.getAttributes() : this.currfacility.getAttributes();
             attributesReader.startTag(name, atts, context, currAttributes);
         }
     }
@@ -112,13 +116,8 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
         } else if (ATTRIBUTES.equalsIgnoreCase(name)) {
             if (context.peek().equals(FACILITIES)) {
                 String inputCRS = (String) currAttributes.getAttribute(CoordUtils.INPUT_CRS_ATT);
-                if (inputCRS == null) {
-                    if (externalInputCRS != null) {
-                        coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
-                        currAttributes.putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
-                    }
-                }
-                else {
+
+                if (inputCRS != null && targetCRS != null) {
                     if (externalInputCRS != null) {
                         // warn or crash?
                         log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");

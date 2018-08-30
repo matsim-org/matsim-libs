@@ -74,6 +74,10 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 			final Network network) {
 		this.externalInputCRS = inputCRS;
 		this.targetCRS = targetCRS;
+		if (externalInputCRS != null && targetCRS != null) {
+			this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
+			network.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+		}
 		this.network = network;
 	}
 
@@ -105,13 +109,7 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 			case ATTRIBUTES:
                 if (context.peek().equals(NETWORK)) {
 					String inputCRS = (String) network.getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT);
-					if (inputCRS == null) {
-						if (externalInputCRS != null) {
-							coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
-							network.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
-						}
-					}
-					else {
+					if (inputCRS != null && targetCRS != null) {
 						if (externalInputCRS != null) {
 							// warn or crash?
 							log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");

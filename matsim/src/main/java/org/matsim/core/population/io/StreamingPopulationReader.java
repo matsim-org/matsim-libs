@@ -53,14 +53,14 @@ public final class StreamingPopulationReader implements MatsimReader {
 
 	public StreamingPopulationReader(Scenario scenario ) {
 	    // should we convert to global by default or not? Optimal seems to depend on usecase...
-		this( null, scenario ) ;
+		this( null, null, scenario ) ;
 	}
 
-	public StreamingPopulationReader(String targetCRS, Scenario scenario ) {
+	public StreamingPopulationReader(String inputCRS, String targetCRS, Scenario scenario ) {
 		if ( scenario instanceof MutableScenario ) {
 			pop = new StreamingPopulation( scenario.getConfig() ) ;
 			((MutableScenario) scenario).setPopulation(pop);
-			reader = new PopulationReader( targetCRS, scenario, true) ;
+			reader = new PopulationReader( inputCRS, targetCRS, scenario, true) ;
 		} else {
 			throw new RuntimeException("scenario given into this class needs to be an instance of MutableScenario.") ;
 		}

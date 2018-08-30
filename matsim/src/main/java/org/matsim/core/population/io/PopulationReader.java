@@ -51,6 +51,7 @@ public final class PopulationReader extends MatsimXmlParser {
 	private final static String POPULATION_V5 = "population_v5.dtd";
 	private final static String POPULATION_V6 = "population_v6.dtd";
 
+	private final String inputCRS;
 	private final String targetCRS;
 
 	private MatsimXmlParser delegate = null;
@@ -61,16 +62,15 @@ public final class PopulationReader extends MatsimXmlParser {
 	private static final Logger log = Logger.getLogger(PopulationReader.class);
 
 	public PopulationReader(final Scenario scenario) {
-		this( null , scenario );
+		this(null, null, scenario);
 	}
 
-	public PopulationReader(
-	        final String targetCRS,
-			final Scenario scenario ) {
-		this( targetCRS, scenario, false ) ;
+	public PopulationReader(final String inputCRS, final String targetCRS, final Scenario scenario) {
+		this(inputCRS, targetCRS, scenario, false);
 	}
-	
+
 	/*deliberately package*/ PopulationReader(
+				final String inputCRS,
 				final String targetCRS,
 				final Scenario scenario,
 				boolean streaming ) {
@@ -78,6 +78,7 @@ public final class PopulationReader extends MatsimXmlParser {
 			throw new RuntimeException("MatsimPopulationReader called directly with an instance of StreamingPopulation "
 					+ "in scenario.  Call via StreamingPopulationReader or ask for help.  kai, jul'16") ;
 		}
+		this.inputCRS = inputCRS;
 		this.targetCRS = targetCRS;
 		this.scenario = scenario;
 	}
@@ -104,7 +105,6 @@ public final class PopulationReader extends MatsimXmlParser {
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);
 
-		final String inputCRS = scenario.getConfig().plans().getInputCRS();
 		final CoordinateTransformation transformation =
 				inputCRS == null ?
 						new IdentityTransformation() :

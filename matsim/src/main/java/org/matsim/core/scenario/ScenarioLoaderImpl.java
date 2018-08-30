@@ -184,8 +184,9 @@ class ScenarioLoaderImpl {
 			log.info("loading population from " + populationFileName);
 
             final String targetCRS = config.global().getCoordinateSystem();
+			final String internalCRS = config.global().getCoordinateSystem();
 
-            final PopulationReader reader = new PopulationReader(targetCRS , this.scenario);
+            final PopulationReader reader = new PopulationReader(targetCRS, internalCRS, this.scenario);
             reader.putAttributeConverters( attributeConverters );
             reader.parse( populationFileName );
 

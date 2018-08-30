@@ -79,14 +79,11 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 		this( null, null , schedule , routeFactory );
 	}
 
-	public TransitScheduleReaderV2(String externalInputCRS, String targetCRS, final Scenario scenario) {
-		this( scenario.getTransitSchedule(),
-				scenario.getPopulation().getFactory().getRouteFactories() );
-	}
-
-	public TransitScheduleReaderV2( final Scenario scenario) {
-		this( scenario.getTransitSchedule(),
-				scenario.getPopulation().getFactory().getRouteFactories() );
+	public TransitScheduleReaderV2(
+			final String externalInputCRS,
+			final String targetCRS,
+			final Scenario scenario) {
+		this( externalInputCRS, targetCRS , scenario.getTransitSchedule() , scenario.getPopulation().getFactory().getRouteFactories() );
 	}
 
 	private TransitScheduleReaderV2(
@@ -98,6 +95,10 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 		this.targetCRS = targetCRS;
 		this.schedule = schedule;
 		this.routeFactory = routeFactory;
+		if (externalInputCRS != null && targetCRS != null) {
+			this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
+			this.schedule.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+		}
 	}
 
 	@Override
@@ -229,13 +230,8 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 		} else if (Constants.ATTRIBUTES.equals(name)) {
 			if (context.peek().equals(Constants.TRANSIT_SCHEDULE)) {
 				String inputCRS = (String) currentAttributes.getAttribute(CoordUtils.INPUT_CRS_ATT);
-				if (inputCRS == null) {
-					if (externalInputCRS != null) {
-						coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
-						currentAttributes.putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
-					}
-				}
-				else {
+
+				if (inputCRS != null && targetCRS != null) {
 					if (externalInputCRS != null) {
 						// warn or crash?
 						log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
