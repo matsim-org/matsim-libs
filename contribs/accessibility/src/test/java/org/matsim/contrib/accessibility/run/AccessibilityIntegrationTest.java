@@ -57,7 +57,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -316,7 +316,7 @@ public class AccessibilityIntegrationTest {
 		}
 		
 		Scenario measuringPointsSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new FacilitiesReaderMatsimV1(measuringPointsSc).readFile(f.getAbsolutePath());
+		new MatsimFacilitiesReader(measuringPointsSc).readFile(f.getAbsolutePath());
 		ActivityFacilities measuringPoints = (ActivityFacilities) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(measuringPointsSc, null);
 
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
