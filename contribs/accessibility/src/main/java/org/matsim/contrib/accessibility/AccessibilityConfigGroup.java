@@ -26,6 +26,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.facilities.ActivityFacilities;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -65,7 +66,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private String shapeFileCellBasedAccessibility;
 	
 	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation"; 
-	public static enum AreaOfAccesssibilityComputation{fromNetwork, fromBoundingBox, fromShapeFile, fromFile} 
+	public static enum AreaOfAccesssibilityComputation{fromNetwork, fromBoundingBox, fromShapeFile, fromFacilitiesFile, fromFacilitiesObject} 
 	private AreaOfAccesssibilityComputation areaOfAccessibilityComputation = AreaOfAccesssibilityComputation.fromNetwork;
 	private Set<Modes4Accessibility> isComputingMode = EnumSet.noneOf(Modes4Accessibility.class);
 	
@@ -94,6 +95,9 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	public void setMeasuringPointsFile(String measuringPointsFile){
 		this.measuringPointsFile = measuringPointsFile;
 	}
+	
+	// Optional; only used if measuring points are set directly
+	private ActivityFacilities measuringPointsFacilities;
 
 	public static final String TIME_OF_DAY = "timeOfDay";
 	private Double timeOfDay = 8.*3600 ;
@@ -272,5 +276,16 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     @StringSetter(AREA_OF_ACC_COMP)
 	public void setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation areaOfAccessibilityComputation) {
 	    this.areaOfAccessibilityComputation = areaOfAccessibilityComputation ;
+	}
+    
+    /**
+	 * helper method to set measuring points in code
+	 */
+    public void setMeasuringPointsFacilities(ActivityFacilities measuringPointsFacilities){
+		this.measuringPointsFacilities = measuringPointsFacilities;
+    }
+    
+    public ActivityFacilities getMeasuringPointsFacilities(){
+		return this.measuringPointsFacilities;
 	}
 }

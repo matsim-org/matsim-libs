@@ -40,6 +40,7 @@ import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
+import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -56,6 +57,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -302,6 +304,53 @@ public class AccessibilityIntegrationTest {
 		// Compare some results -> done in EvaluateTestResults. Check here that this was done at all
 		Assert.assertTrue( evaluateListener.isDone() ) ;
 	}
+	
+	
+	// new
+	@Test
+	public void testWithMeasuringPointsInFacilitiesFile() {
+
+		Config config = createTestConfig() ;
+
+		File f = new File(this.utils.getInputDirectory() + "measuringPoints.xml");
+
+		if(!f.exists()){
+			LOG.error("Facilities file with measuring points not found! testWithMeasuringPointsInFacilitiesFile could not be performed...");
+			Assert.assertTrue(f.exists());
+		}
+		
+		Scenario measuringPointsSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new FacilitiesReaderMatsimV1(measuringPointsSc).readFile(f.getAbsolutePath());
+		ActivityFacilities measuringPoints = (ActivityFacilities) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(measuringPointsSc, null);
+
+		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		acg.setMeasuringPointsFacilities(measuringPoints);
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromFacilitiesObject);
+
+		final Scenario sc = createTestScenario(config) ;
+		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
+		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
+		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
+
+		Controler controler = new Controler(sc);
+
+		final AccessibilityModule module = new AccessibilityModule();
+		final EvaluateTestResults evaluateListener = new EvaluateTestResults(false);
+		module.addSpatialGridDataExchangeListener(evaluateListener) ;
+		controler.addOverridingModule(module);
+		controler.addOverridingModule(new AbstractModule() {			
+			@Override
+			public void install() {
+				bind(PtMatrix.class).toInstance(ptMatrix);
+			}
+		});
+		
+		controler.run();
+
+		// Compare some results -> done in EvaluateTestResults. Check here that this was done at all
+		Assert.assertTrue( evaluateListener.isDone() ) ;
+	}
+	// end new
 
 	
 	@Ignore
@@ -317,7 +366,7 @@ public class AccessibilityIntegrationTest {
 		}
 		
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromFile);
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromFacilitiesFile);
 		acg.setMeasuringPointsFile(f.getAbsolutePath());
 		
 		final Scenario sc = createTestScenario(config);

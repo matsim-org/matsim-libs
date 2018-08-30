@@ -63,6 +63,7 @@ public final class AccessibilityModule extends AbstractModule {
 
 	private List<SpatialGridDataExchangeInterface> spatialGridDataListeners = new ArrayList<>() ;
 	private List<FacilityDataExchangeInterface> facilityDataListeners = new ArrayList<>() ; 
+	private ActivityFacilities measuringPoints;
 	private List<ActivityFacilities> additionalFacs = new ArrayList<>() ;
 	private String activityType;
 	private boolean pushing2Geoserver;
@@ -103,30 +104,38 @@ public final class AccessibilityModule extends AbstractModule {
 				ActivityFacilities opportunities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType) ;
 				
 				final BoundingBox boundingBox;
-				final ActivityFacilities measuringPoints;
+//				final ActivityFacilities measuringPoints;
 				
 				if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromShapeFile) {
 					Geometry boundary = GridUtils.getBoundary(acg.getShapeFileCellBasedAccessibility());
 					Envelope envelope = boundary.getEnvelopeInternal();
 					boundingBox = BoundingBox.createBoundingBox(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY());
+					if (measuringPoints != null) {LOG.warn("Measuring points had already been set directly. Now overwriting...");}
 					measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize_m);
 					LOG.info("Using shape file to determine the area for accessibility computation.");
-				
 				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromBoundingBox) {
 					boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
+					if (measuringPoints != null) {LOG.warn("Measuring points had already been set directly. Now overwriting...");}
 					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m);
 					LOG.info("Using custom bounding box to determine the area for accessibility computation.");
-				
-				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromFile) {
+				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromFacilitiesFile) {
 					boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 					LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
 					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
 					Scenario measuringPointsSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 					String measuringPointsFile = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class ).getMeasuringPointsFile() ;
 					new FacilitiesReaderMatsimV1(measuringPointsSc).readFile(measuringPointsFile);
+					if (measuringPoints != null) {LOG.warn("Measuring points had already been set directly. Now overwriting...");}
 					measuringPoints = (ActivityFacilitiesImpl) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(measuringPointsSc, activityType);
 					LOG.info("Using measuring points from file: " + measuringPointsFile);
-				
+				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromFacilitiesObject) {
+//					boundingBox = null; // TODO
+					boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+					measuringPoints = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class ).getMeasuringPointsFacilities() ;
+					if (measuringPoints == null) {
+						throw new RuntimeException("Measuring points should have been set direclty if from-facilities-object mode is used.");
+					}
+					LOG.info("Using measuring points from facilities object.");
 				} else {
 					boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m) ;
@@ -221,5 +230,9 @@ public final class AccessibilityModule extends AbstractModule {
 	public void setConsideredActivityType(String activityType) {
 		// yyyy could be done via config (list of activities)
 		this.activityType = activityType ;
+	}
+	
+	public void setMeasuringPoints(ActivityFacilities measuringPoints) {
+		this.measuringPoints = measuringPoints ;
 	}
 }
