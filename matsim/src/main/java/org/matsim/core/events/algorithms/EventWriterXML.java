@@ -125,7 +125,7 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 			}
 		}
 		if (encode) {
-			StringBuffer bf = new StringBuffer();
+			StringBuilder bf = new StringBuilder(attributeValue.length() + 30);
 			for (int pos = 0; pos < len; pos++) {
 				char ch = attributeValue.charAt(pos);
 				if (ch == '<') {
