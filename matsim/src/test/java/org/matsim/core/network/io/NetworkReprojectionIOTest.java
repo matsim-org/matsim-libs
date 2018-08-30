@@ -13,8 +13,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestUtils;
@@ -93,7 +93,7 @@ public class NetworkReprojectionIOTest {
 		final String networkFile = utils.getOutputDirectory()+"/network.xml";
 
 		final Network initialNetwork = createInitialNetwork();
-		initialNetwork.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, INITIAL_CRS);
+		ProjectionUtils.putCRS(initialNetwork, INITIAL_CRS);
 
 		new NetworkWriter( initialNetwork ).write( networkFile );
 
@@ -120,7 +120,7 @@ public class NetworkReprojectionIOTest {
 		Assert.assertEquals(
 				"wrong CRS information after loading",
 				TARGET_CRS,
-				scenario.getNetwork().getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT));
+				ProjectionUtils.getCRS(scenario.getNetwork()));
 
 		config.controler().setLastIteration( 0 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";

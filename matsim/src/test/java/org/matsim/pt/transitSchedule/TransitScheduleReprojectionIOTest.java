@@ -10,8 +10,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -119,7 +119,7 @@ public class TransitScheduleReprojectionIOTest {
 		new TransitScheduleReader( originalScenario ).readURL(ConfigGroup.getInputFileURL(config.getContext(), "transitschedule.xml"));
 
 		final String withAttributes = new File(utils.getOutputDirectory()).getAbsolutePath()+"transitschedule.xml";
-		originalScenario.getTransitSchedule().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, INITIAL_CRS);
+		ProjectionUtils.putCRS(originalScenario.getTransitSchedule(), INITIAL_CRS);
 		new TransitScheduleWriter(originalScenario.getTransitSchedule()).writeFile(withAttributes);
 
 		config.transit().setTransitScheduleFile(withAttributes);
@@ -143,7 +143,7 @@ public class TransitScheduleReprojectionIOTest {
 		Assert.assertEquals(
 				"wrong CRS information after loading",
 				TARGET_CRS,
-				scenario.getTransitSchedule().getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT));
+				ProjectionUtils.getCRS(scenario.getTransitSchedule()));
 
 		config.controler().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";

@@ -26,7 +26,7 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimReader;
-import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -131,7 +131,7 @@ public class TransitScheduleReader implements MatsimReader {
 				throw new RuntimeException(e);
 			}
 			if (targetCRS != null) {
-				scenario.getTransitSchedule().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+				ProjectionUtils.putCRS(scenario.getTransitSchedule(), targetCRS);
 			}
 		}
 	}

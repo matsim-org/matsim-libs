@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -76,7 +76,7 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 		this.targetCRS = targetCRS;
 		if (externalInputCRS != null && targetCRS != null) {
 			this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
-			network.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+			ProjectionUtils.putCRS(network, targetCRS);
 		}
 		this.network = network;
 	}
@@ -108,14 +108,14 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 		switch( name ) {
 			case ATTRIBUTES:
                 if (context.peek().equals(NETWORK)) {
-					String inputCRS = (String) network.getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT);
+					String inputCRS = (String) network.getAttributes().getAttribute(ProjectionUtils.INPUT_CRS_ATT);
 					if (inputCRS != null && targetCRS != null) {
 						if (externalInputCRS != null) {
 							// warn or crash?
 							log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
 						}
 						coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
-						network.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+						ProjectionUtils.putCRS(network, targetCRS);
 					}
 				}
 			case ATTRIBUTE:

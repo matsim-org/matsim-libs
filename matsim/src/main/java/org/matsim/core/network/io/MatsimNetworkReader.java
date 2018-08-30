@@ -26,8 +26,7 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -97,7 +96,7 @@ public final class MatsimNetworkReader extends MatsimXmlParser {
 		    throw new RuntimeException(e);
 		}
 		if (targetCRS != null) {
-			network.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+			ProjectionUtils.putCRS(network, targetCRS);
 		}
 	}
 

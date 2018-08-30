@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
-import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -97,7 +97,7 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 		this.routeFactory = routeFactory;
 		if (externalInputCRS != null && targetCRS != null) {
 			this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
-			this.schedule.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+			ProjectionUtils.putCRS(this.schedule, targetCRS);
 		}
 	}
 
@@ -229,7 +229,7 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 			this.attributesDelegate.endTag(name, content, context);
 		} else if (Constants.ATTRIBUTES.equals(name)) {
 			if (context.peek().equals(Constants.TRANSIT_SCHEDULE)) {
-				String inputCRS = (String) currentAttributes.getAttribute(CoordUtils.INPUT_CRS_ATT);
+				String inputCRS = (String) currentAttributes.getAttribute(ProjectionUtils.INPUT_CRS_ATT);
 
 				if (inputCRS != null && targetCRS != null) {
 					if (externalInputCRS != null) {
@@ -237,7 +237,7 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 						log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
 					}
 					coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
-					currentAttributes.putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+					currentAttributes.putAttribute(ProjectionUtils.INPUT_CRS_ATT, targetCRS);
 				}
 			}
 			this.currentAttributes = null;
