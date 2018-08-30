@@ -320,6 +320,11 @@ public class AccessibilityIntegrationTest {
 		ActivityFacilities measuringPoints = (ActivityFacilities) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(measuringPointsSc, null);
 
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		
+		//
+		acg.setCellSizeCellBasedAccessibility(100);
+		//
+		
 		acg.setMeasuringPointsFacilities(measuringPoints);
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromFacilitiesObject);
 
