@@ -264,10 +264,8 @@ public class AccessibilityIntegrationTest {
 
 	@Test
 	public void testWithExtentDeterminedShapeFile() {
-
 		Config config = createTestConfig() ;
 
-		//		URL url = AccessibilityIntegrationTest.class.getClassLoader().getResource(new File(this.utils.getInputDirectory()).getAbsolutePath() + "shapeFile2.shp");
 		File f = new File(this.utils.getInputDirectory() + "shapefile.shp"); // shape file completely covers the road network
 
 		if(!f.exists()){
@@ -306,10 +304,8 @@ public class AccessibilityIntegrationTest {
 	}
 	
 	
-	// new
 	@Test
-	public void testWithMeasuringPointsInFacilitiesFile() {
-
+	public void testWithPredefinedMeasuringPoints() {
 		Config config = createTestConfig() ;
 
 		File f = new File(this.utils.getInputDirectory() + "measuringPoints.xml");
@@ -350,7 +346,6 @@ public class AccessibilityIntegrationTest {
 		// Compare some results -> done in EvaluateTestResults. Check here that this was done at all
 		Assert.assertTrue( evaluateListener.isDone() ) ;
 	}
-	// end new
 
 	
 	@Ignore
