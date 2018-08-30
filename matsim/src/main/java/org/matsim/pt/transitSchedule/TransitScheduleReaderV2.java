@@ -26,14 +26,17 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -54,7 +57,10 @@ import org.xml.sax.Attributes;
  * @author mrieser
  */
 public class TransitScheduleReaderV2 extends MatsimXmlParser {
+	private static Logger log = Logger.getLogger(TransitScheduleReaderV2.class);
 
+	private final String externalInputCRS;
+	private final String targetCRS;
 	private final TransitSchedule schedule;
 	private final RouteFactories routeFactory;
 
@@ -66,33 +72,33 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 	private final AttributesXmlReaderDelegate attributesDelegate = new AttributesXmlReaderDelegate();
 	private org.matsim.utils.objectattributes.attributable.Attributes currentAttributes = null;
 
-	private final CoordinateTransformation coordinateTransformation;
+	private CoordinateTransformation coordinateTransformation = new IdentityTransformation();
 	private final StringCache cache = new StringCache();
 
 	public TransitScheduleReaderV2(final TransitSchedule schedule, final RouteFactories routeFactory) {
-		this( new IdentityTransformation() , schedule , routeFactory );
-	}
-
-	public TransitScheduleReaderV2(final Scenario scenario) {
-		this( scenario.getTransitSchedule(),
-				scenario.getPopulation().getFactory().getRouteFactories() );
+		this( null, null , schedule , routeFactory );
 	}
 
 	public TransitScheduleReaderV2(
-			final CoordinateTransformation coordinateTransformation,
+			final String externalInputCRS,
+			final String targetCRS,
 			final Scenario scenario) {
-		this( coordinateTransformation,
-				scenario.getTransitSchedule(),
-				scenario.getPopulation().getFactory().getRouteFactories() );
+		this( externalInputCRS, targetCRS , scenario.getTransitSchedule() , scenario.getPopulation().getFactory().getRouteFactories() );
 	}
 
-	public TransitScheduleReaderV2(
-			CoordinateTransformation coordinateTransformation,
+	private TransitScheduleReaderV2(
+	        String externalInputCRS,
+			String targetCRS,
 			TransitSchedule schedule,
 			RouteFactories routeFactory) {
-		this.coordinateTransformation = coordinateTransformation;
+		this.externalInputCRS = externalInputCRS;
+		this.targetCRS = targetCRS;
 		this.schedule = schedule;
 		this.routeFactory = routeFactory;
+		if (externalInputCRS != null && targetCRS != null) {
+			this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
+			this.schedule.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+		}
 	}
 
 	@Override
@@ -222,6 +228,18 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 		} else if (Constants.ATTRIBUTE.equals(name)) {
 			this.attributesDelegate.endTag(name, content, context);
 		} else if (Constants.ATTRIBUTES.equals(name)) {
+			if (context.peek().equals(Constants.TRANSIT_SCHEDULE)) {
+				String inputCRS = (String) currentAttributes.getAttribute(CoordUtils.INPUT_CRS_ATT);
+
+				if (inputCRS != null && targetCRS != null) {
+					if (externalInputCRS != null) {
+						// warn or crash?
+						log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
+					}
+					coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
+					currentAttributes.putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+				}
+			}
 			this.currentAttributes = null;
 		}
 	}

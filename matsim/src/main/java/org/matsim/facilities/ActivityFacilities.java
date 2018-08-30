@@ -25,13 +25,14 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * Root class for activity facilities.
  *
  * Maintainer: mrieser / Senozon AG
  */
-public interface ActivityFacilities extends MatsimToplevelContainer {
+public interface ActivityFacilities extends MatsimToplevelContainer, Attributable {
 
 	public String getName();
 
