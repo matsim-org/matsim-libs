@@ -26,13 +26,16 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimReader;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV2;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * Reads {@link TransitSchedule}s from file as long as the files are in one of the
@@ -43,40 +46,53 @@ import org.xml.sax.Attributes;
 public class TransitScheduleReader implements MatsimReader {
 
 	private final Scenario scenario;
-	private final CoordinateTransformation transformation;
+
+	private final String externalInputCRS;
+	private final String targetCRS;
+	private CoordinateTransformation coordinateTransformation;
 
 	public TransitScheduleReader(
-			final CoordinateTransformation transformation,
+	        final String targetCRS,
 			final Scenario scenario) {
-		this.transformation = transformation;
-		this.scenario = scenario;
+	    this(null, targetCRS, scenario);
 	}
 
+	public TransitScheduleReader(
+	        final String externalInputCRS,
+			final String targetCRS,
+			final Scenario scenario) {
+		this.externalInputCRS = externalInputCRS;
+		this.targetCRS = targetCRS;
+		this.scenario = scenario;
+    }
+
 	public TransitScheduleReader(final Scenario scenario) {
-		this(new IdentityTransformation(), scenario);
+		this(null, null, scenario);
 	}
 
 	@Override
 	public void readFile(final String filename) throws UncheckedIOException {
-		new XmlScheduleReader(this.transformation, this.scenario).readFile(filename);
+		new XmlScheduleReader(externalInputCRS, targetCRS, this.scenario).readFile(filename);
 	}
 
 	public void readURL(final URL url) throws UncheckedIOException {
-		new XmlScheduleReader(this.transformation, this.scenario).parse(url);
+		new XmlScheduleReader(externalInputCRS, targetCRS, this.scenario).parse(url);
 	}
 
 	public void readStream(final InputStream stream) throws UncheckedIOException {
-		new XmlScheduleReader(this.transformation, this.scenario).parse(stream);
+		new XmlScheduleReader(externalInputCRS, targetCRS, this.scenario).parse(stream);
 	}
 
 	private static class XmlScheduleReader extends MatsimXmlParser {
 
 		private MatsimXmlParser delegate = null;
-		private final CoordinateTransformation transformation;
+		private final String externalInputCRS;
+		private final String targetCRS;
 		private final Scenario scenario;
 
-		public XmlScheduleReader(CoordinateTransformation transformation, Scenario scenario) {
-			this.transformation = transformation;
+		public XmlScheduleReader(String externalInputCRS, String targetCRS, Scenario scenario) {
+			this.externalInputCRS = externalInputCRS;
+			this.targetCRS = targetCRS;
 			this.scenario = scenario;
 		}
 
@@ -95,11 +111,27 @@ public class TransitScheduleReader implements MatsimReader {
 			super.setDoctype(doctype);
 
 			if ("transitSchedule_v2.dtd".equals(doctype)) {
-				this.delegate = new TransitScheduleReaderV2(this.transformation, this.scenario);
+				this.delegate = new TransitScheduleReaderV2(externalInputCRS, targetCRS, this.scenario);
 			} else if ("transitSchedule_v1.dtd".equals(doctype)) {
-				this.delegate = new TransitScheduleReaderV1(this.transformation, this.scenario);
+				this.delegate = new TransitScheduleReaderV1(
+						externalInputCRS != null ?
+								TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS) :
+								new IdentityTransformation(),
+						this.scenario);
 			} else {
 				throw new IllegalArgumentException("Unsupported doctype: " + doctype);
+			}
+		}
+
+		@Override
+		public void endDocument() {
+			try {
+				this.delegate.endDocument();
+			} catch (SAXException e) {
+				throw new RuntimeException(e);
+			}
+			if (targetCRS != null) {
+				scenario.getTransitSchedule().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
 			}
 		}
 	}
