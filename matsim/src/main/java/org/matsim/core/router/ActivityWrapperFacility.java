@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.facilities.ActivityFacility;
@@ -34,7 +35,7 @@ import org.matsim.facilities.Facility;
  * in a facility interface (for example to pass to the router)
  * @author thibautd
  */
-public class ActivityWrapperFacility implements Facility {
+public class ActivityWrapperFacility implements Facility, Identifiable<ActivityFacility> {
 	private final Activity wrapped;
 
 	public ActivityWrapperFacility( final Activity toWrap ) {

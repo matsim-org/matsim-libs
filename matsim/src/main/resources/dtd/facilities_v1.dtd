@@ -9,7 +9,7 @@
 
         <!-- ============================================================ -->
 
-        <!ELEMENT facilities        (facility*)>
+        <!ELEMENT facilities        (attributes?,facility*)>
         <!ATTLIST facilities
                 name              CDATA   #IMPLIED
                 aggregation_layer CDATA   #IMPLIED

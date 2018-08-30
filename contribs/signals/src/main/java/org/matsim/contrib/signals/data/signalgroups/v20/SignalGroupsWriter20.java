@@ -38,10 +38,10 @@ import org.matsim.jaxb.signalgroups20.XMLIdRefType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroupType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroups;
 import org.matsim.jaxb.signalgroups20.XMLSignalSystemSignalGroupType;
+import org.matsim.contrib.signals.data.MatsimSignalSystemsReader;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.contrib.signals.MatsimSignalSystemsReader;
 
 /**
  * @author dgrether
