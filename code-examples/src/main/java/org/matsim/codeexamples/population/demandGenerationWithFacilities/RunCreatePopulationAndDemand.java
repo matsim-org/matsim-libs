@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.facilities.MatsimFacilitiesReader;
 
 public class RunCreatePopulationAndDemand {
 	
@@ -36,7 +36,7 @@ public class RunCreatePopulationAndDemand {
 		 */
 		Config config = ConfigUtils.createConfig();
 		this.scenario = ScenarioUtils.createScenario(config);
-		new FacilitiesReaderMatsimV1(this.scenario).readFile(facilitiesFile);
+		new MatsimFacilitiesReader(this.scenario).readFile(facilitiesFile);
 	}
 	
 	private void write() {
