@@ -18,23 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.codeexamples.config.example5iterations;
+package org.matsim.codeexamples.config.iterations;
 
 import org.matsim.codeexamples.config.RunFromConfigfileExample;
 
 
 /**
- * runs trip-based iterations (=DTA) and writes events files.  
- * See the config file for configuration details.
+ * runs iterations and writes events files.  See the config file for configuration details.
  * 
  * Stub version to keep class that is referenced from documentation.  Rather see {@link RunFromConfigfileExample}.
  * 
  * @author nagel
  *
  */
-public class RunExample5Trips {
+public class RunExample {
 	public static void main(final String[] args) {
-		RunFromConfigfileExample.main( new String[]{ "examples/tutorial/config/example5trips-config.xml" } ) ;
+		RunFromConfigfileExample.main( new String[]{ "examples/tutorial/config/example5-config.xml" } ) ;
 	}
 
 }

@@ -33,7 +33,7 @@ public class RunReflectiveConfigGroupExample {
 	 */
 	public static void main(String[] args) {
 
-		Config config = ConfigUtils.loadConfig( args[0], new MyConfigGroup() ) ;
+		Config config = ConfigUtils.loadConfig( "scenarios/equil/config.xml", new MyConfigGroup() ) ;
 		
 		// with cast:
 //		MyConfigGroup myConfigGroup = (MyConfigGroup) config.getModule( MyConfigGroup.GROUP_NAME ) ;

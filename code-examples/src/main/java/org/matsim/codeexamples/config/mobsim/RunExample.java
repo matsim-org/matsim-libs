@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * MyControler1.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +16,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.codeexamples.config.example5iterations;
+package org.matsim.codeexamples.config.mobsim;
 
 import org.matsim.codeexamples.config.RunFromConfigfileExample;
 
-
 /**
- * runs iterations and writes events files.  See the config file for configuration details.
- * 
  * Stub version to keep class that is referenced from documentation.  Rather see {@link RunFromConfigfileExample}.
  * 
  * @author nagel
- *
  */
-public class RunExample5 {
-	public static void main(final String[] args) {
-		RunFromConfigfileExample.main( new String[]{ "examples/tutorial/config/example5-config.xml" } ) ;
+public class RunExample {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+//		final String[] args2 = new String[]{"examples/tutorial/config/example1-config.xml"};
+		final String[] args2 = new String[]{"scenarios/equil/config-with-mobsim.xml"};
+		RunFromConfigfileExample.main( args2);
 	}
 
 }
