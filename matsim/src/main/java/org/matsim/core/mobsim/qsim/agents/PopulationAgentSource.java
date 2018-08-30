@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.PrepareForSimImpl;
@@ -57,11 +58,17 @@ public final class PopulationAgentSource implements AgentSource {
 	@Override
 	public void insertAgentsIntoMobsim() {
 		for (Person p : population.getPersons().values()) {
-			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
-			qsim.insertAgentIntoMobsim(agent);
-		}
-		for (Person p : population.getPersons().values()) {
-			insertVehicles(p);
+			
+			final Activity firstAct = (Activity) p.getSelectedPlan().getPlanElements().get( 0 );;
+			final Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( firstAct, qsim.getScenario() );;
+			Link link = qsim.getScenario().getNetwork().getLinks().get( linkId ) ;
+			Node fromNode = link.getFromNode() ;
+			boolean isLocal = (boolean) fromNode.getAttributes().getAttribute( QSim.IS_LOCAL_ATTRIBUTE );
+			if ( isLocal ) {
+				MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson( p );
+				qsim.insertAgentIntoMobsim( agent );
+				insertVehicles( p );
+			}
 		}
 	}
 	

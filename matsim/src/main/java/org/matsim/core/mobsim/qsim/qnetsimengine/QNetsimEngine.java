@@ -36,6 +36,8 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.inject.Inject;
 
+import mpi.Datatype;
+import mpi.MPI;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -321,16 +323,15 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 				for (Future<Boolean> future : pool.invokeAll(this.engines)) {
 					future.get();
 				}
-				sendAvailableBufferSpacesUpstream() ;
-				receiveAvailableBufferSpacesFromDownstream() ;
+				sendReceiveAvailableBufferSpaces() ;
 				for (QNetsimEngineRunner engine : this.engines) {
 					engine.setMovingNodes(false);
 				}
 				for (Future<Boolean> future : pool.invokeAll(this.engines)) {
 					future.get();
 				}
-				sendVehiclesDownstream() ;
-				receiveVehiclesFromUpstream() ;
+//				sendVehiclesDownstream() ;
+//				receiveVehiclesFromUpstream() ;
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e) ;
 			} catch (ExecutionException e) {
@@ -341,8 +342,39 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 			this.endBarrier.arriveAndAwaitAdvance();
 		}
 	}
+	
+	private void sendReceiveAvailableBufferSpaces() {
+		
+		int me;
+		int size;
+		int[] recv_buf = { 0 };
+		int[] buf = {0};
+		double tic = 0, toc = 0;
+		
+		me = MPI.COMM_WORLD.Rank();
+		
+		tic = MPI.Wtime();
+		
+		for (int i = 0; i < 50; i++) {
+			if (me == 0) {
+				int[] send_buf = { i };
+				MPI.COMM_WORLD.Send(send_buf, 0, 1, MPI.INT, 1, 17);
+				MPI.COMM_WORLD.Recv(recv_buf, 0, 1, MPI.INT, 1, 23);
+				System.out.println( "buf=" + recv_buf[0] ) ;
+			} else {
+				MPI.COMM_WORLD.Recv(buf, 0, 1, MPI.INT, 0, 17);
+				MPI.COMM_WORLD.Send(buf, 0, 1, MPI.INT, 0, 23);
+			}
+		}
+		
+		toc = MPI.Wtime();
+		
+		if (me == 0) {
+			System.out.println("Time taken is " + (toc - tic) / 100);
+		}
 
-
+	}
+	
 	/*package*/ void printSimLog(double time) {
 		if (time >= this.infoTime) {
 			this.infoTime += INFO_PERIOD;
