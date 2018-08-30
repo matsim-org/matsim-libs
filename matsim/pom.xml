@@ -404,6 +404,17 @@
 			<artifactId>lz4</artifactId>
 			<version>1.3.0</version>
 		</dependency>
+		<dependency>
+			<groupId>mpj</groupId>
+			<artifactId>mpj</artifactId>
+			<version>0.44</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
 		<!--According to https://stackoverflow.com/questions/43574426/how-to-resolve-java-lang-noclassdeffounderror-javax-xml-bind-jaxbexception-in-j/43574427#43574427,-->
 		<!--the following is needed to include jaxb into java9 and later. kai based on thibaut, feb'18-->
 		<!-- Java 6 = JAX-B Version 2.0   -->
