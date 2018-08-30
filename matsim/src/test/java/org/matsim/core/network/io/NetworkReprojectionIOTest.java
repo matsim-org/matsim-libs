@@ -1,4 +1,4 @@
-package org.matsim.core.network;
+package org.matsim.core.network.io;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -12,16 +12,24 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author thibautd
  */
 public class NetworkReprojectionIOTest {
+    private static final String INITIAL_CRS = "EPSG:3857";
+	private static final String TARGET_CRS = "WGS84";
+	private static final CoordinateTransformation transformation =
+			TransformationFactory.getCoordinateTransformation(
+					INITIAL_CRS,
+					TARGET_CRS);
+
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -35,18 +43,7 @@ public class NetworkReprojectionIOTest {
 
 		final Network readNetwork = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(
-				new CoordinateTransformation() {
-					@Override
-					public Coord transform(Coord coord) {
-						double elevation;
-						try{
-							elevation = coord.getZ();
-							return new Coord( 1000 , 1000 , elevation);
-						} catch (Exception e){
-							return new Coord( 1000 , 1000 );
-						}
-					}
-				},
+				INITIAL_CRS, TARGET_CRS,
 				readNetwork ).readFile( networkFile );
 
 		Assert.assertEquals(
@@ -55,16 +52,11 @@ public class NetworkReprojectionIOTest {
 				readNetwork.getNodes().size() );
 
 		for ( Node n : readNetwork.getNodes().values() ) {
-			double elevation;
-			Coord c;
-			try{
-				elevation = n.getCoord().getZ();
-				c = new Coord(1000, 1000, elevation);
-			} catch (Exception e){
-				c = new Coord(1000, 1000);
-			}
+			Node initialNode = initialNetwork.getNodes().get(n.getId());
 
-			Assert.assertEquals( "Unexpected coordinate", c, n.getCoord() );
+			Assert.assertEquals( "Unexpected coordinate",
+					transformation.transform(initialNode.getCoord()),
+					n.getCoord() );
 		}
 	}
 
@@ -75,18 +67,7 @@ public class NetworkReprojectionIOTest {
 		final Network initialNetwork = createInitialNetwork();
 
 		new NetworkWriter(
-				new CoordinateTransformation() {
-					@Override
-					public Coord transform(Coord coord) {
-						double elevation;
-						try{
-							elevation = coord.getZ();
-							return new Coord( 9999 , 9999 , elevation);
-						} catch (Exception e){
-							return new Coord( 9999 , 9999 );
-						}
-					}
-				},
+				transformation,
 				initialNetwork ).write( networkFile );
 
 		final Network readNetwork = NetworkUtils.createNetwork();
@@ -99,10 +80,65 @@ public class NetworkReprojectionIOTest {
 				readNetwork.getNodes().size() );
 
 		for ( Node n : readNetwork.getNodes().values() ) {
+			Node initialNode = initialNetwork.getNodes().get(n.getId());
 			Assert.assertEquals(
 					"Unexpected coordinate",
-					new Coord( 9999 , 9999 ),
+					transformation.transform(initialNode.getCoord()),
 					n.getCoord() );
+		}
+	}
+
+	@Test
+	public void testWithControlerAndAttributes() {
+		final String networkFile = utils.getOutputDirectory()+"/network.xml";
+
+		final Network initialNetwork = createInitialNetwork();
+		initialNetwork.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, INITIAL_CRS);
+
+		new NetworkWriter( initialNetwork ).write( networkFile );
+
+		final Config config = ConfigUtils.createConfig();
+		config.network().setInputFile( networkFile );
+
+		// web mercator. This would be a pretty silly choice for simulation,
+		// but does not matter for tests. Just makes sure that (almost) every
+		// coordinate can be projected
+		config.global().setCoordinateSystem( TARGET_CRS );
+
+		// TODO: test also with loading from Controler C'tor?
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		for ( Id<Node> id : initialNetwork.getNodes().keySet() ) {
+			final Coord originalCoord = initialNetwork.getNodes().get( id ).getCoord();
+			final Coord internalCoord = scenario.getNetwork().getNodes().get( id ).getCoord();
+
+			Assert.assertEquals(
+					"No coordinates transform performed!",
+					transformation.transform(originalCoord),
+					internalCoord);
+		}
+
+		Assert.assertEquals(
+				"wrong CRS information after loading",
+				TARGET_CRS,
+				scenario.getNetwork().getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT));
+
+		config.controler().setLastIteration( 0 );
+		final String outputDirectory = utils.getOutputDirectory()+"/output/";
+		config.controler().setOutputDirectory( outputDirectory );
+		final Controler controler = new Controler( scenario );
+		controler.run();
+
+		final Network dumpedNetwork = NetworkUtils.createNetwork();
+		new MatsimNetworkReader( dumpedNetwork ).readFile( outputDirectory+"/output_network.xml.gz" );
+
+		for ( Id<Node> id : scenario.getNetwork().getNodes().keySet() ) {
+			final Coord internalCoord = scenario.getNetwork().getNodes().get( id ).getCoord();
+			final Coord dumpedCoord = dumpedNetwork.getNodes().get( id ).getCoord();
+
+			Assert.assertEquals(
+					"coordinates were reprojected for dump",
+					internalCoord,
+					dumpedCoord);
 		}
 	}
 
@@ -116,11 +152,11 @@ public class NetworkReprojectionIOTest {
 		final Config config = ConfigUtils.createConfig();
 		config.network().setInputFile( networkFile );
 
-		config.network().setInputCRS( "WGS84" );
+		config.network().setInputCRS( INITIAL_CRS );
 		// web mercator. This would be a pretty silly choice for simulation,
 		// but does not matter for tests. Just makes sure that (almost) every
 		// coordinate can be projected
-		config.global().setCoordinateSystem(  "EPSG:3857" );
+		config.global().setCoordinateSystem( TARGET_CRS );
 
 		// TODO: test also with loading from Controler C'tor?
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
@@ -153,13 +189,13 @@ public class NetworkReprojectionIOTest {
 			final Coord originalCoord = initialNetwork.getNodes().get( id ).getCoord();
 			final Coord dumpedCoord = dumpedNetwork.getNodes().get( id ).getCoord();
 
-			Assert.assertEquals(
-					"coordinates were not reprojected for dump",
+			Assert.assertNotEquals(
+					"coordinates were reprojected for dump",
 					originalCoord.getX(),
 					dumpedCoord.getX(),
 					MatsimTestUtils.EPSILON );
-			Assert.assertEquals(
-					"coordinates were not reprojected for dump",
+			Assert.assertNotEquals(
+					"coordinates were reprojected for dump",
 					originalCoord.getY(),
 					dumpedCoord.getY(),
 					MatsimTestUtils.EPSILON );
