@@ -20,40 +20,40 @@
 
 package org.matsim.core.events.algorithms;
 
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.Map;
 
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
-
 public class EventWriterXML implements EventWriter, BasicEventHandler {
 	private final BufferedWriter out;
 
 	public EventWriterXML(final String outfilename) {
 		this.out = IOUtils.getBufferedWriter(outfilename);
-		try {
-			this.out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<events version=\"1.0\">\n");
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		this.writeHeader();
 	}
 
 	/**
 	 * Constructor so you can pass System.out or System.err to the writer to see the result on the console.
-	 * 
+	 *
 	 * @param stream
 	 */
 	public EventWriterXML(final PrintStream stream ) {
 		this.out = new BufferedWriter(new OutputStreamWriter(stream));
+		this.writeHeader();
+	}
+
+	private void writeHeader() {
 		try {
-			this.out.write("<events>\n");
+			this.out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<events version=\"1.0\">\n");
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new UncheckedIOException(e);
 		}
 	}
 
