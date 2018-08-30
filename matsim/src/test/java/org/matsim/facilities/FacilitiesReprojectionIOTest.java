@@ -88,6 +88,11 @@ public class FacilitiesReprojectionIOTest {
 					internalCoord);
 		}
 
+		Assert.assertEquals(
+				"wrong CRS information after loading",
+				TARGET_CRS,
+				scenario.getActivityFacilities().getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT));
+
 		config.controler().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
 		config.controler().setOutputDirectory( outputDirectory );
