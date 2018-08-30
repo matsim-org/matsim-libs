@@ -26,12 +26,6 @@ import org.matsim.api.core.v01.Coord;
 public abstract class CoordUtils {
 	final private static Logger LOG = Logger.getLogger(CoordUtils.class);
 
-	// not sure this belongs here
-	/**
-	 * Name of the attribute to add to top-level containers to specify the projection the coordinates are in
-	 */
-	public static final String INPUT_CRS_ATT = "coordinateReferenceSystem";
-	
 	public static Coord createCoord( final double xx, final double yy ) {
 		return new Coord(xx, yy);
 	}

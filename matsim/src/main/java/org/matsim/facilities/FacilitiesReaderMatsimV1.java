@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -75,7 +75,7 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
         this.factory = this.facilities.getFactory();
         if (externalInputCRS != null && targetCRS != null) {
             this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
-            this.facilities.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+            ProjectionUtils.putCRS(this.facilities, targetCRS);
         }
     }
 
@@ -115,7 +115,7 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
             this.curractivity = null;
         } else if (ATTRIBUTES.equalsIgnoreCase(name)) {
             if (context.peek().equals(FACILITIES)) {
-                String inputCRS = (String) currAttributes.getAttribute(CoordUtils.INPUT_CRS_ATT);
+                String inputCRS = (String) currAttributes.getAttribute(ProjectionUtils.INPUT_CRS_ATT);
 
                 if (inputCRS != null && targetCRS != null) {
                     if (externalInputCRS != null) {
@@ -123,7 +123,7 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
                         log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
                     }
                     coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
-                    currAttributes.putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+                    currAttributes.putAttribute(ProjectionUtils.INPUT_CRS_ATT, targetCRS);
                 }
             }
             this.currAttributes = null;
