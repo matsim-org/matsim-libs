@@ -235,19 +235,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 				final String inputCRS = config.transit().getInputScheduleCRS();
 				final String internalCRS = config.global().getCoordinateSystem();
 
-				if ( inputCRS == null ) {
-					new TransitScheduleWriter(transitSchedule).writeFile(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_TRANSIT_SCHEDULE));
-				}
-				else {
-					log.info( "re-projecting transit schedule from "+internalCRS+" back to "+inputCRS+" for export" );
-
-					final CoordinateTransformation transformation =
-							TransformationFactory.getCoordinateTransformation(
-									internalCRS,
-									inputCRS );
-
-					new TransitScheduleWriter( transformation , transitSchedule ).writeFile(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_TRANSIT_SCHEDULE));
-				}
+				new TransitScheduleWriter(transitSchedule).writeFile(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_TRANSIT_SCHEDULE));
 			}
 		} catch ( Exception ee ) {
 			log.error("Exception writing transit schedule.", ee);
@@ -267,19 +255,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			final String inputCRS = config.facilities().getInputCRS();
 			final String internalCRS = config.global().getCoordinateSystem();
 
-			if ( inputCRS == null ) {
-				new FacilitiesWriter(activityFacilities).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_FACILITIES));
-			}
-			else {
-				log.info( "re-projecting facilities from "+internalCRS+" back to "+inputCRS+" for export" );
-
-				final CoordinateTransformation transformation =
-						TransformationFactory.getCoordinateTransformation(
-								internalCRS,
-								inputCRS );
-
-				new FacilitiesWriter( transformation , activityFacilities ).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_FACILITIES));
-			}
+			new FacilitiesWriter(activityFacilities).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_FACILITIES));
 		} catch ( Exception ee ) {
 			log.error("Exception writing facilities.", ee);
 		}
@@ -293,18 +269,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpNetwork() {
 		// dump network
-		if ( config.network().getInputCRS() == null ) {
-			new NetworkWriter(network).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_NETWORK));
-		}
-		else {
-			log.info( "re-projecting network from "+config.global().getCoordinateSystem()+" back to "+config.network().getInputCRS()+" for export" );
-
-			final CoordinateTransformation transformation =
-					TransformationFactory.getCoordinateTransformation(
-							config.global().getCoordinateSystem(),
-							config.network().getInputCRS() );
-			new NetworkWriter( transformation , network ).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_NETWORK));
-		}
+		new NetworkWriter(network).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_NETWORK));
 	}
 
 	private void dumpPlans() {
