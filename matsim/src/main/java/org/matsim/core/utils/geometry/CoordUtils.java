@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Coord;
 
 public abstract class CoordUtils {
 	final private static Logger LOG = Logger.getLogger(CoordUtils.class);
-	
+
 	public static Coord createCoord( final double xx, final double yy ) {
 		return new Coord(xx, yy);
 	}

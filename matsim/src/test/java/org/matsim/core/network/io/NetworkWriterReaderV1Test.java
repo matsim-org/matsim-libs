@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * NetworkWriterReaderV1Test.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +18,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.facilities;
+package org.matsim.core.network.io;
 
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.attributable.Attributable;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.AbstractNetworkWriterReaderTest;
 
 /**
- * Root class for activity facilities.
- *
- * Maintainer: mrieser / Senozon AG
+ * @author mrieser
  */
-public interface ActivityFacilities extends MatsimToplevelContainer, Attributable {
+public class NetworkWriterReaderV1Test extends AbstractNetworkWriterReaderTest {
 
-	public String getName();
-
-	public void setName(String name);
+	@Override
+	protected void writeNetwork(final Network network, final String filename) {
+		new NetworkWriter(network).writeFileV1(filename);
+	}
 	
 	@Override
-	public ActivityFacilitiesFactory getFactory();
-
-	public Map<Id<ActivityFacility>, ? extends ActivityFacility> getFacilities();
-
-	public void addActivityFacility(ActivityFacility facility);
-
-	public ObjectAttributes getFacilityAttributes();
-
-	/* not sure if this method should be in the interface, but too many users seem to use and like it,
-	 * so there seems to be a need for it...   mrieser/jul13
-	 */
-	public TreeMap<Id<ActivityFacility>, ActivityFacility> getFacilitiesForActivityType(final String actType);
+	protected void readNetwork(final Scenario scenario, final String filename) {
+		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario.getNetwork());
+		reader.readFile(filename);
+	}
 	
 }

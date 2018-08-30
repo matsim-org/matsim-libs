@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,40 +16,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.contrib.travelsummary.events2traveldiaries;
 
-package org.matsim.facilities;
-
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.attributable.Attributable;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * Root class for activity facilities.
- *
- * Maintainer: mrieser / Senozon AG
+ * @author nagel
  */
-public interface ActivityFacilities extends MatsimToplevelContainer, Attributable {
+public class RunEventsToTravelDiariesIT {
+    @Rule
+    public MatsimTestUtils utils = new MatsimTestUtils();
 
-	public String getName();
+    @SuppressWarnings("static-method")
+    @Test
+    public final void test() {
 
-	public void setName(String name);
-	
-	@Override
-	public ActivityFacilitiesFactory getFactory();
+        String[] str = {"../../examples/scenarios/equil/config.xml", "../../examples/scenarios/equil/output_events.xml.gz", "_test", utils.getOutputDirectory()};
+        // This goes through the file system (nothing to do with resource paths etc.)
+        // It's OK in an integration test, but keep in mind that it wouldn't work like that in a separate repository.
 
-	public Map<Id<ActivityFacility>, ? extends ActivityFacility> getFacilities();
+        RunEventsToTravelDiaries.main(str);
 
-	public void addActivityFacility(ActivityFacility facility);
+        // yy missing: something that compares output files to expectations. kai, may'15
 
-	public ObjectAttributes getFacilityAttributes();
+    }
 
-	/* not sure if this method should be in the interface, but too many users seem to use and like it,
-	 * so there seems to be a need for it...   mrieser/jul13
-	 */
-	public TreeMap<Id<ActivityFacility>, ActivityFacility> getFacilitiesForActivityType(final String actType);
-	
 }

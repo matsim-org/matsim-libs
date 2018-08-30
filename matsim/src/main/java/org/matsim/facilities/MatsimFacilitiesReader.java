@@ -20,19 +20,17 @@
 
 package org.matsim.facilities;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.xml.sax.Attributes;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * A reader for facilities-files of MATSim. This reader recognizes the format of the facilities-file and uses
@@ -63,32 +61,53 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
 
     private final static Logger log = Logger.getLogger(MatsimFacilitiesReader.class);
 
-    private final CoordinateTransformation coordinateTransformation;
+    private final String externalInputCRS;
+    private final String targetCRS;
+    private CoordinateTransformation coordinateTransformation;
+
     private final Scenario scenario;
     private MatsimXmlParser delegate = null;
-    private Map<Class<?>, AttributeConverter<?>> attributeConverters;
+    private Map<Class<?>, AttributeConverter<?>> attributeConverters = new HashMap<>();
 
     /**
      * Creates a new reader for MATSim facilities files.
+     * Coordinates are not converted
      *
      * @param scenario The scenario containing the Facilities-object to store the facilities in.
      */
     public MatsimFacilitiesReader(final Scenario scenario) {
-        this(new IdentityTransformation(), scenario);
+        this(null, scenario);
+    }
+
+    /**
+     * Creates a new reader for MATSim facilities files.
+     * Converts the coordinates to the target CRS, given the CRS information in the container attributes, or, if absent,
+     * from the config.
+     *
+     * @param targetCRS the CRS the coordinates should be expressed in
+     * @param scenario                 The scenario containing the Facilities-object to store the facilities in.
+     */
+    public MatsimFacilitiesReader(
+            final String targetCRS,
+            final Scenario scenario) {
+        this(scenario.getConfig().facilities().getInputCRS(), targetCRS, scenario);
     }
 
     /**
      * Creates a new reader for MATSim facilities files.
      *
-     * @param coordinateTransformation a transformation from the CRS of the data file to the CRS inside MATSim
+     * @param externalInputCRS specifies the CRS the coordinates are expressed in. If the CRS is define in the container
+     *                         attributes, this value is ignored
+     * @param targetCRS the CRS the coordinates should be expressed in
      * @param scenario                 The scenario containing the Facilities-object to store the facilities in.
      */
     public MatsimFacilitiesReader(
-            final CoordinateTransformation coordinateTransformation,
+            final String externalInputCRS,
+            final String targetCRS,
             final Scenario scenario) {
-        this.coordinateTransformation = coordinateTransformation;
+        this.externalInputCRS = externalInputCRS;
+        this.targetCRS = targetCRS;
         this.scenario = scenario;
-        this.attributeConverters = new HashMap();
     }
 
     public void putAttributeConverter(Class<?> clazz, AttributeConverter<?> converter) {
@@ -114,7 +133,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
         super.setDoctype(doctype);
         // Currently the only facilities-type is v1
         if (FACILITIES_V1.equals(doctype)) {
-            this.delegate = new FacilitiesReaderMatsimV1(coordinateTransformation, scenario);
+            this.delegate = new FacilitiesReaderMatsimV1(externalInputCRS, targetCRS, scenario);
             ((FacilitiesReaderMatsimV1)this.delegate).putAttributeConverters(this.attributeConverters);
             log.info("using facilities_v1-reader.");
         } else {
