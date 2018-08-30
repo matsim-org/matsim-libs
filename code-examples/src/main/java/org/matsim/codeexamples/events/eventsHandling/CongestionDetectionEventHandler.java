@@ -1,4 +1,4 @@
-package org.matsim.codeexamples.events.example06EventsHandling;
+package org.matsim.codeexamples.events.eventsHandling;
 
 import java.util.HashMap;
 import java.util.Map;

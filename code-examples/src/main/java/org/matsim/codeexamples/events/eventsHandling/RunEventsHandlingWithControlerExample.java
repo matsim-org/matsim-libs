@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.codeexamples.events.example06EventsHandling;
+package org.matsim.codeexamples.events.eventsHandling;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;

@@ -1,4 +1,4 @@
-package org.matsim.codeexamples.events.example06EventsHandling;
+package org.matsim.codeexamples.events.eventsHandling;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;

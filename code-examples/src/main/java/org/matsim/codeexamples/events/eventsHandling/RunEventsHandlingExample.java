@@ -17,11 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.codeexamples.events.example06EventsHandling;
+package org.matsim.codeexamples.events.eventsHandling;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.scenario.ScenarioUtils;
 
 
 
@@ -38,8 +43,14 @@ public class RunEventsHandlingExample {
 	
 	public static void main(String[] args) {
 
-		//path to events file
-		String inputFile = "output/example5/ITERS/it.10/10.events.xml.gz";
+		//path to events file. For this you first need to run a simulation.
+		Config config = ConfigUtils.loadConfig("scenarios/equil/config.xml");
+		config.controler().setLastIteration(5);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
+		controler.run();
+
+		String inputFile = "output/example/output_events.xml.gz";
 
 		//create an event object
 		EventsManager events = EventsUtils.createEventsManager();

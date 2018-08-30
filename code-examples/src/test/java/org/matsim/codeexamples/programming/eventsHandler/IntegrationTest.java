@@ -5,7 +5,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 
 import org.junit.Test;
-import org.matsim.codeexamples.events.example06EventsHandling.RunEventsHandlingWithControlerExample;
+import org.matsim.codeexamples.events.eventsHandling.RunEventsHandlingWithControlerExample;
 import org.matsim.core.utils.io.IOUtils;
 
 public class IntegrationTest {
