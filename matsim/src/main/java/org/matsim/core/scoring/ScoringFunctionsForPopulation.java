@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
@@ -136,8 +137,10 @@ import static org.matsim.core.router.TripStructureUtils.*;
 			ScoringFunction data = scoringFunctionFactory.createNewScoringFunction(person);
 			this.agentScorers.put(person.getId(), data);
 			this.partialScores.put(person.getId(), new TDoubleArrayList());
+			tripRecords.put(person.getId(), PopulationUtils.createPlan());
 		}
 	}
+	
 
 	@Override
 	synchronized public void handleEvent(Event o) {
@@ -201,12 +204,14 @@ import static org.matsim.core.router.TripStructureUtils.*;
 			partialScoresForAgent.add(scoringFunction.getScore());
 		}
 		Plan plan = tripRecords.get( agentId ) ; // as container for trip
-		if ( plan==null ) {
-			plan = PopulationUtils.createPlan() ;
-			tripRecords.put( agentId, plan ) ;
+		if ( plan!=null ) {
+			plan.addLeg( leg );
+			log.warn( "" );
+			log.warn( "just added leg to tripRecords; plan=" + plan );
+			for ( PlanElement pe : plan.getPlanElements() ) {
+				log.warn( pe.toString() );
+			}
 		}
-		plan.addLeg( leg );
-		
 	}
 
 	@Override
@@ -219,23 +224,37 @@ import static org.matsim.core.router.TripStructureUtils.*;
 			TDoubleCollection partialScoresForAgent = partialScores.get(agentId);
 			partialScoresForAgent.add(scoringFunction.getScore());
 		}
+		
 		Plan plan = tripRecords.get( agentId ); // as container for trip
-		if ( stageActivityTypes.isStageActivity( activity.getType() ) ) {
-			Gbl.assertNotNull( plan );
+		if ( plan!= null ) {
+			if ( !plan.getPlanElements().isEmpty() ) {
+				// plan != null, meaning we already have pre-existing material
+				if ( stageActivityTypes.isStageActivity( activity.getType() ) ) {
+					// we are at a stage activity.  Don't do anything ; activity will be added later
+				} else {
+					// we are at a real activity, which is not the first one we see for this agent.  output the trip ...
+					plan.addActivity( activity );
+					log.warn( "" );
+					log.warn( "just added FINAL activity to tripRecords; plan=" + plan );
+					for ( PlanElement pe : plan.getPlanElements() ) {
+						log.warn( pe.toString() );
+					}
+					final List<Trip> trips = TripStructureUtils.getTrips( plan, stageActivityTypes );
+					Gbl.assertIf( trips.size() == 1 );
+					final Trip trip = trips.get( 0 );
+					Gbl.assertNotNull( trip );
+					scoringFunction.handleTrip( trip );
+					
+					// ... and clean out the intermediate plan:
+					plan.getPlanElements().clear();
+				}
+			}
 			plan.addActivity( activity );
-		} else if ( plan != null ) {
-			Gbl.assertNotNull( stageActivityTypes );
-			final List<Trip> trips = TripStructureUtils.getTrips( plan, stageActivityTypes );
-			
-			log.warn( "trips.size=" + trips.size() ) ;
-			
-			log.warn( "trip=" + trips ) ;
-			
-			Gbl.assertIf( trips.size()==1 );
-			final Trip trip = trips.get( 0 );
-			Gbl.assertNotNull( trip );
-			scoringFunction.handleTrip( trip );
-			tripRecords.remove( agentId ) ;
+			log.warn( "" );
+			log.warn( "just added activity to tripRecords; plan=" + plan );
+			for ( PlanElement pe : plan.getPlanElements() ) {
+				log.warn( pe.toString() );
+			}
 		}
 	}
 
