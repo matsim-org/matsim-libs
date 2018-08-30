@@ -27,7 +27,7 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.population.io.StreamingPopulationReader.StreamingPopulation;
-import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -165,7 +165,7 @@ public final class PopulationReader extends MatsimXmlParser {
 		    throw new RuntimeException(e);
 		}
 		if (targetCRS != null) {
-			scenario.getPopulation().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+			scenario.getPopulation().getAttributes().putAttribute(ProjectionUtils.INPUT_CRS_ATT, targetCRS);
 		}
 	}
 }

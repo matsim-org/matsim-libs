@@ -32,6 +32,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -123,7 +124,7 @@ import java.util.Stack;
 		this.plans = scenario.getPopulation();
 	    if (targetCRS != null && externalInputCRS !=null) {
 		    this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
-		    this.plans.getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+		    this.plans.getAttributes().putAttribute(ProjectionUtils.INPUT_CRS_ATT, targetCRS);
 	    }
 	}
 
@@ -198,7 +199,7 @@ import java.util.Stack;
 				break;
 			case ATTRIBUTES:
 				if (context.peek().equals(POPULATION)) {
-					String inputCRS = (String) scenario.getPopulation().getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT);
+					String inputCRS = (String) scenario.getPopulation().getAttributes().getAttribute(ProjectionUtils.INPUT_CRS_ATT);
 
 					if (inputCRS != null && targetCRS != null) {
 						if (externalInputCRS != null) {
@@ -206,7 +207,7 @@ import java.util.Stack;
 							log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
 						}
 						coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
-						scenario.getPopulation().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, targetCRS);
+						scenario.getPopulation().getAttributes().putAttribute(ProjectionUtils.INPUT_CRS_ATT, targetCRS);
 					}
 				}
 			    break;

@@ -10,8 +10,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -68,7 +68,7 @@ public class FacilitiesReprojectionIOTest {
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
 
-		originalScenario.getActivityFacilities().getAttributes().putAttribute(CoordUtils.INPUT_CRS_ATT, INITIAL_CRS);
+		originalScenario.getActivityFacilities().getAttributes().putAttribute(ProjectionUtils.INPUT_CRS_ATT, INITIAL_CRS);
 		new FacilitiesWriter(originalScenario.getActivityFacilities()).write(utils.getOutputDirectory()+"/facilities.xml");
 
 		// write scenario and re-read it
@@ -91,7 +91,7 @@ public class FacilitiesReprojectionIOTest {
 		Assert.assertEquals(
 				"wrong CRS information after loading",
 				TARGET_CRS,
-				scenario.getActivityFacilities().getAttributes().getAttribute(CoordUtils.INPUT_CRS_ATT));
+				scenario.getActivityFacilities().getAttributes().getAttribute(ProjectionUtils.INPUT_CRS_ATT));
 
 		config.controler().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
