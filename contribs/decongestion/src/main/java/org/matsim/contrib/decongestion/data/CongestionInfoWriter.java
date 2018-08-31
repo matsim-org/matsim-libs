@@ -52,7 +52,7 @@ public class CongestionInfoWriter {
 		
 		log.info("Writing csv file...");
 		
-		String fileName = outputPathCongestionInfo + runId + ".decongestion_delays_perLinkAndTimeBin.csv";
+		String fileName = outputPathCongestionInfo + runId + "." + iteration + ".decongestion_delays_perLinkAndTimeBin.csv";
 		File file = new File(fileName);
 		
 		try {
@@ -117,7 +117,7 @@ public class CongestionInfoWriter {
 				}
 				if (!isEmpty) chart.addSeries("Link " + linkId, timeBins, values);
 			}
-			chart.saveAsPng(outputPathCongestionInfo + "decongestion_delays_perLinkAndTimeBin.png", 800, 600);			
+			chart.saveAsPng(outputPathCongestionInfo + runId + "." + iteration + ".decongestion_delays_perLinkAndTimeBin.png", 800, 600);			
 		}
 		
 	}
@@ -134,7 +134,7 @@ public class CongestionInfoWriter {
 		
 		log.info("Writing csv file...");
 		
-		String fileName2 = outputPathCongestionInfo + runId + "." + "decongestion_toll_perLinkAndTimeBin.csv";
+		String fileName2 = outputPathCongestionInfo + runId + "." + iteration + ".decongestion_toll_perLinkAndTimeBin.csv";
 		File file2 = new File(fileName2);
 		
 		try {
@@ -198,7 +198,7 @@ public class CongestionInfoWriter {
 				}
 				if (!isEmpty) chart.addSeries("Link " + linkId, timeBins, values);
 			}
-			chart.saveAsPng(outputPathCongestionInfo + "decongestion_toll_perLinkAndTimeBin.png", 800, 600);
+			chart.saveAsPng(outputPathCongestionInfo + runId + "." + iteration + ".decongestion_toll_perLinkAndTimeBin.png", 800, 600);
 		}
 	}
 	
