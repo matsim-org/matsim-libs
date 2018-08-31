@@ -44,7 +44,7 @@ import org.matsim.core.utils.misc.Time;
 public class CongestionInfoWriter {
 	private static final Logger log = Logger.getLogger(CongestionInfoWriter.class);
 	
-	public static void writeDelays(DecongestionInfo congestionInfo, int iteration, String outputPath) {
+	public static void writeDelays(DecongestionInfo congestionInfo, int iteration, String outputPath, String runId) {
 		
 		String outputPathCongestionInfo = outputPath;
 		File dir = new File(outputPathCongestionInfo);
@@ -52,7 +52,7 @@ public class CongestionInfoWriter {
 		
 		log.info("Writing csv file...");
 		
-		String fileName = outputPathCongestionInfo + "delays_perLinkAndTimeBin.csv";
+		String fileName = outputPathCongestionInfo + runId + ".delays_perLinkAndTimeBin.csv";
 		File file = new File(fileName);
 		
 		try {
@@ -124,11 +124,11 @@ public class CongestionInfoWriter {
 		
 	}
 	
-	public static void writeTolls(DecongestionInfo congestionInfo, int iteration, String outputPath) {
-		writeTolls4Excel(congestionInfo, iteration, outputPath);
-		writeFile4Via(congestionInfo, iteration, outputPath);
+	public static void writeTolls(DecongestionInfo congestionInfo, int iteration, String outputPath, String runId) {
+		writeTolls4Excel(congestionInfo, iteration, outputPath, runId);
+		writeFile4Via(congestionInfo, iteration, outputPath, runId);
 	}
-	private static void writeTolls4Excel(DecongestionInfo congestionInfo, int iteration, String outputPath) {
+	private static void writeTolls4Excel(DecongestionInfo congestionInfo, int iteration, String outputPath, String runId) {
 		
 		String outputPathCongestionInfo = outputPath;
 		File dir = new File(outputPathCongestionInfo);
@@ -136,7 +136,7 @@ public class CongestionInfoWriter {
 		
 		log.info("Writing csv file...");
 		
-		String fileName2 = outputPathCongestionInfo + "toll_perLinkAndTimeBin.csv";
+		String fileName2 = outputPathCongestionInfo + runId + "." + "toll_perLinkAndTimeBin.csv";
 		File file2 = new File(fileName2);
 		
 		try {
@@ -203,7 +203,7 @@ public class CongestionInfoWriter {
 			chart.saveAsPng(outputPathCongestionInfo + "toll_perLinkAndTimeBin.png", 800, 600);
 		}
 	}
-	private static void writeFile4Via(DecongestionInfo congestionInfo, int iteration, String outputPath) {
+	private static void writeFile4Via(DecongestionInfo congestionInfo, int iteration, String outputPath, String runId) {
 		
 		String outputPathCongestionInfo = outputPath;
 		File dir = new File(outputPathCongestionInfo);
@@ -212,11 +212,9 @@ public class CongestionInfoWriter {
 		log.info("Writing csv file...");
 		
 		
-		String fileName2 = outputPathCongestionInfo + iteration + ".decongestion_info_via.csv.gz";
-//		File file2 = new File(fileName2);
+		String fileName2 = outputPathCongestionInfo + runId + "." + iteration + ".decongestion_info_via.csv.gz";
 		
 		try {
-//			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
 			BufferedWriter bw = IOUtils.getBufferedWriter(fileName2);
 			
 			int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
@@ -271,9 +269,9 @@ public class CongestionInfoWriter {
 			SortedMap<Integer, Double> iteration2totalTollPayments,
 			SortedMap<Integer, Double> iteration2totalTravelTime,
 			SortedMap<Integer, Double> iteration2userBenefits,
-			String outputDirectory) {
+			String outputDirectory, String runId) {
 		
-		String fileName = outputDirectory + "congestionInfo.csv";
+		String fileName = outputDirectory + runId + ".congestionInfo.csv";
 		File file = new File(fileName);
 		
 		try {
