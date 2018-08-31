@@ -220,7 +220,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 			}
 			chart1.addSeries("Total delay", iterations1, values1a);
 			chart1.addSeries("Total travel time", iterations1, values1b);
-			chart1.saveAsPng(outputDirectory + this.congestionInfo.getScenario().getConfig().controler().getRunId() + ".travelTime_delay.png", 800, 600);
+			chart1.saveAsPng(outputDirectory + this.congestionInfo.getScenario().getConfig().controler().getRunId() + ".decongestion_travelTime_delay.png", 800, 600);
 			
 			XYLineChart chart2 = new XYLineChart("user benefits and toll revenues", "Iteration", "Monetary units");
 			double[] iterations2 = new double[event.getIteration() + 1];
@@ -233,8 +233,8 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 				values2c[i] = this.iteration2totalTollPayments.get(i);
 			}
 			chart2.addSeries("User benefits", iterations2, values2b);
-			chart2.addSeries("Toll revenues", iterations2, values2c);
-			chart2.saveAsPng(outputDirectory + this.congestionInfo.getScenario().getConfig().controler().getRunId() + ".userBenefits_decongestion-toll-payments.png", 800, 600);
+			chart2.addSeries("Toll payments (decongestion tolls only)", iterations2, values2c);
+			chart2.saveAsPng(outputDirectory + this.congestionInfo.getScenario().getConfig().controler().getRunId() + ".decongestion_userBenefits_tolls.png", 800, 600);
 		}
 	}
 
