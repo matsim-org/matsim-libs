@@ -49,7 +49,7 @@ public class ExamplesByConfigfileTest {
 		filesToRun.add(new Object [] {"scenarios/equil/config-with-mobsim.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil/example2-config.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil/example5-config.xml"});
- 		filesToRun.add(new Object [] {"scenarios/equil/example7-config.xml"});
+ 		filesToRun.add(new Object [] {"scenarios/equil/config-with-controlerListener.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil/config-with-pluggablePlanStrategy.xml"});
 
 		filesToRun.add(new Object [] {"scenarios/equil-extended/config.xml"});

@@ -40,7 +40,7 @@ public class RunFromConfigfileExample {
 		if ( args!=null && args.length>=1 ) {
 			configFile = args[0] ;
 		} else {
-			configFile = "sceanrios/equil/config.xml";
+			configFile = "scenarios/equil/config.xml";
 		}
 
 		Config config = ConfigUtils.loadConfig(configFile);
