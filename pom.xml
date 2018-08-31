@@ -6,9 +6,14 @@
 	<groupId>org.matsim.projects</groupId>
 	<artifactId>freight-dfg17</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-
 	<name>freight-dfg17</name>
 	<description>freight-dfg17 internal data not to be put on public github matsim/freight-contrib repository</description>
+	<scm>
+		<url>https://github.com/matsim-org/matsim</url>
+		<connection>scm:git:git://github.com/matsim-org/matsim.git</connection>
+		<developerConnection>scm:git:git@github.com:matsim-org/matsim.git</developerConnection>
+	</scm>
+
 
 	<repositories>
 		<!-- Repository for MATSim releases (MATSim is not on Maven central) -->
@@ -60,6 +65,27 @@
 
 	<build>
 		<plugins>
+		
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<doCheck>false</doCheck>
+					<doUpdate>false</doUpdate>
+					<revisionOnScmFailure>unknown</revisionOnScmFailure>
+					<timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
+				</configuration>
+			</plugin>
+		
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -80,25 +106,32 @@
 					</compilerArguments>
 				</configuration>
 			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.19</version>
 				<configuration>
-					<downloadSources>true</downloadSources>
-					<downloadJavadocs>true</downloadJavadocs>
+					<excludes>
+						<exclude>**/*$*</exclude> <!-- exclude all inner classes -->
+						<exclude>org/matsim/testcases/TestDepth.java</exclude>
+						<exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
+					</excludes>
+					<forkMode>once</forkMode>
+					<!-- avoid out of memory errors: -->
+					<argLine>-Xmx700m -Djava.awt.headless=true
+						-Dmatsim.preferLocalDtds=true</argLine>
 				</configuration>
 			</plugin>
+			
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
+				<!-- Setting this to 2.2.1 because I want to be able to skip assembly from the command line.  kai, jun'17  -->
 				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-					<archive>
-						<manifest>
-							<mainClass>org.matsim.gui.MATSimGUI</mainClass>
-						</manifest>
-					</archive>
+					<descriptors>
+						<descriptor>src/main/assembly/assembly-release.xml</descriptor>
+					</descriptors>
 				</configuration>
 				<executions>
 					<execution>
@@ -112,37 +145,5 @@
 			</plugin>
 		</plugins>
 	</build>
-	
-		<profiles>
-		<profile>
-			<id>release</id>
-			<build>
-				<defaultGoal>assembly:assembly</defaultGoal>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<artifactId>maven-assembly-plugin</artifactId>
-							<configuration>
-								<descriptors>
-									<descriptor>src/main/assembly/assembly-release.xml</descriptor>
-								</descriptors>
-							</configuration>
-						</plugin>
-						<plugin>
-							<artifactId>maven-jar-plugin</artifactId>
-							<configuration>
-								<archive>
-									<manifest>
-										<addClasspath>true</addClasspath>
-										<classpathPrefix>libs/</classpathPrefix>
-									</manifest>
-								</archive>
-							</configuration>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-			</build>
-		</profile>
-	</profiles>
-	
+
 </project>
