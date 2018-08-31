@@ -52,7 +52,7 @@ public class CongestionInfoWriter {
 		
 		log.info("Writing csv file...");
 		
-		String fileName = outputPathCongestionInfo + runId + ".delays_perLinkAndTimeBin.csv";
+		String fileName = outputPathCongestionInfo + runId + ".decongestion_delays_perLinkAndTimeBin.csv";
 		File file = new File(fileName);
 		
 		try {
@@ -67,14 +67,14 @@ public class CongestionInfoWriter {
 			}
 			bw.newLine();
 			
-			for (Id<Link> linkId : congestionInfo.getlinkInfos().keySet()) {
+			for (Id<Link> linkId : congestionInfo.getScenario().getNetwork().getLinks().keySet()) {
 				
 				bw.write(linkId.toString());
 				
 				for (int i = 0; i < totalNumberOfTimeBins; i++) {
 					
 					double timeBinValue1 = 0.;
-					if (congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().containsKey(i)) {
+					if (congestionInfo.getlinkInfos().get(linkId) != null && congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().get(i) != null) {
 						timeBinValue1 = congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().get(i);
 					}
 					
@@ -117,9 +117,7 @@ public class CongestionInfoWriter {
 				}
 				if (!isEmpty) chart.addSeries("Link " + linkId, timeBins, values);
 			}
-			chart.saveAsPng(outputPathCongestionInfo + "delays_perLinkAndTimeBin.png", 800, 600);
-			log.info("Output written to " + outputPathCongestionInfo + "delays_perLinkAndTimeBin.png");
-			
+			chart.saveAsPng(outputPathCongestionInfo + "decongestion_delays_perLinkAndTimeBin.png", 800, 600);			
 		}
 		
 	}
@@ -136,7 +134,7 @@ public class CongestionInfoWriter {
 		
 		log.info("Writing csv file...");
 		
-		String fileName2 = outputPathCongestionInfo + runId + "." + "toll_perLinkAndTimeBin.csv";
+		String fileName2 = outputPathCongestionInfo + runId + "." + "decongestion_toll_perLinkAndTimeBin.csv";
 		File file2 = new File(fileName2);
 		
 		try {
@@ -151,14 +149,14 @@ public class CongestionInfoWriter {
 			}
 			bw.newLine();
 			
-			for (Id<Link> linkId : congestionInfo.getlinkInfos().keySet()) {
+			for (Id<Link> linkId : congestionInfo.getScenario().getNetwork().getLinks().keySet()) {
 				
 				bw.write(linkId.toString());
 				
 				for (int i = 0; i < totalNumberOfTimeBins; i++) {
 					
 					double toll = 0.;
-					if (congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(i)) {
+					if (congestionInfo.getlinkInfos().get(linkId) != null && congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(i) != null) {
 						toll = congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(i);
 					}
 					
@@ -200,9 +198,10 @@ public class CongestionInfoWriter {
 				}
 				if (!isEmpty) chart.addSeries("Link " + linkId, timeBins, values);
 			}
-			chart.saveAsPng(outputPathCongestionInfo + "toll_perLinkAndTimeBin.png", 800, 600);
+			chart.saveAsPng(outputPathCongestionInfo + "decongestion_toll_perLinkAndTimeBin.png", 800, 600);
 		}
 	}
+	
 	private static void writeFile4Via(DecongestionInfo congestionInfo, int iteration, String outputPath, String runId) {
 		
 		String outputPathCongestionInfo = outputPath;
@@ -226,14 +225,25 @@ public class CongestionInfoWriter {
 				double timeInterval = timeBin * congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
 				// (in via (and most other softwares), I need the beginning of the interval in the data, not the end.  Thus, not "(timeBin+1)*...".  kai, may'18
 				
-				for ( Map.Entry<Id<Link>,LinkInfo> entry : congestionInfo.getlinkInfos().entrySet() ) {
-					Double delay = entry.getValue().getTime2avgDelay().get(timeBin);
-					Double toll = entry.getValue().getTime2toll().get(timeBin) ;
+//				for ( Map.Entry<Id<Link>,LinkInfo> entry : congestionInfo.getlinkInfos().entrySet() ) {
+//					delay = entry.getValue().getTime2avgDelay().get(timeBin);
+//					toll = entry.getValue().getTime2toll().get(timeBin) ;
+				
+				// replaced by the following because congestionInfo.getLinkInfos() may no longer contain all network links and we want to avoid delay=NaN
+				
+				for ( Id<Link> linkId : congestionInfo.getScenario().getNetwork().getLinks().keySet() ) {
+					Double delay = null;
+					Double toll = null;
 					
+					if (congestionInfo.getlinkInfos().get(linkId) != null) {
+						delay = congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().get(timeBin);
+						toll = congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(timeBin);
+					}
+										
 //					if ( (delay!=null && delay!=0.) || (toll!=null && toll!=0.) ) {
 					// otherwise time-dep display in VIA will not switch back to 0. kai, may'18
 						
-						bw.write(entry.getKey().toString());
+						bw.write(linkId.toString());
 						bw.write(";" );
 //						bw.write(Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
 						bw.write( Double.toString(timeInterval) ) ;
@@ -271,7 +281,7 @@ public class CongestionInfoWriter {
 			SortedMap<Integer, Double> iteration2userBenefits,
 			String outputDirectory, String runId) {
 		
-		String fileName = outputDirectory + runId + ".congestionInfo.csv";
+		String fileName = outputDirectory + runId + ".decongestion_info.csv";
 		File file = new File(fileName);
 		
 		try {
