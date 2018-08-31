@@ -157,7 +157,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 				final double congestedTravelTime = travelTime.getLinkTravelTime(link, probedTime, null, null);
 				double avgDelay = congestedTravelTime - freespeedTravelTime;
 				
-				if (linkHasAtLeastOneTimeBinWithNonZeroAvgDelay == false && avgDelay >= 1.) {
+				if (linkHasAtLeastOneTimeBinWithNonZeroAvgDelay == false && avgDelay > this.congestionInfo.getDecongestionConfigGroup().getToleratedAverageDelaySec()) {
 					linkHasAtLeastOneTimeBinWithNonZeroAvgDelay = true;
 				}
 				
