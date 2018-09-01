@@ -429,6 +429,15 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private double getBufferStorageCapacity() {
 		return flowCapacityPerTimeStep;//this assumes that vehicles have the flowEfficiencyFactor of 1.0 
 	}
+	
+	public final double getRemainingBufferStorageCapacity() {
+		return this.flowcap_accumulate.getValue() ;
+	}
+	public final void setRemainingBufferStorageCapacity( double val ) {
+		// yyyyyy this needs to be protected if we merge with master. kai, aug'18
+		this.flowcap_accumulate.setValue( val );
+	}
+	
 
 	@Override
 	public final boolean doSimStep( ) {
@@ -673,7 +682,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		QVehicle veh = removeFirstVehicle();
 		if (this.context.qsimConfig.isUseLanes() ) {
 			if (  hasMoreThanOneLane() ) {
-				this.context.getEventsManager().processEvent(new LaneLeaveEvent( now, veh.getId(), this.qLink.getId(), this.getId() ));
+				this.context.getEventsManager().processEvent(new LaneLeaveEvent( now, veh.getId(),
+						this.qLink.getId(), this.getId() ));
 			}
 		}
 		return veh;
@@ -735,7 +745,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 		for (QVehicle veh : vehQueue) {
 			context.getEventsManager().processEvent( new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
-			context.getEventsManager().processEvent( new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+			context.getEventsManager().processEvent( new PersonStuckEvent(now, veh.getDriver().getId(),
+					veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 
 			context.getAgentCounter().incLost();
 			context.getAgentCounter().decLiving();

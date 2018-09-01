@@ -20,12 +20,17 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -33,6 +38,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.ThreadFactory;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -62,6 +68,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.lanes.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
@@ -343,36 +350,101 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		}
 	}
 	
+	private void sendReceiveVehicles() {
+		final int me = MPI.COMM_WORLD.Rank();;
+
+		Map<Integer,QVehicle> vehicleInfo = new HashMap<>() ;
+		
+		
+		
+	}
+	
+	
 	private void sendReceiveAvailableBufferSpaces() {
+		final int me = MPI.COMM_WORLD.Rank();;
 		
-		int me;
-		int size;
-		int[] recv_buf = { 0 };
-		int[] buf = {0};
-		double tic = 0, toc = 0;
+		Map< Integer, Map< String, Double > > linkInfo = new HashMap<>() ;
 		
-		me = MPI.COMM_WORLD.Rank();
-		
-		tic = MPI.Wtime();
-		
-		for (int i = 0; i < 50; i++) {
-			if (me == 0) {
-				int[] send_buf = { i };
-				MPI.COMM_WORLD.Send(send_buf, 0, 1, MPI.INT, 1, 17);
-				MPI.COMM_WORLD.Recv(recv_buf, 0, 1, MPI.INT, 1, 23);
-				System.out.println( "buf=" + recv_buf[0] ) ;
-			} else {
-				MPI.COMM_WORLD.Recv(buf, 0, 1, MPI.INT, 0, 17);
-				MPI.COMM_WORLD.Send(buf, 0, 1, MPI.INT, 0, 23);
+		// yyyyyy we need to cut before the lanes split up.  Than lane info is not necessary!!!!
+		// kai, aug'18
+
+		// collect, for each neighbor, the info that we need to send there:
+		for ( QLinkI link : this.network.getNetsimLinks().values() ) {
+			int toNodeCpn = (int) link.getLink().getToNode().getAttributes().getAttribute( QSim.CPN_ATTRIBUTE );
+			if ( toNodeCpn == me ) {
+				int fromNodeCpn = (int) link.getLink().getFromNode().getAttributes().getAttribute( QSim.CPN_ATTRIBUTE );
+				final Map<String, Double> linkInfoForCpn = linkInfo.computeIfAbsent( fromNodeCpn, k -> new HashMap<>() );
+				
+				final QLaneI lane = link.getAcceptingQLane();;
+				Gbl.assertIf( lane instanceof QueueWithBuffer );
+				final double flowCapForThisTimeStep = ( (QueueWithBuffer) lane ).getRemainingBufferStorageCapacity();
+				// (The convention is that the upstream queue can move vehicles into this one until
+				// it becomes negative.  kai, aug'18)
+				
+				linkInfoForCpn.put( link.getLink().getId().toString(), flowCapForThisTimeStep );
+				log.debug( link.getLink().getId()  + ": SND " + flowCapForThisTimeStep ) ;
 			}
 		}
 		
-		toc = MPI.Wtime();
+		// send the above consolidated info to the neighbors:
+		for ( Entry<Integer,Map<String,Double>> entry : linkInfo.entrySet() ) {
+			final Integer dest = entry.getKey();
+			final Map<String, Double> obj = entry.getValue();
+			sndObjectToNeighbor( dest, obj );
+		}
 		
-		if (me == 0) {
-			System.out.println("Time taken is " + (toc - tic) / 100);
+		// receive the corresponding info from my neighbors:
+		for ( Integer cpn : linkInfo.keySet() ) {
+			// (these are my neighbors)
+
+			Map<String, Double > obj = (Map<String, Double>) rcvObjectFromNeighbor( cpn ) ;
+			for ( Entry<String,Double> entry : obj.entrySet() ) {
+				Id<Link> linkId = Id.createLinkId( entry.getKey() ) ;
+				final QLinkI qLink = this.network.getNetsimLink( linkId );
+				QLaneI qLane = qLink.getAcceptingQLane() ;
+				Gbl.assertIf( qLane instanceof QueueWithBuffer );
+				final Double value = entry.getValue() ;
+				((QueueWithBuffer)qLane).setRemainingBufferStorageCapacity( value );
+				log.debug( qLink.getLink().getId() + "_" + qLane.getId() + ": RCV " + value ) ;
+			}
 		}
 
+	}
+	
+	private Object rcvObjectFromNeighbor( final Integer cpn ) {
+		int[] buf_for_size = {-1};
+		MPI.COMM_WORLD.Recv( buf_for_size, 0, 1, MPI.INT, cpn, 16 );
+		char[] message = new char[buf_for_size[0]];
+		MPI.COMM_WORLD.Recv( message, 0, buf_for_size[0], MPI.CHAR, cpn, 17 );
+		ObjectInputStream ois = null;
+		try {
+			final String serializedObject = String.valueOf( message );
+			byte b[] = serializedObject.getBytes();
+			ByteArrayInputStream bis = new ByteArrayInputStream( b );
+			ois = new ObjectInputStream( bis );
+			return ois.readObject();
+		} catch ( Exception e ) {
+			System.out.println( e );
+		}
+		return null;
+	}
+	
+	private void sndObjectToNeighbor( final Integer dest, final Object obj ) {
+		// yyyyyy I *think* that "Object" is enough here.  kai, aug'18
+		
+		String serialized = "" ;
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject( obj );
+			oos.flush();
+			serialized = baos.toString();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		char [] message = serialized.toCharArray() ;
+		MPI.COMM_WORLD.Send( new int [] { message.length } ,0, 1, MPI.INT, dest, 16 ) ;
+		MPI.COMM_WORLD.Send(message, 0, message.length, MPI.CHAR, dest, 17);
 	}
 	
 	/*package*/ void printSimLog(double time) {
