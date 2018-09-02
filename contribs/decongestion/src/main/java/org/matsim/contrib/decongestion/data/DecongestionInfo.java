@@ -20,18 +20,18 @@
 package org.matsim.contrib.decongestion.data;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.decongestion.DecongestionConfigGroup;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
-
-import org.matsim.contrib.decongestion.DecongestionConfigGroup;
 
 /**
  * Stores the information which is requried during the computation of decongestion prices
@@ -46,6 +46,7 @@ public class DecongestionInfo {
 	
 	private final Map<Id<Link>, LinkInfo> linkId2info = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>();
+	private final Set<Id<Vehicle>> transitVehicleIDs = new HashSet<>();
 
 	public Scenario getScenario() {
 		return scenario;
@@ -60,9 +61,12 @@ public class DecongestionInfo {
 	}
 
 	public DecongestionConfigGroup getDecongestionConfigGroup() {
-//		return ConfigUtils.addOrGetModule(scenario.getConfig(), DecongestionConfigGroup.class);
 		return decongestionConfigGroup ;
 	}
 
+	public Set<Id<Vehicle>> getTransitVehicleIDs() {
+		return transitVehicleIDs;
+	}
+	
 }
 

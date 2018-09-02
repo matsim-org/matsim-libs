@@ -24,7 +24,11 @@
 
 package org.matsim.contrib.decongestion;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -44,16 +48,12 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.ReplanningUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.charts.XYLineChart;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import com.google.inject.Inject;
 
 
 /**
@@ -135,36 +135,32 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		}
 		
 		if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getWriteOutputIteration() == 0.) {
-			CongestionInfoWriter.writeDelays(congestionInfo, event.getIteration(), this.outputDirectory + "ITERS/it." + event.getIteration() + "/");
-			CongestionInfoWriter.writeTolls(congestionInfo, event.getIteration(), this.outputDirectory + "ITERS/it." + event.getIteration() + "/");
+			CongestionInfoWriter.writeDelays(congestionInfo, event.getIteration(), this.outputDirectory + "ITERS/it." + event.getIteration() + "/", this.congestionInfo.getScenario().getConfig().controler().getRunId());
+			CongestionInfoWriter.writeTolls(congestionInfo, event.getIteration(), this.outputDirectory + "ITERS/it." + event.getIteration() + "/", this.congestionInfo.getScenario().getConfig().controler().getRunId());
 		}
 	}
 
-	private void computeDelays(AfterMobsimEvent event) {
-//		log.warn("entering computeDelays ...") ;
-		
+	private void computeDelays(AfterMobsimEvent event) {		
 		TravelTime travelTime = event.getServices().getLinkTravelTimes();
 		int timeBinSize = this.congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
 		
 		for (Link link : this.congestionInfo.getScenario().getNetwork().getLinks().values()) {
-//			log.warn("linkID=" + link.getId() ) ;
 			
 			Map<Integer, Double> time2avgDelay = new HashMap<>();
 			
 			int timeBinCounter = 0;
+			boolean linkHasAtLeastOneTimeBinWithNonZeroAvgDelay = false;
+			
 			for (int endTime = timeBinSize ; endTime <= this.congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime(); endTime = endTime + timeBinSize ) {
 				final double probedTime = endTime - timeBinSize / 2.;
 				double freespeedTravelTime = link.getLength() / link.getFreespeed( probedTime ) ;
 				final double congestedTravelTime = travelTime.getLinkTravelTime(link, probedTime, null, null);
 				double avgDelay = congestedTravelTime - freespeedTravelTime;
-//				if ( link.getId().equals(Id.createLinkId("24007-24006"))) {
-//					log.warn("endTime=" + endTime / 3600. + "; freeTravelTime=" + freespeedTravelTime + "; congTravelTime=" + congestedTravelTime
-//									 + "; avgDelay=" + avgDelay);
-//				}
-//				if ( avgDelay > 0 ) {
-//					log.warn( "time=" + probedTime + "; linkID=" + link.getId() + "; avgDelay=" + avgDelay  ) ;
-////					throw new RuntimeException("found a delay") ;
-//				}
+				
+				if (linkHasAtLeastOneTimeBinWithNonZeroAvgDelay == false && avgDelay > this.congestionInfo.getDecongestionConfigGroup().getToleratedAverageDelaySec()) {
+					linkHasAtLeastOneTimeBinWithNonZeroAvgDelay = true;
+				}
+				
 				time2avgDelay.put(timeBinCounter, avgDelay);				
 				timeBinCounter++;
 			}
@@ -172,12 +168,15 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 			if (this.congestionInfo.getlinkInfos().get(link.getId()) != null) {
 				this.congestionInfo.getlinkInfos().get(link.getId()).setTime2avgDelay(time2avgDelay);
 			} else {
-				LinkInfo linkInfo = new LinkInfo(link);
-				linkInfo.setTime2avgDelay(time2avgDelay);
-				this.congestionInfo.getlinkInfos().put(link.getId(), linkInfo);
+				
+				// only store the linkInfo for links with at least one time bin with a non-zero delay
+				if (linkHasAtLeastOneTimeBinWithNonZeroAvgDelay) {
+					LinkInfo linkInfo = new LinkInfo(link);
+					linkInfo.setTime2avgDelay(time2avgDelay);
+					this.congestionInfo.getlinkInfos().put(link.getId(), linkInfo);
+				}
 			}
 		}
-//		log.warn("... done with computeDelays.") ;
 	}
 
 	@Override
@@ -206,7 +205,8 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 					this.iteration2totalTollPayments,
 					this.iteration2totalTravelTime,
 					this.iteration2userBenefits,
-					outputDirectory
+					outputDirectory,
+					this.congestionInfo.getScenario().getConfig().controler().getRunId()
 					);
 			
 			XYLineChart chart1 = new XYLineChart("Total travel time and total delay", "Iteration", "Hours");
@@ -220,7 +220,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 			}
 			chart1.addSeries("Total delay", iterations1, values1a);
 			chart1.addSeries("Total travel time", iterations1, values1b);
-			chart1.saveAsPng(outputDirectory + "travelTime_delay.png", 800, 600);
+			chart1.saveAsPng(outputDirectory + this.congestionInfo.getScenario().getConfig().controler().getRunId() + ".decongestion_travelTime_delay.png", 800, 600);
 			
 			XYLineChart chart2 = new XYLineChart("user benefits and toll revenues", "Iteration", "Monetary units");
 			double[] iterations2 = new double[event.getIteration() + 1];
@@ -233,8 +233,8 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 				values2c[i] = this.iteration2totalTollPayments.get(i);
 			}
 			chart2.addSeries("User benefits", iterations2, values2b);
-			chart2.addSeries("Toll revenues", iterations2, values2c);
-			chart2.saveAsPng(outputDirectory + "userBenefits_tollRevenues.png", 800, 600);
+			chart2.addSeries("Toll payments (decongestion tolls only)", iterations2, values2c);
+			chart2.saveAsPng(outputDirectory + this.congestionInfo.getScenario().getConfig().controler().getRunId() + ".decongestion_userBenefits_tolls.png", 800, 600);
 		}
 	}
 
@@ -313,19 +313,8 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 
 	private boolean isInnovativeStrategy( GenericPlanStrategy<Plan, Person> strategy) {
 		log.info("Strategy name: " + strategy.toString() );
-//		boolean innovative = false ;
-//		for ( DefaultStrategy strategy : DefaultPlanStrategiesModule.DefaultStrategy.values() ) {
-//			log.info("default strategy: " +  strategy.toString());
-//			if ( strategyName.contains(strategy.toString()) ) {
-//				innovative = true ;
-//				break ;
-//			}
-//		}
-
 		boolean innovative = ! ( ReplanningUtils.isOnlySelector( strategy ) ) ;
-
 		log.info("Innovative: " + innovative);
-		
 		return innovative;
 	}
 }
