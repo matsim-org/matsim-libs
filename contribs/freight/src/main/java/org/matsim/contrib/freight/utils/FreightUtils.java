@@ -40,7 +40,8 @@ public class FreightUtils {
 			copyShipments(carrierWS, carrier);
 			//			copyPickups(carrierWS, carrier);	//Not implemented yet, kmt Sep18
 			//			copyDeliveries(carrierWS, carrier); //Not implemented yet, kmt Sep18
-			createShipmentsFromService(carrierWS, carrier);
+			createShipmentsFromServices(carrierWS, carrier); 
+			//TODO: Vehicles, Carriercapability
 			carriersWithShipments.addCarrier(carrierWS);
 		}
 
@@ -63,7 +64,7 @@ public class FreightUtils {
 		}
 	}
 
-	private void createShipmentsFromService(Carrier carrierWS, Carrier carrier) {
+	private void createShipmentsFromServices(Carrier carrierWS, Carrier carrier) {
 		TreeMap<Id<CarrierService>, Id<Link>> depotServiceIsdeliveredFrom = new TreeMap<Id<CarrierService>, Id<Link>>();
 		for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 			Id<Link> depotForTour = tour.getVehicle().getLocation();
