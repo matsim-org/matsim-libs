@@ -21,6 +21,7 @@ package org.matsim.core.router;
 
 import java.util.List;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -94,6 +95,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 							calcEndOfActivity( oldTrip.getOriginActivity() , plan, tripRouter.getConfig() ),
 							plan.getPerson() );
 			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
+			putModeFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
 			TripRouter.insertTrip(
 					plan, 
 					oldTrip.getOriginActivity(),
@@ -118,6 +120,21 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 						((NetworkRoute) leg.getRoute()).setVehicleId(oldVehicleId);
 					}
 				}
+			}
+		}
+	}
+	
+	/**
+	 * If the old trip was a public transit trip and the trip mode was set different from "pt" in {@link TransportMode},
+	 * then set the mode of the new trip based on the (main-)mode of the old trip.
+	 * @param oldTrip The old trip
+	 * @param newTrip The new trip
+	 */
+	private static void putModeFromOldTripIntoNewTripIfMeaningful(Trip oldTrip, List<? extends PlanElement> newTrip) {
+		for (Leg leg : TripStructureUtils.getLegs(newTrip)) {
+			if (leg.getMode().equals(TransportMode.pt)) {
+				leg.setMode(oldTrip.getLegsOnly().get(1).getMode());
+				// FIXME: Replace hard-coded 1 by something better. kai+ihab Sep'18
 			}
 		}
 	}
