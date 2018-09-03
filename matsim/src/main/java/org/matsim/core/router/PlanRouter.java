@@ -133,6 +133,9 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	private static void putModeFromOldTripIntoNewTripIfMeaningful(Trip oldTrip, List<? extends PlanElement> newTrip) {
 		for (Leg leg : TripStructureUtils.getLegs(newTrip)) {
 			if (leg.getMode().equals(TransportMode.pt)) {
+				if (oldTrip.getLegsOnly().get(1) == null) {
+					throw new RuntimeException("The old trip consists of only one leg. Old trip: " + oldTrip.toString() + " /// New trip: " + newTrip.toString());
+				}
 				leg.setMode(oldTrip.getLegsOnly().get(1).getMode());
 				// FIXME: Replace hard-coded 1 by something better. kai+ihab Sep'18
 			}
