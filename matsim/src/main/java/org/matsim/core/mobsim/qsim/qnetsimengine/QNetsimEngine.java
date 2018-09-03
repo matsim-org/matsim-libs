@@ -337,8 +337,7 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 				for (Future<Boolean> future : pool.invokeAll(this.engines)) {
 					future.get();
 				}
-//				sendVehiclesDownstream() ;
-//				receiveVehiclesFromUpstream() ;
+				sendReceiveVehicles();
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e) ;
 			} catch (ExecutionException e) {
@@ -353,9 +352,63 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 	private void sendReceiveVehicles() {
 		final int me = MPI.COMM_WORLD.Rank();;
 
-		Map<Integer,QVehicle> vehicleInfo = new HashMap<>() ;
+		Map<Integer,Map<String,List<QVehicle>>> vehicleInfo = new HashMap<>() ;
 		
+		// collect, for each neighbor, the info that we need to send there:
+		for ( QLinkI link : this.network.getNetsimLinks().values() ) {
+			int fromNodeCpn = (int) link.getLink().getFromNode().getAttributes().getAttribute( QSim.CPN_ATTRIBUTE );
+			if ( fromNodeCpn == me ) {
+				int toNodeCpn = (int) link.getLink().getToNode().getAttributes().getAttribute( QSim.CPN_ATTRIBUTE );
+				if ( toNodeCpn != me ) {
+					final Map<String, List<QVehicle>> vehicleInfoForCpn = vehicleInfo.computeIfAbsent( toNodeCpn, k -> new HashMap<>() );
+
+					final List<QVehicle> vehicleInfoForLink = vehicleInfoForCpn.computeIfAbsent( link.getLink().getId().toString() , k -> new ArrayList<>() ) ;
+					// yy could be moved to (*)
+					
+					final QLaneI lane = link.getAcceptingQLane();
+					Gbl.assertIf( lane instanceof QueueWithBuffer );
+					
+					// send all vehicles from buffer to other cpn:
+					while ( !lane.isNotOfferingVehicle() ) {
+						// (*) (see above)
+						final QVehicle veh = lane.popFirstVehicle();
+						vehicleInfoForLink.add( veh ) ;
+						/*
+						* Design thoughts at this point:
+						* () Serializing the full QVehicle and all objects inside is would be quite a challenge.
+						* () With respect to passengers, we cannot rely on their type.  Might, e.g., be reactive agents.
+						 */
+					}
+
+				}
+			}
+		}
 		
+		// send the above consolidated info to the neighbors:
+		for ( Entry<Integer, Map<String, List<QVehicle>>> entry : vehicleInfo.entrySet() ) {
+			final Integer dest = entry.getKey();
+			final Map<String, List<QVehicle>> obj = entry.getValue();
+			sndObjectToNeighbor( dest, obj );
+			log.debug( "SND to cpn=" + dest + ": " + obj) ;
+		}
+		
+		// receive the corresponding info from my neighbors:
+		for ( Integer cpn : vehicleInfo.keySet() ) {
+			// (these are my neighbors)
+			
+			Map<String, List<QVehicle>> obj = (Map<String, List<QVehicle>>) rcvObjectFromNeighbor( cpn );
+			log.debug("RCV on cpn=" + me + ": " + obj ) ;
+			for ( Entry<String, List<QVehicle>> entry : obj.entrySet() ) {
+				Id<Link> linkId = Id.createLinkId( entry.getKey() ) ;
+				final QLinkI qLink = this.network.getNetsimLink( linkId );
+				QLaneI qLane = qLink.getAcceptingQLane() ;
+				Gbl.assertIf( qLane instanceof QueueWithBuffer );
+				
+				for ( QVehicle veh : entry.getValue() ) {
+					qLane.addFromWait( veh );
+				}
+			}
+		}
 		
 	}
 	
@@ -365,24 +418,26 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		
 		Map< Integer, Map< String, Double > > linkInfo = new HashMap<>() ;
 		
-		// yyyyyy we need to cut before the lanes split up.  Than lane info is not necessary!!!!
-		// kai, aug'18
+		// We cut before the lanes split up.  The lanes info is thus not necessary.  kai, aug'18
 
 		// collect, for each neighbor, the info that we need to send there:
 		for ( QLinkI link : this.network.getNetsimLinks().values() ) {
 			int toNodeCpn = (int) link.getLink().getToNode().getAttributes().getAttribute( QSim.CPN_ATTRIBUTE );
 			if ( toNodeCpn == me ) {
 				int fromNodeCpn = (int) link.getLink().getFromNode().getAttributes().getAttribute( QSim.CPN_ATTRIBUTE );
-				final Map<String, Double> linkInfoForCpn = linkInfo.computeIfAbsent( fromNodeCpn, k -> new HashMap<>() );
-				
-				final QLaneI lane = link.getAcceptingQLane();;
-				Gbl.assertIf( lane instanceof QueueWithBuffer );
-				final double flowCapForThisTimeStep = ( (QueueWithBuffer) lane ).getRemainingBufferStorageCapacity();
-				// (The convention is that the upstream queue can move vehicles into this one until
-				// it becomes negative.  kai, aug'18)
-				
-				linkInfoForCpn.put( link.getLink().getId().toString(), flowCapForThisTimeStep );
-				log.debug( link.getLink().getId()  + ": SND " + flowCapForThisTimeStep ) ;
+				if ( fromNodeCpn != me ) {
+					final Map<String, Double> linkInfoForCpn = linkInfo.computeIfAbsent( fromNodeCpn, k -> new HashMap<>() );
+					
+					final QLaneI lane = link.getAcceptingQLane();
+					;
+					Gbl.assertIf( lane instanceof QueueWithBuffer );
+					final double flowCapForThisTimeStep = ( (QueueWithBuffer) lane ).getRemainingBufferStorageCapacity();
+					// (The convention is that the upstream queue can move vehicles into this one until
+					// it becomes negative.  kai, aug'18)
+					
+					linkInfoForCpn.put( link.getLink().getId().toString(), flowCapForThisTimeStep );
+					//				log.debug( "cpn=" + me + "; link=" + link.getLink().getId()  + ": SND " + flowCapForThisTimeStep ) ;
+				}
 			}
 		}
 		
@@ -391,6 +446,7 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 			final Integer dest = entry.getKey();
 			final Map<String, Double> obj = entry.getValue();
 			sndObjectToNeighbor( dest, obj );
+			log.debug( "SND to cpn=" + dest + ": " + obj) ;
 		}
 		
 		// receive the corresponding info from my neighbors:
@@ -398,6 +454,7 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 			// (these are my neighbors)
 
 			Map<String, Double > obj = (Map<String, Double>) rcvObjectFromNeighbor( cpn ) ;
+			log.debug("RCV on cpn=" + me + ": " + obj ) ;
 			for ( Entry<String,Double> entry : obj.entrySet() ) {
 				Id<Link> linkId = Id.createLinkId( entry.getKey() ) ;
 				final QLinkI qLink = this.network.getNetsimLink( linkId );
@@ -405,46 +462,42 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 				Gbl.assertIf( qLane instanceof QueueWithBuffer );
 				final Double value = entry.getValue() ;
 				((QueueWithBuffer)qLane).setRemainingBufferStorageCapacity( value );
-				log.debug( qLink.getLink().getId() + "_" + qLane.getId() + ": RCV " + value ) ;
+//				log.debug( "cpn=" + me + "; link=" + linkId + ": RCV " + value ) ;
 			}
 		}
 
 	}
 	
 	private Object rcvObjectFromNeighbor( final Integer cpn ) {
+		// https://stackoverflow.com/questions/14200699/send-objects-with-mpj-express
 		int[] buf_for_size = {-1};
 		MPI.COMM_WORLD.Recv( buf_for_size, 0, 1, MPI.INT, cpn, 16 );
-		char[] message = new char[buf_for_size[0]];
-		MPI.COMM_WORLD.Recv( message, 0, buf_for_size[0], MPI.CHAR, cpn, 17 );
-		ObjectInputStream ois = null;
+		log.debug("expecting message of size=" + buf_for_size[0] ) ;
+		// ---
+		byte [] bytes = new byte[buf_for_size[0]] ;
+		MPI.COMM_WORLD.Recv( bytes, 0, buf_for_size[0], MPI.BYTE, cpn, 17  ) ;
 		try {
-			final String serializedObject = String.valueOf( message );
-			byte b[] = serializedObject.getBytes();
-			ByteArrayInputStream bis = new ByteArrayInputStream( b );
-			ois = new ObjectInputStream( bis );
+			ByteArrayInputStream bis = new ByteArrayInputStream( bytes );
+			ObjectInputStream ois = new ObjectInputStream( bis );
 			return ois.readObject();
 		} catch ( Exception e ) {
-			System.out.println( e );
+			throw new RuntimeException( e );
 		}
-		return null;
 	}
 	
 	private void sndObjectToNeighbor( final Integer dest, final Object obj ) {
-		// yyyyyy I *think* that "Object" is enough here.  kai, aug'18
-		
-		String serialized = "" ;
+		ByteArrayOutputStream baos;
 		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream( baos );
 			oos.writeObject( obj );
 			oos.flush();
-			serialized = baos.toString();
-		} catch (Exception e) {
-			System.out.println(e);
+		} catch ( Exception e ) {
+			throw new RuntimeException( e );
 		}
-		char [] message = serialized.toCharArray() ;
-		MPI.COMM_WORLD.Send( new int [] { message.length } ,0, 1, MPI.INT, dest, 16 ) ;
-		MPI.COMM_WORLD.Send(message, 0, message.length, MPI.CHAR, dest, 17);
+		byte[] bytes = baos.toByteArray();
+		MPI.COMM_WORLD.Isend( new int[]{bytes.length}, 0, 1, MPI.INT, dest, 16 );
+		MPI.COMM_WORLD.Isend( bytes, 0, bytes.length, MPI.BYTE, dest, 17 );
 	}
 	
 	/*package*/ void printSimLog(double time) {
