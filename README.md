@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/matsim-org/matsim.svg?branch=master)](https://travis-ci.org/matsim-org/matsim)
-
 ## Overview
 
 MATSim provides a toolbox to run and implement large-scale agent-based
@@ -14,7 +12,7 @@ For more information, see the project website at http://www.matsim.org/.
 
 ## Questions
 
-Have any questions? Visit https://matsim.atlassian.net/wiki/questions
+Have any questions? Visit http://www.matsim.org/faq
 and see if it has already been answered. If not, post a new question.
 
 ## Development

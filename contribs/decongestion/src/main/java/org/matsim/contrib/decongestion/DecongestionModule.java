@@ -20,9 +20,6 @@
 package org.matsim.contrib.decongestion;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.AbstractModule;
-
-import org.matsim.contrib.decongestion.DecongestionConfigGroup.DecongestionApproach;
 import org.matsim.contrib.decongestion.data.DecongestionInfo;
 import org.matsim.contrib.decongestion.handler.DelayAnalysis;
 import org.matsim.contrib.decongestion.handler.IntervalBasedTolling;
@@ -32,7 +29,7 @@ import org.matsim.contrib.decongestion.tollSetting.DecongestionTollSetting;
 import org.matsim.contrib.decongestion.tollSetting.DecongestionTollingBangBang;
 import org.matsim.contrib.decongestion.tollSetting.DecongestionTollingPID;
 import org.matsim.contrib.decongestion.tollSetting.DecongestionTollingP_MCP;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.controler.AbstractModule;
 
 /**
 * @author ikaddoura
