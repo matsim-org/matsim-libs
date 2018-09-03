@@ -425,6 +425,7 @@ public final class PopulationUtils {
 	/**
 	 * @param config  
 	 */
+	@Deprecated // use decideOnLinkIdForActivity.  kai, sep'18
 	public static Id<Link> computeLinkIdFromActivity( Activity act, ActivityFacilities facs, Config config ) {
 		// the following might eventually become configurable by config. kai, feb'16
 		if ( act.getFacilityId()==null ) {
