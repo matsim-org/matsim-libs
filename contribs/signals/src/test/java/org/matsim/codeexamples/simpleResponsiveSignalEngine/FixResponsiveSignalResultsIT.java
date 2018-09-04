@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package tutorial.simpleResponsiveSignalEngine;
+package org.matsim.codeexamples.simpleResponsiveSignalEngine;
 
 import java.util.SortedMap;
 
