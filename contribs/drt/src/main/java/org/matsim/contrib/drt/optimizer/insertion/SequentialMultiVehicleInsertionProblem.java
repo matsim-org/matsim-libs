@@ -40,14 +40,16 @@ public class SequentialMultiVehicleInsertionProblem implements MultiVehicleInser
 	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
 
 	public SequentialMultiVehicleInsertionProblem(Network network, TravelTime travelTime,
-			TravelDisutility travelDisutility, DrtConfigGroup drtCfg, MobsimTimer timer) {
-		this(new SequentialPathDataProvider(network, travelTime, travelDisutility, drtCfg), drtCfg, timer);
+			TravelDisutility travelDisutility, DrtConfigGroup drtCfg, MobsimTimer timer,
+			InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
+		this(new SequentialPathDataProvider(network, travelTime, travelDisutility, drtCfg), drtCfg, timer,
+				penaltyCalculator);
 	}
 
 	public SequentialMultiVehicleInsertionProblem(PathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
-			MobsimTimer timer) {
+			MobsimTimer timer, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
 		this.insertionProblem = new SingleVehicleInsertionProblem(pathDataProvider,
-				new InsertionCostCalculator(drtCfg, timer));
+				new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));
 	}
 
 	@Override

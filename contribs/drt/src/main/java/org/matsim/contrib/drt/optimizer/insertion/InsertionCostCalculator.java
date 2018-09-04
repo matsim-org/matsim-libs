@@ -31,36 +31,72 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
+
 /**
  * @author michalm
  */
 public class InsertionCostCalculator {
+	public interface PenaltyCalculator {
+		double calcPenalty(double maxWaitTimeViolation, double maxTravelTimeViolation);
+	}
+
+	public static class RejectSoftConstraintViolations implements PenaltyCalculator {
+		@Override
+		public double calcPenalty(double maxWaitTimeViolation, double maxTravelTimeViolation) {
+			return maxWaitTimeViolation > 0 || maxTravelTimeViolation > 0 ? INFEASIBLE_SOLUTION_COST : 0;
+		}
+	}
+
+	public static class DiscourageSoftConstraintViolations implements PenaltyCalculator {
+		//XXX try to keep penalties reasonably high to prevent people waiting or travelling for hours
+		//XXX however, at the same time prefer max-wait-time to max-travel-time violations
+		private static double MAX_WAIT_TIME_VIOLATION_PENALTY = 1;// 1 second of penalty per 1 second of late departure
+		private static double MAX_TRAVEL_TIME_VIOLATION_PENALTY = 10;// 10 seconds of penalty per 1 second of late arrival
+
+		@Override
+		public double calcPenalty(double maxWaitTimeViolation, double maxTravelTimeViolation) {
+			return MAX_WAIT_TIME_VIOLATION_PENALTY * maxWaitTimeViolation
+					+ MAX_TRAVEL_TIME_VIOLATION_PENALTY * maxTravelTimeViolation;
+		}
+	}
+
 	public static final double INFEASIBLE_SOLUTION_COST = Double.MAX_VALUE / 2;
 
 	private final double stopDuration;
 	private final MobsimTimer timer;
+	private final PenaltyCalculator penaltyCalculator;
 
-	public InsertionCostCalculator(DrtConfigGroup drtConfig, MobsimTimer timer) {
+	public InsertionCostCalculator(DrtConfigGroup drtConfig, MobsimTimer timer, PenaltyCalculator penaltyCalculator) {
 		this.stopDuration = drtConfig.getStopDuration();
 		this.timer = timer;
+		this.penaltyCalculator = penaltyCalculator;
 	}
 
-	// the main goal - minimise bus operation time
-	// ==> calculates how much longer the bus will operate after insertion
-	//
-	// the insertion is invalid if some maxTravel/Wait constraints are not fulfilled
-	// ==> checks if all the constraints are satisfied for all passengers/requests ==> if not ==>
-	// INFEASIBLE_SOLUTION_COST is returned
+	/**
+	 * As the main goal is to minimise bus operation time, this method calculates how much longer the bus will operate
+	 * after insertion. By returning a value equal or higher than INFEASIBLE_SOLUTION_COST, the insertion is considered
+	 * infeasible
+	 * <p>
+	 * The insertion is invalid if some maxTravel/Wait constraints for the already scheduled requests are not fulfilled
+	 * or the vehicle's time window is violated (hard constraints). This is denoted by returning INFEASIBLE_SOLUTION_COST.
+	 * <p>
+	 * However, not fulfilling the maxTravel/Time constraints (soft constraints) is penalised using
+	 * PenaltyCalculator. If the penalty is at least as high as INFEASIBLE_SOLUTION_COST, the soft
+	 * constraint becomes effectively a hard one.
+	 *
+	 * @return cost of insertion (values higher or equal to INFEASIBLE_SOLUTION_COST represent an infeasible insertion)
+	 */
 	public double calculate(DrtRequest drtRequest, VehicleData.Entry vEntry, InsertionWithDetourTimes insertion) {
 		double pickupDetourTimeLoss = calculatePickupDetourTimeLoss(drtRequest, vEntry, insertion);
 		double dropoffDetourTimeLoss = calculateDropoffDetourTimeLoss(drtRequest, vEntry, insertion);
 
 		// this is what we want to minimise
 		double totalTimeLoss = pickupDetourTimeLoss + dropoffDetourTimeLoss;
+		if (isHardConstraintsViolated(drtRequest, vEntry, insertion, pickupDetourTimeLoss, totalTimeLoss)) {
+			return INFEASIBLE_SOLUTION_COST;
+		}
 
-		boolean constraintsSatisfied = areConstraintsSatisfied(drtRequest, vEntry, insertion, pickupDetourTimeLoss,
-				totalTimeLoss);
-		return constraintsSatisfied ? totalTimeLoss : INFEASIBLE_SOLUTION_COST;
+		return totalTimeLoss + calcSoftConstraintPenalty(drtRequest, vEntry, insertion, pickupDetourTimeLoss);
 	}
 
 	private double calculatePickupDetourTimeLoss(DrtRequest drtRequest, VehicleData.Entry vEntry,
@@ -127,7 +163,7 @@ public class InsertionCostCalculator {
 		return replacedDriveEndTime - replacedDriveStartTime;
 	}
 
-	private boolean areConstraintsSatisfied(DrtRequest drtRequest, VehicleData.Entry vEntry,
+	private boolean isHardConstraintsViolated(DrtRequest drtRequest, VehicleData.Entry vEntry,
 			InsertionWithDetourTimes insertion, double pickupDetourTimeLoss, double totalTimeLoss) {
 		final int pickupIdx = insertion.getPickupIdx();
 		final int dropoffIdx = insertion.getDropoffIdx();
@@ -138,7 +174,7 @@ public class InsertionCostCalculator {
 			// all stops after pickup are delayed by pickupDetourTimeLoss
 			if (stop.task.getBeginTime() + pickupDetourTimeLoss > stop.maxArrivalTime //
 					|| stop.task.getEndTime() + pickupDetourTimeLoss > stop.maxDepartureTime) {
-				return false;
+				return true;
 			}
 		}
 
@@ -148,36 +184,45 @@ public class InsertionCostCalculator {
 			// all stops after dropoff are delayed by totalTimeLoss
 			if (stop.task.getBeginTime() + totalTimeLoss > stop.maxArrivalTime //
 					|| stop.task.getEndTime() + totalTimeLoss > stop.maxDepartureTime) {
-				return false;
+				return true;
 			}
-		}
-
-		// reject solutions when maxWaitTime for the new request is violated
-		double driveToPickupStartTime = getDriveToInsertionStartTime(vEntry, pickupIdx);
-		double pickupEndTime = driveToPickupStartTime + insertion.getTimeToPickup() + stopDuration;
-
-		if (pickupEndTime > drtRequest.getLatestStartTime()) {
-			return false;
-		}
-
-		// reject solutions when latestArrivalTime for the new request is violated
-		double dropoffStartTime = pickupIdx == dropoffIdx//
-				? pickupEndTime + insertion.getTimeFromPickup()//
-				: vEntry.stops.get(dropoffIdx - 1).task.getEndTime() + pickupDetourTimeLoss
-						+ insertion.getTimeToDropoff();
-
-		if (dropoffStartTime > drtRequest.getLatestArrivalTime()) {
-			return false;
 		}
 
 		// vehicle's time window cannot be violated
 		DrtStayTask lastTask = (DrtStayTask)Schedules.getLastTask(vEntry.vehicle.getSchedule());
 		double timeSlack = vEntry.vehicle.getServiceEndTime() - Math.max(lastTask.getBeginTime(), timer.getTimeOfDay());
 		if (timeSlack < totalTimeLoss) {
-			return false;
+			return true;
 		}
 
-		return true;// all constraints satisfied
+		return false;// all constraints satisfied
+	}
+
+	public static class SoftConstraintViolation {
+		public final double maxWaitTimeViolation;
+		public final double maxTravelTimeViolation;
+
+		public SoftConstraintViolation(double maxWaitTimeViolation, double maxTravelTimeViolation) {
+			this.maxWaitTimeViolation = maxWaitTimeViolation;
+			this.maxTravelTimeViolation = maxTravelTimeViolation;
+		}
+	}
+
+	private double calcSoftConstraintPenalty(DrtRequest drtRequest, VehicleData.Entry vEntry,
+			InsertionWithDetourTimes insertion, double pickupDetourTimeLoss) {
+		final int pickupIdx = insertion.getPickupIdx();
+		final int dropoffIdx = insertion.getDropoffIdx();
+
+		double driveToPickupStartTime = getDriveToInsertionStartTime(vEntry, pickupIdx);
+		double pickupEndTime = driveToPickupStartTime + insertion.getTimeToPickup() + stopDuration;
+		double dropoffStartTime = pickupIdx == dropoffIdx ?
+				pickupEndTime + insertion.getTimeFromPickup() :
+				vEntry.stops.get(dropoffIdx - 1).task.getEndTime() + pickupDetourTimeLoss
+						+ insertion.getTimeToDropoff();
+
+		double maxWaitTimeViolation = Math.max(0, pickupEndTime - drtRequest.getLatestStartTime());
+		double maxTravelTimeViolation = Math.max(0, dropoffStartTime - drtRequest.getLatestArrivalTime());
+		return penaltyCalculator.calcPenalty(maxWaitTimeViolation, maxTravelTimeViolation);
 	}
 
 	private double getDriveToInsertionStartTime(VehicleData.Entry vEntry, int insertionIdx) {

@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.contrib.decongestion.data.DecongestionInfo;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -51,6 +52,9 @@ public class DelayAnalysis implements LinkEnterEventHandler, LinkLeaveEventHandl
 	
 	@Inject
 	private Scenario scenario;
+	
+	@Inject(optional = true)
+	private DecongestionInfo decongestionInfo;
 	
 	// some aggregated numbers for analysis purposes
 	private double totalDelayPerDay_sec = 0.;
@@ -104,8 +108,10 @@ public class DelayAnalysis implements LinkEnterEventHandler, LinkLeaveEventHandl
 	}
 	
 	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		this.vehicleId2enterTime.put(event.getVehicleId(), event.getTime());
+	public void handleEvent(LinkEnterEvent event) {	
+		if (this.decongestionInfo == null || !this.decongestionInfo.getTransitVehicleIDs().contains(event.getVehicleId())) {
+			this.vehicleId2enterTime.put(event.getVehicleId(), event.getTime());
+		}
 	}
 	
 	@Override

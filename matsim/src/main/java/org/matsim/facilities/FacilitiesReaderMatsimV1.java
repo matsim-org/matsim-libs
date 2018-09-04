@@ -27,8 +27,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
@@ -41,7 +43,8 @@ import org.xml.sax.Attributes;
  * @author mrieser
  * @author balmermi
  */
-public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
+final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
+    private static Logger log = Logger.getLogger(FacilitiesReaderMatsimV1.class);
 
     private final static String FACILITIES = "facilities";
     private final static String FACILITY = "facility";
@@ -53,25 +56,27 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 
     private final ActivityFacilities facilities;
     private final ActivityFacilitiesFactory factory;
-    private final AttributesXmlReaderDelegate attributesReader;
+    private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
     private ActivityFacility currfacility = null;
     private ActivityOption curractivity = null;
-    private org.matsim.utils.objectattributes.attributable.Attributes currAttributes;
+    private org.matsim.utils.objectattributes.attributable.Attributes currAttributes = null;
 
-    private final CoordinateTransformation coordinateTransformation;
+    private final String externalInputCRS;
+    private final String targetCRS;
+    private CoordinateTransformation coordinateTransformation = new IdentityTransformation();
 
-    public FacilitiesReaderMatsimV1(final Scenario scenario) {
-        this(new IdentityTransformation(), scenario);
-    }
-
-    public FacilitiesReaderMatsimV1(
-            final CoordinateTransformation coordinateTransformation,
+    FacilitiesReaderMatsimV1(
+            final String externalInputCRS,
+            final String targetCRS,
             final Scenario scenario) {
-        this.coordinateTransformation = coordinateTransformation;
+        this.externalInputCRS = externalInputCRS;
+        this.targetCRS = targetCRS;
         this.facilities = scenario.getActivityFacilities();
         this.factory = this.facilities.getFactory();
-        this.attributesReader = new AttributesXmlReaderDelegate();
-        this.currAttributes = null;
+        if (externalInputCRS != null && targetCRS != null) {
+            this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
+            ProjectionUtils.putCRS(this.facilities, targetCRS);
+        }
     }
 
     public void putAttributeConverter(Class<?> clazz, AttributeConverter<?> converter) {
@@ -97,7 +102,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
         } else if (ATTRIBUTE.equals(name)) {
             this.attributesReader.startTag(name, atts, context, this.currAttributes);
         } else if (ATTRIBUTES.equals(name)) {
-            currAttributes = this.currfacility.getAttributes();
+            currAttributes = context.peek().equals(FACILITIES) ? this.facilities.getAttributes() : this.currfacility.getAttributes();
             attributesReader.startTag(name, atts, context, currAttributes);
         }
     }
@@ -109,6 +114,18 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
         } else if (ACTIVITY.equals(name)) {
             this.curractivity = null;
         } else if (ATTRIBUTES.equalsIgnoreCase(name)) {
+            if (context.peek().equals(FACILITIES)) {
+                String inputCRS = (String) currAttributes.getAttribute(ProjectionUtils.INPUT_CRS_ATT);
+
+                if (inputCRS != null && targetCRS != null) {
+                    if (externalInputCRS != null) {
+                        // warn or crash?
+                        log.warn("coordinate transformation defined both in config and in input file: setting from input file will be used");
+                    }
+                    coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
+                    currAttributes.putAttribute(ProjectionUtils.INPUT_CRS_ATT, targetCRS);
+                }
+            }
             this.currAttributes = null;
         } else if (ATTRIBUTE.equalsIgnoreCase(name)) {
             this.attributesReader.endTag(name, content, context);
@@ -117,6 +134,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 
     private void startFacilities(final Attributes atts) {
         this.facilities.setName(atts.getValue("name"));
+        this.currAttributes = facilities.getAttributes();
         if (atts.getValue("aggregation_layer") != null) {
             Logger.getLogger(FacilitiesReaderMatsimV1.class).warn("aggregation_layer is deprecated.");
         }

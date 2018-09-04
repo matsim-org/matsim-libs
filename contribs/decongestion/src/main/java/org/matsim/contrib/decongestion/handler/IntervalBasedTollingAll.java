@@ -51,7 +51,7 @@ public class IntervalBasedTollingAll implements LinkLeaveEventHandler, IntervalB
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (decongestionInfo.getlinkInfos().get(event.getLinkId()) != null) {
+		if (!decongestionInfo.getTransitVehicleIDs().contains(event.getVehicleId()) && decongestionInfo.getlinkInfos().get(event.getLinkId()) != null) {
 						
 			int currentTimeBin = (int) (event.getTime() / this.decongestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
 			

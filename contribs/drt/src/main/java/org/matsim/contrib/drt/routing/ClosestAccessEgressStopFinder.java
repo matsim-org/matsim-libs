@@ -60,7 +60,7 @@ public class ClosestAccessEgressStopFinder implements AccessEgressStopFinder {
 	}
 
 	@Override
-	public Pair<TransitStopFacility, TransitStopFacility> findStops(Facility<?> fromFacility, Facility<?> toFacility) {
+	public Pair<TransitStopFacility, TransitStopFacility> findStops(Facility fromFacility, Facility toFacility) {
 		TransitStopFacility accessFacility = findClosestStop(fromFacility);
 		if (accessFacility == null) {
 			return new ImmutablePair<>(null, null);
@@ -70,7 +70,7 @@ public class ClosestAccessEgressStopFinder implements AccessEgressStopFinder {
 		return new ImmutablePair<TransitStopFacility, TransitStopFacility>(accessFacility, egressFacility);
 	}
 
-	private TransitStopFacility findClosestStop(Facility<?> facility) {
+	private TransitStopFacility findClosestStop(Facility facility) {
 		Coord coord = StopBasedDrtRoutingModule.getFacilityCoord(facility, network);
 
 		TransitStopFacility closest = stops.values().stream()//

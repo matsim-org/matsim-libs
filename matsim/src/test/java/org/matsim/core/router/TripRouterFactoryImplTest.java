@@ -232,11 +232,6 @@ public class TripRouterFactoryImplTest {
 		}
 
 		@Override
-		public Id<Link> getId() {
-			return l.getId();
-		}
-
-		@Override
 		public Map<String, Object> getCustomAttributes() {
 			return null;
 		}

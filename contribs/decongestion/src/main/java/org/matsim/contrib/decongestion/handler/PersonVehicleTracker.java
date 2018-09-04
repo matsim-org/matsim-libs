@@ -20,7 +20,9 @@
 package org.matsim.contrib.decongestion.handler;
 
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 
 import com.google.inject.Inject;
 
@@ -30,13 +32,12 @@ import org.matsim.contrib.decongestion.data.DecongestionInfo;
 /**
  * 
  * Keeps track of which vehicle is used by which person.
- * 
- * Assumes the taxi driver to be the last one enters the vehicle.
+ * Stores the last person who has entered the vehicle and ignores transit vehicles.
  * 
  * @author ikaddoura
  */
 
-public class PersonVehicleTracker implements PersonEntersVehicleEventHandler {
+public class PersonVehicleTracker implements PersonEntersVehicleEventHandler, TransitDriverStartsEventHandler {
 
 	@Inject
 	private DecongestionInfo congestionInfo;
@@ -44,11 +45,19 @@ public class PersonVehicleTracker implements PersonEntersVehicleEventHandler {
 	@Override
 	public void reset(int iteration) {
 		this.congestionInfo.getVehicleId2personId().clear();
+		this.congestionInfo.getTransitVehicleIDs().clear();
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		this.congestionInfo.getVehicleId2personId().put(event.getVehicleId(), event.getPersonId());
+		if (!this.congestionInfo.getTransitVehicleIDs().contains(event.getVehicleId())) {
+			this.congestionInfo.getVehicleId2personId().put(event.getVehicleId(), event.getPersonId());
+		}
+	}
+
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		this.congestionInfo.getTransitVehicleIDs().add(event.getVehicleId());
 	}
 }
 

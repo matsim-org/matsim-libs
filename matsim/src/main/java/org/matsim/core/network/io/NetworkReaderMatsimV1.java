@@ -43,7 +43,7 @@ import java.util.Stack;
  *
  * @author mrieser
  */
-public final class NetworkReaderMatsimV1 extends MatsimXmlParser {
+final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 
 	private final static String NETWORK = "network";
 	private final static String LINKS = "links";

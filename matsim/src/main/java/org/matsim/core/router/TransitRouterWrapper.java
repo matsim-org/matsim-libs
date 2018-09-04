@@ -74,8 +74,8 @@ public class TransitRouterWrapper implements RoutingModule {
 	 */
 	@Override
 	public List<? extends PlanElement> calcRoute(
-			final Facility<?> fromFacility,
-			final Facility<?> toFacility,
+			final Facility fromFacility,
+			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
 		List<Leg> baseTrip = router.calcRoute(

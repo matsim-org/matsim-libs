@@ -68,7 +68,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(final Facility<?> fromFacility, final Facility<?> toFacility, final double departureTime,
+	public List<? extends PlanElement> calcRoute(final Facility fromFacility, final Facility toFacility, final double departureTime,
 			final Person person) {		
 		Leg newLeg = this.populationFactory.createLeg( this.mode );
 

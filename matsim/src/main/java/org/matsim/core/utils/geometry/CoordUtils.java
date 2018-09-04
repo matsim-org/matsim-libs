@@ -23,19 +23,9 @@ package org.matsim.core.utils.geometry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
 public abstract class CoordUtils {
 	final private static Logger LOG = Logger.getLogger(CoordUtils.class);
-	
-	public static Coordinate createGeotoolsCoordinate( final Coord coord ) {
-		return new Coordinate( coord.getX(), coord.getY() ) ;
-	}
-	
-	public static Coord createCoord( final Coordinate coordinate ) {
-		return new Coord( coordinate.x, coordinate.y ) ;
-	}
-	
+
 	public static Coord createCoord( final double xx, final double yy ) {
 		return new Coord(xx, yy);
 	}

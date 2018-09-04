@@ -276,12 +276,6 @@ public class DefaultPlanbasedSignalSystemController extends AbstractSignalContro
 			throw new UnsupportedOperationException("Signal plans " + plan1.getId() + " and " + plan2.getId() + " of signal system " + system.getId() + " overlap.");
 		}
 	}
-
-	@Override
-	public void reset(Integer iterationNumber) {
-		
-	}
-
 	
 	/**
 	 * Sorts Signal Plans according to their end times.

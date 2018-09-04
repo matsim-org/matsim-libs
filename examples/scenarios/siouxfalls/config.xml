@@ -3,7 +3,7 @@
 <config>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="examples/siouxfalls/network.xml" />
+		<param name="inputNetworkFile" value="./network.xml" />
 	</module>
 
 </config>

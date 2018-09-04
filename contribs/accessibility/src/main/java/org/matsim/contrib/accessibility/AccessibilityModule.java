@@ -19,12 +19,9 @@
 
 package org.matsim.contrib.accessibility;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Provider;
-
+import com.google.inject.Inject;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -49,11 +46,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.facilities.MatsimFacilitiesReader;
 
-import com.google.inject.Inject;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import javax.inject.Provider;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author dziemke
@@ -123,7 +121,7 @@ public final class AccessibilityModule extends AbstractModule {
 					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
 					Scenario measuringPointsSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 					String measuringPointsFile = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class ).getMeasuringPointsFile() ;
-					new FacilitiesReaderMatsimV1(measuringPointsSc).readFile(measuringPointsFile);
+					new MatsimFacilitiesReader(measuringPointsSc).readFile(measuringPointsFile);
 					measuringPoints = (ActivityFacilitiesImpl) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(measuringPointsSc, activityType);
 					LOG.info("Using measuring points from file: " + measuringPointsFile);
 				

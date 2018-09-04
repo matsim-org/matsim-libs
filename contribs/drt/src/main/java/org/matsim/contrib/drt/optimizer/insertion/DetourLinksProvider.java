@@ -89,7 +89,8 @@ class DetourLinksProvider {
 		}
 	}
 
-	public DetourLinksProvider(DrtConfigGroup drtCfg, MobsimTimer timer, DrtRequest drtRequest) {
+	public DetourLinksProvider(DrtConfigGroup drtCfg, MobsimTimer timer, DrtRequest drtRequest,
+			InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
 		this.drtRequest = drtRequest;
 
 		// initial capacities of concurrent maps according to insertion stats for AT Berlin 10pct
@@ -108,7 +109,7 @@ class DetourLinksProvider {
 				new DetourTimesProvider(
 						(from, to) -> DistanceUtils.calculateDistance(from, to) / optimisticBeelineSpeed,
 						drtCfg.getStopDuration()), //
-				new InsertionCostCalculator(drtCfg, timer));
+				new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));
 	}
 
 	void findInsertionsAndLinks(ForkJoinPool forkJoinPool, Collection<Entry> vEntries) {
@@ -122,7 +123,6 @@ class DetourLinksProvider {
 	/**
 	 * Designed to be called in parallel for each vEntry in VehicleData.entries
 	 * 
-	 * @param drtRequest
 	 * @param vEntry
 	 */
 	private void addDetourLinks(Entry vEntry) {

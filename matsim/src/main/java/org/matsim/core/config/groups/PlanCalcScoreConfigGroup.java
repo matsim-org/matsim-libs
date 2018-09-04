@@ -1050,11 +1050,16 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private static final String CONSTANT = "constant";
 		public static final String MODE = "mode";
 		
+		public static final String DAILY_MONETARY_CONSTANT = "dailyMonetaryConstant";
+		public static final String DAILY_UTILITY_CONSTANT = "dailyUtilityConstant";
+		
 		private String mode = null;
 		private double traveling = -6.0;
 		private double distance = 0.0;
 		private double monetaryDistanceRate = 0.0;
 		private double constant = 0.0;
+		private double dailyMonetaryConstant = 0.0;
+		private double dailyUtilityConstant = 0.0;
 
 		// @Override public String toString() {
 		// String str = super.toString();
@@ -1084,8 +1089,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 					"[utils/m] utility of walking per m, normally negative.  this is "
 							+ "on top of the time (dis)utility.");
 			map.put(MONETARY_DISTANCE_RATE, MONETARY_DISTANCE_RATE_CMT);
-			map.put(CONSTANT, "[utils] alternative-specific constant.  no guarantee that this is used anywhere. "
-					+ "default=0 to be backwards compatible for the time being");
+			map.put(CONSTANT, "[utils] alternative-specific constant.");
+			map.put(DAILY_UTILITY_CONSTANT, "[utils] daily utility constant. "
+					+ "default=0 to be backwards compatible");
+			map.put(DAILY_MONETARY_CONSTANT, "[money] daily monetary constant. "
+					+ "default=0 to be backwards compatible");
 			return map;
 		}
 
@@ -1136,6 +1144,26 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		@StringGetter(MONETARY_DISTANCE_RATE)
 		public double getMonetaryDistanceRate() {
 			return this.monetaryDistanceRate;
+		}
+		
+		@StringGetter(DAILY_MONETARY_CONSTANT)
+		public double getDailyMonetaryConstant() {
+			return dailyMonetaryConstant;
+		}
+
+		@StringSetter(DAILY_MONETARY_CONSTANT)
+		public void setDailyMonetaryConstant(double dailyMonetaryConstant) {
+			this.dailyMonetaryConstant = dailyMonetaryConstant;
+		}
+
+		@StringGetter(DAILY_UTILITY_CONSTANT)
+		public double getDailyUtilityConstant() {
+			return dailyUtilityConstant;
+		}
+
+		@StringSetter(DAILY_UTILITY_CONSTANT)
+		public void setDailyUtilityConstant(double dailyUtilityConstant) {
+			this.dailyUtilityConstant = dailyUtilityConstant;
 		}
 
 		/**
@@ -1555,5 +1583,4 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 	}
-
 }

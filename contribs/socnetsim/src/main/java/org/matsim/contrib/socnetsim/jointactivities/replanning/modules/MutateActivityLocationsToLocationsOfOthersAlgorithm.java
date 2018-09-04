@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -69,12 +70,16 @@ public class MutateActivityLocationsToLocationsOfOthersAlgorithm implements Gene
 				final Facility choice = groupChoiceSet.get( random.nextInt( groupChoiceSet.size() ) );
 				((Activity) act).setCoord( choice.getCoord() );
 				((Activity) act).setLinkId( choice.getLinkId() );
-				((Activity) act).setFacilityId( choice.getId() );
+				if ( choice instanceof Identifiable ) {
+					( (Activity) act ).setFacilityId( ((Identifiable)choice).getId() );
+				} else {
+					throw new RuntimeException( Facility.FACILITY_NO_LONGER_IDENTIFIABLE ) ;
+				}
 			}
 		}
 	}
 
-	private static class BasicFacility implements Facility {
+	private static class BasicFacility implements Facility, Identifiable {
 		private final Coord coord;
 		private final Id id;
 		private final Id link;
@@ -170,7 +175,11 @@ public class MutateActivityLocationsToLocationsOfOthersAlgorithm implements Gene
 			Collections.sort( list , new Comparator<Facility>() {
 				@Override
 				public int compare(final Facility o1, final Facility o2) {
-					return o1.getId().compareTo( o2.getId() );
+					if ( o1 instanceof Identifiable && o2 instanceof Identifiable ) {
+						return ((Identifiable) o1).getId().compareTo( ((Identifiable) o2).getId() );
+					} else {
+						throw new RuntimeException( Facility.FACILITY_NO_LONGER_IDENTIFIABLE ) ;
+					}
 				}
 			});
 			return list;
