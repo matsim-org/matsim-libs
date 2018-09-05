@@ -42,9 +42,10 @@ public class CollectionCarrierScheduler extends ResourceScheduler {
 		public LSPCarrierPair(ShipmentTuple tuple, CarrierService service){
 			this.tuple = tuple;
 			this.service = service;
-		}	
+		}
+		
 	}
-	
+		
 	private Carrier carrier;
 	private CollectionCarrierAdapter adapter;
 	private ArrayList<LSPCarrierPair>pairs;
@@ -121,7 +122,7 @@ public class CollectionCarrierScheduler extends ResourceScheduler {
 	    VehicleRoutingProblem vrp = vrpBuilder.build();
 
         VehicleRoutingAlgorithm algorithm = Jsprit.createAlgorithm(vrp);
- 
+        algorithm.setMaxIterations(1);
         Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
        
         VehicleRoutingProblemSolution solution = Solutions.bestOf(solutions);
@@ -132,7 +133,7 @@ public class CollectionCarrierScheduler extends ResourceScheduler {
 	}
 	
 	
-	public void updateShipments() {
+	protected void updateShipments() {
 		for(ShipmentTuple tuple : shipments) {
 			updateShipment(tuple);
 		}

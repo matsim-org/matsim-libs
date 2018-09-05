@@ -1,4 +1,14 @@
-*.png filter=fat -crlf
-*.jpg filter=fat -crlf
-*.gz  filter=fat -crlf
-*.zip  filter=fat -crlf
+*.bz2 filter=lfs diff=lfs merge=lfs -text
+*.gz filter=lfs diff=lfs merge=lfs -text
+*.zip filter=lfs diff=lfs merge=lfs -text
+*.csv filter=lfs diff=lfs merge=lfs -text
+*.shp filter=lfs diff=lfs merge=lfs -text
+*.dbf filter=lfs diff=lfs merge=lfs -text
+*.prj filter=lfs diff=lfs merge=lfs -text
+*.shx filter=lfs diff=lfs merge=lfs -text
+*.mov filter=lfs diff=lfs merge=lfs -text
+*.avi filter=lfs diff=lfs merge=lfs -text
+#data/** filter=lfs diff=lfs merge=lfs -text
+#results/** filter=lfs diff=lfs merge=lfs -text
+#It is not so practical to put whole directories under git lfs since then,
+#without lfs installed, you cannot even read the README.md. kai, may'18

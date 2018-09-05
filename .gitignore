@@ -20,3 +20,5 @@ hs_err_pid*
 
 /.idea/
 *.iml
+/test/output
+/input/carrierPlanned.xml

@@ -1,1 +1,17 @@
 language: java
+jdk: oraclejdk8
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
+script:
+  - mvn package -B -Dmatsim.preferLocalDtds=true 
+# --fail-at-end
+# -Dmaven.test.redirectTestOutputToFile 
+env:
+  global:
+    - MAVEN_OPTS="-Xmx2g"
+cache:
+  directories:
+  - $HOME/.m2
+

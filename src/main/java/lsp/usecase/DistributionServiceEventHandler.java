@@ -5,6 +5,8 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 
 import lsp.events.ServiceEndEvent;
 import lsp.events.ServiceEndEventHandler;
+import lsp.events.ServiceStartEvent;
+import lsp.events.ServiceStartEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 import lsp.shipment.AbstractShipmentPlanElement;
@@ -12,7 +14,7 @@ import lsp.shipment.LSPShipment;
 import lsp.shipment.LoggedShipmentTransport;
 import lsp.shipment.LoggedShipmentUnload;
 
-public class DistributionServiceEventHandler implements ServiceEndEventHandler {
+public class DistributionServiceEventHandler implements ServiceStartEventHandler {
 
 	private CarrierService carrierService;
 	private LSPShipment lspShipment;
@@ -33,14 +35,14 @@ public class DistributionServiceEventHandler implements ServiceEndEventHandler {
 	}
 
 	@Override
-	public void handleEvent(ServiceEndEvent event) {
+	public void handleEvent(ServiceStartEvent event) {
 		if (event.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
 			logTransport(event);
 			logUnload(event);
 		}
 	}
 
-	private void logTransport(ServiceEndEvent event) {
+	private void logTransport(ServiceStartEvent event) {
 		String idString = resource.getId() + "" + solutionElement.getId() + "" + "TRANSPORT";
 		Id<AbstractShipmentPlanElement> id = Id.create(idString, AbstractShipmentPlanElement.class);
 		AbstractShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
@@ -50,7 +52,7 @@ public class DistributionServiceEventHandler implements ServiceEndEventHandler {
 		}		
 	}
 
-	private void logUnload(ServiceEndEvent event) {
+	private void logUnload(ServiceStartEvent event) {
 		LoggedShipmentUnload.Builder builder = LoggedShipmentUnload.Builder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setLinkId(event.getService().getLocationLinkId());

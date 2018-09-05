@@ -118,6 +118,7 @@ public class DistributionCarrierScheduler extends ResourceScheduler {
 	private CarrierService convertToCarrierService(ShipmentTuple tuple){
 		Id<CarrierService> serviceId = Id.create(tuple.getShipment().getId().toString(), CarrierService.class);
 		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, tuple.getShipment().getToLinkId());
+		//builder.setServiceStartTimeWindow(tuple.getShipment().getEndTimeWindow());
 		builder.setCapacityDemand(tuple.getShipment().getCapacityDemand());
 		builder.setServiceDuration(tuple.getShipment().getServiceTime());
 		CarrierService service = builder.build();
@@ -133,7 +134,7 @@ public class DistributionCarrierScheduler extends ResourceScheduler {
 	    VehicleRoutingProblem vrp = vrpBuilder.build();
 
 	    VehicleRoutingAlgorithm algorithm = Jsprit.createAlgorithm(vrp);
-        
+	    algorithm.setMaxIterations(1);
         Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
        
         VehicleRoutingProblemSolution solution = Solutions.bestOf(solutions);
