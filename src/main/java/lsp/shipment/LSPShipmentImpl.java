@@ -9,6 +9,7 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.core.events.handler.EventHandler;
 
 import demand.utilityFunctions.UtilityFunction;
+import lsp.LogisticsSolution;
 import lsp.functions.Info;
 
 public class LSPShipmentImpl implements LSPShipment {
@@ -26,6 +27,7 @@ public class LSPShipmentImpl implements LSPShipment {
 	private ArrayList<Requirement> requirements;
 	private ArrayList<UtilityFunction> utilityFunctions;
 	private ArrayList<Info> infos;
+	private Id<LogisticsSolution> solutionId;
 	
 	public static class Builder {	
 
@@ -197,4 +199,16 @@ public class LSPShipmentImpl implements LSPShipment {
 		return infos;
 	}
 
+
+	public Id<LogisticsSolution> getSolutionId() {
+		return solutionId;
+	}
+
+
+	public void setSolutionId(Id<LogisticsSolution> solutionId) {
+		this.solutionId = solutionId;
+	}
+
+	
+	
 }
