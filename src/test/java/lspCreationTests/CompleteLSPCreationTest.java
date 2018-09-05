@@ -229,7 +229,7 @@ public class CompleteLSPCreationTest {
 		
 		assigner = new DeterministicShipmentAssigner();
 		LSPPlan completePlan = new LSPPlanImpl();
-		completePlan.setAssigner(assigner);;
+		completePlan.setAssigner(assigner);
 		completeSolution  = completeSolutionBuilder.build();
 		completePlan.addSolution(completeSolution);
 		
