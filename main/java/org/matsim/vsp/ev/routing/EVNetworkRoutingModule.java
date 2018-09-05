@@ -65,7 +65,7 @@ public final class EVNetworkRoutingModule implements RoutingModule {
     }
 
     @Override
-    public List<? extends PlanElement> calcRoute(final Facility<?> fromFacility, final Facility<?> toFacility, final double departureTime,
+    public List<? extends PlanElement> calcRoute(final Facility fromFacility, final Facility toFacility, final double departureTime,
                                                  final Person person) {
         List<? extends PlanElement> basicRoute = delegate.calcRoute(fromFacility, toFacility, departureTime, person);
         Id<ElectricVehicle> evId = Id.create(person.getId(), ElectricVehicle.class);
