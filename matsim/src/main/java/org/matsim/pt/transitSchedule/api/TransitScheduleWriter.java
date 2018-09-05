@@ -22,6 +22,7 @@ package org.matsim.pt.transitSchedule.api;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimSomeWriter;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -71,7 +72,7 @@ public class TransitScheduleWriter implements MatsimSomeWriter {
 	 * @throws UncheckedIOException
 	 */
 	public void writeFileV1(final String filename) throws UncheckedIOException {
-		log.info( "about to write transit schedule to: " + filename ) ;
+		log.info( Gbl.aboutToWrite("transit schedule", filename) ) ;
 		new TransitScheduleWriterV1(this.transformation, this.schedule).write(filename);
 	}
 
@@ -83,7 +84,7 @@ public class TransitScheduleWriter implements MatsimSomeWriter {
 	 * @throws UncheckedIOException
 	 */
 	public void writeFileV2(final String filename) throws UncheckedIOException {
-		log.info( "about to write transit schedule to: " + filename ) ;
+		log.info( Gbl.aboutToWrite( "transit schedule" , filename ) ) ;
 		new TransitScheduleWriterV2(this.transformation, this.schedule).write(filename);
 	}
 }

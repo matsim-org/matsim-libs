@@ -70,7 +70,6 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	 * As the mechanism implemented in InputSource is not really working for error handling
 	 * the source to be parsed is stored here for error handling.
 	 */
-	private String theSource;
 
 	/**
 	 * Creates a validating XML-parser.
@@ -144,15 +143,13 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	 */
 	@Override
 	public final void readFile(final String filename) throws UncheckedIOException {
-		log.info("starting to parse xml from file " + filename + " ...");
-		this.theSource = filename;
+		log.info( Gbl.aboutToRead( "xml", filename ) );
 		parse(new InputSource(IOUtils.getBufferedReader(filename)));
 	}
 
 	public final void parse(final URL url) throws UncheckedIOException {
 		Gbl.assertNotNull(url);
-		this.theSource = url.toString();
-		log.info("starting to parse xml from url " + this.theSource + " ...");
+		log.info( Gbl.aboutToRead( "xml", url ) ) ;
 		System.out.flush();
 		if (url.getFile().endsWith(".gz")) {
 			try {
@@ -166,7 +163,6 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	}
 
 	public final void parse(final InputStream stream) throws UncheckedIOException {
-		this.theSource = "stream";
 		parse(new InputSource(stream));
 	}
 

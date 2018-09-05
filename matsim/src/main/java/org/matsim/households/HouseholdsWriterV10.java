@@ -19,8 +19,10 @@
  * *********************************************************************** */
 package org.matsim.households;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -42,7 +44,8 @@ import java.util.Map;
  *
  */
 public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlgorithm{
-
+	private static final Logger log = Logger.getLogger( HouseholdsWriterV10.class ) ;
+	
 	private List<Tuple<String, String>> atts = new ArrayList<>();
 	private Households households;
 	private final Map<Class<?>,AttributeConverter<?>> attributeConverters = new HashMap<>();
@@ -60,6 +63,7 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 	}
 
 	public void writeFile(String filename) throws UncheckedIOException {
+		log.info( Gbl.aboutToWrite( " households", filename ) ) ;
 		this.openFileAndWritePreamble(filename);
 		this.writeHouseholds(this.households);
 		this.writeEndAndCloseFile();
@@ -91,7 +95,7 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 	}
 	
 	private void writeHouseholds(Households basicHouseholds) throws UncheckedIOException {
-		Counter counter = new Counter("[HouseholdsWriter] dumped household # ");
+		Counter counter = new Counter("[HouseholdsWriter] wrote household # ");
 		for (Household h : basicHouseholds.getHouseholds().values()) {
 			this.writeHousehold(h);
 			counter.incCounter();

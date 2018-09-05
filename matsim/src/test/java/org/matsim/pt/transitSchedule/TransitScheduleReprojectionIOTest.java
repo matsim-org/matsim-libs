@@ -119,6 +119,8 @@ public class TransitScheduleReprojectionIOTest {
 		new TransitScheduleReader( originalScenario ).readURL(ConfigGroup.getInputFileURL(config.getContext(), "transitschedule.xml"));
 
 		final String withAttributes = new File(utils.getOutputDirectory()).getAbsolutePath()+"/transitschedule.xml";
+		// (need the absolute path since later it is put into the config, and that will otherwise be relative to some other context. kai, sep'18)
+		
 		ProjectionUtils.putCRS(originalScenario.getTransitSchedule(), INITIAL_CRS);
 		new TransitScheduleWriter(originalScenario.getTransitSchedule()).writeFile(withAttributes);
 
