@@ -45,7 +45,8 @@ public class DynRoutingModule implements RoutingModule {
 
 	public DynRoutingModule(String mode) {
 		this.mode = mode;
-		this.stageActivityType = "other interaction";
+		this.stageActivityType = mode + " interaction";
+		this.stageActivityTypes = new StageActivityTypesImpl(stageActivityType);
 	}
 
 	@Override
