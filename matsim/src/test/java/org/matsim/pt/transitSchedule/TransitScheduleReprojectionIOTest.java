@@ -129,6 +129,7 @@ public class TransitScheduleReprojectionIOTest {
 
 	@Test
 	public void testWithControlerAndAttributes() {
+		// read transit schedule into empty scenario:
 		Scenario originalScenario ;
 		{
 			final Config config = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
@@ -138,20 +139,21 @@ public class TransitScheduleReprojectionIOTest {
 		
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
 
+		// same thing via scenario loader,
 		Scenario scenario ;
 		{
-			final Config config = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
-			
+
+			// add CRS to file, and write it to file:
+			ProjectionUtils.putCRS( originalScenario.getTransitSchedule(), INITIAL_CRS );
 			final String withAttributes = new File( utils.getOutputDirectory() ).getAbsolutePath() + "/transitschedule.xml";
 			// (need the absolute path since later it is put into the config, and that will otherwise be relative to some other context. kai, sep'18)
-			
-			ProjectionUtils.putCRS( originalScenario.getTransitSchedule(), INITIAL_CRS );
 			new TransitScheduleWriter( originalScenario.getTransitSchedule() ).writeFile( withAttributes );
 			
+			final Config config = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
 			config.transit().setTransitScheduleFile( withAttributes );
-			
 			config.transit().setUseTransit( true );
 			config.transit().setInputScheduleCRS( INITIAL_CRS );
+			// yyyyyy Is it so plausible that this is given here when the test is about having this in the file? kai, sep'18
 			config.global().setCoordinateSystem( TARGET_CRS );
 			config.controler().setLastIteration( -1 );
 			config.controler().setOutputDirectory( outputDirectory );
