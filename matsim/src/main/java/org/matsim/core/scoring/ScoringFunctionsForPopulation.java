@@ -77,7 +77,7 @@ import static org.matsim.core.router.TripStructureUtils.*;
  *
  */
  final class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
-	// yyyyyy there is currently only one place outside package where this is used, and I think it
+	// there is currently only one place outside package where this is used, and I think it
 	// can be changed there.  kai, sep'17
 	// I just removed that.  kai, apr'18
 	
@@ -113,7 +113,7 @@ import static org.matsim.core.router.TripStructureUtils.*;
 
 	@Inject
 	ScoringFunctionsForPopulation( ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
-						 Population population, ScoringFunctionFactory scoringFunctionFactory, TripRouter tripRouter ) {
+						 Population population, ScoringFunctionFactory scoringFunctionFactory ) {
 		controlerListenerManager.addControlerListener(new IterationStartsListener() {
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
@@ -129,7 +129,17 @@ import static org.matsim.core.router.TripStructureUtils.*;
 			eventsManager.addHandler(vehicles2Drivers);
 //		}
 //		stageActivityTypes = tripRouter.getStageActivityTypes() ;
-		stageActivityTypes = new StageActivityTypesImpl( new String [] {PtConstants.TRANSIT_ACTIVITY_TYPE} ) ;
+//		stageActivityTypes = new StageActivityTypesImpl( new String [] {PtConstants.TRANSIT_ACTIVITY_TYPE} ) ;
+		stageActivityTypes = new StageActivityTypes() {
+			@Override public boolean isStageActivity( final String activityType ) {
+				if ( activityType.contains( "_interaction" ) ) {
+					return true ;
+				} else {
+					return false ;
+				}
+			}
+		} ;
+		// yyyyyy this is really really terrible, needs to come from global data structure instead.
 	}
 
 	private void init() {
