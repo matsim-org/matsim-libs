@@ -61,24 +61,34 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.17</version>
+		</dependency>
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>4.0</version>
+		</dependency>
+
+		<!-- OpenStreetMap and osmosis -->
+		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-core</artifactId>
+			<version>0.46</version>
+		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-xml</artifactId>
 			<version>0.46</version>
 		</dependency>
 		<dependency>
-    		<groupId>org.apache.poi</groupId>
-    		<artifactId>poi-ooxml</artifactId>
-   		 <version>3.17</version>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-pbf2</artifactId>
+			<version>0.46</version>
 		</dependency>
-	<dependency>
-    <groupId>com.opencsv</groupId>
-    <artifactId>opencsv</artifactId>
-    <version>4.0</version>
-</dependency>
-
-	
-	
 	</dependencies>
 
 	<build>
