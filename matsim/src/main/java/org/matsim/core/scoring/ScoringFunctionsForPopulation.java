@@ -86,7 +86,6 @@ import static org.matsim.core.router.TripStructureUtils.*;
 	private final Population population;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	
-	private final Map<Id<Person>, Plan> tripRecords = new HashMap<>() ;
 	private final StageActivityTypes stageActivityTypes;
 
 	/*
@@ -102,6 +101,7 @@ import static org.matsim.core.router.TripStructureUtils.*;
 	private final Map<Id<Person>, ScoringFunction> agentScorers = new HashMap<>();
 	private final Map<Id<Person>, TDoubleCollection> partialScores = new LinkedHashMap<>();
 	private final AtomicReference<Throwable> exception = new AtomicReference<>();
+	private final Map<Id<Person>, Plan> tripRecords = new LinkedHashMap<>() ;
 	
 //	/**
 //	 * For something like the bicycle scoring, we need to know individual links at the level of the scoring function.  This is a first sketch how this could be implemented.
