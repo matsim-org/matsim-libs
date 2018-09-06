@@ -94,17 +94,19 @@ public class BicycleTest {
 		config.controler().setLastIteration(0);
 		
 		new RunBicycleExample().run(config, false);
-
-		LOG.info("Checking MATSim events file ...");
-		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
-		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew), FILES_ARE_EQUAL);
-		
-		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
-		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
-		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
+		{
+			Scenario scenarioReference = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+			Scenario scenarioCurrent = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+			new PopulationReader( scenarioReference ).readFile( utils.getInputDirectory() + "output_plans.xml.gz" );
+			new PopulationReader( scenarioCurrent ).readFile( utils.getOutputDirectory() + "output_plans.xml.gz" );
+			assertTrue( "Populations are different", PopulationUtils.equalPopulation( scenarioReference.getPopulation(), scenarioCurrent.getPopulation() ) );
+		}
+		{
+			LOG.info( "Checking MATSim events file ..." );
+			final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+			final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+			assertEquals( "Different event files.", EventsFileComparator.compare( eventsFilenameReference, eventsFilenameNew ), FILES_ARE_EQUAL );
+		}
 	}
 	
 	@Test
