@@ -119,6 +119,8 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 			tmpScore += modeParams.dailyUtilityConstant + modeParams.dailyMoneyConstant * this.params.marginalUtilityOfMoney;
 			modesAlreadyConsideredForDailyConstants.add(leg.getMode());
 		}
+		// yyyy the above will cause problems if we ever decide to differentiate pt mode into bus, tram, train, ...
+		// Might have to move the MainModeIdentifier then.  kai, sep'18
 		
 		return tmpScore;
 	}

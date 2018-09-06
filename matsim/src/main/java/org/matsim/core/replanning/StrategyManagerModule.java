@@ -63,9 +63,11 @@ public class StrategyManagerModule extends AbstractModule {
 				planStrategyMapBinder.addBinding(settings).toProvider(new ExternalModuleProvider(externalCounter, settings.getExePath()));
 			} else if (name.contains(".")) {
 				// plan strategy is in Java, but it is found via the class loader:
-				if (name.startsWith("org.matsim.") && !name.startsWith("org.matsim.contrib.")) {
-					// org.matsim strategies are not to be loaded via the class loader:
-					throw new RuntimeException("Strategies in the org.matsim package must not be loaded by name!");
+				if (name.startsWith("org.matsim.core")
+						    // && !name.startsWith("org.matsim.contrib.")
+				) {
+					// org.matsim.core strategies are not to be loaded via the class loader:
+					throw new RuntimeException("Strategies in the org.matsim.core package must not be loaded by name!");
 				} else {
 					try {
 						Class klass = Class.forName(name);

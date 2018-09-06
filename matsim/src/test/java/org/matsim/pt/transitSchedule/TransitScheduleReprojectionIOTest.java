@@ -1,5 +1,6 @@
 package org.matsim.pt.transitSchedule;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,6 +30,8 @@ import java.net.URL;
  * @author thibautd
  */
 public class TransitScheduleReprojectionIOTest {
+	private static final Logger log = Logger.getLogger( TransitScheduleReprojectionIOTest.class ) ;
+	
 	private static final String INITIAL_CRS = TransformationFactory.CH1903_LV03_GT;
 	private static final String TARGET_CRS = "EPSG:3857";
 	private static final CoordinateTransformation transformation =
@@ -152,6 +155,12 @@ public class TransitScheduleReprojectionIOTest {
 			config.global().setCoordinateSystem( TARGET_CRS );
 			config.controler().setLastIteration( -1 );
 			config.controler().setOutputDirectory( outputDirectory );
+			
+			log.info( "" ) ;
+			log.info("just before we are getting the exception:") ;
+			log.info( "context=" + config.getContext() ) ;
+			log.info( "transitScheduleFilename=" + withAttributes ) ;
+			log.info("") ;
 			
 			// TODO: test also with loading from Controler C'tor?
 			scenario = ScenarioUtils.loadScenario( config );
