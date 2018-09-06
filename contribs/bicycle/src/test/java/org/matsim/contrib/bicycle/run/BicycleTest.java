@@ -20,6 +20,7 @@ package org.matsim.contrib.bicycle.run;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result.FILES_ARE_EQUAL;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -97,7 +98,7 @@ public class BicycleTest {
 		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", EventsFileComparator.compareAndReturnInt(eventsFilenameReference, eventsFilenameNew), 0);
+		assertEquals("Different event files.", EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew), FILES_ARE_EQUAL);
 		
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
