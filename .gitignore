@@ -22,3 +22,4 @@ hs_err_pid*
 *.iml
 /test/output
 /input/carrierPlanned.xml
+/input/usecases/capeTown/osm/capeTown_latest.pbf
