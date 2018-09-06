@@ -40,6 +40,11 @@ public class ModeUtilityParameters {
 			this.monetaryDistanceRate = monetaryDistanceRate;
 			return this;
 		}
+		
+		public Builder setConstant(double constant) {
+			this.constant = constant;
+			return this;
+		}
 
 		public Builder setDailyMoneyConstant(double dailyMoneyConstant) {
 			this.dailyMoneyConstant = dailyMoneyConstant;
