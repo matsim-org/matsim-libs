@@ -68,19 +68,31 @@ public class TransitScheduleReprojectionIOTest {
 
 	@Test
 	public void testWithControlerAndConfigParameters() {
-		final Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("pt-tutorial"));
+		// read transitschedule.xml into empty scenario:
+		Scenario originalScenario ;
+		{
+			final Config config0 = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
+			originalScenario = ScenarioUtils.createScenario( config0 );
+			new TransitScheduleReader( originalScenario ).readURL( ConfigGroup.getInputFileURL( config0.getContext(), "transitschedule.xml" ) );
+		}
 
-		final Scenario originalScenario = ScenarioUtils.createScenario(config);
-		new TransitScheduleReader( originalScenario ).readURL(ConfigGroup.getInputFileURL(config.getContext(), "transitschedule.xml"));
-
-		config.transit().setTransitScheduleFile("transitschedule.xml");
-
-		config.transit().setUseTransit( true );
-		config.transit().setInputScheduleCRS( INITIAL_CRS );
-		config.global().setCoordinateSystem( TARGET_CRS );
-
+		final String outputDirectory = utils.getOutputDirectory()+"/output/";
+		
+		// read same thing via scenario loader:
+		Scenario scenario ;
+		{
+			final Config config = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
+			config.transit().setTransitScheduleFile( "transitschedule.xml" );
+			config.transit().setUseTransit( true );
+			config.transit().setInputScheduleCRS( INITIAL_CRS );
+			config.global().setCoordinateSystem( TARGET_CRS );
+			config.controler().setLastIteration( -1 );
+			config.controler().setOutputDirectory( outputDirectory );
+			scenario = ScenarioUtils.loadScenario( config );
+		}
+		
 		// TODO: test also with loading from Controler C'tor?
-		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		
 		for ( Id<TransitStopFacility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
 			final Coord originalCoord = originalScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 			final Coord internalCoord = scenario.getTransitSchedule().getFacilities().get( id ).getCoord();
@@ -90,14 +102,15 @@ public class TransitScheduleReprojectionIOTest {
 					transformation.transform(originalCoord),
 					internalCoord);
 		}
-
-		config.controler().setLastIteration( -1 );
-		final String outputDirectory = utils.getOutputDirectory()+"/output/";
-		config.controler().setOutputDirectory( outputDirectory );
+		
 		final Controler controler = new Controler( scenario );
 		controler.run();
-
-		final Scenario dumpedScenario = ScenarioUtils.createScenario( config );
+		
+		Scenario dumpedScenario ;
+		{
+			final Config config = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
+			dumpedScenario = ScenarioUtils.createScenario( config );
+		}
 		new TransitScheduleReader( dumpedScenario ).readFile( outputDirectory+"/output_transitSchedule.xml.gz" );
 
 		for ( Id<TransitStopFacility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
@@ -113,23 +126,36 @@ public class TransitScheduleReprojectionIOTest {
 
 	@Test
 	public void testWithControlerAndAttributes() {
-		final Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("pt-tutorial"));
+		Scenario originalScenario ;
+		{
+			final Config config = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
+			originalScenario = ScenarioUtils.createScenario( config );
+			new TransitScheduleReader( originalScenario ).readURL( ConfigGroup.getInputFileURL( config.getContext(), "transitschedule.xml" ) );
+		}
+		
+		final String outputDirectory = utils.getOutputDirectory()+"/output/";
 
-		final Scenario originalScenario = ScenarioUtils.createScenario(config);
-		new TransitScheduleReader( originalScenario ).readURL(ConfigGroup.getInputFileURL(config.getContext(), "transitschedule.xml"));
-
-		final String withAttributes = new File(utils.getOutputDirectory()).getAbsolutePath()+"/transitschedule.xml";
-		ProjectionUtils.putCRS(originalScenario.getTransitSchedule(), INITIAL_CRS);
-		new TransitScheduleWriter(originalScenario.getTransitSchedule()).writeFile(withAttributes);
-
-		config.transit().setTransitScheduleFile(withAttributes);
-
-		config.transit().setUseTransit( true );
-		config.transit().setInputScheduleCRS( INITIAL_CRS );
-		config.global().setCoordinateSystem( TARGET_CRS );
-
-		// TODO: test also with loading from Controler C'tor?
-		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		Scenario scenario ;
+		{
+			final Config config = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
+			
+			final String withAttributes = new File( utils.getOutputDirectory() ).getAbsolutePath() + "/transitschedule.xml";
+			// (need the absolute path since later it is put into the config, and that will otherwise be relative to some other context. kai, sep'18)
+			
+			ProjectionUtils.putCRS( originalScenario.getTransitSchedule(), INITIAL_CRS );
+			new TransitScheduleWriter( originalScenario.getTransitSchedule() ).writeFile( withAttributes );
+			
+			config.transit().setTransitScheduleFile( withAttributes );
+			
+			config.transit().setUseTransit( true );
+			config.transit().setInputScheduleCRS( INITIAL_CRS );
+			config.global().setCoordinateSystem( TARGET_CRS );
+			config.controler().setLastIteration( -1 );
+			config.controler().setOutputDirectory( outputDirectory );
+			
+			// TODO: test also with loading from Controler C'tor?
+			scenario = ScenarioUtils.loadScenario( config );
+		}
 		for ( Id<TransitStopFacility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
 			final Coord originalCoord = originalScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 			final Coord internalCoord = scenario.getTransitSchedule().getFacilities().get( id ).getCoord();
@@ -145,13 +171,14 @@ public class TransitScheduleReprojectionIOTest {
 				TARGET_CRS,
 				ProjectionUtils.getCRS(scenario.getTransitSchedule()));
 
-		config.controler().setLastIteration( -1 );
-		final String outputDirectory = utils.getOutputDirectory()+"/output/";
-		config.controler().setOutputDirectory( outputDirectory );
 		final Controler controler = new Controler( scenario );
 		controler.run();
 
-		final Scenario dumpedScenario = ScenarioUtils.createScenario( config );
+		Scenario dumpedScenario ;
+		{
+			final Config config = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
+			dumpedScenario=ScenarioUtils.createScenario( config );
+		}
 		new TransitScheduleReader( dumpedScenario ).readFile( outputDirectory+"/output_transitSchedule.xml.gz" );
 
 		for ( Id<TransitStopFacility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
