@@ -18,12 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.network;
+package org.matsim.core.network.io;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.io.NetworkReaderMatsimV1;
-import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.network.AbstractNetworkWriterReaderTest;
 
 /**
  * @author mrieser

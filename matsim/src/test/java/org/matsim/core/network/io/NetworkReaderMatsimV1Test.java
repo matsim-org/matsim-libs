@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.network;
+package org.matsim.core.network.io;
 
 import java.util.Set;
 import java.util.Stack;

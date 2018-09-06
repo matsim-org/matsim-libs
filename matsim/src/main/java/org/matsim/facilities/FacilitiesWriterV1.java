@@ -20,19 +20,19 @@
 
 package org.matsim.facilities;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.api.internal.MatsimWriter;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedSet;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.utils.objectattributes.AttributeConverter;
-import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
 /**
  * @author mrieser / Senozon AG
@@ -46,10 +46,6 @@ import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegat
     private final CoordinateTransformation coordinateTransformation;
 
     private AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
-
-    public FacilitiesWriterV1(final ActivityFacilities facilities) {
-        this(new IdentityTransformation(), facilities);
-    }
 
     public FacilitiesWriterV1(
             final CoordinateTransformation coordinateTransformation,
@@ -125,6 +121,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegat
             out.write(" name=\"" + facilities.getName() + "\"");
         }
         out.write(">\n\n");
+        this.attributesWriter.writeAttributes("\t", out, facilities.getAttributes());
     }
 
 

@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Maintainer: mrieser / Senozon AG
@@ -49,6 +50,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 
 	private static final Logger log = Logger.getLogger(ActivityFacilitiesImpl.class);
 	private final ActivityFacilitiesFactory factory ;
+	private final Attributes attributes = new Attributes();
 
 	private final Map<Id<ActivityFacility>, ActivityFacility> facilities = new LinkedHashMap<>();
 
@@ -220,4 +222,8 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 	}
 
 
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
 }
