@@ -110,6 +110,8 @@ import static org.matsim.core.router.TripStructureUtils.*;
 //	private boolean passLinkEventsToPerson = false;
 	
 	private Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
+	
+	@Inject(optional=true) TripRouter tripRouter ;
 
 	@Inject
 	ScoringFunctionsForPopulation( ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
@@ -130,16 +132,20 @@ import static org.matsim.core.router.TripStructureUtils.*;
 //		}
 //		stageActivityTypes = tripRouter.getStageActivityTypes() ;
 //		stageActivityTypes = new StageActivityTypesImpl( new String [] {PtConstants.TRANSIT_ACTIVITY_TYPE} ) ;
-		stageActivityTypes = new StageActivityTypes() {
-			@Override public boolean isStageActivity( final String activityType ) {
-				if ( activityType.contains( "_interaction" ) ) {
-					return true ;
-				} else {
-					return false ;
+		if ( tripRouter!=null ) {
+			stageActivityTypes = tripRouter.getStageActivityTypes() ;
+		} else {
+			stageActivityTypes = new StageActivityTypes() {
+				@Override public boolean isStageActivity( final String activityType ) {
+					if ( activityType.contains( "_interaction" ) ) {
+						return true;
+					} else {
+						return false;
+					}
 				}
-			}
-		} ;
-		// yyyyyy this is really really terrible, needs to come from global data structure instead.
+			};
+			// yyyyyy this is really terrible, needs to come from global data structure instead.
+		}
 	}
 
 	private void init() {
