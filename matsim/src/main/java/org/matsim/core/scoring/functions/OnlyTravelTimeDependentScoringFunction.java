@@ -56,11 +56,6 @@ public class OnlyTravelTimeDependentScoringFunction implements ScoringFunction {
 	}
 
 	@Override
-	public void handleTrip( final TripStructureUtils.Trip trip ) {
-		throw new RuntimeException( "not implemented" );
-	}
-
-	@Override
 	public void addMoney(final double amount) {
 	}
 

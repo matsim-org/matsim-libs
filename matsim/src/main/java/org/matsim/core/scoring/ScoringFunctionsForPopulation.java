@@ -222,11 +222,11 @@ import static org.matsim.core.router.TripStructureUtils.*;
 		Plan plan = tripRecords.get( agentId ) ; // as container for trip
 		if ( plan!=null ) {
 			plan.addLeg( leg );
-			log.warn( "" );
-			log.warn( "just added leg to tripRecords; plan=" + plan );
-			for ( PlanElement pe : plan.getPlanElements() ) {
-				log.warn( pe.toString() );
-			}
+//			log.warn( "" );
+//			log.warn( "just added leg to tripRecords; plan=" + plan );
+//			for ( PlanElement pe : plan.getPlanElements() ) {
+//				log.warn( pe.toString() );
+//			}
 		}
 	}
 
@@ -250,11 +250,11 @@ import static org.matsim.core.router.TripStructureUtils.*;
 				} else {
 					// we are at a real activity, which is not the first one we see for this agent.  output the trip ...
 					plan.addActivity( activity );
-					log.warn( "" );
-					log.warn( "just added FINAL activity to tripRecords; plan=" + plan );
-					for ( PlanElement pe : plan.getPlanElements() ) {
-						log.warn( pe.toString() );
-					}
+//					log.warn( "" );
+//					log.warn( "just added FINAL activity to tripRecords; plan=" + plan );
+//					for ( PlanElement pe : plan.getPlanElements() ) {
+//						log.warn( pe.toString() );
+//					}
 					final List<Trip> trips = TripStructureUtils.getTrips( plan, stageActivityTypes );
 					Gbl.assertIf( trips.size() == 1 );
 					final Trip trip = trips.get( 0 );
@@ -266,11 +266,11 @@ import static org.matsim.core.router.TripStructureUtils.*;
 				}
 			}
 			plan.addActivity( activity );
-			log.warn( "" );
-			log.warn( "just added activity to tripRecords; plan=" + plan );
-			for ( PlanElement pe : plan.getPlanElements() ) {
-				log.warn( pe.toString() );
-			}
+//			log.warn( "" );
+//			log.warn( "just added activity to tripRecords; plan=" + plan );
+//			for ( PlanElement pe : plan.getPlanElements() ) {
+//				log.warn( pe.toString() );
+//			}
 		}
 	}
 
