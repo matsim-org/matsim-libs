@@ -78,30 +78,30 @@ class RunScoringExample {
 			ssf.addScoringFunction(new CharyparNagelMoneyScoring(params));
 			ssf.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-			ssf.addScoringFunction( new SumScoringFunction.TripScoring() {
-				private double score = 0. ;
-				@Override
-				public void handleTrip( final TripStructureUtils.Trip trip ) {
-					log.info("") ;
-					log.info( "trip=" + trip ) ;
-					log.info( "mainMode=" + mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ) ;
-					log.info("") ;
-					
-					if ( TransportMode.pt.equals( mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ) ) {
-						score -= 10. ;
-					}
-				}
-
-				@Override
-				public void finish() {
-				
-				}
-
-				@Override
-				public double getScore() {
-					return score ;
-				}
-			} );
+//			ssf.addScoringFunction( new SumScoringFunction.TripScoring() {
+//				private double score = 0. ;
+//				@Override
+//				public void handleTrip( final TripStructureUtils.Trip trip ) {
+//					log.info("") ;
+//					log.info( "trip=" + trip ) ;
+//					log.info( "mainMode=" + mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ) ;
+//					log.info("") ;
+//
+//					if ( TransportMode.pt.equals( mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ) ) {
+//						score -= 10. ;
+//					}
+//				}
+//
+//				@Override
+//				public void finish() {
+//
+//				}
+//
+//				@Override
+//				public double getScore() {
+//					return score ;
+//				}
+//			} );
 			return ssf ;
 		}
 	}
