@@ -69,8 +69,6 @@ public interface ScoringFunction {
 	 */
 	public void agentStuck(final double time);
 
-	void handleTrip( TripStructureUtils.Trip trip );
-
 	/**
 	 * Adds the specified amount of utility to the agent's score. This is mostly
 	 * used for handling {@link PersonMoneyEvent}s, allowing other parts of the
@@ -95,5 +93,10 @@ public interface ScoringFunction {
 	public double getScore();
 
 	public void handleEvent( Event event ) ;
+	
+	default void handleTrip( TripStructureUtils.Trip trip ) {
+		// empty default implementation, since older implementations of the interface
+		// don't have this method, and work happily without. kai, sep'18
+	}
 
 }
