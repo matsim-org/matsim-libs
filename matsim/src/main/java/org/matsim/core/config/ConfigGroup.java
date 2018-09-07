@@ -243,6 +243,10 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	public static URL getInputFileURL(URL context, String filename) {
 		if (filename.startsWith("~" + File.separator)) {
 			filename = System.getProperty("user.home") + filename.substring(1);
+			return IOUtils.newUrl( null, filename ) ;
+		}
+		if ( filename.startsWith( File.separator ) ) {
+			return IOUtils.newUrl( null, filename ) ;
 		}
 		return IOUtils.newUrl(context, filename);
 	}
