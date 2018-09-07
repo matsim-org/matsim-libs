@@ -22,12 +22,6 @@
  */
 package org.matsim.contrib.analysis.vsp.traveltimedistance;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -38,14 +32,22 @@ import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
+
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author  jbischoff
@@ -60,33 +62,33 @@ public class TravelTimeValidationRunner {
 	private final String eventsFile;
 	private final TravelTimeDistanceValidator travelTimeValidator;
 	private int numberOfTripsToValidate;
-	private final Population population;
+	private final Set<Id<Person>> populationIds;
 	private final String outputfolder;
-	
-	
-	public TravelTimeValidationRunner(Network network, Population population, String eventsFile, String outputFolder ,TravelTimeDistanceValidator travelTimeValidator,
-			int numberOfTripsToValidate) {
+
+
+	public TravelTimeValidationRunner(Network network, Set<Id<Person>> populationIds, String eventsFile, String outputFolder, TravelTimeDistanceValidator travelTimeValidator,
+									  int numberOfTripsToValidate) {
 		this.network = network;
 		this.eventsFile = eventsFile;
 		this.travelTimeValidator = travelTimeValidator;
 		this.numberOfTripsToValidate = numberOfTripsToValidate;
-		this.population = population;
 		this.outputfolder = outputFolder;
+		this.populationIds = populationIds;
 	}
-	
-	public TravelTimeValidationRunner(Network network, Population population, String eventsFile, String outputFolder ,TravelTimeDistanceValidator travelTimeValidator) {
+
+	public TravelTimeValidationRunner(Network network, Set<Id<Person>> populationIds, String eventsFile, String outputFolder, TravelTimeDistanceValidator travelTimeValidator) {
 		this.network = network;
 		this.eventsFile = eventsFile;
 		this.travelTimeValidator = travelTimeValidator;
 		this.numberOfTripsToValidate = Integer.MAX_VALUE;
-		this.population = population;
 		this.outputfolder = outputFolder;
+		this.populationIds = populationIds;
 	}
 	
 	public void run(){
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		CarTripsExtractor carTripsExtractor = new CarTripsExtractor(population.getPersons().keySet(), network);
+		CarTripsExtractor carTripsExtractor = new CarTripsExtractor(populationIds, network);
 		events.addHandler(carTripsExtractor);
 		new MatsimEventsReader(events).readFile(eventsFile);
 		List<CarTrip> carTrips = carTripsExtractor.getTrips();
