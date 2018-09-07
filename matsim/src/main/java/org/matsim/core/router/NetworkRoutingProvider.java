@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -91,9 +90,6 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 				this.singleModeNetworksCache.getSingleModeNetworksCache().put(mode, filteredNetwork);
 			}
 		}
-		
-		// clean filtered network
-		new NetworkCleaner().run(filteredNetwork);
 
 		// the travel time & disutility refer to the routing mode:
 		TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactories.get(routingMode);
