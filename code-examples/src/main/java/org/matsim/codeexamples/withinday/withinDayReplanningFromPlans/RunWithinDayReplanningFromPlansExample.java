@@ -36,7 +36,7 @@ import java.util.Set;
 public class RunWithinDayReplanningFromPlansExample {
 
 	public static void main(String[] args){
-		final Config config = ConfigUtils.loadConfig( "examples/tutorial/programming/example50VeryExperimentalWithinDayReplanning/withinday-config.xml" );
+		final Config config = ConfigUtils.loadConfig( "examples/tutorial/programming/veryExperimentalWithinDayReplanning/withinday-config.xml" );
 		final Scenario scenario = ScenarioUtils.createScenario( config );
 		final Controler controler = new Controler( scenario );
 
