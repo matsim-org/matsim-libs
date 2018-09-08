@@ -38,20 +38,20 @@ public class IntegrationTest {
 	@Test
 	public final void test() {
 		
-		try {
+//		try {
 			RunCreateFacilities.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
+//		} catch ( Exception eee ) {
+//			eee.printStackTrace();
+//			Assert.fail();
+//		}
 		
 
-		try {
+//		try {
 			RunCreatePopulationAndDemand.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
+//		} catch ( Exception eee ) {
+//			eee.printStackTrace();
+//			Assert.fail();
+//		}
 
 		// We don't want to check in the input network.
 //		try {
