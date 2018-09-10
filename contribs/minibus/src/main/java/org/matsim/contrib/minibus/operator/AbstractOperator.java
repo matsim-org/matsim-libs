@@ -19,22 +19,31 @@
 
 package org.matsim.contrib.minibus.operator;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants.OperatorState;
+import org.matsim.contrib.minibus.genericUtils.TerminusStopFinder;
 import org.matsim.contrib.minibus.performance.PTransitLineMerger;
 import org.matsim.contrib.minibus.replanning.PStrategy;
 import org.matsim.contrib.minibus.replanning.PStrategyManager;
 import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
 import org.matsim.contrib.minibus.scoring.PScoreContainer;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.GeometryUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
+
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Common implementation for all operators, except for replanning
@@ -272,15 +281,92 @@ abstract class AbstractOperator implements Operator{
 		}
 	}
 
-	private final static void scorePlan(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap, PPlan plan) {
+	private final void scorePlan(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap, PPlan plan) {
 		double totalLineScore = 0.0;
 		int totalTripsServed = 0;
-		
+
 		for (Id<Vehicle> vehId : plan.getVehicleIds()) {
 			totalLineScore += driverId2ScoreMap.get(vehId).getTotalRevenue();
-			totalTripsServed += driverId2ScoreMap.get(vehId).getTripsServed();	
+			totalTripsServed += driverId2ScoreMap.get(vehId).getTripsServed();
 		}
-		
+
+		// Route design scoring
+
+		double routeDesignScore = 0.0;
+		// Params to be made configurable
+		double stop2Stop2BeelinePenalty_Weight = 2 * costPerVehicleSell; // if stop2stop 2x longer than beeline * stop2Stop2BeelinePenalty_Start, penalty equals price of one vehicle to sell
+		double stop2Stop2BeelinePenalty_Start = 1.2 * 2;
+
+		double area2BeelinePenalty_Weight = 1 * costPerVehicleSell;
+		double area2BeelinePenalty_Start = 50;
+
+		for (TransitRoute route : plan.getLine().getRoutes().values()) {
+			TransitStopFacility startStop = plan.getStopsToBeServed().get(0);
+			TransitStopFacility endStop = plan.getStopsToBeServed()
+					.get(TerminusStopFinder.findStopIndexWithLargestDistance(plan.getStopsToBeServed()));
+			double beelineLength = CoordUtils.calcEuclideanDistance(startStop.getCoord(), endStop.getCoord());
+
+			List<Coord> coords = new ArrayList<>();
+			for (TransitRouteStop stop : route.getStops()) {
+				coords.add(stop.getStopFacility().getCoord());
+			}
+			
+			double area = 0;
+			
+			try {
+				Polygon polygon = GeometryUtils.createGeotoolsPolygon(coords);
+				area = polygon.getArea();
+			} catch (IllegalArgumentException e) {
+				log.warn(e.getMessage());
+			}
+
+			double lengthStop2Stop = 0.0;
+			TransitStopFacility previousStop = plan.getStopsToBeServed().get(0);
+
+			for (int i = 0; i < plan.getStopsToBeServed().size(); i++) {
+				TransitStopFacility currentStop = plan.getStopsToBeServed().get(i);
+				lengthStop2Stop = lengthStop2Stop
+						+ CoordUtils.calcEuclideanDistance(previousStop.getCoord(), currentStop.getCoord());
+				previousStop = currentStop;
+			}
+			// add leg from last to first stop
+			lengthStop2Stop = lengthStop2Stop + CoordUtils.calcEuclideanDistance(previousStop.getCoord(),
+					plan.getStopsToBeServed().get(0).getCoord());
+
+			double stop2Stop2BeelinePenalty = stop2Stop2BeelinePenalty_Weight
+					* ((lengthStop2Stop / beelineLength) / stop2Stop2BeelinePenalty_Start - 1);
+			double area2BeelinePenalty = area2BeelinePenalty_Weight
+					* ((area / beelineLength) / area2BeelinePenalty_Start - 1);
+
+			// assuming there could be a second TransitRoute, so scores should be summed up,
+			// even though it seems there is only one
+			routeDesignScore = routeDesignScore - Math.max(0, stop2Stop2BeelinePenalty)
+					- Math.max(0, area2BeelinePenalty);
+		}
+
+		if (routeDesignScore != 0) {
+			/*
+			 * Cap route design score, if score is bad enough to eliminate the plan, so it
+			 * would affect other plans less. Don't cap if a plan performs really bad
+			 * financially besides non-monetary metrics like route design scoring. At
+			 * minScoreToSurvive CarefulMultiPlanOperator would leave at least one vehicle
+			 * on the plan, so plan could survive
+			 */
+			double minScoreToSurvive = -costPerVehicleSell * (plan.getNVehicles() - 1);
+			if (totalLineScore >= minScoreToSurvive) {
+				/*
+				 * Limit negative score to the amount at which the plan is eliminated. Multiply
+				 * route design score with number of vehicles, so route design score still still
+				 * has an influence on busy lines.
+				 */
+				totalLineScore = Math.max(totalLineScore + routeDesignScore * plan.getNVehicles(),
+						minScoreToSurvive - 0.001 * costPerVehicleSell);
+			} else {
+				// plan already has a bad score that will cause its elimination, don't cap this
+				// monetary cost
+			}
+		}
+
 		plan.setScore(totalLineScore);
 		plan.setTripsServed(totalTripsServed);
 	}
