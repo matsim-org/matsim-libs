@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.fixedTimeSignals;
+package org.matsim.codeexamples.fixedTimeSignals;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.builder.SignalsModule;

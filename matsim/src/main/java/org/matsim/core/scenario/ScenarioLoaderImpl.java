@@ -103,9 +103,11 @@ class ScenarioLoaderImpl {
 	 * @return the Scenario
 	 */
 	Scenario loadScenario() {
-		String currentDir = new File("tmp").getAbsolutePath();
-		currentDir = currentDir.substring(0, currentDir.length() - 3);
-		log.info("loading scenario from base directory: " + currentDir);
+//		String currentDir = new File("tmp").getAbsolutePath();
+//		currentDir = currentDir.substring(0, currentDir.length() - 3);
+//		log.info("loading scenario from base directory: " + currentDir);
+		// the above is not used and thus only causing confusion in the log output.  kai, sep'18
+
 		this.loadNetwork();
 		this.loadActivityFacilities();
 		this.loadPopulation();
