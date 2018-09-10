@@ -23,6 +23,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.minibus.genericUtils.TerminusStopFinder;
 import org.matsim.contrib.minibus.operator.Operator;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
@@ -69,7 +70,7 @@ public final class EndRouteExtension extends AbstractPStrategyModule {
 		 * terminus stops. So we only know one terminus stop, the base stop, and try to find the other terminus, the other end 
 		 * of the route, by scanning the stops on the TransitRoute for the stop which has the largest distance from the base stop.
 		 */
-		int remoteStopIndex = this.findStopIndexWithLargestDistance(currentStopsToBeServed);
+		int remoteStopIndex = TerminusStopFinder.findStopIndexWithLargestDistance(currentStopsToBeServed);
 		
 		if (baseStop.equals(currentStopsToBeServed.get(remoteStopIndex))) {
 			/*
