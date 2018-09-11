@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -146,7 +147,7 @@ public final class SylviaPreprocessData {
 				// add a copy of the old plan
 				newControllerData.addSignalPlanData(SignalUtils.copySignalPlanData(signalPlan, 
 						Id.create(FIXED_TIME_PREFIX + signalPlan.getId().toString(), SignalPlan.class)));
-				newControllerData.addSignalPlanData(convertSignalPlanData(signalPlan, sylviaSignalControlData.getFactory()));
+				newControllerData.addSignalPlanData(convertSignalPlanData(signalPlan));
 			}
 		}
 	}
@@ -210,8 +211,69 @@ public final class SylviaPreprocessData {
 		return newPhase;
 	}
 	
-	private static SignalPlanData convertSignalPlanData(final SignalPlanData fixedTimePlan, SignalControlDataFactory factory) {
+	private static SignalPlanData convertSignalPlanData(final SignalPlanData fixedTimePlan) {
 		SignalPlanData newPlan = SignalUtils.copySignalPlanData(fixedTimePlan, Id.create(SYLVIA_PREFIX + fixedTimePlan.getId().toString(), SignalPlan.class));
+		// shift plan such that longest green time starts at second zero
+		shiftPlan(newPlan);
+		/* create sorted list by onset and dropping (decreasing) */
+		List<SignalGroupSettingsData> settingsSortedByDropping = new ArrayList<>();
+		settingsSortedByDropping.addAll(newPlan.getSignalGroupSettingsDataByGroupId().values());
+		Collections.sort(settingsSortedByDropping, new Comparator<SignalGroupSettingsData>() {
+
+			@Override
+			public int compare(SignalGroupSettingsData setting1, SignalGroupSettingsData setting2) {
+				// shift 1 and 2 to get reverse order
+				return Integer.compare(setting2.getDropping(), setting1.getDropping());
+			}
+		});
+		List<SignalGroupSettingsData> settingsSortedByOnset = new ArrayList<>();
+		settingsSortedByOnset.addAll(newPlan.getSignalGroupSettingsDataByGroupId().values());
+		Collections.sort(settingsSortedByOnset, new Comparator<SignalGroupSettingsData>() {
+
+			@Override
+			public int compare(SignalGroupSettingsData setting1, SignalGroupSettingsData setting2) {
+				// shift 1 and 2 to get reverse order
+				return Integer.compare(setting2.getOnset(), setting1.getOnset());
+			}
+		});
+		/* scan cycle time for time periods before droppings, where no signal setting is changed and shrink them to MIN_GREEN_SECONDS seconds */
+		Iterator<SignalGroupSettingsData> droppingIterator = settingsSortedByDropping.iterator();
+		Iterator<SignalGroupSettingsData> onsetIterator = settingsSortedByOnset.iterator();
+		SignalGroupSettingsData thisDropping = droppingIterator.next();
+		SignalGroupSettingsData nextDropping = droppingIterator.hasNext()? droppingIterator.next() : null;
+		while (nextDropping != null) {
+			// look for the next dropping pair with a minimum of MIN_GREEN_SECONDS seconds inbetween
+			while (nextDropping != null && thisDropping.getDropping() - nextDropping.getDropping() <= MIN_GREEN_SECONDS) {
+				// between these two droppings we can not shrink the signal plan. check the next pair
+				thisDropping = nextDropping;
+				nextDropping = droppingIterator.hasNext()? droppingIterator.next() : null;
+			}
+			// look for the next onset that is before the current dropping (note: there always is one, because no dropping is scheduled at second 0 but at least one offset is scheduled for second 0)
+			SignalGroupSettingsData nextOnset = onsetIterator.next();
+			while (nextOnset.getOnset() >= thisDropping.getDropping()) {
+				nextOnset = onsetIterator.next();
+			}
+			if (thisDropping.getDropping() - nextOnset.getOnset() <= MIN_GREEN_SECONDS) {
+				// we can not shrink the signal plan before the current dropping
+				thisDropping = nextDropping;
+				continue;
+			}
+			// we can shrink the signal plan
+			int shrinkStart = Math.max(nextOnset.getOnset(), nextDropping==null? 0 : nextDropping.getDropping()) + MIN_GREEN_SECONDS;
+			int shrinkEnd = thisDropping.getDropping();
+			// shift all settings behind shrinkStart by shrinkEnd - shrinkStart seconds to
+			// the left
+			log.info("Shrink plan " + newPlan.getId() + " by " + (shrinkEnd - shrinkStart)
+					+ " seconds at dropping of signal group " + thisDropping.getSignalGroupId()
+					+ ". Shift all settings behind " + shrinkStart + " accordingly. The next dropping is signal group "
+					+ (nextDropping == null ? "null" : nextDropping.getSignalGroupId() )
+					+ ". The next onset is signal group " + nextOnset.getSignalGroupId());
+			shrinkSignalPlan(newPlan, shrinkStart, shrinkEnd - shrinkStart);
+			thisDropping = nextDropping;
+		}
+		return newPlan;
+		
+		/* alt:
 		List<SignalGroupSettingsData> groupSettingsList = new ArrayList<>();
 		groupSettingsList.addAll(newPlan.getSignalGroupSettingsDataByGroupId().values());
 		//filter allGreenSettings
@@ -300,9 +362,62 @@ public final class SylviaPreprocessData {
 			settings.setDropping(sylviaCycle);
 			newPlan.addSignalGroupSettings(settings);
 		}
-		return newPlan;
+		return newPlan; */
 	}
 	
+	/**
+	 * shift plan such that longest green time starts at second zero. adapt offset accordingly. check that no dropping happens at second 0 but cycleTime
+	 */
+	private static SignalPlanData shiftPlan(SignalPlanData signalPlan) {
+		// identify longest green time
+		int longestGreenTime = 0;
+		Id<SignalGroup> longestGreenGroup = null;
+		for (SignalGroupSettingsData setting : signalPlan.getSignalGroupSettingsDataByGroupId().values()) {
+			int greenTime = setting.getDropping() - setting.getOnset();
+			if (greenTime <= 0) greenTime += signalPlan.getCycleTime();
+			
+			if (greenTime > longestGreenTime) {
+				longestGreenTime = greenTime;
+				longestGreenGroup = setting.getSignalGroupId();
+			}
+		}
+		// shift all settings and offset accordingly
+		int shiftBy = signalPlan.getSignalGroupSettingsDataByGroupId().get(longestGreenGroup).getOnset();
+		log.info("The setting with the longest green time is signal group " + longestGreenGroup + " with a green time of " + longestGreenTime + " seconds. Shift start to second " + shiftBy);
+		if (shiftBy == 0) {
+			return signalPlan;
+		}
+		signalPlan.setOffset((signalPlan.getOffset() - shiftBy + signalPlan.getCycleTime()) % signalPlan.getCycleTime());
+		for (SignalGroupSettingsData setting : signalPlan.getSignalGroupSettingsDataByGroupId().values()) {
+			// set new onset in interval [0,cycleTime-1]
+			int shiftedOnset = setting.getOnset() - shiftBy;
+			if (shiftedOnset < 0) shiftedOnset += signalPlan.getCycleTime();
+			setting.setOnset(shiftedOnset);
+			// set new dropping in interval [1,cycleTime]
+			int shiftedDropping = setting.getDropping() - shiftBy;
+			if (shiftedDropping <= 0) shiftedDropping += signalPlan.getCycleTime();
+			setting.setDropping(shiftedDropping);
+		}
+		return signalPlan;
+	}
+
+	/**
+	 * move all droppings and onsets behind shrinkStart by secondsToBeRemoved
+	 * seconds to the left, i.e. shrink the whole signal plan by secondsToBeRemoved
+	 * seconds beginning at second shrinkStart.
+	 */
+	private static void shrinkSignalPlan(SignalPlanData signalPlan, int shrinkStart, int secondsToBeRemoved) {
+		signalPlan.setCycleTime(signalPlan.getCycleTime() - secondsToBeRemoved);
+		for (SignalGroupSettingsData setting : signalPlan.getSignalGroupSettingsDataByGroupId().values()) {
+			if (setting.getOnset() > shrinkStart) {
+				setting.setOnset(setting.getOnset() - secondsToBeRemoved);
+			}
+			if (setting.getDropping() > shrinkStart) {
+				setting.setDropping(setting.getDropping() - secondsToBeRemoved);
+			}
+		}
+	}
+
 	/**
 	 * calculates the time that should be between two phases that overlap in time
 	 * @return 
@@ -446,8 +561,8 @@ public final class SylviaPreprocessData {
 	}
 	
 	public static void main(String[] args) throws JAXBException, SAXException, ParserConfigurationException, IOException {
-		String signalControlFile = "../../../shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_no_13_random_offsets.xml";
-		String signalControlOutFile = "../../../shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_sylvia_no_13_random_offsets.xml";
+		String signalControlFile = args[0];
+		String signalControlOutFile = args[1];
 		SylviaPreprocessData.convertFixedTimePlansToSylviaBasePlans(signalControlFile, signalControlOutFile);
 	}
 }
