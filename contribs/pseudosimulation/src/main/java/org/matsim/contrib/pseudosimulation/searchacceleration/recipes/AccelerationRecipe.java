@@ -1,0 +1,70 @@
+/*
+ * Copyright 2018 Gunnar Flötteröd
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * contact: gunnar.flotterod@gmail.com
+ *
+ */
+package org.matsim.contrib.pseudosimulation.searchacceleration.recipes;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+
+/**
+ *
+ * @author Gunnar Flötteröd
+ *
+ */
+public class AccelerationRecipe implements ReplannerIdentifierRecipe {
+
+	// -------------------- MEMBERS --------------------
+
+	// private final boolean randomizeIfNotScoreImprover;
+
+	// private final double baselineLambda;
+
+	private final double meanLambda;
+
+	// -------------------- CONSTRUCTION --------------------
+
+	public AccelerationRecipe(
+			// final boolean randomizeIfNotScoreImprover,
+			// final double baselineLambda,
+			final double meanLambda) {
+		// this.randomizeIfNotScoreImprover = randomizeIfNotScoreImprover;
+		// this.baselineLambda = baselineLambda;
+		this.meanLambda = meanLambda;
+	}
+
+	// --------------- IMPLEMENTATION OF AccelerationRecipe ---------------
+
+	@Override
+	public boolean isReplanner(final Id<Person> personId, final double deltaScoreIfYes, final double deltaScoreIfNo) {
+		return (deltaScoreIfYes < deltaScoreIfNo);
+		//
+		// // if (MatsimRandom.getRandom().nextDouble() < this.baselineLambda) {
+		// // return true;
+		// // } else {
+		// final boolean isScoreReducer = (Math.min(deltaScoreIfYes, deltaScoreIfNo) <
+		// 0);
+		// // if (isScoreReducer || !this.randomizeIfNotScoreImprover) {
+		// if (isScoreReducer) {
+		// return (deltaScoreIfYes < deltaScoreIfNo);
+		// } else { // !scoreImprover && randomizeIfNotScoreImprover
+		// return (MatsimRandom.getRandom().nextDouble() < this.meanLambda);
+		// }
+		// }
+	}
+}
