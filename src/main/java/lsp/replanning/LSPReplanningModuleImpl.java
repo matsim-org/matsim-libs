@@ -22,9 +22,7 @@ public class LSPReplanningModuleImpl implements LSPReplanningModule{
 	@Override
 	public void replanLSPs(ReplanningEvent arg0) {
 		for(LSP lsp : lsps.getLSPs().values()) {
-			if(lsp.getReplanner() != null) {
-				lsp.getReplanner().replan(arg0);
-			}					
+			lsp.replan(arg0);
 		}
 	}
 }

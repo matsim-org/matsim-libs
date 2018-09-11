@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.replanning.GenericStrategyManager;
 
 import lsp.resources.Resource;
@@ -108,10 +109,10 @@ public class LSPImpl implements LSP {
 		return id;
 	}
 
-	@Override
-	public Collection<LSPShipment> getShipments() {
-		return shipments;
-	}
+//	@Override
+//	public Collection<LSPShipment> getShipments() {
+//		return shipments;
+//	}
 
 	
 	@Override
@@ -201,9 +202,9 @@ public class LSPImpl implements LSP {
 		this.selectedPlan.setScore(score);
 	}
 	
-	public LSPReplanner getReplanner() {
-		return replanner;
-	}
+//	public LSPReplanner getReplanner() {
+//		return replanner;
+//	}
 
 
 	@Override
@@ -211,13 +212,19 @@ public class LSPImpl implements LSP {
 		shipments.add(shipment);
 		selectedPlan.getAssigner().assignShipment(shipment);
 	}
-
-
-	@Override
-	public LSPScorer getScorer() {
-		return scorer;
-	}
 	
+	@Override public void replan( final ReplanningEvent arg0 ) {
+		if ( this.replanner!=null ) {
+			this.replanner.replan( arg0 );
+		}
+	}
+
+
+//	@Override
+//	public LSPScorer getScorer() {
+//		return scorer;
+//	}
+
 	@Override
 	public void setScorer(LSPScorer scorer) {
 		this.scorer =  scorer;
@@ -230,9 +237,14 @@ public class LSPImpl implements LSP {
 	}
 
 
+//	@Override
+//	public SolutionScheduler getScheduler() {
+//		return solutionScheduler;
+//	}
+	
 	@Override
-	public SolutionScheduler getScheduler() {
-		return solutionScheduler;
+	public Collection<LSPShipment> getShipments() {
+		return this.shipments ;
 	}
 
 }

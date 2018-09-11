@@ -22,9 +22,7 @@ public class LSPScoringModuleImpl implements LSPScoringModule{
 	@Override
 	public void scoreLSPs(ScoringEvent arg0) {
 		for(LSP lsp : lsps.getLSPs().values()) {
-			if(lsp.getScorer() != null) {
-				lsp.scoreSelectedPlan();
-			}
-		}	
+			lsp.scoreSelectedPlan();
+		}
 	}
 }
