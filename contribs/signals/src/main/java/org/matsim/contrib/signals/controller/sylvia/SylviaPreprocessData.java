@@ -21,16 +21,12 @@ package org.matsim.contrib.signals.controller.sylvia;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -41,7 +37,6 @@ import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlReader20;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsDataImpl;
@@ -71,7 +66,7 @@ public final class SylviaPreprocessData {
 
 	private static final int MIN_GREEN_SECONDS = 5; //see RILSA pp. 28
 
-	public static void simplifySignalGroupsAndConvertFixedTimePlansToSylviaBasePlans(String signalControlInputFile, String singalControlOutputFile, String signalGroupsFile, String signalGroupsOutFile)
+	public static void simplifySignalGroupsAndConvertFixedTimePlansToSylviaBasePlans(String signalControlInputFile, String signalControlOutputFile, String signalGroupsFile, String signalGroupsOutFile)
 			throws JAXBException, SAXException, ParserConfigurationException, IOException {
 		SignalControlData signalControl = new SignalControlDataImpl();
 		SignalControlReader20 reader = new SignalControlReader20(signalControl);
@@ -87,7 +82,7 @@ public final class SylviaPreprocessData {
 		convertSignalControlData(signalControl, sylviaSignalControl);
 
 		SignalControlWriter20 writer = new SignalControlWriter20(sylviaSignalControl);
-		writer.write(singalControlOutputFile);
+		writer.write(signalControlOutputFile);
 
 		SignalGroupsWriter20 groupsWriter = new SignalGroupsWriter20(signalGroupsData);
 		groupsWriter.write(signalGroupsOutFile);
@@ -141,8 +136,6 @@ public final class SylviaPreprocessData {
 			SignalSystemControllerData newControllerData = sylviaSignalControlData.getFactory().createSignalSystemControllerData(controllerData.getSignalSystemId());
 			sylviaSignalControlData.addSignalSystemControllerData(newControllerData);
 			newControllerData.setControllerIdentifier(SylviaSignalController.IDENTIFIER);
-//			log.debug("");
-//			log.debug("system: " + controllerData.getSignalSystemId());
 			for (SignalPlanData signalPlan : controllerData.getSignalPlanData().values()) {
 				// add a copy of the old plan
 				newControllerData.addSignalPlanData(SignalUtils.copySignalPlanData(signalPlan, 
@@ -150,66 +143,7 @@ public final class SylviaPreprocessData {
 				newControllerData.addSignalPlanData(convertSignalPlanData(signalPlan));
 			}
 		}
-	}
-	
-	
-	private static FixedTimeSignalPhase createSylviaPhase(final FixedTimeSignalPhase phase, final SignalControlDataFactory factory){
-		log.info("creating sylvia phase...");
-		final int on = phase.getPhaseStartSecond();
-		List<SignalGroupSettingsData> alltimeGreenSettings = new ArrayList<>();
-		List<SignalGroupSettingsData> shorterSettingsSortedByOnset  = new ArrayList<>();
-		List<SignalGroupSettingsData> newSettings = new ArrayList<>();
-		//get all group settings that are shorter than the phase
-		for (SignalGroupSettingsData settings : phase.getSignalGroupSettingsByGroupId().values()){
-			if (settings.getOnset() == phase.getPhaseStartSecond() && settings.getDropping() == phase.getPhaseEndSecond()){
-				alltimeGreenSettings.add(settings);
-			}
-			else {
-				shorterSettingsSortedByOnset.add(settings);
-			}
-		}
-		
-		//shorten the settings that are shorter than the phase
-		Collections.sort(shorterSettingsSortedByOnset, new SignalGroupSettingsOnsetComparator());
-		int currentShortOn = on;
-		int currentOn = on;
-//		Integer currentOff = null;
-		int currentShortOff = on + MIN_GREEN_SECONDS;
-		for (SignalGroupSettingsData settings : shorterSettingsSortedByOnset) {
-			SignalGroupSettingsData shortSettings = SignalUtils.copySignalGroupSettingsData(settings, factory);
-			if (settings.getOnset() != currentOn){
-				currentOn = settings.getOnset();
-				currentShortOn = currentShortOn + MIN_GREEN_SECONDS;
-				currentShortOff = currentShortOn + MIN_GREEN_SECONDS;
-			}
-			shortSettings.setOnset(currentShortOn);
-			shortSettings.setDropping(currentShortOff);
-			newSettings.add(shortSettings);
-		}
-
-		//now there is a phase length, i.e.:
-		int off;
-		//only short settings at the beginning
-		if (currentShortOn == on && shorterSettingsSortedByOnset.size() > 0) {
-			off = currentShortOff + MIN_GREEN_SECONDS;
-		}
-		else {
-			off = currentShortOff;
-		}
-		FixedTimeSignalPhase newPhase = new FixedTimeSignalPhase(on, off);
-		//create all time green settings
-		for (SignalGroupSettingsData settings : alltimeGreenSettings){
-			SignalGroupSettingsData shortSettings = SignalUtils.copySignalGroupSettingsData(settings, factory);
-			shortSettings.setOnset(on);
-			shortSettings.setDropping(off);
-			newSettings.add(shortSettings);
-		}
-		//add the new settings to the new phase
-		for (SignalGroupSettingsData settings : newSettings){
-			newPhase.addSignalGroupSettingsData(settings);
-		}
-		return newPhase;
-	}
+	}	
 	
 	private static SignalPlanData convertSignalPlanData(final SignalPlanData fixedTimePlan) {
 		SignalPlanData newPlan = SignalUtils.copySignalPlanData(fixedTimePlan, Id.create(SYLVIA_PREFIX + fixedTimePlan.getId().toString(), SignalPlan.class));
@@ -417,148 +351,7 @@ public final class SylviaPreprocessData {
 			}
 		}
 	}
-
-	/**
-	 * calculates the time that should be between two phases that overlap in time
-	 * @return 
-	 */
-	private static Collection<IntergreenConstraint> calculateIntergreenConstraints(FixedTimeSignalPhase lastPhase, FixedTimeSignalPhase phase) {
-		Map<SignalGroupSettingsData, IntergreenConstraint> map = new HashMap<>();
-		for (SignalGroupSettingsData settings : phase.getSignalGroupSettingsByGroupId().values()){
-			for (SignalGroupSettingsData lastSettings : lastPhase.getSignalGroupSettingsByGroupId().values()){
-				int intergreen = settings.getOnset() - lastSettings.getDropping();
-				log.info("intergreen: " + intergreen);
-				if (intergreen >= 0){
-					if ((! map.containsKey(settings)) || map.get(settings).intergreen > intergreen){
-						IntergreenConstraint ic = new IntergreenConstraint();
-						ic.onSettingsId = settings.getSignalGroupId();
-						ic.droppingSettingsId = lastSettings.getSignalGroupId();
-						ic.intergreen = intergreen;
-						map.put(settings, ic);
-					}
-				}
-			}
-		}
-		return map.values();
-	}
-		
 	
-
-	private static List<SignalGroupSettingsData> calculateSettingsShorterThanPhase(FixedTimeSignalPhase phase){
-		List<SignalGroupSettingsData> settingsList  = new ArrayList<>();
-		//get all group settings that are shorter than the phase
-		for (SignalGroupSettingsData settings : phase.getSignalGroupSettingsByGroupId().values()){
-			if (settings.getOnset() == phase.getPhaseStartSecond() && settings.getDropping() == phase.getPhaseEndSecond()){
-				continue;
-			}
-			settingsList.add(settings);
-		}
-		return settingsList;
-	}
-	
-
-	private static void addPhaseToPlan(FixedTimeSignalPhase p, SignalPlanData newPlan){
-		for (SignalGroupSettingsData settings : p.getSignalGroupSettingsByGroupId().values()){
-			newPlan.addSignalGroupSettings(settings);
-		}
-	}
-
-	/**
-	 * Calculates phases sorted by start time
-	 * A signal group is considered to be member of a phase if it
-	 *   - starts together with others at a time t
-	 *   - starts after t but ends at the same time as the groups starting at t
-	 */
-	private static List<FixedTimeSignalPhase> calculateSortedPhases(final List<SignalGroupSettingsData> groupSettingsList) {
-		List<FixedTimeSignalPhase> phases = new ArrayList<>();
-		//make a copy
-		ArrayList<SignalGroupSettingsData> settingsList = new ArrayList<>();
-		settingsList.addAll(groupSettingsList);
-		//sort the copy
-		Collections.sort(settingsList, new SignalGroupSettingsOnsetComparator());
-		//preprocess
-		Map<Integer, Set<SignalGroupSettingsData>> onsetSettingsMap = new HashMap<>();
-		Map<Integer, Set<SignalGroupSettingsData>> droppingSettingsMap = new HashMap<>();
-		for (SignalGroupSettingsData settings : groupSettingsList){
-			if (!onsetSettingsMap.containsKey(settings.getOnset())){
-				onsetSettingsMap.put(settings.getOnset(), new HashSet<>());
-			}
-			onsetSettingsMap.get(settings.getOnset()).add(settings);
-			if (!droppingSettingsMap.containsKey(settings.getDropping())){
-				droppingSettingsMap.put(settings.getDropping(), new HashSet<>());
-			}
-			droppingSettingsMap.get(settings.getDropping()).add(settings);
-		}
-		
-		//create the phases
-		Set<SignalGroupSettingsData> handledSettings = new HashSet<>();
-		//loop through the settings sorted by onset
-		for (SignalGroupSettingsData settings : settingsList){
-			if (handledSettings.contains(settings)){
-				continue;
-			}
-			Set<SignalGroupSettingsData> sameOnsetSettings = onsetSettingsMap.get(settings.getOnset());
-			SignalGroupSettingsData lastDropSettings = getLastDroppingSettings(sameOnsetSettings); 
-			int phaseOn = lastDropSettings.getOnset();
-			int phaseDrop = lastDropSettings.getDropping();
-			FixedTimeSignalPhase phase = new FixedTimeSignalPhase(phaseOn, phaseDrop);
-			phases.add(phase);
-			Set<SignalGroupSettingsData> sameDroppingSettings = droppingSettingsMap.get(phaseDrop);
-			//check semantics and add to phase
-			for (SignalGroupSettingsData sameOnsetSetting : sameOnsetSettings){
-				if (sameOnsetSetting.getDropping() <= phaseDrop){
-					handledSettings.add(sameOnsetSetting);
-					phase.addSignalGroupSettingsData(sameOnsetSetting);
-				}
-				else {
-					log.error("should not happen");
-				}
-			}
-			for (SignalGroupSettingsData sameDropSetting : sameDroppingSettings){
-				if (handledSettings.contains(sameDropSetting)){
-					continue;
-				}
-				if (sameDropSetting.getOnset() >= phaseOn){
-					handledSettings.add(sameDropSetting);
-					phase.addSignalGroupSettingsData(sameDropSetting);
-				}
-				else {
-					log.error("should not happen");
-				}
-			}
-		}
-		return phases;
-	}
-	
-
-
-	private static SignalGroupSettingsData getLastDroppingSettings(Set<SignalGroupSettingsData> sameOnsetSettings) {
-		SignalGroupSettingsData lastDropSettings = null;
-		for (SignalGroupSettingsData settings : sameOnsetSettings){
-			if (settings.getOnset() > settings.getDropping()){
-				throw new IllegalStateException("onset > dropping not implemented yet!");
-			}
-			if (lastDropSettings == null || settings.getDropping() >= lastDropSettings.getDropping()){
-				lastDropSettings = settings;
-			}
-		}
-		return lastDropSettings;
-	}
-
-
-
-	private static Set<SignalGroupSettingsData> removeAllGreenSignalGroupSettings(List<SignalGroupSettingsData> groupSettingsList, Integer cycleTime){
-		Set<SignalGroupSettingsData> allGreenSettings = new HashSet<>();
-		ListIterator<SignalGroupSettingsData> it = groupSettingsList.listIterator();
-		while (it.hasNext()){
-			SignalGroupSettingsData settings = it.next();
-			if (settings.getOnset() == 0 && settings.getDropping() == cycleTime){
-				allGreenSettings.add(settings);
-				it.remove();
-			}
-		}
-		return allGreenSettings;
-	}
 	
 	public static void main(String[] args) throws JAXBException, SAXException, ParserConfigurationException, IOException {
 		String signalControlFile = args[0];
