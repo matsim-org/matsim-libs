@@ -77,7 +77,6 @@ env:
     - MODULE=contribs/matrixbasedptrouter
     - MODULE=contribs/accessibility
     - MODULE=contribs/multimodal
-    - MODULE=contribs/travelsummary
     - MODULE=contribs/otfvis
     - MODULE=contribs/protobuf
     - MODULE=contribs/socnetsim
