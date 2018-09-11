@@ -38,7 +38,7 @@ public class SignalPlanDataImpl implements SignalPlanData {
 	private Id<SignalPlan> id;
 	private Integer cycletime;
 	private double endtime = 0.0;
-	private Integer offset;
+	private int offset;
 	private SortedMap<Id<SignalGroup>, SignalGroupSettingsData> signalGroupSettingsBySignalGroupId;
 	private double starttime = 0.0;
 
@@ -70,7 +70,7 @@ public class SignalPlanDataImpl implements SignalPlanData {
 	}
 
 	@Override
-	public Integer getOffset() {
+	public int getOffset() {
 		return this.offset;
 	}
 
@@ -95,7 +95,7 @@ public class SignalPlanDataImpl implements SignalPlanData {
 	}
 
 	@Override
-	public void setOffset(Integer seconds) {
+	public void setOffset(int seconds) {
 		this.offset = seconds;
 	}
 
