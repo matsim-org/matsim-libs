@@ -178,6 +178,7 @@
 		<module>signals</module>
 		<module>socnetsim</module>
 		<module>taxi</module>
+		<module>travelsummary</module>
 	</modules>
 	<repositories>
 		<repository>
