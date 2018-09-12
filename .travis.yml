@@ -32,15 +32,21 @@ stages:
 
 # this is the script run in the "test" stage:
 # 'failsafe:verify' triggers travis failures for errors/failures of integration tests. 
-script: mvn install --also-make --projects ${MODULE} -DskipTests -Dmaven.javadoc.skip && cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn failsafe:integration-test failsafe:verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dmaven.javadoc.skip
+script: mvn install --also-make --projects ${MODULE} -DskipTests -Dmaven.javadoc.skip && cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn failsafe:integration-test failsafe:verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dmaven.javadoc.skip -Dsource.skip -Dassembly.skipAssembly=true -DskipTests
+
+# I just added -DskipTests here since I think that we only want to run the IT tests.  kai, sep'18
 
 # this defines all other stages.
 jobs:
   include:
     - stage: package
-      script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dmaven.javadoc.skip
+      script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end 
 
-# (would be nice to run this also in parallel with the others.  But it
+#-Dmaven.javadoc.skip # may need this for the weekly/monthly releases
+#-Dsource.skip # may need this for the weekly/monthly releases
+#-Dassembly.skipAssembly=true # if we skip this, then mvn package fails
+
+# (Would be nice to run this also in parallel with the others.  But it
 # is either the matrix thing and then exactly the same command for
 # each module.  Or hand-written entries (see .travis.yml.nomatrix),
 # which in particular has the disadvantage that one cannot see the
@@ -75,7 +81,6 @@ env:
     - MODULE=contribs/matrixbasedptrouter
     - MODULE=contribs/accessibility
     - MODULE=contribs/multimodal
-    - MODULE=contribs/travelsummary
     - MODULE=contribs/otfvis
     - MODULE=contribs/protobuf
     - MODULE=contribs/socnetsim

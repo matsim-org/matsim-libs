@@ -230,6 +230,7 @@ public class Gui extends JFrame {
 			prebuttonsSequentialGroup.addComponent( button ) ;
 			prebuttonsParallelGroup.addComponent( button ) ;
 		}
+
 		final GroupLayout.SequentialGroup postbuttonsSequentialGroup = groupLayout.createSequentialGroup();
 		final GroupLayout.ParallelGroup postbuttonsParallelGroup = groupLayout.createParallelGroup() ;
 		for ( JButton button : postprocessButtons.values() ) {
@@ -326,7 +327,7 @@ public class Gui extends JFrame {
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnStartMatsim)
 						.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup( postbuttonsParallelGroup )
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
@@ -563,6 +564,11 @@ public class Gui extends JFrame {
 	final void addPreprocessButton( String str, JButton button ) {
 		this.preprocessButtons.put( str, button );
 	}
+	
+	/**
+	 * @param str -- name.  These are named so that they can be replaced, and in theory removed.  Maybe not necessary. kai, sep'18
+	 * @param button
+	 */
 	final void addPostprocessButton( String str, JButton button ) {
 		this.postprocessButtons.put( str, button );
 	}
