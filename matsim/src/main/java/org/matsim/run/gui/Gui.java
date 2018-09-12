@@ -578,10 +578,10 @@ public class Gui extends JFrame {
 	JTextField getTxtRam() {
 		return this.txtRam ;
 	}
-	@Deprecated // this should not be necessary. kai, aug'18
-	String getMainClass() {
-		return this.mainClass ;
-	}
+//	@Deprecated // this should not be necessary. kai, aug'18
+//	String getMainClass() {
+//		return this.mainClass ;
+//	}
 	JTextField getTxtConfigfilename() {
 		return this.txtConfigfilename ;
 	}
