@@ -21,7 +21,11 @@ package org.matsim.contrib.dvrp.trafficmonitoring;
 
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 /**
  * @author michalm
@@ -33,7 +37,7 @@ public class DvrpTravelTimeModule extends AbstractModule {
 
 	public void install() {
 		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_INITIAL).to(QSimFreeSpeedTravelTime.class).asEagerSingleton();
-		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_OBSERVED).to(networkTravelTime());
+		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_OBSERVED).to(Key.get(TravelTime.class, Names.named(DvrpConfigGroup.get(getConfig()).getNetworkMode())));
 		addTravelTimeBinding(DVRP_ESTIMATED).to(DvrpTravelTimeEstimator.class);
 
 		bind(DvrpOfflineTravelTimeEstimator.class).asEagerSingleton();
