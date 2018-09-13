@@ -65,6 +65,10 @@ import com.graphhopper.jsprit.core.util.Coordinate;
  * A factory that creates matsim-object from jsprit (https://github.com/jsprit/jsprit) and vice versa.
  * 
  * @author sschroeder
+ * 
+ * Extend the functionality for the use of shipments 
+ * 
+ * @author kturner
  *
  */
 public class MatsimJspritFactory {
@@ -304,13 +308,6 @@ public class MatsimJspritFactory {
 		return sTour;
 	}
 	
-	private static Coord findCoord(Id<Link> linkId, Network network) {
-		if(network == null) return null;
-		Link l = network.getLinks().get(linkId);
-		if(l == null) throw new IllegalStateException("link to linkId " + linkId + " is missing.");
-		return l.getCoord();
-	}
-	
 	
 	/**
 	 * Creates {@link VehicleRoute} from {@link ScheduledTour}.
@@ -338,7 +335,6 @@ public class MatsimJspritFactory {
 				if(e instanceof org.matsim.contrib.freight.carrier.Tour.ServiceActivity){
 					CarrierService carrierService = ((org.matsim.contrib.freight.carrier.Tour.ServiceActivity) e).getService();
 					Service service = (Service) vehicleRoutingProblem.getJobs().get(carrierService.getId().toString());
-//                    Service service = createService(carrierService, findCoord(carrierService.getLocationLinkId(), network));
                     if(service == null) throw new IllegalStateException("service to id="+carrierService.getId()+" is missing");
 					routeBuilder.addService(service);
 				}
