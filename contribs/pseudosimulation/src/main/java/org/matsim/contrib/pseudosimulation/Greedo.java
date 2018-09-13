@@ -36,7 +36,7 @@ import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculat
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculator;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimProvider;
-import org.matsim.contrib.pseudosimulation.mobsim.SwitchingMobsimProvider;
+import org.matsim.contrib.pseudosimulation.mobsim.QSimModuleForPSim;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.contrib.pseudosimulation.searchacceleration.AccelerationConfigGroup;
 import org.matsim.contrib.pseudosimulation.searchacceleration.AcceptIntendedReplanningStragetyProvider;
@@ -54,15 +54,19 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 
+import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
-import ch.sbb.matsim.mobsim.qsim.SBBQSimModule;
+import ch.sbb.matsim.mobsim.qsim.SBBTransitModule;
+import ch.sbb.matsim.mobsim.qsim.pt.SBBTransitEngineQSimModule;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 /**
@@ -250,7 +254,9 @@ public class Greedo extends AbstractModule {
 		System.out.println("Installing the pSim");
 		this.addControlerListenerBinding().toInstance(mobSimSwitcher);
 		this.bind(MobSimSwitcher.class).toInstance(mobSimSwitcher);
-		this.bindMobsim().toProvider(SwitchingMobsimProvider.class);
+		
+		this.install(new QSimModuleForPSim());
+
 		this.bind(WaitTimeCalculator.class).to(PSimWaitTimeCalculator.class);
 		this.bind(WaitTime.class).toProvider(PSimWaitTimeCalculator.class);
 		this.bind(StopStopTimeCalculator.class).to(PSimStopStopTimeCalculator.class);
@@ -287,7 +293,7 @@ public class Greedo extends AbstractModule {
 		 * all standard strategies pre-configured?
 		 */
 
-		Greedo greedo = new Greedo();
+		Greedo greedo = null; // new Greedo();
 
 		/*
 		 * Create Config, Scenario, Controler in the usual order. Let the Greedo meet
@@ -318,7 +324,7 @@ public class Greedo extends AbstractModule {
 
 	public static void runPT() {
 
-		Greedo greedo = null; //new Greedo();
+		Greedo greedo = null; // new Greedo();
 
 		Config config = ConfigUtils
 				.loadConfig("/Users/GunnarF/NoBackup/data-workspace/pt/production-scenario/config.xml");
@@ -413,10 +419,15 @@ public class Greedo extends AbstractModule {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				System.out.println("Installing the deterministic PT sim");
-				install(new SBBQSimModule());
-				System.out.println("Installing the Raptor");
+				install(new SBBTransitModule());
 				install(new SwissRailRaptorModule());
+			}
+			@Provides
+			QSimComponents provideQSimComponents() {
+				QSimComponents components = new QSimComponents();
+				new StandardQSimComponentsConfigurator(config).configure(components);
+				SBBTransitEngineQSimModule.configure(components);
+				return components;
 			}
 		});
 
