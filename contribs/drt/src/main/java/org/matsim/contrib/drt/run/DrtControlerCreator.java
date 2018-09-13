@@ -22,9 +22,6 @@
  */
 package org.matsim.contrib.drt.run;
 
-import java.util.Arrays;
-import java.util.function.Function;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -63,6 +60,9 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.Arrays;
+import java.util.function.Function;
 
 /**
  * @author jbischoff
@@ -137,7 +137,8 @@ public final class DrtControlerCreator {
 				Logger.getLogger(DrtControlerCreator.class).info(
 						"drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 			}
-			if (!config.planCalcScore().getModes().containsKey(DrtStageActivityType.DRT_WALK)) {
+		}
+		if (!config.planCalcScore().getModes().containsKey(DrtStageActivityType.DRT_WALK)) {
 				ModeParams drtWalk = new ModeParams(DrtStageActivityType.DRT_WALK);
 				ModeParams walk = config.planCalcScore().getModes().get(TransportMode.walk);
 				drtWalk.setConstant(walk.getConstant());
@@ -148,7 +149,7 @@ public final class DrtControlerCreator {
 						.forEach(k -> k.addModeParams(drtWalk));
 				Logger.getLogger(DrtControlerCreator.class)
 						.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
-			}
+
 		}
 
 		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
