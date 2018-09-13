@@ -29,11 +29,12 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
 public class FreightUtils {
-	
+
 	private static final Logger log = Logger.getLogger(FreightUtils.class);
 
 	/**
@@ -100,6 +101,11 @@ public class FreightUtils {
 		} catch (Exception e) {
 			throw new RuntimeException("Carrier " + carrier.getId() + " has NO selectedPlan. --> CanNOT create a new carrier from solution");
 		}
+		try {
+			carrier.getSelectedPlan().getScheduledTours();
+		} catch (Exception e) {
+			throw new RuntimeException("Carrier " + carrier.getId() + " has NO ScheduledTours. --> CanNOT create a new carrier from solution");
+		}
 		for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 			Id<Link> depotForTour = tour.getVehicle().getLocation();
 			for (TourElement te : tour.getTour().getTourElements()) {
@@ -108,14 +114,18 @@ public class FreightUtils {
 					depotServiceIsdeliveredFrom.put(act.getService().getId(), depotForTour);
 				}
 			}
-			for (CarrierService carrierService : carrier.getServices()) {
-				CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class), 
-						depotServiceIsdeliveredFrom.get(carrierService.getId()), 
-						carrierService.getLocationLinkId(), 
-						carrierService.getCapacityDemand())
-						.build();
-				carrierWS.getShipments().add(carrierShipment);
-			}
+		}
+		for (CarrierService carrierService : carrier.getServices()) {
+			CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class), 
+					depotServiceIsdeliveredFrom.get(carrierService.getId()), 
+					carrierService.getLocationLinkId(), 
+					carrierService.getCapacityDemand())
+					.setDeliveryServiceTime(carrierService.getServiceDuration())
+					//						.setPickupServiceTime(pickupServiceTime)			//Not set yet, because in service we have now time for that. Maybe change it later, kmt sep18
+					.setDeliveryTimeWindow(carrierService.getServiceStartTimeWindow())
+					.setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))			// limited to end of delivery timeWindow (pickup later as latest delivery is not usefull)
+					.build();
+			carrierWS.getShipments().add(carrierShipment);
 		}
 	}
 
