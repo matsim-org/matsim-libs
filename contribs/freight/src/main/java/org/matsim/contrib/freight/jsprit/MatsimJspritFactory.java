@@ -341,12 +341,12 @@ public class MatsimJspritFactory {
 			}
 		}
 		VehicleRoute route = routeBuilder.build();
-//        System.out.println("jsprit route: " + route);
-//        System.out.println("start-location: " + route.getStart().getLocationId() + " endTime: " + route.getDepartureTime() + "(" + route.getStart().getEndTime() + ")");
-//        for(TourActivity act : route.getActivities()){
-//            System.out.println("act: " + act);
-//        }
-//        System.out.println("end: " + route.getEnd());
+        log.debug("jsprit route: " + route);
+        log.debug("start-location: " + route.getStart().getLocation() + " endTime: " + route.getDepartureTime() + "(" + route.getStart().getEndTime() + ")");
+        for(TourActivity act : route.getActivities()){
+            log.debug("act: " + act);
+        }
+        log.debug("end: " + route.getEnd());
         assert route.getDepartureTime() == scheduledTour.getDeparture() : "departureTimes of both routes must be equal";
 		return route;
 	}
