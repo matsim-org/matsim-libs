@@ -37,6 +37,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -77,18 +78,18 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		TransitStopFacility accessFacility = stops.getLeft();
 		if (accessFacility == null) {
 			printError(() -> "No access stop found, agent will walk, using mode " + DrtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
-			return (createDrtWalkLegList(fromFacility, toFacility, departureTime, person));
+            return (Collections.singletonList((createDrtWalkLeg(fromFacility, toFacility, departureTime, person))));
 		}
 
 		TransitStopFacility egressFacility = stops.getRight();
 		if (egressFacility == null) {
 			printError(() -> "No egress stop found, agent will walk, using mode " + DrtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
-			return (createDrtWalkLegList(fromFacility, toFacility, departureTime, person));
+            return (Collections.singletonList((createDrtWalkLeg(fromFacility, toFacility, departureTime, person))));
 		}
 
 		if (accessFacility.getLinkId() == egressFacility.getLinkId()) {
 			printError(() -> "Start and end stop are the same, agent will walk, using mode " + DrtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
-			return (createDrtWalkLegList(fromFacility, toFacility, departureTime, person));
+            return (Collections.singletonList((createDrtWalkLeg(fromFacility, toFacility, departureTime, person))));
 		}
 
 		List<PlanElement> trip = new ArrayList<>();
@@ -115,14 +116,6 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		Leg leg = (Leg)walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
 		leg.setMode(DrtStageActivityType.DRT_WALK);
 		return leg;
-	}
-
-	private List<? extends PlanElement> createDrtWalkLegList(Facility fromFacility, Facility toFacility, double departureTime,
-															 Person person) {
-		List<Leg> legList = new ArrayList<>();
-		Leg leg = createDrtWalkLeg(fromFacility, toFacility, departureTime, person);
-		legList.add(leg);
-		return legList;
 	}
 
 	private Activity createDrtStageActivity(Facility stopFacility) {

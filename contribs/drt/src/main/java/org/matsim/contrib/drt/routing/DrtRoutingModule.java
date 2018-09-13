@@ -45,7 +45,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -89,11 +88,9 @@ public class DrtRoutingModule implements RoutingModule {
 			if (drtCfg.isPrintDetailedWarnings()) {
 				LOGGER.error("Start and end stop are the same, agent will walk using mode " + DrtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
 			}
-			List<Leg> legList = new ArrayList<>();
-			Leg leg = (Leg) walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
-			leg.setMode(DrtStageActivityType.DRT_WALK);
-			legList.add(leg);
-			return legList;
+            Leg leg = (Leg) walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
+            leg.setMode(DrtStageActivityType.DRT_WALK);
+            return (Collections.singletonList(leg));
 		}
 
 		VrpPathWithTravelData unsharedPath = VrpPaths
