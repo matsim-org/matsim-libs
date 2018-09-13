@@ -44,7 +44,7 @@ public class FreightUtils {
 	 * @param carriers	carriers with a Solution (result of solving the VRP).
 	 * @return Carriers carriersWithShipments
 	 */
-	public Carriers createShipmentVRPCarrierFromServiceVRPSolution(Carriers carriers) {
+	public static Carriers createShipmentVRPCarrierFromServiceVRPSolution(Carriers carriers) {
 		Carriers carriersWithShipments = new Carriers();
 		for (Carrier carrier : carriers.getCarriers().values()){
 			Carrier carrierWS = CarrierImpl.newInstance(carrier.getId());
@@ -64,7 +64,7 @@ public class FreightUtils {
 	 * @param carrier
 	 */
 	private void copyDeliveries(Carrier carrierWS, Carrier carrier) {
-		log.warn("Coping of Deliveries is NOT implemented yet due to missing CarrierDelivery in freight contrib");
+		log.error("Coping of Deliveries is NOT implemented yet due to missing CarrierDelivery in freight contrib");
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class FreightUtils {
 	 * @param carrier
 	 */
 	private void copyPickups(Carrier carrierWS, Carrier carrier) {
-		log.warn("Coping of Pickup is NOT implemented yet due to missing CarrierPickup in freight contrib");
+		log.error("Coping of Pickup is NOT implemented yet due to missing CarrierPickup in freight contrib");
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class FreightUtils {
 	 * @param carrierWS		the "new" carrier with Shipments
 	 * @param carrier		the already existing
 	 */
-	private void copyShipments(Carrier carrierWS, Carrier carrier) {
+	private static void copyShipments(Carrier carrierWS, Carrier carrier) {
 		for (CarrierShipment carrierShipment: carrier.getShipments()){
 			carrierWS.getShipments().add(carrierShipment);
 		}
@@ -93,7 +93,7 @@ public class FreightUtils {
 	 * @param carrierWS		the "new" carrier with Shipments
 	 * @param carrier		the already existing
 	 */
-	private void createShipmentsFromServices(Carrier carrierWS, Carrier carrier) {
+	private static void createShipmentsFromServices(Carrier carrierWS, Carrier carrier) {
 		TreeMap<Id<CarrierService>, Id<Link>> depotServiceIsdeliveredFrom = new TreeMap<Id<CarrierService>, Id<Link>>();
 		try {
 			carrier.getSelectedPlan();
