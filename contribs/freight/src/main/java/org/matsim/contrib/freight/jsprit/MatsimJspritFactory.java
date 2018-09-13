@@ -150,16 +150,6 @@ public class MatsimJspritFactory {
 		.build();
 	}
 	
-	private static Delivery createDelivery(CarrierShipment carrierShipment,  Coord toCoordinate) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private static Pickup createPickup(CarrierShipment carrierShipment, Coord fromCoordinate) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 	static Service createService(CarrierService carrierService, Coord locationCoord) {
 		Location.Builder locationBuilder = Location.Builder.newInstance();
 		locationBuilder.setId(carrierService.getLocationLinkId().toString());
@@ -430,12 +420,6 @@ public class MatsimJspritFactory {
 					fromCoordinate = fromLink.getCoord();
 					toCoordinate = toLink.getCoord();
 					vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
-				} else if (fromLink != null && toLink== null) { 	//Pickup to be delivered from specified location to depot TODO: Use Pickup also in MATSim freight contrib?? kmt aug/18
-					fromCoordinate = fromLink.getCoord();
-					vrpBuilder.addJob(createPickup(carrierShipment, fromCoordinate));
-				} else if (fromLink == null && toLink != null) { 	//Delivery to be delivered from depot to specified location TODO: Use Delivery also in MATSim freight contrib?? kmt aug/18
-					toCoordinate = toLink.getCoord();
-					vrpBuilder.addJob(createDelivery(carrierShipment, toCoordinate));
 				} else 
 					throw new IllegalStateException("cannot create shipment since neither fromLinkId " + carrierShipment.getTo() + " nor toLinkId " + carrierShipment.getTo() + " exists in network.");
 					
