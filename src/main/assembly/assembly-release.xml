@@ -10,8 +10,8 @@
 	
 	<fileSets>
 		<fileSet>
-			<directory>./input/</directory>
-			<outputDirectory>input</outputDirectory>
+			<directory>./scenarios/</directory>
+			<outputDirectory>scenarios</outputDirectory>
 		</fileSet>
 	</fileSets>
 	
