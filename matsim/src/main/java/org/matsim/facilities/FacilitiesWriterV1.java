@@ -30,6 +30,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegat
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedSet;
@@ -56,16 +57,25 @@ import java.util.SortedSet;
 
     @Override
     public void write(String filename) {
-        this.writeOpenAndInit(filename);
+        openFile(filename);
+        this.writeInit();
         for (ActivityFacility f : FacilitiesUtils.getSortedFacilities(this.facilities).values()) {
             this.writeFacility((ActivityFacilityImpl) f);
         }
         this.writeFinish();
     }
 
-    private final void writeOpenAndInit(final String filename) {
+    public void write(OutputStream stream) {
+        openOutputStream(stream);
+        this.writeInit();
+        for (ActivityFacility f : FacilitiesUtils.getSortedFacilities(this.facilities).values()) {
+            this.writeFacility((ActivityFacilityImpl) f);
+        }
+        this.writeFinish();
+    }
+
+    private final void writeInit() {
         try {
-            openFile(filename);
             this.writeXmlHead();
             this.writeDoctype("facilities", DTD);
             this.startFacilities(this.facilities, this.writer);
