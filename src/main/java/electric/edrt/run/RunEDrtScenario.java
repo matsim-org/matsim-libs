@@ -21,6 +21,8 @@ package electric.edrt.run;
 
 import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.av.maxspeed.DvrpTravelTimeWithMaxSpeedLimitModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
@@ -30,9 +32,11 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vsp.edvrp.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.vsp.edvrp.edrt.run.EDrtControlerCreator;
@@ -84,8 +88,16 @@ public class RunEDrtScenario {
 		config.qsim().setFlowCapFactor(0.12);
 		config.qsim().setStorageCapFactor(0.24);
 
+        config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
+
 		config.controler().setOutputDirectory(inputPath + "../output/" + runId);
-		createControler(config).run();
+        Controler controler = createControler(config);
+
+        VehicleType slowAV = controler.getScenario().getVehicles().getFactory().createVehicleType(Id.create("av", VehicleType.class));
+        slowAV.setMaximumVelocity(20 / 3.6);
+
+        controler.addOverridingModule(new DvrpTravelTimeWithMaxSpeedLimitModule(slowAV));
+        controler.run();
 	}
 
 	public static Controler createControler(Config config) {
