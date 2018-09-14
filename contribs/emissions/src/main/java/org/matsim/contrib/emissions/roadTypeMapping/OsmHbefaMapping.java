@@ -50,18 +50,22 @@ public class OsmHbefaMapping implements HbefaRoadTypeMapping {
     @Provides
     public static OsmHbefaMapping build() {
         OsmHbefaMapping mapping = new OsmHbefaMapping();
-        mapping.hbfeaMap.put("motorway-Nat.", new Hbefa("MW-Nat.",80,130));
-        mapping.hbfeaMap.put("motorway", new Hbefa("MW-City",60,90));
-        mapping.hbfeaMap.put("primary-Nat.", new Hbefa("Trunk-Nat.",80,110));
-        mapping.hbfeaMap.put("primary", new Hbefa("Trunk-City",50,80));
-        mapping.hbfeaMap.put("trunk", new Hbefa("Trunk-City",50,80));
-        mapping.hbfeaMap.put("secondary", new Hbefa("Distr",50,80));
-        mapping.hbfeaMap.put("tertiary", new Hbefa("Local",50,60));
-        mapping.hbfeaMap.put("residential", new Hbefa("Access",30,50));
-        mapping.hbfeaMap.put("service", new Hbefa("Access",30,50));
-        mapping.hbfeaMap.put("living", new Hbefa("Access",30,50));
+        mapping.put("motorway-Nat.", new Hbefa("MW-Nat.",80,130));
+        mapping.put("motorway", new Hbefa("MW-City",60,90));
+        mapping.put("primary-Nat.", new Hbefa("Trunk-Nat.",80,110));
+        mapping.put("primary", new Hbefa("Trunk-City",50,80));
+        mapping.put("trunk", new Hbefa("Trunk-City",50,80));
+        mapping.put("secondary", new Hbefa("Distr",50,80));
+        mapping.put("tertiary", new Hbefa("Local",50,60));
+        mapping.put("residential", new Hbefa("Access",30,50));
+        mapping.put("service", new Hbefa("Access",30,50));
+        mapping.put("living", new Hbefa("Access",30,50));
 
         return mapping;
+    }
+
+    private void put(String s, Hbefa hbefa) {
+        hbfeaMap.put(s, hbefa);
     }
 
     @Override
