@@ -64,7 +64,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
     private final String targetCRS;
     private CoordinateTransformation coordinateTransformation;
 
-    private final Scenario scenario;
+    private final ActivityFacilities facilities;
     private MatsimXmlParser delegate = null;
     private Map<Class<?>, AttributeConverter<?>> attributeConverters = new HashMap<>();
 
@@ -89,7 +89,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
     public MatsimFacilitiesReader(
             final String targetCRS,
             final Scenario scenario) {
-        this(scenario.getConfig().facilities().getInputCRS(), targetCRS, scenario);
+        this(scenario.getConfig().facilities().getInputCRS(), targetCRS, scenario.getActivityFacilities());
     }
 
     /**
@@ -98,15 +98,15 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
      * @param externalInputCRS specifies the CRS the coordinates are expressed in. If the CRS is define in the container
      *                         attributes, this value is ignored
      * @param targetCRS the CRS the coordinates should be expressed in
-     * @param scenario                 The scenario containing the Facilities-object to store the facilities in.
+     * @param facilities                 The ActivityFacilities-object to store the facilities in.
      */
     public MatsimFacilitiesReader(
             final String externalInputCRS,
             final String targetCRS,
-            final Scenario scenario) {
+            final ActivityFacilities facilities) {
         this.externalInputCRS = externalInputCRS;
         this.targetCRS = targetCRS;
-        this.scenario = scenario;
+        this.facilities = facilities;
     }
 
     public void putAttributeConverter(Class<?> clazz, AttributeConverter<?> converter) {
@@ -132,7 +132,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
         super.setDoctype(doctype);
         // Currently the only facilities-type is v1
         if (FACILITIES_V1.equals(doctype)) {
-            this.delegate = new FacilitiesReaderMatsimV1(externalInputCRS, targetCRS, scenario.getActivityFacilities());
+            this.delegate = new FacilitiesReaderMatsimV1(this.externalInputCRS, this.targetCRS, this.facilities);
             ((FacilitiesReaderMatsimV1)this.delegate).putAttributeConverters(this.attributeConverters);
             log.info("using facilities_v1-reader.");
         } else {
