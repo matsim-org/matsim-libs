@@ -29,9 +29,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.examples.TriangleScenario;
-import org.matsim.facilities.algorithms.FacilitiesCalcMinDist;
-import org.matsim.facilities.algorithms.FacilitiesCombine;
-import org.matsim.facilities.algorithms.FacilitiesSummary;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class FacilitiesParserWriterTest {
@@ -46,10 +43,6 @@ public class FacilitiesParserWriterTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
-
-		new FacilitiesSummary().run(facilities);
-		new FacilitiesCalcMinDist().run(facilities);
-		new FacilitiesCombine().run(facilities);
 
 		String outputFilename = this.utils.getOutputDirectory() + "output_facilities.xml";
 		TriangleScenario.writeFacilities(facilities, outputFilename);
