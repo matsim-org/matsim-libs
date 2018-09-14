@@ -6,14 +6,9 @@
 	<groupId>org.matsim.projects</groupId>
 	<artifactId>freight-dfg17</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+
 	<name>freight-dfg17</name>
 	<description>freight-dfg17 internal data not to be put on public github matsim/freight-contrib repository</description>
-	<scm>
-		<url>https://github.com/matsim-org/matsim</url>
-		<connection>scm:git:git://github.com/matsim-org/matsim.git</connection>
-		<developerConnection>scm:git:git@github.com:matsim-org/matsim.git</developerConnection>
-	</scm>
-
 
 	<repositories>
 		<!-- Repository for MATSim releases (MATSim is not on Maven central) -->
@@ -61,43 +56,10 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>3.17</version>
-		</dependency>
-		<dependency>
-			<groupId>com.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>4.0</version>
-		</dependency>
-
-
-
 	</dependencies>
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>1.4</version>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<goals>
-							<goal>create</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<doCheck>false</doCheck>
-					<doUpdate>false</doUpdate>
-					<revisionOnScmFailure>unknown</revisionOnScmFailure>
-					<timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
-				</configuration>
-			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -118,69 +80,25 @@
 					</compilerArguments>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.19</version>
+				<artifactId>maven-eclipse-plugin</artifactId>
 				<configuration>
-					<excludes>
-						<exclude>**/*$*</exclude> <!-- exclude all inner classes -->
-						<exclude>org/matsim/testcases/TestDepth.java</exclude>
-						<exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
-					</excludes>
-					<forkMode>once</forkMode>
-					<!-- avoid out of memory errors: -->
-					<argLine>-Xmx700m -Djava.awt.headless=true
-						-Dmatsim.preferLocalDtds=true</argLine>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
 				</configuration>
 			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>libs/</classpathPrefix>
-							<mainClass>org.matsim.run.gui.Gui</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2.1</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
-				<!-- Setting this to 2.2.1 because I want to be able to skip assembly 
-					from the command line. kai, jun'17 -->
 				<configuration>
-					<descriptors>
-						<descriptor>src/main/assembly/assembly-release.xml</descriptor>
-					</descriptors>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>org.matsim.gui.MATSimGUI</mainClass>
+						</manifest>
+					</archive>
 				</configuration>
 				<executions>
 					<execution>
@@ -194,8 +112,8 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>	
+	
+		<profiles>
 		<profile>
 			<id>release</id>
 			<build>
@@ -226,5 +144,5 @@
 			</build>
 		</profile>
 	</profiles>
-
+	
 </project>
