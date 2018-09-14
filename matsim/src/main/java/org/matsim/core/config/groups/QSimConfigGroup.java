@@ -451,6 +451,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES_CMT =
 			"decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false";
 	private boolean insertingWaitingVehiclesBeforeDrivingVehicles = false;
+	// (yyyyyy switch this default to true; false has really weird consequences sometimes (vehicles waiting for hours in driveway;
+	// and this is not included into decongestion approach. kai/ihab, aug'18)
 	/**
 	 * @return {@value #INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES_CMT}
 	 */

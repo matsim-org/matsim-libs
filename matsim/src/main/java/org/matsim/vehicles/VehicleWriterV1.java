@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -48,11 +49,11 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 	}
 	
 	public void writeFile(String filename) throws UncheckedIOException {
+		log.info( Gbl.aboutToWrite( "vehicles", filename) ) ;
 		this.openFile(filename);
 		this.writeXmlHead();
 		this.writeRootElement();
 		this.close();
-		log.info("Vehicles written to: " + filename);
 	}
 
 	private void writeRootElement() throws UncheckedIOException {

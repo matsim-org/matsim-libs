@@ -22,17 +22,24 @@
  */
 package org.matsim.contrib.analysis.vsp.traveltimedistance;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author  jbischoff
  * An example how to validate car travel times in MATSim against an external source. In this example, the Here Maps API is used.
+ * Here allows you to query a certain number of routes per month for free after registering.
  * 
  */
 
@@ -70,19 +77,30 @@ public class RunTraveltimeValidationExample {
 		if (args.length>8){
 			tripsToValidate = Integer.parseInt(args[8]);
 		}
-		
+
+        Set<Id<Person>> populationIds = new HashSet<>();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(network);
-		new PopulationReader(scenario).readFile(plans);
+        StreamingPopulationReader spr = new StreamingPopulationReader(scenario);
+        spr.addAlgorithm(new PersonAlgorithm() {
+            @Override
+            public void run(Person person) {
+                populationIds.add(person.getId());
+            }
+        });
+        spr.readFile(plans);
+
+
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(epsg, TransformationFactory.WGS84);
 		HereMapsRouteValidator validator = new HereMapsRouteValidator(outputfolder, appId, appCode, date, transformation);
-		validator.setWriteDetailedFiles(true);
+        //Setting this to true will write out the raw JSON files for each calculated route
+        validator.setWriteDetailedFiles(false);
 		TravelTimeValidationRunner runner;
 		if (tripsToValidate != null){
-		runner = new TravelTimeValidationRunner(scenario.getNetwork(), scenario.getPopulation(), events, outputfolder, validator, tripsToValidate);
+            runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events, outputfolder, validator, tripsToValidate);
 		}
 		else  {
-			runner = new TravelTimeValidationRunner(scenario.getNetwork(), scenario.getPopulation(), events, outputfolder,  validator);
+            runner = new TravelTimeValidationRunner(scenario.getNetwork(), populationIds, events, outputfolder, validator);
 		}
 		runner.run();
 	}

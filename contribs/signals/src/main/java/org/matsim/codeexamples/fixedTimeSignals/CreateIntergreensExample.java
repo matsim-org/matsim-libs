@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.fixedTimeSignals;
+package org.matsim.codeexamples.fixedTimeSignals;
 
 import java.io.IOException;
 

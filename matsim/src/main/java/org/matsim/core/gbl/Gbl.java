@@ -239,7 +239,15 @@ public abstract class Gbl {
 	public static final String WRONG_IMPLEMENTATION = "wrong implementation of interface; " ;
 	
 	public static final String COPY_PASTE_FROM_CORE_NO_LONGER_WORKING="Another solution for this has been found in the core, and thus this copy-and-paste from the core is no longer working." ;
-
-
 	
+	public static String aboutToWrite( String what, String filename ) {
+		return "about to write " + what + " to: "  + filename ;
+	}
+	public static String aboutToRead( String what, URL url ) {
+		return "about to read " + what + " from: "  + url ;
+	}
+	public static String aboutToRead( String what, String filename ) {
+		return "about to read " + what + " from: "  + filename ;
+	}
+
 }

@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimSomeWriter;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.jaxb.lanedefinitions20.*;
@@ -59,7 +60,7 @@ public final class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSome
 	 *
 	 */
 	public LanesWriter(Lanes lanedefs) {
-		log.info("Using LaneDefinitionWriter20...");
+//		log.info("Using LaneDefinitionWriter20...");
 		this.laneDefinitions = lanedefs;
 	}
 
@@ -68,7 +69,7 @@ public final class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSome
 	 */
 	@Override
 	public void write(String filename) {
-		log.info("writing to file: " + filename);
+		log.info( Gbl.aboutToWrite( "lanes", filename ) ) ;
   	JAXBContext jc;
 		try {
 			XMLLaneDefinitions xmlLaneDefinitions = convertDataToXml();

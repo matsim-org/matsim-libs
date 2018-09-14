@@ -12,12 +12,12 @@ For more information, see the project website at http://www.matsim.org/.
 
 ## Questions
 
-Have any questions? Visit http://www.matsim.org/faq
+Have any questions? Visit https://matsim.org/faq
 and see if it has already been answered. If not, post a new question.
 
 ## Development
 
-The issue tracker is at http://matsim.atlassian.net/.
+The issue tracker is at https://matsim.org/issuetracker .
 
 Build by running (from this directory, not any sub-directory):
 
@@ -32,3 +32,7 @@ Releases and release candidates, including information how to use them by Maven,
 Snapshots, with the usual use-at-your-own-risk disclaimer, are at http://oss.jfrog.org/artifactory/simple/oss-snapshot-local/org/matsim/.
 
 An example how to get started with your own project, including a complete pom.xml, is at https://github.com/matsim-org/matsim-example-project .
+
+Code examples are at https://github.com/matsim-org/matsim-code-examples .
+
+
