@@ -103,6 +103,7 @@ import java.util.SortedSet;
                 }
                 this.endActivity(this.writer);
             }
+						this.attributesWriter.writeAttributes("\t\t", this.writer, f.getAttributes());
             this.endFacility(this.writer);
             this.writeSeparator(this.writer);
             this.writer.flush();
@@ -158,7 +159,6 @@ import java.util.SortedSet;
             out.write(" desc=\"" + facility.getDesc() + "\"");
         }
         out.write(">\n");
-        this.attributesWriter.writeAttributes("\t\t", out, facility.getAttributes());
     }
 
     public void endFacility(final BufferedWriter out) throws IOException {
