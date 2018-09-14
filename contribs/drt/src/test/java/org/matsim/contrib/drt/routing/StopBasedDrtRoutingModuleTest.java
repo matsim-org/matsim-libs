@@ -22,19 +22,13 @@
  */
 package org.matsim.contrib.drt.routing;
 
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -46,6 +40,8 @@ import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TeleportationRoutingModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+
+import java.util.List;
 
 /**
  * @author jbischoff
@@ -88,8 +84,19 @@ public class StopBasedDrtRoutingModuleTest {
 
 		List<? extends PlanElement> routedList2 = stopBasedDRTRoutingModule.calcRoute(hf2, wf2, 8 * 3600, p2);
 
+		Person p3 = scenario.getPopulation().getPersons().get(Id.createPersonId(3));
+		Activity h3 = (Activity) p3.getSelectedPlan().getPlanElements().get(0);
+		ActivityWrapperFacility hf3 = new ActivityWrapperFacility(h3);
+
+		Activity w3 = (Activity) p3.getSelectedPlan().getPlanElements().get(2);
+		ActivityWrapperFacility wf3 = new ActivityWrapperFacility(w3);
+
+		List<? extends PlanElement> routedList3 = stopBasedDRTRoutingModule.calcRoute(hf3, wf3, 8 * 3600, p3);
+
+
 		Assert.assertEquals(5, routedList.size());
-		Assert.assertEquals(1, routedList2.size());
+		Assert.assertEquals(5, routedList2.size());
+		Assert.assertEquals(1, routedList3.size());
 
 		System.out.println(routedList);
 
@@ -102,7 +109,7 @@ public class StopBasedDrtRoutingModuleTest {
 		Config config = ConfigUtils.createConfig();
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 		drtConfigGroup.setMaxWalkDistance(200);
-		drtConfigGroup.setTransitStopFile("./src/test/resources/cottbus/stops-schedule.xml.gz");
+		drtConfigGroup.setTransitStopFile("./src/test/resources/cottbus/drtstops.xml.gz");
 		config.addModule(drtConfigGroup);
 
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
@@ -143,6 +150,20 @@ public class StopBasedDrtRoutingModuleTest {
 		work2.setLinkId(Id.createLinkId(7717));
 		plan2.addActivity(work2);
 		scenario.getPopulation().addPerson(p2);
+
+
+		Person p3 = pf.createPerson(Id.createPersonId(3));
+		Plan plan3 = pf.createPlan();
+		p3.addPlan(plan3);
+		Activity home3 = pf.createActivityFromCoord("home", new Coord(460077.7116017367, 5740133.3409971865));
+		home3.setLinkId(Id.createLinkId(9541));
+		home3.setEndTime(8 * 3600);
+		plan3.addActivity(home3);
+		plan3.addLeg(pf.createLeg("drt"));
+		Activity work3 = pf.createActivityFromCoord("work", new Coord(460077.7116017367, 5740133.3409971865));
+		work3.setLinkId(Id.createLinkId(7717));
+		plan3.addActivity(work3);
+		scenario.getPopulation().addPerson(p3);
 	}
 
 }

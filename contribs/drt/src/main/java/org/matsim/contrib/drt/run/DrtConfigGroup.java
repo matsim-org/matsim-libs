@@ -19,21 +19,20 @@
 
 package org.matsim.contrib.drt.run;
 
-import java.net.URL;
-import java.util.Collection;
-import java.util.Map;
+import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-
-import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Map;
 
 public class DrtConfigGroup extends ReflectiveConfigGroup {
 
@@ -80,7 +79,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	static final String OP_SCHEME_EXP = "Operational Scheme, either door2door or stopbased. door2door by default";
 
 	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
-	static final String MAX_WALK_EXP = "Maximum walk distance (in meters) to next stop location in stopbased system.";
+	static final String MAX_WALK_EXP = "Maximum desired walk distance (in meters) to next stop location in stopbased system. If no suitable stop is found in that range, the search radius will be extended in steps of maxWalkDistance until a stop is found.";
 
 	public static final String ESTIMATED_DRT_SPEED = "estimatedDrtSpeed";
 	static final String ESTIMATED_DRT_SPEED_EXP = "Beeline-speed estimate for DRT. Used in analysis, optimisation constraints "
@@ -180,6 +179,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 		map.put(ESTIMATED_BEELINE_DISTANCE_FACTOR, ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP);
 		map.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_EXP);
 		map.put(PRINT_WARNINGS, PRINT_WARNINGS_EXP);
+		map.put(REQUEST_REJECTION, REQUEST_REJECTION_EXP);
 		return map;
 	}
 
