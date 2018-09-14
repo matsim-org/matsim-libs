@@ -23,7 +23,6 @@ package org.matsim.facilities;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.xml.sax.Attributes;
@@ -133,7 +132,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
         super.setDoctype(doctype);
         // Currently the only facilities-type is v1
         if (FACILITIES_V1.equals(doctype)) {
-            this.delegate = new FacilitiesReaderMatsimV1(externalInputCRS, targetCRS, scenario);
+            this.delegate = new FacilitiesReaderMatsimV1(externalInputCRS, targetCRS, scenario.getActivityFacilities());
             ((FacilitiesReaderMatsimV1)this.delegate).putAttributeConverters(this.attributeConverters);
             log.info("using facilities_v1-reader.");
         } else {
