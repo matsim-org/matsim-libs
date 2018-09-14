@@ -21,7 +21,6 @@
 package org.matsim.facilities;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -37,39 +36,27 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class FacilitiesParserWriterTest {
 
-	private Config config = null;
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-
-	@Before
-	public void setUp() {
-		this.config = ConfigUtils.createConfig();
-		TriangleScenario.setUpScenarioConfig(this.config);
-	}
-
-	private void runModules(final ActivityFacilities facilities) {
-		new FacilitiesSummary().run(facilities);
-		new FacilitiesCalcMinDist().run(facilities);
-		new FacilitiesCombine().run(facilities);
-	}
-
-	private void compareOutputFacilities(String filename) {
-		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.facilities().getInputFile());
-		long checksum_run = CRCChecksum.getCRCFromFile(filename);
-		Assert.assertEquals(checksum_ref, checksum_run);
-	}
 
 	@Test
 	public void testParserWriter1() {
-		System.out.println("  reading facilites xml file independent of the world...");
-		Scenario scenario = ScenarioUtils.createScenario(this.config);
-		ActivityFacilities facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
+		Config config = ConfigUtils.createConfig();
+		TriangleScenario.setUpScenarioConfig(config);
 
-		this.runModules(facilities);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		ActivityFacilities facilities = scenario.getActivityFacilities();
+		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
+
+		new FacilitiesSummary().run(facilities);
+		new FacilitiesCalcMinDist().run(facilities);
+		new FacilitiesCombine().run(facilities);
 
 		String outputFilename = this.utils.getOutputDirectory() + "output_facilities.xml";
 		TriangleScenario.writeFacilities(facilities, outputFilename);
-		this.compareOutputFacilities(outputFilename);
+
+		long checksum_ref = CRCChecksum.getCRCFromFile(config.facilities().getInputFile());
+		long checksum_run = CRCChecksum.getCRCFromFile(outputFilename);
+		Assert.assertEquals(checksum_ref, checksum_run);
 	}
 
 }
