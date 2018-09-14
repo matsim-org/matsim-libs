@@ -21,6 +21,7 @@ package org.matsim.contrib.freight.utils;
 import java.util.Collection;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -44,7 +45,7 @@ import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
@@ -55,7 +56,7 @@ import com.graphhopper.jsprit.core.util.Solutions;
 
 import org.junit.Assert;
 
-public class FreightUtilsIT extends MatsimTestCase{
+public class FreightUtilsIT {
 	
 	private static final Id<Carrier> CARRIER_ID = Id.create("Carrier", Carrier.class);
 	
@@ -65,7 +66,9 @@ public class FreightUtilsIT extends MatsimTestCase{
 	private Carriers carriersShipmentsOnly;
 	private Carrier carrierShipmentsOnly1;
 	
-
+	@Rule
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	
 	@Before
 	public void setUp() {
 		
@@ -107,7 +110,7 @@ public class FreightUtilsIT extends MatsimTestCase{
 
 		//load Network and build netbasedCosts for jsprit
 		Network network = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(network).readFile(getClassInputDirectory() + "grid-network.xml"); 
+		new MatsimNetworkReader(network).readFile(testUtils.getClassInputDirectory() + "grid-network.xml"); 
 		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( network, vehicleTypes.getVehicleTypes().values() );
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
 		netBuilder.setTimeSliceWidth(1800) ; // !!!!, otherwise it will not do anything.
@@ -171,7 +174,7 @@ public class FreightUtilsIT extends MatsimTestCase{
 		for (CarrierShipment carrierShipment : carrierServicesAndShipments1.getShipments()) {
 			demandShipments += carrierShipment.getSize();
 		}
-		Assert.assertEquals(4, demandShipments);
+		Assert.assertEquals(3, demandShipments);
 	}
 	
 	@Test
