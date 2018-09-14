@@ -20,31 +20,30 @@
 
 package org.matsim.facilities;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.examples.TriangleScenario;
 import org.matsim.facilities.algorithms.FacilitiesCalcMinDist;
 import org.matsim.facilities.algorithms.FacilitiesCombine;
 import org.matsim.facilities.algorithms.FacilitiesSummary;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class FacilitiesParserWriterTest extends MatsimTestCase {
+public class FacilitiesParserWriterTest {
 
 	private Config config = null;
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.config = super.loadConfig(null);
-		TriangleScenario.setUpScenarioConfig(this.config, super.getOutputDirectory());
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		this.config = null;
-		super.tearDown();
+	@Before
+	public void setUp() {
+		this.config = ConfigUtils.createConfig();
+		TriangleScenario.setUpScenarioConfig(this.config);
 	}
 
 	private void runModules(final ActivityFacilities facilities) {
@@ -56,9 +55,10 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 	private void compareOutputFacilities(String filename) {
 		long checksum_ref = CRCChecksum.getCRCFromFile(this.config.facilities().getInputFile());
 		long checksum_run = CRCChecksum.getCRCFromFile(filename);
-		assertEquals(checksum_ref, checksum_run);
+		Assert.assertEquals(checksum_ref, checksum_run);
 	}
 
+	@Test
 	public void testParserWriter1() {
 		System.out.println("  reading facilites xml file independent of the world...");
 		Scenario scenario = ScenarioUtils.createScenario(this.config);
@@ -67,56 +67,9 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 
 		this.runModules(facilities);
 
-		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
-	
-		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
+		String outputFilename = this.utils.getOutputDirectory() + "output_facilities.xml";
+		TriangleScenario.writeFacilities(facilities, outputFilename);
+		this.compareOutputFacilities(outputFilename);
 	}
 
-	//////////////////////////////////////////////////////////////////////
-
-	public void testParserWriter2() {
-		Scenario scenario = ScenarioUtils.createScenario(this.config);
-	
-		System.out.println("  reading facilites xml file as a layer of the world...");
-		ActivityFacilities facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
-
-		this.runModules(facilities);
-
-		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
-
-		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
-	}
-
-	//////////////////////////////////////////////////////////////////////
-
-	public void testParserWriter3() {
-		Scenario scenario = ScenarioUtils.createScenario(this.config);
-
-		System.out.println("  reading facilites xml file as a layer of the world...");
-		ActivityFacilities facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
-
-		this.runModules(facilities);
-
-		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
-
-		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
-	}
-
-	//////////////////////////////////////////////////////////////////////
-
-	public void testParserWriter4() {
-		Scenario scenario = ScenarioUtils.createScenario(this.config);
-
-		System.out.println("  reading facilites xml file as a layer of the world...");
-		ActivityFacilities facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
-
-		this.runModules(facilities);
-
-		TriangleScenario.writeFacilities(facilities, getOutputDirectory() + "output_facilities.xml");
-
-		this.compareOutputFacilities(getOutputDirectory() + "output_facilities.xml");
-	}
 }

@@ -41,7 +41,7 @@ public abstract class TriangleScenario {
 	// setup
 	//////////////////////////////////////////////////////////////////////
 
-	public static final void setUpScenarioConfig(final Config config, final String outputDirectory) {
+	public static final void setUpScenarioConfig(final Config config) {
 		config.network().setInputFile(studyfolder + "network.xml");
 		config.facilities().setInputFile(studyfolder + "facilities.xml");
 	}
