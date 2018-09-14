@@ -3,21 +3,18 @@
  */
 package org.matsim.contrib.pseudosimulation.mobsim;
 
-import java.util.Collection;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
+import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
+import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
+import org.matsim.contrib.pseudosimulation.searchacceleration.listeners.FifoTransitPerformance;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
-import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.router.util.TravelTime;
-
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 
 /**
  * @author fouriep
@@ -31,6 +28,7 @@ public class PSimProvider implements Provider<Mobsim> {
     private TransitPerformance transitPerformance;
     private final Scenario scenario;
     private final EventsManager eventsManager;
+    @Inject FifoTransitPerformance fifoTransitPerformance;
 
     @Inject
 	public PSimProvider(Scenario scenario, EventsManager eventsManager) {
@@ -44,6 +42,11 @@ public class PSimProvider implements Provider<Mobsim> {
 //			eventsManager.resetHandlers(iteration++);
 //		else
 //			iteration++;
+    	
+    	if (this.fifoTransitPerformance != null) {
+            return new PSim(scenario, eventsManager, plans.getPlansForPSim(), travelTime, this.fifoTransitPerformance);
+    	} else
+    		
         if (waitTime != null) {
             return new PSim(scenario, eventsManager, plans.getPlansForPSim(), travelTime, waitTime, stopStopTime, transitPerformance);
 

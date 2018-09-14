@@ -42,7 +42,7 @@ import org.matsim.contrib.pseudosimulation.searchacceleration.AccelerationConfig
 import org.matsim.contrib.pseudosimulation.searchacceleration.AcceptIntendedReplanningStragetyProvider;
 import org.matsim.contrib.pseudosimulation.searchacceleration.AcceptIntendedReplanningStrategy;
 import org.matsim.contrib.pseudosimulation.searchacceleration.SearchAccelerator;
-import org.matsim.contrib.pseudosimulation.searchacceleration.listeners.TransitStopInteractionListener;
+import org.matsim.contrib.pseudosimulation.searchacceleration.listeners.FifoTransitPerformance;
 import org.matsim.contrib.pseudosimulation.searchacceleration.utils.PTCapacityAdjusmentPerSample;
 import org.matsim.contrib.pseudosimulation.searchacceleration.utils.ScoreHistogramLogger;
 import org.matsim.contrib.pseudosimulation.trafficinfo.PSimStopStopTimeCalculator;
@@ -254,7 +254,7 @@ public class Greedo extends AbstractModule {
 		System.out.println("Installing the pSim");
 		this.addControlerListenerBinding().toInstance(mobSimSwitcher);
 		this.bind(MobSimSwitcher.class).toInstance(mobSimSwitcher);
-		
+
 		this.install(new QSimModuleForPSim());
 
 		this.bind(WaitTimeCalculator.class).to(PSimWaitTimeCalculator.class);
@@ -273,11 +273,18 @@ public class Greedo extends AbstractModule {
 		this.addPlanStrategyBinding(AcceptIntendedReplanningStrategy.STRATEGY_NAME)
 				.toProvider(AcceptIntendedReplanningStragetyProvider.class);
 
-		final TransitStopInteractionListener transitStopInteractionListener = new TransitStopInteractionListener(
-				mobSimSwitcher, this.scenario.getPopulation(), this.scenario.getTransitVehicles(),
-				this.scenario.getTransitSchedule());
-		this.bind(TransitStopInteractionListener.class).toInstance(transitStopInteractionListener);
-		this.addEventHandlerBinding().toInstance(transitStopInteractionListener);
+		final FifoTransitPerformance sbbListener = new FifoTransitPerformance(mobSimSwitcher,
+				scenario.getPopulation(), scenario.getTransitVehicles(), scenario.getTransitSchedule());
+		this.bind(FifoTransitPerformance.class).toInstance(sbbListener);
+		this.addEventHandlerBinding().toInstance(sbbListener);
+
+		// final TransitStopInteractionListener transitStopInteractionListener = new
+		// TransitStopInteractionListener(
+		// mobSimSwitcher, this.scenario.getPopulation(),
+		// this.scenario.getTransitVehicles(),
+		// this.scenario.getTransitSchedule());
+		// this.bind(TransitStopInteractionListener.class).toInstance(transitStopInteractionListener);
+		// this.addEventHandlerBinding().toInstance(transitStopInteractionListener);
 	}
 
 	// -------------------- MAIN-FUNCTION, ONLY FOR TESTING --------------------
@@ -293,7 +300,7 @@ public class Greedo extends AbstractModule {
 		 * all standard strategies pre-configured?
 		 */
 
-		Greedo greedo = null; // new Greedo();
+		Greedo greedo = new Greedo();
 
 		/*
 		 * Create Config, Scenario, Controler in the usual order. Let the Greedo meet
@@ -324,7 +331,7 @@ public class Greedo extends AbstractModule {
 
 	public static void runPT() {
 
-		Greedo greedo = null; // new Greedo();
+		Greedo greedo = new Greedo();
 
 		Config config = ConfigUtils
 				.loadConfig("/Users/GunnarF/NoBackup/data-workspace/pt/production-scenario/config.xml");
@@ -340,11 +347,14 @@ public class Greedo extends AbstractModule {
 		Network network = scenario.getNetwork();
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		new CreatePseudoNetwork(schedule, network, "tr_").createNetwork();
-//		AdjustPseudoNetwork adj = new AdjustPseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "tr_");
-//		adj.run();
-//		ValidationResult validationResult = TransitScheduleValidator.validateAll(scenario.getTransitSchedule(),
-//				scenario.getNetwork());
-//		TransitScheduleValidator.printResult(validationResult);
+		// AdjustPseudoNetwork adj = new
+		// AdjustPseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(),
+		// "tr_");
+		// adj.run();
+		// ValidationResult validationResult =
+		// TransitScheduleValidator.validateAll(scenario.getTransitSchedule(),
+		// scenario.getNetwork());
+		// TransitScheduleValidator.printResult(validationResult);
 
 		final Set<Id<Person>> remove = new LinkedHashSet<>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
@@ -377,43 +387,45 @@ public class Greedo extends AbstractModule {
 		PTCapacityAdjusmentPerSample capadjuster = new PTCapacityAdjusmentPerSample();
 		capadjuster.adjustStoarageAndFlowCapacity(scenario, samplesize);
 
-//		List<TransitLine> removeLines = new ArrayList<>();
-//		for (TransitLine line : scenario.getTransitSchedule().getTransitLines().values()) {
-//			List<TransitRoute> removeRoutes = new ArrayList<>();
-//			for (TransitRoute route : line.getRoutes().values()) {
-//				log.info("route " + route.getId() + ": " + route.getRoute());
-//				for (TransitRouteStop stop : route.getStops()) {
-//					// System.out.println("At " + stop.getStopFacility().getId() + ": await departure time = true");
-//					stop.setAwaitDepartureTime(true);
-//				}
-//				final List<Departure> removeDepartures = new ArrayList<>();
-//				for (Departure dpt : route.getDepartures().values()) {
-//					for (TransitRouteStop stop : route.getStops()) {											
-//						if (dpt.getDepartureTime() + stop.getArrivalOffset() >= 24 * 3600) {
-//							removeDepartures.add(dpt);
-//						}
-//					}
-//				}
-//				for (Departure dpt : removeDepartures) {
-//					log.info("removed departure at " + dpt.getDepartureTime());
-//					route.removeDeparture(dpt);
-//				}
-//				if (route.getDepartures().size() == 0) {
-//					removeRoutes.add(route);
-//				}
-//			}
-//			for (TransitRoute removeRoute : removeRoutes) {
-//				log.info("removed route " + removeRoute.getId());
-//				line.removeRoute(removeRoute);
-//			}
-//			if (line.getRoutes().size() == 0) {
-//				removeLines.add(line);
-//			}
-//		}
-//		for (TransitLine removeLine : removeLines) {
-//			log.info("removed line " + removeLine.getId());
-//			scenario.getTransitSchedule().removeTransitLine(removeLine);
-//		}
+		// List<TransitLine> removeLines = new ArrayList<>();
+		// for (TransitLine line :
+		// scenario.getTransitSchedule().getTransitLines().values()) {
+		// List<TransitRoute> removeRoutes = new ArrayList<>();
+		// for (TransitRoute route : line.getRoutes().values()) {
+		// log.info("route " + route.getId() + ": " + route.getRoute());
+		// for (TransitRouteStop stop : route.getStops()) {
+		// // System.out.println("At " + stop.getStopFacility().getId() + ": await
+		// departure time = true");
+		// stop.setAwaitDepartureTime(true);
+		// }
+		// final List<Departure> removeDepartures = new ArrayList<>();
+		// for (Departure dpt : route.getDepartures().values()) {
+		// for (TransitRouteStop stop : route.getStops()) {
+		// if (dpt.getDepartureTime() + stop.getArrivalOffset() >= 24 * 3600) {
+		// removeDepartures.add(dpt);
+		// }
+		// }
+		// }
+		// for (Departure dpt : removeDepartures) {
+		// log.info("removed departure at " + dpt.getDepartureTime());
+		// route.removeDeparture(dpt);
+		// }
+		// if (route.getDepartures().size() == 0) {
+		// removeRoutes.add(route);
+		// }
+		// }
+		// for (TransitRoute removeRoute : removeRoutes) {
+		// log.info("removed route " + removeRoute.getId());
+		// line.removeRoute(removeRoute);
+		// }
+		// if (line.getRoutes().size() == 0) {
+		// removeLines.add(line);
+		// }
+		// }
+		// for (TransitLine removeLine : removeLines) {
+		// log.info("removed line " + removeLine.getId());
+		// scenario.getTransitSchedule().removeTransitLine(removeLine);
+		// }
 
 		System.out.println("Adding the Raptor...");
 		controler.addOverridingModule(new AbstractModule() {
@@ -422,6 +434,7 @@ public class Greedo extends AbstractModule {
 				install(new SBBTransitModule());
 				install(new SwissRailRaptorModule());
 			}
+
 			@Provides
 			QSimComponents provideQSimComponents() {
 				QSimComponents components = new QSimComponents();

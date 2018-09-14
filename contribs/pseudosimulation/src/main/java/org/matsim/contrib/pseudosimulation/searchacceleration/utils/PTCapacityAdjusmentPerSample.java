@@ -41,18 +41,19 @@ public class PTCapacityAdjusmentPerSample {
 			VehicleType vt = (VehicleType)vehtypes.next();
 			VehicleCapacity cap = vt.getCapacity();
 
-//			cap.setSeats((int)Math.ceil(cap.getSeats()*samplesize));
-//			cap.setStandingRoom((int)Math.ceil(cap.getStandingRoom()*samplesize));
-			cap.setSeats(100 * 1000);
-			cap.setStandingRoom(100 * 1000);
+			cap.setSeats((int)Math.ceil(cap.getSeats()*samplesize));
+			cap.setStandingRoom((int)Math.ceil(cap.getStandingRoom()*samplesize));
+//			cap.setSeats(100 * 1000);
+//			cap.setStandingRoom(100 * 1000);
 			
 			vt.setCapacity(cap);
-			vt.setPcuEquivalents(vt.getPcuEquivalents()*samplesize); // FIXME !!!
+//			vt.setPcuEquivalents(vt.getPcuEquivalents()*samplesize); // FIXME !!!
+			vt.setPcuEquivalents(vt.getPcuEquivalents() / samplesize);
 
-//			vt.setAccessTime(vt.getAccessTime() / samplesize);
-//			vt.setEgressTime(vt.getEgressTime() / samplesize);
-			vt.setAccessTime(0.0);
-			vt.setEgressTime(0.0);
+			vt.setAccessTime(vt.getAccessTime() / samplesize);
+			vt.setEgressTime(vt.getEgressTime() / samplesize);
+//			vt.setAccessTime(0.0);
+//			vt.setEgressTime(0.0);
 		}
 	}
 }
