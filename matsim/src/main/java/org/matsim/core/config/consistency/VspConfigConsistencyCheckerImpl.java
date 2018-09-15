@@ -161,7 +161,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			}
 		}
 		
-		if ( config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0 ) {
+		if ( config.planCalcScore().getModes().get(TransportMode.car) != null && config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
 		}
 		final ModeParams modeParamsPt = config.planCalcScore().getModes().get(TransportMode.pt);
