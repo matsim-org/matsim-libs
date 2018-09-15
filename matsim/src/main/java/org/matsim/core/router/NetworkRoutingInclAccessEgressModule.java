@@ -43,6 +43,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 
@@ -114,9 +115,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Gbl.assertNotNull(fromFacility);
 		Gbl.assertNotNull(toFacility);
 
-		Link accessActLink = decideOnLink(fromFacility);
+		Link accessActLink = FacilitiesUtils.decideOnLink(fromFacility, network );
 
-		Link egressActLink = decideOnLink(toFacility);
+		Link egressActLink = FacilitiesUtils.decideOnLink(toFacility, network );
 		
 		double now = departureTime ;
 
@@ -124,26 +125,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		// === access:
 		{
-			if ( fromFacility.getCoord() != null ) { // otherwise the trip starts directly on the link; no need to bushwhack
-
-				Coord accessActCoord  = accessActLink.getToNode().getCoord() ;
-				// yyyy think about better solution: this may generate long walks along the link.
-				// (e.g. orthogonal projection)
-				Gbl.assertNotNull(accessActCoord);
-
-				Leg accessLeg = this.populationFactory.createLeg( TransportMode.access_walk ) ;
-				accessLeg.setDepartureTime( now );
-				now += routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), accessActCoord, now, accessActLink.getId(), 
-						accessActLink.getId(), this.populationFactory ) ;
-				// yyyy might be possible to set the link ids to null. kai & dominik, may'16
-				
-				result.add( accessLeg ) ;
-//				log.warn( accessLeg );
-
-				final Activity interactionActivity = createInteractionActivity(accessActCoord, accessActLink.getId() );
-				result.add( interactionActivity ) ;
-//				log.warn( interactionActivity );
-			}
+			now = addBushwhackingLegFromFacilityToLinkIfNecessary( fromFacility, person, accessActLink, now, result, populationFactory, stageActivityType );
 		}
 
 		// === compute the network leg:
@@ -158,69 +140,67 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		// === egress:
 		{
-			if ( toFacility.getCoord() != null ) { // otherwise the trip ends directly on the link; no need to bushwhack
-
-				Coord egressActCoord = egressActLink.getToNode().getCoord() ;
-				Gbl.assertNotNull( egressActCoord );
-
-				final Activity interactionActivity = createInteractionActivity( egressActCoord, egressActLink.getId() );
-				result.add( interactionActivity ) ;
-//				log.warn( interactionActivity );
-
-				Leg egressLeg = this.populationFactory.createLeg( TransportMode.egress_walk ) ;
-				egressLeg.setDepartureTime( now );
-				now += routeBushwhackingLeg(person, egressLeg, egressActCoord, toFacility.getCoord(), now, egressActLink.getId(), 
-						egressActLink.getId(), this.populationFactory ) ;
-				result.add( egressLeg ) ;
-//				log.warn( egressLeg );
-			}
-//			log.warn( "===" );
+			addBushwhackingLegFromLinkToFacilityIfNecessary( toFacility, person, egressActLink, now, result, populationFactory, stageActivityType );
 		}
 
 		return result ;
 	}
+	
+	public static void addBushwhackingLegFromLinkToFacilityIfNecessary( final Facility toFacility, final Person person,
+												   final Link egressActLink, double now, final List<PlanElement> result,
+												   final PopulationFactory populationFactory, final String stageActivityType ) {
+		if ( toFacility.getCoord() != null ) { // otherwise the trip ends directly on the link; no need to bushwhack
 
-	private Link decideOnLink(final Facility fromFacility) {
-		Link accessActLink = null ;
-		if ( fromFacility.getLinkId()!=null ) {
-			accessActLink = this.network.getLinks().get( fromFacility.getLinkId() );
-			// i.e. if street address is in mode-specific subnetwork, I just use that, and do not search for another (possibly closer)
-			// other link.
-			
-		} 
-		
-		if ( accessActLink==null ) {
-			// this is the case where the postal address link is NOT in the subnetwork, i.e. does NOT serve the desired mode,
-			// OR the facility does not have a street address link in the first place.
+			Coord egressActCoord = egressActLink.getToNode().getCoord() ;
+			Gbl.assertNotNull( egressActCoord );
 
-			if( fromFacility.getCoord()==null ) {
-				throw new RuntimeException("access/egress bushwhacking leg not possible when neither facility link id nor facility coordinate given") ;
-			}
-			
-			accessActLink = NetworkUtils.getNearestLink(this.network, fromFacility.getCoord()) ;
-			if ( accessActLink == null ) {
-				int ii = 0 ;
-				for ( Link link : this.network.getLinks().values() ) {
-					if ( ii==10 ) {
-						break ;
-					}
-					ii++ ;
-					log.warn( link );
-				}
-			}
-			Gbl.assertNotNull(accessActLink);
+			final Activity interactionActivity = createInteractionActivity( egressActCoord, egressActLink.getId(), stageActivityType );
+			result.add( interactionActivity ) ;
+//				log.warn( interactionActivity );
+
+			Leg egressLeg = populationFactory.createLeg( TransportMode.egress_walk ) ;
+			egressLeg.setDepartureTime( now );
+			now += routeBushwhackingLeg(person, egressLeg, egressActCoord, toFacility.getCoord(), now, egressActLink.getId(),
+					egressActLink.getId(), populationFactory ) ;
+			result.add( egressLeg ) ;
+//				log.warn( egressLeg );
 		}
-		return accessActLink;
+		//			log.warn( "===" );
 	}
+	
+	public static double addBushwhackingLegFromFacilityToLinkIfNecessary( final Facility fromFacility, final Person person,
+												     final Link accessActLink, double now, final List<PlanElement> result, final PopulationFactory populationFactory, final String stageActivityType ) {
+		if ( fromFacility.getCoord() != null ) { // otherwise the trip starts directly on the link; no need to bushwhack
 
-	private Activity createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink) {
-		Activity act = PopulationUtils.createActivityFromCoordAndLinkId(this.stageActivityType, interactionCoord, interactionLink);
+			Coord accessActCoord  = accessActLink.getToNode().getCoord() ;
+			// yyyy think about better solution: this may generate long walks along the link.
+			// (e.g. orthogonal projection)
+			Gbl.assertNotNull(accessActCoord);
+
+			Leg accessLeg = populationFactory.createLeg( TransportMode.access_walk ) ;
+			accessLeg.setDepartureTime( now );
+			now += routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), accessActCoord, now, accessActLink.getId(),
+					accessActLink.getId(), populationFactory ) ;
+			// yyyy might be possible to set the link ids to null. kai & dominik, may'16
+			
+			result.add( accessLeg ) ;
+//				log.warn( accessLeg );
+
+			final Activity interactionActivity = createInteractionActivity(accessActCoord, accessActLink.getId(), stageActivityType );
+			result.add( interactionActivity ) ;
+//				log.warn( interactionActivity );
+		}
+		return now;
+	}
+	
+	private static Activity createInteractionActivity( final Coord interactionCoord, final Id<Link> interactionLink, final String stageActivityType ) {
+		Activity act = PopulationUtils.createActivityFromCoordAndLinkId(stageActivityType, interactionCoord, interactionLink);
 		act.setMaximumDuration(0.0);
 		return act;
 	}
 
 
-	private static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime, 
+	private static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
 			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf) {
 		// I don't think that it makes sense to use a RoutingModule for this, since that again makes assumptions about how to
 		// map facilities, and if you follow through to the teleportation routers one even finds activity wrappers, which is yet another
