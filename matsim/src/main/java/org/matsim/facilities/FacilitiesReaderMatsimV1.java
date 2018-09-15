@@ -20,12 +20,9 @@
 
 package org.matsim.facilities;
 
-import java.util.Map;
-import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -36,6 +33,9 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.Attributes;
+
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * A reader for facilities-files of MATSim according to <code>facilities_v1.dtd</code>.
@@ -68,10 +68,10 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
     FacilitiesReaderMatsimV1(
             final String externalInputCRS,
             final String targetCRS,
-            final Scenario scenario) {
+            final ActivityFacilities facilities) {
         this.externalInputCRS = externalInputCRS;
         this.targetCRS = targetCRS;
-        this.facilities = scenario.getActivityFacilities();
+        this.facilities = facilities;
         this.factory = this.facilities.getFactory();
         if (externalInputCRS != null && targetCRS != null) {
             this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(externalInputCRS, targetCRS);
