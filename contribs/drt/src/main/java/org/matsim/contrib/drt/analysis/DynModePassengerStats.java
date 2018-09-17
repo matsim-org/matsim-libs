@@ -24,8 +24,10 @@ package org.matsim.contrib.drt.analysis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.matsim.api.core.v01.Coord;
@@ -43,9 +45,12 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
+import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEventHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -59,7 +64,7 @@ import com.google.inject.Inject;
  *
  */
 public class DynModePassengerStats implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler,
-		PersonArrivalEventHandler, LinkEnterEventHandler, ActivityEndEventHandler, DrtRequestSubmittedEventHandler {
+		PersonArrivalEventHandler, LinkEnterEventHandler, ActivityEndEventHandler, DrtRequestSubmittedEventHandler, DrtRequestRejectedEventHandler {
 
 	final private Map<Id<Person>, Double> departureTimes = new HashMap<>();
 	final private Map<Id<Person>, Id<Link>> departureLinks = new HashMap<>();
@@ -69,6 +74,8 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 	final private Map<Id<Person>, DynModeTrip> currentTrips = new HashMap<>();
 	final private Map<Id<Person>, Double> unsharedDistances = new HashMap<>();
 	final private Map<Id<Person>, Double> unsharedTimes = new HashMap<>();
+	final private Set<Id<Person>> rejectedPersons = new HashSet<>();
+	final private Map<Id<Request>, Id<Person>> request2person = new HashMap<>();
 	final String mode;
 	private final int maxcap ;
 	
@@ -107,6 +114,8 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 		vehicleDistances.clear();
 		unsharedDistances.clear();
 		unsharedTimes.clear();
+		rejectedPersons.clear();
+		request2person.clear();
 	}
 
 	/*
@@ -169,7 +178,11 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 				trip.setToCoord(toCoord);
 				trip.setInVehicleTravelTime(event.getTime() - trip.getDepartureTime() - trip.getWaitTime());
 			} else {
-				throw new NullPointerException("Arrival without departure?");
+				if (this.rejectedPersons.contains(event.getPersonId())) {
+					// rejected request
+				} else {
+					throw new NullPointerException("Arrival without departure?");
+				}
 			}
 		}
 
@@ -240,5 +253,11 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 	public void handleEvent(DrtRequestSubmittedEvent event) {
 		this.unsharedDistances.put(event.getPersonId(), event.getUnsharedRideDistance());
 		this.unsharedTimes.put(event.getPersonId(), event.getUnsharedRideTime());
+		this.request2person.put(event.getRequestId(), event.getPersonId());
+	}
+
+	@Override
+	public void handleEvent(DrtRequestRejectedEvent event) {
+		rejectedPersons.add(request2person.get(event.getRequestId()));
 	}
 }
