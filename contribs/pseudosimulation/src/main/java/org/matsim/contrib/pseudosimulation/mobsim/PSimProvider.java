@@ -21,65 +21,74 @@ import com.google.inject.Provider;
  */
 public class PSimProvider implements Provider<Mobsim> {
 
-    @Inject private PlanCatcher plans;
-    @Inject private TravelTime travelTime;
-    @Inject private WaitTime waitTime;
-    @Inject private StopStopTime stopStopTime;
-    private TransitPerformance transitPerformance;
-    private final Scenario scenario;
-    private final EventsManager eventsManager;
-    @Inject FifoTransitPerformance fifoTransitPerformance;
+	@Inject
+	private PlanCatcher plans;
+	@Inject
+	private TravelTime travelTime;
+	// @Inject private WaitTime waitTime;
+	// @Inject private StopStopTime stopStopTime;
+	// private TransitPerformance transitPerformance;
+	private final Scenario scenario;
+	private final EventsManager eventsManager;
+	@Inject
+	FifoTransitPerformance fifoTransitPerformance;
 
-    @Inject
+	@Inject
 	public PSimProvider(Scenario scenario, EventsManager eventsManager) {
-        this.scenario = scenario;
-        this.eventsManager = eventsManager;
-    }
+		this.scenario = scenario;
+		this.eventsManager = eventsManager;
+	}
 
-    @Override
-    public Mobsim get() {
-//		if (iteration > 0)
-//			eventsManager.resetHandlers(iteration++);
-//		else
-//			iteration++;
-    	
-    	if (this.fifoTransitPerformance != null) {
-            return new PSim(scenario, eventsManager, plans.getPlansForPSim(), travelTime, this.fifoTransitPerformance);
-    	} else
-    		
-        if (waitTime != null) {
-            return new PSim(scenario, eventsManager, plans.getPlansForPSim(), travelTime, waitTime, stopStopTime, transitPerformance);
+	@Override
+	public Mobsim get() {
+		// if (iteration > 0)
+		// eventsManager.resetHandlers(iteration++);
+		// else
+		// iteration++;
 
-        } else {
-            return new PSim(scenario, eventsManager, plans.getPlansForPSim(), travelTime);
-        }
-    }
+		// if (this.fifoTransitPerformance != null) {
+		return new PSim(scenario, eventsManager, plans.getPlansForPSim(), travelTime, this.fifoTransitPerformance);
+		// } else
+		//
+		// if (waitTime != null) {
+		// return new PSim(scenario, eventsManager, plans.getPlansForPSim(), travelTime,
+		// waitTime, stopStopTime, transitPerformance);
+		//
+		// } else {
+		// return new PSim(scenario, eventsManager, plans.getPlansForPSim(),
+		// travelTime);
+		// }
+	}
 
-    public void setTravelTime(TravelTime travelTime) {
-        this.travelTime = travelTime;
-    }
+	public void setTravelTime(TravelTime travelTime) {
+		this.travelTime = travelTime;
+	}
 
-    public void setWaitTime(WaitTime waitTime) {
-        this.waitTime = waitTime;
-    }
+	public void setWaitTime(WaitTime waitTime) {
+		throw new UnsupportedOperationException();
+		// this.waitTime = waitTime;
+	}
 
-    public void setStopStopTime(StopStopTime stopStopTime) {
-        this.stopStopTime = stopStopTime;
-    }
+	public void setStopStopTime(StopStopTime stopStopTime) {
+		throw new UnsupportedOperationException();
+		// this.stopStopTime = stopStopTime;
+	}
 
-    public void setTransitPerformance(TransitPerformance transitPerformance) {
-        this.transitPerformance = transitPerformance;
-    }
+	public void setTransitPerformance(TransitPerformance transitPerformance) {
+		throw new UnsupportedOperationException();
+		// this.transitPerformance = transitPerformance;
+	}
 
-    public void setTimes(TravelTime travelTime, WaitTime waitTime, StopStopTime stopStopTime) {
-        this.travelTime = travelTime;
-        this.waitTime = waitTime;
-        this.stopStopTime = stopStopTime;
-    }
+	public void setTimes(TravelTime travelTime, WaitTime waitTime, StopStopTime stopStopTime) {
+		throw new UnsupportedOperationException();
+		// this.travelTime = travelTime;
+		// this.waitTime = waitTime;
+		// this.stopStopTime = stopStopTime;
+	}
 
-    @Deprecated
-    //will replace where necessary
-    public Mobsim createMobsim(Scenario scenario, EventsManager events) {
-        return get();
-    }
+	@Deprecated
+	// will replace where necessary
+	public Mobsim createMobsim(Scenario scenario, EventsManager events) {
+		return get();
+	}
 }

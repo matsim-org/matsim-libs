@@ -212,6 +212,7 @@ public class FifoTransitPerformance
 	@Override
 	public void handleEvent(final PersonEntersVehicleEvent event) {
 		if (this.mobsimSwitcher.isQSimIteration()
+				&& this.transitVehicles.getVehicles().containsKey(event.getVehicleId())
 				&& this.population.getPersons().keySet().contains(event.getPersonId())) {
 			List<Double> allStartWaitingTimes_s = this.vehicle2startWaitingTimes_s.get(event.getVehicleId());
 			if (allStartWaitingTimes_s == null) {

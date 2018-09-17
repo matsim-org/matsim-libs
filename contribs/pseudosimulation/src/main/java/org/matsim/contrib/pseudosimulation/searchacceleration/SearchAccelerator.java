@@ -43,13 +43,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.contrib.pseudosimulation.MobSimSwitcher;
 import org.matsim.contrib.pseudosimulation.PSimConfigGroup;
 import org.matsim.contrib.pseudosimulation.mobsim.PSim;
+import org.matsim.contrib.pseudosimulation.mobsim.PSimProvider;
 import org.matsim.contrib.pseudosimulation.searchacceleration.datastructures.SpaceTimeIndicators;
 import org.matsim.contrib.pseudosimulation.searchacceleration.datastructures.Utilities;
+import org.matsim.contrib.pseudosimulation.searchacceleration.listeners.FifoTransitPerformance;
 import org.matsim.contrib.pseudosimulation.searchacceleration.logging.AverageDeltaForUniformReplanning;
 import org.matsim.contrib.pseudosimulation.searchacceleration.logging.AverageReplanningEfficiency;
 import org.matsim.contrib.pseudosimulation.searchacceleration.logging.AverageUtility;
@@ -127,10 +127,16 @@ public class SearchAccelerator implements StartupListener, IterationEndsListener
 	private TravelTime linkTravelTimes;
 
 	@Inject
-	private WaitTime waitTime;
+	private FifoTransitPerformance fifoTransitPerformance;
+
+	// @Inject
+	// private WaitTime waitTime;
+
+	// @Inject
+	// private StopStopTime stopStopTime;
 
 	@Inject
-	private StopStopTime stopStopTime;
+	private PSimProvider pSimProvider;
 
 	// -------------------- NON-INJECTED MEMBERS --------------------
 
@@ -613,7 +619,10 @@ public class SearchAccelerator implements StartupListener, IterationEndsListener
 				final EventsManager eventsManager = EventsUtils.createEventsManager();
 				eventsManager.addHandler(pSimSlotUsageListener);
 				final PSim pSim = new PSim(this.services.getScenario(), eventsManager, selectedHypotheticalPlans,
-						this.linkTravelTimes, waitTime, stopStopTime, null);
+						this.linkTravelTimes, this.fifoTransitPerformance);
+				// final PSim pSim = new PSim(this.services.getScenario(), eventsManager,
+				// selectedHypotheticalPlans,
+				// this.linkTravelTimes, waitTime, stopStopTime, null);
 				// final PSim pSim = new PSim(this.services.getScenario(), eventsManager,
 				// selectedHypotheticalPlans,
 				// this.linkTravelTimes);
