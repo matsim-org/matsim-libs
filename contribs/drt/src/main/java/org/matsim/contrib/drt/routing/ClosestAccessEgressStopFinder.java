@@ -18,11 +18,7 @@
 
 package org.matsim.contrib.drt.routing;
 
-import java.util.Comparator;
-import java.util.Map;
-
-import javax.inject.Inject;
-
+import com.google.inject.name.Named;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
@@ -37,7 +33,9 @@ import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import com.google.inject.name.Named;
+import javax.inject.Inject;
+import java.util.Comparator;
+import java.util.Map;
 
 /**
  * @author michalm
@@ -77,11 +75,6 @@ public class ClosestAccessEgressStopFinder implements AccessEgressStopFinder {
 				.max(Comparator.comparing(s -> DistanceUtils.calculateSquaredDistance(coord, s.getCoord())))//
 				.orElse(null);
 
-		if (closest != null
-				&& walkBeelineFactor * DistanceUtils.calculateDistance(coord, closest.getCoord()) <= maxWalkDistance) {
-			return closest;
-		} else {
-			return null;
-		}
+		return closest;
 	}
 }
