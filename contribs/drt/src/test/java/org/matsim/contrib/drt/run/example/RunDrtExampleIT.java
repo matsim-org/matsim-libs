@@ -24,12 +24,22 @@ package org.matsim.contrib.drt.run.example;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.drt.data.DrtRequest;
+import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
+import org.matsim.contrib.drt.routing.DrtRoute;
+import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.examples.RunDrtExample;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.population.routes.RouteFactories;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -50,6 +60,45 @@ public class RunDrtExampleIT {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		RunDrtExample.run(config, false);
+	}
+	
+	@Test
+	public void testRunDrtExampleWithRejection() {
+		String configFile = "./src/main/resources/drt_example/drtconfig_door2door.xml";
+		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+		config.plans().setInputFile("cb-drtplans_test.xml.gz");
+		
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		
+		DrtControlerCreator.adjustDrtConfig(config);
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
+		routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
+		
+		Controler controler = new Controler(scenario);
+		DrtControlerCreator.addDrtToControler(controler);
+		controler.addOverridingModule(new AbstractModule() {	
+			@Override
+			public void install() {
+				
+				this.bind(DrtRequestValidator.class).toInstance(new DrtRequestValidator() {
+					
+					@Override
+					public boolean validateDrtRequest(DrtRequest request) {
+						if (request.getPassenger().getId().toString().equals("12052000_12052000_100")) {
+							return false;
+						} else {
+							return true;
+						}
+					}
+				});
+			}
+		});
+		
+		controler.run();
 	}
 	
 	@Test
