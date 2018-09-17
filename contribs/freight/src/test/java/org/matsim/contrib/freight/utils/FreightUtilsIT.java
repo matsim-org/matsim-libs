@@ -37,7 +37,10 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.carrier.Tour.Leg;
+import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
@@ -47,6 +50,9 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.EngineInformation;
+import org.matsim.vehicles.EngineInformation.FuelType;
+import org.matsim.vehicles.EngineInformationImpl;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
@@ -77,10 +83,7 @@ public class FreightUtilsIT {
 		carrierServicesAndShipments1 = CarrierImpl.newInstance(CARRIER_ID);
 		carrierServicesAndShipments1.getShipments().add(createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1)); 
 		carrierServicesAndShipments1.getShipments().add(createMatsimShipment("shipment2", "i(3,0)", "i(3,7)", 2));
-		//		carrier.getShipments().add(createMatsimShipment("shipment3", "i(6,0)", "i(4,7)", 2));
-		//		carrier.getShipments().add(createMatsimShipment("shipment4", "i(6,0)", "i(4,5)", 2));
 
-		//		carrier.getServices().add(createMatsimService("Service1", "i(7,4)R", 1));
 		carrierServicesAndShipments1.getServices().add(createMatsimService("Service2", "i(3,9)", 2));
 		carrierServicesAndShipments1.getServices().add(createMatsimService("Service3", "i(4,9)", 2));
 
@@ -91,6 +94,7 @@ public class FreightUtilsIT {
 				.setCostPerDistanceUnit(0.0001)
 				.setCostPerTimeUnit(0.001)
 				.setFixCost(130)
+				.setEngineInformation(new EngineInformationImpl(FuelType.diesel, 0.015))
 				.build();
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
 		vehicleTypes.getVehicleTypes().put(carrierVehType.getId(), carrierVehType);
@@ -189,14 +193,140 @@ public class FreightUtilsIT {
 		Assert.assertEquals(7, demandShipments);
 	}
 	
-	//TODO: Daten der nur kopierten Shipments korrekt (From, to, TWs p/d, demand)
-	//TODO: Daten der nur kopierten Shipments korrekt (From, to, TWs p/d, demand)
+	@Test
+	public void copiingOfShipmentsIsDoneCorrectly() {
+		boolean foundShipment1 = false;
+		boolean foundShipment2 = false;
+		for (CarrierShipment carrierShipment :  carrierShipmentsOnly1.getShipments()) {
+			if (carrierShipment.getId() == Id.create("shipment1", CarrierShipment.class)) {
+				foundShipment1 = true;
+				Assert.assertEquals(Id.createLinkId("(1,0)"), carrierShipment.getFrom());
+				Assert.assertEquals(Id.createLinkId("i(7,6)R"), carrierShipment.getTo());
+				Assert.assertEquals(1, carrierShipment.getSize());
+				Assert.assertEquals(30.0, carrierShipment.getDeliveryServiceTime(), 0);
+				Assert.assertEquals(3600.0, carrierShipment.getDeliveryTimeWindow().getStart(), 0);
+				Assert.assertEquals(36000.0, carrierShipment.getDeliveryTimeWindow().getEnd(), 0);
+				Assert.assertEquals(5.0, carrierShipment.getPickupServiceTime(), 0);
+				Assert.assertEquals(0.0, carrierShipment.getPickupTimeWindow().getStart(), 0);
+				Assert.assertEquals(7200.0, carrierShipment.getPickupTimeWindow().getEnd(), 0);
+			} else if (carrierShipment.getId() == Id.create("shipment2", CarrierShipment.class)) {
+				foundShipment2 = true;
+				Assert.assertEquals(Id.createLinkId("(3,0)"), carrierShipment.getFrom());
+				Assert.assertEquals(Id.createLinkId("i(3,7)"), carrierShipment.getTo());
+				Assert.assertEquals(2, carrierShipment.getSize());
+				Assert.assertEquals(30.0, carrierShipment.getDeliveryServiceTime(), 0);
+				Assert.assertEquals(3600.0, carrierShipment.getDeliveryTimeWindow().getStart(), 0);
+				Assert.assertEquals(36000.0, carrierShipment.getDeliveryTimeWindow().getEnd(), 0);
+				Assert.assertEquals(5.0, carrierShipment.getPickupServiceTime(), 0);
+				Assert.assertEquals(0.0, carrierShipment.getPickupTimeWindow().getStart(), 0);
+				Assert.assertEquals(7200.0, carrierShipment.getPickupTimeWindow().getEnd(), 0);
+			} 
+			
+			Assert.assertTrue("Not found Shipment1 after copiing", foundShipment1);
+			Assert.assertTrue("Not found Shipment2 after copiing", foundShipment2);
+		}
+	}
 	
-	//TODO: Anzahl Touren jeweils
 	
+	@Test
+	public void convertionOfSericesIsDoneCorrectly() {
+		boolean foundSercice2 = false;
+		boolean foundService3 = false;
+		for (CarrierShipment carrierShipment :  carrierShipmentsOnly1.getShipments()) {
+			if (carrierShipment.getId() == Id.create("service2", CarrierShipment.class)) {
+				foundSercice2 = true;
+				Assert.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment.getFrom());
+				Assert.assertEquals(Id.createLinkId("i(3,9)"), carrierShipment.getTo());
+				Assert.assertEquals(2, carrierShipment.getSize());
+				Assert.assertEquals(31.0, carrierShipment.getDeliveryServiceTime(), 0);
+				Assert.assertEquals(3601.0, carrierShipment.getDeliveryTimeWindow().getStart(), 0);
+				Assert.assertEquals(36001.0, carrierShipment.getDeliveryTimeWindow().getEnd(), 0);
+				Assert.assertEquals(0.0, carrierShipment.getPickupServiceTime(), 0);
+				Assert.assertEquals(0.0, carrierShipment.getPickupTimeWindow().getStart(), 0);
+				Assert.assertEquals(36001.0, carrierShipment.getPickupTimeWindow().getEnd(), 0);
+			} else if (carrierShipment.getId() == Id.create("service3", CarrierShipment.class)) {
+				foundService3 = true;
+				Assert.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment.getFrom());
+				Assert.assertEquals(Id.createLinkId("i(4,9)"), carrierShipment.getTo());
+				Assert.assertEquals(2, carrierShipment.getSize());
+				Assert.assertEquals(31.0, carrierShipment.getDeliveryServiceTime(), 0);
+				Assert.assertEquals(3601.0, carrierShipment.getDeliveryTimeWindow().getStart(), 0);
+				Assert.assertEquals(36001.0, carrierShipment.getDeliveryTimeWindow().getEnd(), 0);
+				Assert.assertEquals(0.0, carrierShipment.getPickupServiceTime(), 0);
+				Assert.assertEquals(0.0, carrierShipment.getPickupTimeWindow().getStart(), 0);
+				Assert.assertEquals(36001.0, carrierShipment.getPickupTimeWindow().getEnd(), 0);
+			}
+			
+			Assert.assertTrue("Not found Shipment1 after copiing", foundSercice2);
+			Assert.assertTrue("Not found Shipment2 after copiing", foundService3);
+		}
+	}
 	
-	//TODO: jeweils Länge, Fahrzeit und Score der Touren
+	@Test
+	public void numberOfToursIsCorrect() {
+		Assert.assertEquals(3 , carrierServicesAndShipments1.getSelectedPlan().getScheduledTours().size());
+		Assert.assertEquals(1, carrierShipmentsOnly1.getSelectedPlan().getScheduledTours().size());
+	}
 	
+	@Test
+	public void toursShipmentOnlyCarrierAreCorrect() {
+		
+		Assert.assertEquals(-99, carrierShipmentsOnly1.getSelectedPlan().getScore(), 0);			//TODO: Korrekten WErt ermitteln und eintragen
+		
+		double tourDurationSum = 0;
+		for (ScheduledTour scheduledTour: carrierShipmentsOnly1.getSelectedPlan().getScheduledTours()){
+			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
+		}
+		Assert.assertEquals(3 , tourDurationSum, 0);													//TODO: Korrekten WErt ermitteln und eintragen
+		
+		double tourLengthSum = 0;
+		for (ScheduledTour scheduledTour: carrierShipmentsOnly1.getSelectedPlan().getScheduledTours()){
+			for (TourElement te : scheduledTour.getTour().getTourElements()) {
+				if (te instanceof Leg) {
+					tourLengthSum += ((Leg) te).getRoute().getDistance();
+				}
+			}
+		}
+		Assert.assertEquals(1, tourLengthSum, 0);														//TODO: Korrekten WErt ermitteln und eintragen
+	}
+	
+	@Test
+	public void toursMixedCarrierAreCorrect() {
+		
+		Assert.assertEquals(-99, carrierServicesAndShipments1.getSelectedPlan().getScore(), 0);			//TODO: Korrekten WErt ermitteln und eintragen
+		
+		double tourDurationSum = 0;
+		for (ScheduledTour scheduledTour: carrierServicesAndShipments1.getSelectedPlan().getScheduledTours()){
+			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
+		}
+		Assert.assertEquals(3 , tourDurationSum, 0);													//TODO: Korrekten WErt ermitteln und eintragen
+		
+		double tourLengthSum = 0;
+		for (ScheduledTour scheduledTour: carrierServicesAndShipments1.getSelectedPlan().getScheduledTours()){
+			for (TourElement te : scheduledTour.getTour().getTourElements()) {
+				if (te instanceof Leg) {
+					tourLengthSum += ((Leg) te).getRoute().getDistance();
+				}
+			}
+		}
+		Assert.assertEquals(1, tourLengthSum, 0);														//TODO: Korrekten WErt ermitteln und eintragen
+	}
+	
+
+	@Test
+	public void fleetAvailableIsCorrect() {
+		Assert.assertEquals(FleetSize.INFINITE, carrierShipmentsOnly1.getCarrierCapabilities().getFleetSize());
+		Assert.assertEquals(1, carrierShipmentsOnly1.getCarrierCapabilities().getVehicleTypes().size());
+		for (CarrierVehicleType carrierVehicleType : carrierShipmentsOnly1.getCarrierCapabilities().getVehicleTypes()){
+			Assert.assertEquals(3,carrierVehicleType.getCarrierVehicleCapacity());
+			Assert.assertEquals(130, carrierVehicleType.getVehicleCostInformation().fix, 0.0);
+			Assert.assertEquals(0.0001, carrierVehicleType.getVehicleCostInformation().perDistanceUnit, 0.0);
+			Assert.assertEquals(0.001, carrierVehicleType.getVehicleCostInformation().perTimeUnit, 0.0);
+			Assert.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
+			Assert.assertEquals(EngineInformation.FuelType.diesel, carrierVehicleType.getEngineInformation().getFuelType());
+			Assert.assertEquals(0.015, carrierVehicleType.getEngineInformation().getGasConsumption(), 0.0);
+		}
+	}
 
 
 	private static CarrierShipment createMatsimShipment(String id, String from, String to, int size) {
@@ -222,8 +352,8 @@ public class FreightUtilsIT {
 	private static CarrierService createMatsimService(String id, String to, int size) {
 		return CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class))
 				.setCapacityDemand(size)
-				.setServiceDuration(30.0)
-				.setServiceStartTimeWindow(TimeWindow.newInstance(3600.0, 36000.0))
+				.setServiceDuration(31.0)
+				.setServiceStartTimeWindow(TimeWindow.newInstance(3601.0, 36001.0))
 				.build();
 	}
 
