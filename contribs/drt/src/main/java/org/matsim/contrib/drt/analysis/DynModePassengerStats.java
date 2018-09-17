@@ -184,6 +184,9 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 					throw new NullPointerException("Arrival without departure?");
 				}
 			}
+			
+			// remove person in case the person has trips with dvrp and non-dvrp modes
+			this.departureTimes.remove(event.getPersonId());
 		}
 
 	}
