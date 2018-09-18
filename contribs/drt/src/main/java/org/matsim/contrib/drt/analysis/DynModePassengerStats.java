@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.drt.analysis;
 
@@ -61,10 +61,11 @@ import com.google.inject.Inject;
 
 /**
  * @author jbischoff
- *
  */
-public class DynModePassengerStats implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler,
-		PersonArrivalEventHandler, LinkEnterEventHandler, ActivityEndEventHandler, DrtRequestSubmittedEventHandler, DrtRequestRejectedEventHandler {
+public class DynModePassengerStats
+		implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
+		LinkEnterEventHandler, ActivityEndEventHandler, DrtRequestSubmittedEventHandler,
+		DrtRequestRejectedEventHandler {
 
 	final private Map<Id<Person>, Double> departureTimes = new HashMap<>();
 	final private Map<Id<Person>, Id<Link>> departureLinks = new HashMap<>();
@@ -77,18 +78,17 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 	final private Set<Id<Person>> rejectedPersons = new HashSet<>();
 	final private Map<Id<Request>, Id<Person>> request2person = new HashMap<>();
 	final String mode;
-	private final int maxcap ;
-	
+	private final int maxcap;
 
 	final private Network network;
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
 	 */
 
 	/**
-	 * 
+	 *
 	 */
 	@Inject
 	public DynModePassengerStats(Network network, EventsManager events, Config config, Fleet fleet) {
@@ -120,7 +120,7 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.matsim.api.core.v01.events.handler.ActivityEndEventHandler#handleEvent(org.matsim.api.core.v01.events.
 	 * ActivityEndEvent)
 	 */
@@ -129,13 +129,13 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 		if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)) {
 			Id<Vehicle> vid = Id.createVehicleId(event.getPersonId().toString());
 			this.inVehicleDistance.put(vid, new HashMap<Id<Person>, MutableDouble>());
-			this.vehicleDistances.put(vid, new double[3+maxcap]);
+			this.vehicleDistances.put(vid, new double[3 + maxcap]);
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.matsim.api.core.v01.events.handler.LinkEnterEventHandler#handleEvent(org.matsim.api.core.v01.events.
 	 * LinkEnterEvent)
 	 */
@@ -148,12 +148,11 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 			}
 			this.vehicleDistances.get(event.getVehicleId())[0] += distance; // overall distance drive
 			int occupancy = inVehicleDistance.get(event.getVehicleId()).size();
-			this.vehicleDistances.get(event.getVehicleId())[1] += distance
-					* occupancy; // overall revenue distance
+			this.vehicleDistances.get(event.getVehicleId())[1] += distance * occupancy; // overall revenue distance
 			if (occupancy > 0) {
 				this.vehicleDistances.get(event.getVehicleId())[2] += distance; // overall occupied distance
-				this.vehicleDistances.get(event.getVehicleId())[2+occupancy] += distance; // overall occupied distance with n passengers
-				
+				this.vehicleDistances.get(event.getVehicleId())[2 + occupancy] += distance; // overall occupied distance with n passengers
+
 			}
 		}
 
@@ -161,7 +160,7 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler#handleEvent(org.matsim.api.core.v01.events.
 	 * PersonArrivalEvent)
 	 */
@@ -179,12 +178,12 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 				trip.setInVehicleTravelTime(event.getTime() - trip.getDepartureTime() - trip.getWaitTime());
 			} else {
 				if (this.rejectedPersons.contains(event.getPersonId())) {
-					// rejected request
+					// XXX might happen only if we teleported rejected passengers
 				} else {
 					throw new NullPointerException("Arrival without departure?");
 				}
 			}
-			
+
 			// remove person in case the person has trips with dvrp and non-dvrp modes
 			this.departureTimes.remove(event.getPersonId());
 		}
@@ -193,7 +192,7 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler#handleEvent(org.matsim.api.core.v01.events.
 	 * PersonDepartureEvent)
@@ -208,7 +207,7 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler#handleEvent(org.matsim.api.core.v01.events
 	 * .PersonEntersVehicleEvent)
@@ -248,7 +247,7 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler#handleEvent(org.matsim.contrib.drt.
 	 * passenger.events.DrtRequestScheduledEvent)
 	 */
@@ -257,6 +256,7 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 		this.unsharedDistances.put(event.getPersonId(), event.getUnsharedRideDistance());
 		this.unsharedTimes.put(event.getPersonId(), event.getUnsharedRideTime());
 		this.request2person.put(event.getRequestId(), event.getPersonId());
+		this.rejectedPersons.remove(event.getPersonId());// XXX needed only if we teleported rejected passengers
 	}
 
 	@Override
