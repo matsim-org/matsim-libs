@@ -30,12 +30,12 @@ import org.matsim.contrib.drt.data.DrtRequest;
  * @author jbischoff
  */
 public class DefaultDrtRequestValidator implements DrtRequestValidator {
-	public static final String EQUAL_FROM_TO_LINKS_CAUSE = "fromLink and toLink must be different";
+	public static final String EQUAL_FROM_LINK_AND_TO_LINK_CAUSE = "eqal_fromLink_and_toLink";
 
 	@Override
 	public Set<String> validateDrtRequest(DrtRequest request) {
 		return request.getFromLink() == request.getToLink() ?
-				Collections.singleton(EQUAL_FROM_TO_LINKS_CAUSE) :
+				Collections.singleton(EQUAL_FROM_LINK_AND_TO_LINK_CAUSE) :
 				Collections.emptySet();
 	}
 }

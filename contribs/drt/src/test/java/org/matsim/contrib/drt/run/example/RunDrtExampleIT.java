@@ -78,7 +78,7 @@ public class RunDrtExampleIT {
 					@Override
 					public Set<String> validateDrtRequest(DrtRequest request) {
 						return request.getPassenger().getId().toString().equals("12052000_12052000_100") ?
-								Collections.singleton("REJECT passenger 12052000_12052000_100") :
+								Collections.singleton("REJECT_passenger_12052000_12052000_100") :
 								Collections.emptySet();
 					}
 				});

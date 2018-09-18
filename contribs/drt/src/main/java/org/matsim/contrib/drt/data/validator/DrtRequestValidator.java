@@ -32,9 +32,11 @@ import org.matsim.contrib.drt.data.DrtRequest;
 public interface DrtRequestValidator {
 	/**
 	 * Checks if the request can be served given some spatiotemporal (limited time and area of operations) or other constraints.
+	 * <p>
+	 * Preferred format for causes: underscores instead of spaces.
 	 *
 	 * @param request to be validated
-	 * @return set containing descriptions of constraint violations. An empty set means the request fulfills all
+	 * @return set containing causes of constraint violations. An empty set means the request fulfills all
 	 * constraints and may be considered by the optimizer (although this does not guarantee it will get scheduled)
 	 */
 	Set<String> validateDrtRequest(DrtRequest request);
