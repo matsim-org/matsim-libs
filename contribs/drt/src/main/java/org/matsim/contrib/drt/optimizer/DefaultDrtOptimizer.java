@@ -141,8 +141,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 		if (!violations.isEmpty()) {
 			String causes = violations.stream().collect(Collectors.joining(", "));
-			log.error(
-					"Request " + request.getId() + " will not be served. The agent will get stuck. Causes: " + causes);
+			log.warn("Request " + request.getId() + " will not be served. The agent will get stuck. Causes: " + causes);
 			drtRequest.setRejected(true);
 			eventsManager.processEvent(
 					new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), drtRequest.getId(), causes));
