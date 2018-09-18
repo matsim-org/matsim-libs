@@ -4,7 +4,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim-all</artifactId>
 	<packaging>pom</packaging>
-	<version>0.11.0-SNAPSHOT</version>
+	<version>0.10.1-experimental-minibus-for-SBB-Router</version>
 	<name>MATSim-All</name>
 	<modules>
 		<module>matsim</module>

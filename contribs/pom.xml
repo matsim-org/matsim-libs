@@ -4,7 +4,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>contrib</artifactId>
 	<packaging>pom</packaging>
-	<version>0.11.0-SNAPSHOT</version>
+	<version>0.10.1-experimental-minibus-for-SBB-Router</version>
 	<name>MATSim-Contrib</name>
 
 	<scm>
@@ -222,14 +222,14 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
+			<version>0.10.1-experimental-minibus-for-SBB-Router</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
+			<version>0.10.1-experimental-minibus-for-SBB-Router</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
