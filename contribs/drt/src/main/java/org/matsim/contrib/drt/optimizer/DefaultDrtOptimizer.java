@@ -144,7 +144,8 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 			log.error(
 					"Request " + request.getId() + " will not be served. The agent will get stuck. Causes: " + causes);
 			drtRequest.setRejected(true);
-			eventsManager.processEvent(new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), drtRequest.getId()));
+			eventsManager.processEvent(
+					new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), drtRequest.getId(), causes));
 			return;
 		}
 
