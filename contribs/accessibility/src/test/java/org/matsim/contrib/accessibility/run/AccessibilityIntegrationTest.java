@@ -20,7 +20,9 @@
 package org.matsim.contrib.accessibility.run;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -34,6 +36,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityModule;
@@ -51,6 +54,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -400,7 +405,7 @@ public class AccessibilityIntegrationTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, true);
 		
 		// modify config according to needs
-		Network network = CreateTestNetwork.createTestNetwork(); // this is a little odd. kai, dec'16
+		Network network = createTestNetwork(); // this is a little odd. kai, dec'16
 		String networkFile = utils.getOutputDirectory() + "network.xml";
 		new NetworkWriter(network).write(networkFile);
 		config.network().setInputFile(networkFile);
@@ -455,6 +460,104 @@ public class AccessibilityIntegrationTest {
 		}
 		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.setInScenario);
 		return scenario;
+	}
+	
+	
+	/**
+	 * This method creates a test network. It is used for example in PtMatrixTest.java to test the pt simulation in MATSim.
+	 * The network has 9 nodes and 8 links (see the sketch below).
+	 * 
+	 * @return the created test network
+	 * 
+	 * @author thomas
+	 * @author tthunig
+	 */
+	public static Network createTestNetwork() {
+		/*
+		 * (2)		(5)------(8)
+		 * 	|		 |
+		 * 	|		 |
+		 * (1)------(4)------(7)
+		 * 	|		 |
+		 * 	|		 |
+		 * (3)		(6)------(9)
+		 */
+		// TODO 2.7m/s does obviously not correspond to 50km/h; changing this will alter results, dz, july'17
+		double freespeed = 2.7;	// this is m/s and corresponds to 50km/h
+		double capacity = 500.;
+		double numLanes = 1.;
+
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		Network network = (Network) scenario.getNetwork();
+
+		// add nodes
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 100));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 0, (double) 200));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord((double) 0, (double) 0));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create(4, Node.class), new Coord((double) 100, (double) 100));
+		Node node5 = NetworkUtils.createAndAddNode(network, Id.create(5, Node.class), new Coord((double) 100, (double) 200));
+		Node node6 = NetworkUtils.createAndAddNode(network, Id.create(6, Node.class), new Coord((double) 100, (double) 0));
+		Node node7 = NetworkUtils.createAndAddNode(network, Id.create(7, Node.class), new Coord((double) 200, (double) 100));
+		Node node8 = NetworkUtils.createAndAddNode(network, Id.create(8, Node.class), new Coord((double) 200, (double) 200));
+		Node node9 = NetworkUtils.createAndAddNode(network, Id.create(9, Node.class), new Coord((double) 200, (double) 0));
+		
+		//
+		Set<String> modes = new HashSet<>();
+		modes.add("car");
+//		modes.add("bus");
+		//
+
+		// add links (bi-directional)
+		NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), node1, node2, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(1, Link.class)).setAllowedModes(modes);
+		
+		NetworkUtils.createAndAddLink(network,Id.create(2, Link.class), node2, node1, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(2, Link.class)).setAllowedModes(modes);
+		
+		NetworkUtils.createAndAddLink(network,Id.create(3, Link.class), node1, node3, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(3, Link.class)).setAllowedModes(modes);
+		
+		NetworkUtils.createAndAddLink(network,Id.create(4, Link.class), node3, node1, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(4, Link.class)).setAllowedModes(modes);
+		
+		NetworkUtils.createAndAddLink(network,Id.create(5, Link.class), node1, node4, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(5, Link.class)).setAllowedModes(modes);
+		
+		NetworkUtils.createAndAddLink(network,Id.create(6, Link.class), node4, node1, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(6, Link.class)).setAllowedModes(modes);
+		
+		NetworkUtils.createAndAddLink(network,Id.create(7, Link.class), node4, node5, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(7, Link.class)).setAllowedModes(modes);
+		
+		NetworkUtils.createAndAddLink(network,Id.create(8, Link.class), node5, node4, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(8, Link.class)).setAllowedModes(modes);
+		
+		NetworkUtils.createAndAddLink(network,Id.create(9, Link.class), node4, node6, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(9, Link.class)).setAllowedModes(modes);
+		
+		NetworkUtils.createAndAddLink(network,Id.create(10, Link.class), node6, node4, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(10, Link.class)).setAllowedModes(modes);
+		
+		NetworkUtils.createAndAddLink(network,Id.create(11, Link.class), node4, node7, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(11, Link.class)).setAllowedModes(modes);
+		
+		NetworkUtils.createAndAddLink(network,Id.create(12, Link.class), node7, node4, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(12, Link.class)).setAllowedModes(modes);
+		
+		NetworkUtils.createAndAddLink(network,Id.create(13, Link.class), node5, node8, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(13, Link.class)).setAllowedModes(modes);
+		
+		NetworkUtils.createAndAddLink(network,Id.create(14, Link.class), node8, node5, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(14, Link.class)).setAllowedModes(modes);
+		
+		NetworkUtils.createAndAddLink(network,Id.create(15, Link.class), node6, node9, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(15, Link.class)).setAllowedModes(modes);
+
+		NetworkUtils.createAndAddLink(network,Id.create(16, Link.class), node9, node6, (double) 100, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(16, Link.class)).setAllowedModes(modes);
+		
+		return network;
 	}
 
 	
