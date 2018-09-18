@@ -21,7 +21,9 @@ package org.matsim.contrib.drt.optimizer;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
@@ -114,7 +116,9 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	private void rebalanceFleet() {
 		// right now we relocate only idle vehicles (vehicles that are being relocated cannot be relocated)
-		Stream<? extends Vehicle> rebalancableVehicles = fleet.getVehicles().values().stream()
+		Stream<? extends Vehicle> rebalancableVehicles = fleet.getVehicles()
+				.values()
+				.stream()
 				.filter(scheduleInquiry::isIdle);
 		List<Relocation> relocations = rebalancingStrategy.calcRelocations(rebalancableVehicles,
 				mobsimTimer.getTimeOfDay());
@@ -133,7 +137,12 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	@Override
 	public void requestSubmitted(Request request) {
 		DrtRequest drtRequest = (DrtRequest)request;
-		if (!requestValidator.validateDrtRequest(drtRequest)) {
+		Set<String> violations = requestValidator.validateDrtRequest(drtRequest);
+
+		if (!violations.isEmpty()) {
+			String causes = violations.stream().collect(Collectors.joining(", "));
+			log.error(
+					"Request " + request.getId() + " will not be served. The agent will get stuck. Causes: " + causes);
 			drtRequest.setRejected(true);
 			eventsManager.processEvent(new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), drtRequest.getId()));
 			return;

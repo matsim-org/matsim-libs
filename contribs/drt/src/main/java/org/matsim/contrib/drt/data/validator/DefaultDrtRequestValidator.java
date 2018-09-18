@@ -19,24 +19,23 @@
 
 package org.matsim.contrib.drt.data.validator;
 
-import org.apache.log4j.Logger;
+import java.util.Collections;
+import java.util.Set;
+
 import org.matsim.contrib.drt.data.DrtRequest;
 
 /**
- * Accepts all DRT requests as long as start and end link are different.
- * 
+ * Accepts all DRT requests as long as the start and end link are different.
+ *
  * @author jbischoff
  */
 public class DefaultDrtRequestValidator implements DrtRequestValidator {
-	@Override
-	public boolean validateDrtRequest(DrtRequest request) {
-		if (request.getFromLink() == request.getToLink()) {
-			// throw new IllegalArgumentException("fromLink and toLink must be different");
-			Logger.getLogger(getClass()).error("fromLink and toLink must be different. Request " + request.getId()
-					+ " will not be served. The agent will stay in limbo.");
-			return false;
-		}
+	public static final String EQUAL_FROM_TO_LINKS_CAUSE = "fromLink and toLink must be different";
 
-		return true;
+	@Override
+	public Set<String> validateDrtRequest(DrtRequest request) {
+		return request.getFromLink() == request.getToLink() ?
+				Collections.singleton(EQUAL_FROM_TO_LINKS_CAUSE) :
+				Collections.emptySet();
 	}
 }
