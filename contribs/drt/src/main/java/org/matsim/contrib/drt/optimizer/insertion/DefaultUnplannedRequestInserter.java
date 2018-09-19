@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
@@ -97,6 +98,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				req.setRejected(true);
 				eventsManager.processEvent(
 						new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), req.getId(), NO_INSERTION_FOUND_CAUSE));
+				eventsManager.processEvent(new PersonStuckEvent(mobsimTimer.getTimeOfDay(), req.getPassenger().getId(), req.getFromLink().getId(), req.getPassenger().getMode()));
 				if (drtCfg.isPrintDetailedWarnings()) {
 					log.warn("No insertion found for drt request " + req + " from passenger id=" + req.getPassenger()
 							.getId() + " fromLinkId=" + req.getFromLink().getId());
