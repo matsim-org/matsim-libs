@@ -23,7 +23,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Max;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -34,6 +34,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 public class DvrpConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "dvrp";
+
 	@SuppressWarnings("deprecation")
 	public static DvrpConfigGroup get(Config config) {
 		return (DvrpConfigGroup)config.getModule(GROUP_NAME);// will fail if not in the config
@@ -44,16 +45,23 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 			+ "(passengers'/customers' perspective)";
 
 	public static final String NETWORK_MODE = "networkMode";
-	static final String NETWORK_MODE_EXP = "Mode of which the network will be used for routing vehicles, calculating travel times, "
-			+ "etc. (fleet operator's perspective). " + "Default is car.";
+	static final String NETWORK_MODE_EXP = "Mode of which the network will be used for routing vehicles. "
+			+ "Default is car, i.e. the car network is used. "
+			+ "'null' means no network filtering - the scenario.network is used";
+
+	public static final String MOBSIM_MODE = "mobsimMode";
+	static final String MOBSIM_MODE_EXP =
+			"Mode of which the network will be used for throwing events and hence calculating travel times. "
+					+ "Default is car.";
 
 	public static final String TRAVEL_TIME_ESTIMATION_ALPHA = "travelTimeEstimationAlpha";
-	static final String TRAVEL_TIME_ESTIMATION_ALPHA_EXP = "Used for OFFLINE estimation of travel times for VrpOptimizer"
-			+ " by means of the exponential moving average."
-			+ " The weighting decrease, alpha, must be in (0,1]."
-			+ " We suggest small values of alpha, e.g. 0.05."
-			+ " The averaging starts from the initial travel time estimates. If not provided,"
-			+ " the free-speed TTs is used as the initial estimates";
+	static final String TRAVEL_TIME_ESTIMATION_ALPHA_EXP =
+			"Used for OFFLINE estimation of travel times for VrpOptimizer"
+					+ " by means of the exponential moving average."
+					+ " The weighting decrease, alpha, must be in (0,1]."
+					+ " We suggest small values of alpha, e.g. 0.05."
+					+ " The averaging starts from the initial travel time estimates. If not provided,"
+					+ " the free-speed TTs is used as the initial estimates";
 
 	public static final String TRAVEL_TIME_ESTIMATION_BETA = "travelTimeEstimationBeta";
 	static final String TRAVEL_TIME_ESTIMATION_BETA_EXP = "Used for ONLINE estimation of travel times for VrpOptimizer"
@@ -61,7 +69,8 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 			+ " The beta coefficient is provided in seconds and should be either 0 (no online estimation)"
 			+ " or positive (mixed online-offline estimation)."
 			/////
-			+ " For 'beta = 0', only the offline estimate is used:" + " 'onlineTT(t) = offlineTT(t)',"
+			+ " For 'beta = 0', only the offline estimate is used:"
+			+ " 'onlineTT(t) = offlineTT(t)',"
 			+ " where 'offlineTT(t)' in the offline estimate for TT at time 't',"
 			/////
 			+ " For 'beta > 0', estimating future TTs at time 't',"
@@ -78,12 +87,14 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	// In DVRP 'time < currentTime' may only happen for backward path search, a adding proper search termination
 	// criterion should prevent this from happening
 
-	@NotNull
+	@NotBlank
 	private String mode = null; // travel mode (passengers'/customers' perspective)
 
 	@Nullable
-	private String networkMode = TransportMode.car; // used for building routes, calculating travel times, etc.
-	// (dispatcher's perspective); null ==> no filtering (routing network equals scenario.network)
+	private String networkMode = TransportMode.car; // used for building route; null ==> no filtering (routing network equals scenario.network)
+
+	@NotBlank
+	private String mobsimMode = TransportMode.car;// used for events throwing and thus calculating travel times, etc.
 
 	@Positive
 	@Max(1)
@@ -101,15 +112,13 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 		Map<String, String> map = super.getComments();
 		map.put(MODE, MODE_EXP);
 		map.put(NETWORK_MODE, NETWORK_MODE_EXP);
-		map.put(TRAVEL_TIME_ESTIMATION_ALPHA, //
-				TRAVEL_TIME_ESTIMATION_ALPHA_EXP);
-		map.put(TRAVEL_TIME_ESTIMATION_BETA,
-				TRAVEL_TIME_ESTIMATION_BETA_EXP);
+		map.put(MOBSIM_MODE, MOBSIM_MODE_EXP);
+		map.put(TRAVEL_TIME_ESTIMATION_ALPHA, TRAVEL_TIME_ESTIMATION_ALPHA_EXP);
+		map.put(TRAVEL_TIME_ESTIMATION_BETA, TRAVEL_TIME_ESTIMATION_BETA_EXP);
 		return map;
 	}
 
 	/**
-	 * 
 	 * @return -- {@value #MODE_EXP}}
 	 */
 	@StringGetter(MODE)
@@ -118,15 +127,14 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * 
 	 * @param -- {@value #MODE_EXP}
 	 */
 	@StringSetter(MODE)
 	public void setMode(String mode) {
 		this.mode = mode;
 	}
+
 	/**
-	 * 
 	 * @return -- {@value #NETWORK_MODE_EXP}
 	 */
 	@StringGetter(NETWORK_MODE)
@@ -135,16 +143,30 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * 
 	 * @param -- {@value #NETWORK_MODE_EXP}
 	 */
 	@StringSetter(NETWORK_MODE)
-	public void setNetworkMode(String routingMode) {
-		this.networkMode = routingMode;
+	public void setNetworkMode(String networkMode) {
+		this.networkMode = networkMode;
 	}
 
 	/**
-	 * 
+	 * @return -- {@value #MOBSIM_MODE_EXP}
+	 */
+	@StringGetter(MOBSIM_MODE)
+	public String getMobsimMode() {
+		return mobsimMode;
+	}
+
+	/**
+	 * @param -- {@value #MOBSIM_MODE_EXP}
+	 */
+	@StringSetter(MOBSIM_MODE)
+	public void setMobsimMode(String networkMode) {
+		this.mobsimMode = networkMode;
+	}
+
+	/**
 	 * @return -- {@value #TRAVEL_TIME_ESTIMATION_ALPHA_EXP}
 	 */
 	@StringGetter(TRAVEL_TIME_ESTIMATION_ALPHA)
@@ -153,7 +175,6 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * 
 	 * @value -- {@value #TRAVEL_TIME_ESTIMATION_ALPHA_EXP}
 	 */
 	@StringSetter(TRAVEL_TIME_ESTIMATION_ALPHA)
@@ -162,7 +183,6 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * 
 	 * @return -- {@value #TRAVEL_TIME_ESTIMATION_BETA_EXP}
 	 */
 	@StringGetter(TRAVEL_TIME_ESTIMATION_BETA)
@@ -171,7 +191,6 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * 
 	 * @param -- {@value #TRAVEL_TIME_ESTIMATION_BETA_EXP}
 	 */
 	@StringSetter(TRAVEL_TIME_ESTIMATION_BETA)
