@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
@@ -145,6 +146,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 			drtRequest.setRejected(true);
 			eventsManager.processEvent(
 					new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), drtRequest.getId(), causes));
+			eventsManager.processEvent(new PersonStuckEvent(mobsimTimer.getTimeOfDay(), drtRequest.getPassenger().getId(), drtRequest.getFromLink().getId(), drtRequest.getPassenger().getMode()));
 			return;
 		}
 
