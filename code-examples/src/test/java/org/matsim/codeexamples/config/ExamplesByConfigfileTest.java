@@ -56,7 +56,6 @@ public class ExamplesByConfigfileTest {
 		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-lanes.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-network-change-events.xml"});
 
-		//		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-roadpricing.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-subpopulation.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-trips.xml"});
 
