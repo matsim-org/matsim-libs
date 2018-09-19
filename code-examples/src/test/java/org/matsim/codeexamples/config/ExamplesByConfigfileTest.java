@@ -62,6 +62,9 @@ public class ExamplesByConfigfileTest {
 
 		filesToRun.add(new Object [] {"scenarios/equil-mixedTraffic/config-with-mode-vehicles.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil-mixedTraffic/config-with-all-vehicles-from-file.xml"});
+		
+		filesToRun.add(new Object [] {"examples/tutorial/config/externalMobsim.xml"});
+		filesToRun.add(new Object [] {"examples/tutorial/config/externalReplanning.xml"});
 
 		return filesToRun;
 		
