@@ -24,6 +24,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
@@ -50,9 +51,11 @@ public class EDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final MobsimTimer timer;
 
 	@Inject
-	public EDrtActionCreator(PassengerEngine passengerEngine, VrpOptimizer optimizer, MobsimTimer timer) {
+	public EDrtActionCreator(PassengerEngine passengerEngine, VrpOptimizer optimizer, MobsimTimer timer,
+			DvrpConfigGroup dvrpCfg) {
 		this.timer = timer;
-		drtActionCreator = new DrtActionCreator(passengerEngine, v -> createLeg(v, optimizer, timer));
+		drtActionCreator = new DrtActionCreator(passengerEngine,
+				v -> createLeg(dvrpCfg.getMobsimMode(), v, optimizer, timer));
 	}
 
 	@Override
@@ -70,9 +73,9 @@ public class EDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 		}
 	}
 
-	private static VrpLeg createLeg(Vehicle vehicle, VrpOptimizer optimizer, MobsimTimer timer) {
+	private static VrpLeg createLeg(String mobsimMode, Vehicle vehicle, VrpOptimizer optimizer, MobsimTimer timer) {
 		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
-		VrpLeg leg = new VrpLeg(driveTask.getPath());
+		VrpLeg leg = new VrpLeg(mobsimMode, driveTask.getPath());
 		OnlineDriveTaskTracker onlineTracker = new OnlineDriveTaskTrackerImpl(vehicle, leg,
 				(VrpOptimizerWithOnlineTracking)optimizer, timer);
 		OnlineEDriveTaskTracker onlineETracker = new OnlineEDriveTaskTracker((EvDvrpVehicle)vehicle, timer,
