@@ -27,6 +27,7 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.passenger.BusStopActivity;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
@@ -46,9 +47,10 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final VrpLegFactory legFactory;
 
 	@Inject
-	public DrtActionCreator(PassengerEngine passengerEngine, VrpOptimizer optimizer, MobsimTimer timer) {
-		this(passengerEngine,
-				v -> VrpLegFactory.createWithOnlineTracker(v, (VrpOptimizerWithOnlineTracking)optimizer, timer));
+	public DrtActionCreator(PassengerEngine passengerEngine, VrpOptimizer optimizer, MobsimTimer timer,
+			DvrpConfigGroup dvrpCfg) {
+		this(passengerEngine, v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v,
+				(VrpOptimizerWithOnlineTracking)optimizer, timer));
 	}
 
 	public DrtActionCreator(PassengerEngine passengerEngine, VrpLegFactory legFactory) {
