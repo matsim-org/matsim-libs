@@ -18,9 +18,12 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.drt.run;
+
+import java.util.Arrays;
+import java.util.function.Function;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -61,12 +64,9 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import java.util.Arrays;
-import java.util.function.Function;
-
 /**
  * @author jbischoff
- *
+ * @author michalm (Michal Maciejewski)
  */
 public final class DrtControlerCreator {
 
@@ -118,8 +118,9 @@ public final class DrtControlerCreator {
 	}
 
 	public static void addDrtToControler(Controler controler) {
-		controler.addOverridingModule(new DvrpModule(DrtControlerCreator::createModuleForQSimPlugin, Arrays
-				.asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class, ParallelPathDataProvider.class)));
+		controler.addOverridingModule(new DvrpModule(DrtControlerCreator::createModuleForQSimPlugin,
+				Arrays.asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class,
+						ParallelPathDataProvider.class)));
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
 	}
@@ -131,25 +132,28 @@ public final class DrtControlerCreator {
 				ActivityParams params = new ActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY);
 				params.setTypicalDuration(1);
 				params.setScoringThisActivityAtAll(false);
-				config.planCalcScore().getScoringParametersPerSubpopulation().values()
+				config.planCalcScore()
+						.getScoringParametersPerSubpopulation()
+						.values()
 						.forEach(k -> k.addActivityParams(params));
 				config.planCalcScore().addActivityParams(params);
-				Logger.getLogger(DrtControlerCreator.class).info(
-						"drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
+				Logger.getLogger(DrtControlerCreator.class)
+						.info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 			}
 		}
 		if (!config.planCalcScore().getModes().containsKey(DrtStageActivityType.DRT_WALK)) {
-				ModeParams drtWalk = new ModeParams(DrtStageActivityType.DRT_WALK);
-				ModeParams walk = config.planCalcScore().getModes().get(TransportMode.walk);
-				drtWalk.setConstant(walk.getConstant());
-				drtWalk.setMarginalUtilityOfDistance(walk.getMarginalUtilityOfDistance());
-				drtWalk.setMarginalUtilityOfTraveling(walk.getMarginalUtilityOfTraveling());
-				drtWalk.setMonetaryDistanceRate(walk.getMonetaryDistanceRate());
-				config.planCalcScore().getScoringParametersPerSubpopulation().values()
-						.forEach(k -> k.addModeParams(drtWalk));
-				Logger.getLogger(DrtControlerCreator.class)
-						.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
-
+			ModeParams drtWalk = new ModeParams(DrtStageActivityType.DRT_WALK);
+			ModeParams walk = config.planCalcScore().getModes().get(TransportMode.walk);
+			drtWalk.setConstant(walk.getConstant());
+			drtWalk.setMarginalUtilityOfDistance(walk.getMarginalUtilityOfDistance());
+			drtWalk.setMarginalUtilityOfTraveling(walk.getMarginalUtilityOfTraveling());
+			drtWalk.setMonetaryDistanceRate(walk.getMonetaryDistanceRate());
+			config.planCalcScore()
+					.getScoringParametersPerSubpopulation()
+					.values()
+					.forEach(k -> k.addModeParams(drtWalk));
+			Logger.getLogger(DrtControlerCreator.class)
+					.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
 		}
 
 		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());

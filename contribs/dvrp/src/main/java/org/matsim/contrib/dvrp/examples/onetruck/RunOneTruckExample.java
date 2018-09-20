@@ -125,6 +125,6 @@ public final class RunOneTruckExample {
 	}
 
 	public static void main(String... args) {
-		run(true, 0); // switch to 'false' to turn off visualisation
+		run(false, 0); // switch to 'false' to turn off visualisation
 	}
 }
