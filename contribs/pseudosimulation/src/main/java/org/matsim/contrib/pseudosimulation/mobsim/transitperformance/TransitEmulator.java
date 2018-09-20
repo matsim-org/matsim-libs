@@ -19,7 +19,9 @@
  */
 package org.matsim.contrib.pseudosimulation.mobsim.transitperformance;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.vehicles.Vehicle;
 
 /**
  *
@@ -30,13 +32,20 @@ public interface TransitEmulator {
 
 	public static class Trip {
 
+		private final Id<Vehicle> vehicleId;
+
 		private final double accessTime_s;
 
 		private final double egressTime_s;
 
-		public Trip(final double accessTime_s, final double egressTime_s) {
+		public Trip(final Id<Vehicle> vehicleId, final double accessTime_s, final double egressTime_s) {
+			this.vehicleId = vehicleId;
 			this.accessTime_s = accessTime_s;
 			this.egressTime_s = egressTime_s;
+		}
+
+		public Id<Vehicle> vehicleId() {
+			return this.vehicleId;
 		}
 
 		public double accessTime_s() {

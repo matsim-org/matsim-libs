@@ -4,10 +4,11 @@
 package org.matsim.contrib.pseudosimulation.mobsim;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -34,26 +35,18 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
-import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmulator;
 import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.TransitRouteImpl;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.config.TransitConfigGroup;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author illenberger
@@ -95,7 +88,8 @@ public class PSim implements Mobsim {
     
     // Encapsulates TransitPerformance, WaitTime, StopStopTime, ...
     private TransitEmulator transitEmulator = null;
-
+    private Set<String> transitModes = new LinkedHashSet<>();
+    
     public PSim(Scenario sc, EventsManager eventsManager, Collection<Plan> plans, TravelTime carLinkTravelTimes) {
         Logger.getLogger(getClass()).warn("Constructing PSim");
         this.scenario = sc;
@@ -138,6 +132,7 @@ public class PSim implements Mobsim {
 //        stopFacilities = scenario.getTransitSchedule().getFacilities();
 
         this.transitEmulator = transitEmulator;
+        this.transitModes = ConfigUtils.addOrGetModule(sc.getConfig(), TransitConfigGroup.class).getTransitModes();
     }
 
     @Override
@@ -230,14 +225,19 @@ public class PSim implements Mobsim {
                             TransitWalkTimeAndDistance tnd = new TransitWalkTimeAndDistance(act.getCoord(), prevAct.getCoord());
                             travelTime = tnd.time;
                             eventQueue.add(new TeleportationArrivalEvent(prevEndTime + tnd.time, personId, tnd.distance));
-                        } else if (prevLeg.getMode().equals(TransportMode.pt)) {
+//                        } else if (prevLeg.getMode().equals(TransportMode.pt)) {
+                        } else if (transitModes.contains(prevLeg.getMode())) {
                         	TransitEmulator.Trip trip = transitEmulator.findTrip(prevLeg, prevEndTime);
                         	if (trip != null) {
 //                        	if (isUseTransit) {                            	
                             	
-                                Id dummyVehicleId = Id.create("dummy", TransitVehicle.class);
-                                eventQueue.add(new PersonEntersVehicleEvent(trip.accessTime_s(), personId, dummyVehicleId));
-                                eventQueue.add(new PersonLeavesVehicleEvent(trip.egressTime_s(), personId, dummyVehicleId));
+//                        		Id dummyVehicleId = Id.create("dummy", TransitVehicle.class);
+                        		Id<Vehicle> vehicleId = trip.vehicleId();
+                        		if (vehicleId == null) {
+                        			vehicleId = Id.create("dummy", Vehicle.class);
+                        		}
+                                eventQueue.add(new PersonEntersVehicleEvent(trip.accessTime_s(), personId, vehicleId)); // dummyVehicleId));
+                                eventQueue.add(new PersonLeavesVehicleEvent(trip.egressTime_s(), personId, vehicleId)); // dummyVehicleId));
                                 travelTime = trip.egressTime_s() - prevEndTime;
                             	
 //                                ExperimentalTransitRoute route = (ExperimentalTransitRoute) prevLeg.getRoute();
@@ -264,7 +264,10 @@ public class PSim implements Mobsim {
                             try {
                                 Route route = prevLeg.getRoute();
                                 travelTime = route.getTravelTime();
-                                eventQueue.add(new TeleportationArrivalEvent(prevEndTime + travelTime, personId, Double.NaN));
+                                eventQueue.add(new TeleportationArrivalEvent(prevEndTime + travelTime, personId, 
+                                		route.getDistance()
+                                		// Double.NaN
+                                		));
                             } catch (NullPointerException e) {
                                 Logger.getLogger(this.getClass()).error("No route for this leg. Continuing with next leg");
                                 continue;

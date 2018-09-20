@@ -62,6 +62,6 @@ public class TransitPerformanceFromPSimSpecificImplementation implements Transit
 				route.getRouteId(), accessStopId, egressStopId, earliestDepartureTime_s);
 		final double accessTime_s = earliestDepartureTime_s + routeTravelTime.getFirst();
 		final double egressTime_s = accessTime_s + routeTravelTime.getSecond();
-		return new Trip(accessTime_s, egressTime_s);
+		return new Trip(null, accessTime_s, egressTime_s);
 	}
 }

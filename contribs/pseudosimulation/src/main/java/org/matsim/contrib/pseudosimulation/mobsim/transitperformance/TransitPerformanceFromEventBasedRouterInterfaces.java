@@ -68,7 +68,7 @@ public class TransitPerformanceFromEventBasedRouterInterfaces implements Transit
 		final double accessTime_s = earliestDepartureTime_s + this.waitTimes.getRouteStopWaitTime(route.getLineId(),
 				transitRoute.getId(), route.getAccessStopId(), earliestDepartureTime_s);
 		final double egressTime_s = accessTime_s + this.findTransitTravelTime(route, accessTime_s);
-		return new Trip(accessTime_s, egressTime_s);
+		return new Trip(null, accessTime_s, egressTime_s);
 	}
 
 	private double findTransitTravelTime(ExperimentalTransitRoute route, double prevEndTime) {
