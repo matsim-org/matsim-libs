@@ -53,13 +53,14 @@ public class RunETaxiScenario {
 	public static Controler createControler(Config config, boolean otfvis) {
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
+		String mode = TaxiConfigGroup.get(config).getMode();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new TaxiModule());
 		controler.addOverridingModule(new EvModule());
-		controler.addOverridingModule(ETaxiDvrpModules.create());
+		controler.addOverridingModule(ETaxiDvrpModules.create(mode));
 		controler.addOverridingModule(createEvDvrpIntegrationModule());
 
 		if (otfvis) {
@@ -71,8 +72,9 @@ public class RunETaxiScenario {
 
 	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule() {
 		return new EvDvrpIntegrationModule()//
-				.setChargingStrategyFactory(charger -> new FixedSpeedChargingStrategy(
-						charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC))//
+				.setChargingStrategyFactory(
+						charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
+								MAX_RELATIVE_SOC))//
 				.setTemperatureProvider(() -> TEMPERATURE)//
 				.setTurnedOnPredicate(vehicle -> vehicle.getSchedule().getStatus() == ScheduleStatus.STARTED)//
 				.setVehicleFileUrlGetter(cfg -> TaxiConfigGroup.get(cfg).getTaxisFileUrl(cfg.getContext()));

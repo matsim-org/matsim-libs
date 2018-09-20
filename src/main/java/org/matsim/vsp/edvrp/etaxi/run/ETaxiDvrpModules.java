@@ -19,6 +19,8 @@
 
 package org.matsim.vsp.edvrp.etaxi.run;
 
+import java.util.Collections;
+
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -37,11 +39,10 @@ import org.matsim.vsp.edvrp.etaxi.ETaxiActionCreator;
 import org.matsim.vsp.edvrp.etaxi.ETaxiScheduler;
 import org.matsim.vsp.edvrp.etaxi.optimizer.ETaxiOptimizerProvider;
 
-import java.util.Collections;
-
 public class ETaxiDvrpModules {
-	public static AbstractModule create() {
-		return new DvrpModule(ETaxiDvrpModules::createModuleForQSimPlugin, Collections.singleton(TaxiOptimizer.class));
+	public static AbstractModule create(String mode) {
+		return DvrpModule.createModule(mode, ETaxiDvrpModules::createModuleForQSimPlugin,
+				Collections.singleton(TaxiOptimizer.class));
 	}
 
 	private static AbstractQSimModule createModuleForQSimPlugin(Config cfg) {

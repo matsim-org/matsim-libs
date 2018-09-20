@@ -58,6 +58,7 @@ public class RunETaxiBenchmark {
 		config.controler().setLastIteration(runs - 1);
 		config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
 		config.checkConsistency();
+		String mode = TaxiConfigGroup.get(config).getMode();
 
 		Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
 
@@ -65,7 +66,7 @@ public class RunETaxiBenchmark {
 		controler.setModules(new DvrpBenchmarkControlerModule());
 		controler.addOverridingModule(new TaxiModule());
 		controler.addOverridingModule(new EvModule());
-		controler.addOverridingModule(ETaxiDvrpModules.create());
+		controler.addOverridingModule(ETaxiDvrpModules.create(mode));
 		controler.addOverridingModule(RunETaxiScenario.createEvDvrpIntegrationModule());
 
 		controler.addOverridingModule(new AbstractModule() {

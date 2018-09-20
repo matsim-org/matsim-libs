@@ -18,6 +18,8 @@
 
 package org.matsim.vsp.edvrp.edrt.run;
 
+import java.util.Arrays;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
@@ -29,6 +31,7 @@ import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.PrecalculablePathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.DrtModule;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
@@ -56,8 +59,6 @@ import org.matsim.vsp.edvrp.edrt.optimizer.depot.NearestChargerAsDepot;
 import org.matsim.vsp.edvrp.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.vsp.edvrp.edrt.scheduler.EmptyVehicleChargingScheduler;
 
-import java.util.Arrays;
-
 /**
  * @author michalm
  */
@@ -75,18 +76,20 @@ public class EDrtControlerCreator {
 		return controler;
 	}
 
-    public static void addEDrtToController(Controler controler) {
-        controler.addOverridingModule(new DvrpModule(EDrtControlerCreator::createModuleForQSimPlugin, Arrays
-                .asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class, ParallelPathDataProvider.class)));
-        controler.addOverridingModule(new DrtModule());
-        controler.addOverridingModule(new DrtAnalysisModule());
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bind(DepotFinder.class).to(NearestChargerAsDepot.class);
-            }
-        });
-    }
+	public static void addEDrtToController(Controler controler) {
+		String mode = DrtConfigGroup.get(controler.getConfig()).getMode();
+		controler.addOverridingModule(DvrpModule.createModule(mode, EDrtControlerCreator::createModuleForQSimPlugin,
+				Arrays.asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class,
+						ParallelPathDataProvider.class)));
+		controler.addOverridingModule(new DrtModule());
+		controler.addOverridingModule(new DrtAnalysisModule());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(DepotFinder.class).to(NearestChargerAsDepot.class);
+			}
+		});
+	}
 
 	public static AbstractQSimModule createModuleForQSimPlugin(Config config) {
 		return new AbstractQSimModule() {
