@@ -119,7 +119,7 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return -- {@value #MODE_EXP}}
+	 * @return -- {@value #MODE_EXP}
 	 */
 	@StringGetter(MODE)
 	public String getMode() {
