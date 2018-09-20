@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -81,8 +82,8 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 	 * 
 	 */
 	@Inject
-	public DynModePassengerStats(Network network, EventsManager events, Config config, Fleet fleet) {
-		this.mode = ((DvrpConfigGroup)config.getModules().get(DvrpConfigGroup.GROUP_NAME)).getMode();
+	public DynModePassengerStats(Network network, EventsManager events, DrtConfigGroup drtConfigGroup, Fleet fleet) {
+		this.mode = drtConfigGroup.getMode();
 		this.network = network;
 		events.addHandler(this);
 		maxcap = DynModeTripsAnalyser.findMaxCap(fleet);
