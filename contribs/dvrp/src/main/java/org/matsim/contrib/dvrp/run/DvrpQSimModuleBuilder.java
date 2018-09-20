@@ -23,8 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.matsim.contrib.dvrp.passenger.PassengerEngineModule;
+import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimComponentsConfigurator;
+import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
+import org.matsim.contrib.dynagent.run.DynQSimComponentsConfigurator;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -74,7 +76,7 @@ public class DvrpQSimModuleBuilder {
 				install(new DynQSimModule(VrpAgentSource.class));
 
 				if (passengerEngineMode != null) {
-					install(new PassengerEngineModule(passengerEngineMode));
+					install(new PassengerEngineQSimModule(passengerEngineMode));
 				}
 
 				install(new ListenerModule());
@@ -93,7 +95,10 @@ public class DvrpQSimModuleBuilder {
 	}
 
 	public void configureComponents(QSimComponents components) {
-		new DvrpQSimComponentsConfigurator(passengerEngineMode != null).configure(components);
+		new DynQSimComponentsConfigurator().configure(components);
+		if (passengerEngineMode != null) {
+			new PassengerEngineQSimComponentsConfigurator(passengerEngineMode).configure(components);
+		}
 		components.activeMobsimListeners.addAll(listeners.keySet());
 	}
 
