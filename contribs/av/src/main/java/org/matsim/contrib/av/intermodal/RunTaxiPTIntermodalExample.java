@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.av.intermodal;
 
@@ -40,9 +40,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
- * @author  jbischoff
- *
+ * @author jbischoff
  */
+
 /**
  *
  */
@@ -84,12 +84,15 @@ public class RunTaxiPTIntermodalExample {
 
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
+
+		String mode = TaxiConfigGroup.get(config).getMode();
+
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
 
-		controler.addOverridingModule(TaxiDvrpModules.create());
+		controler.addOverridingModule(TaxiDvrpModules.create(mode));
 
 		controler.addOverridingModule(new TaxiModule());
 

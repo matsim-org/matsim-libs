@@ -1,6 +1,5 @@
 package org.matsim.contrib.drt.routing;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +10,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -22,11 +21,11 @@ public class DrtMainModeIdentifierTest {
 
 	@Test
 	public void test() {
-		DvrpConfigGroup dvrp = new DvrpConfigGroup();
-		dvrp.setMode("drt");
+		DrtConfigGroup drtConfigGroup= new DrtConfigGroup();
+		drtConfigGroup.setMode("drt");
 		Config config = ConfigUtils.createConfig();
-		config.addModule(dvrp);
-		MainModeIdentifier mmi = new DrtMainModeIdentifier(config);
+		config.addModule(drtConfigGroup);
+		MainModeIdentifier mmi = new DrtMainModeIdentifier(drtConfigGroup);
 		{
 		List<PlanElement> testElements = new ArrayList<>();
 		Leg l1 = PopulationUtils.createLeg(TransportMode.car);

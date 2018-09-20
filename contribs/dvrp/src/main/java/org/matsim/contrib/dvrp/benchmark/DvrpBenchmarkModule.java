@@ -23,7 +23,6 @@ import java.util.function.Function;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponentsConfigurator;
 import org.matsim.contrib.dvrp.run.DvrpQSimModuleBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
@@ -42,12 +41,13 @@ import com.google.inject.name.Names;
 public class DvrpBenchmarkModule extends AbstractModule {
 	private final DvrpQSimModuleBuilder qsimModuleBuilder;
 
-	public DvrpBenchmarkModule(Function<Config, AbstractQSimModule> moduleCreator,
+	public static DvrpBenchmarkModule createModule(String mode, Function<Config, AbstractQSimModule> moduleCreator,
 			Collection<Class<? extends MobsimListener>> listeners) {
-		this(new DvrpQSimModuleBuilder(moduleCreator).addListeners(listeners));
+		return new DvrpBenchmarkModule(
+				new DvrpQSimModuleBuilder(moduleCreator).addListeners(listeners).setPassengerEngineMode(mode));
 	}
 
-	public DvrpBenchmarkModule(DvrpQSimModuleBuilder qsimModuleBuilder) {
+	private DvrpBenchmarkModule(DvrpQSimModuleBuilder qsimModuleBuilder) {
 		this.qsimModuleBuilder = qsimModuleBuilder;
 	}
 
@@ -65,8 +65,9 @@ public class DvrpBenchmarkModule extends AbstractModule {
 		install(new DvrpBenchmarkTravelTimeModule());// fixed travel times
 
 		bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))
-				.toProvider(DvrpRoutingNetworkProvider.class).asEagerSingleton();
-		
+				.toProvider(DvrpRoutingNetworkProvider.class)
+				.asEagerSingleton();
+
 		installQSimModule(qsimModuleBuilder.build(getConfig()));
 	}
 }

@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 import java.util.Collections;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
@@ -57,8 +58,7 @@ public final class RunOneTaxiExample {
 
 		// setup controler
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule(//
-				cfg -> new AbstractQSimModule() {
+		controler.addOverridingModule(DvrpModule.createModule(TransportMode.taxi, cfg -> new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
 						// optimizer that dispatches taxis
