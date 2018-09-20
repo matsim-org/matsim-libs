@@ -26,6 +26,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -37,6 +38,10 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 	public static TaxiConfigGroup get(Config config) {
 		return (TaxiConfigGroup)config.getModule(GROUP_NAME);
 	}
+
+	public static final String MODE = "mode";
+	static final String MODE_EXP = "Mode which will be handled by PassengerEngine and VrpOptimizer "
+			+ "(passengers'/customers' perspective)";
 
 	public static final String DESTINATION_KNOWN = "destinationKnown";
 	static final String DESTINATION_KNOWN_EXP =
@@ -96,6 +101,9 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 			"Specifies the type and parameters of the TaxiOptimizer. See: TaxiOptimizerParams and classes"
 					+ " implementing it, e.g. AbstractTaxiOptimizerParams.";
 
+	@NotBlank
+	private String mode = TransportMode.taxi; // travel mode (passengers'/customers' perspective)
+
 	private boolean destinationKnown = false;
 	private boolean vehicleDiversion = false;
 
@@ -126,6 +134,7 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
+		map.put(MODE, MODE_EXP);
 		map.put(DESTINATION_KNOWN, DESTINATION_KNOWN_EXP);
 		map.put(VEHICLE_DIVERSION, VEHICLE_DIVERSION_EXP);
 		map.put(PICKUP_DURATION, PICKUP_DURATION_EXP);
@@ -139,6 +148,22 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 		map.put(BREAK_IF_NOT_ALL_REQUESTS_SERVED, BREAK_IF_NOT_ALL_REQUESTS_SERVED_EXP);
 		map.put(OPTIMIZER_PARAMETER_SET, OPTIMIZER_PARAMETER_SET_EXP);
 		return map;
+	}
+
+	/**
+	 * @return {@value #MODE_EXP}
+	 */
+	@StringGetter(MODE)
+	public String getMode() {
+		return mode;
+	}
+
+	/**
+	 * @param mode {@value #MODE_EXP}
+	 */
+	@StringSetter(MODE)
+	public void setMode(String mode) {
+		this.mode = mode;
 	}
 
 	/**

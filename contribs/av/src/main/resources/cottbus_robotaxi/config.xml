@@ -17,9 +17,6 @@
 	</module>
 
 	<module name="dvrp">
-	<!-- Mode of which the agent is traveling on-->
-		<param name="mode" value="taxi" />
-		
 		<!-- Mode of which the network will be used for routing vehicles, calculating trave times etc. (fleet operator's perspective).
 					If null, no mode filtering is done; the standard network (Scenario.getNetwork()) is used - usually, car -->
 		<param name="networkMode" value="null"/>

@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.dvrp.examples.onetruck;
 
+import java.nio.channels.NonWritableChannelException;
 import java.util.Arrays;
 
 import org.matsim.api.core.v01.Id;
@@ -120,8 +121,7 @@ public final class RunOneTruckExample {
 					bind(DynActionCreator.class).to(OneTruckActionCreator.class).asEagerSingleton();
 				}
 			};
-		}).addListener(OneTruckRequestCreator.class)//
-				.setAddPassengerEnginePlugin(false);
+		}).addListener(OneTruckRequestCreator.class);
 	}
 
 	public static void main(String... args) {

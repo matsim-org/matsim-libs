@@ -40,10 +40,6 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 		return (DvrpConfigGroup)config.getModule(GROUP_NAME);// will fail if not in the config
 	}
 
-	public static final String MODE = "mode";
-	static final String MODE_EXP = "Mode which will be handled by PassengerEngine and VrpOptimizer "
-			+ "(passengers'/customers' perspective)";
-
 	public static final String NETWORK_MODE = "networkMode";
 	static final String NETWORK_MODE_EXP = "Mode of which the network will be used for routing vehicles. "
 			+ "Default is car, i.e. the car network is used. "
@@ -87,9 +83,6 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	// In DVRP 'time < currentTime' may only happen for backward path search, a adding proper search termination
 	// criterion should prevent this from happening
 
-	@NotBlank
-	private String mode = null; // travel mode (passengers'/customers' perspective)
-
 	@Nullable
 	private String networkMode = TransportMode.car; // used for building route; null ==> no filtering (routing network equals scenario.network)
 
@@ -110,7 +103,6 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
-		map.put(MODE, MODE_EXP);
 		map.put(NETWORK_MODE, NETWORK_MODE_EXP);
 		map.put(MOBSIM_MODE, MOBSIM_MODE_EXP);
 		map.put(TRAVEL_TIME_ESTIMATION_ALPHA, TRAVEL_TIME_ESTIMATION_ALPHA_EXP);
@@ -119,23 +111,7 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return -- {@value #MODE_EXP}
-	 */
-	@StringGetter(MODE)
-	public String getMode() {
-		return mode;
-	}
-
-	/**
-	 * @param -- {@value #MODE_EXP}
-	 */
-	@StringSetter(MODE)
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
-
-	/**
-	 * @return -- {@value #NETWORK_MODE_EXP}
+	 * @return {@value #NETWORK_MODE_EXP}
 	 */
 	@StringGetter(NETWORK_MODE)
 	public String getNetworkMode() {
@@ -143,7 +119,7 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param -- {@value #NETWORK_MODE_EXP}
+	 * @param networkMode {@value #NETWORK_MODE_EXP}
 	 */
 	@StringSetter(NETWORK_MODE)
 	public void setNetworkMode(String networkMode) {
@@ -151,7 +127,7 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return -- {@value #MOBSIM_MODE_EXP}
+	 * @return {@value #MOBSIM_MODE_EXP}
 	 */
 	@StringGetter(MOBSIM_MODE)
 	public String getMobsimMode() {
@@ -159,7 +135,7 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param -- {@value #MOBSIM_MODE_EXP}
+	 * @param networkMode {@value #MOBSIM_MODE_EXP}
 	 */
 	@StringSetter(MOBSIM_MODE)
 	public void setMobsimMode(String networkMode) {
@@ -167,7 +143,7 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return -- {@value #TRAVEL_TIME_ESTIMATION_ALPHA_EXP}
+	 * @return {@value #TRAVEL_TIME_ESTIMATION_ALPHA_EXP}
 	 */
 	@StringGetter(TRAVEL_TIME_ESTIMATION_ALPHA)
 	public double getTravelTimeEstimationAlpha() {
@@ -175,7 +151,7 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @value -- {@value #TRAVEL_TIME_ESTIMATION_ALPHA_EXP}
+	 * @param travelTimeEstimationAlpha {@value #TRAVEL_TIME_ESTIMATION_ALPHA_EXP}
 	 */
 	@StringSetter(TRAVEL_TIME_ESTIMATION_ALPHA)
 	public void setTravelTimeEstimationAlpha(double travelTimeEstimationAlpha) {
@@ -183,7 +159,7 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return -- {@value #TRAVEL_TIME_ESTIMATION_BETA_EXP}
+	 * @return {@value #TRAVEL_TIME_ESTIMATION_BETA_EXP}
 	 */
 	@StringGetter(TRAVEL_TIME_ESTIMATION_BETA)
 	public double getTravelTimeEstimationBeta() {
@@ -191,7 +167,7 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param -- {@value #TRAVEL_TIME_ESTIMATION_BETA_EXP}
+	 * @param travelTimeEstimationBeta {@value #TRAVEL_TIME_ESTIMATION_BETA_EXP}
 	 */
 	@StringSetter(TRAVEL_TIME_ESTIMATION_BETA)
 	public void setTravelTimeEstimationBeta(double travelTimeEstimationBeta) {

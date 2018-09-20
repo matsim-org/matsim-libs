@@ -118,7 +118,8 @@ public final class DrtControlerCreator {
 	}
 
 	public static void addDrtToControler(Controler controler) {
-		controler.addOverridingModule(new DvrpModule(DrtControlerCreator::createModuleForQSimPlugin,
+		String mode = DrtConfigGroup.get(controler.getConfig()).getMode();
+		controler.addOverridingModule(DvrpModule.createModule(mode, DrtControlerCreator::createModuleForQSimPlugin,
 				Arrays.asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class,
 						ParallelPathDataProvider.class)));
 		controler.addOverridingModule(new DrtModule());
