@@ -10,7 +10,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
 public class JDEQSimModule extends AbstractQSimModule {
-	public static String JDEQ_ENGINE_NAME = "JDEQEngine";
+	public final static String JDEQ_ENGINE_NAME = "JDEQEngine";
 
 	@Override
 	protected void configureQSim() {

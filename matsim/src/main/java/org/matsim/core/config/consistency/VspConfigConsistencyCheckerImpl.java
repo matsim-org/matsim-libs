@@ -297,7 +297,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		// added nov'15
 		boolean usingTimeMutator = false ;
 		for ( StrategySettings it : config.strategy().getStrategySettings() ) {
-			if ( DefaultStrategy.TimeAllocationMutator.toString().equals( it.getName() ) ) {
+			if ( DefaultStrategy.TimeAllocationMutator.equals( it.getName() ) ) {
 				usingTimeMutator = true ;
 				break ;
 			}
