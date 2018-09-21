@@ -29,10 +29,8 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author  jbischoff
- * Config Group to set taxi fares.
- */
-/**
- *
+ * Config Group to set taxi or drt fares.
+ * 
  */
 public class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 
@@ -42,12 +40,13 @@ public class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 	public static final String DAILY_FEE = "dailySubscriptionFee";
 	public static final String TIMEFARE = "timeFare_h";
 	public static final String DISTANCEFARE = "distanceFare_m";
+	public static final String MODE = "mode";
 
 	private double basefare;
 	private double dailySubscriptionFee;
 	private double timeFare_h;
 	private double distanceFare_m;
-
+	private String mode = "taxi";
 	
 	public TaxiFareConfigGroup() {
 		super(GROUP_NAME);
@@ -66,6 +65,7 @@ public class TaxiFareConfigGroup extends ReflectiveConfigGroup {
         map.put(DAILY_FEE, "Daily subscription fee (fee = positive value)");
         map.put(TIMEFARE , "taxi fare per hour (fee = positive value)");
         map.put(DISTANCEFARE, "taxi fare per meter (fee = positive value)");
+        map.put(MODE, "taxi / drt mode (passengers'/customers' perspective; default: taxi)");
 		return map;
     }
 
@@ -107,12 +107,18 @@ public class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 		return distanceFare_m;
 	}
 
-
 	@StringSetter(DISTANCEFARE)
 	public void setDistanceFare_m(double distanceFare_m) {
 		this.distanceFare_m = distanceFare_m;
 	}
 	
+	@StringGetter(MODE)
+	public String getMode() {
+		return mode;
+	}
 	
-
+	@StringSetter(MODE)
+	public void setMode(String mode) {
+		this.mode = mode;
+	}
 }
