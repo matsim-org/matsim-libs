@@ -434,7 +434,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	@Override
 	public void recalcTimeVariantAttributes() {
-		double now = context.getSimTimer().getTimeOfDay() ;
+//		double now = context.getSimTimer().getTimeOfDay() ;
 
 		for (QLaneI lane : this.laneQueues.values()) {
 //			lane.changeEffectiveNumberOfLanes( getLink().getNumberOfLanes( now ) ) ;

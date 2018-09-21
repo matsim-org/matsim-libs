@@ -62,7 +62,7 @@ public final class NetworkSimplifier {
 	private boolean mergeLinksWithDifferentAttributes = false;
 	private Collection<Integer> nodeTopoToMerge = Arrays.asList( NetworkCalcTopoType.PASS1WAY , NetworkCalcTopoType.PASS2WAY );
 
-	private Set<Id<Node>> nodesNotToMerge = new HashSet<Id<Node>>();
+	private Set<Id<Node>> nodesNotToMerge = new HashSet<>();
 
 	private final Map<Id<Link>,List<Node>> mergedLinksToIntermediateNodes = new HashMap<>();
 
@@ -72,7 +72,7 @@ public final class NetworkSimplifier {
 	 * @param network
 	 */
 	public void run(final Network network){
-		run(network, Double.POSITIVE_INFINITY, thresholdExceeded.EITHER);
+		run(network, Double.POSITIVE_INFINITY, ThresholdExceeded.EITHER);
 	}
 	
 	
@@ -89,13 +89,13 @@ public final class NetworkSimplifier {
 	 */
 	@Deprecated
 	public void run(final Network network, double thresholdLength){
-		run(network, thresholdLength, thresholdExceeded.BOTH);
-		run(network, thresholdLength, thresholdExceeded.EITHER);
+		run(network, thresholdLength, ThresholdExceeded.BOTH);
+		run(network, thresholdLength, ThresholdExceeded.EITHER);
 	}
 
 	/**
 	 * Specifies a set of nodes of which all outgoing and ingoing links should not be merged.
-	 * Should probably not be used if nodes of type {@link NetworkCalcTopoType.INTERSECTION} are to be merged.
+	 * Should probably not be used if nodes of type {@link NetworkCalcTopoType#INTERSECTION} are to be merged.
 	 * tschlenther jun'17
 	 * @param nodeIDs
 	 */
@@ -105,7 +105,7 @@ public final class NetworkSimplifier {
 		}
 	}
 	
-	private void run(final Network network, double thresholdLength, thresholdExceeded type) {
+	private void run(final Network network, double thresholdLength, ThresholdExceeded type) {
 
 		if(this.nodeTopoToMerge.size() == 0){
 			throw new RuntimeException("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
@@ -118,17 +118,17 @@ public final class NetworkSimplifier {
 
 		for (Node node : network.getNodes().values()) {
 			
-			if(this.nodeTopoToMerge.contains(Integer.valueOf(nodeTopo.getTopoType(node))) && (!this.nodesNotToMerge.contains(node.getId())) ){
+			if(this.nodeTopoToMerge.contains(nodeTopo.getTopoType(node)) && (!this.nodesNotToMerge.contains(node.getId())) ){
 
-				List<Link> iLinks = new ArrayList<Link> (node.getInLinks().values());
+				List<Link> iLinks = new ArrayList<>(node.getInLinks().values());
 
 				for (Link iL : iLinks) {
-					Link inLink = (Link) iL;
+					Link inLink = iL;
 
-					List<Link> oLinks = new ArrayList<Link> (node.getOutLinks().values());
+					List<Link> oLinks = new ArrayList<>(node.getOutLinks().values());
 
 					for (Link oL : oLinks) {
-						Link outLink = (Link) oL;
+						Link outLink = oL;
 
 						if(inLink != null && outLink != null){
 //							if(!outLink.getToNode().equals(inLink.getFromNode())){
@@ -207,7 +207,7 @@ public final class NetworkSimplifier {
 										}
 																				
 										if(isHavingShortLinks){
-											Link newLink = NetworkUtils.createAndAddLink(((Network) network),Id.create(inLink.getId() + "-" + outLink.getId(), Link.class), inLink.getFromNode(), outLink.getToNode(), inLink.getLength() + outLink.getLength(), inLink.getFreespeed(), inLink.getCapacity(), inLink.getNumberOfLanes(), NetworkUtils.getOrigId( inLink ) + "-" + NetworkUtils.getOrigId( outLink ), null);
+											Link newLink = NetworkUtils.createAndAddLink(network,Id.create(inLink.getId() + "-" + outLink.getId(), Link.class), inLink.getFromNode(), outLink.getToNode(), inLink.getLength() + outLink.getLength(), inLink.getFreespeed(), inLink.getCapacity(), inLink.getNumberOfLanes(), NetworkUtils.getOrigId( inLink ) + "-" + NetworkUtils.getOrigId( outLink ), null);
 											
 											newLink.setAllowedModes(inLink.getAllowedModes());
 											
@@ -338,9 +338,9 @@ public final class NetworkSimplifier {
 		final String inNetworkFile = args[ 0 ];
 		final String outNetworkFile = args[ 1 ];
 
-		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
-		nodeTypesToMerge.add(new Integer(4));
-		nodeTypesToMerge.add(new Integer(5));
+		Set<Integer> nodeTypesToMerge = new TreeSet<>();
+		nodeTypesToMerge.add(4);
+		nodeTypesToMerge.add(5);
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
@@ -355,7 +355,7 @@ public final class NetworkSimplifier {
 
 	}
 	
-	private enum thresholdExceeded{
+	private enum ThresholdExceeded {
 		EITHER, BOTH
 	}
 }
