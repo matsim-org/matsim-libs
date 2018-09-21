@@ -78,6 +78,6 @@ public class SnapshotWritersModule extends AbstractModule {
 			}
 		}
 
-		private class NoopMobsimListener implements MobsimListener {
+		private static class NoopMobsimListener implements MobsimListener {
 		}
 	}}
