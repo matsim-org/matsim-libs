@@ -19,7 +19,6 @@
 package org.matsim.contrib.dvrp.benchmark;
 
 import java.util.Collection;
-import java.util.function.Function;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
@@ -27,7 +26,6 @@ import org.matsim.contrib.dvrp.run.DvrpQSimModuleBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponents;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 
@@ -41,10 +39,9 @@ import com.google.inject.name.Names;
 public class DvrpBenchmarkModule extends AbstractModule {
 	private final DvrpQSimModuleBuilder qsimModuleBuilder;
 
-	public static DvrpBenchmarkModule createModule(String mode, Function<Config, AbstractQSimModule> moduleCreator,
-			Collection<Class<? extends MobsimListener>> listeners) {
+	public static DvrpBenchmarkModule createModule(String mode, Collection<Class<? extends MobsimListener>> listeners) {
 		return new DvrpBenchmarkModule(
-				new DvrpQSimModuleBuilder(moduleCreator).addListeners(listeners).setPassengerEngineMode(mode));
+				new DvrpQSimModuleBuilder().addListeners(listeners).setPassengerEngineMode(mode));
 	}
 
 	private DvrpBenchmarkModule(DvrpQSimModuleBuilder qsimModuleBuilder) {

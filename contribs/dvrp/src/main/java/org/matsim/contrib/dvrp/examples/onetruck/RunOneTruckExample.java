@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.dvrp.examples.onetruck;
 
-import java.nio.channels.NonWritableChannelException;
 import java.util.Arrays;
 
 import org.matsim.api.core.v01.Id;
@@ -71,9 +70,6 @@ public final class RunOneTruckExample {
 		// load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// set up DVRP
-		DvrpQSimModuleBuilder builder = createQSimModuleBuilder();
-
 		// setup controler
 		Controler controler = new Controler(scenario);
 
@@ -88,6 +84,16 @@ public final class RunOneTruckExample {
 			}
 		});
 
+		controler.addQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(OneTruckRequestCreator.class).asEagerSingleton();
+				bind(VrpOptimizer.class).to(OneTruckOptimizer.class).asEagerSingleton();
+				bind(DynActionCreator.class).to(OneTruckActionCreator.class).asEagerSingleton();
+			}
+		});
+
+		DvrpQSimModuleBuilder builder = new DvrpQSimModuleBuilder().addListener(OneTruckRequestCreator.class);
 		controler.addQSimModule(builder.build(config));
 		controler.configureQSimComponents(builder::configureComponents);
 
@@ -109,19 +115,6 @@ public final class RunOneTruckExample {
 		vehicleCapacity.setSeats(1);
 		truckType.setCapacity(vehicleCapacity);
 		return truckType;
-	}
-
-	private static DvrpQSimModuleBuilder createQSimModuleBuilder() {
-		return new DvrpQSimModuleBuilder(cfg -> {
-			return new AbstractQSimModule() {
-				@Override
-				protected void configureQSim() {
-					bind(OneTruckRequestCreator.class).asEagerSingleton();
-					bind(VrpOptimizer.class).to(OneTruckOptimizer.class).asEagerSingleton();
-					bind(DynActionCreator.class).to(OneTruckActionCreator.class).asEagerSingleton();
-				}
-			};
-		}).addListener(OneTruckRequestCreator.class);
 	}
 
 	public static void main(String... args) {

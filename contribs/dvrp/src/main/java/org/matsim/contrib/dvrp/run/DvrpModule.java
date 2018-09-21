@@ -20,7 +20,6 @@
 package org.matsim.contrib.dvrp.run;
 
 import java.util.Collection;
-import java.util.function.Function;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
@@ -30,7 +29,6 @@ import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponents;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
@@ -42,10 +40,8 @@ import com.google.inject.name.Names;
 public final class DvrpModule extends AbstractModule {
 	private final DvrpQSimModuleBuilder qsimModuleBuilder;
 
-	public static DvrpModule createModule(String mode, Function<Config, AbstractQSimModule> moduleCreator,
-			Collection<Class<? extends MobsimListener>> listeners) {
-		return new DvrpModule(
-				new DvrpQSimModuleBuilder(moduleCreator).addListeners(listeners).setPassengerEngineMode(mode));
+	public static DvrpModule createModule(String mode, Collection<Class<? extends MobsimListener>> listeners) {
+		return new DvrpModule(new DvrpQSimModuleBuilder().addListeners(listeners).setPassengerEngineMode(mode));
 	}
 
 	private DvrpModule(DvrpQSimModuleBuilder qsimModuleBuilder) {

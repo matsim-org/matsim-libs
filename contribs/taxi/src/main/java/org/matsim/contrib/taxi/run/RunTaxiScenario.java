@@ -19,10 +19,14 @@
 
 package org.matsim.contrib.taxi.run;
 
+import java.util.Collections;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.run.examples.TaxiDvrpModules;
+import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
+import org.matsim.contrib.taxi.run.examples.TaxiQSimModules;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -44,7 +48,9 @@ public class RunTaxiScenario {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(TaxiDvrpModules.create(mode));
+		controler.addQSimModule(TaxiQSimModules.createModuleForQSimPlugin());
+		controler.addOverridingModule(DvrpModule.createModule(mode,
+				Collections.singleton(TaxiOptimizer.class)));
 		controler.addOverridingModule(new TaxiModule());
 
 		if (otfvis) {

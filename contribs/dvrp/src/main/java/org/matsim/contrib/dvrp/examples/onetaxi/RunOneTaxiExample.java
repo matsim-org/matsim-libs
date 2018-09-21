@@ -58,17 +58,18 @@ public final class RunOneTaxiExample {
 
 		// setup controler
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(DvrpModule.createModule(TransportMode.taxi, cfg -> new AbstractQSimModule() {
-					@Override
-					protected void configureQSim() {
-						// optimizer that dispatches taxis
-						bind(VrpOptimizer.class).to(OneTaxiOptimizer.class).asEagerSingleton();
-						// converts departures of the "taxi" mode into taxi requests
-						bind(PassengerRequestCreator.class).to(OneTaxiRequestCreator.class).asEagerSingleton();
-						// converts scheduled tasks into simulated actions (legs and activities)
-						bind(DynActionCreator.class).to(OneTaxiActionCreator.class).asEagerSingleton();
-					}
-				}, //
+		controler.addQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				// optimizer that dispatches taxis
+				bind(VrpOptimizer.class).to(OneTaxiOptimizer.class).asEagerSingleton();
+				// converts departures of the "taxi" mode into taxi requests
+				bind(PassengerRequestCreator.class).to(OneTaxiRequestCreator.class).asEagerSingleton();
+				// converts scheduled tasks into simulated actions (legs and activities)
+				bind(DynActionCreator.class).to(OneTaxiActionCreator.class).asEagerSingleton();
+			}
+		});
+		controler.addOverridingModule(DvrpModule.createModule(TransportMode.taxi,
 				Collections.emptySet()));// no mobsim listeners necessary in OneTaxiExample
 
 		controler.addOverridingModule(

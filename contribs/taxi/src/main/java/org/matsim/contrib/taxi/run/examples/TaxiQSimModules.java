@@ -18,11 +18,8 @@
 
 package org.matsim.contrib.taxi.run.examples;
 
-import java.util.Collections;
-
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
@@ -39,14 +36,9 @@ import com.google.inject.Provider;
 /**
  * @author michalm
  */
-public class TaxiDvrpModules {
-	public static DvrpModule create(String mode) {
-		return create(mode, DefaultTaxiOptimizerProvider.class);
-	}
-
-	public static DvrpModule create(String mode, Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
-		return DvrpModule.createModule(mode, cfg -> createModuleForQSimPlugin(providerClass),
-				Collections.singleton(TaxiOptimizer.class));
+public class TaxiQSimModules {
+	public static AbstractQSimModule createModuleForQSimPlugin() {
+		return createModuleForQSimPlugin(DefaultTaxiOptimizerProvider.class);
 	}
 
 	public static AbstractQSimModule createModuleForQSimPlugin(
@@ -61,12 +53,7 @@ public class TaxiDvrpModules {
 				bind(TaxiScheduler.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
 				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
-				install(new com.google.inject.AbstractModule() {
-					@Override
-					protected void configure() {
-						bind(TaxiOptimizer.class).toProvider(providerClass).asEagerSingleton();
-					}
-				});
+				bind(TaxiOptimizer.class).toProvider(providerClass).asEagerSingleton();
 			}
 		};
 	}
