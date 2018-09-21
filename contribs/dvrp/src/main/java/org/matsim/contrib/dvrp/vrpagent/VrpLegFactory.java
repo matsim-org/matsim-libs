@@ -29,23 +29,22 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  */
 public interface VrpLegFactory {
 	/**
-	 * @param vehicle
-	 *            for which the leg is created
+	 * @param vehicle for which the leg is created
 	 * @return fully initialised VrpLeg (e.g. with online tracking, etc.)
 	 */
 	VrpLeg create(Vehicle vehicle);
 
-	static VrpLeg createWithOfflineTracker(Vehicle vehicle, MobsimTimer timer) {
+	static VrpLeg createWithOfflineTracker(String mode, Vehicle vehicle, MobsimTimer timer) {
 		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
-		VrpLeg leg = new VrpLeg(driveTask.getPath());
+		VrpLeg leg = new VrpLeg(mode, driveTask.getPath());
 		TaskTrackers.initOfflineTaskTracking(driveTask, timer);
 		return leg;
 	}
 
-	static VrpLeg createWithOnlineTracker(Vehicle vehicle, VrpOptimizerWithOnlineTracking optimizer,
+	static VrpLeg createWithOnlineTracker(String mode, Vehicle vehicle, VrpOptimizerWithOnlineTracking optimizer,
 			MobsimTimer timer) {
 		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
-		VrpLeg leg = new VrpLeg(driveTask.getPath());
+		VrpLeg leg = new VrpLeg(mode, driveTask.getPath());
 		TaskTrackers.initOnlineDriveTaskTracking(vehicle, leg, optimizer, timer);
 		return leg;
 	}

@@ -48,6 +48,7 @@ public class RunTaxiExample {
 		config.controler().setLastIteration(lastIteration);
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
+		String mode = TaxiConfigGroup.get(config).getMode();
 
 		// load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -57,10 +58,10 @@ public class RunTaxiExample {
 
 		final boolean ownTaxiOptimizer = false;
 		if (!ownTaxiOptimizer) {
-			controler.addOverridingModule(TaxiDvrpModules.create());
+			controler.addOverridingModule(TaxiDvrpModules.create(mode));
 			// (default taxi optimizer)
 		} else {
-			controler.addOverridingModule(TaxiDvrpModules.create(MyTaxiOptimizerProvider.class));
+			controler.addOverridingModule(TaxiDvrpModules.create(mode, MyTaxiOptimizerProvider.class));
 			// (implement your own taxi optimizer)
 		}
 

@@ -34,23 +34,23 @@ import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
-import com.google.inject.Module;
 import com.google.inject.Provider;
 
 /**
  * @author michalm
  */
 public class TaxiDvrpModules {
-	public static DvrpModule create() {
-		return create(DefaultTaxiOptimizerProvider.class);
+	public static DvrpModule create(String mode) {
+		return create(mode, DefaultTaxiOptimizerProvider.class);
 	}
 
-	public static DvrpModule create(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
-		return new DvrpModule(cfg -> createModuleForQSimPlugin(providerClass),
+	public static DvrpModule create(String mode, Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
+		return DvrpModule.createModule(mode, cfg -> createModuleForQSimPlugin(providerClass),
 				Collections.singleton(TaxiOptimizer.class));
 	}
 
-	public static AbstractQSimModule createModuleForQSimPlugin(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
+	public static AbstractQSimModule createModuleForQSimPlugin(
+			Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
 		return new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {

@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.vehicles.Vehicle;
@@ -81,7 +82,7 @@ public class TaxiFareHandler implements LinkEnterEventHandler, PersonEntersVehic
 	@Inject
 	public TaxiFareHandler(Config config, EventsManager events, Network network) {
 		TaxiFareConfigGroup taxiFareConfigGroup = TaxiFareConfigGroup.get(config);
-		this.mode = DvrpConfigGroup.get(config).getMode();
+		this.mode = TaxiConfigGroup.get(config).getMode();
 		this.events= events;
 		this.network = network;
 		this.distanceFare_Meter = taxiFareConfigGroup.getDistanceFare_m();
