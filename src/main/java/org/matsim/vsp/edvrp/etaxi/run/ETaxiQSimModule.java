@@ -34,21 +34,17 @@ import org.matsim.vsp.edvrp.etaxi.ETaxiActionCreator;
 import org.matsim.vsp.edvrp.etaxi.ETaxiScheduler;
 import org.matsim.vsp.edvrp.etaxi.optimizer.ETaxiOptimizerProvider;
 
-public class ETaxiQSimModules {
-	public static AbstractQSimModule createModuleForQSimPlugin() {
-		return new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
-						DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
-				bind(TaxiOptimizer.class).toProvider(ETaxiOptimizerProvider.class).asEagerSingleton();
-				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
-				bind(ETaxiScheduler.class).asEagerSingleton();
-				bind(TaxiActionCreator.class).asEagerSingleton();
-				bind(DynActionCreator.class).to(ETaxiActionCreator.class).asEagerSingleton();
-				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
-			}
-		};
+public class ETaxiQSimModule extends AbstractQSimModule {
+	@Override
+	protected void configureQSim() {
+		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
+		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
+				DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
+		bind(TaxiOptimizer.class).toProvider(ETaxiOptimizerProvider.class).asEagerSingleton();
+		bind(VrpOptimizer.class).to(TaxiOptimizer.class);
+		bind(ETaxiScheduler.class).asEagerSingleton();
+		bind(TaxiActionCreator.class).asEagerSingleton();
+		bind(DynActionCreator.class).to(ETaxiActionCreator.class).asEagerSingleton();
+		bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
 	}
 }
