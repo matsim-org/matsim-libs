@@ -41,9 +41,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * should run out of the box without any additional files. If required, you may find all input files in the resource
  * path or in the jar maven has downloaded). There are two vehicle files: 2000 vehicles and 5000, which may be set in
  * the config. Different fleet sizes can be created using
- * {@link org.matsim.contrib.robotaxi.vehicles.CreateTaxiVehicles}
- * 
- * 
+ * {@link org.matsim.contrib.av.robotaxi.vehicles.CreateTaxiVehicles}
  */
 public class RunRobotaxiExample {
 
@@ -61,6 +59,7 @@ public class RunRobotaxiExample {
 	public static Controler createControler(Config config, boolean otfvis) {
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
+		String mode = TaxiConfigGroup.get(config).getMode();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -71,7 +70,7 @@ public class RunRobotaxiExample {
 				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
 			}
 		});
-		controler.addOverridingModule(TaxiDvrpModules.create());
+		controler.addOverridingModule(TaxiDvrpModules.create(mode));
 		controler.addOverridingModule(new TaxiModule());
 
 		if (otfvis) {

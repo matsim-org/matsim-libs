@@ -37,14 +37,14 @@ import org.matsim.core.mobsim.qsim.components.QSimComponents;
 public class DvrpQSimModuleBuilder {
 	private final Function<Config, AbstractQSimModule> moduleCreator;
 	private final Map<String, Class<? extends MobsimListener>> listeners = new HashMap<>();
-	
+
 	private int listenerIndex = 0;
-	private boolean addPassengerEngineModule = true;
+	private String passengerEngineMode = null;
 
 	public DvrpQSimModuleBuilder(Function<Config, AbstractQSimModule> moduleCreator) {
 		this.moduleCreator = moduleCreator;
 	}
-	
+
 	private String createNextListenerName(Class<? extends MobsimListener> listener) {
 		return String.format("DVRP_%d_%s", listenerIndex++, listener.getClass().toString());
 	}
@@ -59,8 +59,11 @@ public class DvrpQSimModuleBuilder {
 		return this;
 	}
 
-	public DvrpQSimModuleBuilder setAddPassengerEnginePlugin(boolean addPassengerEnginePlugin) {
-		this.addPassengerEngineModule = addPassengerEnginePlugin;
+	/**
+	 * @param mode null means passenger engine module will not be installed
+	 */
+	public DvrpQSimModuleBuilder setPassengerEngineMode(String mode) {
+		this.passengerEngineMode = mode;
 		return this;
 	}
 
@@ -69,11 +72,11 @@ public class DvrpQSimModuleBuilder {
 			@Override
 			protected void configureQSim() {
 				install(new DynQSimModule(VrpAgentSource.class));
-				
-				if (addPassengerEngineModule) {
-					install(new PassengerEngineModule(DvrpConfigGroup.get(config).getMode()));
+
+				if (passengerEngineMode != null) {
+					install(new PassengerEngineModule(passengerEngineMode));
 				}
-				
+
 				install(new ListenerModule());
 				install(moduleCreator.apply(config));
 			}
@@ -88,9 +91,13 @@ public class DvrpQSimModuleBuilder {
 			}
 		}
 	}
-	
+
 	public void configureComponents(QSimComponents components) {
-		new DvrpQSimComponentsConfigurator(addPassengerEngineModule).configure(components);
+		new DvrpQSimComponentsConfigurator(passengerEngineMode != null).configure(components);
 		components.activeMobsimListeners.addAll(listeners.keySet());
+	}
+
+	public String getPassengerEngineMode() {
+		return passengerEngineMode;
 	}
 }

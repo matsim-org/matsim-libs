@@ -42,12 +42,13 @@ import com.google.inject.name.Names;
 public final class DvrpModule extends AbstractModule {
 	private final DvrpQSimModuleBuilder qsimModuleBuilder;
 
-	public DvrpModule(Function<Config, AbstractQSimModule> moduleCreator,
+	public static DvrpModule createModule(String mode, Function<Config, AbstractQSimModule> moduleCreator,
 			Collection<Class<? extends MobsimListener>> listeners) {
-		this(new DvrpQSimModuleBuilder(moduleCreator).addListeners(listeners));
+		return new DvrpModule(
+				new DvrpQSimModuleBuilder(moduleCreator).addListeners(listeners).setPassengerEngineMode(mode));
 	}
 
-	public DvrpModule(DvrpQSimModuleBuilder qsimModuleBuilder) {
+	private DvrpModule(DvrpQSimModuleBuilder qsimModuleBuilder) {
 		this.qsimModuleBuilder = qsimModuleBuilder;
 	}
 
@@ -62,8 +63,10 @@ public final class DvrpModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		String mode = DvrpConfigGroup.get(getConfig()).getMode();
-		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
+		String mode = qsimModuleBuilder.getPassengerEngineMode();
+		if (mode != null) {
+			addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
+		}
 
 		// Visualisation of schedules for DVRP DynAgents
 		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
@@ -72,8 +75,9 @@ public final class DvrpModule extends AbstractModule {
 		install(new DvrpTravelTimeModule());
 
 		bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))
-				.toProvider(DvrpRoutingNetworkProvider.class).asEagerSingleton();
-		
+				.toProvider(DvrpRoutingNetworkProvider.class)
+				.asEagerSingleton();
+
 		installQSimModule(qsimModuleBuilder.build(getConfig()));
 	}
 }

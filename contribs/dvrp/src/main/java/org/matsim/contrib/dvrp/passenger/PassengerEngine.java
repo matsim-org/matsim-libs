@@ -128,7 +128,11 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 			}
 		}
 
-		return !request.isRejected();
+		// always mark the departure as handled, even if rejected, in order to get more consistency with rejections
+		// that are decided later (for instance, during optimisation which is usually called in the next sim step)
+		// michalm, sep'18
+		// See: github.com/matsim-org/matsim/pull/362 for some more discussion
+		return true;//!request.isRejected();
 	}
 
 	public void rejectRequest(PassengerRequest request, double now) {

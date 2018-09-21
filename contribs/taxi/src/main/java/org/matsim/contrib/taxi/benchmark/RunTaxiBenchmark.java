@@ -66,11 +66,12 @@ public class RunTaxiBenchmark {
 		config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
 		config.checkConsistency();
 
+		String mode = TaxiConfigGroup.get(config).getMode();
 		Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
 
 		Controler controler = new Controler(scenario);
 		controler.setModules(new DvrpBenchmarkControlerModule());
-		controler.addOverridingModule(new DvrpBenchmarkModule(
+		controler.addOverridingModule(DvrpBenchmarkModule.createModule(mode,
 				cfg -> TaxiDvrpModules.createModuleForQSimPlugin(DefaultTaxiOptimizerProvider.class),
 				Collections.singleton(TaxiOptimizer.class)));
 
