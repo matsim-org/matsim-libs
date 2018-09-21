@@ -59,11 +59,6 @@ public final class DvrpModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		String mode = qsimModuleBuilder.getPassengerEngineMode();
-		if (mode != null) {
-			addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
-		}
-
 		// Visualisation of schedules for DVRP DynAgents
 		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
 

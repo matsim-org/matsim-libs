@@ -30,10 +30,12 @@ import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
+import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -72,6 +74,12 @@ public final class RunOneTaxiExample {
 		controler.addOverridingModule(DvrpModule.createModule(TransportMode.taxi,
 				Collections.emptySet()));// no mobsim listeners necessary in OneTaxiExample
 
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addRoutingModuleBinding(TransportMode.taxi).toInstance(new DynRoutingModule(TransportMode.taxi));
+			}
+		});
 		controler.addOverridingModule(
 				FleetProvider.createModule(ConfigGroup.getInputFileURL(config.getContext(), TAXIS_FILE)));
 
