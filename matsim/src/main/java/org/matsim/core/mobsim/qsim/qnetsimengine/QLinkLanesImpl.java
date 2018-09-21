@@ -20,16 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
@@ -41,14 +31,24 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCa
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.lanes.ModelLane;
 import org.matsim.lanes.Lane;
+import org.matsim.lanes.ModelLane;
 import org.matsim.lanes.VisLane;
 import org.matsim.lanes.VisLaneModelBuilder;
 import org.matsim.lanes.VisLinkWLanes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 /**
  * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed into something
@@ -216,7 +216,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				laneIdToLinksMap.put(laneId, toLinkIds);
 			} else { // lane is within the link and has no connection to a node
 				Map<Id<Link>, List<QLaneI>> toLinkIdDownstreamQueues = new LinkedHashMap<>();
-				nextQueueToLinkCache.put(Id.create(((QueueWithBuffer) queue).getId(), Lane.class),
+				nextQueueToLinkCache.put(Id.create(queue.getId(), Lane.class),
 						toLinkIdDownstreamQueues);
 				for (ModelLane toLane : lane.getToLanes()) {
 					Set<Id<Link>> toLinks = laneIdToLinksMap.get(toLane.getLaneData().getId());
@@ -244,7 +244,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		// reverse the order in the linked map, i.e. upstream to downstream
 		while (!stack.isEmpty()) {
 			QLaneI queue = stack.pop();
-			this.laneQueues.put(((QueueWithBuffer) queue).getId(), queue);
+			this.laneQueues.put(queue.getId(), queue);
 		}
 	}
 
@@ -350,7 +350,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			QLaneI nextQueue = this.chooseNextLane(qlane, toLinkId);
 			if (nextQueue != null) {
 				if (nextQueue.isAcceptingFromUpstream()) {
-					((QueueWithBuffer) qlane).popFirstVehicle();
+					qlane.popFirstVehicle();
 					nextQueue.addFromUpstream(veh);
 				} else {
 					break;
@@ -358,7 +358,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			} else {
 				StringBuilder b = new StringBuilder();
 				b.append("Person Id: ").append(veh.getDriver().getId());
-				b.append(" is on Lane Id ").append(((QueueWithBuffer) qlane).getId());
+				b.append(" is on Lane Id ").append(qlane.getId());
 				b.append(" on Link Id ").append(this.getLink().getId());
 				b.append(" and wants to drive to Link Id ").append(toLinkId);
 				b.append(" but there is no Lane leading to that Link!");
@@ -377,7 +377,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		// else chose lane by storage cap
 		for (int i = 1; i < toQueues.size(); i++) {
 			QLaneI toQueue = toQueues.get(i);
-			if (((QueueWithBuffer) toQueue).getLoadIndicator() < ((QueueWithBuffer) retLane).getLoadIndicator()) {
+			if (toQueue.getLoadIndicator() < retLane.getLoadIndicator()) {
 				retLane = toQueue;
 			}
 		}
@@ -552,7 +552,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			if (visLink != null) {
 				for (QLaneI ql : QLinkLanesImpl.this.laneQueues.values()) {
 					VisLane otfLane = visLink.getLaneData().get(
-							((QueueWithBuffer) ql).getId().toString());
+							ql.getId().toString());
 					((QueueWithBuffer.VisDataImpl) ql.getVisData()).setVisInfo(
 							otfLane.getStartCoord(), otfLane.getEndCoord());
 				}
