@@ -36,25 +36,26 @@ import com.google.inject.Provider;
 /**
  * @author michalm
  */
-public class TaxiQSimModules {
-	public static AbstractQSimModule createModuleForQSimPlugin() {
-		return createModuleForQSimPlugin(DefaultTaxiOptimizerProvider.class);
+public class TaxiQSimModule extends AbstractQSimModule {
+	private final Class<? extends Provider<? extends TaxiOptimizer>> providerClass;
+
+	public TaxiQSimModule() {
+		this(DefaultTaxiOptimizerProvider.class);
 	}
 
-	public static AbstractQSimModule createModuleForQSimPlugin(
-			Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
-		return new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
-						DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
-				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
-				bind(TaxiScheduler.class).asEagerSingleton();
-				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
-				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
-				bind(TaxiOptimizer.class).toProvider(providerClass).asEagerSingleton();
-			}
-		};
+	public TaxiQSimModule(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
+		this.providerClass = providerClass;
+	}
+
+	@Override
+	protected void configureQSim() {
+		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
+		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
+				DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
+		bind(VrpOptimizer.class).to(TaxiOptimizer.class);
+		bind(TaxiScheduler.class).asEagerSingleton();
+		bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
+		bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
+		bind(TaxiOptimizer.class).toProvider(providerClass).asEagerSingleton();
 	}
 }

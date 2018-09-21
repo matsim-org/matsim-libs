@@ -119,7 +119,7 @@ public final class DrtControlerCreator {
 
 	public static void addDrtToControler(Controler controler) {
 		String mode = DrtConfigGroup.get(controler.getConfig()).getMode();
-		controler.addQSimModule(DrtControlerCreator.createModuleForQSimPlugin());
+		controler.addQSimModule(DrtControlerCreator.createQSimModule());
 		controler.addOverridingModule(DvrpModule.createModule(mode,
 				Arrays.asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class,
 						ParallelPathDataProvider.class)));
@@ -162,7 +162,7 @@ public final class DrtControlerCreator {
 		config.checkConsistency();
 	}
 
-	public static AbstractQSimModule createModuleForQSimPlugin() {
+	public static AbstractQSimModule createQSimModule() {
 		return new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {

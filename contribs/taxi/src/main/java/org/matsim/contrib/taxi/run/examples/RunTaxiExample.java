@@ -62,10 +62,10 @@ public class RunTaxiExample {
 
 		final boolean ownTaxiOptimizer = false;
 		if (!ownTaxiOptimizer) {
-			controler.addQSimModule(TaxiQSimModules.createModuleForQSimPlugin());
+			controler.addQSimModule(new TaxiQSimModule());
 			// (default taxi optimizer)
 		} else {
-			controler.addQSimModule(TaxiQSimModules.createModuleForQSimPlugin(MyTaxiOptimizerProvider.class));
+			controler.addQSimModule(new TaxiQSimModule(MyTaxiOptimizerProvider.class));
 			// (implement your own taxi optimizer)
 		}
 
