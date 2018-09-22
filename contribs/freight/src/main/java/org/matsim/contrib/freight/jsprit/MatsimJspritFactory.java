@@ -369,6 +369,9 @@ public class MatsimJspritFactory {
 	 */
 	public static VehicleRoutingProblem createRoutingProblem(Carrier carrier, Network network, VehicleRoutingTransportCosts transportCosts, VehicleRoutingActivityCosts activityCosts){
 		VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
+		boolean serviceInVrp = false;
+		boolean shipmentInVrp = false;
+		
 		FleetSize fleetSize; 
 		CarrierCapabilities carrierCapabilities = carrier.getCarrierCapabilities();
 		if(carrierCapabilities.getFleetSize().equals(org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize.INFINITE)){
@@ -393,6 +396,9 @@ public class MatsimJspritFactory {
 		}
 		
 		for(CarrierService service : carrier.getServices()){
+			if (shipmentInVrp) {
+				throw new UnsupportedOperationException("VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+			}
 			Coord coordinate = null;
 			if(network != null){
 				Link link = network.getLinks().get(service.getLocationLinkId());
@@ -401,11 +407,15 @@ public class MatsimJspritFactory {
 				}
 				else log.warn("cannot find linkId " + service.getLocationLinkId());
 			}
+			serviceInVrp = true;
 			vrpBuilder.addJob(createService(service, coordinate));
 		}
 		
 		
 		for(CarrierShipment carrierShipment : carrier.getShipments()) {
+			if (serviceInVrp) {
+				throw new UnsupportedOperationException("VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+			}
 			Coord fromCoordinate = null;
 			Coord toCoordinate = null;
 			if(network != null){
@@ -420,6 +430,7 @@ public class MatsimJspritFactory {
 					throw new IllegalStateException("cannot create shipment since neither fromLinkId " + carrierShipment.getTo() + " nor toLinkId " + carrierShipment.getTo() + " exists in network.");
 					
 			}
+			shipmentInVrp = true;
 			vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
 		}
 		
@@ -442,6 +453,9 @@ public class MatsimJspritFactory {
 	 */
 	public static VehicleRoutingProblem.Builder createRoutingProblemBuilder(Carrier carrier, Network network){
 		VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
+		boolean serviceInVrp = false;
+		boolean shipmentInVrp = false;
+		
 		FleetSize fleetSize; 
 		CarrierCapabilities carrierCapabilities = carrier.getCarrierCapabilities();
 		if(carrierCapabilities.getFleetSize().equals(org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize.INFINITE)){
@@ -464,6 +478,9 @@ public class MatsimJspritFactory {
 		
 		for(CarrierService service : carrier.getServices()){
 			log.debug("Handle CarrierService: " + service.toString());
+			if (shipmentInVrp) {
+				throw new UnsupportedOperationException("VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+			}
 			Coord coordinate = null;
 			if(network != null){
 				Link link = network.getLinks().get(service.getLocationLinkId());
@@ -472,12 +489,17 @@ public class MatsimJspritFactory {
 				}
 				else coordinate = link.getCoord();
 			}
+			serviceInVrp = true;
 			vrpBuilder.addJob(createService(service, coordinate));
 		}
 		
 		
 		for(CarrierShipment carrierShipment : carrier.getShipments()) {
 			log.debug("Handle CarrierShipment: " + carrierShipment.toString());
+			if (serviceInVrp) {
+				throw new UnsupportedOperationException("VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+			}
+			
 			Coord fromCoordinate = null;
 			Coord toCoordinate = null;
 			if(network != null){
@@ -492,6 +514,7 @@ public class MatsimJspritFactory {
 					throw new IllegalStateException("cannot create shipment " + carrierShipment.getId().toString() + " since either fromLinkId " + carrierShipment.getTo() + " or toLinkId " + carrierShipment.getTo() + " exists in network.");
 					
 			}
+			shipmentInVrp = true;
 			vrpBuilder.addJob(createShipment(carrierShipment, fromCoordinate, toCoordinate));
 		}
 		
