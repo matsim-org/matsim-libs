@@ -6,9 +6,9 @@ import org.matsim.core.mobsim.qsim.components.QSimComponents;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
 
 public class WithinDayQSimModule extends AbstractQSimModule {
-	public static String WITHIN_DAY_ENGINE_NAME = "WithinDayEngine";
-	public static String WITHIN_TRAVEL_TIME_NAME = "WithinDayTravelTime";
-	public static String FIXED_ORDER_SIMULATION_LISTENER = "FixedOrderSimulationListener";
+	public static final String WITHIN_DAY_ENGINE_NAME = "WithinDayEngine";
+	public static final String WITHIN_TRAVEL_TIME_NAME = "WithinDayTravelTime";
+	public static final String FIXED_ORDER_SIMULATION_LISTENER = "FixedOrderSimulationListener";
 
 	private final WithinDayEngine withinDayEngine;
 	private final FixedOrderSimulationListener fixedOrderSimulationListener;

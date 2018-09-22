@@ -312,13 +312,14 @@ public class DensityCluster {
 			int clusterCounter = 0;
 			int clusterMultiplier = 1;
 			int clusterNumber = 0;
-			for (Cluster DigicoreCluster : clusterMap.keySet()) {
-				List<ClusterActivity> listOfClusterPoints = clusterMap.get(DigicoreCluster);
+			for (Map.Entry<Cluster, List<ClusterActivity>> e : clusterMap.entrySet()) {
+				Cluster digicoreCluster = e.getKey();
+				List<ClusterActivity> listOfClusterPoints = e.getValue();
 				if(listOfClusterPoints.size() >= minimumPoints){
-					DigicoreCluster.setClusterId(Id.create(clusterNumber++, Cluster.class));
+					digicoreCluster.setClusterId(Id.create(clusterNumber++, Cluster.class));
 					clusterNumber++;
-					DigicoreCluster.setCenterOfGravity();
-					clusterList.add(DigicoreCluster);
+					digicoreCluster.setCenterOfGravity();
+					clusterList.add(digicoreCluster);
 				} else if(!silent){
 					log.warn(" ... why do we HAVE a cluster with too few points?...");
 				}

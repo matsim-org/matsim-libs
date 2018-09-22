@@ -18,9 +18,6 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -45,6 +42,9 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -160,7 +160,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 			Leg egressLeg = populationFactory.createLeg( TransportMode.egress_walk ) ;
 			egressLeg.setDepartureTime( now );
-			now += routeBushwhackingLeg(person, egressLeg, egressActCoord, toFacility.getCoord(), now, egressActLink.getId(),
+			routeBushwhackingLeg(person, egressLeg, egressActCoord, toFacility.getCoord(), now, egressActLink.getId(),
 					egressActLink.getId(), populationFactory ) ;
 			result.add( egressLeg ) ;
 //				log.warn( egressLeg );
