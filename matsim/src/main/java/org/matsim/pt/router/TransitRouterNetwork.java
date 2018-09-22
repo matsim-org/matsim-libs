@@ -131,19 +131,16 @@ public final class TransitRouterNetwork implements Network {
 
 		@Override
 		public Link removeInLink(Id<Link> linkId) {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
 		public Link removeOutLink(Id<Link> outLinkId) {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
 		public void setCoord(Coord coord) {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
@@ -290,13 +287,11 @@ public final class TransitRouterNetwork implements Network {
 
 		@Override
 		public double getFlowCapacityPerSec() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
 		public double getFlowCapacityPerSec(double time) {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
@@ -462,37 +457,31 @@ public final class TransitRouterNetwork implements Network {
 
 	@Override
 	public void setCapacityPeriod(double capPeriod) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public void setEffectiveCellSize(double effectiveCellSize) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public void setEffectiveLaneWidth(double effectiveLaneWidth) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public void setName(String name) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public double getEffectiveCellSize() {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 

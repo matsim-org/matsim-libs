@@ -19,16 +19,12 @@
 
 package org.matsim.contrib.parking.parkingsearch;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import javax.swing.DropMode;
-
-import org.apache.commons.lang3.mutable.MutableDouble;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
 
 /**
  * @author  jbischoff, tschlenther
@@ -41,7 +37,6 @@ public class ParkingUtils {
 
 	
 	public ParkingUtils() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public static Coord getRandomPointAlongLink(Random rnd, Link link){

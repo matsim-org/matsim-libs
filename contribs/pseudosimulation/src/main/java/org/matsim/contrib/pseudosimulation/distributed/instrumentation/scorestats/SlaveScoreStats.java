@@ -39,7 +39,6 @@ public class SlaveScoreStats implements ScoreStats {
 
 @Override
 public Map<ScoreItem, Map<Integer, Double>> getScoreHistory() {
-	// TODO Auto-generated method stub
 	throw new RuntimeException("not implemented") ;
 }
     
