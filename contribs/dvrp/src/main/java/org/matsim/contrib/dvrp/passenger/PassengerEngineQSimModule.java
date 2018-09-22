@@ -11,12 +11,12 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 import com.google.inject.name.Named;
 
-public class PassengerEngineModule extends AbstractQSimModule {
-	public final static String PASSENGER_ENGINE_NAME = "PassengerEngine";
+public class PassengerEngineQSimModule extends AbstractQSimModule {
+	public final static String PASSENGER_ENGINE_NAME_PREFIX = "PassengerEngine_";
 
 	private final String mode;
 
-	public PassengerEngineModule(String mode) {
+	public PassengerEngineQSimModule(String mode) {
 		this.mode = mode;
 	}
 
@@ -24,8 +24,8 @@ public class PassengerEngineModule extends AbstractQSimModule {
 	protected void configureQSim() {
 		bind(PassengerEngine.class).toProvider(new PassengerEngineProvider(mode)).asEagerSingleton();
 
-		bindDepartureHandler(PASSENGER_ENGINE_NAME).to(PassengerEngine.class);
-		bindMobsimEngine(PASSENGER_ENGINE_NAME).to(PassengerEngine.class);
+		bindDepartureHandler(PASSENGER_ENGINE_NAME_PREFIX + mode).to(PassengerEngine.class);
+		bindMobsimEngine(PASSENGER_ENGINE_NAME_PREFIX + mode).to(PassengerEngine.class);
 	}
 
 	public static class PassengerEngineProvider implements Provider<PassengerEngine> {
