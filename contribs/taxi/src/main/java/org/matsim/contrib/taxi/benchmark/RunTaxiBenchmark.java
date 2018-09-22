@@ -26,11 +26,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiModule;
-import org.matsim.contrib.taxi.run.examples.TaxiDvrpModules;
+import org.matsim.contrib.taxi.run.examples.TaxiQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -71,16 +70,18 @@ public class RunTaxiBenchmark {
 
 		Controler controler = new Controler(scenario);
 		controler.setModules(new DvrpBenchmarkControlerModule());
-		controler.addOverridingModule(DvrpBenchmarkModule.createModule(mode,
-				cfg -> TaxiDvrpModules.createModuleForQSimPlugin(DefaultTaxiOptimizerProvider.class),
-				Collections.singleton(TaxiOptimizer.class)));
+		controler.addQSimModule(new TaxiQSimModule());
+		controler.addOverridingModule(
+				DvrpBenchmarkModule.createModule(mode, Collections.singleton(TaxiOptimizer.class)));
 
 		controler.addOverridingModule(new TaxiModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addControlerListenerBinding().to(TaxiBenchmarkStats.class).asEagerSingleton();
-			};
+			}
+
+			;
 		});
 
 		return controler;

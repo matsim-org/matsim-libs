@@ -30,10 +30,12 @@ import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
+import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -58,19 +60,26 @@ public final class RunOneTaxiExample {
 
 		// setup controler
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(DvrpModule.createModule(TransportMode.taxi, cfg -> new AbstractQSimModule() {
-					@Override
-					protected void configureQSim() {
-						// optimizer that dispatches taxis
-						bind(VrpOptimizer.class).to(OneTaxiOptimizer.class).asEagerSingleton();
-						// converts departures of the "taxi" mode into taxi requests
-						bind(PassengerRequestCreator.class).to(OneTaxiRequestCreator.class).asEagerSingleton();
-						// converts scheduled tasks into simulated actions (legs and activities)
-						bind(DynActionCreator.class).to(OneTaxiActionCreator.class).asEagerSingleton();
-					}
-				}, //
+		controler.addQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				// optimizer that dispatches taxis
+				bind(VrpOptimizer.class).to(OneTaxiOptimizer.class).asEagerSingleton();
+				// converts departures of the "taxi" mode into taxi requests
+				bind(PassengerRequestCreator.class).to(OneTaxiRequestCreator.class).asEagerSingleton();
+				// converts scheduled tasks into simulated actions (legs and activities)
+				bind(DynActionCreator.class).to(OneTaxiActionCreator.class).asEagerSingleton();
+			}
+		});
+		controler.addOverridingModule(DvrpModule.createModule(TransportMode.taxi,
 				Collections.emptySet()));// no mobsim listeners necessary in OneTaxiExample
 
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addRoutingModuleBinding(TransportMode.taxi).toInstance(new DynRoutingModule(TransportMode.taxi));
+			}
+		});
 		controler.addOverridingModule(
 				FleetProvider.createModule(ConfigGroup.getInputFileURL(config.getContext(), TAXIS_FILE)));
 

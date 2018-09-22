@@ -22,6 +22,7 @@ package org.matsim.contrib.taxi.run;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
@@ -43,12 +44,14 @@ public final class TaxiModule extends AbstractModule {
 				.asEagerSingleton();
 		bind(TravelDisutilityFactory.class).annotatedWith(Names.named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER))
 				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
-		
+
 		bind(SubmittedTaxiRequestsCollector.class).toInstance(new SubmittedTaxiRequestsCollector());
 		addControlerListenerBinding().to(SubmittedTaxiRequestsCollector.class);
 
 		addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
 		addControlerListenerBinding().to(TaxiStatsDumper.class);
+
+		addRoutingModuleBinding(taxiCfg.getMode()).toInstance(new DynRoutingModule(taxiCfg.getMode()));
 
 		if (taxiCfg.getTimeProfiles()) {
 			addMobsimListenerBinding().toProvider(TaxiStatusTimeProfileCollectorProvider.class);
