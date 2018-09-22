@@ -307,7 +307,6 @@ import org.xml.sax.helpers.AttributesImpl;
 
 		@Override
 		public Person removePerson(Id<Person> personId) {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 

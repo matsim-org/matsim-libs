@@ -104,7 +104,6 @@ public class InverseArrayRoutingNetworkFactory extends AbstractRoutingNetworkFac
 
 	@Override
 	public void setLinkFactory(LinkFactory factory) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 }

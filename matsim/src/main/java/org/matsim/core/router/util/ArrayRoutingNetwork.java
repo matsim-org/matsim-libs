@@ -35,13 +35,11 @@ public class ArrayRoutingNetwork extends AbstractRoutingNetwork {
 
 	@Override
 	public void setName(String name) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 

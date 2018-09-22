@@ -162,8 +162,6 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 
 		@Override
 		public void finish() {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
@@ -191,8 +189,6 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 
 		@Override
 		public void finish() {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
@@ -205,8 +201,6 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 
 		@Override
 		public void reset() {
-			// TODO Auto-generated method stub
-			
 		}
 		
 	}
