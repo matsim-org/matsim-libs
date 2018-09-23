@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYSeries;
+import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.util.CompactCSVWriter;
@@ -45,7 +46,7 @@ public class DrtVehicleOccupancyProfileWriter implements MobsimBeforeCleanupList
 	private final MatsimServices matsimServices;
 
 	@Inject
-	public DrtVehicleOccupancyProfileWriter(Fleet fleet, MatsimServices matsimServices) {
+	public DrtVehicleOccupancyProfileWriter(@Drt Fleet fleet, MatsimServices matsimServices) {
 		this.fleet = fleet;
 		this.matsimServices = matsimServices;
 	}
@@ -62,7 +63,8 @@ public class DrtVehicleOccupancyProfileWriter implements MobsimBeforeCleanupList
 		String timeFormat = timeDiscretizer.getTimeInterval() % 60 == 0 ? Time.TIMEFORMAT_HHMM : Time.TIMEFORMAT_HHMMSS;
 
 		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"))) {
-			String[] paxHeader = IntStream.rangeClosed(0, calculator.getMaxCapacity()).mapToObj(i -> i + " pax")
+			String[] paxHeader = IntStream.rangeClosed(0, calculator.getMaxCapacity())
+					.mapToObj(i -> i + " pax")
 					.toArray(String[]::new);
 			writer.writeNext("time", "stay", paxHeader);
 

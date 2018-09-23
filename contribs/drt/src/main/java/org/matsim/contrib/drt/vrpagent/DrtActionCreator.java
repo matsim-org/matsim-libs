@@ -19,12 +19,12 @@
 
 package org.matsim.contrib.drt.vrpagent;
 
+import org.matsim.contrib.drt.optimizer.DrtOptimizer;
+import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.passenger.BusStopActivity;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -47,10 +47,9 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final VrpLegFactory legFactory;
 
 	@Inject
-	public DrtActionCreator(PassengerEngine passengerEngine, VrpOptimizer optimizer, MobsimTimer timer,
+	public DrtActionCreator(@Drt PassengerEngine passengerEngine, DrtOptimizer optimizer, MobsimTimer timer,
 			DvrpConfigGroup dvrpCfg) {
-		this(passengerEngine, v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v,
-				(VrpOptimizerWithOnlineTracking)optimizer, timer));
+		this(passengerEngine, v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v, optimizer, timer));
 	}
 
 	public DrtActionCreator(PassengerEngine passengerEngine, VrpLegFactory legFactory) {
