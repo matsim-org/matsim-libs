@@ -95,6 +95,8 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 	@Override
 	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 
+//		System.out.println("oring = " + origin.getCoord().getX() + "   " + origin.getCoord().getY());
+//		System.out.println("destnode = " + destination.getNearestNode().getCoord().getX() + "   " + destination.getNearestNode().getCoord().getY());
 		Link nearestLink = NetworkUtils.getNearestLinkExactly(scenario.getNetwork(), origin.getCoord());
 
 		// === (1) ORIGIN to LINK to NODE (captures the distance (as walk time) between the origin via the link to the node):
@@ -104,26 +106,32 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		// In the state found before modularization (june 15), this was anyway not consistent accross modes
 		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense. (comment by thibaut?)
 		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);
+//		System.out.println("walkTravelTimeMeasuringPoint2Road_h = " + walkTravelTimeMeasuringPoint2Road_h);
 		
 		// (a) disutilities to get on or off the network
 		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT)
 				+ (distance.getDistancePoint2Intersection() * betaWalkTD);
+//		System.out.println("walkDisutilityMeasuringPoint2Road = " + walkDisutilityMeasuringPoint2Road);
 		
 		// (b) TRAVEL ON NETWORK to FIRST NODE:
 		double toll_money = getTollMoney(departureTime, nearestLink, distance);
 		double carSpeedOnNearestLink_m_s = nearestLink.getLength() / travelTime.getLinkTravelTime(nearestLink, departureTime, null, null);
 		double road2NodeCongestedCarTime_h = distance.getDistanceIntersection2Node() / (carSpeedOnNearestLink_m_s * 3600.);
+//		System.out.println("road2NodeCongestedCarTime_h = " + road2NodeCongestedCarTime_h);
 		
 		double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) 
 				+ (distance.getDistanceIntersection2Node() * betaCarTD) + (toll_money * betaCarTMC);
+//		System.out.println("congestedCarDisutilityRoad2Node = " + congestedCarDisutilityRoad2Node);
 //		// yyyyyy dzdzdz: replace the above by link disutility multiplied by fraction of link that is used according to the entry point.  (toll should be in there automatically??)
 
 		// === (2) REMAINING TRAVEL ON NETWORK:
 		double congestedCarDisutility = - lcpt.getTree().get(destination.getNearestNode().getId()).getCost();
+//		System.out.println("congestedCarDisutility = " + congestedCarDisutility);
 		// travel disutility congested car on road network (including toll)
 		
 		// === (3) Pre-computed effect of all opportunities reachable from destination network node:
 		double sumExpVjkWalk = destination.getSum();
+//		System.out.println("destination.getSum() = " + destination.getSum());
 		// works because something like exp(A+c1) + exp(A+c2) + ... = exp(A) * [ exp(c1) + exp(c2) + ...]  =: exp(A) * sumExpVjkWalk
 		
 		// === (4) Everything together:
