@@ -19,17 +19,20 @@
 
 package org.matsim.contrib.accessibility;
 
-import com.google.inject.Inject;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
-import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
@@ -46,12 +49,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 
-import javax.inject.Provider;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.google.inject.Inject;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author dziemke
@@ -59,7 +62,6 @@ import java.util.Map;
 public final class AccessibilityModule extends AbstractModule {
 	private static final Logger LOG = Logger.getLogger(AccessibilityModule.class);
 
-	private List<SpatialGridDataExchangeInterface> spatialGridDataListeners = new ArrayList<>() ;
 	private List<FacilityDataExchangeInterface> facilityDataListeners = new ArrayList<>() ; 
 	private ActivityFacilities measuringPoints;
 	private List<ActivityFacilities> additionalFacs = new ArrayList<>() ;
@@ -102,7 +104,6 @@ public final class AccessibilityModule extends AbstractModule {
 				ActivityFacilities opportunities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType) ;
 				
 				final BoundingBox boundingBox;
-//				final ActivityFacilities measuringPoints;
 				
 				if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromShapeFile) {
 					Geometry boundary = GridUtils.getBoundary(acg.getShapeFileCellBasedAccessibility());
@@ -177,40 +178,37 @@ public final class AccessibilityModule extends AbstractModule {
 					accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calculator);
 				}
 				
+				Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap = VoronoiGeometryUtils.buildMapMeasurePointGeometryMap(measuringPoints, boundingBox);
+
+				
 				if (pushing2Geoserver == true) {
 					accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs,
 							config.controler().getRunId() + "_" + activityType, acg.getCellSizeCellBasedAccessibility()));
 				}
+				
+				String outputDirectory = scenario.getConfig().controler().getOutputDirectory();
 
-				GridBasedAccessibilityShutdownListenerV3 gbasl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, 
-						opportunities, ptMatrix, scenario, boundingBox, cellSize_m);
+				AccessibilityShutdownListenerV4 accessibilityShutdownListener = new AccessibilityShutdownListenerV4(accessibilityCalculator, 
+						opportunities, ptMatrix, outputDirectory, acg, measurePointGeometryMap, measuringPoints);
 				
 				for (ActivityFacilities fac : additionalFacs) {
-					gbasl.addAdditionalFacilityData(fac);
-				}
-
-				for (SpatialGridDataExchangeInterface listener : spatialGridDataListeners) {
-					gbasl.addSpatialGridDataExchangeListener(listener) ;
+					accessibilityShutdownListener.addAdditionalFacilityData(fac);
 				}
 				
 				for (FacilityDataExchangeInterface listener : facilityDataListeners) {
-					gbasl.addFacilityDataExchangeListener(listener);
+					accessibilityShutdownListener.addFacilityDataExchangeListener(listener);
 				}
 				
-				gbasl.writeToSubdirectoryWithName(activityType);
+				accessibilityShutdownListener.writeToSubdirectoryWithName(activityType);
 				
-				return gbasl;
+				return accessibilityShutdownListener;
 			}
 		});
 	}
 	
+	
 	public final void setPushing2Geoserver( boolean pushing2Geoserver ) {
 		this.pushing2Geoserver = pushing2Geoserver ;
-	}
-	
-	@Deprecated
-	public final void addSpatialGridDataExchangeListener(SpatialGridDataExchangeInterface listener) {
-		spatialGridDataListeners.add(listener) ;
 	}
 	
 	public final void addFacilityDataExchangeListener(FacilityDataExchangeInterface listener) {
