@@ -8,8 +8,12 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponents;
 
+import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 
 public class PassengerEngineQSimModule extends AbstractQSimModule {
 	public final static String PASSENGER_ENGINE_NAME_PREFIX = "PassengerEngine_";
@@ -22,21 +26,26 @@ public class PassengerEngineQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bind(PassengerEngine.class).toProvider(new PassengerEngineProvider(mode)).asEagerSingleton();
+		bind(PassengerEngine.class).annotatedWith(Names.named(mode))
+				.toProvider(new PassengerEngineProvider(mode))
+				.asEagerSingleton();
+		Named modeNamed = Names.named(mode);
+		bindDepartureHandler(PASSENGER_ENGINE_NAME_PREFIX + mode).to(Key.get(PassengerEngine.class, modeNamed));
+		bindMobsimEngine(PASSENGER_ENGINE_NAME_PREFIX + mode).to(Key.get(PassengerEngine.class, modeNamed));
+	}
 
-		bindDepartureHandler(PASSENGER_ENGINE_NAME_PREFIX + mode).to(PassengerEngine.class);
-		bindMobsimEngine(PASSENGER_ENGINE_NAME_PREFIX + mode).to(PassengerEngine.class);
+	public static void configureComponents(QSimComponents components, String mode) {
+		components.activeMobsimEngines.add(PassengerEngineQSimModule.PASSENGER_ENGINE_NAME_PREFIX + mode);
+		components.activeDepartureHandlers.add(PassengerEngineQSimModule.PASSENGER_ENGINE_NAME_PREFIX + mode);
 	}
 
 	public static class PassengerEngineProvider implements Provider<PassengerEngine> {
 		private final String mode;
 
 		@Inject
+		private Injector injector;
+		@Inject
 		private EventsManager eventsManager;
-		@Inject
-		private PassengerRequestCreator requestCreator;
-		@Inject
-		private VrpOptimizer optimizer;
 		@Inject
 		@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
 		private Network network;
@@ -47,6 +56,10 @@ public class PassengerEngineQSimModule extends AbstractQSimModule {
 
 		@Override
 		public PassengerEngine get() {
+			Named modeNamed = Names.named(mode);
+			PassengerRequestCreator requestCreator = injector.getInstance(
+					Key.get(PassengerRequestCreator.class, modeNamed));
+			VrpOptimizer optimizer = injector.getInstance(Key.get(VrpOptimizer.class, modeNamed));
 			return new PassengerEngine(mode, eventsManager, requestCreator, optimizer, network);
 		}
 	}
