@@ -44,6 +44,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author thomas
  * @author tthunig
  */
+@Deprecated
 public final class SpatialGrid{
 	private static final Logger LOG = Logger.getLogger(SpatialGrid.class);
 	
