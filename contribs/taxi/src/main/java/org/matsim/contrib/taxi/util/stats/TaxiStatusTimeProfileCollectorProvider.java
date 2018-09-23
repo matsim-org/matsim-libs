@@ -26,6 +26,7 @@ import org.jfree.data.xy.DefaultTableXYDataset;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
+import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts.ChartType;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
@@ -43,7 +44,7 @@ public class TaxiStatusTimeProfileCollectorProvider implements Provider<MobsimLi
 	private final MatsimServices matsimServices;
 
 	@Inject
-	public TaxiStatusTimeProfileCollectorProvider(Fleet fleet, MatsimServices matsimServices,
+	public TaxiStatusTimeProfileCollectorProvider(@Taxi Fleet fleet, MatsimServices matsimServices,
 			SubmittedTaxiRequestsCollector requestCollector) {
 		this.fleet = fleet;
 		this.requestCollector = requestCollector;
