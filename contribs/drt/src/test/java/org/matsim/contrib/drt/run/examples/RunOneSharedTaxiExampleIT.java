@@ -16,10 +16,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.run.example;
+package org.matsim.contrib.drt.run.examples;
 
 import org.junit.Test;
-import org.matsim.contrib.drt.run.examples.RunOneSharedTaxiExample;
 
 /**
  * @author michalm
