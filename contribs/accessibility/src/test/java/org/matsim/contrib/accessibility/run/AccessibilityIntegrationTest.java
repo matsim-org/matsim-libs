@@ -77,6 +77,7 @@ public class AccessibilityIntegrationTest {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();	
 	
+	@Ignore
 	@Test
 	public void testRunAccessibilityExample() {
 		Config config = ConfigUtils.loadConfig("./examples/RunAccessibilityExample/config.xml");
