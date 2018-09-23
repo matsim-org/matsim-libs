@@ -47,7 +47,6 @@ public class RandomTripToCarsharingStrategy implements PlanStrategy{
 
 	@Override
 	public void finish() {
-		// TODO Auto-generated method stub
 		strategy.finish();
 	}
 	@Override

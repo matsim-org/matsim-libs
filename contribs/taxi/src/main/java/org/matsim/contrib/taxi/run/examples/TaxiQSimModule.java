@@ -18,11 +18,8 @@
 
 package org.matsim.contrib.taxi.run.examples;
 
-import java.util.Collections;
-
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
@@ -34,40 +31,31 @@ import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
-import com.google.inject.Module;
 import com.google.inject.Provider;
 
 /**
  * @author michalm
  */
-public class TaxiDvrpModules {
-	public static DvrpModule create() {
-		return create(DefaultTaxiOptimizerProvider.class);
+public class TaxiQSimModule extends AbstractQSimModule {
+	private final Class<? extends Provider<? extends TaxiOptimizer>> providerClass;
+
+	public TaxiQSimModule() {
+		this(DefaultTaxiOptimizerProvider.class);
 	}
 
-	public static DvrpModule create(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
-		return new DvrpModule(cfg -> createModuleForQSimPlugin(providerClass),
-				Collections.singleton(TaxiOptimizer.class));
+	public TaxiQSimModule(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
+		this.providerClass = providerClass;
 	}
 
-	public static AbstractQSimModule createModuleForQSimPlugin(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
-		return new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
-						DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
-				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
-				bind(TaxiScheduler.class).asEagerSingleton();
-				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
-				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
-				install(new com.google.inject.AbstractModule() {
-					@Override
-					protected void configure() {
-						bind(TaxiOptimizer.class).toProvider(providerClass).asEagerSingleton();
-					}
-				});
-			}
-		};
+	@Override
+	protected void configureQSim() {
+		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
+		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
+				DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
+		bind(VrpOptimizer.class).to(TaxiOptimizer.class);
+		bind(TaxiScheduler.class).asEagerSingleton();
+		bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
+		bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
+		bind(TaxiOptimizer.class).toProvider(providerClass).asEagerSingleton();
 	}
 }

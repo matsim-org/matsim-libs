@@ -20,14 +20,15 @@
 
 package org.matsim.core.gbl;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.net.URL;
-
-import org.apache.log4j.Logger;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Some utility functions for dumping time and memory usage, and for logging.
@@ -83,7 +84,7 @@ public abstract class Gbl {
 		String date = null;
 		URL url = Gbl.class.getResource(resourceFilename);
 		if (url != null) {
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
 				revision = reader.readLine();
 				date = reader.readLine();
 			} catch (IOException e) {
@@ -239,7 +240,15 @@ public abstract class Gbl {
 	public static final String WRONG_IMPLEMENTATION = "wrong implementation of interface; " ;
 	
 	public static final String COPY_PASTE_FROM_CORE_NO_LONGER_WORKING="Another solution for this has been found in the core, and thus this copy-and-paste from the core is no longer working." ;
-
-
 	
+	public static String aboutToWrite( String what, String filename ) {
+		return "about to write " + what + " to: "  + filename ;
+	}
+	public static String aboutToRead( String what, URL url ) {
+		return "about to read " + what + " from: "  + url ;
+	}
+	public static String aboutToRead( String what, String filename ) {
+		return "about to read " + what + " from: "  + filename ;
+	}
+
 }

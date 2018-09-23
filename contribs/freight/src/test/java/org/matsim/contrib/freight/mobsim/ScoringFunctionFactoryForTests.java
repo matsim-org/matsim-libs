@@ -139,8 +139,6 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 
 		@Override
 		public void finish() {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
@@ -168,8 +166,6 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 
 		@Override
 		public void finish() {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
@@ -182,8 +178,6 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 
 		@Override
 		public void reset() {
-			// TODO Auto-generated method stub
-			
 		}
 		
 	}

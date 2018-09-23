@@ -17,9 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.contrib.parking.parkingsearch.events;
 
 import java.util.Map;
@@ -40,13 +37,7 @@ public class StartParkingSearchEvent extends Event {
 	public static final String ATTRIBUTE_LINK = "link";
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
-	/**
-	 * 
-	 */
-	
-	/**
-	 * @param time
-	 */
+
 	public StartParkingSearchEvent(final double time, Id<Vehicle> vehicleId, Id<Link> linkId) {
 		super(time);
 		this.linkId = linkId;
@@ -54,12 +45,8 @@ public class StartParkingSearchEvent extends Event {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.events.Event#getEventType()
-	 */
 	@Override
 	public String getEventType() {
-		// TODO Auto-generated method stub
 		return EVENT_TYPE;
 	}
 	

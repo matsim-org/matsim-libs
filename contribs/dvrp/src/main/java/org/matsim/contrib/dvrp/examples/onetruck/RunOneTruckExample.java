@@ -19,16 +19,20 @@
 
 package org.matsim.contrib.dvrp.examples.onetruck;
 
+import java.util.Arrays;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponentsConfigurator;
 import org.matsim.contrib.dvrp.run.DvrpQSimModuleBuilder;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -36,9 +40,15 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
+import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 /**
@@ -51,6 +61,8 @@ public final class RunOneTruckExample {
 	public static void run(boolean otfvis, int lastIteration) {
 		// load config
 		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new OTFVisConfigGroup());
+		config.qsim().setMainModes(Arrays.asList(TransportMode.car, TransportMode.truck));
+		config.travelTimeCalculator().setAnalyzedModes(TransportMode.car + "," + TransportMode.truck);
 		config.controler().setLastIteration(lastIteration);
 		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
 		config.checkConsistency();
@@ -58,25 +70,35 @@ public final class RunOneTruckExample {
 		// load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// set up DVRP
-		DvrpQSimModuleBuilder builder = createQSimModuleBuilder();
-
 		// setup controler
 		Controler controler = new Controler(scenario);
 
 		controler.addOverridingModule(new AbstractModule() {
 			public void install() {
-				addTravelTimeBinding(DvrpTravelTimeModule.DVRP_ESTIMATED).to(networkTravelTime());
+				bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSource.DVRP_VEHICLE_TYPE))
+						.toInstance(createTruckType());
+				addTravelTimeBinding(DvrpTravelTimeModule.DVRP_ESTIMATED).to(
+						Key.get(TravelTime.class, Names.named(TransportMode.truck)));
 				bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))
 						.to(Network.class);
 			}
 		});
 
+		controler.addQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(OneTruckRequestCreator.class).asEagerSingleton();
+				bind(VrpOptimizer.class).to(OneTruckOptimizer.class).asEagerSingleton();
+				bind(DynActionCreator.class).to(OneTruckActionCreator.class).asEagerSingleton();
+			}
+		});
+
+		DvrpQSimModuleBuilder builder = new DvrpQSimModuleBuilder().addListener(OneTruckRequestCreator.class);
 		controler.addQSimModule(builder.build(config));
 		controler.configureQSimComponents(builder::configureComponents);
 
 		controler.addOverridingModule(
-				FleetProvider.createModule(ConfigGroup.getInputFileURL(config.getContext(), TRUCK_FILE)));		
+				FleetProvider.createModule(ConfigGroup.getInputFileURL(config.getContext(), TRUCK_FILE)));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation
@@ -86,18 +108,13 @@ public final class RunOneTruckExample {
 		controler.run();
 	}
 
-	private static DvrpQSimModuleBuilder createQSimModuleBuilder() {
-		return new DvrpQSimModuleBuilder(cfg -> {
-			return new AbstractQSimModule() {
-				@Override
-				protected void configureQSim() {
-					bind(OneTruckRequestCreator.class).asEagerSingleton();
-					bind(VrpOptimizer.class).to(OneTruckOptimizer.class).asEagerSingleton();
-					bind(DynActionCreator.class).to(OneTruckActionCreator.class).asEagerSingleton();
-				}
-			};
-		}).addListener(OneTruckRequestCreator.class)//
-				.setAddPassengerEnginePlugin(false);
+	private static VehicleType createTruckType() {
+		VehicleType truckType = VehicleUtils.getFactory().createVehicleType(Id.create("truck", VehicleType.class));
+		truckType.setLength(15.);
+		VehicleCapacity vehicleCapacity = new VehicleCapacityImpl();
+		vehicleCapacity.setSeats(1);
+		truckType.setCapacity(vehicleCapacity);
+		return truckType;
 	}
 
 	public static void main(String... args) {

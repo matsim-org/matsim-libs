@@ -21,10 +21,11 @@ package org.matsim.contrib.dvrp.run;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
-import org.matsim.contrib.dvrp.passenger.PassengerEngineModule;
+import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimComponentsConfigurator;
+import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
+import org.matsim.contrib.dynagent.run.DynQSimComponentsConfigurator;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -35,16 +36,11 @@ import org.matsim.core.mobsim.qsim.components.QSimComponents;
  * @author michalm
  */
 public class DvrpQSimModuleBuilder {
-	private final Function<Config, AbstractQSimModule> moduleCreator;
 	private final Map<String, Class<? extends MobsimListener>> listeners = new HashMap<>();
-	
-	private int listenerIndex = 0;
-	private boolean addPassengerEngineModule = true;
 
-	public DvrpQSimModuleBuilder(Function<Config, AbstractQSimModule> moduleCreator) {
-		this.moduleCreator = moduleCreator;
-	}
-	
+	private int listenerIndex = 0;
+	private String passengerEngineMode = null;
+
 	private String createNextListenerName(Class<? extends MobsimListener> listener) {
 		return String.format("DVRP_%d_%s", listenerIndex++, listener.getClass().toString());
 	}
@@ -59,8 +55,11 @@ public class DvrpQSimModuleBuilder {
 		return this;
 	}
 
-	public DvrpQSimModuleBuilder setAddPassengerEnginePlugin(boolean addPassengerEnginePlugin) {
-		this.addPassengerEngineModule = addPassengerEnginePlugin;
+	/**
+	 * @param mode null means passenger engine module will not be installed
+	 */
+	public DvrpQSimModuleBuilder setPassengerEngineMode(String mode) {
+		this.passengerEngineMode = mode;
 		return this;
 	}
 
@@ -69,28 +68,32 @@ public class DvrpQSimModuleBuilder {
 			@Override
 			protected void configureQSim() {
 				install(new DynQSimModule(VrpAgentSource.class));
-				
-				if (addPassengerEngineModule) {
-					install(new PassengerEngineModule(DvrpConfigGroup.get(config).getMode()));
+
+				if (passengerEngineMode != null) {
+					install(new PassengerEngineQSimModule(passengerEngineMode));
 				}
-				
-				install(new ListenerModule());
-				install(moduleCreator.apply(config));
+
+				install(new AbstractQSimModule() {
+					@Override
+					protected void configureQSim() {
+						for (Map.Entry<String, Class<? extends MobsimListener>> entry : listeners.entrySet()) {
+							bindMobsimListener(entry.getKey()).to(entry.getValue());
+						}
+					}
+				});
 			}
 		};
 	}
 
-	private class ListenerModule extends AbstractQSimModule {
-		@Override
-		protected void configureQSim() {
-			for (Map.Entry<String, Class<? extends MobsimListener>> entry : listeners.entrySet()) {
-				bindMobsimListener(entry.getKey()).to(entry.getValue());
-			}
-		}
-	}
-	
 	public void configureComponents(QSimComponents components) {
-		new DvrpQSimComponentsConfigurator(addPassengerEngineModule).configure(components);
+		new DynQSimComponentsConfigurator().configure(components);
+		if (passengerEngineMode != null) {
+			new PassengerEngineQSimComponentsConfigurator(passengerEngineMode).configure(components);
+		}
 		components.activeMobsimListeners.addAll(listeners.keySet());
+	}
+
+	public String getPassengerEngineMode() {
+		return passengerEngineMode;
 	}
 }

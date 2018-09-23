@@ -32,12 +32,16 @@ public class DrtRequestRejectedEvent extends Event {
 	public static final String EVENT_TYPE = "DrtRequest rejected";
 
 	public static final String ATTRIBUTE_REQUEST = "request";
+	public static final String ATTRIBUTE_CAUSE = "cause";
 
 	private final Id<Request> requestId;
 
-	public DrtRequestRejectedEvent(double time, Id<Request> requestId) {
+	private final String cause;
+
+	public DrtRequestRejectedEvent(double time, Id<Request> requestId, String cause) {
 		super(time);
 		this.requestId = requestId;
+		this.cause = cause;
 	}
 
 	@Override
@@ -52,10 +56,15 @@ public class DrtRequestRejectedEvent extends Event {
 		return requestId;
 	}
 
+	public String getCause() {
+		return cause;
+	}
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_REQUEST, requestId + "");
+		attr.put(ATTRIBUTE_CAUSE, cause);
 		return attr;
 	}
 }

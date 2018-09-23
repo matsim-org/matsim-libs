@@ -82,9 +82,16 @@ import com.google.inject.Inject;
 					Leg leg = (Leg) pe ;
 					if (plansConfigGroup.isRemovingUnneccessaryPlanAttributes()) {
 						leg.setDepartureTime(Time.UNDEFINED_TIME) ;
-						Leg r = (leg); // given by activity end time; everything else confuses
-						r.setTravelTime( Time.UNDEFINED_TIME - r.getDepartureTime() );
-						leg.setTravelTime( Time.UNDEFINED_TIME ); // added apr'2015
+
+//						Leg r = (leg); // given by activity end time; everything else confuses
+//						r.setTravelTime( Time.UNDEFINED_TIME - r.getDepartureTime() );
+//						leg.setTravelTime( Time.UNDEFINED_TIME ); // added apr'2015
+						
+						// found the weird code above; rewriting it now.  kai, aug'2018
+						if ( leg.getRoute()!=null ) {
+							leg.setTravelTime( Time.UNDEFINED_TIME );
+						}
+						
 					}
 				}
 			}

@@ -1,9 +1,9 @@
-/* *********************************************************************** *
- * project: org.matsim.*												   *
- *                                                                         *
+/*
+ * *********************************************************************** *
+ * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,9 +15,23 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-/**
- * @author nagel
- *
+ * *********************************************************************** *
  */
-package tutorial.fixedTimeSignals;
+
+package org.matsim.contrib.dvrp.passenger;
+
+import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
+
+public class PassengerEngineQSimComponentsConfigurator implements QSimComponentsConfigurator {
+	private final String mode;
+
+	public PassengerEngineQSimComponentsConfigurator(String mode) {
+		this.mode = mode;
+	}
+
+	public void configure(QSimComponents components) {
+		components.activeMobsimEngines.add(PassengerEngineQSimModule.PASSENGER_ENGINE_NAME_PREFIX + mode);
+		components.activeDepartureHandlers.add(PassengerEngineQSimModule.PASSENGER_ENGINE_NAME_PREFIX + mode);
+	}
+}

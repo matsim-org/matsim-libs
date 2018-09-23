@@ -235,8 +235,8 @@ public final class NetworkExpandNode {
 			l.setCapacity(inlink.getCapacity());
 			l.setNumberOfLanes(inlink.getNumberOfLanes());
 			l.setAllowedModes(inlink.getAllowedModes());
-			NetworkUtils.setOrigId( ((Link) l), NetworkUtils.getOrigId( ((Link) inlink) ) ) ;
-			NetworkUtils.setType( ((Link) l), NetworkUtils.getType(((Link) inlink)));
+			NetworkUtils.setOrigId(l, NetworkUtils.getOrigId(inlink) ) ;
+			NetworkUtils.setType(l, NetworkUtils.getType(inlink));
 			network.addLink(l);
 		}
 		for (Link outlink : outlinks.values()) {
@@ -262,10 +262,8 @@ public final class NetworkExpandNode {
 			l.setCapacity(outlink.getCapacity());
 			l.setNumberOfLanes(outlink.getNumberOfLanes());
 			l.setAllowedModes(outlink.getAllowedModes());
-			if (outlink instanceof Link) {
-				NetworkUtils.setOrigId( ((Link) l), NetworkUtils.getOrigId( ((Link) outlink) ) ) ;
-				NetworkUtils.setType( ((Link) l), NetworkUtils.getType(((Link) outlink)));
-			}
+			NetworkUtils.setOrigId(l, NetworkUtils.getOrigId(outlink) ) ;
+			NetworkUtils.setType(l, NetworkUtils.getType(outlink));
 			network.addLink(l);
 		}
 
@@ -290,8 +288,8 @@ public final class NetworkExpandNode {
 			} else {
 				l.setAllowedModes(turn.getModes());
 			}
-			NetworkUtils.setOrigId( ((Link) l), NetworkUtils.getOrigId( ((Link) fromLink) ) ) ;
-			NetworkUtils.setType( ((Link) l), NetworkUtils.getType(((Link) fromLink)));
+			NetworkUtils.setOrigId(l, NetworkUtils.getOrigId(fromLink) ) ;
+			NetworkUtils.setType(l, NetworkUtils.getType(fromLink));
 			network.addLink(l);
 			newLinks.add(l);
 		}

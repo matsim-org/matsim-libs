@@ -42,7 +42,7 @@ import org.matsim.core.utils.io.OsmNetworkReader;
 /**
  * @author dziemke
  */
-public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
+public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 	private final static Logger LOG = Logger.getLogger(BicycleOsmNetworkReaderV2.class);
 
 	private ElevationDataParser elevationDataParser;

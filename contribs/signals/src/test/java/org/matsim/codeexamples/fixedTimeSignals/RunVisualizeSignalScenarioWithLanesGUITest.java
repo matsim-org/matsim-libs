@@ -1,4 +1,4 @@
-package tutorial.fixedTimeSignals;
+package org.matsim.codeexamples.fixedTimeSignals;
 
 import org.junit.Assert;
 import org.junit.Test;

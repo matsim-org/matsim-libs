@@ -20,7 +20,6 @@
 package org.matsim.contrib.dvrp.run;
 
 import java.util.Collection;
-import java.util.function.Function;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
@@ -30,7 +29,6 @@ import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponents;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
@@ -42,12 +40,11 @@ import com.google.inject.name.Names;
 public final class DvrpModule extends AbstractModule {
 	private final DvrpQSimModuleBuilder qsimModuleBuilder;
 
-	public DvrpModule(Function<Config, AbstractQSimModule> moduleCreator,
-			Collection<Class<? extends MobsimListener>> listeners) {
-		this(new DvrpQSimModuleBuilder(moduleCreator).addListeners(listeners));
+	public static DvrpModule createModule(String mode, Collection<Class<? extends MobsimListener>> listeners) {
+		return new DvrpModule(new DvrpQSimModuleBuilder().addListeners(listeners).setPassengerEngineMode(mode));
 	}
 
-	public DvrpModule(DvrpQSimModuleBuilder qsimModuleBuilder) {
+	private DvrpModule(DvrpQSimModuleBuilder qsimModuleBuilder) {
 		this.qsimModuleBuilder = qsimModuleBuilder;
 	}
 
@@ -62,9 +59,6 @@ public final class DvrpModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		String mode = DvrpConfigGroup.get(getConfig()).getMode();
-		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
-
 		// Visualisation of schedules for DVRP DynAgents
 		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
 
@@ -72,8 +66,9 @@ public final class DvrpModule extends AbstractModule {
 		install(new DvrpTravelTimeModule());
 
 		bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))
-				.toProvider(DvrpRoutingNetworkProvider.class).asEagerSingleton();
-		
+				.toProvider(DvrpRoutingNetworkProvider.class)
+				.asEagerSingleton();
+
 		installQSimModule(qsimModuleBuilder.build(getConfig()));
 	}
 }

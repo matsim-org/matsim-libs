@@ -284,7 +284,6 @@ public final class PopulationUtils {
 
 		@Override
 		public void setCoord(Coord coord) {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
@@ -423,8 +422,9 @@ public final class PopulationUtils {
 
 	private static int missingFacilityCnt = 0 ;
 	/**
-	 * @param config  
+	 * @param config
 	 */
+	@Deprecated // use decideOnLinkIdForActivity.  kai, sep'18
 	public static Id<Link> computeLinkIdFromActivity( Activity act, ActivityFacilities facs, Config config ) {
 		// the following might eventually become configurable by config. kai, feb'16
 		if ( act.getFacilityId()==null ) {
@@ -448,7 +448,7 @@ public final class PopulationUtils {
 				return linkIdFromActivity ;
 			} else {
 				return facility.getLinkId() ;
-			} 
+			}
 			// yy sorry about this mess, I am just trying to make explicit which seems to have been the logic so far implicitly.  kai, feb'16
 		}
 	}
@@ -1046,6 +1046,13 @@ public final class PopulationUtils {
 			Link link = sc.getNetwork().getLinks().get( act.getLinkId() ) ;
 			Gbl.assertNotNull( link );
 			return link.getCoord() ;
+		}
+	}
+	public static double decideOnTravelTimeForLeg( Leg leg ) {
+		if ( leg.getRoute()!=null ) {
+			return leg.getRoute().getTravelTime() ;
+		} else {
+			return leg.getTravelTime() ;
 		}
 	}
 	public static void sampleDown( Population pop, double sample ) {

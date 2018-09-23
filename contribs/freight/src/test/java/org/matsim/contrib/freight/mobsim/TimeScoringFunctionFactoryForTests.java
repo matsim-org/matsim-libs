@@ -46,7 +46,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 				super();
 				this.network = network;
 				this.carrier = carrier;
-				employedVehicles = new HashSet<CarrierVehicle>();
+				employedVehicles = new HashSet<>();
 			}
 
 			
@@ -167,8 +167,6 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 
 		@Override
 		public void finish() {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
@@ -197,8 +195,6 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 
 		@Override
 		public void finish() {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
@@ -211,8 +207,6 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 
 		@Override
 		public void reset() {
-			// TODO Auto-generated method stub
-			
 		}
 		
 	}
