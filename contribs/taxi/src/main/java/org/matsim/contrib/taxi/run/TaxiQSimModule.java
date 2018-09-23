@@ -1,4 +1,5 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
@@ -14,9 +15,10 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.taxi.run.examples;
+package org.matsim.contrib.taxi.run;
 
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
@@ -27,8 +29,6 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
-import org.matsim.contrib.taxi.run.Taxi;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -55,9 +55,6 @@ public class TaxiQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		String mode = TaxiConfigGroup.get(getConfig()).getMode();
-		Named modeNamed = Names.named(mode);
-
 		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
 				DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
@@ -65,10 +62,10 @@ public class TaxiQSimModule extends AbstractQSimModule {
 		bind(TaxiOptimizer.class).toProvider(providerClass).asEagerSingleton();
 		bind(TaxiScheduler.class).asEagerSingleton();
 
+		Named modeNamed = Names.named(TaxiConfigGroup.get(getConfig()).getMode());
 		bind(VrpOptimizer.class).annotatedWith(modeNamed).to(TaxiOptimizer.class);
 		bind(DynActionCreator.class).annotatedWith(modeNamed).to(TaxiActionCreator.class).asEagerSingleton();
 		bind(PassengerRequestCreator.class).annotatedWith(modeNamed).to(TaxiRequestCreator.class).asEagerSingleton();
-
 		bind(PassengerEngine.class).annotatedWith(Taxi.class).to(Key.get(PassengerEngine.class, modeNamed));
 	}
 }

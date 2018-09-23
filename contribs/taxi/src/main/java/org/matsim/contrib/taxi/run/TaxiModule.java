@@ -40,7 +40,7 @@ import com.google.inject.name.Names;
  */
 public final class TaxiModule extends AbstractModule {
 	@Inject
-	TaxiConfigGroup taxiCfg;
+	private TaxiConfigGroup taxiCfg;
 
 	@Override
 	public void install() {
