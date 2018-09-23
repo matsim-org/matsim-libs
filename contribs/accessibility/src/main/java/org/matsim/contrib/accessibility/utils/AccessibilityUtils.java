@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.accessibility.Labels;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.network.NetworkUtils;
@@ -115,7 +116,7 @@ public class AccessibilityUtils {
 	}
 	
 	public static final ActivityFacilities createFacilityForEachLink( Network network ) {
-		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities("LinkFacilities") ;
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities(Labels.POPULATION_DENSITIY); // TODO change label
 		ActivityFacilitiesFactory ff = facilities.getFactory() ;
 		for ( Link link : network.getLinks().values() ) {
 			ActivityFacility facility = ff.createActivityFacility( Id.create(link.getId(),ActivityFacility.class) , link.getCoord(), link.getId() ) ;
