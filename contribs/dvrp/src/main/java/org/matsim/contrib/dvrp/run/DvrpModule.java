@@ -37,14 +37,14 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
 public final class DvrpModule extends AbstractModule {
-	private final DvrpQSimModuleBuilder qsimModuleBuilder;
+	private final DvrpQSimModule qsimModule;
 
 	public static DvrpModule createModule(String mode, Collection<Class<? extends MobsimListener>> listeners) {
-		return new DvrpModule(new DvrpQSimModuleBuilder().addListeners(listeners).setMode(mode));
+		return new DvrpModule(new DvrpQSimModule.Builder().addListeners(listeners).setMode(mode).build());
 	}
 
-	public DvrpModule(DvrpQSimModuleBuilder qsimModuleBuilder) {
-		this.qsimModuleBuilder = qsimModuleBuilder;
+	public DvrpModule(DvrpQSimModule qsimModule) {
+		this.qsimModule = qsimModule;
 	}
 
 	@Provides
@@ -52,7 +52,7 @@ public final class DvrpModule extends AbstractModule {
 	public QSimComponents provideQSimComponents(Config config) {
 		QSimComponents components = new QSimComponents();
 		new StandardQSimComponentsConfigurator(config).configure(components);
-		qsimModuleBuilder.configureComponents(components);
+		qsimModule.configureComponents(components);
 		return components;
 	}
 
@@ -68,6 +68,6 @@ public final class DvrpModule extends AbstractModule {
 				.toProvider(DvrpRoutingNetworkProvider.class)
 				.asEagerSingleton();
 
-		installQSimModule(qsimModuleBuilder.build(getConfig()));
+		installQSimModule(qsimModule);
 	}
 }

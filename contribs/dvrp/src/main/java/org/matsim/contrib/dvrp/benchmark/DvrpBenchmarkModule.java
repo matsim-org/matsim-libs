@@ -22,7 +22,7 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.DvrpQSimModuleBuilder;
+import org.matsim.contrib.dvrp.run.DvrpQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -37,14 +37,14 @@ import com.google.inject.name.Names;
  * @author michalm
  */
 public class DvrpBenchmarkModule extends AbstractModule {
-	private final DvrpQSimModuleBuilder qsimModuleBuilder;
+	private final DvrpQSimModule qsimModule;
 
 	public static DvrpBenchmarkModule createModule(String mode, Collection<Class<? extends MobsimListener>> listeners) {
-		return new DvrpBenchmarkModule(new DvrpQSimModuleBuilder().addListeners(listeners).setMode(mode));
+		return new DvrpBenchmarkModule(new DvrpQSimModule.Builder().addListeners(listeners).setMode(mode).build());
 	}
 
-	public DvrpBenchmarkModule(DvrpQSimModuleBuilder qsimModuleBuilder) {
-		this.qsimModuleBuilder = qsimModuleBuilder;
+	public DvrpBenchmarkModule(DvrpQSimModule qsimModule) {
+		this.qsimModule = qsimModule;
 	}
 
 	@Provides
@@ -52,7 +52,7 @@ public class DvrpBenchmarkModule extends AbstractModule {
 	public QSimComponents provideQSimComponents(Config config) {
 		QSimComponents components = new QSimComponents();
 		new StandardQSimComponentsConfigurator(config).configure(components);
-		qsimModuleBuilder.configureComponents(components);
+		qsimModule.configureComponents(components);
 		return components;
 	}
 
@@ -64,6 +64,6 @@ public class DvrpBenchmarkModule extends AbstractModule {
 				.toProvider(DvrpRoutingNetworkProvider.class)
 				.asEagerSingleton();
 
-		installQSimModule(qsimModuleBuilder.build(getConfig()));
+		installQSimModule(qsimModule);
 	}
 }
