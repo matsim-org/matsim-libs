@@ -19,44 +19,16 @@
 
 package org.matsim.contrib.taxi.run;
 
-import java.util.Collections;
-
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunTaxiScenario {
 	public static void run(String configFile, boolean otfvis) {
 		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
-		createControler(config, otfvis).run();
-	}
-
-	public static Controler createControler(Config config, boolean otfvis) {
-		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
-		config.checkConsistency();
-		String mode = TaxiConfigGroup.get(config).getMode();
-
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		Controler controler = new Controler(scenario);
-		controler.addQSimModule(new TaxiQSimModule());
-		controler.addOverridingModule(DvrpModule.createModule(mode,
-				Collections.singleton(TaxiOptimizer.class)));
-		controler.addOverridingModule(new TaxiModule());
-
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
-
-		return controler;
+		TaxiControlerCreator.createControler(config, otfvis).run();
 	}
 
 	public static void main(String[] args) {
