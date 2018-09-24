@@ -30,20 +30,28 @@ import org.matsim.vsp.ev.data.ElectricVehicle;
 import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
 import org.matsim.vsp.ev.discharging.OhdeSlaskiAuxEnergyConsumption;
 
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+
 public class DvrpAuxConsumptionFactory implements AuxEnergyConsumption.Factory {
 	@Inject
-	private Fleet fleet;
+	private Injector injector;
 
+	private final String mode;
 	private final DoubleSupplier temperatureProvider;
 	private final Predicate<Vehicle> turnedOnPredicate;
 
-	public DvrpAuxConsumptionFactory(DoubleSupplier temperatureProvider, Predicate<Vehicle> turnedOnPredicate) {
+	public DvrpAuxConsumptionFactory(String mode, DoubleSupplier temperatureProvider,
+			Predicate<Vehicle> turnedOnPredicate) {
+		this.mode = mode;
 		this.temperatureProvider = temperatureProvider;
 		this.turnedOnPredicate = turnedOnPredicate == null ? v -> true : turnedOnPredicate;
 	}
 
 	@Override
 	public AuxEnergyConsumption create(ElectricVehicle electricVehicle) {
+		Fleet fleet = injector.getInstance(Key.get(Fleet.class, Names.named(mode)));
 		Vehicle vehicle = fleet.getVehicles().get(electricVehicle.getId());
 		return new OhdeSlaskiAuxEnergyConsumption(electricVehicle, temperatureProvider,
 				ev -> turnedOnPredicate.test(vehicle));

@@ -24,7 +24,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.core.config.Config;
@@ -50,10 +49,16 @@ public class EvDvrpIntegrationModule extends AbstractModule {
 	private Predicate<Vehicle> turnedOnPredicate;
 	private Function<Config, URL> vehicleFileUrlGetter;
 
+	private final String mode;
+
+	public EvDvrpIntegrationModule(String mode) {
+		this.mode = mode;
+	}
+
 	@Override
 	public void install() {
-		if (EvConfigGroup.get(getConfig())
-				.getAuxDischargingSimulation() == AuxDischargingSimulation.insideDriveDischargingHandler) {
+		if (EvConfigGroup.get(getConfig()).getAuxDischargingSimulation()
+				== AuxDischargingSimulation.insideDriveDischargingHandler) {
 			if (turnedOnPredicate != null) {
 				throw new RuntimeException("turnedOnPredicate must not be set"
 						+ " if auxDischargingSimulation == 'insideDriveDischargingHandler'");
@@ -69,10 +74,9 @@ public class EvDvrpIntegrationModule extends AbstractModule {
 				.to(Key.get(Network.class, Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))).asEagerSingleton();
 		bind(ChargingLogic.Factory.class).toInstance(
 				charger -> new ChargingWithQueueingAndAssignmentLogic(charger, chargingStrategyFactory.apply(charger)));
-		bind(AuxEnergyConsumption.Factory.class)
-				.toInstance(new DvrpAuxConsumptionFactory(temperatureProvider, turnedOnPredicate));
-		bind(Fleet.class).toProvider(new EvDvrpFleetProvider(vehicleFileUrlGetter.apply(getConfig())))
-				.asEagerSingleton();
+		bind(AuxEnergyConsumption.Factory.class).toInstance(
+				new DvrpAuxConsumptionFactory(mode, temperatureProvider, turnedOnPredicate));
+		install(EvDvrpFleetProvider.createModule(mode, vehicleFileUrlGetter.apply(getConfig())));
 	}
 
 	public EvDvrpIntegrationModule setChargingStrategyFactory(

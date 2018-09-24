@@ -32,6 +32,7 @@ import org.matsim.vsp.ev.data.ElectricFleet;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 
 /**
  * @author michalm
@@ -62,11 +63,13 @@ public class EvDvrpFleetProvider implements Provider<Fleet> {
 		return evDvrpFleet;
 	}
 
-	public static AbstractModule createModule(URL url) {
+	public static AbstractModule createModule(String mode, URL url) {
 		return new AbstractModule() {
 			@Override
 			public void install() {
-				bind(Fleet.class).toProvider(new EvDvrpFleetProvider(url)).asEagerSingleton();
+				bind(Fleet.class).annotatedWith(Names.named(mode))
+						.toProvider(new EvDvrpFleetProvider(url))
+						.asEagerSingleton();
 			}
 		};
 	}
