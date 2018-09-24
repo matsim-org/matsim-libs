@@ -90,19 +90,22 @@ public final class DrtControlerCreator {
 		adjustDrtConfig(config);
 		Scenario scenario = scenarioLoader.apply(config);
 		Controler controler = new Controler(scenario);
-		addDrtToControler(controler);
+		addDrtAsSingleDvrpModeToControler(controler);
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
 		return controler;
 	}
 
-	public static void addDrtToControler(Controler controler) {
-		String mode = DrtConfigGroup.get(controler.getConfig()).getMode();
-		controler.addQSimModule(new DrtQSimModule());
-		controler.addOverridingModule(DvrpModule.createModule(mode,
+	public static void addDrtAsSingleDvrpModeToControler(Controler controler) {
+		addDrtWithoutDvrpModuleToControler(controler);
+		controler.addOverridingModule(DvrpModule.createModule(DrtConfigGroup.get(controler.getConfig()).getMode(),
 				Arrays.asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class,
 						ParallelPathDataProvider.class)));
+	}
+
+	public static void addDrtWithoutDvrpModuleToControler(Controler controler) {
+		controler.addQSimModule(new DrtQSimModule());
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
 	}

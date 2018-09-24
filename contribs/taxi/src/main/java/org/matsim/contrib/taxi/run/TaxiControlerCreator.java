@@ -38,17 +38,21 @@ public class TaxiControlerCreator {
 		adjustTaxiConfig(config);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		addTaxiToControler(controler);
+		addTaxiAsSingleDvrpModeToControler(controler);
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
 		return controler;
 	}
 
-	public static void addTaxiToControler(Controler controler) {
-		String mode = TaxiConfigGroup.get(controler.getConfig()).getMode();
+	public static void addTaxiAsSingleDvrpModeToControler(Controler controler) {
+		addTaxiWithoutDvrpModuleToControler(controler);
+		controler.addOverridingModule(DvrpModule.createModule(TaxiConfigGroup.get(controler.getConfig()).getMode(),
+				Collections.singleton(TaxiOptimizer.class)));
+	}
+
+	public static void addTaxiWithoutDvrpModuleToControler(Controler controler) {
 		controler.addQSimModule(new TaxiQSimModule());
-		controler.addOverridingModule(DvrpModule.createModule(mode, Collections.singleton(TaxiOptimizer.class)));
 		controler.addOverridingModule(new TaxiModule());
 	}
 
