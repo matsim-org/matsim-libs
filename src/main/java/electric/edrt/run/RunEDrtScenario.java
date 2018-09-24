@@ -19,8 +19,6 @@
 
 package electric.edrt.run;
 
-import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
-import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.av.maxspeed.DvrpTravelTimeWithMaxSpeedLimitModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -49,6 +47,9 @@ import org.matsim.vsp.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.vsp.ev.temperature.TemperatureChangeConfigGroup;
 import org.matsim.vsp.ev.temperature.TemperatureChangeModule;
 
+import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
+import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
+
 public class RunEDrtScenario {
 	private static final double CHARGING_SPEED_FACTOR = 1.; // full speed
 	private static final double MAX_RELATIVE_SOC = 0.8;// charge up to 80% SOC
@@ -57,8 +58,9 @@ public class RunEDrtScenario {
 	private static String inputPath = "C:\\Users\\Joschka\\Documents\\shared-svn\\projects\\vw_rufbus\\projekt2\\drt_test_Scenarios\\BS_DRT\\input\\";
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(inputPath+"edrt-config.xml", new DrtConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup(), new EvConfigGroup(), new TemperatureChangeConfigGroup());
+		Config config = ConfigUtils.loadConfig(inputPath + "edrt-config.xml", new DrtConfigGroup(),
+				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
+				new TemperatureChangeConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.plans().setInputFile("population/vw219_it_1_sampleRate0.1replaceRate_bs_drt.xml.gz");
 		config.controler().setLastIteration(1); // Number of simulation iterations
@@ -66,10 +68,11 @@ public class RunEDrtScenario {
 		config.controler().setWritePlansInterval(1); // Write Plan file every x-Iterations
 		config.network().setInputFile("network/modifiedNetwork.xml.gz");
 
-		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup) config.getModules().get(TemperatureChangeConfigGroup.GROUP_NAME);
+		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup)config.getModules()
+				.get(TemperatureChangeConfigGroup.GROUP_NAME);
 		tcg.setTempFile("temperatures.csv");
 
-		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		DrtConfigGroup drt = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
 
 		// Use custom stop duration
 		drt.setOperationalScheme("stopbased");
@@ -88,16 +91,19 @@ public class RunEDrtScenario {
 		config.qsim().setFlowCapFactor(0.12);
 		config.qsim().setStorageCapFactor(0.24);
 
-        config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
+		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 
 		config.controler().setOutputDirectory(inputPath + "../output/" + runId);
-        Controler controler = createControler(config);
+		Controler controler = createControler(config);
 
-        VehicleType slowAV = controler.getScenario().getVehicles().getFactory().createVehicleType(Id.create("av", VehicleType.class));
-        slowAV.setMaximumVelocity(20 / 3.6);
+		VehicleType slowAV = controler.getScenario()
+				.getVehicles()
+				.getFactory()
+				.createVehicleType(Id.create("av", VehicleType.class));
+		slowAV.setMaximumVelocity(20 / 3.6);
 
-        controler.addOverridingModule(new DvrpTravelTimeWithMaxSpeedLimitModule(slowAV));
-        controler.run();
+		controler.addOverridingModule(new DvrpTravelTimeWithMaxSpeedLimitModule(slowAV));
+		controler.run();
 	}
 
 	public static Controler createControler(Config config) {
@@ -105,25 +111,25 @@ public class RunEDrtScenario {
 		controler.addOverridingModule(new TemperatureChangeModule());
 
 		controler.addOverridingModule(new EvModule());
-		controler.addOverridingModule(createEvDvrpIntegrationModule());
+		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config).getMode()));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(EDrtVehicleDataEntryFactoryProvider.class)
-						.toInstance(new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
+				bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
+						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
 				bind(DriveEnergyConsumption.class).to(VwDrtDriveEnergyConsumption.class);
 				bind(AuxEnergyConsumption.class).to(VwAVAuxEnergyConsumptionWithTemperatures.class);
 			}
 		});
 
-		
 		return controler;
 	}
 
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule() {
-		return new EvDvrpIntegrationModule()//
-				.setChargingStrategyFactory(charger -> new FixedSpeedChargingStrategy(
-						charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC))//
+	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(String mode) {
+		return new EvDvrpIntegrationModule(mode)//
+				.setChargingStrategyFactory(
+						charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
+								MAX_RELATIVE_SOC))//
 				.setTemperatureProvider(() -> TEMPERATURE) //
 				.setTurnedOnPredicate(RunEDrtScenario::isTurnedOn)//
 				.setVehicleFileUrlGetter(cfg -> DrtConfigGroup.get(cfg).getVehiclesFileUrl(cfg.getContext()));
@@ -138,5 +144,4 @@ public class RunEDrtScenario {
 		return false;
 	}
 
-	
 }
