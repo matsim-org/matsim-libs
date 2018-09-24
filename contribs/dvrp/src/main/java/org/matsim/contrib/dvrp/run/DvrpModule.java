@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
-import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -41,10 +40,10 @@ public final class DvrpModule extends AbstractModule {
 	private final DvrpQSimModuleBuilder qsimModuleBuilder;
 
 	public static DvrpModule createModule(String mode, Collection<Class<? extends MobsimListener>> listeners) {
-		return new DvrpModule(new DvrpQSimModuleBuilder().addListeners(listeners).setPassengerEngineMode(mode));
+		return new DvrpModule(new DvrpQSimModuleBuilder().addListeners(listeners).setMode(mode));
 	}
 
-	private DvrpModule(DvrpQSimModuleBuilder qsimModuleBuilder) {
+	public DvrpModule(DvrpQSimModuleBuilder qsimModuleBuilder) {
 		this.qsimModuleBuilder = qsimModuleBuilder;
 	}
 

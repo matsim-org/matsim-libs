@@ -20,8 +20,6 @@
 package org.matsim.contrib.taxi.vrpagent;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
@@ -31,6 +29,8 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
+import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
@@ -53,11 +53,10 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final double pickupDuration;
 
 	@Inject
-	public TaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg, VrpOptimizer optimizer,
-			MobsimTimer timer, DvrpConfigGroup dvrpCfg) {
+	public TaxiActionCreator(@Taxi PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg,
+			TaxiOptimizer optimizer, MobsimTimer timer, DvrpConfigGroup dvrpCfg) {
 		this(passengerEngine, taxiCfg.isOnlineVehicleTracker() ?
-						v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v,
-								(VrpOptimizerWithOnlineTracking)optimizer, timer) :
+						v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v, optimizer, timer) :
 						v -> VrpLegFactory.createWithOfflineTracker(dvrpCfg.getMobsimMode(), v, timer),
 				taxiCfg.getPickupDuration());
 	}

@@ -41,6 +41,8 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
+import com.google.inject.name.Names;
+
 /**
  * @author michalm
  */
@@ -64,11 +66,17 @@ public final class RunOneTaxiExample {
 			@Override
 			protected void configureQSim() {
 				// optimizer that dispatches taxis
-				bind(VrpOptimizer.class).to(OneTaxiOptimizer.class).asEagerSingleton();
+				bind(VrpOptimizer.class).annotatedWith(Names.named(TransportMode.taxi))
+						.to(OneTaxiOptimizer.class)
+						.asEagerSingleton();
 				// converts departures of the "taxi" mode into taxi requests
-				bind(PassengerRequestCreator.class).to(OneTaxiRequestCreator.class).asEagerSingleton();
+				bind(PassengerRequestCreator.class).annotatedWith(Names.named(TransportMode.taxi))
+						.to(OneTaxiRequestCreator.class)
+						.asEagerSingleton();
 				// converts scheduled tasks into simulated actions (legs and activities)
-				bind(DynActionCreator.class).to(OneTaxiActionCreator.class).asEagerSingleton();
+				bind(DynActionCreator.class).annotatedWith(Names.named(TransportMode.taxi))
+						.to(OneTaxiActionCreator.class)
+						.asEagerSingleton();
 			}
 		});
 		controler.addOverridingModule(DvrpModule.createModule(TransportMode.taxi,
@@ -78,14 +86,14 @@ public final class RunOneTaxiExample {
 			@Override
 			public void install() {
 				addRoutingModuleBinding(TransportMode.taxi).toInstance(new DynRoutingModule(TransportMode.taxi));
+				install(FleetProvider.createModule(TransportMode.taxi,
+						ConfigGroup.getInputFileURL(config.getContext(), TAXIS_FILE)));
+
+				if (otfvis) {
+					install(new OTFVisLiveModule()); // OTFVis visualisation
+				}
 			}
 		});
-		controler.addOverridingModule(
-				FleetProvider.createModule(ConfigGroup.getInputFileURL(config.getContext(), TAXIS_FILE)));
-
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation
-		}
 
 		// run simulation
 		controler.run();

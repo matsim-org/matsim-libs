@@ -31,17 +31,23 @@ import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
+import com.google.inject.Inject;
+import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 /**
  * @author michalm
  */
 public final class TaxiModule extends AbstractModule {
+	@Inject
+	private TaxiConfigGroup taxiCfg;
+
 	@Override
 	public void install() {
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(getConfig());
-		bind(Fleet.class).toProvider(new FleetProvider(taxiCfg.getTaxisFileUrl(getConfig().getContext())))
-				.asEagerSingleton();
+		String mode = taxiCfg.getMode();
+		install(FleetProvider.createModule(mode, taxiCfg.getTaxisFileUrl(getConfig().getContext())));
+		bind(Fleet.class).annotatedWith(Taxi.class).to(Key.get(Fleet.class, Names.named(mode))).asEagerSingleton();
+
 		bind(TravelDisutilityFactory.class).annotatedWith(Names.named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER))
 				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
 
@@ -51,7 +57,7 @@ public final class TaxiModule extends AbstractModule {
 		addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
 		addControlerListenerBinding().to(TaxiStatsDumper.class);
 
-		addRoutingModuleBinding(taxiCfg.getMode()).toInstance(new DynRoutingModule(taxiCfg.getMode()));
+		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
 
 		if (taxiCfg.getTimeProfiles()) {
 			addMobsimListenerBinding().toProvider(TaxiStatusTimeProfileCollectorProvider.class);

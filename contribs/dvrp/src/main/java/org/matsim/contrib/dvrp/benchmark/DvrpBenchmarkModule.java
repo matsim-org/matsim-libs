@@ -40,11 +40,10 @@ public class DvrpBenchmarkModule extends AbstractModule {
 	private final DvrpQSimModuleBuilder qsimModuleBuilder;
 
 	public static DvrpBenchmarkModule createModule(String mode, Collection<Class<? extends MobsimListener>> listeners) {
-		return new DvrpBenchmarkModule(
-				new DvrpQSimModuleBuilder().addListeners(listeners).setPassengerEngineMode(mode));
+		return new DvrpBenchmarkModule(new DvrpQSimModuleBuilder().addListeners(listeners).setMode(mode));
 	}
 
-	private DvrpBenchmarkModule(DvrpQSimModuleBuilder qsimModuleBuilder) {
+	public DvrpBenchmarkModule(DvrpQSimModuleBuilder qsimModuleBuilder) {
 		this.qsimModuleBuilder = qsimModuleBuilder;
 	}
 
