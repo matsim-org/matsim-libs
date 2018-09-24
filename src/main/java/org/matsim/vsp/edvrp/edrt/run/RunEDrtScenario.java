@@ -56,12 +56,12 @@ public class RunEDrtScenario {
 	public static Controler createControler(Config config, boolean otfvis) {
 		Controler controler = EDrtControlerCreator.createControler(config, otfvis);
 		controler.addOverridingModule(new EvModule());
-		controler.addOverridingModule(createEvDvrpIntegrationModule());
+		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config).getMode()));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(EDrtVehicleDataEntryFactoryProvider.class)
-						.toInstance(new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
+				bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
+						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
 			}
 		});
 
@@ -72,10 +72,11 @@ public class RunEDrtScenario {
 		return controler;
 	}
 
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule() {
-		return new EvDvrpIntegrationModule()//
-				.setChargingStrategyFactory(charger -> new FixedSpeedChargingStrategy(
-						charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC))//
+	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(String mode) {
+		return new EvDvrpIntegrationModule(mode)//
+				.setChargingStrategyFactory(
+						charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
+								MAX_RELATIVE_SOC))//
 				.setTemperatureProvider(() -> TEMPERATURE) //
 				.setTurnedOnPredicate(RunEDrtScenario::isTurnedOn)//
 				.setVehicleFileUrlGetter(cfg -> DrtConfigGroup.get(cfg).getVehiclesFileUrl(cfg.getContext()));

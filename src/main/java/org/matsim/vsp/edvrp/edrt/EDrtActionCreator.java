@@ -20,6 +20,7 @@
 package org.matsim.vsp.edvrp.edrt;
 
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
+import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
@@ -50,7 +51,7 @@ public class EDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final MobsimTimer timer;
 
 	@Inject
-	public EDrtActionCreator(PassengerEngine passengerEngine, DrtOptimizer optimizer, MobsimTimer timer,
+	public EDrtActionCreator(@Drt PassengerEngine passengerEngine, DrtOptimizer optimizer, MobsimTimer timer,
 			DvrpConfigGroup dvrpCfg) {
 		this.timer = timer;
 		drtActionCreator = new DrtActionCreator(passengerEngine,

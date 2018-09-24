@@ -34,6 +34,7 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
+import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
@@ -52,7 +53,7 @@ import com.google.inject.name.Named;
 public class ETaxiScheduler extends TaxiScheduler {
 
 	@Inject
-	public ETaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet,
+	public ETaxiScheduler(TaxiConfigGroup taxiCfg, @Taxi Fleet fleet,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER) TravelDisutility travelDisutility) {

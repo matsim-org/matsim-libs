@@ -4,6 +4,7 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
+import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.util.CSVLineBuilder;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -20,7 +21,7 @@ public class ETaxiBenchmarkStats extends TaxiBenchmarkStats {
 	private final SummaryStatistics queuedTimeRatio = new SummaryStatistics();
 
 	@Inject
-	public ETaxiBenchmarkStats(Fleet fleet, SubmittedTaxiRequestsCollector requestCollector,
+	public ETaxiBenchmarkStats(@Taxi Fleet fleet, SubmittedTaxiRequestsCollector requestCollector,
 			OutputDirectoryHierarchy controlerIO) {
 		super(fleet, requestCollector, controlerIO);
 	}
@@ -39,5 +40,5 @@ public class ETaxiBenchmarkStats extends TaxiBenchmarkStats {
 
 	protected CSVLineBuilder createAndInitLineBuilder() {
 		return super.createAndInitLineBuilder().addf("%.3f", queuedTimeRatio.getMean());
-	};
+	}
 }

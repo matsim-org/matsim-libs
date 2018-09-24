@@ -67,7 +67,7 @@ public class RunETaxiScenario {
 		controler.addQSimModule(new ETaxiQSimModule());
 		controler.addOverridingModule(DvrpModule.createModule(mode, Collections.singleton(TaxiOptimizer.class)));
 
-		controler.addOverridingModule(createEvDvrpIntegrationModule());
+		controler.addOverridingModule(createEvDvrpIntegrationModule(mode));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
@@ -76,8 +76,8 @@ public class RunETaxiScenario {
 		return controler;
 	}
 
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule() {
-		return new EvDvrpIntegrationModule()//
+	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(String mode) {
+		return new EvDvrpIntegrationModule(mode)//
 				.setChargingStrategyFactory(
 						charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
 								MAX_RELATIVE_SOC))//
