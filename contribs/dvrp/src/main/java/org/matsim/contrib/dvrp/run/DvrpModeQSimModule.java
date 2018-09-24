@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
-import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponents;
@@ -34,12 +33,12 @@ import org.matsim.core.mobsim.qsim.components.QSimComponents;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DvrpQSimModule extends AbstractQSimModule {
+public class DvrpModeQSimModule extends AbstractQSimModule {
 	private final String mode;
 	private final boolean installPassengerEngineModule;
 	private final Map<String, Class<? extends MobsimListener>> listeners;
 
-	public DvrpQSimModule(String mode, boolean installPassengerEngineModule,
+	public DvrpModeQSimModule(String mode, boolean installPassengerEngineModule,
 			Map<String, Class<? extends MobsimListener>> listeners) {
 		this.mode = mode;
 		this.installPassengerEngineModule = installPassengerEngineModule;
@@ -48,7 +47,6 @@ public class DvrpQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		install(new DynActivityEngineModule());
 		install(new VrpAgentSourceQSimModule(mode));
 
 		if (installPassengerEngineModule) {
@@ -66,7 +64,6 @@ public class DvrpQSimModule extends AbstractQSimModule {
 	}
 
 	public void configureComponents(QSimComponents components) {
-		DynActivityEngineModule.configureComponents(components);
 		VrpAgentSourceQSimModule.configureComponents(components, mode);
 
 		if (installPassengerEngineModule) {
@@ -76,14 +73,18 @@ public class DvrpQSimModule extends AbstractQSimModule {
 	}
 
 	public static class Builder {
+		private final String mode;
 		private final Map<String, Class<? extends MobsimListener>> listeners = new HashMap<>();
 
 		private int listenerIndex = 0;
-		private String mode;
 		private boolean installPassengerEngineModule = true;
 
+		public Builder(String mode) {
+			this.mode = mode;
+		}
+
 		private String createNextListenerName(Class<? extends MobsimListener> listener) {
-			return String.format("DVRP_%d_%s", listenerIndex++, listener.getClass().toString());
+			return String.format("DVRP_%s_%d_%s", mode, listenerIndex++, listener.getClass().toString());
 		}
 
 		public Builder addListener(Class<? extends MobsimListener> listener) {
@@ -96,18 +97,13 @@ public class DvrpQSimModule extends AbstractQSimModule {
 			return this;
 		}
 
-		public Builder setMode(String mode) {
-			this.mode = mode;
-			return this;
-		}
-
 		public Builder setInstallPassengerEngineModule(boolean installPassengerEngineModule) {
 			this.installPassengerEngineModule = installPassengerEngineModule;
 			return this;
 		}
 
-		public DvrpQSimModule build() {
-			return new DvrpQSimModule(mode, installPassengerEngineModule, listeners);
+		public DvrpModeQSimModule build() {
+			return new DvrpModeQSimModule(mode, installPassengerEngineModule, listeners);
 		}
 	}
 }

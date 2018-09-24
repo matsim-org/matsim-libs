@@ -28,8 +28,8 @@ import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -83,10 +83,10 @@ public final class RunOneTruckExample {
 			}
 		});
 
-		controler.addOverridingModule(new DvrpModule(new DvrpQSimModule.Builder().setMode(TransportMode.truck)
-				.setInstallPassengerEngineModule(false)
-				.addListener(OneTruckRequestCreator.class)
-				.build()));
+		controler.addOverridingModule(new DvrpModule(
+				new DvrpModeQSimModule.Builder(TransportMode.truck).setInstallPassengerEngineModule(false)
+						.addListener(OneTruckRequestCreator.class)
+						.build()));
 
 		controler.addOverridingModule(new AbstractModule() {
 			public void install() {

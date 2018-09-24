@@ -22,7 +22,7 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.DvrpQSimModule;
+import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -37,13 +37,13 @@ import com.google.inject.name.Names;
  * @author michalm
  */
 public class DvrpBenchmarkModule extends AbstractModule {
-	private final DvrpQSimModule qsimModule;
+	private final DvrpModeQSimModule qsimModule;
 
 	public static DvrpBenchmarkModule createModule(String mode, Collection<Class<? extends MobsimListener>> listeners) {
-		return new DvrpBenchmarkModule(new DvrpQSimModule.Builder().addListeners(listeners).setMode(mode).build());
+		return new DvrpBenchmarkModule(new DvrpModeQSimModule.Builder(mode).addListeners(listeners).build());
 	}
 
-	public DvrpBenchmarkModule(DvrpQSimModule qsimModule) {
+	public DvrpBenchmarkModule(DvrpModeQSimModule qsimModule) {
 		this.qsimModule = qsimModule;
 	}
 
