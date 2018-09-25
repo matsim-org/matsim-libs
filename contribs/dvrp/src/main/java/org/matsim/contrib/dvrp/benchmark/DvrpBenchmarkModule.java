@@ -23,6 +23,7 @@ import java.util.Collection;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
+import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -52,6 +53,7 @@ public class DvrpBenchmarkModule extends AbstractModule {
 	public QSimComponents provideQSimComponents(Config config) {
 		QSimComponents components = new QSimComponents();
 		new StandardQSimComponentsConfigurator(config).configure(components);
+		DynActivityEngineModule.configureComponents(components);
 		qsimModule.configureComponents(components);
 		return components;
 	}
@@ -64,6 +66,7 @@ public class DvrpBenchmarkModule extends AbstractModule {
 				.toProvider(DvrpRoutingNetworkProvider.class)
 				.asEagerSingleton();
 
+		installQSimModule(new DynActivityEngineModule());
 		installQSimModule(qsimModule);
 	}
 }
