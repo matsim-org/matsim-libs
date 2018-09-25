@@ -39,7 +39,7 @@ import com.google.inject.name.Named;
 /**
  * @author michalm
  */
-final class OneTruckRequestCreator implements MobsimAfterSimStepListener {
+public final class OneTruckRequestCreator implements MobsimAfterSimStepListener {
 	private final VrpOptimizer optimizer;
 	private final PriorityQueue<OneTruckRequest> requests = new PriorityQueue<>(10,
 			Comparator.comparing(Request::getSubmissionTime));

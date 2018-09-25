@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,16 +15,19 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.dvrp.examples.onetaxi;
-
-import java.util.Collections;
+package org.matsim.contrib.dvrp.examples.onetaxionetruck;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiModule;
+import org.matsim.contrib.dvrp.examples.onetruck.OneTruckModule;
+import org.matsim.contrib.dvrp.examples.onetruck.OneTruckRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
@@ -34,11 +37,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public final class RunOneTaxiExample {
-	private static final String CONFIG_FILE = "./src/main/resources/one_taxi/one_taxi_config.xml";
+public class RunOneTaxiOneTruckExample {
+	private static final String CONFIG_FILE = "./src/main/resources/one_taxi_one_truck/one_taxi_one_truck_config.xml";
 	private static final String TAXIS_FILE = "one_taxi_vehicles.xml";
+	private static final String TRUCKS_FILE = "one_truck_vehicles.xml";
 
 	public static void run(boolean otfvis, int lastIteration) {
 		// load config
@@ -53,7 +57,14 @@ public final class RunOneTaxiExample {
 		// setup controler
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new OneTaxiModule(TAXIS_FILE));
-		controler.addOverridingModule(DvrpModule.createModule(TransportMode.taxi, Collections.emptySet()));
+		controler.addOverridingModule(new OneTruckModule(TRUCKS_FILE));
+
+		DvrpModeQSimModule oneTaxiQSimModule = new DvrpModeQSimModule.Builder(TransportMode.taxi).build();
+		DvrpModeQSimModule oneTruckQSimModule = new DvrpModeQSimModule.Builder(
+				TransportMode.truck).setInstallPassengerEngineModule(false)
+				.addListener(OneTruckRequestCreator.class)
+				.build();
+		controler.addOverridingModule(new DvrpModule(oneTaxiQSimModule, oneTruckQSimModule));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation
