@@ -22,8 +22,10 @@ package org.matsim.contrib.taxi.run;
 import java.util.Collections;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
@@ -70,8 +72,10 @@ public class RunTaxiScenarioTestIT {
 		Config config = ConfigUtils.loadConfig(configFile, taxiCfg, new DvrpConfigGroup(), new OTFVisConfigGroup());
 		config.plans().setInputFile(plansFile);
 		taxiCfg.setTaxisFile(taxisFile);
+		taxiCfg.setBreakSimulationIfNotAllRequestsServed(false);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setDumpDataAtEnd(false);
+		config.qsim().setEndTime(36. * 3600);
 		Controler controler = TaxiControlerCreator.createControler(config, false);
 		
 		controler.addOverridingModule(new AbstractModule() {
@@ -89,5 +93,7 @@ public class RunTaxiScenarioTestIT {
 		});
 		
 		controler.run();
+		
+		Assert.assertEquals(-476.003472470419, controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("0000009")).getSelectedPlan().getScore(), utils.EPSILON);
 	}
 }
