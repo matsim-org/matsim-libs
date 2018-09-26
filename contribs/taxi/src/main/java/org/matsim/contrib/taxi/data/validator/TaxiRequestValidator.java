@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer.fifo;
+package org.matsim.contrib.taxi.data.validator;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import java.util.Set;
+
+import org.matsim.contrib.taxi.data.TaxiRequest;
 
 /**
- * @author michalm
+ * Validates (for the optimizer), whether a taxi request should be served or not (e.g. for limitations in business area or
+ * distance or time)
+ *
+ * @author jbischoff, ikaddoura
  */
-public class FifoTaxiOptimizer extends DefaultTaxiOptimizer {
-
-	public FifoTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, Network network, MobsimTimer timer,
-			TravelTime travelTime, TravelDisutility travelDisutility, TaxiScheduler scheduler,
-			FifoTaxiOptimizerParams params, TaxiRequestValidator requestValidator, EventsManager events) {
-		super(taxiCfg, fleet, scheduler, params,
-				new FifoRequestInserter(network, fleet, timer, travelTime, travelDisutility, scheduler),
-				requestValidator, events);
-	}
+public interface TaxiRequestValidator {
+	/**
+	 * Checks if the request can be served given some spatiotemporal (limited time and area of operations) or other constraints.
+	 * <p>
+	 * Preferred format for causes: underscores instead of spaces.
+	 *
+	 * @param request to be validated
+	 * @return set containing causes of constraint violations. An empty set means the request fulfills all
+	 * constraints and may be considered by the optimizer (although this does not guarantee it will get scheduled)
+	 */
+	Set<String> validateTaxiRequest(TaxiRequest request);
 }
