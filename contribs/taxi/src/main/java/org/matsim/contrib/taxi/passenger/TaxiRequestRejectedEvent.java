@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +17,54 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer.fifo;
+package org.matsim.contrib.taxi.passenger;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.contrib.dvrp.data.Request;
 
 /**
  * @author michalm
  */
-public class FifoTaxiOptimizer extends DefaultTaxiOptimizer {
+public class TaxiRequestRejectedEvent extends Event {
+	public static final String EVENT_TYPE = "TaxiRequest rejected";
 
-	public FifoTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, Network network, MobsimTimer timer,
-			TravelTime travelTime, TravelDisutility travelDisutility, TaxiScheduler scheduler,
-			FifoTaxiOptimizerParams params, TaxiRequestValidator requestValidator, EventsManager events) {
-		super(taxiCfg, fleet, scheduler, params,
-				new FifoRequestInserter(network, fleet, timer, travelTime, travelDisutility, scheduler),
-				requestValidator, events);
+	public static final String ATTRIBUTE_REQUEST = "request";
+	public static final String ATTRIBUTE_CAUSE = "cause";
+
+	private final Id<Request> requestId;
+
+	private final String cause;
+
+	public TaxiRequestRejectedEvent(double time, Id<Request> requestId, String cause) {
+		super(time);
+		this.requestId = requestId;
+		this.cause = cause;
+	}
+
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+
+	/**
+	 * the ID of the initial request submitted
+	 */
+	public Id<Request> getRequestId() {
+		return requestId;
+	}
+
+	public String getCause() {
+		return cause;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_REQUEST, requestId + "");
+		attr.put(ATTRIBUTE_CAUSE, cause);
+		return attr;
 	}
 }
