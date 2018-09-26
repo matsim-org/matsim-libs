@@ -69,7 +69,7 @@ public class RunEmissionToolOfflineExample {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		HbefaRoadTypeMapping roadTypeMapping = VisumHbefaRoadTypeMapping.createVisumRoadTypeMapping(ecg.getEmissionRoadTypeMappingFile());
-		EmissionModule emissionModule = new EmissionModule(scenario, eventsManager, roadTypeMapping);
+		EmissionModule emissionModule = new EmissionModule(scenario, eventsManager);
 
 		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);

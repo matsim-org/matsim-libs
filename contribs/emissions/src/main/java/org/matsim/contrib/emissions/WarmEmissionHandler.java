@@ -150,17 +150,6 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		// excluding links with zero lengths from leaveCnt. Amit July'17
 		linkLeaveCnt++;
 
-		Double freeVelocity = link.getFreespeed();
-		String roadType = (String) link.getAttributes().getAttribute("osm:highway:type");
-		if(roadType == null) roadType="unclassified";
-		String roadTypeString = warmEmissionAnalysisModule.getRoadTypeMapping().get(roadType, freeVelocity);;
-
-
-		if (roadTypeString.isEmpty()){
-			logger.error("Roadtype missing in network information!");
-			throw new RuntimeException("Roadtype missing in network information for link " + linkId);
-		}
-
 		if(!this.linkenter.containsKey(vehicleId)){
 			int maxLinkLeaveFirstActWarnCnt = 3;
 			if(linkLeaveFirstActWarnCnt < maxLinkLeaveFirstActWarnCnt){
@@ -204,9 +193,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 
 			Map<WarmPollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
 					vehicle,
-					roadTypeString,
-					freeVelocity,
-					linkLength,
+					link,
 					travelTime);
 
 			warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
