@@ -13,7 +13,9 @@ public abstract class HbefaRoadTypeMapping {
     public void addHbefaMappings(Network network) {
         for (Link link : network.getLinks().values()) {
             String hbefaString = determineHebfaType(link);
-            EmissionUtils.setHbefaRoadType(link, hbefaString);
+            if (hbefaString != null) {
+                EmissionUtils.setHbefaRoadType(link, hbefaString);
+            }
         }
     }
 

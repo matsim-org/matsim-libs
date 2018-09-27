@@ -36,6 +36,7 @@ import java.util.Map;
  */
 public class OsmHbefaMapping extends HbefaRoadTypeMapping {
     private static final int MAX_SPEED = 130;
+    private static final String OSM_HIGHWAY_TAG = "osm:way:highway";
     Map<String, Hbefa> hbfeaMap = new HashMap<>();
 
     public static class Hbefa {
@@ -73,8 +74,12 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
 
     @Override
     public String determineHebfaType(Link link) {
-        String roadType = NetworkUtils.getType(link);
-        return getHEBFAtype(roadType,link.getFreespeed());
+        String roadType = (String) link.getAttributes().getAttribute(OSM_HIGHWAY_TAG);
+        String hbefaType = null;
+        if (roadType != null) {
+            hbefaType = getHEBFAtype(roadType,link.getFreespeed());
+        }
+        return hbefaType;
 
     }
 
