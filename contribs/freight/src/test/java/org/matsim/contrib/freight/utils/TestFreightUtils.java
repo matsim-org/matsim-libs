@@ -324,9 +324,20 @@ public class TestFreightUtils {
 		}
 	}
 	
+	/* Note: This test can be removed / modified when jsprit works properly with a combined Service and Shipment VRP. 
+	* Currently the capacity of the vehicle seems to be "ignored" in a way that the load within the tour is larger than the capacity;
+	* Maybe it is because of the misunderstanding, that a Service is modeled as "Pickup" and not as thought before as "Delivery". KMT sep18
+	*/
 	@Test(expected=UnsupportedOperationException.class)
-	public void exceptionIsThrownWhenUsingShipmentsAndServices() {
-		//TODO Insert content.
+	public void exceptionIsThrownWhenUsingMixedShipmentsAndServices() {
+		Carrier carrierMixedWServicesAndShipments = CarrierImpl.newInstance(Id.create("CarrierMixed", Carrier.class));
+		carrierMixedWServicesAndShipments.getServices().add(createMatsimService("Service1", "i(3,9)", 2));
+		carrierMixedWServicesAndShipments.getShipments().add(createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1)); 
+		
+		Network network = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(network).readFile(getPackageInputDirectory() + "grid-network.xml"); 
+		
+		MatsimJspritFactory.createRoutingProblemBuilder(carrierMixedWServicesAndShipments, network);
 	}
 	
 	private static CarrierShipment createMatsimShipment(String id, String from, String to, int size) {
