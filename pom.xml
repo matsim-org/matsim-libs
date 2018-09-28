@@ -56,6 +56,23 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- OpenStreetMap and osmosis -->
+		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-core</artifactId>
+			<version>0.46</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-xml</artifactId>
+			<version>0.46</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-pbf2</artifactId>
+			<version>0.46</version>
+		</dependency>
 	</dependencies>
 
 	<build>
