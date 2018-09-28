@@ -33,6 +33,12 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
+/**
+ * Utils for the work with the freight contrib
+ * 
+ * @author kturner
+ *
+ */
 public class FreightUtils {
 
 	private static final Logger log = Logger.getLogger(FreightUtils.class);
