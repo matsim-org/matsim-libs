@@ -20,9 +20,7 @@ package org.matsim.contrib.freight.utils;
 
 import java.util.Collection;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -51,7 +49,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.EngineInformation.FuelType;
 import org.matsim.vehicles.EngineInformationImpl;
 
@@ -76,7 +73,11 @@ public class FreightUtilsIT {
 	private static Carrier carrierWShipmentsOnlyFromCarrierWServices;
 	private static Carrier carrierWShipmentsOnlyFromCarrierWShipments;
 	
-//	@Rule
+	/** Commented out because it is not working even as @Rule nor as @ClassRule due to different reasons, 
+	* e.g. @BeforeClass needs @ClassRule, but MatsimTestUtils does not work together with @ClassRule ;
+	*  MatsimTestUtils needs be static vs static not allowed in @Rule, KMT sep/18
+	**/
+//	@Rule		
 //	public static MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	@BeforeClass
@@ -295,6 +296,11 @@ public class FreightUtilsIT {
 				.build();
 	}
 	
+	
+	/**
+	 * Note: Manually added here, because MatsimTestUtils does not work with @BeforeClass; KMT sep/18
+	 * @return String location of the packageInputDirectory
+	 */
 	private static String getPackageInputDirectory() {
 		String classInputDirectory = "test/input/" + TestFreightUtils.class.getCanonicalName().replace('.', '/') + "/";
 		String packageInputDirectory = classInputDirectory.substring(0, classInputDirectory.lastIndexOf('/'));
