@@ -90,21 +90,21 @@ public class FreightUtils {
 	/**
 	 * Copy all shipments from the existing carrier to the new carrier with shipments.
 	 * @param carrierWS		the "new" carrier with Shipments
-	 * @param carrier		the already existing
+	 * @param carrier		the already existing carrier
 	 */
 	private static void copyShipments(Carrier carrierWS, Carrier carrier) {
 		for (CarrierShipment carrierShipment: carrier.getShipments()){
-			log.debug("Copiing CarrierShipment: " + carrierShipment.getId());
+			log.debug("Copy CarrierShipment: " + carrierShipment.toString());
 			carrierWS.getShipments().add(carrierShipment);
-			log.debug("New Carrier now contains the following number of Shipments: " + carrierWS.getShipments().size());
 		}
+		
 	}
 
 	/**
 	 * Transform all services from the existing carrier to the new carrier with shipments.
 	 * The location of the depot from which the "old" carrier starts the tour to the service is used as fromLocation for the new Shipment.
 	 * @param carrierWS		the "new" carrier with Shipments
-	 * @param carrier		the already existing
+	 * @param carrier		the already existing carrier
 	 */
 	private static void createShipmentsFromServices(Carrier carrierWS, Carrier carrier) {
 		TreeMap<Id<CarrierService>, Id<Link>> depotServiceIsdeliveredFrom = new TreeMap<Id<CarrierService>, Id<Link>>();
