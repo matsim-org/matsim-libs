@@ -25,6 +25,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,6 +69,16 @@ public class FacilitiesWriter implements MatsimWriter {
         FacilitiesWriterV1 writer = new FacilitiesWriterV1(coordinateTransformation, facilities);
         writer.putAttributeConverters(this.converters);
         writer.write(filename);
+    }
+
+    /**
+     * Writes the activity facilities in the current default format to the stream
+     * (currently facilities_v1.dtd).
+     */
+    public final void write(final OutputStream stream) {
+        FacilitiesWriterV1 writer = new FacilitiesWriterV1(coordinateTransformation, facilities);
+        writer.putAttributeConverters(this.converters);
+        writer.write(stream);
     }
 
     public void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {

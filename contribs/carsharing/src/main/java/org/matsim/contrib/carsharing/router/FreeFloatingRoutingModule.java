@@ -21,7 +21,7 @@ public class FreeFloatingRoutingModule implements RoutingModule {
 	public List<? extends PlanElement> calcRoute(Facility fromFacility,
 			Facility toFacility, double departureTime, Person person) {
 		
-		final List<PlanElement> trip = new ArrayList<PlanElement>();
+		final List<PlanElement> trip = new ArrayList<>();
 						
 		final Leg leg1 = PopulationUtils.createLeg("freefloating");
 		CarsharingRoute route1 = new CarsharingRoute(fromFacility.getLinkId(), toFacility.getLinkId());
@@ -33,8 +33,6 @@ public class FreeFloatingRoutingModule implements RoutingModule {
 
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
-		// TODO Auto-generated method stub
-		
 		return EmptyStageActivityTypes.INSTANCE;
 	}
 	

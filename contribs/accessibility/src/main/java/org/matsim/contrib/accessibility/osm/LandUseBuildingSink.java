@@ -437,6 +437,5 @@ public class LandUseBuildingSink implements Sink {
 
 	@Override
 	public void initialize(Map<String, Object> metaData) {
-		// TODO Auto-generated method stub
 	}
 }

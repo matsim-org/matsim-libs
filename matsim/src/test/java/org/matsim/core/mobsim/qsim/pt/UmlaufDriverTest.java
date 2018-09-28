@@ -655,7 +655,6 @@ public class UmlaufDriverTest extends MatsimTestCase {
 
 		@Override
 		public String getMode() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 	}

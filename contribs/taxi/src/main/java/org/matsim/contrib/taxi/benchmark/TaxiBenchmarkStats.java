@@ -3,6 +3,7 @@ package org.matsim.contrib.taxi.benchmark;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
+import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.contrib.util.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -32,7 +33,7 @@ public class TaxiBenchmarkStats implements AfterMobsimListener, ShutdownListener
 	private final SummaryStatistics stayRatio = new SummaryStatistics();
 
 	@Inject
-	public TaxiBenchmarkStats(Fleet fleet, SubmittedTaxiRequestsCollector requestCollector,
+	public TaxiBenchmarkStats(@Taxi Fleet fleet, SubmittedTaxiRequestsCollector requestCollector,
 			OutputDirectoryHierarchy controlerIO) {
 		this.fleet = fleet;
 		this.requestCollector = requestCollector;

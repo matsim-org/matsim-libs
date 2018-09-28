@@ -39,9 +39,10 @@ public class VrpLeg implements DivertibleLeg {
 	private int currentLinkIdx = 0;
 	private boolean askedAboutNextLink = false;
 
-	private final String mode = TransportMode.car;// TODO
+	private final String mode;
 
-	public VrpLeg(VrpPath path) {
+	public VrpLeg(String mode, VrpPath path) {
+		this.mode = mode;
 		this.path = path;
 	}
 

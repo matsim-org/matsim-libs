@@ -284,7 +284,6 @@ public final class PopulationUtils {
 
 		@Override
 		public void setCoord(Coord coord) {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 

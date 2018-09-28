@@ -19,16 +19,14 @@
 package org.matsim.contrib.dvrp.benchmark;
 
 import java.util.Collection;
-import java.util.function.Function;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponentsConfigurator;
-import org.matsim.contrib.dvrp.run.DvrpQSimModuleBuilder;
+import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
+import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponents;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 
@@ -40,15 +38,14 @@ import com.google.inject.name.Names;
  * @author michalm
  */
 public class DvrpBenchmarkModule extends AbstractModule {
-	private final DvrpQSimModuleBuilder qsimModuleBuilder;
+	private final DvrpModeQSimModule qsimModule;
 
-	public DvrpBenchmarkModule(Function<Config, AbstractQSimModule> moduleCreator,
-			Collection<Class<? extends MobsimListener>> listeners) {
-		this(new DvrpQSimModuleBuilder(moduleCreator).addListeners(listeners));
+	public static DvrpBenchmarkModule createModule(String mode, Collection<Class<? extends MobsimListener>> listeners) {
+		return new DvrpBenchmarkModule(new DvrpModeQSimModule.Builder(mode).addListeners(listeners).build());
 	}
 
-	public DvrpBenchmarkModule(DvrpQSimModuleBuilder qsimModuleBuilder) {
-		this.qsimModuleBuilder = qsimModuleBuilder;
+	public DvrpBenchmarkModule(DvrpModeQSimModule qsimModule) {
+		this.qsimModule = qsimModule;
 	}
 
 	@Provides
@@ -56,7 +53,8 @@ public class DvrpBenchmarkModule extends AbstractModule {
 	public QSimComponents provideQSimComponents(Config config) {
 		QSimComponents components = new QSimComponents();
 		new StandardQSimComponentsConfigurator(config).configure(components);
-		qsimModuleBuilder.configureComponents(components);
+		DynActivityEngineModule.configureComponents(components);
+		qsimModule.configureComponents(components);
 		return components;
 	}
 
@@ -65,8 +63,10 @@ public class DvrpBenchmarkModule extends AbstractModule {
 		install(new DvrpBenchmarkTravelTimeModule());// fixed travel times
 
 		bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))
-				.toProvider(DvrpRoutingNetworkProvider.class).asEagerSingleton();
-		
-		installQSimModule(qsimModuleBuilder.build(getConfig()));
+				.toProvider(DvrpRoutingNetworkProvider.class)
+				.asEagerSingleton();
+
+		installQSimModule(new DynActivityEngineModule());
+		installQSimModule(qsimModule);
 	}
 }

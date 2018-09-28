@@ -30,6 +30,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
+import com.google.inject.Inject;
+import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 /**
@@ -37,12 +39,15 @@ import com.google.inject.name.Names;
  * @author michalm (Michal Maciejewski)
  */
 public final class DrtModule extends AbstractModule {
+	@Inject
+	private DrtConfigGroup drtCfg;
 
 	@Override
 	public void install() {
-		DrtConfigGroup drtCfg = DrtConfigGroup.get(getConfig());
-		bind(Fleet.class).toProvider(new FleetProvider(drtCfg.getVehiclesFileUrl(getConfig().getContext())))
-				.asEagerSingleton();
+		String mode = drtCfg.getMode();
+		install(FleetProvider.createModule(mode, drtCfg.getVehiclesFileUrl(getConfig().getContext())));
+		bind(Fleet.class).annotatedWith(Drt.class).to(Key.get(Fleet.class, Names.named(mode))).asEagerSingleton();
+
 		bind(DrtRequestValidator.class).to(DefaultDrtRequestValidator.class);
 		bind(DepotFinder.class).to(NearestStartLinkAsDepot.class);
 		bind(TravelDisutilityFactory.class).annotatedWith(Names.named(DefaultDrtOptimizer.DRT_OPTIMIZER))

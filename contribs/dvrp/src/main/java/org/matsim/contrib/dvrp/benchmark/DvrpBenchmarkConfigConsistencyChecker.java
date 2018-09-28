@@ -50,7 +50,7 @@ public class DvrpBenchmarkConfigConsistencyChecker implements ConfigConsistencyC
 
 		if (config.network().isTimeVariantNetwork() && DvrpConfigGroup.get(config).getNetworkMode() != null) {
 			throw new RuntimeException("The current version of RunTaxiBenchmark does not support this case: "
-					+ "@Named(DvrpModule.DVRP_ROUTING) Network would consists of links having "
+					+ "@Named(DvrpModule.DVRP_ROUTING) Network would consist of links having "
 					+ "VariableIntervalTimeVariantAttributes instead of FixedIntervalTimeVariantAttributes.");
 		}
 	}

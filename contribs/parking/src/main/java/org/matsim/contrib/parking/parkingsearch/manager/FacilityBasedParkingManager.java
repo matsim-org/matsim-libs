@@ -17,9 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.contrib.parking.parkingsearch.manager;
 
 import java.util.ArrayList;
@@ -46,9 +43,6 @@ import com.google.inject.Inject;
  * @author  jbischoff, schlenther
  *
  */
-/**
- *
- */
 public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	protected Map<Id<Link>, Integer> capacity = new HashMap<>();
@@ -61,9 +55,6 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	Network network;
 
-	/**
-	 * 
-	 */
 	@Inject
 	public FacilityBasedParkingManager(Scenario scenario) {
 		this.network = scenario.getNetwork();
@@ -84,13 +75,6 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.jbischoff.parking.manager.ParkingManager#canVehicleParkHere(
-	 * org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id)
-	 */
 	@Override
 	public boolean reserveSpaceIfVehicleCanParkHere(Id<Vehicle> vehicleId, Id<Link> linkId) {
 		boolean canPark = false;
@@ -132,12 +116,6 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.jbischoff.parking.manager.ParkingManager#
-	 * getVehicleParkingLocation(org.matsim.api.core.v01.Id)
-	 */
 	@Override
 	public Id<Link> getVehicleParkingLocation(Id<Vehicle> vehicleId) {
 		if (this.parkingLocations.containsKey(vehicleId)) {
@@ -148,13 +126,6 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.jbischoff.parking.manager.ParkingManager#parkVehicleHere(org.
-	 * matsim.api.core.v01.Id, org.matsim.api.core.v01.Id, double)
-	 */
 	@Override
 	public boolean parkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
 		if (parkVehicleAtLink(vehicleId, linkId, time)) {
@@ -163,11 +134,6 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			return false;
 	}
 
-	/**
-	 * @param vehicleId
-	 * @param linkId
-	 * @param time
-	 */
 	protected boolean parkVehicleAtLink(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		if (parkingFacilitiesAtLink == null) {
@@ -186,13 +152,6 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.jbischoff.parking.manager.ParkingManager#unParkVehicleHere(org
-	 * .matsim.api.core.v01.Id, org.matsim.api.core.v01.Id, double)
-	 */
 	@Override
 	public boolean unParkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
 		if (!this.parkingLocations.containsKey(vehicleId)) {
@@ -207,12 +166,6 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.jbischoff.parking.manager.ParkingManager#produceStatistics()
-	 */
 	@Override
 	public List<String> produceStatistics() {
 		List<String> stats = new ArrayList<>();
@@ -252,15 +205,8 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.jbischoff.parking.manager.ParkingManager#reset(int)
-	 */
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-
 	}
 
 	

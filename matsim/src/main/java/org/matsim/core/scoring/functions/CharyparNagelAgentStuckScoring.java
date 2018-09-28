@@ -28,7 +28,7 @@ package org.matsim.core.scoring.functions;
  */
 public final class CharyparNagelAgentStuckScoring implements org.matsim.core.scoring.SumScoringFunction.AgentStuckScoring {
 
-	protected double score;
+	private double score;
 
 	private static final double INITIAL_SCORE = 0.0;
 
