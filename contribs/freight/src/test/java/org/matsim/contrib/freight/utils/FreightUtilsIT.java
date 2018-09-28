@@ -21,6 +21,7 @@ package org.matsim.contrib.freight.utils;
 import java.util.Collection;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -64,30 +65,35 @@ import org.junit.Assert;
 
 public class FreightUtilsIT {
 	
-	private static final Id<Carrier> CARRIER_ID = Id.create("Carrier", Carrier.class);
+	private static final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
+	private static final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
 	
-	private Carriers carriersWithServicesAndShpiments;
-	private Carrier carrierServicesAndShipments1;
+	private static Carriers carriersWithServicesAndShpiments;
+	private static Carrier carrierWServices;
+	private static Carrier carrierWShipments;
 	
-	private Carriers carriersShipmentsOnly;
-	private Carrier carrierShipmentsOnly1;
+	private static Carriers carriersWithShipmentsOnly;
+	private static Carrier carrierWShipmentsOnlyFromCarrierWServices;
+	private static Carrier carrierWShipmentsOnlyFromCarrierWShipments;
 	
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+//	@Rule
+//	public static MatsimTestUtils testUtils = new MatsimTestUtils();
 	
-	@Before
-	public void setUp() {
+	@BeforeClass
+	public static void setUp() {
 		
 		//Create carrier with services and shipments
 		carriersWithServicesAndShpiments = new Carriers() ;
-		carrierServicesAndShipments1 = CarrierImpl.newInstance(CARRIER_ID);
-		carrierServicesAndShipments1.getShipments().add(createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1)); 
-		carrierServicesAndShipments1.getShipments().add(createMatsimShipment("shipment2", "i(3,0)", "i(3,7)", 2));
+		carrierWServices = CarrierImpl.newInstance(CARRIER_SERVICES_ID );
+		carrierWServices.getServices().add(createMatsimService("Service1", "i(3,9)", 2));
+		carrierWServices.getServices().add(createMatsimService("Service2", "i(4,9)", 2));
+		
+		//Create carrier with shipments
+		carrierWShipments = CarrierImpl.newInstance(CARRIER_SHIPMENTS_ID);
+		carrierWShipments.getShipments().add(createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1)); 
+		carrierWShipments.getShipments().add(createMatsimShipment("shipment2", "i(3,0)", "i(3,7)", 2));
 
-		carrierServicesAndShipments1.getServices().add(createMatsimService("Service2", "i(3,9)", 2));
-		carrierServicesAndShipments1.getServices().add(createMatsimService("Service3", "i(4,9)", 2));
-
-		//Create vehicle for Carrier
+		//Create vehicle for Carriers
 		CarrierVehicleType carrierVehType = CarrierVehicleType.Builder.newInstance(Id.create("gridType", VehicleType.class))
 				.setCapacity(3)
 				.setMaxVelocity(10)
@@ -104,202 +110,112 @@ public class FreightUtilsIT {
 				.addType(carrierVehType)
 				.addVehicle(carrierVehicle)
 				.setFleetSize(FleetSize.INFINITE);				
-		carrierServicesAndShipments1.setCarrierCapabilities(ccBuilder.build());
+		carrierWServices.setCarrierCapabilities(ccBuilder.build());
+		carrierWShipments.setCarrierCapabilities(ccBuilder.build());
 
-		carriersWithServicesAndShpiments.addCarrier(carrierServicesAndShipments1);
+		// Add both carriers
+		carriersWithServicesAndShpiments.addCarrier(carrierWServices);
+		carriersWithServicesAndShpiments.addCarrier(carrierWShipments);
 
 		// assign vehicle types to the carriers
-		new CarrierVehicleTypeLoader(carriersWithServicesAndShpiments).loadVehicleTypes(vehicleTypes) ;	
+		new CarrierVehicleTypeLoader(carriersWithServicesAndShpiments).loadVehicleTypes(vehicleTypes) ;
 
 		//load Network and build netbasedCosts for jsprit
 		Network network = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(network).readFile(testUtils.getPackageInputDirectory() + "grid-network.xml"); 
+		new MatsimNetworkReader(network).readFile(getPackageInputDirectory() + "grid-network.xml"); 
 		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( network, vehicleTypes.getVehicleTypes().values() );
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
 		netBuilder.setTimeSliceWidth(1800) ; // !!!!, otherwise it will not do anything.
 		
-
-		//Build jsprit VRP
-		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrierServicesAndShipments1, network);
-		vrpBuilder.setRoutingCost(netBasedCosts) ;
-		VehicleRoutingProblem problem = vrpBuilder.build();
-
-		// get the algorithm out-of-the-box, search solution and get the best one.
-		VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
-		Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
-		VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
-
-		//Routing bestPlan to Network
-		CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(carrierServicesAndShipments1, bestSolution) ;
-		NetworkRouter.routePlan(carrierPlanServicesAndShipments,netBasedCosts) ;
-		carrierServicesAndShipments1.setSelectedPlan(carrierPlanServicesAndShipments) ;
+		for (Carrier carrier : carriersWithServicesAndShpiments.getCarriers().values()) {
+			//Build VRP
+			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
+			vrpBuilder.setRoutingCost(netBasedCosts) ;
+			VehicleRoutingProblem problem = vrpBuilder.build();
+	
+				// get the algorithm out-of-the-box, search solution and get the best one.
+			VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
+			Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
+			VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
+	
+				//Routing bestPlan to Network
+			CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(carrier, bestSolution) ;
+			NetworkRouter.routePlan(carrierPlanServicesAndShipments,netBasedCosts) ;
+			carrier.setSelectedPlan(carrierPlanServicesAndShipments) ;
+		}
 
 		/*
-		 * Now convert it to a only shipment-based VRP and run it again.
+		 * Now convert it to a only shipment-based VRP.
 		 */
 
 		//Convert to jsprit VRP
-		carriersShipmentsOnly = FreightUtils.createShipmentVRPCarrierFromServiceVRPSolution(carriersWithServicesAndShpiments);
-		carrierShipmentsOnly1 = carriersShipmentsOnly.getCarriers().get(CARRIER_ID);
+		carriersWithShipmentsOnly = FreightUtils.createShipmentVRPCarrierFromServiceVRPSolution(carriersWithServicesAndShpiments);
 
 		// assign vehicle types to the carriers
-		new CarrierVehicleTypeLoader(carriersShipmentsOnly).loadVehicleTypes(vehicleTypes) ;	
-
-		VehicleRoutingProblem.Builder vrpBuilderShipmentsOnly = MatsimJspritFactory.createRoutingProblemBuilder(carrierShipmentsOnly1, network);
-
-		vrpBuilderShipmentsOnly.setRoutingCost(netBasedCosts) ;
-
-		VehicleRoutingProblem problemSchipmentsOnly = vrpBuilderShipmentsOnly.build();
-
-		// get the algorithm out-of-the-box, search solution and get the best one.
-		VehicleRoutingAlgorithm algorithmShipmentsOnly = new SchrimpfFactory().createAlgorithm(problemSchipmentsOnly);
-		Collection<VehicleRoutingProblemSolution> solutionsShipmentsOnly = algorithmShipmentsOnly.searchSolutions();
-		VehicleRoutingProblemSolution bestSolutionShipmentsOnly = Solutions.bestOf(solutionsShipmentsOnly);
-
-
-		CarrierPlan carrierPlanShipmentsOnly = MatsimJspritFactory.createPlan(carrierShipmentsOnly1, bestSolutionShipmentsOnly) ;
-		NetworkRouter.routePlan(carrierPlanShipmentsOnly,netBasedCosts) ;
-		carrierShipmentsOnly1.setSelectedPlan(carrierPlanShipmentsOnly) ;
-	}
-	
-	@Test
-	public void numberOfServicesAndShipmentsIsCorrect() {
-		Assert.assertEquals(2, carrierServicesAndShipments1.getServices().size());
+		new CarrierVehicleTypeLoader(carriersWithShipmentsOnly).loadVehicleTypes(vehicleTypes) ;	
 		
-		int demandServices = 0;
-		for (CarrierService carrierService : carrierServicesAndShipments1.getServices()) {
-			demandServices += carrierService.getCapacityDemand();
-		}
-		Assert.assertEquals(4, demandServices);
-		
-		Assert.assertEquals(2, carrierServicesAndShipments1.getShipments().size());
-		int demandShipments = 0;
-		for (CarrierShipment carrierShipment : carrierServicesAndShipments1.getShipments()) {
-			demandShipments += carrierShipment.getSize();
-		}
-		Assert.assertEquals(3, demandShipments);
-	}
+		for (Carrier carrier : carriersWithShipmentsOnly.getCarriers().values()) {
+			//Build VRP
+			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
+			vrpBuilder.setRoutingCost(netBasedCosts) ;
+			VehicleRoutingProblem problem = vrpBuilder.build();
 	
-	@Test
-	public void numberOfShipmentsInShipmentOnlyIsCorrect() {
-		Assert.assertEquals(0, carrierShipmentsOnly1.getServices().size());
-		
-		Assert.assertEquals(4, carrierShipmentsOnly1.getShipments().size());
-		int demandShipments = 0;
-		for (CarrierShipment carrierShipment : carrierShipmentsOnly1.getShipments()) {
-			demandShipments += carrierShipment.getSize();
-		}
-		Assert.assertEquals(7, demandShipments);
-	}
+				// get the algorithm out-of-the-box, search solution and get the best one.
+			VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
+			Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
+			VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
 	
-	@Test
-	public void fleetAvailableIsCorrect() {
-		Assert.assertEquals(FleetSize.INFINITE, carrierShipmentsOnly1.getCarrierCapabilities().getFleetSize());
-		Assert.assertEquals(1, carrierShipmentsOnly1.getCarrierCapabilities().getVehicleTypes().size());
-		for (CarrierVehicleType carrierVehicleType : carrierShipmentsOnly1.getCarrierCapabilities().getVehicleTypes()){
-			Assert.assertEquals(3,carrierVehicleType.getCarrierVehicleCapacity());
-			Assert.assertEquals(130, carrierVehicleType.getVehicleCostInformation().fix, 0.0);
-			Assert.assertEquals(0.0001, carrierVehicleType.getVehicleCostInformation().perDistanceUnit, 0.0);
-			Assert.assertEquals(0.001, carrierVehicleType.getVehicleCostInformation().perTimeUnit, 0.0);
-			Assert.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
-			Assert.assertEquals(EngineInformation.FuelType.diesel, carrierVehicleType.getEngineInformation().getFuelType());
-			Assert.assertEquals(0.015, carrierVehicleType.getEngineInformation().getGasConsumption(), 0.0);
+				//Routing bestPlan to Network
+			CarrierPlan carrierPlanServicesAndShipments = MatsimJspritFactory.createPlan(carrier, bestSolution) ;
+			NetworkRouter.routePlan(carrierPlanServicesAndShipments,netBasedCosts) ;
+			carrier.setSelectedPlan(carrierPlanServicesAndShipments) ;
 		}
-	}
+		
+		carrierWShipmentsOnlyFromCarrierWServices = carriersWithShipmentsOnly.getCarriers().get(CARRIER_SERVICES_ID);		//with converted Service
+		carrierWShipmentsOnlyFromCarrierWShipments = carriersWithShipmentsOnly.getCarriers().get(CARRIER_SHIPMENTS_ID);		//with copied Shipments
 
-	@Test
-	public void copiingOfShipmentsIsDoneCorrectly() {
-		boolean foundShipment1 = false;
-		boolean foundShipment2 = false;
-		for (CarrierShipment carrierShipment :  carrierShipmentsOnly1.getShipments()) {
-			if (carrierShipment.getId() == Id.create("shipment1", CarrierShipment.class)) {
-				foundShipment1 = true;
-				Assert.assertEquals(Id.createLinkId("i(1,0)"), carrierShipment.getFrom());
-				Assert.assertEquals(Id.createLinkId("i(7,6)R"), carrierShipment.getTo());
-				Assert.assertEquals(1, carrierShipment.getSize());
-				Assert.assertEquals(30.0, carrierShipment.getDeliveryServiceTime(), 0);
-				Assert.assertEquals(3600.0, carrierShipment.getDeliveryTimeWindow().getStart(), 0);
-				Assert.assertEquals(36000.0, carrierShipment.getDeliveryTimeWindow().getEnd(), 0);
-				Assert.assertEquals(5.0, carrierShipment.getPickupServiceTime(), 0);
-				Assert.assertEquals(0.0, carrierShipment.getPickupTimeWindow().getStart(), 0);
-				Assert.assertEquals(7200.0, carrierShipment.getPickupTimeWindow().getEnd(), 0);
-			} else if (carrierShipment.getId() == Id.create("shipment2", CarrierShipment.class)) {
-				foundShipment2 = true;
-				Assert.assertEquals(Id.createLinkId("(3,0)"), carrierShipment.getFrom());
-				Assert.assertEquals(Id.createLinkId("i(3,7)"), carrierShipment.getTo());
-				Assert.assertEquals(2, carrierShipment.getSize());
-				Assert.assertEquals(30.0, carrierShipment.getDeliveryServiceTime(), 0);
-				Assert.assertEquals(3600.0, carrierShipment.getDeliveryTimeWindow().getStart(), 0);
-				Assert.assertEquals(36000.0, carrierShipment.getDeliveryTimeWindow().getEnd(), 0);
-				Assert.assertEquals(5.0, carrierShipment.getPickupServiceTime(), 0);
-				Assert.assertEquals(0.0, carrierShipment.getPickupTimeWindow().getStart(), 0);
-				Assert.assertEquals(7200.0, carrierShipment.getPickupTimeWindow().getEnd(), 0);
-			} 
-			
-			Assert.assertTrue("Not found Shipment1 after copiing", foundShipment1);
-			Assert.assertTrue("Not found Shipment2 after copiing", foundShipment2);
-		}
 	}
 	
-	
-	@Test
-	public void convertionOfSericesIsDoneCorrectly() {
-		boolean foundSercice2 = false;
-		boolean foundService3 = false;
-		for (CarrierShipment carrierShipment :  carrierShipmentsOnly1.getShipments()) {
-			if (carrierShipment.getId() == Id.create("service2", CarrierShipment.class)) {
-				foundSercice2 = true;
-				Assert.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment.getFrom());
-				Assert.assertEquals(Id.createLinkId("i(3,9)"), carrierShipment.getTo());
-				Assert.assertEquals(2, carrierShipment.getSize());
-				Assert.assertEquals(31.0, carrierShipment.getDeliveryServiceTime(), 0);
-				Assert.assertEquals(3601.0, carrierShipment.getDeliveryTimeWindow().getStart(), 0);
-				Assert.assertEquals(36001.0, carrierShipment.getDeliveryTimeWindow().getEnd(), 0);
-				Assert.assertEquals(0.0, carrierShipment.getPickupServiceTime(), 0);
-				Assert.assertEquals(0.0, carrierShipment.getPickupTimeWindow().getStart(), 0);
-				Assert.assertEquals(36001.0, carrierShipment.getPickupTimeWindow().getEnd(), 0);
-			} else if (carrierShipment.getId() == Id.create("service3", CarrierShipment.class)) {
-				foundService3 = true;
-				Assert.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment.getFrom());
-				Assert.assertEquals(Id.createLinkId("i(4,9)"), carrierShipment.getTo());
-				Assert.assertEquals(2, carrierShipment.getSize());
-				Assert.assertEquals(31.0, carrierShipment.getDeliveryServiceTime(), 0);
-				Assert.assertEquals(3601.0, carrierShipment.getDeliveryTimeWindow().getStart(), 0);
-				Assert.assertEquals(36001.0, carrierShipment.getDeliveryTimeWindow().getEnd(), 0);
-				Assert.assertEquals(0.0, carrierShipment.getPickupServiceTime(), 0);
-				Assert.assertEquals(0.0, carrierShipment.getPickupTimeWindow().getStart(), 0);
-				Assert.assertEquals(36001.0, carrierShipment.getPickupTimeWindow().getEnd(), 0);
-			}
-			
-			Assert.assertTrue("Not found Shipment1 after copiing", foundSercice2);
-			Assert.assertTrue("Not found Shipment2 after copiing", foundService3);
-		}
-	}
-	
-	@Test(expected=UnsupportedOperationException.class)
-	public void exceptionIsThrownWhenUsingShipmentsAndServices() {
-		//TODO Insert content.
-	}
 	
 	@Test
 	public void numberOfToursIsCorrect() {
-		Assert.assertEquals(2 , carrierServicesAndShipments1.getSelectedPlan().getScheduledTours().size());
-		Assert.assertEquals(1, carrierShipmentsOnly1.getSelectedPlan().getScheduledTours().size());
+		Assert.assertEquals(2, carrierWServices.getSelectedPlan().getScheduledTours().size());
+		Assert.assertEquals(1, carrierWShipments.getSelectedPlan().getScheduledTours().size());
+		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScheduledTours().size());
+		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScheduledTours().size());
 	}
 	
 	@Test
-	public void toursMixedCarrierAreCorrect() {
-		
-		Assert.assertEquals(-99, carrierServicesAndShipments1.getSelectedPlan().getScore(), 0);			//TODO: Korrekten WErt ermitteln und eintragen
+	public void toursInitialCarrierWServicesIsCorrect() {
+		Assert.assertEquals(-99, carrierWServices.getSelectedPlan().getScore(), 0);			//TODO: Korrekten WErt ermitteln und eintragen
+		double tourDurationSum = 0;
+		for (ScheduledTour scheduledTour: carrierWServices.getSelectedPlan().getScheduledTours()){
+			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
+		}
+		Assert.assertEquals(3 , tourDurationSum, 0);													//TODO: Korrekten WErt ermitteln und eintragen
+		double tourLengthSum = 0;
+		for (ScheduledTour scheduledTour: carrierWServices.getSelectedPlan().getScheduledTours()){
+			for (TourElement te : scheduledTour.getTour().getTourElements()) {
+				if (te instanceof Leg) {
+					tourLengthSum += ((Leg) te).getRoute().getDistance();
+				}
+			}
+		}
+		Assert.assertEquals(1, tourLengthSum, 0);														//TODO: Korrekten WErt ermitteln und eintragen
+	}
+	
+	@Test
+	public void toursInitialCarrierWShipmentsIsCorrect() {
+		Assert.assertEquals(-99, carrierWShipments.getSelectedPlan().getScore(), 0);			//TODO: Korrekten WErt ermitteln und eintragen
 		
 		double tourDurationSum = 0;
-		for (ScheduledTour scheduledTour: carrierServicesAndShipments1.getSelectedPlan().getScheduledTours()){
+		for (ScheduledTour scheduledTour: carrierWShipments.getSelectedPlan().getScheduledTours()){
 			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
 		}
 		Assert.assertEquals(3 , tourDurationSum, 0);													//TODO: Korrekten WErt ermitteln und eintragen
 		
 		double tourLengthSum = 0;
-		for (ScheduledTour scheduledTour: carrierServicesAndShipments1.getSelectedPlan().getScheduledTours()){
+		for (ScheduledTour scheduledTour: carrierWShipments.getSelectedPlan().getScheduledTours()){
 			for (TourElement te : scheduledTour.getTour().getTourElements()) {
 				if (te instanceof Leg) {
 					tourLengthSum += ((Leg) te).getRoute().getDistance();
@@ -310,18 +226,38 @@ public class FreightUtilsIT {
 	}
 
 	@Test
-	public void toursShipmentOnlyCarrierAreCorrect() {
-		
-		Assert.assertEquals(-99, carrierShipmentsOnly1.getSelectedPlan().getScore(), 0);			//TODO: Korrekten WErt ermitteln und eintragen
+	public void toursCarrierWShipmentsOnlyFromCarrierWServicesIsCorrect() {
+		Assert.assertEquals(-99, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScore(), 0);			//TODO: Korrekten WErt ermitteln und eintragen	
 		
 		double tourDurationSum = 0;
-		for (ScheduledTour scheduledTour: carrierShipmentsOnly1.getSelectedPlan().getScheduledTours()){
+		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScheduledTours()){
 			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
 		}
 		Assert.assertEquals(3 , tourDurationSum, 0);													//TODO: Korrekten WErt ermitteln und eintragen
 		
 		double tourLengthSum = 0;
-		for (ScheduledTour scheduledTour: carrierShipmentsOnly1.getSelectedPlan().getScheduledTours()){
+		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScheduledTours()){
+			for (TourElement te : scheduledTour.getTour().getTourElements()) {
+				if (te instanceof Leg) {
+					tourLengthSum += ((Leg) te).getRoute().getDistance();
+				}
+			}
+		}
+		Assert.assertEquals(1, tourLengthSum, 0);														//TODO: Korrekten WErt ermitteln und eintragen
+	}
+	
+	@Test
+	public void toursCarrierWShipmentsOnlyFromCarrierWShipmentsIsCorrect() {
+		Assert.assertEquals(-99, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScore(), 0);			//TODO: Korrekten WErt ermitteln und eintragen	
+		
+		double tourDurationSum = 0;
+		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScheduledTours()){
+			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
+		}
+		Assert.assertEquals(3 , tourDurationSum, 0);													//TODO: Korrekten WErt ermitteln und eintragen
+		
+		double tourLengthSum = 0;
+		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScheduledTours()){
 			for (TourElement te : scheduledTour.getTour().getTourElements()) {
 				if (te instanceof Leg) {
 					tourLengthSum += ((Leg) te).getRoute().getDistance();
@@ -357,6 +293,13 @@ public class FreightUtilsIT {
 				.setServiceDuration(31.0)
 				.setServiceStartTimeWindow(TimeWindow.newInstance(3601.0, 36001.0))
 				.build();
+	}
+	
+	private static String getPackageInputDirectory() {
+		String classInputDirectory = "test/input/" + TestFreightUtils.class.getCanonicalName().replace('.', '/') + "/";
+		String packageInputDirectory = classInputDirectory.substring(0, classInputDirectory.lastIndexOf('/'));
+		packageInputDirectory = packageInputDirectory.substring(0, packageInputDirectory.lastIndexOf('/') + 1);
+		return packageInputDirectory;
 	}
 
 }
