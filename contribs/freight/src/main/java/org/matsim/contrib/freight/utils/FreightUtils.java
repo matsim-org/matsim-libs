@@ -55,10 +55,14 @@ public class FreightUtils {
 		Carriers carriersWithShipments = new Carriers();
 		for (Carrier carrier : carriers.getCarriers().values()){
 			Carrier carrierWS = CarrierImpl.newInstance(carrier.getId());
-			copyShipments(carrierWS, carrier);
+			if (carrier.getShipments().size() > 0) {
+				copyShipments(carrierWS, carrier);
+			}
 			//			copyPickups(carrierWS, carrier);	//Not implemented yet due to missing CarrierPickup in freight contrib, kmt Sep18
 			//			copyDeliveries(carrierWS, carrier); //Not implemented yet due to missing CarrierDelivery in freight contrib, kmt Sep18
-			createShipmentsFromServices(carrierWS, carrier); 
+			if (carrier.getServices().size() > 0) {
+				createShipmentsFromServices(carrierWS, carrier); 
+			}
 			carrierWS.setCarrierCapabilities(carrier.getCarrierCapabilities()); //vehicles and other carrierCapabilites
 			carriersWithShipments.addCarrier(carrierWS);
 		}
@@ -90,7 +94,9 @@ public class FreightUtils {
 	 */
 	private static void copyShipments(Carrier carrierWS, Carrier carrier) {
 		for (CarrierShipment carrierShipment: carrier.getShipments()){
+			log.debug("Copiing CarrierShipment: " + carrierShipment.getId());
 			carrierWS.getShipments().add(carrierShipment);
+			log.debug("New Carrier now contains the following number of Shipments: " + carrierWS.getShipments().size());
 		}
 	}
 
@@ -122,6 +128,7 @@ public class FreightUtils {
 			}
 		}
 		for (CarrierService carrierService : carrier.getServices()) {
+			log.debug("Converting CarrierService to CarrierShipment: " + carrierService.getId());
 			CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class), 
 					depotServiceIsdeliveredFrom.get(carrierService.getId()), 
 					carrierService.getLocationLinkId(), 
