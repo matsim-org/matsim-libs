@@ -100,7 +100,6 @@ public class FreightUtilsIT {
 		vehicleTypes.getVehicleTypes().put(carrierVehType.getId(), carrierVehType);
 		
 		CarrierVehicle carrierVehicle = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle", org.matsim.vehicles.Vehicle.class), Id.createLinkId("i(6,0)")).setEarliestStart(0.0).setLatestEnd(36000.0).setTypeId(carrierVehType.getId()).build();
-		
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance() 
 				.addType(carrierVehType)
 				.addVehicle(carrierVehicle)
@@ -114,7 +113,7 @@ public class FreightUtilsIT {
 
 		//load Network and build netbasedCosts for jsprit
 		Network network = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(network).readFile(testUtils.getClassInputDirectory() + "grid-network.xml"); 
+		new MatsimNetworkReader(network).readFile(testUtils.getPackageInputDirectory() + "grid-network.xml"); 
 		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( network, vehicleTypes.getVehicleTypes().values() );
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
 		netBuilder.setTimeSliceWidth(1800) ; // !!!!, otherwise it will not do anything.
@@ -194,13 +193,28 @@ public class FreightUtilsIT {
 	}
 	
 	@Test
+	public void fleetAvailableIsCorrect() {
+		Assert.assertEquals(FleetSize.INFINITE, carrierShipmentsOnly1.getCarrierCapabilities().getFleetSize());
+		Assert.assertEquals(1, carrierShipmentsOnly1.getCarrierCapabilities().getVehicleTypes().size());
+		for (CarrierVehicleType carrierVehicleType : carrierShipmentsOnly1.getCarrierCapabilities().getVehicleTypes()){
+			Assert.assertEquals(3,carrierVehicleType.getCarrierVehicleCapacity());
+			Assert.assertEquals(130, carrierVehicleType.getVehicleCostInformation().fix, 0.0);
+			Assert.assertEquals(0.0001, carrierVehicleType.getVehicleCostInformation().perDistanceUnit, 0.0);
+			Assert.assertEquals(0.001, carrierVehicleType.getVehicleCostInformation().perTimeUnit, 0.0);
+			Assert.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
+			Assert.assertEquals(EngineInformation.FuelType.diesel, carrierVehicleType.getEngineInformation().getFuelType());
+			Assert.assertEquals(0.015, carrierVehicleType.getEngineInformation().getGasConsumption(), 0.0);
+		}
+	}
+
+	@Test
 	public void copiingOfShipmentsIsDoneCorrectly() {
 		boolean foundShipment1 = false;
 		boolean foundShipment2 = false;
 		for (CarrierShipment carrierShipment :  carrierShipmentsOnly1.getShipments()) {
 			if (carrierShipment.getId() == Id.create("shipment1", CarrierShipment.class)) {
 				foundShipment1 = true;
-				Assert.assertEquals(Id.createLinkId("(1,0)"), carrierShipment.getFrom());
+				Assert.assertEquals(Id.createLinkId("i(1,0)"), carrierShipment.getFrom());
 				Assert.assertEquals(Id.createLinkId("i(7,6)R"), carrierShipment.getTo());
 				Assert.assertEquals(1, carrierShipment.getSize());
 				Assert.assertEquals(30.0, carrierShipment.getDeliveryServiceTime(), 0);
@@ -262,32 +276,15 @@ public class FreightUtilsIT {
 		}
 	}
 	
-	@Test
-	public void numberOfToursIsCorrect() {
-		Assert.assertEquals(3 , carrierServicesAndShipments1.getSelectedPlan().getScheduledTours().size());
-		Assert.assertEquals(1, carrierShipmentsOnly1.getSelectedPlan().getScheduledTours().size());
+	@Test(expected=UnsupportedOperationException.class)
+	public void exceptionIsThrownWhenUsingShipmentsAndServices() {
+		//TODO Insert content.
 	}
 	
 	@Test
-	public void toursShipmentOnlyCarrierAreCorrect() {
-		
-		Assert.assertEquals(-99, carrierShipmentsOnly1.getSelectedPlan().getScore(), 0);			//TODO: Korrekten WErt ermitteln und eintragen
-		
-		double tourDurationSum = 0;
-		for (ScheduledTour scheduledTour: carrierShipmentsOnly1.getSelectedPlan().getScheduledTours()){
-			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
-		}
-		Assert.assertEquals(3 , tourDurationSum, 0);													//TODO: Korrekten WErt ermitteln und eintragen
-		
-		double tourLengthSum = 0;
-		for (ScheduledTour scheduledTour: carrierShipmentsOnly1.getSelectedPlan().getScheduledTours()){
-			for (TourElement te : scheduledTour.getTour().getTourElements()) {
-				if (te instanceof Leg) {
-					tourLengthSum += ((Leg) te).getRoute().getDistance();
-				}
-			}
-		}
-		Assert.assertEquals(1, tourLengthSum, 0);														//TODO: Korrekten WErt ermitteln und eintragen
+	public void numberOfToursIsCorrect() {
+		Assert.assertEquals(2 , carrierServicesAndShipments1.getSelectedPlan().getScheduledTours().size());
+		Assert.assertEquals(1, carrierShipmentsOnly1.getSelectedPlan().getScheduledTours().size());
 	}
 	
 	@Test
@@ -311,24 +308,29 @@ public class FreightUtilsIT {
 		}
 		Assert.assertEquals(1, tourLengthSum, 0);														//TODO: Korrekten WErt ermitteln und eintragen
 	}
-	
 
 	@Test
-	public void fleetAvailableIsCorrect() {
-		Assert.assertEquals(FleetSize.INFINITE, carrierShipmentsOnly1.getCarrierCapabilities().getFleetSize());
-		Assert.assertEquals(1, carrierShipmentsOnly1.getCarrierCapabilities().getVehicleTypes().size());
-		for (CarrierVehicleType carrierVehicleType : carrierShipmentsOnly1.getCarrierCapabilities().getVehicleTypes()){
-			Assert.assertEquals(3,carrierVehicleType.getCarrierVehicleCapacity());
-			Assert.assertEquals(130, carrierVehicleType.getVehicleCostInformation().fix, 0.0);
-			Assert.assertEquals(0.0001, carrierVehicleType.getVehicleCostInformation().perDistanceUnit, 0.0);
-			Assert.assertEquals(0.001, carrierVehicleType.getVehicleCostInformation().perTimeUnit, 0.0);
-			Assert.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
-			Assert.assertEquals(EngineInformation.FuelType.diesel, carrierVehicleType.getEngineInformation().getFuelType());
-			Assert.assertEquals(0.015, carrierVehicleType.getEngineInformation().getGasConsumption(), 0.0);
+	public void toursShipmentOnlyCarrierAreCorrect() {
+		
+		Assert.assertEquals(-99, carrierShipmentsOnly1.getSelectedPlan().getScore(), 0);			//TODO: Korrekten WErt ermitteln und eintragen
+		
+		double tourDurationSum = 0;
+		for (ScheduledTour scheduledTour: carrierShipmentsOnly1.getSelectedPlan().getScheduledTours()){
+			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
 		}
+		Assert.assertEquals(3 , tourDurationSum, 0);													//TODO: Korrekten WErt ermitteln und eintragen
+		
+		double tourLengthSum = 0;
+		for (ScheduledTour scheduledTour: carrierShipmentsOnly1.getSelectedPlan().getScheduledTours()){
+			for (TourElement te : scheduledTour.getTour().getTourElements()) {
+				if (te instanceof Leg) {
+					tourLengthSum += ((Leg) te).getRoute().getDistance();
+				}
+			}
+		}
+		Assert.assertEquals(1, tourLengthSum, 0);														//TODO: Korrekten WErt ermitteln und eintragen
 	}
-
-
+	
 	private static CarrierShipment createMatsimShipment(String id, String from, String to, int size) {
 		Id<CarrierShipment> shipmentId = Id.create(id, CarrierShipment.class);
 		Id<Link> fromLinkId = null; 
