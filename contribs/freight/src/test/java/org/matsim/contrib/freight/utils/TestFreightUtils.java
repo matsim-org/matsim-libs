@@ -20,10 +20,7 @@ package org.matsim.contrib.freight.utils;
 
 import java.util.Collection;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -39,10 +36,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.contrib.freight.carrier.Tour.Leg;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
@@ -50,7 +44,6 @@ import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.EngineInformation.FuelType;
@@ -62,7 +55,6 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
 
-import org.jfree.util.Log;
 import org.junit.Assert;
 
 public class TestFreightUtils {
@@ -156,24 +148,7 @@ public class TestFreightUtils {
 
 		// assign vehicle types to the carriers
 		new CarrierVehicleTypeLoader(carriersWithShipmentsOnly).loadVehicleTypes(vehicleTypes) ;	
-
-//		VehicleRoutingProblem.Builder vrpBuilderShipmentsOnly = MatsimJspritFactory.createRoutingProblemBuilder(carrierWShipmentsOnlyFromCarrierWServices, network);
-//
-//		vrpBuilderShipmentsOnly.setRoutingCost(netBasedCosts) ;
-//
-//		VehicleRoutingProblem problemSchipmentsOnly = vrpBuilderShipmentsOnly.build();
-//
-//		// get the algorithm out-of-the-box, search solution and get the best one.
-//		VehicleRoutingAlgorithm algorithmShipmentsOnly = new SchrimpfFactory().createAlgorithm(problemSchipmentsOnly);
-//		Collection<VehicleRoutingProblemSolution> solutionsShipmentsOnly = algorithmShipmentsOnly.searchSolutions();
-//		VehicleRoutingProblemSolution bestSolutionShipmentsOnly = Solutions.bestOf(solutionsShipmentsOnly);
-//
-//
-//		CarrierPlan carrierPlanShipmentsOnly = MatsimJspritFactory.createPlan(carrierWShipmentsOnlyFromCarrierWServices, bestSolutionShipmentsOnly) ;
-//		NetworkRouter.routePlan(carrierPlanShipmentsOnly,netBasedCosts) ;
-//		carrierWShipmentsOnlyFromCarrierWServices.setSelectedPlan(carrierPlanShipmentsOnly) ;
 	}
-	
 
 
 	@Test //Should only have Services
@@ -254,7 +229,6 @@ public class TestFreightUtils {
 
 	@Test
 	public void copiingOfShipmentsIsDoneCorrectly() {
-		Assert.assertEquals(2, carrierWShipmentsOnlyFromCarrierWShipments.getShipments().size());
 		boolean foundShipment1 = false;
 		boolean foundShipment2 = false;
 		for (CarrierShipment carrierShipment :  carrierWShipmentsOnlyFromCarrierWShipments.getShipments()) {
@@ -273,7 +247,7 @@ public class TestFreightUtils {
 			} else if (carrierShipment.getId() == Id.create("shipment2", CarrierShipment.class)) {
 				System.out.println("Found Shipment2");
 				foundShipment2 = true;
-				Assert.assertEquals(Id.createLinkId("(3,0)"), carrierShipment.getFrom());
+				Assert.assertEquals(Id.createLinkId("i(3,0)"), carrierShipment.getFrom());
 				Assert.assertEquals(Id.createLinkId("i(3,7)"), carrierShipment.getTo());
 				Assert.assertEquals(2, carrierShipment.getSize());
 				Assert.assertEquals(30.0, carrierShipment.getDeliveryServiceTime(), 0);
@@ -282,11 +256,10 @@ public class TestFreightUtils {
 				Assert.assertEquals(5.0, carrierShipment.getPickupServiceTime(), 0);
 				Assert.assertEquals(0.0, carrierShipment.getPickupTimeWindow().getStart(), 0);
 				Assert.assertEquals(7200.0, carrierShipment.getPickupTimeWindow().getEnd(), 0);
-			} 
-			
-//			Assert.assertTrue("Not found Shipment1 after copiing", foundShipment1);
-			Assert.assertTrue("Not found Shipment2 after copiing", foundShipment2);
+			} 	
 		}
+		Assert.assertTrue("Not found Shipment1 after copiing", foundShipment1);
+		Assert.assertTrue("Not found Shipment2 after copiing", foundShipment2);
 	}
 	
 	
@@ -318,10 +291,9 @@ public class TestFreightUtils {
 				Assert.assertEquals(0.0, carrierShipment.getPickupTimeWindow().getStart(), 0);
 				Assert.assertEquals(36001.0, carrierShipment.getPickupTimeWindow().getEnd(), 0);
 			}
-			
-			Assert.assertTrue("Not found converted Service1 after converting", foundSercice1);
-			Assert.assertTrue("Not found converted Service2 after converting", foundService2);
 		}
+		Assert.assertTrue("Not found converted Service1 after converting", foundSercice1);
+		Assert.assertTrue("Not found converted Service2 after converting", foundService2);
 	}
 	
 	/* Note: This test can be removed / modified when jsprit works properly with a combined Service and Shipment VRP. 
