@@ -335,4 +335,7 @@ public final class EditPlans {
 		newAct.setEndTime( Double.MAX_VALUE ) ;
 		return newAct ;
 	}
+	public static Integer getCurrentPlanElementIndex( MobsimAgent agent ) {
+		return WithinDayAgentUtils.getCurrentPlanElementIndex( agent ) ;
+	}
 }
