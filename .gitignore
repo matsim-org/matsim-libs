@@ -25,3 +25,5 @@ hs_err_pid*
 /input/usecases/capeTown/osm/capeTown_latest.pbf
 /scenarios/capeTown/osm/capeTown_latest.pbf
 /scenarios/chessboard/carrierPlanned.xml
+
+*.orig
