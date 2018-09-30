@@ -33,7 +33,7 @@ public class CompleteShipmentBuilderTest {
 		Config config = new Config();
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("input/lsp/network/2regions.xml");
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
         this.network = scenario.getNetwork();
         ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
         this.shipments = new ArrayList<LSPShipment>();

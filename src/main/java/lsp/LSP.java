@@ -9,34 +9,103 @@ import lsp.resources.Resource;
 import lsp.replanning.LSPReplanner;
 import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
+import org.matsim.core.controler.events.ReplanningEvent;
 
 public interface LSP extends HasPlansAndId<LSPPlan,LSP>{
-
-	public Id<LSP> getId();
 	
-	public Collection<LSPShipment> getShipments();
+	/**
+	 * @return
+	 *
+	 * ok
+	 */
+	Id<LSP> getId();
 	
-	public void scheduleSoultions();
+	/**
+	 * @return
+	 *
+	 * yyyy does this have to be exposed?
+	 */
+	Collection<LSPShipment> getShipments();
 	
-	public ArrayList<LSPPlan> getPlans();
+	/**
+	 * ok (behavioral method)
+	 */
+	void scheduleSoultions();
 	
-	public Collection<Resource> getResources();
+	/**
+	 * @return
+	 *
+	 * yyyy does this have to be exposed?
+	 */
+//	ArrayList<LSPPlan> getPlans();
 	
-	public LSPPlan getSelectedPlan();
+	/**
+	 * @return
+	 *
+	 * yyyy does this have to be exposed?
+	 */
+	Collection<Resource> getResources();
 	
-	public void setSelectedPlan(LSPPlan plan);
+	/**
+	 * @return
+	 *
+	 * probably ok (at some point we either need to expose the next step, or the whole plan)
+	 */
+//	LSPPlan getSelectedPlan();
 	
-	public void scoreSelectedPlan();
+	/**
+	 * @param plan
+	 *
+	 * yy does it even make sense to expose this (should internally do this).  But probably easy to fix.
+	 */
+//	void setSelectedPlan( LSPPlan plan );
 	
-	public LSPReplanner getReplanner();
+	/**
+	 * ok (behavioral method)
+	 */
+	void scoreSelectedPlan();
 	
-	public void assignShipmentToLSP(LSPShipment shipment);
+	/**
+	 * @return
+	 *
+	 * yyyy does this have to be exposed?
+	 */
+//	LSPReplanner getReplanner();
 	
-	public LSPScorer getScorer();
+	/**
+	 * @param shipment
+	 *
+	 * ok (LSP needs to be told that it is responsible for shipment)
+	 */
+	void assignShipmentToLSP( LSPShipment shipment );
 	
-	public void setScorer(LSPScorer scorer);
+	void replan( ReplanningEvent arg0 );
 	
-	public void setReplanner(LSPReplanner replanner);
+	/**
+	 * @return
+	 *
+	 * yyyy does this have to be exposed?
+	 */
+//	LSPScorer getScorer();
 	
-	public SolutionScheduler getScheduler();
+	/**
+	 * @param scorer
+	 *
+	 * yyyy does it make sense to expose this (implies that scorer can be changed during iterations)?
+	 */
+	void setScorer( LSPScorer scorer );
+	
+	/**
+	 * @param replanner
+	 *
+	 * yyyy does it make sense to expose this (implies that replanner can be changed during iterations)?
+	 */
+	void setReplanner( LSPReplanner replanner );
+	
+	/**
+	 * @return
+	 *
+	 * yyyy does this have to be exposed?
+	 */
+//	SolutionScheduler getScheduler();
 }    

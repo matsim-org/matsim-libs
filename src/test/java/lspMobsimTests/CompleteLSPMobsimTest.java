@@ -72,7 +72,7 @@ public class CompleteLSPMobsimTest {
 		Config config = new Config();
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("input/lsp/network/2regions.xml");
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
         this.network = scenario.getNetwork();	
 	
    
@@ -325,7 +325,7 @@ public class CompleteLSPMobsimTest {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.network().setInputFile("input/lsp/network/2regions.xml");
+		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		controler.run();
 	}
 
