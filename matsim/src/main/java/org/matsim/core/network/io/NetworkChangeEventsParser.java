@@ -18,9 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.core.network.io;
 
 import java.util.List;
@@ -145,8 +142,8 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if(name.equalsIgnoreCase(NETWORK_CHANGE_EVENT_TAG)) {
-			events.add(currentEvent);
-			currentEvent = null;
+			this.events.add(this.currentEvent);
+			this.currentEvent = null;
 		}
 	}
 
@@ -158,40 +155,40 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 		if(name.equalsIgnoreCase(NETWORK_CHANGE_EVENT_TAG)) {
 			String value = atts.getValue(START_TIME_TAG);
 			if(value != null) {
-				currentEvent = new NetworkChangeEvent(Time.parseTime(value));
+				this.currentEvent = new NetworkChangeEvent(Time.parseTime(value));
 			} else {
-				currentEvent = null;
+				this.currentEvent = null;
 				log.warn("A start time must be defined!");
 			}
 		/*
 		 * Links
 		 */
-		} else if(name.equalsIgnoreCase(LINK_TAG) && currentEvent != null) {
+		} else if(name.equalsIgnoreCase(LINK_TAG) && this.currentEvent != null) {
 			String value = atts.getValue(REF_ID_TAG);
 			if(value != null) {
-				Link link = network.getLinks().get(Id.create(value, Link.class));
+				Link link = this.network.getLinks().get(Id.create(value, Link.class));
 				if(link != null)
-					currentEvent.addLink(link);
+					this.currentEvent.addLink(link);
 				else
 					log.warn(String.format("Link %1$s not found!", value));
 			}
 		/*
 		 * flow capacity changes 
 		 */
-		} else if(name.equalsIgnoreCase(FLOW_CAPACITY_TAG) && currentEvent != null) {
-			currentEvent.setFlowCapacityChange(newNetworkChangeType(atts
+		} else if(name.equalsIgnoreCase(FLOW_CAPACITY_TAG) && this.currentEvent != null) {
+			this.currentEvent.setFlowCapacityChange(newNetworkChangeType(atts
 					.getValue(CHANGE_TYPE_TAG), atts.getValue(VALUE_TAG)));
 		/*
 		 * freespeed change
 		 */
-		} else if(name.equalsIgnoreCase(FREESPEED_TAG) && currentEvent != null) {
-			currentEvent.setFreespeedChange(newNetworkChangeType(atts
+		} else if(name.equalsIgnoreCase(FREESPEED_TAG) && this.currentEvent != null) {
+			this.currentEvent.setFreespeedChange(newNetworkChangeType(atts
 					.getValue(CHANGE_TYPE_TAG), atts.getValue(VALUE_TAG)));
 		/*
 		 * lanes changes
 		 */
-		} else if(name.equalsIgnoreCase(LANES_TAG) && currentEvent != null) {
-			currentEvent.setLanesChange(newNetworkChangeType(atts
+		} else if(name.equalsIgnoreCase(LANES_TAG) && this.currentEvent != null) {
+			this.currentEvent.setLanesChange(newNetworkChangeType(atts
 					.getValue(CHANGE_TYPE_TAG), atts.getValue(VALUE_TAG)));
 		}
 		

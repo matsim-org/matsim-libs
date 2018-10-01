@@ -21,6 +21,7 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
@@ -63,15 +64,18 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 	public static final double DROPOFF_DURATION = 60;
 
 	@Inject
-	public OneTaxiOptimizer(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, Fleet fleet, QSim qSim) {
+	public OneTaxiOptimizer(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
+			@Named(TransportMode.taxi) Fleet fleet, QSim qSim) {
 		timer = qSim.getSimTimer();
 		travelTime = new FreeSpeedTravelTime();
-		router = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime), travelTime);
+		router = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime),
+				travelTime);
 
 		vehicle = fleet.getVehicles().values().iterator().next();
 		vehicle.resetSchedule();
-		vehicle.getSchedule().addTask(new StayTaskImpl(vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
-				vehicle.getStartLink(), "wait"));
+		vehicle.getSchedule()
+				.addTask(new StayTaskImpl(vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
+						vehicle.getStartLink(), "wait"));
 	}
 
 	@Override

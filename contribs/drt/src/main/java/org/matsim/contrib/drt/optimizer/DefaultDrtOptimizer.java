@@ -38,6 +38,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
+import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
@@ -80,10 +81,11 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private boolean requiresReoptimization = false;
 
 	@Inject
-	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, EventsManager eventsManager,
-			DrtRequestValidator requestValidator, DepotFinder depotFinder, RebalancingStrategy rebalancingStrategy,
-			DrtScheduleInquiry scheduleInquiry, DrtScheduleTimingUpdater scheduleTimingUpdater,
-			EmptyVehicleRelocator relocator, UnplannedRequestInserter requestInserter) {
+	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, @Drt Fleet fleet, MobsimTimer mobsimTimer,
+			EventsManager eventsManager, DrtRequestValidator requestValidator, DepotFinder depotFinder,
+			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
+			DrtScheduleTimingUpdater scheduleTimingUpdater, EmptyVehicleRelocator relocator,
+			UnplannedRequestInserter requestInserter) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
@@ -146,7 +148,9 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 			drtRequest.setRejected(true);
 			eventsManager.processEvent(
 					new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), drtRequest.getId(), causes));
-			eventsManager.processEvent(new PersonStuckEvent(mobsimTimer.getTimeOfDay(), drtRequest.getPassenger().getId(), drtRequest.getFromLink().getId(), drtRequest.getPassenger().getMode()));
+			eventsManager.processEvent(
+					new PersonStuckEvent(mobsimTimer.getTimeOfDay(), drtRequest.getPassenger().getId(),
+							drtRequest.getFromLink().getId(), drtRequest.getPassenger().getMode()));
 			return;
 		}
 

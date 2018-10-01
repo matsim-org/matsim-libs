@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
 
 
@@ -51,10 +52,10 @@ public abstract class AbstractMatsimWriter {
 	 * the file is opened for writing. If not set explicitly, the usage of
 	 * compression is defined by the ending of the filename.
 	 *
-	 * @param useCompression1
+	 * @param useCompression
 	 */
-	public final void useCompression(final boolean useCompression1) {
-		this.useCompression = Boolean.valueOf(useCompression1);
+	public final void useCompression(final boolean useCompression) {
+		this.useCompression = useCompression;
 	}
 
 	/**
@@ -68,7 +69,7 @@ public abstract class AbstractMatsimWriter {
 		if (this.useCompression == null) {
 			this.writer = IOUtils.getBufferedWriter(filename);
 		} else {
-			this.writer = IOUtils.getBufferedWriter(filename, this.useCompression.booleanValue());
+			this.writer = IOUtils.getBufferedWriter(filename, this.useCompression);
 		}
 	}
 
@@ -79,10 +80,10 @@ public abstract class AbstractMatsimWriter {
 	protected final void openOutputStream(OutputStream outputStream) {
 		assertNotAlreadyOpen();
 		try {
-			if (this.useCompression == null || this.useCompression.booleanValue()) {
-				this.writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+			if (this.useCompression == null || this.useCompression) {
+				this.writer = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
 			} else {
-				this.writer = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(outputStream)));
+				this.writer = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(outputStream), StandardCharsets.UTF_8));
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
