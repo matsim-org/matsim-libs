@@ -19,6 +19,9 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import javax.inject.Named;
+
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
@@ -46,7 +49,8 @@ final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final String mobsimMode;
 
 	@Inject
-	public OneTaxiActionCreator(PassengerEngine passengerEngine, QSim qSim, DvrpConfigGroup dvrpCfg) {
+	public OneTaxiActionCreator(@Named(TransportMode.taxi) PassengerEngine passengerEngine, QSim qSim,
+			DvrpConfigGroup dvrpCfg) {
 		this.passengerEngine = passengerEngine;
 		this.timer = qSim.getSimTimer();
 		this.mobsimMode = dvrpCfg.getMobsimMode();

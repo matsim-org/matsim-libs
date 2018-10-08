@@ -29,7 +29,9 @@ import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.vehicles.*;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehiclesFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -43,9 +45,9 @@ public class VrpAgentSource implements AgentSource {
 	private final QSim qSim;
 
 	@Inject(optional = true)
-	private @Named(DVRP_VEHICLE_TYPE) VehicleType vehicleType;
+	private @Named(DVRP_VEHICLE_TYPE)
+	VehicleType vehicleType;
 
-	@Inject
 	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, QSim qSim) {
 		this.nextActionCreator = nextActionCreator;
 		this.fleet = fleet;

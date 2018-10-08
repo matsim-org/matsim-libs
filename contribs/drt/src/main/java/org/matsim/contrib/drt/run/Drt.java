@@ -18,20 +18,21 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.passenger;
+package org.matsim.contrib.drt.run;
 
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-public class PassengerEngineQSimComponentsConfigurator implements QSimComponentsConfigurator {
-	private final String mode;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-	public PassengerEngineQSimComponentsConfigurator(String mode) {
-		this.mode = mode;
-	}
+import com.google.inject.BindingAnnotation;
 
-	public void configure(QSimComponents components) {
-		components.activeMobsimEngines.add(PassengerEngineQSimModule.PASSENGER_ENGINE_NAME_PREFIX + mode);
-		components.activeDepartureHandlers.add(PassengerEngineQSimModule.PASSENGER_ENGINE_NAME_PREFIX + mode);
-	}
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+@BindingAnnotation
+@Target({ FIELD, PARAMETER, METHOD })
+@Retention(RUNTIME)
+public @interface Drt {
 }

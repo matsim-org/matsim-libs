@@ -49,6 +49,7 @@ import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEventHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
+import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
@@ -90,7 +91,7 @@ public class DynModePassengerStats
 	 *
 	 */
 	@Inject
-	public DynModePassengerStats(Network network, EventsManager events, DrtConfigGroup drtCfg, Fleet fleet) {
+	public DynModePassengerStats(Network network, EventsManager events, DrtConfigGroup drtCfg, @Drt Fleet fleet) {
 		this.mode = drtCfg.getMode();
 		this.network = network;
 		events.addHandler(this);
