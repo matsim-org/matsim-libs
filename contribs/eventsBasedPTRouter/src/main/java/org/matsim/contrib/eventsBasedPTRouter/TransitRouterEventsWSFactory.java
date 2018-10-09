@@ -36,7 +36,7 @@ import javax.inject.Singleton;
  * @author sergioo
  */
 @Singleton
-public class TransitRouterEventsWSFactory implements Provider<TransitRouter> {
+public class TransitRouterEventsWSFactory implements Provider<TransitRouterVariableImpl> {
 
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;
@@ -64,7 +64,7 @@ public class TransitRouterEventsWSFactory implements Provider<TransitRouter> {
 		this.stopStopTime = stopStopTime;
 	}
 	@Override
-	public TransitRouter get() {
+	public TransitRouterVariableImpl get() {
 		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWS(config, routerNetwork, waitTime, stopStopTime, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().qsim(), new PreparedTransitSchedule(scenario.getTransitSchedule())), routerNetwork);
 	}
 

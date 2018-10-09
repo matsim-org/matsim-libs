@@ -47,7 +47,7 @@ public class RunControlerWW {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(TransitRouter.class).toProvider(new TransitRouterEventsWLFactory(controler, waitTimeCalculator.get()));
+				addRoutingModuleBinding("pt").toProvider(new TransitRouterEventsWLFactory(controler, waitTimeCalculator.get()));
 			}
 		});
 		controler.run();

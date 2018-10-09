@@ -32,10 +32,14 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.InitialNode;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.MultiNodeDijkstra;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -43,7 +47,7 @@ import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
-public class TransitRouterVariableImpl implements TransitRouter {
+public class TransitRouterVariableImpl implements RoutingModule {
 
 	private final TransitRouterNetworkWW transitNetwork;
 
@@ -128,7 +132,12 @@ public class TransitRouterVariableImpl implements TransitRouter {
 
 		return convertPathToLegList( departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person ) ;
 	}
-	
+
+	@Override
+	public StageActivityTypes getStageActivityTypes() {
+		return new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE);
+	}
+
 	public Path calcPathRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
 		// find possible start stops
 		// find possible start stops

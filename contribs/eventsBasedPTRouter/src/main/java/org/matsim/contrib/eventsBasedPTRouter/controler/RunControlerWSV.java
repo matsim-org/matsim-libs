@@ -54,7 +54,7 @@ public class RunControlerWSV {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(TransitRouter.class).toProvider(new TransitRouterEventsWSVFactory(controler.getScenario(), waitTimeCalculator.get(), stopStopTimeCalculator.get(), vehicleOccupancyCalculator.getVehicleOccupancy()));
+				addRoutingModuleBinding("pt").toProvider(new TransitRouterEventsWSVFactory(controler.getScenario(), waitTimeCalculator.get(), stopStopTimeCalculator.get(), vehicleOccupancyCalculator.getVehicleOccupancy()));
 			}
 		});
 		

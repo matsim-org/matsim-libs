@@ -36,7 +36,7 @@ import javax.inject.Singleton;
  * @author sergioo
  */
 @Singleton
-public class TransitRouterEventsWLFactory implements Provider<TransitRouter> {
+public class TransitRouterEventsWLFactory implements Provider<TransitRouterVariableImpl> {
 
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;
@@ -54,7 +54,7 @@ public class TransitRouterEventsWLFactory implements Provider<TransitRouter> {
 		routerNetwork = TransitRouterNetworkWW.createFromSchedule(network, controler.getScenario().getTransitSchedule(), this.config.getBeelineWalkConnectionDistance());
 	}
 	@Override
-	public TransitRouter get() {
+	public TransitRouterVariableImpl get() {
 		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWW(config, network, routerNetwork, controler.getLinkTravelTimes(), waitTime, controler.getConfig().travelTimeCalculator(), controler.getConfig().qsim(), new PreparedTransitSchedule(controler.getScenario().getTransitSchedule())), routerNetwork);
 	}
 
