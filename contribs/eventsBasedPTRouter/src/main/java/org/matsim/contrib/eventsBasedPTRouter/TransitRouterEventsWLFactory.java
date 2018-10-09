@@ -22,6 +22,7 @@ package org.matsim.contrib.eventsBasedPTRouter;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.router.RoutingModule;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -36,7 +37,7 @@ import javax.inject.Singleton;
  * @author sergioo
  */
 @Singleton
-public class TransitRouterEventsWLFactory implements Provider<TransitRouterVariableImpl> {
+public class TransitRouterEventsWLFactory implements Provider<RoutingModule> {
 
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;
@@ -54,7 +55,7 @@ public class TransitRouterEventsWLFactory implements Provider<TransitRouterVaria
 		routerNetwork = TransitRouterNetworkWW.createFromSchedule(network, controler.getScenario().getTransitSchedule(), this.config.getBeelineWalkConnectionDistance());
 	}
 	@Override
-	public TransitRouterVariableImpl get() {
+	public RoutingModule get() {
 		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWW(config, network, routerNetwork, controler.getLinkTravelTimes(), waitTime, controler.getConfig().travelTimeCalculator(), controler.getConfig().qsim(), new PreparedTransitSchedule(controler.getScenario().getTransitSchedule())), routerNetwork);
 	}
 
