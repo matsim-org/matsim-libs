@@ -2,7 +2,6 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 	<module name="dvrp">
-		<param name="mode" value="taxi" />
 	</module>
 
 	<module name="taxi">

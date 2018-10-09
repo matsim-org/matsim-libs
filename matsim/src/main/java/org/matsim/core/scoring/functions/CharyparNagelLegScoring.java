@@ -20,9 +20,6 @@
 
 package org.matsim.core.scoring.functions;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -35,6 +32,9 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -88,7 +88,7 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 				modeParams = this.params.modeParams.get(TransportMode.walk);
 			} else {
 //				modeParams = this.params.modeParams.get(TransportMode.other);
-				throw new RuntimeException("just encountered mode for which no scoring parameters are defined: " + leg.getMode().toString() ) ;
+				throw new RuntimeException("just encountered mode for which no scoring parameters are defined: " + leg.getMode()) ;
 			}
 		}
 		tmpScore += travelTime * modeParams.marginalUtilityOfTraveling_s;

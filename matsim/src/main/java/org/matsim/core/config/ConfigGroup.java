@@ -246,6 +246,8 @@ public class ConfigGroup implements MatsimExtensionPoint {
 			return IOUtils.newUrl( null, filename ) ;
 		}
 		if ( filename.startsWith( File.separator ) ) {
+			// (= filename is absolute)
+			// (yyyy this may possibly fail on win systems. kai, sep.18)
 			return IOUtils.newUrl( null, filename ) ;
 		}
 		return IOUtils.newUrl(context, filename);

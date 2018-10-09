@@ -22,8 +22,6 @@
  */
 package org.matsim.contrib.av.robotaxi.scoring;
 
-import static org.junit.Assert.*;
-
 import org.apache.commons.lang.mutable.MutableDouble;
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,8 +36,7 @@ import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.taxi.run.*;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -51,13 +48,10 @@ import org.matsim.vehicles.Vehicle;
  * @author  jbischoff
  *
  */
-/**
- *
- */
 public class TaxiFareHandlerTest {
 
 	/**
-	 * Test method for {@link org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler#TaxiFareHandler(org.matsim.core.config.Config)}.
+	 * Test method for {@link TaxiFareHandler#TaxiFareHandler(Config, EventsManager, Network)}.
 	 */
 	@Test
 	public void testTaxiFareHandler() {
@@ -69,10 +63,9 @@ public class TaxiFareHandlerTest {
 		tccg.setDailySubscriptionFee(1);
 		tccg.setDistanceFare_m(1.0/1000.0);
 		tccg.setTimeFare_h(36);
-		DvrpConfigGroup dvrp = new DvrpConfigGroup();
-		dvrp.setMode("taxi");
-		config.addModule(dvrp);
-		final MutableDouble fare = new MutableDouble(0); 
+		TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
+		config.addModule(taxiCfg);
+		final MutableDouble fare = new MutableDouble(0);
 		EventsManager events = EventsUtils.createEventsManager();
 		TaxiFareHandler tfh = new TaxiFareHandler(config, events, network);
 		events.addHandler(tfh);
@@ -89,15 +82,15 @@ public class TaxiFareHandlerTest {
 		});
 		Id<Person> p1 = Id.createPersonId("p1");
 		Id<Vehicle> t1= Id.createVehicleId("v1"); 
-		events.processEvent(new PersonDepartureEvent(0.0, p1 , Id.createLinkId("12"), dvrp.getMode()));
+		events.processEvent(new PersonDepartureEvent(0.0, p1 , Id.createLinkId("12"), taxiCfg.getMode()));
 		events.processEvent(new PersonEntersVehicleEvent(60.0, p1 , t1));
 		events.processEvent(new LinkEnterEvent(61,t1,Id.createLinkId("23")));
-		events.processEvent(new PersonArrivalEvent(120.0, p1, Id.createLinkId("23"), dvrp.getMode()));
+		events.processEvent(new PersonArrivalEvent(120.0, p1, Id.createLinkId("23"), taxiCfg.getMode()));
 		
-		events.processEvent(new PersonDepartureEvent(180.0, p1 , Id.createLinkId("12"), dvrp.getMode()));
+		events.processEvent(new PersonDepartureEvent(180.0, p1 , Id.createLinkId("12"), taxiCfg.getMode()));
 		events.processEvent(new PersonEntersVehicleEvent(240.0, p1 , t1));
 		events.processEvent(new LinkEnterEvent(241,t1,Id.createLinkId("23")));
-		events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("23"), dvrp.getMode()));
+		events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("23"), taxiCfg.getMode()));
 		
 		//fare: 1 (daily fee) +2*1(basefare)+ 2*1 (distance) + (36/60)*2 = -(1+2+2+0,12) = -6.2 
 		Assert.assertEquals(-6.2, fare.getValue());

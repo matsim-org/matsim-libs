@@ -22,28 +22,24 @@
  */
 package org.matsim.contrib.drt.routing;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Supplier;
-
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * @author jbischoff
@@ -81,19 +77,19 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 
 		TransitStopFacility accessFacility = stops.getLeft();
 		if (accessFacility == null) {
-			printError(() -> "No access stop found, agent will walk. Agent Id:\t" + person.getId());
-			return (walkRouter.calcRoute(fromFacility, toFacility, departureTime, person));
+			printError(() -> "No access stop found, agent will walk, using mode " + DrtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
+            return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
 		}
 
 		TransitStopFacility egressFacility = stops.getRight();
 		if (egressFacility == null) {
-			printError(() -> "No egress stop found, agent will walk. Agent Id:\t" + person.getId());
-			return (walkRouter.calcRoute(fromFacility, toFacility, departureTime, person));
+			printError(() -> "No egress stop found, agent will walk, using mode " + DrtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
+            return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
 		}
 
 		if (accessFacility.getLinkId() == egressFacility.getLinkId()) {
-			printError(() -> "Start and end stop are the same, agent will walk. Agent Id:\t" + person.getId());
-			return (walkRouter.calcRoute(fromFacility, toFacility, departureTime, person));
+			printError(() -> "Start and end stop are the same, agent will walk, using mode " + DrtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
+            return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
 		}
 
 		List<PlanElement> trip = new ArrayList<>();

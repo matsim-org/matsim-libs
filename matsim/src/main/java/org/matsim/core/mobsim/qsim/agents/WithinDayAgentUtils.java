@@ -58,12 +58,15 @@ import java.util.List;
  * 
  * @author cdobler
  */
-public class WithinDayAgentUtils {
-	//	private WithinDayAgentUtils(){} // do not instantiate: static methods only
+public final class WithinDayAgentUtils {
+
+		private WithinDayAgentUtils(){
+			// do not instantiate: static methods only
+		}
 
 	private static final Logger log = Logger.getLogger( WithinDayAgentUtils.class );
 
-	public static final Integer getCurrentPlanElementIndex(MobsimAgent agent) {
+	public static Integer getCurrentPlanElementIndex(MobsimAgent agent) {
 		//		if (agent instanceof PersonDriverAgentImpl) {
 		//			return ((PersonDriverAgentImpl) agent).getCurrentPlanElementIndex() ;
 		//		} else
@@ -84,7 +87,7 @@ public class WithinDayAgentUtils {
 	 *     arrival link is not in the list, and so for the arrival link special treatment is necessary.
 	 * () Routes may have loops, in which case the "indexOf" approach does not work.
 	 */
-	public static final Integer getCurrentRouteLinkIdIndex(MobsimAgent agent) {
+	public static Integer getCurrentRouteLinkIdIndex(MobsimAgent agent) {
 
 		if (agent instanceof HasModifiablePlan) {
 
@@ -125,7 +128,7 @@ public class WithinDayAgentUtils {
 	//		}
 	//	}
 
-	public static final void resetCaches(MobsimAgent agent) {
+	public static void resetCaches(MobsimAgent agent) {
 		if (agent instanceof HasModifiablePlan) {
 			((HasModifiablePlan) agent).resetCaches();			
 		} else {
@@ -133,7 +136,7 @@ public class WithinDayAgentUtils {
 					" which does not support resetCaches(...). Aborting!");
 		}
 	}
-	public static final void rescheduleActivityEnd( MobsimAgent agent, Mobsim mobsim ) {
+	public static void rescheduleActivityEnd(MobsimAgent agent, Mobsim mobsim ) {
 		if ( mobsim instanceof ActivityEndRescheduler ) {
 			((ActivityEndRescheduler) mobsim).rescheduleActivityEnd(agent);
 		} else {
@@ -141,7 +144,7 @@ public class WithinDayAgentUtils {
 		}
 	}
 
-	public static final Leg getModifiableCurrentLeg(MobsimAgent agent) {
+	public static Leg getModifiableCurrentLeg(MobsimAgent agent) {
 		PlanElement currentPlanElement = getCurrentPlanElement(agent);
 		if (!(currentPlanElement instanceof Leg)) {
 			return null;
@@ -149,7 +152,7 @@ public class WithinDayAgentUtils {
 		return (Leg) currentPlanElement;
 	}
 
-	public static final Plan getModifiablePlan(MobsimAgent agent) {
+	public static Plan getModifiablePlan(MobsimAgent agent) {
 		if (agent instanceof HasModifiablePlan) {
 			return ((HasModifiablePlan) agent).getModifiablePlan();
 		} else {
@@ -158,7 +161,7 @@ public class WithinDayAgentUtils {
 		}
 	}
 
-	public static final PlanElement getCurrentPlanElement(MobsimAgent agent) {
+	public static PlanElement getCurrentPlanElement(MobsimAgent agent) {
 		return getModifiablePlan(agent).getPlanElements().get(getCurrentPlanElementIndex(agent));
 	}
 

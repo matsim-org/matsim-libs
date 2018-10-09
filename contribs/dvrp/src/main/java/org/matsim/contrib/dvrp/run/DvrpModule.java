@@ -20,35 +20,34 @@
 package org.matsim.contrib.dvrp.run;
 
 import java.util.Collection;
-import java.util.function.Function;
+import java.util.List;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
-import org.matsim.contrib.dynagent.run.DynRoutingModule;
+import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponents;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
 public final class DvrpModule extends AbstractModule {
-	private final DvrpQSimModuleBuilder qsimModuleBuilder;
+	private final List<DvrpModeQSimModule> qsimModules;
 
-	public DvrpModule(Function<Config, AbstractQSimModule> moduleCreator,
-			Collection<Class<? extends MobsimListener>> listeners) {
-		this(new DvrpQSimModuleBuilder(moduleCreator).addListeners(listeners));
+	public static DvrpModule createModule(String mode, Collection<Class<? extends MobsimListener>> listeners) {
+		return new DvrpModule(new DvrpModeQSimModule.Builder(mode).addListeners(listeners).build());
 	}
 
-	public DvrpModule(DvrpQSimModuleBuilder qsimModuleBuilder) {
-		this.qsimModuleBuilder = qsimModuleBuilder;
+	public DvrpModule(DvrpModeQSimModule... qsimModules) {
+		this.qsimModules = ImmutableList.copyOf(qsimModules);
 	}
 
 	@Provides
@@ -56,15 +55,13 @@ public final class DvrpModule extends AbstractModule {
 	public QSimComponents provideQSimComponents(Config config) {
 		QSimComponents components = new QSimComponents();
 		new StandardQSimComponentsConfigurator(config).configure(components);
-		qsimModuleBuilder.configureComponents(components);
+		DynActivityEngineModule.configureComponents(components);
+		qsimModules.forEach(m -> m.configureComponents(components));
 		return components;
 	}
 
 	@Override
 	public void install() {
-		String mode = DvrpConfigGroup.get(getConfig()).getMode();
-		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
-
 		// Visualisation of schedules for DVRP DynAgents
 		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
 
@@ -72,8 +69,10 @@ public final class DvrpModule extends AbstractModule {
 		install(new DvrpTravelTimeModule());
 
 		bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))
-				.toProvider(DvrpRoutingNetworkProvider.class).asEagerSingleton();
-		
-		installQSimModule(qsimModuleBuilder.build(getConfig()));
+				.toProvider(DvrpRoutingNetworkProvider.class)
+				.asEagerSingleton();
+
+		installQSimModule(new DynActivityEngineModule());
+		qsimModules.forEach(this::installQSimModule);
 	}
 }

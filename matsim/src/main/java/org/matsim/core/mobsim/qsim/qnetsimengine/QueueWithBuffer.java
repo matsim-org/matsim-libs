@@ -344,7 +344,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private void calculateStorageCapacity() {
 		// The following is not adjusted for time-dependence!! kai, apr'16
 		// No, I think that it simply assumes that the lookups are "now". kai, feb'18
-		double now = context.getSimTimer().getTimeOfDay() ;
+//		double now = context.getSimTimer().getTimeOfDay() ;
 		
 		// first guess at storageCapacity:
 		storageCapacity = this.length * this.effectiveNumberOfLanes / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
