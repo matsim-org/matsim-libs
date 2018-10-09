@@ -23,10 +23,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -38,10 +36,6 @@ import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlReader20;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsDataImpl;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsReader20;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.model.SignalGroup;
@@ -51,9 +45,7 @@ import org.xml.sax.SAXException;
 
 
 /**
- * If I would have to write this again I would start with calculation of the IntergreenConstraints in this class and 
- * than follow a forward-propagation of constraints. but currently it is working fine!
- * @author dgrether
+ * @author dgrether, tthunig
  *
  */
 public final class SylviaPreprocessData {
@@ -65,50 +57,6 @@ public final class SylviaPreprocessData {
 	public static final String SYLVIA_PREFIX = "sylvia_plan_";
 
 	private static final int MIN_GREEN_SECONDS = 5; //see RILSA pp. 28
-
-	public static void simplifySignalGroupsAndConvertFixedTimePlansToSylviaBasePlans(String signalControlInputFile, String signalControlOutputFile, String signalGroupsFile, String signalGroupsOutFile)
-			throws JAXBException, SAXException, ParserConfigurationException, IOException {
-		SignalControlData signalControl = new SignalControlDataImpl();
-		SignalControlReader20 reader = new SignalControlReader20(signalControl);
-		reader.readFile(signalControlInputFile);
-
-		SignalGroupsData signalGroupsData = new SignalGroupsDataImpl();
-		SignalGroupsReader20 groupsReader = new SignalGroupsReader20(signalGroupsData);
-		groupsReader.readFile(signalGroupsFile);
-
-		convertSignalGroupsData(signalGroupsData, signalControl);
-
-		SignalControlData sylviaSignalControl = new SignalControlDataImpl();
-		convertSignalControlData(signalControl, sylviaSignalControl);
-
-		SignalControlWriter20 writer = new SignalControlWriter20(sylviaSignalControl);
-		writer.write(signalControlOutputFile);
-
-		SignalGroupsWriter20 groupsWriter = new SignalGroupsWriter20(signalGroupsData);
-		groupsWriter.write(signalGroupsOutFile);
-
-	}
-	
-	/**
-	 * Merge all signalGroups that have equal onsets and droppings to one SignalGroup, also change the SignalControlData accordingly
-	 */
-	private static SignalGroupsData convertSignalGroupsData(SignalGroupsData signalGroupsData, SignalControlData signalControl) {
-		for (SignalSystemControllerData  controllerData : signalControl.getSignalSystemControllerDataBySystemId().values()){
-			if (controllerData.getSignalPlanData().size() > 1){
-				log.warn("More than one plan, check if this tool is doing the correct work!");
-			}
-			for (SignalPlanData signalPlan : controllerData.getSignalPlanData().values()){
-				Map<Integer, List<SignalGroupSettingsData>> onsetGroupSettingsMap = new HashMap<>();
-				for (SignalGroupSettingsData signalGroupSettings : signalPlan.getSignalGroupSettingsDataByGroupId().values()){
-					if (!onsetGroupSettingsMap.containsKey(signalGroupSettings.getOnset())){
-						onsetGroupSettingsMap.put(signalGroupSettings.getOnset(), new ArrayList<>());
-					}
-					onsetGroupSettingsMap.get(signalGroupSettings.getOnset()).add(signalGroupSettings);
-				}
-			}
-		}
-		return null;
-	}
 	
 	
 	private static void convertFixedTimePlansToSylviaBasePlans(String signalControlInputFile, String signalControlOutputFile)
@@ -206,97 +154,6 @@ public final class SylviaPreprocessData {
 			thisDropping = nextDropping;
 		}
 		return newPlan;
-		
-		/* alt:
-		List<SignalGroupSettingsData> groupSettingsList = new ArrayList<>();
-		groupSettingsList.addAll(newPlan.getSignalGroupSettingsDataByGroupId().values());
-		//filter allGreenSettings
-		Set<SignalGroupSettingsData> allGreenSettings = removeAllGreenSignalGroupSettings(groupSettingsList, fixedTimePlan.getCycleTime());
-		List<FixedTimeSignalPhase> phases = calculateSortedPhases(groupSettingsList);
-		List<FixedTimeSignalPhase> sylviaPhases = new ArrayList<>();
-		
-		int phaseStart  = 0;
-		int lastPhaseOff = 0;
-		for (int i = 0; i < phases.size(); i++){
-			System.out.println();
-			log.info("Processing phase: " + (i+1) + " of " + phases.size());
-			final FixedTimeSignalPhase phase = phases.get(i); // this phase is not modified
-			FixedTimeSignalPhase sylviaPhase = createSylviaPhase(phase, factory);
-			if (i == 0){ //this should be the first phase of the cylce
-				phaseStart = phase.getPhaseStartSecond();
-			}
-			else {
-				FixedTimeSignalPhase lastPhase = phases.get(i - 1);
-				FixedTimeSignalPhase lastSylviaPhase = sylviaPhases.get(i - 1);
-				log.info("last phase end: " + lastSylviaPhase.getPhaseEndSecond());
-				int intergreen = phase.getPhaseStartSecond() - lastPhase.getPhaseEndSecond();
-				log.info("intergreen: " + intergreen + " due to phase start at " + phase.getPhaseStartSecond() + " last phase end: " + lastPhase.getPhaseEndSecond());
-				if (intergreen >= 0){ //phases are not overlapping
-					log.info("phase not overlapping...");
-					phaseStart = lastSylviaPhase.getPhaseEndSecond() + intergreen;
-					int shift = sylviaPhase.getPhaseStartSecond() - phaseStart;
-					log.info("shift of not overlapping phase : " + shift);
-					sylviaPhase.setPhaseStartSecond(sylviaPhase.getPhaseStartSecond() - shift);
-					sylviaPhase.setPhaseEndSecond(sylviaPhase.getPhaseEndSecond() - shift);
-					for (SignalGroupSettingsData settings : sylviaPhase.getSignalGroupSettingsByGroupId().values()){
-						settings.setOnset(settings.getOnset() - shift);
-						settings.setDropping(settings.getDropping() - shift);
-						log.info("  ...modified settings of phase: " + settings.getSignalGroupId() + " on:  " + settings.getOnset() + " off: " + settings.getDropping());
-					}
-				}
-				else { //handle overlapping phases -> shift phase 
-					log.info("phases overlap...");
-					Collection<IntergreenConstraint> intergreenConstraints = calculateIntergreenConstraints(lastPhase, phase);
-					log.info("intergreen constraints: " + intergreenConstraints);
-					if (! intergreenConstraints.isEmpty()){
-						int phaseOn = sylviaPhase.getPhaseEndSecond(); //initialize with maximal value
-						int phaseOff = 0;
-						for (IntergreenConstraint ic : intergreenConstraints){
-							SignalGroupSettingsData sylviaSettings = sylviaPhase.getSignalGroupSettingsByGroupId().get(ic.onSettingsId);
-							SignalGroupSettingsData lastSylviaSettings = lastSylviaPhase.getSignalGroupSettingsByGroupId().get(ic.droppingSettingsId);
-							int greenTime = sylviaSettings.getDropping() - sylviaSettings.getOnset();
-							int on = lastSylviaSettings.getDropping() + ic.intergreen;
-							int off = on + greenTime;
-							log.info("settings " + sylviaSettings.getSignalGroupId() + " green time : " + greenTime + " intergreen constraint: " + ic.intergreen + " to group id " + ic.droppingSettingsId + " on " + on + " off " + off);
-							sylviaSettings.setOnset(on);
-							sylviaSettings.setDropping(off);
-							if (on < phaseOn)
-								phaseOn = on;
-							if (off > phaseOff)
-								phaseOff = off;
-						}
-						log.info("shiftet phase to " + phaseOn + " - " + phaseOff);
-						sylviaPhase.setPhaseStartSecond(phaseOn);
-						sylviaPhase.setPhaseEndSecond(phaseOff);
-						for (SignalGroupSettingsData settings : sylviaPhase.getSignalGroupSettingsByGroupId().values()){
-							settings.setDropping(sylviaPhase.getPhaseEndSecond());
-						}
-					}
-					else { //phases overlap but there are no positive intergreen constaints -> all groups start meanwhile last phase is active and end afterwards
-						//do nothing
-					}
-				}
-			}
-			lastPhaseOff = phase.getPhaseEndSecond();
-			sylviaPhases.add(sylviaPhase);
-		}
-
-		int lastIntergreen = fixedTimePlan.getCycleTime() - lastPhaseOff;
-		int lastSylviaPhaseOff = 0;
-		newPlan.getSignalGroupSettingsDataByGroupId().clear();
-		for (FixedTimeSignalPhase p : sylviaPhases){
-			addPhaseToPlan(p, newPlan);
-			lastSylviaPhaseOff = p.getPhaseEndSecond();
-		}
-		int sylviaCycle = lastSylviaPhaseOff + lastIntergreen;
-		newPlan.setCycleTime(sylviaCycle);
-
-		for (SignalGroupSettingsData settings : allGreenSettings){
-			settings.setOnset(0);
-			settings.setDropping(sylviaCycle);
-			newPlan.addSignalGroupSettings(settings);
-		}
-		return newPlan; */
 	}
 	
 	/**
@@ -357,18 +214,5 @@ public final class SylviaPreprocessData {
 		String signalControlFile = args[0];
 		String signalControlOutFile = args[1];
 		SylviaPreprocessData.convertFixedTimePlansToSylviaBasePlans(signalControlFile, signalControlOutFile);
-	}
-}
-
-class IntergreenConstraint {
-	Id<SignalGroup> droppingSettingsId;
-	Id<SignalGroup> onSettingsId;
-	Integer intergreen;
-}
-
-class SignalGroupSettingsOnsetComparator implements Comparator<SignalGroupSettingsData> {
-	@Override
-	public int compare(SignalGroupSettingsData o1, SignalGroupSettingsData o2) {
-		return Integer.valueOf(o1.getOnset()).compareTo(Integer.valueOf(o2.getOnset()));
 	}
 }
