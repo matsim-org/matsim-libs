@@ -26,6 +26,7 @@ import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithPathData;
+import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -63,7 +64,7 @@ public class RequestInsertionScheduler {
 	private final DrtTaskFactory taskFactory;
 
 	@Inject
-	public RequestInsertionScheduler(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer timer,
+	public RequestInsertionScheduler(DrtConfigGroup drtCfg, @Drt Fleet fleet, MobsimTimer timer,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			DrtScheduleTimingUpdater scheduleTimingUpdater, DrtTaskFactory taskFactory) {
 		this.fleet = fleet;
@@ -80,8 +81,9 @@ public class RequestInsertionScheduler {
 			if (changeStartLinkToLastLinkInSchedule) {
 				Vehicles.changeStartLinkToLastLinkInSchedule(veh);
 			}
-			veh.getSchedule().addTask(taskFactory.createStayTask(veh, veh.getServiceBeginTime(),
-					veh.getServiceEndTime(), veh.getStartLink()));
+			veh.getSchedule()
+					.addTask(taskFactory.createStayTask(veh, veh.getServiceBeginTime(), veh.getServiceEndTime(),
+							veh.getStartLink()));
 		}
 	}
 
@@ -100,7 +102,8 @@ public class RequestInsertionScheduler {
 		DrtTask currentTask = scheduleStatus == ScheduleStatus.PLANNED ? null : (DrtTask)schedule.getCurrentTask();
 		Task beforePickupTask;
 
-		if (pickupIdx == 0 && scheduleStatus != ScheduleStatus.PLANNED
+		if (pickupIdx == 0
+				&& scheduleStatus != ScheduleStatus.PLANNED
 				&& currentTask.getDrtTaskType() == DrtTaskType.DRIVE) {
 			LinkTimePair diversion = ((OnlineDriveTaskTracker)currentTask.getTaskTracker()).getDiversionPoint();
 			if (diversion != null) { // divert vehicle
@@ -151,11 +154,11 @@ public class RequestInsertionScheduler {
 					if (pickupIdx < stops.size()) {// there is at least one following stop
 						DrtStopTask nextStopTask = stops.get(pickupIdx).task;
 						if (stopTask.getTaskIdx() + 2 != nextStopTask.getTaskIdx()) {// there must a drive task in
-																						// between
+							// between
 							throw new RuntimeException();
 						}
 						if (stopTask.getTaskIdx() + 2 == nextStopTask.getTaskIdx()) {// there must a drive task in
-																						// between
+							// between
 							int driveTaskIdx = stopTask.getTaskIdx() + 1;
 							schedule.removeTask(schedule.getTasks().get(driveTaskIdx));
 						}

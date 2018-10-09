@@ -78,18 +78,18 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		TransitStopFacility accessFacility = stops.getLeft();
 		if (accessFacility == null) {
 			printError(() -> "No access stop found, agent will walk, using mode " + DrtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
-            return (Collections.singletonList((createDrtWalkLeg(fromFacility, toFacility, departureTime, person))));
+            return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
 		}
 
 		TransitStopFacility egressFacility = stops.getRight();
 		if (egressFacility == null) {
 			printError(() -> "No egress stop found, agent will walk, using mode " + DrtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
-            return (Collections.singletonList((createDrtWalkLeg(fromFacility, toFacility, departureTime, person))));
+            return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
 		}
 
 		if (accessFacility.getLinkId() == egressFacility.getLinkId()) {
 			printError(() -> "Start and end stop are the same, agent will walk, using mode " + DrtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
-            return (Collections.singletonList((createDrtWalkLeg(fromFacility, toFacility, departureTime, person))));
+            return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
 		}
 
 		List<PlanElement> trip = new ArrayList<>();

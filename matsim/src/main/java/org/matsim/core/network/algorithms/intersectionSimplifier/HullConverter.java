@@ -19,19 +19,18 @@
 
 package org.matsim.core.network.algorithms.intersectionSimplifier;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
 import org.apache.log4j.Logger;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
+import java.util.ArrayList;
+import java.util.List;
 
 /** 
  * Converts a {@link Geometry}, specifically a {@link Polygon} to a sequence
@@ -87,21 +86,21 @@ public class HullConverter implements AttributeConverter<Geometry> {
 		
 		/* Convert to the format: (x1;y1),(x2;y2),...,(xn;yn) */
 		Coordinate[] ca = ((Geometry)o).getCoordinates();
-		String s = new String();
+		StringBuilder s = new StringBuilder();
 		for(int i = 0; i < ca.length-1; i++){
-			s += "(";
-			s += ca[i].x;
-			s += ";";
-			s += ca[i].y;
-			s += "),";
+			s.append("(");
+			s.append(ca[i].x);
+			s.append(";");
+			s.append(ca[i].y);
+			s.append("),");
 		}
-		s += "(";
-		s += ca[ca.length-1].x;
-		s += ";";
-		s += ca[ca.length-1].y;
-		s += ")";
+		s.append("(");
+		s.append(ca[ca.length - 1].x);
+		s.append(";");
+		s.append(ca[ca.length - 1].y);
+		s.append(")");
 		
-		return s;
+		return s.toString();
 	}
 
 }

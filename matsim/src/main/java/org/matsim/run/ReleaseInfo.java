@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This is just a simple class to use as main class in jar-file releases.
@@ -39,7 +40,7 @@ public class ReleaseInfo {
 		String date = null;
 		URL url = ReleaseInfo.class.getResource("/revision.txt");
 		if (url != null) {
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
 				revision = reader.readLine();
 				date = reader.readLine();
 			} catch (IOException e) {

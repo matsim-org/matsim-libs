@@ -255,13 +255,11 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 
 	@Override
 	public Facility getCurrentFacility() {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented");
 	}
 
 	@Override
 	public Facility getDestinationFacility() {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented");
 	}
 }
