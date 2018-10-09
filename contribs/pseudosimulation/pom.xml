@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
   <artifactId>pseudosimulation</artifactId>
-  <version>deterministic-psim</version>
+  <!-- <version>deterministic-psim</version> -->
   <name>pseudosimulation</name>
   <build>
     <plugins>
