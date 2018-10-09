@@ -1,6 +1,11 @@
 
 package org.matsim.contrib.pseudosimulation;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -8,34 +13,20 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.matsim.analysis.ScoreStatsControlerListener;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.common.util.LoggerUtils;
+import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.NoTransitEmulator;
+import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmulator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.lang.reflect.Field;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RunPSimTest {
@@ -78,6 +69,14 @@ public class RunPSimTest {
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(runPSim.getMatsimControler());
 		runPSim.getMatsimControler().addControlerListener(execScoreTracker);
 
+		((Controler) runPSim.getMatsimControler()).addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {		
+				this.bind(TransitEmulator.class).to(NoTransitEmulator.class);
+			}
+		});
+		
+		
 		runPSim.run();
 		psimscore = execScoreTracker.executedScore;
 	}
