@@ -48,8 +48,7 @@ public class CadytsCarModule extends AbstractModule {
 		@Override
 		public Counts<Link> get() {
 			Counts<Link> calibrationCounts = new Counts<>();
-			String occupancyCountsFilename = config.getCountsFileURL(matsimConfig.getContext()).getFile();
-			new MatsimCountsReader(calibrationCounts).readFile(occupancyCountsFilename);
+			new MatsimCountsReader(calibrationCounts).parse(config.getCountsFileURL(matsimConfig.getContext());
 			return calibrationCounts;
 		}
 	}

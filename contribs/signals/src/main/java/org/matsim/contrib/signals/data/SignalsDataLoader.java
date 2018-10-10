@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data;
 
-import java.io.IOException;
-import java.net.URL;
-
 import org.apache.log4j.Logger;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesReader10;
@@ -34,6 +31,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.IOException;
+import java.net.URL;
 
 
 /**
@@ -89,8 +89,7 @@ public class SignalsDataLoader {
 	private void loadAmberTimes(SignalsData data) {
 		if (this.signalConfig.getAmberTimesFile() != null){
 			AmberTimesReader10 reader = new AmberTimesReader10(data.getAmberTimesData());
-			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getAmberTimesFile());
-			reader.readFile(filename.getFile());
+			reader.readFile(this.signalConfig.getAmberTimesFile());
 		}
 		else {
 			log.info("Signals: No amber times file set, can't load amber times!");
