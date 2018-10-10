@@ -34,6 +34,7 @@ public class MobSimSwitcher implements IterationEndsListener,
 	@Inject private PSimProvider pSimProvider;
 
 	@Inject
+	public
 	MobSimSwitcher(PSimConfigGroup pSimConfigGroup, Scenario scenario) {
 		iterationsPerCycle = pSimConfigGroup.getIterationsPerCycle();
 		this.scenario = scenario;
