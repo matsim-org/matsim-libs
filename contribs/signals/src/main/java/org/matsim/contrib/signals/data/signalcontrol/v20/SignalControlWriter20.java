@@ -95,11 +95,9 @@ public class SignalControlWriter20 extends MatsimJaxbXmlWriter {
 						xmlPd.setCycleTime(xmlCycleTime);
 						xmlCycleTime.setSec(planData.getCycleTime());
 					}
-					if (planData.getOffset() != null){
-						XMLOffset xmlOffset = fac.createXMLSignalPlanTypeXMLOffset();
-						xmlPd.setOffset(xmlOffset);
-						xmlOffset.setSec(planData.getOffset());
-					}
+					XMLOffset xmlOffset = fac.createXMLSignalPlanTypeXMLOffset();
+					xmlPd.setOffset(xmlOffset);
+					xmlOffset.setSec(planData.getOffset());
 					
 					//process signalGroupSettings
 					for (SignalGroupSettingsData sgSettings : planData.getSignalGroupSettingsDataByGroupId().values()){
