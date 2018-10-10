@@ -56,11 +56,7 @@ public class DatabasedSignalPlan implements SignalPlan {
 			throw new IllegalStateException("This implementation of SignalPlan works only with a cycle time");
 		}
 	
-		int offset = 0;
-		if (this.data.getOffset() != null){
-			offset = this.data.getOffset();
-		}
-		
+		int offset = this.data.getOffset();
 		for (SignalGroupSettingsData sgdata : this.data.getSignalGroupSettingsDataByGroupId().values()){
 //			log.error("  SignalGroup " +  sgdata.getSignalGroupId());
 			//do nothing if onset == dropping or all time green is set
