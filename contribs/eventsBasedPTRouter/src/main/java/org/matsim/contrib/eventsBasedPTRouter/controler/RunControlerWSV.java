@@ -20,8 +20,8 @@
 
 package org.matsim.contrib.eventsBasedPTRouter.controler;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -30,7 +30,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSVFactory;
 import org.matsim.contrib.eventsBasedPTRouter.vehicleOccupancy.VehicleOccupancyCalculator;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
-import org.matsim.pt.router.TransitRouter;
 
 
 /**
@@ -42,9 +41,8 @@ import org.matsim.pt.router.TransitRouter;
 public class RunControlerWSV {
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, args[0]);
-		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
+		final Controler controler = new Controler(scenario);
 		final WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
 		final StopStopTimeCalculatorImpl stopStopTimeCalculator = new StopStopTimeCalculatorImpl(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
@@ -54,7 +52,7 @@ public class RunControlerWSV {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(TransitRouter.class).toProvider(new TransitRouterEventsWSVFactory(controler.getScenario(), waitTimeCalculator.get(), stopStopTimeCalculator.get(), vehicleOccupancyCalculator.getVehicleOccupancy()));
+				addRoutingModuleBinding("pt").toProvider(new TransitRouterEventsWSVFactory(controler.getScenario(), waitTimeCalculator.get(), stopStopTimeCalculator.get(), vehicleOccupancyCalculator.getVehicleOccupancy()));
 			}
 		});
 		

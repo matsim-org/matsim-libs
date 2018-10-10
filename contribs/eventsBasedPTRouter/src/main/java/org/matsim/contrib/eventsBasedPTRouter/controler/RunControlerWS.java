@@ -20,16 +20,15 @@
 
 package org.matsim.contrib.eventsBasedPTRouter.controler;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
-import org.matsim.pt.router.TransitRouter;
 
 
 /**
@@ -41,10 +40,8 @@ import org.matsim.pt.router.TransitRouter;
 public class RunControlerWS {
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, args[0]);
-		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
+		final Controler controler = new Controler(scenario);
 		final WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
 		final StopStopTimeCalculatorImpl stopStopTimeCalculator = new StopStopTimeCalculatorImpl(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
@@ -52,7 +49,7 @@ public class RunControlerWS {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.get(), stopStopTimeCalculator.get()));
+				addRoutingModuleBinding(TransportMode.pt).toProvider(new TransitRouterEventsWSFactory(scenario, waitTimeCalculator.get(), stopStopTimeCalculator.get()));
 			}
 		});
 		controler.run();

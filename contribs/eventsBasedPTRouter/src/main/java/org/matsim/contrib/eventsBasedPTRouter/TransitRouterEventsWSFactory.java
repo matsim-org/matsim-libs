@@ -23,8 +23,8 @@ import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
+import org.matsim.core.router.RoutingModule;
 import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 
 import javax.inject.Provider;
@@ -36,7 +36,7 @@ import javax.inject.Singleton;
  * @author sergioo
  */
 @Singleton
-public class TransitRouterEventsWSFactory implements Provider<TransitRouter> {
+public class TransitRouterEventsWSFactory implements Provider<RoutingModule> {
 
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;
@@ -64,7 +64,7 @@ public class TransitRouterEventsWSFactory implements Provider<TransitRouter> {
 		this.stopStopTime = stopStopTime;
 	}
 	@Override
-	public TransitRouter get() {
+	public RoutingModule get() {
 		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWS(config, routerNetwork, waitTime, stopStopTime, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().qsim(), new PreparedTransitSchedule(scenario.getTransitSchedule())), routerNetwork);
 	}
 
