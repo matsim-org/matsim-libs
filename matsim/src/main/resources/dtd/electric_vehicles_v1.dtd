@@ -3,7 +3,7 @@
 <!-- ============================================================ -->
 
 <!-- For further information or questions, please contact
-     Michal Maciejewski, michal.maciejewski at put dot poznan dot pl -->
+     Michal Maciejewski, maciejewski at vsp dot tu-berlin dot de -->
 
 <!-- ============================================================ -->
 
@@ -14,5 +14,6 @@
 <!ATTLIST vehicle
 	id          CDATA   #REQUIRED
 	initial_soc    CDATA   #REQUIRED
-	battery_capacity  CDATA   #REQUIRED>
+		battery_capacity  CDATA   #REQUIRED
+		chargerTypes    CDATA    #IMPLIED>
 	
