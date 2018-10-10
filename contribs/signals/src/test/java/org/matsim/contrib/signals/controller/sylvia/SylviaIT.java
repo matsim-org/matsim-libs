@@ -89,12 +89,23 @@ public class SylviaIT {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	/**
-	 * test sylvia with conflicting streams
+	 * Test sylvia with two conflicting streams at a single intersection. A fixed
+	 * cycle time (of 60 seconds) and no maximal extension time per setting are
+	 * used. The two approaches have equal demand but different priority in the
+	 * Sylvia signal algorithm. The priority is given by the order in the signal
+	 * plan. In this test, signal group 1 has priority over 2.
+	 * 
+	 * note: signal settings of the fixed time plan are unbalanced with 5 seconds
+	 * for signal group 1 vs. 45 seconds for signal group 2. but signal settings of
+	 * the sylvia plan are balanced, because each setting is shortend to 5 seconds
+	 * green time. because of the setup in this test (with a fixed cycle time and no
+	 * maximal extension time per setting), the first setting of the plan has
+	 * priority over the second.
 	 */
 	@Test
-	public void testDemandAB() {
+	public void testDemandABPrioA() {
 		double[] noPersons = { 3600, 3600 };
-		SignalAnalysisTool signalAnalyzer = runScenario(noPersons);
+		SignalAnalysisTool signalAnalyzer = runScenario(noPersons, 0);
 
 		// check signal results
 		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); // should be more or less equal (OW direction is always favored as the first phase)
@@ -107,10 +118,49 @@ public class SylviaIT {
 		log.info("total signal green times: " + totalSignalGreenTimes.get(signalGroupId1) + ", " + totalSignalGreenTimes.get(signalGroupId2));
 		log.info("avg signal green times per cycle: " + avgSignalGreenTimePerCycle.get(signalGroupId1) + ", " + avgSignalGreenTimePerCycle.get(signalGroupId2));
 		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
-		Assert.assertEquals("total signal green times of both groups are not similiar enough", 0.0, totalSignalGreenTimes.get(signalGroupId1) - totalSignalGreenTimes.get(signalGroupId2),
-				totalSignalGreenTimes.get(signalGroupId1) / 3); // may differ by 1/3
-		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 25, avgSignalGreenTimePerCycle.get(signalGroupId1), 5);
-		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 25, avgSignalGreenTimePerCycle.get(signalGroupId2), 5);
+		Assert.assertEquals("total signal green time of signal group 1 is wrong", 2900, totalSignalGreenTimes.get(signalGroupId1), 50);
+		Assert.assertEquals("total signal green time of signal group 2 is wrong", 2000, totalSignalGreenTimes.get(signalGroupId2), 50);
+		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 30, avgSignalGreenTimePerCycle.get(signalGroupId1), 1);
+		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 20, avgSignalGreenTimePerCycle.get(signalGroupId2), 1);
+		// can differ from the fixed cycle length because the analysis is quit after the last activity start event
+		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), 1); 
+	}
+	
+	/**
+	 * Test sylvia with two conflicting streams at a single intersection. A fixed
+	 * cycle time (of 60 seconds) and no maximal extension time per setting are
+	 * used. The two approaches have equal demand but different priority in the
+	 * Sylvia signal algorithm. The priority is given by the order in the signal
+	 * plan. In this test, signal group 2 has priority over 1.
+	 * 
+	 * note: signal settings of the fixed time plan are unbalanced with 5 seconds
+	 * for signal group 1 vs. 45 seconds for signal group 2. but signal settings of
+	 * the sylvia plan are balanced, because each setting is shortend to 5 seconds
+	 * green time. because of the setup in this test (with a fixed cycle time and no
+	 * maximal extension time per setting), the first setting of the plan has
+	 * priority over the second.
+	 */
+	@Test
+	public void testDemandABPrioB() {
+		double[] noPersons = { 3600, 3600 };
+		// change the priority (i.e. order in the plan) by using an offset of 5 seconds
+		SignalAnalysisTool signalAnalyzer = runScenario(noPersons, 5);
+
+		// check signal results
+		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); // should be more or less equal (OW direction is always favored as the first phase)
+		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerFlexibleCycle(); // should be more or less equal and around 25
+		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = signalAnalyzer.calculateAvgFlexibleCycleTimePerSignalSystem(); // should be 60
+		Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
+		Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
+		Id<SignalSystem> signalSystemId = Id.create("SignalSystem1", SignalSystem.class);
+
+		log.info("total signal green times: " + totalSignalGreenTimes.get(signalGroupId1) + ", " + totalSignalGreenTimes.get(signalGroupId2));
+		log.info("avg signal green times per cycle: " + avgSignalGreenTimePerCycle.get(signalGroupId1) + ", " + avgSignalGreenTimePerCycle.get(signalGroupId2));
+		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
+		Assert.assertEquals("total signal green time of signal group 2 is wrong", 2900, totalSignalGreenTimes.get(signalGroupId2), 50);
+		Assert.assertEquals("total signal green time of signal group 1 is wrong", 2000, totalSignalGreenTimes.get(signalGroupId1), 50);
+		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 30, avgSignalGreenTimePerCycle.get(signalGroupId2), 1);
+		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 20, avgSignalGreenTimePerCycle.get(signalGroupId1), 1);
 		// can differ from the fixed cycle length because the analysis is quit after the last activity start event
 		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), 1); 
 	}
@@ -121,7 +171,7 @@ public class SylviaIT {
 	@Test
 	public void testDemandA() {
 		double[] noPersons = { 3600, 0 };
-		SignalAnalysisTool signalAnalyzer = runScenario(noPersons);
+		SignalAnalysisTool signalAnalyzer = runScenario(noPersons, 0);
 
 		// check signal results
 		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); // group 1 should have more total green time than group 2
@@ -141,14 +191,14 @@ public class SylviaIT {
 		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), 1);
 	}
 
-	private SignalAnalysisTool runScenario(double[] noPersons) {
+	private SignalAnalysisTool runScenario(double[] noPersons, int offset) {
 		Config config = defineConfig();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		// add missing scenario elements
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 
-		createScenarioElements(scenario, noPersons);
+		createScenarioElements(scenario, noPersons, offset);
 
 		Controler controler = new Controler(scenario);
 		// add signals module
@@ -169,10 +219,10 @@ public class SylviaIT {
 		return signalAnalyzer;
 	}
 
-	private void createScenarioElements(Scenario scenario, double[] noPersons) {
+	private void createScenarioElements(Scenario scenario, double[] noPersons, int offset) {
 		createNetwork(scenario.getNetwork());
 		createPopulation(scenario.getPopulation(), noPersons);
-		createSignals(scenario);
+		createSignals(scenario, offset);
 	}
 
 	/**
@@ -259,7 +309,7 @@ public class SylviaIT {
 		}
 	}
 
-	private void createSignals(Scenario scenario) {
+	private void createSignals(Scenario scenario, int offset) {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 		SignalSystemsDataFactory sysFac = signalSystems.getFactory();
@@ -300,14 +350,13 @@ public class SylviaIT {
 		signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
 		tmpSignalControl.addSignalSystemControllerData(signalSystemControl);
 
-		// create a plan for the signal system (with defined cycle time and offset 0)
-		SignalPlanData signalPlan = SignalUtils.createSignalPlan(conFac, 60, 0, Id.create("SignalPlan1", SignalPlan.class));
+		// create a plan for the signal system (with defined cycle time and offset)
+		SignalPlanData signalPlan = SignalUtils.createSignalPlan(conFac, 60, offset, Id.create("SignalPlan1", SignalPlan.class));
 		signalSystemControl.addSignalPlanData(signalPlan);
 
 		// specify signal group settings for both signal groups
 		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, 5));
 		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId2, 10, 55));
-		signalPlan.setOffset(0);
 
 		// create the sylvia signal control by shorten the temporary signal control
 		SylviaPreprocessData.convertSignalControlData(tmpSignalControl, signalControl);
