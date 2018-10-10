@@ -19,15 +19,18 @@
 
 package org.matsim.vsp.ev.data.file;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.*;
-
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.vsp.ev.EvUnitConversions;
-import org.matsim.vsp.ev.data.Charger;
 import org.matsim.vsp.ev.data.ElectricVehicle;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class ElectricVehicleWriter extends MatsimXmlWriter {
 	private Iterable<ElectricVehicle> vehicles;
@@ -56,6 +59,7 @@ public class ElectricVehicleWriter extends MatsimXmlWriter {
 			atts.add(new Tuple<String, String>("id", v.getId().toString()));
 			atts.add(new Tuple<String, String>("battery_capacity",format.format(v.getBattery().getCapacity()/EvUnitConversions.J_PER_kWh) + ""));
 			atts.add(new Tuple<String, String>("initial_soc", format.format(v.getBattery().getSoc()/EvUnitConversions.J_PER_kWh) + ""));
+            atts.add(new Tuple<>("chargerTypes", v.getChargingTypes().stream().collect(Collectors.joining(","))));
 			writeStartTag("vehicle",atts,true);
 		}
 		

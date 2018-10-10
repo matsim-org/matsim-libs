@@ -18,11 +18,12 @@
 
 package org.matsim.vsp.ev.data;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vsp.ev.charging.ChargingLogic;
+
+import java.util.Map;
 
 /**
  * @author michalm
@@ -31,6 +32,9 @@ public interface ChargingInfrastructure {
 	public static final String CHARGERS = "chargers";
 
 	Map<Id<Charger>, Charger> getChargers();
+
+    Map<Id<Charger>, Charger> getChargersAtLink(Id<Link> linkId);
+
 
 	void initChargingLogics(ChargingLogic.Factory logicFactory, EventsManager eventsManager);
 }

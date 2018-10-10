@@ -13,6 +13,10 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vsp.ev.data.ChargingInfrastructure;
+import org.matsim.vsp.ev.data.ElectricFleet;
+import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
+import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -45,6 +49,16 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
     @Inject
     LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
+    @Inject
+    ElectricFleet electricFleet;
+
+    @Inject
+    ChargingInfrastructure chargingInfrastructure;
+
+    @Inject
+    private DriveEnergyConsumption.Factory driveConsumptionFactory;
+    @Inject
+    private AuxEnergyConsumption.Factory auxConsumptionFactory;
     /**
      * This is the older (and still more standard) constructor, where the routingMode and the resulting mode were the
      * same.
@@ -82,6 +96,7 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
 
         // Ensure this is not performed concurrently by multiple threads!
         synchronized (this.singleModeNetworksCache.getSingleModeNetworksCache()) {
+
             filteredNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(mode);
             if (filteredNetwork == null) {
                 TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
@@ -102,6 +117,7 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
         if (travelTime == null) {
             throw new RuntimeException("No TravelTime bound for mode " + routingMode + ".");
         }
+        electricFleet.resetBatteriesAndConsumptions(driveConsumptionFactory, auxConsumptionFactory);
         LeastCostPathCalculator routeAlgo =
                 leastCostPathCalculatorFactory.createPathCalculator(
                         filteredNetwork,
@@ -112,7 +128,7 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
         if (plansCalcRouteConfigGroup.isInsertingAccessEgressWalk()) {
             throw new IllegalArgumentException("Bushwacking is not currently supported by the EV Routing module");
         } else {
-            return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo);
+            return new EVNetworkRoutingModule(mode, filteredNetwork, DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo), electricFleet, chargingInfrastructure, travelTime);
         }
     }
 }

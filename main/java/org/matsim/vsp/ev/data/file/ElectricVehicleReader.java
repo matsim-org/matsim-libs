@@ -19,16 +19,16 @@
 
 package org.matsim.vsp.ev.data.file;
 
-import java.util.Stack;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.vsp.ev.EvUnitConversions;
-import org.matsim.vsp.ev.data.BatteryImpl;
-import org.matsim.vsp.ev.data.ElectricVehicle;
-import org.matsim.vsp.ev.data.ElectricVehicleImpl;
-import org.matsim.vsp.ev.data.ElectricFleetImpl;
+import org.matsim.vsp.ev.data.*;
 import org.xml.sax.Attributes;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Stack;
 
 public class ElectricVehicleReader extends MatsimXmlParser {
 	private static final String VEHICLE = "vehicle";
@@ -54,7 +54,10 @@ public class ElectricVehicleReader extends MatsimXmlParser {
 		Id<ElectricVehicle> id = Id.create(atts.getValue("id"), ElectricVehicle.class);
 		double batteryCapacity_kWh = Double.parseDouble(atts.getValue("battery_capacity"));
 		double initialSoc_kWh = Double.parseDouble(atts.getValue("initial_soc"));
+        String chargerType = atts.getValue("chargerTypes");
+        List<String> chargerTypes = chargerType != null ? Arrays.asList(chargerType.split(",")) : Collections.singletonList(ChargerImpl.DEFAULT_CHARGER_TYPE);
+
 		return new ElectricVehicleImpl(id, new BatteryImpl(batteryCapacity_kWh * EvUnitConversions.J_PER_kWh,
-				initialSoc_kWh * EvUnitConversions.J_PER_kWh));
+                initialSoc_kWh * EvUnitConversions.J_PER_kWh), chargerTypes);
 	}
 }

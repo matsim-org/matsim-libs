@@ -23,17 +23,28 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
 import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
 
+import java.util.Collections;
+import java.util.List;
+
 public class ElectricVehicleImpl implements ElectricVehicle {
 	private final Id<ElectricVehicle> vehicleId;
 	private Battery battery;// not final -- can be swapped
+    private final List<String> chargingTypes;
 
 	private DriveEnergyConsumption driveEnergyConsumption;
 	private AuxEnergyConsumption auxEnergyConsumption;
 
-	public ElectricVehicleImpl(Id<ElectricVehicle> vehicleId, Battery battery) {
-		this.vehicleId = vehicleId;
-		this.battery = battery;
-	}
+    public ElectricVehicleImpl(Id<ElectricVehicle> vehicleId, Battery battery) {
+        this.vehicleId = vehicleId;
+        this.battery = battery;
+        this.chargingTypes = Collections.singletonList(ChargerImpl.DEFAULT_CHARGER_TYPE);
+    }
+
+    public ElectricVehicleImpl(Id<ElectricVehicle> vehicleId, Battery battery, List<String> chargingTypes) {
+        this.vehicleId = vehicleId;
+        this.battery = battery;
+        this.chargingTypes = chargingTypes;
+    }
 
 	@Override
 	public Id<ElectricVehicle> getId() {
@@ -44,6 +55,11 @@ public class ElectricVehicleImpl implements ElectricVehicle {
 	public Battery getBattery() {
 		return battery;
 	}
+
+    @Override
+    public List<String> getChargingTypes() {
+        return chargingTypes;
+    }
 
 	@Override
 	public DriveEnergyConsumption getDriveEnergyConsumption() {

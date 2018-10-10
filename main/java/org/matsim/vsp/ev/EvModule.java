@@ -19,8 +19,7 @@
 
 package org.matsim.vsp.ev;
 
-import javax.inject.Inject;
-
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
@@ -35,18 +34,13 @@ import org.matsim.vsp.ev.data.ChargingInfrastructure;
 import org.matsim.vsp.ev.data.ElectricFleet;
 import org.matsim.vsp.ev.data.file.ChargingInfrastructureProvider;
 import org.matsim.vsp.ev.data.file.ElectricFleetProvider;
-import org.matsim.vsp.ev.discharging.AuxDischargingHandler;
-import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
-import org.matsim.vsp.ev.discharging.DriveDischargingHandler;
-import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
-import org.matsim.vsp.ev.discharging.OhdeSlaskiAuxEnergyConsumption;
-import org.matsim.vsp.ev.discharging.OhdeSlaskiDriveEnergyConsumption;
+import org.matsim.vsp.ev.discharging.*;
 import org.matsim.vsp.ev.stats.ChargerOccupancyTimeProfileCollectorProvider;
 import org.matsim.vsp.ev.stats.ChargerOccupancyXYDataProvider;
 import org.matsim.vsp.ev.stats.IndividualSocTimeProfileCollectorProvider;
 import org.matsim.vsp.ev.stats.SocHistogramTimeProfileCollectorProvider;
 
-import com.google.inject.name.Names;
+import javax.inject.Inject;
 
 public class EvModule extends AbstractModule {
 	private static ChargingLogic.Factory DEFAULT_CHARGING_LOGIC_FACTORY = charger -> new ChargingWithQueueingLogic(
@@ -69,7 +63,7 @@ public class EvModule extends AbstractModule {
 				.asEagerSingleton();
 		bind(DriveEnergyConsumption.Factory.class).toInstance(DEFAULT_DRIVE_CONSUMPTION_FACTORY);
 
-		if (evCfg.getAuxDischargingSimulation() != AuxDischargingSimulation.seperateAuxDischargingHandler) {
+        if (evCfg.getAuxDischargingSimulation() == AuxDischargingSimulation.seperateAuxDischargingHandler) {
 			// "isTurnedOn" returns true ==> should not be used when for "seperateAuxDischargingHandler"
 			bind(AuxEnergyConsumption.Factory.class).toInstance(DEFAULT_AUX_CONSUMPTION_FACTORY);
 		}

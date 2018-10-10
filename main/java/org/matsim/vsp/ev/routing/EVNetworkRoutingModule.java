@@ -19,6 +19,7 @@
 package org.matsim.vsp.ev.routing;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -32,9 +33,14 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.*;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.LinkWrapperFacility;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
+import org.matsim.vsp.ev.charging.VehicleChargingHandler;
 import org.matsim.vsp.ev.data.Charger;
 import org.matsim.vsp.ev.data.ChargingInfrastructure;
 import org.matsim.vsp.ev.data.ElectricFleet;
@@ -55,27 +61,57 @@ public final class EVNetworkRoutingModule implements RoutingModule {
     private final String mode;
 
     private final Network network;
-    private final NetworkRoutingModule delegate;
+    private final RoutingModule delegate;
     private final ElectricFleet electricFleet;
     private final ChargingInfrastructure chargingInfrastructure;
     private final Random random = MatsimRandom.getLocalInstance();
     private static final LinkProvider<Charger> CHARGER_TO_LINK = charger -> charger.getLink();
     private static final LinkProvider<Link> LINK_TO_LINK = l -> l;
+    private final TravelTime travelTime;
+    private final String stageActivityType;
+    private final String vehicleSuffix;
 
+
+    private final class EVCharingStageActivityType implements StageActivityTypes {
+        @Override
+        public boolean isStageActivity(String activityType) {
+            if (EVNetworkRoutingModule.this.stageActivityType.equals(activityType)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof EVCharingStageActivityType)) {
+                return false;
+            }
+            EVCharingStageActivityType other = (EVCharingStageActivityType) obj;
+            return other.isStageActivity(EVNetworkRoutingModule.this.stageActivityType);
+        }
+
+        @Override
+        public int hashCode() {
+            return EVNetworkRoutingModule.this.stageActivityType.hashCode();
+        }
+    }
 
     public EVNetworkRoutingModule(
             final String mode,
             final Network network,
-            NetworkRoutingModule delegate,
+            RoutingModule delegate,
             ElectricFleet evs,
-            ChargingInfrastructure chargingInfrastructure
-    ) {
+            ChargingInfrastructure chargingInfrastructure, TravelTime travelTime) {
+        this.travelTime = travelTime;
         Gbl.assertNotNull(network);
         this.delegate = delegate;
         this.network = network;
         this.mode = mode;
         this.electricFleet = evs;
         this.chargingInfrastructure = chargingInfrastructure;
+        stageActivityType = mode + VehicleChargingHandler.CHARGING_IDENTIFIER;
+        this.vehicleSuffix = mode == TransportMode.car ? "" : "_" + mode;
     }
 
     @Override
@@ -83,7 +119,7 @@ public final class EVNetworkRoutingModule implements RoutingModule {
                                                  final Person person) {
 
         List<? extends PlanElement> basicRoute = delegate.calcRoute(fromFacility, toFacility, departureTime, person);
-        Id<ElectricVehicle> evId = Id.create(person.getId(), ElectricVehicle.class);
+        Id<ElectricVehicle> evId = Id.create(person.getId() + vehicleSuffix, ElectricVehicle.class);
         if (!electricFleet.getElectricVehicles().containsKey(evId)) {
             return basicRoute;
         } else {
@@ -108,19 +144,27 @@ public final class EVNetworkRoutingModule implements RoutingModule {
                 }
                 List<PlanElement> stagedRoute = new ArrayList<>();
                 Facility lastFrom = fromFacility;
+                double lastArrivaltime = departureTime;
                 for (Link stopLocation : stopLocations) {
 
                     StraightLineKnnFinder<Link, Charger> straightLineKnnFinder = new StraightLineKnnFinder(2, l -> (Link) l, CHARGER_TO_LINK);
-                    List<Charger> nearestChargers = straightLineKnnFinder.findNearest(stopLocation, chargingInfrastructure.getChargers().values().stream());
+                    List<Charger> nearestChargers = straightLineKnnFinder.findNearest(stopLocation, chargingInfrastructure.getChargers().values().stream().filter(charger -> ev.getChargingTypes().contains(charger.getChargerType())));
                     Charger selectedCharger = nearestChargers.get(0);
                     Facility nexttoFacility = new LinkWrapperFacility(selectedCharger.getLink());
-                    stagedRoute.addAll(delegate.calcRoute(lastFrom, nexttoFacility, departureTime, person));
-                    Activity chargeAct = PopulationUtils.createActivityFromCoordAndLinkId("car charging", selectedCharger.getCoord(), selectedCharger.getLink().getId());
+                    if (nexttoFacility.getLinkId().equals(lastFrom.getLinkId())) {
+                        continue;
+                    }
+                    List<? extends PlanElement> routeSegment = delegate.calcRoute(lastFrom, nexttoFacility, lastArrivaltime, person);
+                    Leg lastLeg = (Leg) routeSegment.get(0);
+                    lastArrivaltime = lastLeg.getDepartureTime() + lastLeg.getTravelTime();
+                    stagedRoute.add(lastLeg);
+                    Activity chargeAct = PopulationUtils.createActivityFromCoordAndLinkId(stageActivityType, selectedCharger.getCoord(), selectedCharger.getLink().getId());
                     chargeAct.setMaximumDuration(1800);
+                    lastArrivaltime += chargeAct.getMaximumDuration();
                     stagedRoute.add(chargeAct);
                     lastFrom = nexttoFacility;
                 }
-                stagedRoute.addAll(delegate.calcRoute(lastFrom, toFacility, departureTime, person));
+                stagedRoute.addAll(delegate.calcRoute(lastFrom, toFacility, lastArrivaltime, person));
 
 
                 return stagedRoute;
@@ -136,8 +180,8 @@ public final class EVNetworkRoutingModule implements RoutingModule {
         List<Link> links = NetworkUtils.getLinks(network, route.getLinkIds());
 
         for (Link l : links) {
-            double freeSpeedTravelTime = l.getLength() / l.getFreespeed();
-            double consumption = ev.getDriveEnergyConsumption().calcEnergyConsumption(l, freeSpeedTravelTime) + ev.getAuxEnergyConsumption().calcEnergyConsumption(freeSpeedTravelTime);
+            double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime(), null, null);
+            double consumption = ev.getDriveEnergyConsumption().calcEnergyConsumption(l, travelT) + ev.getAuxEnergyConsumption().calcEnergyConsumption(travelT);
             consumptions.put(l, consumption);
         }
         return consumptions;

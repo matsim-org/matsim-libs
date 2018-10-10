@@ -23,12 +23,16 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
 import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
 
+import java.util.List;
+
 public interface ElectricVehicle extends Identifiable<ElectricVehicle> {
 	DriveEnergyConsumption getDriveEnergyConsumption();
 
 	AuxEnergyConsumption getAuxEnergyConsumption();
 
 	Battery getBattery();
+
+    List<String> getChargingTypes();
 
 	Battery swapBattery(Battery battery);
 

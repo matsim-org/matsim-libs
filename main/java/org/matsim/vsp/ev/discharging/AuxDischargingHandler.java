@@ -19,14 +19,16 @@
 
 package org.matsim.vsp.ev.discharging;
 
+import com.google.inject.Inject;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.vsp.ev.EvConfigGroup;
-import org.matsim.vsp.ev.data.ElectricVehicle;
 import org.matsim.vsp.ev.data.ElectricFleet;
+import org.matsim.vsp.ev.data.ElectricVehicle;
 
-import com.google.inject.Inject;
-
+/**
+ * This AUX Discharge runs also when vehicles are not in use. This is handy for vehicles with idle engines, such as taxis (where heating is on while the vehicle is idle), but should not be used with ordinary passenger cars.
+ */
 public class AuxDischargingHandler implements MobsimAfterSimStepListener {
 	private final ElectricFleet evFleet;
 	private final int auxDischargeTimeStep;

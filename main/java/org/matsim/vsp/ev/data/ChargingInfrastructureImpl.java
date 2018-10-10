@@ -18,13 +18,15 @@
 
 package org.matsim.vsp.ev.data;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vsp.ev.charging.ChargingLogic;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.vsp.ev.charging.ChargingLogic;
+import java.util.stream.Collectors;
 
 /**
  * @author michalm
@@ -32,10 +34,16 @@ import org.matsim.vsp.ev.charging.ChargingLogic;
 public class ChargingInfrastructureImpl implements ChargingInfrastructure {
 	private final Map<Id<Charger>, Charger> chargers = new LinkedHashMap<>();
 
+
 	@Override
 	public Map<Id<Charger>, Charger> getChargers() {
 		return Collections.unmodifiableMap(chargers);
 	}
+
+    @Override
+    public Map<Id<Charger>, Charger> getChargersAtLink(Id<Link> linkId) {
+        return chargers.values().stream().filter(charger -> charger.getLink().getId().equals(linkId)).collect(Collectors.toMap(Charger::getId, charger -> charger));
+    }
 
 	public void addCharger(Charger charger) {
 		chargers.put(charger.getId(), charger);
