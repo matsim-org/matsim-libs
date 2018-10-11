@@ -19,23 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.config;
 
-import static org.matsim.core.config.ConfigV2XmlNames.CONFIG;
-import static org.matsim.core.config.ConfigV2XmlNames.MODULE;
-import static org.matsim.core.config.ConfigV2XmlNames.NAME;
-import static org.matsim.core.config.ConfigV2XmlNames.PARAMETER;
-import static org.matsim.core.config.ConfigV2XmlNames.PARAMETER_SET;
-import static org.matsim.core.config.ConfigV2XmlNames.TYPE;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigWriter.Verbosity;
 import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
@@ -45,11 +28,24 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import javax.jws.WebParam;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import static org.matsim.core.config.ConfigV2XmlNames.CONFIG;
+import static org.matsim.core.config.ConfigV2XmlNames.MODULE;
+import static org.matsim.core.config.ConfigV2XmlNames.NAME;
+import static org.matsim.core.config.ConfigV2XmlNames.PARAMETER;
+import static org.matsim.core.config.ConfigV2XmlNames.PARAMETER_SET;
+import static org.matsim.core.config.ConfigV2XmlNames.TYPE;
 
 /**
  * @author thibautd
