@@ -188,7 +188,7 @@ public class FreightUtilsIT {
 	
 	@Test
 	public void toursInitialCarrierWServicesIsCorrect() {
-		Assert.assertEquals(-99, carrierWServices.getSelectedPlan().getScore(), 0);			//TODO: Korrekten WErt ermitteln und eintragen
+		Assert.assertEquals(-270.4, carrierWServices.getSelectedPlan().getScore(), 0.1);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 		double tourDurationSum = 0;
 		for (ScheduledTour scheduledTour: carrierWServices.getSelectedPlan().getScheduledTours()){
 			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
@@ -207,7 +207,7 @@ public class FreightUtilsIT {
 	
 	@Test
 	public void toursInitialCarrierWShipmentsIsCorrect() {
-		Assert.assertEquals(-99, carrierWShipments.getSelectedPlan().getScore(), 0);			//TODO: Korrekten WErt ermitteln und eintragen
+		Assert.assertEquals(-136.8, carrierWShipments.getSelectedPlan().getScore(), 0.1);			//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 		
 		double tourDurationSum = 0;
 		for (ScheduledTour scheduledTour: carrierWShipments.getSelectedPlan().getScheduledTours()){
@@ -228,7 +228,7 @@ public class FreightUtilsIT {
 
 	@Test
 	public void toursCarrierWShipmentsOnlyFromCarrierWServicesIsCorrect() {
-		Assert.assertEquals(-99, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScore(), 0);			//TODO: Korrekten WErt ermitteln und eintragen	
+		Assert.assertEquals(-140.4, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScore(), 0.1);		//TODO WERTE!	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 		
 		double tourDurationSum = 0;
 		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScheduledTours()){
@@ -249,7 +249,7 @@ public class FreightUtilsIT {
 	
 	@Test
 	public void toursCarrierWShipmentsOnlyFromCarrierWShipmentsIsCorrect() {
-		Assert.assertEquals(-99, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScore(), 0);			//TODO: Korrekten WErt ermitteln und eintragen	
+		Assert.assertEquals(-136.8, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScore(), 0.1);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18		
 		
 		double tourDurationSum = 0;
 		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScheduledTours()){
