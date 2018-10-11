@@ -53,9 +53,6 @@ import java.util.Set;
  * @author  jbischoff
  *
  */
-/**
- *
- */
 public class TravelTimeValidationRunner {
 
 	private final Network network;

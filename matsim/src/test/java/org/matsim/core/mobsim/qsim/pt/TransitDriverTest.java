@@ -703,7 +703,6 @@ public class TransitDriverTest {
 
 		@Override
 		public String getMode() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 	}

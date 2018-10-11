@@ -1,13 +1,9 @@
-/**
- * 
- */
 package org.matsim.contrib.parking.parkingsearch.DynAgent;
 
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.parking.parkingsearch.DynAgent.ParkingDynLeg;
 import org.matsim.contrib.parking.parkingsearch.events.StartParkingSearchEvent;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.contrib.parking.parkingsearch.search.DistanceMemoryParkingSearchLogic;
@@ -24,19 +20,9 @@ import org.matsim.vehicles.Vehicle;
  */
 public class DistanceMemoryDynLeg extends ParkingDynLeg {
 
-	/**
-	 * @param mode
-	 * @param route
-	 * @param logic
-	 * @param parkingManager
-	 * @param vehicleId
-	 * @param timer
-	 * @param events
-	 */
 	public DistanceMemoryDynLeg(String mode, NetworkRoute route, ParkingSearchLogic logic,
-			ParkingSearchManager parkingManager, Id<Vehicle> vehicleId, MobsimTimer timer, EventsManager events) {
+															ParkingSearchManager parkingManager, Id<Vehicle> vehicleId, MobsimTimer timer, EventsManager events) {
 		super(mode, route, logic, parkingManager, vehicleId, timer, events);
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override

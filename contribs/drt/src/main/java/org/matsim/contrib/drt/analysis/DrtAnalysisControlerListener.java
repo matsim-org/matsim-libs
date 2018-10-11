@@ -24,6 +24,7 @@ package org.matsim.contrib.drt.analysis;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.core.config.Config;
@@ -66,7 +67,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	 * 
 	 */
 	@Inject
-	public DrtAnalysisControlerListener(Config config, Fleet fleet) {
+	public DrtAnalysisControlerListener(Config config, @Drt Fleet fleet) {
         this.config = config;
 		drtgroup = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
 		runId = config.controler().getRunId();

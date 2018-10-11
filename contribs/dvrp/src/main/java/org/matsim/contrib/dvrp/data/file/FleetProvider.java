@@ -29,6 +29,7 @@ import org.matsim.core.controler.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 
 /**
  * @author michalm
@@ -51,11 +52,13 @@ public class FleetProvider implements Provider<Fleet> {
 		return fleet;
 	}
 
-	public static AbstractModule createModule(URL url) {
+	public static AbstractModule createModule(String mode, URL url) {
 		return new AbstractModule() {
 			@Override
 			public void install() {
-				bind(Fleet.class).toProvider(new FleetProvider(url)).asEagerSingleton();
+				bind(Fleet.class).annotatedWith(Names.named(mode))
+						.toProvider(new FleetProvider(url))
+						.asEagerSingleton();
 			}
 		};
 	}

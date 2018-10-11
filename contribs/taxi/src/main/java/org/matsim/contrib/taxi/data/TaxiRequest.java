@@ -40,7 +40,7 @@ public class TaxiRequest implements PassengerRequest {
 		PICKUP, RIDE, DROPOFF,
 
 		PERFORMED, //
-		// REJECTED, // rejected by the DISPATCHER
+		REJECTED, // rejected by the DISPATCHER
 		// CANCELLED, // canceled by the CUSTOMER
 		;
 	}
@@ -49,6 +49,8 @@ public class TaxiRequest implements PassengerRequest {
 	private final double submissionTime;
 	private final double earliestStartTime;
 
+	private boolean rejected = false;
+	
 	private final MobsimPassengerAgent passenger;
 	private final Link fromLink;
 	private final Link toLink;
@@ -94,6 +96,15 @@ public class TaxiRequest implements PassengerRequest {
 	@Override
 	public MobsimPassengerAgent getPassenger() {
 		return passenger;
+	}
+	
+	@Override
+	public boolean isRejected() {
+		return rejected;
+	}
+
+	public void setRejected(boolean rejected) {
+		this.rejected = rejected;
 	}
 
 	public TaxiPickupTask getPickupTask() {

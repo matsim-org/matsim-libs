@@ -184,6 +184,6 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 		TransitScheduleWriter writer = new TransitScheduleWriter(controler.getScenario().getTransitSchedule());
 		VehicleWriterV1 writer2 = new VehicleWriterV1(controler.getScenario().getTransitVehicles());
 		writer.writeFile(controler.getControlerIO().getIterationFilename(iteration, "transitSchedule.xml.gz"));
-		writer2.writeFile(controler.getControlerIO().getIterationFilename(iteration, "vehicles.xml.gz"));
+		writer2.writeFile(controler.getControlerIO().getIterationFilename(iteration, "transitVehicles.xml.gz"));
 	}
 }

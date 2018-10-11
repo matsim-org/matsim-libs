@@ -20,6 +20,10 @@
 
 package org.matsim.core.utils.io;
 
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
+import org.apache.log4j.Logger;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -37,6 +41,7 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,19 +51,14 @@ import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.log4j.Logger;
-
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
-
 /** A class with some static utility functions for file-I/O. */
 public class IOUtils {
 
 	private static final String GZ = ".gz";
 	private static final String LZ4 = ".lz4";
 
-	public static final Charset CHARSET_UTF8 = Charset.forName("UTF8");
-	public static final Charset CHARSET_WINDOWS_ISO88591 = Charset.forName("ISO-8859-1");
+	public static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
+	public static final Charset CHARSET_WINDOWS_ISO88591 = StandardCharsets.ISO_8859_1;
 
 	public static final String NATIVE_NEWLINE = System.getProperty("line.separator");
 
@@ -100,7 +100,11 @@ public class IOUtils {
 	 * <br> author mrieser
 	 */
 	public static BufferedReader getBufferedReader(final String filename) throws UncheckedIOException {
-		return getBufferedReader(filename, Charset.forName("UTF8"));
+		return getBufferedReader(filename, StandardCharsets.UTF_8);
+	}
+
+	public static BufferedReader getBufferedReader(final URL url) throws UncheckedIOException {
+		return getBufferedReader(url, StandardCharsets.UTF_8);
 	}
 
 	/**
@@ -122,41 +126,27 @@ public class IOUtils {
 			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
 		}
 		try {
-//			if (new File(filename).exists()) {
-//				if (filename.endsWith(GZ)) {
-//					infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(new FileInputStream(filename))), charset));
-//				} else {
-//					infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new FileInputStream(filename)), charset));
-//				}
-//			} else if (new File(filename + GZ).exists()) {
-//				infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(new FileInputStream(filename  + GZ))), charset));
-//			} else {
-//				InputStream stream = IOUtils.class.getClassLoader().getResourceAsStream(filename);
-//				if (stream != null) {
-//					if (filename.endsWith(GZ)) {
-//						infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(stream)), charset));
-//						log.info("loading file from classpath: " + filename);
-//					} else {
-//						infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(stream), charset));
-//						log.info("loading file from classpath: " + filename);
-//					}
-//				} else {
-//					stream = IOUtils.class.getClassLoader().getResourceAsStream(filename + GZ);
-//					if (stream != null) {
-//						infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(stream)), charset));
-//						log.info("loading file from classpath: " + filename + GZ);
-//					}
-//				}
-//			}
 			infile = new BufferedReader(new InputStreamReader(getInputStream(filename), charset));
 		} catch (UncheckedIOException e) {
 			log.fatal("encountered IOException.  This will most probably be fatal.  Note that for relative path names, the root is no longer the Java root, but the directory where the config file resides.");
 			throw new UncheckedIOException(e);
 		}
 
-//		if (infile == null) {
-//			throw new UncheckedIOException(new FileNotFoundException(filename));
-//		}
+		return infile;
+	}
+
+	public static BufferedReader getBufferedReader(final URL url, final Charset charset) throws UncheckedIOException {
+		BufferedReader infile = null;
+		if (url == null) {
+			throw new UncheckedIOException(new FileNotFoundException("No url given (url == null)"));
+		}
+		try {
+			infile = new BufferedReader(new InputStreamReader(getInputStream(url), charset));
+		} catch (UncheckedIOException e) {
+			log.fatal("encountered IOException.  This will most probably be fatal.  Note that for relative path names, the root is no longer the Java root, but the directory where the config file resides.");
+			throw new UncheckedIOException(e);
+		}
+
 		return infile;
 	}
 
@@ -263,14 +253,6 @@ public class IOUtils {
 			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
 		}
 		try {
-//			if (filename.toLowerCase(Locale.ROOT).endsWith(GZ)) {
-//				File f = new File(filename);
-//				if (append && f.exists() && (f.length() > 0)) {
-//					throw new IllegalArgumentException("Appending to an existing gzip-compressed file is not supported.");
-//				}
-//				return new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(filename, append)), charset));
-//			}
-//			return new BufferedWriter(new OutputStreamWriter(new FileOutputStream (filename, append), charset));
 			return new BufferedWriter(new OutputStreamWriter(getOutputStream(filename, append), charset));
 		} catch (UncheckedIOException e) {
 			throw new UncheckedIOException(e);

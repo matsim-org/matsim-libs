@@ -118,4 +118,116 @@ public class NetworkChangeEventsParserWriterTest {
 		Assert.assertTrue(changeEvents2.isEmpty());
 	}
 
+	@Test
+	public void testAbsoluteChangeEvents() {
+		final Network network = NetworkUtils.createNetwork();
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
+		final Link link = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), node1, node2, (double) 1500, 1.667, (double) 3600, (double) 1);
+
+		final String fileName = this.utils.getOutputDirectory() + "absoluteChanges.xml";
+		List<NetworkChangeEvent> changeEvents = new ArrayList<>();
+
+		final NetworkChangeEvent event = new NetworkChangeEvent(100.0);
+		event.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0.000000000005));
+		event.addLink(link);
+		changeEvents.add(event);
+
+		new NetworkChangeEventsWriter().write(fileName, changeEvents);
+
+		List<NetworkChangeEvent> changeEvents2 = new ArrayList<>();
+		new NetworkChangeEventsParser(network, changeEvents2).readFile(fileName);
+
+		Assert.assertFalse(changeEvents2.isEmpty());
+		Assert.assertEquals(1, changeEvents2.size());
+		NetworkChangeEvent event2 = changeEvents2.get(0);
+		Assert.assertEquals(event.getStartTime(), event2.getStartTime(), 0.0);
+		Assert.assertEquals(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, event2.getFlowCapacityChange().getType());
+		Assert.assertEquals(event.getFlowCapacityChange().getValue(), event2.getFlowCapacityChange().getValue(), 1e-10);
+	}
+
+	@Test
+	public void testScaleFactorChangeEvents() {
+		final Network network = NetworkUtils.createNetwork();
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
+		final Link link = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), node1, node2, (double) 1500, 1.667, (double) 3600, (double) 1);
+
+		final String fileName = this.utils.getOutputDirectory() + "scalefactorChanges.xml";
+		List<NetworkChangeEvent> changeEvents = new ArrayList<>();
+
+		final NetworkChangeEvent event = new NetworkChangeEvent(200.0);
+		event.setLanesChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.FACTOR, 2.5));
+		event.addLink(link);
+		changeEvents.add(event);
+
+		new NetworkChangeEventsWriter().write(fileName, changeEvents);
+
+		List<NetworkChangeEvent> changeEvents2 = new ArrayList<>();
+		new NetworkChangeEventsParser(network, changeEvents2).readFile(fileName);
+
+		Assert.assertFalse(changeEvents2.isEmpty());
+		Assert.assertEquals(1, changeEvents2.size());
+		NetworkChangeEvent event2 = changeEvents2.get(0);
+		Assert.assertEquals(event.getStartTime(), event2.getStartTime(), 0.0);
+		Assert.assertEquals(NetworkChangeEvent.ChangeType.FACTOR, event2.getLanesChange().getType());
+		Assert.assertEquals(event.getLanesChange().getValue(), event2.getLanesChange().getValue(), 1e-10);
+	}
+
+	@Test
+	public void testPositiveOffsetChangeEvents() {
+		final Network network = NetworkUtils.createNetwork();
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
+		final Link link = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), node1, node2, (double) 1500, 1.667, (double) 3600, (double) 1);
+
+		final String fileName = this.utils.getOutputDirectory() + "offsetChanges.xml";
+		List<NetworkChangeEvent> changeEvents = new ArrayList<>();
+
+		final NetworkChangeEvent event = new NetworkChangeEvent(300.0);
+		event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.OFFSET_IN_SI_UNITS, +3.6));
+		event.addLink(link);
+		changeEvents.add(event);
+
+		new NetworkChangeEventsWriter().write(fileName, changeEvents);
+
+		List<NetworkChangeEvent> changeEvents2 = new ArrayList<>();
+		new NetworkChangeEventsParser(network, changeEvents2).readFile(fileName);
+
+		Assert.assertFalse(changeEvents2.isEmpty());
+		Assert.assertEquals(1, changeEvents2.size());
+		NetworkChangeEvent event2 = changeEvents2.get(0);
+		Assert.assertEquals(event.getStartTime(), event2.getStartTime(), 0.0);
+		Assert.assertEquals(NetworkChangeEvent.ChangeType.OFFSET_IN_SI_UNITS, event2.getFreespeedChange().getType());
+		Assert.assertEquals(event.getFreespeedChange().getValue(), event2.getFreespeedChange().getValue(), 1e-10);
+	}
+
+	@Test
+	public void testNegativeOffsetChangeEvents() {
+		final Network network = NetworkUtils.createNetwork();
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
+		final Link link = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), node1, node2, (double) 1500, 1.667, (double) 3600, (double) 1);
+
+		final String fileName = this.utils.getOutputDirectory() + "offsetChanges.xml";
+		List<NetworkChangeEvent> changeEvents = new ArrayList<>();
+
+		final NetworkChangeEvent event = new NetworkChangeEvent(300.0);
+		event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.OFFSET_IN_SI_UNITS, -3.6));
+		event.addLink(link);
+		changeEvents.add(event);
+
+		new NetworkChangeEventsWriter().write(fileName, changeEvents);
+
+		List<NetworkChangeEvent> changeEvents2 = new ArrayList<>();
+		new NetworkChangeEventsParser(network, changeEvents2).readFile(fileName);
+
+		Assert.assertFalse(changeEvents2.isEmpty());
+		Assert.assertEquals(1, changeEvents2.size());
+		NetworkChangeEvent event2 = changeEvents2.get(0);
+		Assert.assertEquals(event.getStartTime(), event2.getStartTime(), 0.0);
+		Assert.assertEquals(NetworkChangeEvent.ChangeType.OFFSET_IN_SI_UNITS, event2.getFreespeedChange().getType());
+		Assert.assertEquals(event.getFreespeedChange().getValue(), event2.getFreespeedChange().getValue(), 1e-10);
+	}
+
 }

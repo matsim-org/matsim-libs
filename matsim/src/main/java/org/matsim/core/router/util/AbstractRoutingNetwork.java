@@ -94,24 +94,20 @@ public abstract class AbstractRoutingNetwork implements RoutingNetwork {
 	}
 	@Override
 	public void setCapacityPeriod(double capPeriod) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public void setEffectiveCellSize(double effectiveCellSize) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public void setEffectiveLaneWidth(double effectiveLaneWidth) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 	@Override
 	public double getEffectiveCellSize() {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 

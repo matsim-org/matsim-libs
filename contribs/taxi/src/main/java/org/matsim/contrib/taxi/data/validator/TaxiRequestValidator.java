@@ -1,8 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,17 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.run.example;
+package org.matsim.contrib.taxi.data.validator;
 
-import org.junit.Test;
-import org.matsim.contrib.drt.run.examples.RunOneSharedTaxiExample;
+import java.util.Set;
+
+import org.matsim.contrib.taxi.data.TaxiRequest;
 
 /**
- * @author michalm
+ * Validates (for the optimizer), whether a taxi request should be served or not (e.g. for limitations in business area or
+ * distance or time)
+ *
+ * @author jbischoff, ikaddoura
  */
-public class RunOneSharedTaxiExampleIT {
-	@Test
-	public void testRun() {
-		RunOneSharedTaxiExample.run(false, 0);
-	}
+public interface TaxiRequestValidator {
+	/**
+	 * Checks if the request can be served given some spatiotemporal (limited time and area of operations) or other constraints.
+	 * <p>
+	 * Preferred format for causes: underscores instead of spaces.
+	 *
+	 * @param request to be validated
+	 * @return set containing causes of constraint violations. An empty set means the request fulfills all
+	 * constraints and may be considered by the optimizer (although this does not guarantee it will get scheduled)
+	 */
+	Set<String> validateTaxiRequest(TaxiRequest request);
 }
