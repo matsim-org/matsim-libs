@@ -70,8 +70,8 @@ public final class DrtModule extends AbstractModule {
 
 			case stopbased:
 				final Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-				new TransitScheduleReader(scenario2).readFile(
-						drtCfg.getTransitStopsFileUrl(getConfig().getContext()).getFile());
+				new TransitScheduleReader(scenario2).readURL(
+						drtCfg.getTransitStopsFileUrl(getConfig().getContext()));
 				bind(TransitSchedule.class).annotatedWith(Names.named(TransportMode.drt))
 						.toInstance(scenario2.getTransitSchedule());
 				bind(MainModeIdentifier.class).to(DrtMainModeIdentifier.class).asEagerSingleton();

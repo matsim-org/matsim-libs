@@ -19,11 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -42,12 +37,17 @@ import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -65,13 +65,13 @@ public class EmissionModule {
 	private final EmissionsConfigGroup emissionConfigGroup;
 
 	//===
-	private static String roadTypeMappingFile;
+	private static URL roadTypeMappingFile;
 
-	private static String averageFleetColdEmissionFactorsFile;
-	private static String averageFleetWarmEmissionFactorsFile;
+	private static URL averageFleetColdEmissionFactorsFile;
+	private static URL averageFleetWarmEmissionFactorsFile;
 
-	private static String detailedWarmEmissionFactorsFile;
-	private static String detailedColdEmissionFactorsFile;
+	private static URL detailedWarmEmissionFactorsFile;
+	private static URL detailedColdEmissionFactorsFile;
 	
 	//===
 	private Vehicles vehicles;
@@ -161,14 +161,14 @@ public class EmissionModule {
 	private void getInputFiles() {
 		URL context = scenario.getConfig().getContext();
 
-		roadTypeMappingFile = emissionConfigGroup.getEmissionRoadTypeMappingFileURL(context).getFile();
+		roadTypeMappingFile = emissionConfigGroup.getEmissionRoadTypeMappingFileURL(context);
 
-		averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(context).getFile();
-		averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL(context).getFile();
+		averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(context);
+		averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL(context);
 		
 		if(emissionConfigGroup.isUsingDetailedEmissionCalculation()) {
-			detailedWarmEmissionFactorsFile = emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(context).getFile();
-			detailedColdEmissionFactorsFile = emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(context).getFile();
+			detailedWarmEmissionFactorsFile = emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(context);
+			detailedColdEmissionFactorsFile = emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(context);
 		}
 	}
 
@@ -189,7 +189,7 @@ public class EmissionModule {
 		logger.info("leaving createEmissionHandler");
 	}
 
-	public static void putHBEFARoadTypeFromFileToLinkAttributes(String filename, Network network){
+	public static void putHBEFARoadTypeFromFileToLinkAttributes(URL filename, Network network){
 
 		logger.info("reading road type mapping info from "+filename) ;
 		logger.info("The information is directly added to the link attributes now.") ;
@@ -222,7 +222,7 @@ public class EmissionModule {
 //		logger.info("leaving createRoadTypeMapping ...") ;
 	}
 	
-	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(String filename){
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(URL filename){
 		logger.info("entering createAvgHbefaWarmTable ...");
 		
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgWarmTable = new HashMap<>();
@@ -256,7 +256,7 @@ public class EmissionModule {
 		return avgWarmTable;
 	}
 	
-	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> createAvgHbefaColdTable(String filename){
+	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> createAvgHbefaColdTable(URL filename){
 		logger.info("entering createAvgHbefaColdTable ...");
 		
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgColdTable = new HashMap<>();
@@ -287,7 +287,7 @@ public class EmissionModule {
 		return avgColdTable;
 	}
 	
-	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createDetailedHbefaWarmTable(String filename){
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createDetailedHbefaWarmTable(URL filename){
 		logger.info("entering createDetailedHbefaWarmTable ...");
 
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> hbefaWarmTableDetailed = new HashMap<>() ;
@@ -324,7 +324,7 @@ public class EmissionModule {
 		return hbefaWarmTableDetailed;
 	}
 	
-	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> createDetailedHbefaColdTable(String filename) {
+	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> createDetailedHbefaColdTable(URL filename) {
 		logger.info("entering createDetailedHbefaColdTable ...");
 		
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> hbefaColdTableDetailed = new HashMap<>();
