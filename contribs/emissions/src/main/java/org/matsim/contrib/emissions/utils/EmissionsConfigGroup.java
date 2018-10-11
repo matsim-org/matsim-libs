@@ -249,7 +249,7 @@ extends ReflectiveConfigGroup
 	}
 
 	/**
-	 * @param isWritingEmissionsEvents -- {@value #WRITING_EMISSIONS_EVENTS_CMT}
+	 * @param writingEmissionsEvents -- {@value #WRITING_EMISSIONS_EVENTS_CMT}
 	 */
 	@StringSetter(WRITING_EMISSIONS_EVENTS)
 	public void setWritingEmissionsEvents(boolean writingEmissionsEvents) {
