@@ -4,7 +4,7 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 
 public class ParkingSearchPopulationModule extends AbstractQSimModule {
-	public final static String PARKING_SEARCH_AGENT_SOURCE_NAME = "ParkingSearchAgentSource";
+	public final static String COMPONENT_NAME = "ParkingSearch";
 
 	@Override
 	protected void configureQSim() {
@@ -15,7 +15,7 @@ public class ParkingSearchPopulationModule extends AbstractQSimModule {
 		bind(AgentFactory.class).to(ParkingAgentFactory.class).asEagerSingleton(); // (**)
 		bind(ParkingPopulationAgentSource.class).asEagerSingleton();
 		
-		bindAgentSource(PARKING_SEARCH_AGENT_SOURCE_NAME).to(ParkingPopulationAgentSource.class);
+		bindNamedAgentSource(COMPONENT_NAME).to(ParkingPopulationAgentSource.class);
 	}
 
 }

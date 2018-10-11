@@ -11,8 +11,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
 public class MultiModalQSimModule extends AbstractQSimModule {
-	static public String MULTIMODAL_ENGINE = "MultimodalEngine";
-	static public String MULTIMODAL_DEPARTURE_HANDLER = "MultimodalDepartureHandler";
+	static final public String COMPONENT_NAME = "Multimodal";
 
 	private final Map<String, TravelTime> multiModalTravelTimes;
 
@@ -22,8 +21,8 @@ public class MultiModalQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bindMobsimEngine(MULTIMODAL_ENGINE).to(MultiModalSimEngine.class);
-		bindDepartureHandler(MULTIMODAL_DEPARTURE_HANDLER).to(MultiModalDepartureHandler.class);
+		bindNamedMobsimEngine(COMPONENT_NAME).to(MultiModalSimEngine.class);
+		bindNamedDepartureHandler(COMPONENT_NAME).to(MultiModalDepartureHandler.class);
 	}
 
 	@Provides
@@ -40,7 +39,6 @@ public class MultiModalQSimModule extends AbstractQSimModule {
 	}
 	
 	static public void configureComponents(QSimComponents components) {
-		components.activeMobsimEngines.add(MULTIMODAL_ENGINE);
-		components.activeDepartureHandlers.add(MULTIMODAL_DEPARTURE_HANDLER);
+		components.addNamedComponent(COMPONENT_NAME);
 	}
 }

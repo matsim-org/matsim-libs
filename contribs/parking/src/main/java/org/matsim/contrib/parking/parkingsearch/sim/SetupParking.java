@@ -40,6 +40,7 @@ import org.matsim.contrib.parking.parkingsearch.routing.WithinDayParkingRouter;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.PrepareForSim;
+import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponents;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 import org.matsim.core.router.StageActivityTypes;
@@ -92,8 +93,8 @@ public class SetupParking {
 				QSimComponents components = new QSimComponents();
 				
 				new StandardQSimComponentsConfigurator(controler.getConfig()).configure(components);
-				components.activeAgentSources.clear();
-				components.activeAgentSources.add("ParkingSearchAgentSource");
+				components.removeNamedComponent(PopulationModule.COMPONENT_NAME);
+				components.addNamedComponent(ParkingSearchPopulationModule.COMPONENT_NAME);
 				
 				bind(QSimComponents.class).toInstance(components);
 			}

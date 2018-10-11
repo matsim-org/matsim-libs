@@ -57,7 +57,7 @@ public class DvrpModeQSimModule extends AbstractQSimModule {
 			@Override
 			protected void configureQSim() {
 				for (Map.Entry<String, Class<? extends MobsimListener>> entry : listeners.entrySet()) {
-					bindMobsimListener(entry.getKey()).to(entry.getValue());
+					bindNamedMobsimListener(entry.getKey()).to(entry.getValue());
 				}
 			}
 		});
@@ -69,7 +69,8 @@ public class DvrpModeQSimModule extends AbstractQSimModule {
 		if (installPassengerEngineModule) {
 			PassengerEngineQSimModule.configureComponents(components, mode);
 		}
-		components.activeMobsimListeners.addAll(listeners.keySet());
+		
+		listeners.keySet().forEach(components::addNamedComponent);
 	}
 
 	public static class Builder {

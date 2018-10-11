@@ -37,8 +37,8 @@ public class ParkingSearchQSimModule extends com.google.inject.AbstractModule {
 		QSimComponents components = new QSimComponents();
 		new StandardQSimComponentsConfigurator(config).configure(components);
 		
-		components.activeAgentSources.remove(PopulationModule.POPULATION_AGENT_SOURCE_NAME);
-		components.activeAgentSources.add(ParkingSearchPopulationModule.PARKING_SEARCH_AGENT_SOURCE_NAME);
+		components.removeNamedComponent(PopulationModule.COMPONENT_NAME);
+		components.addNamedComponent(ParkingSearchPopulationModule.COMPONENT_NAME);
 		
 		return components;
 	}
