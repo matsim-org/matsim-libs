@@ -59,10 +59,10 @@ public interface SignalPlanData {
 
 	public void setCycleTime(Integer cycleTime);
 	/**
-	 * @return null if not set
+	 * @return 0 if not set
 	 */
-	public Integer getOffset();
+	public int getOffset();
 
-	public void setOffset(Integer seconds);
+	public void setOffset(int seconds);
 	
 }
