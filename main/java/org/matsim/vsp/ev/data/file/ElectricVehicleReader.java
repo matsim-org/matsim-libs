@@ -56,8 +56,10 @@ public class ElectricVehicleReader extends MatsimXmlParser {
 		double initialSoc_kWh = Double.parseDouble(atts.getValue("initial_soc"));
         String chargerType = atts.getValue("chargerTypes");
         List<String> chargerTypes = chargerType != null ? Arrays.asList(chargerType.split(",")) : Collections.singletonList(ChargerImpl.DEFAULT_CHARGER_TYPE);
+        String vehicleType = atts.getValue("vehicleType");
+        vehicleType = vehicleType != null ? vehicleType : ElectricVehicleImpl.DEFAULTVEHICLETYPE;
 
 		return new ElectricVehicleImpl(id, new BatteryImpl(batteryCapacity_kWh * EvUnitConversions.J_PER_kWh,
-                initialSoc_kWh * EvUnitConversions.J_PER_kWh), chargerTypes);
+                initialSoc_kWh * EvUnitConversions.J_PER_kWh), chargerTypes, vehicleType);
 	}
 }

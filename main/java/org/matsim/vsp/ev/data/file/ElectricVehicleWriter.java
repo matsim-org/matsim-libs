@@ -60,6 +60,7 @@ public class ElectricVehicleWriter extends MatsimXmlWriter {
 			atts.add(new Tuple<String, String>("battery_capacity",format.format(v.getBattery().getCapacity()/EvUnitConversions.J_PER_kWh) + ""));
 			atts.add(new Tuple<String, String>("initial_soc", format.format(v.getBattery().getSoc()/EvUnitConversions.J_PER_kWh) + ""));
             atts.add(new Tuple<>("chargerTypes", v.getChargingTypes().stream().collect(Collectors.joining(","))));
+			atts.add(new Tuple<>("vehicleType", v.getVehicleType()));
 			writeStartTag("vehicle",atts,true);
 		}
 		

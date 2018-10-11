@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.ev.data;
+package org.matsim.vsp.ev.discharging;/*
+ * created by jbischoff, 11.10.2018
+ */
 
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
-import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
+import org.matsim.vsp.ev.data.ElectricVehicle;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public interface ElectricVehicle extends Identifiable<ElectricVehicle> {
-	DriveEnergyConsumption getDriveEnergyConsumption();
+public class VehicleTypeSpecificDriveEnergyConsumptionFactory implements DriveEnergyConsumption.Factory {
 
-	AuxEnergyConsumption getAuxEnergyConsumption();
+    private Map<String, DriveEnergyConsumption> consumptionMap = new HashMap<>();
 
-	Battery getBattery();
+    public void addEnergyConsumptionModel(String vehicleType, DriveEnergyConsumption driveEnergyConsumption) {
+        consumptionMap.put(vehicleType, driveEnergyConsumption);
+    }
 
-    List<String> getChargingTypes();
-
-	String getVehicleType();
-
-	Battery swapBattery(Battery battery);
-
-	void setDriveEnergyConsumption(DriveEnergyConsumption driveEnergyConsumption);
-
-	void setAuxEnergyConsumption(AuxEnergyConsumption auxEnergyConsumption);
+    @Override
+    public DriveEnergyConsumption create(ElectricVehicle electricVehicle) {
+        DriveEnergyConsumption c = consumptionMap.get(electricVehicle.getVehicleType());
+        if (c != null)
+            return c;
+        else
+            throw new RuntimeException("No EnergyconsumptionModel for VehicleType " + electricVehicle.getVehicleType() + " has been defined.");
+    }
 }
