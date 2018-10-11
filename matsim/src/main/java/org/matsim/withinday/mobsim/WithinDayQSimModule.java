@@ -6,9 +6,8 @@ import org.matsim.core.mobsim.qsim.components.QSimComponents;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
 
 public class WithinDayQSimModule extends AbstractQSimModule {
-	public static String WITHIN_DAY_ENGINE_NAME = "WithinDayEngine";
-	public static String WITHIN_TRAVEL_TIME_NAME = "WithinDayTravelTime";
-	public static String FIXED_ORDER_SIMULATION_LISTENER = "FixedOrderSimulationListener";
+	public final static String COMPONENT_NAME = "WithinDay";
+	public final static String FIXED_ORDER_LISTENER_COMPONENT_NAME = "FixedOrderSimulationListener";
 
 	private final WithinDayEngine withinDayEngine;
 	private final FixedOrderSimulationListener fixedOrderSimulationListener;
@@ -27,14 +26,13 @@ public class WithinDayQSimModule extends AbstractQSimModule {
 		bind(FixedOrderSimulationListener.class).toInstance(fixedOrderSimulationListener);
 		bind(WithinDayTravelTime.class).toInstance(withinDayTravelTime);
 
-		bindMobsimListener(FIXED_ORDER_SIMULATION_LISTENER).to(FixedOrderSimulationListener.class);
-		bindMobsimListener(WITHIN_TRAVEL_TIME_NAME).to(WithinDayTravelTime.class);
-		bindMobsimEngine(WITHIN_DAY_ENGINE_NAME).to(WithinDayEngine.class);
+		bindNamedMobsimListener(FIXED_ORDER_LISTENER_COMPONENT_NAME).to(FixedOrderSimulationListener.class);
+		bindNamedMobsimListener(COMPONENT_NAME).to(WithinDayTravelTime.class);
+		bindNamedMobsimEngine(COMPONENT_NAME).to(WithinDayEngine.class);
 	}
 
 	static public void configureComponents(QSimComponents components) {
-		components.activeMobsimEngines.add(WITHIN_DAY_ENGINE_NAME);
-		components.activeMobsimListeners.add(FIXED_ORDER_SIMULATION_LISTENER);
-		components.activeMobsimListeners.add(WITHIN_TRAVEL_TIME_NAME);
+		components.addNamedComponent(COMPONENT_NAME);
+		components.addNamedComponent(FIXED_ORDER_LISTENER_COMPONENT_NAME);
 	}
 }

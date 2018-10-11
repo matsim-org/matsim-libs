@@ -15,17 +15,11 @@ public class QSimComponentsFromConfigConfigurator implements QSimComponentsConfi
 				.get(QSimComponentsConfigGroup.GROUP_NAME);
 
 		if (componentsConfig != null) {
-			components.activeMobsimEngines.clear();
-			components.activeActivityHandlers.clear();
-			components.activeDepartureHandlers.clear();
-			components.activeAgentSources.clear();
-			components.activeMobsimListeners.clear();
+			components.clear();
 
-			components.activeMobsimEngines.addAll(componentsConfig.getActiveMobsimEngines());
-			components.activeActivityHandlers.addAll(componentsConfig.getActiveActivityHandlers());
-			components.activeDepartureHandlers.addAll(componentsConfig.getActiveDepartureHandlers());
-			components.activeAgentSources.addAll(componentsConfig.getActiveAgentSources());
-			components.activeMobsimListeners.addAll(componentsConfig.getActiveMobsimListeners());
+			// TODO: Eventually, here a translation of strings to more specific annotations
+			// could happen if we ever want a full config-configurable QSim.
+			componentsConfig.getActiveComponents().forEach(components::addNamedComponent);
 		}
 	}
 }

@@ -11,9 +11,10 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 
-public class ComponentFinderTest {
+public class ComponentRegistryTest {
 	@Test
 	public void testComponentFinder() {
 		Injector injector = Guice.createInjector(new AbstractModule() {
@@ -24,10 +25,12 @@ public class ComponentFinderTest {
 				bind(MobsimEngine.class).toInstance(createFakeEngine());
 			}
 		});
-
-		Map<String, Key<MobsimEngine>> result = NamedComponentUtils.find(injector, MobsimEngine.class);
-
-		Assert.assertEquals(2, result.size());
+		
+		ComponentRegistry registry = ComponentRegistry.create(injector);
+		
+		Assert.assertEquals(1, registry.getComponentsByAnnotation(Names.named("A")).size());
+		Assert.assertEquals(1, registry.getComponentsByAnnotation(Names.named("B")).size());
+		Assert.assertEquals(2, registry.getComponentsByAnnotationType(Named.class).size());
 	}
 
 	private static MobsimEngine createFakeEngine() {

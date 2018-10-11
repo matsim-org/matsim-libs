@@ -25,14 +25,13 @@ package org.matsim.core.mobsim.qsim;
 import java.util.Collection;
 import java.util.List;
 
-
-import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.components.NamedComponentUtils;
+import org.matsim.core.mobsim.qsim.components.ComponentRegistry;
+import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponents;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
@@ -40,7 +39,9 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
 
@@ -52,11 +53,12 @@ public class QSimProvider implements Provider<QSim> {
 	private Collection<AbstractQSimModule> modules;
 	private List<AbstractQSimModule> overridingModules;
 	private QSimComponents components;
-	@Inject(optional=true) private IterationCounter iterationCounter;
-	
+	@Inject(optional = true)
+	private IterationCounter iterationCounter;
+
 	@Inject
-	QSimProvider(Injector injector, Config config, Collection<AbstractQSimModule> modules,
-			QSimComponents components, @Named("overrides") List<AbstractQSimModule> overridingModules ) {
+	QSimProvider(Injector injector, Config config, Collection<AbstractQSimModule> modules, QSimComponents components,
+			@Named("overrides") List<AbstractQSimModule> overridingModules) {
 		this.injector = injector;
 		this.modules = modules;
 		// (these are the implementations)
@@ -68,7 +70,7 @@ public class QSimProvider implements Provider<QSim> {
 	@Override
 	public QSim get() {
 		modules.forEach(m -> m.setConfig(config));
-		
+
 		AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, overridingModules);
 
 		AbstractModule module = new AbstractModule() {
@@ -81,39 +83,46 @@ public class QSimProvider implements Provider<QSim> {
 		};
 
 		Injector qsimInjector = injector.createChildInjector(module);
-		if ( iterationCounter==null || config.controler().getFirstIteration() == iterationCounter.getIterationNumber() ) {
+		if (iterationCounter == null
+				|| config.controler().getFirstIteration() == iterationCounter.getIterationNumber()) {
 			// trying to somewhat reduce logfile verbosity. kai, aug'18
-			org.matsim.core.controler.Injector.printInjector( qsimInjector, log );
+			org.matsim.core.controler.Injector.printInjector(qsimInjector, log);
 		}
 		QSim qSim = qsimInjector.getInstance(QSim.class);
 
-		ComponentRegistry<MobsimEngine> mobsimEngineRegistry = new ComponentRegistry<>("MobsimEngine");
-		ComponentRegistry<ActivityHandler> activityHandlerRegistry = new ComponentRegistry<>("ActivityHandler");
-		ComponentRegistry<DepartureHandler> departureHandlerRegistry = new ComponentRegistry<>("DepartureHandler");
-		ComponentRegistry<AgentSource> agentSourceRegistry = new ComponentRegistry<>("AgentSource");
-		ComponentRegistry<MobsimListener> listenerRegistry = new ComponentRegistry<>("MobsimListener");
+		ComponentRegistry componentRegistry = ComponentRegistry.create(qsimInjector);
 
-		NamedComponentUtils.find(qsimInjector, MobsimEngine.class)
-				.forEach(mobsimEngineRegistry::register);
-		NamedComponentUtils.find(qsimInjector, ActivityHandler.class)
-				.forEach(activityHandlerRegistry::register);
-		NamedComponentUtils.find(qsimInjector, DepartureHandler.class)
-				.forEach(departureHandlerRegistry::register);
-		NamedComponentUtils.find(qsimInjector, AgentSource.class)
-				.forEach(agentSourceRegistry::register);
-		NamedComponentUtils.find(qsimInjector, MobsimListener.class)
-				.forEach(listenerRegistry::register);
+		for (Key<? extends QSimComponent> component : componentRegistry.getOrderedComponents(components)) {
+			if (component.getTypeLiteral().getRawType().isAssignableFrom(MobsimEngine.class)) {
+				MobsimEngine instance = (MobsimEngine) qsimInjector.getInstance(component);
+				qSim.addMobsimEngine(instance);
+				log.info("Added MobsimEngine " + instance.getClass());
+			}
 
-		mobsimEngineRegistry.getOrderedComponents(components.activeMobsimEngines).stream()
-				.map(qsimInjector::getInstance).forEach(qSim::addMobsimEngine);
-		activityHandlerRegistry.getOrderedComponents(components.activeActivityHandlers).stream()
-				.map(qsimInjector::getInstance).forEach(qSim::addActivityHandler);
-		departureHandlerRegistry.getOrderedComponents(components.activeDepartureHandlers).stream()
-				.map(qsimInjector::getInstance).forEach(qSim::addDepartureHandler);
-		agentSourceRegistry.getOrderedComponents(components.activeAgentSources).stream()
-				.map(qsimInjector::getInstance).forEach(qSim::addAgentSource);
-		listenerRegistry.getOrderedComponents(components.activeMobsimListeners).stream()
-				.map(qsimInjector::getInstance).forEach(qSim::addQueueSimulationListeners);
+			if (component.getTypeLiteral().getRawType().isAssignableFrom(ActivityHandler.class)) {
+				ActivityHandler instance = (ActivityHandler) qsimInjector.getInstance(component);
+				qSim.addActivityHandler(instance);
+				log.info("Added Activityhandler " + instance.getClass());
+			}
+
+			if (component.getTypeLiteral().getRawType().isAssignableFrom(DepartureHandler.class)) {
+				DepartureHandler instance = (DepartureHandler) qsimInjector.getInstance(component);
+				qSim.addDepartureHandler(instance);
+				log.info("Added DepartureHandler " + instance.getClass());
+			}
+
+			if (component.getTypeLiteral().getRawType().isAssignableFrom(AgentSource.class)) {
+				AgentSource instance = (AgentSource) qsimInjector.getInstance(component);
+				qSim.addAgentSource(instance);
+				log.info("Added AgentSource " + instance.getClass());
+			}
+
+			if (component.getTypeLiteral().getRawType().isAssignableFrom(MobsimListener.class)) {
+				MobsimListener instance = (MobsimListener) qsimInjector.getInstance(component);
+				qSim.addQueueSimulationListeners(instance);
+				log.info("Added MobsimListener " + instance.getClass());
+			}
+		}
 
 		return qSim;
 	}

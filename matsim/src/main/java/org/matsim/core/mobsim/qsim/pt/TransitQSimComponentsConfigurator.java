@@ -14,9 +14,7 @@ public class TransitQSimComponentsConfigurator implements QSimComponentsConfigur
 	@Override
 	public void configure(QSimComponents components) {
 		if (config.transit().isUseTransit() && config.transit().isUsingTransitInMobsim()) {
-			components.activeMobsimEngines.add("TransitEngine");
-			components.activeDepartureHandlers.add("TransitEngine");
-			components.activeAgentSources.add("TransitEngine");
+			components.addNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME);
 		}
 	}
 }

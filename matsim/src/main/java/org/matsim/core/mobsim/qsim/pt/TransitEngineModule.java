@@ -9,8 +9,8 @@ public class TransitEngineModule extends AbstractQSimModule {
 	protected void configureQSim() {
 		bind(TransitQSimEngine.class).asEagerSingleton();
 
-		bindDepartureHandler(TRANSIT_ENGINE_NAME).to(TransitQSimEngine.class);
-		bindAgentSource(TRANSIT_ENGINE_NAME).to(TransitQSimEngine.class);
-		bindMobsimEngine(TRANSIT_ENGINE_NAME).to(TransitQSimEngine.class);
+		bindNamedDepartureHandler(TRANSIT_ENGINE_NAME).to(TransitQSimEngine.class);
+		bindNamedAgentSource(TRANSIT_ENGINE_NAME).to(TransitQSimEngine.class);
+		bindNamedMobsimEngine(TRANSIT_ENGINE_NAME).to(TransitQSimEngine.class);
 	}
 }

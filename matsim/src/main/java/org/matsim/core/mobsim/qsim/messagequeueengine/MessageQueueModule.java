@@ -5,7 +5,7 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.jdeqsimengine.SteppableScheduler;
 
 public class MessageQueueModule extends AbstractQSimModule {
-	static public final String MESSAGE_QUEUE_ENGINE_NAME = "MessageQueueEngine";
+	static public final String COMPONENT_NAME = "MessageQueueEngine";
 
 	@Override
 	protected void configureQSim() {
@@ -13,6 +13,6 @@ public class MessageQueueModule extends AbstractQSimModule {
 		bind(SteppableScheduler.class).asEagerSingleton();
 		bind(MessageQueueEngine.class).asEagerSingleton();
 
-		bindMobsimListener(MESSAGE_QUEUE_ENGINE_NAME).to(MessageQueueEngine.class);
+		bindNamedMobsimListener(COMPONENT_NAME).to(MessageQueueEngine.class);
 	}
 }

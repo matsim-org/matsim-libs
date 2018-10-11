@@ -103,13 +103,8 @@ public class QSimBuilder {
 	 * Resets the active QSim components to the standard ones defined by MATSim.
 	 */
 	public QSimBuilder useDefaultComponents() {
-		components.activeActivityHandlers.clear();
-		components.activeAgentSources.clear();
-		components.activeDepartureHandlers.clear();
-		components.activeMobsimEngines.clear();
-
+		components.clear();
 		new StandardQSimComponentsConfigurator(config).configure(components);
-
 		return this;
 	}
 

@@ -123,12 +123,12 @@ public class AbstractQSimModuleTest {
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bindMobsimEngine("MyEngine").toInstance(engine);
+				bindNamedMobsimEngine("MyEngine").toInstance(engine);
 			}
 		});
 
 		controler.configureQSimComponents(components -> {
-			components.activeMobsimEngines.add("MyEngine");
+			components.addNamedComponent("MyEngine");
 		});
 
 		controler.run();

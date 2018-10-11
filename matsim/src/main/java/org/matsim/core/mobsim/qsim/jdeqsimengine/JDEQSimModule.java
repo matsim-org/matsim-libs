@@ -10,12 +10,12 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
 public class JDEQSimModule extends AbstractQSimModule {
-	public static String JDEQ_ENGINE_NAME = "JDEQEngine";
+	public final static String COMPONENT_NAME = "JDEQEngine";
 
 	@Override
 	protected void configureQSim() {
-		bindMobsimEngine(JDEQ_ENGINE_NAME).to(JDEQSimEngine.class);
-		bindActivityHandler(JDEQ_ENGINE_NAME).to(JDEQSimEngine.class);
+		bindNamedMobsimEngine(COMPONENT_NAME).to(JDEQSimEngine.class);
+		bindNamedActivityHandler(COMPONENT_NAME).to(JDEQSimEngine.class);
 	}
 
 	@Provides

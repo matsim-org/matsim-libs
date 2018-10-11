@@ -12,10 +12,35 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
+import org.matsim.core.mobsim.qsim.components.mock.MockComponentAnnotation;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class QSimComponentsTest {
+	@Test
+	public void testExplicitAnnotationConfiguration() {
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+
+		MockEngine mockEngine = new MockEngine();
+
+		new QSimBuilder(config) //
+				.addQSimModule(new AbstractQSimModule() {
+					@Override
+					protected void configureQSim() {
+						bindMobsimEngine(MockComponentAnnotation.class).toInstance(mockEngine);
+					}
+				}) //
+				.configureComponents(components -> {
+					components.addComponent(MockComponentAnnotation.class);
+				}) //
+				.build(scenario, eventsManager) //
+				.run();
+
+		Assert.assertTrue(mockEngine.isCalled);
+	}
+	
 	@Test
 	public void testManualConfiguration() {
 		Config config = ConfigUtils.createConfig();
@@ -28,11 +53,11 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindMobsimEngine("MockEngine").toInstance(mockEngine);
+						bindNamedMobsimEngine("MockEngine").toInstance(mockEngine);
 					}
 				}) //
 				.configureComponents(components -> {
-					components.activeMobsimEngines.add("MockEngine");
+					components.addNamedComponent("MockEngine");
 				}) //
 				.build(scenario, eventsManager) //
 				.run();
@@ -46,11 +71,8 @@ public class QSimComponentsTest {
 
 		QSimComponentsConfigGroup componentsConfig = new QSimComponentsConfigGroup();
 		config.addModule(componentsConfig);
-
-		componentsConfig.setActiveMobsimEngines(Collections.singletonList("MockEngine"));
-		componentsConfig.setActiveActivityHandlers(Collections.emptyList());
-		componentsConfig.setActiveDepartureHandlers(Collections.emptyList());
-		componentsConfig.setActiveAgentSources(Collections.emptyList());
+		
+		componentsConfig.setActiveComponents(Collections.singletonList("MockEngine"));
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -62,7 +84,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindMobsimEngine("MockEngine").toInstance(mockEngine);
+						bindNamedMobsimEngine("MockEngine").toInstance(mockEngine);
 					}
 				}) //
 				.build(scenario, eventsManager) //
