@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
@@ -36,6 +37,7 @@ import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.zone.SquareGridSystem;
 import org.matsim.contrib.zone.ZonalSystem;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.router.util.TravelDisutility;
@@ -51,15 +53,17 @@ import org.matsim.vsp.ev.dvrp.EvDvrpVehicle;
 public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public static RuleBasedETaxiOptimizer create(TaxiConfigGroup taxiCfg, Fleet fleet, ETaxiScheduler eScheduler,
 			Network network, MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility,
-			RuleBasedETaxiOptimizerParams params, ChargingInfrastructure chargingInfrastructure) {
+			RuleBasedETaxiOptimizerParams params, ChargingInfrastructure chargingInfrastructure,
+			TaxiRequestValidator requestValidator, EventsManager events) {
 		return RuleBasedETaxiOptimizer.create(taxiCfg, fleet, eScheduler, network, timer, travelTime, travelDisutility,
-				params, chargingInfrastructure, new SquareGridSystem(network, params.cellSize));
+				params, chargingInfrastructure, new SquareGridSystem(network, params.cellSize), requestValidator,
+				events);
 	}
 
 	public static RuleBasedETaxiOptimizer create(TaxiConfigGroup taxiCfg, Fleet fleet, ETaxiScheduler eScheduler,
 			Network network, MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility,
 			RuleBasedETaxiOptimizerParams params, ChargingInfrastructure chargingInfrastructure,
-			ZonalSystem zonalSystem) {
+			ZonalSystem zonalSystem, TaxiRequestValidator requestValidator, EventsManager events) {
 		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, eScheduler);
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
 		BestDispatchFinder dispatchFinder = new BestDispatchFinder(eScheduler, network, timer, travelTime,
@@ -68,7 +72,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 				params, idleTaxiRegistry, unplannedRequestRegistry);
 
 		return new RuleBasedETaxiOptimizer(taxiCfg, fleet, eScheduler, chargingInfrastructure, params, idleTaxiRegistry,
-				unplannedRequestRegistry, dispatchFinder, requestInserter);
+				unplannedRequestRegistry, dispatchFinder, requestInserter, requestValidator, events);
 	}
 
 	// TODO MIN_RELATIVE_SOC should depend on the weather and time of day
@@ -81,8 +85,10 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public RuleBasedETaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, ETaxiScheduler eScheduler,
 			ChargingInfrastructure chargingInfrastructure, RuleBasedETaxiOptimizerParams params,
 			IdleTaxiZonalRegistry idleTaxiRegistry, UnplannedRequestZonalRegistry unplannedRequestRegistry,
-			BestDispatchFinder dispatchFinder, UnplannedRequestInserter requestInserter) {
-		super(taxiCfg, fleet, eScheduler, params, idleTaxiRegistry, unplannedRequestRegistry, requestInserter);
+			BestDispatchFinder dispatchFinder, UnplannedRequestInserter requestInserter,
+			TaxiRequestValidator requestValidator, EventsManager events) {
+		super(taxiCfg, fleet, eScheduler, params, idleTaxiRegistry, unplannedRequestRegistry, requestInserter,
+				requestValidator, events);
 		this.params = params;
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.eScheduler = eScheduler;
@@ -94,8 +100,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 		if (isNewDecisionEpoch(e, params.socCheckTimeStep)) {
 			@SuppressWarnings("unchecked")
-			Stream<EvDvrpVehicle> eTaxis = (Stream<EvDvrpVehicle>)(Stream<? extends Vehicle>)idleTaxiRegistry
-					.vehicles();
+			Stream<EvDvrpVehicle> eTaxis = (Stream<EvDvrpVehicle>)(Stream<? extends Vehicle>)idleTaxiRegistry.vehicles();
 			chargeIdleUnderchargedVehicles(eTaxis.filter(this::isUndercharged));
 		}
 
