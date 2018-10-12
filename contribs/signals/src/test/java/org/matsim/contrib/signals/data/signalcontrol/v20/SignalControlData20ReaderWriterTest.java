@@ -115,7 +115,7 @@ public class SignalControlData20ReaderWriterTest {
 		Integer cycleTime = plan.getCycleTime();
 		Assert.assertNotNull(cycleTime);
 		Assert.assertEquals(Integer.valueOf(60), cycleTime);
-		Assert.assertEquals(Integer.valueOf(3), plan.getOffset());
+		Assert.assertEquals(3, plan.getOffset());
 		
 		Assert.assertNotNull(plan.getSignalGroupSettingsDataByGroupId());
 		SignalGroupSettingsData signalGroupSettings = plan.getSignalGroupSettingsDataByGroupId().get(groupId23);

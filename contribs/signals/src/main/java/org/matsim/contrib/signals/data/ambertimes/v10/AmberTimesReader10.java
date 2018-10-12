@@ -56,18 +56,25 @@ public class AmberTimesReader10 implements MatsimReader {
 
 	@Override
 	public void readFile(final String filename) {
+		log.info("starting unmarshalling " + filename);
+		try (InputStream stream = IOUtils.getInputStream(filename)) {
+			readStream(stream);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public void readStream(InputStream stream) {
 		// create jaxb infrastructure
 		JAXBContext jc;
 		XMLAmberTimes xmlatdefs;
-		try (InputStream stream = IOUtils.getInputStream(filename)) {
+		try {
 			jc = JAXBContext.newInstance(org.matsim.jaxb.amberTimes10.ObjectFactory.class);
 			Unmarshaller u = jc.createUnmarshaller();
 			// validate XML file
-			log.info("starting to validate " + filename);
 			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/amberTimes_v1.0.xsd")));
-			log.info("starting unmarshalling " + filename);
 			xmlatdefs = (XMLAmberTimes) u.unmarshal(stream);
-		} catch (JAXBException | SAXException | IOException e) {
+		} catch (JAXBException | SAXException e) {
 			throw new UncheckedIOException(e);
 		}
 

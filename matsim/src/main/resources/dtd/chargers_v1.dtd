@@ -3,7 +3,7 @@
 <!-- ============================================================ -->
 
 <!-- For further information or questions, please contact
-     Michal Maciejewski, michal.maciejewski at put dot poznan dot pl -->
+     Michal Maciejewski, maciejewski at vsp dot tu-berlin dot de -->
 
 <!-- ============================================================ -->
 
@@ -15,4 +15,5 @@
 	id       CDATA   #REQUIRED
 	link     CDATA   #REQUIRED
 	power    CDATA   #IMPLIED
-    capacity CDATA   #IMPLIED>
+		capacity CDATA   #IMPLIED
+		type     CDATA     #IMPLIED >

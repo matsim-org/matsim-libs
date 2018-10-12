@@ -19,33 +19,53 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.utils;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import com.google.inject.Provides;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
+import org.matsim.contrib.emissions.roadTypeMapping.VisumHbefaRoadTypeMapping;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.core.config.Config;
+
+import java.net.URL;
+import java.util.*;
+import java.util.Map.Entry;
 
 
 /**
  * @author ikaddoura, benjamin
  *
  */
-public final class EmissionUtils {
+public class EmissionUtils {
 	private static final Logger logger = Logger.getLogger(EmissionUtils.class);
 
-	private EmissionUtils(){}
+	private static final SortedSet<String> listOfPollutants;
+
+	static {
+		
+		listOfPollutants = new TreeSet<>();
+		for(WarmPollutant wp : WarmPollutant.values()){
+			listOfPollutants.add(wp.toString());
+		}
+		for(ColdPollutant cp : ColdPollutant.values()){
+			listOfPollutants.add(cp.toString());
+		}
+	}
+
+	public static Map<String, Integer> createIndexFromKey(String strLine) {
+		String[] keys = strLine.split(";") ;
+
+		Map<String, Integer> indexFromKey = new HashMap<>() ;
+		for ( int ii = 0; ii < keys.length; ii++ ) {
+			indexFromKey.put(keys[ii], ii ) ;
+		}
+		return indexFromKey ;
+	}
 
 	public static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
 	public static void setHbefaRoadType(Link link, String type){
@@ -57,26 +77,13 @@ public final class EmissionUtils {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
 
-	public static SortedSet<String> getListOfPollutants() {
-		SortedSet<String> listOfPollutants = new TreeSet<>();
-
-		listOfPollutants = new TreeSet<>();
-		for(WarmPollutant wp : WarmPollutant.values()){
-			listOfPollutants.add(wp.toString());
-		}
-		for(ColdPollutant cp : ColdPollutant.values()){
-			listOfPollutants.add(cp.toString());
-		}
-		return listOfPollutants;
-	}
-
 	public static SortedMap<String, Double> sumUpEmissions(Map<WarmPollutant, Double> warmEmissions, Map<ColdPollutant, Double> coldEmissions) {
 		SortedMap<String, Double> pollutant2sumOfEmissions = new TreeMap<>();
 		SortedMap<String, Double> warmPollutant2emissions = convertWarmPollutantMap2String(warmEmissions);
 		SortedMap<String, Double> coldPollutant2emissions = convertColdPollutantMap2String(coldEmissions);
 		double sumOfPollutant;
 	
-		for(String pollutant : getListOfPollutants()){
+		for(String pollutant : listOfPollutants){
 			if(warmPollutant2emissions.containsKey(pollutant)){
 				if(coldPollutant2emissions.containsKey(pollutant)){
 					sumOfPollutant = warmPollutant2emissions.get(pollutant) + coldPollutant2emissions.get(pollutant);
@@ -129,12 +136,12 @@ public final class EmissionUtils {
 			SortedMap<String, Double> emissionType2Value;
 			if(totalEmissions.get(personId) == null){ // person not in map (e.g. pt user)
 				emissionType2Value = new TreeMap<>();
-				for(String pollutant : getListOfPollutants()){
+				for(String pollutant : listOfPollutants){
 					emissionType2Value.put(pollutant, 0.0);
 				}
 			} else { // person in map, but some emissions are not set; setting these to 0.0 
 				emissionType2Value = totalEmissions.get(personId);
-				for(String pollutant : getListOfPollutants()){
+				for(String pollutant : listOfPollutants){ 
 					if(emissionType2Value.get(pollutant) == null){
 						emissionType2Value.put(pollutant, 0.0);
 					} // else do nothing
@@ -154,12 +161,12 @@ public final class EmissionUtils {
 			
 			if(totalEmissions.get(linkId) == null){
 				emissionType2Value = new TreeMap<>();
-				for(String pollutant : getListOfPollutants()){
+				for(String pollutant : listOfPollutants){
 					emissionType2Value.put(pollutant, 0.0);
 				}
 			} else {
 				emissionType2Value = totalEmissions.get(linkId);
-				for(String pollutant : getListOfPollutants()){
+				for(String pollutant : listOfPollutants){ 
 					if(emissionType2Value.get(pollutant) == null){
 						emissionType2Value.put(pollutant, 0.0);
 					} else {
@@ -210,4 +217,7 @@ public final class EmissionUtils {
 		return coldPollutantString2Values;
 	}
 
+	public static SortedSet<String> getListOfPollutants() {
+		return listOfPollutants;
+	}
 }

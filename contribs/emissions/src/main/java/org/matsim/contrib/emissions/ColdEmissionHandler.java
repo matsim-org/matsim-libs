@@ -69,6 +69,8 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
         this.vehicles = vehicles;
         this.network = network;
         this.coldEmissionAnalysisModule = new ColdEmissionAnalysisModule(parameterObject2, emissionEventsManager, emissionEfficiencyFactor);
+        emissionEventsManager.addHandler(this);
+
     }
 
     @Override
