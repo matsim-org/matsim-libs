@@ -21,6 +21,7 @@ package org.matsim.contrib.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -35,10 +36,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.types.WarmPollutant;
-import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
@@ -76,6 +77,8 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		this.emissionVehicles = emissionVehicles;
 		this.network = network;
 		this.warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(parameterObject, emissionEventsManager, emissionEfficiencyFactor);
+		// add event handlers here and restrict the access outside the emission Module.  Amit Apr'17.
+		emissionEventsManager.addHandler(this);
 	}
 
 	@Override
@@ -147,15 +150,6 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		// excluding links with zero lengths from leaveCnt. Amit July'17
 		linkLeaveCnt++;
 
-		Double freeVelocity = link.getFreespeed();
-		String roadTypeString = EmissionUtils.getHbefaRoadType(link);
-
-
-		if (roadTypeString==null || roadTypeString.isEmpty()){
-			logger.error("Roadtype missing in network information!");
-			throw new RuntimeException("Roadtype missing in network information for link " + linkId);
-		}
-
 		if(!this.linkenter.containsKey(vehicleId)){
 			int maxLinkLeaveFirstActWarnCnt = 3;
 			if(linkLeaveFirstActWarnCnt < maxLinkLeaveFirstActWarnCnt){
@@ -199,9 +193,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 
 			Map<WarmPollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
 					vehicle,
-					roadTypeString,
-					freeVelocity,
-					linkLength,
+					link,
 					travelTime);
 
 			warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
