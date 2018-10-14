@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
-import org.matsim.contrib.emissions.roadTypeMapping.LinkHbefaMapping;
 import org.matsim.contrib.emissions.roadTypeMapping.OsmHbefaMapping;
+import org.matsim.contrib.emissions.roadTypeMapping.VisumHbefaRoadTypeMapping;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.HbefaColdEmissionFactor;
 import org.matsim.contrib.emissions.types.HbefaColdEmissionFactorKey;
@@ -188,7 +188,7 @@ public class EmissionModule {
                 break;
 			case fromFile:
 				logger.warn("It is recommended to directly set the HBEFA road types to link attributes and then chose HbefaRoadTypeSource: "+ EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes );
-				roadTypeMapping = new LinkHbefaMapping();
+				roadTypeMapping = VisumHbefaRoadTypeMapping.createVisumRoadTypeMapping(this.emissionConfigGroup.getEmissionRoadTypeMappingFileURL(scenario.getConfig().getContext()));//new LinkHbefaMapping();
 				roadTypeMapping.addHbefaMappings(scenario.getNetwork());
 				break;
 			case fromLinkAttributes: //no need, road types are already there
