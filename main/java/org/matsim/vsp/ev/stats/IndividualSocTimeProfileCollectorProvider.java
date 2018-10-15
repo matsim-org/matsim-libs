@@ -19,20 +19,21 @@
 
 package org.matsim.vsp.ev.stats;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.vsp.ev.EvUnitConversions;
-import org.matsim.vsp.ev.data.ElectricVehicle;
 import org.matsim.vsp.ev.data.ElectricFleet;
+import org.matsim.vsp.ev.data.ElectricVehicle;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class IndividualSocTimeProfileCollectorProvider implements Provider<MobsimListener> {
 	private final ElectricFleet evFleet;
@@ -54,8 +55,12 @@ public class IndividualSocTimeProfileCollectorProvider implements Provider<Mobsi
 
 	public static ProfileCalculator createIndividualSocCalculator(final ElectricFleet evFleet) {
 		int columns = Math.min(evFleet.getElectricVehicles().size(), MAX_VEHICLE_COLUMNS);
-		List<ElectricVehicle> selectedEvs = evFleet.getElectricVehicles().values().stream().limit(columns)
+		List<ElectricVehicle> allEvs = new ArrayList<>();
+		allEvs.addAll(evFleet.getElectricVehicles().values());
+		Collections.shuffle(allEvs);
+		List<ElectricVehicle> selectedEvs = allEvs.stream().limit(columns)
 				.collect(Collectors.toList());
+
 		String[] header = selectedEvs.stream().map(ev -> ev.getId() + "").toArray(String[]::new);
 
 		return TimeProfiles.createProfileCalculator(header, () -> {

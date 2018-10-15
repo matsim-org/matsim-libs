@@ -28,6 +28,7 @@ import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInt
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vsp.ev.EvUnitConversions;
 
@@ -41,6 +42,9 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
     private final double maxSpeed;
     private final double minSlope;
     private final double maxSlope;
+
+    private boolean hasWarnedMaxSpeed = false;
+    private boolean hasWarnedMinSpeed = false;
 
     private final Id<VehicleType> vehicleTypeId;
     private final boolean crashIfOutOfBoundValue;
@@ -64,9 +68,28 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
             if (crashIfOutOfBoundValue) {
                 throw new OutOfScopeException("Speed not covered" + speed);
             } else {
-                Logger.getLogger(getClass()).warn("Assuming maxSpeed, as Speed not covered by consumption data" + speed);
+                if (!hasWarnedMaxSpeed) {
+                    Logger.getLogger(getClass()).warn("Assuming maxSpeed, as Speed not covered by consumption data " + speed);
+                    Logger.getLogger(getClass()).warn(Gbl.ONLYONCE);
+                    hasWarnedMaxSpeed = true;
+                }
                 speed = maxSpeed;
             }
+        }
+
+        if (speed < minSpeed) {
+            if (crashIfOutOfBoundValue) {
+                throw new OutOfScopeException("Speed not covered" + speed);
+            } else {
+                if (!hasWarnedMinSpeed) {
+                    Logger.getLogger(getClass()).warn("Assuming minSpeed, as Speed not covered by consumption data " + speed);
+                    Logger.getLogger(getClass()).warn(Gbl.ONLYONCE);
+                    hasWarnedMinSpeed = true;
+                }
+                speed = minSpeed;
+
+            }
+
         }
 
 
