@@ -72,9 +72,11 @@ extends ReflectiveConfigGroup
 	private static final String CONSIDERING_CO2_COSTS = "consideringCO2Costs";
 	@Deprecated // kai, oct'18
 	private boolean consideringCO2Costs = false;
-	@Deprecated // my preference would be to phase out the "fromFile" option and use "fromLinkAttributes" only.  It can always be solved after reading the network.  kai, oct'18
-	public enum HbefaRoadTypeSource { fromFile, fromLinkAttributes}
-	@Deprecated // my preference would be to phase out the "fromFile" option and use "fromLinkAttributes" only.  It can always be solved after reading the network.  kai, oct'18
+
+	private static final String HANDLE_HIGH_AVERAGE_SPEEDS = "handleHighAverageSpeeds";
+	private boolean handleHighAverageSpeeds = false;
+
+	public enum HbefaRoadTypeSource { fromFile, fromLinkAttributes, fromOsm }
 	private static final String Hbefa_ROADTYPE_SOURCE = "hbefaRoadTypeSource";
 	@Deprecated // my preference would be to phase out the "fromFile" option and use "fromLinkAttributes" only.  It can always be solved after reading the network.  kai, oct'18
 	private HbefaRoadTypeSource hbefaRoadTypeSource = HbefaRoadTypeSource.fromFile; // fromFile is to support backward compatibility
@@ -106,10 +108,12 @@ extends ReflectiveConfigGroup
 	@Deprecated
 	private static final String CONSIDERING_CO2_COSTS_CMT = "if true, only flat emissions will be considered irrespective of pricing either flat air pollution or exposure of air pollution.";
 
+	private static final String HANDLE_HIGH_AVERAGE_SPEEDS_CMT = "if true, don't fail when average speed is higher than the link freespeed, but cap it instead.";
 
 	@Override
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
+
 
 		map.put(EMISSION_ROADTYPE_MAPPING_FILE, EMISSION_ROADTYPE_MAPPING_FILE_CMT);
 
@@ -142,6 +146,8 @@ extends ReflectiveConfigGroup
 		map.put(EMISSION_COST_MULTIPLICATION_FACTOR, EMISSION_COST_MULTIPLICATION_FACTOR_CMT);
 
 		map.put(CONSIDERING_CO2_COSTS, CONSIDERING_CO2_COSTS_CMT);
+
+		map.put(HANDLE_HIGH_AVERAGE_SPEEDS, HANDLE_HIGH_AVERAGE_SPEEDS_CMT);
 
 		return map;
 	}
@@ -264,7 +270,7 @@ extends ReflectiveConfigGroup
 		return isWritingEmissionsEvents;
 	}
 	/**
-	 * @param isWritingEmissionsEvents -- {@value #WRITING_EMISSIONS_EVENTS_CMT}
+	 * @param writingEmissionsEvents -- {@value #WRITING_EMISSIONS_EVENTS_CMT}
 	 */
 	@StringSetter(WRITING_EMISSIONS_EVENTS)
 	public void setWritingEmissionsEvents(boolean writingEmissionsEvents) {
@@ -317,7 +323,18 @@ extends ReflectiveConfigGroup
 	public void setConsideringCO2Costs(boolean consideringCO2Costs) {
 		this.consideringCO2Costs = consideringCO2Costs;
 	}
-	// ---
+
+	@StringGetter(HANDLE_HIGH_AVERAGE_SPEEDS)
+	public boolean handlesHighAverageSpeeds() {
+		return handleHighAverageSpeeds;
+	}
+	/**
+	 * @param handleHighAverageSpeeds -- {@value #HANDLE_HIGH_AVERAGE_SPEEDS_CMT}
+	 */
+	@StringSetter(HANDLE_HIGH_AVERAGE_SPEEDS)
+	public void setHandlesHighAverageSpeeds(boolean handleHighAverageSpeeds) {
+		this.handleHighAverageSpeeds = handleHighAverageSpeeds;
+	}
 	@StringGetter(Hbefa_ROADTYPE_SOURCE)
 	@Deprecated // kai, oct'18
 	public HbefaRoadTypeSource getHbefaRoadTypeSource() {

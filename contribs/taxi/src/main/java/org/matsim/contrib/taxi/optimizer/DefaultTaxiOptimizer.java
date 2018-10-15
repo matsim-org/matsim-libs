@@ -62,6 +62,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	
 	private final EventsManager eventsManager;
 	private final TaxiRequestValidator requestValidator;
+	private final boolean printDetailedWarnings;
 
 	private boolean requiresReoptimization = false;
 
@@ -77,6 +78,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 
 		destinationKnown = taxiCfg.isDestinationKnown();
 		vehicleDiversion = taxiCfg.isVehicleDiversion();
+		this.printDetailedWarnings = taxiCfg.isPrintDetailedWarnings();
 	}
 
 	@Override
@@ -129,7 +131,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 		
 		if (!violations.isEmpty()) {
 			String causes = violations.stream().collect(Collectors.joining(", "));
-			log.warn("Request " + request.getId() + " will not be served. The agent will get stuck. Causes: " + causes);
+			if (printDetailedWarnings) log.warn("Request " + request.getId() + " will not be served. The agent will get stuck. Causes: " + causes);
 			taxiRequest.setRejected(true);
 			eventsManager.processEvent(
 					new TaxiRequestRejectedEvent(taxiRequest.getSubmissionTime(), taxiRequest.getId(), causes));

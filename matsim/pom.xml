@@ -425,6 +425,33 @@
 			<!--<version>2.2.8</version>-->
 		<!--</dependency>-->
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>java-9+</id>
+			<activation>
+				<jdk>[9</jdk>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>javax.xml.bind</groupId>
+					<artifactId>jaxb-api</artifactId>
+					<version>2.3.1</version>
+				</dependency>
+				<dependency>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-core</artifactId>
+					<version>2.3.0.1</version>
+				</dependency>
+				<dependency>
+				<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-impl</artifactId>
+					<version>2.3.0.1</version>
+					</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<geotools.version>14.0</geotools.version>

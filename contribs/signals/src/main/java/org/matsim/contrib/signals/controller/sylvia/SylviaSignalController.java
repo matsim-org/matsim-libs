@@ -338,8 +338,10 @@ public final class SylviaSignalController extends AbstractSignalController imple
 	private Tuple<SignalPlan,SylviaSignalPlan> searchActivePlans() {
 		SylviaSignalPlan sylviaPlan = null;
 		SignalPlan fixedTimePlan = null;
+		if (this.signalPlans.size() > 2) {
+			throw new IllegalStateException("The current implementation of Sylvia does not work with multiple signal plans for different times of the day.");
+		}
 		for (Id<SignalPlan> planId : this.signalPlans.keySet()){
-			// TODO this only works without multiple signal plans
 			if (planId.toString().startsWith(SylviaPreprocessData.SYLVIA_PREFIX)){
 				sylviaPlan = (SylviaSignalPlan) this.signalPlans.get(planId);
 			}
@@ -363,14 +365,11 @@ public final class SylviaSignalController extends AbstractSignalController imple
 	private void calculateExtensionPoints(Tuple<SignalPlan,SylviaSignalPlan> plans) {
 		SignalPlan fixedTime = plans.getFirst();
 		SylviaSignalPlan sylvia = plans.getSecond();
-		int offset = 0;
-		if (sylvia.getOffset() != null){
-			offset = sylvia.getOffset();
-		}
+		int offset = sylvia.getOffset();
 		int lastExtensionMoment = 0;
 		for (SignalGroupSettingsData settings : sylvia.getPlanData().getSignalGroupSettingsDataByGroupId().values()){
 			// set the extension moment to the second of the dropping (but respecting offset and cycle time)
-			Integer extensionMoment = (settings.getDropping() + offset) % sylvia.getCycleTime();
+			int extensionMoment = (settings.getDropping() + offset) % sylvia.getCycleTime();
 			// remember last extension moment
 			if (extensionMoment > lastExtensionMoment){
 				lastExtensionMoment = extensionMoment;

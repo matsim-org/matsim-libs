@@ -21,12 +21,16 @@ package org.matsim.contrib.emissions.example;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
+import org.matsim.contrib.emissions.roadTypeMapping.VisumHbefaRoadTypeMapping;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.net.URL;
 
 /**
  * 
@@ -42,9 +46,9 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 
 public class RunEmissionToolOnlineExampleV2 {
-	
+
 	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config_v2.xml";
-	
+
 	public static Config prepareConfig( String[] args ) {
 		Config config;
 		if ( args == null || args.length == 0 ) {
@@ -54,12 +58,22 @@ public class RunEmissionToolOnlineExampleV2 {
 		}
 		return config;
 	}
-	
+
 	public static Scenario prepareScenario( Config config ) {
 		Scenario scenario = ScenarioUtils.loadScenario( config );
+
+		//load emissions config
+		EmissionsConfigGroup emissionsConfigGroup =  (EmissionsConfigGroup) config.getModules().get(EmissionsConfigGroup.GROUP_NAME);
+		URL context = scenario.getConfig().getContext();
+		URL mappingFile = emissionsConfigGroup.getEmissionRoadTypeMappingFileURL(context);
+
+		//add Hbefa mappings to the network
+		HbefaRoadTypeMapping vhtm = VisumHbefaRoadTypeMapping.createVisumRoadTypeMapping(mappingFile);
+		vhtm.addHbefaMappings(scenario.getNetwork());
+
 		return scenario ;
 	}
-	
+
 	public static void run( Scenario scenario, AbstractModule... modules ) {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {

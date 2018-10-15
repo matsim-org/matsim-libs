@@ -21,11 +21,13 @@ package org.matsim.contrib.emissions.example.archive;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
+import org.matsim.contrib.emissions.roadTypeMapping.VisumHbefaRoadTypeMapping;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -44,7 +46,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunEmissionToolOfflineExample {
 	
 	private final static String runDirectory = "./test/output/";
-	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config.xml";
+	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config_v2.xml";
 	private final static Integer lastIteration = getLastIteration();
 	
 	private static final String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" +  lastIteration;
@@ -64,6 +66,8 @@ public class RunEmissionToolOfflineExample {
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
+
+		HbefaRoadTypeMapping roadTypeMapping = VisumHbefaRoadTypeMapping.createVisumRoadTypeMapping(ecg.getEmissionRoadTypeMappingFileURL(scenario.getConfig().getContext()));
 		EmissionModule emissionModule = new EmissionModule(scenario, eventsManager);
 
 		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
@@ -73,9 +77,7 @@ public class RunEmissionToolOfflineExample {
 		matsimEventsReader.readFile(eventsFile);
 		
 		emissionEventWriter.closeFile();
-
-		emissionModule.writeEmissionInformation();
-	}
+		}
 
 	private static int getLastIteration() {
 		Config config = new Config();

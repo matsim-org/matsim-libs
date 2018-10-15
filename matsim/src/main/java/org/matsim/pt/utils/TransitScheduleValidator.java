@@ -19,11 +19,6 @@
 
 package org.matsim.pt.utils;
 
-import java.io.IOException;
-import java.util.*;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -33,12 +28,25 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * An abstract class offering a number of static methods to validate several aspects of transit schedules.
@@ -205,6 +213,41 @@ public abstract class TransitScheduleValidator {
 		return result;
 	}
 
+	public static ValidationResult validateTransfers(final TransitSchedule schedule) {
+		ValidationResult result = new ValidationResult();
+
+		MinimalTransferTimes transferTimes = schedule.getMinimalTransferTimes();
+		MinimalTransferTimes.MinimalTransferTimesIterator iter = transferTimes.iterator();
+		Set<Id> missingFromStops = new HashSet<>();
+		Set<Id> missingToStops = new HashSet<>();
+
+		while (iter.hasNext()) {
+			iter.next();
+			Id<TransitStopFacility> fromStopId = iter.getFromStopId();
+			Id<TransitStopFacility> toStopId = iter.getToStopId();
+			double transferTime = iter.getSeconds();
+
+			if (fromStopId == null && toStopId == null) {
+				result.addError("Minimal Transfer Times: both fromStop and toStop are null.");
+			} else if (fromStopId == null) {
+				result.addError("Minimal Transfer Times: fromStop = null, toStop " + toStopId + ".");
+			} else if (toStopId == null) {
+				result.addError("Minimal Transfer Times: fromStop " + fromStopId + ", toStop = null.");
+			}
+			if (transferTime <= 0) {
+				result.addWarning("Minimal Transfer Times: fromStop " + fromStopId + " toStop " + toStopId + " with transferTime = " + transferTime);
+			}
+			if (schedule.getFacilities().get(fromStopId) == null && missingFromStops.add(fromStopId)) {
+				result.addError("Minimal Transfer Times: fromStop " + fromStopId + " does not exist in schedule.");
+			}
+			if (schedule.getFacilities().get(toStopId) == null && missingToStops.add(toStopId)) {
+				result.addError("Minimal Transfer Times: toStop " + toStopId + " does not exist in schedule.");
+			}
+		}
+
+		return result;
+	}
+
 	public static ValidationResult validateAll(final TransitSchedule schedule, final Network network) {
 		ValidationResult v = validateUsedStopsHaveLinkId(schedule);
 		v.add(validateNetworkRoutes(schedule, network));
@@ -215,6 +258,7 @@ public abstract class TransitScheduleValidator {
 		}
 		v.add(validateAllStopsExist(schedule));
 		v.add(validateOffsets(schedule));
+		v.add(validateTransfers(schedule));
 		return v;
 	}
 	
