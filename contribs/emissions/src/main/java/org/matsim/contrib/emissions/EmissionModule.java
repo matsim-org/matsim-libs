@@ -188,7 +188,8 @@ public class EmissionModule {
                 break;
 			case fromFile:
 				logger.warn("It is recommended to directly set the HBEFA road types to link attributes and then chose HbefaRoadTypeSource: "+ EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes );
-				roadTypeMapping = VisumHbefaRoadTypeMapping.createVisumRoadTypeMapping(this.emissionConfigGroup.getEmissionRoadTypeMappingFileURL(scenario.getConfig().getContext()));//new LinkHbefaMapping();
+				URL roadTypeMappingFile = this.emissionConfigGroup.getEmissionRoadTypeMappingFileURL(scenario.getConfig().getContext());
+				roadTypeMapping = VisumHbefaRoadTypeMapping.createVisumRoadTypeMapping(roadTypeMappingFile);
 				roadTypeMapping.addHbefaMappings(scenario.getNetwork());
 				break;
 			case fromLinkAttributes: //no need, road types are already there
