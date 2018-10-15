@@ -155,6 +155,6 @@ public final class DrtControlerCreator {
 		ModeRoutingParams drtWalkRoutingParams = new ModeRoutingParams(drtWalkMode);
 		drtWalkRoutingParams.setBeelineDistanceFactor(walkRoutingParams.getBeelineDistanceFactor());
 		drtWalkRoutingParams.setTeleportedModeSpeed(walkRoutingParams.getTeleportedModeSpeed());
-		config.plansCalcRoute().addModeRoutingParams(drtWalkRoutingParams);
+//		config.plansCalcRoute().addModeRoutingParams(drtWalkRoutingParams);
 	}
 }
