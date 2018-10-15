@@ -123,7 +123,7 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 			LOG.warn(additionalDataFacilitiesToAssign + " have not been assigned to a measure point geoemtry.");
 		}
 
-		LOG.info("Computing and writing cell based accessibility measures ...");
+		LOG.info("Computing and writing cell based accessibility measures ..."); // TODO revise... cell-based?
 		// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 
 		accessibilityCalculator.computeAccessibilities(acg.getTimeOfDay(), opportunities);
