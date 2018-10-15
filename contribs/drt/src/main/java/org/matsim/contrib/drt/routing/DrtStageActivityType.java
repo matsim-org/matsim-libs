@@ -1,5 +1,7 @@
 package org.matsim.contrib.drt.routing;
 
+import java.util.Objects;
+
 import org.matsim.core.router.StageActivityTypes;
 
 public class DrtStageActivityType implements StageActivityTypes {
@@ -14,5 +16,20 @@ public class DrtStageActivityType implements StageActivityTypes {
 	@Override
 	public boolean isStageActivity(String activityType) {
 		return activityType.equals(drtStageActivity);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		DrtStageActivityType that = (DrtStageActivityType)o;
+		return Objects.equals(drtStageActivity, that.drtStageActivity) && Objects.equals(drtWalk, that.drtWalk);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(drtStageActivity, drtWalk);
 	}
 }
