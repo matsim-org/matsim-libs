@@ -23,12 +23,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
 import org.matsim.contrib.emissions.roadTypeMapping.VisumHbefaRoadTypeMapping;
-import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -68,7 +67,7 @@ public class RunEmissionToolOfflineExample {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
-		HbefaRoadTypeMapping roadTypeMapping = VisumHbefaRoadTypeMapping.createVisumRoadTypeMapping(ecg.getEmissionRoadTypeMappingFile());
+		HbefaRoadTypeMapping roadTypeMapping = VisumHbefaRoadTypeMapping.createVisumRoadTypeMapping(ecg.getEmissionRoadTypeMappingFileURL(scenario.getConfig().getContext()));
 		EmissionModule emissionModule = new EmissionModule(scenario, eventsManager);
 
 		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);

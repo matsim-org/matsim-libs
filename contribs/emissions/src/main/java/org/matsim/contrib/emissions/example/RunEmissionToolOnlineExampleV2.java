@@ -65,7 +65,7 @@ public class RunEmissionToolOnlineExampleV2 {
 		//load emissions config
 		EmissionsConfigGroup emissionsConfigGroup =  (EmissionsConfigGroup) config.getModules().get(EmissionsConfigGroup.GROUP_NAME);
 		URL context = scenario.getConfig().getContext();
-		String mappingFile = emissionsConfigGroup.getEmissionRoadTypeMappingFileURL(context).getFile();
+		URL mappingFile = emissionsConfigGroup.getEmissionRoadTypeMappingFileURL(context);
 
 		//add Hbefa mappings to the network
 		HbefaRoadTypeMapping vhtm = VisumHbefaRoadTypeMapping.createVisumRoadTypeMapping(mappingFile);

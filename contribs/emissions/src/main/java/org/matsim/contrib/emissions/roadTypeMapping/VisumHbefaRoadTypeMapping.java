@@ -8,6 +8,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +37,7 @@ public class VisumHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
         return new VisumHbefaRoadTypeMapping();
     }
 
-    public static HbefaRoadTypeMapping createVisumRoadTypeMapping(String filename){
+    public static HbefaRoadTypeMapping createVisumRoadTypeMapping(URL filename){
         logger.info("entering createRoadTypeMapping ...") ;
 
         VisumHbefaRoadTypeMapping mapping = new VisumHbefaRoadTypeMapping();

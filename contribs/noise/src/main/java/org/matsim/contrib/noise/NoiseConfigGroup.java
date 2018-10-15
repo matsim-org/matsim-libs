@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -36,6 +37,7 @@ import org.matsim.core.utils.misc.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 
 
@@ -183,7 +185,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	protected void checkConsistency(Config config) {
 		this.checkGridParametersForConsistency();
-		this.checkNoiseParametersForConsistency();
+		this.checkNoiseParametersForConsistency(config);
 	}
 			
 	private void checkGridParametersForConsistency() {
@@ -209,7 +211,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 		}
 	}
 
-	private void checkNoiseParametersForConsistency() {
+	private void checkNoiseParametersForConsistency(Config config) {
 		
 		if (this.internalizeNoiseDamages) {
 			
@@ -271,7 +273,8 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 			}
 			
 			// loading tunnel link IDs from file
-			BufferedReader br = IOUtils.getBufferedReader(this.tunnelLinkIdFile);
+			URL url = this.getTunnelLinkIDsFileURL(config.getContext());
+			BufferedReader br = IOUtils.getBufferedReader(url.getFile());
 			
 			String line = null;
 			try {
@@ -719,5 +722,8 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 		this.computeAvgNoiseCostPerLinkAndTime = computeAvgNoiseCostPerLinkAndTime;
 	}
 
+	public URL getTunnelLinkIDsFileURL(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.getTunnelLinkIdFile());
+	}
 	
 }
