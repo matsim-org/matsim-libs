@@ -3,8 +3,13 @@ package org.matsim.contrib.drt.routing;
 import org.matsim.core.router.StageActivityTypes;
 
 public class DrtStageActivityType implements StageActivityTypes {
-	public static final String DRT_STAGE_ACTIVITY = "drt interaction";
-	public static final String DRT_WALK = "drt_walk";
+	public final String DRT_STAGE_ACTIVITY;
+	public final String DRT_WALK;
+	
+	public DrtStageActivityType (String drtMode) {
+		DRT_STAGE_ACTIVITY = drtMode + " interaction";
+		DRT_WALK = drtMode + "_walk";
+	}
 
 	@Override
 	public boolean isStageActivity(String activityType) {

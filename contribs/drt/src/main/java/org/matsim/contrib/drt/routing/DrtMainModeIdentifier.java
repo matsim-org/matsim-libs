@@ -14,16 +14,19 @@ public class DrtMainModeIdentifier implements MainModeIdentifier{
 
 	private final MainModeIdentifier delegate = new MainModeIdentifierImpl();
 	private final String mode;
+	private final DrtStageActivityType drtStageActivityType;
+	
 	@Inject
 	public DrtMainModeIdentifier(DrtConfigGroup drtCfg) {
 		mode = drtCfg.getMode();
+		drtStageActivityType = drtCfg.getDrtStageActivityType();
 	}
 	
 	@Override
 	public String identifyMainMode(List<? extends PlanElement> tripElements) {
 		for (PlanElement pe : tripElements) {
 			if (pe instanceof Activity) {
-				if (((Activity) pe).getType().equals(DrtStageActivityType.DRT_STAGE_ACTIVITY))
+				if (((Activity) pe).getType().equals(drtStageActivityType.DRT_STAGE_ACTIVITY))
 				return mode;
 			}
 		}

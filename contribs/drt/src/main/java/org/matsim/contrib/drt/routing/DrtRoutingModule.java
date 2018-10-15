@@ -87,10 +87,10 @@ public class DrtRoutingModule implements RoutingModule {
 		if (toLink == fromLink) {
 			if (drtCfg.isPrintDetailedWarnings()) {
 				LOGGER.error("Start and end stop are the same, agent will walk using mode "
-						+ DrtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
+						+ drtCfg.getDrtStageActivityType().DRT_WALK + ". Agent Id:\t" + person.getId());
 			}
             Leg leg = (Leg) walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
-            leg.setMode(DrtStageActivityType.DRT_WALK);
+            leg.setMode(drtCfg.getDrtStageActivityType().DRT_WALK);
             return (Collections.singletonList(leg));
 		}
 
@@ -107,7 +107,7 @@ public class DrtRoutingModule implements RoutingModule {
 		route.setUnsharedRideTime(unsharedRideTime);
 		route.setMaxWaitTime(drtCfg.getMaxWaitTime());
 
-		Leg drtLeg = populationFactory.createLeg(TransportMode.drt);
+		Leg drtLeg = populationFactory.createLeg(drtCfg.getMode());
 		drtLeg.setDepartureTime(departureTime);
 		drtLeg.setTravelTime(maxTravelTime);
 		drtLeg.setRoute(route);

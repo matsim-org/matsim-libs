@@ -34,12 +34,12 @@ import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserte
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
-import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -113,20 +113,20 @@ public final class DrtControlerCreator {
 	public static void adjustDrtConfig(Config config) {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased)) {
-			if (config.planCalcScore().getActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY) == null) {
-				addDrtStageActivityParams(config);
+			if (config.planCalcScore().getActivityParams(drtCfg.getDrtStageActivityType().DRT_STAGE_ACTIVITY) == null) {
+				addDrtStageActivityParams(config, drtCfg.getDrtStageActivityType().DRT_STAGE_ACTIVITY);
 			}
 		}
-		if (!config.planCalcScore().getModes().containsKey(DrtStageActivityType.DRT_WALK)) {
-			addDrtWalkModeParams(config);
+		if (!config.planCalcScore().getModes().containsKey(drtCfg.getDrtStageActivityType().DRT_WALK)) {
+			addDrtWalkModeParams(config, drtCfg.getDrtStageActivityType().DRT_WALK);
 		}
 
 		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
 		config.checkConsistency();
 	}
 
-	private static void addDrtStageActivityParams(Config config) {
-		ActivityParams params = new ActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY);
+	private static void addDrtStageActivityParams(Config config, String stageActivityType) {
+		ActivityParams params = new ActivityParams(stageActivityType);
 		params.setTypicalDuration(1);
 		params.setScoringThisActivityAtAll(false);
 		config.planCalcScore()
@@ -138,8 +138,8 @@ public final class DrtControlerCreator {
 				.info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 	}
 
-	private static void addDrtWalkModeParams(Config config) {
-		ModeParams drtWalk = new ModeParams(DrtStageActivityType.DRT_WALK);
+	private static void addDrtWalkModeParams(Config config, String drtWalkMode) {
+		ModeParams drtWalk = new ModeParams(drtWalkMode);
 		ModeParams walk = config.planCalcScore().getModes().get(TransportMode.walk);
 		drtWalk.setConstant(walk.getConstant());
 		drtWalk.setMarginalUtilityOfDistance(walk.getMarginalUtilityOfDistance());
@@ -148,5 +148,11 @@ public final class DrtControlerCreator {
 		config.planCalcScore().getScoringParametersPerSubpopulation().values().forEach(k -> k.addModeParams(drtWalk));
 		Logger.getLogger(DrtControlerCreator.class)
 				.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
+		
+		ModeRoutingParams walkRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.walk);
+		ModeRoutingParams drtWalkRoutingParams = new ModeRoutingParams(drtWalkMode);
+		drtWalkRoutingParams.setBeelineDistanceFactor(walkRoutingParams.getBeelineDistanceFactor());
+		drtWalkRoutingParams.setTeleportedModeSpeed(walkRoutingParams.getTeleportedModeSpeed());
+		config.plansCalcRoute().addModeRoutingParams(drtWalkRoutingParams);
 	}
 }
