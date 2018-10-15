@@ -194,7 +194,7 @@ public class AccessibilityIT implements FacilityDataExchangeInterface {
 		opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new Coord(200, 100));
 
 		final ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution);
-		final AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints) ;
+		final AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, scenario.getNetwork()) ;
 
 		ctrl.addOverridingModule(new AbstractModule() {
 			@Override public void install() {
@@ -217,12 +217,12 @@ public class AccessibilityIT implements FacilityDataExchangeInterface {
 								final TravelTime travelTime = travelTimes.get(mode.name());
 								Gbl.assertNotNull(travelTime);
 								final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
-								calc = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario) ;
+								calc = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario, scenario.getNetwork()) ;
 								break; }
 							case freespeed: {
 								final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
 								Gbl.assertNotNull(travelDisutilityFactory);
-								calc = new NetworkModeAccessibilityExpContributionCalculator( new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
+								calc = new NetworkModeAccessibilityExpContributionCalculator( new FreeSpeedTravelTime(), travelDisutilityFactory, scenario, scenario.getNetwork()) ;
 								break; }
 							case walk:
 								calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
@@ -361,5 +361,4 @@ public class AccessibilityIT implements FacilityDataExchangeInterface {
 	
 			return config ;
 		}
-
 }

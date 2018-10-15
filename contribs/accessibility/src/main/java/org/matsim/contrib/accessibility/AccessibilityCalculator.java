@@ -61,8 +61,8 @@ public final class AccessibilityCalculator {
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 	
 
-	public AccessibilityCalculator(Scenario scenario, ActivityFacilities measuringPoints) {
-		this.network = scenario.getNetwork();
+	public AccessibilityCalculator(Scenario scenario, ActivityFacilities measuringPoints, Network network) {
+		this.network = network;
 		this.measuringPoints = measuringPoints;
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 		this.cnScoringGroup = scenario.getConfig().planCalcScore();
@@ -207,7 +207,7 @@ public final class AccessibilityCalculator {
 				if (opportunity.getCustomAttributes().get("weight") == null) {
 					throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key \"weight\"");
 				} else {
-					double weight = (double) opportunity.getCustomAttributes().get("weight");
+					double weight = (double) ((Integer) opportunity.getCustomAttributes().get("weight")).intValue();
 					jco.addObject(opportunity.getId(), expVjk * Math.pow(weight, acg.getWeightExponent()));
 				}
 			} else {

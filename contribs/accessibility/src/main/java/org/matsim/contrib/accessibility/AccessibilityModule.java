@@ -109,12 +109,12 @@ public final class AccessibilityModule extends AbstractModule {
 					Geometry boundary = GridUtils.getBoundary(acg.getShapeFileCellBasedAccessibility());
 					Envelope envelope = boundary.getEnvelopeInternal();
 					boundingBox = BoundingBox.createBoundingBox(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY());
-					if (measuringPoints != null) {LOG.warn("Measuring points had already been set directly. Now overwriting...");}
+//					if (measuringPoints != null) {LOG.warn("Measuring points had already been set directly. Now overwriting...");}
 					measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize_m);
 					LOG.info("Using shape file to determine the area for accessibility computation.");
 				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromBoundingBox) {
 					boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
-					if (measuringPoints != null) {LOG.warn("Measuring points had already been set directly. Now overwriting...");}
+//					if (measuringPoints != null) {LOG.warn("Measuring points had already been set directly. Now overwriting...");}
 					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m);
 					LOG.info("Using custom bounding box to determine the area for accessibility computation.");
 				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromFacilitiesFile) {
@@ -124,7 +124,7 @@ public final class AccessibilityModule extends AbstractModule {
 					Scenario measuringPointsSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 					String measuringPointsFile = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class ).getMeasuringPointsFile() ;
 					new MatsimFacilitiesReader(measuringPointsSc).readFile(measuringPointsFile);
-					if (measuringPoints != null) {LOG.warn("Measuring points had already been set directly. Now overwriting...");}
+//					if (measuringPoints != null) {LOG.warn("Measuring points had already been set directly. Now overwriting...");}
 					measuringPoints = (ActivityFacilitiesImpl) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(measuringPointsSc, activityType);
 					LOG.info("Using measuring points from file: " + measuringPointsFile);
 				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromFacilitiesObject) {
@@ -144,7 +144,26 @@ public final class AccessibilityModule extends AbstractModule {
 				
 				LOG.warn("boundingBox = " + boundingBox);
 				
-				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
+				// New AV stuff -------------------------------------------------------------
+				// TODO very dirty quick fix; needs to be revised soon
+//				if (AccessibilityAVUtils.avMode) {
+//					measuringPoints = AccessibilityAVUtils.createActivityFacilitiesWithWaitingTime();
+//					LOG.warn("-------- User-created facilities with waiting times created");
+//				}
+				//
+				
+				//
+//				TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+//				LOG.warn("Full network has " + network.getNodes().size() + " nodes.");
+//				Network carNetwork = NetworkUtils.createNetwork();
+//				Set<String> modeSet = new HashSet<>();
+//				modeSet.add("car");
+//				filter.filter(carNetwork, modeSet);
+//				LOG.warn("Pure car network now has " + carNetwork.getNodes().size() + " nodes.");
+				//
+				// End new AV stuff -------------------------------------------------------------
+				
+				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, network);
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
 					AccessibilityContributionCalculator calculator = null ;
 					switch(mode) {
@@ -155,12 +174,12 @@ public final class AccessibilityModule extends AbstractModule {
 						final TravelTime travelTime = travelTimes.get(mode.name());
 						Gbl.assertNotNull(travelTime);
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
-						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario) ;
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario, network) ;
 						break; }
 					case freespeed: {
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
 						Gbl.assertNotNull(travelDisutilityFactory);
-						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario, network) ;
 						break; }
 					case walk:
 						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), config, network);
@@ -226,9 +245,5 @@ public final class AccessibilityModule extends AbstractModule {
 	public void setConsideredActivityType(String activityType) {
 		// yyyy could be done via config (list of activities)
 		this.activityType = activityType ;
-	}
-	
-	public void setMeasuringPoints(ActivityFacilities measuringPoints) {
-		this.measuringPoints = measuringPoints ;
 	}
 }

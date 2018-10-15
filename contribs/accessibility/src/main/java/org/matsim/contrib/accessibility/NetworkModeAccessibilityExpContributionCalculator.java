@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Distances;
@@ -39,7 +40,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 	private final double constCar;
 
-	private final Scenario scenario;
+	private final Network network;
 	private final TravelTime travelTime;
 
 	private final double betaWalkTT;
@@ -50,12 +51,9 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 	private final LeastCostPathTreeExtended lcpt;
 
 	
-	public NetworkModeAccessibilityExpContributionCalculator(
-			final TravelTime travelTime,
-			final TravelDisutilityFactory travelDisutilityFactory,
-			final Scenario scenario){		
-		
-		this.scenario = scenario;
+	public NetworkModeAccessibilityExpContributionCalculator(final TravelTime travelTime,
+			final TravelDisutilityFactory travelDisutilityFactory, final Scenario scenario,	final Network network) {		
+		this.network = network;
 
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
 		this.scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
@@ -88,7 +86,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 	@Override
 	public void notifyNewOriginNode(Node fromNode, Double departureTime) {
 		this.fromNode = fromNode;
-		this.lcpt.calculateExtended(scenario.getNetwork(), fromNode, departureTime);
+		this.lcpt.calculateExtended(network, fromNode, departureTime);
 	}
 	
 	
@@ -97,7 +95,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 //		System.out.println("oring = " + origin.getCoord().getX() + "   " + origin.getCoord().getY());
 //		System.out.println("destnode = " + destination.getNearestNode().getCoord().getX() + "   " + destination.getNearestNode().getCoord().getY());
-		Link nearestLink = NetworkUtils.getNearestLinkExactly(scenario.getNetwork(), origin.getCoord());
+		Link nearestLink = NetworkUtils.getNearestLinkExactly(network, origin.getCoord());
 
 		// === (1) ORIGIN to LINK to NODE (captures the distance (as walk time) between the origin via the link to the node):
 		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
@@ -108,9 +106,27 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);
 //		System.out.println("walkTravelTimeMeasuringPoint2Road_h = " + walkTravelTimeMeasuringPoint2Road_h);
 		
-		// (a) disutilities to get on or off the network
-		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT)
+		// New AV stuff -------------------------------------------------------------
+//		// TODO dirty quick fix; needs to be revised very soon
+//		// waiting time
+		double walkDisutilityMeasuringPoint2Road = 0.;
+//		double waitingTime_h = 0.;
+//		if (AccessibilityAVUtils.avMode) {
+//			waitingTime_h = (Double) origin.getAttributes().getAttribute("waitingTime") / 3600.;
+//		}
+//		//		log.warn("waiting time of facility " + origin.getId() + " is " + waitingTime_h + " h.");
+//		//
+//		
+//		// (a) disutilities to get on or off the network
+//		// NEW AV MODE
+//		if (AccessibilityAVUtils.avMode) {
+//			walkDisutilityMeasuringPoint2Road = ((walkTravelTimeMeasuringPoint2Road_h + waitingTime_h) * betaWalkTT)
+//				+ (distance.getDistancePoint2Intersection() * betaWalkTD);
+//		} else {
+			// End new AV stuff -------------------------------------------------------------
+			walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT)
 				+ (distance.getDistancePoint2Intersection() * betaWalkTD);
+//		}
 //		System.out.println("walkDisutilityMeasuringPoint2Road = " + walkDisutilityMeasuringPoint2Road);
 		
 		// (b) TRAVEL ON NETWORK to FIRST NODE:
