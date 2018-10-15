@@ -1,6 +1,8 @@
 package org.matsim.core.mobsim.qsim.components;
 
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,15 +24,49 @@ public class ComponentRegistryTest {
 			protected void configure() {
 				bind(Key.get(MobsimEngine.class, Names.named("A"))).toInstance(createFakeEngine());
 				bind(Key.get(MobsimEngine.class, Names.named("B"))).toInstance(createFakeEngine());
+				bind(Key.get(MobsimEngine.class, Named.class)).toInstance(createFakeEngine());
 				bind(MobsimEngine.class).toInstance(createFakeEngine());
 			}
 		});
-		
+
+		Assert.assertEquals(orderedComponents(injector, namedComponents("A")),
+				Arrays.asList(Key.get(MobsimEngine.class, Names.named("A"))));
+
+		Assert.assertEquals(orderedComponents(injector, namedComponents("B")),
+				Arrays.asList(Key.get(MobsimEngine.class, Names.named("B"))));
+
+		Assert.assertEquals(orderedComponents(injector, namedComponents("A", "B")),
+				Arrays.asList(Key.get(MobsimEngine.class, Names.named("A")),
+						Key.get(MobsimEngine.class, Names.named("B"))));
+
+		Assert.assertEquals(orderedComponents(injector, namedComponents("B", "A")),
+				Arrays.asList(Key.get(MobsimEngine.class, Names.named("B")),
+						Key.get(MobsimEngine.class, Names.named("A"))));
+
+		Assert.assertEquals(orderedComponents(injector, namedComponents("A", "B", "C")),
+				Arrays.asList(Key.get(MobsimEngine.class, Names.named("A")),
+						Key.get(MobsimEngine.class, Names.named("B"))));
+
+		Assert.assertEquals(orderedComponents(injector, namedComponents("C")), Arrays.asList());
+
+		QSimComponents qSimComponents = namedComponents("A", "B");
+		qSimComponents.addComponent(Named.class);
+		Assert.assertEquals(orderedComponents(injector, qSimComponents),
+				Arrays.asList(Key.get(MobsimEngine.class, Names.named("A")),
+						Key.get(MobsimEngine.class, Names.named("B")), Key.get(MobsimEngine.class, Named.class)));
+	}
+
+	private QSimComponents namedComponents(String... activeComponentNames) {
+		QSimComponents qSimComponents = new QSimComponents();
+		for (String n : activeComponentNames) {
+			qSimComponents.addNamedComponent(n);
+		}
+		return qSimComponents;
+	}
+
+	private List<Key<? extends QSimComponent>> orderedComponents(Injector injector, QSimComponents qSimComponents) {
 		ComponentRegistry registry = ComponentRegistry.create(injector);
-		
-		Assert.assertEquals(1, registry.getComponentsByAnnotation(Names.named("A")).size());
-		Assert.assertEquals(1, registry.getComponentsByAnnotation(Names.named("B")).size());
-		Assert.assertEquals(2, registry.getComponentsByAnnotationType(Named.class).size());
+		return registry.getOrderedComponents(qSimComponents);
 	}
 
 	private static MobsimEngine createFakeEngine() {

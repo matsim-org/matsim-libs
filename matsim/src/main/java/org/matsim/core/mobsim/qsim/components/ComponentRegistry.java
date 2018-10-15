@@ -1,6 +1,7 @@
 package org.matsim.core.mobsim.qsim.components;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,62 +15,36 @@ import com.google.inject.Key;
 
 public class ComponentRegistry {
 	private final Logger logger = Logger.getLogger(ComponentRegistry.class);
-	
-	private final Map<Annotation, List<Key<? extends QSimComponent>>> componentsByAnnotation = new HashMap<>();
-	private final Map<Class<? extends Annotation>, List<Key<? extends QSimComponent>>> componentsByAnnotationType = new HashMap<>();
+
+	private final Map<Key<?>, List<Key<? extends QSimComponent>>> componentsByKey = new HashMap<>();
 
 	ComponentRegistry() {
 	}
 
 	public void register(Key<? extends QSimComponent> component) {
-		if (!componentsByAnnotation.containsKey(component.getAnnotation())) {
-			componentsByAnnotation.put(component.getAnnotation(), new LinkedList<>());
+		if (component.getAnnotationType() == null) {
+			return;
 		}
 
-		if (!componentsByAnnotationType.containsKey(component.getAnnotationType())) {
-			componentsByAnnotationType.put(component.getAnnotationType(), new LinkedList<>());
-		}
-
-		componentsByAnnotation.get(component.getAnnotation()).add(component);
-		componentsByAnnotationType.get(component.getAnnotationType()).add(component);
-
-		if (component.getAnnotation() == null) {
-			logger.info("Registered " + component.getTypeLiteral() + " with annotation " + component.getAnnotation());
-		} else {
-			logger.warn("Registered " + component.getTypeLiteral() + " without annotation");	
-		}
-	}
-
-	public List<Key<? extends QSimComponent>> getComponentsByAnnotation(Annotation annotation) {
-		if (componentsByAnnotation.containsKey(annotation)) {
-			return componentsByAnnotation.get(annotation);
-		} else {
-			throw new IllegalArgumentException(
-					String.format("No components with annotation %s registered", annotation));
-		}
-	}
-
-	public List<Key<? extends QSimComponent>> getComponentsByAnnotationType(
-			Class<? extends Annotation> annotationType) {
-		if (componentsByAnnotationType.containsKey(annotationType)) {
-			return componentsByAnnotationType.get(annotationType);
-		} else {
-			throw new IllegalArgumentException(
-					String.format("No components with annotation type %s registered", annotationType));
-		}
+		Key<?> key = component.getAnnotation() != null ?
+				Key.get(Object.class, component.getAnnotation()) :
+				Key.get(Object.class, component.getAnnotationType());
+		componentsByKey.computeIfAbsent(key, k -> new ArrayList<>()).add(component);
 	}
 
 	public List<Key<? extends QSimComponent>> getOrderedComponents(QSimComponents config) {
 		List<Key<? extends QSimComponent>> orderedComponents = new LinkedList<>();
 
 		for (Object annotation : config.getActiveComponents()) {
-			if (annotation instanceof Annotation) {
-				orderedComponents.addAll(getComponentsByAnnotation((Annotation) annotation));
-			} else {
-				orderedComponents.addAll(getComponentsByAnnotationType((Class<? extends Annotation>) annotation));
+			Key<?> key = annotation instanceof Annotation ?
+					Key.get(Object.class, (Annotation)annotation) :
+					Key.get(Object.class, (Class<? extends Annotation>)annotation);
+
+			List<Key<? extends QSimComponent>> components = componentsByKey.get(key);
+			if (components != null) {
+				orderedComponents.addAll(components);
 			}
 		}
-
 		return orderedComponents;
 	}
 
@@ -78,7 +53,7 @@ public class ComponentRegistry {
 
 		for (Map.Entry<Key<?>, Binding<?>> entry : injector.getAllBindings().entrySet()) {
 			if (QSimComponent.class.isAssignableFrom(entry.getKey().getTypeLiteral().getRawType())) {
-				registry.register((Key<? extends QSimComponent>) entry.getKey());
+				registry.register((Key<? extends QSimComponent>)entry.getKey());
 			}
 		}
 
