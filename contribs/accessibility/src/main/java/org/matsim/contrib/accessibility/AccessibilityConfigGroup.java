@@ -210,7 +210,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
         this.accessibilityMeasureType = accessibilityMeasureType;
     }
     @StringGetter(USE_OPPORTUNITY_WEIGHTS)
-    public Boolean getUseOpportunityWeights() {
+    public boolean isUseOpportunityWeights() {
     	return useOpportunityWeights;
     }
     @StringSetter(USE_OPPORTUNITY_WEIGHTS)

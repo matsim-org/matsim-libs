@@ -203,7 +203,7 @@ public final class AccessibilityCalculator {
 				// "impact". Leave it as is for the time being as urbanSim code uses this, dz, july'17
 				opportunityClusterMap.put(nearestNode.getId(), jco); 
 			}
-			if (acg.getUseOpportunityWeights()) {
+			if (acg.isUseOpportunityWeights()) {
 				if (opportunity.getCustomAttributes().get("weight") == null) {
 					throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key \"weight\"");
 				} else {

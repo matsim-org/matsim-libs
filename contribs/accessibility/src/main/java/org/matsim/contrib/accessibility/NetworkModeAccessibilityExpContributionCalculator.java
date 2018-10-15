@@ -106,27 +106,8 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);
 //		System.out.println("walkTravelTimeMeasuringPoint2Road_h = " + walkTravelTimeMeasuringPoint2Road_h);
 		
-		// New AV stuff -------------------------------------------------------------
-//		// TODO dirty quick fix; needs to be revised very soon
-//		// waiting time
-		double walkDisutilityMeasuringPoint2Road = 0.;
-//		double waitingTime_h = 0.;
-//		if (AccessibilityAVUtils.avMode) {
-//			waitingTime_h = (Double) origin.getAttributes().getAttribute("waitingTime") / 3600.;
-//		}
-//		//		log.warn("waiting time of facility " + origin.getId() + " is " + waitingTime_h + " h.");
-//		//
-//		
-//		// (a) disutilities to get on or off the network
-//		// NEW AV MODE
-//		if (AccessibilityAVUtils.avMode) {
-//			walkDisutilityMeasuringPoint2Road = ((walkTravelTimeMeasuringPoint2Road_h + waitingTime_h) * betaWalkTT)
-//				+ (distance.getDistancePoint2Intersection() * betaWalkTD);
-//		} else {
-			// End new AV stuff -------------------------------------------------------------
-			walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT)
+		double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT)
 				+ (distance.getDistancePoint2Intersection() * betaWalkTD);
-//		}
 //		System.out.println("walkDisutilityMeasuringPoint2Road = " + walkDisutilityMeasuringPoint2Road);
 		
 		// (b) TRAVEL ON NETWORK to FIRST NODE:
@@ -135,14 +116,16 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		double road2NodeCongestedCarTime_h = distance.getDistanceIntersection2Node() / (carSpeedOnNearestLink_m_s * 3600.);
 //		System.out.println("road2NodeCongestedCarTime_h = " + road2NodeCongestedCarTime_h);
 		
-		double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) 
+		// Note: This is a utility that becomes a disutility when it holds a negative value (as it does)
+		double congestedCarUtilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) 
 				+ (distance.getDistanceIntersection2Node() * betaCarTD) + (toll_money * betaCarTMC);
 //		System.out.println("congestedCarDisutilityRoad2Node = " + congestedCarDisutilityRoad2Node);
 //		// yyyyyy dzdzdz: replace the above by link disutility multiplied by fraction of link that is used according to the entry point.  (toll should be in there automatically??)
 
 		// === (2) REMAINING TRAVEL ON NETWORK:
-		double congestedCarDisutility = - lcpt.getTree().get(destination.getNearestNode().getId()).getCost();
-//		System.out.println("congestedCarDisutility = " + congestedCarDisutility);
+		// Note: This is a utility that becomes a disutility when it holds a negative value (as it does)
+		double congestedCarUtility = - lcpt.getTree().get(destination.getNearestNode().getId()).getCost();
+		// System.out.println("congestedCarDisutility = " + congestedCarDisutility);
 		// travel disutility congested car on road network (including toll)
 		
 		// === (3) Pre-computed effect of all opportunities reachable from destination network node:
@@ -152,8 +135,8 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		
 		// === (4) Everything together:
 		// note that exp(a+b) = exp(a) * exp(b), so for b the exponentiation has already been done.
-		return Math.exp(this.logitScaleParameter * (walkDisutilityMeasuringPoint2Road + constCar + congestedCarDisutilityRoad2Node
-				+ congestedCarDisutility) ) * sumExpVjkWalk;
+		return Math.exp(this.logitScaleParameter * (walkUtilityMeasuringPoint2Road + constCar + congestedCarUtilityRoad2Node
+				+ congestedCarUtility) ) * sumExpVjkWalk;
 	}
 
 
