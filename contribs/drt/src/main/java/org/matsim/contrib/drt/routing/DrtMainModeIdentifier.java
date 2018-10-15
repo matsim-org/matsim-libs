@@ -19,7 +19,7 @@ public class DrtMainModeIdentifier implements MainModeIdentifier{
 	@Inject
 	public DrtMainModeIdentifier(DrtConfigGroup drtCfg) {
 		mode = drtCfg.getMode();
-		drtStageActivityType = drtCfg.getDrtStageActivityType();
+		drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
 	}
 	
 	@Override

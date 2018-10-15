@@ -34,6 +34,7 @@ import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserte
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
+import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
@@ -112,13 +113,14 @@ public final class DrtControlerCreator {
 
 	public static void adjustDrtConfig(Config config) {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
+		DrtStageActivityType drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
 		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased)) {
-			if (config.planCalcScore().getActivityParams(drtCfg.getDrtStageActivityType().DRT_STAGE_ACTIVITY) == null) {
-				addDrtStageActivityParams(config, drtCfg.getDrtStageActivityType().DRT_STAGE_ACTIVITY);
+			if (config.planCalcScore().getActivityParams(drtStageActivityType.DRT_STAGE_ACTIVITY) == null) {
+				addDrtStageActivityParams(config, drtStageActivityType.DRT_STAGE_ACTIVITY);
 			}
 		}
-		if (!config.planCalcScore().getModes().containsKey(drtCfg.getDrtStageActivityType().DRT_WALK)) {
-			addDrtWalkModeParams(config, drtCfg.getDrtStageActivityType().DRT_WALK);
+		if (!config.planCalcScore().getModes().containsKey(drtStageActivityType.DRT_WALK)) {
+			addDrtWalkModeParams(config, drtStageActivityType.DRT_WALK);
 		}
 
 		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());

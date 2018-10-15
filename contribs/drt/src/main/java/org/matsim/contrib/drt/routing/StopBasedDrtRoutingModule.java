@@ -68,7 +68,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		this.walkRouter = walkRouter;
 		this.stopFinder = stopFinder;
 		this.drtCfg = drtCfg;
-		this.drtStageActivityType = drtCfg.getDrtStageActivityType();
+		this.drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
 	}
 
 	@Override
