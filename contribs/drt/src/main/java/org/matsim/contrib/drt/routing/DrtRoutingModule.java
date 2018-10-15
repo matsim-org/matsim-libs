@@ -89,10 +89,10 @@ public class DrtRoutingModule implements RoutingModule {
 		if (toLink == fromLink) {
 			if (drtCfg.isPrintDetailedWarnings()) {
 				LOGGER.error("Start and end stop are the same, agent will walk using mode "
-						+ drtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
+						+ drtStageActivityType.drtWalk + ". Agent Id:\t" + person.getId());
 			}
             Leg leg = (Leg) walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
-            leg.setMode(drtStageActivityType.DRT_WALK);
+            leg.setMode(drtStageActivityType.drtWalk);
             return (Collections.singletonList(leg));
 		}
 

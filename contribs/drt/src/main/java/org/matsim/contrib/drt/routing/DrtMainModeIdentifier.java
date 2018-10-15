@@ -26,7 +26,7 @@ public class DrtMainModeIdentifier implements MainModeIdentifier{
 	public String identifyMainMode(List<? extends PlanElement> tripElements) {
 		for (PlanElement pe : tripElements) {
 			if (pe instanceof Activity) {
-				if (((Activity) pe).getType().equals(drtStageActivityType.DRT_STAGE_ACTIVITY))
+				if (((Activity) pe).getType().equals(drtStageActivityType.drtStageActivity))
 				return mode;
 			}
 		}

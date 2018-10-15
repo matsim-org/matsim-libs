@@ -115,12 +115,12 @@ public final class DrtControlerCreator {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		DrtStageActivityType drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
 		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased)) {
-			if (config.planCalcScore().getActivityParams(drtStageActivityType.DRT_STAGE_ACTIVITY) == null) {
-				addDrtStageActivityParams(config, drtStageActivityType.DRT_STAGE_ACTIVITY);
+			if (config.planCalcScore().getActivityParams(drtStageActivityType.drtStageActivity) == null) {
+				addDrtStageActivityParams(config, drtStageActivityType.drtStageActivity);
 			}
 		}
-		if (!config.planCalcScore().getModes().containsKey(drtStageActivityType.DRT_WALK)) {
-			addDrtWalkModeParams(config, drtStageActivityType.DRT_WALK);
+		if (!config.planCalcScore().getModes().containsKey(drtStageActivityType.drtWalk)) {
+			addDrtWalkModeParams(config, drtStageActivityType.drtWalk);
 		}
 
 		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());

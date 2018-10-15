@@ -40,13 +40,13 @@ public class DrtMainModeIdentifierTest {
 		{
 			DrtStageActivityType drtStageActivityType = new DrtStageActivityType("drt");
 			List<PlanElement> testElements = new ArrayList<>();
-			Leg l1 = PopulationUtils.createLeg(drtStageActivityType.DRT_WALK);
-			Activity a2 = PopulationUtils.createActivityFromCoord(drtStageActivityType.DRT_STAGE_ACTIVITY,
+			Leg l1 = PopulationUtils.createLeg(drtStageActivityType.drtWalk);
+			Activity a2 = PopulationUtils.createActivityFromCoord(drtStageActivityType.drtStageActivity,
 					new Coord(0, 0));
 			Leg l2 = PopulationUtils.createLeg("drt");
-			Activity a3 = PopulationUtils.createActivityFromCoord(drtStageActivityType.DRT_STAGE_ACTIVITY,
+			Activity a3 = PopulationUtils.createActivityFromCoord(drtStageActivityType.drtStageActivity,
 					new Coord(0, 0));
-			Leg l3 = PopulationUtils.createLeg(drtStageActivityType.DRT_WALK);
+			Leg l3 = PopulationUtils.createLeg(drtStageActivityType.drtWalk);
 
 			testElements.add(l1);
 			testElements.add(a2);
