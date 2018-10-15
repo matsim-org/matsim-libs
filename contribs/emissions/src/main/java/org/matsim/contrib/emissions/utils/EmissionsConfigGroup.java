@@ -32,7 +32,7 @@ extends ReflectiveConfigGroup
 {
 	public static final String GROUP_NAME = "emissions";
 	
-	@Deprecated // kai, oct'18
+	@Deprecated // See elsewhere in this class.  kai, oct'18
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE = "emissionRoadTypeMappingFile";
 	@Deprecated // kai, oct'18
 	private String emissionRoadTypeMappingFile = null;
@@ -75,8 +75,10 @@ extends ReflectiveConfigGroup
 
 	private static final String HANDLE_HIGH_AVERAGE_SPEEDS = "handleHighAverageSpeeds";
 	private boolean handleHighAverageSpeeds = false;
-
+	
+	@Deprecated // See elsewhere in this class.  kai, oct'18
 	public enum HbefaRoadTypeSource { fromFile, fromLinkAttributes, fromOsm }
+	@Deprecated // See elsewhere in this class.  kai, oct'18
 	private static final String Hbefa_ROADTYPE_SOURCE = "hbefaRoadTypeSource";
 	@Deprecated // my preference would be to phase out the "fromFile" option and use "fromLinkAttributes" only.  It can always be solved after reading the network.  kai, oct'18
 	private HbefaRoadTypeSource hbefaRoadTypeSource = HbefaRoadTypeSource.fromFile; // fromFile is to support backward compatibility
@@ -156,14 +158,17 @@ extends ReflectiveConfigGroup
 	 * @param roadTypeMappingFile -- {@value #EMISSION_ROADTYPE_MAPPING_FILE_CMT}
 	 */
 	@StringSetter(EMISSION_ROADTYPE_MAPPING_FILE)
+	@Deprecated // See elsewhere in this class.  kai, oct'18
 	public void setEmissionRoadTypeMappingFile(String roadTypeMappingFile) {
 		this.emissionRoadTypeMappingFile = roadTypeMappingFile;
 	}
 	@StringGetter(EMISSION_ROADTYPE_MAPPING_FILE)
+	@Deprecated // See elsewhere in this class.  kai, oct'18
 	public String getEmissionRoadTypeMappingFile() {
 		return this.emissionRoadTypeMappingFile;
 	}
-
+	
+	@Deprecated // See elsewhere in this class.  kai, oct'18
 	public URL getEmissionRoadTypeMappingFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.emissionRoadTypeMappingFile);
 	}
