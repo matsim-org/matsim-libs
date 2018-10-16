@@ -35,10 +35,7 @@ import org.matsim.vsp.ev.data.ElectricFleet;
 import org.matsim.vsp.ev.data.file.ChargingInfrastructureProvider;
 import org.matsim.vsp.ev.data.file.ElectricFleetProvider;
 import org.matsim.vsp.ev.discharging.*;
-import org.matsim.vsp.ev.stats.ChargerOccupancyTimeProfileCollectorProvider;
-import org.matsim.vsp.ev.stats.ChargerOccupancyXYDataProvider;
-import org.matsim.vsp.ev.stats.IndividualSocTimeProfileCollectorProvider;
-import org.matsim.vsp.ev.stats.SocHistogramTimeProfileCollectorProvider;
+import org.matsim.vsp.ev.stats.*;
 
 import javax.inject.Inject;
 
@@ -91,6 +88,7 @@ public class EvModule extends AbstractModule {
 			addMobsimListenerBinding().toProvider(IndividualSocTimeProfileCollectorProvider.class);
 			addMobsimListenerBinding().toProvider(ChargerOccupancyTimeProfileCollectorProvider.class);
 			addMobsimListenerBinding().toProvider(ChargerOccupancyXYDataProvider.class);
+			addMobsimListenerBinding().toProvider(VehicleTypeAggregatedSocTimeProfileCollectorProvider.class);
 			// add more time profiles if necessary
 		}
 
