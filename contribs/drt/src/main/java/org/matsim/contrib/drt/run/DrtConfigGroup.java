@@ -120,7 +120,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
-
+	
 	@PositiveOrZero
 	private double stopDuration = Double.NaN;// seconds
 
@@ -214,7 +214,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public void setMode(String mode) {
 		this.mode = mode;
 	}
-
+	
 	/**
 	 * @return -- {@value #STOP_DURATION_EXP}
 	 */

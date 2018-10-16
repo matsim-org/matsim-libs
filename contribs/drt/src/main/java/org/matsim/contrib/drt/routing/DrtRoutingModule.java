@@ -61,6 +61,7 @@ public class DrtRoutingModule implements RoutingModule {
 	private final LeastCostPathCalculator router;
 	private final PopulationFactory populationFactory;
 	private final RoutingModule walkRouter;
+	private final DrtStageActivityType drtStageActivityType;
 
 	@Inject
 	public DrtRoutingModule(DrtConfigGroup drtCfg, @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
@@ -72,6 +73,7 @@ public class DrtRoutingModule implements RoutingModule {
 		this.travelTime = travelTime;
 		this.populationFactory = populationFactory;
 		this.walkRouter = walkRouter;
+		this.drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
 
 		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
 		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
@@ -87,10 +89,10 @@ public class DrtRoutingModule implements RoutingModule {
 		if (toLink == fromLink) {
 			if (drtCfg.isPrintDetailedWarnings()) {
 				LOGGER.error("Start and end stop are the same, agent will walk using mode "
-						+ DrtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
+						+ drtStageActivityType.drtWalk + ". Agent Id:\t" + person.getId());
 			}
             Leg leg = (Leg) walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
-            leg.setMode(DrtStageActivityType.DRT_WALK);
+            leg.setMode(drtStageActivityType.drtWalk);
             return (Collections.singletonList(leg));
 		}
 
@@ -107,7 +109,7 @@ public class DrtRoutingModule implements RoutingModule {
 		route.setUnsharedRideTime(unsharedRideTime);
 		route.setMaxWaitTime(drtCfg.getMaxWaitTime());
 
-		Leg drtLeg = populationFactory.createLeg(TransportMode.drt);
+		Leg drtLeg = populationFactory.createLeg(drtCfg.getMode());
 		drtLeg.setDepartureTime(departureTime);
 		drtLeg.setTravelTime(maxTravelTime);
 		drtLeg.setRoute(route);

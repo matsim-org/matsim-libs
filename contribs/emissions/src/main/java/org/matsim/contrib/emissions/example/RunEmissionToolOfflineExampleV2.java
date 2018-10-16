@@ -19,13 +19,20 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
+import com.google.inject.Guice;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
+import org.matsim.contrib.emissions.roadTypeMapping.VisumHbefaRoadTypeMapping;
+import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -49,26 +56,13 @@ public class RunEmissionToolOfflineExampleV2 {
 	private static final String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" +  lastIteration;
 	private static final String eventsFile = eventsPath + ".events.xml.gz";
 	private static final String emissionEventOutputFile = eventsPath + ".emission.events.offline.xml.gz";
-	
+	private Config config;
+
 	// =======================================================================================================		
 	
 	public static void main (String[] args) throws Exception{
-		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
-
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EmissionModule emissionModule = new EmissionModule(scenario, eventsManager);
-
-		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
-		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
-
-		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
-		matsimEventsReader.readFile(eventsFile);
-		
-		emissionEventWriter.closeFile();
-
-		emissionModule.writeEmissionInformation();
+        RunEmissionToolOfflineExampleV2 emissionToolOfflineExampleV2 = new RunEmissionToolOfflineExampleV2();
+        emissionToolOfflineExampleV2.run();
 	}
 
 	private static int getLastIteration() {
@@ -76,6 +70,32 @@ public class RunEmissionToolOfflineExampleV2 {
 		config.addCoreModules();
 		ConfigReader configReader = new ConfigReader(config);
 		configReader.readFile(RunEmissionToolOfflineExampleV2.configFile);
+        config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
         return config.controler().getLastIteration();
 	}
+
+	public Config getConfig() {
+		return config;
+	}
+
+    public void run() {
+        config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
+        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+        EventsManager eventsManager = EventsUtils.createEventsManager();
+
+
+        com.google.inject.Injector injector = Injector.createInjector(config);
+
+        EmissionModule emissionModule = injector.getInstance(EmissionModule.class);
+
+        EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
+        emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
+
+        MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
+        matsimEventsReader.readFile(eventsFile);
+
+        emissionEventWriter.closeFile();
+
+    }
 }
