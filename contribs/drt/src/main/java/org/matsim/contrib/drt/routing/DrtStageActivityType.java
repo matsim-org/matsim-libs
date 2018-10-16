@@ -7,8 +7,8 @@ import org.matsim.core.router.StageActivityTypes;
 public class DrtStageActivityType implements StageActivityTypes {
 	public final String drtStageActivity;
 	public final String drtWalk;
-	
-	public DrtStageActivityType (String drtMode) {
+
+	public DrtStageActivityType(String drtMode) {
 		drtStageActivity = drtMode + " interaction";
 		drtWalk = drtMode + "_walk";
 	}
@@ -20,10 +20,12 @@ public class DrtStageActivityType implements StageActivityTypes {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (o == null || getClass() != o.getClass())
+		}
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 		DrtStageActivityType that = (DrtStageActivityType)o;
 		return Objects.equals(drtStageActivity, that.drtStageActivity) && Objects.equals(drtWalk, that.drtWalk);
 	}
