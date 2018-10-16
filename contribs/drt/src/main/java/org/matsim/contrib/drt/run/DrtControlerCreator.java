@@ -22,9 +22,6 @@
  */
 package org.matsim.contrib.drt.run;
 
-import java.util.Arrays;
-import java.util.function.Function;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -40,10 +37,12 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.Arrays;
+import java.util.function.Function;
 
 /**
  * @author jbischoff
@@ -150,11 +149,7 @@ public final class DrtControlerCreator {
 		config.planCalcScore().getScoringParametersPerSubpopulation().values().forEach(k -> k.addModeParams(drtWalk));
 		Logger.getLogger(DrtControlerCreator.class)
 				.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
-		
-		ModeRoutingParams walkRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.walk);
-		ModeRoutingParams drtWalkRoutingParams = new ModeRoutingParams(drtWalkMode);
-		drtWalkRoutingParams.setBeelineDistanceFactor(walkRoutingParams.getBeelineDistanceFactor());
-		drtWalkRoutingParams.setTeleportedModeSpeed(walkRoutingParams.getTeleportedModeSpeed());
-//		config.plansCalcRoute().addModeRoutingParams(drtWalkRoutingParams);
+		System.out.println(config.plansCalcRoute().getModeRoutingParams().toString());
+
 	}
 }
