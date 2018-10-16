@@ -49,6 +49,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author michalm (Michal Maciejewski)
  */
 public final class DrtControlerCreator {
+	private static final Logger LOGGER = Logger.getLogger(DrtControlerCreator.class);
 
 	/**
 	 * Creates a standard scenario and adds a DRT route factory to the default route factories.
@@ -112,21 +113,22 @@ public final class DrtControlerCreator {
 
 	public static void adjustDrtConfig(Config config) {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
+		DrtStageActivityType drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
 		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased)) {
-			if (config.planCalcScore().getActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY) == null) {
-				addDrtStageActivityParams(config);
+			if (config.planCalcScore().getActivityParams(drtStageActivityType.drtStageActivity) == null) {
+				addDrtStageActivityParams(config, drtStageActivityType.drtStageActivity);
 			}
 		}
-		if (!config.planCalcScore().getModes().containsKey(DrtStageActivityType.DRT_WALK)) {
-			addDrtWalkModeParams(config);
+		if (!config.planCalcScore().getModes().containsKey(drtStageActivityType.drtWalk)) {
+			addDrtWalkModeParams(config, drtStageActivityType.drtWalk);
 		}
 
 		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
 		config.checkConsistency();
 	}
 
-	private static void addDrtStageActivityParams(Config config) {
-		ActivityParams params = new ActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY);
+	private static void addDrtStageActivityParams(Config config, String stageActivityType) {
+		ActivityParams params = new ActivityParams(stageActivityType);
 		params.setTypicalDuration(1);
 		params.setScoringThisActivityAtAll(false);
 		config.planCalcScore()
@@ -134,19 +136,17 @@ public final class DrtControlerCreator {
 				.values()
 				.forEach(k -> k.addActivityParams(params));
 		config.planCalcScore().addActivityParams(params);
-		Logger.getLogger(DrtControlerCreator.class)
-				.info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
+		LOGGER.info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 	}
 
-	private static void addDrtWalkModeParams(Config config) {
-		ModeParams drtWalk = new ModeParams(DrtStageActivityType.DRT_WALK);
+	private static void addDrtWalkModeParams(Config config, String drtWalkMode) {
+		ModeParams drtWalk = new ModeParams(drtWalkMode);
 		ModeParams walk = config.planCalcScore().getModes().get(TransportMode.walk);
 		drtWalk.setConstant(walk.getConstant());
 		drtWalk.setMarginalUtilityOfDistance(walk.getMarginalUtilityOfDistance());
 		drtWalk.setMarginalUtilityOfTraveling(walk.getMarginalUtilityOfTraveling());
 		drtWalk.setMonetaryDistanceRate(walk.getMonetaryDistanceRate());
 		config.planCalcScore().getScoringParametersPerSubpopulation().values().forEach(k -> k.addModeParams(drtWalk));
-		Logger.getLogger(DrtControlerCreator.class)
-				.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
+		LOGGER.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
 	}
 }

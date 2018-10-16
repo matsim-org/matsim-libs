@@ -117,14 +117,14 @@
                   <arg value="${protobuf.output.directory}" />
                   <arg value="--plugin=protoc-gen-grpc=${grpc.filepath}" />
                   <!--<arg value="${grpc.filename}" />-->
-                  <arg line="${protobuf.input.filepaths}" />
+                  <arg value="${protobuf.input.filepaths}" />
                 </exec>
                 <exec executable="${protoc.filepath}" failonerror="true">
                   <arg value="-I"/>
                   <arg value="${protobuf.input.directory}" />
                   <arg value="--java_out" />
                   <arg value="${protobuf.output.directory}" />
-                  <arg line="${protobuf.input.filepaths}" />
+                  <arg value="${protobuf.input.filepaths}" />
                 </exec>
               </target>
             </configuration>

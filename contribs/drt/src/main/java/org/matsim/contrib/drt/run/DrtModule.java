@@ -60,6 +60,7 @@ public final class DrtModule extends AbstractModule {
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:
                 addRoutingModuleBinding(drtCfg.getMode()).to(DrtRoutingModule.class);
+                bind(MainModeIdentifier.class).to(DrtMainModeIdentifier.class).asEagerSingleton();
 				break;
 
 			case stopbased:
