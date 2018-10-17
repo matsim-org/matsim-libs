@@ -92,9 +92,6 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 		accessibilityCalculator.addFacilityDataExchangeListener(accessibilityAggregator);
 
 		lockedForAdditionalFacilityData  = true ;
-		for (ActivityFacilities facilities : this.additionalFacilityData) {
-			this.additionalFacilities.put(facilities.getName(), facilities);
-		}
 
 		if (outputSubdirectory != null) {
 			File file = new File(outputDirectory + "/" + outputSubdirectory);
@@ -178,8 +175,9 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 					writer.writeField(Double.NaN) ;
 				}
 			}
-			for (String key : facility.getAttributes().getAsMap().keySet()) {
-				int value = (int) facility.getAttributes().getAttribute(key);
+			for (ActivityFacilities additionalDataFacilities : this.additionalFacilityData) { // Again: Iterate over all additional data collections
+				String additionalDataName = additionalDataFacilities.getName();
+				int value = (int) facility.getAttributes().getAttribute(additionalDataName);
 				writer.writeField(value);
 				writer.writeField(value); // TODO Only here for backwards comparability
 			}
