@@ -16,45 +16,44 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MainModeIdentifier;
 
-
 public class DrtMainModeIdentifierTest {
 
 	@Test
 	public void test() {
-		DrtConfigGroup drtConfigGroup= new DrtConfigGroup();
+		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 		drtConfigGroup.setMode("drt");
 		Config config = ConfigUtils.createConfig();
 		config.addModule(drtConfigGroup);
 		MainModeIdentifier mmi = new DrtMainModeIdentifier(drtConfigGroup);
 		{
-		List<PlanElement> testElements = new ArrayList<>();
-		Leg l1 = PopulationUtils.createLeg(TransportMode.car);
-		testElements.add(l1);
-		Assert.assertEquals(TransportMode.car, mmi.identifyMainMode(testElements));
+			List<PlanElement> testElements = new ArrayList<>();
+			Leg l1 = PopulationUtils.createLeg(TransportMode.car);
+			testElements.add(l1);
+			Assert.assertEquals(TransportMode.car, mmi.identifyMainMode(testElements));
 		}
-		{
-		List<PlanElement> testElements = new ArrayList<>();
-		Leg l1 = PopulationUtils.createLeg("drt");
-		testElements.add(l1);
-		Assert.assertEquals("drt", mmi.identifyMainMode(testElements));		
-		}
-		
 		{
 			List<PlanElement> testElements = new ArrayList<>();
-			Leg l1 = PopulationUtils.createLeg(DrtStageActivityType.DRT_WALK);
-			Activity a2 =  PopulationUtils.createActivityFromCoord(DrtStageActivityType.DRT_STAGE_ACTIVITY, new Coord(0,0));
+			Leg l1 = PopulationUtils.createLeg("drt");
+			testElements.add(l1);
+			Assert.assertEquals("drt", mmi.identifyMainMode(testElements));
+		}
+		{
+			DrtStageActivityType drtStageActivityType = new DrtStageActivityType("drt");
+			List<PlanElement> testElements = new ArrayList<>();
+			Leg l1 = PopulationUtils.createLeg(drtStageActivityType.drtWalk);
+			Activity a2 = PopulationUtils.createActivityFromCoord(drtStageActivityType.drtStageActivity,
+					new Coord(0, 0));
 			Leg l2 = PopulationUtils.createLeg("drt");
-			Activity a3 =  PopulationUtils.createActivityFromCoord(DrtStageActivityType.DRT_STAGE_ACTIVITY, new Coord(0,0));
-			Leg l3 = PopulationUtils.createLeg(DrtStageActivityType.DRT_WALK);
+			Activity a3 = PopulationUtils.createActivityFromCoord(drtStageActivityType.drtStageActivity,
+					new Coord(0, 0));
+			Leg l3 = PopulationUtils.createLeg(drtStageActivityType.drtWalk);
 
 			testElements.add(l1);
 			testElements.add(a2);
 			testElements.add(l2);
 			testElements.add(a3);
 			testElements.add(l3);
-			Assert.assertEquals("drt", mmi.identifyMainMode(testElements));		
-			}
-		
+			Assert.assertEquals("drt", mmi.identifyMainMode(testElements));
+		}
 	}
-
 }
