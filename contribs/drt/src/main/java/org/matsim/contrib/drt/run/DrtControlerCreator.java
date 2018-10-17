@@ -50,6 +50,7 @@ import java.util.function.Function;
  * @author michalm (Michal Maciejewski)
  */
 public final class DrtControlerCreator {
+    private static final Logger LOGGER = Logger.getLogger(DrtControlerCreator.class);
 
 	/**
 	 * Creates a standard scenario and adds a DRT route factory to the default route factories.
@@ -144,8 +145,7 @@ public final class DrtControlerCreator {
 				.values()
 				.forEach(k -> k.addActivityParams(params));
 		config.planCalcScore().addActivityParams(params);
-		Logger.getLogger(DrtControlerCreator.class)
-				.info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
+        LOGGER.info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 	}
 
 	private static void addDrtWalkModeParams(Config config, String drtWalkMode) {
@@ -156,9 +156,7 @@ public final class DrtControlerCreator {
 		drtWalk.setMarginalUtilityOfTraveling(walk.getMarginalUtilityOfTraveling());
 		drtWalk.setMonetaryDistanceRate(walk.getMonetaryDistanceRate());
 		config.planCalcScore().getScoringParametersPerSubpopulation().values().forEach(k -> k.addModeParams(drtWalk));
-		Logger.getLogger(DrtControlerCreator.class)
-				.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
-		System.out.println(config.plansCalcRoute().getModeRoutingParams().toString());
+        LOGGER.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
 
 	}
 }
