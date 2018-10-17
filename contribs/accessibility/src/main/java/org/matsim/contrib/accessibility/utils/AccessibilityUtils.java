@@ -115,8 +115,8 @@ public class AccessibilityUtils {
 		}
 	}
 	
-	public static final ActivityFacilities createFacilityForEachLink( Network network ) {
-		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities(Labels.POPULATION_DENSITIY); // TODO change label
+	public static final ActivityFacilities createFacilityForEachLink(String facilityContainerName, Network network ) {
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities(facilityContainerName);
 		ActivityFacilitiesFactory ff = facilities.getFactory() ;
 		for ( Link link : network.getLinks().values() ) {
 			ActivityFacility facility = ff.createActivityFacility( Id.create(link.getId(),ActivityFacility.class) , link.getCoord(), link.getId() ) ;

@@ -57,7 +57,7 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		config.network().setInputFile("/Users/dominik/Workspace/nairobi/data/nairobi/input/2015-10-15_network.xml");
 		config.facilities().setInputFile("/Users/dominik/Workspace/nairobi/data/land_use/Nairobi_LU_2010/facilities.xml");
 		String runId = "ke_nairobi_landuse_" + cellSize.toString().split("\\.")[0] + "";
-		config.controler().setOutputDirectory("/Users/dominik/Workspace/nairobi/data/nairobi/output/" + runId + "_new_test_3/");
+		config.controler().setOutputDirectory("/Users/dominik/Workspace/nairobi/data/nairobi/output/" + runId + "_new_test_4/");
 		config.controler().setRunId(runId);
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -77,7 +77,7 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		
 //		final List<String> activityTypes = Arrays.asList(new String[]{"educational", "commercial", "industrial", "recreational", "water_body"});
 		final List<String> activityTypes = Arrays.asList(new String[]{"educational"});
-		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(scenario.getNetwork());
+		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(Labels.POPULATION_DENSITIY, scenario.getNetwork());
 		
 		final Controler controler = new Controler(scenario);
 		
