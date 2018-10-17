@@ -576,7 +576,7 @@ public class QuadTree<T> implements Serializable {
 		public Leaf(final double x, final double y, final T value) {
 			this.x = x;
 			this.y = y;
-			this.values = new ArrayList<T>(1);
+			this.values = new ArrayList<>(1);
 			this.values.add(value);
 		}
 	}
@@ -584,7 +584,9 @@ public class QuadTree<T> implements Serializable {
 	protected static class Node<T> implements Serializable {
 		private static final long serialVersionUID = 8151154226742383421L;
 
-		private Leaf<T> leaf = null;
+		private static final int MAX_CHILDS = 128;
+
+		private ArrayList<Leaf<T>> leaves = null;
 
 		private boolean hasChilds = false;
 		private Node<T> northwest = null;
@@ -602,18 +604,26 @@ public class QuadTree<T> implements Serializable {
 				throw new IllegalArgumentException( "cannot add a point at x="+leaf.x+", y="+leaf.y+" with bounds "+bounds );
 			}
 			if (this.hasChilds) return getChild(leaf.x, leaf.y).put(leaf);
-			if (this.leaf == null) {
-				this.leaf = leaf;
+			if (this.leaves == null) {
+				this.leaves = new ArrayList<>();
+				this.leaves.add(leaf);
 				return true;
 			}
-			if (this.leaf.x == leaf.x && this.leaf.y == leaf.y) {
-				boolean changed = false;
-				for (T value : leaf.values) {
-					if (!this.leaf.values.contains(value)) {
-						changed = this.leaf.values.add(value) || changed;
+			for (Leaf<T> l : this.leaves) {
+				if (l.x == leaf.x && l.y == leaf.y) {
+					boolean changed = false;
+					for (T value : leaf.values) {
+						if (!l.values.contains(value)) {
+							changed = l.values.add(value) || changed;
+						}
 					}
+					return changed;
 				}
-				return changed;
+
+			}
+			if (this.leaves.size() < MAX_CHILDS) {
+				this.leaves.add(leaf);
+				return true;
 			}
 			this.split();
 			return getChild(leaf.x, leaf.y).put(leaf);
@@ -625,12 +635,16 @@ public class QuadTree<T> implements Serializable {
 
 		public boolean remove(final double x, final double y, final T value) {
 			if (this.hasChilds) return getChild(x, y).remove(x, y, value);
-			if (this.leaf != null && this.leaf.x == x && this.leaf.y == y) {
-				if (this.leaf.values.remove(value)) {
-					if (this.leaf.values.size() == 0) {
-						this.leaf = null;
+			if (this.leaves != null) {
+				for (Leaf<T> leaf : this.leaves) {
+					if (leaf.x == x && leaf.y == y) {
+						if (leaf.values.remove(value)) {
+							if (leaf.values.size() == 0) {
+								this.leaves.remove(leaf);
+							}
+							return true;
+						}
 					}
-					return true;
 				}
 			}
 			return false;
@@ -650,9 +664,8 @@ public class QuadTree<T> implements Serializable {
 				this.southwest = null;
 				this.hasChilds = false;
 			} else {
-				if (this.leaf != null) {
-					this.leaf.values.clear();
-					this.leaf = null;
+				if (this.leaves != null) {
+					this.leaves = null;
 				}
 			}
 		}
@@ -683,17 +696,21 @@ public class QuadTree<T> implements Serializable {
 				return closest;
 			}
 			// no more childs, so we must contain the closest object
-			if (this.leaf != null && this.leaf.values.size() > 0) {
-				T value = this.leaf.values.get(0);
-				double distance = Math.sqrt(
-						(this.leaf.x - x) * (this.leaf.x - x)
-						+ (this.leaf.y - y) * (this.leaf.y - y));
-				if (distance < bestDistance.value) {
-					bestDistance.value = distance;
-					return value;
+			T closest = null;
+			if (this.leaves != null) {
+				for (Leaf<T> leaf : this.leaves) {
+					if (leaf.values.size() > 0) {
+						double distance = Math.sqrt(
+								(leaf.x - x) * (leaf.x - x)
+										+ (leaf.y - y) * (leaf.y - y));
+						if (distance < bestDistance.value) {
+							bestDistance.value = distance;
+							closest = leaf.values.get(0);
+						}
+					}
 				}
 			}
-			return null;
+			return closest;
 		}
 
 		/* default */ Collection<T> getElliptical(
@@ -739,18 +756,22 @@ public class QuadTree<T> implements Serializable {
 				return values;
 			}
 			// no more childs, so we must contain the closest object
-			if (this.leaf != null && this.leaf.values.size() > 0) {
-				final double distance1 = Math.sqrt(
-						(this.leaf.x - x1) * (this.leaf.x - x1)
-						+ (this.leaf.y - y1) * (this.leaf.y - y1));
-				// same trick as above, though it should not be useul in the vast
-				// majority of cases
-				if (distance1 <= maxDistance ) {
-					final double distance2 = Math.sqrt(
-							(this.leaf.x - x2) * (this.leaf.x - x2)
-							+ (this.leaf.y - y2) * (this.leaf.y - y2));
-					if ( distance1 + distance2 <= maxDistance) {
-						values.addAll(this.leaf.values);
+			if (this.leaves != null) {
+				for (Leaf<T> leaf : this.leaves) {
+					if (leaf.values.size() > 0) {
+						final double distance1 = Math.sqrt(
+								(leaf.x - x1) * (leaf.x - x1)
+										+ (leaf.y - y1) * (leaf.y - y1));
+						// same trick as above, though it should not be useul in the vast
+						// majority of cases
+						if (distance1 <= maxDistance) {
+							final double distance2 = Math.sqrt(
+									(leaf.x - x2) * (leaf.x - x2)
+											+ (leaf.y - y2) * (leaf.y - y2));
+							if (distance1 + distance2 <= maxDistance) {
+								values.addAll(leaf.values);
+							}
+						}
 					}
 				}
 			}
@@ -774,12 +795,16 @@ public class QuadTree<T> implements Serializable {
 				return values;
 			}
 			// no more childs, so we must contain the closest object
-			if (this.leaf != null && this.leaf.values.size() > 0) {
-				double distance = Math.sqrt(
-						(this.leaf.x - x) * (this.leaf.x - x)
-						+ (this.leaf.y - y) * (this.leaf.y - y));
-				if (distance <= maxDistance) {
-					values.addAll(this.leaf.values);
+			if (this.leaves != null) {
+				for (Leaf<T> leaf : this.leaves) {
+					if (leaf != null && leaf.values.size() > 0) {
+						double distance = Math.sqrt(
+								(leaf.x - x) * (leaf.x - x)
+										+ (leaf.y - y) * (leaf.y - y));
+						if (distance <= maxDistance) {
+							values.addAll(leaf.values);
+						}
+					}
 				}
 			}
 			return values;
@@ -795,12 +820,16 @@ public class QuadTree<T> implements Serializable {
 				return values;
 			}
 			// no more childs, so we must contain the closest object
-			if (this.leaf != null && this.leaf.values.size() > 0) {
-				double distance = Math.sqrt(
-						(this.leaf.x - x) * (this.leaf.x - x)
-								+ (this.leaf.y - y) * (this.leaf.y - y));
-				if (distance <= r_max && distance >= r_min) {
-					values.addAll(this.leaf.values);
+			if (this.leaves != null) {
+				for (Leaf<T> leaf : this.leaves) {
+					if (leaf.values.size() > 0) {
+						double distance = Math.sqrt(
+								(leaf.x - x) * (leaf.x - x)
+										+ (leaf.y - y) * (leaf.y - y));
+						if (distance <= r_max && distance >= r_min) {
+							values.addAll(leaf.values);
+						}
+					}
 				}
 			}
 			return values;
@@ -832,8 +861,12 @@ public class QuadTree<T> implements Serializable {
 				return values;
 			}
 			// no more childs, so we must contain the closest object
-			if (this.leaf != null && this.leaf.values.size() > 0 && bounds.containsOrEquals(this.leaf.x, this.leaf.y)) {
-				values.addAll(this.leaf.values);
+			if (this.leaves != null) {
+				for (Leaf<T> leaf : this.leaves) {
+					if (leaf.values.size() > 0 && bounds.containsOrEquals(leaf.x, leaf.y)) {
+						values.addAll(leaf.values);
+					}
+				}
 			}
 			return values;
 		}
@@ -856,22 +889,28 @@ public class QuadTree<T> implements Serializable {
 				return count;
 			}
 			// no more childs, so we must contain the closest object
-			if (this.leaf != null && this.leaf.values.size() > 0 && globalBounds.contains(this.leaf.x, this.leaf.y)) {
-				count += this.leaf.values.size();
-				for (T object : this.leaf.values) executor.execute(this.leaf.x, this.leaf.y, object);
+			if (this.leaves != null) {
+				for (Leaf<T> leaf : this.leaves) {
+					if (leaf.values.size() > 0 && globalBounds.contains(leaf.x, leaf.y)) {
+						count += leaf.values.size();
+						for (T object : leaf.values) executor.execute(leaf.x, leaf.y, object);
+					}
+				}
 			}
 			return count;
 		}
 
 		private void split() {
-			this.northwest = new Node<T>(this.bounds.minX, this.bounds.centerY, this.bounds.centerX, this.bounds.maxY);
-			this.northeast = new Node<T>(this.bounds.centerX, this.bounds.centerY, this.bounds.maxX, this.bounds.maxY);
-			this.southeast = new Node<T>(this.bounds.centerX, this.bounds.minY, this.bounds.maxX, this.bounds.centerY);
-			this.southwest = new Node<T>(this.bounds.minX, this.bounds.minY, this.bounds.centerX, this.bounds.centerY);
+			this.northwest = new Node<>(this.bounds.minX, this.bounds.centerY, this.bounds.centerX, this.bounds.maxY);
+			this.northeast = new Node<>(this.bounds.centerX, this.bounds.centerY, this.bounds.maxX, this.bounds.maxY);
+			this.southeast = new Node<>(this.bounds.centerX, this.bounds.minY, this.bounds.maxX, this.bounds.centerY);
+			this.southwest = new Node<>(this.bounds.minX, this.bounds.minY, this.bounds.centerX, this.bounds.centerY);
 			this.hasChilds = true;
-			if (this.leaf != null) {
-				getChild(this.leaf.x, this.leaf.y).put(this.leaf);
-				this.leaf = null;
+			if (this.leaves != null) {
+				for (Leaf<T> leaf : this.leaves) {
+					getChild(leaf.x, leaf.y).put(leaf);
+				}
+				this.leaves= null;
 			}
 		}
 
@@ -897,7 +936,7 @@ public class QuadTree<T> implements Serializable {
 				if (leaf == null) { leaf = this.northeast.firstLeaf(); }
 				return leaf;
 			}
-			return this.leaf;
+			return (this.leaves == null || this.leaves.isEmpty()) ? null : this.leaves.get(0);
 		}
 
 		/* default */ boolean nextLeaf(final Leaf<T> currentLeaf, final MutableLeaf<T> nextLeaf) {
@@ -932,7 +971,16 @@ public class QuadTree<T> implements Serializable {
 				}
 				return false;
 			}
-			return currentLeaf == this.leaf;
+			if (this.leaves != null) {
+				int idx = this.leaves.indexOf(currentLeaf);
+				if (idx >= 0) {
+					if (idx + 1 < this.leaves.size()) {
+						nextLeaf.value = this.leaves.get(idx + 1);
+					}
+					return true;
+				}
+			}
+			return false;
 		}
 
 		public Leaf<T> nextLeaf(final Leaf<T> currentLeaf) {
@@ -948,6 +996,6 @@ public class QuadTree<T> implements Serializable {
 	}
 
 	public interface Executor<T> {
-		public void execute(double x, double y, T object);
+		void execute(double x, double y, T object);
 	}
 }
