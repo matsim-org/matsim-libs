@@ -22,12 +22,10 @@
  */
 package org.matsim.contrib.drt.run;
 
-import java.util.Arrays;
-import java.util.function.Function;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
@@ -44,12 +42,14 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import java.util.Arrays;
+import java.util.function.Function;
+
 /**
  * @author jbischoff
  * @author michalm (Michal Maciejewski)
  */
 public final class DrtControlerCreator {
-	private static final Logger LOGGER = Logger.getLogger(DrtControlerCreator.class);
 
 	/**
 	 * Creates a standard scenario and adds a DRT route factory to the default route factories.
@@ -59,9 +59,16 @@ public final class DrtControlerCreator {
 	 */
 	public static Scenario createScenarioWithDrtRouteFactory(Config config) {
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
-		routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
+		addDrtRouteFactory(scenario);
 		return scenario;
+	}
+
+	public static void addDrtRouteFactory(Scenario scenario) {
+
+		RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
+		if (routeFactories.getRouteClassForType(DrtRoute.ROUTE_TYPE).equals(Route.class)) {
+			routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
+		}
 	}
 
 	/**
@@ -90,6 +97,7 @@ public final class DrtControlerCreator {
 	public static Controler createControler(Config config, boolean otfvis, Function<Config, Scenario> scenarioLoader) {
 		adjustDrtConfig(config);
 		Scenario scenario = scenarioLoader.apply(config);
+		addDrtRouteFactory(scenario);
 		Controler controler = new Controler(scenario);
 		addDrtAsSingleDvrpModeToControler(controler);
 		if (otfvis) {
@@ -136,7 +144,8 @@ public final class DrtControlerCreator {
 				.values()
 				.forEach(k -> k.addActivityParams(params));
 		config.planCalcScore().addActivityParams(params);
-		LOGGER.info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
+		Logger.getLogger(DrtControlerCreator.class)
+				.info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 	}
 
 	private static void addDrtWalkModeParams(Config config, String drtWalkMode) {
@@ -147,6 +156,9 @@ public final class DrtControlerCreator {
 		drtWalk.setMarginalUtilityOfTraveling(walk.getMarginalUtilityOfTraveling());
 		drtWalk.setMonetaryDistanceRate(walk.getMonetaryDistanceRate());
 		config.planCalcScore().getScoringParametersPerSubpopulation().values().forEach(k -> k.addModeParams(drtWalk));
-		LOGGER.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
+		Logger.getLogger(DrtControlerCreator.class)
+				.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
+		System.out.println(config.plansCalcRoute().getModeRoutingParams().toString());
+
 	}
 }
