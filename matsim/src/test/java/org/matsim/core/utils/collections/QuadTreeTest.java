@@ -495,62 +495,6 @@ public class QuadTreeTest {
 		} catch (UnsupportedOperationException expected) {}
 	}
 
-	@Test
-	public void testValues_EntryOnDividingBorder() {
-		QuadTree<String> qt = new QuadTree<>(0.0, 0.0, 40.0, 60.0);
-		qt.put(10.0, 10.0, "10.0, 10.0");
-		qt.put(20.0, 20.0, "20.0, 20.0"); // on vertical border
-		qt.put(20.0, 30.0, "20.0, 30.0"); // exactly on center
-		qt.put(20.0, 30.0, "30.0, 30.0"); // on horizontal border
-		qt.put(20.0, 30.0, "30.0, 30.0"); // on horizontal border
-		qt.put(10.0, 40.0, "10.0, 40.0"); // on 2nd-level border
-		assertEquals(5, qt.size());
-		valuesTester(5, qt.values());
-		Iterator<String> iter = qt.values().iterator();
-		assertEquals("10.0, 10.0", iter.next());
-		assertEquals("10.0, 40.0", iter.next());
-		assertEquals("20.0, 20.0", iter.next());
-		assertEquals("20.0, 30.0", iter.next());
-		assertEquals("30.0, 30.0", iter.next());
-		assertFalse(iter.hasNext());
-	}
-
-	@Test
-	public void testValues_EntryOnOutsideBorder() {
-		QuadTree<String> qt = new QuadTree<>(0.0, 0.0, 40.0, 60.0);
-		// the 4 corners
-		qt.put(0.0, 0.0, "SW");
-		qt.put(40.0, 0.0, "SE");
-		qt.put(0.0, 60.0, "NW");
-		qt.put(40.0, 60.0, "NE");
-		// the 4 sides
-		qt.put(10.0, 60.0, "N");
-		qt.put(40.0, 10.0, "E");
-		qt.put(10.0, 0.0, "S");
-		qt.put(0.0, 10.0, "W");
-
-		assertEquals(8, qt.size());
-		valuesTester(8, qt.values());
-		assertTrue(qt.values().contains("SW"));
-		assertTrue(qt.values().contains("SE"));
-		assertTrue(qt.values().contains("NW"));
-		assertTrue(qt.values().contains("NE"));
-		assertTrue(qt.values().contains("N"));
-		assertTrue(qt.values().contains("E"));
-		assertTrue(qt.values().contains("S"));
-		assertTrue(qt.values().contains("W"));
-		Iterator<String> iter = qt.values().iterator();
-		assertEquals("SW", iter.next());
-		assertEquals("W", iter.next());
-		assertEquals("S", iter.next());
-		assertEquals("NW", iter.next());
-		assertEquals("N", iter.next());
-		assertEquals("SE", iter.next());
-		assertEquals("E", iter.next());
-		assertEquals("NE", iter.next());
-		assertFalse(iter.hasNext());
-	}
-
 	/**
 	 * Tests that a once obtained values-collection is indeed a live view
 	 * on the QuadTree, so when the QuadTree changes, the view is updated
