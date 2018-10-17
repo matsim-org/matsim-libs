@@ -51,7 +51,8 @@ public class VoronoiGeometryUtils {
 	private static GeometryFactory geometryFactory = new GeometryFactory();
 	
 	
-	static Map<Id<ActivityFacility>, Geometry> buildMapMeasurePointGeometryMap(ActivityFacilities measuringPoints, BoundingBox box) {
+	static Map<Id<ActivityFacility>, Geometry> buildMeasurePointGeometryMap(ActivityFacilities measuringPoints, BoundingBox box) {
+		LOG.warn("Started building measure-point-to-geometry map.");
 		Map<Id<ActivityFacility>, Geometry> measurePointPolygons = new HashMap<>();
 		
 		Collection<Geometry> geometries = determineVoronoiShapes(measuringPoints, box);
@@ -79,6 +80,7 @@ public class VoronoiGeometryUtils {
 				throw new RuntimeException("There must be one Voronoi polygons for each measure point.");
 			}
 		}
+		LOG.warn("Finished building measure-point-to-geometry map.");
 		return measurePointPolygons;
 	}
 
