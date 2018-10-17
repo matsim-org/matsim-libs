@@ -20,20 +20,29 @@
 
 package org.matsim.core.utils.collections;
 
-import org.junit.Assert;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test for {@link QuadTree}.
@@ -725,6 +734,66 @@ public class QuadTreeTest {
 		result = qt.getRing(0, 0, Math.sqrt(18), Math.sqrt(18));
 		assertEquals(result.size(), 1);
 		assertEquals(result.contains("3,3"), true);
+	}
+
+	/**
+	 * A kind of performance test, but not marked as test, as there is no need
+	 * to run it in every check as there is not assert statement.
+	 *
+	 * @author mrieser
+	 */
+	private static void measurePerformance() {
+		Random r = new Random(20181016L);
+		int elementCount = 1_000_000;
+		int queryCount = 10_000_000;
+		Runtime runtime = Runtime.getRuntime();
+
+		double minX = -1000;
+		double minY = -5000;
+		double maxX = 20000;
+		double maxY = 12000;
+
+
+
+		QuadTree<Coord> qt = new QuadTree<>(minX, minY, maxX, maxY);
+		System.gc();
+		System.gc();
+		System.gc();
+		long usedMemBefore = runtime.totalMemory() - runtime.freeMemory();
+		long startTimeInit = System.currentTimeMillis();
+		for (int i = 0; i < elementCount; i++) {
+			Coord coord = new Coord(minX + r.nextDouble() * (maxX - minX), minY + r.nextDouble() * (maxY - minY));
+			qt.put(coord.getX(), coord.getY(), coord);
+		}
+		long endTimeInit = System.currentTimeMillis();
+		System.gc();
+		System.gc();
+		System.gc();
+		long usedMemAfter = runtime.totalMemory() - runtime.freeMemory();
+
+		int countFirstQuadrant = 0;
+		long startTimeQuery = System.currentTimeMillis();
+		for (int i = 0; i < queryCount; i++) {
+			double x = minX + r.nextDouble() * (maxX - minX);
+			double y = minY + r.nextDouble() * (maxY - minY);
+			Coord coord = qt.getClosest(x, y);
+			if (coord.getX() >= 0 && coord.getY() >= 0) {
+				countFirstQuadrant++;
+			}
+		}
+		long endTimeQuery = System.currentTimeMillis();
+
+		log.info("init time: " + (endTimeInit - startTimeInit) / 1000.0 + " sec.");
+		log.info("query time: " + (endTimeQuery - startTimeQuery) / 1000.0 + " sec.");
+		log.info("memory usage: " + (usedMemAfter - usedMemBefore) / 1024 / 1024.0 + " MB");
+		log.info("check, ignore: " + countFirstQuadrant);
+	}
+
+	public static void main(String[] args) {
+		for (int i = 0; i < 5; i++) {
+			log.info("Round " + i);
+			measurePerformance();
+		}
 	}
 
 }
