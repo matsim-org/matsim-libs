@@ -18,6 +18,41 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class QSimComponentsTest {
 	@Test
+	public void testMultipleBindings() {
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+
+		MockEngineA mockEngineA = new MockEngineA();
+		MockEngineB mockEngineB = new MockEngineB();
+
+		new QSimBuilder(config) //
+				.addQSimModule(new AbstractQSimModule() {
+					@Override
+					protected void configureQSim() {
+						bind(MockEngineA.class).annotatedWith(MockComponentAnnotation.class).toInstance(mockEngineA);
+						bind(MockEngineB.class).annotatedWith(MockComponentAnnotation.class).toInstance(mockEngineB);
+					}
+				}) //
+				.configureComponents(components -> {
+					components.addComponent(MockComponentAnnotation.class);
+				}) //
+				.build(scenario, eventsManager) //
+				.run();
+
+		Assert.assertTrue(mockEngineA.isCalled);
+		Assert.assertTrue(mockEngineB.isCalled);
+	}
+	
+	class MockEngineA extends MockEngine implements MobsimEngine {
+		
+	}
+	
+	class MockEngineB extends MockEngine implements MobsimEngine {
+		
+	}
+	
+	@Test
 	public void testExplicitAnnotationConfiguration() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
