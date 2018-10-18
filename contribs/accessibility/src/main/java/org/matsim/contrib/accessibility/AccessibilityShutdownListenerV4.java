@@ -23,15 +23,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.collections.Tuple;
@@ -50,12 +46,10 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 	private static final Logger LOG = Logger.getLogger(AccessibilityShutdownListenerV4.class);
 
 	private final AccessibilityCalculator accessibilityCalculator;
-	private double time;
 	private String outputDirectory;
 	private AccessibilityConfigGroup acg;
 	
-	// for consideration of different activity types subdirectories are required in order not to confuse the output
-	private String outputSubdirectory;
+	private String outputSubdirectory; // For consideration of different activity types subdirectories are required in order not to confuse the output
 	private AccessibilityAggregator accessibilityAggregator;
 	private PtMatrix ptMatrix;
 	private ActivityFacilities opportunities;
@@ -76,7 +70,6 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 	}
 
 	private List<ActivityFacilities> additionalFacilityData = new ArrayList<>() ;
-	private Map<String,ActivityFacilities> additionalFacilities = new TreeMap<>();
 	
 	private boolean lockedForAdditionalFacilityData = false;
 
@@ -91,7 +84,7 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 		accessibilityAggregator = new AccessibilityAggregator();
 		accessibilityCalculator.addFacilityDataExchangeListener(accessibilityAggregator);
 
-		lockedForAdditionalFacilityData  = true ;
+		lockedForAdditionalFacilityData = true;
 
 		if (outputSubdirectory != null) {
 			File file = new File(outputDirectory + "/" + outputSubdirectory);
@@ -125,7 +118,6 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 
 		accessibilityCalculator.computeAccessibilities(acg.getTimeOfDay(), opportunities);
 
-
 		// as for the other writer above: In case multiple AccessibilityControlerListeners are added to the controller, e.g. if 
 		// various calculations are done for different activity types or different modes (or both) subdirectories are required
 		// in order not to confuse the output
@@ -135,7 +127,6 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 			writePlottingData(outputDirectory + "/" + outputSubdirectory);
 		}
 	}
-
 
 	/**
 	 * This writes the accessibility grid data into the MATSim output directory
@@ -149,7 +140,7 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 		// Write header
 		writer.writeField(Labels.X_COORDINATE);
 		writer.writeField(Labels.Y_COORDINATE);
-//		writer.writeField(Labels.TIME); // TODO
+		writer.writeField(Labels.TIME);
 		for (String mode : accessibilityCalculator.getModes() ) {
 			writer.writeField(mode + "_accessibility");
 		}
@@ -165,7 +156,7 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 			ActivityFacility facility = tuple.getFirst();
 			writer.writeField(facility.getCoord().getX());
 			writer.writeField(facility.getCoord().getY());
-			// TODO write time
+			writer.writeField(tuple.getSecond());
 			
 			for (String mode : accessibilityCalculator.getModes() ) {
 				final double value = accessibilitiesMap.get(tuple).get(mode);
@@ -188,7 +179,6 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 		LOG.info("Writing plotting data for other analysis done!");
 	}
 	
-
 	public void addAdditionalFacilityData(ActivityFacilities facilities) {
 		if (this.lockedForAdditionalFacilityData) {
 			throw new RuntimeException("too late for adding additional facility data; spatial grids have already been generated.  Needs"
@@ -206,7 +196,6 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 		this.additionalFacilityData.add( facilities ) ;
 	}
 
-
 	/**
 	 * Using this method changes the folder structure of the output. The output of the calculation will be written into the
 	 * subfolder. This is needed if more than one ContolerListener is added since otherwise the output would be overwritten
@@ -216,13 +205,7 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 		this.outputSubdirectory = subdirectory;
 	}
 	
-
 	public void addFacilityDataExchangeListener( FacilityDataExchangeInterface facilityDataExchangeListener ) {
 		this.accessibilityCalculator.addFacilityDataExchangeListener(facilityDataExchangeListener);
-	}
-
-
-	public void setTime(double time) {
-		this.time = time;
 	}
 }
