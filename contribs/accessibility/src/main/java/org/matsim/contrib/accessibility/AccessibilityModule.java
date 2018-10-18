@@ -20,8 +20,10 @@
 package org.matsim.contrib.accessibility;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Provider;
 
@@ -42,6 +44,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -68,15 +72,7 @@ public final class AccessibilityModule extends AbstractModule {
 	private String activityType;
 	private boolean pushing2Geoserver;
 	private String crs;
-	
-	/**
-	 * If this class does not provide you with enough flexibility, do your own new AbstractModule(){...}, copy the install part from this class
-	 * into that, and go from there. 
-	 */
-	public AccessibilityModule() {
-	}
-	
-	
+
 	@Override
 	public void install() {
 		addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
@@ -125,7 +121,7 @@ public final class AccessibilityModule extends AbstractModule {
 					String measuringPointsFile = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class ).getMeasuringPointsFile() ;
 					new MatsimFacilitiesReader(measuringPointsSc).readFile(measuringPointsFile);
 //					if (measuringPoints != null) {LOG.warn("Measuring points had already been set directly. Now overwriting...");}
-					measuringPoints = (ActivityFacilitiesImpl) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(measuringPointsSc, activityType);
+					measuringPoints = (ActivityFacilitiesImpl) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(measuringPointsSc, null);
 					LOG.info("Using measuring points from file: " + measuringPointsFile);
 				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromFacilitiesObject) {
 //					boundingBox = null; // TODO
@@ -144,15 +140,8 @@ public final class AccessibilityModule extends AbstractModule {
 				
 				LOG.warn("boundingBox = " + boundingBox);
 				
-				// New AV stuff -------------------------------------------------------------
-				// TODO very dirty quick fix; needs to be revised soon
-//				if (AccessibilityAVUtils.avMode) {
-//					measuringPoints = AccessibilityAVUtils.createActivityFacilitiesWithWaitingTime();
-//					LOG.warn("-------- User-created facilities with waiting times created");
-//				}
-				//
-				
-				//
+				// TODO Need to find a stable way for multi-modal networks
+				// AV stuff -------------------------------------------------------------
 //				TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
 //				LOG.warn("Full network has " + network.getNodes().size() + " nodes.");
 //				Network carNetwork = NetworkUtils.createNetwork();
@@ -160,8 +149,7 @@ public final class AccessibilityModule extends AbstractModule {
 //				modeSet.add("car");
 //				filter.filter(carNetwork, modeSet);
 //				LOG.warn("Pure car network now has " + carNetwork.getNodes().size() + " nodes.");
-				//
-				// End new AV stuff -------------------------------------------------------------
+				// End AV stuff -------------------------------------------------------------
 				
 				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, network);
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
@@ -197,7 +185,7 @@ public final class AccessibilityModule extends AbstractModule {
 					accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calculator);
 				}
 				
-				Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap = VoronoiGeometryUtils.buildMapMeasurePointGeometryMap(measuringPoints, boundingBox);
+				Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap = VoronoiGeometryUtils.buildMeasurePointGeometryMap(measuringPoints, boundingBox);
 
 				
 				if (pushing2Geoserver == true) {

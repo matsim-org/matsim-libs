@@ -100,7 +100,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private ActivityFacilities measuringPointsFacilities;
 
 	public static final String TIME_OF_DAY = "timeOfDay";
-	private Double timeOfDay = 8.*3600 ;
+	private Double timeOfDay = 8.*3600;
 
 	public AccessibilityConfigGroup() {
 		super(GROUP_NAME);
@@ -189,8 +189,8 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 		return this.timeOfDay ;
 	}
 	@StringSetter(TIME_OF_DAY)
-	public void setTimeOfDay( Double val ) {
-		this.timeOfDay = val ;
+	public void setTimeOfDay(Double timeOfDay) {
+		this.timeOfDay = timeOfDay;
 	}
 	
 	@StringGetter(ACCESSIBILITY_DESTINATION_SAMPLING_RATE)
