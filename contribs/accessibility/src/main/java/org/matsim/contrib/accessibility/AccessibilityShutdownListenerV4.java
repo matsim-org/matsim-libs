@@ -79,7 +79,6 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 		if (event.isUnexpected()) {
 			return;
 		}
-
 		LOG.info("Initializing accessibility computation...");
 		accessibilityAggregator = new AccessibilityAggregator();
 		accessibilityCalculator.addFacilityDataExchangeListener(accessibilityAggregator);
@@ -91,6 +90,22 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 			file.mkdirs();
 		}
 
+		assignAdditionalFacilitiesDataToMeasurePoint();
+
+		LOG.info("Start computing accessibilities.");
+		accessibilityCalculator.computeAccessibilities(acg.getTimeOfDay(), opportunities);
+		LOG.info("Finished computing accessibilities.");
+
+		// In case multiple accessibility listeners are used, subdirectories are required in order not to confuse the output
+		if (outputSubdirectory == null) {
+			writeOutputFile(outputDirectory);
+		} else {
+			writeOutputFile(outputDirectory + "/" + outputSubdirectory);
+		}
+	}
+
+	private void assignAdditionalFacilitiesDataToMeasurePoint() {
+		LOG.info("Start assigning additional facilities data to measure point.");
 		GeometryFactory geometryFactory = new GeometryFactory();
 		
 		for (ActivityFacilities additionalDataFacilities : this.additionalFacilityData) { // Iterate over all additional data collections
@@ -110,29 +125,13 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 					}
 				}
 			}
-			LOG.warn(additionalDataFacilitiesToAssign + " have not been assigned to a measure point geoemtry.");
+			LOG.warn(additionalDataFacilitiesToAssign + " have not been assigned to a measure point geometry.");
 		}
-
-		LOG.info("Computing and writing cell based accessibility measures ..."); // TODO revise... cell-based?
-		// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
-
-		accessibilityCalculator.computeAccessibilities(acg.getTimeOfDay(), opportunities);
-
-		// as for the other writer above: In case multiple AccessibilityControlerListeners are added to the controller, e.g. if 
-		// various calculations are done for different activity types or different modes (or both) subdirectories are required
-		// in order not to confuse the output
-		if (outputSubdirectory == null) {
-			writePlottingData(outputDirectory);
-		} else {
-			writePlottingData(outputDirectory + "/" + outputSubdirectory);
-		}
+		LOG.info("Finished assigning additional facilities data to measure point.");
 	}
 
-	/**
-	 * This writes the accessibility grid data into the MATSim output directory
-	 */
-	private void writePlottingData(String adaptedOutputDirectory) {
-		LOG.info("Writing plotting data for other analyis into " + adaptedOutputDirectory + " ...");
+	private void writeOutputFile(String adaptedOutputDirectory) {
+		LOG.info("Start writing accessibility output to " + adaptedOutputDirectory + ".");
 
 		Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = accessibilityAggregator.getAccessibilitiesMap();
 		final CSVWriter writer = new CSVWriter(adaptedOutputDirectory + "/" + CSVWriter.FILE_NAME ) ;
@@ -175,8 +174,7 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 			writer.writeNewLine();
 		}
 		writer.close() ;
-
-		LOG.info("Writing plotting data for other analysis done!");
+		LOG.info("Finished writing accessibility output to " + adaptedOutputDirectory + ".");
 	}
 	
 	public void addAdditionalFacilityData(ActivityFacilities facilities) {
@@ -197,9 +195,8 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 	}
 
 	/**
-	 * Using this method changes the folder structure of the output. The output of the calculation will be written into the
-	 * subfolder. This is needed if more than one ContolerListener is added since otherwise the output would be overwritten
-	 * and not be available for analyses anymore.
+	 * Use this method to change the folder structure of the output. The output will be written into the subfolder, which is needed if
+	 * more than one listener is added since otherwise the output would be overwritten and not be available for analyses anymore.
 	 */
 	public void writeToSubdirectoryWithName(String subdirectory) {
 		this.outputSubdirectory = subdirectory;
