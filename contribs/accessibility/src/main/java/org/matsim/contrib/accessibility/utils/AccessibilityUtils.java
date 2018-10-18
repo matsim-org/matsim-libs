@@ -143,36 +143,6 @@ public class AccessibilityUtils {
 		}
 		return facilities ;
 	}
-	
-//	/**
-//	 * Goes through a given set of measuring points and creates a facility on the measuring point if the
-//	 * nearest link from that measure point lies within a specified maximum allowed distance. The presence
-//	 * of such networkDensityFacilites can then be used to plot a density layer, e.g. to excluded tiles
-//	 * from being drawn if there is no network. The network density is thereby used as a proxy for settlement
-//	 * density if no information of settlement density is available.
-//	 */
-//	@Deprecated
-//	public static ActivityFacilities createNetworkDensityFacilities(Network network,
-//			ActivityFacilities measuringPoints, double maximumAllowedDistance) {
-//		// yyyyyy This method scares me ... since in the code it is used by code that does not really know the measuring points and so
-//		// only speculates about it.  kai, dec'16
-//		// yyyyyy Why not just create a facility for each link?  (The GridBasedAccessibilityListener aggregates those anyways ...).  kai, dec'16
-//		
-//		ActivityFacilitiesFactory aff = new ActivityFacilitiesFactoryImpl();
-//		ActivityFacilities networkDensityFacilities = FacilitiesUtils.createActivityFacilities("network_densities");
-//
-//		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values() ) {
-//			Coord coord = measuringPoint.getCoord();
-//			Link link = NetworkUtils.getNearestLink(network, coord);
-//			// TODO check if this is good or if orthogonal projection etc. is more suitable
-//			double distance = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
-//			if (distance <= maximumAllowedDistance) {
-//				ActivityFacility facility = aff.createActivityFacility(measuringPoint.getId(), coord);
-//				networkDensityFacilities.addActivityFacility(facility);
-//			}
-//		}
-//		return networkDensityFacilities;
-//	}
 
 	/**
 	 * Creates measuring points based on the scenario's network and a specified cell size.
