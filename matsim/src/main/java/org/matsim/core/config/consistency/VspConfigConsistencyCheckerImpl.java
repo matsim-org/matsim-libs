@@ -161,7 +161,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			}
 		}
 		
-		if ( config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0 ) {
+		if ( config.planCalcScore().getModes().get(TransportMode.car) != null && config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
 		}
 		final ModeParams modeParamsPt = config.planCalcScore().getModes().get(TransportMode.pt);
@@ -297,7 +297,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		// added nov'15
 		boolean usingTimeMutator = false ;
 		for ( StrategySettings it : config.strategy().getStrategySettings() ) {
-			if ( DefaultStrategy.TimeAllocationMutator.toString().equals( it.getName() ) ) {
+			if ( DefaultStrategy.TimeAllocationMutator.equals( it.getName() ) ) {
 				usingTimeMutator = true ;
 				break ;
 			}

@@ -19,9 +19,6 @@
 
 package org.matsim.facilities;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,6 +41,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Created by amit on 05.02.18.
@@ -131,7 +132,7 @@ public class ActivityFacilitiesSourceTest {
 
 	private ActivityFacilities getFacilities(String outputDir){
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
-		new FacilitiesReaderMatsimV1(null, null, scenario).readFile(outputDir+"/output_facilities.xml.gz");
+		new FacilitiesReaderMatsimV1(null, null, scenario.getActivityFacilities()).readFile(outputDir+"/output_facilities.xml.gz");
 		return scenario.getActivityFacilities();
 	}
 

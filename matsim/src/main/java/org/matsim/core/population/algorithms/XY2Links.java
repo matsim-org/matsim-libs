@@ -20,8 +20,6 @@
 
 package org.matsim.core.population.algorithms;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -31,7 +29,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
+
+import java.util.List;
 
 /**
  * Assigns each activity in a plan a link where the activity takes place
@@ -79,14 +78,13 @@ public final class XY2Links extends AbstractPersonAlgorithm implements PlanAlgor
 			if (planElement instanceof Activity) {
 				Activity act = (Activity) planElement;
 				
-				if ( facilities != null ) {
+				if ( this.facilities != null ) {
 					// since the facilities in Scenario are now permanently enabled, this can only happen when called through the
 					// more specific constructor. kai, feb'16
 					
-					if (act.getFacilityId() != null) {
-						ActivityFacility facility = facilities.getFacilities().get(act.getFacilityId());
-
 						//following is not necessary. Kai, Amit July'18
+//					if (act.getFacilityId() != null) {
+//						ActivityFacility facility = facilities.getFacilities().get(act.getFacilityId());
 //						if (facility != null) {
 //							act.setLinkId(facility.getLinkId());
 //							// yy facility.getLinkId may be null, in particular since linkId is not even part of the facilities DTD. kai, feb'16
@@ -97,7 +95,7 @@ public final class XY2Links extends AbstractPersonAlgorithm implements PlanAlgor
 //								act.setCoord(facility.getCoord());
 //							}
 //						}
-					}
+//					}
 				}
 				
 				if ( act.getLinkId() != null ) {

@@ -42,19 +42,16 @@ public class ArrayRoutingNetworkNode extends AbstractRoutingNetworkNode implemen
 
 	@Override
 	public Link removeInLink(Id<Link> linkId) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public Link removeOutLink(Id<Link> outLinkId) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public void setCoord(Coord coord) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 }

@@ -26,12 +26,12 @@ public final class TransportPlanningMainModeIdentifier implements MainModeIdenti
 	public TransportPlanningMainModeIdentifier() {
 		modeHierarchy.add( TransportMode.access_walk ) ;
 		modeHierarchy.add( TransportMode.egress_walk ) ;
-		modeHierarchy.add( TransportMode.transit_walk ) ;
 		modeHierarchy.add( "undefined" ) ;
 		modeHierarchy.add( TransportMode.other ) ;
 		modeHierarchy.add( TransportMode.transit_walk ) ;
 		modeHierarchy.add( TransportMode.walk ) ;
 		modeHierarchy.add( TransportMode.bike ) ;
+		modeHierarchy.add( TransportMode.drt ) ;
 		modeHierarchy.add( TransportMode.pt ) ;
 		modeHierarchy.add( TransportMode.ride ) ;
 		modeHierarchy.add( TransportMode.car ) ;

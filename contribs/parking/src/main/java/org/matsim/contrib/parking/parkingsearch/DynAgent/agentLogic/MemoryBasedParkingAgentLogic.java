@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.DistanceMemoryDynLeg;
-import org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic.ParkingAgentLogic;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.contrib.parking.parkingsearch.manager.WalkLegFactory;
 import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
@@ -25,21 +24,10 @@ import org.matsim.core.population.routes.NetworkRoute;
  */
 public class MemoryBasedParkingAgentLogic extends ParkingAgentLogic {
 
-	/**
-	 * @param plan
-	 * @param parkingManager
-	 * @param walkLegFactory
-	 * @param parkingRouter
-	 * @param events
-	 * @param parkingLogic
-	 * @param timer
-	 * @param teleportationLogic
-	 */
 	public MemoryBasedParkingAgentLogic(Plan plan, ParkingSearchManager parkingManager, WalkLegFactory walkLegFactory,
 			ParkingRouter parkingRouter, EventsManager events, ParkingSearchLogic parkingLogic, MobsimTimer timer,
 			VehicleTeleportationLogic teleportationLogic, ParkingSearchConfigGroup configGroup) {
 		super(plan, parkingManager, walkLegFactory, parkingRouter, events, parkingLogic, timer, teleportationLogic, configGroup);
-		// TODO Auto-generated constructor stub
 	}
 
 	

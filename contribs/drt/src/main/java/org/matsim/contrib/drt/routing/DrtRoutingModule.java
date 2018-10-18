@@ -19,10 +19,8 @@
 
 package org.matsim.contrib.drt.routing;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -47,8 +45,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author jbischoff
@@ -63,6 +61,7 @@ public class DrtRoutingModule implements RoutingModule {
 	private final LeastCostPathCalculator router;
 	private final PopulationFactory populationFactory;
 	private final RoutingModule walkRouter;
+	private final DrtStageActivityType drtStageActivityType;
 
 	@Inject
 	public DrtRoutingModule(DrtConfigGroup drtCfg, @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
@@ -74,6 +73,7 @@ public class DrtRoutingModule implements RoutingModule {
 		this.travelTime = travelTime;
 		this.populationFactory = populationFactory;
 		this.walkRouter = walkRouter;
+		this.drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
 
 		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
 		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
@@ -88,9 +88,12 @@ public class DrtRoutingModule implements RoutingModule {
 		Link toLink = getLink(toFacility);
 		if (toLink == fromLink) {
 			if (drtCfg.isPrintDetailedWarnings()) {
-				LOGGER.error("Start and end stop are the same, agent will walk. Agent Id:\t" + person.getId());
+				LOGGER.error("Start and end stop are the same, agent will walk using mode "
+						+ drtStageActivityType.drtWalk + ". Agent Id:\t" + person.getId());
 			}
-			return walkRouter.calcRoute(fromFacility, toFacility, departureTime, person);
+            Leg leg = (Leg) walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
+            leg.setMode(drtStageActivityType.drtWalk);
+            return (Collections.singletonList(leg));
 		}
 
 		VrpPathWithTravelData unsharedPath = VrpPaths
@@ -106,7 +109,7 @@ public class DrtRoutingModule implements RoutingModule {
 		route.setUnsharedRideTime(unsharedRideTime);
 		route.setMaxWaitTime(drtCfg.getMaxWaitTime());
 
-		Leg drtLeg = populationFactory.createLeg(TransportMode.drt);
+		Leg drtLeg = populationFactory.createLeg(drtCfg.getMode());
 		drtLeg.setDepartureTime(departureTime);
 		drtLeg.setTravelTime(maxTravelTime);
 		drtLeg.setRoute(route);

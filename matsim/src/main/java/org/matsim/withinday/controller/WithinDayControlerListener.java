@@ -59,7 +59,7 @@ public class WithinDayControlerListener implements StartupListener {
 	private static final Logger log = Logger.getLogger(WithinDayControlerListener.class);
 
 	private int numReplanningThreads = 0;
-	@Inject private WithinDayTravelTime WithinDayTravelTime;
+	@Inject private WithinDayTravelTime withinDayTravelTime;
 	@Inject private ActivityReplanningMap activityReplanningMap;
 	@Inject private LinkReplanningMap linkReplanningMap;
 	@Inject private MobsimDataProvider mobsimDataProvider;
@@ -107,7 +107,7 @@ public class WithinDayControlerListener implements StartupListener {
 	}
 
 	public WithinDayTravelTime getWithinDayTravelTime() {
-		return this.WithinDayTravelTime;
+		return this.withinDayTravelTime;
 	}
 
 	public EarliestLinkExitTimeProvider getEarliestLinkExitTimeProvider() {

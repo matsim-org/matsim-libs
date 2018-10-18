@@ -87,6 +87,8 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 	
 	private int cWarn1 = 0;
 	private int cWarn2 = 0;
+	private int cWarn3 = 0;
+	private int cWarn4 = 0;
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
@@ -580,9 +582,14 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 						if (Math.abs(marginalDamageCostCarThisLink) < 0.0000000001) {
 							marginalDamageCostCarThisLink = 0.;
 						} else {
-							log.warn("The marginal damage cost per car on link " + thisLink.toString() + " for receiver point " + rp.getId().toString() + " is " + marginalDamageCostCarThisLink + ".");
-							log.warn("final immission: " + rp.getFinalImmission() + " - immission plus one car " + noiseImmissionPlusOneCarThisLink + " - marginal damage cost car: " + marginalDamageCostCarThisLink);
-							log.warn("Setting the marginal damage cost per car to 0.");
+							if (cWarn3 == 0) {
+								log.warn("The marginal damage cost per car on link " + thisLink.toString() + " for receiver point " + rp.getId().toString() + " is " + marginalDamageCostCarThisLink + ".");
+								log.warn("final immission: " + rp.getFinalImmission() + " - immission plus one car " + noiseImmissionPlusOneCarThisLink + " - marginal damage cost car: " + marginalDamageCostCarThisLink);
+								log.warn("Setting the marginal damage cost per car to 0.");
+								log.warn("This message is only given once.");
+								cWarn3++;
+							}
+							
 							marginalDamageCostCarThisLink = 0.;
 						}
 					}
@@ -594,9 +601,14 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 						if (Math.abs(marginalDamageCostHGVThisLink) < 0.0000000001) {
 							marginalDamageCostHGVThisLink = 0.;
 						} else {
-							log.warn("The marginal damage cost per HGV on link " + thisLink.toString() + " for receiver point " + rp.getId().toString() + " is " + marginalDamageCostHGVThisLink + ".");
-							log.warn("final immission: " + rp.getFinalImmission() + " - immission plus one car " + noiseImmissionPlusOneCarThisLink + " - marginal damage cost car: " + marginalDamageCostHGVThisLink);
-							log.warn("Setting the marginal damage cost per HGV to 0.");
+							if (cWarn4 == 0) {
+								log.warn("The marginal damage cost per HGV on link " + thisLink.toString() + " for receiver point " + rp.getId().toString() + " is " + marginalDamageCostHGVThisLink + ".");
+								log.warn("final immission: " + rp.getFinalImmission() + " - immission plus one car " + noiseImmissionPlusOneCarThisLink + " - marginal damage cost car: " + marginalDamageCostHGVThisLink);
+								log.warn("Setting the marginal damage cost per HGV to 0.");
+								log.warn("This message is only given once.");
+								cWarn4++;
+							}
+							
 							marginalDamageCostHGVThisLink = 0.;
 						}
 					}

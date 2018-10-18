@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.vehicles.Vehicle;
@@ -49,13 +48,9 @@ import com.google.inject.Inject;
 
 /**
  * @author  jbischoff
- *	A simple implementation for taxi fares.
+ *	A simple implementation for taxi or drt fares.
  *  Note that these fares are scored in excess to anything set in the modeparams in the config file.
  */
-/**
- *
- */
-
 public class TaxiFareHandler implements LinkEnterEventHandler, PersonEntersVehicleEventHandler,
 		PersonDepartureEventHandler, PersonArrivalEventHandler {
 	
@@ -81,8 +76,8 @@ public class TaxiFareHandler implements LinkEnterEventHandler, PersonEntersVehic
 	@Inject
 	public TaxiFareHandler(Config config, EventsManager events, Network network) {
 		TaxiFareConfigGroup taxiFareConfigGroup = TaxiFareConfigGroup.get(config);
-		this.mode = DvrpConfigGroup.get(config).getMode();
-		this.events= events;
+		this.mode =  taxiFareConfigGroup.getMode();
+		this.events = events;
 		this.network = network;
 		this.distanceFare_Meter = taxiFareConfigGroup.getDistanceFare_m();
 		this.baseFare = taxiFareConfigGroup.getBasefare();

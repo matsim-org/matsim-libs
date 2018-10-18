@@ -20,14 +20,15 @@
 
 package org.matsim.core.gbl;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.net.URL;
-
-import org.apache.log4j.Logger;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Some utility functions for dumping time and memory usage, and for logging.
@@ -83,7 +84,7 @@ public abstract class Gbl {
 		String date = null;
 		URL url = Gbl.class.getResource(resourceFilename);
 		if (url != null) {
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
 				revision = reader.readLine();
 				date = reader.readLine();
 			} catch (IOException e) {

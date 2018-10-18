@@ -19,14 +19,25 @@
 
 package org.matsim.contrib.drt.data.validator;
 
+import java.util.Set;
+
 import org.matsim.contrib.drt.data.DrtRequest;
 
 /**
  * Validates (for the optimizer), whether a DRTRequest should be served or not (e.g. for limitations in business area or
  * distance or time)
- * 
+ *
  * @author jbischoff
  */
 public interface DrtRequestValidator {
-	boolean validateDrtRequest(DrtRequest request);
+	/**
+	 * Checks if the request can be served given some spatiotemporal (limited time and area of operations) or other constraints.
+	 * <p>
+	 * Preferred format for causes: underscores instead of spaces.
+	 *
+	 * @param request to be validated
+	 * @return set containing causes of constraint violations. An empty set means the request fulfills all
+	 * constraints and may be considered by the optimizer (although this does not guarantee it will get scheduled)
+	 */
+	Set<String> validateDrtRequest(DrtRequest request);
 }
