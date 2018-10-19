@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.router.example13MultiStageTripRouting;
 
+import java.net.URL;
 import java.util.Map;
 
 import com.google.inject.Key;
@@ -33,11 +34,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -46,16 +50,19 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author thibautd
  */
 public class RunTeleportationMobsimWithCustomRoutingExample {
-	private static final String configFile = "examples/pt-tutorial/config.xml";
 
 	public static void main(final String[] args) {
 		// make sure we get all the log messages in the logfile
 		OutputDirectoryLogging.catchLogEntries();
-
+		
+		final URL url = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ), "0.config.xml" );;
+		
 		// load the config ...
-		final Config config = ConfigUtils.loadConfig( configFile );
+		final Config config = ConfigUtils.loadConfig( url );
 		// ... and add local changes:
 		tuneConfig( config );
+		
+		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 
 		// load the scenario:
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
@@ -94,8 +101,9 @@ public class RunTeleportationMobsimWithCustomRoutingExample {
 	}
 
 	private static void tuneConfig(final Config config) {
-		config.getModule( "changeLegMode" ).addParam( "modes" , "car,pt,"+MyRoutingModule.TELEPORTATION_MAIN_MODE );
-
+//		config.getModule( "changeMode" ).addParam( "modes" , "car,pt,"+MyRoutingModule.TELEPORTATION_MAIN_MODE );
+		config.changeMode().setModes( new String[] {"car", "pt", MyRoutingModule.TELEPORTATION_MAIN_MODE} );
+		
 		final ActivityParams scoreTelepInteract = new ActivityParams( MyRoutingModule.STAGE );
 		scoreTelepInteract.setTypicalDuration( 2 * 60 );
 		scoreTelepInteract.setOpeningTime( 0 );
