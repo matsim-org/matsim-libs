@@ -20,12 +20,12 @@
 
 package org.matsim.core.config.groups;
 
-import java.net.URL;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+
+import java.net.URL;
+import java.util.Map;
 
 public final class PlansConfigGroup extends ReflectiveConfigGroup {
 
@@ -85,7 +85,7 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		"(simpler) version of the TimeAllocationMutator.") ;
 		
 		comments.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not tested) will remove plan attributes that are presumably not used, such as " +
-		"activityStartTime. default=false") ;
+                "activityStartTime. default=false. Use with Caution!");
 
 		comments.put( INPUT_CRS , "The Coordinates Reference System in which the coordinates are expressed in the input file." +
 				" At import, the coordinates will be converted to the coordinate system defined in \"global\", and will" +
