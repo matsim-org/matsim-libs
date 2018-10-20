@@ -433,7 +433,7 @@ public class AccessibilityIntegrationTest {
 		@Override
 		public void setAndProcessSpatialGrids( Map<String,SpatialGrid> spatialGrids ){
 
-			LOG.info("Evaluating resuts ...");
+			LOG.info("Evaluating results ...");
 
 			for(double x = 50; x < 200; x += 100){
 				for(double y = 50; y < 200; y += 100){
