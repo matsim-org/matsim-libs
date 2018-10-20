@@ -140,7 +140,7 @@ public class QuadTree<T> implements Serializable {
 	 * @return the objects found within distance to x/y
 	 */
 	public Collection<T> getDisk(final double x, final double y, final double distance) {
-		return this.top.get(x, y, distance, new ArrayList<T>());
+		return this.top.get(x, y, distance, new ArrayList<>());
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class QuadTree<T> implements Serializable {
 	 * @return objects within the ring
 	 */
 	public Collection<T> getRing(final double x, final double y, final double r_min, final double r_max) {
-		return this.top.get(x, y, r_min, r_max, new ArrayList<T>());
+		return this.top.get(x, y, r_min, r_max, new ArrayList<>());
 	}
 
 	/**
@@ -726,6 +726,7 @@ public class QuadTree<T> implements Serializable {
 			}
 			// no more childs, so we must contain the closest object
 			T closest = null;
+			Leaf<T> closestLeaf = null;
 			if (this.leaves != null) {
 				for (Leaf<T> leaf : this.leaves) {
 					double distance = Math.sqrt(
@@ -734,10 +735,75 @@ public class QuadTree<T> implements Serializable {
 					if (distance < bestDistance.value) {
 						bestDistance.value = distance;
 						closest = leaf.value != null ? leaf.value : leaf.values.get(0);
+						closestLeaf = leaf;
+					} else if (distance == bestDistance.value) {
+						closestLeaf = backwardsCompatibleSort(x, y, closestLeaf, leaf);
+						closest = closestLeaf.value != null ? closestLeaf.value : closestLeaf.values.get(0);
 					}
 				}
 			}
 			return closest;
+		}
+
+		private Leaf<T> backwardsCompatibleSort(double x, double y, Leaf<T> leaf1, Leaf<T> leaf2) {
+			/*
+			 * In the old quadtree, the first closest object encountered was the one that was inside the same
+			 * quadrant than the search coordinate. If no such object existed, the remaining quadrants were
+			 * searched in the fixed order of NW (0), NE (1), SE (2) and SW (3).
+			 * Try to figure out according to this scheme if first leaf1 or leaf2 would have been found.
+			 */
+			double minX = this.bounds.minX;
+			double minY = this.bounds.minY;
+			double maxX = this.bounds.maxX;
+			double maxY = this.bounds.maxY;
+			double ctrX = this.bounds.centerX;
+			double ctrY = this.bounds.centerY;
+
+			while (true) {
+				int childQ = getChildIndex(ctrX, ctrY, x, y);
+				int child1 = getChildIndex(ctrX, ctrY, leaf1.x, leaf1.y);
+				int child2 = getChildIndex(ctrX, ctrY, leaf2.x, leaf2.y);
+
+				if (child1 == child2) {
+					if (child1 == 0) {
+						maxX = ctrX;
+						minY = ctrY;
+					}
+					if (child1 == 1) {
+						minX = ctrX;
+						minY = ctrY;
+					}
+					if (child1 == 2) {
+						minX = ctrX;
+						maxY = ctrY;
+					}
+					if (child1 == 3) {
+						maxX = ctrX;
+						maxY = ctrY;
+					}
+					ctrX = (maxX + minX) / 2.0;
+					ctrY = (maxY + minY) / 2.0;
+				} else {
+					if (childQ == child1) {
+						return leaf1;
+					}
+					if (childQ == child2) {
+						return leaf2;
+					}
+					return (child1 < child2) ? leaf1 : leaf2;
+				}
+			}
+		}
+
+		private static int getChildIndex(double centerX, double centerY, double x, double y) {
+			if (x < centerX) {
+				if (y < centerY)
+					return 3; // south west
+				return 0; // north west
+			}
+			if (y < centerY)
+				return 2; // south east
+			return 1; // north eath
 		}
 
 		/* default */ Collection<T> getElliptical(

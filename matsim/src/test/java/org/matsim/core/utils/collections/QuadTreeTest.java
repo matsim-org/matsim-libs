@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -681,6 +682,36 @@ public class QuadTreeTest {
 	}
 
 	/**
+	 * tests that also for a large number of entries, values() returns the correct result.
+	 */
+	@Test
+	public void testGetValues() {
+		double minX = -1000;
+		double minY = -5000;
+		double maxX = 20000;
+		double maxY = 12000;
+
+		Random r = new Random(20181017L);
+		List<String> expected = new ArrayList<>(1000);
+		QuadTree<String> qt = new QuadTree<>(minX, minY, maxX, maxY);
+		for (int i = 0; i < 1000; i++) {
+			double x = minX + r.nextDouble() * (maxX - minX);
+			double y = minY + r.nextDouble() * (maxY - minY);
+			String value = "ITEM_" + i;
+			qt.put(x, y, value);
+			expected.add(value);
+		}
+
+		List<String> items = new ArrayList<>(qt.values());
+		Assert.assertEquals(1000, items.size());
+		items.sort(String::compareTo);
+		expected.sort(String::compareTo);
+		for (int i = 0; i < 1000; i++) {
+			Assert.assertEquals(expected.get(i), items.get(i));
+		}
+	}
+
+	/**
 	 * A kind of performance test, but not marked as test, as there is no need
 	 * to run it in every check as there is not assert statement.
 	 *
@@ -696,8 +727,6 @@ public class QuadTreeTest {
 		double minY = -5000;
 		double maxX = 20000;
 		double maxY = 12000;
-
-
 
 		QuadTree<Coord> qt = new QuadTree<>(minX, minY, maxX, maxY);
 		System.gc();
