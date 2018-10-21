@@ -150,6 +150,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			currentShipments = new HashMap<String, CarrierShipment>();
 		}
 		else if (name.equals(SHIPMENT)) {
+			String idString = atts.getValue("id");
+			if(idString == null) throw new IllegalStateException("shipment.id is missing.");
+			Id<CarrierShipment> id = Id.create(idString, CarrierShipment.class);
 			String from = atts.getValue(FROM);
 			if(from == null) throw new IllegalStateException("shipment.from is missing.");
 			String to = atts.getValue(TO);
@@ -157,7 +160,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			String sizeString = atts.getValue(SIZE);
 			if(sizeString == null) throw new IllegalStateException("shipment.size is missing.");
 			int size = getInt(sizeString);
-			CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance(Id.create(from, Link.class), Id.create(to, Link.class), size);
+			CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance(id, Id.create(from, Link.class), Id.create(to, Link.class), size);
 			
 			String startPickup = atts.getValue("startPickup");
 			String endPickup = atts.getValue("endPickup");
