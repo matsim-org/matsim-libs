@@ -94,7 +94,7 @@ public class TinyAccessibilityTest {
 		final Config config = ConfigUtils.createConfig();
 
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		acg.setCellSizeCellBasedAccessibility(100);
+		acg.setTileSize_m(100);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
 
 		config.controler().setLastIteration(0);

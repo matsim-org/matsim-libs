@@ -41,7 +41,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private static final String BOUNDING_BOX_BOTTOM = "boundingBoxBottom";
 
 	@SuppressWarnings("unused")
-	private static Logger log = Logger.getLogger(AccessibilityConfigGroup.class);
+	private static Logger LOG = Logger.getLogger(AccessibilityConfigGroup.class);
 
 	public static final String GROUP_NAME = "accessibility";
 	
@@ -62,11 +62,11 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     private double boundingBoxRight;
     private double boundingBoxBottom;
 	
-	private Long cellSizeCellBasedAccessibility;
+	private Integer tileSize_m;
 	private String shapeFileCellBasedAccessibility;
 	
 	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation"; 
-	public static enum AreaOfAccesssibilityComputation{fromNetwork, fromBoundingBox, fromShapeFile, fromFacilitiesFile, fromFacilitiesObject} 
+	public static enum AreaOfAccesssibilityComputation{fromNetwork, fromBoundingBox, fromBoundingBoxHexagons, fromShapeFile, fromFacilitiesFile, fromFacilitiesObject} 
 	private AreaOfAccesssibilityComputation areaOfAccessibilityComputation = AreaOfAccesssibilityComputation.fromNetwork;
 	private Set<Modes4Accessibility> isComputingMode = EnumSet.noneOf(Modes4Accessibility.class);
 	
@@ -149,21 +149,27 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	// NOTE: It seems ok to have the string constants immediately here since having them separately really does not help
 	// keeping the code compact
 	
-	@StringGetter("cellSizeForCellBasedAccessibility") 
-    public Long getCellSizeCellBasedAccessibility() {
-		return this.cellSizeCellBasedAccessibility;
+	@StringGetter("tileSize_m") 
+    public Integer getTileSize() {
+		return this.tileSize_m;
     }
-	@StringSetter("cellSizeForCellBasedAccessibility")  // size in meters (whatever that is since the coord system does not know about meters)
-    public void setCellSizeCellBasedAccessibility(long value) {
+	
+	/**
+	 * Set the size of the tiles (in meters if a metric CRS is used).
+	 * If a square grid is created, this value will be used as the side length of each square.
+	 * If a hexagon pattern is created, this value will be used as the maximum diameter of every hexagon.
+	 */
+	@StringSetter("tileSize_m")
+    public void setTileSize_m(int value) {
 		if (value <= 0) {
-			throw new IllegalArgumentException("Cell size must be greater than zero.");
+			throw new IllegalArgumentException("Tile size must be greater than zero.");
 		}
 		if (value < 100) {
-			log.warn("Cell size is set to " + value + ". This is a comparatively small" +
-					" value, which may lead to computational problems.");
+			LOG.warn("Tile size = " + value + ". This is a comparatively small value, which may lead to computational problems.");
 		}
-		this.cellSizeCellBasedAccessibility = value;
+		this.tileSize_m = value;
     }
+	
 	@StringGetter("extentOfAccessibilityComputationShapeFile")
     public String getShapeFileCellBasedAccessibility() {
         return this.shapeFileCellBasedAccessibility;

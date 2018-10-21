@@ -267,7 +267,7 @@ public class AccessibilityIntegrationTest {
 		}
 
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		acg.setCellSizeCellBasedAccessibility(100);
+		acg.setTileSize_m(100);
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile);
 		//		acg.setShapeFileCellBasedAccessibility(url.getPath()); // yyyyyy todo
 		acg.setShapeFileCellBasedAccessibility(f.getAbsolutePath());
@@ -310,7 +310,7 @@ public class AccessibilityIntegrationTest {
 
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		
-		acg.setCellSizeCellBasedAccessibility(100);
+		acg.setTileSize_m(100);
 		
 		acg.setMeasuringPointsFacilities(measuringPoints);
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromFacilitiesObject);
@@ -374,7 +374,7 @@ public class AccessibilityIntegrationTest {
 		final Config config = ConfigUtils.createConfig();
 
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		acg.setCellSizeCellBasedAccessibility(100);
+		acg.setTileSize_m(100);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);

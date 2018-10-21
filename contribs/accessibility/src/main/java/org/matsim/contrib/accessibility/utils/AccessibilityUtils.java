@@ -147,15 +147,14 @@ public class AccessibilityUtils {
 	/**
 	 * Creates measuring points based on the scenario's network and a specified cell size.
 	 */
-	public static ActivityFacilities createMeasuringPointsFromNetworkBounds(Network network, double cellSize) {
+	public static ActivityFacilities createMeasuringPointsFromNetworkBounds(Network network, int cellSize) {
 		BoundingBox boundingBox = BoundingBox.createBoundingBox(network);
 		double xMin = boundingBox.getXMin();
 		double xMax = boundingBox.getXMax();
 		double yMin = boundingBox.getYMin();
 		double yMax = boundingBox.getYMax();
 		
-		ActivityFacilities measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(
-				xMin, yMin, xMax, yMax, cellSize);
+		ActivityFacilities measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(xMin, yMin, xMax, yMax, cellSize);
 		return measuringPoints;
 	}
 	

@@ -70,9 +70,7 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 	}
 
 	private List<ActivityFacilities> additionalFacilityData = new ArrayList<>() ;
-	
 	private boolean lockedForAdditionalFacilityData = false;
-
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {

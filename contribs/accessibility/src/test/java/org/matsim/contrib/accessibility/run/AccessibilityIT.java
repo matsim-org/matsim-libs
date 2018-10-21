@@ -67,7 +67,7 @@ public class AccessibilityIT implements FacilityDataExchangeInterface {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private double resolution = 100.;
+	private int resolution = 100;
 	private int nPersons = 3;
 	private double[][] accessibilities;
 
@@ -329,7 +329,7 @@ public class AccessibilityIT implements FacilityDataExchangeInterface {
 			Config config = ConfigUtils.createConfig() ;
 			
 			AccessibilityConfigGroup accConfig = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class ) ;
-			accConfig.setCellSizeCellBasedAccessibility(100);
+			accConfig.setTileSize_m(100);
 			accConfig.setAreaOfAccessibilityComputation( AreaOfAccesssibilityComputation.fromNetwork );
 	
 	//		config.network().setInputFile(this.networkInputFileName);
