@@ -28,6 +28,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.facilities.ActivityFacilities;
@@ -50,8 +51,7 @@ public class VoronoiGeometryUtils {
 	
 	private static GeometryFactory geometryFactory = new GeometryFactory();
 	
-	
-	static Map<Id<ActivityFacility>, Geometry> buildMeasurePointGeometryMap(ActivityFacilities measuringPoints, BoundingBox box) {
+	static Map<Id<ActivityFacility>, Geometry> buildMeasurePointGeometryMap(ActivityFacilities measuringPoints, BoundingBox box, int tileSize_m) {
 		LOG.warn("Started building measure-point-to-geometry map.");
 		Map<Id<ActivityFacility>, Geometry> measurePointPolygons = new HashMap<>();
 		
@@ -67,7 +67,7 @@ public class VoronoiGeometryUtils {
 			
 			boolean polygonFound = false;
 			for (Geometry geometry : geometries) {
-				if (geometry.contains(point)) {
+				if (geometry.covers(point)) {
 					if (!measurePointPolygons.containsKey(measurePointId)) {
 						measurePointPolygons.put(measurePointId, geometry);
 						polygonFound = true;
@@ -77,14 +77,57 @@ public class VoronoiGeometryUtils {
 				}
 			}
 			if (!polygonFound) {
-				throw new RuntimeException("There must be one Voronoi polygons for each measure point.");
+				throw new RuntimeException("There must be one Voronoi polygon for each measure point.");
 			}
 		}
+		Map<Id<ActivityFacility>, Geometry> revisedMeasurePointPolygons = reduceEdgePolygons(measuringPoints, tileSize_m, measurePointPolygons);
+		
 		LOG.warn("Finished building measure-point-to-geometry map.");
-		return measurePointPolygons;
+		return revisedMeasurePointPolygons;
 	}
 
-	
+	private static Map<Id<ActivityFacility>, Geometry> reduceEdgePolygons(ActivityFacilities measuringPoints,
+			int tileSize_m, Map<Id<ActivityFacility>, Geometry> measurePointPolygons) {
+		Map<Id<ActivityFacility>, Geometry> measurePointPolygons2 = new HashMap<>();
+		for (Id<ActivityFacility> measurePointId : measurePointPolygons.keySet()) {
+			Coord measuringPointsCoord = measuringPoints.getFacilities().get(measurePointId).getCoord();
+			Polygon polygon = (Polygon) measurePointPolygons.get(measurePointId);
+
+			Coordinate[] coordinates = polygon.getCoordinates();
+			Coordinate[] revisedCoordinates = new Coordinate[coordinates.length];
+			
+			int i = 0;
+			for (Coordinate coordinate : coordinates) {
+				double xCoordCenter = measuringPointsCoord.getX();
+				double xCoord;
+				if (coordinate.x < xCoordCenter - tileSize_m/2.) {
+					xCoord = xCoordCenter - tileSize_m/2.;
+				} else if (coordinate.x > xCoordCenter + tileSize_m/2.) {
+					xCoord = xCoordCenter + tileSize_m/2.;
+				} else {
+					xCoord = coordinate.x;
+				}
+
+				double yCoordCenter = measuringPointsCoord.getY();
+				double yCoord;
+				if (coordinate.y < yCoordCenter - tileSize_m/2.) {
+					yCoord = yCoordCenter - tileSize_m/2.;
+				} else if (coordinate.y > yCoordCenter + tileSize_m/2.) {
+					yCoord = yCoordCenter + tileSize_m/2.;
+				} else {
+					yCoord = coordinate.y;
+				}
+
+				Coordinate revisedCoordinate = new Coordinate(xCoord, yCoord);
+				revisedCoordinates[i] = revisedCoordinate;
+				i++;
+			}
+			Geometry geometry = geometryFactory.createPolygon(revisedCoordinates);
+			measurePointPolygons2.put(measurePointId, geometry.convexHull());
+		}
+		return measurePointPolygons2;
+	}
+
 	static Collection<Geometry> determineVoronoiShapes(ActivityFacilities measuringPoints, BoundingBox box) {
 		LOG.warn("Started creating Voronoi shapes.");
 		Collection<Coordinate> sites = new ArrayList<>();
@@ -98,7 +141,6 @@ public class VoronoiGeometryUtils {
 		voronoiDiagramBuilder.setSites(sites);		
 
 		List<Polygon> polygons = voronoiDiagramBuilder.getSubdivision().getVoronoiCellPolygons(geometryFactory);
-		
 		Polygon boundingPolygon = createBoundingPolygon(box);
 		Collection<Geometry> geometries = cutPolygonsByBoundary(polygons, boundingPolygon);
 		
@@ -106,7 +148,6 @@ public class VoronoiGeometryUtils {
 		return geometries;
 	}
 
-	
 	static Polygon createBoundingPolygon(BoundingBox box) {
 		Coordinate boundingBoxSW = new Coordinate(box.getXMin(), box.getYMin());
 		Coordinate boundingBoxSE = new Coordinate(box.getXMax(), box.getYMin());
@@ -117,7 +158,6 @@ public class VoronoiGeometryUtils {
 		Polygon boundingPolygon = geometryFactory.createPolygon(boundingBoxCoordinates);
 		return boundingPolygon;
 	}
-	
 	
 	static Collection<SimpleFeature> createFeaturesFromPolygons(Collection<Geometry> geometries) {
 		Collection<SimpleFeature> features = new LinkedList<>();
@@ -138,7 +178,6 @@ public class VoronoiGeometryUtils {
 	    }
 	    return features;
 	}
-
 
 	static Collection<Geometry> cutPolygonsByBoundary(Collection<Polygon> polygons, Polygon boundingPolygon) {
 		Collection<Geometry> cutPolygons = new LinkedList<>();
