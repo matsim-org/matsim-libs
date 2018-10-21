@@ -91,67 +91,72 @@ public final class AccessibilityModule extends AbstractModule {
 			@Override
 			public ControlerListener get() {
 				AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.class);
-				double cellSize_m = acg.getCellSizeCellBasedAccessibility();
-				if (cellSize_m <= 0) {
-					LOG.error("Cell Size needs to be assigned a value greater than zero.");
-				}
 				crs = acg.getOutputCrs() ;
 				
 				ActivityFacilities opportunities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType) ;
-				
 				final BoundingBox boundingBox;
+				int cellSize_m = acg.getTileSize();
+				if (cellSize_m <= 0) {
+					LOG.error("Cell Size needs to be assigned a value greater than zero.");
+				}
 				
 				if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromShapeFile) {
+					
 					Geometry boundary = GridUtils.getBoundary(acg.getShapeFileCellBasedAccessibility());
 					Envelope envelope = boundary.getEnvelopeInternal();
 					boundingBox = BoundingBox.createBoundingBox(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY());
-//					if (measuringPoints != null) {LOG.warn("Measuring points had already been set directly. Now overwriting...");}
 					measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize_m);
 					LOG.info("Using shape file to determine the area for accessibility computation.");
+					
 				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromBoundingBox) {
 					boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
-//					if (measuringPoints != null) {LOG.warn("Measuring points had already been set directly. Now overwriting...");}
-					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m);
+					 measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m);
 					LOG.info("Using custom bounding box to determine the area for accessibility computation.");
+					
+				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromBoundingBoxHexagons) {
+					boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
+					measuringPoints = GridUtils.createHexagonLayer(boundingBox, cellSize_m);
+					LOG.info("Using custom bounding box to determine the area for accessibility computation.");
+					
 				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromFacilitiesFile) {
-					boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
-					LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
-					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
+					boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
 					Scenario measuringPointsSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 					String measuringPointsFile = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class ).getMeasuringPointsFile() ;
 					new MatsimFacilitiesReader(measuringPointsSc).readFile(measuringPointsFile);
-//					if (measuringPoints != null) {LOG.warn("Measuring points had already been set directly. Now overwriting...");}
 					measuringPoints = (ActivityFacilitiesImpl) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(measuringPointsSc, null);
 					LOG.info("Using measuring points from file: " + measuringPointsFile);
+					
 				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromFacilitiesObject) {
-//					boundingBox = null; // TODO
-					boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+					boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
 					measuringPoints = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class ).getMeasuringPointsFacilities() ;
 					if (measuringPoints == null) {
 						throw new RuntimeException("Measuring points should have been set direclty if from-facilities-object mode is used.");
 					}
 					LOG.info("Using measuring points from facilities object.");
-				} else {
+					
+				} else { // This covers also the "fromNetwork" case
+					LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
+					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
+
 					boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m) ;
 					LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
 					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
 				}
 				
-				LOG.warn("boundingBox = " + boundingBox);
-				
 				// TODO Need to find a stable way for multi-modal networks
 				// AV stuff -------------------------------------------------------------
-//				TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-//				LOG.warn("Full network has " + network.getNodes().size() + " nodes.");
-//				Network carNetwork = NetworkUtils.createNetwork();
-//				Set<String> modeSet = new HashSet<>();
-//				modeSet.add("car");
-//				filter.filter(carNetwork, modeSet);
-//				LOG.warn("Pure car network now has " + carNetwork.getNodes().size() + " nodes.");
+				TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+				LOG.warn("Full network has " + network.getNodes().size() + " nodes.");
+				Network carNetwork = NetworkUtils.createNetwork();
+				Set<String> modeSet = new HashSet<>();
+				modeSet.add("car");
+				filter.filter(carNetwork, modeSet);
+				LOG.warn("Pure car network now has " + carNetwork.getNodes().size() + " nodes.");
 				// End AV stuff -------------------------------------------------------------
 				
 				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, network);
+//				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, carNetwork);
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
 					AccessibilityContributionCalculator calculator = null ;
 					switch(mode) {
@@ -162,12 +167,14 @@ public final class AccessibilityModule extends AbstractModule {
 						final TravelTime travelTime = travelTimes.get(mode.name());
 						Gbl.assertNotNull(travelTime);
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
-						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario, network) ;
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario, network);
+//						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario, carNetwork);
 						break; }
 					case freespeed: {
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
 						Gbl.assertNotNull(travelDisutilityFactory);
-						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario, network) ;
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario, network);
+//						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario, carNetwork);
 						break; }
 					case walk:
 						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), config, network);
@@ -185,12 +192,12 @@ public final class AccessibilityModule extends AbstractModule {
 					accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calculator);
 				}
 				
-				Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap = VoronoiGeometryUtils.buildMeasurePointGeometryMap(measuringPoints, boundingBox);
-
+				Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap = VoronoiGeometryUtils.buildMeasurePointGeometryMap(
+						measuringPoints, boundingBox, cellSize_m);
 				
 				if (pushing2Geoserver == true) {
 					accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs,
-							config.controler().getRunId() + "_" + activityType, acg.getCellSizeCellBasedAccessibility()));
+							config.controler().getRunId() + "_" + activityType, measurePointGeometryMap));
 				}
 				
 				String outputDirectory = scenario.getConfig().controler().getOutputDirectory();
@@ -207,12 +214,10 @@ public final class AccessibilityModule extends AbstractModule {
 				}
 				
 				accessibilityShutdownListener.writeToSubdirectoryWithName(activityType);
-				
 				return accessibilityShutdownListener;
 			}
 		});
 	}
-	
 	
 	public final void setPushing2Geoserver( boolean pushing2Geoserver ) {
 		this.pushing2Geoserver = pushing2Geoserver ;
