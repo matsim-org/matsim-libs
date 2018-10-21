@@ -19,6 +19,22 @@ import com.google.inject.name.Names;
 
 public class ComponentRegistryTest {
 	@Test
+	public void testMissingAnnotation() {
+		// Here we may expect an exception in the future. So far we just ignore
+		// QSimComponents without any annotation.
+		Injector injector = Guice.createInjector(new ModuleWithMissingAnnotation());
+		ComponentRegistry registry = ComponentRegistry.create(injector);
+	}
+
+	static private class ModuleWithMissingAnnotation extends AbstractModule {
+		@Override
+		protected void configure() {
+			bind(QSimComponent.class).toInstance(new QSimComponent() {
+			});
+		}
+	}
+
+	@Test
 	public void testComponentFinder() {
 		Injector injector = Guice.createInjector(new ModuleWithProvides());
 
@@ -28,17 +44,14 @@ public class ComponentRegistryTest {
 		Assert.assertEquals(orderedComponents(injector, namedComponents("B")),
 				Arrays.asList(Key.get(MobsimEngine.class, Names.named("B"))));
 
-		Assert.assertEquals(orderedComponents(injector, namedComponents("A", "B")),
-				Arrays.asList(Key.get(MobsimEngine.class, Names.named("A")),
-						Key.get(MobsimEngine.class, Names.named("B"))));
+		Assert.assertEquals(orderedComponents(injector, namedComponents("A", "B")), Arrays
+				.asList(Key.get(MobsimEngine.class, Names.named("A")), Key.get(MobsimEngine.class, Names.named("B"))));
 
-		Assert.assertEquals(orderedComponents(injector, namedComponents("B", "A")),
-				Arrays.asList(Key.get(MobsimEngine.class, Names.named("B")),
-						Key.get(MobsimEngine.class, Names.named("A"))));
+		Assert.assertEquals(orderedComponents(injector, namedComponents("B", "A")), Arrays
+				.asList(Key.get(MobsimEngine.class, Names.named("B")), Key.get(MobsimEngine.class, Names.named("A"))));
 
-		Assert.assertEquals(orderedComponents(injector, namedComponents("A", "B", "C")),
-				Arrays.asList(Key.get(MobsimEngine.class, Names.named("A")),
-						Key.get(MobsimEngine.class, Names.named("B"))));
+		Assert.assertEquals(orderedComponents(injector, namedComponents("A", "B", "C")), Arrays
+				.asList(Key.get(MobsimEngine.class, Names.named("A")), Key.get(MobsimEngine.class, Names.named("B"))));
 
 		Assert.assertEquals(orderedComponents(injector, namedComponents("C")), Arrays.asList());
 
