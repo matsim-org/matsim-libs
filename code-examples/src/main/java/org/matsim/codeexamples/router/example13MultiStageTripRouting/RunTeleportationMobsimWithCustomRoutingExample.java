@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -95,7 +96,8 @@ public class RunTeleportationMobsimWithCustomRoutingExample {
 				bind(MainModeIdentifier.class).toInstance(new MyMainModeIdentifier(new MainModeIdentifierImpl()));
 			}
 		});
-		
+
+
 		// run the controler:
 		controler.run();
 	}
@@ -109,6 +111,11 @@ public class RunTeleportationMobsimWithCustomRoutingExample {
 		scoreTelepInteract.setOpeningTime( 0 );
 		scoreTelepInteract.setClosingTime( 0 );
 		config.planCalcScore().addActivityParams( scoreTelepInteract );
+
+
+		final PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams(
+				MyRoutingModule.TELEPORTATION_LEG_MODE);
+		config.planCalcScore().addModeParams(modeParams);
 	}
 
 	private static ActivityFacility createFacility(
