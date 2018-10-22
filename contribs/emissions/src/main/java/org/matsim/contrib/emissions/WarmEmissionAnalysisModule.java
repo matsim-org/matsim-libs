@@ -23,6 +23,8 @@ package org.matsim.contrib.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -33,7 +35,6 @@ import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactor;
 import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
-import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionSpecificationMarker;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -41,7 +42,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
 
 
 /**
@@ -53,6 +53,7 @@ public class WarmEmissionAnalysisModule {
 
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+	private final Set<String> warmPollutants;
 
 	private final EventsManager eventsManager;
 	private final Double emissionEfficiencyFactor;
@@ -78,12 +79,16 @@ public class WarmEmissionAnalysisModule {
 		public final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 		public final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 		private final EmissionsConfigGroup ecg;
+		private final Set<String> warmPollutants;
 
 		public WarmEmissionAnalysisModuleParameter(
 				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
-				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable, EmissionsConfigGroup emissionsConfigGroup) {
+				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable, Set<String> warmPollutants,
+				EmissionsConfigGroup emissionsConfigGroup) {
 			this.avgHbefaWarmTable = avgHbefaWarmTable;
 			this.detailedHbefaWarmTable = detailedHbefaWarmTable;
+			this.warmPollutants = warmPollutants;
+
 			this.ecg = emissionsConfigGroup;
 			// check if all needed tables are non-null
 
@@ -97,7 +102,7 @@ public class WarmEmissionAnalysisModule {
 	public WarmEmissionAnalysisModule(
 			WarmEmissionAnalysisModuleParameter parameterObject,
 			EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
-		
+
 		if(parameterObject == null){
 			logger.error("No warm emission analysis module parameter set. Aborting...");
 			System.exit(0);
@@ -108,6 +113,7 @@ public class WarmEmissionAnalysisModule {
 		}
 		this.avgHbefaWarmTable = parameterObject.avgHbefaWarmTable;
 		this.detailedHbefaWarmTable = parameterObject.detailedHbefaWarmTable;
+		this.warmPollutants = parameterObject.warmPollutants;
 		this.eventsManager = emissionEventsManager;
 		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
 		this.ecg = parameterObject.ecg;
@@ -127,12 +133,12 @@ public class WarmEmissionAnalysisModule {
 		stopGoKmCounter = 0.0;
 	}
 
-	public void throwWarmEmissionEvent(double leaveTime, Id<Link> linkId, Id<Vehicle> vehicleId, Map<WarmPollutant, Double> warmEmissions){
+	public void throwWarmEmissionEvent(double leaveTime, Id<Link> linkId, Id<Vehicle> vehicleId, Map<String, Double> warmEmissions){
 		Event warmEmissionEvent = new WarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
 
-	public Map<WarmPollutant, Double> checkVehicleInfoAndCalculateWarmEmissions(
+	public Map<String, Double> checkVehicleInfoAndCalculateWarmEmissions(
 			Vehicle vehicle,
 			Link link,
 			double travelTime) {
@@ -150,7 +156,7 @@ public class WarmEmissionAnalysisModule {
 			}
 		}
 
-		Map<WarmPollutant, Double> warmEmissions = new HashMap<>();
+		Map<String, Double> warmEmissions = new HashMap<>();
 		if(vehicle == null ||
 				(vehicle.getType() == null && vehicle.getType().getDescription() == null) // if both are null together; no vehicle type information.
 				) {
@@ -181,10 +187,10 @@ public class WarmEmissionAnalysisModule {
 		return warmEmissions;
 	}
 	
-	private Map<WarmPollutant, Double> rescaleWarmEmissions(Map<WarmPollutant, Double> warmEmissions) {
-		Map<WarmPollutant, Double> rescaledWarmEmissions = new HashMap<>();
+	private Map<String, Double> rescaleWarmEmissions(Map<String, Double> warmEmissions) {
+		Map<String, Double> rescaledWarmEmissions = new HashMap<>();
 		
-		for(WarmPollutant wp : warmEmissions.keySet()){
+		for(String wp : warmEmissions.keySet()){
 			Double orgValue = warmEmissions.get(wp);
 			Double rescaledValue = emissionEfficiencyFactor * orgValue;
 			rescaledWarmEmissions.put(wp, rescaledValue);
@@ -192,7 +198,7 @@ public class WarmEmissionAnalysisModule {
 		return rescaledWarmEmissions;
 	}
 
-	private Map<WarmPollutant, Double> calculateWarmEmissions(
+	private Map<String, Double> calculateWarmEmissions(
 			Id<Vehicle> vehicleId,
 			double travelTime,
 			String roadType,
@@ -200,7 +206,7 @@ public class WarmEmissionAnalysisModule {
 			double linkLength,
 			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
 
-		Map<WarmPollutant, Double> warmEmissionsOfEvent = new HashMap<>();
+		Map<String, Double> warmEmissionsOfEvent = new HashMap<>();
 
 		final String hbefaRoadTypeName ;
 			hbefaRoadTypeName = roadType;
@@ -215,7 +221,7 @@ public class WarmEmissionAnalysisModule {
 			keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.MOTORCYCLE);
 			keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.MOTORCYCLE);
 		} else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
-			for (WarmPollutant warmPollutant : WarmPollutant.values()) {
+			for (String warmPollutant : warmPollutants) {
 				warmEmissionsOfEvent.put( warmPollutant, 0.0 );
 			}
 			return warmEmissionsOfEvent;
@@ -261,7 +267,7 @@ public class WarmEmissionAnalysisModule {
 			}
 		}
 
-		for (WarmPollutant warmPollutant : WarmPollutant.values()) {
+		for (String warmPollutant : warmPollutants) {
 			double generatedEmissions;
 
 			keyFreeFlow.setHbefaComponent(warmPollutant);
@@ -352,27 +358,27 @@ public class WarmEmissionAnalysisModule {
 	}
 
 	public int getFreeFlowOccurences() {
-		return freeFlowCounter / WarmPollutant.values().length;
+		return freeFlowCounter / warmPollutants.size();
 	}
 
 	public int getFractionOccurences() {
-		return fractionCounter / WarmPollutant.values().length;
+		return fractionCounter / warmPollutants.size();
 	}
 	
 	public int getStopGoOccurences() {
-		return stopGoCounter / WarmPollutant.values().length;
+		return stopGoCounter / warmPollutants.size();
 	}
 
 	public double getKmCounter() {
-		return kmCounter / WarmPollutant.values().length;
+		return kmCounter / warmPollutants.size();
 	}
 
 	public double getFreeFlowKmCounter() {
-		return freeFlowKmCounter / WarmPollutant.values().length;
+		return freeFlowKmCounter / warmPollutants.size();
 	}
 
 	public double getStopGoKmCounter() {
-		return stopGoKmCounter / WarmPollutant.values().length;
+		return stopGoKmCounter / warmPollutants.size();
 	}
 
 	public int getWarmEmissionEventCounter() {

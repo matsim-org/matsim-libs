@@ -23,6 +23,8 @@ package org.matsim.contrib.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -79,17 +81,20 @@ public class ColdEmissionAnalysisModule {
 	private int vehAttributesNotSpecifiedCnt = 0;
 	private static final int maxWarnCnt = 3;
 	private int vehInfoWarnMotorCylceCnt = 0;
-	
+	private final Set<String> coldPollutants;
+
 	public static class ColdEmissionAnalysisModuleParameter {
 		public final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
 		public final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
+		private final Set<String> coldPollutants;
 		private final EmissionsConfigGroup ecg;
 
 		public ColdEmissionAnalysisModuleParameter(
 				Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
-				Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, EmissionsConfigGroup emissionsConfigGroup) {
+				Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, Set<String> coldPollutants, EmissionsConfigGroup emissionsConfigGroup) {
 			this.avgHbefaColdTable = avgHbefaColdTable;
 			this.detailedHbefaColdTable = detailedHbefaColdTable;
+			this.coldPollutants = coldPollutants;
 			this.ecg = emissionsConfigGroup;
 		}
 	}
@@ -100,6 +105,7 @@ public class ColdEmissionAnalysisModule {
 
 		this.avgHbefaColdTable = parameterObject.avgHbefaColdTable;
 		this.detailedHbefaColdTable = parameterObject.detailedHbefaColdTable;
+		this.coldPollutants = parameterObject.coldPollutants;
 		this.ecg = parameterObject.ecg;
 		this.eventsManager = emissionEventsManager;
 		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
@@ -145,7 +151,7 @@ public class ColdEmissionAnalysisModule {
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
 		
-		Map<ColdPollutant, Double> coldEmissions = getColdPollutantDoubleMap( vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km );
+		Map<String, Double> coldEmissions = getColdPollutantDoubleMap( vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km );
 
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){
@@ -155,10 +161,10 @@ public class ColdEmissionAnalysisModule {
 		this.eventsManager.processEvent(coldEmissionEvent);
 	}
 
-	private Map<ColdPollutant, Double> rescaleColdEmissions(Map<ColdPollutant, Double> coldEmissions) {
-		Map<ColdPollutant, Double> rescaledColdEmissions = new HashMap<>();
+	private Map<String, Double> rescaleColdEmissions(Map<String, Double> coldEmissions) {
+		Map<String, Double> rescaledColdEmissions = new HashMap<>();
 		
-		for(ColdPollutant wp : coldEmissions.keySet()){
+		for(String wp : coldEmissions.keySet()){
 			Double orgValue = coldEmissions.get(wp);
 			Double rescaledValue = emissionEfficiencyFactor * orgValue;
 			rescaledColdEmissions.put(wp, rescaledValue);
@@ -166,8 +172,8 @@ public class ColdEmissionAnalysisModule {
 		return rescaledColdEmissions;
 	}
 
-    private Map<ColdPollutant, Double> getColdPollutantDoubleMap(Id<Vehicle> vehicleId, double parkingDuration, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km) {
-        final Map<ColdPollutant, Double> coldEmissionsOfEvent = new HashMap<>();
+    private Map<String, Double> getColdPollutantDoubleMap(Id<Vehicle> vehicleId, double parkingDuration, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km) {
+        final Map<String, Double> coldEmissionsOfEvent = new HashMap<>();
 
         HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
 
@@ -182,7 +188,7 @@ public class ColdEmissionAnalysisModule {
                 if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
             }
         } else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
-			for (ColdPollutant cp : ColdPollutant.values()){
+			for (String cp : coldPollutants){
 				coldEmissionsOfEvent.put( cp, 0.0 );
 			}
 			return coldEmissionsOfEvent;
@@ -194,7 +200,7 @@ public class ColdEmissionAnalysisModule {
 						". Setting cold emissions to zero.");
 				logger.warn(Gbl.ONLYONCE + "\t" + Gbl.FUTURE_SUPPRESSED);
 			}
-			for (ColdPollutant cp : ColdPollutant.values()){
+			for (String cp : coldPollutants){
 				coldEmissionsOfEvent.put( cp, 0.0 );
 			}
 			return coldEmissionsOfEvent;
@@ -207,7 +213,7 @@ public class ColdEmissionAnalysisModule {
 
         key.setHbefaParkingTime(parkingDuration_h);
 
-        for (ColdPollutant coldPollutant : ColdPollutant.values()) {
+        for (String coldPollutant : coldPollutants) {
             double generatedEmissions;
             if (distance_km == 1) {
                generatedEmissions = getTableEmissions(vehicleId, vehicleInformationTuple, 1, key, coldPollutant);
@@ -219,7 +225,7 @@ public class ColdEmissionAnalysisModule {
         return coldEmissionsOfEvent;
     }
 
-    private double getTableEmissions(Id<Vehicle> vehicleId, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km, HbefaColdEmissionFactorKey key, ColdPollutant coldPollutant) {
+    private double getTableEmissions(Id<Vehicle> vehicleId, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km, HbefaColdEmissionFactorKey key, String coldPollutant) {
         key.setHbefaDistance(distance_km);
         double generatedEmissions;
 

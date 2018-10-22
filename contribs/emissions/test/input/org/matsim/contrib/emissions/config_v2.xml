@@ -34,17 +34,11 @@
 		<!-- REQUIRED: file with HBEFA 3.1 fleet average warm emission factors -->
 		<param name="averageFleetWarmEmissionFactorsFile" value="sample_EFA_HOT_vehcat_2005average.txt" />
 
-		<!-- if true, only flat emissions will be considered irrespective of pricing either flat air pollution or exposure of air pollution. -->
-		<param name="consideringCO2Costs" value="true" />
-
 		<!-- OPTIONAL: file with HBEFA 3.1 detailed cold emission factors -->
 		<param name="detailedColdEmissionFactorsFile" value="sample_EFA_ColdStart_SubSegm_2005detailed.txt" />
 
 		<!-- OPTIONAL: file with HBEFA 3.1 detailed warm emission factors -->
 		<param name="detailedWarmEmissionFactorsFile" value="sample_EFA_HOT_SubSegm_2005detailed.txt" />
-
-		<!-- A factor, by which the emission cost factors from literature (Maibach et al. (2008)) are increased. -->
-		<param name="emissionCostMultiplicationFactor" value="1.0" />
 
 		<!-- A factor to include efficiency of the vehicles; the factor is applied to the whole fleet.  -->
 		<param name="emissionEfficiencyFactor" value="1.0" />

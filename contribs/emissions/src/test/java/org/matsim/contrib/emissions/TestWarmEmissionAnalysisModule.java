@@ -20,8 +20,8 @@
 
 package org.matsim.contrib.emissions;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -29,13 +29,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
-import org.matsim.contrib.emissions.roadTypeMapping.LinkHbefaMapping;
 import org.matsim.contrib.emissions.types.HbefaTrafficSituation;
 import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactor;
 import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
-import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -45,10 +43,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
-import org.matsim.contrib.emissions.roadTypeMapping.VisumHbefaRoadTypeMapping;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -82,8 +76,10 @@ import java.util.Map;
  
 
 public class TestWarmEmissionAnalysisModule {
-	
-	private final int numberOfWarmPollutants= WarmPollutant.values().length;
+
+	//Old list of pollutants
+	private final Set<String> pollutants = new HashSet<>(Arrays.asList("CO", "CO2(total)", "FC", "HC", "NMHC", "NOx", "NO2","PM", "SO2"));
+	private final int numberOfWarmPollutants = pollutants.size();
 	private final String hbefaRoadCategory = "URB";
     private final String roadType = "0";
 	private final int leaveTime = 0;
@@ -94,7 +90,7 @@ public class TestWarmEmissionAnalysisModule {
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
     private WarmEmissionAnalysisModule weam;
-	private Map<WarmPollutant, Double> warmEmissions;
+	private Map<String, Double> warmEmissions;
 	
 	// saturated and heavy not used so far -> not tested
     private final HbefaTrafficSituation trafficSituationff = HbefaTrafficSituation.FREEFLOW;
@@ -161,9 +157,9 @@ public class TestWarmEmissionAnalysisModule {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
-		WarmEmissionAnalysisModuleParameter weamp = new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, null, ecg);
+		WarmEmissionAnalysisModuleParameter weamp = new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, null, pollutants, ecg);
 		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
-		weamp = new WarmEmissionAnalysisModuleParameter(null, detailedHbefaWarmTable, ecg);
+		weamp = new WarmEmissionAnalysisModuleParameter(null, detailedHbefaWarmTable, pollutants, ecg);
 		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
 	}
 	
@@ -194,7 +190,7 @@ public class TestWarmEmissionAnalysisModule {
 		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
 
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, mockLink, linkLength/petrolSpeedFf*3.6);
-		Assert.assertEquals(detailedPetrolFactorFf*linkLength/1000., warmEmissions.get(WarmPollutant.CO2_TOTAL), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedPetrolFactorFf*linkLength/1000., warmEmissions.get("CO2(total)"), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		
 		weam.throwWarmEmissionEvent(leaveTime, mockLink.getId(), vehicleId, warmEmissions);
@@ -218,14 +214,14 @@ public class TestWarmEmissionAnalysisModule {
 		
 		// sub case avg speed = free flow speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle, pclink, pclinkLength/pcfreeVelocity*3.6);
-		Assert.assertEquals(avgPcFactorFf*pclinkLength/1000., warmEmissions.get(WarmPollutant.NMHC), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(avgPcFactorFf*pclinkLength/1000., warmEmissions.get("NMHC"), MatsimTestUtils.EPSILON);
 		weam.throwWarmEmissionEvent(leaveTime, pclink.getId(), pcVehicleId, warmEmissions);
 		Assert.assertEquals(numberOfWarmPollutants*avgPcFactorFf*pclinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset(); warmEmissions.clear();
 
 		// sub case avg speed = stop go speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle, pclink, pclinkLength/pcsgVelocity*3.6);
-		Assert.assertEquals(avgPcFactorSg*pclinkLength/1000., warmEmissions.get(WarmPollutant.NMHC), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(avgPcFactorSg*pclinkLength/1000., warmEmissions.get("NMHC"), MatsimTestUtils.EPSILON);
 		weam.throwWarmEmissionEvent(leaveTime, pclink.getId(), pcVehicleId, warmEmissions);
 		Assert.assertEquals(numberOfWarmPollutants*avgPcFactorSg*pclinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset(); warmEmissions.clear();
@@ -248,7 +244,7 @@ public class TestWarmEmissionAnalysisModule {
 		
 		// sub case avg speed = free flow speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselVehicle, diesellink,  dieselLinkLength/dieselFreeVelocity*3.6);
-		Assert.assertEquals(avgDieselFactorFf*dieselLinkLength/1000., warmEmissions.get(WarmPollutant.PM), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(avgDieselFactorFf*dieselLinkLength/1000., warmEmissions.get("PM"), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		weam.throwWarmEmissionEvent(leaveTime, diesellink.getId(), dieselVehicleId, warmEmissions);
 		Assert.assertEquals(numberOfWarmPollutants*avgDieselFactorFf*dieselLinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
@@ -256,7 +252,7 @@ public class TestWarmEmissionAnalysisModule {
 
 		// sub case avg speed = stop go speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselVehicle, diesellink,  dieselLinkLength/dieselSgVelocity*3.6);
-		Assert.assertEquals(avgDieselFactorSg*dieselLinkLength/1000., warmEmissions.get(WarmPollutant.PM), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(avgDieselFactorSg*dieselLinkLength/1000., warmEmissions.get("PM"), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		weam.throwWarmEmissionEvent(leaveTime, diesellink.getId(), dieselVehicleId, warmEmissions);
 		Assert.assertEquals(numberOfWarmPollutants*avgDieselFactorSg*dieselLinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
@@ -280,7 +276,7 @@ public class TestWarmEmissionAnalysisModule {
 		
 		// sub case avg speed = free flow speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, lpglink, lpgLinkLength/lpgFreeVelocity*3.6);
-		Assert.assertEquals(avgLpgFactorFf*lpgLinkLength/1000., warmEmissions.get(WarmPollutant.PM), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(avgLpgFactorFf*lpgLinkLength/1000., warmEmissions.get("PM"), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		weam.throwWarmEmissionEvent(leaveTime, lpgLinkId, lpgVehicleId, warmEmissions);
 		Assert.assertEquals(numberOfWarmPollutants*avgLpgFactorFf*lpgLinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
@@ -288,7 +284,7 @@ public class TestWarmEmissionAnalysisModule {
 
 		// sub case avg speed = stop go speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, lpglink, lpgLinkLength/lpgSgVelocity*3.6);
-		Assert.assertEquals(avgLpgFactorSg*lpgLinkLength/1000., warmEmissions.get(WarmPollutant.PM), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(avgLpgFactorSg*lpgLinkLength/1000., warmEmissions.get("PM"), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		weam.throwWarmEmissionEvent(leaveTime, lpgLinkId, lpgVehicleId, warmEmissions);
 		Assert.assertEquals(numberOfWarmPollutants*avgLpgFactorSg*lpgLinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
@@ -312,7 +308,7 @@ public class TestWarmEmissionAnalysisModule {
 		Vehicle zeroVehicle = vehFac.createVehicle(zeroVehicleId, vehFac.createVehicleType(zeroVehicleTypeId));
 		
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(zeroVehicle, zerolink, 2*zeroLinklength/(zeroFreeVelocity+zeroSgVelocity)*3.6);
-		Assert.assertEquals(detailedZeroFactorFf*zeroLinklength/1000., warmEmissions.get(WarmPollutant.PM), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedZeroFactorFf*zeroLinklength/1000., warmEmissions.get("PM"), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		
 		weam.throwWarmEmissionEvent(22., lpgLinkId, zeroVehicleId, warmEmissions);
@@ -346,10 +342,10 @@ public class TestWarmEmissionAnalysisModule {
 		//Assert.assertEquals(detailedSgffFactorFf*sgffLinklength/1000., warmEmissions.get(WarmPollutant.NO2), MatsimTestUtils.EPSILON);
 		//avg=ff=sg -> use ff factors
 		warmEmissions= weam.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, sgflink, sgffLinklength/sgffDetailedFfSpeed*3.6);
-		Assert.assertEquals(detailedSgffFactorFf*sgffLinklength/1000., warmEmissions.get(WarmPollutant.NO2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedSgffFactorFf*sgffLinklength/1000., warmEmissions.get("NO2"), MatsimTestUtils.EPSILON);
 		//avg<sg -> use sg factors 
 		warmEmissions= weam.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, sgflink, 2*sgffLinklength/sgffDetailedFfSpeed*3.6);
-		Assert.assertEquals(detailedSgffFactorSg*sgffLinklength/1000., warmEmissions.get(WarmPollutant.NO2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedSgffFactorSg*sgffLinklength/1000., warmEmissions.get("NO2"), MatsimTestUtils.EPSILON);
 	}
 	
 	@Test
@@ -371,7 +367,7 @@ public class TestWarmEmissionAnalysisModule {
 		
 		excep= false;
 		try{
-			Map<WarmPollutant, Double> warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions
+			Map<String, Double> warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions
 					(noeVehicle, noelink, 1.5* noeLinkLength /noeFreeSpeed);
 			weam.throwWarmEmissionEvent(10., noelink.getId(), noeVehicleId, warmEmissions);
 		}catch(Exception e){
@@ -396,7 +392,7 @@ public class TestWarmEmissionAnalysisModule {
 		
 		excep= false;
 		try{
-			Map<WarmPollutant, Double> warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions
+			Map<String, Double> warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions
 					(noeVehicle, noelink, 1.5* noeLinkLength /noeFreeSpeed);
 			weam.throwWarmEmissionEvent(10., noelink.getId(), noeVehicleId, warmEmissions);
 		}catch(Exception e){
@@ -420,7 +416,7 @@ public class TestWarmEmissionAnalysisModule {
 
 		excep= false;
 		try{
-			Map<WarmPollutant, Double> warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions
+			Map<String, Double> warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions
 					(noeVehicle, noelink, 1.5*noeLinkLength/noeFreeSpeed);
 			weam.throwWarmEmissionEvent(10., noelink.getId(), noeVehicleId, warmEmissions);
 		}catch(Exception e){
@@ -443,7 +439,7 @@ public class TestWarmEmissionAnalysisModule {
 
 		excep= false;
 		try{
-			Map<WarmPollutant, Double> warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions
+			Map<String, Double> warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions
 					(noeVehicle, noelink, 1.5*22./noeFreeSpeed);
 			weam.throwWarmEmissionEvent(10., noelink.getId(), noeVehicleId, warmEmissions);
 		}catch(Exception e){
@@ -763,7 +759,7 @@ public class TestWarmEmissionAnalysisModule {
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
 		fillAverageTable(avgHbefaWarmTable);
 		fillDetailedTable(detailedHbefaWarmTable);
-		Map<WarmPollutant, Double> warmEmissions;
+		Map<String, Double> warmEmissions;
 		
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		
@@ -772,7 +768,7 @@ public class TestWarmEmissionAnalysisModule {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
-		WarmEmissionAnalysisModuleParameter weamParameter = new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, detailedHbefaWarmTable, ecg);
+		WarmEmissionAnalysisModuleParameter weamParameter = new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, detailedHbefaWarmTable, pollutants, ecg);
 		WarmEmissionAnalysisModule weam = new WarmEmissionAnalysisModule(weamParameter , emissionEventManager, rescaleF);
 		HandlerToTestEmissionAnalysisModules.reset();
 		// ---- end of setup
@@ -789,7 +785,7 @@ public class TestWarmEmissionAnalysisModule {
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicleForAvgTable, dieselLink, linkLength /dieselFreeVelocity*3.6);
 		weam.throwWarmEmissionEvent(10, idForAvgTable, vehicleIdForAvgTable, warmEmissions);
 		
-		int numberOfWarmEmissions = WarmPollutant.values().length;
+		int numberOfWarmEmissions = numberOfWarmPollutants;
 		
 		String message = "The expected rescaled emissions for this event are (calculated emissions * rescalefactor) = " 
 				+ (numberOfWarmEmissions*avgDieselFactorFf) + " * " + rescaleF + " = " +
@@ -811,7 +807,7 @@ public class TestWarmEmissionAnalysisModule {
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
 		WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(
-				avgHbefaWarmTable, detailedHbefaWarmTable, ecg);
+				avgHbefaWarmTable, detailedHbefaWarmTable, pollutants, ecg);
 		weam = new WarmEmissionAnalysisModule(warmEmissionParameterObject, emissionEventManager, null);
 
 	}
@@ -837,7 +833,7 @@ public class TestWarmEmissionAnalysisModule {
 		detWarmFactor.setWarmEmissionFactor(detailedPetrolFactorFf); 
 		detWarmFactor.setSpeed(petrolSpeedFf);
 
-		for (WarmPollutant wp: WarmPollutant.values()){
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -859,7 +855,7 @@ public class TestWarmEmissionAnalysisModule {
         detWarmFactor.setWarmEmissionFactor(detailedPetrolFactorSg);
 		detWarmFactor.setSpeed(petrolSpeedSg);
 
-		for (WarmPollutant wp: WarmPollutant.values()){
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -881,7 +877,7 @@ public class TestWarmEmissionAnalysisModule {
         detWarmFactor.setWarmEmissionFactor(detailedPcFactorFf);
 		detWarmFactor.setSpeed(pcfreeVelocity);
 
-		for (WarmPollutant wp: WarmPollutant.values()){
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -903,7 +899,7 @@ public class TestWarmEmissionAnalysisModule {
         detWarmFactor.setWarmEmissionFactor(detailedDieselFactorSg);
 		detWarmFactor.setSpeed(dieselSgVelocity);
 
-		for (WarmPollutant wp: WarmPollutant.values()){
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -929,7 +925,7 @@ public class TestWarmEmissionAnalysisModule {
         double ffOnlyffSpeed = 120.;
         detWarmFactor.setSpeed(ffOnlyffSpeed);
 		
-		for (WarmPollutant wp: WarmPollutant.values()){
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -954,8 +950,8 @@ public class TestWarmEmissionAnalysisModule {
         detWarmFactor.setWarmEmissionFactor(detailedSgOnlyFactorSg);
         double sgOnlysgSpeed = 50.;
         detWarmFactor.setSpeed(sgOnlysgSpeed);
-		
-		for (WarmPollutant wp: WarmPollutant.values()){
+
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -976,8 +972,8 @@ public class TestWarmEmissionAnalysisModule {
         double detailedTableFactorFf = .11;
         detWarmFactor.setWarmEmissionFactor(detailedTableFactorFf);
 		detWarmFactor.setSpeed(tableffSpeed);
-		
-		for (WarmPollutant wp: WarmPollutant.values()){
+
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -992,8 +988,8 @@ public class TestWarmEmissionAnalysisModule {
         detWarmFactor.setWarmEmissionFactor(detailedTableFactorSg);
         double tablesgSpeed = 55.;
         detWarmFactor.setSpeed(tablesgSpeed);
-		
-		for (WarmPollutant wp: WarmPollutant.values()){
+
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -1012,8 +1008,8 @@ public class TestWarmEmissionAnalysisModule {
 		detWarmFactor = new HbefaWarmEmissionFactor();
 		detWarmFactor.setWarmEmissionFactor(detailedZeroFactorFf);
 		detWarmFactor.setSpeed(zeroFreeVelocity);
-		
-		for (WarmPollutant wp: WarmPollutant.values()){
+
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -1027,8 +1023,8 @@ public class TestWarmEmissionAnalysisModule {
         double detailedZeroFactorSg = .00011;
         detWarmFactor.setWarmEmissionFactor(detailedZeroFactorSg);
 		detWarmFactor.setSpeed(zeroSgVelocity);
-		
-		for (WarmPollutant wp: WarmPollutant.values()){
+
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -1047,8 +1043,8 @@ public class TestWarmEmissionAnalysisModule {
 		detWarmFactor = new HbefaWarmEmissionFactor();
 		detWarmFactor.setWarmEmissionFactor(detailedSgffFactorFf);
 		detWarmFactor.setSpeed(sgffDetailedFfSpeed);
-		
-		for (WarmPollutant wp: WarmPollutant.values()){
+
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -1066,8 +1062,8 @@ public class TestWarmEmissionAnalysisModule {
 		detWarmFactor = new HbefaWarmEmissionFactor();
 		detWarmFactor.setWarmEmissionFactor(detailedSgffFactorSg);
 		detWarmFactor.setSpeed(sgffDetailedFfSpeed);
-		
-		for (WarmPollutant wp: WarmPollutant.values()){
+
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -1092,8 +1088,8 @@ public class TestWarmEmissionAnalysisModule {
         double avgPetrolFactorFf = 1000000.;
         detWarmFactor.setWarmEmissionFactor(avgPetrolFactorFf);
 		detWarmFactor.setSpeed(petrolSpeedFf);
-		
-		for (WarmPollutant wp: WarmPollutant.values()){
+
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -1108,8 +1104,8 @@ public class TestWarmEmissionAnalysisModule {
         double avgPetrolFactorSg = 10000000.;
         detWarmFactor.setWarmEmissionFactor(avgPetrolFactorSg);
 		detWarmFactor.setSpeed(petrolSpeedSg);
-		
-		for (WarmPollutant wp: WarmPollutant.values()){
+
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -1130,7 +1126,7 @@ public class TestWarmEmissionAnalysisModule {
 		detWarmFactor.setWarmEmissionFactor(avgPcFactorFf); 
 		detWarmFactor.setSpeed(pcfreeVelocity);
 
-		for (WarmPollutant wp: WarmPollutant.values()){
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -1150,7 +1146,7 @@ public class TestWarmEmissionAnalysisModule {
 		detWarmFactor.setWarmEmissionFactor(avgPcFactorSg); 
 		detWarmFactor.setSpeed(pcsgVelocity);
 
-		for (WarmPollutant wp: WarmPollutant.values()){
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -1170,7 +1166,7 @@ public class TestWarmEmissionAnalysisModule {
 		detWarmFactor.setWarmEmissionFactor(avgDieselFactorFf); 
 		detWarmFactor.setSpeed(dieselFreeVelocity);
 
-		for (WarmPollutant wp: WarmPollutant.values()){
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -1189,7 +1185,7 @@ public class TestWarmEmissionAnalysisModule {
 		detWarmFactor.setWarmEmissionFactor(avgDieselFactorSg); 
 		detWarmFactor.setSpeed(dieselSgVelocity);
 
-		for (WarmPollutant wp: WarmPollutant.values()){
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -1210,7 +1206,7 @@ public class TestWarmEmissionAnalysisModule {
 		detWarmFactor.setWarmEmissionFactor(avgLpgFactorFf); 
 		detWarmFactor.setSpeed(lpgFreeVelocity);
 
-		for (WarmPollutant wp: WarmPollutant.values()){
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -1229,7 +1225,7 @@ public class TestWarmEmissionAnalysisModule {
 		detWarmFactor.setWarmEmissionFactor(avgLpgFactorSg); 
 		detWarmFactor.setSpeed(lpgSgVelocity);
 
-		for (WarmPollutant wp: WarmPollutant.values()){
+		for (String wp: pollutants){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
