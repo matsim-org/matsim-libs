@@ -28,7 +28,7 @@ public class ComponentRegistry {
 		componentsByKey.computeIfAbsent(key, k -> new ArrayList<>()).add(component);
 	}
 
-	public List<Key<? extends QSimComponent>> getOrderedComponents(QSimComponents config) {
+	public List<Key<? extends QSimComponent>> getOrderedComponents(QSimComponentsConfig config) {
 		List<Key<? extends QSimComponent>> orderedComponents = new LinkedList<>();
 
 		for (Object annotation : config.getActiveComponents()) {

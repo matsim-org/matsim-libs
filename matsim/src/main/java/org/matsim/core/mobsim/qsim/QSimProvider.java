@@ -32,7 +32,7 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.components.ComponentRegistry;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -52,12 +52,12 @@ public class QSimProvider implements Provider<QSim> {
 	private Config config;
 	private Collection<AbstractQSimModule> modules;
 	private List<AbstractQSimModule> overridingModules;
-	private QSimComponents components;
+	private QSimComponentsConfig components;
 	@Inject(optional = true)
 	private IterationCounter iterationCounter;
 
 	@Inject
-	QSimProvider(Injector injector, Config config, Collection<AbstractQSimModule> modules, QSimComponents components,
+	QSimProvider(Injector injector, Config config, Collection<AbstractQSimModule> modules, QSimComponentsConfig components,
 			@Named("overrides") List<AbstractQSimModule> overridingModules) {
 		this.injector = injector;
 		this.modules = modules;

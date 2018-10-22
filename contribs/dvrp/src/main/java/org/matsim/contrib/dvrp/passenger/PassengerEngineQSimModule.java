@@ -8,7 +8,7 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -33,7 +33,7 @@ public class PassengerEngineQSimModule extends AbstractQSimModule {
 		bindNamedComponent(PassengerEngine.class, PASSENGER_ENGINE_NAME_PREFIX + mode).to(Key.get(PassengerEngine.class, modeNamed));
 	}
 
-	public static void configureComponents(QSimComponents components, String mode) {
+	public static void configureComponents(QSimComponentsConfig components, String mode) {
 		components.addNamedComponent(PassengerEngineQSimModule.PASSENGER_ENGINE_NAME_PREFIX + mode);
 	}
 

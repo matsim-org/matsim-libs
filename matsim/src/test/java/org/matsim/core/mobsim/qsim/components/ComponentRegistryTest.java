@@ -55,7 +55,7 @@ public class ComponentRegistryTest {
 
 		Assert.assertEquals(orderedComponents(injector, namedComponents("C")), Arrays.asList());
 
-		QSimComponents qSimComponents = namedComponents("A", "B");
+		QSimComponentsConfig qSimComponents = namedComponents("A", "B");
 		qSimComponents.addComponent(Named.class);
 		qSimComponents.addComponent(MockComponentAnnotation.class);
 		Assert.assertEquals(orderedComponents(injector, qSimComponents),
@@ -80,15 +80,15 @@ public class ComponentRegistryTest {
 		}
 	}
 
-	private QSimComponents namedComponents(String... activeComponentNames) {
-		QSimComponents qSimComponents = new QSimComponents();
+	private QSimComponentsConfig namedComponents(String... activeComponentNames) {
+		QSimComponentsConfig qSimComponents = new QSimComponentsConfig();
 		for (String n : activeComponentNames) {
 			qSimComponents.addNamedComponent(n);
 		}
 		return qSimComponents;
 	}
 
-	private List<Key<? extends QSimComponent>> orderedComponents(Injector injector, QSimComponents qSimComponents) {
+	private List<Key<? extends QSimComponent>> orderedComponents(Injector injector, QSimComponentsConfig qSimComponents) {
 		ComponentRegistry registry = ComponentRegistry.create(injector);
 		return registry.getOrderedComponents(qSimComponents);
 	}

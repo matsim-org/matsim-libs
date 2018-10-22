@@ -2,7 +2,7 @@ package org.matsim.contrib.dynagent.run;
 
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 
 public class DynActivityEngineModule extends AbstractQSimModule {
 	public final static String COMPONENT_NAME = "DynActivityEngine";
@@ -14,7 +14,7 @@ public class DynActivityEngineModule extends AbstractQSimModule {
 		addNamedComponent(DynActivityEngine.class, COMPONENT_NAME);
 	}
 
-	public static void configureComponents(QSimComponents components) {
+	public static void configureComponents(QSimComponentsConfig components) {
 		components.removeNamedComponent(ActivityEngineModule.COMPONENT_NAME);
 		components.addNamedComponent(COMPONENT_NAME);
 	}

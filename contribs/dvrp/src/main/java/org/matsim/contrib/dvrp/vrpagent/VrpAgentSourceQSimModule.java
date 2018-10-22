@@ -26,7 +26,7 @@ import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -48,7 +48,7 @@ public class VrpAgentSourceQSimModule extends AbstractQSimModule {
 		bindNamedComponent(VrpAgentSource.class, VRP_AGENT_SOURCE_NAME_PREFIX + mode).toProvider(new VrpAgentSourceProvider(mode)).asEagerSingleton();
 	}
 
-	public static void configureComponents(QSimComponents components, String mode) {
+	public static void configureComponents(QSimComponentsConfig components, String mode) {
 		components.addNamedComponent(VrpAgentSourceQSimModule.VRP_AGENT_SOURCE_NAME_PREFIX + mode);
 	}
 

@@ -11,9 +11,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
-import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
+import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 import com.google.inject.Injector;
@@ -54,7 +54,7 @@ public class QSimBuilder {
 	private final Config config;
 
 	private final Collection<AbstractQSimModule> qsimModules = new LinkedList<>();
-	private final QSimComponents components = new QSimComponents();
+	private final QSimComponentsConfig components = new QSimComponentsConfig();
 
 	private final List<AbstractModule> overridingControllerModules = new LinkedList<>();
 	private final List<AbstractQSimModule> overridingQSimModules = new LinkedList<>();
@@ -104,7 +104,7 @@ public class QSimBuilder {
 	 */
 	public QSimBuilder useDefaultComponents() {
 		components.clear();
-		new StandardQSimComponentsConfigurator(config).configure(components);
+		new StandardQSimComponentConfigurator(config).configure(components);
 		return this;
 	}
 
@@ -159,7 +159,7 @@ public class QSimBuilder {
 		controllerModule = AbstractModule.override(Collections.singleton(controllerModule), new AbstractModule() {
 			@Override
 			public void install() {
-				bind(QSimComponents.class).toInstance(components);
+				bind(QSimComponentsConfig.class).toInstance(components);
 				qsimModules.forEach(this::installQSimModule);
 				bind(Key.get(new TypeLiteral<List<AbstractQSimModule>>() {
 				}, Names.named("overrides"))).toInstance(overridingQSimModules);

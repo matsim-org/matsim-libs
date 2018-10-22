@@ -14,7 +14,7 @@ import com.google.inject.name.Names;
  * Contains information about which QSim components should be used in the
  * simulation and in which order they are registered with the QSim.
  */
-final public class QSimComponents {
+final public class QSimComponentsConfig {
 	private final List<Object> components = new LinkedList<>();
 	private final Set<Key<?>> keys = new HashSet<>();
 
