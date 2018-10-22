@@ -70,6 +70,7 @@ public class QSimProvider implements Provider<QSim> {
 	@Override
 	public QSim get() {
 		modules.forEach(m -> m.setConfig(config));
+		overridingModules.forEach(m -> m.setConfig(config));
 
 		AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, overridingModules);
 

@@ -7,15 +7,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import com.google.inject.Binding;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 
 public class ComponentRegistry {
-	private final Logger logger = Logger.getLogger(ComponentRegistry.class);
-
 	private final Map<Key<?>, List<Key<? extends QSimComponent>>> componentsByKey = new HashMap<>();
 
 	ComponentRegistry() {
@@ -23,9 +19,6 @@ public class ComponentRegistry {
 
 	public void register(Key<? extends QSimComponent> component) {
 		if (component.getAnnotationType() == null) {
-			logger.warn(String.format(
-					"Ignoring QSimComponent '%s' because annotation is missing. This may raise an exception in the future.",
-					component.getTypeLiteral()));
 			return;
 		}
 

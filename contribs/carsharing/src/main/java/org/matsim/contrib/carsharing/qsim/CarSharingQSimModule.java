@@ -14,7 +14,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
 public class CarSharingQSimModule extends AbstractQSimModule {
-	public final static String CARSHARING_COMPONENT = "Carsharing";
+	public final static String COMPONENT_NAME = "Carsharing";
 
 	private final CarsharingSupplyInterface carsharingSupply;
 	private final CarsharingManagerInterface carsharingManager;
@@ -27,10 +27,7 @@ public class CarSharingQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bind(PopulationAgentSource.class).asEagerSingleton();
-
-		bindNamedAgentSource(PopulationModule.COMPONENT_NAME).to(PopulationAgentSource.class);
-		bindNamedAgentSource(CARSHARING_COMPONENT).to(ParkCSVehicles.class);
+		addNamedComponent(ParkCSVehicles.class, COMPONENT_NAME);
 	}
 
 	@Provides
@@ -46,6 +43,6 @@ public class CarSharingQSimModule extends AbstractQSimModule {
 	}
 	
 	static public void configureComponents(QSimComponents components) {
-		components.addNamedComponent(CARSHARING_COMPONENT);
+		components.addNamedComponent(COMPONENT_NAME);
 	}
 }

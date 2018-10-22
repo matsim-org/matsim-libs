@@ -57,7 +57,7 @@ public class DvrpModeQSimModule extends AbstractQSimModule {
 			@Override
 			protected void configureQSim() {
 				for (Map.Entry<String, Class<? extends MobsimListener>> entry : listeners.entrySet()) {
-					bindNamedMobsimListener(entry.getKey()).to(entry.getValue());
+					addNamedComponent(entry.getValue(), entry.getKey());
 				}
 			}
 		});

@@ -23,7 +23,7 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 
-public class AbstractQSimModuleTest {
+public class AbstractQSimModuleTest {	
 	@Test
 	public void testOverrides() {
 		AbstractQSimModule moduleA = new AbstractQSimModule() {
@@ -123,7 +123,7 @@ public class AbstractQSimModuleTest {
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bindNamedMobsimEngine("MyEngine").toInstance(engine);
+				bindNamedComponent(TestEngine.class, "MyEngine").toInstance(engine);
 			}
 		});
 

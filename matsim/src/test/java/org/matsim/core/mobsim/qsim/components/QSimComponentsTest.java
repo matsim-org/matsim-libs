@@ -13,10 +13,35 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.components.mock.MockComponentAnnotation;
+import org.matsim.core.mobsim.qsim.components.mock.MockMobsimListener;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import com.google.inject.Key;
+
 public class QSimComponentsTest {
+	@Test
+	public void testGenericAddComponentMethod() {
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		
+		AbstractQSimModule module = new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				addComponent(MockMobsimListener.class, MockComponentAnnotation.class);
+			}
+		};
+		
+		new QSimBuilder(config) //
+		.addQSimModule(module) //
+		.configureComponents(components -> {
+			components.addComponent(MockComponentAnnotation.class);
+		}) //
+		.build(scenario, eventsManager) //
+		.run();
+	}
+
 	@Test
 	public void testMultipleBindings() {
 		Config config = ConfigUtils.createConfig();
@@ -43,15 +68,15 @@ public class QSimComponentsTest {
 		Assert.assertTrue(mockEngineA.isCalled);
 		Assert.assertTrue(mockEngineB.isCalled);
 	}
-	
+
 	class MockEngineA extends MockEngine implements MobsimEngine {
-		
+
 	}
-	
+
 	class MockEngineB extends MockEngine implements MobsimEngine {
-		
+
 	}
-	
+
 	@Test
 	public void testExplicitAnnotationConfiguration() {
 		Config config = ConfigUtils.createConfig();
@@ -64,7 +89,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindMobsimEngine(MockComponentAnnotation.class).toInstance(mockEngine);
+						bindComponent(MockEngine.class, MockComponentAnnotation.class).toInstance(mockEngine);
 					}
 				}) //
 				.configureComponents(components -> {
@@ -75,7 +100,7 @@ public class QSimComponentsTest {
 
 		Assert.assertTrue(mockEngine.isCalled);
 	}
-	
+
 	@Test
 	public void testManualConfiguration() {
 		Config config = ConfigUtils.createConfig();
@@ -88,7 +113,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindNamedMobsimEngine("MockEngine").toInstance(mockEngine);
+						bindNamedComponent(MockEngine.class, "MockEngine").toInstance(mockEngine);
 					}
 				}) //
 				.configureComponents(components -> {
@@ -106,7 +131,7 @@ public class QSimComponentsTest {
 
 		QSimComponentsConfigGroup componentsConfig = new QSimComponentsConfigGroup();
 		config.addModule(componentsConfig);
-		
+
 		componentsConfig.setActiveComponents(Collections.singletonList("MockEngine"));
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -119,7 +144,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindNamedMobsimEngine("MockEngine").toInstance(mockEngine);
+						bindNamedComponent(MockEngine.class, "MockEngine").toInstance(mockEngine);
 					}
 				}) //
 				.build(scenario, eventsManager) //

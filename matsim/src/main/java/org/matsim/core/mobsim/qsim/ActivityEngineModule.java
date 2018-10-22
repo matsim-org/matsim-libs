@@ -6,8 +6,6 @@ public class ActivityEngineModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(ActivityEngine.class).asEagerSingleton();
-
-		bindNamedActivityHandler(COMPONENT_NAME).to(ActivityEngine.class);
-		bindNamedMobsimEngine(COMPONENT_NAME).to(ActivityEngine.class);
+		addNamedComponent(ActivityEngine.class, COMPONENT_NAME);
 	}
 }

@@ -12,7 +12,7 @@ public class MessageQueueModule extends AbstractQSimModule {
 		bind(MessageQueue.class).asEagerSingleton();
 		bind(SteppableScheduler.class).asEagerSingleton();
 		bind(MessageQueueEngine.class).asEagerSingleton();
-
-		bindNamedMobsimListener(COMPONENT_NAME).to(MessageQueueEngine.class);
+		
+		addNamedComponent(MessageQueueEngine.class, COMPONENT_NAME);
 	}
 }

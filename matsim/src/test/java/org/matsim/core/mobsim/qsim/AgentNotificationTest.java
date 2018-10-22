@@ -252,7 +252,7 @@ public class AgentNotificationTest {
 				@Override
 				protected void configureQSim() {
 					bind(PopulationAgentSource.class).asEagerSingleton();
-					bindNamedAgentSource(PopulationModule.COMPONENT_NAME).to(PopulationAgentSource.class);
+					addNamedComponent(PopulationAgentSource.class, PopulationModule.COMPONENT_NAME);
 					bind(AgentFactory.class).to(MyAgentFactory.class).asEagerSingleton();
 				}
 			})

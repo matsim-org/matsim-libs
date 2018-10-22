@@ -15,7 +15,7 @@ public class ParkingSearchPopulationModule extends AbstractQSimModule {
 		bind(AgentFactory.class).to(ParkingAgentFactory.class).asEagerSingleton(); // (**)
 		bind(ParkingPopulationAgentSource.class).asEagerSingleton();
 		
-		bindNamedAgentSource(COMPONENT_NAME).to(ParkingPopulationAgentSource.class);
+		addNamedComponent(ParkingPopulationAgentSource.class, COMPONENT_NAME);
 	}
 
 }

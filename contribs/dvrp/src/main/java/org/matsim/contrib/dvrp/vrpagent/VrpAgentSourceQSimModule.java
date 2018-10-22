@@ -45,8 +45,7 @@ public class VrpAgentSourceQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bindNamedAgentSource(VRP_AGENT_SOURCE_NAME_PREFIX + mode).toProvider(new VrpAgentSourceProvider(mode))
-				.asEagerSingleton();
+		bindNamedComponent(VrpAgentSource.class, VRP_AGENT_SOURCE_NAME_PREFIX + mode).toProvider(new VrpAgentSourceProvider(mode)).asEagerSingleton();
 	}
 
 	public static void configureComponents(QSimComponents components, String mode) {

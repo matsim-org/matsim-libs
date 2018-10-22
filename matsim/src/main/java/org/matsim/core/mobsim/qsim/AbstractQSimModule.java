@@ -25,64 +25,32 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule {
 		configureQSim();
 	}
 	
-	protected LinkedBindingBuilder<MobsimEngine> bindNamedMobsimEngine(String name) {
-		return bindMobsimEngine(Names.named(name));
+	protected <T extends QSimComponent> AnnotatedBindingBuilder<T> bindComponent(Class<T> componentClass) {
+		return binder().bind(componentClass);
 	}
 	
-	protected LinkedBindingBuilder<MobsimEngine> bindMobsimEngine(Annotation annotation) {
-		return binder().bind(Key.get(MobsimEngine.class, annotation));
+	protected <T extends QSimComponent> LinkedBindingBuilder<T> bindComponent(Class<T> componentClass, Annotation annotation) {
+		return bindComponent(componentClass).annotatedWith(annotation);
 	}
 	
-	protected LinkedBindingBuilder<MobsimEngine> bindMobsimEngine(Class<? extends Annotation> annotation) {
-		return binder().bind(Key.get(MobsimEngine.class, annotation));
-	}
-
-	protected LinkedBindingBuilder<ActivityHandler> bindNamedActivityHandler(String name) {
-		return bindActivityHandler(Names.named(name));
+	protected <T extends QSimComponent> LinkedBindingBuilder<T> bindComponent(Class<T> componentClass, Class<? extends Annotation> annotationClass) {
+		return bindComponent(componentClass).annotatedWith(annotationClass);
 	}
 	
-	protected LinkedBindingBuilder<ActivityHandler> bindActivityHandler(Annotation annotation) {
-		return binder().bind(Key.get(ActivityHandler.class, annotation));
+	protected <T extends QSimComponent> LinkedBindingBuilder<T> bindNamedComponent(Class<T> componentClass, String name) {
+		return bindComponent(componentClass).annotatedWith(Names.named(name));
 	}
 	
-	protected LinkedBindingBuilder<ActivityHandler> bindActivityHandler(Class<? extends Annotation> annotation) {
-		return binder().bind(Key.get(ActivityHandler.class, annotation));
-	}
-
-	protected LinkedBindingBuilder<DepartureHandler> bindNamedDepartureHandler(String name) {
-		return bindDepartureHandler(Names.named(name));
+	protected <T extends QSimComponent> void addComponent(Class<T> componentClass, Annotation annotation) {
+		bindComponent(componentClass, annotation).to(componentClass);
 	}
 	
-	protected LinkedBindingBuilder<DepartureHandler> bindDepartureHandler(Annotation annotation) {
-		return binder().bind(Key.get(DepartureHandler.class, annotation));
+	protected <T extends QSimComponent> void addComponent(Class<T> componentClass, Class<? extends Annotation> annotationClass) {
+		bindComponent(componentClass, annotationClass).to(componentClass);
 	}
 	
-	protected LinkedBindingBuilder<DepartureHandler> bindDepartureHandler(Class<? extends Annotation> annotation) {
-		return binder().bind(Key.get(DepartureHandler.class, annotation));
-	}
-
-	protected LinkedBindingBuilder<AgentSource> bindNamedAgentSource(String name) {
-		return bindAgentSource(Names.named(name));
-	}
-	
-	protected LinkedBindingBuilder<AgentSource> bindAgentSource(Annotation annotation) {
-		return binder().bind(Key.get(AgentSource.class, annotation));
-	}
-	
-	protected LinkedBindingBuilder<AgentSource> bindAgentSource(Class<? extends Annotation> annotation) {
-		return binder().bind(Key.get(AgentSource.class, annotation));
-	}
-
-	protected LinkedBindingBuilder<MobsimListener> bindNamedMobsimListener(String name) {
-		return bindMobsimListener(Names.named(name));
-	}
-	
-	protected LinkedBindingBuilder<MobsimListener> bindMobsimListener(Annotation annotation) {
-		return binder().bind(Key.get(MobsimListener.class, annotation));
-	}
-	
-	protected LinkedBindingBuilder<MobsimListener> bindMobsimListener(Class<? extends Annotation> annotation) {
-		return binder().bind(Key.get(MobsimListener.class, annotation));
+	protected <T extends QSimComponent> void addNamedComponent(Class<T> componentClass, String name) {
+		bindNamedComponent(componentClass, name).to(componentClass);
 	}
 
 	protected abstract void configureQSim();

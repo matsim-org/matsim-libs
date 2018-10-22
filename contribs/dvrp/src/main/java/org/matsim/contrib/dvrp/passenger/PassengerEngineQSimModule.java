@@ -30,8 +30,7 @@ public class PassengerEngineQSimModule extends AbstractQSimModule {
 				.toProvider(new PassengerEngineProvider(mode))
 				.asEagerSingleton();
 		Named modeNamed = Names.named(mode);
-		bindNamedDepartureHandler(PASSENGER_ENGINE_NAME_PREFIX + mode).to(Key.get(PassengerEngine.class, modeNamed));
-		bindNamedMobsimEngine(PASSENGER_ENGINE_NAME_PREFIX + mode).to(Key.get(PassengerEngine.class, modeNamed));
+		bindNamedComponent(PassengerEngine.class, PASSENGER_ENGINE_NAME_PREFIX + mode).to(Key.get(PassengerEngine.class, modeNamed));
 	}
 
 	public static void configureComponents(QSimComponents components, String mode) {
