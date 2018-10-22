@@ -31,6 +31,7 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.opengis.feature.simple.SimpleFeature;
@@ -56,6 +57,10 @@ public class VoronoiGeometryUtils {
 		Map<Id<ActivityFacility>, Geometry> measurePointPolygons = new HashMap<>();
 		
 		Collection<Geometry> geometries = determineVoronoiShapes(measuringPoints, box);
+		
+		// Write geometries to file
+//		Collection<SimpleFeature> features = VoronoiGeometryUtils.createFeaturesFromPolygons(geometries);
+//	    ShapeFileWriter.writeGeometries(features, "/Users/dominik/voronoi_test.shp");
 		
 		if (geometries.size() != measuringPoints.getFacilities().size()) {
 			throw new RuntimeException("Number of Voronoi polygons and measure points must be equal.");
