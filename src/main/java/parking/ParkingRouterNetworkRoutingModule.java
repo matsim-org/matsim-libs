@@ -58,7 +58,7 @@ public final class ParkingRouterNetworkRoutingModule implements RoutingModule {
         @Override
         public boolean isStageActivity(String activityType) {
             if (ParkingRouterNetworkRoutingModule.stageActivityType.equals(activityType) ||
-                    ParkingRouterNetworkRoutingModule.parkingStageActivityType.equals(activityType)
+                    ParkingRouterNetworkRoutingModule.parkingStageActivityType.equals(activityType) || activityType.endsWith("interaction")
                     ) {
                 return true;
             } else {

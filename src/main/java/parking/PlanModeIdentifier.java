@@ -46,7 +46,7 @@ public class PlanModeIdentifier {
         StageActivityTypes blackList = new ParkingRouterNetworkRoutingModule.ParkingAccessEgressStageActivityTypes();
         MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
 
-        new PopulationReader(scenario).readFile("");
+        new PopulationReader(scenario).readFile("D:/runs-svn/vw_rufbus/vw220park10T/vw220park10T.output_plans.xml.gz");
         for (Person person : scenario.getPopulation().getPersons().values()) {
             System.out.println(person.getId().toString() + ": ");
             Plan plan = person.getSelectedPlan();
