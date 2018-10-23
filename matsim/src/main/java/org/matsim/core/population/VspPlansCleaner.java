@@ -19,22 +19,17 @@
  * *********************************************************************** */
 package org.matsim.core.population;
 
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import com.google.inject.Inject;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.utils.misc.Time;
 
-import com.google.inject.Inject;
-
 /**
  * @author nagel
  *
+ * Use with caution! (jb, Oct 2018)
  */
 /* deliberately package */ class VspPlansCleaner implements BeforeMobsimListener {
 
@@ -81,13 +76,8 @@ import com.google.inject.Inject;
 				} else if ( pe instanceof Leg ) {
 					Leg leg = (Leg) pe ;
 					if (plansConfigGroup.isRemovingUnneccessaryPlanAttributes()) {
-						leg.setDepartureTime(Time.UNDEFINED_TIME) ;
-
-//						Leg r = (leg); // given by activity end time; everything else confuses
-//						r.setTravelTime( Time.UNDEFINED_TIME - r.getDepartureTime() );
-//						leg.setTravelTime( Time.UNDEFINED_TIME ); // added apr'2015
-						
-						// found the weird code above; rewriting it now.  kai, aug'2018
+//						leg.setDepartureTime(Time.UNDEFINED_TIME) ;
+						//this information is not unneccesary, but may be used, e.g., by DRTRoutes and others.
 						if ( leg.getRoute()!=null ) {
 							leg.setTravelTime( Time.UNDEFINED_TIME );
 						}
