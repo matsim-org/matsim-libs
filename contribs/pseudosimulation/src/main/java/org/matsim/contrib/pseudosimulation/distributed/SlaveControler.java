@@ -267,7 +267,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 //                    transitRouterEventsWSFactory = new TransitRouterEventsWSFactory(scenario,
 //                            waitTimes,
 //                            stopStopTimes);
-                    bind(TransitRouter.class).toProvider(transitRouterEventsWSFactory);
+                    addRoutingModuleBinding(TransportMode.pt).toProvider(transitRouterEventsWSFactory);
                 }
             });
 

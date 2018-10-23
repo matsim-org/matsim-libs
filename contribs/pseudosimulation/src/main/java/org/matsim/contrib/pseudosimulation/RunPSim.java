@@ -22,6 +22,7 @@
 package org.matsim.contrib.pseudosimulation;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
@@ -41,6 +42,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.qsim.QSimProvider;
+import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -87,7 +89,7 @@ public class RunPSim {
 				bind(StopStopTime.class).toProvider(PSimStopStopTimeCalculator.class);
 				bind(TravelTimeCalculator.class).to(PSimTravelTimeCalculator.class);
 				bind(TravelTime.class).toProvider(PSimTravelTimeCalculator.class);
-				bind(TransitRouter.class).toProvider(TransitRouterEventsWSFactory.class);
+				addRoutingModuleBinding(TransportMode.pt).toProvider(TransitRouterEventsWSFactory.class);
 				bind(PlanCatcher.class).toInstance(new PlanCatcher());
 				bind(PSimProvider.class).toInstance(new PSimProvider(scenario,matsimControler.getEvents()));
 				bind(QSimProvider.class);

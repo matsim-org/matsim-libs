@@ -52,7 +52,7 @@ public class RunControlerWS {
 				addRoutingModuleBinding(TransportMode.pt).toProvider(new TransitRouterEventsWSFactory(scenario, waitTimeCalculator.get(), stopStopTimeCalculator.get()));
 			}
 		});
-		controler.run();
+        controler.run();
 	}
 	
 }

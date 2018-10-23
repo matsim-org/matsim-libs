@@ -2,6 +2,7 @@ package org.matsim.contrib.pseudosimulation;
 
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
@@ -60,7 +61,7 @@ public ChoiceGenerationControler(String[] args) {
     controler.addOverridingModule(new AbstractModule() {
         @Override
         public void install() {
-            bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(),
+            addRoutingModuleBinding(TransportMode.pt).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(),
                     waitTimeCalculator.get(),
                     stopStopTimeCalculator.get()));
         }
