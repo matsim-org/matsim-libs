@@ -19,12 +19,6 @@
 
 package parking;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -32,12 +26,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.util.random.WeightedRandomSelection;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -53,6 +42,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 
+import java.util.*;
+
 
 /**
  * This wraps a "computer science" {@link LeastCostPathCalculator}, which routes from a node to another node, into something that
@@ -63,11 +54,11 @@ import org.matsim.facilities.Facility;
 public final class ParkingRouterNetworkRoutingModule implements RoutingModule {
     private static final Logger log = Logger.getLogger(ParkingRouterNetworkRoutingModule.class);
 
-    private final class AccessEgressStageActivityTypes implements StageActivityTypes {
+    public static final class ParkingAccessEgressStageActivityTypes implements StageActivityTypes {
         @Override
         public boolean isStageActivity(String activityType) {
-            if (ParkingRouterNetworkRoutingModule.this.stageActivityType.equals(activityType) ||
-                    ParkingRouterNetworkRoutingModule.this.parkingStageActivityType.equals(activityType)
+            if (ParkingRouterNetworkRoutingModule.stageActivityType.equals(activityType) ||
+                    ParkingRouterNetworkRoutingModule.parkingStageActivityType.equals(activityType)
                     ) {
                 return true;
             } else {
@@ -77,16 +68,16 @@ public final class ParkingRouterNetworkRoutingModule implements RoutingModule {
 
         @Override
         public boolean equals(Object obj) {
-            if (!(obj instanceof AccessEgressStageActivityTypes)) {
+            if (!(obj instanceof ParkingAccessEgressStageActivityTypes)) {
                 return false;
             }
-            AccessEgressStageActivityTypes other = (AccessEgressStageActivityTypes) obj;
-            return other.isStageActivity(ParkingRouterNetworkRoutingModule.this.stageActivityType);
+            ParkingAccessEgressStageActivityTypes other = (ParkingAccessEgressStageActivityTypes) obj;
+            return other.isStageActivity(ParkingRouterNetworkRoutingModule.stageActivityType);
         }
 
         @Override
         public int hashCode() {
-            return ParkingRouterNetworkRoutingModule.this.stageActivityType.hashCode();// TODO update this too
+            return ParkingRouterNetworkRoutingModule.stageActivityType.hashCode();// TODO update this too
         }
     }
 
@@ -96,8 +87,8 @@ public final class ParkingRouterNetworkRoutingModule implements RoutingModule {
 
     private final Network network;
     private final LeastCostPathCalculator routeAlgo;
-    private String stageActivityType;
-    private String parkingStageActivityType;
+    private final static String stageActivityType = TransportMode.car + " interaction";
+    public final static String parkingStageActivityType = TransportMode.car + " parkingSearch";
 
     private ZonalLinkParkingInfo zoneToLinks;
 
@@ -116,8 +107,6 @@ public final class ParkingRouterNetworkRoutingModule implements RoutingModule {
         this.routeAlgo = routeAlgo;
         this.mode = mode;
         this.populationFactory = populationFactory;
-        this.stageActivityType = this.mode + " interaction";
-        this.parkingStageActivityType = this.mode + " parkingSearch";
         if (!calcRouteConfig.isInsertingAccessEgressWalk()) {
             throw new RuntimeException("trying to use access/egress but not switched on in config.  "
                     + "currently not supported; there are too many other problems");
@@ -341,7 +330,7 @@ public final class ParkingRouterNetworkRoutingModule implements RoutingModule {
 
     @Override
     public StageActivityTypes getStageActivityTypes() {
-        return new AccessEgressStageActivityTypes();
+        return new ParkingAccessEgressStageActivityTypes();
     }
 
     @Override
