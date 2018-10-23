@@ -233,6 +233,17 @@ public class EmissionModule {
 
 				currMap.put(currTrafficSituation, value);
 
+				//add a null pollutant to the table, to allow for speed checks
+				HbefaWarmEmissionFactorKey noPollutantKey = new HbefaWarmEmissionFactorKey(key);
+				noPollutantKey.setHbefaComponent("None");
+
+				HbefaWarmEmissionFactor noneValue = new HbefaWarmEmissionFactor();
+				noneValue.setSpeed(value.getSpeed());
+				noneValue.setWarmEmissionFactor(0);
+
+				avgWarmTable.putIfAbsent(noPollutantKey, new HashMap<>());
+				avgWarmTable.get(noPollutantKey).put(currTrafficSituation, noneValue);
+
 
 			}
 		} catch (IOException e) {

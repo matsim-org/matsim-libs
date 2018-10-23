@@ -79,7 +79,7 @@ import org.matsim.vehicles.VehiclesFactory;
 public class TestWarmEmissionAnalysisModule {
 
 	//Old list of pollutants
-	private final Set<String> pollutants = new HashSet<>(Arrays.asList("CO", "CO2(total)", "FC", "HC", "NMHC", "NOx", "NO2","PM", "SO2"));
+	private final Set<String> pollutants = new HashSet<>(Arrays.asList("None", "CO", "CO2(total)", "FC", "HC", "NMHC", "NOx", "NO2","PM", "SO2"));
 	private final int numberOfWarmPollutants = pollutants.size();
 	private final String hbefaRoadCategory = "URB";
     private final String roadType = "0";
@@ -659,9 +659,9 @@ public class TestWarmEmissionAnalysisModule {
 		// average speed equals free flow speed from table
 		warmEmissions =weam.checkVehicleInfoAndCalculateWarmEmissions(inconffVehicle,inconLink, inconff/petrolSpeedFf*3.6);
 	//TODO:	Assert.assertEquals(1, weam.getFractionOccurences());
-		Assert.assertEquals(0, weam.getFreeFlowOccurences());
+		Assert.assertEquals(1, weam.getFreeFlowOccurences());
 		Assert.assertEquals(inconff/1000, weam.getKmCounter(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, weam.getStopGoOccurences());
+		Assert.assertEquals(0, weam.getStopGoOccurences());
 		Assert.assertEquals(1, weam.getWarmEmissionEventCounter());
 		weam.reset();
 		
@@ -1001,12 +1001,17 @@ public class TestWarmEmissionAnalysisModule {
             Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = detailedHbefaWarmTable.get(detWarmKey);
 
             currMap.put(trafficSituationff, detWarmFactor);
+
+            if (avgHbefaWarmTable != null && wp.equals("None")) {
+				avgHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+				avgHbefaWarmTable.get(detWarmKey).put(trafficSituationff, detWarmFactor);
+			}
 		}
 		
 		detWarmFactor = new HbefaWarmEmissionFactor();
         double detailedTableFactorSg = .011;
         detWarmFactor.setWarmEmissionFactor(detailedTableFactorSg);
-        double tablesgSpeed = 55.;
+        double tablesgSpeed = 0.5 * tableffSpeed;
         detWarmFactor.setSpeed(tablesgSpeed);
 
 		for (String wp: pollutants){
@@ -1019,6 +1024,11 @@ public class TestWarmEmissionAnalysisModule {
             detailedHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
             Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = detailedHbefaWarmTable.get(detWarmKey);
             currMap.put(trafficSituationsg, detWarmFactor);
+
+			if (avgHbefaWarmTable != null && wp.equals("None")) {
+				avgHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+				avgHbefaWarmTable.get(detWarmKey).put(trafficSituationsg, detWarmFactor);
+			}
         }
 		
 		//entries for zero case

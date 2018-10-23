@@ -22,8 +22,10 @@
 package org.matsim.contrib.emissions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -42,6 +44,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+
+import static org.matsim.contrib.emissions.types.HbefaTrafficSituation.*;
 
 
 /**
@@ -262,6 +266,7 @@ public class WarmEmissionAnalysisModule {
 			}
 		}
 
+		efkey.setHbefaComponent("None");
 		HbefaTrafficSituation trafficSituation = getTrafficSituation(efkey, averageSpeed_kmh, freeFlowSpeed_kmh);
 
 		for (String warmPollutant : warmPollutants) {
@@ -296,15 +301,20 @@ public class WarmEmissionAnalysisModule {
 		return warmEmissionsOfEvent;
 	}
 
-	//TODO: this is a round estimate of the percentages based on looking at the file, using an MFP, maybe from A.Loder would be nicer, jm  oct'18
+	//TODO: this is based on looking at the speeds in the HBEFA files, using an MFP, maybe from A.Loder would be nicer, jm  oct'18
 	private HbefaTrafficSituation getTrafficSituation(HbefaWarmEmissionFactorKey efkey, double averageSpeed_kmh, double freeFlowSpeed_kmh) {
-		HbefaTrafficSituation trafficSituation = HbefaTrafficSituation.FREEFLOW;
-		if (averageSpeed_kmh < 0.60 * freeFlowSpeed_kmh) {
-			trafficSituation = HbefaTrafficSituation.STOPANDGO;
-		} else if (averageSpeed_kmh < 0.70 * freeFlowSpeed_kmh) {
-			trafficSituation = HbefaTrafficSituation.SATURATED;
-		} else if (averageSpeed_kmh < 0.80 * freeFlowSpeed_kmh) {
-			trafficSituation = HbefaTrafficSituation.HEAVY;
+		//TODO: should this be generated only once much earlier?
+		Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> trafficSpeeds = this.avgHbefaWarmTable.get(efkey);
+
+		HbefaTrafficSituation trafficSituation = FREEFLOW;
+		if (trafficSpeeds.containsKey(SATURATED) && averageSpeed_kmh <= trafficSpeeds.get(SATURATED).getSpeed()) {
+			trafficSituation = SATURATED;
+		}
+		if (trafficSpeeds.containsKey(HEAVY) && averageSpeed_kmh <= trafficSpeeds.get(HEAVY).getSpeed()) {
+			trafficSituation = HEAVY;
+		}
+		if (trafficSpeeds.containsKey(STOPANDGO) && averageSpeed_kmh <= trafficSpeeds.get(STOPANDGO).getSpeed()) {
+			trafficSituation = STOPANDGO;
 		}
 		return trafficSituation;
 	}
