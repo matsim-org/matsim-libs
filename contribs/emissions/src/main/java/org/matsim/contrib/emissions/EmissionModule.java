@@ -74,10 +74,10 @@ public class EmissionModule {
 	//===
 	private Vehicles vehicles;
 	
-	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
+	private Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> avgHbefaWarmTable;
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
 
-	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+	private Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> detailedHbefaWarmTable;
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
 	private Set<String> warmPollutants = new HashSet<>();
 	private Set<String> coldPollutants = new HashSet<>();
@@ -200,10 +200,10 @@ public class EmissionModule {
 	}
 
 	
-	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(URL filename){
+	private Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> createAvgHbefaWarmTable(URL filename){
 		logger.info("entering createAvgHbefaWarmTable ...");
 		
-		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgWarmTable = new HashMap<>();
+		Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> avgWarmTable = new HashMap<>();
 		
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
@@ -221,14 +221,19 @@ public class EmissionModule {
 				key.setHbefaComponent(pollutant);
 
 				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
-				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
 				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
-				
+
 				HbefaWarmEmissionFactor value = new HbefaWarmEmissionFactor();
 				value.setSpeed(Double.parseDouble(array[indexFromKey.get("V_weighted")]));
 				value.setWarmEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
-				
-				avgWarmTable.put(key, value);
+
+				avgWarmTable.putIfAbsent(key, new HashMap<>());
+				HbefaTrafficSituation currTrafficSituation =  mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]);
+				Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = avgWarmTable.get(key);
+
+				currMap.put(currTrafficSituation, value);
+
+
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -274,10 +279,10 @@ public class EmissionModule {
 		return avgColdTable;
 	}
 	
-	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createDetailedHbefaWarmTable(URL filename){
+	private Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> createDetailedHbefaWarmTable(URL filename){
 		logger.info("entering createDetailedHbefaWarmTable ...");
 
-		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> hbefaWarmTableDetailed = new HashMap<>() ;
+		Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> hbefaWarmTableDetailed = new HashMap<>() ;
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
@@ -295,7 +300,6 @@ public class EmissionModule {
 				key.setHbefaComponent(pollutant);
 
 				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
-				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
 				HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 				hbefaVehicleAttributes.setHbefaTechnology(array[indexFromKey.get("Technology")]);
 				hbefaVehicleAttributes.setHbefaSizeClass(array[indexFromKey.get("SizeClasse")]);
@@ -306,7 +310,12 @@ public class EmissionModule {
 				value.setSpeed(Double.parseDouble(array[indexFromKey.get("V")]));
 				value.setWarmEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA")]));
 
-				hbefaWarmTableDetailed.put(key, value);
+				hbefaWarmTableDetailed.putIfAbsent(key, new HashMap<>());
+				HbefaTrafficSituation currTrafficSituation =  mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]);
+				Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = hbefaWarmTableDetailed.get(key);
+
+				currMap.put(currTrafficSituation, value);
+
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

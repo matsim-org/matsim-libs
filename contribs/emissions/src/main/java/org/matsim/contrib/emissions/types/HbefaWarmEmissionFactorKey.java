@@ -28,7 +28,6 @@ public class HbefaWarmEmissionFactorKey {
 	private HbefaVehicleCategory hbefaVehicleCategory;
 	private String hbefaComponent;
 	private String hbefaRoadCategory;
-	private HbefaTrafficSituation hbefaTrafficSituation;
 	private HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 	
 	public HbefaWarmEmissionFactorKey(){
@@ -58,14 +57,6 @@ public class HbefaWarmEmissionFactorKey {
 		this.hbefaRoadCategory = hbefaRoadCategory;
 	}
 
-	public HbefaTrafficSituation getHbefaTrafficSituation() {
-		return this.hbefaTrafficSituation;
-	}
-
-	public void setHbefaTrafficSituation(HbefaTrafficSituation hbefaTrafficSituation) {
-		this.hbefaTrafficSituation = hbefaTrafficSituation;
-	}
-
 	HbefaVehicleAttributes getHbefaVehicleAttributes(){
 		return this.hbefaVehicleAttributes;
 	}
@@ -89,7 +80,6 @@ public class HbefaWarmEmissionFactorKey {
 	            hbefaVehicleCategory.equals(key.getHbefaVehicleCategory())
 	         && hbefaComponent.equals(key.getHbefaComponent())
 	         && hbefaRoadCategory.equals(key.getHbefaRoadCategory())
-	         && hbefaTrafficSituation.equals(key.getHbefaTrafficSituation())
 	         && hbefaVehicleAttributes.equals(key.getHbefaVehicleAttributes());
 	}
 
@@ -106,7 +96,6 @@ public class HbefaWarmEmissionFactorKey {
 		  hbefaVehicleCategory + "; " 
 		+ hbefaComponent + "; " 
 		+ hbefaRoadCategory + "; " 
-		+ hbefaTrafficSituation + "; "
 		+ hbefaVehicleAttributes;
 	}
 }

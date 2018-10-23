@@ -21,6 +21,7 @@
 package org.matsim.contrib.emissions.types;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -72,7 +73,6 @@ public class TestHbefaWarmEmissionFactorKey{
 		HbefaWarmEmissionFactorKey compare = new HbefaWarmEmissionFactorKey();
 		compare.setHbefaComponent("FC");
 		compare.setHbefaRoadCategory(hbefaRoadCategory);
-		compare.setHbefaTrafficSituation(hbefaTrafficSituation);
 		compare.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 		compare.setHbefaVehicleCategory(hbefaVehicleCategory);
 		
@@ -84,7 +84,6 @@ public class TestHbefaWarmEmissionFactorKey{
 		HbefaWarmEmissionFactorKey different = new HbefaWarmEmissionFactorKey();
 		different.setHbefaComponent("CO");
 		different.setHbefaRoadCategory("another road category");
-		different.setHbefaTrafficSituation(HbefaTrafficSituation.SATURATED);
 		HbefaVehicleAttributes attrForDifferent = new HbefaVehicleAttributes();
 		attrForDifferent.setHbefaEmConcept("em concept2");
 		attrForDifferent.setHbefaSizeClass("size class2");
@@ -115,7 +114,6 @@ public class TestHbefaWarmEmissionFactorKey{
 		HbefaWarmEmissionFactorKey noVehCat = new HbefaWarmEmissionFactorKey();
 		noVehCat.setHbefaComponent(warmPollutant);
 		noVehCat.setHbefaRoadCategory(hbefaRoadCategory);
-		noVehCat.setHbefaTrafficSituation(hbefaTrafficSituation);
 		noVehCat.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 
 		equalErr = false;
@@ -143,7 +141,6 @@ public class TestHbefaWarmEmissionFactorKey{
 		// empty warm pollutant
 		HbefaWarmEmissionFactorKey noPollutant = new HbefaWarmEmissionFactorKey();
 		noPollutant.setHbefaRoadCategory(hbefaRoadCategory);
-		noPollutant.setHbefaTrafficSituation(hbefaTrafficSituation);
 		noPollutant.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 		noPollutant.setHbefaVehicleCategory(hbefaVehicleCategory);
 
@@ -171,7 +168,6 @@ public class TestHbefaWarmEmissionFactorKey{
 		//empty road category
 		HbefaWarmEmissionFactorKey noRoadCat = new HbefaWarmEmissionFactorKey();
 		noRoadCat.setHbefaComponent(warmPollutant);
-		noRoadCat.setHbefaTrafficSituation(hbefaTrafficSituation);
 		noRoadCat.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 		noRoadCat.setHbefaVehicleCategory(hbefaVehicleCategory);
 		
@@ -188,7 +184,8 @@ public class TestHbefaWarmEmissionFactorKey{
 		Assert.assertTrue(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noRoadCat));
 	}
-	
+
+	@Ignore //This test is now ignored as trafficSituation has been extracted down a level in the HBEFA detailed and average Maps
 	@Test
 	public final void testEqualsForIncompleteKeys_trafficSituation() {
 		// generate a complete HbefaWarmEmissionFactorKey: 'normal'
@@ -254,7 +251,6 @@ public class TestHbefaWarmEmissionFactorKey{
 		HbefaWarmEmissionFactorKey noVehAtt = new HbefaWarmEmissionFactorKey();
 		noVehAtt.setHbefaComponent(warmPollutant);
 		noVehAtt.setHbefaRoadCategory(hbefaRoadCategory);
-		noVehAtt.setHbefaTrafficSituation(hbefaTrafficSituation);
 		noVehAtt.setHbefaVehicleCategory(hbefaVehicleCategory);
 		
 		equalErr = false;
@@ -290,7 +286,6 @@ public class TestHbefaWarmEmissionFactorKey{
 	private void setToNormal(HbefaWarmEmissionFactorKey normal) {
 		normal.setHbefaComponent(warmPollutant);
 		normal.setHbefaRoadCategory(hbefaRoadCategory);
-		normal.setHbefaTrafficSituation(hbefaTrafficSituation);
 		normal.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 		normal.setHbefaVehicleCategory(hbefaVehicleCategory);
 	}

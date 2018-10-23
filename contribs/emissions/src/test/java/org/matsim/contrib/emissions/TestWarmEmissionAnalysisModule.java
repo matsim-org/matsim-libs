@@ -88,8 +88,8 @@ public class TestWarmEmissionAnalysisModule {
 	private final String passengercar= "PASSENGER_CAR";
 
     private HbefaRoadTypeMapping roadTypeMapping;
-	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
-	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+	private Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> avgHbefaWarmTable;
+	private Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> detailedHbefaWarmTable;
     private WarmEmissionAnalysisModule weam;
 	private Map<String, Double> warmEmissions;
 	
@@ -758,8 +758,8 @@ public class TestWarmEmissionAnalysisModule {
 	public void rescaleWarmEmissionsTest() {
 		// can not use the setUp method here because the efficiency factor is not null
 		// setup ----
-		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
-		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
+		Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> avgHbefaWarmTable = new HashMap<>();
+		Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> detailedHbefaWarmTable = new HashMap<>();
 		fillAverageTable(avgHbefaWarmTable);
 		fillDetailedTable(detailedHbefaWarmTable);
 		Map<String, Double> warmEmissions;
@@ -825,7 +825,7 @@ public class TestWarmEmissionAnalysisModule {
 	}
 
 	private void fillDetailedTable(
-			Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable) {
+			Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> detailedHbefaWarmTable) {
 		
 		HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
 		vehAtt.setHbefaTechnology(petrolTechnology);
@@ -840,10 +840,14 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationff);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
+
+            detailedHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            HbefaTrafficSituation currTrafficSituation =  trafficSituationff;
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = detailedHbefaWarmTable.get(detWarmKey);
+
+            currMap.put(currTrafficSituation, detWarmFactor);
 			
 		}
 		
@@ -862,10 +866,14 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationsg);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
+
+            detailedHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            HbefaTrafficSituation currTrafficSituation =  trafficSituationsg;
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = detailedHbefaWarmTable.get(detWarmKey);
+
+            currMap.put(currTrafficSituation, detWarmFactor);
 		}
 		
 		// entry for second test case "pc" -- should not be used
@@ -932,11 +940,14 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationff);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
-		}
+
+            detailedHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = detailedHbefaWarmTable.get(detWarmKey);
+
+            currMap.put(trafficSituationff, detWarmFactor);
+        }
 		
 		// entry for sgOnlyTestcase
 		
@@ -958,10 +969,13 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationsg);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
+
+            detailedHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = detailedHbefaWarmTable.get(detWarmKey);
+
+            currMap.put(trafficSituationsg, detWarmFactor);
 		}
 		
 		// entries for table testcase
@@ -980,10 +994,13 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationff);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
+
+            detailedHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = detailedHbefaWarmTable.get(detWarmKey);
+
+            currMap.put(trafficSituationff, detWarmFactor);
 		}
 		
 		detWarmFactor = new HbefaWarmEmissionFactor();
@@ -996,11 +1013,13 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationsg);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
-		}
+
+            detailedHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = detailedHbefaWarmTable.get(detWarmKey);
+            currMap.put(trafficSituationsg, detWarmFactor);
+        }
 		
 		//entries for zero case
 		vehAtt = new HbefaVehicleAttributes();
@@ -1016,10 +1035,12 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationff);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
+
+            detailedHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = detailedHbefaWarmTable.get(detWarmKey);
+            currMap.put(trafficSituationff, detWarmFactor);
 		}
 		
 		detWarmFactor = new HbefaWarmEmissionFactor();
@@ -1031,11 +1052,13 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationsg);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
-		}
+
+            detailedHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = detailedHbefaWarmTable.get(detWarmKey);
+            currMap.put(trafficSituationsg, detWarmFactor);
+        }
 		
 		// entries for case sg speed = ff speed
 		vehAtt = new HbefaVehicleAttributes();
@@ -1051,11 +1074,13 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationff);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
-		}
+
+            detailedHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = detailedHbefaWarmTable.get(detWarmKey);
+            currMap.put(trafficSituationff, detWarmFactor);
+        }
 		
 		vehAtt = new HbefaVehicleAttributes();
 		vehAtt.setHbefaEmConcept(sgffConcept);
@@ -1070,15 +1095,17 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationsg);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
-		}
+
+            detailedHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = detailedHbefaWarmTable.get(detWarmKey);
+            currMap.put(trafficSituationsg, detWarmFactor);
+        }
 		
 	}
 
-	private void fillAverageTable(	Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable) {
+	private void fillAverageTable(	Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> avgHbefaWarmTable) {
 		
 		// entries for first case "petrol" should not be used since there are entries in the detailed table
 		// free flow
@@ -1096,11 +1123,13 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationff);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			avgHbefaWarmTable.put(detWarmKey, detWarmFactor);
-		}
+
+            avgHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = avgHbefaWarmTable.get(detWarmKey);
+            currMap.put(trafficSituationff, detWarmFactor);
+        }
 		
 		// stop and go
 		detWarmFactor = new HbefaWarmEmissionFactor();
@@ -1112,11 +1141,13 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationsg);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			avgHbefaWarmTable.put(detWarmKey, detWarmFactor);
-		}
+
+            avgHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = avgHbefaWarmTable.get(detWarmKey);
+            currMap.put(trafficSituationsg, detWarmFactor);
+        }
 		
 		//entry for second test case "pc"
 		// free flow
@@ -1133,11 +1164,13 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationff);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			avgHbefaWarmTable.put(detWarmKey, detWarmFactor);
-		}
+
+            avgHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = avgHbefaWarmTable.get(detWarmKey);
+            currMap.put(trafficSituationff, detWarmFactor);
+        }
 		
 		//stop and go
 		vehAtt = new HbefaVehicleAttributes();
@@ -1153,11 +1186,13 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationsg);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			avgHbefaWarmTable.put(detWarmKey, detWarmFactor);
-		}
+
+            avgHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = avgHbefaWarmTable.get(detWarmKey);
+            currMap.put(trafficSituationsg, detWarmFactor);
+        }
 		
 		// entries for third test case "diesel"
 		vehAtt = new HbefaVehicleAttributes();
@@ -1173,11 +1208,13 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationff);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			avgHbefaWarmTable.put(detWarmKey, detWarmFactor);
-		}
+
+            avgHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = avgHbefaWarmTable.get(detWarmKey);
+            currMap.put(trafficSituationff, detWarmFactor);
+        }
 		
 		vehAtt = new HbefaVehicleAttributes();
 		vehAtt.setHbefaTechnology(dieselTechnology);
@@ -1192,11 +1229,13 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationsg);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			avgHbefaWarmTable.put(detWarmKey, detWarmFactor);
-		}
+
+            avgHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = avgHbefaWarmTable.get(detWarmKey);
+            currMap.put(trafficSituationsg, detWarmFactor);
+        }
 		
 		//entries for fourth test case "lpg"
 		
@@ -1213,11 +1252,13 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationff);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			avgHbefaWarmTable.put(detWarmKey, detWarmFactor);
-		}
+
+            avgHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = avgHbefaWarmTable.get(detWarmKey);
+            currMap.put(trafficSituationff, detWarmFactor);
+        }
 		
 		vehAtt = new HbefaVehicleAttributes();
 		vehAtt.setHbefaTechnology(lpgTechnology);
@@ -1232,11 +1273,13 @@ public class TestWarmEmissionAnalysisModule {
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
 			detWarmKey.setHbefaComponent(wp);
 			detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-			detWarmKey.setHbefaTrafficSituation(trafficSituationsg);
 			detWarmKey.setHbefaVehicleAttributes(vehAtt);
 			detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			avgHbefaWarmTable.put(detWarmKey, detWarmFactor);
-		}
+
+            avgHbefaWarmTable.putIfAbsent(detWarmKey, new HashMap<>());
+            Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = avgHbefaWarmTable.get(detWarmKey);
+            currMap.put(trafficSituationsg, detWarmFactor);
+        }
 		
 		
 	}

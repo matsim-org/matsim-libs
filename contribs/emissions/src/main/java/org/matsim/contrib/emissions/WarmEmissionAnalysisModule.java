@@ -51,8 +51,8 @@ import org.matsim.vehicles.Vehicle;
 public class WarmEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
 
-	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
-	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+	private final Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>>  avgHbefaWarmTable;
+	private final Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> detailedHbefaWarmTable;
 	private final Set<String> warmPollutants;
 
 	private final EventsManager eventsManager;
@@ -79,14 +79,14 @@ public class WarmEmissionAnalysisModule {
 
 	public static class WarmEmissionAnalysisModuleParameter {
 
-		public final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
-		public final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+		public final Map<HbefaWarmEmissionFactorKey,  Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> avgHbefaWarmTable;
+		public final Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> detailedHbefaWarmTable;
 		private final EmissionsConfigGroup ecg;
 		private final Set<String> warmPollutants;
 
 		public WarmEmissionAnalysisModuleParameter(
-				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
-				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable, Set<String> warmPollutants,
+				Map<HbefaWarmEmissionFactorKey,  Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> avgHbefaWarmTable,
+				Map<HbefaWarmEmissionFactorKey,  Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> detailedHbefaWarmTable, Set<String> warmPollutants,
 				EmissionsConfigGroup emissionsConfigGroup) {
 			this.avgHbefaWarmTable = avgHbefaWarmTable;
 			this.detailedHbefaWarmTable = detailedHbefaWarmTable;
@@ -262,7 +262,7 @@ public class WarmEmissionAnalysisModule {
 			}
 		}
 
-		setTrafficSituation(efkey, averageSpeed_kmh, freeFlowSpeed_kmh);
+		HbefaTrafficSituation trafficSituation = getTrafficSituation(efkey, averageSpeed_kmh, freeFlowSpeed_kmh);
 
 		for (String warmPollutant : warmPollutants) {
 			double generatedEmissions;
@@ -272,13 +272,13 @@ public class WarmEmissionAnalysisModule {
 			//TODO: opportunity for refactor of logic here jm oct '18
 			//The logic has changed here, now it will fall back to aggregate factors per traffic scenario, instead of if any scenarios are missing.
 			if(this.detailedHbefaWarmTable != null && this.detailedHbefaWarmTable.get(efkey) != null){
-					speedFromTable_kmh = this.detailedHbefaWarmTable.get(efkey).getSpeed();
-					ef_gpkm = this.detailedHbefaWarmTable.get(efkey).getWarmEmissionFactor();
+					speedFromTable_kmh = this.detailedHbefaWarmTable.get(efkey).get(trafficSituation).getSpeed();
+					ef_gpkm = this.detailedHbefaWarmTable.get(efkey).get(trafficSituation).getWarmEmissionFactor();
 
 			} else {
 				vehAttributesNotSpecifiedCnt++;
-				speedFromTable_kmh = this.avgHbefaWarmTable.get(efkey).getSpeed();
-				ef_gpkm = this.avgHbefaWarmTable.get(efkey).getWarmEmissionFactor();
+				speedFromTable_kmh = this.avgHbefaWarmTable.get(efkey).get(trafficSituation).getSpeed();
+				ef_gpkm = this.avgHbefaWarmTable.get(efkey).get(trafficSituation).getWarmEmissionFactor();
 
 				int maxWarnCnt = 3;
 				if(this.detailedHbefaWarmTable != null && vehAttributesNotSpecifiedCnt <= maxWarnCnt) {
@@ -291,30 +291,30 @@ public class WarmEmissionAnalysisModule {
 			generatedEmissions = linkLength_km * ef_gpkm;
 			warmEmissionsOfEvent.put(warmPollutant, generatedEmissions);
 		}
-		incrementCounters(efkey, linkLength_km);
+		incrementCounters(trafficSituation, linkLength_km);
 //		vehicleIdSet.add(personId);
 		return warmEmissionsOfEvent;
 	}
 
 	//TODO: this is a round estimate of the percentages based on looking at the file, using an MFP, maybe from A.Loder would be nicer, jm  oct'18
-	private void setTrafficSituation(HbefaWarmEmissionFactorKey efkey, double averageSpeed_kmh, double freeFlowSpeed_kmh) {
+	private HbefaTrafficSituation getTrafficSituation(HbefaWarmEmissionFactorKey efkey, double averageSpeed_kmh, double freeFlowSpeed_kmh) {
+		HbefaTrafficSituation trafficSituation = HbefaTrafficSituation.FREEFLOW;
 		if (averageSpeed_kmh < 0.60 * freeFlowSpeed_kmh) {
-			efkey.setHbefaTrafficSituation(HbefaTrafficSituation.STOPANDGO);
+			trafficSituation = HbefaTrafficSituation.STOPANDGO;
 		} else if (averageSpeed_kmh < 0.70 * freeFlowSpeed_kmh) {
-			efkey.setHbefaTrafficSituation(HbefaTrafficSituation.SATURATED);
+			trafficSituation = HbefaTrafficSituation.SATURATED;
 		} else if (averageSpeed_kmh < 0.80 * freeFlowSpeed_kmh) {
-			efkey.setHbefaTrafficSituation(HbefaTrafficSituation.HEAVY);
-		} else {
-			efkey.setHbefaTrafficSituation(HbefaTrafficSituation.FREEFLOW);
+			trafficSituation = HbefaTrafficSituation.HEAVY;
 		}
+		return trafficSituation;
 	}
 
-	private void incrementCounters(HbefaWarmEmissionFactorKey efKey, double linkLength_km) {
+	private void incrementCounters(HbefaTrafficSituation trafficSituation, double linkLength_km) {
 
 		kmCounter = kmCounter + linkLength_km;
 		emissionEventCounter++;
 
-		switch(efKey.getHbefaTrafficSituation()) { // both speeds are assumed to be not very different > only freeFlow on link
+		switch(trafficSituation) { // both speeds are assumed to be not very different > only freeFlow on link
 			case FREEFLOW: {
 				freeFlowCounter++;
 				freeFlowKmCounter += linkLength_km;
