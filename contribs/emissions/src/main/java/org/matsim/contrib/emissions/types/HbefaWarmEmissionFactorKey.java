@@ -42,7 +42,7 @@ public class HbefaWarmEmissionFactorKey {
 		this.hbefaVehicleCategory = hbefaVehicleCategory;
 	}
 
-	String getHbefaComponent(){
+	public String getHbefaComponent(){
 		return this.hbefaComponent;
 	}
 	
@@ -50,7 +50,7 @@ public class HbefaWarmEmissionFactorKey {
 		this.hbefaComponent = warmPollutant;
 	}
 
-	String getHbefaRoadCategory() {
+	public String getHbefaRoadCategory() {
 		return this.hbefaRoadCategory;
 	}
 
@@ -58,7 +58,7 @@ public class HbefaWarmEmissionFactorKey {
 		this.hbefaRoadCategory = hbefaRoadCategory;
 	}
 
-	HbefaTrafficSituation getHbefaTrafficSituation() {
+	public HbefaTrafficSituation getHbefaTrafficSituation() {
 		return this.hbefaTrafficSituation;
 	}
 

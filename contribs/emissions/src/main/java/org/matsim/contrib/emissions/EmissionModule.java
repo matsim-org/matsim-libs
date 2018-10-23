@@ -440,12 +440,18 @@ public class EmissionModule {
 		
 		logger.info("Emission calculation based on `Free flow only' occured for " + wam.getFreeFlowOccurences() + " of " +
 				wam.getWarmEmissionEventCounter() + " warm emission events.");
+		logger.info("Emission calculation based on `Heavy only' occured for " + wam.getHeavyOccurences() + " of " +
+				wam.getWarmEmissionEventCounter() + " warm emission events.");
+		logger.info("Emission calculation based on `Saturated only' occured for " + wam.getSaturatedOccurences() + " of " +
+				wam.getWarmEmissionEventCounter() + " warm emission events.");
 		logger.info("Emission calculation based on `Stop&Go only' occured for " + wam.getStopGoOccurences() + " of " +
 				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Emission calculation based on `Fractions' occured for " + wam.getFractionOccurences() + " of " +
-				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		
-		logger.info("Free flow occured on " + wam.getFreeFlowKmCounter() + " km of total " + 
+
+		logger.info("Free flow occured on " + wam.getFreeFlowKmCounter() + " km of total " +
+				wam.getKmCounter() + " km, where emissions were calculated.");
+		logger.info("Heavy flow occured on " + wam.getHeavyFlowKmCounter() + " km of total " +
+				wam.getKmCounter() + " km, where emissions were calculated.");
+		logger.info("Saturated flow occured on " + wam.getSaturatedKmCounter() + " km of total " +
 				wam.getKmCounter() + " km, where emissions were calculated.");
 		logger.info("Stop&Go occured on " + wam.getStopGoKmCounter() + " km of total " +
 				wam.getKmCounter() + " km, where emissions were calculated.");
