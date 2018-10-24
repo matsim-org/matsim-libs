@@ -20,6 +20,7 @@
 package org.matsim.contrib.accessibility.utils;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,12 +35,14 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.VoronoiGeometryUtils;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.facilities.ActivityFacility;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -76,6 +79,12 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 		SimpleFeatureTypeBuilder featureTypeBuilder = createFeatureTypeBuilder();
 		SimpleFeatureType featureType = featureTypeBuilder.buildFeatureType();
 		DefaultFeatureCollection featureCollection = createFeatureCollection(geometryFactory, featureType);
+		
+		//
+		// temporary shapefile-write-out for testing...
+	    ShapeFileWriter.writeGeometries(featureCollection, "/Users/dominik/voronoi_test.shp");
+		//
+	    
 		updateOnGeoserver(featureType, featureCollection);
 	}
 
