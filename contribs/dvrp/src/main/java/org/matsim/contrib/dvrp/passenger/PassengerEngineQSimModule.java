@@ -8,7 +8,7 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -30,13 +30,11 @@ public class PassengerEngineQSimModule extends AbstractQSimModule {
 				.toProvider(new PassengerEngineProvider(mode))
 				.asEagerSingleton();
 		Named modeNamed = Names.named(mode);
-		bindDepartureHandler(PASSENGER_ENGINE_NAME_PREFIX + mode).to(Key.get(PassengerEngine.class, modeNamed));
-		bindMobsimEngine(PASSENGER_ENGINE_NAME_PREFIX + mode).to(Key.get(PassengerEngine.class, modeNamed));
+		bindNamedComponent(PassengerEngine.class, PASSENGER_ENGINE_NAME_PREFIX + mode).to(Key.get(PassengerEngine.class, modeNamed));
 	}
 
-	public static void configureComponents(QSimComponents components, String mode) {
-		components.activeMobsimEngines.add(PassengerEngineQSimModule.PASSENGER_ENGINE_NAME_PREFIX + mode);
-		components.activeDepartureHandlers.add(PassengerEngineQSimModule.PASSENGER_ENGINE_NAME_PREFIX + mode);
+	public static void configureComponents(QSimComponentsConfig components, String mode) {
+		components.addNamedComponent(PassengerEngineQSimModule.PASSENGER_ENGINE_NAME_PREFIX + mode);
 	}
 
 	public static class PassengerEngineProvider implements Provider<PassengerEngine> {

@@ -67,9 +67,10 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
-import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
+import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -237,7 +238,7 @@ public class CreateAutomatedFDTest {
 			final QSim qSim = new QSimBuilder(config) //
 					.useDefaults()
 					.configureComponents(components -> {
-						components.activeAgentSources.clear();
+						components.removeNamedComponent(PopulationModule.COMPONENT_NAME);
 					})
 					.build(scenario, events);
 

@@ -28,7 +28,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -57,19 +57,20 @@ public class DvrpModeQSimModule extends AbstractQSimModule {
 			@Override
 			protected void configureQSim() {
 				for (Map.Entry<String, Class<? extends MobsimListener>> entry : listeners.entrySet()) {
-					bindMobsimListener(entry.getKey()).to(entry.getValue());
+					addNamedComponent(entry.getValue(), entry.getKey());
 				}
 			}
 		});
 	}
 
-	public void configureComponents(QSimComponents components) {
+	public void configureComponents(QSimComponentsConfig components) {
 		VrpAgentSourceQSimModule.configureComponents(components, mode);
 
 		if (installPassengerEngineModule) {
 			PassengerEngineQSimModule.configureComponents(components, mode);
 		}
-		components.activeMobsimListeners.addAll(listeners.keySet());
+		
+		listeners.keySet().forEach(components::addNamedComponent);
 	}
 
 	public static class Builder {
