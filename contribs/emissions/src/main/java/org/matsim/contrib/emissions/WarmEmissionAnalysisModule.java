@@ -282,6 +282,7 @@ public class WarmEmissionAnalysisModule {
 
 			} else {
 				vehAttributesNotSpecifiedCnt++;
+				efkey.setHbefaVehicleAttributes(new HbefaVehicleAttributes()); //want to check for average vehicle
 				ef_gpkm = this.avgHbefaWarmTable.get(efkey).getWarmEmissionFactor();
 
 				int maxWarnCnt = 3;
@@ -312,14 +313,11 @@ public class WarmEmissionAnalysisModule {
 		}
 
 		HbefaTrafficSituation trafficSituation  = FREEFLOW;
-		double freeflowSpeed = trafficSpeeds.get(FREEFLOW);
-		if (trafficSpeeds.containsKey(SATURATED)
-				&& averageSpeed_kmh <= trafficSpeeds.get(SATURATED)) {
-			trafficSituation = SATURATED;
-		}
-		if (trafficSpeeds.containsKey(HEAVY)
-				&& averageSpeed_kmh <= trafficSpeeds.get(HEAVY)) {
+		if (trafficSpeeds.containsKey(HEAVY) && averageSpeed_kmh <= trafficSpeeds.get(HEAVY)) {
 			trafficSituation = HEAVY;
+		}
+		if (trafficSpeeds.containsKey(SATURATED) && averageSpeed_kmh <= trafficSpeeds.get(SATURATED)) {
+			trafficSituation = SATURATED;
 		}
 		if (trafficSpeeds.containsKey(STOPANDGO) && averageSpeed_kmh <= trafficSpeeds.get(STOPANDGO)) {
 			if (averageSpeed_kmh != trafficSpeeds.get(FREEFLOW)) { //handle case testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6
