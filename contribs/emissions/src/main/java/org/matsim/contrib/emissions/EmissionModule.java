@@ -74,10 +74,10 @@ public class EmissionModule {
 	//===
 	private Vehicles vehicles;
 	
-	private Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> avgHbefaWarmTable;
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
 
-	private Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> detailedHbefaWarmTable;
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
 	private Set<String> warmPollutants = new HashSet<>();
 	private Set<String> coldPollutants = new HashSet<>();
@@ -200,10 +200,10 @@ public class EmissionModule {
 	}
 
 	
-	private Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> createAvgHbefaWarmTable(URL filename){
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(URL filename){
 		logger.info("entering createAvgHbefaWarmTable ...");
 		
-		Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> avgWarmTable = new HashMap<>();
+		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgWarmTable = new HashMap<>();
 		
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
@@ -221,30 +221,14 @@ public class EmissionModule {
 				key.setHbefaComponent(pollutant);
 
 				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
+				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
 				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
-
+				
 				HbefaWarmEmissionFactor value = new HbefaWarmEmissionFactor();
 				value.setSpeed(Double.parseDouble(array[indexFromKey.get("V_weighted")]));
 				value.setWarmEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
-
-				avgWarmTable.putIfAbsent(key, new HashMap<>());
-				HbefaTrafficSituation currTrafficSituation =  mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]);
-				Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = avgWarmTable.get(key);
-
-				currMap.put(currTrafficSituation, value);
-
-				//add a null pollutant to the table, to allow for speed checks
-				HbefaWarmEmissionFactorKey noPollutantKey = new HbefaWarmEmissionFactorKey(key);
-				noPollutantKey.setHbefaComponent("None");
-
-				HbefaWarmEmissionFactor noneValue = new HbefaWarmEmissionFactor();
-				noneValue.setSpeed(value.getSpeed());
-				noneValue.setWarmEmissionFactor(0);
-
-				avgWarmTable.putIfAbsent(noPollutantKey, new HashMap<>());
-				avgWarmTable.get(noPollutantKey).put(currTrafficSituation, noneValue);
-
-
+				
+				avgWarmTable.put(key, value);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -290,10 +274,10 @@ public class EmissionModule {
 		return avgColdTable;
 	}
 	
-	private Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> createDetailedHbefaWarmTable(URL filename){
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createDetailedHbefaWarmTable(URL filename){
 		logger.info("entering createDetailedHbefaWarmTable ...");
 
-		Map<HbefaWarmEmissionFactorKey, Map<HbefaTrafficSituation, HbefaWarmEmissionFactor>> hbefaWarmTableDetailed = new HashMap<>() ;
+		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> hbefaWarmTableDetailed = new HashMap<>() ;
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
@@ -311,6 +295,7 @@ public class EmissionModule {
 				key.setHbefaComponent(pollutant);
 
 				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
+				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
 				HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 				hbefaVehicleAttributes.setHbefaTechnology(array[indexFromKey.get("Technology")]);
 				hbefaVehicleAttributes.setHbefaSizeClass(array[indexFromKey.get("SizeClasse")]);
@@ -321,12 +306,7 @@ public class EmissionModule {
 				value.setSpeed(Double.parseDouble(array[indexFromKey.get("V")]));
 				value.setWarmEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA")]));
 
-				hbefaWarmTableDetailed.putIfAbsent(key, new HashMap<>());
-				HbefaTrafficSituation currTrafficSituation =  mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]);
-				Map<HbefaTrafficSituation, HbefaWarmEmissionFactor> currMap = hbefaWarmTableDetailed.get(key);
-
-				currMap.put(currTrafficSituation, value);
-
+				hbefaWarmTableDetailed.put(key, value);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -460,18 +440,12 @@ public class EmissionModule {
 		
 		logger.info("Emission calculation based on `Free flow only' occured for " + wam.getFreeFlowOccurences() + " of " +
 				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Emission calculation based on `Heavy only' occured for " + wam.getHeavyOccurences() + " of " +
-				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Emission calculation based on `Saturated only' occured for " + wam.getSaturatedOccurences() + " of " +
-				wam.getWarmEmissionEventCounter() + " warm emission events.");
 		logger.info("Emission calculation based on `Stop&Go only' occured for " + wam.getStopGoOccurences() + " of " +
 				wam.getWarmEmissionEventCounter() + " warm emission events.");
-
-		logger.info("Free flow occured on " + wam.getFreeFlowKmCounter() + " km of total " +
-				wam.getKmCounter() + " km, where emissions were calculated.");
-		logger.info("Heavy flow occured on " + wam.getHeavyFlowKmCounter() + " km of total " +
-				wam.getKmCounter() + " km, where emissions were calculated.");
-		logger.info("Saturated flow occured on " + wam.getSaturatedKmCounter() + " km of total " +
+		logger.info("Emission calculation based on `Fractions' occured for " + wam.getFractionOccurences() + " of " +
+				wam.getWarmEmissionEventCounter() + " warm emission events.");
+		
+		logger.info("Free flow occured on " + wam.getFreeFlowKmCounter() + " km of total " + 
 				wam.getKmCounter() + " km, where emissions were calculated.");
 		logger.info("Stop&Go occured on " + wam.getStopGoKmCounter() + " km of total " +
 				wam.getKmCounter() + " km, where emissions were calculated.");

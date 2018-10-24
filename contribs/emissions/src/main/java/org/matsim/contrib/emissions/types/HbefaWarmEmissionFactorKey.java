@@ -28,6 +28,7 @@ public class HbefaWarmEmissionFactorKey {
 	private HbefaVehicleCategory hbefaVehicleCategory;
 	private String hbefaComponent;
 	private String hbefaRoadCategory;
+	private HbefaTrafficSituation hbefaTrafficSituation;
 	private HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 	
 	public HbefaWarmEmissionFactorKey(){
@@ -48,7 +49,7 @@ public class HbefaWarmEmissionFactorKey {
 		this.hbefaVehicleCategory = hbefaVehicleCategory;
 	}
 
-	public String getHbefaComponent(){
+	String getHbefaComponent(){
 		return this.hbefaComponent;
 	}
 	
@@ -56,12 +57,20 @@ public class HbefaWarmEmissionFactorKey {
 		this.hbefaComponent = warmPollutant;
 	}
 
-	public String getHbefaRoadCategory() {
+	String getHbefaRoadCategory() {
 		return this.hbefaRoadCategory;
 	}
 
 	public void setHbefaRoadCategory(String hbefaRoadCategory) {
 		this.hbefaRoadCategory = hbefaRoadCategory;
+	}
+
+	HbefaTrafficSituation getHbefaTrafficSituation() {
+		return this.hbefaTrafficSituation;
+	}
+
+	public void setHbefaTrafficSituation(HbefaTrafficSituation hbefaTrafficSituation) {
+		this.hbefaTrafficSituation = hbefaTrafficSituation;
 	}
 
 	HbefaVehicleAttributes getHbefaVehicleAttributes(){
@@ -87,6 +96,7 @@ public class HbefaWarmEmissionFactorKey {
 	            hbefaVehicleCategory.equals(key.getHbefaVehicleCategory())
 	         && hbefaComponent.equals(key.getHbefaComponent())
 	         && hbefaRoadCategory.equals(key.getHbefaRoadCategory())
+	         && hbefaTrafficSituation.equals(key.getHbefaTrafficSituation())
 	         && hbefaVehicleAttributes.equals(key.getHbefaVehicleAttributes());
 	}
 
@@ -103,6 +113,7 @@ public class HbefaWarmEmissionFactorKey {
 		  hbefaVehicleCategory + "; " 
 		+ hbefaComponent + "; " 
 		+ hbefaRoadCategory + "; " 
+		+ hbefaTrafficSituation + "; "
 		+ hbefaVehicleAttributes;
 	}
 }
