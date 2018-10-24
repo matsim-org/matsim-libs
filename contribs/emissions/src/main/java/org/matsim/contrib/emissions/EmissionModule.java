@@ -28,13 +28,8 @@ import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnaly
 import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
 import org.matsim.contrib.emissions.roadTypeMapping.OsmHbefaMapping;
 import org.matsim.contrib.emissions.roadTypeMapping.VisumHbefaRoadTypeMapping;
-import org.matsim.contrib.emissions.types.HbefaColdEmissionFactor;
-import org.matsim.contrib.emissions.types.HbefaColdEmissionFactorKey;
-import org.matsim.contrib.emissions.types.HbefaTrafficSituation;
-import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
-import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
-import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactor;
-import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
+import org.matsim.contrib.emissions.types.*;
+import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -79,6 +74,10 @@ public class EmissionModule {
 
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
+
+	private Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
+
+
 	private Set<String> warmPollutants = new HashSet<>();
 	private Set<String> coldPollutants = new HashSet<>();
 
@@ -134,6 +133,7 @@ public class EmissionModule {
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
 		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
+		hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
 
 		if(emissionConfigGroup.isUsingDetailedEmissionCalculation()){
 			detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
@@ -164,7 +164,8 @@ public class EmissionModule {
 
 		loadRoadTypeMappings();
 
-		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, detailedHbefaWarmTable, warmPollutants,
+		WarmEmissionAnalysisModuleParameter parameterObject =
+				new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, warmPollutants,
 				emissionConfigGroup);
 		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable, coldPollutants,
 				emissionConfigGroup);
@@ -354,6 +355,8 @@ public class EmissionModule {
 		logger.info("leaving createDetailedHbefaColdTable ...");
 		return hbefaColdTableDetailed;
 	}
+
+
 
 	private Integer mapAmbientCondPattern2Distance(String string) {
 		Integer distance;

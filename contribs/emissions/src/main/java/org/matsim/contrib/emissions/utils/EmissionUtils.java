@@ -25,8 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
-import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
+import org.matsim.contrib.emissions.types.*;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.VehicleType;
 
@@ -202,5 +201,24 @@ public class EmissionUtils {
 
 		vehicleInformationTuple = new Tuple<>(hbefaVehicleCategory, hbefaVehicleAttributes);
 		return vehicleInformationTuple;
+	}
+
+
+	public static Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>>
+			createHBEFASpeedsTable(Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable) {
+
+		Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> table = new HashMap<>();
+
+		avgHbefaWarmTable.forEach((warmEmissionFactorKey, emissionFactor) -> {
+			HbefaRoadVehicleCategoryKey roadVehicleCategoryKey = new HbefaRoadVehicleCategoryKey(warmEmissionFactorKey);
+			HbefaTrafficSituation hbefaTrafficSituation = warmEmissionFactorKey.getHbefaTrafficSituation();
+			double speed = emissionFactor.getSpeed();
+
+			table.putIfAbsent(roadVehicleCategoryKey, new HashMap<>());
+			table.get(roadVehicleCategoryKey).put(hbefaTrafficSituation, speed);
+		});
+
+
+		return table;
 	}
 }

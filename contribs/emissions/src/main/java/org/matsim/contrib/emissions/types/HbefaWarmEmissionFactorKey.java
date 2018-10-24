@@ -65,7 +65,7 @@ public class HbefaWarmEmissionFactorKey {
 		this.hbefaRoadCategory = hbefaRoadCategory;
 	}
 
-	HbefaTrafficSituation getHbefaTrafficSituation() {
+	public HbefaTrafficSituation getHbefaTrafficSituation() {
 		return this.hbefaTrafficSituation;
 	}
 
