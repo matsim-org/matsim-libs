@@ -58,6 +58,22 @@ final public class QSimComponentsConfig {
 	public void removeNamedComponent(String name) {
 		removeComponent(Names.named(name));
 	}
+	
+	public boolean hasComponent(Class<? extends Annotation> annotation) {
+		return hasComponent(Key.get(Object.class, annotation));
+	}
+
+	public boolean hasComponent(Annotation annotation) {
+		return hasComponent(Key.get(Object.class, annotation));
+	}
+
+	private boolean hasComponent(Key<?> componentKey) {
+		return keys.contains(componentKey);
+	}
+
+	public boolean hasNamedComponent(String name) {
+		return hasComponent(Names.named(name));
+	}
 
 	private String keyToString(Key<?> componentKey) {
 		return "Annotation" + componentKey.getAnnotation() != null ?
