@@ -58,7 +58,7 @@ final public class QSimComponentsConfig {
 	public void removeNamedComponent(String name) {
 		removeComponent(Names.named(name));
 	}
-	
+
 	public boolean hasComponent(Class<? extends Annotation> annotation) {
 		return hasComponent(Key.get(Object.class, annotation));
 	}
@@ -83,6 +83,7 @@ final public class QSimComponentsConfig {
 
 	public void clear() {
 		components.clear();
+		keys.clear();
 	}
 
 	List<Object> getActiveComponents() {
