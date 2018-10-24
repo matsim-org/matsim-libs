@@ -35,8 +35,6 @@ import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 
 public class VrpAgentSourceQSimModule extends AbstractQSimModule {
-	public final static String VRP_AGENT_SOURCE_NAME_PREFIX = "VrpAgentSource_";
-
 	private final String mode;
 
 	public VrpAgentSourceQSimModule(String mode) {
@@ -45,11 +43,7 @@ public class VrpAgentSourceQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bindNamedComponent(VrpAgentSource.class, VRP_AGENT_SOURCE_NAME_PREFIX + mode).toProvider(new VrpAgentSourceProvider(mode)).asEagerSingleton();
-	}
-
-	public static void configureComponents(QSimComponentsConfig components, String mode) {
-		components.addNamedComponent(VrpAgentSourceQSimModule.VRP_AGENT_SOURCE_NAME_PREFIX + mode);
+		bindNamedComponent(VrpAgentSource.class, mode).toProvider(new VrpAgentSourceProvider(mode)).asEagerSingleton();
 	}
 
 	public static class VrpAgentSourceProvider implements Provider<VrpAgentSource> {

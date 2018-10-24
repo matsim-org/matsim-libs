@@ -64,8 +64,6 @@ public class DvrpModeQSimModule extends AbstractQSimModule {
 	}
 
 	public void configureComponents(QSimComponentsConfig components) {
-		VrpAgentSourceQSimModule.configureComponents(components, mode);
-
 		if (installPassengerEngineModule) {
 			PassengerEngineQSimModule.configureComponents(components, mode);
 		}
