@@ -32,16 +32,18 @@ import com.google.inject.Inject;
  * @author michalm
  */
 public class TaxiRequestCreator implements PassengerRequestCreator {
-	@Inject(optional = true)
-	private SubmittedTaxiRequestsCollector requestsCollector;
+	private final SubmittedTaxiRequestsCollector requestsCollector;
+
+	@Inject
+	public TaxiRequestCreator(SubmittedTaxiRequestsCollector requestsCollector) {
+		this.requestsCollector = requestsCollector;
+	}
 
 	@Override
 	public TaxiRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
 			double departureTime, double submissionTime) {
 		TaxiRequest request = new TaxiRequest(id, passenger, fromLink, toLink, departureTime, submissionTime);
-		if (requestsCollector != null) {
-			requestsCollector.addRequest(request);
-		}
+		requestsCollector.addRequest(request);
 		return request;
 	}
 }

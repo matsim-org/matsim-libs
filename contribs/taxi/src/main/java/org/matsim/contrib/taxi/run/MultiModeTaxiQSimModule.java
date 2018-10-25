@@ -34,6 +34,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
+import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
@@ -134,8 +135,17 @@ public class MultiModeTaxiQSimModule extends AbstractQSimModule {
 					}
 				}).asEagerSingleton();
 
+		bind(modalKey(PassengerRequestCreator.class)).toProvider(
+				new Providers.AbstractProviderWithInjector<TaxiRequestCreator>(taxiCfg.getMode()) {
+					@Override
+					public TaxiRequestCreator get() {
+						SubmittedTaxiRequestsCollector requestsCollector = getModalInstance(
+								SubmittedTaxiRequestsCollector.class);
+						return new TaxiRequestCreator(requestsCollector);
+					}
+				}).asEagerSingleton();
+
 		bind(modalKey(VrpOptimizer.class)).to(modalKey(TaxiOptimizer.class));
-		bind(modalKey(PassengerRequestCreator.class)).to(TaxiRequestCreator.class).asEagerSingleton();
 	}
 
 	private <T> Key<T> modalKey(Class<T> type) {
