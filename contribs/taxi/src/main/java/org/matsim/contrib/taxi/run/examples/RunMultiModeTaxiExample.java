@@ -77,7 +77,6 @@ public class RunMultiModeTaxiExample {
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
 						DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
-
 			}
 		});
 
@@ -90,6 +89,6 @@ public class RunMultiModeTaxiExample {
 	}
 
 	public static void main(String[] args) {
-		RunMultiModeTaxiExample.run(!false, 0); // switch to 'true' to turn on visualisation
+		RunMultiModeTaxiExample.run(false, 0); // switch to 'true' to turn on visualisation
 	}
 }
