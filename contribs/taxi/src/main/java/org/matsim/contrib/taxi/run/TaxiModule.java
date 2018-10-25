@@ -53,7 +53,7 @@ public final class TaxiModule extends AbstractModule {
 		bind(TravelDisutilityFactory.class).annotatedWith(Names.named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER))
 				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
 
-		bind(SubmittedTaxiRequestsCollector.class).toInstance(new SubmittedTaxiRequestsCollector());
+		bind(SubmittedTaxiRequestsCollector.class).asEagerSingleton();
 		addControlerListenerBinding().to(SubmittedTaxiRequestsCollector.class);
 
 		addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
