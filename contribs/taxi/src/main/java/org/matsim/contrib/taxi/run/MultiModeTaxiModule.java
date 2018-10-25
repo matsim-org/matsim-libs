@@ -77,7 +77,7 @@ public final class MultiModeTaxiModule extends AbstractModule {
 			addMobsimListenerBinding().toProvider(Providers.createProvider(
 					injector -> new TaxiStatusTimeProfileCollectorProvider(injector.getInstance(modalKey(Fleet.class)),
 							injector.getInstance(MatsimServices.class),
-							injector.getInstance(modalKey(SubmittedTaxiRequestsCollector.class))).get()));
+							injector.getInstance(modalKey(SubmittedTaxiRequestsCollector.class)), taxiCfg).get()));
 			// add more time profiles if necessary
 		}
 
