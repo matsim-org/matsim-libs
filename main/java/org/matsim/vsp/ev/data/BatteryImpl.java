@@ -19,9 +19,9 @@
 
 package org.matsim.vsp.ev.data;
 
-import java.util.logging.Logger;
-
 import org.geotools.util.logging.Logging;
+
+import java.util.logging.Logger;
 
 public class BatteryImpl implements Battery {
 	private static final Logger LOGGER = Logging.getLogger(BatteryImpl.class);
@@ -53,7 +53,7 @@ public class BatteryImpl implements Battery {
 		}
 		this.soc = soc;
 		if (soc == 0) {
-			LOGGER.warning("Battery SoC is 0");
+//			LOGGER.warning("Battery SoC is 0");
 		}
 	}
 

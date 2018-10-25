@@ -33,7 +33,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -77,7 +76,10 @@ public final class EVNetworkRoutingModule implements RoutingModule {
         public boolean isStageActivity(String activityType) {
             if (EVNetworkRoutingModule.this.stageActivityType.equals(activityType)) {
                 return true;
-            } else {
+            } else if (activityType.endsWith("interaction")) {
+                return true;
+            }
+            {
                 return false;
             }
         }
@@ -149,7 +151,7 @@ public final class EVNetworkRoutingModule implements RoutingModule {
 
                     StraightLineKnnFinder<Link, Charger> straightLineKnnFinder = new StraightLineKnnFinder(2, l -> (Link) l, CHARGER_TO_LINK);
                     List<Charger> nearestChargers = straightLineKnnFinder.findNearest(stopLocation, chargingInfrastructure.getChargers().values().stream().filter(charger -> ev.getChargingTypes().contains(charger.getChargerType())));
-                    Charger selectedCharger = nearestChargers.get(0);
+                    Charger selectedCharger = nearestChargers.get(random.nextInt(1));
                     Facility nexttoFacility = new LinkWrapperFacility(selectedCharger.getLink());
                     if (nexttoFacility.getLinkId().equals(lastFrom.getLinkId())) {
                         continue;
@@ -159,7 +161,8 @@ public final class EVNetworkRoutingModule implements RoutingModule {
                     lastArrivaltime = lastLeg.getDepartureTime() + lastLeg.getTravelTime();
                     stagedRoute.add(lastLeg);
                     Activity chargeAct = PopulationUtils.createActivityFromCoordAndLinkId(stageActivityType, selectedCharger.getCoord(), selectedCharger.getLink().getId());
-                    chargeAct.setMaximumDuration(1800);
+                    double estimatedChargingTime = (ev.getBattery().getCapacity() * .8) / selectedCharger.getPower();
+                    chargeAct.setMaximumDuration(estimatedChargingTime);
                     lastArrivaltime += chargeAct.getMaximumDuration();
                     stagedRoute.add(chargeAct);
                     lastFrom = nexttoFacility;
@@ -189,7 +192,7 @@ public final class EVNetworkRoutingModule implements RoutingModule {
 
     @Override
     public StageActivityTypes getStageActivityTypes() {
-        return EmptyStageActivityTypes.INSTANCE;
+        return new EVCharingStageActivityType();
     }
 
     @Override
