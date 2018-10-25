@@ -90,8 +90,8 @@ public class TaxiStatsDumper implements AfterMobsimListener, ShutdownListener {
 	private void writeDetailedStats(List<TaxiStats> taxiStats, AfterMobsimEvent event) {
 		String prefix = controlerIO.getIterationFilename(event.getIteration(), "taxi_");
 
-		new TaxiStatsWriter(taxiStats).write(prefix + "stats.txt");
-		new TaxiHistogramsWriter(taxiStats).write(prefix + "histograms.txt");
+		new TaxiStatsWriter(taxiStats).write(prefix + "stats_" + taxiCfg.getMode() + ".txt");
+		new TaxiHistogramsWriter(taxiStats).write(prefix + "histograms_" + taxiCfg.getMode() + ".txt");
 	}
 
 	@Override
