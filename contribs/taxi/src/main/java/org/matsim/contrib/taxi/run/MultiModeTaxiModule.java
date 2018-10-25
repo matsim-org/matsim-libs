@@ -56,7 +56,6 @@ public final class MultiModeTaxiModule extends AbstractModule {
 		Named namedMode = Names.named(mode);
 
 		install(FleetProvider.createModule(mode, taxiCfg.getTaxisFileUrl(getConfig().getContext())));
-		bind(Fleet.class).annotatedWith(Taxi.class).to(modalKey(Fleet.class)).asEagerSingleton();
 
 		bind(TravelDisutilityFactory.class).annotatedWith(Names.named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER))
 				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));

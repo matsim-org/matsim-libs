@@ -136,7 +136,6 @@ public class MultiModeTaxiQSimModule extends AbstractQSimModule {
 
 		bind(modalKey(VrpOptimizer.class)).to(modalKey(TaxiOptimizer.class));
 		bind(modalKey(PassengerRequestCreator.class)).to(TaxiRequestCreator.class).asEagerSingleton();
-		bind(PassengerEngine.class).annotatedWith(Taxi.class).to(modalKey(PassengerEngine.class));
 	}
 
 	private <T> Key<T> modalKey(Class<T> type) {
