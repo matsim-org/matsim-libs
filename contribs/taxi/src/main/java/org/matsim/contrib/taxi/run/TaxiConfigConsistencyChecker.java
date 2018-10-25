@@ -29,12 +29,28 @@ public class TaxiConfigConsistencyChecker implements ConfigConsistencyChecker {
 		new DvrpConfigConsistencyChecker().checkConsistency(config);
 
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		MultiModeTaxiConfigGroup multiModeTaxiCfg = MultiModeTaxiConfigGroup.get(config);
+		if (taxiCfg != null) {
+			if (multiModeTaxiCfg != null) {
+				throw new RuntimeException("Either TaxiConfigGroup or MultiModeTaxiConfigGroup must be defined");
+			}
+			checkTaxiModeConsistency(taxiCfg);
+		} else {
+			if (multiModeTaxiCfg == null) {
+				throw new RuntimeException("Either TaxiConfigGroup or MultiModeTaxiConfigGroup must be defined");
+			}
+			multiModeTaxiCfg.getTaxiConfigGroups().stream().forEach(this::checkTaxiModeConsistency);
+		}
+
+		if (config.qsim().getNumberOfThreads() != 1) {
+			throw new RuntimeException("Only a single-threaded QSim allowed");
+		}
+	}
+
+	private void checkTaxiModeConsistency(TaxiConfigGroup taxiCfg) {
 		if (taxiCfg.isVehicleDiversion() && !taxiCfg.isOnlineVehicleTracker()) {
 			throw new RuntimeException(
 					TaxiConfigGroup.VEHICLE_DIVERSION + " requires " + TaxiConfigGroup.ONLINE_VEHICLE_TRACKER);
-		}
-		if (config.qsim().getNumberOfThreads() != 1) {
-			throw new RuntimeException("Only a single-threaded QSim allowed");
 		}
 	}
 }
