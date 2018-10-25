@@ -27,8 +27,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
@@ -61,10 +59,6 @@ public class MultiModeTaxiQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
-				DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
-
 		bind(modalKey(TaxiOptimizer.class)).toProvider(
 				new Providers.AbstractProviderWithInjector<TaxiOptimizer>(taxiCfg.getMode()) {
 					@Inject

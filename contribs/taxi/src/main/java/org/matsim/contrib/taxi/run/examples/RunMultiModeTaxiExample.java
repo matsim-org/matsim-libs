@@ -25,7 +25,10 @@ import java.util.Collections;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
 import org.matsim.contrib.taxi.run.MultiModeTaxiQSimModule;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
@@ -33,6 +36,8 @@ import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -56,8 +61,15 @@ public class RunMultiModeTaxiExample {
 
 		controler.addQSimModule(new MultiModeTaxiQSimModule(TaxiConfigGroup.get(config)));
 
-		controler.addOverridingModule(DvrpModule.createModule(mode, Collections.emptyList()));
-		controler.addOverridingModule(new MultiModeTaxiModule(TaxiConfigGroup.get(config)));
+		controler.addQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
+				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
+						DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
+
+			}
+		});
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation
