@@ -64,21 +64,21 @@ public final class MultiModeTaxiModule extends AbstractModule {
 				.asEagerSingleton();
 		addControlerListenerBinding().to(modalKey(SubmittedTaxiRequestsCollector.class));
 
-		addControlerListenerBinding().toProvider(Providers.createProvider(
-				injector -> new TaxiSimulationConsistencyChecker(
-						injector.getInstance(modalKey(SubmittedTaxiRequestsCollector.class)), taxiCfg)));
+		addControlerListenerBinding().toProvider(ModalProviders.createProvider(mode,
+				getter -> new TaxiSimulationConsistencyChecker(getter.getModal(SubmittedTaxiRequestsCollector.class),
+						taxiCfg)));
 
-		addControlerListenerBinding().toProvider(Providers.createProvider(
-				injector -> new TaxiStatsDumper(injector.getInstance(modalKey(Fleet.class)), taxiCfg,
-						injector.getInstance(OutputDirectoryHierarchy.class))));
+		addControlerListenerBinding().toProvider(ModalProviders.createProvider(mode,
+				getter -> new TaxiStatsDumper(getter.getModal(Fleet.class), taxiCfg,
+						getter.get(OutputDirectoryHierarchy.class))));
 
 		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
 
 		if (taxiCfg.getTimeProfiles()) {
-			addMobsimListenerBinding().toProvider(Providers.createProvider(
-					injector -> new TaxiStatusTimeProfileCollectorProvider(injector.getInstance(modalKey(Fleet.class)),
-							injector.getInstance(MatsimServices.class),
-							injector.getInstance(modalKey(SubmittedTaxiRequestsCollector.class)), taxiCfg).get()));
+			addMobsimListenerBinding().toProvider(ModalProviders.createProvider(mode,
+					getter -> new TaxiStatusTimeProfileCollectorProvider(getter.getModal(Fleet.class),
+							getter.get(MatsimServices.class), getter.getModal(SubmittedTaxiRequestsCollector.class),
+							taxiCfg).get()));
 			// add more time profiles if necessary
 		}
 

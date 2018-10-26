@@ -60,7 +60,7 @@ public class MultiModeTaxiQSimModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(modalKey(TaxiOptimizer.class)).toProvider(
-				new Providers.AbstractProviderWithInjector<TaxiOptimizer>(taxiCfg.getMode()) {
+				new ModalProviders.AbstractProvider<TaxiOptimizer>(taxiCfg.getMode()) {
 					@Inject
 					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
 					private Network network;
@@ -90,7 +90,7 @@ public class MultiModeTaxiQSimModule extends AbstractQSimModule {
 				}).asEagerSingleton();
 
 		bind(modalKey(TaxiScheduler.class)).toProvider(
-				new Providers.AbstractProviderWithInjector<TaxiScheduler>(taxiCfg.getMode()) {
+				new ModalProviders.AbstractProvider<TaxiScheduler>(taxiCfg.getMode()) {
 					@Inject
 					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
 					private Network network;
@@ -114,7 +114,7 @@ public class MultiModeTaxiQSimModule extends AbstractQSimModule {
 				}).asEagerSingleton();
 
 		bind(modalKey(DynActionCreator.class)).toProvider(
-				new Providers.AbstractProviderWithInjector<TaxiActionCreator>(taxiCfg.getMode()) {
+				new ModalProviders.AbstractProvider<TaxiActionCreator>(taxiCfg.getMode()) {
 					@Inject
 					private MobsimTimer timer;
 
@@ -129,9 +129,9 @@ public class MultiModeTaxiQSimModule extends AbstractQSimModule {
 					}
 				}).asEagerSingleton();
 
-		bind(modalKey(PassengerRequestCreator.class)).toProvider(Providers.createProvider(
-				injector -> new TaxiRequestCreator(
-						injector.getInstance(modalKey(SubmittedTaxiRequestsCollector.class))))).asEagerSingleton();
+		bind(modalKey(PassengerRequestCreator.class)).toProvider(ModalProviders.createProvider(taxiCfg.getMode(),
+				getter -> new TaxiRequestCreator(getter.getModal(SubmittedTaxiRequestsCollector.class))))
+				.asEagerSingleton();
 
 		bind(modalKey(VrpOptimizer.class)).to(modalKey(TaxiOptimizer.class));
 	}

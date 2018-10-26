@@ -32,7 +32,7 @@ import com.google.inject.name.Names;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class Providers {
+public class ModalProviders {
 	public static <T> Provider<T> createProvider(Function<Injector, T> delegate) {
 		return new Provider<T>() {
 			@Inject
@@ -45,13 +45,47 @@ public class Providers {
 		};
 	}
 
-	public static abstract class AbstractProviderWithInjector<T> implements Provider<T> {
+	public static <T> Provider<T> createProvider(String mode, Function<InstanceGetter, T> delegate) {
+		return new Provider<T>() {
+			@Inject
+			private Injector injector;
+
+			@Override
+			public T get() {
+				return delegate.apply(new InstanceGetter(mode, injector));
+			}
+		};
+	}
+
+	public static class InstanceGetter {
+		private final String mode;
+		private final Injector injector;
+
+		public InstanceGetter(String mode, Injector injector) {
+			this.mode = mode;
+			this.injector = injector;
+		}
+
+		<T> T get(Class<T> type) {
+			return injector.getInstance(type);
+		}
+
+		<T> T get(Key<T> key) {
+			return injector.getInstance(key);
+		}
+
+		<T> T getModal(Class<T> type) {
+			return injector.getInstance(Key.get(type, Names.named(mode)));
+		}
+	}
+
+	public static abstract class AbstractProvider<T> implements Provider<T> {
 		private final String mode;
 
 		@Inject
 		private Injector injector;
 
-		public AbstractProviderWithInjector(String mode) {
+		public AbstractProvider(String mode) {
 			this.mode = mode;
 		}
 
