@@ -67,6 +67,7 @@ public final class MultiModeTaxiModule extends AbstractModule {
 		addControlerListenerBinding().toProvider(Providers.createProvider(
 				injector -> new TaxiSimulationConsistencyChecker(
 						injector.getInstance(modalKey(SubmittedTaxiRequestsCollector.class)), taxiCfg)));
+
 		addControlerListenerBinding().toProvider(Providers.createProvider(
 				injector -> new TaxiStatsDumper(injector.getInstance(modalKey(Fleet.class)), taxiCfg,
 						injector.getInstance(OutputDirectoryHierarchy.class))));

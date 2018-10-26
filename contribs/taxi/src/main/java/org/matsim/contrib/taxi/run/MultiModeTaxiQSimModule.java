@@ -129,15 +129,9 @@ public class MultiModeTaxiQSimModule extends AbstractQSimModule {
 					}
 				}).asEagerSingleton();
 
-		bind(modalKey(PassengerRequestCreator.class)).toProvider(
-				new Providers.AbstractProviderWithInjector<TaxiRequestCreator>(taxiCfg.getMode()) {
-					@Override
-					public TaxiRequestCreator get() {
-						SubmittedTaxiRequestsCollector requestsCollector = getModalInstance(
-								SubmittedTaxiRequestsCollector.class);
-						return new TaxiRequestCreator(requestsCollector);
-					}
-				}).asEagerSingleton();
+		bind(modalKey(PassengerRequestCreator.class)).toProvider(Providers.createProvider(
+				injector -> new TaxiRequestCreator(
+						injector.getInstance(modalKey(SubmittedTaxiRequestsCollector.class))))).asEagerSingleton();
 
 		bind(modalKey(VrpOptimizer.class)).to(modalKey(TaxiOptimizer.class));
 	}
