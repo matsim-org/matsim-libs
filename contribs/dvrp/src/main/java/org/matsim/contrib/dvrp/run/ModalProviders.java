@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.taxi.run;
+package org.matsim.contrib.dvrp.run;
 
 import java.util.function.Function;
 
@@ -57,24 +57,24 @@ public class ModalProviders {
 		};
 	}
 
-	public static class InstanceGetter {
+	public static final class InstanceGetter {
 		private final String mode;
 		private final Injector injector;
 
-		public InstanceGetter(String mode, Injector injector) {
+		private InstanceGetter(String mode, Injector injector) {
 			this.mode = mode;
 			this.injector = injector;
 		}
 
-		<T> T get(Class<T> type) {
+		public <T> T get(Class<T> type) {
 			return injector.getInstance(type);
 		}
 
-		<T> T get(Key<T> key) {
+		public <T> T get(Key<T> key) {
 			return injector.getInstance(key);
 		}
 
-		<T> T getModal(Class<T> type) {
+		public <T> T getModal(Class<T> type) {
 			return injector.getInstance(Key.get(type, Names.named(mode)));
 		}
 	}
@@ -85,11 +85,11 @@ public class ModalProviders {
 		@Inject
 		private Injector injector;
 
-		public AbstractProvider(String mode) {
+		protected AbstractProvider(String mode) {
 			this.mode = mode;
 		}
 
-		<I> I getModalInstance(Class<I> type) {
+		protected <I> I getModalInstance(Class<I> type) {
 			return injector.getInstance(Key.get(type, Names.named(mode)));
 		}
 	}

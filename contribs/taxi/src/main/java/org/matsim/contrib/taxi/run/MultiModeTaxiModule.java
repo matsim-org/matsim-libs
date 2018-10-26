@@ -23,6 +23,7 @@ package org.matsim.contrib.taxi.run;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.taxi.data.validator.DefaultTaxiRequestValidator;
 import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
