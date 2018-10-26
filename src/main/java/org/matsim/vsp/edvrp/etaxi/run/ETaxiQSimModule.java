@@ -25,7 +25,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.run.Taxi;
@@ -45,8 +44,7 @@ public class ETaxiQSimModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
-				DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
+		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Taxi.class);
 
 		bind(TaxiOptimizer.class).toProvider(ETaxiOptimizerProvider.class).asEagerSingleton();
 		bind(ETaxiScheduler.class).asEagerSingleton();

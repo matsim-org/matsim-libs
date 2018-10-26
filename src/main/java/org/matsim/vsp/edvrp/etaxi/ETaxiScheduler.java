@@ -33,7 +33,6 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
@@ -56,7 +55,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 	public ETaxiScheduler(TaxiConfigGroup taxiCfg, @Taxi Fleet fleet,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER) TravelDisutility travelDisutility) {
+			@Taxi TravelDisutility travelDisutility) {
 		super(taxiCfg, fleet, network, timer, travelTime, travelDisutility);
 	}
 
@@ -79,8 +78,8 @@ public class ETaxiScheduler extends TaxiScheduler {
 		divertOrAppendDrive(schedule, vrpPath);
 
 		ChargingWithQueueingAndAssignmentLogic logic = (ChargingWithQueueingAndAssignmentLogic)charger.getLogic();
-		double chargingEndTime = vrpPath.getArrivalTime()
-				+ ChargingEstimations.estimateMaxWaitTimeForNextVehicle(charger)// TODO not precise!!!
+		double chargingEndTime = vrpPath.getArrivalTime() + ChargingEstimations.estimateMaxWaitTimeForNextVehicle(
+				charger)// TODO not precise!!!
 				+ logic.getChargingStrategy().calcRemainingTimeToCharge(ev);// TODO not precise !!! (SOC will be lower)
 		schedule.addTask(new ETaxiChargingTask(vrpPath.getArrivalTime(), chargingEndTime, charger, ev,
 				-logic.getChargingStrategy().calcRemainingEnergyToCharge(ev)));// TODO not precise !!! (ditto)

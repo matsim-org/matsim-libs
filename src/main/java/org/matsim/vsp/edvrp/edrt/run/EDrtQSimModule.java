@@ -35,7 +35,6 @@ import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.DrtScheduleTimingUpdater;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
-import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
@@ -61,7 +60,7 @@ public class EDrtQSimModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), DefaultDrtOptimizer.DRT_OPTIMIZER);
+		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Drt.class);
 
 		bind(DrtOptimizer.class).to(EDrtOptimizer.class).asEagerSingleton();
 		bind(DefaultDrtOptimizer.class).asEagerSingleton();

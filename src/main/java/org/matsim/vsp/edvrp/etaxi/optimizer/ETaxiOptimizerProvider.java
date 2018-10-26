@@ -26,7 +26,6 @@ import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -66,8 +65,7 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	@Inject
 	public ETaxiOptimizerProvider(TaxiConfigGroup taxiCfg, @Taxi Fleet fleet,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER) TravelDisutility travelDisutility,
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, @Taxi TravelDisutility travelDisutility,
 			ETaxiScheduler eScheduler, ChargingInfrastructure chargingInfrastructure,
 			TaxiRequestValidator requestValidator, EventsManager eventsManager) {
 		this.taxiCfg = taxiCfg;
