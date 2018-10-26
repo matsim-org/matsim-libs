@@ -27,7 +27,6 @@ import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.taxi.data.validator.DefaultTaxiRequestValidator;
 import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
@@ -58,7 +57,7 @@ public final class MultiModeTaxiModule extends AbstractModule {
 
 		install(FleetProvider.createModule(mode, taxiCfg.getTaxisFileUrl(getConfig().getContext())));
 
-		bind(TravelDisutilityFactory.class).annotatedWith(Names.named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER))
+		bind(TravelDisutilityFactory.class).annotatedWith(Taxi.class)
 				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
 
 		bind(modalKey(SubmittedTaxiRequestsCollector.class)).to(SubmittedTaxiRequestsCollector.class)

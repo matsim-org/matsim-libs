@@ -21,7 +21,7 @@ package org.matsim.contrib.drt.scheduler;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
+import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -50,9 +50,8 @@ public class EmptyVehicleRelocator {
 
 	@Inject
 	public EmptyVehicleRelocator(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility, MobsimTimer timer,
-			DrtTaskFactory taskFactory) {
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, @Drt TravelDisutility travelDisutility,
+			MobsimTimer timer, DrtTaskFactory taskFactory) {
 		this.travelTime = travelTime;
 		this.timer = timer;
 		this.taskFactory = taskFactory;
