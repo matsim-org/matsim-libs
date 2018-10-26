@@ -23,7 +23,6 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -82,7 +81,7 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 				.values()
 				.stream()
 				.flatMap(p -> p.getSelectedPlan().getPlanElements().stream())
-				.filter(e -> e instanceof Leg && ((Leg)e).getMode().equals(TransportMode.drt))
+				.filter(e -> e instanceof Leg && ((Leg)e).getMode().equals(drtCfg.getMode()))
 				.map(e -> (Leg)e);
 		executorService.submitRunnablesAndWait(drtLegs.map(l -> (router -> updateDrtRoute(router, l))));
 	}
