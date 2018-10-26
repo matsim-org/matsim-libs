@@ -30,10 +30,10 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
 import org.matsim.contrib.taxi.run.MultiModeTaxiQSimModule;
+import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
@@ -75,8 +75,7 @@ public class RunMultiModeTaxiExample {
 			@Override
 			protected void configureQSim() {
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
-						DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
+				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Taxi.class);
 			}
 		});
 

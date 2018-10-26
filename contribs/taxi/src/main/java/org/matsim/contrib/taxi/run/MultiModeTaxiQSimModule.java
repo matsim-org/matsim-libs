@@ -74,7 +74,7 @@ public class MultiModeTaxiQSimModule extends AbstractQSimModule {
 					private TravelTime travelTime;
 
 					@Inject
-					@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER)
+					@Taxi
 					private TravelDisutility travelDisutility;
 
 					@Inject
@@ -104,7 +104,7 @@ public class MultiModeTaxiQSimModule extends AbstractQSimModule {
 					private TravelTime travelTime;
 
 					@Inject
-					@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER)
+					@Taxi
 					private TravelDisutility travelDisutility;
 
 					@Override
