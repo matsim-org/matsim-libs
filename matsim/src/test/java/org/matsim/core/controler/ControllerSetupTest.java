@@ -99,7 +99,6 @@ public class ControllerSetupTest {
 		Assert.assertTrue(called2.get());
 	}
 	
-	@Test(expected = com.google.inject.CreationException.class)
 	public void testSetOverridingModule() {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
