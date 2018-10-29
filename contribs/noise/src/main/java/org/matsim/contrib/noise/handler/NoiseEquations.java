@@ -33,8 +33,10 @@ import java.util.Collection;
  *
  */
 
-public class NoiseEquations {
-	
+public final class NoiseEquations {
+
+	private NoiseEquations() {};
+
 	public static double calculateMittelungspegelLm(int n, double p) {
 
 		//	Der Beurteilungspegel L_r ist bei Straßenverkehrsgeraeuschen gleich dem Mittelungspegel L_m.
@@ -73,7 +75,29 @@ public class NoiseEquations {
 		
 		return geschwindigkeitskorrekturDv;
 	}
-			
+
+	/**
+	 * Pegeländerung D_B durch bauliche Maßnahmen (und topografische Gegebenheiten)
+	 * @param s distance between emission source and immission receiver point
+	 * @param a distance between emission source and (first) edge of diffraction
+	 * @param b distance between (last) edge of diffraction and immission receiver point
+	 * @param c sum of distances between edges of diffraction
+	 * @return shielding correction term for the given parameters
+	 */
+	public static double calculateShieldingCorrection(double s, double a, double b, double c) {
+
+	    //Shielding value z: the difference between length of the way from the emission source via the obstacle
+        //to the immission receiver point and direct distance between emission source and immission receiver point
+		double z = a + b + c - s;
+
+		//Weather correction for diffracted rays
+		double k = Math.exp(- 1. / 2000. * Math.sqrt( (a*b*s) / (2 * z)) );
+
+		double temp = 5 + ((70 + 0.25 * s) / (1+ 0.2 * z)) * z * Math.pow(k,2);
+		double correction = 7 * Math.log10(temp);
+		return correction;
+	}
+
 	public static double calculateResultingNoiseImmission (Collection<Double> collection){
 		
 		double resultingNoiseImmission = 0.;
