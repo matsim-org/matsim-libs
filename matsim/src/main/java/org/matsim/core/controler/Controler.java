@@ -110,16 +110,12 @@ public final class Controler implements ControlerI, MatsimServices {
 
 	private com.google.inject.Injector injector;
 	private boolean injectorCreated = false;
+	private List<AbstractModule> modules = new LinkedList<>();
 
 	@Override
 	public IterationStopWatch getStopwatch() {
 		return injector.getInstance(IterationStopWatch.class);
 	}
-
-	// DefaultControlerModule includes submodules. If you want less than what the Controler does
-    // by default, you can leave ControlerDefaultsModule out, look at what it does,
-    // and only include what you want.
-    private List<AbstractModule> modules = Collections.singletonList(new ControlerDefaultsModule());
 
 	// The module which is currently defined by the sum of the setXX methods called on this Controler.
     private AbstractModule overrides = AbstractModule.emptyModule();
@@ -186,6 +182,10 @@ public final class Controler implements ControlerI, MatsimServices {
 			//scenario  = ScenarioUtils.createScenario(this.config);
 			//ScenarioUtils.loadScenario(scenario) ;
 		}
+		
+		// We add some modules by default. They can be removed via setModules
+		this.modules.add(new ControlerDefaultsModule());
+		
 		this.config.parallelEventHandling().makeLocked();
 		this.scenario = scenario;
 		this.overrides = scenario == null ?
@@ -452,31 +452,68 @@ public final class Controler implements ControlerI, MatsimServices {
 			}
         });
 	}
-
-    public final void addOverridingModule(AbstractModule abstractModule) {
+	
+	private void checkBeforeInjectorCreated() {
         if (this.injectorCreated) {
             throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
         }
-        this.overrides = AbstractModule.override(Collections.singletonList(this.overrides), abstractModule);
+	}
+	
+	private boolean addOverridingModuleWarningShown = false;
+
+	public final void addOverridingModule(AbstractModule abstractModule) {
+		checkBeforeInjectorCreated();
+
+		if (!addOverridingModuleWarningShown) {
+			log.warn("Consider using setOverridingModule instead of addOverridingModule to make sure "
+					+ "you are only overriding the smallest necessary set of bindings.");
+			addOverridingModuleWarningShown = true;
+		}
+
+		overrides = AbstractModule.override(Collections.singletonList(this.overrides), abstractModule);
+	}
+
+    public final void setOverridingModule(AbstractModule overridingModule) {
+    	checkBeforeInjectorCreated();
+    	overrides = overridingModule;
     }
 
     public final void setModules(AbstractModule... modules) {
-        if (this.injectorCreated) {
-            throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
-        }
-        this.modules = Arrays.asList(modules);
+    	checkBeforeInjectorCreated();
+    	
+    	this.modules.clear();
+    	this.modules.addAll(Arrays.asList(modules));
     }
+    
+    public final void addModule(AbstractModule module) {
+    	checkBeforeInjectorCreated();
+    	modules.add(module);
+    }
+    
+    private boolean addOverridingQSimModuleWarningShown = false;
 
     public final void addOverridingQSimModule(AbstractQSimModule qsimModule) {
-        if (this.injectorCreated) {
-            throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
-        }
-        
+    	checkBeforeInjectorCreated();
+
+		if (!addOverridingQSimModuleWarningShown) {
+			log.warn("Consider using setOverridingQSimModule instead of addOverridingQSimModule to make sure "
+					+ "you are only overriding the smallest necessary set of bindings.");
+			addOverridingModuleWarningShown = true;
+		}
+
+    	overridingQSimModules.add(qsimModule);
+    }
+    
+    public final void setOverridingQSimModule(AbstractQSimModule qsimModule) {
+    	checkBeforeInjectorCreated();
+    	overridingQSimModules.clear();
     	overridingQSimModules.add(qsimModule);
     }
     
     public final void addQSimModule(AbstractQSimModule qsimModule) {
-    	this.addOverridingModule(new AbstractModule() {
+    	checkBeforeInjectorCreated();
+    	
+    	addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				installQSimModule(qsimModule);
@@ -485,7 +522,9 @@ public final class Controler implements ControlerI, MatsimServices {
     }
     
     public final void configureQSimComponents(QSimComponentsConfigurator configurator) {
-    	this.addOverridingModule(new AbstractModule() {
+    	checkBeforeInjectorCreated();
+    	
+    	addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				QSimComponentsConfig components = new QSimComponentsConfig();
