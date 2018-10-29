@@ -60,8 +60,6 @@ import com.google.inject.Inject;
 public class DefaultDrtOptimizer implements DrtOptimizer {
 	private static final Logger log = Logger.getLogger(DefaultDrtOptimizer.class);
 
-	public static final String DRT_OPTIMIZER = "drt_optimizer";
-
 	private final DrtConfigGroup drtCfg;
 	private final MinCostFlowRebalancingParams rebalancingParams;
 	private final boolean rebalancingEnabled;

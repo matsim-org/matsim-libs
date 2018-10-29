@@ -71,7 +71,7 @@ public class RunTaxiExample {
 		}
 
 		controler.addOverridingModule(DvrpModule.createModule(mode, Collections.singleton(TaxiOptimizer.class)));
-		controler.addOverridingModule(new TaxiModule()); // taxi output (can be commented out)
+		controler.addOverridingModule(new TaxiModule());
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation

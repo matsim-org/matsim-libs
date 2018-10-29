@@ -18,6 +18,7 @@
 package org.matsim.contrib.drt.routing;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.AbstractRoute;
 
@@ -32,7 +33,7 @@ import org.matsim.core.population.routes.AbstractRoute;
  * @author michalm (Michal Maciejewski)
  */
 public class DrtRoute extends AbstractRoute {
-    public final static String ROUTE_TYPE = "drt";
+    public final static String ROUTE_TYPE = TransportMode.drt;
 
 	private double maxWaitTime;
 	private double directRideTime;

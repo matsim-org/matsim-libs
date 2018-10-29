@@ -24,7 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -33,6 +32,7 @@ import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -55,7 +55,11 @@ public class ScheduleReconstructor {
 
 	@Inject
 	public ScheduleReconstructor(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			EventsManager eventsManager) {
+			EventsManager eventsManager, TaxiConfigGroup taxiCfg) {
+		this(network, eventsManager, taxiCfg.getMode());
+	}
+
+	public ScheduleReconstructor(Network network, EventsManager eventsManager, String mode) {
 		links = network.getLinks();
 
 		driveRecorder = new DriveRecorder(this);
@@ -64,7 +68,7 @@ public class ScheduleReconstructor {
 		stayRecorder = new StayRecorder(this);
 		eventsManager.addHandler(stayRecorder);
 
-		requestRecorder = new RequestRecorder(this, TransportMode.taxi);
+		requestRecorder = new RequestRecorder(this, mode);
 		eventsManager.addHandler(requestRecorder);
 	}
 
@@ -77,7 +81,8 @@ public class ScheduleReconstructor {
 	}
 
 	private void validateSchedules() {
-		if (driveRecorder.hasOngoingDrives() || stayRecorder.hasOngoingStays()
+		if (driveRecorder.hasOngoingDrives()
+				|| stayRecorder.hasOngoingStays()
 				|| requestRecorder.hasAwaitingRequests()) {
 			throw new IllegalStateException();
 		}
@@ -97,9 +102,9 @@ public class ScheduleReconstructor {
 		return fleet;
 	}
 
-	public static Fleet reconstructFromFile(Network network, String eventsFile) {
+	public static Fleet reconstructFromFile(Network network, String eventsFile, String mode) {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		ScheduleReconstructor reconstructor = new ScheduleReconstructor(network, eventsManager);
+		ScheduleReconstructor reconstructor = new ScheduleReconstructor(network, eventsManager, mode);
 		new MatsimEventsReader(eventsManager).readFile(eventsFile);
 		return reconstructor.getFleet();
 	}
