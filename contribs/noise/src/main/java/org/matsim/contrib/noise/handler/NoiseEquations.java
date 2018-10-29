@@ -37,6 +37,8 @@ public final class NoiseEquations {
 
 	private NoiseEquations() {};
 
+	private enum DayTime {NIGHT, DAY, EVENING}
+
 	public static double calculateMittelungspegelLm(int n, double p) {
 
 		//	Der Beurteilungspegel L_r ist bei Straßenverkehrsgeraeuschen gleich dem Mittelungspegel L_m.
@@ -141,34 +143,33 @@ public final class NoiseEquations {
 
 	public static double calculateDamageCosts(double noiseImmission, double affectedAgentUnits, double timeInterval, double annualCostRate, double timeBinSize) {
 
-		String daytimeType = "NIGHT";
-		
+		DayTime daytimeType = DayTime.NIGHT;
+
 		if (timeInterval > 6 * 3600 && timeInterval <= 18 * 3600) {
-			daytimeType = "DAY";
+			daytimeType = DayTime.DAY;
 		} else if (timeInterval > 18 * 3600 && timeInterval <= 22 * 3600) {
-			daytimeType = "EVENING";
+			daytimeType = DayTime.EVENING;
 		}
-		
+
 		double lautheitsgewicht = 0;
-		
-		if (daytimeType == "DAY"){
-			if (noiseImmission < 50){
-			} else {
-				lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 50));
-			}
-		} else if (daytimeType == "EVENING"){
-			if (noiseImmission < 45){
-			} else {
-				lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 45));
-			}
-		} else if (daytimeType == "NIGHT"){
-			if (noiseImmission < 40){
-			} else {
-				lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 40));
-			}
-			
-		} else {
-			throw new RuntimeException("Neither day, evening nor night. Aborting...");
+
+		switch (daytimeType) {
+			case DAY:
+				if (noiseImmission >= 50) {
+					lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 50));
+				}
+				break;
+			case EVENING:
+				if (noiseImmission >= 45) {
+					lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 45));
+				}
+				break;
+			case NIGHT:
+				if (noiseImmission >= 40) {
+					lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 40));
+				}
+				break;
+			default:
 		}
 		
 		double laermEinwohnerGleichwert = lautheitsgewicht * affectedAgentUnits;
