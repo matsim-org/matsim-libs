@@ -114,9 +114,8 @@ public class NoiseContext {
 
 	// for routing purposes
 	public final void storeTimeInterval() {
-		
-		Map<Id<Link>, NoiseLink> noiseLinksThisTimeBinCopy = new HashMap<>();
-		noiseLinksThisTimeBinCopy.putAll(this.noiseLinks);
+
+		Map<Id<Link>, NoiseLink> noiseLinksThisTimeBinCopy = new HashMap<>(this.noiseLinks);
 		
 		double currentTimeIntervalCopy = this.currentTimeBinEndTime;
 		
@@ -132,13 +131,9 @@ public class NoiseContext {
 		List<String> consideredActivitiesForDamagesList = new ArrayList<String>();
 		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<String>();
 
-		for (int i = 0; i < this.grid.getGridParams().getConsideredActivitiesForDamageCalculationArray().length; i++) {
-			consideredActivitiesForDamagesList.add(this.grid.getGridParams().getConsideredActivitiesForDamageCalculationArray()[i]);
-		}
-		
-		for (int i = 0; i < this.grid.getGridParams().getConsideredActivitiesForReceiverPointGridArray().length; i++) {
-			consideredActivitiesForReceiverPointGridList.add(this.grid.getGridParams().getConsideredActivitiesForReceiverPointGridArray()[i]);
-		}
+		Collections.addAll(consideredActivitiesForDamagesList, this.grid.getGridParams().getConsideredActivitiesForDamageCalculationArray());
+
+		Collections.addAll(consideredActivitiesForReceiverPointGridList, this.grid.getGridParams().getConsideredActivitiesForReceiverPointGridArray());
 		
 		if (this.noiseParams.isComputeNoiseDamages()) {
 			
@@ -354,11 +349,7 @@ public class NoiseContext {
 			
 			// go through these zone grid cells and save the link Id 			
 			for(Tuple<Integer,Integer> tuple : relevantTuples) {
-				List<Id<Link>> linkIds = zoneTuple2listOfLinkIds.get(tuple);
-				if(linkIds == null) {
-					linkIds = new ArrayList<>();
-					zoneTuple2listOfLinkIds.put(tuple, linkIds);
-				}
+				List<Id<Link>> linkIds = zoneTuple2listOfLinkIds.computeIfAbsent(tuple, k -> new ArrayList<>());
 				linkIds.add(link.getId());
 			}
 			cnt.incCounter();
@@ -373,9 +364,8 @@ public class NoiseContext {
 		
 		int xDirection = (int) ((xCoord - xCoordMinLinkNode) / (noiseParams.getRelevantRadius() / 1.));	
 		int yDirection = (int) ((yCoordMaxLinkNode - yCoord) / noiseParams.getRelevantRadius() / 1.);
-		
-		Tuple<Integer,Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
-		return zoneDefinition;
+
+		return new Tuple<>(xDirection, yDirection);
 	}
 	
 	private double calculateAngleImmissionCorrection(Coord receiverPointCoord, Link link) {
