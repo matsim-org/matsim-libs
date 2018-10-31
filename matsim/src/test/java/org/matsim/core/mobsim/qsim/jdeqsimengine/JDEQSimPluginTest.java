@@ -18,8 +18,7 @@ public class JDEQSimPluginTest extends MatsimTestCase {
         return new QSimBuilder(scenario.getConfig()) //
         	.addQSimModule(new JDEQSimModule()) //
         	.configureComponents(components -> {
-        		components.activeMobsimEngines.add(JDEQSimModule.JDEQ_ENGINE_NAME);
-        		components.activeActivityHandlers.add(JDEQSimModule.JDEQ_ENGINE_NAME);
+        		components.addNamedComponent(JDEQSimModule.COMPONENT_NAME);
         	}) //
         	.build(scenario, eventsManager);
 	}

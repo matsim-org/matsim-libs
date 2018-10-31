@@ -21,13 +21,13 @@ package org.matsim.contrib.dynagent.run;
 
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 
 /**
  * Enables basic DynAgent functionality in QSim. However, for DVRP simulation, use DvrpQSimModule instead.
  */
 public class DynQSimModule extends AbstractQSimModule {
-	public final static String DYN_AGENT_SOURCE_NAME = "DynAgentSource";
+	public final static String COMPONENT_NAME = "DynAgentSource";
 	private final Class<? extends AgentSource> agentSourceClass;
 
 	public DynQSimModule(Class<? extends AgentSource> agentSourceClass) {
@@ -37,11 +37,11 @@ public class DynQSimModule extends AbstractQSimModule {
 	@Override
 	public void configureQSim() {
 		install(new DynActivityEngineModule());
-		bindAgentSource(DYN_AGENT_SOURCE_NAME).to(agentSourceClass);
+		addNamedComponent(agentSourceClass, COMPONENT_NAME);
 	}
 
-	public static void configureComponents(QSimComponents components) {
+	public static void configureComponents(QSimComponentsConfig components) {
 		DynActivityEngineModule.configureComponents(components);
-		components.activeAgentSources.add(DYN_AGENT_SOURCE_NAME);
+		components.addNamedComponent(COMPONENT_NAME);
 	}
 }
