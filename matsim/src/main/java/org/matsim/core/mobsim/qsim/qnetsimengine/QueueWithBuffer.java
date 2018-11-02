@@ -745,8 +745,10 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 		for (QVehicle veh : vehQueue) {
 			context.getEventsManager().processEvent( new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
-			context.getEventsManager().processEvent( new PersonStuckEvent(now, veh.getDriver().getId(),
-					veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+			final MobsimDriverAgent driver = veh.getDriver();
+			Gbl.assertNotNull( driver );
+			context.getEventsManager().processEvent( new PersonStuckEvent(now, driver.getId(),
+					veh.getCurrentLink().getId(), driver.getMode()));
 
 			context.getAgentCounter().incLost();
 			context.getAgentCounter().decLiving();

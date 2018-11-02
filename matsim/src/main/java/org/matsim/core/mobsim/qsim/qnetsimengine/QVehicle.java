@@ -91,10 +91,14 @@ public class QVehicle extends QItem implements MobsimVehicle, Serializable {
 			final VehicleType type = VehicleUtils.getDefaultVehicleType() ;
 			Vehicle basicVehicle = new VehicleImpl( Id.createVehicleId( vehicleIdAsString ), type ) ;
 			final QVehicle qVeh = new QVehicle( basicVehicle );
+			Gbl.assertNotNull( driverAgent );
 			qVeh.setDriver( driverAgent );
 			driverAgent.setVehicle( qVeh );
+			((PersonDriverAgentImpl)driverAgent).setEnvironmentForParallel( QNetsimEngine.qsim.getScenario(),  QNetsimEngine.qsim.getEventsManager(), QNetsimEngine.qsim.getSimTimer() );
 			final Link link = QNetsimEngine.qsim.getScenario().getNetwork().getLinks().get( driverAgent.getCurrentLinkId() );;
 			qVeh.setCurrentLink( link );
+			qVeh.earliestLinkExitTime = this.earliestLinkExitTime ;
+			qVeh.linkEnterTime = this.linkEnterTime ;
 			return qVeh ;
 		}
 		

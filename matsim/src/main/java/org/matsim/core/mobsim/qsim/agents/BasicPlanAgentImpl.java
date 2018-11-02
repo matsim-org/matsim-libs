@@ -47,9 +47,9 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	private int currentPlanElementIndex = 0;
 	private Plan plan;
 	private boolean firstTimeToGetModifiablePlan = true;
-	transient private final Scenario scenario;
-	transient private final EventsManager events;
-	transient private final MobsimTimer simTimer;
+	transient private Scenario scenario;
+	transient private EventsManager events;
+	transient private MobsimTimer simTimer;
 	transient private MobsimVehicle vehicle ;
 	private double activityEndTime = Time.UNDEFINED_TIME;
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
@@ -60,6 +60,14 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	 * by the entity that holds the plan. Better ideas are welcome.  kai, nov'14
 	 */
 	private int currentLinkIndex = 0;
+	
+	final void setEnvironmentForParallel( Scenario scenario, EventsManager events, MobsimTimer simTimer ) {
+		// yyyyyy todo: protect this in some way. kai, nov'18
+		
+		this.scenario = scenario ;
+		this.events = events ;
+		this.simTimer = simTimer ;
+	}
 
 	public BasicPlanAgentImpl(Plan plan2, Scenario scenario, EventsManager events, MobsimTimer simTimer) {
 

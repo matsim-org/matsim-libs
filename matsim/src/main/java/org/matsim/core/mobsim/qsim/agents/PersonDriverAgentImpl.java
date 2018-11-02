@@ -22,11 +22,14 @@ package org.matsim.core.mobsim.qsim.agents;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -51,6 +54,11 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	
 	private BasicPlanAgentImpl basicAgentDelegate ;
 	private PlanBasedDriverAgentImpl driverAgentDelegate ;
+	
+	public final void setEnvironmentForParallel( Scenario scenario, EventsManager events, MobsimTimer simTimer ) {
+		// yyyyyy encapsulate!!
+		this.basicAgentDelegate.setEnvironmentForParallel( scenario, events, simTimer );
+	}
 
 	public PersonDriverAgentImpl(final Plan plan1, final Netsim simulation) {
 		basicAgentDelegate = new BasicPlanAgentImpl(plan1, simulation.getScenario(), simulation.getEventsManager(), 

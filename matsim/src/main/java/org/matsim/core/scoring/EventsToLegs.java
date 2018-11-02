@@ -201,6 +201,7 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	public void handleEvent(LinkEnterEvent event) {
 		Id<Person> driverOfVehicle = delegate.getDriverOfVehicle(event.getVehicleId());
 		List<Id<Link>> route = experiencedRoutes.get(driverOfVehicle);
+		Gbl.assertNotNull( route );
 		route.add(event.getLinkId());
 	}
 

@@ -44,6 +44,7 @@ import javax.inject.Inject;
 
 import mpi.Datatype;
 import mpi.MPI;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -145,6 +146,8 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 
 	@Inject
 	public QNetsimEngine(final QSim sim, QNetworkFactory netsimNetworkFactory) {
+		log.setLevel( Level.INFO );
+		
 		this.qsim = sim;
 
 		final Config config = sim.getScenario().getConfig();
@@ -354,6 +357,8 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 
 		Map<Integer,Map<String,List<QVehicle>>> vehicleInfo = new HashMap<>() ;
 		
+		boolean interesting = false ;
+		
 		// collect, for each neighbor, the info that we need to send there:
 		for ( QLinkI link : this.network.getNetsimLinks().values() ) {
 			int fromNodeCpn = (int) link.getLink().getFromNode().getAttributes().getAttribute( QSim.CPN_ATTRIBUTE );
@@ -373,6 +378,7 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 						// (*) (see above)
 						final QVehicle veh = lane.popFirstVehicle();
 						vehicleInfoForLink.add( veh ) ;
+						interesting = true ;
 						/*
 						* Design thoughts at this point:
 						* () Serializing the full QVehicle and all objects inside is would be quite a challenge.
@@ -389,7 +395,9 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 			final Integer dest = entry.getKey();
 			final Map<String, List<QVehicle>> obj = entry.getValue();
 			sndObjectToNeighbor( dest, obj );
-			log.debug( "SND to cpn=" + dest + ": " + obj) ;
+			if ( interesting ) {
+				log.info( "SND veh to cpn=" + dest + ": " + obj );
+			}
 		}
 		
 		// receive the corresponding info from my neighbors:
@@ -397,7 +405,7 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 			// (these are my neighbors)
 			
 			Map<String, List<QVehicle>> obj = (Map<String, List<QVehicle>>) rcvObjectFromNeighbor( cpn );
-			log.debug("RCV on cpn=" + me + ": " + obj ) ;
+			log.debug("RCV veh on cpn=" + me + ": " + obj ) ;
 			for ( Entry<String, List<QVehicle>> entry : obj.entrySet() ) {
 				Id<Link> linkId = Id.createLinkId( entry.getKey() ) ;
 				final QLinkI qLink = this.network.getNetsimLink( linkId );
@@ -405,6 +413,7 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 				Gbl.assertIf( qLane instanceof QueueWithBuffer );
 				
 				for ( QVehicle veh : entry.getValue() ) {
+					log.info( "RCV veh on cpn=" + me + ":"  + veh) ;
 					qLane.addFromWait( veh );
 				}
 			}
