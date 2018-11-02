@@ -34,12 +34,14 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
+import java.io.Serializable;
+
 /**
  * @author dgrether, nagel
  * <p></p>
  * I think this class is reasonable in terms of what is public and/or final and what not.
  */
-public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, HasModifiablePlan {
+public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, HasModifiablePlan, Serializable {
 	// yy cannot make this final since it is overridden at 65 locations
 	// (but since all methods are final, it seems that all of these could be solved by delegation).
 	// kai, nov'14

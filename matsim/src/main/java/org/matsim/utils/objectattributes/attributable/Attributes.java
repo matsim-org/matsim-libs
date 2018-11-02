@@ -1,5 +1,6 @@
 package org.matsim.utils.objectattributes.attributable;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -7,7 +8,7 @@ import java.util.*;
  *
  * @author thibautd
  */
-public final class Attributes {
+public final class Attributes implements Serializable {
 	// there are potentially lots of instance of this class, containing typically few mappings each.
 	// to minimize memory footprint, values are stored in arrays, kept as short as possible.
 	// This makes insertion costly, but query can be kept efficient even when the number of mappings

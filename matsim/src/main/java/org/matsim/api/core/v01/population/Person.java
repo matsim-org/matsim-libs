@@ -20,11 +20,12 @@
 package org.matsim.api.core.v01.population;
 
 import org.matsim.api.core.v01.Customizable;
+import org.matsim.core.api.internal.MatsimPopulationObject;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * @author dgrether
  */
-public interface Person extends Customizable, Attributable, HasPlansAndId<Plan, Person> {
+public interface Person extends Customizable, Attributable, HasPlansAndId<Plan, Person>, MatsimPopulationObject {
 
 }

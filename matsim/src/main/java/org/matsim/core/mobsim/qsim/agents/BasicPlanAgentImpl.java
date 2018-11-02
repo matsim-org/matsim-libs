@@ -1,5 +1,6 @@
 package org.matsim.core.mobsim.qsim.agents;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
-public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPerson, VehicleUsingAgent, HasModifiablePlan {
+public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPerson, VehicleUsingAgent, HasModifiablePlan, Serializable {
 	
 	private static final Logger log = Logger.getLogger(BasicPlanAgentImpl.class);
 	private static int finalActHasDpTimeWrnCnt = 0;
@@ -46,10 +47,10 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	private int currentPlanElementIndex = 0;
 	private Plan plan;
 	private boolean firstTimeToGetModifiablePlan = true;
-	private final Scenario scenario;
-	private final EventsManager events;
-	private final MobsimTimer simTimer;
-	private MobsimVehicle vehicle ;
+	transient private final Scenario scenario;
+	transient private final EventsManager events;
+	transient private final MobsimTimer simTimer;
+	transient private MobsimVehicle vehicle ;
 	private double activityEndTime = Time.UNDEFINED_TIME;
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	private Id<Link> currentLinkId = null;

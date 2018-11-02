@@ -22,19 +22,35 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * The ``Q'' implementation of the MobsimVehicle.
@@ -49,18 +65,39 @@ import java.util.Collections;
  * @author nagel
  */
 
-public final class QVehicle extends QItem implements MobsimVehicle, Serializable {
+public class QVehicle extends QItem implements MobsimVehicle, Serializable {
 	private static final Logger log = Logger.getLogger(QVehicle.class);
 	private static final long serialVersionUID = -1331834361118700652L;
 	
 	private static class SerializationProxy implements Serializable {
+		private final String vehicleIdAsString;
+		private final MobsimDriverAgent driverAgent;
+		//		private final Integer planIndex;
+//		private final Integer routeIndex;
 		private static final long serialVersionUID = 3771813209818182306L;
 		private final double linkEnterTime ;
 		private final double earliestLinkExitTime ;
 		SerializationProxy( QVehicle qVeh ) {
 			this.linkEnterTime = qVeh.linkEnterTime ;
 			this.earliestLinkExitTime = qVeh.earliestLinkExitTime ;
+			this.vehicleIdAsString = qVeh.id.toString() ;
+//			this.driverId = qVeh.getDriver().getId() ;
+//			this.planIndex = WithinDayAgentUtils.getCurrentPlanElementIndex( qVeh.getDriver() );;
+//			this.routeIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex( qVeh.getDriver() );
+			this.driverAgent = qVeh.getDriver() ;
 		}
+
+		Object readResolve() throws ObjectStreamException {
+			final VehicleType type = VehicleUtils.getDefaultVehicleType() ;
+			Vehicle basicVehicle = new VehicleImpl( Id.createVehicleId( vehicleIdAsString ), type ) ;
+			final QVehicle qVeh = new QVehicle( basicVehicle );
+			qVeh.setDriver( driverAgent );
+			driverAgent.setVehicle( qVeh );
+			final Link link = QNetsimEngine.qsim.getScenario().getNetwork().getLinks().get( driverAgent.getCurrentLinkId() );;
+			qVeh.setCurrentLink( link );
+			return qVeh ;
+		}
+		
 	}
 	
 	private static int warnCount = 0;
@@ -77,7 +114,7 @@ public final class QVehicle extends QItem implements MobsimVehicle, Serializable
 	private Object writeReplace() {
 		return new SerializationProxy( this ) ;
 	}
-
+	
 	public QVehicle(final Vehicle basicVehicle) {
 		this.id = basicVehicle.getId();
 		this.vehicle = basicVehicle;

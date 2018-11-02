@@ -20,6 +20,7 @@
 
 package org.matsim.api.core.v01.population;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.matsim.api.core.v01.Customizable;
@@ -34,7 +35,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  * The only thing which is not "expected" in the same sense is the score.
  *
  */
-public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, Attributable {
+public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, Attributable, Serializable {
 	
 	public abstract List<PlanElement> getPlanElements();
 

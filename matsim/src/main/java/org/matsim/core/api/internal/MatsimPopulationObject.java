@@ -20,12 +20,14 @@
 
 package org.matsim.core.api.internal;
 
+import java.io.Serializable;
+
 /**
  * marker interface, only used for objects without id
  * 
  * @author nagel
  *
  */
-public interface MatsimPopulationObject {
+public interface MatsimPopulationObject extends Serializable {
 
 }

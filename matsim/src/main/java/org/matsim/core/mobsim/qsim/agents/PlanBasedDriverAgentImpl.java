@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.agents;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -36,7 +37,7 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-public final class PlanBasedDriverAgentImpl implements DriverAgent {
+public final class PlanBasedDriverAgentImpl implements DriverAgent, Serializable {
 
 	private static final Logger log = Logger.getLogger(PlanBasedDriverAgentImpl.class);
 

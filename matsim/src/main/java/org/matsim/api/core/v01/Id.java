@@ -20,6 +20,7 @@
 
 package org.matsim.api.core.v01;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,7 +39,7 @@ import org.matsim.vehicles.Vehicle;
  * 
  *  @author mrieser / Senozon AG
  */
-public abstract class Id<T> implements Comparable<Id<T>> {
+public abstract class Id<T> implements Comparable<Id<T>>, Serializable {
 
 	private final static Map<Class<?>, Map<String, Id<?>>> cache = new ConcurrentHashMap<Class<?>, Map<String, Id<?>>>();
 	

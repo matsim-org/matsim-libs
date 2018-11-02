@@ -20,6 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.interfaces;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Link;
@@ -30,7 +31,7 @@ import org.matsim.vis.snapshotwriters.VisVehicle;
  * @author nagel
  *
  */
-public interface MobsimVehicle extends VisVehicle{
+public interface MobsimVehicle extends VisVehicle, Serializable {
 	
 	Link getCurrentLink();
 	

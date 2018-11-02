@@ -23,6 +23,8 @@ package org.matsim.api.core.v01.population;
 import org.matsim.core.api.internal.MatsimPopulationObject;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
-public interface PlanElement extends MatsimPopulationObject, Attributable {
+import java.io.Serializable;
+
+public interface PlanElement extends MatsimPopulationObject, Attributable, Serializable {
 
 }

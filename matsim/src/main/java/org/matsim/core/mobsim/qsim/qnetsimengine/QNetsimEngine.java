@@ -107,7 +107,7 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 
 	private final Map<Id<Vehicle>, QVehicle> vehicles = new HashMap<>();
 
-	private final QSim qsim;
+	static QSim qsim;
 
 	private final VehicularDepartureHandler dpHandler;
 
