@@ -26,8 +26,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.minibus.operator.BasicOperator;
+import org.matsim.contrib.minibus.scoring.routeDesignScoring.RouteDesignScoringManager;
+import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
@@ -747,6 +750,150 @@ public final class PConfigGroup extends ConfigGroup{
 		}
 
 	}
+	
+	public static class RouteDesignScoreParams extends ReflectiveConfigGroup implements MatsimParameters {
+		public static final String SET_TYPE = "routeDesignScoreParameters";
+		public static final String ROUTE_DESIGN_SCORE_FUNCTION = "routeDesignScoreFunction";
+		public static final String COST_FACTOR = "costFactor";
+		public static final String VALUE_T0_START_SCORING = "valueToStartScoring";
+
+		private RouteDesignScoringManager.RouteDesignScoreFunctionName routeDesignScoreFunction = null;
+		private double costFactor = 0.0;
+		private double valueToStartScoring = 0.0;
+		
+		public RouteDesignScoreParams() {
+			super(SET_TYPE);
+		}
+		
+		@Override
+		public final Map<String, String> getComments() {
+			Map<String,String> map = super.getComments();
+
+			StringBuilder defaultRouteDesignScoreFunctions = new StringBuilder();
+			for (RouteDesignScoringManager.RouteDesignScoreFunctionName scoreFunctionName: 
+				RouteDesignScoringManager.RouteDesignScoreFunctionName.values()) {
+				defaultRouteDesignScoreFunctions.append(scoreFunctionName.toString());
+			}
+			
+			map.put( ROUTE_DESIGN_SCORE_FUNCTION,
+					"name of route design score function to be applied. Possible default names: " + defaultRouteDesignScoreFunctions + "." );
+			map.put( COST_FACTOR,
+					"factor with which the score calculated by the route design score function is multiplied to obtain the monetary cost applied to the TransitRoute's score.");
+			map.put( VALUE_T0_START_SCORING,
+					"value which is subtracted from the score calculated by the route design score function before multiplying with the cost factor. If the result is negative, nothing will be added or substracted from the TransitRoute's score. This can be interpreted as an maximum allowable value before a penalty for bad route design is applied.");
+
+			return map ;
+		}
+		
+		@StringSetter( ROUTE_DESIGN_SCORE_FUNCTION )
+		public void setRouteDesignScoreFunction(final String routeDesignScoreFunction) {
+			setRouteDesignScoreFunction(RouteDesignScoringManager.RouteDesignScoreFunctionName.valueOf(routeDesignScoreFunction));
+		}
+		
+		public void setRouteDesignScoreFunction(final RouteDesignScoringManager.RouteDesignScoreFunctionName routeDesignScoreFunction) {
+			this.routeDesignScoreFunction = routeDesignScoreFunction;
+		}
+
+		@StringGetter( ROUTE_DESIGN_SCORE_FUNCTION )
+		public RouteDesignScoringManager.RouteDesignScoreFunctionName getRouteDesignScoreFunction() {
+			return this.routeDesignScoreFunction;
+		}
+		
+		@StringSetter( COST_FACTOR )
+		public void setCostFactor(final double costFactor) {
+			this.costFactor = costFactor;
+		}
+
+		@StringGetter( COST_FACTOR )
+		public double getCostFactor() {
+			return this.costFactor;
+		}
+		
+		@StringSetter( VALUE_T0_START_SCORING )
+		public void setValueToStartScoring(final double valueToStartScoring) {
+			this.valueToStartScoring = valueToStartScoring;
+		}
+
+		@StringGetter( VALUE_T0_START_SCORING )
+		public double getValueToStartScoring() {
+			return this.valueToStartScoring;
+		}
+		
+	}
+	
+	@Override
+	public ConfigGroup createParameterSet( final String type ) {
+		switch ( type ) {
+			case RouteDesignScoreParams.SET_TYPE:
+				return new RouteDesignScoreParams();
+			default:
+				throw new IllegalArgumentException( type );
+		}
+	}
+
+	@Override
+	protected void checkParameterSet( final ConfigGroup module ) {
+		switch ( module.getName() ) {
+			case RouteDesignScoreParams.SET_TYPE:
+				if ( !(module instanceof RouteDesignScoreParams) ) {
+					throw new RuntimeException( "unexpected class for module "+module );
+				}
+				break;
+			default:
+				throw new IllegalArgumentException( module.getName() );
+		}
+	}
+	
+	public void addRouteDesignScoreParams(final RouteDesignScoreParams pars) {
+		testForLocked() ;
+		addParameterSet( pars );
+	}
+	
+	public void removeRouteDesignScoreParams( RouteDesignScoringManager.RouteDesignScoreFunctionName key ) {
+		testForLocked() ;
+		for ( ConfigGroup pars : getParameterSets( RouteDesignScoreParams.SET_TYPE ) ) {
+			final RouteDesignScoringManager.RouteDesignScoreFunctionName routeDesignScoreFunction = ((RouteDesignScoreParams) pars).getRouteDesignScoreFunction();
+			if ( key.equals(routeDesignScoreFunction) ) {
+				this.removeParameterSet(pars) ;
+				break ;
+			}
+		}
+	}
+
+	public Map<RouteDesignScoringManager.RouteDesignScoreFunctionName, RouteDesignScoreParams> getRouteDesignScoreParams() {
+		final Map<RouteDesignScoringManager.RouteDesignScoreFunctionName, RouteDesignScoreParams> map = new LinkedHashMap< >();
+
+		for ( ConfigGroup pars : getParameterSets( RouteDesignScoreParams.SET_TYPE ) ) {
+			if ( this.isLocked() ) {
+				pars.setLocked(); 
+			}
+			
+			System.out.println(pars + " " + pars.getClass() + " " + (pars instanceof RouteDesignScoreParams));
+			RouteDesignScoreParams scoreParams = (RouteDesignScoreParams) pars;
+			
+			final RouteDesignScoringManager.RouteDesignScoreFunctionName routeDesignScoreFunction = scoreParams.getRouteDesignScoreFunction();
+			final RouteDesignScoreParams old = map.put( routeDesignScoreFunction , scoreParams );
+			if ( old != null ) throw new IllegalStateException( "several parameter sets for routeDesignScoreFunction " + routeDesignScoreFunction );
+		}
+
+		return map;
+	}
+
+	public RouteDesignScoreParams getOrCreateRouteDesignScoreParams(final RouteDesignScoringManager.RouteDesignScoreFunctionName routeDesignScoreFunction) {
+		RouteDesignScoreParams pars = getRouteDesignScoreParams().get( routeDesignScoreFunction );
+
+		if ( pars == null ) {
+			pars = (RouteDesignScoreParams) createParameterSet( RouteDesignScoreParams.SET_TYPE );
+			pars.setRouteDesignScoreFunction( routeDesignScoreFunction );
+			addParameterSet( pars );
+		}
+		if ( this.isLocked() ) {
+			pars.setLocked(); 
+		}
+
+		return pars;
+	}
+	
 	@Override
 	protected void checkConsistency( Config config ) {
 		
