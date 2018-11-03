@@ -43,7 +43,7 @@ public class RunInjectionBeforeControlerExample {
 		// Also note that what we have here is ControlerI, not the full Controler.
 		
 		controler.run();
-
+		
 	}
 
 }

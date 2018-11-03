@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -55,6 +56,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 
 import com.google.inject.Provider;
+import org.matsim.vis.otfvis.OTFClientLive;
 
 public class RunWithinDayReplanningAgentExample {
 
@@ -103,7 +105,7 @@ public class RunWithinDayReplanningAgentExample {
 						});
 
 						// add otfvis live.  Can't do this in core since otfvis is not accessible from there.
-						// OTFClientLive.run(sc.getConfig(), OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, ev, qsim));
+						 OTFClientLive.run(sc.getConfig(), OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, ev, qsim));
 
 						return qsim;
 					}
@@ -117,7 +119,8 @@ public class RunWithinDayReplanningAgentExample {
 }
 
 /**
- * See {@link tutorial.mobsim.ownMobsimAgentWithPerception} and {@link tutorial.mobsim.ownMobsimAgentUsingRouter} for
+ * See {@link org.matsim.codeexamples.mobsim.ownMobsimAgentWithPerception.RunOwnMobsimAgentWithPerceptionExample}
+ * and {@link org.matsim.codeexamples.mobsim.ownMobsimAgentUsingRouter.RunOwnMobsimAgentUsingRouterExample} for
  * more complete examples.
  *
  * @author nagel
