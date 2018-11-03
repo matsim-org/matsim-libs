@@ -91,6 +91,8 @@ public class EvModule extends AbstractModule {
 			addMobsimListenerBinding().toProvider(VehicleTypeAggregatedSocTimeProfileCollectorProvider.class);
 			// add more time profiles if necessary
 		}
+        addControlerListenerBinding().to(EVControlerListener.class).asEagerSingleton();
+        bind(ChargerPowerCollector.class).asEagerSingleton();
 
 		bind(InitAtIterationStart.class).asEagerSingleton();
 		addControlerListenerBinding().to(InitAtIterationStart.class);

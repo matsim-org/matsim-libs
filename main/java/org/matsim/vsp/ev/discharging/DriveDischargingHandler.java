@@ -19,9 +19,7 @@
 
 package org.matsim.vsp.ev.discharging;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
@@ -37,7 +35,8 @@ import org.matsim.vsp.ev.EvConfigGroup.AuxDischargingSimulation;
 import org.matsim.vsp.ev.data.ElectricFleet;
 import org.matsim.vsp.ev.data.ElectricVehicle;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Because in QSim and JDEQSim vehicles enter and leave traffic at the end of links, we skip the first link when
@@ -66,6 +65,7 @@ public class DriveDischargingHandler
 	private final Map<Id<ElectricVehicle>, ? extends ElectricVehicle> eVehicles;
 	private final boolean handleAuxDischarging;
 	private final Map<Id<Vehicle>, EVDrive> evDrives;
+    private Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
 
 	@Inject
 	public DriveDischargingHandler(ElectricFleet data, Network network, EvConfigGroup evCfg) {
@@ -112,12 +112,19 @@ public class DriveDischargingHandler
 				energy += ev.getAuxEnergyConsumption().calcEnergyConsumption(tt);
 			}
 			ev.getBattery().discharge(energy);
+            double linkConsumption = energy + energyConsumptionPerLink.getOrDefault(linkId, 0.0);
+            energyConsumptionPerLink.put(linkId, linkConsumption);
 		}
 		return evDrive;
 	}
 
 	@Override
-	public void reset(int iteration) {
-		evDrives.clear();
-	}
+    public void reset(int iteration) {
+        evDrives.clear();
+        energyConsumptionPerLink.clear();
+    }
+
+    public Map<Id<Link>, Double> getEnergyConsumptionPerLink() {
+        return energyConsumptionPerLink;
+    }
 }
