@@ -19,7 +19,6 @@ import javax.inject.Inject;
 public class RunReplaceAgentFactoryExampleTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
-	@Ignore
 	@Test public void testMain() {
 		try {
 			final RunReplaceAgentFactoryExample main = new RunReplaceAgentFactoryExample();;
