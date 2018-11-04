@@ -29,7 +29,7 @@ import com.google.inject.name.Names;
  * The default settings can be added via a couple of methods:
  * 
  * <ul>
- * <li>{@link #useDefaultModules()} loads the default QSim modules for
+ * <li>{@link #useDefaultQSimModules()} loads the default QSim modules for
  * MATSim</li>
  * <li>{@link #useDefaultComponents()} registers the default components for
  * MATSim</li>
@@ -47,7 +47,18 @@ import com.google.inject.name.Names;
  * 		}) //
  * 		.build(scenario, eventsManager);
  * </pre>
- * 
+ *
+ * Note that this is meant for situations where there is no embedding {@link org.matsim.core.controler.Controler}.  When that is
+ * there, something like
+ * <pre>
+ *    controler.addOverridingQSimModule(new AbstractQSimModule() {
+ *       @Override protected void configureQSim() {
+ *          bind(Xxx.class).to(Yyy.class);
+ *       }
+ *    });
+ * </pre>
+ * should be sufficient.
+ *
  * @author Sebastian Hörl <sebastian.hoerl@ivt.baug.ethz.ch>
  */
 public class QSimBuilder {
@@ -66,7 +77,7 @@ public class QSimBuilder {
 	/**
 	 * Adds the default plugins and components to the QSim.
 	 * 
-	 * @see {@link #useDefaultComponents()} and {@link #useDefaultPlugins()}
+	 * @see {@link #useDefaultComponents()} and {@link #useDefaultQSimModules()} ()}
 	 */
 	public QSimBuilder useDefaults() {
 		useDefaultComponents();

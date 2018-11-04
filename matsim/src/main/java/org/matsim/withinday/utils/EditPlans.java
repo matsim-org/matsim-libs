@@ -330,11 +330,11 @@ public final class EditPlans {
 		newAct.setEndTime( Double.POSITIVE_INFINITY ) ;
 		return newAct ;
 	}
-	public Activity createAgentThatKeepsMatsimAlive( String type, Id<Link> newLinkId) {
-		Activity newAct = this.pf.createActivityFromLinkId( type, newLinkId);;
-		newAct.setEndTime( Double.MAX_VALUE ) ;
-		return newAct ;
-	}
+//	public Activity createAgentThatKeepsMatsimAlive( String type, Id<Link> newLinkId) {
+//		Activity newAct = this.pf.createActivityFromLinkId( type, newLinkId);;
+//		newAct.setEndTime( Double.MAX_VALUE ) ;
+//		return newAct ;
+//	}
 	public static Integer getCurrentPlanElementIndex( MobsimAgent agent ) {
 		return WithinDayAgentUtils.getCurrentPlanElementIndex( agent ) ;
 	}

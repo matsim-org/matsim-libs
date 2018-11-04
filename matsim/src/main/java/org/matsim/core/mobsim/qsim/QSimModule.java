@@ -57,7 +57,8 @@ public class QSimModule extends AbstractModule {
 		});
 
 		bind(Mobsim.class).toProvider(QSimProvider.class);
-		if ( config.qsim().isUseLanes() ) { 
+
+		if ( config.qsim().isUseLanes() ) {
 			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ) ;
 		} else {
 			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
