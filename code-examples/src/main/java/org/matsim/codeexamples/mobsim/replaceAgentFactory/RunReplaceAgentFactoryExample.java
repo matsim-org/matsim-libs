@@ -12,6 +12,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
+import org.matsim.core.mobsim.qsim.QSimModule;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -34,7 +35,14 @@ class RunReplaceAgentFactoryExample {
 		}
 		controler = new Controler( scenario );
 		
-		controler.addOverridingModule( new AbstractModule() {
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(AgentFactory.class).to(MyAgentFactory.class);
+			}
+		});
+		
+		/*controler.addOverridingModule( new AbstractModule() {
 			@Override public void install() {
 				this.bindMobsim().toProvider( new Provider<Mobsim>() {
 					@Inject Scenario scenario;
@@ -57,7 +65,8 @@ class RunReplaceAgentFactoryExample {
 					}
 				} );
 			}
-		} );
+		} );*/
+		
 		return controler;
 	}
 	
