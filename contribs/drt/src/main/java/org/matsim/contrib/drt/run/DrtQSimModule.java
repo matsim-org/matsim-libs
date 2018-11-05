@@ -56,7 +56,7 @@ public class DrtQSimModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), DefaultDrtOptimizer.DRT_OPTIMIZER);
+		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Drt.class);
 
 		bind(DrtOptimizer.class).to(DefaultDrtOptimizer.class).asEagerSingleton();
 

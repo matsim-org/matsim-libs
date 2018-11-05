@@ -11,12 +11,12 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
 public class PopulationModule extends AbstractQSimModule {
-	public final static String POPULATION_AGENT_SOURCE_NAME = "PopulationAgentSource";
+	public final static String COMPONENT_NAME = "PopulationAgentSource";
 
 	@Override
 	protected void configureQSim() {
 		bind(PopulationAgentSource.class).asEagerSingleton();
-		bindAgentSource(POPULATION_AGENT_SOURCE_NAME).to(PopulationAgentSource.class);
+		addNamedComponent(PopulationAgentSource.class, COMPONENT_NAME);
 	}
 
 	@Provides

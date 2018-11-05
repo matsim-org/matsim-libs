@@ -27,6 +27,7 @@ import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.run.Taxi;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts.ChartType;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
@@ -42,13 +43,15 @@ public class TaxiStatusTimeProfileCollectorProvider implements Provider<MobsimLi
 	private final Fleet fleet;
 	private final SubmittedTaxiRequestsCollector requestCollector;
 	private final MatsimServices matsimServices;
+	private final String mode;
 
 	@Inject
 	public TaxiStatusTimeProfileCollectorProvider(@Taxi Fleet fleet, MatsimServices matsimServices,
-			SubmittedTaxiRequestsCollector requestCollector) {
+			SubmittedTaxiRequestsCollector requestCollector, TaxiConfigGroup taxiCfg) {
 		this.fleet = fleet;
 		this.requestCollector = requestCollector;
 		this.matsimServices = matsimServices;
+		mode = taxiCfg.getMode();
 	}
 
 	@Override
@@ -58,7 +61,7 @@ public class TaxiStatusTimeProfileCollectorProvider implements Provider<MobsimLi
 				TaxiTimeProfiles.createRequestsWithStatusCounter(requestCollector.getRequests().values(),
 						TaxiRequestStatus.UNPLANNED));
 
-		TimeProfileCollector collector = new TimeProfileCollector(calc, 300, "taxi_status_time_profiles",
+		TimeProfileCollector collector = new TimeProfileCollector(calc, 300, "taxi_status_time_profiles_" + mode,
 				matsimServices);
 
 		collector.setChartCustomizer((chart, chartType) -> {

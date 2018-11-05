@@ -217,7 +217,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		try {
 			// Teleportation must be last (default) departure handler, so add it
 			// only before running.
-			addDepartureHandler(this.teleportationEngine);
+			this.departureHandlers.add(this.teleportationEngine);
 			prepareSim();
 			this.listenerManager.fireQueueSimulationInitializedEvent();
 
@@ -580,7 +580,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	}
 
 	public void addDepartureHandler(DepartureHandler departureHandler) {
-		this.departureHandlers.add(departureHandler);
+		if (!(departureHandler instanceof TeleportationEngine)) {
+			// We add the teleportation handler manually later
+			this.departureHandlers.add(departureHandler);
+		}
 	}
 
 	public void addActivityHandler(ActivityHandler activityHandler) {

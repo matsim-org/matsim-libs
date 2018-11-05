@@ -34,8 +34,8 @@ import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.zonal.ZonalTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.zonal.ZonalTaxiOptimizerParams;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.run.Taxi;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -47,7 +47,6 @@ import com.google.inject.Provider;
 import com.google.inject.name.Named;
 
 public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
-	public static final String TAXI_OPTIMIZER = "taxi_optimizer";
 	public static final String TYPE = "type";
 
 	public enum OptimizerType {
@@ -67,9 +66,8 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	@Inject
 	public DefaultTaxiOptimizerProvider(TaxiConfigGroup taxiCfg, @Taxi Fleet fleet,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Named(TAXI_OPTIMIZER) TravelDisutility travelDisutility, TaxiScheduler scheduler,
-			TaxiRequestValidator requestValidator, EventsManager events) {
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, @Taxi TravelDisutility travelDisutility,
+			TaxiScheduler scheduler, TaxiRequestValidator requestValidator, EventsManager events) {
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
 		this.network = network;
