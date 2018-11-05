@@ -60,6 +60,7 @@ public class TerminusStopFinder {
 			if (distFromStart2StopIndex.get(i) >= totalDistance / 2) {
 				if (Math.abs(totalDistance / 2 - distFromStart2StopIndex.get(i - 1)) > Math
 						.abs(totalDistance / 2 - distFromStart2StopIndex.get(i))) {
+					// -> if both Math.abs() are equal the previous stop (i-1) is returned
 					return i;
 				} else {
 					return i - 1;
