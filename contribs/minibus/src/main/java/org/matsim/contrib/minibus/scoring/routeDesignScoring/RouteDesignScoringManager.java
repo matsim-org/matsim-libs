@@ -42,10 +42,9 @@ public class RouteDesignScoringManager {
 		stop2StopVsBeelinePenalty, areaVsBeelinePenalty
 	}
 
-	List<RouteDesignScoringFunction> scoringFunctions = new ArrayList<>();
-	Map<RouteDesignScoreFunctionName, RouteDesignScoreParams> paramMap = new HashMap<>();
-	final static Logger log = Logger.getLogger(RouteDesignScoringManager.class);
-	boolean isActive = false;
+	private List<RouteDesignScoringFunction> scoringFunctions = new ArrayList<>();
+	private Map<RouteDesignScoreFunctionName, RouteDesignScoreParams> paramMap = new HashMap<>();
+	private final static Logger log = Logger.getLogger(RouteDesignScoringManager.class);
 
 	public final double scoreRouteDesign(PPlan pPlan) {
 		double routeDesignScore = 0.0;
@@ -72,7 +71,7 @@ public class RouteDesignScoringManager {
 		return routeDesignScore;
 	}
 
-	public final void init(PConfigGroup pConfig) {
+	public final void init(final PConfigGroup pConfig) {
 		paramMap = pConfig.getRouteDesignScoreParams();
 
 		paramMap.forEach((name, params) -> {
@@ -88,14 +87,10 @@ public class RouteDesignScoringManager {
 				new RuntimeException("Unknown RouteDesignScoreFunctionName");
 			}
 		});
-
-		if (scoringFunctions.size() > 0) {
-			isActive = true;
-		}
 	}
 
 	public final boolean isActive() {
-		return isActive;
+		return scoringFunctions.size() > 0;
 	}
 
 }
