@@ -35,6 +35,19 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import com.vividsolutions.jts.geom.Polygon;
 
+/**
+ * Calculate penalty score for the area between all TransitStopFacilities (of
+ * the TransitRoute of the PPlan) divided by the beeline distance between the
+ * two terminus stops of the stopsToBeServed of the PPlan.
+ * 
+ * TransitRoutes which operate in different roads per direction have a bigger
+ * area between all TransitStopFacilities, so this can be useful to encourage
+ * TransitRoutes going back and forth on the same road instead of more circular
+ * routes.
+ * 
+ * @author gregor
+ *
+ */
 class AreaVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 
 	final static Logger log = Logger.getLogger(AreaVsTerminiBeelinePenalty.class);

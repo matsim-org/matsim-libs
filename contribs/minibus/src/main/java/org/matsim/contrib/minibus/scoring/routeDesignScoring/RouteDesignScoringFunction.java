@@ -22,6 +22,11 @@ package org.matsim.contrib.minibus.scoring.routeDesignScoring;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
+/**
+ * 
+ * @author gregor
+ *
+ */
 public interface RouteDesignScoringFunction {
 	
 	public double getScore(PPlan pPlan, TransitRoute route);

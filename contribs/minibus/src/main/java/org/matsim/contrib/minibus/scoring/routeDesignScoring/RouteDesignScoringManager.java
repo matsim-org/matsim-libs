@@ -30,6 +30,12 @@ import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
+/**
+ * Instantiate and apply RouteDesignScoringFunctions.
+ * 
+ * @author gregor
+ *
+ */
 public class RouteDesignScoringManager {
 
 	public static enum RouteDesignScoreFunctionName {

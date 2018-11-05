@@ -26,6 +26,15 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+/**
+ * Calculate penalty score for circuitous TransitRoutes (TransitRoute of the
+ * PPlan) measured as sum of all beeline distances of consecutive TransitStops
+ * divided by the beeline distance between the two terminus stops of the
+ * stopsToBeServed of the PPlan.
+ * 
+ * @author gregor
+ *
+ */
 class Stop2StopVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 
 	private final RouteDesignScoreParams params;
