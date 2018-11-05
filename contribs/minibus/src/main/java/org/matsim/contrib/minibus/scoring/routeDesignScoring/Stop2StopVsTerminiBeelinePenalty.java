@@ -47,7 +47,7 @@ class Stop2StopVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 	public double getScore(PPlan pPlan, TransitRoute route) {
 		TransitStopFacility startStop = pPlan.getStopsToBeServed().get(0);
 		TransitStopFacility endStop = pPlan.getStopsToBeServed()
-				.get(TerminusStopFinder.findStopIndexWithLargestDistance(pPlan.getStopsToBeServed()));
+				.get(TerminusStopFinder.findSecondTerminusStop(pPlan.getStopsToBeServed()));
 		double beelineLength = CoordUtils.calcEuclideanDistance(startStop.getCoord(), endStop.getCoord());
 
 		double lengthStop2Stop = 0.0;

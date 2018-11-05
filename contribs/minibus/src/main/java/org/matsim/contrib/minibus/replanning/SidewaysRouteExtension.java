@@ -68,7 +68,7 @@ public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 		ArrayList<TransitStopFacility> currentStopsToBeServed = oldPlan.getStopsToBeServed();
 		
 		TransitStopFacility baseStop = currentStopsToBeServed.get(0);
-		int remoteStopIndex = TerminusStopFinder.findStopIndexWithLargestDistance(currentStopsToBeServed);
+		int remoteStopIndex = TerminusStopFinder.findSecondTerminusStop(currentStopsToBeServed);
 		double bufferSizeBasedOnRatio = CoordUtils.calcEuclideanDistance(baseStop.getCoord(), currentStopsToBeServed.get(remoteStopIndex).getCoord()) * this.ratio;
 		
 		List<Geometry> lineStrings = this.createGeometryFromStops(currentStopsToBeServed, remoteStopIndex);

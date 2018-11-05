@@ -70,7 +70,7 @@ public final class EndRouteExtension extends AbstractPStrategyModule {
 		 * terminus stops. So we only know one terminus stop, the base stop, and try to find the other terminus, the other end 
 		 * of the route, by scanning the stops on the TransitRoute for the stop which has the largest distance from the base stop.
 		 */
-		int remoteStopIndex = TerminusStopFinder.findStopIndexWithLargestDistance(currentStopsToBeServed);
+		int remoteStopIndex = TerminusStopFinder.findSecondTerminusStop(currentStopsToBeServed);
 		
 		if (baseStop.equals(currentStopsToBeServed.get(remoteStopIndex))) {
 			/*
