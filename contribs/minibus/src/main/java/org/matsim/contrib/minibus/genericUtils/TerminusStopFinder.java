@@ -37,6 +37,9 @@ public class TerminusStopFinder {
 	 * @param stops
 	 * @return index of the stop which is half way on the route from start stop over
 	 *         all stops back to the start stop
+	 *         
+	 * @author gleich
+	 * 
 	 */
 	public static final int findSecondTerminusStop(ArrayList<TransitStopFacility> stops) {
 		double totalDistance = 0;
