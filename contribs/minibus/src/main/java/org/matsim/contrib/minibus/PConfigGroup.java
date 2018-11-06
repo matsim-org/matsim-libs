@@ -890,7 +890,6 @@ public final class PConfigGroup extends ConfigGroup{
 				pars.setLocked(); 
 			}
 			
-			System.out.println(pars + " " + pars.getClass() + " " + (pars instanceof RouteDesignScoreParams));
 			RouteDesignScoreParams scoreParams = (RouteDesignScoreParams) pars;
 			
 			final RouteDesignScoringManager.RouteDesignScoreFunctionName routeDesignScoreFunction = scoreParams.getRouteDesignScoreFunction();
