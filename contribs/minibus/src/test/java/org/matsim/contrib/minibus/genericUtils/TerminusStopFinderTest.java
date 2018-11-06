@@ -33,6 +33,11 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.junit.Assert;
 import org.junit.Before;
 
+/**
+ * 
+ * @author gleich
+ *
+ */
 public class TerminusStopFinderTest {
 	
 	TransitSchedule schedule;

@@ -24,7 +24,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**
  * 
- * @author gregor
+ * @author gleich
  *
  */
 public interface RouteDesignScoringFunction {

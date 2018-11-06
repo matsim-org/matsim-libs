@@ -33,7 +33,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 /**
  * Instantiate and apply RouteDesignScoringFunctions.
  * 
- * @author gregor
+ * @author gleich
  *
  */
 public class RouteDesignScoringManager {

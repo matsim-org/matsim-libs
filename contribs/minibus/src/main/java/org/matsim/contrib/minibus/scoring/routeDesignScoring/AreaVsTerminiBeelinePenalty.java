@@ -45,7 +45,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * TransitRoutes going back and forth on the same road instead of more circular
  * routes.
  * 
- * @author gregor
+ * @author gleich
  *
  */
 class AreaVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
