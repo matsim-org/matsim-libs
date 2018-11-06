@@ -64,9 +64,19 @@ class AreaVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 				.get(TerminusStopFinder.findSecondTerminusStop(pPlan.getStopsToBeServed()));
 		double beelineLength = CoordUtils.calcEuclideanDistance(startStop.getCoord(), endStop.getCoord());
 
+		List<TransitStopFacility> stopListToEvaluate = new ArrayList<>();
+		switch (params.getStopListToEvaluate()) {
+		case transitRouteAllStops: for (TransitRouteStop stop: route.getStops()) {stopListToEvaluate.add(stop.getStopFacility());}
+		break;
+		case pPlanStopsToBeServed: stopListToEvaluate = pPlan.getStopsToBeServed();
+		break;
+		default: log.error("Unknown stopListToEvaluate parameter :" + params.getStopListToEvaluate());
+		new RuntimeException();
+		}
+		
 		List<Coord> coords = new ArrayList<>();
-		for (TransitRouteStop stop : route.getStops()) {
-			coords.add(stop.getStopFacility().getCoord());
+		for (TransitStopFacility stop : stopListToEvaluate) {
+			coords.add(stop.getCoord());
 		}
 
 		double area = 0;

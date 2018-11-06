@@ -755,10 +755,16 @@ public final class PConfigGroup extends ConfigGroup{
 		public static final String SET_TYPE = "routeDesignScoreParameters";
 		public static final String ROUTE_DESIGN_SCORE_FUNCTION = "routeDesignScoreFunction";
 		public static final String COST_FACTOR = "costFactor";
+		public static final String STOP_LIST_TO_EVALUATE = "stopListToEvaluate";
 		public static final String VALUE_T0_START_SCORING = "valueToStartScoring";
 
+		public enum StopListToEvaluate {
+			transitRouteAllStops, pPlanStopsToBeServed
+		}
+		
 		private RouteDesignScoringManager.RouteDesignScoreFunctionName routeDesignScoreFunction = null;
 		private double costFactor = 0.0;
+		private StopListToEvaluate stopListToEvaluate = StopListToEvaluate.transitRouteAllStops;
 		private double valueToStartScoring = 0.0;
 		
 		public RouteDesignScoreParams() {
@@ -779,6 +785,8 @@ public final class PConfigGroup extends ConfigGroup{
 					"name of route design score function to be applied. Possible default names: " + defaultRouteDesignScoreFunctions + "." );
 			map.put( COST_FACTOR,
 					"factor with which the score calculated by the route design score function is multiplied to obtain the monetary cost applied to the TransitRoute's score.");
+			map.put( STOP_LIST_TO_EVALUATE,
+					"which stops shall be evaluated. Possible values " + StopListToEvaluate.pPlanStopsToBeServed + " and " + StopListToEvaluate.transitRouteAllStops);
 			map.put( VALUE_T0_START_SCORING,
 					"value which is subtracted from the score calculated by the route design score function before multiplying with the cost factor. If the result is negative, nothing will be added or substracted from the TransitRoute's score. This can be interpreted as an maximum allowable value before a penalty for bad route design is applied.");
 
@@ -807,6 +815,20 @@ public final class PConfigGroup extends ConfigGroup{
 		@StringGetter( COST_FACTOR )
 		public double getCostFactor() {
 			return this.costFactor;
+		}
+		
+		@StringSetter( STOP_LIST_TO_EVALUATE )
+		public void setStopListToEvaluate(final String stopListToEvaluate) {
+			setStopListToEvaluate(StopListToEvaluate.valueOf(stopListToEvaluate));
+		}
+		
+		public void setStopListToEvaluate(final StopListToEvaluate stopListToEvaluate) {
+			this.stopListToEvaluate = stopListToEvaluate;
+		}
+
+		@StringGetter( STOP_LIST_TO_EVALUATE )
+		public StopListToEvaluate getStopListToEvaluate() {
+			return this.stopListToEvaluate;
 		}
 		
 		@StringSetter( VALUE_T0_START_SCORING )

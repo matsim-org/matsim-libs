@@ -19,11 +19,16 @@
 
 package org.matsim.contrib.minibus.scoring.routeDesignScoring;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams;
 import org.matsim.contrib.minibus.genericUtils.TerminusStopFinder;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -37,6 +42,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 class Stop2StopVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 
+	private static final Logger log = Logger.getLogger(Stop2StopVsTerminiBeelinePenalty.class);
 	private final RouteDesignScoreParams params;
 
 	public Stop2StopVsTerminiBeelinePenalty(RouteDesignScoreParams params) {
@@ -50,18 +56,28 @@ class Stop2StopVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 				.get(TerminusStopFinder.findSecondTerminusStop(pPlan.getStopsToBeServed()));
 		double beelineLength = CoordUtils.calcEuclideanDistance(startStop.getCoord(), endStop.getCoord());
 
+		List<TransitStopFacility> stopListToEvaluate = new ArrayList<>();
+		switch (params.getStopListToEvaluate()) {
+		case transitRouteAllStops: for (TransitRouteStop stop: route.getStops()) {stopListToEvaluate.add(stop.getStopFacility());}
+		break;
+		case pPlanStopsToBeServed: stopListToEvaluate = pPlan.getStopsToBeServed();
+		break;
+		default: log.error("Unknown stopListToEvaluate parameter :" + params.getStopListToEvaluate());
+		new RuntimeException();
+		}
+		
 		double lengthStop2Stop = 0.0;
-		TransitStopFacility previousStop = pPlan.getStopsToBeServed().get(0);
+		TransitStopFacility previousStop = stopListToEvaluate.get(0);
 
-		for (int i = 0; i < pPlan.getStopsToBeServed().size(); i++) {
-			TransitStopFacility currentStop = pPlan.getStopsToBeServed().get(i);
+		for (int i = 0; i < stopListToEvaluate.size(); i++) {
+			TransitStopFacility currentStop = stopListToEvaluate.get(i);
 			lengthStop2Stop = lengthStop2Stop
 					+ CoordUtils.calcEuclideanDistance(previousStop.getCoord(), currentStop.getCoord());
 			previousStop = currentStop;
 		}
 		// add leg from last to first stop
 		lengthStop2Stop = lengthStop2Stop + CoordUtils.calcEuclideanDistance(previousStop.getCoord(),
-				pPlan.getStopsToBeServed().get(0).getCoord());
+				stopListToEvaluate.get(0).getCoord());
 
 		return params.getCostFactor() * ((lengthStop2Stop / beelineLength) - params.getValueToStartScoring());
 	}
