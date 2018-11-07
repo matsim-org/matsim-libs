@@ -79,7 +79,14 @@ class Stop2StopVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 		lengthStop2Stop = lengthStop2Stop + CoordUtils.calcEuclideanDistance(previousStop.getCoord(),
 				stopListToEvaluate.get(0).getCoord());
 
-		return params.getCostFactor() * ((lengthStop2Stop / beelineLength) - params.getValueToStartScoring());
+
+		double score = lengthStop2Stop / beelineLength - params.getValueToStartScoring();
+		if (score > 0) {
+			return params.getCostFactor() * score;
+		} else {
+			// return 0 if score better than valueToStartScoring; it is a penalty, not a subsidy
+			return 0;
+		}
 	}
 
 }

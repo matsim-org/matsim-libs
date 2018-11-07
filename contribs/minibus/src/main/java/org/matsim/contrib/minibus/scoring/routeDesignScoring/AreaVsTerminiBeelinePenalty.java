@@ -81,14 +81,25 @@ class AreaVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 
 		double area = 0;
 
-		try {
-			Polygon polygon = GeometryUtils.createGeotoolsPolygon(coords);
-			area = polygon.getArea();
-		} catch (IllegalArgumentException e) {
-			log.warn(e.getMessage());
+		if (coords.size() < 3) {
+			// not enough coords to calculate an area, no scoring possible
+			return 0;
+		} else {
+			try {
+				Polygon polygon = GeometryUtils.createGeotoolsPolygon(coords);
+				area = polygon.getArea();
+			} catch (IllegalArgumentException e) {
+				log.warn(e.getMessage());
+			}
 		}
 
-		return params.getCostFactor() * ((area / beelineLength) - params.getValueToStartScoring());
+		double score = area / beelineLength - params.getValueToStartScoring();
+		if (score > 0) {
+			return params.getCostFactor() * score;
+		} else {
+			// return 0 if score better than valueToStartScoring; it is a penalty, not a subsidy
+			return 0;
+		}
 	}
 
 }
