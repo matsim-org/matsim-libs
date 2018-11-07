@@ -48,7 +48,7 @@ import java.util.Collections;
  * @author nagel
  */
 
-public class QVehicleImpl implements QVehicle {
+public final class QVehicleImpl implements QVehicle {
 
 	private static final Logger log = Logger.getLogger(QVehicleImpl.class);
 

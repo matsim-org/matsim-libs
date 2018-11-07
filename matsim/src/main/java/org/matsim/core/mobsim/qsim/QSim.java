@@ -274,11 +274,11 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 	}
 
-	private static int wrnCnt = 0;
-	public void createAndParkVehicleOnLink(Vehicle vehicle, Id<Link> linkId) {
-		QVehicle qveh = new QVehicleImpl(vehicle);
-		addParkedVehicle ( qveh, linkId ) ;
-	}
+//	private static int wrnCnt = 0;
+//	public void createAndParkVehicleOnLink(Vehicle vehicle, Id<Link> linkId) {
+//		QVehicle qveh = new QVehicleImpl(vehicle);
+//		addParkedVehicle ( qveh, linkId ) ;
+//	}
 
 	private static int wrnCnt2 = 0;
 	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
