@@ -43,6 +43,7 @@ import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -275,7 +276,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	private static int wrnCnt = 0;
 	public void createAndParkVehicleOnLink(Vehicle vehicle, Id<Link> linkId) {
-		QVehicle qveh = new QVehicle(vehicle);
+		QVehicle qveh = new QVehicleImpl(vehicle);
 		addParkedVehicle ( qveh, linkId ) ;
 	}
 

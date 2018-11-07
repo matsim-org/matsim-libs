@@ -1,5 +1,6 @@
 package org.matsim.core.mobsim.qsim;
 
+import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -15,7 +16,7 @@ public class PopulationModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bind(PopulationAgentSource.class).asEagerSingleton();
+		bind( AgentSource.class).to(PopulationAgentSource.class).asEagerSingleton();
 		addNamedComponent(PopulationAgentSource.class, COMPONENT_NAME);
 	}
 

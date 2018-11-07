@@ -867,17 +867,17 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		return this.id;
 	}
 
-	static final class Hole extends QItem {
+	static final class Hole implements QItem {
 		private double earliestLinkEndTime ;
 		private double pcu;
 
 		@Override
-		final double getEarliestLinkExitTime() {
+		public final double getEarliestLinkExitTime() {
 			return earliestLinkEndTime;
 		}
 
 		@Override
-		final void setEarliestLinkExitTime(double earliestLinkEndTime) {
+		public final void setEarliestLinkExitTime( double earliestLinkEndTime ) {
 			this.earliestLinkEndTime = earliestLinkEndTime;
 		}
 
