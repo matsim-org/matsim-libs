@@ -23,6 +23,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.minibus.genericUtils.TerminusStopFinder;
 import org.matsim.contrib.minibus.operator.Operator;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
@@ -67,7 +68,7 @@ public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 		ArrayList<TransitStopFacility> currentStopsToBeServed = oldPlan.getStopsToBeServed();
 		
 		TransitStopFacility baseStop = currentStopsToBeServed.get(0);
-		int remoteStopIndex = this.findStopIndexWithLargestDistance(currentStopsToBeServed);
+		int remoteStopIndex = TerminusStopFinder.findSecondTerminusStop(currentStopsToBeServed);
 		double bufferSizeBasedOnRatio = CoordUtils.calcEuclideanDistance(baseStop.getCoord(), currentStopsToBeServed.get(remoteStopIndex).getCoord()) * this.ratio;
 		
 		List<Geometry> lineStrings = this.createGeometryFromStops(currentStopsToBeServed, remoteStopIndex);
