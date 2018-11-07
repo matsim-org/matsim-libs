@@ -32,6 +32,7 @@ import org.matsim.contrib.minibus.replanning.PStrategy;
 import org.matsim.contrib.minibus.replanning.PStrategyManager;
 import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
 import org.matsim.contrib.minibus.scoring.PScoreContainer;
+import org.matsim.contrib.minibus.scoring.routeDesignScoring.RouteDesignScoringManager;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
@@ -106,13 +107,14 @@ abstract class AbstractOperator implements Operator{
 	}
 
 	@Override
-	public void score(Map<Id<Vehicle>, PScoreContainer> pScores, SubsidyI subsidy) {
+	public void score(Map<Id<Vehicle>, PScoreContainer> pScores, SubsidyI subsidy, 
+			RouteDesignScoringManager routeDesignScoringManager) {
 		this.setScoreLastIteration(this.getScore());
 		this.setScore(0);
 		
 		// score all plans
 		for (PPlan plan : this.getAllPlans()) {
-			scorePlan(pScores, plan);
+			scorePlan(pScores, plan, routeDesignScoringManager);
 			
 			if (subsidy != null) {
 				Id<PPlan> pplanId = Id.create(plan.getLine().getId().toString() + "-" + plan.getId().toString(), PPlan.class);
@@ -272,19 +274,53 @@ abstract class AbstractOperator implements Operator{
 		}
 	}
 
-	private final static void scorePlan(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap, PPlan plan) {
+	private final void scorePlan(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap, PPlan plan, RouteDesignScoringManager routeDesignScoringManager) {
 		double totalLineScore = 0.0;
 		int totalTripsServed = 0;
-		
+
 		for (Id<Vehicle> vehId : plan.getVehicleIds()) {
 			totalLineScore += driverId2ScoreMap.get(vehId).getTotalRevenue();
-			totalTripsServed += driverId2ScoreMap.get(vehId).getTripsServed();	
+			totalTripsServed += driverId2ScoreMap.get(vehId).getTripsServed();
 		}
-		
+
+		totalLineScore = capAndAddRouteDesignScore (plan, totalLineScore, routeDesignScoringManager);
+
 		plan.setScore(totalLineScore);
 		plan.setTripsServed(totalTripsServed);
 	}
-
+	
+	private double capAndAddRouteDesignScore (PPlan plan, double totalLineScore, RouteDesignScoringManager routeDesignScoringManager) {
+		if (routeDesignScoringManager.isActive()) {
+			
+			double routeDesignScore = routeDesignScoringManager.scoreRouteDesign(plan);
+			
+			if (routeDesignScore != 0) {
+				/*
+				 * Cap route design score, if score is bad enough to eliminate the plan, so it
+				 * would affect other plans less. Don't cap if a plan performs really bad
+				 * financially besides non-monetary metrics like route design scoring. At
+				 * minScoreToSurvive CarefulMultiPlanOperator would leave at least one vehicle
+				 * on the plan, so plan could survive
+				 */
+				double minScoreToSurvive = -costPerVehicleSell * (plan.getNVehicles() - 1);
+				if (totalLineScore >= minScoreToSurvive) {
+					/*
+					 * Limit negative score to the amount at which the plan is eliminated. Multiply
+					 * route design score with number of vehicles, so route design score still still
+					 * has an influence on busy lines.
+					 */
+					totalLineScore = Math.max(totalLineScore + routeDesignScore * plan.getNVehicles(),
+							minScoreToSurvive - 0.001 * costPerVehicleSell);
+				} else {
+					// plan already has a bad score that will cause its elimination, don't cap this
+					// monetary cost
+				}
+			}
+		}
+		
+		return totalLineScore;
+	}
+	
 	double getScore() {
 		return score;
 	}
