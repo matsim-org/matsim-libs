@@ -560,6 +560,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	}
 
 	private void letVehicleArrive(QVehicle veh) {
+		
+		// yyyy feels like the letVehicleArrive method should go to the QLink. kai, oct'18
 		qLink.addParkedVehicle(veh);
 		qLink.letVehicleArrive(veh);
 		qLink.makeVehicleAvailableToNextDriver(veh);

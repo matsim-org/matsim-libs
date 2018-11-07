@@ -29,8 +29,12 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
 import org.matsim.contrib.emissions.roadTypeMapping.VisumHbefaRoadTypeMapping;
 import org.matsim.contrib.emissions.types.ColdPollutant;
+import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
+import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.config.Config;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.vehicles.VehicleType;
 
 import java.net.URL;
 import java.util.*;
@@ -44,6 +48,8 @@ import java.util.Map.Entry;
 public class EmissionUtils {
 	private static final Logger logger = Logger.getLogger(EmissionUtils.class);
 
+	@Deprecated // yyyy we don't like static fields, especially not with mutable material.  Pls explain why this one here is
+	// unavoidable.  kai, oct'18
 	private static final SortedSet<String> listOfPollutants;
 
 	static {
@@ -219,5 +225,42 @@ public class EmissionUtils {
 
 	public static SortedSet<String> getListOfPollutants() {
 		return listOfPollutants;
+	}
+	
+	public static void setHbefaVehicleDescription( final VehicleType vt, final String hbefaVehicleDescription ) {
+		// yyyy maybe this should use the vehicle information tuple (see below)?
+		// yyyy replace this by using Attributes.  kai, oct'18
+	    vt.setDescription(  vt.getDescription() + " " + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()+
+							hbefaVehicleDescription +
+			EmissionSpecificationMarker.END_EMISSIONS.toString() );
+	}
+	
+	public static Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple( String vehicleDescription ) {
+		// yyyy what is the advantage of having this as a tuple over just using a class with four entries?  kai, oct'18
+		
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
+		HbefaVehicleCategory hbefaVehicleCategory = null;
+		
+		// yyyy replace this by using Attributes.  kai, oct'18
+		int startIndex = vehicleDescription.indexOf(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
+		int endIndex = vehicleDescription.lastIndexOf(EmissionSpecificationMarker.END_EMISSIONS.toString());
+
+		String[] vehicleInformationArray = vehicleDescription.substring(startIndex, endIndex).split(";");
+
+		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
+			if(vehCat.toString().equals(vehicleInformationArray[0])){
+				hbefaVehicleCategory = vehCat;
+			}
+		}
+		
+		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
+		if(vehicleInformationArray.length == 4){
+			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationArray[1]);
+			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationArray[2]);
+			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationArray[3]);
+		} // else interpretation as "average vehicle"
+
+		vehicleInformationTuple = new Tuple<>(hbefaVehicleCategory, hbefaVehicleAttributes);
+		return vehicleInformationTuple;
 	}
 }

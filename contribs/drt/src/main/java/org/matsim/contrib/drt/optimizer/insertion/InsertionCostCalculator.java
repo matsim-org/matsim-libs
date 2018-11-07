@@ -22,6 +22,9 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
+import org.matsim.contrib.drt.passenger.DrtRequestCreator;
+import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
+import org.matsim.contrib.drt.routing.DrtRoutingModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
@@ -84,15 +87,24 @@ public class InsertionCostCalculator {
 	 * PenaltyCalculator. If the penalty is at least as high as INFEASIBLE_SOLUTION_COST, the soft
 	 * constraint becomes effectively a hard one.
 	 *
+	 * @param drtRequest  the request
+	 * @param vEntry the vehicle into which it will be attempted to insert the request
+	 * @param insertion I think that this is  the insertion to be considered here, with PickupIdx and DropoffIdx the
+	 *                  positions
+	 *
 	 * @return cost of insertion (values higher or equal to INFEASIBLE_SOLUTION_COST represent an infeasible insertion)
 	 */
 	public double calculate(DrtRequest drtRequest, VehicleData.Entry vEntry, InsertionWithDetourTimes insertion) {
 		double pickupDetourTimeLoss = calculatePickupDetourTimeLoss(drtRequest, vEntry, insertion);
 		double dropoffDetourTimeLoss = calculateDropoffDetourTimeLoss(drtRequest, vEntry, insertion);
+		// yy I am finding it odd that these two are computed separately since when no other pickup/dropoff is in between,
+		// the vehicle will not return to the original sequence. kai, nov'18
+		// The reason, I think, is that the pickupTimeLoss is needed for stops that suffer only that one, while the sum of both will be suffered by the stops after the dropoff stop.
+		// The computation is complicated; presumably, it takes care of this.  kai, nov'18
 
 		// this is what we want to minimise
 		double totalTimeLoss = pickupDetourTimeLoss + dropoffDetourTimeLoss;
-		if (isHardConstraintsViolated(drtRequest, vEntry, insertion, pickupDetourTimeLoss, totalTimeLoss)) {
+		if (isHardConstraintsViolated( vEntry, insertion, pickupDetourTimeLoss, totalTimeLoss)) {
 			return INFEASIBLE_SOLUTION_COST;
 		}
 
@@ -163,20 +175,27 @@ public class InsertionCostCalculator {
 		return replacedDriveEndTime - replacedDriveStartTime;
 	}
 
-	private boolean isHardConstraintsViolated(DrtRequest drtRequest, VehicleData.Entry vEntry,
-			InsertionWithDetourTimes insertion, double pickupDetourTimeLoss, double totalTimeLoss) {
+	private boolean isHardConstraintsViolated( VehicleData.Entry vEntry,
+								 InsertionWithDetourTimes insertion, double pickupDetourTimeLoss, double totalTimeLoss ) {
 		final int pickupIdx = insertion.getPickupIdx();
 		final int dropoffIdx = insertion.getDropoffIdx();
 
 		// this is what we cannot violate
 		for (int s = pickupIdx; s < dropoffIdx; s++) {
 			Stop stop = vEntry.stops.get(s);
-			// all stops after pickup are delayed by pickupDetourTimeLoss
+			// all stops after pickup but still before dropoff are delayed by pickupDetourTimeLoss
 			if (stop.task.getBeginTime() + pickupDetourTimeLoss > stop.maxArrivalTime //
-					|| stop.task.getEndTime() + pickupDetourTimeLoss > stop.maxDepartureTime) {
+					    // (stop.maxArrivalTime is (presumably) the latest arrival time according to alpha*t_direct +
+					    // beta.  So we are checking if we are now larger than that.)
+					    || stop.task.getEndTime() + pickupDetourTimeLoss > stop.maxDepartureTime
+				// (this is the  same except for the departure.  Presumably has to do with maximum
+				//  waiting. kai, nov'18)
+			) {
 				return true;
 			}
 		}
+		
+		// ... now the same for everything after the considered dropoff:
 
 		// this is what we cannot violate
 		for (int s = dropoffIdx; s < vEntry.stops.size(); s++) {
@@ -207,21 +226,33 @@ public class InsertionCostCalculator {
 			this.maxTravelTimeViolation = maxTravelTimeViolation;
 		}
 	}
-
+	
+	/**
+	 * The request constraints are set in {@link DrtRequest}, which is used by {@link DrtRequestCreator}, which is used by {@link
+	 * DrtRoutingModule} and {@link DefaultDrtRouteUpdater}, which are the two places where the alpha*directTTime+beta formula is
+	 * declared.  kai, nov'18
+	 */
 	private double calcSoftConstraintPenalty(DrtRequest drtRequest, VehicleData.Entry vEntry,
 			InsertionWithDetourTimes insertion, double pickupDetourTimeLoss) {
 		final int pickupIdx = insertion.getPickupIdx();
 		final int dropoffIdx = insertion.getDropoffIdx();
 
 		double driveToPickupStartTime = getDriveToInsertionStartTime(vEntry, pickupIdx);
+		// (normally the end time of the previous task)
 		double pickupEndTime = driveToPickupStartTime + insertion.getTimeToPickup() + stopDuration;
 		double dropoffStartTime = pickupIdx == dropoffIdx ?
-				pickupEndTime + insertion.getTimeFromPickup() :
+				pickupEndTime + insertion.getTimeFromPickup() : // (special case if inserted dropoff is directly after inserted pickup)
 				vEntry.stops.get(dropoffIdx - 1).task.getEndTime() + pickupDetourTimeLoss
 						+ insertion.getTimeToDropoff();
 
 		double maxWaitTimeViolation = Math.max(0, pickupEndTime - drtRequest.getLatestStartTime());
+		// how much we are beyond the latest start time = request time + max wait time.  max wait time currently comes from
+		// config
+		
 		double maxTravelTimeViolation = Math.max(0, dropoffStartTime - drtRequest.getLatestArrivalTime());
+		// how much we are beyond the latest dropoff time = request time + max travel time.  max travel time currently
+		// calculated as alpha * directTravelTime + beta, where alpha, beta come from config
+		
 		return penaltyCalculator.calcPenalty(maxWaitTimeViolation, maxTravelTimeViolation);
 	}
 
