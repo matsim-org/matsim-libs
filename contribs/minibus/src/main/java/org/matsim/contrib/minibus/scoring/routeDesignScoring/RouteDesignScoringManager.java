@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams;
 import org.matsim.contrib.minibus.operator.PPlan;
@@ -39,7 +40,8 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 public class RouteDesignScoringManager {
 
 	public static enum RouteDesignScoreFunctionName {
-		stop2StopVsBeelinePenalty, areaVsBeelinePenalty
+		stop2StopVsBeelinePenalty, areaBtwStopsVsBeelinePenalty, areaBtwLinksVsBeelinePenalty,
+		stopServedMultipleTimesPenalty
 	}
 
 	private List<RouteDesignScoringFunction> scoringFunctions = new ArrayList<>();
@@ -71,7 +73,7 @@ public class RouteDesignScoringManager {
 		return routeDesignScore;
 	}
 
-	public final void init(final PConfigGroup pConfig) {
+	public final void init(final PConfigGroup pConfig, Network network) {
 		paramMap = pConfig.getRouteDesignScoreParams();
 
 		paramMap.forEach((name, params) -> {
@@ -79,8 +81,14 @@ public class RouteDesignScoringManager {
 			case stop2StopVsBeelinePenalty:
 				scoringFunctions.add(new Stop2StopVsTerminiBeelinePenalty(params));
 				break;
-			case areaVsBeelinePenalty:
-				scoringFunctions.add(new AreaVsTerminiBeelinePenalty(params));
+			case areaBtwStopsVsBeelinePenalty:
+				scoringFunctions.add(new AreaBtwStopsVsTerminiBeelinePenalty(params));
+				break;
+			case areaBtwLinksVsBeelinePenalty:
+				scoringFunctions.add(new AreaBtwLinksVsTerminiBeelinePenalty(params, network));
+				break;
+			case stopServedMultipleTimesPenalty:
+				scoringFunctions.add(new StopServedMultipleTimesPenalty(params));
 				break;
 			default:
 				log.error("Unknown RouteDesignScoreFunctionName");

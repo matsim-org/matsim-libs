@@ -109,7 +109,7 @@ public final class PBox implements POperators {
 		this.strategyManager.init(this.pConfig, this.stageCollectorHandler, this.ticketMachine, timeProvider);
 		
 		// initialize route design scoring manager
-		this.routeDesignScoreManager.init(this.pConfig);
+		this.routeDesignScoreManager.init(this.pConfig, event.getServices().getScenario().getNetwork());
 
 		// init fare collector
 		this.stageCollectorHandler.init(event.getServices().getScenario().getNetwork());
