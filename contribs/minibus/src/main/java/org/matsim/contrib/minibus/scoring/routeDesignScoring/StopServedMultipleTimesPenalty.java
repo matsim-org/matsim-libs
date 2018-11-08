@@ -87,7 +87,8 @@ class StopServedMultipleTimesPenalty implements RouteDesignScoringFunction {
 		}
 
 		if (params.getLogScore().equals(LogRouteDesignScore.onlyNonZeroScore) && score != 0) {
-			log.info("Transit Route " + route.getId() + " with " + pPlan.getNVehicles() + " vehicles scored " + score);
+			log.info("Transit Route " + route.getId() + " scored " + score + " (total " + stopListToEvaluate.size()
+					+ " stops served; unique TransitStopFacilities " + stopIdServed.size());
 		}
 		return score;
 	}

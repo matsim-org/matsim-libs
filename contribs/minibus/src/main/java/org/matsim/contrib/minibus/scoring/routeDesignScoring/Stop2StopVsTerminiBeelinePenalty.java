@@ -95,7 +95,8 @@ class Stop2StopVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 		}
 		
 		if (params.getLogScore().equals(LogRouteDesignScore.onlyNonZeroScore) && score != 0) {
-			log.info("Transit Route " + route.getId() + " with " + pPlan.getNVehicles() + " vehicles scored " + score);
+			log.info("Transit Route " + route.getId() + " scored " + score + " (length stop2stop " + lengthStop2Stop
+					+ "; beeline " + beelineLength);
 		}
 		return score;
 	}

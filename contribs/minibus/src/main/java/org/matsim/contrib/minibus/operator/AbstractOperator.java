@@ -324,11 +324,11 @@ abstract class AbstractOperator implements Operator{
 				}
 				
 				if (logRouteDesignVsTotalScore.equals(LogRouteDesignVsTotalScore.onlyNonZeroRouteDesignScore)) {
-					log.info("operator " + id + ". line " + plan.getLine().getId() + ". TransitRoute(s) "
+					log.info("operator " + id + ". TransitRoute(s) "
 							+ plan.getLine().getRoutes().values().iterator().next().getId()
-							+ ". original totalLineScore: " + originaltotalLineScore + ". routeDesignScore: "
-							+ routeDesignScore + ". minScoreToSurvive: " + minScoreToSurvive
-							+ ". totalLineScore after: " + totalLineScore);
+							+ ". original totalLineScore: " + originaltotalLineScore + ". totalLineScore after: "
+							+ totalLineScore + ". routeDesignScore: " + routeDesignScore + ". vehicles "
+							+ plan.getNVehicles() + ". minScoreToSurvive: " + minScoreToSurvive);
 				}
 			}
 		}

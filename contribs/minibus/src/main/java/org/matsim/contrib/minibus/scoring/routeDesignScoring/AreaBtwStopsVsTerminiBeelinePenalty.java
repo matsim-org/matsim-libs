@@ -109,7 +109,8 @@ class AreaBtwStopsVsTerminiBeelinePenalty implements RouteDesignScoringFunction 
 		}
 
 		if (params.getLogScore().equals(LogRouteDesignScore.onlyNonZeroScore) && score != 0) {
-			log.info("Transit Route " + route.getId() + " with " + pPlan.getNVehicles() + " vehicles scored " + score);
+			log.info("Transit Route " + route.getId() + " scored " + score + " (area " + area + "; beeline "
+					+ beelineLength);
 		}
 		return score;
 	}
