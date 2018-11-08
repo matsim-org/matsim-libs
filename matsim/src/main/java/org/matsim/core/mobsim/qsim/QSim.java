@@ -178,7 +178,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private Collection<AgentTracker> agentTrackers = new ArrayList<>() ;
 
 	private Injector childInjector;
-	private final QVehicleFactory qVehicleFactory;
+//	private QVehicleFactory qVehicleFactory;
 	
 	@Override
 	public final void rescheduleActivityEnd(MobsimAgent agent) {
@@ -194,7 +194,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	 *
 	 */
 	@Inject
-	private QSim( final Scenario sc, EventsManager events, Injector childInjector, QVehicleFactory qVehicleFactory ) {
+	private QSim( final Scenario sc, EventsManager events, Injector childInjector ) {
 		this.scenario = sc;
 		if ( sc.getConfig().qsim().getNumberOfThreads() > 1) {
 			this.events = EventsUtils.getParallelFeedableInstance( events );
@@ -206,7 +206,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		this.simTimer = new MobsimTimer( sc.getConfig().qsim().getTimeStepSize());
 		
 		this.childInjector = childInjector ;
-		this.qVehicleFactory = qVehicleFactory;
+//		this.qVehicleFactory = qVehicleFactory;
 	}
 
 	// ============================================================================================================================
@@ -273,10 +273,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 	}
 
-	public void createAndParkVehicleOnLink(Vehicle vehicle, Id<Link> linkId) {
-		QVehicle qveh = this.qVehicleFactory.createQVehicle( vehicle ) ;
-		addParkedVehicle ( qveh, linkId ) ;
-	}
+//	public void createAndParkVehicleOnLink(Vehicle vehicle, Id<Link> linkId) {
+//		QVehicle qveh = this.qVehicleFactory.createQVehicle( vehicle ) ;
+//		addParkedVehicle ( qveh, linkId ) ;
+//	}
 
 	private static int wrnCnt2 = 0;
 	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {

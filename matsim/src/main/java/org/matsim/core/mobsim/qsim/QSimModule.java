@@ -91,11 +91,11 @@ public class QSimModule extends AbstractModule {
 		bind(Mobsim.class).toProvider(QSimProvider.class);
 		
 		// yyyy the following will eventually be moved to QSim scope, and into QNetsimEngineModule:
-		if ( config.qsim().isUseLanes() ) {
-			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ) ;
-		} else {
-			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
-		}
+//		if ( config.qsim().isUseLanes() ) {
+//			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ) ;
+//		} else {
+//			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
+//		}
 		
 		// yyyy the following will eventually be moved to QSim scope, and into TranistEngineModule:
 		if ( config.transit().isUseTransit() && config.transit().isUsingTransitInMobsim() ) {

@@ -72,6 +72,8 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -260,7 +262,11 @@ public class CreateAutomatedFDTest {
 
 						final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), travelModesTypes.get(travelMode));
 						final Id<Link> linkId4VehicleInsertion = Id.createLinkId("home");
-						qSim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+						
+//						qSim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+						QVehicle qVehicle = new QVehicleImpl( vehicle ) ; // yyyyyy should use factory. kai, nov'18
+						qSim.addParkedVehicle( qVehicle, linkId4VehicleInsertion );
+						
 					}
 				}
 			};

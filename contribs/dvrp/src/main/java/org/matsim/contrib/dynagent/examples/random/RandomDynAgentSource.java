@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
@@ -56,9 +58,14 @@ public class RandomDynAgentSource implements AgentSource {
 			Id<Link> startLinkId = RandomDynAgentLogic.chooseRandomElement(network.getLinks().keySet());
 			DynAgent agent = new DynAgent(id, startLinkId, qSim.getEventsManager(), agentLogic);
 
-			qSim.createAndParkVehicleOnLink(qSimVehicleFactory.createVehicle(Id.create(id, Vehicle.class),
-					VehicleUtils.getDefaultVehicleType()), startLinkId);
-			qSim.insertAgentIntoMobsim(agent);
+//			qSim.createAndParkVehicleOnLink(qSimVehicleFactory.createVehicle(Id.create(id, Vehicle.class),
+//					VehicleUtils.getDefaultVehicleType()), startLinkId);
+			
+			final Vehicle vehicle = qSimVehicleFactory.createVehicle( Id.create( id, Vehicle.class ), VehicleUtils.getDefaultVehicleType() ) ;
+			QVehicle qVehicle = new QVehicleImpl( vehicle ) ; // yyyyyy should use factory.  kai, nov'18
+			qSim.addParkedVehicle( qVehicle, startLinkId );
+			
+			qSim.insertAgentIntoMobsim( agent );
 		}
 	}
 }
