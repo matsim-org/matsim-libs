@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams.StopListToEvaluate;
@@ -39,7 +40,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -50,13 +50,13 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class RouteDesignScoringManagerTest {
 	
-	TransitSchedule schedule;
+	Scenario scenario;
 	TransitScheduleFactory factory;
 	
 	@Before
 	public void setUp() {
-		schedule = ScenarioUtils.loadScenario(ConfigUtils.createConfig()).getTransitSchedule();
-		factory = schedule.getFactory();
+		scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
+		factory = scenario.getTransitSchedule().getFactory();
 	}
 	
 	@Test
@@ -96,7 +96,7 @@ public class RouteDesignScoringManagerTest {
 		pConfig.addRouteDesignScoreParams(stop2stopVsBeeline);
 		
 		RouteDesignScoringManager manager1 = new RouteDesignScoringManager();
-		manager1.init(pConfig);
+		manager1.init(pConfig, scenario.getNetwork());
 		double actual = manager1.scoreRouteDesign(pPlan1);
 		// 6 stop->stop distances of 10 units each in the stops (not stopsToBeServed)
 		double expected = -1 * ((6 * 10 / (10 * Math.sqrt(2))) - 1);
@@ -106,7 +106,7 @@ public class RouteDesignScoringManagerTest {
 		stop2stopVsBeeline.setStopListToEvaluate(StopListToEvaluate.pPlanStopsToBeServed);
 		
 		manager1 = new RouteDesignScoringManager();
-		manager1.init(pConfig);
+		manager1.init(pConfig, scenario.getNetwork());
 		actual = manager1.scoreRouteDesign(pPlan1);
 		// 4 stop->stop distances of 10 units each in the stops
 		expected = -1 * ((4 * 10 / (10 * Math.sqrt(2))) - 1);
@@ -117,14 +117,14 @@ public class RouteDesignScoringManagerTest {
 		/* areaVsBeelinePenalty */
 		/* option StopListToEvaluate.transitRouteAllStops */
 		RouteDesignScoreParams areaVsBeeline = new RouteDesignScoreParams();
-		areaVsBeeline.setRouteDesignScoreFunction(RouteDesignScoreFunctionName.areaVsBeelinePenalty);
+		areaVsBeeline.setRouteDesignScoreFunction(RouteDesignScoreFunctionName.areaBtwStopsVsBeelinePenalty);
 		areaVsBeeline.setCostFactor(-1);
 		areaVsBeeline.setStopListToEvaluate(StopListToEvaluate.transitRouteAllStops);
 		areaVsBeeline.setValueToStartScoring(1);
 		pConfig.addRouteDesignScoreParams(areaVsBeeline);
 		
 		manager1 = new RouteDesignScoringManager();
-		manager1.init(pConfig);
+		manager1.init(pConfig, scenario.getNetwork());
 		actual = manager1.scoreRouteDesign(pPlan1);
 		// x=[-10,10], y=[0,10] -> 20 X 10
 		expected = -1 * ((20 * 10 / (10 * Math.sqrt(2))) - 1);
@@ -134,7 +134,7 @@ public class RouteDesignScoringManagerTest {
 		areaVsBeeline.setStopListToEvaluate(StopListToEvaluate.pPlanStopsToBeServed);
 		
 		manager1 = new RouteDesignScoringManager();
-		manager1.init(pConfig);
+		manager1.init(pConfig, scenario.getNetwork());
 		actual = manager1.scoreRouteDesign(pPlan1);
 		// x=[0,10], y=[0,10] -> 10 X 10
 		expected = -1 * ((10 * 10 / (10 * Math.sqrt(2))) - 1);
@@ -144,7 +144,7 @@ public class RouteDesignScoringManagerTest {
 		pConfig.addRouteDesignScoreParams(stop2stopVsBeeline);
 		
 		manager1 = new RouteDesignScoringManager();
-		manager1.init(pConfig);
+		manager1.init(pConfig, scenario.getNetwork());
 		actual = manager1.scoreRouteDesign(pPlan1);
 		// x=[0,10], y=[0,10] -> 10 X 10 ; 4 stop->stop distances of 10 units each in the stops
 		expected = -1 * ((10 * 10 / (10 * Math.sqrt(2))) - 1) + (-1) * ((4 * 10 / (10 * Math.sqrt(2))) - 1);
@@ -170,7 +170,7 @@ public class RouteDesignScoringManagerTest {
 		pPlan2.setLine(line2);
 		
 		manager1 = new RouteDesignScoringManager();
-		manager1.init(pConfig);
+		manager1.init(pConfig, scenario.getNetwork());
 		actual = manager1.scoreRouteDesign(pPlan2);
 		// would be positive
 		expected = -1;
@@ -194,7 +194,7 @@ public class RouteDesignScoringManagerTest {
 		pPlan3.setLine(line3);
 		
 		manager1 = new RouteDesignScoringManager();
-		manager1.init(pConfig);
+		manager1.init(pConfig, scenario.getNetwork());
 		actual = manager1.scoreRouteDesign(pPlan3);
 		// would be positive
 		expected = 0;
@@ -203,8 +203,8 @@ public class RouteDesignScoringManagerTest {
 	
 	private TransitStopFacility getOrCreateStopAtCoord(int x, int y) {
 		Id<TransitStopFacility> stopId = getStopId(x, y);
-		if (schedule.getFacilities().containsKey(stopId)) {
-			return schedule.getFacilities().get(stopId);
+		if (scenario.getTransitSchedule().getFacilities().containsKey(stopId)) {
+			return scenario.getTransitSchedule().getFacilities().get(stopId);
 		} else {
 			return factory.createTransitStopFacility(
 					stopId, CoordUtils.createCoord(x, y), false);

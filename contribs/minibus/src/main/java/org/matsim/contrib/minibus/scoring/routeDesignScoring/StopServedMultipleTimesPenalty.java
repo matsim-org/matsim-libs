@@ -20,50 +20,39 @@
 package org.matsim.contrib.minibus.scoring.routeDesignScoring;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams;
-import org.matsim.contrib.minibus.genericUtils.TerminusStopFinder;
+import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams.LogRouteDesignScore;
 import org.matsim.contrib.minibus.operator.PPlan;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.GeometryUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import com.vividsolutions.jts.geom.Polygon;
-
 /**
- * Calculate penalty score for the area between all TransitStopFacilities (of
- * the TransitRoute of the PPlan) divided by the beeline distance between the
- * two terminus stops of the stopsToBeServed of the PPlan.
- * 
- * TransitRoutes which operate in different roads per direction have a bigger
- * area between all TransitStopFacilities, so this can be useful to encourage
- * TransitRoutes going back and forth on the same road instead of more circular
- * routes.
+ * Calculate penalty score for circuitous TransitRoutes (TransitRoute of the
+ * PPlan) measured as sum of all beeline distances of consecutive
+ * StopsToBeServed TransitStops divided by the beeline distance between the two
+ * terminus stops of the stopsToBeServed of the PPlan.
  * 
  * @author gleich
  *
  */
-class AreaVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
+class StopServedMultipleTimesPenalty implements RouteDesignScoringFunction {
 
-	final static Logger log = Logger.getLogger(AreaVsTerminiBeelinePenalty.class);
+	private static final Logger log = Logger.getLogger(StopServedMultipleTimesPenalty.class);
 	private final RouteDesignScoreParams params;
 
-	public AreaVsTerminiBeelinePenalty(RouteDesignScoreParams params) {
+	public StopServedMultipleTimesPenalty(RouteDesignScoreParams params) {
 		this.params = params;
 	}
 
 	@Override
 	public double getScore(PPlan pPlan, TransitRoute route) {
-		TransitStopFacility startStop = pPlan.getStopsToBeServed().get(0);
-		TransitStopFacility endStop = pPlan.getStopsToBeServed()
-				.get(TerminusStopFinder.findSecondTerminusStop(pPlan.getStopsToBeServed()));
-		double beelineLength = CoordUtils.calcEuclideanDistance(startStop.getCoord(), endStop.getCoord());
-
 		List<TransitStopFacility> stopListToEvaluate = new ArrayList<>();
 		switch (params.getStopListToEvaluate()) {
 		case transitRouteAllStops:
@@ -79,33 +68,28 @@ class AreaVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 			new RuntimeException();
 		}
 
-		List<Coord> coords = new ArrayList<>();
-		for (TransitStopFacility stop : stopListToEvaluate) {
-			coords.add(stop.getCoord());
-		}
+		Set<Id<TransitStopFacility>> stopIdServed = new HashSet<>();
 
-		double area = 0;
-
-		if (coords.size() < 3) {
-			// not enough coords to calculate an area, no scoring possible
-			return 0;
-		} else {
-			try {
-				Polygon polygon = GeometryUtils.createGeotoolsPolygon(coords);
-				area = polygon.getArea();
-			} catch (IllegalArgumentException e) {
-				log.warn(e.getMessage());
+		for (int i = 0; i < stopListToEvaluate.size(); i++) {
+			Id<TransitStopFacility> currentStop = stopListToEvaluate.get(i).getId();
+			if (! stopIdServed.contains(currentStop)) {
+				stopIdServed.add(currentStop);
 			}
 		}
 
-		double score = area / beelineLength - params.getValueToStartScoring();
+		double score = stopListToEvaluate.size() / stopIdServed.size() - params.getValueToStartScoring();
 		if (score > 0) {
-			return params.getCostFactor() * score;
+			score = params.getCostFactor() * score;
 		} else {
 			// return 0 if score better than valueToStartScoring; it is a penalty, not a
 			// subsidy
-			return 0;
+			score = 0;
 		}
+
+		if (params.getLogScore().equals(LogRouteDesignScore.onlyNonZeroScore) && score != 0) {
+			log.info("Transit Route " + route.getId() + " with " + pPlan.getNVehicles() + " vehicles scored " + score);
+		}
+		return score;
 	}
 
 }
