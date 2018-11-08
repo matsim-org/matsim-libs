@@ -37,8 +37,11 @@ import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.ConfigurationException;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -57,8 +60,8 @@ public class QSimProvider implements Provider<QSim> {
 	private IterationCounter iterationCounter;
 
 	@Inject
-	QSimProvider(Injector injector, Config config, Collection<AbstractQSimModule> modules, QSimComponentsConfig components,
-			@Named("overrides") List<AbstractQSimModule> overridingModules) {
+	QSimProvider(Injector injector, Config config, Collection<AbstractQSimModule> modules,
+			QSimComponentsConfig components, @Named("overrides") List<AbstractQSimModule> overridingModules) {
 		this.injector = injector;
 		this.modules = modules;
 		// (these are the implementations)
@@ -69,6 +72,8 @@ public class QSimProvider implements Provider<QSim> {
 
 	@Override
 	public QSim get() {
+		performHistoricalCheck(injector);
+
 		modules.forEach(m -> m.setConfig(config));
 		overridingModules.forEach(m -> m.setConfig(config));
 
@@ -94,7 +99,9 @@ public class QSimProvider implements Provider<QSim> {
 		ComponentRegistry componentRegistry = ComponentRegistry.create(qsimInjector);
 
 		for (Key<? extends QSimComponent> component : componentRegistry.getOrderedComponents(components)) {
-			//if (component.getTypeLiteral().getRawType().isAssignableFrom(MobsimEngine.class)) {
+			// if
+			// (component.getTypeLiteral().getRawType().isAssignableFrom(MobsimEngine.class))
+			// {
 			if (MobsimEngine.class.isAssignableFrom(component.getTypeLiteral().getRawType())) {
 				MobsimEngine instance = (MobsimEngine) qsimInjector.getInstance(component);
 				qSim.addMobsimEngine(instance);
@@ -129,4 +136,34 @@ public class QSimProvider implements Provider<QSim> {
 		return qSim;
 	}
 
+	/**
+	 * Historically, some bindings that are used in the QSim were defined in the
+	 * outer controller scope. This method checks that those bindings are now
+	 * registered in the QSim scope.
+	 */
+	private void performHistoricalCheck(Injector injector) {
+		boolean foundNetworkFactoryBinding = true;
+
+		try {
+			injector.getBinding(QNetworkFactory.class);
+		} catch (ConfigurationException e) {
+			foundNetworkFactoryBinding = false;
+		}
+
+		if (foundNetworkFactoryBinding) {
+			throw new IllegalStateException("QNetworkFactory should only be bound via AbstractQSimModule");
+		}
+
+		boolean foundTransitStopHandlerFactoryBinding = true;
+
+		try {
+			injector.getBinding(TransitStopHandlerFactory.class);
+		} catch (ConfigurationException e) {
+			foundTransitStopHandlerFactoryBinding = false;
+		}
+
+		if (foundTransitStopHandlerFactoryBinding) {
+			throw new IllegalStateException("TransitStopHandlerFactory should be bound via AbstractQSimModule");
+		}
+	}
 }
