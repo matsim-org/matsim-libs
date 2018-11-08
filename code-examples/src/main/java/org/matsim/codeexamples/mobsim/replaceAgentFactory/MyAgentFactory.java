@@ -15,7 +15,7 @@ import java.util.Map;
 class MyAgentFactory implements AgentFactory {
 	
 	@Inject private QSim qsim;
-	@Inject private TripRouter tripRouter; // injecting TripRouter at level of qsim fails
+	@Inject private TripRouter tripRouter; // injecting TripRouter at level of qsim fails ... no longer
 	@Inject private Scenario scenario ;
 	@Inject private Map<String,TravelTime> travelTimes ;
 	

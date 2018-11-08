@@ -65,6 +65,7 @@ public class RunAgentSourceExample {
 					@Inject EventsManager events ;
 					@Override public Mobsim get() {
 						final QSim qsim = new QSimBuilder(getConfig()).useDefaults().build(scenario, events);
+						// yyyyyy don't use qsim builder here, there should be a simpler way.  discuss with sebhoerl.  kai, nov'18
 						qsim.addAgentSource(new AgentSource() {
 							@Override
 							public void insertAgentsIntoMobsim() {

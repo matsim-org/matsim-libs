@@ -42,31 +42,6 @@ class RunReplaceAgentFactoryExample {
 			}
 		});
 		
-		/*controler.addOverridingModule( new AbstractModule() {
-			@Override public void install() {
-				this.bindMobsim().toProvider( new Provider<Mobsim>() {
-					@Inject Scenario scenario;
-					@Inject EventsManager events;
-					
-					@Override public Mobsim get() {
-						final QSimBuilder builder = new QSimBuilder( scenario.getConfig() ).useDefaults();
-						
-						// my idea was that "AgentFactory" should be at the level of the QSim injection, and with the following I override it.
-						// however, the simulation just does not generate any agents now.  :-(  kai, nov'18
-						builder.addOverridingQSimModule( new AbstractQSimModule() {
-							@Override protected void configureQSim() {
-								this.bind( AgentFactory.class ).to( MyAgentFactory.class );
-							}
-						} );
-						
-						QSim qsim = builder.build( scenario, events );
-						//						OTFClientLive.run(config, OTFVis.startServerAndRegisterWithQSim( config, scenario, events, qsim));
-						return qsim;
-					}
-				} );
-			}
-		} );*/
-		
 		return controler;
 	}
 	
