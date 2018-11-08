@@ -58,14 +58,19 @@ class Stop2StopVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 
 		List<TransitStopFacility> stopListToEvaluate = new ArrayList<>();
 		switch (params.getStopListToEvaluate()) {
-		case transitRouteAllStops: for (TransitRouteStop stop: route.getStops()) {stopListToEvaluate.add(stop.getStopFacility());}
-		break;
-		case pPlanStopsToBeServed: stopListToEvaluate = pPlan.getStopsToBeServed();
-		break;
-		default: log.error("Unknown stopListToEvaluate parameter :" + params.getStopListToEvaluate());
-		new RuntimeException();
+		case transitRouteAllStops:
+			for (TransitRouteStop stop : route.getStops()) {
+				stopListToEvaluate.add(stop.getStopFacility());
+			}
+			break;
+		case pPlanStopsToBeServed:
+			stopListToEvaluate = pPlan.getStopsToBeServed();
+			break;
+		default:
+			log.error("Unknown stopListToEvaluate parameter :" + params.getStopListToEvaluate());
+			new RuntimeException();
 		}
-		
+
 		double lengthStop2Stop = 0.0;
 		TransitStopFacility previousStop = stopListToEvaluate.get(0);
 
@@ -76,15 +81,15 @@ class Stop2StopVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 			previousStop = currentStop;
 		}
 		// add leg from last to first stop
-		lengthStop2Stop = lengthStop2Stop + CoordUtils.calcEuclideanDistance(previousStop.getCoord(),
-				stopListToEvaluate.get(0).getCoord());
-
+		lengthStop2Stop = lengthStop2Stop
+				+ CoordUtils.calcEuclideanDistance(previousStop.getCoord(), stopListToEvaluate.get(0).getCoord());
 
 		double score = lengthStop2Stop / beelineLength - params.getValueToStartScoring();
 		if (score > 0) {
 			return params.getCostFactor() * score;
 		} else {
-			// return 0 if score better than valueToStartScoring; it is a penalty, not a subsidy
+			// return 0 if score better than valueToStartScoring; it is a penalty, not a
+			// subsidy
 			return 0;
 		}
 	}

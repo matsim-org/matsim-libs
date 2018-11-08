@@ -66,14 +66,19 @@ class AreaVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 
 		List<TransitStopFacility> stopListToEvaluate = new ArrayList<>();
 		switch (params.getStopListToEvaluate()) {
-		case transitRouteAllStops: for (TransitRouteStop stop: route.getStops()) {stopListToEvaluate.add(stop.getStopFacility());}
-		break;
-		case pPlanStopsToBeServed: stopListToEvaluate = pPlan.getStopsToBeServed();
-		break;
-		default: log.error("Unknown stopListToEvaluate parameter :" + params.getStopListToEvaluate());
-		new RuntimeException();
+		case transitRouteAllStops:
+			for (TransitRouteStop stop : route.getStops()) {
+				stopListToEvaluate.add(stop.getStopFacility());
+			}
+			break;
+		case pPlanStopsToBeServed:
+			stopListToEvaluate = pPlan.getStopsToBeServed();
+			break;
+		default:
+			log.error("Unknown stopListToEvaluate parameter :" + params.getStopListToEvaluate());
+			new RuntimeException();
 		}
-		
+
 		List<Coord> coords = new ArrayList<>();
 		for (TransitStopFacility stop : stopListToEvaluate) {
 			coords.add(stop.getCoord());
@@ -97,7 +102,8 @@ class AreaVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 		if (score > 0) {
 			return params.getCostFactor() * score;
 		} else {
-			// return 0 if score better than valueToStartScoring; it is a penalty, not a subsidy
+			// return 0 if score better than valueToStartScoring; it is a penalty, not a
+			// subsidy
 			return 0;
 		}
 	}
