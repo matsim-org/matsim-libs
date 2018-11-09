@@ -42,18 +42,23 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 
 	private final Map<Network, PreProcessLandmarks> preProcessData = new HashMap<>();
 
-	@Inject private GlobalConfigGroup globalConfig ;
+	private final int nThreads;
 	
 	@Inject
-	public AStarLandmarksFactory() {
+	public AStarLandmarksFactory(final GlobalConfigGroup globalConfigGroup) {
+		this(globalConfigGroup.getNumberOfThreads());
 	}
-	
+
+	public AStarLandmarksFactory(int numberOfThreads) {
+		this.nThreads = numberOfThreads;
+	}
+
 	@Override
 	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		PreProcessLandmarks preProcessLandmarks = this.preProcessData.get(network);
 		if (preProcessLandmarks == null) {
 			preProcessLandmarks = new PreProcessLandmarks(travelCosts);
-			preProcessLandmarks.setNumberOfThreads( globalConfig.getNumberOfThreads());
+			preProcessLandmarks.setNumberOfThreads(nThreads);
 			preProcessLandmarks.run(network);
 			this.preProcessData.put(network, preProcessLandmarks);
 		}
