@@ -25,6 +25,7 @@ package org.matsim.contrib.signals.builder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.controller.SignalControllerFactory;
@@ -56,62 +57,18 @@ import com.google.inject.multibindings.MapBinder;
  * @author tthunig
  */
 public class SignalsModule extends AbstractModule {
-	
-	private MapBinder<String, SignalControllerFactory> signalControllerFactoryMultibinder;
-	private Map<String, Class<? extends SignalControllerFactory>> signalControllerFactoryClassNames = new HashMap<>();
-//	
 	public SignalsModule() {
-		// specify default signal controller. you can add your own by calling addSignalControllerFactory (see method java-doc below)
-		signalControllerFactoryClassNames.put(DefaultPlanbasedSignalSystemController.IDENTIFIER, DefaultPlanbasedSignalSystemController.FixedTimeFactory.class);
-		signalControllerFactoryClassNames.put(SylviaSignalController.IDENTIFIER, SylviaSignalController.SylviaFactory.class);
-		signalControllerFactoryClassNames.put(LaemmerSignalController.IDENTIFIER, LaemmerSignalController.LaemmerFactory.class);
+		throw new RuntimeException("Some bindings have moved to a separate SignalsQSimModule.  " +
+                "In order to notify the user of this change, the material from SignalsModule has been " +
+                "moved to SignalsModuleV2.  You now need\n" +
+                "   controler.addOverridingModule( new SignalsModuleV2() ) ;\n" +
+                "   controler.addOverridingModule( new SignalsQSimModule() )\n" +
+                "in your code.") ;
 	}
-	
-	@Override
-	public void install() {
-		this.signalControllerFactoryMultibinder = MapBinder.newMapBinder(binder(), new TypeLiteral<String>() {}, new TypeLiteral<SignalControllerFactory>() {});
-		
-		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
-			// bindings for sensor-based signals (also works for fixed-time signals)
-			bind(SignalModelFactory.class).to(SignalModelFactoryImpl.class);
-			addControlerListenerBinding().to(SensorBasedSignalControlerListener.class);
-			bind(LinkSensorManager.class).asEagerSingleton();
-			bind(DownstreamSensor.class).asEagerSingleton();
-//			// bind factory for all specified signal controller
-			for (String identifier : signalControllerFactoryClassNames.keySet()) {
-				/* note: This cannot be called before (e.g. in the constructor or from outside),
-				 * as the binder in AbstractModule that is needed here is only created in method
-				 * configure()... theresa, aug'18 */
-				signalControllerFactoryMultibinder.addBinding(identifier).to(signalControllerFactoryClassNames.get(identifier));
-			}
-			
-			// general signal bindings
-			bind(SignalSystemsManager.class).toProvider(FromDataBuilder.class);
-			addMobsimListenerBinding().to(QSimSignalEngine.class);
-			bind(QNetworkFactory.class).to(QSignalsNetworkFactory.class);
 
-			// bind tool to write information about signal states for via
-			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
-			addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
-			addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
+    @Override
+    public void install(){
+        throw new RuntimeException( "not implemented" );
+    }
 
-			if (getConfig().qsim().isUsingFastCapacityUpdate()) {
-				throw new RuntimeException("Fast flow capacity update does not support signals");
-			}
-		}
-		if (getConfig().controler().isLinkToLinkRoutingEnabled()){
-			//use the extended NetworkWithSignalsTurnInfoBuilder (instead of NetworkTurnInfoBuilder)
-			//michalm, jan'17
-			bind(NetworkTurnInfoBuilderI.class).to(NetworkWithSignalsTurnInfoBuilder.class);
-		}
-	}
-	
-	/**
-	 * Call this method when you want to add your own SignalController. E.g. via signalsModule.addSignalControllerFactory().to(LaemmerSignalController.LaemmerFactory.class)
-	 * 
-	 * @param signalControllerFactoryClassName
-	 */
-	public final void addSignalControllerFactory(String key, Class<? extends SignalControllerFactory> signalControllerFactoryClassName) {
-		this.signalControllerFactoryClassNames.put(key, signalControllerFactoryClassName);
-	}
 }

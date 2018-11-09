@@ -22,6 +22,8 @@ package org.matsim.codeexamples.fixedTimeSignals;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.builder.SignalsModule;
+import org.matsim.contrib.signals.builder.SignalsModuleV2;
+import org.matsim.contrib.signals.builder.SignalsQSimModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.otfvis.OTFVisWithSignalsLiveModule;
@@ -74,7 +76,8 @@ public class RunSignalSystemsExample {
 		// --- create the controler
 		Controler c = new Controler(scenario);
 		// add the signals module to the simulation such that SignalsData is not only contained in the scenario but also used in the simulation
-		c.addOverridingModule(new SignalsModule());
+		c.addOverridingModule(new SignalsModuleV2() );
+		c.addOverridingQSimModule( new SignalsQSimModule() );
 
 		// add live visualization module
 		if (visualize) {

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.contrib.signals.builder.SignalsModule;
+import org.matsim.contrib.signals.builder.SignalsQSimModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
@@ -213,6 +214,7 @@ public class QSimSignalTest implements
 		new QSimBuilder(scenario.getConfig())
 				.useDefaults()
 				.addOverridingControllerModule(new SignalsModule())
+				.addOverridingQSimModule( new SignalsQSimModule() )
 				.build(scenario, events)
 				.run();
 	}
