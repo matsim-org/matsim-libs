@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams;
+import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams.LogRouteDesignScore;
 import org.matsim.contrib.minibus.genericUtils.TerminusStopFinder;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -48,12 +49,12 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author gleich
  *
  */
-class AreaVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
+class AreaBtwStopsVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 
-	final static Logger log = Logger.getLogger(AreaVsTerminiBeelinePenalty.class);
+	final static Logger log = Logger.getLogger(AreaBtwStopsVsTerminiBeelinePenalty.class);
 	private final RouteDesignScoreParams params;
 
-	public AreaVsTerminiBeelinePenalty(RouteDesignScoreParams params) {
+	public AreaBtwStopsVsTerminiBeelinePenalty(RouteDesignScoreParams params) {
 		this.params = params;
 	}
 
@@ -66,14 +67,19 @@ class AreaVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 
 		List<TransitStopFacility> stopListToEvaluate = new ArrayList<>();
 		switch (params.getStopListToEvaluate()) {
-		case transitRouteAllStops: for (TransitRouteStop stop: route.getStops()) {stopListToEvaluate.add(stop.getStopFacility());}
-		break;
-		case pPlanStopsToBeServed: stopListToEvaluate = pPlan.getStopsToBeServed();
-		break;
-		default: log.error("Unknown stopListToEvaluate parameter :" + params.getStopListToEvaluate());
-		new RuntimeException();
+		case transitRouteAllStops:
+			for (TransitRouteStop stop : route.getStops()) {
+				stopListToEvaluate.add(stop.getStopFacility());
+			}
+			break;
+		case pPlanStopsToBeServed:
+			stopListToEvaluate = pPlan.getStopsToBeServed();
+			break;
+		default:
+			log.error("Unknown stopListToEvaluate parameter :" + params.getStopListToEvaluate());
+			new RuntimeException();
 		}
-		
+
 		List<Coord> coords = new ArrayList<>();
 		for (TransitStopFacility stop : stopListToEvaluate) {
 			coords.add(stop.getCoord());
@@ -81,14 +87,32 @@ class AreaVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 
 		double area = 0;
 
-		try {
-			Polygon polygon = GeometryUtils.createGeotoolsPolygon(coords);
-			area = polygon.getArea();
-		} catch (IllegalArgumentException e) {
-			log.warn(e.getMessage());
+		if (coords.size() < 3) {
+			// not enough coords to calculate an area, no scoring possible
+			return 0;
+		} else {
+			try {
+				Polygon polygon = GeometryUtils.createGeotoolsPolygon(coords);
+				area = polygon.getArea();
+			} catch (IllegalArgumentException e) {
+				log.warn(e.getMessage());
+			}
 		}
 
-		return params.getCostFactor() * ((area / beelineLength) - params.getValueToStartScoring());
+		double score = area / beelineLength - params.getValueToStartScoring();
+		if (score > 0) {
+			score = params.getCostFactor() * score;
+		} else {
+			// return 0 if score better than valueToStartScoring; it is a penalty, not a
+			// subsidy
+			score = 0;
+		}
+
+		if (params.getLogScore().equals(LogRouteDesignScore.onlyNonZeroScore) && score != 0) {
+			log.info("Transit Route " + route.getId() + " scored " + score + " (area " + area + "; beeline "
+					+ beelineLength);
+		}
+		return score;
 	}
 
 }
