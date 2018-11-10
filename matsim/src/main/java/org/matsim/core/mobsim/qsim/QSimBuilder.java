@@ -11,9 +11,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
-import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
+import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 import com.google.inject.Injector;
@@ -29,7 +29,7 @@ import com.google.inject.name.Names;
  * The default settings can be added via a couple of methods:
  * 
  * <ul>
- * <li>{@link #useDefaultModules()} loads the default QSim modules for
+ * <li>{@link #useDefaultQSimModules()} loads the default QSim modules for
  * MATSim</li>
  * <li>{@link #useDefaultComponents()} registers the default components for
  * MATSim</li>
@@ -47,14 +47,25 @@ import com.google.inject.name.Names;
  * 		}) //
  * 		.build(scenario, eventsManager);
  * </pre>
- * 
+ *
+ * Note that this is meant for situations where there is no embedding {@link org.matsim.core.controler.Controler}.  When that is
+ * there, something like
+ * <pre>
+ *    controler.addOverridingQSimModule(new AbstractQSimModule() {
+ *       @Override protected void configureQSim() {
+ *          bind(Xxx.class).to(Yyy.class);
+ *       }
+ *    });
+ * </pre>
+ * should be sufficient.
+ *
  * @author Sebastian Hörl <sebastian.hoerl@ivt.baug.ethz.ch>
  */
 public class QSimBuilder {
 	private final Config config;
 
 	private final Collection<AbstractQSimModule> qsimModules = new LinkedList<>();
-	private final QSimComponents components = new QSimComponents();
+	private final QSimComponentsConfig components = new QSimComponentsConfig();
 
 	private final List<AbstractModule> overridingControllerModules = new LinkedList<>();
 	private final List<AbstractQSimModule> overridingQSimModules = new LinkedList<>();
@@ -66,7 +77,7 @@ public class QSimBuilder {
 	/**
 	 * Adds the default plugins and components to the QSim.
 	 * 
-	 * @see {@link #useDefaultComponents()} and {@link #useDefaultPlugins()}
+	 * @see {@link #useDefaultComponents()} and {@link #useDefaultQSimModules()} ()}
 	 */
 	public QSimBuilder useDefaults() {
 		useDefaultComponents();
@@ -103,13 +114,8 @@ public class QSimBuilder {
 	 * Resets the active QSim components to the standard ones defined by MATSim.
 	 */
 	public QSimBuilder useDefaultComponents() {
-		components.activeActivityHandlers.clear();
-		components.activeAgentSources.clear();
-		components.activeDepartureHandlers.clear();
-		components.activeMobsimEngines.clear();
-
-		new StandardQSimComponentsConfigurator(config).configure(components);
-
+		components.clear();
+		new StandardQSimComponentConfigurator(config).configure(components);
 		return this;
 	}
 
@@ -164,7 +170,7 @@ public class QSimBuilder {
 		controllerModule = AbstractModule.override(Collections.singleton(controllerModule), new AbstractModule() {
 			@Override
 			public void install() {
-				bind(QSimComponents.class).toInstance(components);
+				bind(QSimComponentsConfig.class).toInstance(components);
 				qsimModules.forEach(this::installQSimModule);
 				bind(Key.get(new TypeLiteral<List<AbstractQSimModule>>() {
 				}, Names.named("overrides"))).toInstance(overridingQSimModules);

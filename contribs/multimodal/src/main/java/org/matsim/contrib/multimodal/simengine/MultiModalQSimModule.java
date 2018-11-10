@@ -4,15 +4,14 @@ import java.util.Map;
 
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
 public class MultiModalQSimModule extends AbstractQSimModule {
-	static public String MULTIMODAL_ENGINE = "MultimodalEngine";
-	static public String MULTIMODAL_DEPARTURE_HANDLER = "MultimodalDepartureHandler";
+	static final public String COMPONENT_NAME = "Multimodal";
 
 	private final Map<String, TravelTime> multiModalTravelTimes;
 
@@ -22,8 +21,8 @@ public class MultiModalQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bindMobsimEngine(MULTIMODAL_ENGINE).to(MultiModalSimEngine.class);
-		bindDepartureHandler(MULTIMODAL_DEPARTURE_HANDLER).to(MultiModalDepartureHandler.class);
+		addNamedComponent(MultiModalSimEngine.class, COMPONENT_NAME);
+		addNamedComponent(MultiModalDepartureHandler.class, COMPONENT_NAME);
 	}
 
 	@Provides
@@ -39,8 +38,7 @@ public class MultiModalQSimModule extends AbstractQSimModule {
 		return new MultiModalDepartureHandler(multiModalEngine, multiModalConfigGroup);
 	}
 	
-	static public void configureComponents(QSimComponents components) {
-		components.activeMobsimEngines.add(MULTIMODAL_ENGINE);
-		components.activeDepartureHandlers.add(MULTIMODAL_DEPARTURE_HANDLER);
+	static public void configureComponents(QSimComponentsConfig components) {
+		components.addNamedComponent(COMPONENT_NAME);
 	}
 }

@@ -56,8 +56,7 @@ public class TaxiQSimModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
-				DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
+		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Taxi.class);
 
 		bind(TaxiOptimizer.class).toProvider(providerClass).asEagerSingleton();
 		bind(TaxiScheduler.class).asEagerSingleton();

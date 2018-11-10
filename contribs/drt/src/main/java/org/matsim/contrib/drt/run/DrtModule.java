@@ -1,10 +1,8 @@
 package org.matsim.contrib.drt.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.data.validator.DefaultDrtRequestValidator;
 import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
-import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
@@ -50,8 +48,7 @@ public final class DrtModule extends AbstractModule {
 
 		bind(DrtRequestValidator.class).to(DefaultDrtRequestValidator.class);
 		bind(DepotFinder.class).to(NearestStartLinkAsDepot.class);
-		bind(TravelDisutilityFactory.class).annotatedWith(Names.named(DefaultDrtOptimizer.DRT_OPTIMIZER))
-				.toInstance(TimeAsTravelDisutility::new);
+		bind(TravelDisutilityFactory.class).annotatedWith(Drt.class).toInstance(TimeAsTravelDisutility::new);
 
 		if (MinCostFlowRebalancingParams.isRebalancingEnabled(drtCfg.getMinCostFlowRebalancing())) {
 			install(new MinCostFlowRebalancingModule());
@@ -65,18 +62,18 @@ public final class DrtModule extends AbstractModule {
 
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:
-				addRoutingModuleBinding(TransportMode.drt).to(DrtRoutingModule.class);
+				addRoutingModuleBinding(drtCfg.getMode()).to(DrtRoutingModule.class);
+				bind(MainModeIdentifier.class).to(DrtMainModeIdentifier.class).asEagerSingleton();
 				break;
 
 			case stopbased:
-				final Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-				new TransitScheduleReader(scenario2).readURL(
-						drtCfg.getTransitStopsFileUrl(getConfig().getContext()));
-				bind(TransitSchedule.class).annotatedWith(Names.named(TransportMode.drt))
-						.toInstance(scenario2.getTransitSchedule());
+				Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+				new TransitScheduleReader(scenario2).readURL(drtCfg.getTransitStopsFileUrl(getConfig().getContext()));
+				bind(TransitSchedule.class).annotatedWith(Drt.class).toInstance(scenario2.getTransitSchedule());
+
 				bind(MainModeIdentifier.class).to(DrtMainModeIdentifier.class).asEagerSingleton();
 				bind(DrtRoutingModule.class);
-				addRoutingModuleBinding(TransportMode.drt).to(StopBasedDrtRoutingModule.class);
+				addRoutingModuleBinding(drtCfg.getMode()).to(StopBasedDrtRoutingModule.class);
 				bind(AccessEgressStopFinder.class).to(DefaultAccessEgressStopFinder.class).asEagerSingleton();
 				break;
 

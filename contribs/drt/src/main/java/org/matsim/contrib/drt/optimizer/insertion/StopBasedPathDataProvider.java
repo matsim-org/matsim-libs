@@ -25,13 +25,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
-import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
+import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.ManyToManyPathData;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -61,13 +60,13 @@ public class StopBasedPathDataProvider implements PrecalculablePathDataProvider 
 
 	@Inject
 	public StopBasedPathDataProvider(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility,
-			@Named(TransportMode.drt) TransitSchedule schedule, TravelTimeCalculatorConfigGroup ttcConfig,
-			DrtConfigGroup drtCfg) {
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, @Drt TravelDisutility travelDisutility,
+			@Drt TransitSchedule schedule, TravelTimeCalculatorConfigGroup ttcConfig, DrtConfigGroup drtCfg) {
 		stopDuration = drtCfg.getStopDuration();
 
-		List<Link> stopLinks = schedule.getFacilities().values().stream()
+		List<Link> stopLinks = schedule.getFacilities()
+				.values()
+				.stream()
 				.map(tsf -> network.getLinks().get(tsf.getLinkId()))//
 				.distinct()// more than one stop can be located on a link
 				.collect(ImmutableList.toImmutableList());

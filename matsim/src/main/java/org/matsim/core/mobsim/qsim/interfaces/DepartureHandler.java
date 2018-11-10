@@ -23,8 +23,9 @@ package org.matsim.core.mobsim.qsim.interfaces;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
-public interface DepartureHandler {
+public interface DepartureHandler extends QSimComponent {
 	
 	/**
 	 * @return <code>true</code> if the departure is handled, <code>false</code> if other DepartureHandlers should be tried as well.

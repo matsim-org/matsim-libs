@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.types.*;
 import org.matsim.contrib.emissions.utils.EmissionSpecificationMarker;
+import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
@@ -132,20 +133,19 @@ public class ColdEmissionAnalysisModule {
 
 		String vehicleDescription = vehicle.getType().getDescription();
 
-		Map<ColdPollutant, Double> coldEmissions = new HashMap<>();
 		if(vehicle.getType().getDescription() == null){
 			throw new RuntimeException("Vehicle type description for vehicle " + vehicle + "is missing. " +
 					"Please make sure that requirements for emission vehicles in "
 					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleDescription2VehicleInformationTuple(vehicleDescription);
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(vehicleDescription);
 		if (vehicleInformationTuple.getFirst() == null){
 			throw new RuntimeException("Vehicle category for vehicle " + vehicle + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
-
-		coldEmissions = getColdPollutantDoubleMap(vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km);
+		
+		Map<ColdPollutant, Double> coldEmissions = getColdPollutantDoubleMap( vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km );
 
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){
@@ -253,32 +253,6 @@ public class ColdEmissionAnalysisModule {
 	    // from what the tests imply. kai, jul'18)
     }
 	
-	private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple(String vehicleDescription) {
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
-		HbefaVehicleCategory hbefaVehicleCategory = null;
-
-		int startIndex = vehicleDescription.indexOf(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
-		int endIndex = vehicleDescription.lastIndexOf(EmissionSpecificationMarker.END_EMISSIONS.toString());
-
-		String[] vehicleInformationArray = vehicleDescription.substring(startIndex, endIndex).split(";");
-
-		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
-			if(vehCat.toString().equals(vehicleInformationArray[0])){
-				hbefaVehicleCategory = vehCat;
-			}
-		}
-		
-		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-		if(vehicleInformationArray.length == 4){
-			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationArray[1]);
-			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationArray[2]);
-			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationArray[3]);
-		} // else interpretation as "average vehicle"
-
-		vehicleInformationTuple = new Tuple<>(hbefaVehicleCategory, hbefaVehicleAttributes);
-		return vehicleInformationTuple;
-	}
-	
 	static HbefaVehicleAttributes createHbefaVehicleAttributes( final String hbefaTechnology, final String hbefaSizeClass, final String hbefaEmConcept ) {
 		HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
 		vehAtt.setHbefaTechnology( hbefaTechnology );
@@ -286,12 +260,5 @@ public class ColdEmissionAnalysisModule {
 		vehAtt.setHbefaEmConcept( hbefaEmConcept );
 		return vehAtt;
 	}
-	
-//	private static HbefaVehicleAttributes createHbefaVehicleAttributes( final HbefaVehicleAttributes hbefaVehicleAttributes ) {
-//		// yyyy is this copy really necessary?  kai, jul'18
-//		return createHbefaVehicleAttributes( hbefaVehicleAttributes.getHbefaTechnology(), hbefaVehicleAttributes.getHbefaSizeClass(), hbefaVehicleAttributes.getHbefaEmConcept() ) ;
-//	}
-	
-	
 	
 }

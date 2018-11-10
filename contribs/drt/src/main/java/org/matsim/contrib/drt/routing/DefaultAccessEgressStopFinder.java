@@ -18,7 +18,13 @@
 
 package org.matsim.contrib.drt.routing;
 
-import com.google.inject.name.Named;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
@@ -27,6 +33,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
+import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -34,124 +41,120 @@ import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import javax.inject.Inject;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 /**
  * @author michalm
  */
 public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 
-    private final Network network;
-    private final Map<Id<TransitStopFacility>, TransitStopFacility> stops;
-    private final double maxWalkDistance;
-    private final double walkBeelineFactor;
+	private final Network network;
+	private final Map<Id<TransitStopFacility>, TransitStopFacility> stops;
+	private final double maxWalkDistance;
+	private final double walkBeelineFactor;
 
-    @Inject
-    public DefaultAccessEgressStopFinder(@Named(TransportMode.drt) TransitSchedule transitSchedule,
-                                         DrtConfigGroup drtconfig, PlansCalcRouteConfigGroup planscCalcRouteCfg, Network network) {
-        this.network = network;
-        this.stops = transitSchedule.getFacilities();
-        this.maxWalkDistance = drtconfig.getMaxWalkDistance();
-        this.walkBeelineFactor = planscCalcRouteCfg.getModeRoutingParams().get(TransportMode.walk)
-                .getBeelineDistanceFactor();
-        ;
-    }
+	@Inject
+	public DefaultAccessEgressStopFinder(@Drt TransitSchedule transitSchedule, DrtConfigGroup drtconfig,
+			PlansCalcRouteConfigGroup planscCalcRouteCfg, Network network) {
+		this.network = network;
+		this.stops = transitSchedule.getFacilities();
+		this.maxWalkDistance = drtconfig.getMaxWalkDistance();
+		this.walkBeelineFactor = planscCalcRouteCfg.getModeRoutingParams()
+				.get(TransportMode.walk)
+				.getBeelineDistanceFactor();
+		;
+	}
 
-    @Override
-    public Pair<TransitStopFacility, TransitStopFacility> findStops(Facility fromFacility, Facility toFacility) {
-        TransitStopFacility accessFacility = findAccessFacility(fromFacility, toFacility);
-        if (accessFacility == null) {
-            return new ImmutablePair<>(null, null);
-        }
+	@Override
+	public Pair<TransitStopFacility, TransitStopFacility> findStops(Facility fromFacility, Facility toFacility) {
+		TransitStopFacility accessFacility = findAccessFacility(fromFacility, toFacility);
+		if (accessFacility == null) {
+			return new ImmutablePair<>(null, null);
+		}
 
-        TransitStopFacility egressFacility = findEgressFacility(accessFacility, toFacility);
-        return new ImmutablePair<TransitStopFacility, TransitStopFacility>(accessFacility, egressFacility);
-    }
+		TransitStopFacility egressFacility = findEgressFacility(accessFacility, toFacility);
+		return new ImmutablePair<TransitStopFacility, TransitStopFacility>(accessFacility, egressFacility);
+	}
 
-    /**
-     * @param fromFacility
-     * @param toFacility
-     * @return
-     */
-    private TransitStopFacility findAccessFacility(Facility fromFacility, Facility toFacility) {
-        Coord fromCoord = StopBasedDrtRoutingModule.getFacilityCoord(fromFacility, network);
-        Coord toCoord = StopBasedDrtRoutingModule.getFacilityCoord(toFacility, network);
-        Set<TransitStopFacility> stopCandidates = findStopCandidates(fromCoord);
-        TransitStopFacility accessFacility = null;
-        double bestHeading = Double.MAX_VALUE;
-        for (TransitStopFacility stop : stopCandidates) {
-            Link stopLink = network.getLinks().get(stop.getLinkId());
-            if (stopLink == null) {
-                throw new RuntimeException(
-                        "Stop " + stop.getId() + " on link id " + stop.getLinkId() + " is not part of the network.");
-            }
+	/**
+	 * @param fromFacility
+	 * @param toFacility
+	 * @return
+	 */
+	private TransitStopFacility findAccessFacility(Facility fromFacility, Facility toFacility) {
+		Coord fromCoord = StopBasedDrtRoutingModule.getFacilityCoord(fromFacility, network);
+		Coord toCoord = StopBasedDrtRoutingModule.getFacilityCoord(toFacility, network);
+		Set<TransitStopFacility> stopCandidates = findStopCandidates(fromCoord);
+		TransitStopFacility accessFacility = null;
+		double bestHeading = Double.MAX_VALUE;
+		for (TransitStopFacility stop : stopCandidates) {
+			Link stopLink = network.getLinks().get(stop.getLinkId());
+			if (stopLink == null) {
+				throw new RuntimeException(
+						"Stop " + stop.getId() + " on link id " + stop.getLinkId() + " is not part of the network.");
+			}
 
-            double[] stopLinkVector = getVector(stopLink.getFromNode().getCoord(), stopLink.getToNode().getCoord());
-            double[] destinationVector = getVector(stopLink.getFromNode().getCoord(), toCoord);
-            double heading = calcHeading(stopLinkVector, destinationVector);
-            if (heading < bestHeading) {
-                accessFacility = stop;
-                bestHeading = heading;
-            }
-        }
-        return accessFacility;
-    }
+			double[] stopLinkVector = getVector(stopLink.getFromNode().getCoord(), stopLink.getToNode().getCoord());
+			double[] destinationVector = getVector(stopLink.getFromNode().getCoord(), toCoord);
+			double heading = calcHeading(stopLinkVector, destinationVector);
+			if (heading < bestHeading) {
+				accessFacility = stop;
+				bestHeading = heading;
+			}
+		}
+		return accessFacility;
+	}
 
-    private TransitStopFacility findEgressFacility(TransitStopFacility fromStopFacility, Facility toFacility) {
-        Coord fromCoord = fromStopFacility.getCoord();
-        Coord toCoord = StopBasedDrtRoutingModule.getFacilityCoord(toFacility, network);
-        Set<TransitStopFacility> stopCandidates = findStopCandidates(toCoord);
+	private TransitStopFacility findEgressFacility(TransitStopFacility fromStopFacility, Facility toFacility) {
+		Coord fromCoord = fromStopFacility.getCoord();
+		Coord toCoord = StopBasedDrtRoutingModule.getFacilityCoord(toFacility, network);
+		Set<TransitStopFacility> stopCandidates = findStopCandidates(toCoord);
 
-        TransitStopFacility egressFacility = null;
-        double bestHeading = Double.MAX_VALUE;
-        for (TransitStopFacility stop : stopCandidates) {
-            Link stopLink = network.getLinks().get(stop.getLinkId());
+		TransitStopFacility egressFacility = null;
+		double bestHeading = Double.MAX_VALUE;
+		for (TransitStopFacility stop : stopCandidates) {
+			Link stopLink = network.getLinks().get(stop.getLinkId());
 
-            double[] stopLinkVector = getVector(stopLink.getFromNode().getCoord(), stopLink.getToNode().getCoord());
-            double[] originVector = getVector(fromCoord, stopLink.getToNode().getCoord());
-            double heading = calcHeading(stopLinkVector, originVector);
-            if (heading < bestHeading) {
-                egressFacility = stop;
-                bestHeading = heading;
-            }
-        }
-        return egressFacility;
-    }
+			double[] stopLinkVector = getVector(stopLink.getFromNode().getCoord(), stopLink.getToNode().getCoord());
+			double[] originVector = getVector(fromCoord, stopLink.getToNode().getCoord());
+			double heading = calcHeading(stopLinkVector, originVector);
+			if (heading < bestHeading) {
+				egressFacility = stop;
+				bestHeading = heading;
+			}
+		}
+		return egressFacility;
+	}
 
-    /**
-     * @param stopLinkVector
-     * @param destinationVector
-     * @return
-     */
-    private double calcHeading(double[] stopLinkVector, double[] destinationVector) {
-        return Math.acos((stopLinkVector[0] * destinationVector[0] + stopLinkVector[1] * destinationVector[1]) //
-                / (Math.sqrt(stopLinkVector[0] * stopLinkVector[0] + stopLinkVector[1] * stopLinkVector[1])//
-                * Math.sqrt(destinationVector[0] * destinationVector[0]
-                + destinationVector[1] * destinationVector[1])));
-    }
+	/**
+	 * @param stopLinkVector
+	 * @param destinationVector
+	 * @return
+	 */
+	private double calcHeading(double[] stopLinkVector, double[] destinationVector) {
+		return Math.acos((stopLinkVector[0] * destinationVector[0] + stopLinkVector[1] * destinationVector[1]) //
+				/ (Math.sqrt(stopLinkVector[0] * stopLinkVector[0] + stopLinkVector[1] * stopLinkVector[1])//
+				* Math.sqrt(
+				destinationVector[0] * destinationVector[0] + destinationVector[1] * destinationVector[1])));
+	}
 
-    private Set<TransitStopFacility> findStopCandidates(Coord coord) {
-        Set<TransitStopFacility> candidates = new HashSet<>();
-        double extensionRadius = 0.0;
-        while (candidates.isEmpty()) {
-            double maxBeelineDistance = ((maxWalkDistance + extensionRadius) / walkBeelineFactor);
-            double maxSquaredBeelineDistance = maxBeelineDistance * maxBeelineDistance;
-            candidates = stops.values().stream()//
-                    .filter(s -> DistanceUtils.calculateSquaredDistance(coord, s.getCoord()) < maxSquaredBeelineDistance)//
-                    .collect(Collectors.toSet());
-            extensionRadius += maxWalkDistance;
-        }
-        return candidates;
-    }
+	private Set<TransitStopFacility> findStopCandidates(Coord coord) {
+		Set<TransitStopFacility> candidates = new HashSet<>();
+		double extensionRadius = 0.0;
+		while (candidates.isEmpty()) {
+			double maxBeelineDistance = ((maxWalkDistance + extensionRadius) / walkBeelineFactor);
+			double maxSquaredBeelineDistance = maxBeelineDistance * maxBeelineDistance;
+			candidates = stops.values().stream()//
+					.filter(s -> DistanceUtils.calculateSquaredDistance(coord, s.getCoord())
+							< maxSquaredBeelineDistance)//
+					.collect(Collectors.toSet());
+			extensionRadius += maxWalkDistance;
+		}
+		return candidates;
+	}
 
-    private double[] getVector(Coord from, Coord to) {
-        double[] vector = new double[2];
-        vector[0] = to.getX() - from.getX();
-        vector[1] = to.getY() - from.getY();
-        return vector;
-    }
+	private double[] getVector(Coord from, Coord to) {
+		double[] vector = new double[2];
+		vector[0] = to.getX() - from.getX();
+		vector[1] = to.getY() - from.getY();
+		return vector;
+	}
 }

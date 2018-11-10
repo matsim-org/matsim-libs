@@ -102,15 +102,15 @@ public class AccessibilityIntegrationTest {
 	            	
 	            	if (x == 50) {
 	            		if (y == 50) {
-	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", value, 2.1486094237531126, utils.EPSILON);
+	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", 2.1486094237531126, value, utils.EPSILON);
 	            		} else if (y == 150){
-	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", value, 2.1766435716006005, utils.EPSILON);
+	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", 2.1766435716006005, value, utils.EPSILON);
 	            		} 
 	            	} else if (x == 150) {
 	            		if (y == 50) {
-	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", value, 2.1486094237531126, utils.EPSILON);
+	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", 2.1486094237531126, value, utils.EPSILON);
 	            		} else if (y == 150){
-	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", value, 2.2055702759681273, utils.EPSILON);
+	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", 2.2055702759681273, value, utils.EPSILON);
 	            		}
 	            	}
             	}
@@ -557,6 +557,67 @@ public class AccessibilityIntegrationTest {
 		
 		@Override
 		public void finish() {
+//			if (!useOpportunityWeights) {
+//				if (x == 50 && y == 50) {
+//					expected.accessibilityFreespeed = 2.14486658890362;
+//					expected.accessibilityCar = 2.14486658890362;
+//					expected.accessibilityBike = 2.224157412491891;
+//					expected.accessibilityWalk = 1.6634857793433138;
+//					expected.accessibilityPt = 2.1581641260040683;
+//					expected.accessibilityMatrixBasedPt = 1.6542905235735796;
+//				} else if (x == 150 && y == 50) {
+//					expected.accessibilityFreespeed = 2.14486658890362;
+//					expected.accessibilityCar = 2.14486658890362;
+//					expected.accessibilityBike = 2.224157412491891;
+//					expected.accessibilityWalk = 1.6634857793433138;
+//					expected.accessibilityPt = 2.0032465393091434;
+//					expected.accessibilityMatrixBasedPt = 1.6542905235735796;
+//				} else if (x == 50 && y == 150) {
+//					expected.accessibilityFreespeed = 2.207441799716032;
+//					expected.accessibilityCar = 2.207441799716032;
+//					expected.accessibilityBike = 2.2645288908389554;
+//					expected.accessibilityWalk = 1.8697283849051263;
+//					expected.accessibilityPt = 2.1581641260040683;
+//					expected.accessibilityMatrixBasedPt = 1.6542905235735796;
+//				} else if (x == 150 && y == 150) {
+//					expected.accessibilityFreespeed = 2.235503385314382;
+//					expected.accessibilityCar = 2.235503385314382;
+//					expected.accessibilityBike = 2.2833435568892395;
+//					expected.accessibilityWalk = 1.9418539664691532;
+//					expected.accessibilityPt = 2.0032465393091434;
+//					expected.accessibilityMatrixBasedPt = 1.5073890466447624;
+//				}
+//			} else {
+//				if (x == 50 && y == 50) {
+//					expected.accessibilityFreespeed = 3.531160950023511;
+//					expected.accessibilityCar = 3.531160950023511;
+//					expected.accessibilityBike = 3.610451773611781;
+//					expected.accessibilityWalk = 3.0497801404632043;
+//					expected.accessibilityPt = 3.5444584871239586;
+//					expected.accessibilityMatrixBasedPt = 3.0405848846934704;
+//				} else if (x == 150 && y == 50) {
+//					expected.accessibilityFreespeed = 3.531160950023511;
+//					expected.accessibilityCar = 3.531160950023511;
+//					expected.accessibilityBike = 3.610451773611781;
+//					expected.accessibilityWalk = 3.0497801404632043;
+//					expected.accessibilityPt = 3.389540900429034;
+//					expected.accessibilityMatrixBasedPt = 3.0405848846934704;
+//				} else if (x == 50 && y == 150) {
+//					expected.accessibilityFreespeed = 3.5937361608359226;
+//					expected.accessibilityCar = 3.5937361608359226;
+//					expected.accessibilityBike = 3.650823251958846;
+//					expected.accessibilityWalk = 3.256022746025017;
+//					expected.accessibilityPt = 3.5444584871239586;
+//					expected.accessibilityMatrixBasedPt = 3.0405848846934704;
+//				} else if (x == 150 && y == 150) {
+//					expected.accessibilityFreespeed = 3.621797746434273;
+//					expected.accessibilityCar = 3.621797746434273;
+//					expected.accessibilityBike = 3.66963791800913;
+//					expected.accessibilityWalk = 3.328148327589044;
+//					expected.accessibilityPt = 3.389540900429034;
+//					expected.accessibilityMatrixBasedPt = 2.893683407764653;
+//				}
+//			}
 			for (Tuple<ActivityFacility, Double> tuple : accessibilitiesMap.keySet()) {
 				if (!useOpportunityWeights) {
 					if (tuple.getFirst().getCoord().getX() == 50.) {

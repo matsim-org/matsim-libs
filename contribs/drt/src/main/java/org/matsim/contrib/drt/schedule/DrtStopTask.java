@@ -40,11 +40,18 @@ public class DrtStopTask extends StayTaskImpl implements DrtTask {
 	public DrtTaskType getDrtTaskType() {
 		return DrtTaskType.STOP;
 	}
-
+	
+	/**
+	 * one stop task my have multiple dropoffs.  I speculate that this may mean, e.g., drop off multiple passengers at same stop. kai, nov'18
+	 */
 	public Set<DrtRequest> getDropoffRequests() {
 		return Collections.unmodifiableSet(dropoffRequests);
 	}
-
+	
+	/**
+	 * one task my have multiple pickups (?).  I speculate this this may mean, e.g., pick up multiple passengers at same stop.
+	 * Note that we can have both dropoff requests and pickup requests for the same stop.  kai, nov'18
+	 */
 	public Set<DrtRequest> getPickupRequests() {
 		return Collections.unmodifiableSet(pickupRequests);
 	}

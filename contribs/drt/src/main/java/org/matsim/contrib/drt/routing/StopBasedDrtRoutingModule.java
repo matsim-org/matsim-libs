@@ -52,7 +52,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		Pair<TransitStopFacility, TransitStopFacility> findStops(Facility fromFacility, Facility toFacility);
 	}
 
-	private final StageActivityTypes drtStageActivityType = new DrtStageActivityType();
+	private final DrtStageActivityType drtStageActivityType;
 	private final PopulationFactory populationFactory;
 	private final RoutingModule walkRouter;
 	private final AccessEgressStopFinder stopFinder;
@@ -68,6 +68,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		this.walkRouter = walkRouter;
 		this.stopFinder = stopFinder;
 		this.drtCfg = drtCfg;
+		this.drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
 	}
 
 	@Override
@@ -77,18 +78,21 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 
 		TransitStopFacility accessFacility = stops.getLeft();
 		if (accessFacility == null) {
-			printError(() -> "No access stop found, agent will walk, using mode " + DrtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
+			printError(() -> "No access stop found, agent will walk, using mode " + drtStageActivityType.drtWalk
+					+ ". Agent Id:\t" + person.getId());
             return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
 		}
 
 		TransitStopFacility egressFacility = stops.getRight();
 		if (egressFacility == null) {
-			printError(() -> "No egress stop found, agent will walk, using mode " + DrtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
+			printError(() -> "No egress stop found, agent will walk, using mode " + drtStageActivityType.drtWalk
+					+ ". Agent Id:\t" + person.getId());
             return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
 		}
 
 		if (accessFacility.getLinkId() == egressFacility.getLinkId()) {
-			printError(() -> "Start and end stop are the same, agent will walk, using mode " + DrtStageActivityType.DRT_WALK + ". Agent Id:\t" + person.getId());
+			printError(() -> "Start and end stop are the same, agent will walk, using mode " + drtStageActivityType.drtWalk
+					+ ". Agent Id:\t" + person.getId());
             return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
 		}
 
@@ -114,13 +118,13 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	private Leg createDrtWalkLeg( Facility fromFacility, Facility toFacility, double departureTime,
 						Person person) {
 		Leg leg = (Leg)walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
-		leg.setMode(DrtStageActivityType.DRT_WALK);
+		leg.setMode(drtStageActivityType.drtWalk);
 		return leg;
 	}
 
 	private Activity createDrtStageActivity(Facility stopFacility) {
 		Activity activity = populationFactory
-				.createActivityFromCoord(DrtStageActivityType.DRT_STAGE_ACTIVITY, stopFacility.getCoord());
+				.createActivityFromCoord(drtStageActivityType.drtStageActivity, stopFacility.getCoord());
 		activity.setMaximumDuration(1);
 		activity.setLinkId(stopFacility.getLinkId());
 		return activity;

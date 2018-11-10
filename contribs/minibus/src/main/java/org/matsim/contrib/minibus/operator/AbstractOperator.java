@@ -26,12 +26,14 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
+import org.matsim.contrib.minibus.PConfigGroup.LogRouteDesignVsTotalScore;
 import org.matsim.contrib.minibus.PConstants.OperatorState;
 import org.matsim.contrib.minibus.performance.PTransitLineMerger;
 import org.matsim.contrib.minibus.replanning.PStrategy;
 import org.matsim.contrib.minibus.replanning.PStrategyManager;
 import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
 import org.matsim.contrib.minibus.scoring.PScoreContainer;
+import org.matsim.contrib.minibus.scoring.routeDesignScoring.RouteDesignScoringManager;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
@@ -72,6 +74,8 @@ abstract class AbstractOperator implements Operator{
 	
 	PRouteProvider routeProvider;
 	int currentIteration;
+	
+	private final LogRouteDesignVsTotalScore logRouteDesignVsTotalScore;
 
 	AbstractOperator(Id<Operator> id, PConfigGroup pConfig, PFranchise franchise){
 		this.id = id;
@@ -81,6 +85,7 @@ abstract class AbstractOperator implements Operator{
 		this.costPerVehicleAndDay = pConfig.getCostPerVehicleAndDay();
 		this.minOperationTime = pConfig.getMinOperationTime();
 		this.mergeTransitLine = pConfig.getMergeTransitLine();
+		this.logRouteDesignVsTotalScore = pConfig.getLogLogRouteDesignVsTotalScore();
 		this.franchise = franchise;
 	}
 
@@ -106,13 +111,14 @@ abstract class AbstractOperator implements Operator{
 	}
 
 	@Override
-	public void score(Map<Id<Vehicle>, PScoreContainer> pScores, SubsidyI subsidy) {
+	public void score(Map<Id<Vehicle>, PScoreContainer> pScores, SubsidyI subsidy, 
+			RouteDesignScoringManager routeDesignScoringManager) {
 		this.setScoreLastIteration(this.getScore());
 		this.setScore(0);
 		
 		// score all plans
 		for (PPlan plan : this.getAllPlans()) {
-			scorePlan(pScores, plan);
+			scorePlan(pScores, plan, routeDesignScoringManager);
 			
 			if (subsidy != null) {
 				Id<PPlan> pplanId = Id.create(plan.getLine().getId().toString() + "-" + plan.getId().toString(), PPlan.class);
@@ -272,19 +278,64 @@ abstract class AbstractOperator implements Operator{
 		}
 	}
 
-	private final static void scorePlan(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap, PPlan plan) {
+	private final void scorePlan(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap, PPlan plan, RouteDesignScoringManager routeDesignScoringManager) {
 		double totalLineScore = 0.0;
 		int totalTripsServed = 0;
-		
+
 		for (Id<Vehicle> vehId : plan.getVehicleIds()) {
 			totalLineScore += driverId2ScoreMap.get(vehId).getTotalRevenue();
-			totalTripsServed += driverId2ScoreMap.get(vehId).getTripsServed();	
+			totalTripsServed += driverId2ScoreMap.get(vehId).getTripsServed();
 		}
-		
+
+		totalLineScore = capAndAddRouteDesignScore (plan, totalLineScore, routeDesignScoringManager);
+
 		plan.setScore(totalLineScore);
 		plan.setTripsServed(totalTripsServed);
 	}
-
+	
+	private double capAndAddRouteDesignScore (PPlan plan, double originaltotalLineScore, RouteDesignScoringManager routeDesignScoringManager) {
+		double totalLineScore = originaltotalLineScore;
+		
+		if (routeDesignScoringManager.isActive()) {
+			
+			double routeDesignScore = routeDesignScoringManager.scoreRouteDesign(plan);
+			
+			if (routeDesignScore != 0) {
+				/*
+				 * Cap route design score, if score is bad enough to eliminate the plan, so it
+				 * would affect other plans less. Don't cap if a plan performs really bad
+				 * financially besides non-monetary metrics like route design scoring. At
+				 * minScoreToSurvive CarefulMultiPlanOperator would leave at least one vehicle
+				 * on the plan, so plan could survive
+				 */
+				
+				double minScoreToSurvive = -costPerVehicleSell * plan.getNVehicles();
+				if (originaltotalLineScore >= minScoreToSurvive) {
+					/*
+					 * Limit negative score to the amount at which the plan is eliminated. Multiply
+					 * route design score with number of vehicles, so route design score still
+					 * has an influence on busy lines.
+					 */
+					totalLineScore = Math.max(originaltotalLineScore + routeDesignScore * plan.getNVehicles(),
+							minScoreToSurvive - 0.0001 * costPerVehicleSell);
+				} else {
+					// plan already has a bad score that will cause its elimination, don't cap this
+					// monetary cost
+				}
+				
+				if (logRouteDesignVsTotalScore.equals(LogRouteDesignVsTotalScore.onlyNonZeroRouteDesignScore)) {
+					log.info("operator " + id + ". TransitRoute(s) "
+							+ plan.getLine().getRoutes().values().iterator().next().getId()
+							+ ". original totalLineScore: " + originaltotalLineScore + ". totalLineScore after: "
+							+ totalLineScore + ". routeDesignScore: " + routeDesignScore + ". vehicles "
+							+ plan.getNVehicles() + ". minScoreToSurvive: " + minScoreToSurvive);
+				}
+			}
+		}
+		
+		return totalLineScore;
+	}
+	
 	double getScore() {
 		return score;
 	}
