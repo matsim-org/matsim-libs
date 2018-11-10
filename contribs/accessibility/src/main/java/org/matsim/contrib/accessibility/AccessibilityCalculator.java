@@ -204,10 +204,10 @@ public final class AccessibilityCalculator {
 				opportunityClusterMap.put(nearestNode.getId(), jco); 
 			}
 			if (acg.isUseOpportunityWeights()) {
-				if (opportunity.getCustomAttributes().get("weight") == null) {
-					throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key \"weight\"");
+				if (opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT) == null) {
+					throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key " + AccessibilityAttributes.WEIGHT + ".");
 				} else {
-					double weight = (double) ((Integer) opportunity.getCustomAttributes().get("weight")).intValue();
+					double weight = (double) opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT);
 					jco.addObject(opportunity.getId(), expVjk * Math.pow(weight, acg.getWeightExponent()));
 				}
 			} else {
