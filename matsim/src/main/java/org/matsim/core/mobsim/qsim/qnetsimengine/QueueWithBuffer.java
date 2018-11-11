@@ -221,7 +221,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	public final void addFromWait(final QVehicle veh) {
 		//To protect against calling addToBuffer() without calling hasFlowCapacityLeft() first.
 		//This only could happen for addFromWait(), because it can be called from outside QueueWithBuffer
-		if (flowcap_accumulate.getValue() <= 0.0 && veh.getVehicle().getType().getPcuEquivalents() > context.qsimConfig
+		if (flowcap_accumulate.getValue() <= 0.0 && veh.getFlowCapacityConsumptionInEquivalents() > context.qsimConfig
 				.getPcuThresholdForFlowCapacityEasing()) {
 			throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
 		}
@@ -256,13 +256,13 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		return this.hasFlowCapacityLeft(veh) ;
 	}
 
-	private boolean hasFlowCapacityLeft(VisVehicle veh) {
+	private boolean hasFlowCapacityLeft(QVehicle veh) {
 		if(context.qsimConfig.isUsingFastCapacityUpdate() ){
 			updateFastFlowAccumulation();
 		}
 
-		return flowcap_accumulate.getValue() > 0.0 || veh.getVehicle().getType()
-				.getPcuEquivalents() <= context.qsimConfig.getPcuThresholdForFlowCapacityEasing();
+		return flowcap_accumulate.getValue() > 0.0 || veh
+				.getFlowCapacityConsumptionInEquivalents() <= context.qsimConfig.getPcuThresholdForFlowCapacityEasing();
 	}
 
 	private void updateFastFlowAccumulation(){
