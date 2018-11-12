@@ -235,7 +235,7 @@ final class QNodeImpl implements QNodeI {
 		for (QLaneI lane : link.getOfferingQLanes()) {
 			while (! lane.isNotOfferingVehicle()) {
 				QVehicle veh = lane.getFirstVehicle();
-				if (! moveVehicleOverNode(veh, lane, now)) {
+				if (! moveVehicleOverNode(veh, link, lane, now )) {
 					break;
 				}
 			}
@@ -251,13 +251,13 @@ final class QNodeImpl implements QNodeI {
 	 * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
 	 * otherwise (e.g. in case where the next link is jammed)
 	 */
-	private boolean moveVehicleOverNode(final QVehicle veh, final QLaneI fromLaneBuffer, final double now) {
+	private boolean moveVehicleOverNode( final QVehicle veh, QLinkI fromLink, final QLaneI fromLane, final double now ) {
 		Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
-		Link currentLink = veh.getCurrentLink();
-		
-		AcceptTurn turn = turnAcceptanceLogic.isAcceptingTurn(currentLink, fromLaneBuffer, nextLinkId, veh, this.netsimEngine.getNetsimNetwork(), now);
+		Link currentLink = fromLink.getLink() ;
+
+		AcceptTurn turn = turnAcceptanceLogic.isAcceptingTurn(currentLink, fromLane, nextLinkId, veh, this.netsimEngine.getNetsimNetwork(), now);
 		if ( turn.equals(AcceptTurn.ABORT) ) {
-			moveVehicleFromInlinkToAbort( veh, fromLaneBuffer, now, currentLink.getId() ) ;
+			moveVehicleFromInlinkToAbort( veh, fromLane, now, currentLink.getId() ) ;
 			return true ;
 		} else if ( turn.equals(AcceptTurn.WAIT) ) {
 			return false;
@@ -266,20 +266,20 @@ final class QNodeImpl implements QNodeI {
 		QLinkI nextQueueLink = this.netsimEngine.getNetsimNetwork().getNetsimLinks().get(nextLinkId);
 		QLaneI nextQueueLane = nextQueueLink.getAcceptingQLane() ;
 		if (nextQueueLane.isAcceptingFromUpstream()) {
-			moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLaneBuffer, nextLinkId, nextQueueLane);
+			moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLane, nextLinkId, nextQueueLane);
 			return true;
 		}
 		
-		if (vehicleIsStuck(fromLaneBuffer, now)) {
+		if (vehicleIsStuck(fromLane, now)) {
 			/* We just push the vehicle further after stucktime is over, regardless
 			 * of if there is space on the next link or not.. optionally we let them
 			 * die here, we have a config setting for that!
 			 */
 			if (this.context.qsimConfig.isRemoveStuckVehicles()) {
-				moveVehicleFromInlinkToAbort(veh, fromLaneBuffer, now, currentLink.getId());
+				moveVehicleFromInlinkToAbort(veh, fromLane, now, currentLink.getId());
 				return false ;
 			} else {
-				moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLaneBuffer, nextLinkId, nextQueueLane);
+				moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLane, nextLinkId, nextQueueLane);
 				return true;
 				// (yyyy why is this returning `true'?  Since this is a fix to avoid gridlock, this should proceed in small steps. 
 				// kai, feb'12) 
