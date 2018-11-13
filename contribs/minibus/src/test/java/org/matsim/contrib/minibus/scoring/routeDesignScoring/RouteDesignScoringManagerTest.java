@@ -45,6 +45,13 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * 
+ * Tests {@link RouteDesignScoringManager},
+ * {@link AreaBtwStopsVsTerminiBeelinePenalty},
+ * {@link Stop2StopVsTerminiBeelinePenalty}.
+ * 
+ * The latter two are tested here, because they are also used as two example
+ * RouteDesignScoringFunctions managed by RouteDesignScoringManager.
+ * 
  * @author gleich
  * 
  */

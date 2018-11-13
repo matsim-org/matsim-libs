@@ -797,6 +797,7 @@ public final class PConfigGroup extends ConfigGroup{
 			for (RouteDesignScoringManager.RouteDesignScoreFunctionName scoreFunctionName: 
 				RouteDesignScoringManager.RouteDesignScoreFunctionName.values()) {
 				defaultRouteDesignScoreFunctions.append(scoreFunctionName.toString());
+				defaultRouteDesignScoreFunctions.append(", ");
 			}
 			
 			map.put( ROUTE_DESIGN_SCORE_FUNCTION,
