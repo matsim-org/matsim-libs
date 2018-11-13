@@ -207,7 +207,7 @@ public final class AccessibilityCalculator {
 				if (opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT) == null) {
 					throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key " + AccessibilityAttributes.WEIGHT + ".");
 				} else {
-					double weight = (double) opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT);
+					double weight = Double.parseDouble(opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT).toString());
 					jco.addObject(opportunity.getId(), expVjk * Math.pow(weight, acg.getWeightExponent()));
 				}
 			} else {
