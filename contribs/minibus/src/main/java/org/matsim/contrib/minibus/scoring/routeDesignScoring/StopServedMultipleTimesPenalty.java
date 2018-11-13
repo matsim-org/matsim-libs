@@ -77,7 +77,7 @@ class StopServedMultipleTimesPenalty implements RouteDesignScoringFunction {
 			}
 		}
 
-		double score = stopListToEvaluate.size() / stopIdServed.size() - params.getValueToStartScoring();
+		double score = ((double) stopListToEvaluate.size()) / stopIdServed.size() - params.getValueToStartScoring();
 		if (score > 0) {
 			score = params.getCostFactor() * score;
 		} else {

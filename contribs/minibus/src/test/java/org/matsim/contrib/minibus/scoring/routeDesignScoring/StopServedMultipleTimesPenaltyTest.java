@@ -13,6 +13,7 @@ import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams.StopListTo
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.contrib.minibus.scoring.routeDesignScoring.RouteDesignScoringManager.RouteDesignScoreFunctionName;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -21,6 +22,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class StopServedMultipleTimesPenaltyTest {
@@ -44,6 +46,7 @@ public class StopServedMultipleTimesPenaltyTest {
 		
 		stops.add(factory.createTransitRouteStop(getOrCreateStopAtCoord(0, 0), 0, 0));
 		stops.add(factory.createTransitRouteStop(getOrCreateStopAtCoord(10, 0), 0, 0));
+		stops.add(factory.createTransitRouteStop(getOrCreateStopAtCoord(10, 10), 0, 0));
 		stops.add(factory.createTransitRouteStop(getOrCreateStopAtCoord(0, 0), 0, 0));
 		
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(Id.createLinkId("dummy1.1"), Id.createLinkId("dummy1.2"));
@@ -66,11 +69,11 @@ public class StopServedMultipleTimesPenaltyTest {
 		
 		StopServedMultipleTimesPenalty penalty = new StopServedMultipleTimesPenalty(params);
 		double actual = penalty.getScore(pPlan1, route1);
-		// 3 stops served, but only 2 different stop ids
-		double expected = -1 * ((3 / 2) - 1);
+		// 4 stops served, but only 3 different stop ids
+		double expected = -1 * ((4.0 / 3) - 1);
 		Assert.assertEquals(expected, actual, 0.001);
 	}
-
+	
 	private TransitStopFacility getOrCreateStopAtCoord(int x, int y) {
 		Id<TransitStopFacility> stopId = getStopId(x, y);
 		if (scenario.getTransitSchedule().getFacilities().containsKey(stopId)) {
