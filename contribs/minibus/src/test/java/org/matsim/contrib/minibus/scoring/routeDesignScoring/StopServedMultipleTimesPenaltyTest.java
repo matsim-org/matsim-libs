@@ -42,6 +42,13 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+/**
+ * 
+ * Tests {@link StopServedMultipleTimesPenalty}
+ * 
+ * @author gleich
+ *
+ */
 public class StopServedMultipleTimesPenaltyTest {
 	
 	Scenario scenario;
