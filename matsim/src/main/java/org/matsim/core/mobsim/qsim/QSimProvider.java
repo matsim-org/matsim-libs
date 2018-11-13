@@ -151,7 +151,7 @@ public class QSimProvider implements Provider<QSim> {
 		}
 
 		if (foundNetworkFactoryBinding) {
-			throw new IllegalStateException("QNetworkFactory binding has moved to AbstractQSimModule");
+			throw new IllegalStateException("QNetworkFactory should only be bound via AbstractQSimModule");
 		}
 
 //		boolean foundTransitStopHandlerFactoryBinding = true;
@@ -163,7 +163,7 @@ public class QSimProvider implements Provider<QSim> {
 //		}
 //
 //		if (foundTransitStopHandlerFactoryBinding) {
-//			throw new IllegalStateException("TransitStopHandlerFactory binding has moved to AbstractQSimModule");
+//			throw new IllegalStateException("TransitStopHandlerFactory should be bound via AbstractQSimModule");
 //		}
 	}
 }

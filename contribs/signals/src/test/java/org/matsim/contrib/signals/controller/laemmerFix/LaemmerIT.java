@@ -21,6 +21,8 @@
  */
 package org.matsim.contrib.signals.controller.laemmerFix;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -37,7 +39,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.signals.analysis.DelayAnalysisTool;
 import org.matsim.contrib.signals.analysis.SignalAnalysisTool;
 import org.matsim.contrib.signals.builder.SignalsModule;
-import org.matsim.contrib.signals.builder.SignalsQSimModule;
 import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfigGroup.Regime;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
@@ -53,8 +54,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.Map;
 
 /**
  * @author tthunig
@@ -517,7 +516,6 @@ public class LaemmerIT {
 			
 			// add the signals module
 			controler.addOverridingModule(new SignalsModule());
-			controler.addOverridingQSimModule( new SignalsQSimModule() );
 			
 			// add signal analysis tool
 			controler.addOverridingModule(new AbstractModule() {

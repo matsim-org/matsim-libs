@@ -27,7 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.builder.SignalsModule;
-import org.matsim.contrib.signals.builder.SignalsQSimModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -36,11 +35,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -98,33 +94,29 @@ public class TravelTimeFourWaysTest {
 	}
 
 	private void runQSimWithSignals(final Scenario scenario) {
-//		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override(Collections.singleton(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				// defaults
-//				install(new NewControlerModule());
-//				install(new ControlerDefaultCoreListenersModule());
-//				install(new ControlerDefaultsModule());
-//				install(new ScenarioByInstanceModule(scenario));
-//			}
-//		}), new SignalsModule()));
-//
-//		EventsManager events = injector.getInstance(EventsManager.class);
-		EventsManager events = EventsUtils.createEventsManager( scenario.getConfig() ) ;
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override(Collections.singleton(new AbstractModule() {
+			@Override
+			public void install() {
+				// defaults
+				install(new NewControlerModule());
+				install(new ControlerDefaultCoreListenersModule());
+				install(new ControlerDefaultsModule());
+				install(new ScenarioByInstanceModule(scenario));
+			}
+		}), new SignalsModule()));
+	
+		EventsManager events = injector.getInstance(EventsManager.class);
 		events.initProcessing();
 		String eventsOut = this.testUtils.getOutputDirectory() + EVENTSFILE;
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-//		Mobsim mobsim = injector.getInstance(Mobsim.class);
-		QSim mobsim = new QSimBuilder(
-				scenario.getConfig() ).useDefaults().addOverridingControllerModule(
-				new SignalsModule() ).addOverridingQSimModule( new SignalsQSimModule() ).build( scenario, events );;
+		Mobsim mobsim = injector.getInstance(Mobsim.class);
 		mobsim.run();
 		
 		eventsXmlWriter.closeFile();
-	    Assert.assertEquals("different events files", EventsFileComparator.compare(this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut), EventsFileComparator.Result.FILES_ARE_EQUAL );
+	    Assert.assertEquals("different events files", EventsFileComparator.compareAndReturnInt(this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut), 0);
 	}
 	
 }
