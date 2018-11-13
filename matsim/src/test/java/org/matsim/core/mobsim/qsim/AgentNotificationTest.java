@@ -46,6 +46,7 @@ import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
@@ -251,13 +252,12 @@ public class AgentNotificationTest {
 				@Override
 				protected void configureQSim() {
 					bind(PopulationAgentSource.class).asEagerSingleton();
-					bindAgentSource(PopulationModule.POPULATION_AGENT_SOURCE_NAME).to(PopulationAgentSource.class);
+					addNamedComponent(PopulationAgentSource.class, PopulationModule.COMPONENT_NAME);
 					bind(AgentFactory.class).to(MyAgentFactory.class).asEagerSingleton();
 				}
 			})
 			.configureComponents(components -> {
-				components.activeMobsimEngines.remove("NetsimEngine");
-				components.activeDepartureHandlers.remove("NetsimEngine");
+				components.removeNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
 			}) //
 			.build(scenario, eventsManager) //
 			.run();

@@ -21,14 +21,14 @@
 package org.matsim.contrib.dvrp.run;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -36,10 +36,10 @@ import org.matsim.core.mobsim.qsim.components.QSimComponents;
 public class DvrpModeQSimModule extends AbstractQSimModule {
 	private final String mode;
 	private final boolean installPassengerEngineModule;
-	private final Map<String, Class<? extends MobsimListener>> listeners;
+	private final Set<Class<? extends MobsimListener>> listeners;
 
 	public DvrpModeQSimModule(String mode, boolean installPassengerEngineModule,
-			Map<String, Class<? extends MobsimListener>> listeners) {
+			Set<Class<? extends MobsimListener>> listeners) {
 		this.mode = mode;
 		this.installPassengerEngineModule = installPassengerEngineModule;
 		this.listeners = listeners;
@@ -56,39 +56,31 @@ public class DvrpModeQSimModule extends AbstractQSimModule {
 		install(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				for (Map.Entry<String, Class<? extends MobsimListener>> entry : listeners.entrySet()) {
-					bindMobsimListener(entry.getKey()).to(entry.getValue());
+				for (Class<? extends MobsimListener> l : listeners) {
+					addNamedComponent(l, mode);
 				}
 			}
 		});
 	}
 
-	public void configureComponents(QSimComponents components) {
-		VrpAgentSourceQSimModule.configureComponents(components, mode);
-
-		if (installPassengerEngineModule) {
-			PassengerEngineQSimModule.configureComponents(components, mode);
-		}
-		components.activeMobsimListeners.addAll(listeners.keySet());
+	public void configureComponents(QSimComponentsConfig components) {
+		components.addNamedComponent(mode);
 	}
 
 	public static class Builder {
 		private final String mode;
-		private final Map<String, Class<? extends MobsimListener>> listeners = new HashMap<>();
+		private final Set<Class<? extends MobsimListener>> listeners = new HashSet<>();
 
-		private int listenerIndex = 0;
 		private boolean installPassengerEngineModule = true;
 
 		public Builder(String mode) {
 			this.mode = mode;
 		}
 
-		private String createNextListenerName(Class<? extends MobsimListener> listener) {
-			return String.format("DVRP_%s_%d_%s", mode, listenerIndex++, listener.getClass().toString());
-		}
-
 		public Builder addListener(Class<? extends MobsimListener> listener) {
-			listeners.put(createNextListenerName(listener), listener);
+			if (!listeners.add(listener)) {
+				throw new IllegalArgumentException("Listener: " + listener + " has been already added.");
+			}
 			return this;
 		}
 

@@ -20,8 +20,9 @@
 package org.matsim.core.mobsim.qsim.interfaces;
 
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
-public interface ActivityHandler {
+public interface ActivityHandler extends QSimComponent {
 
 	boolean handleActivity(MobsimAgent agent);
 

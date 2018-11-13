@@ -25,7 +25,6 @@ import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.utils.misc.Time;
@@ -34,23 +33,25 @@ import com.google.inject.Inject;
 
 public class TaxiSimulationConsistencyChecker implements AfterMobsimListener {
 	private final SubmittedTaxiRequestsCollector requestCollector;
-	private final TaxiConfigGroup tcg;
+	private final TaxiConfigGroup taxiCfg;
 
 	@Inject
-	public TaxiSimulationConsistencyChecker(SubmittedTaxiRequestsCollector requestCollector, Config config) {
+	public TaxiSimulationConsistencyChecker(SubmittedTaxiRequestsCollector requestCollector, TaxiConfigGroup taxiCfg) {
 		this.requestCollector = requestCollector;
-		this.tcg = TaxiConfigGroup.get(config);
+		this.taxiCfg = taxiCfg;
 	}
 
 	public void addCheckAllRequestsPerformed() {
 		for (Request r : requestCollector.getRequests().values()) {
 			TaxiRequest tr = (TaxiRequest)r;
 			if (tr.getStatus() != TaxiRequestStatus.PERFORMED) {
-				if (tcg.isBreakSimulationIfNotAllRequestsServed()) {
-					throw new IllegalStateException("Not all taxi requests served at simulation end time. This exception can be disabled in the taxi config group.");
+				if (taxiCfg.isBreakSimulationIfNotAllRequestsServed()) {
+					throw new IllegalStateException(
+							"Not all taxi requests served at simulation end time. This exception can be disabled in the taxi config group.");
 				} else {
-					Logger.getLogger(getClass()).warn("Taxi request not performed. Request time:\t"
-							+ Time.writeTime(tr.getEarliestStartTime()) + "\tPassenger:\t" + tr.getPassenger().getId());
+					Logger.getLogger(getClass())
+							.warn("Taxi request not performed. Request time:\t" + Time.writeTime(
+									tr.getEarliestStartTime()) + "\tPassenger:\t" + tr.getPassenger().getId());
 				}
 			}
 		}

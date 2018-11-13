@@ -93,15 +93,15 @@ public class AccessibilityIntegrationTest {
 	            	
 	            	if (x == 50) {
 	            		if (y == 50) {
-	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", value, 2.1486094237531126, utils.EPSILON);
+	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", 2.1486094237531126, value, utils.EPSILON);
 	            		} else if (y == 150){
-	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", value, 2.1766435716006005, utils.EPSILON);
+	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", 2.1766435716006005, value, utils.EPSILON);
 	            		} 
 	            	} else if (x == 150) {
 	            		if (y == 50) {
-	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", value, 2.1486094237531126, utils.EPSILON);
+	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", 2.1486094237531126, value, utils.EPSILON);
 	            		} else if (y == 150){
-	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", value, 2.2055702759681273, utils.EPSILON);
+	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", 2.2055702759681273, value, utils.EPSILON);
 	            		}
 	            	}
             	}
@@ -433,7 +433,7 @@ public class AccessibilityIntegrationTest {
 		@Override
 		public void setAndProcessSpatialGrids( Map<String,SpatialGrid> spatialGrids ){
 
-			LOG.info("Evaluating resuts ...");
+			LOG.info("Evaluating results ...");
 
 			for(double x = 50; x < 200; x += 100){
 				for(double y = 50; y < 200; y += 100){
@@ -441,63 +441,63 @@ public class AccessibilityIntegrationTest {
 
 					if (!useOpportunityWeights) {
 						if (x == 50 && y == 50) {
-							expected.accessibilityFreespeed = 2.1486094237531126;
-							expected.accessibilityCar = 2.1482840466191093;
-							expected.accessibilityBike = 2.2257398663221;
-							expected.accessibilityWalk = 1.70054725728361;
+							expected.accessibilityFreespeed = 2.14486658890362;
+							expected.accessibilityCar = 2.14486658890362;
+							expected.accessibilityBike = 2.224157412491891;
+							expected.accessibilityWalk = 1.6634857793433138;
 							expected.accessibilityPt = 2.1581641260040683;
-							expected.accessibilityMatrixBasedPt = 0.461863556339195;
+							expected.accessibilityMatrixBasedPt = 1.6542905235735796;
 						} else if (x == 150 && y == 50) {
-							expected.accessibilityFreespeed = 2.1486094237531126;
-							expected.accessibilityCar = 2.1482840466191093;
-							expected.accessibilityBike = 2.2257398663221;
-							expected.accessibilityWalk = 1.70054725728361;
+							expected.accessibilityFreespeed = 2.14486658890362;
+							expected.accessibilityCar = 2.14486658890362;
+							expected.accessibilityBike = 2.224157412491891;
+							expected.accessibilityWalk = 1.6634857793433138;
 							expected.accessibilityPt = 2.0032465393091434;
-							expected.accessibilityMatrixBasedPt = 0.461863556339195;
+							expected.accessibilityMatrixBasedPt = 1.6542905235735796;
 						} else if (x == 50 && y == 150) {
-							expected.accessibilityFreespeed = 2.1766435716006005;
-							expected.accessibilityCar = 2.176238564675181;
-							expected.accessibilityBike = 2.2445468698643367;
-							expected.accessibilityWalk = 1.7719146868026079;
-							expected.accessibilityPt = 2.057596373646452;
-							expected.accessibilityMatrixBasedPt = 0.461863556339195;
+							expected.accessibilityFreespeed = 2.207441799716032;
+							expected.accessibilityCar = 2.207441799716032;
+							expected.accessibilityBike = 2.2645288908389554;
+							expected.accessibilityWalk = 1.8697283849051263;
+							expected.accessibilityPt = 2.1581641260040683;
+							expected.accessibilityMatrixBasedPt = 1.6542905235735796;
 						} else if (x == 150 && y == 150) {
-							expected.accessibilityFreespeed = 2.2055702759681273;
-							expected.accessibilityCar = 2.2052225231109226;
-							expected.accessibilityBike = 2.2637376515333636;
-							expected.accessibilityWalk = 1.851165291193725;
-							expected.accessibilityPt = 1.9202710265495115;
-							expected.accessibilityMatrixBasedPt = 0.624928280738513;
+							expected.accessibilityFreespeed = 2.235503385314382;
+							expected.accessibilityCar = 2.235503385314382;
+							expected.accessibilityBike = 2.2833435568892395;
+							expected.accessibilityWalk = 1.9418539664691532;
+							expected.accessibilityPt = 2.0032465393091434;
+							expected.accessibilityMatrixBasedPt = 1.5073890466447624;
 						}
 					} else {
 						if (x == 50 && y == 50) {
-							expected.accessibilityFreespeed = 3.534903784873003;
-							expected.accessibilityCar = 3.534578407739;
-							expected.accessibilityBike = 3.6120342274419914;
-							expected.accessibilityWalk = 3.086841618403501;
+							expected.accessibilityFreespeed = 3.531160950023511;
+							expected.accessibilityCar = 3.531160950023511;
+							expected.accessibilityBike = 3.610451773611781;
+							expected.accessibilityWalk = 3.0497801404632043;
 							expected.accessibilityPt = 3.5444584871239586;
-							expected.accessibilityMatrixBasedPt = 1.8481579174590859;
+							expected.accessibilityMatrixBasedPt = 3.0405848846934704;
 						} else if (x == 150 && y == 50) {
-							expected.accessibilityFreespeed = 3.534903784873003;
-							expected.accessibilityCar = 3.534578407739;
-							expected.accessibilityBike = 3.6120342274419914;
-							expected.accessibilityWalk = 3.086841618403501;
+							expected.accessibilityFreespeed = 3.531160950023511;
+							expected.accessibilityCar = 3.531160950023511;
+							expected.accessibilityBike = 3.610451773611781;
+							expected.accessibilityWalk = 3.0497801404632043;
 							expected.accessibilityPt = 3.389540900429034;
-							expected.accessibilityMatrixBasedPt = 1.8481579174590859;
+							expected.accessibilityMatrixBasedPt = 3.0405848846934704;
 						} else if (x == 50 && y == 150) {
-							expected.accessibilityFreespeed = 3.562937932720491;
-							expected.accessibilityCar = 3.5625329257950717;
-							expected.accessibilityBike = 3.6308412309842275;
-							expected.accessibilityWalk = 3.1582090479224982;
-							expected.accessibilityPt = 3.443890734766343;
-							expected.accessibilityMatrixBasedPt = 1.8481579174590859;
+							expected.accessibilityFreespeed = 3.5937361608359226;
+							expected.accessibilityCar = 3.5937361608359226;
+							expected.accessibilityBike = 3.650823251958846;
+							expected.accessibilityWalk = 3.256022746025017;
+							expected.accessibilityPt = 3.5444584871239586;
+							expected.accessibilityMatrixBasedPt = 3.0405848846934704;
 						} else if (x == 150 && y == 150) {
-							expected.accessibilityFreespeed = 3.5918646370880176;
-							expected.accessibilityCar = 3.591516884230813;
-							expected.accessibilityBike = 3.6500320126532544;
-							expected.accessibilityWalk = 3.2374596523136154;
-							expected.accessibilityPt = 3.3065653876694023;
-							expected.accessibilityMatrixBasedPt = 2.0112226418584043;
+							expected.accessibilityFreespeed = 3.621797746434273;
+							expected.accessibilityCar = 3.621797746434273;
+							expected.accessibilityBike = 3.66963791800913;
+							expected.accessibilityWalk = 3.328148327589044;
+							expected.accessibilityPt = 3.389540900429034;
+							expected.accessibilityMatrixBasedPt = 2.893683407764653;
 						}
 					}
 
