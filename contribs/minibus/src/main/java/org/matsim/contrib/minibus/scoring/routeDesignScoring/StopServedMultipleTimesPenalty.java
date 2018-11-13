@@ -35,9 +35,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Calculate penalty score for circuitous TransitRoutes (TransitRoute of the
- * PPlan) measured as sum of all beeline distances of consecutive
- * StopsToBeServed TransitStops divided by the beeline distance between the two
- * terminus stops of the stopsToBeServed of the PPlan.
+ * PPlan) which overlap themselves, i.e. the same stop is served several times
+ * by the same TransitRoute. Score is calculated as number of stops on the route
+ * divided by the number of unique stop facilities served.
  * 
  * @author gleich
  *
