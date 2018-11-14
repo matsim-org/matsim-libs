@@ -14,7 +14,7 @@
 		<param name="boundingBoxLeft" value="0.0" />
 		<param name="boundingBoxRight" value="200.0" />
 		<param name="boundingBoxTop" value="200.0" />
-		<param name="cellSizeForCellBasedAccessibility" value="100" />
+		<param name="tileSize_m" value="100" />
 		<param name="extentOfAccessibilityComputationShapeFile" value="null" />
 		<!-- if the accibility is computed using the `fromFile` option, the this must be the file containing the measuring points' coordinates.  -->
 		<param name="measuringPointsFile" value="null" />
