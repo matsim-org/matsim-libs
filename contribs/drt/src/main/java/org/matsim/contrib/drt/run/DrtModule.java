@@ -60,10 +60,11 @@ public final class DrtModule extends AbstractModule {
 				InsertionCostCalculator.RejectSoftConstraintViolations.class :
 				InsertionCostCalculator.DiscourageSoftConstraintViolations.class).asEagerSingleton();
 
+		bind(MainModeIdentifier.class).to(DrtMainModeIdentifier.class).asEagerSingleton();
+
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:
 				addRoutingModuleBinding(drtCfg.getMode()).to(DrtRoutingModule.class);
-				bind(MainModeIdentifier.class).to(DrtMainModeIdentifier.class).asEagerSingleton();
 				break;
 
 			case stopbased:
@@ -71,7 +72,6 @@ public final class DrtModule extends AbstractModule {
 				new TransitScheduleReader(scenario2).readURL(drtCfg.getTransitStopsFileUrl(getConfig().getContext()));
 				bind(TransitSchedule.class).annotatedWith(Drt.class).toInstance(scenario2.getTransitSchedule());
 
-				bind(MainModeIdentifier.class).to(DrtMainModeIdentifier.class).asEagerSingleton();
 				bind(DrtRoutingModule.class);
 				addRoutingModuleBinding(drtCfg.getMode()).to(StopBasedDrtRoutingModule.class);
 				bind(AccessEgressStopFinder.class).to(DefaultAccessEgressStopFinder.class).asEagerSingleton();
@@ -82,7 +82,7 @@ public final class DrtModule extends AbstractModule {
 		}
 
 		bind(DefaultDrtRouteUpdater.class).asEagerSingleton();
-		bind(DrtRouteUpdater.class).to(DefaultDrtRouteUpdater.class).asEagerSingleton();
+		bind(DrtRouteUpdater.class).to(DefaultDrtRouteUpdater.class);
 		addControlerListenerBinding().to(DrtRouteUpdater.class);
 	}
 }
