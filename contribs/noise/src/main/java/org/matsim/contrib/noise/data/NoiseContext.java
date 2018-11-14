@@ -402,6 +402,15 @@ public class NoiseContext {
 							Math.pow(toCoordX - pointCoordX, 2) + Math.pow(toCoordY - pointCoordY, 2)
 							)
 					);
+
+			//due to rounding errors, cosine sometimes is larger than one
+            // TODO: find cleaner way possibly.
+			if (cosAngle > 1.) {
+			    cosAngle = 1.;
+            } else if (cosAngle < -1.) {
+			    cosAngle = -1.;
+            }
+
 			angle = Math.toDegrees(Math.acos(cosAngle));
 
 			if (sc > 0) {

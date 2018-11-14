@@ -23,7 +23,11 @@ package org.matsim.contrib.emissions.utils;
 /**
  * Created by amit on 29/09/16.
  */
+@Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
 public enum EmissionSpecificationMarker {
-
-    BEGIN_EMISSIONS , END_EMISSIONS ;
+    
+    @Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
+    BEGIN_EMISSIONS ,
+    @Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
+    END_EMISSIONS ;
 }
