@@ -1,5 +1,7 @@
 package org.matsim.contrib.drt.run;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.data.validator.DefaultDrtRequestValidator;
 import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
@@ -64,16 +66,15 @@ public final class DrtModule extends AbstractModule {
 
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:
-				addRoutingModuleBinding(drtCfg.getMode()).to(DrtRoutingModule.class);
+				addRoutingModuleBinding(drtCfg.getMode()).to(DrtRoutingModule.class);//not singleton
 				break;
 
 			case stopbased:
-				Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-				new TransitScheduleReader(scenario2).readURL(drtCfg.getTransitStopsFileUrl(getConfig().getContext()));
-				bind(TransitSchedule.class).annotatedWith(Drt.class).toInstance(scenario2.getTransitSchedule());
+				bind(TransitSchedule.class).annotatedWith(Drt.class)
+						.toInstance(readTransitSchedule(drtCfg.getTransitStopsFileUrl(getConfig().getContext())));
 
-				bind(DrtRoutingModule.class);
-				addRoutingModuleBinding(drtCfg.getMode()).to(StopBasedDrtRoutingModule.class);
+				bind(DrtRoutingModule.class);//not singleton
+				addRoutingModuleBinding(drtCfg.getMode()).to(StopBasedDrtRoutingModule.class);//not singleton
 				bind(AccessEgressStopFinder.class).to(DefaultAccessEgressStopFinder.class).asEagerSingleton();
 				break;
 
@@ -81,8 +82,13 @@ public final class DrtModule extends AbstractModule {
 				throw new IllegalStateException();
 		}
 
-		bind(DefaultDrtRouteUpdater.class).asEagerSingleton();
-		bind(DrtRouteUpdater.class).to(DefaultDrtRouteUpdater.class);
+		bind(DrtRouteUpdater.class).to(DefaultDrtRouteUpdater.class).asEagerSingleton();
 		addControlerListenerBinding().to(DrtRouteUpdater.class);
+	}
+
+	static TransitSchedule readTransitSchedule(URL url) {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new TransitScheduleReader(scenario).readURL(url);
+		return scenario.getTransitSchedule();
 	}
 }
