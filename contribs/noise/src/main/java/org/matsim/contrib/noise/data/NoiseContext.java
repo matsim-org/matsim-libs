@@ -23,14 +23,6 @@
 package org.matsim.contrib.noise.data;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -39,13 +31,16 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.handler.NoiseEquations;
+import org.matsim.contrib.noise.utils.FeatureNoiseBarriersReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Contains the grid and further noise-specific information.
@@ -60,6 +55,7 @@ public class NoiseContext {
 	private final Scenario scenario;
 	private final NoiseConfigGroup noiseParams;
 	private final Grid grid;
+	private final QuadTree<? extends NoiseBarrier> noiseBarriers;
 			
 	private final Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
 	private double xCoordMinLinkNode = Double.MAX_VALUE;
@@ -103,13 +99,19 @@ public class NoiseContext {
 				
 		this.currentTimeBinEndTime = noiseParams.getTimeBinSizeNoiseComputation();
 		
-		this.noiseReceiverPoints = new HashMap<Id<ReceiverPoint>, NoiseReceiverPoint>();
-		this.noiseLinks = new HashMap<Id<Link>, NoiseLink>();
+		this.noiseReceiverPoints = new HashMap<>();
+		this.noiseLinks = new HashMap<>();
 		
 		checkConsistency();
 		setLinksMinMax();
 		setLinksToZones();
 		setRelevantLinkInfo();
+
+		if(noiseParams.isConsiderNoiseBarriers()) {
+			noiseBarriers = FeatureNoiseBarriersReader.read(noiseParams.getNoiseBarriersFilePath());
+		} else {
+			noiseBarriers = null;
+		}
 	}
 
 	// for routing purposes
@@ -214,6 +216,8 @@ public class NoiseContext {
 		}
 		cnt.printCounter();
 	}
+
+
 	
 	/**
 	 * @param nrp
@@ -255,19 +259,17 @@ public class NoiseContext {
 	
 		if (yAbschnitt<yAbschnitt2) {
 			yAbschnitt2 = yAbschnitt2 - yAbschnitt;
-			yAbschnitt = 0;
 			xValue = yAbschnitt2 / (vector - vector2);
 			yValue = yAbschnittOriginal + (xValue*vector);
 		} else if(yAbschnitt2<yAbschnitt) {
 			yAbschnitt = yAbschnitt - yAbschnitt2;
-			yAbschnitt2 = 0;
 			xValue = yAbschnitt / (vector2 - vector);
 			yValue = yAbschnittOriginal + (xValue*vector);
 		}
 	
 		lotPointX = xValue;
 		lotPointY = yValue;
-		double distance = 0.;
+		double distance;
 		
 		if(((xValue>fromCoordX)&&(xValue<toCoordX))||((xValue>toCoordX)&&(xValue<fromCoordX))||((yValue>fromCoordY)&&(yValue<toCoordY))||((yValue>toCoordY)&&(yValue<fromCoordY))) {
 			// no edge solution
