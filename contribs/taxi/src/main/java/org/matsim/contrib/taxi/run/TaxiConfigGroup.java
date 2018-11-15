@@ -27,11 +27,12 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.dvrp.run.HasMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-public class TaxiConfigGroup extends ReflectiveConfigGroup {
+public class TaxiConfigGroup extends ReflectiveConfigGroup implements HasMode {
 	public static final String GROUP_NAME = "taxi";
 
 	@SuppressWarnings("deprecation")
@@ -90,7 +91,7 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 	public static final String DETAILED_STATS = "detailedStats";
 	static final String DETAILED_STATS_EXP = "If true, detailed hourly taxi stats are dumped after each iteration."
 			+ " False by default.";
-	
+
 	public static final String PRINT_WARNINGS = "plotDetailedWarnings";
 	static final String PRINT_WARNINGS_EXP = "Prints detailed warnings for taxi customers that cannot be served or routed. True by default.";
 
@@ -129,7 +130,7 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 	private boolean detailedStats = false;
 
 	private boolean breakSimulationIfNotAllRequestsServed = true;
-	
+
 	private boolean printDetailedWarnings = true;
 
 	public TaxiConfigGroup() {
@@ -159,6 +160,8 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 	/**
 	 * @return {@value #MODE_EXP}
 	 */
+
+	@Override
 	@StringGetter(MODE)
 	public String getMode() {
 		return mode;

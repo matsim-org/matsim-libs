@@ -19,9 +19,8 @@
 
 package org.matsim.contrib.taxi.run;
 
-import java.util.HashSet;
-
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
+import org.matsim.contrib.dvrp.run.HasMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 
@@ -42,11 +41,7 @@ public class TaxiConfigConsistencyChecker implements ConfigConsistencyChecker {
 				throw new RuntimeException("Either TaxiConfigGroup or MultiModeTaxiConfigGroup must be defined");
 			}
 			multiModeTaxiCfg.getTaxiConfigGroups().stream().forEach(this::checkTaxiModeConsistency);
-			boolean allModesUnique = multiModeTaxiCfg.getTaxiConfigGroups()
-					.stream()
-					.map(TaxiConfigGroup::getMode)
-					.allMatch(new HashSet<>()::add);
-			if (!allModesUnique) {
+			if (!HasMode.areModesUnique(multiModeTaxiCfg.getTaxiConfigGroups().stream())) {
 				throw new RuntimeException("Taxi modes are not unique");
 			}
 		}
