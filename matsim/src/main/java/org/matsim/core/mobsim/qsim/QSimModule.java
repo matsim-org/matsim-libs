@@ -98,12 +98,12 @@ public class QSimModule extends AbstractModule {
 //		}
 		
 		// yyyy the following will eventually be moved to QSim scope, and into TranistEngineModule:
-		if ( config.transit().isUseTransit() && config.transit().isUsingTransitInMobsim() ) {
-			bind( TransitStopHandlerFactory.class ).to( ComplexTransitStopHandlerFactory.class ) ;
-		} else {
-			// Explicit bindings are required, so although it may not be used, we need provide something.
-			bind( TransitStopHandlerFactory.class ).to( SimpleTransitStopHandlerFactory.class );
-		}
+//		if ( config.transit().isUseTransit() && config.transit().isUsingTransitInMobsim() ) {
+//			bind( TransitStopHandlerFactory.class ).to( ComplexTransitStopHandlerFactory.class ) ;
+//		} else {
+//			// Explicit bindings are required, so although it may not be used, we need provide something.
+//			bind( TransitStopHandlerFactory.class ).to( SimpleTransitStopHandlerFactory.class );
+//		}
 		// yy see MATSIM-756
 	}
 

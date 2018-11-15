@@ -10,13 +10,13 @@ public class EventsUtils {
 
     public static EventsManager createEventsManager() {
 		final EventsManagerImpl events = new EventsManagerImpl();
-		events.initProcessing();
+//		events.initProcessing();
 		return events;
     }
 
     public static EventsManager createEventsManager(Config config) {
 		final EventsManager events = Injector.createInjector( config, new EventsManagerModule() ).getInstance( EventsManager.class );
-		events.initProcessing();
+//		events.initProcessing();
 		return events;
     }
 
