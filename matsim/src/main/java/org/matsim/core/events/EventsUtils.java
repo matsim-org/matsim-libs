@@ -9,12 +9,15 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 public class EventsUtils {
 
     public static EventsManager createEventsManager() {
-        return new EventsManagerImpl();
+		final EventsManagerImpl events = new EventsManagerImpl();
+		events.initProcessing();
+		return events;
     }
 
     public static EventsManager createEventsManager(Config config) {
-        return Injector.createInjector(config, new EventsManagerModule())
-                .getInstance(EventsManager.class);
+		final EventsManager events = Injector.createInjector( config, new EventsManagerModule() ).getInstance( EventsManager.class );
+		events.initProcessing();
+		return events;
     }
 
     /**

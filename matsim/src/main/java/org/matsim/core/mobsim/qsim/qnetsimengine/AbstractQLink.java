@@ -144,8 +144,6 @@ abstract class AbstractQLink implements QLinkI {
 	public final void addParkedVehicle(MobsimVehicle vehicle) {
 		QVehicle qveh = (QVehicle) vehicle; // cast ok: when it gets here, it needs to be a qvehicle to work.
 
-		log.warn( "time=" + context.getSimTimer().getTimeOfDay() + "; linkId=" + this.link.getId() + "; addParkedVehicle w/ Id=" + qveh.getId() ) ;
-		
 		if ( this.parkedVehicles.put(qveh.getId(), qveh) != null ) {
 			if ( wrnCnt < 1 ) {
 				wrnCnt++ ;
