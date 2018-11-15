@@ -31,6 +31,7 @@ import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -43,16 +44,12 @@ import com.google.inject.Inject;
  */
 public class DrtAnalysisControlerListener implements IterationEndsListener {
 
-	@Inject
-	private DynModePassengerStats drtPassengerStats;
-	@Inject
-	private MatsimServices matsimServices;
-	@Inject
-	private Network network;
-	@Inject
-	private DrtRequestAnalyzer drtRequestAnalyzer;
-	private final DrtConfigGroup drtgroup;
-	private final Config config;
+	private final DynModePassengerStats drtPassengerStats;
+	private final MatsimServices matsimServices;
+	private final Network network;
+	private final DrtRequestAnalyzer drtRequestAnalyzer;
+	private final DrtConfigGroup drtCfg;
+	private final QSimConfigGroup qSimCfg;
 	private boolean headerWritten = false;
 	private boolean vheaderWritten = false;
 	private final String runId;
@@ -60,11 +57,18 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private final int maxcap;
 
 	@Inject
-	public DrtAnalysisControlerListener(Config config, @Drt Fleet fleet) {
-		this.config = config;
-		drtgroup = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
+	public DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, @Drt Fleet fleet,
+			DynModePassengerStats drtPassengerStats, MatsimServices matsimServices, Network network,
+			DrtRequestAnalyzer drtRequestAnalyzer) {
+		this.drtPassengerStats = drtPassengerStats;
+		this.matsimServices = matsimServices;
+		this.network = network;
+		this.drtRequestAnalyzer = drtRequestAnalyzer;
+		this.drtCfg = drtCfg;
+		this.qSimCfg = config.qsim();
 		runId = config.controler().getRunId();
 		maxcap = DynModeTripsAnalyser.findMaxCap(fleet);
+
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 		format.setMinimumIntegerDigits(1);
 		format.setMaximumFractionDigits(2);
@@ -96,16 +100,16 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		String occStats = DynModeTripsAnalyser.summarizeDetailedOccupancyStats(drtPassengerStats.getVehicleDistances(),
 				";", maxcap);
 		writeIterationVehicleStats(vehStats, occStats, event.getIteration());
-		if (drtgroup.isPlotDetailedCustomerStats()) {
+		if (drtCfg.isPlotDetailedCustomerStats()) {
 			DynModeTripsAnalyser.collection2Text(trips, filename(event, "drt_trips", ".csv"), DynModeTrip.HEADER);
 		}
 		DynModeTripsAnalyser.writeVehicleDistances(drtPassengerStats.getVehicleDistances(),
 				filename(event, "vehicleDistanceStats", ".csv"));
-		DynModeTripsAnalyser.analyseDetours(network, trips, drtgroup, filename(event, "drt_detours"));
+		DynModeTripsAnalyser.analyseDetours(network, trips, drtCfg, filename(event, "drt_detours"));
 		DynModeTripsAnalyser.analyseWaitTimes(filename(event, "waitStats"), trips, 1800);
-		if (drtgroup.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased)) {
-			DynModeTripsAnalyser.analyzeBoardingsAndDeboardings(trips, ";", config.qsim().getStartTime(),
-					config.qsim().getEndTime(), 3600, filename(event, "drt_boardings", ".csv"),
+		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased)) {
+			DynModeTripsAnalyser.analyzeBoardingsAndDeboardings(trips, ";", qSimCfg.getStartTime(),
+					qSimCfg.getEndTime(), 3600, filename(event, "drt_boardings", ".csv"),
 					filename(event, "drt_alightments", ".csv"), network);
 		}
 	}
@@ -116,7 +120,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 
 	private String filename(IterationEndsEvent event, String prefix, String extension) {
 		return matsimServices.getControlerIO()
-				.getIterationFilename(event.getIteration(), prefix + "_" + drtgroup.getMode() + extension);
+				.getIterationFilename(event.getIteration(), prefix + "_" + drtCfg.getMode() + extension);
 	}
 
 	/**
@@ -184,5 +188,4 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 			e.printStackTrace();
 		}
 	}
-
 }
