@@ -23,31 +23,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams.LogRouteDesignScore;
 import org.matsim.contrib.minibus.genericUtils.TerminusStopFinder;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.GeometryUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import com.vividsolutions.jts.geom.Polygon;
+
 /**
- * Calculate penalty score for circuitous TransitRoutes (TransitRoute of the
- * PPlan) measured as sum of all beeline distances of consecutive
- * StopsToBeServed TransitStops divided by the beeline distance between the two
- * terminus stops of the stopsToBeServed of the PPlan.
+ * Calculate penalty score for the area between all links (of
+ * the TransitRoute of the PPlan) divided by the beeline distance between the
+ * two terminus stops of the stopsToBeServed of the PPlan.
+ * 
+ * TransitRoutes which operate in different roads per direction have a bigger
+ * area between all TransitStopFacilities, so this can be useful to encourage
+ * TransitRoutes going back and forth on the same road instead of more circular
+ * routes.
  * 
  * @author gleich
  *
  */
-class Stop2StopVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
+class AreaBtwLinksVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 
-	private static final Logger log = Logger.getLogger(Stop2StopVsTerminiBeelinePenalty.class);
+	final static Logger log = Logger.getLogger(AreaBtwLinksVsTerminiBeelinePenalty.class);
 	private final RouteDesignScoreParams params;
+	private final Network network;
 
-	public Stop2StopVsTerminiBeelinePenalty(RouteDesignScoreParams params) {
+	public AreaBtwLinksVsTerminiBeelinePenalty(RouteDesignScoreParams params, Network network) {
 		this.params = params;
+		this.network = network;
 	}
 
 	@Override
@@ -57,35 +69,28 @@ class Stop2StopVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 				.get(TerminusStopFinder.findSecondTerminusStop(pPlan.getStopsToBeServed()));
 		double beelineLength = CoordUtils.calcEuclideanDistance(startStop.getCoord(), endStop.getCoord());
 
-		List<TransitStopFacility> stopListToEvaluate = new ArrayList<>();
-		switch (params.getStopListToEvaluate()) {
-		case transitRouteAllStops:
-			for (TransitRouteStop stop : route.getStops()) {
-				stopListToEvaluate.add(stop.getStopFacility());
+		List<Coord> coords = new ArrayList<>();
+		coords.add(network.getLinks().get(route.getRoute().getStartLinkId()).getToNode().getCoord());
+		for (Id<Link> id : route.getRoute().getLinkIds()) {
+			coords.add(network.getLinks().get(id).getToNode().getCoord());
+		}
+		coords.add(network.getLinks().get(route.getRoute().getEndLinkId()).getToNode().getCoord());
+
+		double area = 0;
+
+		if (coords.size() < 3) {
+			// not enough coords to calculate an area, no scoring possible
+			return 0;
+		} else {
+			try {
+				Polygon polygon = GeometryUtils.createGeotoolsPolygon(coords);
+				area = polygon.getArea();
+			} catch (IllegalArgumentException e) {
+				log.warn(e.getMessage());
 			}
-			break;
-		case pPlanStopsToBeServed:
-			stopListToEvaluate = pPlan.getStopsToBeServed();
-			break;
-		default:
-			log.error("Unknown stopListToEvaluate parameter :" + params.getStopListToEvaluate());
-			new RuntimeException();
 		}
 
-		double lengthStop2Stop = 0.0;
-		TransitStopFacility previousStop = stopListToEvaluate.get(0);
-
-		for (int i = 0; i < stopListToEvaluate.size(); i++) {
-			TransitStopFacility currentStop = stopListToEvaluate.get(i);
-			lengthStop2Stop = lengthStop2Stop
-					+ CoordUtils.calcEuclideanDistance(previousStop.getCoord(), currentStop.getCoord());
-			previousStop = currentStop;
-		}
-		// add leg from last to first stop
-		lengthStop2Stop = lengthStop2Stop
-				+ CoordUtils.calcEuclideanDistance(previousStop.getCoord(), stopListToEvaluate.get(0).getCoord());
-
-		double score = lengthStop2Stop / beelineLength - params.getValueToStartScoring();
+		double score = area / beelineLength - params.getValueToStartScoring();
 		if (score > 0) {
 			score = params.getCostFactor() * score;
 		} else {
@@ -93,10 +98,10 @@ class Stop2StopVsTerminiBeelinePenalty implements RouteDesignScoringFunction {
 			// subsidy
 			score = 0;
 		}
-		
+
 		if (params.getLogScore().equals(LogRouteDesignScore.onlyNonZeroScore) && score != 0) {
-			log.info("Transit Route " + route.getId() + " scored " + score + " (length stop2stop " + lengthStop2Stop
-					+ "; beeline " + beelineLength);
+			log.info("Transit Route " + route.getId() + " scored " + score + " (area " + area + "; beeline "
+					+ beelineLength);
 		}
 		return score;
 	}

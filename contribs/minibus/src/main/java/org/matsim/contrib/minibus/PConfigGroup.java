@@ -54,6 +54,8 @@ public final class PConfigGroup extends ConfigGroup{
 		StopLocationSelector(String name) {this.name = name;}
 	}
 	
+	public static enum LogRouteDesignVsTotalScore {no, onlyNonZeroRouteDesignScore}
+	
 	// Tags
 	
 	public static final String GROUP_NAME = "p";
@@ -87,6 +89,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private static final String USEFRANCHISE = "useFranchise";
 	private static final String WRITESTATS_INTERVAL = "writeStatsInterval";
 	private static final String LOG_OPERATORS = "logOperators";
+	private static final String LOG_ROUTE_DESIGN_VS_TOTAL_SCORE = "logRouteDesignVsTotalScore";
 	private static final String WRITE_METRICS = "writeMetrics";
 	private static final String WRITE_GEXF_STATS_INTERVAL = "writeGexfStatsInterval";
 	private static final String ROUTE_PROVIDER = "routeProvider";
@@ -146,6 +149,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private boolean useFranchise = false;
 	private int writeStatsInterval = 0;
 	private boolean logOperators = false;
+	private LogRouteDesignVsTotalScore logRouteDesignVsTotalScore = LogRouteDesignVsTotalScore.no;
 	private boolean writeMetrics = false;
 	private int writeGexfStatsInterval = 0;
 	private String routeProvider = "SimpleCircleScheduleProvider";
@@ -248,6 +252,8 @@ public final class PConfigGroup extends ConfigGroup{
 			this.writeStatsInterval = Integer.parseInt(value);
 		} else if (LOG_OPERATORS.equals(key)){
 			this.logOperators = Boolean.parseBoolean(value);		
+		} else if (LOG_ROUTE_DESIGN_VS_TOTAL_SCORE.equals(key)){
+			this.logRouteDesignVsTotalScore = LogRouteDesignVsTotalScore.valueOf(value);	
 		} else if (WRITE_METRICS.equals(key)){
 			this.writeMetrics = Boolean.parseBoolean(value);		
 		} else if (WRITE_GEXF_STATS_INTERVAL.equals(key)) {
@@ -346,6 +352,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(USEFRANCHISE, Boolean.toString(this.useFranchise));
 		map.put(WRITESTATS_INTERVAL, Integer.toString(this.writeStatsInterval));
 		map.put(LOG_OPERATORS, Boolean.toString(this.logOperators));
+		map.put(LOG_ROUTE_DESIGN_VS_TOTAL_SCORE, this.logRouteDesignVsTotalScore.toString());
 		map.put(WRITE_METRICS, Boolean.toString(this.writeMetrics));
 		map.put(WRITE_GEXF_STATS_INTERVAL, Integer.toString(this.writeGexfStatsInterval));
 		map.put(ROUTE_PROVIDER, this.routeProvider);
@@ -411,6 +418,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(USEFRANCHISE, "Will use a franchise system if set to true");
 		map.put(WRITESTATS_INTERVAL, "interval in which statistics will be plotted. Set to zero to turn this feature off. Set to something larger than the total number of iterations to turn off the plots, but write the statistics file anyway");
 		map.put(LOG_OPERATORS, "will log operators individually if set to true");
+		map.put(LOG_ROUTE_DESIGN_VS_TOTAL_SCORE, "will log total score before and after adding route design score. Values: " + LogRouteDesignVsTotalScore.no + " and " + LogRouteDesignVsTotalScore.onlyNonZeroRouteDesignScore);
 		map.put(WRITE_METRICS, "will calculate common performance metrics if set to true, default is false");
 		map.put(WRITE_GEXF_STATS_INTERVAL, "number of iterations the gexf output gets updated. Set to zero to turn this feature off");
 		map.put(ROUTE_PROVIDER, "The route provider used. Currently, there are SimpleCircleScheduleProvider and SimpleBackAndForthScheduleProvider");
@@ -557,6 +565,10 @@ public final class PConfigGroup extends ConfigGroup{
 	
 	public boolean getLogOperators() {
 		return this.logOperators;
+	}
+	
+	public LogRouteDesignVsTotalScore getLogLogRouteDesignVsTotalScore() {
+		return this.logRouteDesignVsTotalScore;
 	}
 	
 	public boolean getWriteMetrics() {
@@ -755,6 +767,7 @@ public final class PConfigGroup extends ConfigGroup{
 		public static final String SET_TYPE = "routeDesignScoreParameters";
 		public static final String ROUTE_DESIGN_SCORE_FUNCTION = "routeDesignScoreFunction";
 		public static final String COST_FACTOR = "costFactor";
+		public static final String LOG_SCORE = "logScore";
 		public static final String STOP_LIST_TO_EVALUATE = "stopListToEvaluate";
 		public static final String VALUE_T0_START_SCORING = "valueToStartScoring";
 
@@ -762,8 +775,13 @@ public final class PConfigGroup extends ConfigGroup{
 			transitRouteAllStops, pPlanStopsToBeServed
 		}
 		
+		public enum LogRouteDesignScore {
+			no, onlyNonZeroScore
+		}
+		
 		private RouteDesignScoringManager.RouteDesignScoreFunctionName routeDesignScoreFunction = null;
 		private double costFactor = 0.0;
+		private LogRouteDesignScore logScore = LogRouteDesignScore.no;
 		private StopListToEvaluate stopListToEvaluate = StopListToEvaluate.transitRouteAllStops;
 		private double valueToStartScoring = 0.0;
 		
@@ -779,6 +797,7 @@ public final class PConfigGroup extends ConfigGroup{
 			for (RouteDesignScoringManager.RouteDesignScoreFunctionName scoreFunctionName: 
 				RouteDesignScoringManager.RouteDesignScoreFunctionName.values()) {
 				defaultRouteDesignScoreFunctions.append(scoreFunctionName.toString());
+				defaultRouteDesignScoreFunctions.append(", ");
 			}
 			
 			map.put( ROUTE_DESIGN_SCORE_FUNCTION,
@@ -815,6 +834,20 @@ public final class PConfigGroup extends ConfigGroup{
 		@StringGetter( COST_FACTOR )
 		public double getCostFactor() {
 			return this.costFactor;
+		}
+		
+		@StringSetter( LOG_SCORE )
+		public void setLogScore(final String logScore) {
+			setLogScore(LogRouteDesignScore.valueOf(logScore));
+		}
+		
+		public void setLogScore(final LogRouteDesignScore logScore) {
+			this.logScore = logScore;
+		}
+
+		@StringGetter( LOG_SCORE )
+		public LogRouteDesignScore getLogScore() {
+			return this.logScore;
 		}
 		
 		@StringSetter( STOP_LIST_TO_EVALUATE )
