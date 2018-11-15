@@ -121,7 +121,7 @@ public class MultiModeDrtQSimModule extends AbstractQSimModule {
 					}
 				}).asEagerSingleton();
 
-		bind(modalKey(DrtScheduleInquiry.class)).asEagerSingleton();
+		bind(modalKey(DrtScheduleInquiry.class)).to(DrtScheduleInquiry.class).asEagerSingleton();
 
 		bind(modalKey(RequestInsertionScheduler.class)).toProvider(ModalProviders.createProvider(drtCfg.getMode(),
 				getter -> new RequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
