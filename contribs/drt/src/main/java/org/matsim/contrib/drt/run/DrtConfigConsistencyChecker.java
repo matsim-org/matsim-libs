@@ -24,6 +24,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebal
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParamsConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup.OperationalScheme;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
+import org.matsim.contrib.dvrp.run.HasMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.groups.GlobalConfigGroup;
@@ -37,8 +38,22 @@ public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
 	public void checkConsistency(Config config) {
 		new DvrpConfigConsistencyChecker().checkConsistency(config);
 
-		checkDrtConfigConsistency(DrtConfigGroup.get(config), config.global());
-
+		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
+		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(config);
+		if (drtCfg != null) {
+			if (multiModeDrtCfg != null) {
+				throw new RuntimeException("Either DrtConfigGroup or MultiModeDrtConfigGroup must be defined");
+			}
+			checkDrtConfigConsistency(drtCfg, config.global());
+		} else {
+			if (multiModeDrtCfg == null) {
+				throw new RuntimeException("Either DrtConfigGroup or MultiModeDrtConfigGroup must be defined");
+			}
+			multiModeDrtCfg.getDrtConfigGroups().stream().forEach(c -> checkDrtConfigConsistency(c, config.global()));
+			if (!HasMode.areModesUnique(multiModeDrtCfg.getDrtConfigGroups().stream())) {
+				throw new RuntimeException("Drt modes are not unique");
+			}
+		}
 		if (Time.isUndefinedTime(config.qsim().getEndTime())
 				&& config.qsim().getSimEndtimeInterpretation() != EndtimeInterpretation.onlyUseEndtime) {
 			// Not an issue if all request rejections are immediate (i.e. happen during request submission)
