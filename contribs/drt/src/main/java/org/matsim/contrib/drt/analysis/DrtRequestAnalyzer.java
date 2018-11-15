@@ -81,9 +81,6 @@ public class DrtRequestAnalyzer implements DrtRequestRejectedEventHandler, DrtRe
 	}
 	
 	
-	/* (non-Javadoc)
-	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
-	 */
 	@Override
 	public void reset(int iteration) {
 		submittedRequests.clear();
@@ -92,9 +89,6 @@ public class DrtRequestAnalyzer implements DrtRequestRejectedEventHandler, DrtRe
 		rejections.clear();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler#handleEvent(org.matsim.api.core.v01.events.PersonEntersVehicleEvent)
-	 */
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (this.scheduledRequests.containsKey(event.getPersonId())){
@@ -107,9 +101,6 @@ public class DrtRequestAnalyzer implements DrtRequestRejectedEventHandler, DrtRe
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler#handleEvent(org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent)
-	 */
 	@Override
 	public void handleEvent(DrtRequestScheduledEvent event) {
 		DrtRequestSubmittedEvent submission  = this.submittedRequests.get(event.getRequestId());
@@ -119,17 +110,11 @@ public class DrtRequestAnalyzer implements DrtRequestRejectedEventHandler, DrtRe
 		else throw new RuntimeException("Vehicle allocation without submission?");
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEventHandler#handleEvent(org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent)
-	 */
 	@Override
 	public void handleEvent(DrtRequestSubmittedEvent event) {
 		this.submittedRequests.put(event.getRequestId(), event);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEventHandler#handleEvent(org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent)
-	 */
 	@Override
 	public void handleEvent(DrtRequestRejectedEvent event) {
 		DrtRequestSubmittedEvent submission = this.submittedRequests.remove(event.getRequestId());

@@ -59,9 +59,6 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private final DecimalFormat format = new DecimalFormat();
 	private final int maxcap;
 
-	/**
-	 *
-	 */
 	@Inject
 	public DrtAnalysisControlerListener(Config config, @Drt Fleet fleet) {
 		this.config = config;
@@ -74,13 +71,6 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		format.setGroupingUsed(false);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.
-	 * IterationEndsEvent)
-	 */
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
