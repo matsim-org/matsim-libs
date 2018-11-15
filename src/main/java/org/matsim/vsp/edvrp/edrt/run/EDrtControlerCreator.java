@@ -27,6 +27,7 @@ import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.DrtModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -43,7 +44,7 @@ import org.matsim.vsp.edvrp.edrt.optimizer.depot.NearestChargerAsDepot;
 public class EDrtControlerCreator {
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		DrtControlerCreator.adjustDrtConfig(config);
+		DrtConfigs.adjustDrtConfig(DrtConfigGroup.get(config), config.planCalcScore());
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
 		Controler controler = new Controler(scenario);
