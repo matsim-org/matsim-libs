@@ -128,8 +128,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	 * @param it             iteration
 	 */
 	private void writeIterationPassengerStats(String summarizeTrips, int it) {
-		BufferedWriter bw = IOUtils.getAppendingBufferedWriter(
-				matsimServices.getControlerIO().getOutputFilename("drt_customer_stats.csv"));
+		BufferedWriter bw = getAppendingBufferedWriter("drt_customer_stats", ".csv");
 		try {
 			if (!headerWritten) {
 				headerWritten = true;
@@ -151,8 +150,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	 * @param it                iteration
 	 */
 	private void writeIterationVehicleStats(String summarizeVehicles, String vehOcc, int it) {
-		BufferedWriter bw = IOUtils.getAppendingBufferedWriter(
-				matsimServices.getControlerIO().getOutputFilename("drt_vehicle_stats.csv"));
+		BufferedWriter bw = getAppendingBufferedWriter("drt_vehicle_stats", ".csv");
 		try {
 			if (!vheaderWritten) {
 				bw.write(
@@ -169,8 +167,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 			e.printStackTrace();
 		}
 
-		BufferedWriter bw2 = IOUtils.getAppendingBufferedWriter(
-				matsimServices.getControlerIO().getOutputFilename("drt_detailed_distanceStats.csv"));
+		BufferedWriter bw2 = getAppendingBufferedWriter("drt_detailed_distanceStats", ".csv");
 		try {
 			if (!vheaderWritten) {
 				vheaderWritten = true;
@@ -187,5 +184,10 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private BufferedWriter getAppendingBufferedWriter(String prefix, String extension) {
+		return IOUtils.getAppendingBufferedWriter(
+				matsimServices.getControlerIO().getOutputFilename(prefix + "_" + drtCfg.getMode() + extension));
 	}
 }
