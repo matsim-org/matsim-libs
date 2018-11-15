@@ -99,6 +99,6 @@ public class RunMultiModeTaxiExample {
 	}
 
 	public static void main(String[] args) {
-		RunMultiModeTaxiExample.run(false, 0); // switch to 'true' to turn on visualisation
+		run(false, 0); // switch to 'true' to turn on visualisation
 	}
 }

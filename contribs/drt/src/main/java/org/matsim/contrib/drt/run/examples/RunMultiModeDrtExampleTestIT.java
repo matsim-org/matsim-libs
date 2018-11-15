@@ -1,4 +1,5 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
@@ -14,18 +15,16 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
 package org.matsim.contrib.drt.run.examples;
 
 import org.junit.Test;
 
-/**
- * @author michalm
- */
-public class RunOneSharedTaxiExampleIT {
+public class RunMultiModeDrtExampleTestIT {
 	@Test
 	public void testRun() {
-		RunOneSharedTaxiExample.run(false, 1);
+		RunMultiModeDrtExample.run(false, 1);
 	}
 }

@@ -57,7 +57,10 @@ public class RunMultiModeDrtExample {
 
 	private static final String CONFIG_FILE = "multi_mode_one_shared_taxi/multi_mode_one_shared_taxi_config.xml";
 
-	public static void run(Config config, boolean otfvis) {
+	public static void run(boolean otfvis, int lastIteration) {
+		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new MultiModeDrtConfigGroup(),
+				new DvrpConfigGroup(), new OTFVisConfigGroup());
+
 		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(config);
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
 			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
@@ -103,10 +106,6 @@ public class RunMultiModeDrtExample {
 	}
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new MultiModeDrtConfigGroup(),
-				new DvrpConfigGroup(), new OTFVisConfigGroup());
-		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
-		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.kinematicWaves);
-		run(config, false);
+		run(false, 0);
 	}
 }
