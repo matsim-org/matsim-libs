@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.drt.analysis.MultiModeDrtAnalysisModule;
 import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -41,7 +42,6 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -58,8 +58,8 @@ public class RunMultiModeDrtExample {
 	private static final String CONFIG_FILE = "multi_mode_one_shared_taxi/multi_mode_one_shared_taxi_config.xml";
 
 	public static void run(boolean otfvis, int lastIteration) {
-		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new MultiModeDrtConfigGroup(),
-				new DvrpConfigGroup(), new OTFVisConfigGroup());
+		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
 
 		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(config);
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
@@ -78,6 +78,7 @@ public class RunMultiModeDrtExample {
 			dvrpModeQSimModules.add(new DvrpModeQSimModule.Builder(drtCfg.getMode()).build());
 			controler.addQSimModule(new MultiModeDrtQSimModule(drtCfg));
 			controler.addOverridingModule(new MultiModeDrtModule(drtCfg));
+			controler.addOverridingModule(new MultiModeDrtAnalysisModule(drtCfg));
 		}
 
 		controler.addOverridingModule(new DvrpModule(dvrpModeQSimModules.stream().toArray(DvrpModeQSimModule[]::new)));
