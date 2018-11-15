@@ -62,7 +62,10 @@ public class RunMultiModeDrtExample {
 	private static final String MIELEC_CONFIG_FILE = "mielec_2014_02/mielec_drt_config.xml";
 
 	public static void run(Config config, boolean otfvis) {
-		DrtConfigs.adjustDrtConfig(DrtConfigGroup.get(config), config.planCalcScore());
+		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(config);
+		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
+			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
+		}
 		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
 		config.checkConsistency();
 
