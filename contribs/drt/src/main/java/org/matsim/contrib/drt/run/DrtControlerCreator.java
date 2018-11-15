@@ -59,7 +59,6 @@ public final class DrtControlerCreator {
 	}
 
 	public static void addDrtRouteFactory(Scenario scenario) {
-
 		RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
 		if (routeFactories.getRouteClassForType(DrtRoute.ROUTE_TYPE).equals(Route.class)) {
 			routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
@@ -96,7 +95,7 @@ public final class DrtControlerCreator {
 		config.checkConsistency();
 
 		Scenario scenario = scenarioLoader.apply(config);
-		addDrtRouteFactory(scenario);
+
 		Controler controler = new Controler(scenario);
 		addDrtAsSingleDvrpModeToControler(controler);
 		if (otfvis) {
