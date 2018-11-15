@@ -65,7 +65,11 @@ import com.google.inject.name.Names;
  * @author michalm (Michal Maciejewski)
  */
 public final class MultiModeDrtModule extends AbstractModule {
-	private DrtConfigGroup drtCfg;
+	private final DrtConfigGroup drtCfg;
+
+	public MultiModeDrtModule(DrtConfigGroup drtCfg) {
+		this.drtCfg = drtCfg;
+	}
 
 	@Override
 	public void install() {
