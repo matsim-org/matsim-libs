@@ -154,16 +154,16 @@ public class QSimProvider implements Provider<QSim> {
 			throw new IllegalStateException("QNetworkFactory should only be bound via AbstractQSimModule");
 		}
 
-//		boolean foundTransitStopHandlerFactoryBinding = true;
-//
-//		try {
-//			injector.getBinding(TransitStopHandlerFactory.class);
-//		} catch (ConfigurationException e) {
-//			foundTransitStopHandlerFactoryBinding = false;
-//		}
-//
-//		if (foundTransitStopHandlerFactoryBinding) {
-//			throw new IllegalStateException("TransitStopHandlerFactory should be bound via AbstractQSimModule");
-//		}
+		boolean foundTransitStopHandlerFactoryBinding = true;
+
+		try {
+			injector.getBinding(TransitStopHandlerFactory.class);
+		} catch (ConfigurationException e) {
+			foundTransitStopHandlerFactoryBinding = false;
+		}
+
+		if (foundTransitStopHandlerFactoryBinding) {
+			throw new IllegalStateException("TransitStopHandlerFactory should be bound via AbstractQSimModule");
+		}
 	}
 }
