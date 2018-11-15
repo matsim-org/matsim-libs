@@ -76,11 +76,6 @@ public class MultiModeDrtQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		//FIXME move outside (currently - a singleton; not one instance per mode)
-		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-		//FIXME move outside (currently - a singleton; not one instance per mode)
-		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Drt.class);
-
 		bind(modalKey(DrtOptimizer.class)).toProvider(ModalProviders.createProvider(drtCfg.getMode(),
 				getter -> new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 						getter.get(EventsManager.class), getter.getModal(DrtRequestValidator.class),
