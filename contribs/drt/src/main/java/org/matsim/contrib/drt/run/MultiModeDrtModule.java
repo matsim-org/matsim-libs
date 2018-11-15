@@ -80,9 +80,6 @@ public final class MultiModeDrtModule extends AbstractModule {
 		bind(modalKey(DepotFinder.class)).toProvider(ModalProviders.createProvider(mode,
 				getter -> new NearestStartLinkAsDepot(getter.getModal(Fleet.class))));
 
-		//FIXME move outside (currently - a singleton; not one instance per mode)
-		bind(TravelDisutilityFactory.class).annotatedWith(Drt.class).toInstance(TimeAsTravelDisutility::new);
-
 		if (MinCostFlowRebalancingParams.isRebalancingEnabled(drtCfg.getMinCostFlowRebalancing())) {
 			install(new MultiModalMinCostFlowRebalancingModule(drtCfg));
 		} else {

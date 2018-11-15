@@ -32,6 +32,7 @@ import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.drt.run.MultiModeDrtQSimModule;
+import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -41,9 +42,11 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -51,7 +54,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author michal.mac
  */
 public class RunMultiModeDrtExample {
-	
+
 	private static final String COTTBUS_CONFIG_FILE_DOOR2DOOR = "drt_example/drtconfig_door2door.xml";
 	@SuppressWarnings("unused")
 	private static final String COTTBUS_CONFIG_FILE_STOPBASED = "drt_example/drtconfig_stopbased.xml";
@@ -78,6 +81,14 @@ public class RunMultiModeDrtExample {
 
 		controler.addOverridingModule(new DvrpModule(dvrpModeQSimModules.stream().toArray(DvrpModeQSimModule[]::new)));
 
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(TravelDisutilityFactory.class).annotatedWith(Drt.class)
+						.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
+			}
+		});
+
 		controler.addQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
@@ -94,8 +105,8 @@ public class RunMultiModeDrtExample {
 	}
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(COTTBUS_CONFIG_FILE_DOOR2DOOR, new DrtConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
+		Config config = ConfigUtils.loadConfig(COTTBUS_CONFIG_FILE_DOOR2DOOR, new DrtConfigGroup(),
+				new DvrpConfigGroup(), new OTFVisConfigGroup());
 		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.kinematicWaves);
 		run(config, false);
