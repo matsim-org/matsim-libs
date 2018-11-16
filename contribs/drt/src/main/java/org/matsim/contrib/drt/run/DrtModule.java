@@ -44,8 +44,9 @@ public final class DrtModule extends AbstractModule {
 	@Override
 	public void install() {
 		String mode = drtCfg.getMode();
-		install(FleetProvider.createModule(mode, drtCfg.getVehiclesFileUrl(getConfig().getContext())));
-		bind(Fleet.class).annotatedWith(Drt.class).to(DvrpModes.key(Fleet.class, mode)).asEagerSingleton();
+		bind(DvrpModes.key(Fleet.class, mode)).toProvider(new FleetProvider(drtCfg.getVehiclesFile()))
+				.asEagerSingleton();
+		bind(Fleet.class).annotatedWith(Drt.class).to(DvrpModes.key(Fleet.class, mode));
 
 		bind(DrtRequestValidator.class).to(DefaultDrtRequestValidator.class);
 		bind(DepotFinder.class).to(NearestStartLinkAsDepot.class);

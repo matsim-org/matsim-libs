@@ -45,8 +45,8 @@ public final class TaxiModule extends AbstractModule {
 	@Override
 	public void install() {
 		String mode = taxiCfg.getMode();
-		install(FleetProvider.createModule(mode, taxiCfg.getTaxisFileUrl(getConfig().getContext())));
-		bind(Fleet.class).annotatedWith(Taxi.class).to(DvrpModes.key(Fleet.class, mode)).asEagerSingleton();
+		bind(DvrpModes.key(Fleet.class, mode)).toProvider(new FleetProvider(taxiCfg.getTaxisFile())).asEagerSingleton();
+		bind(Fleet.class).annotatedWith(Taxi.class).to(DvrpModes.key(Fleet.class, mode));
 
 		bind(TravelDisutilityFactory.class).annotatedWith(Taxi.class)
 				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));

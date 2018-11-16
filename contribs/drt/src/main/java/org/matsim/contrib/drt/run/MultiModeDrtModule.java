@@ -73,7 +73,8 @@ public final class MultiModeDrtModule extends AbstractModule {
 	@Override
 	public void install() {
 		String mode = drtCfg.getMode();
-		install(FleetProvider.createModule(mode, drtCfg.getVehiclesFileUrl(getConfig().getContext())));
+		bind(DvrpModes.key(Fleet.class, mode)).toProvider(new FleetProvider(drtCfg.getVehiclesFile()))
+				.asEagerSingleton();
 
 		bind(modalKey(DrtRequestValidator.class)).to(DefaultDrtRequestValidator.class).asEagerSingleton();
 		bind(modalKey(DepotFinder.class)).toProvider(ModalProviders.createProvider(mode,

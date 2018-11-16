@@ -50,8 +50,7 @@ public final class MultiModeTaxiModule extends AbstractModule {
 	@Override
 	public void install() {
 		String mode = taxiCfg.getMode();
-
-		install(FleetProvider.createModule(mode, taxiCfg.getTaxisFileUrl(getConfig().getContext())));
+		bind(DvrpModes.key(Fleet.class, mode)).toProvider(new FleetProvider(taxiCfg.getTaxisFile())).asEagerSingleton();
 
 		bind(modalKey(SubmittedTaxiRequestsCollector.class)).to(SubmittedTaxiRequestsCollector.class)
 				.asEagerSingleton();
