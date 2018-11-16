@@ -27,6 +27,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
@@ -46,7 +47,6 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm
@@ -138,6 +138,6 @@ public class MultiModeTaxiQSimModule extends AbstractQSimModule {
 	}
 
 	private <T> Key<T> modalKey(Class<T> type) {
-		return Key.get(type, Names.named(taxiCfg.getMode()));
+		return DvrpModes.key(type, taxiCfg.getMode());
 	}
 }

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileWriter;
 import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -34,7 +35,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.MatsimServices;
 
 import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm (Michal Maciejewski)
@@ -68,6 +68,6 @@ public class MultiModeDrtAnalysisModule extends AbstractModule {
 	}
 
 	private <T> Key<T> modalKey(Class<T> type) {
-		return Key.get(type, Names.named(drtCfg.getMode()));
+		return DvrpModes.key(type, drtCfg.getMode());
 	}
 }

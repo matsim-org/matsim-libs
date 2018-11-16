@@ -43,7 +43,7 @@ import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStop
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
@@ -59,7 +59,6 @@ import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm (Michal Maciejewski)
@@ -184,6 +183,6 @@ public final class MultiModeDrtModule extends AbstractModule {
 	}
 
 	private <T> Key<T> modalKey(Class<T> type) {
-		return Key.get(type, Names.named(drtCfg.getMode()));
+		return Key.get(type, DvrpModes.mode(drtCfg.getMode()));
 	}
 }

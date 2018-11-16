@@ -47,9 +47,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -62,7 +61,6 @@ import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -170,6 +168,6 @@ public class MultiModeDrtQSimModule extends AbstractQSimModule {
 	}
 
 	private <T> Key<T> modalKey(Class<T> type) {
-		return Key.get(type, Names.named(drtCfg.getMode()));
+		return DvrpModes.key(type, drtCfg.getMode());
 	}
 }

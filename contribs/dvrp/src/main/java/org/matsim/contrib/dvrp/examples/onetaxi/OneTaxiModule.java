@@ -24,14 +24,13 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.run.DvrpMode;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -52,15 +51,15 @@ public class OneTaxiModule extends AbstractModule {
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				Named namedTaxi = Names.named(TransportMode.taxi);
+				DvrpMode dvrpMode = DvrpModes.mode(TransportMode.taxi);
 				// optimizer that dispatches taxis
-				bind(VrpOptimizer.class).annotatedWith(namedTaxi).to(OneTaxiOptimizer.class).asEagerSingleton();
+				bind(VrpOptimizer.class).annotatedWith(dvrpMode).to(OneTaxiOptimizer.class).asEagerSingleton();
 				// converts departures of the "taxi" mode into taxi requests
-				bind(PassengerRequestCreator.class).annotatedWith(namedTaxi)
+				bind(PassengerRequestCreator.class).annotatedWith(dvrpMode)
 						.to(OneTaxiRequestCreator.class)
 						.asEagerSingleton();
 				// converts scheduled tasks into simulated actions (legs and activities)
-				bind(VrpAgentLogic.DynActionCreator.class).annotatedWith(namedTaxi)
+				bind(VrpAgentLogic.DynActionCreator.class).annotatedWith(dvrpMode)
 						.to(OneTaxiActionCreator.class)
 						.asEagerSingleton();
 			}

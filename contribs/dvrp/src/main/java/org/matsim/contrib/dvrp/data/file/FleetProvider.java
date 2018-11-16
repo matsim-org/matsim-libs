@@ -24,12 +24,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm
@@ -56,9 +56,7 @@ public class FleetProvider implements Provider<Fleet> {
 		return new AbstractModule() {
 			@Override
 			public void install() {
-				bind(Fleet.class).annotatedWith(Names.named(mode))
-						.toProvider(new FleetProvider(url))
-						.asEagerSingleton();
+				bind(DvrpModes.key(Fleet.class, mode)).toProvider(new FleetProvider(url)).asEagerSingleton();
 			}
 		};
 	}

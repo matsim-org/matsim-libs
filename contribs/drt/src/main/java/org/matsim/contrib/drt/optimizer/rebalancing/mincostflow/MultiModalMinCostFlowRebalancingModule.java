@@ -28,12 +28,12 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebal
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm
@@ -70,6 +70,6 @@ public class MultiModalMinCostFlowRebalancingModule extends AbstractModule {
 	}
 
 	private <T> Key<T> modalKey(Class<T> type) {
-		return Key.get(type, Names.named(drtCfg.getMode()));
+		return DvrpModes.key(type, drtCfg.getMode());
 	}
 }

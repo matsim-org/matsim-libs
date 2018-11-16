@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.run;
 
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
-import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.taxi.data.validator.DefaultTaxiRequestValidator;
@@ -34,11 +34,8 @@ import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 import com.google.inject.Key;
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm
@@ -53,7 +50,6 @@ public final class MultiModeTaxiModule extends AbstractModule {
 	@Override
 	public void install() {
 		String mode = taxiCfg.getMode();
-		Named namedMode = Names.named(mode);
 
 		install(FleetProvider.createModule(mode, taxiCfg.getTaxisFileUrl(getConfig().getContext())));
 
@@ -83,6 +79,6 @@ public final class MultiModeTaxiModule extends AbstractModule {
 	}
 
 	private <T> Key<T> modalKey(Class<T> type) {
-		return Key.get(type, Names.named(taxiCfg.getMode()));
+		return DvrpModes.key(type, taxiCfg.getMode());
 	}
 }

@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
 import org.matsim.core.config.ConfigGroup;
@@ -34,7 +35,6 @@ import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 
 /**
@@ -57,12 +57,11 @@ public class OneTruckModule extends AbstractModule {
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				Named namedTruck = Names.named(TransportMode.truck);
 				bind(OneTruckRequestCreator.class).asEagerSingleton();
-				bind(VrpOptimizer.class).annotatedWith(namedTruck).to(OneTruckOptimizer.class).asEagerSingleton();
-				bind(VrpAgentLogic.DynActionCreator.class).annotatedWith(namedTruck)
-						.to(OneTruckActionCreator.class)
+				bind(DvrpModes.key(VrpOptimizer.class, TransportMode.truck)).to(OneTruckOptimizer.class)
 						.asEagerSingleton();
+				bind(DvrpModes.key(VrpAgentLogic.DynActionCreator.class, TransportMode.truck)).to(
+						OneTruckActionCreator.class).asEagerSingleton();
 			}
 		});
 	}

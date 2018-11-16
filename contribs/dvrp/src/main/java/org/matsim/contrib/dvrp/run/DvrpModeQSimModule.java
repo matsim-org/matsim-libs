@@ -57,14 +57,14 @@ public class DvrpModeQSimModule extends AbstractQSimModule {
 			@Override
 			protected void configureQSim() {
 				for (Class<? extends MobsimListener> l : listeners) {
-					addNamedComponent(l, mode);
+					addComponent(l, DvrpModes.mode(mode));
 				}
 			}
 		});
 	}
 
 	public void configureComponents(QSimComponentsConfig components) {
-		components.addNamedComponent(mode);
+		components.addComponent(DvrpModes.mode(mode));
 	}
 
 	public static class Builder {

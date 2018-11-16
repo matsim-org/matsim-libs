@@ -18,36 +18,19 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.vrpagent;
+package org.matsim.contrib.dvrp.run;
 
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.QSim;
+import com.google.inject.Key;
 
-import com.google.inject.Inject;
-
-public class VrpAgentSourceQSimModule extends AbstractQSimModule {
-	private final String mode;
-
-	public VrpAgentSourceQSimModule(String mode) {
-		this.mode = mode;
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class DvrpModes {
+	public static DvrpMode mode(String mode) {
+		return new DvrpModeImpl(mode);
 	}
 
-	@Override
-	protected void configureQSim() {
-		bindComponent(VrpAgentSource.class, DvrpModes.mode(mode)).toProvider(
-				new ModalProviders.AbstractProvider<VrpAgentSource>(mode) {
-					@Inject
-					private QSim qSim;
-
-					@Override
-					public VrpAgentSource get() {
-						return new VrpAgentSource(getModalInstance(VrpAgentLogic.DynActionCreator.class),
-								getModalInstance(Fleet.class), getModalInstance(VrpOptimizer.class), qSim);
-					}
-				}).asEagerSingleton();
+	public static <T> Key<T> key(Class<T> type, String mode) {
+		return Key.get(type, mode(mode));
 	}
 }
