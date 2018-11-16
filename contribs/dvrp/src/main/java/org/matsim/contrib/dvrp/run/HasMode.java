@@ -1,4 +1,5 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
@@ -14,18 +15,21 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.drt.run.examples;
+package org.matsim.contrib.dvrp.run;
 
-import org.junit.Test;
+import java.util.HashSet;
+import java.util.stream.Stream;
 
 /**
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public class RunOneSharedTaxiExampleIT {
-	@Test
-	public void testRun() {
-		RunOneSharedTaxiExample.run(false, 1);
+public interface HasMode {
+	String getMode();
+
+	static boolean areModesUnique(Stream<? extends HasMode> elementsWithModes) {
+		return elementsWithModes.map(HasMode::getMode).allMatch(new HashSet<>()::add);
 	}
 }

@@ -18,9 +18,29 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.drt.analysis;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -45,20 +65,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import java.awt.*;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.List;
-import java.util.Map.Entry;
-
 /**
  * @author jbischoff
- *
  */
 
 public class DynModeTripsAnalyser {
@@ -90,21 +98,22 @@ public class DynModeTripsAnalyser {
 
 	}
 
-	public static void analyzeBoardingsAndDeboardings(List<DynModeTrip> trips, String delimiter, double startTime, double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
+	public static void analyzeBoardingsAndDeboardings(List<DynModeTrip> trips, String delimiter, double startTime,
+			double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
 		Map<Id<Link>, int[]> boardings = new HashMap<>();
 		Map<Id<Link>, int[]> deboardings = new HashMap<>();
 		double actualstartTime = Math.max(startTime, 0.0);
-		int bins = (int) ((endTime - actualstartTime) / timeBinSize);
+		int bins = (int)((endTime - actualstartTime) / timeBinSize);
 
 		for (DynModeTrip trip : trips) {
 			int[] board = boardings.getOrDefault(trip.getFromLinkId(), new int[bins]);
-			int startTimeBin = (int) ((trip.getDepartureTime() - startTime) / timeBinSize);
+			int startTimeBin = (int)((trip.getDepartureTime() - startTime) / timeBinSize);
 			if (startTimeBin < bins) {
 				board[startTimeBin]++;
 				boardings.put(trip.getFromLinkId(), board);
 			}
 			int[] deboard = deboardings.getOrDefault(trip.getToLinkId(), new int[bins]);
-			int arrivalTimeBin = (int) ((trip.getArrivalTime() - startTime) / timeBinSize);
+			int arrivalTimeBin = (int)((trip.getArrivalTime() - startTime) / timeBinSize);
 			if (arrivalTimeBin < bins) {
 				deboard[arrivalTimeBin]++;
 				deboardings.put(trip.getFromLinkId(), deboard);
@@ -114,7 +123,8 @@ public class DynModeTripsAnalyser {
 		writeBoardings(deboardingsFile, network, deboardings, startTime, timeBinSize, bins, delimiter);
 	}
 
-	private static void writeBoardings(String filename, Network network, Map<Id<Link>, int[]> boardings, double startTime, double timeBinSize, int bins, String delimiter) {
+	private static void writeBoardings(String filename, Network network, Map<Id<Link>, int[]> boardings,
+			double startTime, double timeBinSize, int bins, String delimiter) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		try {
 			bw.write("Link" + delimiter + "x" + delimiter + "y");
@@ -160,12 +170,25 @@ public class DynModeTripsAnalyser {
 			directDistanceStats.addValue(trip.getUnsharedDistanceEstimate_m());
 			traveltimes.addValue(trip.getInVehicleTravelTime() + trip.getWaitTime());
 		}
-		String value = format.format(waitStats.getValues().length) + delimiter + format.format(waitStats.getMean())
-				+ delimiter + format.format(waitStats.getMax()) + delimiter + format.format(waitStats.getPercentile(95))
-				+ delimiter + format.format(waitStats.getPercentile(75)) + delimiter
-				+ format.format(waitStats.getPercentile(50)) + delimiter + format.format(rideStats.getMean())
-				+ delimiter + format.format(distanceStats.getMean()) + delimiter
-				+ format.format(directDistanceStats.getMean()) + delimiter + format.format(traveltimes.getMean());
+		String value = format.format(waitStats.getValues().length)
+				+ delimiter
+				+ format.format(waitStats.getMean())
+				+ delimiter
+				+ format.format(waitStats.getMax())
+				+ delimiter
+				+ format.format(waitStats.getPercentile(95))
+				+ delimiter
+				+ format.format(waitStats.getPercentile(75))
+				+ delimiter
+				+ format.format(waitStats.getPercentile(50))
+				+ delimiter
+				+ format.format(rideStats.getMean())
+				+ delimiter
+				+ format.format(distanceStats.getMean())
+				+ delimiter
+				+ format.format(directDistanceStats.getMean())
+				+ delimiter
+				+ format.format(traveltimes.getMean());
 		return value;
 	}
 
@@ -205,8 +228,18 @@ public class DynModeTripsAnalyser {
 
 			double distanceDetour = trip.getTravelDistance() / trip.getUnsharedDistanceEstimate_m();
 			double timeDetour = travelTime / trip.getUnsharedTimeEstimate_m();
-			detours.add(trip.getPerson() + ";" + trip.getTravelDistance() + ";" + trip.getUnsharedDistanceEstimate_m()
-					+ ";" + distanceDetour + ";" + travelTime + ";" + trip.getUnsharedTimeEstimate_m() + ";"
+			detours.add(trip.getPerson()
+					+ ";"
+					+ trip.getTravelDistance()
+					+ ";"
+					+ trip.getUnsharedDistanceEstimate_m()
+					+ ";"
+					+ distanceDetour
+					+ ";"
+					+ travelTime
+					+ ";"
+					+ trip.getUnsharedTimeEstimate_m()
+					+ ";"
 					+ timeDetour);
 		}
 
@@ -289,9 +322,24 @@ public class DynModeTripsAnalyser {
 				p_95Wait.addOrUpdate(h, Double.valueOf(p_95));
 				requests.addOrUpdate(h, rides * 3600. / binsize_s);// normalised [req/h]
 				bw.newLine();
-				bw.write(Time.writeTime(e.getKey()) + ";" + rides + ";" + format.format(averageWait) + ";"
-						+ format.format(min) + ";" + format.format(p_5) + ";" + format.format(p_25) + ";"
-						+ format.format(median) + ";" + format.format(p_75) + ";" + format.format(p_95) + ";"
+				bw.write(Time.writeTime(e.getKey())
+						+ ";"
+						+ rides
+						+ ";"
+						+ format.format(averageWait)
+						+ ";"
+						+ format.format(min)
+						+ ";"
+						+ format.format(p_5)
+						+ ";"
+						+ format.format(p_25)
+						+ ";"
+						+ format.format(median)
+						+ ";"
+						+ format.format(p_75)
+						+ ";"
+						+ format.format(p_95)
+						+ ";"
 						+ format.format(max));
 
 			}
@@ -345,7 +393,7 @@ public class DynModeTripsAnalyser {
 				bw.write(header);
 				bw.newLine();
 			}
-			for (Iterator<T> iterator = c.iterator(); iterator.hasNext();) {
+			for (Iterator<T> iterator = c.iterator(); iterator.hasNext(); ) {
 
 				bw.write(iterator.next().toString());
 				bw.newLine();
@@ -378,8 +426,15 @@ public class DynModeTripsAnalyser {
 				double occDistance = e.getValue()[2];
 				double emptyDistance = drivenDistance - occDistance;
 				bw.newLine();
-				bw.write(e.getKey().toString() + ";" + format.format(drivenDistance) + ";" + format.format(occDistance)
-						+ ";" + format.format(emptyDistance) + ";" + format.format(revenueDistance));
+				bw.write(e.getKey().toString()
+						+ ";"
+						+ format.format(drivenDistance)
+						+ ";"
+						+ format.format(occDistance)
+						+ ";"
+						+ format.format(emptyDistance)
+						+ ";"
+						+ format.format(revenueDistance));
 			}
 			bw.flush();
 			bw.close();
@@ -392,7 +447,7 @@ public class DynModeTripsAnalyser {
 
 	/**
 	 * @param vehicleDistances Map of vehicle distances
-	 * @param del Delimiter tag
+	 * @param del              Delimiter tag
 	 * @return
 	 */
 	public static String summarizeVehicles(Map<Id<Vehicle>, double[]> vehicleDistances, String del) {
@@ -406,7 +461,6 @@ public class DynModeTripsAnalyser {
 		DescriptiveStatistics revenue = new DescriptiveStatistics();
 		DescriptiveStatistics occupied = new DescriptiveStatistics();
 		DescriptiveStatistics empty = new DescriptiveStatistics();
-	
 
 		for (double[] dist : vehicleDistances.values()) {
 			driven.addValue(dist[0]);
@@ -417,11 +471,23 @@ public class DynModeTripsAnalyser {
 		}
 		double d_r_d_t = revenue.getSum() / driven.getSum();
 		// bw.write("iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance");
-		String result = vehicleDistances.size() + del + format.format(driven.getSum()) + del
-				+ format.format(empty.getSum()) + del + format.format(empty.getSum() / driven.getSum()) + del
-				+ format.format(revenue.getSum()) + del + format.format(driven.getMean()) + del
-				+ format.format(empty.getMean()) + del + format.format(revenue.getMean()) + del
-				+ format.format(d_r_d_t); 
+		String result = vehicleDistances.size()
+				+ del
+				+ format.format(driven.getSum())
+				+ del
+				+ format.format(empty.getSum())
+				+ del
+				+ format.format(empty.getSum() / driven.getSum())
+				+ del
+				+ format.format(revenue.getSum())
+				+ del
+				+ format.format(driven.getMean())
+				+ del
+				+ format.format(empty.getMean())
+				+ del
+				+ format.format(revenue.getMean())
+				+ del
+				+ format.format(d_r_d_t);
 		return result;
 	}
 
@@ -432,43 +498,37 @@ public class DynModeTripsAnalyser {
 		}
 		return driven.getSum();
 	}
-	
-	
+
 	/**
 	 * @param fleet
 	 * @return
 	 */
 	public static int findMaxCap(Fleet fleet) {
-		int maxCap = 0;
-		for (org.matsim.contrib.dvrp.data.Vehicle v : fleet.getVehicles().values()){
-			if (v.getCapacity()>maxCap){
-				maxCap = (int) v.getCapacity();
-			}
-		}
-		return maxCap;
+		return fleet.getVehicles().values().stream().mapToInt(v -> v.getCapacity()).max().getAsInt();
 	}
 
-	public static String summarizeDetailedOccupancyStats(Map<Id<Vehicle>, double[]> vehicleDistances, String del, int maxcap) {
+	public static String summarizeDetailedOccupancyStats(Map<Id<Vehicle>, double[]> vehicleDistances, String del,
+			int maxcap) {
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 		format.setMinimumIntegerDigits(1);
 		format.setMaximumFractionDigits(2);
 		format.setGroupingUsed(false);
-		
-		double[] sum = new double[maxcap+1];
-		
+
+		double[] sum = new double[maxcap + 1];
+
 		for (double[] dist : vehicleDistances.values()) {
 			double emptyD = dist[0] - dist[2];
 			sum[0] += emptyD;
-			for (int i = 3;i<maxcap+3;i++) {
-				sum[i-2]+=dist[i];
+			for (int i = 3; i < maxcap + 3; i++) {
+				sum[i - 2] += dist[i];
 			}
 		}
 		String result = "";
-		for (int i = 0;i<=maxcap;i++) {
-			result = result+";"+format.format(sum[i]);
+		for (int i = 0; i <= maxcap; i++) {
+			result = result + ";" + format.format(sum[i]);
 		}
-		
+
 		return result;
 	}
 }

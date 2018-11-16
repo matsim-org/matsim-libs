@@ -31,11 +31,6 @@ import org.matsim.core.controler.AbstractModule;
  */
 public class DrtAnalysisModule extends AbstractModule {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.matsim.core.controler.AbstractModule#install()
-	 */
 	@Override
 	public void install() {
 		bind(DynModePassengerStats.class).asEagerSingleton();

@@ -57,9 +57,6 @@ public final class MultiModeTaxiModule extends AbstractModule {
 
 		install(FleetProvider.createModule(mode, taxiCfg.getTaxisFileUrl(getConfig().getContext())));
 
-		bind(TravelDisutilityFactory.class).annotatedWith(Taxi.class)
-				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
-
 		bind(modalKey(SubmittedTaxiRequestsCollector.class)).to(SubmittedTaxiRequestsCollector.class)
 				.asEagerSingleton();
 		addControlerListenerBinding().to(modalKey(SubmittedTaxiRequestsCollector.class));

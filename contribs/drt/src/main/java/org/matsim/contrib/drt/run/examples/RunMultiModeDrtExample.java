@@ -18,12 +18,21 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.taxi.run.examples;
+package org.matsim.contrib.drt.run.examples;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.drt.analysis.MultiModeDrtAnalysisModule;
+import org.matsim.contrib.drt.run.Drt;
+import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtConfigs;
+import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtModule;
+import org.matsim.contrib.drt.run.MultiModeDrtQSimModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
@@ -31,12 +40,6 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
-import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
-import org.matsim.contrib.taxi.run.MultiModeTaxiQSimModule;
-import org.matsim.contrib.taxi.run.Taxi;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -47,29 +50,35 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-public class RunMultiModeTaxiExample {
-	private static final String CONFIG_FILE = "multi_mode_one_taxi/multi_mode_one_taxi_config.xml";
+/**
+ * @author michal.mac
+ */
+public class RunMultiModeDrtExample {
+
+	private static final String CONFIG_FILE = "multi_mode_one_shared_taxi/multi_mode_one_shared_taxi_config.xml";
 
 	public static void run(boolean otfvis, int lastIteration) {
-		// load config
-		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
-		config.controler().setLastIteration(lastIteration);
-		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
+
+		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(config);
+		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
+			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
+		}
+		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
 		config.checkConsistency();
 
-		// load scenario
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
+		ScenarioUtils.loadScenario(scenario);
 
-		// setup controler
 		Controler controler = new Controler(scenario);
 
-		MultiModeTaxiConfigGroup multiModeTaxiCfg = MultiModeTaxiConfigGroup.get(config);
 		List<DvrpModeQSimModule> dvrpModeQSimModules = new ArrayList<>();
-		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getTaxiConfigGroups()) {
-			dvrpModeQSimModules.add(new DvrpModeQSimModule.Builder(taxiCfg.getMode()).build());
-			controler.addQSimModule(new MultiModeTaxiQSimModule(taxiCfg));
-			controler.addOverridingModule(new MultiModeTaxiModule(taxiCfg));
+		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
+			dvrpModeQSimModules.add(new DvrpModeQSimModule.Builder(drtCfg.getMode()).build());
+			controler.addQSimModule(new MultiModeDrtQSimModule(drtCfg));
+			controler.addOverridingModule(new MultiModeDrtModule(drtCfg));
+			controler.addOverridingModule(new MultiModeDrtAnalysisModule(drtCfg));
 		}
 
 		controler.addOverridingModule(new DvrpModule(dvrpModeQSimModules.stream().toArray(DvrpModeQSimModule[]::new)));
@@ -77,7 +86,7 @@ public class RunMultiModeTaxiExample {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(TravelDisutilityFactory.class).annotatedWith(Taxi.class)
+				bind(TravelDisutilityFactory.class).annotatedWith(Drt.class)
 						.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
 			}
 		});
@@ -86,19 +95,18 @@ public class RunMultiModeTaxiExample {
 			@Override
 			protected void configureQSim() {
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Taxi.class);
+				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Drt.class);
 			}
 		});
 
 		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation
+			controler.addOverridingModule(new OTFVisLiveModule());
 		}
 
-		// run simulation
 		controler.run();
 	}
 
 	public static void main(String[] args) {
-		run(false, 0); // switch to 'true' to turn on visualisation
+		run(false, 0);
 	}
 }

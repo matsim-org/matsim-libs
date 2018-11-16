@@ -77,6 +77,10 @@ public class ModalProviders {
 		public <T> T getModal(Class<T> type) {
 			return injector.getInstance(Key.get(type, Names.named(mode)));
 		}
+
+		public <T> T getNamed(Class<T> type, String name) {
+			return injector.getInstance(Key.get(type, Names.named(name)));
+		}
 	}
 
 	public static abstract class AbstractProvider<T> implements Provider<T> {
