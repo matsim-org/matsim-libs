@@ -17,9 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.contrib.drt.analysis;
 
 import java.text.DecimalFormat;
@@ -153,21 +150,11 @@ public class DynModeTrip implements Comparable<DynModeTrip> {
 		return fromCoord;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
 	@Override
 	public int compareTo(DynModeTrip o) {
 		return getDepartureTime().compareTo(o.getDepartureTime());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		double fromCoordX = Double.NaN;
