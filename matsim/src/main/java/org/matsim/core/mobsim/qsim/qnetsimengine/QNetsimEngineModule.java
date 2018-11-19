@@ -2,6 +2,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import com.google.inject.Inject;
 import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 public class QNetsimEngineModule extends AbstractQSimModule {
@@ -14,6 +15,8 @@ public class QNetsimEngineModule extends AbstractQSimModule {
 		bind(QNetsimEngine.class).asEagerSingleton();
 		bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class)
 				.asEagerSingleton();
+
+		Gbl.assertNotNull( config );
 		
 		if ( config.qsim().isUseLanes() ) {
 			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ) ;
