@@ -8,24 +8,16 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 public class QNetsimEngineModule extends AbstractQSimModule {
 	public final static String COMPONENT_NAME = "NetsimEngine";
 	
-	@Inject Config config ;
-
 	@Override
 	protected void configureQSim() {
 		bind(QNetsimEngine.class).asEagerSingleton();
-		bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class)
-				.asEagerSingleton();
+		bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class).asEagerSingleton();
 
-		Gbl.assertNotNull( config );
-		
-		if ( config.qsim().isUseLanes() ) {
+		if ( this.getConfig().qsim().isUseLanes() ) {
 			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ) ;
 		} else {
 			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
 		}
-		
-
-		
 		
 		addNamedComponent(VehicularDepartureHandler.class, COMPONENT_NAME);
 		addNamedComponent(QNetsimEngine.class, COMPONENT_NAME);
