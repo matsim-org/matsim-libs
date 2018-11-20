@@ -30,6 +30,11 @@ public class LinearBusStopDurationCalculator implements BusStopDurationCalculato
     private final double dropoffTimePerPassenger;
     private final double fixedStopTime;
 
+    /**
+     * @param pickupTimePerPassenger  - pick up time per Passenger for Boarding a vehicle
+     * @param dropoffTimePerPassenger - drop off time per Passenger for Boarding a vehicle
+     * @param fixedStopTime           - constant time per stop
+     */
     public LinearBusStopDurationCalculator(double pickupTimePerPassenger, double dropoffTimePerPassenger,
                                            double fixedStopTime) {
         this.pickupTimePerPassenger = pickupTimePerPassenger;
