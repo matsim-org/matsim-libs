@@ -23,8 +23,6 @@
 package peoplemover.preparation;
 
 
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -42,6 +40,8 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import java.util.Random;
+
 /**
  * @author  jbischoff
  *
@@ -52,11 +52,11 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class CreatePeoplemoverStops {
 	public static void main(String[] args) {
 
-		String networkFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/networkpt-av.xml";
-		final String networkModeDesignator = "av";
-		double averageStopDistance_meters = 300;
-		String transitStopsOutputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/stopsWRS_"+Math.round(averageStopDistance_meters)+"m.xml";
-		
+        String networkFile = "D:/BS_DRT/input/network/modifiedNetwork.xml.gz";
+        final String networkModeDesignator = "car";
+        double averageStopDistance_meters = 600;
+        String transitStopsOutputFile = "D:/BS_DRT/input/virtualstops/stopsWRS_" + Math.round(averageStopDistance_meters) + "m.xml";
+
 		Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(networkFile);
 		NetworkFilterManager nfm = new NetworkFilterManager(network);
