@@ -1,19 +1,27 @@
 package org.matsim.contrib.noise.data;
 
-import mil.nga.sf.Point;
-import mil.nga.sf.geojson.Feature;
-import org.matsim.api.core.v01.Coord;
+import com.vividsolutions.jts.geom.Geometry;
 
-public class FeatureNoiseBarrierImpl implements NoiseBarrier {
+/**
+ * @author nkuehnel
+ */
+public final class FeatureNoiseBarrierImpl implements NoiseBarrier {
 
-    private final Feature geoJsonFeature;
+    private final Geometry geom;
+    private final double height;
 
-    public FeatureNoiseBarrierImpl(Feature feature) {
-        this.geoJsonFeature = feature;
+    public FeatureNoiseBarrierImpl(Geometry geom, double height) {
+        this.geom = geom.convexHull();
+        this.height = height;
     }
 
-    public Coord getCentroid() {
-        final Point centroid = geoJsonFeature.getGeometry().getGeometry().getCentroid();
-        return new Coord(centroid.getX(), centroid.getY());
+    @Override
+    public Geometry getGeometry() {
+        return geom;
+    }
+
+    @Override
+    public double getHeight() {
+        return height;
     }
 }

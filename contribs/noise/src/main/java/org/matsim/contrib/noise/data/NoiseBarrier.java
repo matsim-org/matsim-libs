@@ -1,5 +1,7 @@
 package org.matsim.contrib.noise.data;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 /**
  * Used for noise shielding calculations.
  *
@@ -8,4 +10,7 @@ package org.matsim.contrib.noise.data;
  */
 public interface NoiseBarrier {
 
+    Geometry getGeometry();
+
+    double getHeight();
 }

@@ -34,8 +34,9 @@ import org.matsim.contrib.noise.handler.NoiseEquations;
 import org.matsim.contrib.noise.utils.FeatureNoiseBarriersReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.GeometryUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
 
@@ -55,8 +56,8 @@ public class NoiseContext {
 	private final Scenario scenario;
 	private final NoiseConfigGroup noiseParams;
 	private final Grid grid;
-	private final QuadTree<? extends NoiseBarrier> noiseBarriers;
-			
+	private final ShieldingContext shielding;
+
 	private final Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
 	private double xCoordMinLinkNode = Double.MAX_VALUE;
 //	private double xCoordMaxLinkNode = Double.MIN_VALUE;
@@ -103,15 +104,18 @@ public class NoiseContext {
 		this.noiseLinks = new HashMap<>();
 		
 		checkConsistency();
+
+        if(noiseParams.isConsiderNoiseBarriers()) {
+            final Collection<FeatureNoiseBarrierImpl> barriers
+                    = FeatureNoiseBarriersReader.read(noiseParams.getNoiseBarriersFilePath());
+            shielding = new ShieldingContext(barriers);
+        } else {
+            shielding = null;
+        }
+
 		setLinksMinMax();
 		setLinksToZones();
 		setRelevantLinkInfo();
-
-		if(noiseParams.isConsiderNoiseBarriers()) {
-			noiseBarriers = FeatureNoiseBarriersReader.read(noiseParams.getNoiseBarriersFilePath());
-		} else {
-			noiseBarriers = null;
-		}
 	}
 
 	// for routing purposes
@@ -204,9 +208,18 @@ public class NoiseContext {
 						}
 						double correctionTermDs = NoiseEquations.calculateDistanceCorrection(distance);
 						double correctionTermAngle = calculateAngleImmissionCorrection(nrp.getCoord(), scenario.getNetwork().getLinks().get(linkId));
-						
 						nrp.setLinkId2distanceCorrection(linkId, correctionTermDs);
 						nrp.setLinkId2angleCorrection(linkId, correctionTermAngle);
+						if(noiseParams.isConsiderNoiseBarriers()) {
+                            Coord projectedSourceCoord = CoordUtils.orthogonalProjectionOnLineSegment(
+                                    candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
+							double correctionTermShielding =
+                                    shielding.determineShieldingCorrection(
+                                            GeometryUtils.createGeotoolsPoint(nrp.getCoord()),
+                                            GeometryUtils.createGeotoolsPoint(projectedSourceCoord),
+                                            distance);
+							nrp.setLinkId2ShieldingCorrection(linkId, correctionTermShielding);
+						}
 					}
 				}
 			}
@@ -218,8 +231,7 @@ public class NoiseContext {
 	}
 
 
-	
-	/**
+    /**
 	 * @param nrp
 	 * @param candidateLink
 	 * @return
@@ -231,10 +243,7 @@ public class NoiseContext {
 		double fromCoordY = candidateLink.getFromNode().getCoord().getY();
 		double toCoordX = candidateLink.getToNode().getCoord().getX();
 		double toCoordY = candidateLink.getToNode().getCoord().getY();
-	
-		double lotPointX = 0.;
-		double lotPointY = 0.;
-	
+
 		double vectorX = toCoordX - fromCoordX;
 		if (vectorX == 0.) {
 			vectorX = 0.00000001;
@@ -249,8 +258,9 @@ public class NoiseContext {
 		}
 	
 		double vector2 = (-1) * (1/vector);
+
 		double yAbschnitt = fromCoordY - (fromCoordX * vector);
-		double yAbschnittOriginal = fromCoordY - (fromCoordX * vector);
+		double yAbschnittOriginal = yAbschnitt;
 	
 		double yAbschnitt2 = pointCoordY - (pointCoordX * vector2);
 	
@@ -267,13 +277,11 @@ public class NoiseContext {
 			yValue = yAbschnittOriginal + (xValue*vector);
 		}
 	
-		lotPointX = xValue;
-		lotPointY = yValue;
 		double distance;
 		
 		if(((xValue>fromCoordX)&&(xValue<toCoordX))||((xValue>toCoordX)&&(xValue<fromCoordX))||((yValue>fromCoordY)&&(yValue<toCoordY))||((yValue>toCoordY)&&(yValue<fromCoordY))) {
 			// no edge solution
-			distance = Math.sqrt((Math.pow(lotPointX-pointCoordX, 2))+(Math.pow(lotPointY-pointCoordY, 2)));
+			distance = Math.sqrt((Math.pow(xValue-pointCoordX, 2))+(Math.pow(yValue-pointCoordY, 2)));
 		} else {
 			// edge solution (Randloesung)
 			double distanceToFromNode = Math.sqrt((Math.pow(fromCoordX-pointCoordX, 2))+(Math.pow(fromCoordY-pointCoordY, 2)));
@@ -397,12 +405,12 @@ public class NoiseContext {
 			double sc = (fromCoordX - pointCoordX) * (toCoordX - pointCoordX) + (fromCoordY - pointCoordY) * (toCoordY - pointCoordY);
 			double cosAngle = sc / (
 					Math.sqrt(
-							Math.pow(fromCoordX - pointCoordX, 2) + Math.pow(fromCoordY - pointCoordY, 2)
-							)
-							*
+					Math.pow(fromCoordX - pointCoordX, 2) + Math.pow(fromCoordY - pointCoordY, 2)
+			)
+					*
 					Math.sqrt(
 							Math.pow(toCoordX - pointCoordX, 2) + Math.pow(toCoordY - pointCoordY, 2)
-							)
+					)
 					);
 
 			//due to rounding errors, cosine sometimes is larger than one

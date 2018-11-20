@@ -86,16 +86,13 @@ public class GeometryUtils {
 	}
 	
 	public static Polygon createGeotoolsPolygon(List<Coord> coords ) {
-		// better way to do this is welcome.  kai, dec'17
-		double [] flatArray = new double[coords.size()*2] ;
+		Coordinate[] coordinates = new Coordinate[coords.size()] ;
 		int ii=0 ;
 		for ( Coord coord : coords ) {
-			flatArray[ii] = coord.getX() ;
-			ii++ ;
-			flatArray[ii] = coord.getY() ;
+			coordinates[ii] = new Coordinate(coord.getX(), coord.getY()); ;
 			ii++ ;
 		}
-		return new GeometryBuilder().polygon( flatArray ) ;
+		return new GeometryFactory().createPolygon(coordinates);
 	}
 	
 }
