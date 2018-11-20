@@ -20,10 +20,9 @@
 package org.matsim.codeexamples.fixedTimeSignals;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.signals.builder.SignalsModule;
+import org.matsim.contrib.signals.builder.Signals;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
-import org.matsim.contrib.signals.otfvis.OTFVisWithSignals;
 import org.matsim.contrib.signals.otfvis.OTFVisWithSignalsLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -55,7 +54,9 @@ public class VisualizeSignalScenarioWithLanes {
 		Controler c = new Controler(scenario);
 		// add the signals module to the simulation such that SignalsData is not only
 		// contained in the scenario but also used in the simulation
-		c.addOverridingModule(new SignalsModule());
+//		c.addOverridingModule(new SignalsModule());
+		Signals.configure( c ) ;
+
 		if (startOtfvis) {
 			// add the module that start the otfvis visualization with signals
 			c.addOverridingModule(new OTFVisWithSignalsLiveModule());

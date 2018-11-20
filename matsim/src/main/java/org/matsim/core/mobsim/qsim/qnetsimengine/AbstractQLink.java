@@ -132,7 +132,7 @@ abstract class AbstractQLink implements QLinkI {
 	 * <br>
 	 * seems ok as public interface function. kai, aug'15
 	 */
-	void activateLink() {
+	private void activateLink() {
 		if (!this.active) {
 			netElementActivationRegistry.registerLinkAsActive(this);
 			this.active = true;
@@ -143,7 +143,7 @@ abstract class AbstractQLink implements QLinkI {
 	@Override
 	public final void addParkedVehicle(MobsimVehicle vehicle) {
 		QVehicle qveh = (QVehicle) vehicle; // cast ok: when it gets here, it needs to be a qvehicle to work.
-		
+
 		if ( this.parkedVehicles.put(qveh.getId(), qveh) != null ) {
 			if ( wrnCnt < 1 ) {
 				wrnCnt++ ;
@@ -155,11 +155,13 @@ abstract class AbstractQLink implements QLinkI {
 	}
 	
 	/* package */ final void letVehicleArrive(QVehicle qveh) {
+		addParkedVehicle(qveh);
 		double now = context.getSimTimer().getTimeOfDay();;
 		context.getEventsManager().processEvent(new VehicleLeavesTrafficEvent(now , qveh.getDriver().getId(), 
 				this.link.getId(), qveh.getId(), qveh.getDriver().getMode(), 1.0 ) ) ;
 		
 		this.netsimEngine.letVehicleArrive(qveh);
+		makeVehicleAvailableToNextDriver(qveh);
 	}
 
 	@Override
