@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.av.robotaxi.scoring;
 
@@ -47,36 +47,36 @@ import org.matsim.vehicles.Vehicle;
 import com.google.inject.Inject;
 
 /**
- * @author  jbischoff
- *	A simple implementation for taxi or drt fares.
- *  Note that these fares are scored in excess to anything set in the modeparams in the config file.
+ * @author jbischoff
+ * A simple implementation for taxi or drt fares.
+ * Note that these fares are scored in excess to anything set in the modeparams in the config file.
  */
-public class TaxiFareHandler implements LinkEnterEventHandler, PersonEntersVehicleEventHandler,
-		PersonDepartureEventHandler, PersonArrivalEventHandler {
-	
-	
+public class TaxiFareHandler
+		implements LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonDepartureEventHandler,
+		PersonArrivalEventHandler {
+
 	private final EventsManager events;
 	private final Network network;
-	
+
 	private final double distanceFare_Meter;
 	private final double baseFare;
 	private final double timeFare_hour;
 	private final double dailyFee;
-	
-	Map<Id<Vehicle>,MutableDouble> currentRideDistance = new HashMap<>();
-	Map<Id<Person>,Id<Vehicle>> currentVehicle = new HashMap<>();
+
+	Map<Id<Vehicle>, MutableDouble> currentRideDistance = new HashMap<>();
+	Map<Id<Person>, Id<Vehicle>> currentVehicle = new HashMap<>();
 	Set<Id<Person>> waitingPax = new HashSet<>();
 	Map<Id<Person>, Double> vehicleEnterTime = new HashMap<>();
 	Set<Id<Person>> dailyFeeCharged = new HashSet<>();
 	private String mode;
-	
+
 	/**
-	 *  @params config: A Matsim config that contains a TaxiFareConfigGroup
+	 * @params config: A Matsim config that contains a TaxiFareConfigGroup
 	 */
 	@Inject
 	public TaxiFareHandler(Config config, EventsManager events, Network network) {
 		TaxiFareConfigGroup taxiFareConfigGroup = TaxiFareConfigGroup.get(config);
-		this.mode =  taxiFareConfigGroup.getMode();
+		this.mode = taxiFareConfigGroup.getMode();
 		this.events = events;
 		this.network = network;
 		this.distanceFare_Meter = taxiFareConfigGroup.getDistanceFare_m();
@@ -84,12 +84,7 @@ public class TaxiFareHandler implements LinkEnterEventHandler, PersonEntersVehic
 		this.dailyFee = taxiFareConfigGroup.getDailySubscriptionFee();
 		this.timeFare_hour = taxiFareConfigGroup.getTimeFare_h();
 	}
-	
-	
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
-	 */
 	@Override
 	public void reset(int iteration) {
 		waitingPax.clear();
@@ -99,40 +94,31 @@ public class TaxiFareHandler implements LinkEnterEventHandler, PersonEntersVehic
 		vehicleEnterTime.clear();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler#handleEvent(org.matsim.api.core.v01.events.PersonArrivalEvent)
-	 */
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		if (currentVehicle.containsKey(event.getPersonId())){
+		if (currentVehicle.containsKey(event.getPersonId())) {
 			Id<Vehicle> vid = currentVehicle.remove(event.getPersonId());
 			double distance = currentRideDistance.remove(vid).doubleValue();
-			double rideTime = (event.getTime() - vehicleEnterTime.remove(event.getPersonId()))/3600.0 ;
-			double fare = -(baseFare + distance*distanceFare_Meter + rideTime*timeFare_hour);
+			double rideTime = (event.getTime() - vehicleEnterTime.remove(event.getPersonId())) / 3600.0;
+			double fare = -(baseFare + distance * distanceFare_Meter + rideTime * timeFare_hour);
 			events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), fare));
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler#handleEvent(org.matsim.api.core.v01.events.PersonDepartureEvent)
-	 */
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals(mode)){
+		if (event.getLegMode().equals(mode)) {
 			waitingPax.add(event.getPersonId());
-			if (!dailyFeeCharged.contains(event.getPersonId())){
+			if (!dailyFeeCharged.contains(event.getPersonId())) {
 				dailyFeeCharged.add(event.getPersonId());
 				events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -dailyFee));
 			}
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler#handleEvent(org.matsim.api.core.v01.events.PersonEntersVehicleEvent)
-	 */
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (waitingPax.contains(event.getPersonId())){
+		if (waitingPax.contains(event.getPersonId())) {
 			currentVehicle.put(event.getPersonId(), event.getVehicleId());
 			currentRideDistance.put(event.getVehicleId(), new MutableDouble(0.0));
 			waitingPax.remove(event.getPersonId());
@@ -140,15 +126,11 @@ public class TaxiFareHandler implements LinkEnterEventHandler, PersonEntersVehic
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.events.handler.LinkEnterEventHandler#handleEvent(org.matsim.api.core.v01.events.LinkEnterEvent)
-	 */
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (currentRideDistance.containsKey(event.getVehicleId())){
+		if (currentRideDistance.containsKey(event.getVehicleId())) {
 			double length = network.getLinks().get(event.getLinkId()).getLength();
 			currentRideDistance.get(event.getVehicleId()).add(length);
 		}
 	}
-
 }
