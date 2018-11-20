@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.signals;
+package org.matsim.contrib.signals.builder;
 
 import java.util.Collections;
 
@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.builder.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
@@ -35,8 +36,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -80,7 +83,7 @@ public class TravelTimeFourWaysTest {
 		conf.qsim().setUseLanes(true);
 	    conf.qsim().setUsingFastCapacityUpdate(false);
 	    
-		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
+		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class );
 		signalsConfig.setUseSignalSystems(true);
 		signalsConfig.setSignalSystemFile("testSignalSystems_v2.0.xml");
 		signalsConfig.setSignalGroupsFile("testSignalGroups_v2.0.xml");
@@ -94,26 +97,35 @@ public class TravelTimeFourWaysTest {
 	}
 
 	private void runQSimWithSignals(final Scenario scenario) {
-		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override(Collections.singleton(new AbstractModule() {
-			@Override
-			public void install() {
-				// defaults
-				install(new NewControlerModule());
-				install(new ControlerDefaultCoreListenersModule());
-				install(new ControlerDefaultsModule());
-				install(new ScenarioByInstanceModule(scenario));
-			}
-		}), new SignalsModule()));
+//		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override(Collections.singleton(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				// defaults
+//				install(new NewControlerModule());
+//				install(new ControlerDefaultCoreListenersModule());
+//				install(new ControlerDefaultsModule());
+//				install(new ScenarioByInstanceModule(scenario));
+//			}
+//		}), new SignalsModule()));
 	
-		EventsManager events = injector.getInstance(EventsManager.class);
-		events.initProcessing();
+//		EventsManager events = injector.getInstance(EventsManager.class);
+//		events.initProcessing();
+
+		EventsManager events = EventsUtils.createEventsManager() ;
+
 		String eventsOut = this.testUtils.getOutputDirectory() + EVENTSFILE;
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Mobsim mobsim = injector.getInstance(Mobsim.class);
-		mobsim.run();
+//		Mobsim mobsim = injector.getInstance(Mobsim.class);
+//		mobsim.run();
+
+		new QSimBuilder( scenario.getConfig() )
+				.useDefaults()
+				.addOverridingControllerModule( new SignalsModule() )
+				.addOverridingQSimModule( new SignalsQSimModule() )
+				.build( scenario, events ).run();
 		
 		eventsXmlWriter.closeFile();
 	    Assert.assertEquals("different events files", EventsFileComparator.compareAndReturnInt(this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut), 0);

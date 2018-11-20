@@ -24,6 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -47,14 +48,14 @@ public class RunConfigurableQNetworkFactoryExample {
 		
 		final EventsManager events = controler.getEvents() ;
 		
-		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install() {
+		controler.addOverridingQSimModule( new AbstractQSimModule(){
+			@Override public void configureQSim() {
 				final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
 				factory.setLinkSpeedCalculator(null); // fill with something reasonable
 				factory.setTurnAcceptanceLogic(null); // fill with something reasonable
 				bind( QNetworkFactory.class ).toInstance( factory ) ;
-				// NOTE: Other than when using a provider, this uses the same factory instance over all iterations, re-configuring 
-				// it in every iteration via the initializeFactory(...) method. kai, mar'16 
+				// NOTE: Other than when using a provider, this uses the same factory instance over all iterations, re-configuring
+				// it in every iteration via the initializeFactory(...) method. kai, mar'16
 			}
 		});
 		

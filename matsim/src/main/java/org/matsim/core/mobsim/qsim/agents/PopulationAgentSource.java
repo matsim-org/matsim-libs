@@ -31,6 +31,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
@@ -42,14 +44,16 @@ public final class PopulationAgentSource implements AgentSource {
 
 	private final Population population;
 	private final AgentFactory agentFactory;
+	private final QVehicleFactory qVehicleFactory;
 	private final QSim qsim;
 	private final Collection<String> mainModes;
 	private Map<Id<Vehicle>,Id<Link>> seenVehicleIds = new HashMap<>() ;
 
 	@Inject
-	public PopulationAgentSource(Population population, AgentFactory agentFactory, QSim qsim ) {
+	PopulationAgentSource( Population population, AgentFactory agentFactory, QVehicleFactory qVehicleFactory, QSim qsim ) {
 		this.population = population;
 		this.agentFactory = agentFactory;
+		this.qVehicleFactory = qVehicleFactory;
 		this.qsim = qsim;  
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
 	}
@@ -130,7 +134,8 @@ public final class PopulationAgentSource implements AgentSource {
 				
 			} else {
 				this.seenVehicleIds.put( vehicleId, vehicleLinkId ) ;
-				qsim.createAndParkVehicleOnLink(vehicle, vehicleLinkId);
+//				qsim.createAndParkVehicleOnLink(vehicle, vehicleLinkId);
+				qsim.addParkedVehicle( this.qVehicleFactory.createQVehicle( vehicle ) , vehicleLinkId );
 			}
 		}
 	}

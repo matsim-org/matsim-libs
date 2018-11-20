@@ -53,6 +53,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
@@ -63,6 +64,7 @@ import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -1060,5 +1062,18 @@ public final class PopulationUtils {
 		log.info( "population size before downsampling=" + pop.getPersons().size() ) ;
 		pop.getPersons().values().removeIf( person ->  rnd.nextDouble() >= sample ) ;
 		log.info( "population size after downsampling=" + pop.getPersons().size() ) ;
+	}
+	public static void readPopulation( Population population, String filename ) {
+		MutableScenario scenario = ScenarioUtils.createMutableScenario( ConfigUtils.createConfig() ) ;
+		scenario.setPopulation( population );
+		new PopulationReader( scenario ).readFile( filename );
+		// (yyyy population reader uses network to retrofit some missing geo information such as route lenth.
+		// In my opinion, that should be done in prepareForSim, not in the parser.  It is commented as such
+		// in the PopulationReader class.  kai, nov'18)
+	}
+
+	public static boolean comparePopulations( Population population1, Population population2 ) {
+		boolean result = PopulationUtils.equalPopulation( population1, population2 );
+		return result ;
 	}
 }

@@ -21,7 +21,7 @@ package org.matsim.codeexamples.fixedTimeSignals;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.builder.SignalsModule;
+import org.matsim.contrib.signals.builder.Signals;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.otfvis.OTFVisWithSignalsLiveModule;
@@ -114,7 +114,8 @@ public class RunSignalSystemsExampleWithHoles {
 		/* add the signals module to the simulation
 		 * such that SignalsData is not only contained in the scenario 
 		 * but also used in the simulation */
-		c.addOverridingModule(new SignalsModule());
+//		c.addOverridingModule(new SignalsModule());
+		Signals.configure( c );
 		
 		/* add the visualization module to the simulation
 		 * such that it is used */

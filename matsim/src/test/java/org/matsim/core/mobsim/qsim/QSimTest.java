@@ -73,6 +73,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -1039,8 +1040,8 @@ public class QSimTest {
 		NetsimLink qlink3 = qnet.getNetsimLink(Id.create(3, Link.class));
 
 		VehicleType defaultVehicleType = new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class));
-		QVehicle vehicle1 = new QVehicle(new VehicleImpl(Id.create(1, Vehicle.class), defaultVehicleType));
-		QVehicle vehicle2 = new QVehicle(new VehicleImpl(Id.create(2, Vehicle.class), defaultVehicleType));
+		QVehicle vehicle1 = new QVehicleImpl(new VehicleImpl(Id.create(1, Vehicle.class), defaultVehicleType));
+		QVehicle vehicle2 = new QVehicleImpl(new VehicleImpl(Id.create(2, Vehicle.class), defaultVehicleType));
 		sim.addParkedVehicle(vehicle1, Id.create(2, Link.class));
 		sim.addParkedVehicle(vehicle2, Id.create(2, Link.class));
 
