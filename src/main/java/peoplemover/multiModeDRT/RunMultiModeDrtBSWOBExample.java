@@ -20,6 +20,7 @@
 
 package peoplemover.multiModeDRT;
 
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.analysis.MultiModeDrtAnalysisModule;
 import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
@@ -80,7 +81,7 @@ public class RunMultiModeDrtBSWOBExample {
         }
 
         controler.addOverridingModule(new DvrpModule(dvrpModeQSimModules.stream().toArray(DvrpModeQSimModule[]::new)));
-
+        controler.addOverridingModule(new SwissRailRaptorModule());
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
