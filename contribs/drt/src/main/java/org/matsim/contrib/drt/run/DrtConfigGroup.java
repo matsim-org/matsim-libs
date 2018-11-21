@@ -19,17 +19,6 @@
 
 package org.matsim.contrib.drt.run;
 
-import java.net.URL;
-import java.util.Collection;
-import java.util.Map;
-
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
@@ -37,6 +26,12 @@ import org.matsim.contrib.dvrp.run.HasMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+
+import javax.validation.Valid;
+import javax.validation.constraints.*;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Map;
 
 public class DrtConfigGroup extends ReflectiveConfigGroup implements HasMode {
 
@@ -163,7 +158,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements HasMode {
 	private String transitStopFile = null; // only for stopbased DRT scheme
 
 	private boolean plotDetailedCustomerStats = true;
-	private boolean printDetailedWarnings = true;
+	private boolean printDetailedWarnings = false;
 
 	@Positive
 	private int numberOfThreads = Math.min(Runtime.getRuntime().availableProcessors(),
