@@ -194,10 +194,8 @@ public class NoiseContext {
 			for (Id<Link> linkId : potentialLinks){
 				if (!(relevantLinkIds.contains(linkId))) {
 					Link candidateLink = scenario.getNetwork().getLinks().get(linkId);
-					//maybe replace the disctance-calculation to remove dupolicated code. Not absolute sure, since tests are failing, when method is replaced.
-					//double distance = CoordUtils.distancePointLinesegment(candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
-					double distance = calcDistance(nrp, candidateLink);
-					
+					double distance = CoordUtils.distancePointLinesegment(candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
+
 					if (distance < noiseParams.getRelevantRadius()){
 						
 						relevantLinkIds.add(linkId);
@@ -229,71 +227,6 @@ public class NoiseContext {
 			cnt.incCounter();
 		}
 		cnt.printCounter();
-	}
-
-
-    /**
-	 * @param nrp
-	 * @param candidateLink
-	 * @return
-	 */
-	private double calcDistance(NoiseReceiverPoint nrp, Link candidateLink) {
-		double pointCoordX = nrp.getCoord().getX();
-		double pointCoordY = nrp.getCoord().getY();
-		double fromCoordX = candidateLink.getFromNode().getCoord().getX();
-		double fromCoordY = candidateLink.getFromNode().getCoord().getY();
-		double toCoordX = candidateLink.getToNode().getCoord().getX();
-		double toCoordY = candidateLink.getToNode().getCoord().getY();
-
-		double vectorX = toCoordX - fromCoordX;
-		if (vectorX == 0.) {
-			vectorX = 0.00000001;
-			// dividing by zero is not possible
-		}
-		
-		double vectorY = toCoordY - fromCoordY;
-		double vector = vectorY/vectorX;
-		if (vector == 0.) {
-			vector = 0.00000001;
-			// dividing by zero is not possible
-		}
-	
-		double vector2 = (-1) * (1/vector);
-
-		double yAbschnitt = fromCoordY - (fromCoordX * vector);
-		double yAbschnittOriginal = yAbschnitt;
-	
-		double yAbschnitt2 = pointCoordY - (pointCoordX * vector2);
-	
-		double xValue = 0.;
-		double yValue = 0.;
-	
-		if (yAbschnitt<yAbschnitt2) {
-			yAbschnitt2 = yAbschnitt2 - yAbschnitt;
-			xValue = yAbschnitt2 / (vector - vector2);
-			yValue = yAbschnittOriginal + (xValue*vector);
-		} else if(yAbschnitt2<yAbschnitt) {
-			yAbschnitt = yAbschnitt - yAbschnitt2;
-			xValue = yAbschnitt / (vector2 - vector);
-			yValue = yAbschnittOriginal + (xValue*vector);
-		}
-	
-		double distance;
-		
-		if(((xValue>fromCoordX)&&(xValue<toCoordX))||((xValue>toCoordX)&&(xValue<fromCoordX))||((yValue>fromCoordY)&&(yValue<toCoordY))||((yValue>toCoordY)&&(yValue<fromCoordY))) {
-			// no edge solution
-			distance = Math.sqrt((Math.pow(xValue-pointCoordX, 2))+(Math.pow(yValue-pointCoordY, 2)));
-		} else {
-			// edge solution (Randloesung)
-			double distanceToFromNode = Math.sqrt((Math.pow(fromCoordX-pointCoordX, 2))+(Math.pow(fromCoordY-pointCoordY, 2)));
-			double distanceToToNode = Math.sqrt((Math.pow(toCoordX-pointCoordX, 2))+(Math.pow(toCoordY-pointCoordY, 2)));
-			if (distanceToFromNode > distanceToToNode) {
-				distance = distanceToToNode;
-			} else {
-				distance = distanceToFromNode;
-			}
-		}
-		return distance;
 	}
 
 	/**
