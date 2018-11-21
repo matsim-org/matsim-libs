@@ -23,6 +23,7 @@
 package org.matsim.contrib.noise.data;
 
 
+import com.vividsolutions.jts.algorithm.Angle;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -402,46 +403,12 @@ public class NoiseContext {
 			
 		} else {
 			// all other cases
-			double sc = (fromCoordX - pointCoordX) * (toCoordX - pointCoordX) + (fromCoordY - pointCoordY) * (toCoordY - pointCoordY);
-			double cosAngle = sc / (
-					Math.sqrt(
-					Math.pow(fromCoordX - pointCoordX, 2) + Math.pow(fromCoordY - pointCoordY, 2)
-			)
-					*
-					Math.sqrt(
-							Math.pow(toCoordX - pointCoordX, 2) + Math.pow(toCoordY - pointCoordY, 2)
-					)
-					);
-
-			//due to rounding errors, cosine sometimes is larger than one
-            // TODO: find cleaner way possibly.
-			if (cosAngle > 1.) {
-			    cosAngle = 1.;
-            } else if (cosAngle < -1.) {
-			    cosAngle = -1.;
-            }
-
-			angle = Math.toDegrees(Math.acos(cosAngle));
-
-			if (sc > 0) {
-				// spitzer winkel
-						
-				if (angle > 90) {
-					angle = 180 - angle;
-				}
-				
-			} else if (sc < 0) {
-				// stumpfer winkel
-				
-				if (angle < 90) {
-					angle = 180 - angle;
-				}
-				
-			} else {
-				angle = 0.;
-			}
+            angle = Angle.toDegrees(Angle.angleBetween(
+                    CoordUtils.createGeotoolsCoordinate(link.getFromNode().getCoord()),
+                    CoordUtils.createGeotoolsCoordinate(receiverPointCoord),
+                    CoordUtils.createGeotoolsCoordinate(link.getToNode().getCoord())));
 		}
-			
+
 		// since zero is not defined
 		if (angle == 0.) {
 			// zero degrees is not defined
@@ -449,8 +416,7 @@ public class NoiseContext {
 		}
 					
 //		System.out.println(receiverPointCoord + " // " + link.getId() + "(" + link.getFromNode().getCoord() + "-->" + link.getToNode().getCoord() + " // " + angle);
-		double immissionCorrection = NoiseEquations.calculateAngleCorrection(angle);
-		return immissionCorrection;
+        return NoiseEquations.calculateAngleCorrection(angle);
 	}
 	
 	public final Scenario getScenario() {
