@@ -1,14 +1,14 @@
 package org.matsim.contrib.drt.routing;
 
-import java.util.List;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 
-import com.google.inject.Inject;
+import java.util.List;
 
 public class DrtMainModeIdentifier implements MainModeIdentifier{
 
@@ -27,7 +27,11 @@ public class DrtMainModeIdentifier implements MainModeIdentifier{
 		for (PlanElement pe : tripElements) {
 			if (pe instanceof Activity) {
 				if (((Activity) pe).getType().equals(drtStageActivityType.drtStageActivity))
-				return mode;
+					return mode;
+			} else if (pe instanceof Leg) {
+				if (((Leg) pe).getMode().equals(drtStageActivityType.drtWalk)) {
+					return mode;
+				}
 			}
 		}
 		

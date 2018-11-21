@@ -20,19 +20,10 @@
 
 package org.matsim.contrib.drt.run.examples;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.analysis.MultiModeDrtAnalysisModule;
-import org.matsim.contrib.drt.run.Drt;
-import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtConfigs;
-import org.matsim.contrib.drt.run.DrtControlerCreator;
-import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.drt.run.MultiModeDrtModule;
-import org.matsim.contrib.drt.run.MultiModeDrtQSimModule;
+import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
+import org.matsim.contrib.drt.run.*;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
@@ -46,9 +37,13 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author michal.mac
@@ -88,6 +83,7 @@ public class RunMultiModeDrtExample {
 			public void install() {
 				bind(TravelDisutilityFactory.class).annotatedWith(Drt.class)
 						.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
+				bind(MainModeIdentifier.class).toInstance(new MultiModeDrtMainModeIdentifier(multiModeDrtCfg));
 			}
 		});
 
