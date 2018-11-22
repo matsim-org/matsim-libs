@@ -32,7 +32,7 @@ public class RunEmissionToolOfflineExampleTest {
 
 	@Test
 	public final void testMain() {
-		RunEmissionToolOfflineExampleV2 offlineExample = new RunEmissionToolOfflineExampleV2();
+		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
 		Config config = offlineExample.prepareConfig();
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		offlineExample.run();

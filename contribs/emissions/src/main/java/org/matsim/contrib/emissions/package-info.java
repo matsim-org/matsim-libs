@@ -1,10 +1,10 @@
 /**
  * <h2>Usage</h2>
- * Execute {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig} and {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExampleV2 RunEmissionToolOnlineExampleV2} or {@link org.matsim.contrib.emissions.example.RunEmissionToolOfflineExampleV2 RunEmissionToolOfflineExampleV2} from the example package.
+ * Execute {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig} and {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample RunEmissionToolOnlineExampleV2} or {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample RunEmissionToolOfflineExampleV2} from the example package.
  * <ul>
  * <li> {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig}: Creates a MATSim config file with links to emission related input files as {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup}. </li>
- * <li> {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExampleV2 RunEmissionToolOnlineExampleV2}: Writes emission events to the events file during the simulation. </li>
- * <li> {@link org.matsim.contrib.emissions.example.RunEmissionToolOfflineExampleV2 RunEmissionToolOfflineExampleV2}: Writes emission events to the events file based on a standard MATSim events file. </li>
+ * <li> {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample RunEmissionToolOnlineExampleV2}: Writes emission events to the events file during the simulation. </li>
+ * <li> {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample RunEmissionToolOfflineExampleV2}: Writes emission events to the events file based on a standard MATSim events file. </li>
  * </ul>
  * The online example as well as the offline example use a config file as created by {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig}. 
  * An example config and the associated files can be found at the test input directory.
@@ -65,8 +65,8 @@
  * </ul>
  *
  * Optional: If you want to use vehicle specific emission calculations, set isUsingDetailedEmissionCalculation to <code>true</code> in the
- * {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExampleV2 RunEmissionToolOnlineExampleV2} or
- * {@link org.matsim.contrib.emissions.example.RunEmissionToolOfflineExampleV2 RunEmissionToolOfflineExampleV2} class.
+ * {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample RunEmissionToolOnlineExampleV2} or
+ * {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample RunEmissionToolOfflineExampleV2} class.
  * Define the input paths for
  * <ul>
  * 

@@ -24,16 +24,13 @@ import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.examples.ExamplesUtils;
 
 
 /**
@@ -44,10 +41,10 @@ import org.matsim.examples.ExamplesUtils;
  *
  * @author benjamin, julia
  */
-public class RunEmissionToolOfflineExampleV2 {
+public class RunAverageEmissionToolOfflineExample{
 	
 	private final static String runDirectory = "./test/output/";
-	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config_v2.xml";
+	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config_average.xml";
 	private final static Integer lastIteration = getLastIteration();
 	
 	private static final String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" +  lastIteration;
@@ -61,12 +58,12 @@ public class RunEmissionToolOfflineExampleV2 {
 
 	// =======================================================================================================		
 	
-	public static void main (String[] args) throws Exception{
-        RunEmissionToolOfflineExampleV2 emissionToolOfflineExampleV2 = new RunEmissionToolOfflineExampleV2();
+	public static void main (String[] args){
+        RunAverageEmissionToolOfflineExample emissionToolOfflineExampleV2 = new RunAverageEmissionToolOfflineExample();
         emissionToolOfflineExampleV2.run();
 	}
 
-	private static int getLastIteration() {
+	public static int getLastIteration() {
 		Config config = new Config();
 		config.addCoreModules();
 //		ConfigReader configReader = new ConfigReader(config);

@@ -45,7 +45,7 @@ import java.net.URL;
  * @author benjamin, julia
  */
 
-public class RunEmissionToolOnlineExampleV2 {
+public class RunEmissionToolOnlineExample{
 
 	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config_v2.xml";
 
