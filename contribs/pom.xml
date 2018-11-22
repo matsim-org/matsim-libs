@@ -226,6 +226,14 @@
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
+		<!--MATSim examples.  Not inherited from matsim since it is in test scope there-->
+		<dependency>
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim-examples</artifactId>
+ 			<!--<version>0.10.0</version>-->
+			<!--<version>0.11.0-apr17</version>-->
+			<version>0.11.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>

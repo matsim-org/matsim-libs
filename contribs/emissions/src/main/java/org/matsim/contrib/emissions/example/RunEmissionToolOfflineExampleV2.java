@@ -26,12 +26,14 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.examples.ExamplesUtils;
 
 
 /**
@@ -49,7 +51,11 @@ public class RunEmissionToolOfflineExampleV2 {
 	private final static Integer lastIteration = getLastIteration();
 	
 	private static final String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" +  lastIteration;
-	private static final String eventsFile = eventsPath + ".events.xml.gz";
+
+	//	private static final String eventsFile = eventsPath + ".events.xml.gz";
+	private static final String eventsFile =  "./test/input/org/matsim/contrib/emissions/5.events.xml.gz";
+	// (remove dependency of one test/execution path from other. kai/ihab, nov'18)
+
 	private static final String emissionEventOutputFile = eventsPath + ".emission.events.offline.xml.gz";
 	private Config config;
 
@@ -63,8 +69,8 @@ public class RunEmissionToolOfflineExampleV2 {
 	private static int getLastIteration() {
 		Config config = new Config();
 		config.addCoreModules();
-		ConfigReader configReader = new ConfigReader(config);
-		configReader.readFile(RunEmissionToolOfflineExampleV2.configFile);
+//		ConfigReader configReader = new ConfigReader(config);
+//		configReader.readFile(RunEmissionToolOfflineExampleV2.configFile);
         config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
         return config.controler().getLastIteration();
 	}
@@ -81,8 +87,16 @@ public class RunEmissionToolOfflineExampleV2 {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         EventsManager eventsManager = EventsUtils.createEventsManager();
 
+		AbstractModule module = new AbstractModule(){
+			@Override
+			public void install(){
+				bind( Scenario.class ).toInstance( scenario );
+				bind( EventsManager.class ).toInstance( eventsManager );
+				bind( EmissionModule.class ) ;
+			}
+		};;
 
-        com.google.inject.Injector injector = Injector.createInjector(config);
+		com.google.inject.Injector injector = Injector.createInjector(config, module );
 
         EmissionModule emissionModule = injector.getInstance(EmissionModule.class);
 
