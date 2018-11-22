@@ -20,6 +20,7 @@ package org.matsim.contrib.emissions.example;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.emissions.example.archive.RunEmissionToolOfflineExample;
 import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -33,6 +34,14 @@ public class RunEmissionToolOfflineExampleTest {
 	@Test
 	public final void testMain() {
 		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
+		Config config = offlineExample.prepareConfig();
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		offlineExample.run();
+	}
+
+	@Test
+	public final void testAverage() {
+		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
 		Config config = offlineExample.prepareConfig();
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		offlineExample.run();
