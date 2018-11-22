@@ -19,18 +19,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
-import com.google.inject.Guice;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
-import org.matsim.contrib.emissions.roadTypeMapping.VisumHbefaRoadTypeMapping;
-import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
@@ -74,13 +69,15 @@ public class RunEmissionToolOfflineExampleV2 {
         return config.controler().getLastIteration();
 	}
 
-	public Config getConfig() {
+	public Config prepareConfig() {
+		config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
 		return config;
 	}
 
     public void run() {
-        config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		if ( config==null ) {
+			this.prepareConfig() ;
+		}
         Scenario scenario = ScenarioUtils.loadScenario(config);
         EventsManager eventsManager = EventsUtils.createEventsManager();
 
