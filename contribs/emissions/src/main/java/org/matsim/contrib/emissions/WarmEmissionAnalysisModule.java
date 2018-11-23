@@ -23,6 +23,7 @@ package org.matsim.contrib.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -41,7 +42,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
 
 
 /**
@@ -377,6 +377,10 @@ public class WarmEmissionAnalysisModule {
 
 	public int getWarmEmissionEventCounter() {
 		return emissionEventCounter;
+	}
+
+	public EmissionsConfigGroup getEcg() {
+		return ecg;
 	}
 	
 }
