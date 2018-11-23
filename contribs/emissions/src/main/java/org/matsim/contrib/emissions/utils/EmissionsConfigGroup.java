@@ -124,8 +124,9 @@ extends ReflectiveConfigGroup
 		{
 			String Hbefa_ROADTYPE_SOURCE_CMT = "Source of the HBEFFA road type. The options are:"+ Arrays.stream(HbefaRoadTypeSource.values())
 																							 .map(source -> " " + source.toString())
-																							 .collect(Collectors.joining()) +"."+
-			"\n"+HbefaRoadTypeSource.fromLinkAttributes+" is default i.e. put HBEFA road type directly to the link attributes.";
+																							 .collect(Collectors.joining()) +"."
+//			"\n"+HbefaRoadTypeSource.fromLinkAttributes+" is default i.e. put HBEFA road type directly to the link attributes." // unfortunately not true
+			;
 
 			map.put(Hbefa_ROADTYPE_SOURCE, Hbefa_ROADTYPE_SOURCE_CMT);
 		}
