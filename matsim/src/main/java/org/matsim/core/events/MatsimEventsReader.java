@@ -21,6 +21,7 @@
 package org.matsim.core.events;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Locale;
 import java.util.Stack;
 
@@ -70,6 +71,11 @@ public final class MatsimEventsReader implements MatsimReader {
 
 	public void readStream(final InputStream stream) {
 		new XmlEventsReader(this.events).parse(stream);
+	}
+
+	@Override
+	public void readURL( final URL url ) {
+		new XmlEventsReader( this.events ).readURL( url );
 	}
 
 	private static class XmlEventsReader extends MatsimXmlParser {
