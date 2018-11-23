@@ -45,15 +45,11 @@ public class RunDetailedEmissionToolOfflineExample{
 	
 	private final static String runDirectory = "./test/output/";
 	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config_detailed.xml";
-	private final static Integer lastIteration = getLastIteration();
 	
-	private static final String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" +  lastIteration;
-
-	//	private static final String eventsFile = eventsPath + ".events.xml.gz";
 	private static final String eventsFile =  "./test/input/org/matsim/contrib/emissions/5.events.xml.gz";
 	// (remove dependency of one test/execution path from other. kai/ihab, nov'18)
 
-	private static final String emissionEventOutputFile = eventsPath + ".emission.events.offline.xml.gz";
+	private static final String emissionEventOutputFile = runDirectory + "5.emission.events.offline.xml.gz";
 	private Config config;
 
 	// =======================================================================================================		
@@ -61,15 +57,6 @@ public class RunDetailedEmissionToolOfflineExample{
 	public static void main (String[] args) throws Exception{
         RunDetailedEmissionToolOfflineExample emissionToolOfflineExampleV2 = new RunDetailedEmissionToolOfflineExample();
         emissionToolOfflineExampleV2.run();
-	}
-
-	private static int getLastIteration() {
-		Config config = new Config();
-		config.addCoreModules();
-//		ConfigReader configReader = new ConfigReader(config);
-//		configReader.readFile(RunEmissionToolOfflineExampleV2.configFile);
-        config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
-        return config.controler().getLastIteration();
 	}
 
 	public Config prepareConfig() {
