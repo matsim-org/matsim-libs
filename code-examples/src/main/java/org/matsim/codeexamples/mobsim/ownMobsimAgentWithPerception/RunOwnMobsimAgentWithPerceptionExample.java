@@ -38,6 +38,8 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -104,7 +106,9 @@ public class RunOwnMobsimAgentWithPerceptionExample {
 								final VehicleType vehType = VehicleUtils.getDefaultVehicleType();
 								final VehiclesFactory vehFactory = VehicleUtils.getFactory();
 								final Vehicle vehicle = vehFactory.createVehicle(vehId, vehType);
-								qsim.createAndParkVehicleOnLink(vehicle, startingLinkId);
+//								qsim.createAndParkVehicleOnLink(vehicle, startingLinkId);
+								final QVehicle qVeh = new QVehicleImpl( vehicle ) ;
+								qsim.addParkedVehicle( qVeh, startingLinkId );
 								
 								// insert traveler agent:
 								final MobsimAgent ag = new MyMobsimAgent(guidance, startingLinkId, vehId,

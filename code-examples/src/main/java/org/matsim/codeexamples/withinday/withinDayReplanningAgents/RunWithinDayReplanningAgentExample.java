@@ -44,6 +44,7 @@ import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.facilities.Facility;
@@ -95,8 +96,8 @@ public class RunWithinDayReplanningAgentExample {
 							@Override
 							public void insertAgentsIntoMobsim() {
 								final Id<Link> startLinkId = (Id<Link>) (sc.getNetwork().getLinks().keySet().toArray())[0];
-//								final MobsimVehicle veh = new QVehicleImpl(new VehicleImpl(Id.create("testVehicle", Vehicle.class ), basicVehicleType));
-								final MobsimVehicle veh = new QVehicle(new VehicleImpl(Id.create("testVehicle", Vehicle.class ), basicVehicleType));
+								final MobsimVehicle veh = new QVehicleImpl(new VehicleImpl(Id.create("testVehicle", Vehicle.class ), basicVehicleType));
+//								final MobsimVehicle veh = new QVehicle(new VehicleImpl(Id.create("testVehicle", Vehicle.class ), basicVehicleType));
 								qsim.addParkedVehicle(veh, startLinkId);
 								qsim.insertAgentIntoMobsim(new MyAgent(sc, ev, qsim, startLinkId, veh));
 								// (the Id of the parked vehicle needs to be known to the agent, otherwise it will not work!)

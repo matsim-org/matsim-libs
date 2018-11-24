@@ -33,6 +33,8 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
@@ -79,7 +81,9 @@ public class RunOwnMobsimAgentUsingRouterExample {
 								// insert vehicle:
 								final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(ag.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
 								final Id<Link> linkId4VehicleInsertion = Id.createLinkId(1);
-								qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+//								qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+								final QVehicle qVeh = new QVehicleImpl( vehicle ) ;
+								qsim.addParkedVehicle( qVeh, linkId4VehicleInsertion );
 							}
 						});
 						return qsim;

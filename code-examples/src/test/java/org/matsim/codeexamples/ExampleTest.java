@@ -55,23 +55,23 @@ public class ExampleTest {
 		// ---
 
 		// compare population file against some reference:
-		Population popReference = null;
-		PopulationUtils.equalPopulation( popReference, scenario.getPopulation() ) ;
+//		Population popReference = null;
+//		PopulationUtils.equalPopulation( popReference, scenario.getPopulation() ) ;
 
 		// ---
 
 		// compare events file against some reference:
-		String eventsFileActual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
-		String eventsFileReference = null;
-		EventsFileComparator.compare( eventsFileReference, eventsFileActual ) ;
+		//		String eventsFileReference = null;
+//		String eventsFileActual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
+//		EventsFileComparator.compare( eventsFileReference, eventsFileActual ) ;
 
 	}
 	
 	@Test
 	public void testExampleUtils() {
 		final URL url = ExamplesUtils.getTestScenarioURL( "equil" );
-		// (this works because "matsim-examples" is included transitively by "matsim" ... it is _not_ in the test scope)
-		
+		// (works when matsim-examples is specified as dependency in pom.xml)
+
 		final URL configUrl = IOUtils.newUrl( url, "config.xml" );;
 		Config config = ConfigUtils.loadConfig( configUrl ) ;
 
