@@ -19,15 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalgroups.v20;
 
-import java.io.InputStream;
-
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.SchemaFactory;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.data.AbstractSignalsReader;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -38,7 +31,16 @@ import org.matsim.jaxb.signalgroups20.XMLIdRefType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroupType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroups;
 import org.matsim.jaxb.signalgroups20.XMLSignalSystemSignalGroupType;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.SchemaFactory;
+import java.io.InputStream;
+import java.net.URL;
 
 /**
  * @author dgrether
@@ -55,13 +57,18 @@ public class SignalGroupsReader20 implements MatsimReader {
 	}
 
 	@Override
+	public void readURL( URL url ) {
+		throw new RuntimeException( "not implemented; please try to use AbstractSignalsReader when doing that" ) ;
+	}
+
+	@Override
 	public void readFile(String filename) {
 		XMLSignalGroups xmlsgdefs = readXmlSignalGroups(filename);
 		fillStuff(xmlsgdefs);
 	}
 
 	public void readStream(InputStream stream) {
-		XMLSignalGroups xmlsgdefs = readXmlSignalGroups(stream);
+		XMLSignalGroups xmlsgdefs = readXmlSignalGroups( new InputSource( stream ) ) ;
 		fillStuff(xmlsgdefs);
 	}
 
@@ -80,10 +87,10 @@ public class SignalGroupsReader20 implements MatsimReader {
 	}
 
 	private XMLSignalGroups readXmlSignalGroups(String filename) {
-		return readXmlSignalGroups(IOUtils.getInputStream(filename));
+		return readXmlSignalGroups( new InputSource( IOUtils.getInputStream(filename) ) ) ;
 	}
 
-	private XMLSignalGroups readXmlSignalGroups(InputStream stream) {
+	private XMLSignalGroups readXmlSignalGroups( InputSource stream ) {
 		try {
 			JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.signalgroups20.ObjectFactory.class);
 			Unmarshaller u = jc.createUnmarshaller();
