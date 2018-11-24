@@ -118,8 +118,14 @@ extends ReflectiveConfigGroup
 
 	private static final String HANDLE_HIGH_AVERAGE_SPEEDS_CMT = "if true, don't fail when average speed is higher than the link freespeed, but cap it instead.";
 
-	private static final String NON_SCENARIO_VEHICLES_CMT = "Specifies the handling of non-scenario vehicles.  The options are: " + Arrays.stream(NonScenarioVehicles.values()).map(handling -> " " + handling.toString()).collect(Collectors.joining()) +"."
-			+ " Should eventually be extended by 'getVehiclesFromMobsim'.";
+	private static final String NON_SCENARIO_VEHICLES_CMT = "Specifies the handling of non-scenario vehicles.  The options are: "
+//			+ Arrays.stream(NonScenarioVehicles.values()).map(handling -> " " + handling.toString()).collect(Collectors.joining()) +"."
+			//    https://stackoverflow.com/questions/48300252/getting-stackoverflowerror-while-initializing-a-static-variable .
+			// really ugly compilation error with java8, difficult to find.  kai, nov'18
+			+ NonScenarioVehicles.values()
+			+ " Should eventually be extended by 'getVehiclesFromMobsim'."
+	 ;
+
 
 	@Override
 	public Map<String, String> getComments() {
@@ -132,7 +138,7 @@ extends ReflectiveConfigGroup
 			String Hbefa_ROADTYPE_SOURCE_CMT = "Source of the HBEFFA road type. The options are:"+ Arrays.stream(HbefaRoadTypeSource.values())
 																							 .map(source -> " " + source.toString())
 																							 .collect(Collectors.joining()) +"."
-//			"\n"+HbefaRoadTypeSource.fromLinkAttributes+" is default i.e. put HBEFA road type directly to the link attributes." // unfortunately not true
+//			"\n"+HbefaRoadTypeSource.fromLinkAttributes+" is default i.e. put HBEFA road type directly to the link attributes." // unfortunately not default
 			;
 
 			map.put(Hbefa_ROADTYPE_SOURCE, Hbefa_ROADTYPE_SOURCE_CMT);
