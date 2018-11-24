@@ -34,8 +34,10 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
@@ -46,7 +48,7 @@ import com.google.inject.Provider;
  * @author nagel
  *
  */
-public class RunAgentSourceExample {
+public class RunAddAgentSourceExample{
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig("examples/tutorial/config/example5-config.xml" ) ;
@@ -58,6 +60,7 @@ public class RunAgentSourceExample {
 		scenario.getPopulation().getPersons().clear();
 
 		final Controler controler = new Controler( scenario );
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override public void install() {
 				bindMobsim().toProvider(new Provider<Mobsim>() {
@@ -76,7 +79,9 @@ public class RunAgentSourceExample {
 								// insert vehicle:
 								final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(ag.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
 								final Id<Link> linkId4VehicleInsertion = Id.createLinkId(1);
-								qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+//								qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+								QVehicleImpl qVeh = new QVehicleImpl( vehicle );
+								qsim.addParkedVehicle( qVeh, linkId4VehicleInsertion );
 								
 								// Note: I think that you can actually insert the agents directly into the qsim, i.e. no need to use the
 								// agent source for this.  However, this probably does not work with vehicles ... since the links for
