@@ -42,49 +42,46 @@ import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStop
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import com.google.inject.Inject;
-import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
 
 /**
  * @author michalm (Michal Maciejewski)
  */
-public final class MultiModeDrtModule extends AbstractModule {
+public final class MultiModeDrtModule extends AbstractMultiModeModule {
 	private final DrtConfigGroup drtCfg;
 
 	public MultiModeDrtModule(DrtConfigGroup drtCfg) {
+		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
 	}
 
 	@Override
 	public void install() {
-		String mode = drtCfg.getMode();
-		bind(DvrpModes.key(Fleet.class, mode)).toProvider(new FleetProvider(drtCfg.getVehiclesFile()))
-				.asEagerSingleton();
+		bindModal(Fleet.class).toProvider(new FleetProvider(drtCfg.getVehiclesFile())).asEagerSingleton();
 
-		bind(modalKey(DrtRequestValidator.class)).to(DefaultDrtRequestValidator.class).asEagerSingleton();
-		bind(modalKey(DepotFinder.class)).toProvider(ModalProviders.createProvider(mode,
-				getter -> new NearestStartLinkAsDepot(getter.getModal(Fleet.class))));
+		bindModal(DrtRequestValidator.class).to(DefaultDrtRequestValidator.class).asEagerSingleton();
+		bindModal(DepotFinder.class).toProvider(
+				modalProvider(getter -> new NearestStartLinkAsDepot(getter.getModal(Fleet.class))));
 
 		if (MinCostFlowRebalancingParams.isRebalancingEnabled(drtCfg.getMinCostFlowRebalancing())) {
 			install(new MultiModeMinCostFlowRebalancingModule(drtCfg));
 		} else {
-			bind(modalKey(RebalancingStrategy.class)).to(NoRebalancingStrategy.class).asEagerSingleton();
+			bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
 		}
 
-		bind(modalKey(InsertionCostCalculator.PenaltyCalculator.class)).to(drtCfg.isRequestRejection() ?
+		bindModal(InsertionCostCalculator.PenaltyCalculator.class).to(drtCfg.isRequestRejection() ?
 				InsertionCostCalculator.RejectSoftConstraintViolations.class :
 				InsertionCostCalculator.DiscourageSoftConstraintViolations.class).asEagerSingleton();
 
@@ -95,18 +92,18 @@ public final class MultiModeDrtModule extends AbstractModule {
 				break;
 
 			case stopbased:
-				bind(modalKey(TransitSchedule.class)).toInstance(
+				bindModal(TransitSchedule.class).toInstance(
 						DrtModule.readTransitSchedule(drtCfg.getTransitStopsFileUrl(getConfig().getContext())));
 
-				bind(modalKey(DrtRoutingModule.class)).toProvider(new DrtRoutingModuleProvider(drtCfg));//not singleton
+				bindModal(DrtRoutingModule.class).toProvider(new DrtRoutingModuleProvider(drtCfg));//not singleton
 
-				addRoutingModuleBinding(drtCfg.getMode()).toProvider(ModalProviders.createProvider(drtCfg.getMode(),
+				addRoutingModuleBinding(drtCfg.getMode()).toProvider(modalProvider(
 						getter -> new StopBasedDrtRoutingModule(getter.get(PopulationFactory.class),
 								getter.getModal(DrtRoutingModule.class),
 								getter.getNamed(RoutingModule.class, TransportMode.walk),
 								getter.getModal(AccessEgressStopFinder.class), drtCfg)));//not singleton
 
-				bind(modalKey(AccessEgressStopFinder.class)).toProvider(ModalProviders.createProvider(drtCfg.getMode(),
+				bindModal(AccessEgressStopFinder.class).toProvider(modalProvider(
 						getter -> new ClosestAccessEgressStopFinder(getter.getModal(TransitSchedule.class), drtCfg,
 								getter.get(PlansCalcRouteConfigGroup.class), getter.get(Network.class))))
 						.asEagerSingleton();
@@ -116,7 +113,7 @@ public final class MultiModeDrtModule extends AbstractModule {
 				throw new IllegalStateException();
 		}
 
-		bind(modalKey(DrtRouteUpdater.class)).toProvider(new Provider<DrtRouteUpdater>() {
+		bindModal(DrtRouteUpdater.class).toProvider(new Provider<DrtRouteUpdater>() {
 			@Inject
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
 			private Network network;
@@ -177,9 +174,5 @@ public final class MultiModeDrtModule extends AbstractModule {
 			return new DrtRoutingModule(drtCfg, network, travelTime, travelDisutilityFactory, populationFactory,
 					walkRouter);
 		}
-	}
-
-	private <T> Key<T> modalKey(Class<T> type) {
-		return Key.get(type, DvrpModes.mode(drtCfg.getMode()));
 	}
 }

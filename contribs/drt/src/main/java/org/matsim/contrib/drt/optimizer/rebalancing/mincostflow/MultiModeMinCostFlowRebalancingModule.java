@@ -28,48 +28,40 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebal
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.AbstractModule;
-
-import com.google.inject.Key;
 
 /**
  * @author michalm
  */
-public class MultiModeMinCostFlowRebalancingModule extends AbstractModule {
+public class MultiModeMinCostFlowRebalancingModule extends AbstractMultiModeModule {
 	private final DrtConfigGroup drtCfg;
 
 	public MultiModeMinCostFlowRebalancingModule(DrtConfigGroup drtCfg) {
+		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
 	}
 
 	@Override
 	public void install() {
 		MinCostFlowRebalancingParams params = drtCfg.getMinCostFlowRebalancing();
-		bind(modalKey(DrtZonalSystem.class)).toProvider(
-				new DrtZonalSystem.DrtZonalSystemProvider(params.getCellSize()));
+		bindModal(DrtZonalSystem.class).toProvider(new DrtZonalSystem.DrtZonalSystemProvider(params.getCellSize()));
 
-		bind(modalKey(RebalancingStrategy.class)).toProvider(ModalProviders.createProvider(drtCfg.getMode(),
+		bindModal(RebalancingStrategy.class).toProvider(modalProvider(
 				getter -> new MinCostFlowRebalancingStrategy(getter.getModal(RebalancingTargetCalculator.class),
 						getter.getModal(DrtZonalSystem.class), getter.getModal(Fleet.class),
 						getter.getModal(MinCostRelocationCalculator.class), drtCfg))).asEagerSingleton();
 
-		bind(modalKey(RebalancingTargetCalculator.class)).toProvider(ModalProviders.createProvider(drtCfg.getMode(),
+		bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
 				getter -> new LinearRebalancingTargetCalculator(getter.getModal(ZonalDemandAggregator.class), drtCfg)))
 				.asEagerSingleton();
 
-		bind(modalKey(MinCostRelocationCalculator.class)).toProvider(ModalProviders.createProvider(drtCfg.getMode(),
+		bindModal(MinCostRelocationCalculator.class).toProvider(modalProvider(
 				getter -> new AggregatedMinCostRelocationCalculator(getter.getModal(DrtZonalSystem.class),
 						getter.getNamed(Network.class, DvrpRoutingNetworkProvider.DVRP_ROUTING)))).asEagerSingleton();
 
-		bind(modalKey(ZonalDemandAggregator.class)).toProvider(ModalProviders.createProvider(drtCfg.getMode(),
+		bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
 				getter -> new ZonalDemandAggregator(getter.get(EventsManager.class),
 						getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
-	}
-
-	private <T> Key<T> modalKey(Class<T> type) {
-		return DvrpModes.key(type, drtCfg.getMode());
 	}
 }
