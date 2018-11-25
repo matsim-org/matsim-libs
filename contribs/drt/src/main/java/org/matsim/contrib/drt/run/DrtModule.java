@@ -22,6 +22,7 @@ import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStop
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.MainModeIdentifier;
@@ -31,8 +32,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import com.google.inject.Inject;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 /**
  * @author jbischoff
@@ -45,8 +44,9 @@ public final class DrtModule extends AbstractModule {
 	@Override
 	public void install() {
 		String mode = drtCfg.getMode();
-		install(FleetProvider.createModule(mode, drtCfg.getVehiclesFileUrl(getConfig().getContext())));
-		bind(Fleet.class).annotatedWith(Drt.class).to(Key.get(Fleet.class, Names.named(mode))).asEagerSingleton();
+		bind(DvrpModes.key(Fleet.class, mode)).toProvider(new FleetProvider(drtCfg.getVehiclesFile()))
+				.asEagerSingleton();
+		bind(Fleet.class).annotatedWith(Drt.class).to(DvrpModes.key(Fleet.class, mode));
 
 		bind(DrtRequestValidator.class).to(DefaultDrtRequestValidator.class);
 		bind(DepotFinder.class).to(NearestStartLinkAsDepot.class);

@@ -27,47 +27,40 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileWriter;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.MatsimServices;
-
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm (Michal Maciejewski)
  */
-public class MultiModeDrtAnalysisModule extends AbstractModule {
+public class MultiModeDrtAnalysisModule extends AbstractMultiModeModule {
 	private final DrtConfigGroup drtCfg;
 
 	public MultiModeDrtAnalysisModule(DrtConfigGroup drtCfg) {
+		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
 	}
 
 	@Override
 	public void install() {
-		bind(modalKey(DynModePassengerStats.class)).toProvider(ModalProviders.createProvider(drtCfg.getMode(),
+		bindModal(DynModePassengerStats.class).toProvider(modalProvider(
 				getter -> new DynModePassengerStats(getter.get(Network.class), getter.get(EventsManager.class), drtCfg,
 						getter.getModal(Fleet.class)))).asEagerSingleton();
 
-		bind(modalKey(DrtRequestAnalyzer.class)).toProvider(ModalProviders.createProvider(drtCfg.getMode(),
+		bindModal(DrtRequestAnalyzer.class).toProvider(modalProvider(
 				getter -> new DrtRequestAnalyzer(getter.get(EventsManager.class), getter.get(Network.class), drtCfg)))
 				.asEagerSingleton();
 
-		addControlerListenerBinding().toProvider(ModalProviders.createProvider(drtCfg.getMode(),
+		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new DrtAnalysisControlerListener(getter.get(Config.class), drtCfg,
 						getter.getModal(Fleet.class), getter.getModal(DynModePassengerStats.class),
 						getter.get(MatsimServices.class), getter.get(Network.class),
 						getter.getModal(DrtRequestAnalyzer.class)))).asEagerSingleton();
 
-		addMobsimListenerBinding().toProvider(ModalProviders.createProvider(drtCfg.getMode(),
+		addMobsimListenerBinding().toProvider(modalProvider(
 				getter -> new DrtVehicleOccupancyProfileWriter(getter.getModal(Fleet.class),
 						getter.get(MatsimServices.class), drtCfg)));
-	}
-
-	private <T> Key<T> modalKey(Class<T> type) {
-		return Key.get(type, Names.named(drtCfg.getMode()));
 	}
 }
