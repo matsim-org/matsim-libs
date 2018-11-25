@@ -53,12 +53,10 @@ public class DvrpModeQSimModule extends AbstractQSimModule {
 			install(new PassengerEngineQSimModule(mode));
 		}
 
-		install(new AbstractQSimModule() {
+		install(new AbstractMultiModeQSimModule(mode) {
 			@Override
 			protected void configureQSim() {
-				for (Class<? extends MobsimListener> l : listeners) {
-					addComponent(l, DvrpModes.mode(mode));
-				}
+				listeners.stream().forEach(this::addModalComponent);
 			}
 		});
 	}

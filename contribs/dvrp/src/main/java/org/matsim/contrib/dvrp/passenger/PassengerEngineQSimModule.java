@@ -5,24 +5,21 @@ import javax.inject.Inject;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 import com.google.inject.name.Named;
 
-public class PassengerEngineQSimModule extends AbstractQSimModule {
-	private final String mode;
-
+public class PassengerEngineQSimModule extends AbstractMultiModeQSimModule {
 	public PassengerEngineQSimModule(String mode) {
-		this.mode = mode;
+		super(mode);
 	}
 
 	@Override
 	protected void configureQSim() {
-		bindComponent(PassengerEngine.class, DvrpModes.mode(mode)).toProvider(
-				new ModalProviders.AbstractProvider<PassengerEngine>(mode) {
+		bindModalComponent(PassengerEngine.class).toProvider(
+				new ModalProviders.AbstractProvider<PassengerEngine>(getMode()) {
 					@Inject
 					private EventsManager eventsManager;
 
@@ -32,8 +29,9 @@ public class PassengerEngineQSimModule extends AbstractQSimModule {
 
 					@Override
 					public PassengerEngine get() {
-						return new PassengerEngine(mode, eventsManager, getModalInstance(PassengerRequestCreator.class),
-								getModalInstance(VrpOptimizer.class), network);
+						return new PassengerEngine(getMode(), eventsManager,
+								getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
+								network);
 					}
 				}).asEagerSingleton();
 	}

@@ -22,24 +22,22 @@ package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.QSim;
 
 import com.google.inject.Inject;
 
-public class VrpAgentSourceQSimModule extends AbstractQSimModule {
-	private final String mode;
+public class VrpAgentSourceQSimModule extends AbstractMultiModeQSimModule {
 
 	public VrpAgentSourceQSimModule(String mode) {
-		this.mode = mode;
+		super(mode);
 	}
 
 	@Override
 	protected void configureQSim() {
-		bindComponent(VrpAgentSource.class, DvrpModes.mode(mode)).toProvider(
-				new ModalProviders.AbstractProvider<VrpAgentSource>(mode) {
+		bindModalComponent(VrpAgentSource.class).toProvider(
+				new ModalProviders.AbstractProvider<VrpAgentSource>(getMode()) {
 					@Inject
 					private QSim qSim;
 

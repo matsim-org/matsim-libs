@@ -25,11 +25,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
+import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
@@ -40,10 +39,11 @@ import com.google.inject.name.Names;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class OneTruckModule extends AbstractModule {
+public class OneTruckModule extends AbstractMultiModeModule {
 	private final String trucksFile;
 
 	public OneTruckModule(String truckFile) {
+		super(TransportMode.truck);
 		this.trucksFile = truckFile;
 	}
 
@@ -51,17 +51,14 @@ public class OneTruckModule extends AbstractModule {
 	public void install() {
 		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSource.DVRP_VEHICLE_TYPE))
 				.toInstance(createTruckType());
-		bind(DvrpModes.key(Fleet.class, TransportMode.truck)).toProvider(new FleetProvider(trucksFile))
-				.asEagerSingleton();
+		bindModal(Fleet.class).toProvider(new FleetProvider(trucksFile)).asEagerSingleton();
 
-		installQSimModule(new AbstractQSimModule() {
+		installQSimModule(new AbstractMultiModeQSimModule(TransportMode.truck) {
 			@Override
 			protected void configureQSim() {
 				bind(OneTruckRequestCreator.class).asEagerSingleton();
-				bind(DvrpModes.key(VrpOptimizer.class, TransportMode.truck)).to(OneTruckOptimizer.class)
-						.asEagerSingleton();
-				bind(DvrpModes.key(VrpAgentLogic.DynActionCreator.class, TransportMode.truck)).to(
-						OneTruckActionCreator.class).asEagerSingleton();
+				bindModal(VrpOptimizer.class).to(OneTruckOptimizer.class).asEagerSingleton();
+				bindModal(VrpAgentLogic.DynActionCreator.class).to(OneTruckActionCreator.class).asEagerSingleton();
 			}
 		});
 	}
