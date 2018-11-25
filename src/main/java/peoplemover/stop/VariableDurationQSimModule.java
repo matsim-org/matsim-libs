@@ -20,8 +20,9 @@
 
 package peoplemover.stop;
 
-import com.google.inject.name.Names;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpMode;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
@@ -29,17 +30,18 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
  * @author Michal Maciejewski (michalm)
  */
 public class VariableDurationQSimModule extends AbstractQSimModule {
-    private final BusStopDurationCalculator busStopDurationCalculator;
+	private final BusStopDurationCalculator busStopDurationCalculator;
 
-    public VariableDurationQSimModule(BusStopDurationCalculator busStopDurationCalculator) {
-        this.busStopDurationCalculator = busStopDurationCalculator;
-    }
+	public VariableDurationQSimModule(BusStopDurationCalculator busStopDurationCalculator) {
+		this.busStopDurationCalculator = busStopDurationCalculator;
+	}
 
-    @Override
-    protected void configureQSim() {
-        bind(BusStopDurationCalculator.class).toInstance(busStopDurationCalculator);
-        bind(VrpAgentLogic.DynActionCreator.class).annotatedWith(Names.named(DrtConfigGroup.get(getConfig()).getMode()))
-                .to(CustomizedDrtActionCreator.class)
-                .asEagerSingleton();
-    }
+	@Override
+	protected void configureQSim() {
+		bind(BusStopDurationCalculator.class).toInstance(busStopDurationCalculator);
+		DvrpMode dvrpMode = DvrpModes.mode(DrtConfigGroup.get(getConfig()).getMode());
+		bind(VrpAgentLogic.DynActionCreator.class).annotatedWith(dvrpMode)
+				.to(CustomizedDrtActionCreator.class)
+				.asEagerSingleton();
+	}
 }
