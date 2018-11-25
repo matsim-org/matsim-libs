@@ -33,9 +33,8 @@ import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MultiModalMinCostFlowRebalancingModule;
-import org.matsim.contrib.drt.routing.DefaultAccessEgressStopFinder;
+import org.matsim.contrib.drt.routing.ClosestAccessEgressStopFinder;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
-import org.matsim.contrib.drt.routing.DrtMainModeIdentifier;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
@@ -49,7 +48,6 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -90,8 +88,6 @@ public final class MultiModeDrtModule extends AbstractModule {
 				InsertionCostCalculator.RejectSoftConstraintViolations.class :
 				InsertionCostCalculator.DiscourageSoftConstraintViolations.class).asEagerSingleton();
 
-		bind(modalKey(MainModeIdentifier.class)).toInstance(new DrtMainModeIdentifier(drtCfg));
-
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:
 				addRoutingModuleBinding(drtCfg.getMode()).toProvider(
@@ -111,7 +107,7 @@ public final class MultiModeDrtModule extends AbstractModule {
 								getter.getModal(AccessEgressStopFinder.class), drtCfg)));//not singleton
 
 				bind(modalKey(AccessEgressStopFinder.class)).toProvider(ModalProviders.createProvider(drtCfg.getMode(),
-						getter -> new DefaultAccessEgressStopFinder(getter.getModal(TransitSchedule.class), drtCfg,
+						getter -> new ClosestAccessEgressStopFinder(getter.getModal(TransitSchedule.class), drtCfg,
 								getter.get(PlansCalcRouteConfigGroup.class), getter.get(Network.class))))
 						.asEagerSingleton();
 				break;

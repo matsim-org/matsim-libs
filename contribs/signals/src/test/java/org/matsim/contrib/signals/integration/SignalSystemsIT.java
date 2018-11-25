@@ -23,7 +23,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.signals.builder.SignalsModule;
+import org.matsim.contrib.signals.builder.Signals;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
@@ -78,7 +78,8 @@ public class SignalSystemsIT {
 		// ---
 		
 		Controler c = new Controler(scenario);
-		c.addOverridingModule(new SignalsModule());
+//		c.addOverridingModule(new SignalsModule());
+		Signals.configure(c);
 		
 		c.getConfig().controler().setDumpDataAtEnd(false);
 
@@ -170,7 +171,8 @@ public class SignalSystemsIT {
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		
 		Controler c = new Controler(scenario);
-		c.addOverridingModule(new SignalsModule());
+//		c.addOverridingModule(new SignalsModule());
+		Signals.configure( c );
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
 		c.getConfig().controler().setCreateGraphs(false);
 		c.getConfig().controler().setDumpDataAtEnd(false);
