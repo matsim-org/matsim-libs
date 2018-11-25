@@ -32,7 +32,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MultiModalMinCostFlowRebalancingModule;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MultiModeMinCostFlowRebalancingModule;
 import org.matsim.contrib.drt.routing.ClosestAccessEgressStopFinder;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
@@ -79,7 +79,7 @@ public final class MultiModeDrtModule extends AbstractModule {
 				getter -> new NearestStartLinkAsDepot(getter.getModal(Fleet.class))));
 
 		if (MinCostFlowRebalancingParams.isRebalancingEnabled(drtCfg.getMinCostFlowRebalancing())) {
-			install(new MultiModalMinCostFlowRebalancingModule(drtCfg));
+			install(new MultiModeMinCostFlowRebalancingModule(drtCfg));
 		} else {
 			bind(modalKey(RebalancingStrategy.class)).to(NoRebalancingStrategy.class).asEagerSingleton();
 		}

@@ -38,10 +38,10 @@ import com.google.inject.Key;
 /**
  * @author michalm
  */
-public class MultiModalMinCostFlowRebalancingModule extends AbstractModule {
+public class MultiModeMinCostFlowRebalancingModule extends AbstractModule {
 	private final DrtConfigGroup drtCfg;
 
-	public MultiModalMinCostFlowRebalancingModule(DrtConfigGroup drtCfg) {
+	public MultiModeMinCostFlowRebalancingModule(DrtConfigGroup drtCfg) {
 		this.drtCfg = drtCfg;
 	}
 
