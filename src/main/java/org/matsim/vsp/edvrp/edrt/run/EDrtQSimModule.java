@@ -38,6 +38,8 @@ import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.run.DvrpMode;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -50,8 +52,6 @@ import org.matsim.vsp.edvrp.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.vsp.edvrp.edrt.scheduler.EmptyVehicleChargingScheduler;
 
 import com.google.inject.Key;
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -82,13 +82,13 @@ public class EDrtQSimModule extends AbstractQSimModule {
 		bind(ParallelPathDataProvider.class).asEagerSingleton();
 		bind(PrecalculablePathDataProvider.class).to(ParallelPathDataProvider.class);
 
-		Named modeNamed = Names.named(DrtConfigGroup.get(getConfig()).getMode());
-		bind(VrpOptimizer.class).annotatedWith(modeNamed).to(DrtOptimizer.class);
-		bind(VrpAgentLogic.DynActionCreator.class).annotatedWith(modeNamed)
+		DvrpMode dvrpMode = DvrpModes.mode(DrtConfigGroup.get(getConfig()).getMode());
+		bind(VrpOptimizer.class).annotatedWith(dvrpMode).to(DrtOptimizer.class);
+		bind(VrpAgentLogic.DynActionCreator.class).annotatedWith(dvrpMode)
 				.to(EDrtActionCreator.class)
 				.asEagerSingleton();
-		bind(PassengerRequestCreator.class).annotatedWith(modeNamed).to(DrtRequestCreator.class).asEagerSingleton();
-		bind(PassengerEngine.class).annotatedWith(Drt.class).to(Key.get(PassengerEngine.class, modeNamed));
+		bind(PassengerRequestCreator.class).annotatedWith(dvrpMode).to(DrtRequestCreator.class).asEagerSingleton();
+		bind(PassengerEngine.class).annotatedWith(Drt.class).to(Key.get(PassengerEngine.class, dvrpMode));
 
 	}
 
