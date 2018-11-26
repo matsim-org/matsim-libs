@@ -18,15 +18,15 @@
 
 package org.matsim.vsp.ev.dvrp;
 
-import java.net.URL;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.core.config.Config;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.vsp.ev.EvConfigGroup;
 import org.matsim.vsp.ev.EvConfigGroup.AuxDischargingSimulation;
@@ -47,9 +47,9 @@ public class EvDvrpIntegrationModule extends AbstractModule {
 	private Function<Charger, ChargingStrategy> chargingStrategyFactory;
 	private DoubleSupplier temperatureProvider;
 	private Predicate<Vehicle> turnedOnPredicate;
-	private Function<Config, URL> vehicleFileUrlGetter;
 
 	private final String mode;
+	private String vehicleFile;
 
 	public EvDvrpIntegrationModule(String mode) {
 		this.mode = mode;
@@ -76,7 +76,7 @@ public class EvDvrpIntegrationModule extends AbstractModule {
 				charger -> new ChargingWithQueueingAndAssignmentLogic(charger, chargingStrategyFactory.apply(charger)));
 		bind(AuxEnergyConsumption.Factory.class).toInstance(
 				new DvrpAuxConsumptionFactory(mode, temperatureProvider, turnedOnPredicate));
-		install(EvDvrpFleetProvider.createModule(mode, vehicleFileUrlGetter.apply(getConfig())));
+		bind(DvrpModes.key(Fleet.class, mode)).toProvider(new EvDvrpFleetProvider(vehicleFile)).asEagerSingleton();
 	}
 
 	public EvDvrpIntegrationModule setChargingStrategyFactory(
@@ -95,8 +95,8 @@ public class EvDvrpIntegrationModule extends AbstractModule {
 		return this;
 	}
 
-	public EvDvrpIntegrationModule setVehicleFileUrlGetter(Function<Config, URL> vehicleFileUrlGetter) {
-		this.vehicleFileUrlGetter = vehicleFileUrlGetter;
+	public EvDvrpIntegrationModule setVehicleFile(String vehicleFile) {
+		this.vehicleFile = vehicleFile;
 		return this;
 	}
 }

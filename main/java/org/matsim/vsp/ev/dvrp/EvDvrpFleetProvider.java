@@ -18,21 +18,19 @@
 
 package org.matsim.vsp.ev.dvrp;
 
-import java.net.URL;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.vsp.ev.data.ElectricFleet;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm
@@ -43,34 +41,26 @@ public class EvDvrpFleetProvider implements Provider<Fleet> {
 	private Network network;
 
 	@Inject
+	private Config config;
+
+	@Inject
 	private ElectricFleet evFleet;
 
-	private final URL url;
+	private final String file;
 
-	public EvDvrpFleetProvider(URL url) {
-		this.url = url;
+	public EvDvrpFleetProvider(String file) {
+		this.file = file;
 	}
 
 	@Override
 	public Fleet get() {
 		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(network, fleet).parse(url);
+		new VehicleReader(network, fleet).parse(ConfigGroup.getInputFileURL(config.getContext(), file));
 
 		FleetImpl evDvrpFleet = new FleetImpl();
 		for (Vehicle v : fleet.getVehicles().values()) {
 			evDvrpFleet.addVehicle(EvDvrpVehicle.create(v, evFleet));
 		}
 		return evDvrpFleet;
-	}
-
-	public static AbstractModule createModule(String mode, URL url) {
-		return new AbstractModule() {
-			@Override
-			public void install() {
-				bind(Fleet.class).annotatedWith(Names.named(mode))
-						.toProvider(new EvDvrpFleetProvider(url))
-						.asEagerSingleton();
-			}
-		};
 	}
 }

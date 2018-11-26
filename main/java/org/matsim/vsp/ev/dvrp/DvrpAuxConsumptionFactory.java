@@ -26,13 +26,13 @@ import javax.inject.Inject;
 
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.vsp.ev.data.ElectricVehicle;
 import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
 import org.matsim.vsp.ev.discharging.OhdeSlaskiAuxEnergyConsumption;
 
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 public class DvrpAuxConsumptionFactory implements AuxEnergyConsumption.Factory {
 	@Inject
@@ -51,7 +51,7 @@ public class DvrpAuxConsumptionFactory implements AuxEnergyConsumption.Factory {
 
 	@Override
 	public AuxEnergyConsumption create(ElectricVehicle electricVehicle) {
-		Fleet fleet = injector.getInstance(Key.get(Fleet.class, Names.named(mode)));
+		Fleet fleet = injector.getInstance(Key.get(Fleet.class, DvrpModes.mode(mode)));
 		Vehicle vehicle = fleet.getVehicles().get(electricVehicle.getId());
 		return new OhdeSlaskiAuxEnergyConsumption(electricVehicle, temperatureProvider,
 				ev -> turnedOnPredicate.test(vehicle));
