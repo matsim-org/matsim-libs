@@ -23,14 +23,12 @@
 package org.matsim.contrib.drt.run.examples;
 
 import java.util.Collections;
-import java.util.Set;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.drt.data.DrtRequest;
-import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -73,14 +71,10 @@ public class RunDrtExampleIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.bind(DrtRequestValidator.class).toInstance(new DrtRequestValidator() {
-					@Override
-					public Set<String> validateDrtRequest(DrtRequest request) {
-						return request.getPassenger().getId().toString().equals("12052000_12052000_100") ?
+				this.bind(PassengerRequestValidator.class)
+						.toInstance(req -> req.getPassenger().getId().toString().equals("12052000_12052000_100") ?
 								Collections.singleton("REJECT_passenger_12052000_12052000_100") :
-								Collections.emptySet();
-					}
-				});
+								Collections.emptySet());
 			}
 		});
 		controler.run();

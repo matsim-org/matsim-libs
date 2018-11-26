@@ -23,9 +23,9 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.MapConfiguration;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.fifo.FifoTaxiOptimizer;
@@ -60,14 +60,14 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final TravelTime travelTime;
 	private final TravelDisutility travelDisutility;
 	private final TaxiScheduler scheduler;
-	private final TaxiRequestValidator requestValidator;
+	private final PassengerRequestValidator requestValidator;
 	private final EventsManager events;
 
 	@Inject
 	public DefaultTaxiOptimizerProvider(TaxiConfigGroup taxiCfg, @Taxi Fleet fleet,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, @Taxi TravelDisutility travelDisutility,
-			TaxiScheduler scheduler, TaxiRequestValidator requestValidator, EventsManager events) {
+			TaxiScheduler scheduler, @Taxi PassengerRequestValidator requestValidator, EventsManager events) {
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
 		this.network = network;

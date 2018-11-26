@@ -22,10 +22,10 @@ package org.matsim.contrib.taxi.run;
 
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
+import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
-import org.matsim.contrib.taxi.data.validator.DefaultTaxiRequestValidator;
-import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
@@ -69,6 +69,6 @@ public final class MultiModeTaxiModule extends AbstractMultiModeModule {
 			// add more time profiles if necessary
 		}
 
-		bindModal(TaxiRequestValidator.class).to(DefaultTaxiRequestValidator.class).asEagerSingleton();
+		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 	}
 }

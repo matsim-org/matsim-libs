@@ -3,8 +3,6 @@ package org.matsim.contrib.drt.run;
 import java.net.URL;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.data.validator.DefaultDrtRequestValidator;
-import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
@@ -21,6 +19,8 @@ import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
+import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.ConfigUtils;
@@ -48,7 +48,7 @@ public final class DrtModule extends AbstractModule {
 				.asEagerSingleton();
 		bind(Fleet.class).annotatedWith(Drt.class).to(DvrpModes.key(Fleet.class, mode));
 
-		bind(DrtRequestValidator.class).to(DefaultDrtRequestValidator.class);
+		bind(PassengerRequestValidator.class).annotatedWith(Drt.class).to(DefaultPassengerRequestValidator.class);
 		bind(DepotFinder.class).to(NearestStartLinkAsDepot.class);
 		bind(TravelDisutilityFactory.class).annotatedWith(Drt.class).toInstance(TimeAsTravelDisutility::new);
 

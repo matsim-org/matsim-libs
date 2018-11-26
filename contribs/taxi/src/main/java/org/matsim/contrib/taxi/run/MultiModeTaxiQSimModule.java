@@ -25,13 +25,13 @@ import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
-import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
@@ -83,7 +83,7 @@ public class MultiModeTaxiQSimModule extends AbstractMultiModeQSimModule {
 					public TaxiOptimizer get() {
 						Fleet fleet = getModalInstance(Fleet.class);
 						TaxiScheduler taxiScheduler = getModalInstance(TaxiScheduler.class);
-						TaxiRequestValidator requestValidator = getModalInstance(TaxiRequestValidator.class);
+						PassengerRequestValidator requestValidator = getModalInstance(PassengerRequestValidator.class);
 						return new DefaultTaxiOptimizerProvider(taxiCfg, fleet, network, timer, travelTime,
 								travelDisutility, taxiScheduler, requestValidator, events).get();
 					}

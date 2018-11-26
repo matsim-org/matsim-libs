@@ -21,7 +21,7 @@ package org.matsim.contrib.taxi.optimizer.zonal;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.taxi.optimizer.rules.IdleTaxiZonalRegistry;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.rules.UnplannedRequestZonalRegistry;
@@ -37,15 +37,15 @@ import org.matsim.core.router.util.TravelTime;
 public class ZonalTaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public static ZonalTaxiOptimizer create(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
 			Network network, MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility,
-			ZonalTaxiOptimizerParams params, TaxiRequestValidator requestValidator, EventsManager events) {
+			ZonalTaxiOptimizerParams params, PassengerRequestValidator requestValidator, EventsManager events) {
 		return create(taxiCfg, fleet, scheduler, network, timer, travelTime, travelDisutility, params,
 				new SquareGridSystem(network, params.cellSize), requestValidator, events);
 	}
 
 	public static ZonalTaxiOptimizer create(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
 			Network network, MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility,
-			ZonalTaxiOptimizerParams params, ZonalSystem zonalSystem,
-			TaxiRequestValidator requestValidator, EventsManager events) {
+			ZonalTaxiOptimizerParams params, ZonalSystem zonalSystem, PassengerRequestValidator requestValidator,
+			EventsManager events) {
 		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, scheduler);
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
 		ZonalRequestInserter requestInserter = new ZonalRequestInserter(fleet, scheduler, timer, network, travelTime,
@@ -57,7 +57,8 @@ public class ZonalTaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public ZonalTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler, Network network,
 			ZonalTaxiOptimizerParams params, IdleTaxiZonalRegistry idleTaxiRegistry,
 			UnplannedRequestZonalRegistry unplannedRequestRegistry, ZonalRequestInserter requestInserter,
-			TaxiRequestValidator requestValidator, EventsManager events) {
-		super(taxiCfg, fleet, scheduler, params, idleTaxiRegistry, unplannedRequestRegistry, requestInserter, requestValidator, events);
+			PassengerRequestValidator requestValidator, EventsManager events) {
+		super(taxiCfg, fleet, scheduler, params, idleTaxiRegistry, unplannedRequestRegistry, requestInserter,
+				requestValidator, events);
 	}
 }

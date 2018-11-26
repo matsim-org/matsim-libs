@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.data.DrtRequest;
-import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.Depots;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
@@ -47,6 +46,7 @@ import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -69,7 +69,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private final RebalancingStrategy rebalancingStrategy;
 	private final MobsimTimer mobsimTimer;
 	private final EventsManager eventsManager;
-	private final DrtRequestValidator requestValidator;
+	private final PassengerRequestValidator requestValidator;
 	private final DepotFinder depotFinder;
 	private final EmptyVehicleRelocator relocator;
 	private final UnplannedRequestInserter requestInserter;
@@ -80,7 +80,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	@Inject
 	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, @Drt Fleet fleet, MobsimTimer mobsimTimer,
-			EventsManager eventsManager, DrtRequestValidator requestValidator, DepotFinder depotFinder,
+			EventsManager eventsManager, @Drt PassengerRequestValidator requestValidator, DepotFinder depotFinder,
 			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
 			DrtScheduleTimingUpdater scheduleTimingUpdater, EmptyVehicleRelocator relocator,
 			UnplannedRequestInserter requestInserter) {
@@ -138,7 +138,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	@Override
 	public void requestSubmitted(Request request) {
 		DrtRequest drtRequest = (DrtRequest)request;
-		Set<String> violations = requestValidator.validateDrtRequest(drtRequest);
+		Set<String> violations = requestValidator.validateRequest(drtRequest);
 
 		if (!violations.isEmpty()) {
 			String causes = violations.stream().collect(Collectors.joining(", "));

@@ -21,7 +21,7 @@ package org.matsim.contrib.taxi.optimizer.fifo;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
@@ -37,7 +37,7 @@ public class FifoTaxiOptimizer extends DefaultTaxiOptimizer {
 
 	public FifoTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, Network network, MobsimTimer timer,
 			TravelTime travelTime, TravelDisutility travelDisutility, TaxiScheduler scheduler,
-			FifoTaxiOptimizerParams params, TaxiRequestValidator requestValidator, EventsManager events) {
+			FifoTaxiOptimizerParams params, PassengerRequestValidator requestValidator, EventsManager events) {
 		super(taxiCfg, fleet, scheduler, params,
 				new FifoRequestInserter(network, fleet, timer, travelTime, travelDisutility, scheduler),
 				requestValidator, events);
