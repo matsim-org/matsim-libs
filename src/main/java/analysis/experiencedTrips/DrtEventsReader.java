@@ -64,14 +64,15 @@ public class DrtEventsReader extends MatsimXmlParser {
 				Map<String, String> attributes = event.getAttributes();
 				
 				Double time = Double.parseDouble(attributes.get(DrtRequestSubmittedEvent.ATTRIBUTE_TIME));
+				String mode = attributes.get(PassengerRequestRejectedEvent.ATTRIBUTE_MODE);
 				Id<Request> requestId = Id.create(attributes.get(DrtRequestSubmittedEvent.ATTRIBUTE_REQUEST), Request.class);
 				Id<Person> personId = Id.createPersonId(attributes.get(DrtRequestSubmittedEvent.ATTRIBUTE_PERSON));
 				Id<Link> fromLinkId = Id.createLinkId(attributes.get(DrtRequestSubmittedEvent.ATTRIBUTE_FROM_LINK));
 				Id<Link> toLinkId = Id.createLinkId(attributes.get(DrtRequestSubmittedEvent.ATTRIBUTE_TO_LINK));
 				Double unsharedRideTime = Double.parseDouble(attributes.get(DrtRequestSubmittedEvent.ATTRIBUTE_UNSHARED_RIDE_TIME));
 				Double unsharedRideDistance = Double.parseDouble(attributes.get(DrtRequestSubmittedEvent.ATTRIBUTE_UNSHARED_RIDE_DISTANCE));
-				
-				return new DrtRequestSubmittedEvent(time, requestId, personId, fromLinkId,
+
+				return new DrtRequestSubmittedEvent(time, mode, requestId, personId, fromLinkId,
 						toLinkId, unsharedRideTime, unsharedRideDistance);
 			}
 		};
@@ -105,12 +106,13 @@ public class DrtEventsReader extends MatsimXmlParser {
 				Map<String, String> attributes = event.getAttributes();
 				
 				double time = Double.parseDouble(attributes.get(DrtRequestScheduledEvent.ATTRIBUTE_TIME));
+				String mode = attributes.get(PassengerRequestRejectedEvent.ATTRIBUTE_MODE);
 				Id<Request> requestId = Id.create(attributes.get(DrtRequestScheduledEvent.ATTRIBUTE_REQUEST), Request.class);
 				Id<Vehicle> vehicleId = Id.create(attributes.get(DrtRequestScheduledEvent.ATTRIBUTE_VEHICLE), Vehicle.class);
 				double pickUpTime = Double.parseDouble(attributes.get(DrtRequestScheduledEvent.ATTRIBUTE_PICKUP_TIME));
 				double dropOffDistance = Double.parseDouble(attributes.get(DrtRequestScheduledEvent.ATTRIBUTE_DROPOFF_TIME));
-				
-				return new DrtRequestScheduledEvent(time, requestId, vehicleId, pickUpTime, dropOffDistance);
+
+				return new DrtRequestScheduledEvent(time, mode, requestId, vehicleId, pickUpTime, dropOffDistance);
 			}
 		};
 		
