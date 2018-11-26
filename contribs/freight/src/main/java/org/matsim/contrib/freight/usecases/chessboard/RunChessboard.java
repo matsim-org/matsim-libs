@@ -1,6 +1,7 @@
 package org.matsim.contrib.freight.usecases.chessboard;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Map;
 
 import org.matsim.api.core.v01.TransportMode;
@@ -40,6 +41,8 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 
 import javax.inject.Inject;
 
@@ -59,10 +62,10 @@ public class RunChessboard {
         Controler controler = new Controler(config);
 
         final Carriers carriers = new Carriers();
-        new CarrierPlanXmlReaderV2(carriers).readFile("input/usecases/chessboard/freight/carrierPlans.xml");
+        new CarrierPlanXmlReaderV2(carriers).readFile("carrierPlans.xml");
 
         final CarrierVehicleTypes types = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes.xml");
+        new CarrierVehicleTypeReader(types).readFile("vehicleTypes.xml");
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 
         final CarrierPlanStrategyManagerFactory strategyManagerFactory = new MyCarrierPlanStrategyManagerFactory(types);
@@ -120,7 +123,9 @@ public class RunChessboard {
     }
 
     public Config prepareConfig(){
-        config = ConfigUtils.loadConfig("input/usecases/chessboard/passenger/config.xml" );
+    	final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
+        final URL configURL = IOUtils.newUrl(url, "config.xml");
+		config = ConfigUtils.loadConfig(configURL  );
         config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
         config.global().setRandomSeed(4177);
         config.controler().setOutputDirectory("./output/");
