@@ -27,12 +27,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
 import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
-import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData;
@@ -80,7 +80,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 	public static AssignmentETaxiOptimizer create(TaxiConfigGroup taxiCfg, Fleet fleet, Network network,
 			MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility, ETaxiScheduler eScheduler,
 			ChargingInfrastructure chargingInfrastructure, AssignmentETaxiOptimizerParams params,
-			TaxiRequestValidator requestValidator, EventsManager events) {
+			PassengerRequestValidator requestValidator, EventsManager events) {
 		MultiNodePathCalculator multiNodeRouter = (MultiNodePathCalculator)new FastMultiNodeDijkstraFactory(
 				true).createPathCalculator(network, travelDisutility, travelTime);
 		BackwardMultiNodePathCalculator backwardMultiNodeRouter = (BackwardMultiNodePathCalculator)new BackwardFastMultiNodeDijkstraFactory(
@@ -105,7 +105,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 			ETaxiScheduler eScheduler, ChargingInfrastructure chargingInfrastructure,
 			AssignmentETaxiOptimizerParams params, MultiNodePathCalculator multiNodeRouter,
 			BackwardMultiNodePathCalculator backwardMultiNodeRouter, LeastCostPathCalculator router,
-			TaxiRequestValidator requestValidator, EventsManager events) {
+			PassengerRequestValidator requestValidator, EventsManager events) {
 		super(taxiCfg, fleet, eScheduler, params,
 				new AssignmentRequestInserter(fleet, timer, travelTime, eScheduler, params, multiNodeRouter,
 						backwardMultiNodeRouter, router), requestValidator, events);

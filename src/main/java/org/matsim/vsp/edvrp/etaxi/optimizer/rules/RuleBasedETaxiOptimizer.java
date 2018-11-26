@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
@@ -54,7 +54,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public static RuleBasedETaxiOptimizer create(TaxiConfigGroup taxiCfg, Fleet fleet, ETaxiScheduler eScheduler,
 			Network network, MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility,
 			RuleBasedETaxiOptimizerParams params, ChargingInfrastructure chargingInfrastructure,
-			TaxiRequestValidator requestValidator, EventsManager events) {
+			PassengerRequestValidator requestValidator, EventsManager events) {
 		return RuleBasedETaxiOptimizer.create(taxiCfg, fleet, eScheduler, network, timer, travelTime, travelDisutility,
 				params, chargingInfrastructure, new SquareGridSystem(network, params.cellSize), requestValidator,
 				events);
@@ -63,7 +63,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public static RuleBasedETaxiOptimizer create(TaxiConfigGroup taxiCfg, Fleet fleet, ETaxiScheduler eScheduler,
 			Network network, MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility,
 			RuleBasedETaxiOptimizerParams params, ChargingInfrastructure chargingInfrastructure,
-			ZonalSystem zonalSystem, TaxiRequestValidator requestValidator, EventsManager events) {
+			ZonalSystem zonalSystem, PassengerRequestValidator requestValidator, EventsManager events) {
 		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, eScheduler);
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
 		BestDispatchFinder dispatchFinder = new BestDispatchFinder(eScheduler, network, timer, travelTime,
@@ -86,7 +86,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 			ChargingInfrastructure chargingInfrastructure, RuleBasedETaxiOptimizerParams params,
 			IdleTaxiZonalRegistry idleTaxiRegistry, UnplannedRequestZonalRegistry unplannedRequestRegistry,
 			BestDispatchFinder dispatchFinder, UnplannedRequestInserter requestInserter,
-			TaxiRequestValidator requestValidator, EventsManager events) {
+			PassengerRequestValidator requestValidator, EventsManager events) {
 		super(taxiCfg, fleet, eScheduler, params, idleTaxiRegistry, unplannedRequestRegistry, requestInserter,
 				requestValidator, events);
 		this.params = params;
