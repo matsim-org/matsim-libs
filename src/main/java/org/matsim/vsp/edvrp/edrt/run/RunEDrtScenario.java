@@ -56,7 +56,7 @@ public class RunEDrtScenario {
 	public static Controler createControler(Config config, boolean otfvis) {
 		Controler controler = EDrtControlerCreator.createControler(config, otfvis);
 		controler.addOverridingModule(new EvModule());
-		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config).getMode()));
+		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config)));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -72,14 +72,14 @@ public class RunEDrtScenario {
 		return controler;
 	}
 
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(String mode) {
-		return new EvDvrpIntegrationModule(mode)//
+	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
+		return new EvDvrpIntegrationModule(drtCfg.getMode())//
 				.setChargingStrategyFactory(
 						charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
 								MAX_RELATIVE_SOC))//
 				.setTemperatureProvider(() -> TEMPERATURE) //
 				.setTurnedOnPredicate(RunEDrtScenario::isTurnedOn)//
-				.setVehicleFileUrlGetter(cfg -> DrtConfigGroup.get(cfg).getVehiclesFileUrl(cfg.getContext()));
+				.setVehicleFile(drtCfg.getVehiclesFile());
 	}
 
 	private static boolean isTurnedOn(Vehicle vehicle) {

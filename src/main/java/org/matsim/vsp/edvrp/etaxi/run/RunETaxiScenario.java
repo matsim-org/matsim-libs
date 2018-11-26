@@ -57,7 +57,7 @@ public class RunETaxiScenario {
 	public static Controler createControler(Config config, boolean otfvis) {
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
-		String mode = TaxiConfigGroup.get(config).getMode();
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -65,9 +65,10 @@ public class RunETaxiScenario {
 		controler.addOverridingModule(new TaxiModule());
 		controler.addOverridingModule(new EvModule());
 		controler.addQSimModule(new ETaxiQSimModule());
-		controler.addOverridingModule(DvrpModule.createModule(mode, Collections.singleton(TaxiOptimizer.class)));
+		controler.addOverridingModule(
+				DvrpModule.createModule(taxiCfg.getMode(), Collections.singleton(TaxiOptimizer.class)));
 
-		controler.addOverridingModule(createEvDvrpIntegrationModule(mode));
+		controler.addOverridingModule(createEvDvrpIntegrationModule(taxiCfg));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
@@ -76,14 +77,14 @@ public class RunETaxiScenario {
 		return controler;
 	}
 
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(String mode) {
-		return new EvDvrpIntegrationModule(mode)//
+	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(TaxiConfigGroup taxiCfg) {
+		return new EvDvrpIntegrationModule(taxiCfg.getMode())//
 				.setChargingStrategyFactory(
 						charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
 								MAX_RELATIVE_SOC))//
 				.setTemperatureProvider(() -> TEMPERATURE)//
 				.setTurnedOnPredicate(vehicle -> vehicle.getSchedule().getStatus() == ScheduleStatus.STARTED)//
-				.setVehicleFileUrlGetter(cfg -> TaxiConfigGroup.get(cfg).getTaxisFileUrl(cfg.getContext()));
+				.setVehicleFile(taxiCfg.getTaxisFile());
 	}
 
 	public static void main(String[] args) {

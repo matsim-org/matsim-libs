@@ -19,7 +19,6 @@
 
 package org.matsim.vsp.edvrp.etaxi.run;
 
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
@@ -31,6 +30,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.run.Taxi;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -50,7 +50,7 @@ public class ETaxiQSimModule extends AbstractQSimModule {
 		bind(ETaxiScheduler.class).asEagerSingleton();
 		bind(TaxiActionCreator.class).asEagerSingleton();
 
-		DvrpMode dvrpMode = DvrpModes.mode(DrtConfigGroup.get(getConfig()).getMode());
+		DvrpMode dvrpMode = DvrpModes.mode(TaxiConfigGroup.get(getConfig()).getMode());
 		bind(VrpOptimizer.class).annotatedWith(dvrpMode).to(TaxiOptimizer.class);
 		bind(DynActionCreator.class).annotatedWith(dvrpMode).to(ETaxiActionCreator.class).asEagerSingleton();
 		bind(PassengerRequestCreator.class).annotatedWith(dvrpMode).to(TaxiRequestCreator.class).asEagerSingleton();
