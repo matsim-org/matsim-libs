@@ -61,11 +61,16 @@ public class RunChessboard {
 
         Controler controler = new Controler(config);
 
+        final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
+        
         final Carriers carriers = new Carriers();
-        new CarrierPlanXmlReaderV2(carriers).readFile("carrierPlans.xml");
+        final URL carrierPlansURL = IOUtils.newUrl(url, "carrierPlans.xml");
+		new CarrierPlanXmlReaderV2(carriers).readURL(carrierPlansURL);
 
         final CarrierVehicleTypes types = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(types).readFile("vehicleTypes.xml");
+        
+        final URL vehTypesURL = IOUtils.newUrl(url, "vehicleTypes.xml");
+        new CarrierVehicleTypeReader(types).readURL(vehTypesURL);
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 
         final CarrierPlanStrategyManagerFactory strategyManagerFactory = new MyCarrierPlanStrategyManagerFactory(types);
