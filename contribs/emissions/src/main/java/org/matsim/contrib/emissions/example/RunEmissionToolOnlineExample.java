@@ -47,7 +47,7 @@ import java.net.URL;
 
 public class RunEmissionToolOnlineExample{
 
-	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config_v2.xml";
+	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config_detailed.xml";
 
 	public static Config prepareConfig( String[] args ) {
 		Config config;
@@ -63,13 +63,15 @@ public class RunEmissionToolOnlineExample{
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
 		//load emissions config
-		EmissionsConfigGroup emissionsConfigGroup =  (EmissionsConfigGroup) config.getModules().get(EmissionsConfigGroup.GROUP_NAME);
-		URL context = scenario.getConfig().getContext();
-		URL mappingFile = emissionsConfigGroup.getEmissionRoadTypeMappingFileURL(context);
+//		EmissionsConfigGroup emissionsConfigGroup =  (EmissionsConfigGroup) config.getModules().get(EmissionsConfigGroup.GROUP_NAME);
+//		URL context = scenario.getConfig().getContext();
+//		URL mappingFile = emissionsConfigGroup.getEmissionRoadTypeMappingFileURL(context);
 
 		//add Hbefa mappings to the network
-		HbefaRoadTypeMapping vhtm = VisumHbefaRoadTypeMapping.createVisumRoadTypeMapping(mappingFile);
-		vhtm.addHbefaMappings(scenario.getNetwork());
+//		HbefaRoadTypeMapping vhtm = VisumHbefaRoadTypeMapping.createVisumRoadTypeMapping(mappingFile);
+//		vhtm.addHbefaMappings(scenario.getNetwork());
+		
+		// no need for the mapping file; hbefa mappings were directly written into the link attributes. ihab nov '18
 
 		return scenario ;
 	}
