@@ -21,7 +21,6 @@
 package org.matsim.contrib.drt.run;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.optimizer.VehicleData;
@@ -75,7 +74,6 @@ public class MultiModeDrtQSimModule extends AbstractMultiModeQSimModule {
 	protected void configureQSim() {
 		bindModal(DrtOptimizer.class).toProvider(modalProvider(
 				getter -> new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
-						getter.get(EventsManager.class), getter.getModal(DrtRequestValidator.class),
 						getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
 						getter.getModal(DrtScheduleInquiry.class), getter.getModal(DrtScheduleTimingUpdater.class),
 						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class))))

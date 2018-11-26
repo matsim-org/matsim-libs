@@ -98,6 +98,7 @@ public class DrtRequest implements PassengerRequest {
 		return rejected;
 	}
 
+	@Override
 	public void setRejected(boolean rejected) {
 		this.rejected = rejected;
 	}

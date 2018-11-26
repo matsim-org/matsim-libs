@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,9 +15,10 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.taxi.passenger;
+package org.matsim.contrib.dvrp.passenger;
 
 import java.util.Map;
 
@@ -28,18 +29,20 @@ import org.matsim.contrib.dvrp.data.Request;
 /**
  * @author michalm
  */
-public class TaxiRequestRejectedEvent extends Event {
-	public static final String EVENT_TYPE = "TaxiRequest rejected";
+public class PassengerRequestRejectedEvent extends Event {
+	public static final String EVENT_TYPE = "PassengersRequest rejected";
 
+	public static final String ATTRIBUTE_MODE = "mode";
 	public static final String ATTRIBUTE_REQUEST = "request";
 	public static final String ATTRIBUTE_CAUSE = "cause";
 
+	private final String mode;
 	private final Id<Request> requestId;
-
 	private final String cause;
 
-	public TaxiRequestRejectedEvent(double time, Id<Request> requestId, String cause) {
+	public PassengerRequestRejectedEvent(double time, String mode, Id<Request> requestId, String cause) {
 		super(time);
+		this.mode = mode;
 		this.requestId = requestId;
 		this.cause = cause;
 	}
@@ -47,6 +50,10 @@ public class TaxiRequestRejectedEvent extends Event {
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
+	}
+
+	public String getMode() {
+		return mode;
 	}
 
 	/**
@@ -63,6 +70,7 @@ public class TaxiRequestRejectedEvent extends Event {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_MODE, mode);
 		attr.put(ATTRIBUTE_REQUEST, requestId + "");
 		attr.put(ATTRIBUTE_CAUSE, cause);
 		return attr;

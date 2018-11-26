@@ -31,7 +31,7 @@ public class PassengerEngineQSimModule extends AbstractMultiModeQSimModule {
 					public PassengerEngine get() {
 						return new PassengerEngine(getMode(), eventsManager,
 								getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
-								network);
+								network, getModalInstance(PassengerRequestValidator.class));
 					}
 				}).asEagerSingleton();
 	}
