@@ -20,7 +20,6 @@ package org.matsim.contrib.emissions.example;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.emissions.example.archive.RunEmissionToolOfflineExample;
 import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestUtils;
 
