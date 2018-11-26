@@ -97,6 +97,9 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 
 	@Override
 	public void handleEvent(DrtRequestScheduledEvent event) {
+		if (!event.getMode().equals(drtCfg.getMode())) {
+			return;
+		}
 		DrtRequestSubmittedEvent submission = this.submittedRequests.get(event.getRequestId());
 		if (submission != null) {
 			this.scheduledRequests.put(submission.getPersonId(), event);
@@ -106,11 +109,17 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 
 	@Override
 	public void handleEvent(DrtRequestSubmittedEvent event) {
+		if (!event.getMode().equals(drtCfg.getMode())) {
+			return;
+		}
 		this.submittedRequests.put(event.getRequestId(), event);
 	}
 
 	@Override
 	public void handleEvent(PassengerRequestRejectedEvent event) {
+		if (!event.getMode().equals(drtCfg.getMode())) {
+			return;
+		}
 		DrtRequestSubmittedEvent submission = this.submittedRequests.remove(event.getRequestId());
 		Coord fromCoord = network.getLinks().get(submission.getFromLinkId()).getCoord();
 		Coord toCoord = network.getLinks().get(submission.getToLinkId()).getCoord();

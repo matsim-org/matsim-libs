@@ -201,6 +201,9 @@ public class DynModePassengerStats
 
 	@Override
 	public void handleEvent(DrtRequestSubmittedEvent event) {
+		if (!event.getMode().equals(mode)) {
+			return;
+		}
 		this.unsharedDistances.put(event.getPersonId(), event.getUnsharedRideDistance());
 		this.unsharedTimes.put(event.getPersonId(), event.getUnsharedRideTime());
 		this.request2person.put(event.getRequestId(), event.getPersonId());
@@ -209,6 +212,9 @@ public class DynModePassengerStats
 
 	@Override
 	public void handleEvent(PassengerRequestRejectedEvent event) {
+		if (!event.getMode().equals(mode)) {
+			return;
+		}
 		rejectedPersons.add(request2person.get(event.getRequestId()));
 	}
 }
