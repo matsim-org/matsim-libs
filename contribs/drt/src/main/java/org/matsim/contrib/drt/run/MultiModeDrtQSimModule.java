@@ -159,7 +159,18 @@ public class MultiModeDrtQSimModule extends AbstractMultiModeQSimModule {
 						getter.get(DvrpConfigGroup.class)))).
 				asEagerSingleton();
 
-		bindModal(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
+		bindModal(PassengerRequestCreator.class).toProvider(new Provider<DrtRequestCreator>() {
+			@Inject
+			private EventsManager events;
+			@Inject
+			private MobsimTimer timer;
+
+			@Override
+			public DrtRequestCreator get() {
+				return new DrtRequestCreator(drtCfg, events, timer);
+			}
+		}).asEagerSingleton();
+
 		bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));
 	}
 }
