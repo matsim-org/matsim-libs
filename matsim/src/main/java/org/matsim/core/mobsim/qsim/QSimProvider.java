@@ -99,36 +99,31 @@ public class QSimProvider implements Provider<QSim> {
 		ComponentRegistry componentRegistry = ComponentRegistry.create(qsimInjector);
 
 		for (Key<? extends QSimComponent> component : componentRegistry.getOrderedComponents(components)) {
-			// if
-			// (component.getTypeLiteral().getRawType().isAssignableFrom(MobsimEngine.class))
-			// {
-			if (MobsimEngine.class.isAssignableFrom(component.getTypeLiteral().getRawType())) {
-				MobsimEngine instance = (MobsimEngine) qsimInjector.getInstance(component);
-				qSim.addMobsimEngine(instance);
+
+			QSimComponent instance = qsimInjector.getInstance( component );;
+
+			if ( instance instanceof  MobsimEngine ) {
+				qSim.addMobsimEngine( (MobsimEngine) instance );
 				log.info("Added MobsimEngine " + instance.getClass());
 			}
 
-			if (ActivityHandler.class.isAssignableFrom(component.getTypeLiteral().getRawType())) {
-				ActivityHandler instance = (ActivityHandler) qsimInjector.getInstance(component);
-				qSim.addActivityHandler(instance);
-				log.info("Added Activityhandler " + instance.getClass());
+			if ( instance instanceof ActivityHandler) {
+				qSim.addActivityHandler( (ActivityHandler) instance );
+				log.info("Added ActivityHandler " + instance.getClass());
 			}
 
-			if (DepartureHandler.class.isAssignableFrom(component.getTypeLiteral().getRawType())) {
-				DepartureHandler instance = (DepartureHandler) qsimInjector.getInstance(component);
-				qSim.addDepartureHandler(instance);
+			if ( instance instanceof DepartureHandler ){
+				qSim.addDepartureHandler( (DepartureHandler) instance );
 				log.info("Added DepartureHandler " + instance.getClass());
 			}
 
-			if (AgentSource.class.isAssignableFrom(component.getTypeLiteral().getRawType())) {
-				AgentSource instance = (AgentSource) qsimInjector.getInstance(component);
-				qSim.addAgentSource(instance);
+			if ( instance instanceof AgentSource ) {
+				qSim.addAgentSource( (AgentSource) instance );
 				log.info("Added AgentSource " + instance.getClass());
 			}
 
-			if (MobsimListener.class.isAssignableFrom(component.getTypeLiteral().getRawType())) {
-				MobsimListener instance = (MobsimListener) qsimInjector.getInstance(component);
-				qSim.addQueueSimulationListeners(instance);
+			if ( instance instanceof  MobsimListener ) {
+				qSim.addQueueSimulationListeners( (MobsimListener) instance);
 				log.info("Added MobsimListener " + instance.getClass());
 			}
 		}
