@@ -20,29 +20,27 @@
 
 package org.matsim.codeexamples.mobsim.ownMobsimAgent;
 
-import javax.inject.Inject;
-
+import com.google.inject.Inject;
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimBuilder;
+import org.matsim.core.mobsim.qsim.components.QSimComponent;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
-
-import com.google.inject.Provider;
 
 /**
  * @author nagel
@@ -50,50 +48,49 @@ import com.google.inject.Provider;
  */
 public class RunAddAgentSourceExample{
 
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("examples/tutorial/config/example5-config.xml" ) ;
-		config.qsim().setEndTime(25 * 60 * 60);
-		config.controler().setLastIteration(0);
+	public static void main(String[] args){
+		Config config = ConfigUtils.loadConfig( "scenarios/equil/example5-config.xml" );
+		config.qsim().setEndTime( 25 * 60 * 60 );
+		config.controler().setLastIteration( 0 );
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
-		Scenario scenario = ScenarioUtils.loadScenario(config) ;
-		scenario.getPopulation().getPersons().clear();
+		Scenario scenario = ScenarioUtils.loadScenario( config );
+//		scenario.getPopulation().getPersons().clear();
 
 		final Controler controler = new Controler( scenario );
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Inject Scenario scenario ;
-					@Inject EventsManager events ;
-					@Override public Mobsim get() {
-						final QSim qsim = new QSimBuilder(getConfig()).useDefaults().build(scenario, events);
-						// yyyyyy don't use qsim builder here, there should be a simpler way.  discuss with sebhoerl.  kai, nov'18
-						qsim.addAgentSource(new AgentSource() {
-							@Override
-							public void insertAgentsIntoMobsim() {
-								// insert traveler agent:
-								final MobsimAgent ag = new MyMobsimAgent(qsim.getScenario(), qsim.getSimTimer());
-								qsim.insertAgentIntoMobsim(ag);
+		{
+			QSimComponentsConfigGroup cconfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
+			cconfig.getActiveComponents().add( "newAgentSource" );
 
-								// insert vehicle:
-								final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(ag.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
-								final Id<Link> linkId4VehicleInsertion = Id.createLinkId(1);
-//								qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
-								QVehicleImpl qVeh = new QVehicleImpl( vehicle );
-								qsim.addParkedVehicle( qVeh, linkId4VehicleInsertion );
-								
-								// Note: I think that you can actually insert the agents directly into the qsim, i.e. no need to use the
-								// agent source for this.  However, this probably does not work with vehicles ... since the links for
-								// the vehicle placements are not yet there.  ???? kai, oct'17
-							}
-						});
-						return qsim;
-					}
-				});
-			}
-		});
+			controler.addOverridingQSimModule( new AbstractQSimModule(){
+				@Override
+				protected void configureQSim(){
+					this.addNamedComponent( MyAgentSource.class, "newAgentSource" );
+				}
+			} );
+		}
+
 		controler.run();
+	}
+
+	private static class MyAgentSource implements AgentSource{
+		@Inject private QSim qsim;
+
+		@Override
+		public void insertAgentsIntoMobsim(){
+			// insert traveler agent:
+			final MobsimAgent ag = new MyMobsimAgent( qsim.getScenario(), qsim.getSimTimer() );
+			qsim.insertAgentIntoMobsim( ag );
+
+			// insert vehicle:
+			final Vehicle vehicle = VehicleUtils.getFactory().createVehicle( Id.create( ag.getId(), Vehicle.class ), VehicleUtils.getDefaultVehicleType() );
+			final Id<Link> linkId4VehicleInsertion = Id.createLinkId( 1 );
+			//								qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+			QVehicleImpl qVeh = new QVehicleImpl( vehicle );
+			qsim.addParkedVehicle( qVeh, linkId4VehicleInsertion );
+
+		}
 	}
 
 }
