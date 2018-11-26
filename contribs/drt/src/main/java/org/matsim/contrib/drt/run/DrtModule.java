@@ -48,7 +48,7 @@ public final class DrtModule extends AbstractModule {
 				.asEagerSingleton();
 		bind(Fleet.class).annotatedWith(Drt.class).to(DvrpModes.key(Fleet.class, mode));
 
-		bind(PassengerRequestValidator.class).annotatedWith(Drt.class).to(DefaultPassengerRequestValidator.class);
+		bind(DvrpModes.key(PassengerRequestValidator.class, mode)).to(DefaultPassengerRequestValidator.class);
 		bind(DepotFinder.class).to(NearestStartLinkAsDepot.class);
 		bind(TravelDisutilityFactory.class).annotatedWith(Drt.class).toInstance(TimeAsTravelDisutility::new);
 

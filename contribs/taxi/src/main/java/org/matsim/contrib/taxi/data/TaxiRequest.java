@@ -103,6 +103,7 @@ public class TaxiRequest implements PassengerRequest {
 		return rejected;
 	}
 
+	@Override
 	public void setRejected(boolean rejected) {
 		this.rejected = rejected;
 	}

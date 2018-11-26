@@ -23,7 +23,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.MapConfiguration;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizer;
@@ -37,7 +36,6 @@ import org.matsim.contrib.taxi.optimizer.zonal.ZonalTaxiOptimizerParams;
 import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -60,14 +58,12 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final TravelTime travelTime;
 	private final TravelDisutility travelDisutility;
 	private final TaxiScheduler scheduler;
-	private final PassengerRequestValidator requestValidator;
-	private final EventsManager events;
 
 	@Inject
 	public DefaultTaxiOptimizerProvider(TaxiConfigGroup taxiCfg, @Taxi Fleet fleet,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, @Taxi TravelDisutility travelDisutility,
-			TaxiScheduler scheduler, @Taxi PassengerRequestValidator requestValidator, EventsManager events) {
+			TaxiScheduler scheduler) {
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
 		this.network = network;
@@ -75,8 +71,6 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 		this.travelTime = travelTime;
 		this.travelDisutility = travelDisutility;
 		this.scheduler = scheduler;
-		this.requestValidator = requestValidator;
-		this.events = events;
 	}
 
 	@Override
@@ -87,19 +81,19 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 		switch (type) {
 			case ASSIGNMENT:
 				return new AssignmentTaxiOptimizer(taxiCfg, fleet, network, timer, travelTime, travelDisutility,
-						scheduler, new AssignmentTaxiOptimizerParams(optimizerConfig), requestValidator, events);
+						scheduler, new AssignmentTaxiOptimizerParams(optimizerConfig));
 
 			case FIFO:
 				return new FifoTaxiOptimizer(taxiCfg, fleet, network, timer, travelTime, travelDisutility, scheduler,
-						new FifoTaxiOptimizerParams(optimizerConfig), requestValidator, events);
+						new FifoTaxiOptimizerParams(optimizerConfig));
 
 			case RULE_BASED:
 				return RuleBasedTaxiOptimizer.create(taxiCfg, fleet, scheduler, network, timer, travelTime,
-						travelDisutility, new RuleBasedTaxiOptimizerParams(optimizerConfig), requestValidator, events);
+						travelDisutility, new RuleBasedTaxiOptimizerParams(optimizerConfig));
 
 			case ZONAL:
 				return ZonalTaxiOptimizer.create(taxiCfg, fleet, scheduler, network, timer, travelTime,
-						travelDisutility, new ZonalTaxiOptimizerParams(optimizerConfig), requestValidator, events);
+						travelDisutility, new ZonalTaxiOptimizerParams(optimizerConfig));
 
 			default:
 				throw new IllegalStateException();

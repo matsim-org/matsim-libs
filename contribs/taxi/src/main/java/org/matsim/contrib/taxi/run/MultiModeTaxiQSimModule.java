@@ -25,7 +25,6 @@ import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -83,9 +82,8 @@ public class MultiModeTaxiQSimModule extends AbstractMultiModeQSimModule {
 					public TaxiOptimizer get() {
 						Fleet fleet = getModalInstance(Fleet.class);
 						TaxiScheduler taxiScheduler = getModalInstance(TaxiScheduler.class);
-						PassengerRequestValidator requestValidator = getModalInstance(PassengerRequestValidator.class);
 						return new DefaultTaxiOptimizerProvider(taxiCfg, fleet, network, timer, travelTime,
-								travelDisutility, taxiScheduler, requestValidator, events).get();
+								travelDisutility, taxiScheduler).get();
 					}
 				}).asEagerSingleton();
 

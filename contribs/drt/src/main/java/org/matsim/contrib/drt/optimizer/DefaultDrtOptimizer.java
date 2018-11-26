@@ -21,13 +21,10 @@ package org.matsim.contrib.drt.optimizer;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
@@ -36,7 +33,6 @@ import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
 import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -46,9 +42,7 @@ import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequests;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
@@ -68,8 +62,6 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private final DrtScheduleTimingUpdater scheduleTimingUpdater;
 	private final RebalancingStrategy rebalancingStrategy;
 	private final MobsimTimer mobsimTimer;
-	private final EventsManager eventsManager;
-	private final PassengerRequestValidator requestValidator;
 	private final DepotFinder depotFinder;
 	private final EmptyVehicleRelocator relocator;
 	private final UnplannedRequestInserter requestInserter;
@@ -80,15 +72,12 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	@Inject
 	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, @Drt Fleet fleet, MobsimTimer mobsimTimer,
-			EventsManager eventsManager, @Drt PassengerRequestValidator requestValidator, DepotFinder depotFinder,
-			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
+			DepotFinder depotFinder, RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
 			DrtScheduleTimingUpdater scheduleTimingUpdater, EmptyVehicleRelocator relocator,
 			UnplannedRequestInserter requestInserter) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
-		this.eventsManager = eventsManager;
-		this.requestValidator = requestValidator;
 		this.depotFinder = depotFinder;
 		this.rebalancingStrategy = rebalancingStrategy;
 		this.scheduleInquiry = scheduleInquiry;
@@ -137,22 +126,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	@Override
 	public void requestSubmitted(Request request) {
-		DrtRequest drtRequest = (DrtRequest)request;
-		Set<String> violations = requestValidator.validateRequest(drtRequest);
-
-		if (!violations.isEmpty()) {
-			String causes = violations.stream().collect(Collectors.joining(", "));
-			log.warn("Request " + request.getId() + " will not be served. The agent will get stuck. Causes: " + causes);
-			drtRequest.setRejected(true);
-			eventsManager.processEvent(
-					new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), drtRequest.getId(), causes));
-			eventsManager.processEvent(
-					new PersonStuckEvent(mobsimTimer.getTimeOfDay(), drtRequest.getPassenger().getId(),
-							drtRequest.getFromLink().getId(), drtRequest.getPassenger().getMode()));
-			return;
-		}
-
-		unplannedRequests.add(drtRequest);
+		unplannedRequests.add((DrtRequest)request);
 		requiresReoptimization = true;
 	}
 

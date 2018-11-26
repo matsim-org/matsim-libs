@@ -21,26 +21,20 @@ package org.matsim.contrib.taxi.optimizer;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.passenger.TaxiRequestRejectedEvent;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 /**
@@ -60,25 +54,17 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final boolean vehicleDiversion;
 	private final DefaultTaxiOptimizerParams params;
 
-	private final EventsManager eventsManager;
-	private final PassengerRequestValidator requestValidator;
-	private final boolean printDetailedWarnings;
-
 	private boolean requiresReoptimization = false;
 
 	public DefaultTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
-			DefaultTaxiOptimizerParams params, UnplannedRequestInserter requestInserter,
-			PassengerRequestValidator requestValidator, EventsManager eventsManager) {
+			DefaultTaxiOptimizerParams params, UnplannedRequestInserter requestInserter) {
 		this.fleet = fleet;
 		this.scheduler = scheduler;
 		this.requestInserter = requestInserter;
 		this.params = params;
-		this.requestValidator = requestValidator;
-		this.eventsManager = eventsManager;
 
 		destinationKnown = taxiCfg.isDestinationKnown();
 		vehicleDiversion = taxiCfg.isVehicleDiversion();
-		this.printDetailedWarnings = taxiCfg.isPrintDetailedWarnings();
 	}
 
 	@Override
@@ -126,26 +112,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 
 	@Override
 	public void requestSubmitted(Request request) {
-		TaxiRequest taxiRequest = (TaxiRequest)request;
-		Set<String> violations = requestValidator.validateRequest(taxiRequest);
-
-		if (!violations.isEmpty()) {
-			String causes = violations.stream().collect(Collectors.joining(", "));
-			if (printDetailedWarnings)
-				log.warn("Request "
-						+ request.getId()
-						+ " will not be served. The agent will get stuck. Causes: "
-						+ causes);
-			taxiRequest.setRejected(true);
-			eventsManager.processEvent(
-					new TaxiRequestRejectedEvent(taxiRequest.getSubmissionTime(), taxiRequest.getId(), causes));
-			eventsManager.processEvent(
-					new PersonStuckEvent(taxiRequest.getSubmissionTime(), taxiRequest.getPassenger().getId(),
-							taxiRequest.getFromLink().getId(), taxiRequest.getPassenger().getMode()));
-			return;
-		}
-
-		unplannedRequests.add(taxiRequest);
+		unplannedRequests.add((TaxiRequest)request);
 		requiresReoptimization = true;
 	}
 

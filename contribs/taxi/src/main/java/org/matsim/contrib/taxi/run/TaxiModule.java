@@ -64,6 +64,7 @@ public final class TaxiModule extends AbstractModule {
 			// add more time profiles if necessary
 		}
 
-		bind(PassengerRequestValidator.class).annotatedWith(Taxi.class).to(DefaultPassengerRequestValidator.class);
+		bind(DvrpModes.key(PassengerRequestValidator.class, mode)).to(DefaultPassengerRequestValidator.class)
+				.asEagerSingleton();
 	}
 }

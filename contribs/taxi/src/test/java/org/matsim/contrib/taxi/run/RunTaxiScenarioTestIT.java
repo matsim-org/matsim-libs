@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -79,7 +80,7 @@ public class RunTaxiScenarioTestIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.bind(PassengerRequestValidator.class)
+				bind(DvrpModes.key(PassengerRequestValidator.class, taxiCfg.getMode()))
 						.toInstance(req -> req.getPassenger().getId().toString().equals("0000009") ?
 								Collections.singleton("REJECT_0000009") : Collections.emptySet());
 			}

@@ -43,14 +43,14 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
-import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEventHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEventHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -58,9 +58,8 @@ import org.matsim.core.utils.io.IOUtils;
 /**
  * @author jbischoff
  */
-public class DrtRequestAnalyzer
-		implements DrtRequestRejectedEventHandler, DrtRequestScheduledEventHandler, DrtRequestSubmittedEventHandler,
-		PersonEntersVehicleEventHandler {
+public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler, DrtRequestScheduledEventHandler,
+		DrtRequestSubmittedEventHandler, PersonEntersVehicleEventHandler {
 
 	private final Map<Id<Request>, DrtRequestSubmittedEvent> submittedRequests = new HashMap<>();
 	private final Map<Id<Request>, Tuple<Double, Double>> waitTimeCompare = new HashMap<>();
@@ -111,7 +110,7 @@ public class DrtRequestAnalyzer
 	}
 
 	@Override
-	public void handleEvent(DrtRequestRejectedEvent event) {
+	public void handleEvent(PassengerRequestRejectedEvent event) {
 		DrtRequestSubmittedEvent submission = this.submittedRequests.remove(event.getRequestId());
 		Coord fromCoord = network.getLinks().get(submission.getFromLinkId()).getCoord();
 		Coord toCoord = network.getLinks().get(submission.getToLinkId()).getCoord();
@@ -169,8 +168,7 @@ public class DrtRequestAnalyzer
 			//			yAxis.setLowerBound(0);
 			ChartUtilities.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 }
