@@ -18,34 +18,50 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.vrpagent;
+package org.matsim.contrib.dvrp.run;
 
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
-import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.core.mobsim.qsim.QSim;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.inject.Inject;
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
 
-public class VrpAgentSourceQSimModule extends AbstractMultiModeQSimModule {
+/**
+ * This class is based on guava's NamedImpl.
+ *
+ * @author Michal Maciejewski (michalm)
+ */
+class DvrpModeImpl implements DvrpMode, Serializable {
+	private final String value;
 
-	public VrpAgentSourceQSimModule(String mode) {
-		super(mode);
+	DvrpModeImpl(String value) {
+		this.value = checkNotNull(value, "value");
 	}
 
-	@Override
-	protected void configureQSim() {
-		bindModalComponent(VrpAgentSource.class).toProvider(
-				new ModalProviders.AbstractProvider<VrpAgentSource>(getMode()) {
-					@Inject
-					private QSim qSim;
-
-					@Override
-					public VrpAgentSource get() {
-						return new VrpAgentSource(getModalInstance(VrpAgentLogic.DynActionCreator.class),
-								getModalInstance(Fleet.class), getModalInstance(VrpOptimizer.class), qSim);
-					}
-				}).asEagerSingleton();
+	public String value() {
+		return this.value;
 	}
+
+	public int hashCode() {
+		// This is specified in java.lang.Annotation.
+		return (127 * "value".hashCode()) ^ value.hashCode();
+	}
+
+	public boolean equals(Object o) {
+		if (!(o instanceof DvrpMode)) {
+			return false;
+		}
+
+		DvrpMode other = (DvrpMode)o;
+		return value.equals(other.value());
+	}
+
+	public String toString() {
+		return "@" + DvrpMode.class.getName() + "(value=" + value + ")";
+	}
+
+	public Class<? extends Annotation> annotationType() {
+		return DvrpMode.class;
+	}
+
+	private static final long serialVersionUID = 0;
 }

@@ -22,6 +22,7 @@ package org.matsim.contrib.taxi.run;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.taxi.data.validator.DefaultTaxiRequestValidator;
 import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
@@ -33,8 +34,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 import com.google.inject.Inject;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm
@@ -46,8 +45,8 @@ public final class TaxiModule extends AbstractModule {
 	@Override
 	public void install() {
 		String mode = taxiCfg.getMode();
-		install(FleetProvider.createModule(mode, taxiCfg.getTaxisFileUrl(getConfig().getContext())));
-		bind(Fleet.class).annotatedWith(Taxi.class).to(Key.get(Fleet.class, Names.named(mode))).asEagerSingleton();
+		bind(DvrpModes.key(Fleet.class, mode)).toProvider(new FleetProvider(taxiCfg.getTaxisFile())).asEagerSingleton();
+		bind(Fleet.class).annotatedWith(Taxi.class).to(DvrpModes.key(Fleet.class, mode));
 
 		bind(TravelDisutilityFactory.class).annotatedWith(Taxi.class)
 				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));

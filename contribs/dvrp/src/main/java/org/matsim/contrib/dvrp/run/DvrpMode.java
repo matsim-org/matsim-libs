@@ -18,34 +18,22 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.vrpagent;
+package org.matsim.contrib.dvrp.run;
 
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
-import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.core.mobsim.qsim.QSim;
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import com.google.inject.Inject;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-public class VrpAgentSourceQSimModule extends AbstractMultiModeQSimModule {
+import com.google.inject.BindingAnnotation;
 
-	public VrpAgentSourceQSimModule(String mode) {
-		super(mode);
-	}
-
-	@Override
-	protected void configureQSim() {
-		bindModalComponent(VrpAgentSource.class).toProvider(
-				new ModalProviders.AbstractProvider<VrpAgentSource>(getMode()) {
-					@Inject
-					private QSim qSim;
-
-					@Override
-					public VrpAgentSource get() {
-						return new VrpAgentSource(getModalInstance(VrpAgentLogic.DynActionCreator.class),
-								getModalInstance(Fleet.class), getModalInstance(VrpOptimizer.class), qSim);
-					}
-				}).asEagerSingleton();
-	}
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+@BindingAnnotation
+@Target({ FIELD, PARAMETER, METHOD })
+@Retention(RUNTIME)
+public @interface DvrpMode {
+	String value();
 }

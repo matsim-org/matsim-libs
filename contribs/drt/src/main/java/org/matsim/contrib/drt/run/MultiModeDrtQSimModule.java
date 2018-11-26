@@ -46,37 +46,34 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
-import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModeDrtQSimModule extends AbstractQSimModule {
+public class MultiModeDrtQSimModule extends AbstractMultiModeQSimModule {
 	private final DrtConfigGroup drtCfg;
 
 	public MultiModeDrtQSimModule(DrtConfigGroup drtCfg) {
+		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
 	}
 
 	@Override
 	protected void configureQSim() {
-		bind(modalKey(DrtOptimizer.class)).toProvider(ModalProviders.createProvider(drtCfg.getMode(),
+		bindModal(DrtOptimizer.class).toProvider(modalProvider(
 				getter -> new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 						getter.get(EventsManager.class), getter.getModal(DrtRequestValidator.class),
 						getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
@@ -84,20 +81,20 @@ public class MultiModeDrtQSimModule extends AbstractQSimModule {
 						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class))))
 				.asEagerSingleton();
 
-		bind(modalKey(DefaultUnplannedRequestInserter.class)).toProvider(ModalProviders.createProvider(drtCfg.getMode(),
+		bindModal(DefaultUnplannedRequestInserter.class).toProvider(modalProvider(
 				getter -> new DefaultUnplannedRequestInserter(drtCfg, getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class), getter.get(EventsManager.class),
 						getter.getModal(RequestInsertionScheduler.class),
 						getter.getModal(VehicleData.EntryFactory.class),
 						getter.getModal(PrecalculablePathDataProvider.class),
 						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class)))).asEagerSingleton();
-		bind(modalKey(UnplannedRequestInserter.class)).to(modalKey(DefaultUnplannedRequestInserter.class));
+		bindModal(UnplannedRequestInserter.class).to(modalKey(DefaultUnplannedRequestInserter.class));
 
-		bind(modalKey(VehicleData.EntryFactory.class)).toInstance(new VehicleDataEntryFactoryImpl(drtCfg));
+		bindModal(VehicleData.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl(drtCfg));
 
-		bind(modalKey(DrtTaskFactory.class)).toInstance(new DrtTaskFactoryImpl());
+		bindModal(DrtTaskFactory.class).toInstance(new DrtTaskFactoryImpl());
 
-		bind(modalKey(EmptyVehicleRelocator.class)).toProvider(
+		bindModal(EmptyVehicleRelocator.class).toProvider(
 				new ModalProviders.AbstractProvider<EmptyVehicleRelocator>(drtCfg.getMode()) {
 					@Inject
 					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
@@ -121,16 +118,16 @@ public class MultiModeDrtQSimModule extends AbstractQSimModule {
 					}
 				}).asEagerSingleton();
 
-		bind(modalKey(DrtScheduleInquiry.class)).to(DrtScheduleInquiry.class).asEagerSingleton();
+		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
 
-		bind(modalKey(RequestInsertionScheduler.class)).toProvider(ModalProviders.createProvider(drtCfg.getMode(),
+		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
 				getter -> new RequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class),
 						getter.getNamed(TravelTime.class, DvrpTravelTimeModule.DVRP_ESTIMATED),
 						getter.getModal(DrtScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class))))
 				.asEagerSingleton();
 
-		bind(modalKey(DrtScheduleTimingUpdater.class)).toProvider(new Provider<DrtScheduleTimingUpdater>() {
+		bindModal(DrtScheduleTimingUpdater.class).toProvider(new Provider<DrtScheduleTimingUpdater>() {
 			@Inject
 			private MobsimTimer timer;
 
@@ -140,7 +137,7 @@ public class MultiModeDrtQSimModule extends AbstractQSimModule {
 			}
 		}).asEagerSingleton();
 
-		bind(modalKey(ParallelPathDataProvider.class)).toProvider(new Provider<ParallelPathDataProvider>() {
+		bindModal(ParallelPathDataProvider.class).toProvider(new Provider<ParallelPathDataProvider>() {
 			@Inject
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
 			private Network network;
@@ -156,20 +153,15 @@ public class MultiModeDrtQSimModule extends AbstractQSimModule {
 				return new ParallelPathDataProvider(network, travelTime, travelDisutility, drtCfg);
 			}
 		}).asEagerSingleton();
-		bind(modalKey(PrecalculablePathDataProvider.class)).to(modalKey(ParallelPathDataProvider.class));
+		bindModal(PrecalculablePathDataProvider.class).to(modalKey(ParallelPathDataProvider.class));
 
-		bind(modalKey(VrpAgentLogic.DynActionCreator.class)).
-				toProvider(ModalProviders.createProvider(drtCfg.getMode(),
-						getter -> new DrtActionCreator(getter.getModal(PassengerEngine.class),
-								getter.getModal(DrtOptimizer.class), getter.get(MobsimTimer.class),
-								getter.get(DvrpConfigGroup.class)))).
+		bindModal(VrpAgentLogic.DynActionCreator.class).
+				toProvider(modalProvider(getter -> new DrtActionCreator(getter.getModal(PassengerEngine.class),
+						getter.getModal(DrtOptimizer.class), getter.get(MobsimTimer.class),
+						getter.get(DvrpConfigGroup.class)))).
 				asEagerSingleton();
 
-		bind(modalKey(PassengerRequestCreator.class)).to(DrtRequestCreator.class).asEagerSingleton();
-		bind(modalKey(VrpOptimizer.class)).to(modalKey(DrtOptimizer.class));
-	}
-
-	private <T> Key<T> modalKey(Class<T> type) {
-		return Key.get(type, Names.named(drtCfg.getMode()));
+		bindModal(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
+		bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));
 	}
 }
