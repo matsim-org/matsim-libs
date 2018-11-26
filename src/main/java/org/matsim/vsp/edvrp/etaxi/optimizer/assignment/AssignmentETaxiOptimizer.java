@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
@@ -43,7 +42,6 @@ import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.Ass
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.contrib.util.PartialSort;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.router.FastAStarEuclideanFactory;
@@ -79,8 +77,7 @@ import com.google.common.collect.Maps;
 public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 	public static AssignmentETaxiOptimizer create(TaxiConfigGroup taxiCfg, Fleet fleet, Network network,
 			MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility, ETaxiScheduler eScheduler,
-			ChargingInfrastructure chargingInfrastructure, AssignmentETaxiOptimizerParams params,
-			PassengerRequestValidator requestValidator, EventsManager events) {
+			ChargingInfrastructure chargingInfrastructure, AssignmentETaxiOptimizerParams params) {
 		MultiNodePathCalculator multiNodeRouter = (MultiNodePathCalculator)new FastMultiNodeDijkstraFactory(
 				true).createPathCalculator(network, travelDisutility, travelTime);
 		BackwardMultiNodePathCalculator backwardMultiNodeRouter = (BackwardMultiNodePathCalculator)new BackwardFastMultiNodeDijkstraFactory(
@@ -88,7 +85,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 		LeastCostPathCalculator router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility,
 				travelTime);
 		return new AssignmentETaxiOptimizer(taxiCfg, fleet, timer, travelTime, eScheduler, chargingInfrastructure,
-				params, multiNodeRouter, backwardMultiNodeRouter, router, requestValidator, events);
+				params, multiNodeRouter, backwardMultiNodeRouter, router);
 	}
 
 	private final AssignmentETaxiOptimizerParams params;
@@ -104,11 +101,10 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 	public AssignmentETaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, MobsimTimer timer, TravelTime travelTime,
 			ETaxiScheduler eScheduler, ChargingInfrastructure chargingInfrastructure,
 			AssignmentETaxiOptimizerParams params, MultiNodePathCalculator multiNodeRouter,
-			BackwardMultiNodePathCalculator backwardMultiNodeRouter, LeastCostPathCalculator router,
-			PassengerRequestValidator requestValidator, EventsManager events) {
+			BackwardMultiNodePathCalculator backwardMultiNodeRouter, LeastCostPathCalculator router) {
 		super(taxiCfg, fleet, eScheduler, params,
 				new AssignmentRequestInserter(fleet, timer, travelTime, eScheduler, params, multiNodeRouter,
-						backwardMultiNodeRouter, router), requestValidator, events);
+						backwardMultiNodeRouter, router));
 		this.params = params;
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.eScheduler = eScheduler;
