@@ -19,6 +19,17 @@
 
 package org.matsim.contrib.drt.run;
 
+import java.net.URL;
+import java.util.Collection;
+import java.util.Map;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
@@ -26,12 +37,6 @@ import org.matsim.contrib.dvrp.run.HasMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
-
-import javax.validation.Valid;
-import javax.validation.constraints.*;
-import java.net.URL;
-import java.util.Collection;
-import java.util.Map;
 
 public class DrtConfigGroup extends ReflectiveConfigGroup implements HasMode {
 
@@ -106,7 +111,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements HasMode {
 	static final String PLOT_CUST_STATS_EXP = "Writes out detailed DRT customer stats in each iteration. True by default.";
 
 	public static final String PRINT_WARNINGS = "plotDetailedWarnings";
-	static final String PRINT_WARNINGS_EXP = "Prints detailed warnings for DRT customers that cannot be served or routed. Default is false.";
+	static final String PRINT_WARNINGS_EXP = "Prints detailed warnings for DRT customers that cannot be served or routed. Default is true.";
 
 	public static final String NUMBER_OF_THREADS = "numberOfThreads";
 	static final String NUMBER_OF_THREADS_EXP =
@@ -158,7 +163,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements HasMode {
 	private String transitStopFile = null; // only for stopbased DRT scheme
 
 	private boolean plotDetailedCustomerStats = true;
-	private boolean printDetailedWarnings = false;
+	private boolean printDetailedWarnings = true;
 
 	@Positive
 	private int numberOfThreads = Math.min(Runtime.getRuntime().availableProcessors(),
