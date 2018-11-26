@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.routing.DrtRoute;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -38,11 +39,13 @@ import com.google.inject.Inject;
  * @author michalm
  */
 public class DrtRequestCreator implements PassengerRequestCreator {
+	private final DrtConfigGroup drtCfg;
 	private final EventsManager eventsManager;
 	private final MobsimTimer timer;
 
 	@Inject
-	public DrtRequestCreator(EventsManager eventsManager, MobsimTimer timer) {
+	public DrtRequestCreator(DrtConfigGroup drtCfg, EventsManager eventsManager, MobsimTimer timer) {
+		this.drtCfg = drtCfg;
 		this.eventsManager = eventsManager;
 		this.timer = timer;
 	}
@@ -58,8 +61,8 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		double latestArrivalTime = departureTime + drtRoute.getTravelTime();
 
 		eventsManager.processEvent(
-				new DrtRequestSubmittedEvent(timer.getTimeOfDay(), id, passenger.getId(), fromLink.getId(),
-						toLink.getId(), drtRoute.getDirectRideTime(), drtRoute.getDistance()));
+				new DrtRequestSubmittedEvent(timer.getTimeOfDay(), drtCfg.getMode(), id, passenger.getId(),
+						fromLink.getId(), toLink.getId(), drtRoute.getDirectRideTime(), drtRoute.getDistance()));
 
 		return new DrtRequest(id, passenger, fromLink, toLink, departureTime, latestDepartureTime, latestArrivalTime,
 				submissionTime);

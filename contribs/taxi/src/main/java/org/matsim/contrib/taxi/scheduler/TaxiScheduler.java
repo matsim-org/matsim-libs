@@ -333,7 +333,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		TaxiPickupTask pickupStayTask = (TaxiPickupTask)Schedules.getLastTask(schedule);
 
 		// add DELIVERY after SERVE
-		TaxiRequest req = ((TaxiPickupTask)pickupStayTask).getRequest();
+		TaxiRequest req = pickupStayTask.getRequest();
 		Link reqFromLink = req.getFromLink();
 		Link reqToLink = req.getToLink();
 		double t3 = pickupStayTask.getEndTime();

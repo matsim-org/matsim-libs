@@ -110,9 +110,10 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				BestInsertion bestInsertion = best.get();
 				insertionScheduler.scheduleRequest(bestInsertion.vehicleEntry, req, bestInsertion.insertion);
 				vData.updateEntry(bestInsertion.vehicleEntry.vehicle);
-				eventsManager.processEvent(new DrtRequestScheduledEvent(mobsimTimer.getTimeOfDay(), req.getId(),
-						bestInsertion.vehicleEntry.vehicle.getId(), req.getPickupTask().getEndTime(),
-						req.getDropoffTask().getBeginTime()));
+				eventsManager.processEvent(
+						new DrtRequestScheduledEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
+								bestInsertion.vehicleEntry.vehicle.getId(), req.getPickupTask().getEndTime(),
+								req.getDropoffTask().getBeginTime()));
 			}
 			reqIter.remove();
 		}
