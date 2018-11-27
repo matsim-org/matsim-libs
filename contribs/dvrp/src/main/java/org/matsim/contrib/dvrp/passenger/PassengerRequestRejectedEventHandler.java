@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,19 +15,19 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
 /**
- * 
+ *
  */
-package org.matsim.contrib.taxi.passenger;
+package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.core.events.handler.EventHandler;
 
 /**
- * @author jbischoff
- *
+ * @author michalm (Michal Maciejewski)
  */
-public interface TaxiRequestRejectedEventHandler extends EventHandler {
-	public void handleEvent(final TaxiRequestRejectedEvent event);
+public interface PassengerRequestRejectedEventHandler extends EventHandler {
+	void handleEvent(PassengerRequestRejectedEvent event);
 }

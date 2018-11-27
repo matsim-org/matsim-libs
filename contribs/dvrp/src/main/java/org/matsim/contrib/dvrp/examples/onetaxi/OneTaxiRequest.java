@@ -76,4 +76,9 @@ public final class OneTaxiRequest implements PassengerRequest {
 	public MobsimPassengerAgent getPassenger() {
 		return passenger;
 	}
+
+	@Override
+	public void setRejected(boolean rejected) {
+		throw new UnsupportedOperationException();
+	}
 }

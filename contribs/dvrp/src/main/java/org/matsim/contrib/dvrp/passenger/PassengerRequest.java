@@ -41,4 +41,6 @@ public interface PassengerRequest extends Request {
 	Link getToLink();
 
 	MobsimPassengerAgent getPassenger();
+
+	void setRejected(boolean rejected);
 }
