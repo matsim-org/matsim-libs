@@ -23,15 +23,21 @@ package org.matsim.contrib.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
-import org.matsim.contrib.emissions.types.*;
+import org.matsim.contrib.emissions.types.ColdPollutant;
+import org.matsim.contrib.emissions.types.HbefaColdEmissionFactor;
+import org.matsim.contrib.emissions.types.HbefaColdEmissionFactorKey;
+import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
+import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.utils.EmissionSpecificationMarker;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.NonScenarioVehicles;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
@@ -79,6 +85,7 @@ public class ColdEmissionAnalysisModule {
 	private int vehAttributesNotSpecifiedCnt = 0;
 	private static final int maxWarnCnt = 3;
 	private int vehInfoWarnMotorCylceCnt = 0;
+	private int noVehWarnCnt = 0;
 	
 	public static class ColdEmissionAnalysisModuleParameter {
 		public final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
@@ -117,42 +124,63 @@ public class ColdEmissionAnalysisModule {
 			double eventTime,
 			double parkingDuration,
 			int distance_km ) {
-
-		if(this.ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
-			if(vehicle.getType().getDescription()==null) { // emission specification is in vehicle type id
-				vehicle.getType().setDescription(EmissionSpecificationMarker.BEGIN_EMISSIONS
-						+vehicle.getType().getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS);
-			} else if( vehicle.getType().getDescription().contains(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()) ) {
-				// emission specification is in vehicle type id and in vehicle description too.
-			} else {
-				String vehicleDescription = vehicle.getType().getDescription() + EmissionSpecificationMarker.BEGIN_EMISSIONS
-						+ vehicle.getType().getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS;
-				vehicle.getType().setDescription(vehicleDescription);
-			}
-		}
-
-		String vehicleDescription = vehicle.getType().getDescription();
-
-		if(vehicle.getType().getDescription() == null){
-			throw new RuntimeException("Vehicle type description for vehicle " + vehicle + "is missing. " +
-					"Please make sure that requirements for emission vehicles in "
-					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-		}
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(vehicleDescription);
-		if (vehicleInformationTuple.getFirst() == null){
-			throw new RuntimeException("Vehicle category for vehicle " + vehicle + " is not valid. " +
-					"Please make sure that requirements for emission vehicles in " + 
-					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-		}
 		
-		Map<ColdPollutant, Double> coldEmissions = getColdPollutantDoubleMap( vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km );
+		if (vehicle == null) {
+			if (ecg.getNonScenarioVehicles().equals(NonScenarioVehicles.abort)) {
+				throw new RuntimeException(
+						"Vehicle is null. " +
+						"Please make sure that requirements for emission vehicles in " + EmissionsConfigGroup.GROUP_NAME + " config group are met."
+								+ " Or set the parameter + 'nonScenarioVehicles' to 'ignore' in order to skip such vehicles."
+								+ " Aborting...");
+			} else if (ecg.getNonScenarioVehicles().equals(NonScenarioVehicles.ignore)) {
+				if (noVehWarnCnt < 10) {
+					logger.warn(
+							"Vehicle will be ignored.");
+					noVehWarnCnt++;
+					if (noVehWarnCnt == 10) logger.warn(Gbl.FUTURE_SUPPRESSED);
+				}
+			} else {
+				throw new RuntimeException("Not yet implemented. Aborting...");
+			}
+							
+		} else {
+			
+			if(this.ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
+				if(vehicle.getType().getDescription()==null) { // emission specification is in vehicle type id
+					vehicle.getType().setDescription(EmissionSpecificationMarker.BEGIN_EMISSIONS
+							+vehicle.getType().getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS);
+				} else if( vehicle.getType().getDescription().contains(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()) ) {
+					// emission specification is in vehicle type id and in vehicle description too.
+				} else {
+					String vehicleDescription = vehicle.getType().getDescription() + EmissionSpecificationMarker.BEGIN_EMISSIONS
+							+ vehicle.getType().getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS;
+					vehicle.getType().setDescription(vehicleDescription);
+				}
+			}
 
-		// a basic apporach to introduce emission reduced cars:
-		if(emissionEfficiencyFactor != null){
-			coldEmissions = rescaleColdEmissions(coldEmissions);
+			String vehicleDescription = vehicle.getType().getDescription();
+
+			if(vehicle.getType().getDescription() == null){
+				throw new RuntimeException("Vehicle type description for vehicle " + vehicle + "is missing. " +
+						"Please make sure that requirements for emission vehicles in "
+						+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
+			}
+			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(vehicleDescription);
+			if (vehicleInformationTuple.getFirst() == null){
+				throw new RuntimeException("Vehicle category for vehicle " + vehicle + " is not valid. " +
+						"Please make sure that requirements for emission vehicles in " + 
+						EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
+			}
+			
+			Map<ColdPollutant, Double> coldEmissions = getColdPollutantDoubleMap( vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km );
+
+			// a basic apporach to introduce emission reduced cars:
+			if(emissionEfficiencyFactor != null){
+				coldEmissions = rescaleColdEmissions(coldEmissions);
+			}
+			Event coldEmissionEvent = new ColdEmissionEvent(eventTime, coldEmissionEventLinkId, vehicle.getId(), coldEmissions);
+			this.eventsManager.processEvent(coldEmissionEvent);
 		}
-		Event coldEmissionEvent = new ColdEmissionEvent(eventTime, coldEmissionEventLinkId, vehicle.getId(), coldEmissions);
-		this.eventsManager.processEvent(coldEmissionEvent);
 	}
 
 	private Map<ColdPollutant, Double> rescaleColdEmissions(Map<ColdPollutant, Double> coldEmissions) {

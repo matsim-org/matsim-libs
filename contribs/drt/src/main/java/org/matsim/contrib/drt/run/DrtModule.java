@@ -88,7 +88,7 @@ public final class DrtModule extends AbstractModule {
 
 	static TransitSchedule readTransitSchedule(URL url) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReader(scenario).readURL(url);
+		new TransitScheduleReader(scenario).readURL(url );
 		return scenario.getTransitSchedule();
 	}
 }

@@ -16,41 +16,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.example.archive;
+package org.matsim.contrib.emissions.example;
 
-import static org.junit.Assert.fail;
+import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * @author nagel
+ * @author ihab
  *
  */
-public class RunEmissionToolOnlineExampleIT {
+public class RunEmissionToolOfflineExampleTest {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	/**
-	 * Test method for {@link RunEmissionToolOnlineExample#main(String[])}.
-	 */
-	@SuppressWarnings("static-method")
 	@Test
 	public final void testMain() {
-		try {
-			Config config = RunEmissionToolOnlineExample.prepareConfig( null ) ;
+		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
+		Config config = offlineExample.prepareConfig();
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		offlineExample.run();
+	}
 
-			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-			// otherwise the test fails on jenkins
-			
-			config.controler().setLastIteration( 1 );
-			
-			Scenario scenario = RunEmissionToolOnlineExample.prepareScenario( config ) ;
-			
-			RunEmissionToolOnlineExample.run( scenario ) ;
-		} catch ( Exception ee ) {
-			ee.printStackTrace();
-			fail("something did not work" ) ;
-		}
+	@Test
+	public final void testAverage() {
+		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
+		Config config = offlineExample.prepareConfig();
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		offlineExample.run();
 	}
 
 }

@@ -72,8 +72,8 @@ public class TransitScheduleReader implements MatsimReader {
 	public void readFile(final String filename) throws UncheckedIOException {
 		new XmlScheduleReader(externalInputCRS, targetCRS, this.scenario).readFile(filename);
 	}
-
-	public void readURL(final URL url) throws UncheckedIOException {
+	@Override
+	public void readURL( final URL url ) throws UncheckedIOException {
 		new XmlScheduleReader(externalInputCRS, targetCRS, this.scenario).parse(url);
 	}
 

@@ -4,7 +4,7 @@
 <config>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="../network/grid9x9.xml" />
+		<param name="inputNetworkFile" value="grid9x9.xml" />
 	</module>
 
 	<module name="plans">

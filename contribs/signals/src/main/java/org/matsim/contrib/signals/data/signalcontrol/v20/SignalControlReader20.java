@@ -30,6 +30,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.data.AbstractSignalsReader;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
@@ -46,6 +47,7 @@ import org.matsim.jaxb.signalcontrol20.XMLSignalGroupSettingsType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalSystemControllerType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalSystemType;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
@@ -53,7 +55,7 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
-public class SignalControlReader20 implements MatsimReader {
+public class SignalControlReader20 extends AbstractSignalsReader{
 
 	private SignalControlData signalControlData;
 
@@ -72,11 +74,6 @@ public class SignalControlReader20 implements MatsimReader {
 		}
 	}
 
-	@Override
-	public void readFile(String filename) {
-		readStream(IOUtils.getInputStream(filename));
-	}
-
 	private double getSeconds(XMLGregorianCalendar daytime) {
 		double sec = daytime.getHour() * 3600.0;
 		sec += daytime.getMinute() * 60.0;
@@ -84,8 +81,9 @@ public class SignalControlReader20 implements MatsimReader {
 		return sec;
 	}
 
-	public void readStream(InputStream inputStream) {
-		XMLSignalControl xmlSignalControl = this.readSignalControl20Stream(inputStream);
+	public void read( InputSource inputStream ) {
+//		XMLSignalControl xmlSignalControl = this.readSignalControl20Stream(inputStream);
+		XMLSignalControl xmlSignalControl = this.readSignalControl20Stream(inputStream.getByteStream());
 		SignalControlDataFactory factory = this.signalControlData.getFactory();
 		for (XMLSignalSystemType xmlSystem : xmlSignalControl.getSignalSystem()){
 			SignalSystemControllerData controllerData = factory.createSignalSystemControllerData(Id.create(xmlSystem.getRefId(), SignalSystem.class));

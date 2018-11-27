@@ -30,6 +30,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.data.AbstractSignalsReader;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.api.internal.MatsimReader;
@@ -38,12 +39,13 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.intergreenTimes10.XMLEndingSignalGroupType;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes.XMLSignalSystem;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
  */
-public class IntergreenTimesReader10 implements MatsimReader {
+public class IntergreenTimesReader10 extends AbstractSignalsReader{
 
 	private static final Logger log = Logger.getLogger(IntergreenTimesReader10.class);
 	
@@ -54,17 +56,7 @@ public class IntergreenTimesReader10 implements MatsimReader {
 	}
 	
 	
-	@Override
-	public void readFile(final String filename) throws UncheckedIOException {
-		log.info("starting unmarshalling " + filename);
-		try (InputStream stream = IOUtils.getInputStream(filename)){
-			readStream(stream);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
-
-	public void readStream(InputStream stream) throws UncheckedIOException {
+		public void read(InputSource stream) throws UncheckedIOException {
 		try {
 			Unmarshaller u = JAXBContext.newInstance(org.matsim.jaxb.intergreenTimes10.ObjectFactory.class).createUnmarshaller();
 			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/intergreenTimes_v1.0.xsd")));
