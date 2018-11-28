@@ -1,15 +1,14 @@
 package org.matsim.contrib.signals.builder;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.AllowsOverriding;
 
-public class Signals{
-    private Signals(){} // do not instantiate
+public class SignalsBuilder{
 
-    public static void configure( Controler c ) {
+    public static void configure( AllowsOverriding ao ) {
 
-        c.addOverridingModule( new SignalsModule() );
+        ao.addOverridingModule( new SignalsModule() );
 
-        c.addOverridingQSimModule( new SignalsQSimModule() );
+        ao.addOverridingQSimModule( new SignalsQSimModule() );
 
     }
 
