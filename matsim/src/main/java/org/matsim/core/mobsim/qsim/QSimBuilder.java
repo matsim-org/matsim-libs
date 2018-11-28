@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.AllowsOverriding;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
@@ -61,7 +62,7 @@ import com.google.inject.name.Names;
  *
  * @author Sebastian Hörl <sebastian.hoerl@ivt.baug.ethz.ch>
  */
-public class QSimBuilder {
+public class QSimBuilder implements AllowsOverriding {
 	private final Config config;
 
 	private final Collection<AbstractQSimModule> qsimModules = new LinkedList<>();
@@ -89,7 +90,8 @@ public class QSimBuilder {
 	 * Adds a module that overrides existing bindings from MATSim (i.e. mainly those
 	 * from the {@link StandaloneQSimModule} and derived stages).
 	 */
-	public QSimBuilder addOverridingControllerModule(AbstractModule module) {
+	@Override
+	public QSimBuilder addOverridingModule( AbstractModule module ) {
 		overridingControllerModules.add(module);
 		return this;
 	}
@@ -105,6 +107,7 @@ public class QSimBuilder {
 	/**
 	 * Adds a QSim module that overrides previously defined elements.
 	 */
+	@Override
 	public QSimBuilder addOverridingQSimModule(AbstractQSimModule module) {
 		this.overridingQSimModules.add(module);
 		return this;
