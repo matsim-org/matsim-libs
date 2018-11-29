@@ -94,7 +94,7 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(fromLink, toLink, drtLeg.getDepartureTime(),
 				router, travelTime);
 		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
-		double maxTravelTime = drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta();
+		double maxTravelTime = DrtRoutingModule.getMaxTravelTime(drtCfg, unsharedRideTime);
 		double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
 
 		drtRoute.setDistance(unsharedDistance);

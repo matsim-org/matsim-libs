@@ -26,11 +26,11 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
-import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
@@ -39,28 +39,26 @@ import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
-import com.google.inject.Key;
 import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm
  */
-public class MultiModeTaxiQSimModule extends AbstractQSimModule {
+public class MultiModeTaxiQSimModule extends AbstractMultiModeQSimModule {
 	private final TaxiConfigGroup taxiCfg;
 
 	public MultiModeTaxiQSimModule(TaxiConfigGroup taxiCfg) {
+		super(taxiCfg.getMode());
 		this.taxiCfg = taxiCfg;
 	}
 
 	@Override
 	protected void configureQSim() {
-		bind(modalKey(TaxiOptimizer.class)).toProvider(
+		bindModal(TaxiOptimizer.class).toProvider(
 				new ModalProviders.AbstractProvider<TaxiOptimizer>(taxiCfg.getMode()) {
 					@Inject
 					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
@@ -84,13 +82,12 @@ public class MultiModeTaxiQSimModule extends AbstractQSimModule {
 					public TaxiOptimizer get() {
 						Fleet fleet = getModalInstance(Fleet.class);
 						TaxiScheduler taxiScheduler = getModalInstance(TaxiScheduler.class);
-						TaxiRequestValidator requestValidator = getModalInstance(TaxiRequestValidator.class);
 						return new DefaultTaxiOptimizerProvider(taxiCfg, fleet, network, timer, travelTime,
-								travelDisutility, taxiScheduler, requestValidator, events).get();
+								travelDisutility, taxiScheduler).get();
 					}
 				}).asEagerSingleton();
 
-		bind(modalKey(TaxiScheduler.class)).toProvider(
+		bindModal(TaxiScheduler.class).toProvider(
 				new ModalProviders.AbstractProvider<TaxiScheduler>(taxiCfg.getMode()) {
 					@Inject
 					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
@@ -114,7 +111,7 @@ public class MultiModeTaxiQSimModule extends AbstractQSimModule {
 					}
 				}).asEagerSingleton();
 
-		bind(modalKey(DynActionCreator.class)).toProvider(
+		bindModal(DynActionCreator.class).toProvider(
 				new ModalProviders.AbstractProvider<TaxiActionCreator>(taxiCfg.getMode()) {
 					@Inject
 					private MobsimTimer timer;
@@ -130,14 +127,10 @@ public class MultiModeTaxiQSimModule extends AbstractQSimModule {
 					}
 				}).asEagerSingleton();
 
-		bind(modalKey(PassengerRequestCreator.class)).toProvider(ModalProviders.createProvider(taxiCfg.getMode(),
-				getter -> new TaxiRequestCreator(getter.getModal(SubmittedTaxiRequestsCollector.class))))
+		bindModal(PassengerRequestCreator.class).toProvider(
+				modalProvider(getter -> new TaxiRequestCreator(getter.getModal(SubmittedTaxiRequestsCollector.class))))
 				.asEagerSingleton();
 
-		bind(modalKey(VrpOptimizer.class)).to(modalKey(TaxiOptimizer.class));
-	}
-
-	private <T> Key<T> modalKey(Class<T> type) {
-		return Key.get(type, Names.named(taxiCfg.getMode()));
+		bindModal(VrpOptimizer.class).to(modalKey(TaxiOptimizer.class));
 	}
 }

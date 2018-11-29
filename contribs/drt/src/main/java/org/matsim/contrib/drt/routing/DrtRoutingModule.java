@@ -102,7 +102,7 @@ public class DrtRoutingModule implements RoutingModule {
 		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(fromLink, toLink, departureTime, router,
 				travelTime);
 		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
-		double maxTravelTime = drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta();
+		double maxTravelTime = getMaxTravelTime(drtCfg, unsharedRideTime);
 		double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
 
 		DrtRoute route = populationFactory.getRouteFactories()
@@ -127,5 +127,16 @@ public class DrtRoutingModule implements RoutingModule {
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
 		return EmptyStageActivityTypes.INSTANCE;
+	}
+
+	/**
+	 * Calculates the maximum travel time defined as: drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta()
+	 *
+	 * @param drtCfg
+	 * @param unsharedRideTime ride time of the direct (shortest-time) route
+	 * @return maximum travel time
+	 */
+	public static double getMaxTravelTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
+		return drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta();
 	}
 }

@@ -71,6 +71,12 @@ public final class StreamingPopulationReader implements MatsimReader {
 	@Override public void readFile(String filename) {
 		reader.readFile(filename);
 	}
+
+	@Override
+	public void readURL( URL url ) {
+		reader.parse( url ) ;
+	}
+
 	public void parse(InputStream is) {
 		reader.parse(is);
 	}

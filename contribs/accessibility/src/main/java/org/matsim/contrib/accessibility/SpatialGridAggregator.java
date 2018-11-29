@@ -7,6 +7,7 @@ import org.matsim.facilities.ActivityFacility;
 import java.util.HashMap;
 import java.util.Map;
 
+@Deprecated
 public class SpatialGridAggregator implements FacilityDataExchangeInterface {
 
 	private Map<String, SpatialGrid> accessibilityGrids = new HashMap<>() ;

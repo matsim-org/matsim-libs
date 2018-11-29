@@ -60,7 +60,6 @@ public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 		this.walkBeelineFactor = planscCalcRouteCfg.getModeRoutingParams()
 				.get(TransportMode.walk)
 				.getBeelineDistanceFactor();
-		;
 	}
 
 	@Override

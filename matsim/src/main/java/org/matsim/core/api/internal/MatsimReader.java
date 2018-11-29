@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.api.internal;
 
+import java.net.URL;
+
 /**
  * There seems to be some tentative decision (https://matsim.atlassian.net/browse/MATSIM-182) to use read(filename).  Interface marking
  * those readers which adhere to this convention.
@@ -29,6 +31,8 @@ package org.matsim.core.api.internal;
  */
 public interface MatsimReader {
 
-	public void readFile( String filename ) ;
+	void readFile( String filename ) ;
+
+	void readURL( URL url ) ;
 	
 }

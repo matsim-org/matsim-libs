@@ -5,13 +5,10 @@ import org.matsim.vis.snapshotwriters.VisVehicle;
 /**
  * @author nagel
  */
-abstract class QItem implements VisVehicle {
+interface QItem extends VisVehicle {
 	
-	abstract double getEarliestLinkExitTime();
+	double getEarliestLinkExitTime();
 
-	abstract void setEarliestLinkExitTime(double earliestLinkEndTime);
+	void setEarliestLinkExitTime( double earliestLinkEndTime );
 	
-	@Override public abstract double getSizeInEquivalents();
-
-
 }

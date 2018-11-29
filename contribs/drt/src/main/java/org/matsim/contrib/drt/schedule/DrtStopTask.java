@@ -19,13 +19,19 @@
 
 package org.matsim.contrib.drt.schedule;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
 /**
+ * A task representing stopping at a bus stop with at least one or more passengers being picked up or dropped off.
+ * <p>
+ * Note that we can have both dropoff requests and pickup requests for the same stop.  kai, nov'18
+ *
  * @author michalm
  */
 public class DrtStopTask extends StayTaskImpl implements DrtTask {
@@ -40,17 +46,16 @@ public class DrtStopTask extends StayTaskImpl implements DrtTask {
 	public DrtTaskType getDrtTaskType() {
 		return DrtTaskType.STOP;
 	}
-	
+
 	/**
-	 * one stop task my have multiple dropoffs.  I speculate that this may mean, e.g., drop off multiple passengers at same stop. kai, nov'18
+	 * @return requests associated with passengers being dropped off at this stop
 	 */
 	public Set<DrtRequest> getDropoffRequests() {
 		return Collections.unmodifiableSet(dropoffRequests);
 	}
-	
+
 	/**
-	 * one task my have multiple pickups (?).  I speculate this this may mean, e.g., pick up multiple passengers at same stop.
-	 * Note that we can have both dropoff requests and pickup requests for the same stop.  kai, nov'18
+	 * @return requests associated with passengers being picked up at this stop
 	 */
 	public Set<DrtRequest> getPickupRequests() {
 		return Collections.unmodifiableSet(pickupRequests);

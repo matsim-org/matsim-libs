@@ -26,6 +26,6 @@ import org.junit.Test;
 public class RunOneSharedTaxiExampleIT {
 	@Test
 	public void testRun() {
-		RunOneSharedTaxiExample.run(false, 0);
+		RunOneSharedTaxiExample.run(false, 1);
 	}
 }

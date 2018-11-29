@@ -30,17 +30,6 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
  * @author michalm
  */
 public class DrtRequest implements PassengerRequest {
-
-	public enum DrtRequestStatus {
-		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
-		PLANNED, // planned - included into one of the routes
-		PICKUP, // being picked up
-		RIDE, // on board
-		DROPOFF, // being dropped off
-		PERFORMED, // completed
-		REJECTED; // rejected by the DISPATCHER
-	}
-
 	private final Id<Request> id;
 	private final double submissionTime;
 	private final double earliestStartTime;
@@ -98,6 +87,7 @@ public class DrtRequest implements PassengerRequest {
 		return rejected;
 	}
 
+	@Override
 	public void setRejected(boolean rejected) {
 		this.rejected = rejected;
 	}
@@ -131,36 +121,6 @@ public class DrtRequest implements PassengerRequest {
 
 	public void setDropoffTask(DrtStopTask dropoffTask) {
 		this.dropoffTask = dropoffTask;
-	}
-
-	public DrtRequestStatus getStatus() {
-		if (pickupTask == null) {
-			return DrtRequestStatus.UNPLANNED;
-		}
-
-		switch (pickupTask.getStatus()) {
-			case PLANNED:
-				return DrtRequestStatus.PLANNED;
-
-			case STARTED:
-				return DrtRequestStatus.PICKUP;
-
-			case PERFORMED:// continue
-		}
-
-		switch (dropoffTask.getStatus()) {
-			case PLANNED:
-				return DrtRequestStatus.RIDE;
-
-			case STARTED:
-				return DrtRequestStatus.DROPOFF;
-
-			case PERFORMED:
-				return DrtRequestStatus.PERFORMED;
-
-		}
-
-		throw new IllegalStateException("Unreachable code");
 	}
 
 	@Override

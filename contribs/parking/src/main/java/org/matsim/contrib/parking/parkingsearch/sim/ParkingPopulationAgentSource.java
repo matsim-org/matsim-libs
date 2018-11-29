@@ -43,6 +43,8 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.facilities.ActivityFacilities;
@@ -157,7 +159,11 @@ public final class ParkingPopulationAgentSource implements AgentSource {
 							}
 						} else {
 							this.seenVehicleIds.put( vehicleId, vehicleLinkId ) ;
-							qsim.createAndParkVehicleOnLink(vehicle, vehicleLinkId);
+//							qsim.createAndParkVehicleOnLink(vehicle, vehicleLinkId);
+							QVehicle qVehicle = new QVehicleImpl( vehicle ) ; // yyyyyy should use factory.  kai, nov'18
+							qsim.addParkedVehicle( qVehicle, vehicleLinkId );
+							
+							// yyyy in fact, should rather try to use central method since the central method has moved on.  kai, nov'18
 						}
 						seenModes.add(leg.getMode());
 					}

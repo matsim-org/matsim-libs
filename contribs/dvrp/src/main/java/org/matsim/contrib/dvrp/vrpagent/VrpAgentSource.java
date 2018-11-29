@@ -29,6 +29,7 @@ import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
@@ -75,7 +76,7 @@ public class VrpAgentSource implements AgentSource {
 			VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, vrpVeh);
 			DynAgent vrpAgent = new DynAgent(Id.createPersonId(id), startLinkId, qSim.getEventsManager(),
 					vrpAgentLogic);
-			QVehicle mobsimVehicle = new QVehicle(
+			QVehicle mobsimVehicle = new QVehicleImpl(
 					vehicleFactory.createVehicle(Id.create(id, org.matsim.vehicles.Vehicle.class), vehicleType));
 			vrpAgent.setVehicle(mobsimVehicle);
 			mobsimVehicle.setDriver(vrpAgent);
