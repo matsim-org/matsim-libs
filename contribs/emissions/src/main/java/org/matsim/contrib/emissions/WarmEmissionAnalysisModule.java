@@ -430,9 +430,10 @@ public class WarmEmissionAnalysisModule {
 	@Deprecated
 	public double getFractionKmCounter() {
 		return getSaturatedKmCounter() + getHeavyFlowKmCounter();
-
-  public EmissionsConfigGroup getEcg() {
+	}
+  	
+	public EmissionsConfigGroup getEcg() {
 		return ecg;
 	}
-	
+
 }
