@@ -17,9 +17,9 @@ public class JDEQSimPluginTest extends MatsimTestCase {
 	private QSim prepareQSim(Scenario scenario, EventsManager eventsManager) {
         return new QSimBuilder(scenario.getConfig()) //
         	.addQSimModule(new JDEQSimModule()) //
-        	.configureComponents(components -> {
+        	.configureQSimComponents( components -> {
         		components.addNamedComponent(JDEQSimModule.COMPONENT_NAME);
-        	}) //
+        	} ) //
         	.build(scenario, eventsManager);
 	}
 

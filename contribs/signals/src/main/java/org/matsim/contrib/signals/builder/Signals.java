@@ -1,11 +1,11 @@
 package org.matsim.contrib.signals.builder;
 
 import org.matsim.contrib.signals.controller.SignalControllerFactory;
-import org.matsim.core.controler.AllowsOverriding;
+import org.matsim.core.controler.AllowsConfiguration;
 
 public class Signals{
 
-    public static void configure( AllowsOverriding ao ){
+    public static void configure( AllowsConfiguration ao ){
 
         ao.addOverridingModule( new SignalsModule() );
 

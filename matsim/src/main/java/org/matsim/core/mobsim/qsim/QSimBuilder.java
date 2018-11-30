@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.AllowsOverriding;
+import org.matsim.core.controler.AllowsConfiguration;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
@@ -62,7 +62,7 @@ import com.google.inject.name.Names;
  *
  * @author Sebastian Hörl <sebastian.hoerl@ivt.baug.ethz.ch>
  */
-public class QSimBuilder implements AllowsOverriding {
+public class QSimBuilder implements AllowsConfiguration{
 	private final Config config;
 
 	private final Collection<AbstractQSimModule> qsimModules = new LinkedList<>();
@@ -125,7 +125,7 @@ public class QSimBuilder implements AllowsOverriding {
 	/**
 	 * Configures the current active QSim components.
 	 */
-	public QSimBuilder configureComponents(QSimComponentsConfigurator configurator) {
+	public QSimBuilder configureQSimComponents( QSimComponentsConfigurator configurator ) {
 		configurator.configure(components);
 		return this;
 	}
