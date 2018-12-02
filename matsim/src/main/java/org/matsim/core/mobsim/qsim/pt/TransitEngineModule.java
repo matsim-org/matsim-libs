@@ -1,8 +1,5 @@
 package org.matsim.core.mobsim.qsim.pt;
 
-import com.google.inject.Inject;
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 public class TransitEngineModule extends AbstractQSimModule {
@@ -11,7 +8,8 @@ public class TransitEngineModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(TransitQSimEngine.class).asEagerSingleton();
-		addNamedComponent(TransitQSimEngine.class, TRANSIT_ENGINE_NAME);
+		//		bindNamedComponent(componentClass, name).to(componentClass);
+		this.addQSimComponentBinding( TRANSIT_ENGINE_NAME ).to( TransitQSimEngine.class ) ;
 
 		if ( this.getConfig().transit().isUseTransit() && this.getConfig().transit().isUsingTransitInMobsim() ) {
 			bind( TransitStopHandlerFactory.class ).to( ComplexTransitStopHandlerFactory.class ) ;

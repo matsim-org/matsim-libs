@@ -1,8 +1,5 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import com.google.inject.Inject;
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 public class QNetsimEngineModule extends AbstractQSimModule {
@@ -18,8 +15,10 @@ public class QNetsimEngineModule extends AbstractQSimModule {
 		} else {
 			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
 		}
-		
-		addNamedComponent(VehicularDepartureHandler.class, COMPONENT_NAME);
-		addNamedComponent(QNetsimEngine.class, COMPONENT_NAME);
+
+		//		bindNamedComponent(componentClass, name).to(componentClass);
+		this.addQSimComponentBinding( COMPONENT_NAME ).to( VehicularDepartureHandler.class ) ;
+		//		bindNamedComponent(componentClass, name).to(componentClass);
+		this.addQSimComponentBinding( COMPONENT_NAME ).to( QNetsimEngine.class ) ;
 	}
 }

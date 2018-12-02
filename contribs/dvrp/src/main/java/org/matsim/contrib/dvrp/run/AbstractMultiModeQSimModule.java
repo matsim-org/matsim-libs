@@ -52,7 +52,7 @@ public abstract class AbstractMultiModeQSimModule extends AbstractQSimModule {
 	}
 
 	protected <T extends QSimComponent> LinkedBindingBuilder<T> bindModalComponent(Class<T> componentClass) {
-		return bindComponent(componentClass).annotatedWith(DvrpModes.mode(mode));
+		return binder().bind( componentClass ).annotatedWith(DvrpModes.mode(mode ) );
 	}
 
 	protected <T extends QSimComponent> void addModalComponent(Class<T> componentClass) {

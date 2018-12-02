@@ -3,10 +3,8 @@ package org.matsim.contrib.carsharing.qsim;
 import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
@@ -27,7 +25,8 @@ public class CarSharingQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		addNamedComponent(ParkCSVehicles.class, COMPONENT_NAME);
+		//		bindNamedComponent(componentClass, name).to(componentClass);
+		this.addQSimComponentBinding( COMPONENT_NAME ).to( ParkCSVehicles.class ) ;
 	}
 
 	@Provides

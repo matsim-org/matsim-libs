@@ -8,7 +8,6 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
@@ -25,11 +24,16 @@ public class JointQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		addNamedComponent(JointModesDepartureHandler.class, JOINT_MODES_DEPARTURE_HANDLER);
-		addNamedComponent(PassengerUnboardingAgentFactory.class, JOINT_PASSENGER_UNBOARDING);
-		addNamedComponent(JointModesDepartureHandler.class, JOINT_MODES_DEPARTURE_HANDLER);
-		addNamedComponent(PopulationAgentSourceWithVehicles.class, AGENTS_SOURCE_WITH_VEHICLES);
-		addNamedComponent(QNetsimEngine.class, REPLACEMENT_QNETSIM_ENGINE);
+		//		bindNamedComponent(componentClass, name).to(componentClass);
+		this.addQSimComponentBinding( JOINT_MODES_DEPARTURE_HANDLER ).to( JointModesDepartureHandler.class ) ;
+		//		bindNamedComponent(componentClass, name).to(componentClass);
+		this.addQSimComponentBinding( JOINT_PASSENGER_UNBOARDING ).to( PassengerUnboardingAgentFactory.class ) ;
+		//		bindNamedComponent(componentClass, name).to(componentClass);
+		this.addQSimComponentBinding( JOINT_MODES_DEPARTURE_HANDLER ).to( JointModesDepartureHandler.class ) ;
+		//		bindNamedComponent(componentClass, name).to(componentClass);
+		this.addQSimComponentBinding( AGENTS_SOURCE_WITH_VEHICLES ).to( PopulationAgentSourceWithVehicles.class ) ;
+		//		bindNamedComponent(componentClass, name).to(componentClass);
+		this.addQSimComponentBinding( REPLACEMENT_QNETSIM_ENGINE ).to( QNetsimEngine.class ) ;
 	}
 
 	@Provides

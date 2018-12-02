@@ -37,7 +37,8 @@ public class DynQSimModule extends AbstractQSimModule {
 	@Override
 	public void configureQSim() {
 		install(new DynActivityEngineModule());
-		addNamedComponent(agentSourceClass, COMPONENT_NAME);
+		//		bindNamedComponent(componentClass, name).to(componentClass);
+		this.addQSimComponentBinding( COMPONENT_NAME ).to( agentSourceClass ) ;
 	}
 
 	public static void configureComponents(QSimComponentsConfig components) {

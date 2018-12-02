@@ -2,6 +2,7 @@ package org.matsim.core.mobsim.qsim.components;
 
 import java.util.Collections;
 
+import com.google.inject.name.Names;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -17,8 +18,6 @@ import org.matsim.core.mobsim.qsim.components.mock.MockMobsimListener;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.google.inject.Key;
-
 public class QSimComponentsTest {
 	@Test
 	public void testGenericAddComponentMethod() {
@@ -29,7 +28,7 @@ public class QSimComponentsTest {
 		AbstractQSimModule module = new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				addComponent(MockMobsimListener.class, MockComponentAnnotation.class);
+				binder().bind( MockMobsimListener.class ).annotatedWith( MockComponentAnnotation.class ).to( MockMobsimListener.class );
 			}
 		};
 		
@@ -89,7 +88,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindComponent(MockEngine.class, MockComponentAnnotation.class).toInstance(mockEngine);
+						binder().bind( MockEngine.class ).annotatedWith( MockComponentAnnotation.class ).toInstance(mockEngine );
 					}
 				}) //
 				.configureComponents(components -> {
@@ -113,7 +112,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindNamedComponent(MockEngine.class, "MockEngine").toInstance(mockEngine);
+						binder().bind( MockEngine.class ).annotatedWith( Names.named( "MockEngine" ) ).toInstance(mockEngine );
 					}
 				}) //
 				.configureComponents(components -> {
@@ -144,7 +143,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindNamedComponent(MockEngine.class, "MockEngine").toInstance(mockEngine);
+						binder().bind( MockEngine.class ).annotatedWith( Names.named( "MockEngine" ) ).toInstance(mockEngine );
 					}
 				}) //
 				.build(scenario, eventsManager) //

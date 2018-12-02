@@ -3,6 +3,7 @@ package org.matsim.core.mobsim.qsim;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.google.inject.name.Names;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -123,7 +124,7 @@ public class AbstractQSimModuleTest {
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bindNamedComponent(TestEngine.class, "MyEngine").toInstance(engine);
+				binder().bind( TestEngine.class ).annotatedWith( Names.named( "MyEngine" ) ).toInstance(engine );
 			}
 		});
 
