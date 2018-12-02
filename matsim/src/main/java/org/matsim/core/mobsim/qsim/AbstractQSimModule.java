@@ -20,6 +20,14 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule {
 		return binder().bind(QSimComponent.class).annotatedWith(Names.named(label));
 	}
 
+	// if we really want support for non-String annotations, it could look as follows.  kai, dec'18
+//	protected final LinkedBindingBuilder<QSimComponent> addQSimComponentBinding( Annotation annotation ) {
+//		return binder().bind(QSimComponent.class).annotatedWith( annotation );
+//	}
+//	protected final LinkedBindingBuilder<QSimComponent> addQSimComponentBinding( Class<? extends Annotation> annotationClass ) {
+//		return binder().bind(QSimComponent.class).annotatedWith( annotationClass );
+//	}
+
 
 	protected abstract void configureQSim();
 	
