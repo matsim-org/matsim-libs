@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,28 +16,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.contrib.emissions.example;
 
-package org.matsim.contrib.drt.data.validator;
-
-import java.util.Set;
-
-import org.matsim.contrib.drt.data.DrtRequest;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.core.config.Config;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * Validates (for the optimizer), whether a DRTRequest should be served or not (e.g. for limitations in business area or
- * distance or time)
+ * @author ihab
  *
- * @author jbischoff
  */
-public interface DrtRequestValidator {
-	/**
-	 * Checks if the request can be served given some spatiotemporal (limited time and area of operations) or other constraints.
-	 * <p>
-	 * Preferred format for causes: underscores instead of spaces.
-	 *
-	 * @param request to be validated
-	 * @return set containing causes of constraint violations. An empty set means the request fulfills all
-	 * constraints and may be considered by the optimizer (although this does not guarantee it will get scheduled)
-	 */
-	Set<String> validateDrtRequest(DrtRequest request);
+public class RunEmissionToolOfflineExampleTest {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+
+	@Test
+	public final void testMain() {
+		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
+		Config config = offlineExample.prepareConfig();
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		offlineExample.run();
+	}
+
+	@Test
+	public final void testAverage() {
+		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
+		Config config = offlineExample.prepareConfig();
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		offlineExample.run();
+	}
+
 }

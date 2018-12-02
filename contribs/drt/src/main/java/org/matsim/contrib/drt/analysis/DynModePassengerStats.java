@@ -45,14 +45,14 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
-import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEventHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
@@ -65,7 +65,7 @@ import com.google.inject.Inject;
 public class DynModePassengerStats
 		implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
 		LinkEnterEventHandler, ActivityEndEventHandler, DrtRequestSubmittedEventHandler,
-		DrtRequestRejectedEventHandler {
+		PassengerRequestRejectedEventHandler {
 
 	private final Map<Id<Person>, Double> departureTimes = new HashMap<>();
 	private final Map<Id<Person>, Id<Link>> departureLinks = new HashMap<>();
@@ -201,6 +201,9 @@ public class DynModePassengerStats
 
 	@Override
 	public void handleEvent(DrtRequestSubmittedEvent event) {
+		if (!event.getMode().equals(mode)) {
+			return;
+		}
 		this.unsharedDistances.put(event.getPersonId(), event.getUnsharedRideDistance());
 		this.unsharedTimes.put(event.getPersonId(), event.getUnsharedRideTime());
 		this.request2person.put(event.getRequestId(), event.getPersonId());
@@ -208,7 +211,10 @@ public class DynModePassengerStats
 	}
 
 	@Override
-	public void handleEvent(DrtRequestRejectedEvent event) {
+	public void handleEvent(PassengerRequestRejectedEvent event) {
+		if (!event.getMode().equals(mode)) {
+			return;
+		}
 		rejectedPersons.add(request2person.get(event.getRequestId()));
 	}
 }

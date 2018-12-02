@@ -17,11 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.routing;/*
+package org.matsim.contrib.drt.routing;
+/*
  * created by jbischoff, 20.11.2018
  */
 
-import com.google.inject.Inject;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -29,39 +33,41 @@ import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.google.inject.Inject;
 
 public class MultiModeDrtMainModeIdentifier implements MainModeIdentifier {
 
-    private final MainModeIdentifier delegate = new MainModeIdentifierImpl();
-    private final List<String> modes;
-    private final Map<String, String> drtStageActivityTypes;
-    private final Map<String, String> drtWalkTypes;
+	private final MainModeIdentifier delegate = new MainModeIdentifierImpl();
+	private final Map<String, String> drtStageActivityTypes;
+	private final Map<String, String> drtWalkTypes;
 
-    @Inject
-    public MultiModeDrtMainModeIdentifier(MultiModeDrtConfigGroup drtCfg) {
-        modes = drtCfg.getDrtConfigGroups().stream().map(c -> c.getMode()).collect(Collectors.toList());
-        drtStageActivityTypes = drtCfg.getDrtConfigGroups().stream().map(drtConfigGroup -> drtConfigGroup.getMode()).collect(Collectors.toMap(s -> new DrtStageActivityType(s).drtStageActivity, s -> s));
-        drtWalkTypes = drtCfg.getDrtConfigGroups().stream().map(drtConfigGroup -> drtConfigGroup.getMode()).collect(Collectors.toMap(s -> new DrtStageActivityType(s).drtWalk, s -> s));
-    }
+	@Inject
+	public MultiModeDrtMainModeIdentifier(MultiModeDrtConfigGroup drtCfg) {
+		drtStageActivityTypes = drtCfg.getDrtConfigGroups()
+				.stream()
+				.map(drtConfigGroup -> drtConfigGroup.getMode())
+				.collect(Collectors.toMap(s -> new DrtStageActivityType(s).drtStageActivity, s -> s));
+		drtWalkTypes = drtCfg.getDrtConfigGroups()
+				.stream()
+				.map(drtConfigGroup -> drtConfigGroup.getMode())
+				.collect(Collectors.toMap(s -> new DrtStageActivityType(s).drtWalk, s -> s));
+	}
 
-    @Override
-    public String identifyMainMode(List<? extends PlanElement> tripElements) {
-        for (PlanElement pe : tripElements) {
-            if (pe instanceof Activity) {
-                Activity a = (Activity) pe;
-                if (drtStageActivityTypes.containsKey(a.getType())) {
-                    return drtStageActivityTypes.get(a.getType());
-                }
-            } else if (pe instanceof Leg) {
-                Leg l = (Leg) pe;
-                if (drtWalkTypes.containsKey(l.getMode())) {
-                    return drtWalkTypes.get(l.getMode());
-                }
-            }
-        }
-        return delegate.identifyMainMode(tripElements);
-    }
+	@Override
+	public String identifyMainMode(List<? extends PlanElement> tripElements) {
+		for (PlanElement pe : tripElements) {
+			if (pe instanceof Activity) {
+				String type = drtStageActivityTypes.get(((Activity)pe).getType());
+				if (type != null) {
+					return type;
+				}
+			} else if (pe instanceof Leg) {
+				String mode = drtWalkTypes.get(((Leg)pe).getMode());
+				if (mode != null) {
+					return mode;
+				}
+			}
+		}
+		return delegate.identifyMainMode(tripElements);
+	}
 }

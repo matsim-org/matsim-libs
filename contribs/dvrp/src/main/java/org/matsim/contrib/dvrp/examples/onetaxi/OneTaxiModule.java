@@ -24,7 +24,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
 import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -45,6 +47,7 @@ public class OneTaxiModule extends AbstractMultiModeModule {
 	public void install() {
 		addRoutingModuleBinding(TransportMode.taxi).toInstance(new DynRoutingModule(TransportMode.taxi));
 		bindModal(Fleet.class).toProvider(new FleetProvider(taxisFile)).asEagerSingleton();
+		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class);
 
 		installQSimModule(new AbstractMultiModeQSimModule(TransportMode.taxi) {
 			@Override

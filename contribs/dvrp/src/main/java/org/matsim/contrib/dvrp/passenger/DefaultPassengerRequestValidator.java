@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,19 +15,27 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-
-/**
- * 
+ * *********************************************************************** *
  */
-package org.matsim.contrib.drt.passenger.events;
 
-import org.matsim.core.events.handler.EventHandler;
+package org.matsim.contrib.dvrp.passenger;
+
+import java.util.Collections;
+import java.util.Set;
 
 /**
- * @author jbischoff
+ * Accepts all DRT requests as long as the start and end link are different.
  *
+ * @author jbischoff
+ * @author michalm (Michal Maciejewski)
  */
-public interface DrtRequestRejectedEventHandler extends EventHandler {
-	public void handleEvent(final DrtRequestRejectedEvent event);
+public class DefaultPassengerRequestValidator implements PassengerRequestValidator {
+	public static final String EQUAL_FROM_LINK_AND_TO_LINK_CAUSE = "eqal_fromLink_and_toLink";
+
+	@Override
+	public Set<String> validateRequest(PassengerRequest request) {
+		return request.getFromLink() == request.getToLink() ?
+				Collections.singleton(EQUAL_FROM_LINK_AND_TO_LINK_CAUSE) :
+				Collections.emptySet();
+	}
 }

@@ -24,8 +24,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.drt.data.validator.DefaultDrtRequestValidator;
-import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
@@ -41,6 +39,8 @@ import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
+import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
@@ -71,7 +71,7 @@ public final class MultiModeDrtModule extends AbstractMultiModeModule {
 	public void install() {
 		bindModal(Fleet.class).toProvider(new FleetProvider(drtCfg.getVehiclesFile())).asEagerSingleton();
 
-		bindModal(DrtRequestValidator.class).to(DefaultDrtRequestValidator.class).asEagerSingleton();
+		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 		bindModal(DepotFinder.class).toProvider(
 				modalProvider(getter -> new NearestStartLinkAsDepot(getter.getModal(Fleet.class))));
 

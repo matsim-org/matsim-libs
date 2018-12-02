@@ -260,9 +260,9 @@ public class AgentNotificationTest {
 					bind( QVehicleFactory.class ).toProvider( () -> QVehicleImpl::new ) ;
 				}
 			})
-			.configureComponents(components -> {
+			.configureQSimComponents( components -> {
 				components.removeNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
-			}) //
+			} ) //
 			.build(scenario, eventsManager) //
 			.run();
 		
