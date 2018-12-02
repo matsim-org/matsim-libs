@@ -11,7 +11,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import com.google.inject.Provider;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
@@ -48,7 +47,6 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.population.routes.RouteUtils;
@@ -261,9 +259,9 @@ public class AgentNotificationTest {
 					bind( QVehicleFactory.class ).toProvider( () -> QVehicleImpl::new ) ;
 				}
 			})
-			.configureComponents(components -> {
+			.configureQSimComponents( components -> {
 				components.removeNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
-			}) //
+			} ) //
 			.build(scenario, eventsManager) //
 			.run();
 		

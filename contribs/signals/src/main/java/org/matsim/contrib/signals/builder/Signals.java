@@ -1,16 +1,25 @@
 package org.matsim.contrib.signals.builder;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.contrib.signals.controller.SignalControllerFactory;
+import org.matsim.core.controler.AllowsConfiguration;
 
 public class Signals{
-    private Signals(){} // do not instantiate
 
-    public static void configure( Controler c ) {
+    public static void configure( AllowsConfiguration ao ){
 
-        c.addOverridingModule( new SignalsModule() );
+        ao.addOverridingModule( new SignalsModule() );
 
-        c.addOverridingQSimModule( new SignalsQSimModule() );
+        ao.addOverridingQSimModule( new SignalsQSimModule() );
+    }
 
+    public static class Configurator{
+        private final SignalsModule signalsModule;
+        private Configurator( SignalsModule signalsModule ){
+            this.signalsModule = signalsModule;
+        }
+        public final void addSignalControllerFactory( String key, Class<? extends SignalControllerFactory> signalControllerFactoryClassName ) {
+            signalsModule.addSignalControllerFactory( key, signalControllerFactoryClassName );
+        }
     }
 
 }

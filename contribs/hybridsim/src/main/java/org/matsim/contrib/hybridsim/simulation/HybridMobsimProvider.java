@@ -53,10 +53,10 @@ public class HybridMobsimProvider implements Provider<Mobsim> {
 		Config config = this.sc.getConfig();
 
 		return new QSimBuilder(config) //
-				.useDefaults() //
-				.addQSimModule(new HybridQSimModule()) //
-				.configureComponents(HybridQSimModule::configureComponents) //
-				.build(sc, em);
+							 .useDefaults() //
+							 .addQSimModule(new HybridQSimModule()) //
+							 .configureQSimComponents(HybridQSimModule::configureComponents ) //
+							 .build(sc, em);
 	}
 
 }
