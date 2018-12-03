@@ -70,7 +70,6 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
-import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
@@ -239,9 +238,9 @@ public class CreateAutomatedFDTest {
 			
 			final QSim qSim = new QSimBuilder(config) //
 					.useDefaults()
-					.configureComponents(components -> {
+					.configureQSimComponents( components -> {
 						components.removeNamedComponent(PopulationModule.COMPONENT_NAME);
-					})
+					} )
 					.build(scenario, events);
 
 			final Map<String, VehicleType> travelModesTypes = new HashMap<>();
