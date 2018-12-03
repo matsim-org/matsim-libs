@@ -382,24 +382,42 @@ public class QGisFileWriter {
 			
 			out.write("\t\t\t\t</ranges>\n");
 			
-		} else if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.RuleRenderer)){
-			
-            RuleBasedRenderer renderer = (RuleBasedRenderer)qRenderer;
+		} else if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.RuleRenderer)) {
 
-            out.write("\t\t\t<renderer-v2 attr=\"" + renderer.getRenderingAttribute() + "\" symbollevels=\"0\" type=\"" + renderer.getRenderingType().toString() + "\">\n");
+			RuleBasedRenderer renderer = (RuleBasedRenderer) qRenderer;
 
-            out.write("\t\t\t\t<rules>\n");
+			out.write("\t\t\t<renderer-v2 attr=\"" + renderer.getRenderingAttribute() + "\" symbollevels=\"0\" type=\"" + renderer.getRenderingType().toString() + "\">\n");
 
-            for(Rule rule : renderer.getRules()) {
+			out.write("\t\t\t\t<rules>\n");
 
-                out.write("\t\t\t\t\t<rule filter=\"" + rule.getFilter()
-                        + "\" symbol=\"" + rule.getSymbol() + "\" label=\"" + rule.getLabel() + "\"/>\n");
+			for (Rule rule : renderer.getRules()) {
 
-            }
+				out.write("\t\t\t\t\t<rule filter=\"" + rule.getFilter()
+						+ "\" symbol=\"" + rule.getSymbol() + "\" label=\"" + rule.getLabel() + "\"/>\n");
 
-            out.write("\t\t\t\t</rules>\n");
-			
-		} else if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.singleSymbol)){
+			}
+
+			out.write("\t\t\t\t</rules>\n");
+
+		} else if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.PolygonRenderer)){
+
+			PolygonLayerRenderer renderer = (PolygonLayerRenderer)qRenderer;
+
+			out.write("\t\t\t<renderer-v2 attr=\"" + renderer.getRenderingAttribute() + "\" symbollevels=\"0\" type=\"" + QGisConstants.renderingType.RuleRenderer.toString() + "\">\n");
+
+			out.write("\t\t\t\t<rules>\n");
+
+			for(Rule rule : renderer.getRules()) {
+
+				out.write("\t\t\t\t\t<rule filter=\"" + rule.getFilter()
+						+ "\" symbol=\"" + rule.getSymbol() + "\" label=\"" + rule.getLabel() + "\"/>\n");
+
+			}
+
+			out.write("\t\t\t\t</rules>\n");
+
+
+			} else if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.singleSymbol)){
 			
 			out.write("\t\t\t<renderer-v2 symbollevels=\"0\" type=\"" + qRenderer.getRenderingType().toString() + "\">\n");
 			
@@ -416,7 +434,11 @@ public class QGisFileWriter {
 			} else if(layer.getGeometryType().equals(QGisConstants.geometryType.Point)){
 				
 				writePointLayer(out, layer, i);
-				
+
+			} else if(layer.getGeometryType().equals(QGisConstants.geometryType.Polygon)){
+
+				writePolygonLayer(out, layer, i);
+
 			} else{
 				throw new RuntimeException("Unknown geometry type! Cannot write symbol layer!");
 			}
@@ -510,6 +532,46 @@ public class QGisFileWriter {
 		
 		out.write("\t\t\t\t\t</symbol>\n");
 			
+	}
+
+	private void writePolygonLayer(BufferedWriter out, QGisLayer layer, int idx) throws IOException {
+
+		QGisPolygonSymbolLayer psl = (QGisPolygonSymbolLayer)layer.getRenderer().getSymbolLayers().get(idx);
+
+		String color = Integer.toString(psl.getColor().getRed()) + ","
+				+ Integer.toString(psl.getColor().getGreen()) + ","
+				+ Integer.toString(psl.getColor().getBlue()) + ","
+				+ Integer.toString(psl.getColor().getAlpha());
+
+		String outlineColor = Integer.toString(psl.getOutlineColor().getRed()) + ","
+				+ Integer.toString(psl.getOutlineColor().getGreen()) + ","
+				+ Integer.toString(psl.getOutlineColor().getBlue()) + ","
+				+ Integer.toString(psl.getOutlineColor().getAlpha());
+
+		String offset = Double.toString(psl.getOffset()[0]) + "," + Double.toString(psl.getOffset()[1]);
+		String offsetMapUnitScale = Double.toString(psl.getOffsetMapUnitScale()[0]) + "," +
+				Double.toString(psl.getOffsetMapUnitScale()[1]);
+
+		out.write("\t\t\t\t\t<symbol alpha=\"" + psl.getLayerTransparency() + "\" type=\"" + psl.getSymbolType().toString().toLowerCase() + "\" name=\"" + idx + "\">\n");
+
+		out.write("\t\t\t\t\t\t<layer pass=\"0\" class=\"" + layer.getLayerClass().toString() + "\" locked=\"0\">\n");
+
+		out.write("\t\t\t\t\t\t\t<prop k=\"border_width_map_unit_scale\" v=\"0,0,0,0,0,0\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"color\" v=\"" + color + "\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"joinstyle\" v=\"bevel\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"offset\" v=\"" + offset + "\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"offset_map_unit_scale\" v=\"" + offsetMapUnitScale + "\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"offset_unit\" v=\"" + psl.getSizeUnits().toString() + "\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"outline_color\" v=\"" + outlineColor + "\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"outline_style\" v=\"" + psl.getPenStyle().toString() + "\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"outline_width\" v=\"" + psl.getOutlineWidth() + "\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"outline_width_unit\" v=\"" + psl.getSizeUnits().toString() + "\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"style\" v=\"" + psl.getPenStyle().toString() + "\"/>\n");
+
+		out.write("\t\t\t\t\t\t</layer>\n");
+
+		out.write("\t\t\t\t\t</symbol>\n");
+
 	}
 
 	public void writeProperties(BufferedWriter out) throws IOException{

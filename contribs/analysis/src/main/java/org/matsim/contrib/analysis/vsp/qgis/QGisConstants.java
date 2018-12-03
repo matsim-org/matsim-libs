@@ -10,7 +10,7 @@ public class QGisConstants {
 	
 	public static enum inputType{shp,csv,xml};
 	
-	public static enum layerClass{SimpleLine,SimpleMarker};
+	public static enum layerClass{SimpleLine,SimpleMarker,SimpleFill};
 	
 	public static enum layerType{raster,vector};
 	
@@ -20,11 +20,11 @@ public class QGisConstants {
 	
 	public static enum rasterRendererType{multibandcolor};
 	
-	public static enum renderingType{singleSymbol,categorizedSymbol,graduatedSymbol,RuleRenderer};
+	public static enum renderingType{singleSymbol,categorizedSymbol,graduatedSymbol,RuleRenderer,PolygonRenderer};
 	
 	public static enum sizeUnits{MM,MapUnit};
 	
-	public static enum symbolType{Line,Marker};
+	public static enum symbolType{Line,Marker,Fill};
 	
 	public static enum units{degrees,meters};
 	
