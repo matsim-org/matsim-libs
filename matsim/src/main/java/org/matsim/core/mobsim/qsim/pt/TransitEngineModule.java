@@ -8,7 +8,6 @@ public class TransitEngineModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(TransitQSimEngine.class).asEagerSingleton();
-		//		bindNamedComponent(componentClass, name).to(componentClass);
 		this.addQSimComponentBinding( TRANSIT_ENGINE_NAME ).to( TransitQSimEngine.class ) ;
 
 		if ( this.getConfig().transit().isUseTransit() && this.getConfig().transit().isUsingTransitInMobsim() ) {

@@ -24,15 +24,10 @@ public class JointQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		//		bindNamedComponent(componentClass, name).to(componentClass);
 		this.addQSimComponentBinding( JOINT_MODES_DEPARTURE_HANDLER ).to( JointModesDepartureHandler.class ) ;
-		//		bindNamedComponent(componentClass, name).to(componentClass);
 		this.addQSimComponentBinding( JOINT_PASSENGER_UNBOARDING ).to( PassengerUnboardingAgentFactory.class ) ;
-		//		bindNamedComponent(componentClass, name).to(componentClass);
 		this.addQSimComponentBinding( JOINT_MODES_DEPARTURE_HANDLER ).to( JointModesDepartureHandler.class ) ;
-		//		bindNamedComponent(componentClass, name).to(componentClass);
 		this.addQSimComponentBinding( AGENTS_SOURCE_WITH_VEHICLES ).to( PopulationAgentSourceWithVehicles.class ) ;
-		//		bindNamedComponent(componentClass, name).to(componentClass);
 		this.addQSimComponentBinding( REPLACEMENT_QNETSIM_ENGINE ).to( QNetsimEngine.class ) ;
 	}
 

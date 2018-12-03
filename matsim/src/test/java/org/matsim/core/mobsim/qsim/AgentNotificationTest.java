@@ -254,7 +254,6 @@ public class AgentNotificationTest {
 				@Override
 				protected void configureQSim() {
 					bind(PopulationAgentSource.class).asEagerSingleton();
-					//		bindNamedComponent(componentClass, name).to(componentClass);
 					this.addQSimComponentBinding( PopulationModule.COMPONENT_NAME ).to( PopulationAgentSource.class ) ;
 					bind(AgentFactory.class).to(MyAgentFactory.class).asEagerSingleton();
 					bind( QVehicleFactory.class ).toProvider( () -> QVehicleImpl::new ) ;

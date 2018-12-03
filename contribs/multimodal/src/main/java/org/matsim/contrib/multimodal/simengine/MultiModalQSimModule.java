@@ -21,9 +21,7 @@ public class MultiModalQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		//		bindNamedComponent(componentClass, name).to(componentClass);
 		this.addQSimComponentBinding( COMPONENT_NAME ).to( MultiModalSimEngine.class ) ;
-		//		bindNamedComponent(componentClass, name).to(componentClass);
 		this.addQSimComponentBinding( COMPONENT_NAME ).to( MultiModalDepartureHandler.class ) ;
 	}
 
