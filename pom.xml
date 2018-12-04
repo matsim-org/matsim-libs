@@ -128,9 +128,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.github.SchweizerischeBundesbahnen</groupId>
+			<groupId>com.github.simunto</groupId>
 			<artifactId>matsim-sbb-extensions</artifactId>
-			<version>0.10.0</version>
+			<version>0.11.0-2018w44</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.vsp</groupId>
