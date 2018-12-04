@@ -53,9 +53,9 @@ public class RunMultiModeDrtBSWOBExample {
     private static final String INPUTDIR = "D:/BS_DRT/input/";
 
     public static void run() {
-        Config config = ConfigUtils.loadConfig(INPUTDIR + "/multimode-drt-config.xml", new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+        Config config = ConfigUtils.loadConfig(INPUTDIR + "/multimode-drt-config_run2.xml", new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
                 new OTFVisConfigGroup());
-        String runId = "multiModeDRT";
+        String runId = "multiModeDRT2";
         config.controler().setRunId(runId);
         config.controler().setOutputDirectory(INPUTDIR + "../output/" + runId);
 
