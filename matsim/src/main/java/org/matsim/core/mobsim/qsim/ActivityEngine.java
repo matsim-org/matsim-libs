@@ -61,13 +61,13 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	 * in the mean time, it might be inserted at the wrong position.
 	 * cdobler, apr'12
 	 */
-	private static class AgentEntry {
-		public AgentEntry(MobsimAgent agent, double activityEndTime) {
+	static class AgentEntry {
+		public AgentEntry(MobsimAgent agent, double time) {
 			this.agent = agent;
-			this.activityEndTime = activityEndTime;
+			this.time = time;
 		}
 		final MobsimAgent agent;
-		final double activityEndTime;
+		final double time;
 	}
 
 	private InternalInterface internalInterface;
@@ -76,27 +76,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	 * This list needs to be a "blocking" queue since this is needed for
 	 * thread-safety in the parallel qsim. cdobler, oct'10
 	 */
-	private final Queue<AgentEntry> activityEndsList = new PriorityBlockingQueue<>(500, new Comparator<AgentEntry>() {
-
-		@Override
-		public int compare(AgentEntry arg0, AgentEntry arg1) {
-			int cmp = Double.compare(arg0.activityEndTime, arg1.activityEndTime);
-			if (cmp == 0) {
-				// Both depart at the same time -> let the one with the larger id be first (=smaller)
-				//
-				// yy We are not sure what the above comment line is supposed to say.  Presumably, it is supposed
-				// to say that the agent with the larger ID should be "smaller" one in the comparison.
-				// In practice, it seems
-				// that something like "emob_9" is before "emob_8", and something like "emob_10" before "emob_1".
-				// It is unclear why this convention is supposed to be helpful.
-				// kai & dominik, jul'12
-				//
-				return arg1.agent.getId().compareTo(arg0.agent.getId());
-			}
-			return cmp;
-		}
-
-	});
+	private final Queue<AgentEntry> activityEndsList = new PriorityBlockingQueue<>(500, new AgentEntryComparator() );
 	
 	// See handleActivity for the reason for this.
 	private boolean beforeFirstSimStep = true;
@@ -110,7 +90,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	public void doSimStep(double time) {
 		beforeFirstSimStep = false;
 		while (activityEndsList.peek() != null) {
-			if (activityEndsList.peek().activityEndTime <= time) {
+			if (activityEndsList.peek().time <= time) {
 				MobsimAgent agent = activityEndsList.poll().agent;
 				unregisterAgentAtActivityLocation(agent);
 				agent.endActivityAndComputeNextState(time);
@@ -125,7 +105,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	public void afterSim() {
 		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		for (AgentEntry entry : activityEndsList) {
-			if (entry.activityEndTime!=Double.POSITIVE_INFINITY && entry.activityEndTime!=Time.UNDEFINED_TIME) {
+			if (entry.time !=Double.POSITIVE_INFINITY && entry.time !=Time.UNDEFINED_TIME) {
 				// since we are at an activity, it is not plausible to assume that the agents know mode or destination
 				// link id.  Thus generating the event with ``null'' in the corresponding entries.  kai, mar'12
 				eventsManager.processEvent(new PersonStuckEvent(now, entry.agent.getId(), null, null));
@@ -244,4 +224,25 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		}
 	}
 
+	 static class AgentEntryComparator implements Comparator<AgentEntry>{
+
+		@Override
+		public int compare( AgentEntry arg0, AgentEntry arg1 ) {
+			int cmp = Double.compare(arg0.time, arg1.time );
+			if (cmp == 0) {
+				// Both depart at the same time -> let the one with the larger id be first (=smaller)
+				//
+				// yy We are not sure what the above comment line is supposed to say.  Presumably, it is supposed
+				// to say that the agent with the larger ID should be "smaller" one in the comparison.
+				// In practice, it seems
+				// that something like "emob_9" is before "emob_8", and something like "emob_10" before "emob_1".
+				// It is unclear why this convention is supposed to be helpful.
+				// kai & dominik, jul'12
+				//
+				return arg1.agent.getId().compareTo(arg0.agent.getId());
+			}
+			return cmp;
+		}
+
+	}
 }
