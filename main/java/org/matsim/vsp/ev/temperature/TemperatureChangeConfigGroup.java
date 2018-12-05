@@ -53,7 +53,7 @@ public class TemperatureChangeConfigGroup extends ReflectiveConfigGroup {
     }
 
     /**
-     * @param delimiter -- {@param #DELIMITER_EXP}
+     * @param delimiter -- {@value #DELIMITER_EXP}
      */
     @StringSetter(DELIMITER_TAG)
     public void setDelimiter(String delimiter) {
