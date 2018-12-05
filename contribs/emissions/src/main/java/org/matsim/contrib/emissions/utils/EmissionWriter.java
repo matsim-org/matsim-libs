@@ -85,5 +85,4 @@ public class EmissionWriter {
 			throw new RuntimeException(e);
 		}
 	}
-
 }
