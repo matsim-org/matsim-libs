@@ -217,7 +217,7 @@ public class QSimSignalTest implements
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig())
 				.useDefaults()
-				.addOverridingControllerModule(new SignalsModule())
+				.addOverridingModule(new SignalsModule() )
 				.addOverridingQSimModule( new SignalsQSimModule() )
 				.build(scenario, events)
 				.run();

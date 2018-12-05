@@ -20,14 +20,11 @@
 
 package org.matsim.contrib.signals.builder;
 
-import java.util.Collections;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.builder.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -35,12 +32,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
-import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
@@ -123,7 +117,7 @@ public class TravelTimeFourWaysTest {
 
 		new QSimBuilder( scenario.getConfig() )
 				.useDefaults()
-				.addOverridingControllerModule( new SignalsModule() )
+				.addOverridingModule( new SignalsModule() )
 				.addOverridingQSimModule( new SignalsQSimModule() )
 				.build( scenario, events ).run();
 		
