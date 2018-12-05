@@ -77,7 +77,7 @@ public class TemperatureChangeConfigGroup extends ReflectiveConfigGroup {
 
 
     /**
-     * @param tempFile -- {@param #TEMP_CHANGE_FILE_EXP}
+     * @param tempFile -- {@value #TEMP_CHANGE_FILE_EXP}
      */
     @StringSetter(TEMP_CHANGE_FILE)
     public void setTempFile(String tempFile) {
