@@ -55,7 +55,7 @@ public class RunEDrtScenario {
 	private static final double MAX_RELATIVE_SOC = 0.8;// charge up to 80% SOC
 	private static final double MIN_RELATIVE_SOC = 0.2;// send to chargers vehicles below 20% SOC
 	private static final double TEMPERATURE = 20;// oC
-	private static String inputPath = "C:\\Users\\Joschka\\Documents\\shared-svn\\projects\\vw_rufbus\\projekt2\\drt_test_Scenarios\\BS_DRT\\input\\";
+	private static String inputPath = "D:\\BS_DRT\\input\\";
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(inputPath + "edrt-config.xml", new DrtConfigGroup(),
