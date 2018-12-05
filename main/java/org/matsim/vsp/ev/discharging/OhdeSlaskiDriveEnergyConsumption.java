@@ -23,15 +23,11 @@ import org.matsim.api.core.v01.network.Link;
 
 /**
  * Parametrised for the Nissan Leaf. All values in SI units.
- * <p>
- * </p>
- * See: </br>
- * Ohde, B., Ślaski, G., & Maciejewski, M. (2016). Statistical analysis of real-world urban driving cycles for modelling
+ * See:
+ * Ohde, B., Ślaski, G., Maciejewski, M. (2016). Statistical analysis of real-world urban driving cycles for modelling
  * energy consumption of electric vehicles. Journal of Mechanical and Transport Engineering, 68.
  * 
  * http://fwmt.put.poznan.pl/imgWYSIWYG/agill/File/2_68_2016/jmte_2016_68_2_03_ohde_b_slaski_g.pdf
- * <p>
- * </p>
  * TODO Add (dis-)charging efficiency relative to SOC, temperature, etc...
  */
 public class OhdeSlaskiDriveEnergyConsumption implements DriveEnergyConsumption {
