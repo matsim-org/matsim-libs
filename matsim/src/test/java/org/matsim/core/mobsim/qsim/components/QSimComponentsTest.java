@@ -3,6 +3,7 @@ package org.matsim.core.mobsim.qsim.components;
 import java.util.Collections;
 
 import com.google.inject.name.Names;
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -19,6 +20,8 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class QSimComponentsTest {
+	private static final Logger log = Logger.getLogger( QSimComponentsTest.class ) ;
+
 	@Test
 	public void testGenericAddComponentMethod() {
 		Config config = ConfigUtils.createConfig();
@@ -130,8 +133,9 @@ public class QSimComponentsTest {
 
 		QSimComponentsConfigGroup componentsConfig = new QSimComponentsConfigGroup();
 		config.addModule(componentsConfig);
-
+		log.warn( componentsConfig ) ;
 		componentsConfig.setActiveComponents(Collections.singletonList("MockEngine"));
+		log.warn( componentsConfig ) ;
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -143,13 +147,33 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						binder().bind( MockEngine.class ).annotatedWith( Names.named( "MockEngine" ) ).toInstance(mockEngine );
+//						binder().bind( MockEngine.class ).annotatedWith( Names.named( "MockEngine" ) ).toInstance(mockEngine );
+						this.addQSimComponentBinding( "MockEngine" ).toInstance( mockEngine );
 					}
 				}) //
 				.build(scenario, eventsManager) //
 				.run();
 
 		Assert.assertTrue(mockEngine.isCalled);
+	}
+
+	@Test
+	public void testMultipleBindingsUnderSameName() {
+		// michal wants that
+		Config config = ConfigUtils.createConfig() ;
+
+		Scenario scenario = ScenarioUtils.createScenario( config ) ;
+
+		EventsManager events = EventsUtils.createEventsManager() ;
+
+		QSimBuilder builder = new QSimBuilder( config ).useDefaults();
+		builder.addOverridingQSimModule( new AbstractQSimModule(){
+			@Override protected void configureQSim(){
+//				this.addQSimComponentBinding( "name" ).to( MockEngine.class ) ;
+			}
+		} ) ;
+		builder.build( scenario, events ).run() ;
+
 	}
 
 	private static class MockEngine implements MobsimEngine {

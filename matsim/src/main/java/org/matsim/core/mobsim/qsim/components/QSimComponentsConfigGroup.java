@@ -70,4 +70,14 @@ public class QSimComponentsConfigGroup extends ConfigGroup {
 
 		return elements;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder stb = new StringBuilder( ) ;
+		stb.append( super.toString() ) ;
+		for ( String str : activeComponents ) {
+			stb.append( " " + str  ) ;
+		}
+		return stb.toString() ;
+	}
 }

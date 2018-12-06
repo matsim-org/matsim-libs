@@ -18,6 +18,8 @@ final public class QSimComponentsConfig {
 	private final List<Object> components = new LinkedList<>();
 	private final Set<Key<?>> keys = new HashSet<>();
 
+	// looks like a manually maintained map to me; would it be possible to explain that design decision?  kai, dec'18
+
 	public void addComponent(Class<? extends Annotation> annotation) {
 		addComponent(Key.get(Object.class, annotation));
 		components.add(annotation);
@@ -88,5 +90,18 @@ final public class QSimComponentsConfig {
 
 	List<Object> getActiveComponents() {
 		return Collections.unmodifiableList(components);
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder strb = new StringBuilder() ;
+		strb.append( super.toString() ) ;
+		for ( Object cc : components ){
+			strb.append( " " + cc.toString() );
+		}
+		for ( Key<?> key : keys ) {
+			strb.append( "" + key.toString() ) ;
+		}
+		return strb.toString() ;
 	}
 }

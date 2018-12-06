@@ -6,13 +6,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.AllowsConfiguration;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
@@ -63,6 +66,8 @@ import com.google.inject.name.Names;
  * @author Sebastian Hörl <sebastian.hoerl@ivt.baug.ethz.ch>
  */
 public class QSimBuilder implements AllowsConfiguration{
+	private static final Logger log = Logger.getLogger( QSimBuilder.class ) ;
+
 	private final Config config;
 
 	private final Collection<AbstractQSimModule> qsimModules = new LinkedList<>();
@@ -72,6 +77,8 @@ public class QSimBuilder implements AllowsConfiguration{
 	private final List<AbstractQSimModule> overridingQSimModules = new LinkedList<>();
 
 	public QSimBuilder(Config config) {
+		QSimComponentsConfigGroup cconfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );;
+		log.warn( cconfig ) ;
 		this.config = config;
 	}
 

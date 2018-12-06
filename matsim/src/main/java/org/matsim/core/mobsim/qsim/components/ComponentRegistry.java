@@ -10,22 +10,26 @@ import java.util.Map;
 import com.google.inject.Binding;
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import org.apache.log4j.Logger;
 
 public class ComponentRegistry {
+	private static final Logger log = Logger.getLogger( ComponentRegistry.class ) ;
+
 	private final Map<Key<?>, List<Key<? extends QSimComponent>>> componentsByKey = new HashMap<>();
 
 	ComponentRegistry() {
 	}
 
-	public void register(Key<? extends QSimComponent> component) {
+	public boolean register(Key<? extends QSimComponent> component) {
 		if (component.getAnnotationType() == null) {
-			return;
+			return false;
 		}
 
 		Key<?> key = component.getAnnotation() != null ? //
 				Key.get(Object.class, component.getAnnotation()) //
 				: Key.get(Object.class, component.getAnnotationType());
 		componentsByKey.computeIfAbsent(key, k -> new ArrayList<>()).add(component);
+		return true ;
 	}
 
 	public List<Key<? extends QSimComponent>> getOrderedComponents(QSimComponentsConfig config) {
@@ -39,6 +43,8 @@ public class ComponentRegistry {
 			List<Key<? extends QSimComponent>> components = componentsByKey.get(key);
 			if (components != null) {
 				orderedComponents.addAll(components);
+			} else {
+				throw new RuntimeException("no component registered under key=" + key ) ;
 			}
 		}
 		return orderedComponents;
@@ -49,7 +55,19 @@ public class ComponentRegistry {
 
 		for (Map.Entry<Key<?>, Binding<?>> entry : injector.getAllBindings().entrySet()) {
 			if (QSimComponent.class.isAssignableFrom(entry.getKey().getTypeLiteral().getRawType())) {
-				registry.register((Key<? extends QSimComponent>) entry.getKey());
+				boolean result = registry.register( (Key<? extends QSimComponent>) entry.getKey() );
+//				if ( entry.getValue().toString().contains( "Mock" ) ){
+				if ( result ){
+					log.warn("") ;
+					log.warn( "did register the following QSimComponent:" );
+					log.warn( "key=" + entry.getKey() );
+					log.warn( "value=" + entry.getValue() );
+				} else {
+					log.warn("") ;
+					log.warn("did NOT register the following QSimComponent:") ;
+					log.warn( "key=" + entry.getKey() );
+					log.warn( "value=" + entry.getValue() );
+				}
 			}
 		}
 

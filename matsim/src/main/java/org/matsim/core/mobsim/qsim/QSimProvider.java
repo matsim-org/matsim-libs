@@ -27,12 +27,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.components.ComponentRegistry;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -77,6 +79,9 @@ public class QSimProvider implements Provider<QSim> {
 		modules.forEach(m -> m.setConfig(config));
 		overridingModules.forEach(m -> m.setConfig(config));
 
+		QSimComponentsConfigGroup cConfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );;
+		log.warn( cConfig ) ;
+
 		AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, overridingModules);
 
 		AbstractModule module = new AbstractModule() {
@@ -98,7 +103,10 @@ public class QSimProvider implements Provider<QSim> {
 
 		ComponentRegistry componentRegistry = ComponentRegistry.create(qsimInjector);
 
+		log.warn( "components=" + components ) ;
+
 		for (Key<? extends QSimComponent> component : componentRegistry.getOrderedComponents(components)) {
+			log.warn("looking at component=" + component ) ;
 
 			QSimComponent instance = qsimInjector.getInstance( component );;
 
