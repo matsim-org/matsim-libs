@@ -25,8 +25,6 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.emissions.types.ColdPollutant;
-import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.vehicles.Vehicle;
@@ -79,8 +77,8 @@ public class EmissionEventsReader extends MatsimXmlParser{
 		Double time = 0.0;
 		Id<Link> linkId = null;
 		Id<Vehicle> vehicleId = null;
-		Map<WarmPollutant, Double> warmEmissions = new HashMap<>();
-		Map<ColdPollutant, Double> coldEmissions = new HashMap<>();
+		Map<String, Double> warmEmissions = new HashMap<>();
+		Map<String, Double> coldEmissions = new HashMap<>();
 
 		if(WarmEmissionEvent.EVENT_TYPE.equals(eventType)){
 			for (int i = 0; i < attributes.getLength(); i++){
@@ -97,7 +95,7 @@ public class EmissionEventsReader extends MatsimXmlParser{
 					vehicleId = Id.create((attributes.getValue(i)), Vehicle.class);
 				}
 				else {
-					WarmPollutant pollutant = WarmPollutant.valueOf(attributes.getQName(i));
+					String pollutant = attributes.getQName(i);
 					Double value = Double.parseDouble(attributes.getValue(i));
 					warmEmissions.put(pollutant, value);
 				}
@@ -124,7 +122,7 @@ public class EmissionEventsReader extends MatsimXmlParser{
 					vehicleId = Id.create((attributes.getValue(i)), Vehicle.class);
 				}
 				else {
-					ColdPollutant pollutant = ColdPollutant.valueOf(attributes.getQName(i));
+					String pollutant = attributes.getQName(i);
 					Double value = Double.parseDouble(attributes.getValue(i));
 					coldEmissions.put(pollutant, value);
 				}

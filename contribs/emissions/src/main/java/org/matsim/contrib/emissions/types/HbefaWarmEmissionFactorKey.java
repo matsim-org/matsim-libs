@@ -26,7 +26,7 @@ package org.matsim.contrib.emissions.types;
 public class HbefaWarmEmissionFactorKey {
 	
 	private HbefaVehicleCategory hbefaVehicleCategory;
-	private WarmPollutant hbefaComponent;
+	private String hbefaComponent;
 	private String hbefaRoadCategory;
 	private HbefaTrafficSituation hbefaTrafficSituation;
 	private HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
@@ -34,7 +34,14 @@ public class HbefaWarmEmissionFactorKey {
 	public HbefaWarmEmissionFactorKey(){
 	}
 
-	HbefaVehicleCategory getHbefaVehicleCategory() {
+    public HbefaWarmEmissionFactorKey(HbefaWarmEmissionFactorKey key) {
+        this.hbefaVehicleCategory = key.hbefaVehicleCategory;
+        this.hbefaComponent = key.hbefaComponent;
+        this.hbefaRoadCategory = key.hbefaRoadCategory;
+        this.hbefaVehicleAttributes = key.hbefaVehicleAttributes;
+    }
+
+    HbefaVehicleCategory getHbefaVehicleCategory() {
 		return this.hbefaVehicleCategory;
 	}
 
@@ -42,11 +49,11 @@ public class HbefaWarmEmissionFactorKey {
 		this.hbefaVehicleCategory = hbefaVehicleCategory;
 	}
 
-	WarmPollutant getHbefaComponent(){
+	String getHbefaComponent(){
 		return this.hbefaComponent;
 	}
 	
-	public void setHbefaComponent(WarmPollutant warmPollutant) {
+	public void setHbefaComponent(String warmPollutant) {
 		this.hbefaComponent = warmPollutant;
 	}
 
@@ -58,7 +65,7 @@ public class HbefaWarmEmissionFactorKey {
 		this.hbefaRoadCategory = hbefaRoadCategory;
 	}
 
-	HbefaTrafficSituation getHbefaTrafficSituation() {
+	public HbefaTrafficSituation getHbefaTrafficSituation() {
 		return this.hbefaTrafficSituation;
 	}
 

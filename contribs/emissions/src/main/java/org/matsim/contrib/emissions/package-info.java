@@ -12,18 +12,18 @@
  * <p>
  * Please note that the emission values given by the sample files are NOT actual data from HBEFA due to copyright restrictions. In the follwing section, there is a guide how to export these files.
  *
- * <h2>Export from HBEFA 3.1</h2>
- * Currently, data from the HBEFA 3.1 Microsoft Access database needs to be exported manually.
+ * <h2>Export from HBEFA 3.x</h2>
+ * Currently, data from the HBEFA 3.x Microsoft Access database needs to be exported manually.
  * 
- * Consequently, the following steps within HBEFA 3.1 need still be done manually:
+ * Consequently, the following steps within HBEFA 3.x need still be done manually:
  * <ul>
- *  <li> Install and open HBEFA 3.1</li>
+ *  <li> Install and open HBEFA 3.x</li>
  *  <li> Select your country and language</li>
  *  <li> Go to "CaseDefinition" > "New"</li>
  *  <li> Select the desired parameters:</li>
  *   <ul>
  *    <li> VEHICLE CATEGORIES: Currently, PC (passenger car), HGV (heavy goods vehicle), MOTORCYCLE and ZEV (zero emission vehicle) are supported (see {@link org.matsim.contrib.emissions.types.HbefaVehicleCategory HbefaVehicleCategory})</li>
- *    <li> COMPONENTS: Currently, all pollutants listed under {@link org.matsim.contrib.emissions.types.WarmPollutant WarmPollutant} are supported; please choose accordingly</li>
+ *    <li> COMPONENTS: MATSim will handle any components that are exported from the hbefa database</li>
  *    <li> YEARS: Choose the year of your scenario (only when exporting the mandatory average emission factors files)</li>
  *    <li> FLEET COMPOSITION: Choose "EF weighted with fleet composition" for the mandatory average emission factors files, and "EF per subsegment (without weighting)" for the optional detailed emission factors files</li>
  *    <li> HOT EMISSION FACTORS: Choose "Individual TrafficSituations" > "Construct your own list" > "SelectAll" > "Return"</li>
@@ -41,7 +41,7 @@
  * <h2>Input files</h2>
  * Required files are:
  * <ul>
- * <li>roadTypeMappingFile: This file needs to map road types in your network to HBEFA 3.1 road types.
+ * <li>roadTypeMappingFile: This file needs to map road types in your network to HBEFA 3.x road types.
  * Update (June'2018) one can now directly add HBEFA road type to link attributes using {@link org.matsim.contrib.emissions.utils.EmissionUtils#setHbefaRoadType(org.matsim.api.core.v01.network.Link, java.lang.String) setHbefaRoadType}
  * or see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup} for a detailed description.
  * 
@@ -53,12 +53,12 @@
  *  <li> OPTIONAL: If detailed emission calculation is switched on, the vehicle type Id should additionally contain
  *  HbefaVehicleAttributes ("Technology;SizeClasse;EmConcept"), corresponding to the strings in detailedWarmEmissionFactorsFile (see below) </li>
  * </ul>
- * <li>averageFleetWarmEmissionFactorsFile: This file can be exported from HBEFA 3.1 (see above). 
+ * <li>averageFleetWarmEmissionFactorsFile: This file can be exported from HBEFA 3.x (see above).
  * See the parser {@link org.matsim.contrib.emissions.EmissionModule#createAvgHbefaWarmTable createAvgHbefaWarmTable}
  *  at the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule} 
  *  or see the {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup} for a detailed description. </li>
  *
- * <li>averageFleetColdEmissionFactorsFile: This file can be exported from HBEFA 3.1 (see above).
+ * <li>averageFleetColdEmissionFactorsFile: This file can be exported from HBEFA 3.x (see above).
  * See the parser {@link org.matsim.contrib.emissions.EmissionModule#createAvgHbefaColdTable createAvgHbefaColdTable}
  * at the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule} 
  * or see the {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup} for a detailed description. </li>
@@ -97,11 +97,11 @@
  * some functions from {@link org.matsim.core.controler.Controler Controler}.
  *
  * <h3>Types</h3>
- * {@link org.matsim.contrib.emissions.types.ColdPollutant ColdPollutant} and {@link org.matsim.contrib.emissions.types.WarmPollutant WarmPollutant} are enumerations of emission factors. 
  * {@link org.matsim.contrib.emissions.types.HbefaVehicleAttributes HbefaVehicleAttributes} contains a default constructor, setting all values to average.
  * This way a calculation of emissions for undefined vehicle types can be performed.
  * Any instance of {@link org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey HbefaWarmEmissionFactorKey} contains a vehicle category, a warm pollutant; a road category,
  * a traffic situation and three vehicle attributes (technology, size class, em concept).
+ * Any instance of {@link org.matsim.contrib.emissions.types.HbefaTrafficSituation HbefaTrafficSituation} specifies one of 4 traffic situations.
  * Instances of {@link org.matsim.contrib.emissions.types.HbefaColdEmissionFactorKey HbefaColdEmissionFactorKey} contain a vehicle category, a cold pollutant, a parking time range,
  * a distance, which is driven after parking and, again, vehicle attributes.
  * The cold/warm emission factor keys are mapped to the values of cold/warm emissions, the cold/warm emission factors.
