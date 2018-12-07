@@ -50,8 +50,6 @@ final class LinkSensor {
 	private boolean doDistanceMonitoring = false;
 	private boolean doAverageVehiclesPerSecondMonitoring = false;
 	private Map<Double, Map<Id<Vehicle>, CarLocator>> distanceMeterCarLocatorMap = null;
-	private Map<Id<Vehicle>, VehicleLeavesTrafficEvent> link2WaitEventPerVehicleId = null;
-	private Map<Double, Map<Id<Vehicle>, CarLocator>> inActivityDistanceCarLocatorMap = null;
 	private double monitoringStartTime;
 
 	private double lookBackTime;
@@ -93,7 +91,6 @@ final class LinkSensor {
 			this.enableDistanceMonitoring();
 		}
 		this.distanceMeterCarLocatorMap.put(distanceMeter, new HashMap<Id<Vehicle>, CarLocator>());
-		this.inActivityDistanceCarLocatorMap.put(distanceMeter, new HashMap<Id<Vehicle>, CarLocator>());
 	}
 
 	public void registerAverageVehiclesPerSecondToMonitor() {
@@ -115,8 +112,6 @@ final class LinkSensor {
 	private void enableDistanceMonitoring() {
 		this.doDistanceMonitoring = true;
 		this.distanceMeterCarLocatorMap = new HashMap<Double, Map<Id<Vehicle>, CarLocator>>();
-		this.link2WaitEventPerVehicleId = new HashMap<Id<Vehicle>, VehicleLeavesTrafficEvent>();
-		this.inActivityDistanceCarLocatorMap = new HashMap<Double, Map<Id<Vehicle>, CarLocator>>();
 	}
 
 
@@ -219,47 +214,6 @@ final class LinkSensor {
 		}
 	}
 	
-	public void handleEvent(LinkLeaveEvent event) {
-		this.vehiclesOnLink--;
-		if (this.doDistanceMonitoring){
-			for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
-				Map<Id<Vehicle>, CarLocator> carLocatorPerVehicleId = this.distanceMeterCarLocatorMap.get(distance);
-				carLocatorPerVehicleId.remove(event.getVehicleId());
-			}
-		}
-	}
-	
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		this.vehiclesOnLink--;
-		/*
-		 * I'm very unsure if totalVehicles should also decremented after a vehicle
-		 * leaves traffic. I assume not, since it's only used to calculate the average
-		 * number of vehicles per second and therefore we assume, that leaving vehicles
-		 * are not using the link at all. See also comment from Theresa at
-		 * VehiclesEnterTrafficEvent handler. It should be decided, how vehicles should
-		 * handled when they are only partly passing the link. pschade, Dec '17
-		 * 
-		 * Some extra: If we keep this behavior, we should find another way to determine
-		 * the monitoringStartTime since it can be set again in the current
-		 * implementation and getting the avg. num of vehicles should probably not
-		 * return 0 again after it returns a value > 0 before. pschade, Dec '17
-		 */
-		/*
-		 * In my opinion, the sensor should detect cars that will arrive at the link end, i.e. the traffic signal.
-		 * Vehicles that leave traffic at the link will not reach the link end and should, therefore, not be counted here.
-		 * theresa, feb'17
-		 */
-		totalVehicles--;
-		if (this.doDistanceMonitoring){
-			for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
-				Map<Id<Vehicle>, CarLocator> vehicleIdCarLocatorMap = this.distanceMeterCarLocatorMap.get(distance);
-				CarLocator cl = vehicleIdCarLocatorMap.remove(event.getVehicleId());
-				this.inActivityDistanceCarLocatorMap.get(distance).put(event.getVehicleId(), cl);
-			}			
-			this.link2WaitEventPerVehicleId.put(event.getVehicleId(), event);
-		}
-	}
-	
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		this.vehiclesOnLink++;
 		/* the sensor so far may not work for doAverageVehiclesPerSecondMonitoring when vehicles enter traffic at this link.
@@ -275,26 +229,38 @@ final class LinkSensor {
 			}
 		}
 		if (this.doDistanceMonitoring){
-			// the vehicle leaves its first act on this link --> add a car locator
-			if (! this.link2WaitEventPerVehicleId.containsKey(event.getVehicleId())){ 
-//				log.debug("wait2link at: " + event.getTime() + " vehicle: "+ event.getVehicleId() + " link: " + event.getLinkId());
-				for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
-					Map<Id<Vehicle>, CarLocator> carLocatorPerVehicleId = this.distanceMeterCarLocatorMap.get(distance);
-					//as the position now is not clear, assume enter time was freespeed travel time ago
-					double fs_tt = this.link.getLength() / this.link.getFreespeed();
-					carLocatorPerVehicleId.put(event.getVehicleId(), new CarLocator(this.link, event.getTime() - fs_tt, distance));
-				}				
-			}
-			else {
-				double arrivalTime = this.link2WaitEventPerVehicleId.remove(event.getVehicleId()).getTime();
-				double actTime = event.getTime() - arrivalTime;
-				for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
-					Map<Id<Vehicle>, CarLocator> carLocatorPerInActVehicleId = this.inActivityDistanceCarLocatorMap.get(distance);
-					CarLocator cl = carLocatorPerInActVehicleId.remove(event.getVehicleId());
-					cl.setEarliestTimeInDistance(cl.getEarliestTimeInDistance() + actTime);
-					Map<Id<Vehicle>, CarLocator> carLocatorPerVehicleId = this.distanceMeterCarLocatorMap.get(distance);
-					carLocatorPerVehicleId.put(event.getVehicleId(), cl);
-				}
+			for (Double distance : this.distanceMeterCarLocatorMap.keySet()) {
+				Map<Id<Vehicle>, CarLocator> carLocatorPerVehicleId = this.distanceMeterCarLocatorMap.get(distance);
+				// as vehicles enter links at their downstream end, assume enter time was freespeed travel time ago
+				double fs_tt = this.link.getLength() / this.link.getFreespeed();
+				carLocatorPerVehicleId.put(event.getVehicleId(), new CarLocator(this.link, event.getTime() - fs_tt, distance));
+			}				
+		}
+	}
+
+	public void handleEvent(LinkLeaveEvent event) {
+		vehicleLeftLink(event.getVehicleId());
+	}
+
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		vehicleLeftLink(event.getVehicleId());
+		
+		if(this.doAverageVehiclesPerSecondMonitoring) {
+			/*
+			 * Note: the sensor detects cars that will arrive at the link end, i.e. the traffic signal.
+			 * Vehicles that leave traffic at the link will not reach the link end and are, therefore, not counted here.
+			 * theresa, feb'17
+			 */
+			totalVehicles--;
+		}
+	}
+
+	private void vehicleLeftLink(Id<Vehicle> vehId) {
+		this.vehiclesOnLink--;
+		if (this.doDistanceMonitoring){
+			for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
+				Map<Id<Vehicle>, CarLocator> carLocatorPerVehicleId = this.distanceMeterCarLocatorMap.get(distance);
+				carLocatorPerVehicleId.remove(vehId);
 			}
 		}
 	}
