@@ -10,6 +10,10 @@
 	<name>freight-dfg17</name>
 	<description>freight-dfg17 internal data not to be put on public github matsim/freight-contrib repository</description>
 
+	<properties>
+	  <matsim.version>0.11.0-2018w49</matsim.version>
+	</properties>
+
 	<repositories>
 		<!-- Repository for MATSim releases (MATSim is not on Maven central) -->
 		<repository>
@@ -34,20 +38,31 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>freight</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+		
+		<!--MATSim examples. Not transitive -->
+		<dependency>
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim-examples</artifactId>
+			<version>0.11.0-SNAPSHOT</version>
+			<!--(not in weekly release!)-->
+		</dependency>
+		
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
 			<type>test-jar</type>
-			<version>0.11.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>freight</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
-		</dependency>
+
 
 		<!-- Include the JUnit testing library -->
 		<dependency>
