@@ -9,7 +9,7 @@ import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.components.QSimComponentAnnotationsRegistry;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 
@@ -53,13 +53,13 @@ public class JointQSimModule extends AbstractQSimModule {
 				new NetsimWrappingQVehicleProvider(netsimEngine));
 	}
 	
-	static public void configureComponents(QSimComponentsConfig components) {
+	static public void configureComponents( QSimComponentAnnotationsRegistry components ) {
 		components.removeNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
 		components.removeNamedComponent(PopulationModule.COMPONENT_NAME);
 		
-		components.addNamedComponent(REPLACEMENT_QNETSIM_ENGINE);		
-		components.addNamedComponent(JOINT_MODES_DEPARTURE_HANDLER);
-		components.addNamedComponent(JOINT_PASSENGER_UNBOARDING);
-		components.addNamedComponent(AGENTS_SOURCE_WITH_VEHICLES);
+		components.addNamedAnnotation(REPLACEMENT_QNETSIM_ENGINE );
+		components.addNamedAnnotation(JOINT_MODES_DEPARTURE_HANDLER );
+		components.addNamedAnnotation(JOINT_PASSENGER_UNBOARDING );
+		components.addNamedAnnotation(AGENTS_SOURCE_WITH_VEHICLES );
 	}
 }

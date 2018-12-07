@@ -31,9 +31,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.components.ComponentRegistry;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsRegistry;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.components.QSimComponentAnnotationsRegistry;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
@@ -57,18 +57,18 @@ public class QSimProvider implements Provider<QSim> {
 	private Config config;
 	private Collection<AbstractQSimModule> modules;
 	private List<AbstractQSimModule> overridingModules;
-	private QSimComponentsConfig components;
+	private QSimComponentAnnotationsRegistry annotationsRegistry;
 	@Inject(optional = true)
 	private IterationCounter iterationCounter;
 
 	@Inject
-	QSimProvider(Injector injector, Config config, Collection<AbstractQSimModule> modules,
-			QSimComponentsConfig components, @Named("overrides") List<AbstractQSimModule> overridingModules) {
+	QSimProvider( Injector injector, Config config, Collection<AbstractQSimModule> modules,
+			  QSimComponentAnnotationsRegistry components, @Named("overrides") List<AbstractQSimModule> overridingModules ) {
 		this.injector = injector;
 		this.modules = modules;
 		// (these are the implementations)
 		this.config = config;
-		this.components = components;
+		this.annotationsRegistry = components;
 		this.overridingModules = overridingModules;
 	}
 
@@ -93,19 +93,27 @@ public class QSimProvider implements Provider<QSim> {
 			}
 		};
 
+		// create the child injector:
 		Injector qsimInjector = injector.createChildInjector(module);
-		if (iterationCounter == null
-				|| config.controler().getFirstIteration() == iterationCounter.getIterationNumber()) {
+		if (iterationCounter == null || config.controler().getFirstIteration() == iterationCounter.getIterationNumber()) {
 			// trying to somewhat reduce logfile verbosity. kai, aug'18
 			org.matsim.core.controler.Injector.printInjector(qsimInjector, log);
 		}
+
+		// pull out the qsim:
 		QSim qSim = qsimInjector.getInstance(QSim.class);
 
-		ComponentRegistry componentRegistry = ComponentRegistry.create(qsimInjector);
 
-		log.warn( "components=" + components ) ;
+		QSimComponentsRegistry componentRegistry = QSimComponentsRegistry.create(qsimInjector );
 
-		for (Key<? extends QSimComponent> component : componentRegistry.getOrderedComponents(components)) {
+		log.warn("") ;
+		log.warn( "annotationsRegistry=" ) ;
+		for( Object activeComponentAnnotation : this.annotationsRegistry.getActiveComponentAnnotations() ){
+			log.warn("registered annotation=" + activeComponentAnnotation ) ;
+		}
+		log.warn("") ;
+
+		for (Key<? extends QSimComponent> component : componentRegistry.getOrderedComponents( annotationsRegistry )) {
 			log.warn("looking at component=" + component ) ;
 
 			QSimComponent instance = qsimInjector.getInstance( component );;

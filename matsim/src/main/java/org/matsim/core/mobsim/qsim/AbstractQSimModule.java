@@ -3,6 +3,7 @@ package org.matsim.core.mobsim.qsim;
 import com.google.inject.Module;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
 import org.matsim.core.mobsim.framework.AbstractMobsimModule;
@@ -19,9 +20,9 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule {
 
 	protected final LinkedBindingBuilder<QSimComponent> addQSimComponentBinding( String label ) {
 //		return binder().bind(QSimComponent.class).annotatedWith(Names.named(label));
-		MapBinder<String,QSimComponent> mapBinder = MapBinder.newMapBinder( binder(), String.class, QSimComponent.class ) ;
+		MapBinder<Named,QSimComponent> mapBinder = MapBinder.newMapBinder( binder(), Named.class, QSimComponent.class ) ;
 		mapBinder.permitDuplicates() ;
-		return mapBinder.addBinding( label ) ;
+		return mapBinder.addBinding( Names.named( label ) ) ;
 	}
 
 	// if we really want support for non-String annotations, it could look as follows.  kai, dec'18

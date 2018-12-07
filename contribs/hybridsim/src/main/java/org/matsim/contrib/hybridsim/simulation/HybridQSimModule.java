@@ -4,7 +4,7 @@ import org.matsim.contrib.hybridsim.utils.IdIntMapper;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.components.QSimComponentAnnotationsRegistry;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
 
 import com.google.inject.Provides;
@@ -27,7 +27,7 @@ public class HybridQSimModule extends AbstractQSimModule {
 		return engine;
 	}
 	
-	static public void configureComponents(QSimComponentsConfig components) {
-		components.addNamedComponent(HYBRID_EXTERNAL_ENGINE_NAME);
+	static public void configureComponents( QSimComponentAnnotationsRegistry components ) {
+		components.addNamedAnnotation(HYBRID_EXTERNAL_ENGINE_NAME );
 	}
 }

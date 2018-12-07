@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.components.QSimComponentAnnotationsRegistry;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Provides;
@@ -38,7 +38,7 @@ public class MultiModalQSimModule extends AbstractQSimModule {
 		return new MultiModalDepartureHandler(multiModalEngine, multiModalConfigGroup);
 	}
 	
-	static public void configureComponents(QSimComponentsConfig components) {
-		components.addNamedComponent(COMPONENT_NAME);
+	static public void configureComponents( QSimComponentAnnotationsRegistry components ) {
+		components.addNamedAnnotation(COMPONENT_NAME );
 	}
 }

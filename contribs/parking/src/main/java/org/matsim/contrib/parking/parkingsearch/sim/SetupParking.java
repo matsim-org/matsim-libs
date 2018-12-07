@@ -41,7 +41,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.PrepareForSim;
 import org.matsim.core.mobsim.qsim.PopulationModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.components.QSimComponentAnnotationsRegistry;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.router.StageActivityTypes;
 
@@ -90,13 +90,13 @@ public class SetupParking {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				QSimComponentsConfig components = new QSimComponentsConfig();
+				QSimComponentAnnotationsRegistry components = new QSimComponentAnnotationsRegistry();
 				
 				new StandardQSimComponentConfigurator(controler.getConfig()).configure(components);
 				components.removeNamedComponent(PopulationModule.COMPONENT_NAME);
-				components.addNamedComponent(ParkingSearchPopulationModule.COMPONENT_NAME);
+				components.addNamedAnnotation(ParkingSearchPopulationModule.COMPONENT_NAME );
 				
-				bind(QSimComponentsConfig.class).toInstance(components);
+				bind( QSimComponentAnnotationsRegistry.class ).toInstance(components );
 			}
 		});
 

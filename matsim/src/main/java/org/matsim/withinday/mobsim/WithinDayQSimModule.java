@@ -2,7 +2,7 @@ package org.matsim.withinday.mobsim;
 
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.components.QSimComponentAnnotationsRegistry;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
 
 public class WithinDayQSimModule extends AbstractQSimModule {
@@ -31,8 +31,8 @@ public class WithinDayQSimModule extends AbstractQSimModule {
 		this.addQSimComponentBinding( COMPONENT_NAME ).to( WithinDayEngine.class ) ;
 	}
 
-	static public void configureComponents(QSimComponentsConfig components) {
-		components.addNamedComponent(COMPONENT_NAME);
-		components.addNamedComponent(FIXED_ORDER_LISTENER_COMPONENT_NAME);
+	static public void configureComponents( QSimComponentAnnotationsRegistry components ) {
+		components.addNamedAnnotation(COMPONENT_NAME );
+		components.addNamedAnnotation(FIXED_ORDER_LISTENER_COMPONENT_NAME );
 	}
 }

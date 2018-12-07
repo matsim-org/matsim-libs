@@ -23,7 +23,7 @@ public class ComponentRegistryTest {
 		// Here we may expect an exception in the future. So far we just ignore
 		// QSimComponents without any annotation.
 		Injector injector = Guice.createInjector(new ModuleWithMissingAnnotation());
-		ComponentRegistry registry = ComponentRegistry.create(injector);
+		QSimComponentsRegistry registry = QSimComponentsRegistry.create(injector );
 	}
 
 	static private class ModuleWithMissingAnnotation extends AbstractModule {
@@ -55,9 +55,9 @@ public class ComponentRegistryTest {
 
 		Assert.assertEquals(orderedComponents(injector, namedComponents("C")), Arrays.asList());
 
-		QSimComponentsConfig qSimComponents = namedComponents("A", "B");
-		qSimComponents.addComponent(Named.class);
-		qSimComponents.addComponent(MockComponentAnnotation.class);
+		QSimComponentAnnotationsRegistry qSimComponents = namedComponents("A", "B" );
+		qSimComponents.addAnnotation(Named.class );
+		qSimComponents.addAnnotation(MockComponentAnnotation.class );
 		Assert.assertEquals(orderedComponents(injector, qSimComponents),
 				Arrays.asList(Key.get(MobsimEngine.class, Names.named("A")),
 						Key.get(MobsimEngine.class, Names.named("B")), Key.get(MobsimEngine.class, Named.class),
@@ -80,16 +80,16 @@ public class ComponentRegistryTest {
 		}
 	}
 
-	private QSimComponentsConfig namedComponents(String... activeComponentNames) {
-		QSimComponentsConfig qSimComponents = new QSimComponentsConfig();
+	private QSimComponentAnnotationsRegistry namedComponents( String... activeComponentNames ) {
+		QSimComponentAnnotationsRegistry qSimComponents = new QSimComponentAnnotationsRegistry();
 		for (String n : activeComponentNames) {
-			qSimComponents.addNamedComponent(n);
+			qSimComponents.addNamedAnnotation(n );
 		}
 		return qSimComponents;
 	}
 
-	private List<Key<? extends QSimComponent>> orderedComponents(Injector injector, QSimComponentsConfig qSimComponents) {
-		ComponentRegistry registry = ComponentRegistry.create(injector);
+	private List<Key<? extends QSimComponent>> orderedComponents(Injector injector, QSimComponentAnnotationsRegistry qSimComponents ) {
+		QSimComponentsRegistry registry = QSimComponentsRegistry.create(injector );
 		return registry.getOrderedComponents(qSimComponents);
 	}
 

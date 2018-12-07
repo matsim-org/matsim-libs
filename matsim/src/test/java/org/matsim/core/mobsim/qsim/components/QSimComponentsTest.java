@@ -38,7 +38,7 @@ public class QSimComponentsTest {
 		new QSimBuilder(config) //
 		.addQSimModule(module) //
 		.configureQSimComponents( components -> {
-			components.addComponent(MockComponentAnnotation.class);
+			components.addAnnotation(MockComponentAnnotation.class );
 		} ) //
 		.build(scenario, eventsManager) //
 		.run();
@@ -62,7 +62,7 @@ public class QSimComponentsTest {
 					}
 				}) //
 				.configureQSimComponents( components -> {
-					components.addComponent(MockComponentAnnotation.class);
+					components.addAnnotation(MockComponentAnnotation.class );
 				} ) //
 				.build(scenario, eventsManager) //
 				.run();
@@ -95,7 +95,7 @@ public class QSimComponentsTest {
 					}
 				}) //
 				.configureQSimComponents( components -> {
-					components.addComponent(MockComponentAnnotation.class);
+					components.addAnnotation(MockComponentAnnotation.class );
 				} ) //
 				.build(scenario, eventsManager) //
 				.run();
@@ -119,7 +119,7 @@ public class QSimComponentsTest {
 					}
 				}) //
 				.configureQSimComponents( components -> {
-					components.addNamedComponent("MockEngine");
+					components.addNamedAnnotation("MockEngine" );
 				} ) //
 				.build(scenario, eventsManager) //
 				.run();

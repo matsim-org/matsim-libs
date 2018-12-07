@@ -12,12 +12,12 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import org.apache.log4j.Logger;
 
-public final class ComponentRegistry {
-	private static final Logger log = Logger.getLogger( ComponentRegistry.class ) ;
+public final class QSimComponentsRegistry{
+	private static final Logger log = Logger.getLogger( QSimComponentsRegistry.class ) ;
 
 	private final Map<Key<?>, List<Key<? extends QSimComponent>>> componentsByKey = new HashMap<>();
 
-	ComponentRegistry() {
+	QSimComponentsRegistry() {
 	}
 
 	/**
@@ -72,8 +72,8 @@ public final class ComponentRegistry {
 		return orderedComponents;
 	}
 
-	static public ComponentRegistry create(Injector injector) {
-		ComponentRegistry registry = new ComponentRegistry();
+	static public QSimComponentsRegistry create( Injector injector ) {
+		QSimComponentsRegistry registry = new QSimComponentsRegistry();
 
 		for (Map.Entry<Key<?>, Binding<?>> entry : injector.getAllBindings().entrySet()) {
 			if (QSimComponent.class.isAssignableFrom(entry.getKey().getTypeLiteral().getRawType())) {

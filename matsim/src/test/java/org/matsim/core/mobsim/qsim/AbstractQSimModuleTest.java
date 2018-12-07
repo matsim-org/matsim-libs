@@ -129,7 +129,7 @@ public class AbstractQSimModuleTest {
 		});
 
 		controler.configureQSimComponents(components -> {
-			components.addNamedComponent("MyEngine");
+			components.addNamedAnnotation("MyEngine" );
 		});
 
 		controler.run();

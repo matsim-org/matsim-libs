@@ -14,35 +14,35 @@ import com.google.inject.name.Names;
  * Contains information about which QSim components should be used in the
  * simulation and in which order they are registered with the QSim.
  */
-final public class QSimComponentsConfig {
+final public class QSimComponentAnnotationsRegistry{
 	private final List<Object> components = new LinkedList<>();
 	private final Set<Key<?>> keys = new HashSet<>();
 
 	// looks like a manually maintained map to me; would it be possible to explain that design decision?  kai, dec'18
 
-	public void addComponent(Class<? extends Annotation> annotation) {
-		addComponent(Key.get(Object.class, annotation));
+	public void addAnnotation( Class<? extends Annotation> annotation ) {
+		addAnnotation(Key.get(Object.class, annotation ) );
 		components.add(annotation);
 	}
 
-	public void addComponent(Annotation annotation) {
-		addComponent(Key.get(Object.class, annotation));
+	public void addAnnotation( Annotation annotation ) {
+		addAnnotation(Key.get(Object.class, annotation ) );
 		components.add(annotation);
 	}
 
-	private void addComponent(Key<?> componentKey) {
+	private void addAnnotation( Key<?> componentKey ) {
 		if (keys.contains(componentKey)) {
 			throw new IllegalStateException(keyToString(componentKey) + " is already registered.");
 		}
 		keys.add(componentKey);
 	}
 
-	public void addNamedComponent(String name) {
-		addComponent(Names.named(name));
+	public void addNamedAnnotation( String name ) {
+		addAnnotation(Names.named(name ) );
 	}
 
 	public void removeComponent(Class<? extends Annotation> annotation) {
-		addComponent(Key.get(Object.class, annotation));
+		addAnnotation(Key.get(Object.class, annotation ) );
 		components.remove(annotation);
 	}
 
@@ -88,7 +88,7 @@ final public class QSimComponentsConfig {
 		keys.clear();
 	}
 
-	List<Object> getActiveComponents() {
+	public List<Object> getActiveComponentAnnotations() {
 		return Collections.unmodifiableList(components);
 	}
 

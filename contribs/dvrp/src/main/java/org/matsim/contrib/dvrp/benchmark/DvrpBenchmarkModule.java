@@ -27,7 +27,7 @@ import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.components.QSimComponentAnnotationsRegistry;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 
 import com.google.inject.Provides;
@@ -50,8 +50,8 @@ public class DvrpBenchmarkModule extends AbstractModule {
 
 	@Provides
 	@Singleton
-	public QSimComponentsConfig provideQSimComponentsConfig(Config config) {
-		QSimComponentsConfig components = new QSimComponentsConfig();
+	public QSimComponentAnnotationsRegistry provideQSimComponentsConfig( Config config ) {
+		QSimComponentAnnotationsRegistry components = new QSimComponentAnnotationsRegistry();
 		new StandardQSimComponentConfigurator(config).configure(components);
 		DynActivityEngineModule.configureComponents(components);
 		qsimModule.configureComponents(components);

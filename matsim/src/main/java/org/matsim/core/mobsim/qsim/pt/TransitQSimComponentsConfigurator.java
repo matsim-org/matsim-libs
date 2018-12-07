@@ -1,7 +1,7 @@
 package org.matsim.core.mobsim.qsim.pt;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.components.QSimComponentAnnotationsRegistry;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 
 public class TransitQSimComponentsConfigurator implements QSimComponentsConfigurator {
@@ -12,9 +12,9 @@ public class TransitQSimComponentsConfigurator implements QSimComponentsConfigur
 	}
 
 	@Override
-	public void configure(QSimComponentsConfig components) {
+	public void configure( QSimComponentAnnotationsRegistry components ) {
 		if (config.transit().isUseTransit() && config.transit().isUsingTransitInMobsim()) {
-			components.addNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME);
+			components.addNamedAnnotation(TransitEngineModule.TRANSIT_ENGINE_NAME );
 		}
 	}
 }

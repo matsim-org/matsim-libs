@@ -10,7 +10,7 @@ public class QSimComponentsFromConfigConfigurator implements QSimComponentsConfi
 	}
 
 	@Override
-	public void configure(QSimComponentsConfig components) {
+	public void configure( QSimComponentAnnotationsRegistry components ) {
 		QSimComponentsConfigGroup componentsConfig = (QSimComponentsConfigGroup) config.getModules()
 				.get(QSimComponentsConfigGroup.GROUP_NAME);
 
@@ -19,7 +19,7 @@ public class QSimComponentsFromConfigConfigurator implements QSimComponentsConfi
 
 			// TODO: Eventually, here a translation of strings to more specific annotations
 			// could happen if we ever want a full config-configurable QSim.
-			componentsConfig.getActiveComponents().forEach(components::addNamedComponent);
+			componentsConfig.getActiveComponents().forEach(components::addNamedAnnotation );
 		}
 	}
 }
