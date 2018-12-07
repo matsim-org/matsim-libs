@@ -95,12 +95,12 @@ final public class QSimComponentsConfig {
 	@Override
 	public String toString() {
 		StringBuilder strb = new StringBuilder() ;
-		strb.append( super.toString() ) ;
+		strb.append( super.toString() + "\n") ;
 		for ( Object cc : components ){
-			strb.append( " " + cc.toString() );
+			strb.append( " " + cc.toString() +"\n");
 		}
 		for ( Key<?> key : keys ) {
-			strb.append( "" + key.toString() ) ;
+			strb.append( "" + key.toString() +"\n") ;
 		}
 		return strb.toString() ;
 	}
