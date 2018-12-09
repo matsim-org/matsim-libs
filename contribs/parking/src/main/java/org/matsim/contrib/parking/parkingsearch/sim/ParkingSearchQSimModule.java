@@ -10,7 +10,7 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSimModule;
 import org.matsim.core.mobsim.qsim.QSimProvider;
-import org.matsim.core.mobsim.qsim.components.QSimComponentKeysRegistry;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.pt.config.TransitConfigGroup;
 
@@ -33,8 +33,8 @@ public class ParkingSearchQSimModule extends com.google.inject.AbstractModule {
 	}
 	
 	@Provides
-	QSimComponentKeysRegistry provideQSimComponentsConfig( Config config ) {
-		QSimComponentKeysRegistry components = new QSimComponentKeysRegistry();
+	QSimComponentsConfig provideQSimComponentsConfig( Config config ) {
+		QSimComponentsConfig components = new QSimComponentsConfig();
 		new StandardQSimComponentConfigurator(config).configure(components);
 		
 		components.removeNamedComponent(PopulationModule.COMPONENT_NAME);

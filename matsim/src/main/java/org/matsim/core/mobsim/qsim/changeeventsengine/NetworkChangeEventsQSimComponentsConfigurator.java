@@ -3,7 +3,7 @@ package org.matsim.core.mobsim.qsim.changeeventsengine;
 import static org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsModule.NETWORK_CHANGE_EVENTS_ENGINE_NAME;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.mobsim.qsim.components.QSimComponentKeysRegistry;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 
 public class NetworkChangeEventsQSimComponentsConfigurator implements QSimComponentsConfigurator {
@@ -14,7 +14,7 @@ public class NetworkChangeEventsQSimComponentsConfigurator implements QSimCompon
 	}
 
 	@Override
-	public void configure( QSimComponentKeysRegistry components ) {
+	public void configure( QSimComponentsConfig components ) {
 		if (config.network().isTimeVariantNetwork()) {
 			components.addNamedAnnotation(NETWORK_CHANGE_EVENTS_ENGINE_NAME );
 		}

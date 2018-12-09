@@ -32,7 +32,7 @@ import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
-import org.matsim.core.mobsim.qsim.components.QSimComponentKeysRegistry;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
@@ -53,13 +53,13 @@ public class QSimProvider implements Provider<QSim> {
 	private Collection<AbstractQSimModule> modules;
 	private List<AbstractQSimModule> overridingModules;
 	private final Map<Named, QSimComponent> qSimComponentMap;
-	private QSimComponentKeysRegistry annotationsRegistry;
+	private QSimComponentsConfig annotationsRegistry;
 	@Inject(optional = true)
 	private IterationCounter iterationCounter;
 
 	@Inject
 	QSimProvider( Injector injector, Config config, Collection<AbstractQSimModule> modules,
-			  QSimComponentKeysRegistry components, @Named("overrides") List<AbstractQSimModule> overridingModules, Map<Named,QSimComponent> qSimComponentMap ) {
+			  QSimComponentsConfig components, @Named("overrides") List<AbstractQSimModule> overridingModules, Map<Named,QSimComponent> qSimComponentMap ) {
 		this.injector = injector;
 		this.modules = modules;
 		// (these are the implementations)

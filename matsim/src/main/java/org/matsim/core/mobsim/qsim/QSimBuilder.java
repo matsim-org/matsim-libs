@@ -14,7 +14,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.AllowsConfiguration;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.components.QSimComponentKeysRegistry;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
@@ -71,7 +71,7 @@ public class QSimBuilder implements AllowsConfiguration{
 	private final Config config;
 
 	private final Collection<AbstractQSimModule> qsimModules = new LinkedList<>();
-	private final QSimComponentKeysRegistry annotationsRegistry = new QSimComponentKeysRegistry();
+	private final QSimComponentsConfig annotationsRegistry = new QSimComponentsConfig();
 
 	private final List<AbstractModule> overridingControllerModules = new LinkedList<>();
 	private final List<AbstractQSimModule> overridingQSimModules = new LinkedList<>();
@@ -180,7 +180,7 @@ public class QSimBuilder implements AllowsConfiguration{
 		controllerModule = AbstractModule.override(Collections.singleton(controllerModule), new AbstractModule() {
 			@Override
 			public void install() {
-				bind( QSimComponentKeysRegistry.class ).toInstance( annotationsRegistry );
+				bind( QSimComponentsConfig.class ).toInstance( annotationsRegistry );
 				qsimModules.forEach(this::installQSimModule);
 				bind(Key.get(new TypeLiteral<List<AbstractQSimModule>>() {
 				}, Names.named("overrides"))).toInstance(overridingQSimModules);

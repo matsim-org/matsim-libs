@@ -23,7 +23,7 @@ public class ComponentRegistryTest {
 		// Here we may expect an exception in the future. So far we just ignore
 		// QSimComponents without any annotation.
 		Injector injector = Guice.createInjector(new ModuleWithMissingAnnotation());
-		QSimComponentsRegistry registry = QSimComponentsRegistry.create(injector );
+		ComponentsRegistry registry = ComponentsRegistry.create(injector );
 	}
 
 	static private class ModuleWithMissingAnnotation extends AbstractModule {
@@ -55,7 +55,7 @@ public class ComponentRegistryTest {
 
 		Assert.assertEquals(orderedComponents(injector, namedComponents("C")), Arrays.asList());
 
-		QSimComponentKeysRegistry qSimComponents = namedComponents("A", "B" );
+		QSimComponentsConfig qSimComponents = namedComponents("A", "B" );
 		qSimComponents.addAnnotation(Named.class );
 		qSimComponents.addAnnotation(MockComponentAnnotation.class );
 		Assert.assertEquals(orderedComponents(injector, qSimComponents),
@@ -80,16 +80,16 @@ public class ComponentRegistryTest {
 		}
 	}
 
-	private QSimComponentKeysRegistry namedComponents( String... activeComponentNames ) {
-		QSimComponentKeysRegistry qSimComponents = new QSimComponentKeysRegistry();
+	private QSimComponentsConfig namedComponents( String... activeComponentNames ) {
+		QSimComponentsConfig qSimComponents = new QSimComponentsConfig();
 		for (String n : activeComponentNames) {
 			qSimComponents.addNamedAnnotation(n );
 		}
 		return qSimComponents;
 	}
 
-	private List<Key<? extends QSimComponent>> orderedComponents(Injector injector, QSimComponentKeysRegistry qSimComponents ) {
-		QSimComponentsRegistry registry = QSimComponentsRegistry.create(injector );
+	private List<Key<? extends QSimComponent>> orderedComponents(Injector injector, QSimComponentsConfig qSimComponents ) {
+		ComponentsRegistry registry = ComponentsRegistry.create(injector );
 		return registry.getOrderedComponents(qSimComponents);
 	}
 

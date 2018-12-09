@@ -9,7 +9,7 @@ import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.components.QSimComponentKeysRegistry;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 
@@ -53,7 +53,7 @@ public class JointQSimModule extends AbstractQSimModule {
 				new NetsimWrappingQVehicleProvider(netsimEngine));
 	}
 	
-	static public void configureComponents( QSimComponentKeysRegistry components ) {
+	static public void configureComponents( QSimComponentsConfig components ) {
 		components.removeNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
 		components.removeNamedComponent(PopulationModule.COMPONENT_NAME);
 		

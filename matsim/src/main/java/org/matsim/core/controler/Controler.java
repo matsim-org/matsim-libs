@@ -44,7 +44,7 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentKeysRegistry;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.replanning.ReplanningContext;
@@ -489,10 +489,10 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
     	this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				QSimComponentKeysRegistry components = new QSimComponentKeysRegistry();
+				QSimComponentsConfig components = new QSimComponentsConfig();
 				new StandardQSimComponentConfigurator(config).configure(components);
 				configurator.configure(components);
-				bind( QSimComponentKeysRegistry.class ).toInstance(components );
+				bind( QSimComponentsConfig.class ).toInstance(components );
 			}
 		});
     	return this ;

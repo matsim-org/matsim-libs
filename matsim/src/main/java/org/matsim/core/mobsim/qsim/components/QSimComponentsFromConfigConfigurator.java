@@ -10,7 +10,7 @@ public class QSimComponentsFromConfigConfigurator implements QSimComponentsConfi
 	}
 
 	@Override
-	public void configure( QSimComponentKeysRegistry components ) {
+	public void configure( QSimComponentsConfig components ) {
 		QSimComponentsConfigGroup componentsConfig = (QSimComponentsConfigGroup) config.getModules()
 				.get(QSimComponentsConfigGroup.GROUP_NAME);
 

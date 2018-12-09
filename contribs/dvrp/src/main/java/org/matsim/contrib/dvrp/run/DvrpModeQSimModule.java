@@ -28,7 +28,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentKeysRegistry;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -61,7 +61,7 @@ public class DvrpModeQSimModule extends AbstractQSimModule {
 		});
 	}
 
-	public void configureComponents( QSimComponentKeysRegistry components ) {
+	public void configureComponents( QSimComponentsConfig components ) {
 		components.addAnnotation(DvrpModes.mode(mode ) );
 	}
 

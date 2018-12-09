@@ -12,14 +12,14 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import org.apache.log4j.Logger;
 
- final class QSimComponentsRegistry{
+ final class ComponentsRegistry{
  	// had to be public when it was used by QSimProvider. kai, dec'18
 
-	private static final Logger log = Logger.getLogger( QSimComponentsRegistry.class ) ;
+	private static final Logger log = Logger.getLogger( ComponentsRegistry.class ) ;
 
 	private final Map<Key<?>, List<Key<? extends QSimComponent>>> componentsByKey = new HashMap<>();
 
-	QSimComponentsRegistry() {
+	ComponentsRegistry() {
 	}
 
 	/**
@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
 		return true ;
 	}
 
-	 List<Key<? extends QSimComponent>> getOrderedComponents( QSimComponentKeysRegistry annotationsRegistry ) {
+	 List<Key<? extends QSimComponent>> getOrderedComponents( QSimComponentsConfig annotationsRegistry ) {
 		// only used by tests ?!
 
 		log.warn("") ;
@@ -78,10 +78,10 @@ import org.apache.log4j.Logger;
 		return orderedComponents;
 	}
 
-	static public QSimComponentsRegistry create( Injector injector ) {
+	static public ComponentsRegistry create( Injector injector ) {
 		// only used in tests (after I removed it from QSimProvider). kai, dec'18
 
-		QSimComponentsRegistry registry = new QSimComponentsRegistry();
+		ComponentsRegistry registry = new ComponentsRegistry();
 
 		for (Map.Entry<Key<?>, Binding<?>> entry : injector.getAllBindings().entrySet()) {
 			if (QSimComponent.class.isAssignableFrom(entry.getKey().getTypeLiteral().getRawType())) {

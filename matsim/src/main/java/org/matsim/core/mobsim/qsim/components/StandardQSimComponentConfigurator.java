@@ -12,7 +12,7 @@ public class StandardQSimComponentConfigurator implements QSimComponentsConfigur
 	}
 
 	@Override
-	public void configure( QSimComponentKeysRegistry components ) {
+	public void configure( QSimComponentsConfig components ) {
 		
 		new DefaultQSimComponentsConfigurator().configure(components);
 		// (clears all the components, and puts in those components defined as defaults in the
