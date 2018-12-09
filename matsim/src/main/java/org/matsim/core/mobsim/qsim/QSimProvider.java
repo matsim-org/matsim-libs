@@ -22,18 +22,17 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.util.Collection;
-import java.util.List;
-
+import com.google.inject.*;
+import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsRegistry;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
-import org.matsim.core.mobsim.qsim.components.QSimComponentAnnotationsRegistry;
+import org.matsim.core.mobsim.qsim.components.QSimComponentKeysRegistry;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
@@ -42,13 +41,9 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.ConfigurationException;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.name.Named;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class QSimProvider implements Provider<QSim> {
 	private static final Logger log = Logger.getLogger(QSimProvider.class);
@@ -57,19 +52,21 @@ public class QSimProvider implements Provider<QSim> {
 	private Config config;
 	private Collection<AbstractQSimModule> modules;
 	private List<AbstractQSimModule> overridingModules;
-	private QSimComponentAnnotationsRegistry annotationsRegistry;
+	private final Map<Named, QSimComponent> qSimComponentMap;
+	private QSimComponentKeysRegistry annotationsRegistry;
 	@Inject(optional = true)
 	private IterationCounter iterationCounter;
 
 	@Inject
 	QSimProvider( Injector injector, Config config, Collection<AbstractQSimModule> modules,
-			  QSimComponentAnnotationsRegistry components, @Named("overrides") List<AbstractQSimModule> overridingModules ) {
+			  QSimComponentKeysRegistry components, @Named("overrides") List<AbstractQSimModule> overridingModules, Map<Named,QSimComponent> qSimComponentMap ) {
 		this.injector = injector;
 		this.modules = modules;
 		// (these are the implementations)
 		this.config = config;
 		this.annotationsRegistry = components;
 		this.overridingModules = overridingModules;
+		this.qSimComponentMap = qSimComponentMap;
 	}
 
 	@Override
@@ -95,28 +92,38 @@ public class QSimProvider implements Provider<QSim> {
 
 		// create the child injector:
 		Injector qsimInjector = injector.createChildInjector(module);
-		if (iterationCounter == null || config.controler().getFirstIteration() == iterationCounter.getIterationNumber()) {
-			// trying to somewhat reduce logfile verbosity. kai, aug'18
-			org.matsim.core.controler.Injector.printInjector(qsimInjector, log);
-		}
+
+//		if (iterationCounter == null || config.controler().getFirstIteration() == iterationCounter.getIterationNumber()) {
+//			// trying to somewhat reduce logfile verbosity. kai, aug'18
+//			org.matsim.core.controler.Injector.printInjector(qsimInjector, log);
+//		}
+		// (printing out the injector is somewhat useless since it contains more bindings than what is afterwards used. kai, dec'18)
 
 		// pull out the qsim:
 		QSim qSim = qsimInjector.getInstance(QSim.class);
 
 
-		QSimComponentsRegistry componentRegistry = QSimComponentsRegistry.create(qsimInjector );
+//		QSimComponentsRegistry componentRegistry = QSimComponentsRegistry.create(qsimInjector );
 
-		log.warn("") ;
-		log.warn( "annotationsRegistry=" ) ;
-		for( Object activeComponentAnnotation : this.annotationsRegistry.getActiveComponentAnnotations() ){
-			log.warn("registered annotation=" + activeComponentAnnotation ) ;
-		}
-		log.warn("") ;
+//		log.warn("") ;
+//		log.warn( "annotationsRegistry=" ) ;
+//		for( Object activeComponentAnnotation : this.annotationsRegistry.getActiveComponentAnnotations() ){
+//			log.warn("registered annotation=" + activeComponentAnnotation ) ;
+//		}
+//		log.warn("") ;
 
-		for (Key<? extends QSimComponent> component : componentRegistry.getOrderedComponents( annotationsRegistry )) {
-			log.warn("looking at component=" + component ) ;
+//		for (Key<? extends QSimComponent> component : componentRegistry.getOrderedComponents( annotationsRegistry )) {
+		for ( Object annotation : annotationsRegistry.getActiveComponentAnnotations() ) {
 
-			QSimComponent instance = qsimInjector.getInstance( component );;
+			log.warn("looking at annotation=" + annotation ) ;
+
+			if ( ! ( annotation instanceof  String ) ) {
+				continue ;
+			}
+			String str = (String) annotation;;
+			QSimComponent instance = this.qSimComponentMap.get( Names.named(str) );;
+
+			//			QSimComponent instance = qsimInjector.getInstance( component );;
 
 			if ( instance instanceof  MobsimEngine ) {
 				qSim.addMobsimEngine( (MobsimEngine) instance );

@@ -21,7 +21,7 @@ package org.matsim.contrib.dynagent.run;
 
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentAnnotationsRegistry;
+import org.matsim.core.mobsim.qsim.components.QSimComponentKeysRegistry;
 
 /**
  * Enables basic DynAgent functionality in QSim. However, for DVRP simulation, use DvrpQSimModule instead.
@@ -40,7 +40,7 @@ public class DynQSimModule extends AbstractQSimModule {
 		this.addQSimComponentBinding( COMPONENT_NAME ).to( agentSourceClass ) ;
 	}
 
-	public static void configureComponents( QSimComponentAnnotationsRegistry components ) {
+	public static void configureComponents( QSimComponentKeysRegistry components ) {
 		DynActivityEngineModule.configureComponents(components);
 		components.addNamedAnnotation(COMPONENT_NAME );
 	}

@@ -9,8 +9,8 @@ import com.google.inject.Singleton;
 public class QSimComponentsModule extends AbstractModule {
 	@Provides
 	@Singleton
-	public QSimComponentAnnotationsRegistry provideDefaultQSimComponentsConfig( Config config ) {
-		QSimComponentAnnotationsRegistry components = new QSimComponentAnnotationsRegistry();
+	public QSimComponentKeysRegistry provideDefaultQSimComponentsConfig( Config config ) {
+		QSimComponentKeysRegistry components = new QSimComponentKeysRegistry();
 		new StandardQSimComponentConfigurator(config).configure(components);
 		return components;
 	}

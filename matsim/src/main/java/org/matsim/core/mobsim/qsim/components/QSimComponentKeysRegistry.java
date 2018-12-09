@@ -14,11 +14,15 @@ import com.google.inject.name.Names;
  * Contains information about which QSim components should be used in the
  * simulation and in which order they are registered with the QSim.
  */
-final public class QSimComponentAnnotationsRegistry{
+final public class QSimComponentKeysRegistry{
 	private final List<Object> components = new LinkedList<>();
 	private final Set<Key<?>> keys = new HashSet<>();
 
-	// looks like a manually maintained map to me; would it be possible to explain that design decision?  kai, dec'18
+	// looks like a manually maintained map to me; would it be possible to explain that design decision?  kai, dec'18 In fact, I
+	// think this is the list of "keys" that define which components will be actually used, i.e. NOT the same as the list of keys
+	// that are registered.  It needs to be a replica of what is on the config since the config only accepts strings but some
+	// people want to be able to use Annotations here. (I think we could still debate to have this here in the scope of the config
+	// group.)  kai, dec'18
 
 	public void addAnnotation( Class<? extends Annotation> annotation ) {
 		addAnnotation(Key.get(Object.class, annotation ) );

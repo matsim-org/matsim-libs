@@ -30,7 +30,7 @@ import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.components.QSimComponentAnnotationsRegistry;
+import org.matsim.core.mobsim.qsim.components.QSimComponentKeysRegistry;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
@@ -52,8 +52,8 @@ public final class DvrpModule extends AbstractModule {
 
 	@Provides
 	@Singleton
-	public QSimComponentAnnotationsRegistry provideQSimComponentsConfig( Config config ) {
-		QSimComponentAnnotationsRegistry components = new QSimComponentAnnotationsRegistry();
+	public QSimComponentKeysRegistry provideQSimComponentsConfig( Config config ) {
+		QSimComponentKeysRegistry components = new QSimComponentKeysRegistry();
 		new StandardQSimComponentConfigurator(config).configure(components);
 		DynActivityEngineModule.configureComponents(components);
 		qsimModules.forEach(m -> m.configureComponents(components));

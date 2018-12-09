@@ -12,7 +12,9 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import org.apache.log4j.Logger;
 
-public final class QSimComponentsRegistry{
+ final class QSimComponentsRegistry{
+ 	// had to be public when it was used by QSimProvider. kai, dec'18
+
 	private static final Logger log = Logger.getLogger( QSimComponentsRegistry.class ) ;
 
 	private final Map<Key<?>, List<Key<? extends QSimComponent>>> componentsByKey = new HashMap<>();
@@ -23,7 +25,9 @@ public final class QSimComponentsRegistry{
 	/**
 	 * Registers the component, using its annotation, or if not available its annotation type, as key.  If neither is available, registration fails.
 	 */
-	public boolean register(Key<? extends QSimComponent> component) {
+	private boolean register(Key<? extends QSimComponent> component) {
+		// only used below ?!
+
 		if (component.getAnnotationType() == null) {
 			log.warn("not registering QSimComponent because it has no annotation: " + component ) ;
 			return false;
@@ -36,7 +40,9 @@ public final class QSimComponentsRegistry{
 		return true ;
 	}
 
-	public List<Key<? extends QSimComponent>> getOrderedComponents( QSimComponentAnnotationsRegistry annotationsRegistry ) {
+	 List<Key<? extends QSimComponent>> getOrderedComponents( QSimComponentKeysRegistry annotationsRegistry ) {
+		// only used by tests ?!
+
 		log.warn("") ;
 		log.warn("entering getOrderedComponents ... ") ;
 
@@ -73,6 +79,8 @@ public final class QSimComponentsRegistry{
 	}
 
 	static public QSimComponentsRegistry create( Injector injector ) {
+		// only used in tests (after I removed it from QSimProvider). kai, dec'18
+
 		QSimComponentsRegistry registry = new QSimComponentsRegistry();
 
 		for (Map.Entry<Key<?>, Binding<?>> entry : injector.getAllBindings().entrySet()) {
