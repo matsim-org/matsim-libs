@@ -14,11 +14,14 @@ public class Signals{
 
     public static class Configurator{
         private final SignalsModule signalsModule;
-        private Configurator( SignalsModule signalsModule ){
-            this.signalsModule = signalsModule;
+        public Configurator( AllowsConfiguration ao ){
+            this.signalsModule = new SignalsModule() ;
+            ao.addOverridingModule( this.signalsModule ) ;
+            ao.addOverridingQSimModule( new SignalsQSimModule() ) ;
         }
         public final void addSignalControllerFactory( String key, Class<? extends SignalControllerFactory> signalControllerFactoryClassName ) {
             signalsModule.addSignalControllerFactory( key, signalControllerFactoryClassName );
+            // it is not _totally_ sure that adding this after adding it as an overridingModule will work, but I think that it will.  kai, dec'19
         }
     }
 
