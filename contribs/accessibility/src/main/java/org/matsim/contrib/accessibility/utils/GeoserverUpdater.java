@@ -145,7 +145,6 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 			}
 			for (String currentAdditionalFacInfo : additionalFacInfo) {
 				Double additionalFacInfoValue = Double.parseDouble(entry.getKey().getFirst().getAttributes().getAttribute(currentAdditionalFacInfo).toString());
-				LOG.warn("additionalFacInfoValue = " + additionalFacInfoValue);
 				if (additionalFacInfoValue != null && !Double.isNaN(additionalFacInfoValue)) {
 					featureBuilder.add(additionalFacInfoValue);
 				} else {

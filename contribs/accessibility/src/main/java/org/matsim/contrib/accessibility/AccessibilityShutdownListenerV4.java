@@ -122,6 +122,10 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 		LOG.info("Finished writing accessibility output to " + adaptedOutputDirectory + ".");
 	}
 	
+	public void addAdditionalFacilityData(ActivityFacilities facilities) {
+		this.additionalFacilityData.add(facilities);
+	}
+	
 	public void addFacilityDataExchangeListener( FacilityDataExchangeInterface facilityDataExchangeListener ) {
 		this.accessibilityCalculator.addFacilityDataExchangeListener(facilityDataExchangeListener);
 	}
