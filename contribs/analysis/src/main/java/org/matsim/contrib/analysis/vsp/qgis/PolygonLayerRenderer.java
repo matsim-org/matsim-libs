@@ -61,6 +61,7 @@ public class PolygonLayerRenderer extends QGisRenderer {
             currentLevel.setColor(ColorRangeUtils.getColor(colorRange, colorRangeStep*i));
             currentLevel.setOutlineColor(new Color(0,0,0,255));
             currentLevel.setLayerTransparency(1);
+            currentLevel.setPenStyle(QGisConstants.penstyle.no);
             this.addSymbolLayer(currentLevel);
         }
     }
