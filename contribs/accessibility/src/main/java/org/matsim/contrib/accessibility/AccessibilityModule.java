@@ -229,6 +229,10 @@ public final class AccessibilityModule extends AbstractModule {
 				AccessibilityShutdownListenerV4 accessibilityShutdownListener = new AccessibilityShutdownListenerV4(accessibilityCalculator, 
 						opportunities, outputDirectory, acg);
 				
+				for (ActivityFacilities fac : additionalFacs.values()) {
+					accessibilityShutdownListener.addAdditionalFacilityData(fac);
+				}
+				
 				for (FacilityDataExchangeInterface listener : facilityDataListeners) {
 					accessibilityShutdownListener.addFacilityDataExchangeListener(listener);
 				}
