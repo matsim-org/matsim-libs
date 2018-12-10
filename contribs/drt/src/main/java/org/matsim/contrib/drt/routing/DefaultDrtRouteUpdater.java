@@ -23,12 +23,11 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
+import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -58,10 +57,10 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 	private final ExecutorServiceWithResource<LeastCostPathCalculator> executorService;
 
 	@Inject
-	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg, @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
+	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg,
+			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory,
-			Population population, Config config) {
+			@Drt TravelDisutilityFactory travelDisutilityFactory, Population population, Config config) {
 		this.drtCfg = drtCfg;
 		this.network = network;
 		this.travelTime = travelTime;
@@ -82,7 +81,7 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 				.values()
 				.stream()
 				.flatMap(p -> p.getSelectedPlan().getPlanElements().stream())
-				.filter(e -> e instanceof Leg && ((Leg)e).getMode().equals(TransportMode.drt))
+				.filter(e -> e instanceof Leg && ((Leg)e).getMode().equals(drtCfg.getMode()))
 				.map(e -> (Leg)e);
 		executorService.submitRunnablesAndWait(drtLegs.map(l -> (router -> updateDrtRoute(router, l))));
 	}
@@ -95,7 +94,7 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(fromLink, toLink, drtLeg.getDepartureTime(),
 				router, travelTime);
 		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
-		double maxTravelTime = drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta();
+		double maxTravelTime = DrtRoutingModule.getMaxTravelTime(drtCfg, unsharedRideTime);
 		double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
 
 		drtRoute.setDistance(unsharedDistance);

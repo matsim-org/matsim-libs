@@ -11,8 +11,8 @@
 			</capabilities>
 
 			<shipments>
-				<shipment id="1" from="15" to="22" size="30" startPickup="06:01:00" endPickup="07:46:40" startDelivery="00:00:00" endDelivery="20:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:00:00"/>
-				<shipment id="2" from="20" to="22" size="10" startPickup="06:01:00" endPickup="07:46:40" startDelivery="00:00:00" endDelivery="20:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:00:00"/>
+				<shipment id="s1" from="15" to="22" size="30" startPickup="06:01:00" endPickup="07:46:40" startDelivery="00:00:00" endDelivery="20:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:00:00"/>
+				<shipment id="s2" from="20" to="22" size="10" startPickup="06:01:00" endPickup="07:46:40" startDelivery="00:00:00" endDelivery="20:00:00" pickupServiceTime="00:00:00" deliveryServiceTime="00:00:00"/>
 			</shipments>
 
 			<services>
@@ -45,19 +45,19 @@
 					<leg expected_dep_time="07:00:00" expected_transp_time="00:30:00">
 						<route>2 3 4</route>
 					</leg>
-					<act type="pickup" shipmentId="1" />
+					<act type="pickup" shipmentId="s1" />
 					<leg expected_dep_time="07:00:00" expected_transp_time="00:00:00">
 						<route></route>
 					</leg>
-					<act type="delivery" shipmentId="1" />
+					<act type="delivery" shipmentId="s1" />
 					<leg expected_dep_time="07:00:00" expected_transp_time="00:00:00">
 						<route></route>
 					</leg>
-					<act type="pickup" shipmentId="2" />
+					<act type="pickup" shipmentId="s2" />
 					<leg expected_dep_time="07:00:00" expected_transp_time="00:00:00">
 						<route></route>
 					</leg>
-					<act type="delivery" shipmentId="2" />
+					<act type="delivery" shipmentId="s2" />
 					<leg expected_dep_time="07:00:00" expected_transp_time="00:00:00">
 						<route></route>
 					</leg>
@@ -71,19 +71,19 @@
 					<leg expected_dep_time="07:00:00" expected_transp_time="00:30:00">
 						<route>2 3 4</route>
 					</leg>
-					<act type="pickup" shipmentId="1" />
+					<act type="pickup" shipmentId="s1" />
 					<leg expected_dep_time="07:00:00" expected_transp_time="00:00:00">
 						<route></route>
 					</leg>
-					<act type="delivery" shipmentId="1" />
+					<act type="delivery" shipmentId="s1" />
 					<leg expected_dep_time="07:00:00" expected_transp_time="00:00:00">
 						<route></route>
 					</leg>
-					<act type="pickup" shipmentId="2" />
+					<act type="pickup" shipmentId="s2" />
 					<leg expected_dep_time="07:00:00" expected_transp_time="00:00:00">
 						<route></route>
 					</leg>
-					<act type="delivery" shipmentId="2" />
+					<act type="delivery" shipmentId="s2" />
 					<leg expected_dep_time="07:00:00" expected_transp_time="00:00:00">
 						<route></route>
 					</leg>

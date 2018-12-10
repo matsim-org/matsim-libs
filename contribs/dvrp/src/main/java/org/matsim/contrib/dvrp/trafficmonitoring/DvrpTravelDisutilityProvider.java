@@ -18,6 +18,8 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
+import java.lang.annotation.Annotation;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -29,15 +31,16 @@ import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm
  */
 public class DvrpTravelDisutilityProvider implements Provider<TravelDisutility> {
-	public static void bindTravelDisutilityForOptimizer(Binder binder, String annotation) {
-		binder.bind(TravelDisutility.class).annotatedWith(Names.named(annotation))
-				.toProvider(new DvrpTravelDisutilityProvider(annotation)).asEagerSingleton();
+	public static void bindTravelDisutilityForOptimizer(Binder binder, Class<? extends Annotation> annotationType) {
+		binder.bind(TravelDisutility.class)
+				.annotatedWith(annotationType)
+				.toProvider(new DvrpTravelDisutilityProvider(annotationType))
+				.asEagerSingleton();
 	}
 
 	@Inject
@@ -47,15 +50,15 @@ public class DvrpTravelDisutilityProvider implements Provider<TravelDisutility> 
 	@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 	private TravelTime travelTime;
 
-	private final String annotation;
+	private final Class<? extends Annotation> annotationType;
 
-	public DvrpTravelDisutilityProvider(String annotation) {
-		this.annotation = annotation;
+	public DvrpTravelDisutilityProvider(Class<? extends Annotation> annotationType) {
+		this.annotationType = annotationType;
 	}
 
 	@Override
 	public TravelDisutility get() {
-		return injector.getInstance(Key.get(TravelDisutilityFactory.class, Names.named(annotation)))
+		return injector.getInstance(Key.get(TravelDisutilityFactory.class, annotationType))
 				.createTravelDisutility(travelTime);
 	}
 }

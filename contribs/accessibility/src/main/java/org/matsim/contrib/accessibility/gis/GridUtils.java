@@ -8,12 +8,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.accessibility.CSVWriter;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.geometry.BoundingBox;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -22,12 +22,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 public final class GridUtils {
-
-	// logger
-	private static final Logger log = Logger.getLogger(GridUtils.class);
+	private static final Logger LOG = Logger.getLogger(GridUtils.class);
 
 	/**
-	 * 
 	 * @param shapeFileName
 	 * @return Geometry determines the scenario boundary for the accessibility measure
 	 */
@@ -39,28 +36,26 @@ public final class GridUtils {
 			// yyyy I find this quite terrible to have the reader hidden in here.  Now I cannot pass a shape file which
 			// I may have gotten in some way, but need to first write it to file. kai, mar'14
 
-
-			log.info("Extracting boundary of the shape file ...");
+			LOG.info("Extracting boundary of the shape file ...");
 			Geometry boundary = (Geometry) featureSet.iterator().next().getDefaultGeometry();
-			log.info("Done extracting boundary ...");
+			LOG.info("Done extracting boundary ...");
 
 			if(featureSet.size() > 1){
-				log.warn("The given shape file is not suitable for accessibility calculations.");
-				log.warn("This means you have to provide a shape file that only contains the border of the study area without any further features, i.e. zones or fazes, are allowed!");
-				log.warn("Replace the shape file in your UrbanSim configuration provided at \"travel_model_configuration/matsim4urbansim/controler_parameter/shape_file\"");
-				log.warn("If the shape file contains features accessibilities will be computes for only feature, i.e. for one zone or faz.");
+				LOG.warn("The given shape file is not suitable for accessibility calculations.");
+				LOG.warn("This means you have to provide a shape file that only contains the border of the study area without any further features, i.e. zones or fazes, are allowed!");
+				LOG.warn("Replace the shape file in your UrbanSim configuration provided at \"travel_model_configuration/matsim4urbansim/controler_parameter/shape_file\"");
+				LOG.warn("If the shape file contains features accessibilities will be computes for only feature, i.e. for one zone or faz.");
 			}
 			return boundary;
 		} catch (NullPointerException npe){
 			npe.printStackTrace();
 		} catch (IOException io){
 			io.printStackTrace();
-			log.error("Geometry object containing the study area boundary shape is null !");
+			LOG.error("Geometry object containing the study area boundary shape is null !");
 			System.exit(-1);
 		}
 		return null;
 	}
-
 
 	/**
 	 * creates measuring points for accessibility computation
@@ -70,8 +65,7 @@ public final class GridUtils {
 	 * @return ActivityFacilitiesImpl containing the coordinates for the measuring points 
 	 */
 	public static ActivityFacilitiesImpl createGridLayerByGridSizeByShapeFileV2(Geometry boundary, double gridSize) {
-
-		log.info("Setting statring points for accessibility measure ...");
+		LOG.info("Setting statring points for accessibility measure ...");
 
 		int skippedPoints = 0;
 		int setPoints = 0;
@@ -100,13 +94,13 @@ public final class GridUtils {
 			}
 		}
 
-		log.info("Having " + setPoints + " inside the shape file boundary (and " + skippedPoints + " outside).");
-		log.info("Done with setting starting points!");
+		LOG.info("Having " + setPoints + " inside the shape file boundary (and " + skippedPoints + " outside).");
+		LOG.info("Done with setting starting points!");
 		return measuringPoints;
 	}
 
-	public static ActivityFacilitiesImpl createGridLayerByGridSizeByBoundingBoxV2( org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox box, double gridSize ) {
-		return createGridLayerByGridSizeByBoundingBoxV2( box.getXMin(), box.getYMin(), box.getXMax(), box.getYMax(), gridSize) ;
+	public static ActivityFacilitiesImpl createGridLayerByGridSizeByBoundingBoxV2(BoundingBox box, int gridSize) {
+		return createGridLayerByGridSizeByBoundingBoxV2(box.getXMin(), box.getYMin(), box.getXMax(), box.getYMax(), gridSize);
 	}
 
 	/**
@@ -119,39 +113,64 @@ public final class GridUtils {
 	 * 
 	 * @return ActivityFacilitiesImpl containing the coordinates for the measuring points 
 	 */
-	public static ActivityFacilitiesImpl createGridLayerByGridSizeByBoundingBoxV2(double minX, double minY, double maxX, double maxY, double gridSize) {
-
-		log.info("Setting statring points for accessibility measure ...");
-
+	public static ActivityFacilitiesImpl createGridLayerByGridSizeByBoundingBoxV2(double minX, double minY, double maxX, double maxY, int gridSize) {
+		LOG.info("Start creating measure points on a grid.");
 		int skippedPoints = 0;
 		int setPoints = 0;
-
-		//		ActivityFacilitiesImpl measuringPoints = new ActivityFacilitiesImpl("accessibility measuring points");
 		ActivityFacilitiesImpl measuringPoints = (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities("accessibility measuring points");
 
-		// goes step by step from the min x and y coordinate to max x and y coordinate
-		for(double x = minX; x <maxX; x += gridSize) {
-
-			for(double y = minY; y < maxY; y += gridSize) {
-
-				// check first if cell centroid is within study area
+		for (double x = minX; x <maxX; x += gridSize) {
+			for (double y = minY; y < maxY; y += gridSize) {
 				double centerX = x + (gridSize/2);
 				double centerY = y + (gridSize/2);
 
-				// check if x, y is within network boundary
-				if (centerX <= maxX && centerX >= minX && 
-						centerY <= maxY && centerY >= minY) {
-
+				if (centerX <= maxX && centerX >= minX && centerY <= maxY && centerY >= minY) {
 					Coord center = new Coord(centerX, centerY);
-					measuringPoints.createAndAddFacility(Id.create( setPoints , ActivityFacility.class), center);
+					measuringPoints.createAndAddFacility(Id.create(setPoints, ActivityFacility.class), center);
 					setPoints++;
 				}
 				else skippedPoints++;
 			}
 		}
+		LOG.info("Created " + setPoints + " inside the boundary. " + skippedPoints + " lie outside.");
+		LOG.info("Finished creating measure points on a grid.");
+		return measuringPoints;
+	}
+	
+	public static ActivityFacilities createHexagonLayer(BoundingBox box, int maxDiameter_m) {
+		return createHexagonLayer(box.getXMin(), box.getYMin(), box.getXMax(), box.getYMax(), maxDiameter_m);
+	}
+	
+	public static ActivityFacilities createHexagonLayer(double minX, double minY, double maxX, double maxY, int maxDiameter_m) {
+		LOG.info("Start creating measure points on a hexagon pattern.");
+		double inRadius_m = Math.sqrt(3) / 4 * maxDiameter_m;
+		int skippedPoints = 0;
+		int setPoints = 0;
+		ActivityFacilitiesImpl measuringPoints = (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities("accessibility measuring points");
 
-		log.info("Having " + setPoints + " inside the shape file boundary (and " + skippedPoints + " outside).");
-		log.info("Done with setting starting points!");
+		int columnNumber = 1;
+		for (double x = minX; x < (maxX - 1./2 * maxDiameter_m); x += (3./4 * maxDiameter_m)) {
+			for (double y = minY; y <= maxY; y += (2 * inRadius_m)) {
+
+				double centerX = x;
+				double centerY;
+				if (columnNumber % 2 != 0) {
+					centerY = y;
+				} else {
+					centerY = y + inRadius_m;
+				}
+
+				if (centerX <= maxX && centerX >= minX && centerY <= maxY && centerY >= minY) {
+					Coord center = new Coord(centerX, centerY);
+					measuringPoints.createAndAddFacility(Id.create(setPoints, ActivityFacility.class), center);
+					setPoints++;
+				}
+				else skippedPoints++; 
+			}
+			columnNumber++;
+		}
+		LOG.info("Created " + setPoints + " inside the boundary. " + skippedPoints + " lie outside.");
+		LOG.info("Finished creating measure points on a hexagon pattern.");
 		return measuringPoints;
 	}
 
@@ -181,11 +200,11 @@ public final class GridUtils {
 	 */
 	public static void writeSpatialGridTable(SpatialGrid grid, String fileName){
 
-		log.info("Writing spatial grid table " + fileName + " ...");
+		LOG.info("Writing spatial grid table " + fileName + " ...");
 		SpatialGridTableWriter sgTableWriter = new SpatialGridTableWriter();
 		try{
 			sgTableWriter.write(grid, fileName);
-			log.info("... done!");
+			LOG.info("... done!");
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -247,7 +266,7 @@ public final class GridUtils {
 						//						log.warn("jj=" + jj );
 						double sum = spatialGridSum.getMatrix()[ii][jj];
 						spatialGridAv.getMatrix()[ii][jj] = sum/cnt ;
-						log.warn("sum=" + sum + "; cnt=" + cnt + "; av=" + spatialGridAv.getMatrix()[ii][jj] ) ;
+						LOG.warn("sum=" + sum + "; cnt=" + cnt + "; av=" + spatialGridAv.getMatrix()[ii][jj] ) ;
 					}
 				}
 			}

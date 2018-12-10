@@ -67,7 +67,15 @@ public class FacilitiesUtils {
 	
 	public static Link decideOnLink( final Facility fromFacility, final Network network ) {
 		Link accessActLink = null ;
-		if ( fromFacility.getLinkId()!=null ) {
+		
+		Id<Link> accessActLinkId = null ;
+		try {
+			accessActLinkId = fromFacility.getLinkId() ;
+		} catch ( Exception ee ) {
+			// there are implementations that throw an exception here although "null" is, in fact, an interpretable value. kai, oct'18
+		}
+		
+		if ( accessActLinkId!=null ) {
 			accessActLink = network.getLinks().get( fromFacility.getLinkId() );
 			// i.e. if street address is in mode-specific subnetwork, I just use that, and do not search for another (possibly closer)
 			// other link.

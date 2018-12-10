@@ -17,8 +17,6 @@ import org.matsim.core.mobsim.qsim.components.mock.MockMobsimListener;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.google.inject.Key;
-
 public class QSimComponentsTest {
 	@Test
 	public void testGenericAddComponentMethod() {
@@ -35,9 +33,9 @@ public class QSimComponentsTest {
 		
 		new QSimBuilder(config) //
 		.addQSimModule(module) //
-		.configureComponents(components -> {
+		.configureQSimComponents( components -> {
 			components.addComponent(MockComponentAnnotation.class);
-		}) //
+		} ) //
 		.build(scenario, eventsManager) //
 		.run();
 	}
@@ -59,9 +57,9 @@ public class QSimComponentsTest {
 						bind(MockEngineB.class).annotatedWith(MockComponentAnnotation.class).toInstance(mockEngineB);
 					}
 				}) //
-				.configureComponents(components -> {
+				.configureQSimComponents( components -> {
 					components.addComponent(MockComponentAnnotation.class);
-				}) //
+				} ) //
 				.build(scenario, eventsManager) //
 				.run();
 
@@ -92,9 +90,9 @@ public class QSimComponentsTest {
 						bindComponent(MockEngine.class, MockComponentAnnotation.class).toInstance(mockEngine);
 					}
 				}) //
-				.configureComponents(components -> {
+				.configureQSimComponents( components -> {
 					components.addComponent(MockComponentAnnotation.class);
-				}) //
+				} ) //
 				.build(scenario, eventsManager) //
 				.run();
 
@@ -116,9 +114,9 @@ public class QSimComponentsTest {
 						bindNamedComponent(MockEngine.class, "MockEngine").toInstance(mockEngine);
 					}
 				}) //
-				.configureComponents(components -> {
+				.configureQSimComponents( components -> {
 					components.addNamedComponent("MockEngine");
-				}) //
+				} ) //
 				.build(scenario, eventsManager) //
 				.run();
 

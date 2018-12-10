@@ -291,7 +291,7 @@ public final class SylviaSignalController extends AbstractSignalController imple
 			} else {
 				// link has lanes
 				for (Id<Lane> laneId : signal.getLaneIds()) {
-					int noCars = this.sensorManager.getNumberOfCarsOnLane(signal.getLinkId(), laneId);
+					int noCars = this.sensorManager.getNumberOfCarsInDistanceOnLane(signal.getLinkId(), laneId, this.sylviaConfig.getSensorDistanceMeter(), currentTime);
 					if (noCars > 0)
 						return true;
 				}
@@ -437,7 +437,7 @@ public final class SylviaSignalController extends AbstractSignalController imple
 				}
 				else {
 					for (Id<Lane> laneId : signal.getLaneIds()){
-						this.sensorManager.registerNumberOfCarsMonitoringOnLane(signal.getLinkId(), laneId);
+						this.sensorManager.registerNumberOfCarsOnLaneInDistanceMonitoring(signal.getLinkId(), laneId, this.sylviaConfig.getSensorDistanceMeter());
 					}
 				}
 			}

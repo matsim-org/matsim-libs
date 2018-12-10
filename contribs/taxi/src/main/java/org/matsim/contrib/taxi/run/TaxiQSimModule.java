@@ -23,6 +23,8 @@ package org.matsim.contrib.taxi.run;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.run.DvrpMode;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
@@ -36,8 +38,6 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 import com.google.inject.Key;
 import com.google.inject.Provider;
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm
@@ -56,16 +56,15 @@ public class TaxiQSimModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
-				DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
+		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Taxi.class);
 
 		bind(TaxiOptimizer.class).toProvider(providerClass).asEagerSingleton();
 		bind(TaxiScheduler.class).asEagerSingleton();
 
-		Named modeNamed = Names.named(TaxiConfigGroup.get(getConfig()).getMode());
-		bind(VrpOptimizer.class).annotatedWith(modeNamed).to(TaxiOptimizer.class);
-		bind(DynActionCreator.class).annotatedWith(modeNamed).to(TaxiActionCreator.class).asEagerSingleton();
-		bind(PassengerRequestCreator.class).annotatedWith(modeNamed).to(TaxiRequestCreator.class).asEagerSingleton();
-		bind(PassengerEngine.class).annotatedWith(Taxi.class).to(Key.get(PassengerEngine.class, modeNamed));
+		DvrpMode dvrpMode = DvrpModes.mode(TaxiConfigGroup.get(getConfig()).getMode());
+		bind(VrpOptimizer.class).annotatedWith(dvrpMode).to(TaxiOptimizer.class);
+		bind(DynActionCreator.class).annotatedWith(dvrpMode).to(TaxiActionCreator.class).asEagerSingleton();
+		bind(PassengerRequestCreator.class).annotatedWith(dvrpMode).to(TaxiRequestCreator.class).asEagerSingleton();
+		bind(PassengerEngine.class).annotatedWith(Taxi.class).to(Key.get(PassengerEngine.class, dvrpMode));
 	}
 }

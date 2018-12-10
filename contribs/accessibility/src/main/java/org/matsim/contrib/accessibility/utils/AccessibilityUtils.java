@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.facilities.ActivityFacilities;
@@ -114,11 +113,11 @@ public class AccessibilityUtils {
 		}
 	}
 	
-	public static final ActivityFacilities createFacilityForEachLink( Network network ) {
-		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities("LinkFacilities") ;
-		ActivityFacilitiesFactory ff = facilities.getFactory() ;
-		for ( Link link : network.getLinks().values() ) {
-			ActivityFacility facility = ff.createActivityFacility( Id.create(link.getId(),ActivityFacility.class) , link.getCoord(), link.getId() ) ;
+	public static final ActivityFacilities createFacilityForEachLink(String facilityContainerName, Network network) {
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities(facilityContainerName);
+		ActivityFacilitiesFactory aff = facilities.getFactory();
+		for (Link link : network.getLinks().values()) {
+			ActivityFacility facility = aff.createActivityFacility(Id.create(link.getId(),ActivityFacility.class), link.getCoord(), link.getId());
 			facilities.addActivityFacility(facility);
 		}
 		return facilities ;
@@ -144,49 +143,18 @@ public class AccessibilityUtils {
 		}
 		return facilities ;
 	}
-	
-	/**
-	 * Goes through a given set of measuring points and creates a facility on the measuring point if the
-	 * nearest link from that measure point lies within a specified maximum allowed distance. The presence
-	 * of such networkDensityFacilites can then be used to plot a density layer, e.g. to excluded tiles
-	 * from being drawn if there is no network. The network density is thereby used as a proxy for settlement
-	 * density if no information of settlement density is available.
-	 */
-	@Deprecated
-	public static ActivityFacilities createNetworkDensityFacilities(Network network,
-			ActivityFacilities measuringPoints, double maximumAllowedDistance) {
-		// yyyyyy This method scares me ... since in the code it is used by code that does not really know the measuring points and so
-		// only speculates about it.  kai, dec'16
-		// yyyyyy Why not just create a facility for each link?  (The GridBasedAccessibilityListener aggregates those anyways ...).  kai, dec'16
-		
-		ActivityFacilitiesFactory aff = new ActivityFacilitiesFactoryImpl();
-		ActivityFacilities networkDensityFacilities = FacilitiesUtils.createActivityFacilities("network_densities");
-
-		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values() ) {
-			Coord coord = measuringPoint.getCoord();
-			Link link = NetworkUtils.getNearestLink(network, coord);
-			// TODO check if this is good or if orthogonal projection etc. is more suitable
-			double distance = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
-			if (distance <= maximumAllowedDistance) {
-				ActivityFacility facility = aff.createActivityFacility(measuringPoint.getId(), coord);
-				networkDensityFacilities.addActivityFacility(facility);
-			}
-		}
-		return networkDensityFacilities;
-	}
 
 	/**
 	 * Creates measuring points based on the scenario's network and a specified cell size.
 	 */
-	public static ActivityFacilities createMeasuringPointsFromNetworkBounds(Network network, double cellSize) {
+	public static ActivityFacilities createMeasuringPointsFromNetworkBounds(Network network, int cellSize) {
 		BoundingBox boundingBox = BoundingBox.createBoundingBox(network);
 		double xMin = boundingBox.getXMin();
 		double xMax = boundingBox.getXMax();
 		double yMin = boundingBox.getYMin();
 		double yMax = boundingBox.getYMax();
 		
-		ActivityFacilities measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(
-				xMin, yMin, xMax, yMax, cellSize);
+		ActivityFacilities measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(xMin, yMin, xMax, yMax, cellSize);
 		return measuringPoints;
 	}
 	

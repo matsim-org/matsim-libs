@@ -69,8 +69,8 @@ public class TestColdEmissionAnalysisModule {
 	// same values as int for table
 	private static final int tableParkingDuration = (int) Math.round( parkingDuration );
 	private static final int tableAccDistance = 1;
-	private final int numberOfColdEmissions = ColdPollutant.values().length;
-	
+	private static final Set<String> pollutants = new HashSet<>(Arrays.asList("CO", "CO2(total)", "FC", "HC", "NMHC", "NOx", "NO2","PM", "SO2"));
+	private final int numberOfColdEmissions = pollutants.size();
 	// strings for test cases
 	
 	// The material below was confused in the way that strings like "petrol" or "diesel" were given for the
@@ -249,7 +249,7 @@ public class TestColdEmissionAnalysisModule {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setUsingVehicleTypeIdAsVehicleDescription( true );
 		
-		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, ecg ), emissionEventManager, rescaleFactor );
+		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants, ecg), emissionEventManager, rescaleFactor );
 		HandlerToTestEmissionAnalysisModules.reset();
 		
 		Id<Link> idForAvgTable = Id.create( "link id avg", Link.class );
@@ -276,7 +276,7 @@ public class TestColdEmissionAnalysisModule {
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setUsingVehicleTypeIdAsVehicleDescription( true );
-		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, ecg ), emissionEventManager, null );
+		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants , ecg), emissionEventManager, null );
 		
 	}
 	
@@ -348,7 +348,7 @@ public class TestColdEmissionAnalysisModule {
 	
 	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable,
 								 final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
-		for ( ColdPollutant cp : ColdPollutant.values() ) {
+		for ( String cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
 			detColdKey.setHbefaDistance( tableAccDistance );
 			detColdKey.setHbefaParkingTime( tableParkingDuration );
