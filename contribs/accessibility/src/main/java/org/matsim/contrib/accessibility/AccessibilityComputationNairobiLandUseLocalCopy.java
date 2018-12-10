@@ -57,7 +57,7 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		config.network().setInputFile("/Users/dominik/Workspace/nairobi/data/nairobi/input/2015-10-15_network.xml");
 		config.facilities().setInputFile("/Users/dominik/Workspace/nairobi/data/land_use/Nairobi_LU_2010/facilities.xml");
 		String runId = "ke_nairobi_landuse_hexagons_" + tileSize_m;
-		config.controler().setOutputDirectory("/Users/dominik/Workspace/nairobi/data/nairobi/output/" + runId + "/");
+		config.controler().setOutputDirectory("/Users/dominik/Workspace/nairobi/data/nairobi/output/" + runId + "_new/");
 		config.controler().setRunId(runId);
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -78,7 +78,7 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		
 //		final List<String> activityTypes = Arrays.asList(new String[]{"educational", "commercial", "industrial", "recreational", "water_body"});
 		final List<String> activityTypes = Arrays.asList(new String[]{"educational"});
-		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(Labels.POPULATION_DENSITIY, scenario.getNetwork());
+		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(Labels.DENSITIY, scenario.getNetwork());
 		
 		final Controler controler = new Controler(scenario);
 		
@@ -93,7 +93,6 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		controler.run();
 		
 		if (createQGisOutput) {
-			final boolean includeDensityLayer = true;
 			final Integer range = 9; // In the current implementation, this must always be 9
 			final Double lowerBound = -7.; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
 			final Double upperBound = 7.;
@@ -105,8 +104,7 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
 					VisualizationUtils.createQGisOutputRuleBasedStandardColorRange(actType, mode.toString(), envelope, workingDirectory,
-//					VisualizationUtils.createQGisOutputGraduatedStandardColorRange(actType, mode.toString(), envelope, workingDirectory,
-							scenarioCRS, includeDensityLayer, lowerBound, upperBound, range, tileSize_m, populationThreshold);
+							scenarioCRS, lowerBound, upperBound, range, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode.toString(), osName);
 				}
 			}
