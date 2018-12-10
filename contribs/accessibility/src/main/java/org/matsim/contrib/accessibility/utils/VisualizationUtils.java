@@ -75,7 +75,7 @@ public class VisualizationUtils {
 			densityLayer.setXField(Labels.X_COORDINATE);
 			densityLayer.setYField(Labels.Y_COORDINATE);
 			GraduatedSymbolRenderer dRenderer = RendererFactory.createDensitiesRenderer(densityLayer, populationThreshold, symbolSize);
-			dRenderer.setRenderingAttribute(Labels.POPULATION_DENSITIY);
+			dRenderer.setRenderingAttribute(Labels.DENSITIY);
 			writer.addLayer(densityLayer);
 		}
 
@@ -96,22 +96,17 @@ public class VisualizationUtils {
 		writer.write(qGisProjectFile);
 	}
 	
-    
+    // TODO new version; please rescue previous (non-polygon-based) version from history
     public static void createQGisOutputRuleBasedStandardColorRange(String actType, String mode, Envelope envelope,
-			String workingDirectory, String crs, boolean includeDensityLayer,
-			Double lowerBound, Double upperBound, Integer range,
-			int symbolSize, int populationThreshold) {
-    	createQGisOutputRuleBased(actType, mode, envelope,
-	    		workingDirectory, crs, includeDensityLayer, lowerBound, upperBound,
-                range, ColorRangeUtils.ColorRange.DEFAULT_RED_TO_BLUE, 
-                symbolSize, populationThreshold);
+			String workingDirectory, String crs, Double lowerBound, Double upperBound, Integer range, int populationThreshold) {
+    	createQGisOutputRuleBased(actType, mode, envelope, workingDirectory, crs, lowerBound, upperBound,
+                range, ColorRangeUtils.ColorRange.DEFAULT_RED_TO_BLUE, populationThreshold);
     }
 	
-    
+    // TODO new version; please rescue previous (non-polygon-based) version from history
 	public static void createQGisOutputRuleBased(String actType, String mode, Envelope envelope,
-			String workingDirectory, String crs, boolean includeDensityLayer,
-			Double lowerBound, Double upperBound, Integer range,
-			ColorRangeUtils.ColorRange colorRange, int symbolSize, int populationThreshold) {
+			String workingDirectory, String crs, Double lowerBound, Double upperBound, Integer range,
+			ColorRangeUtils.ColorRange colorRange, int populationThreshold) {
 
 		// Create Mapnik file that is needed for OSM layer
 		QGisMapnikFileCreator.writeMapnikFile(workingDirectory + "osm_mapnik.xml");
@@ -145,30 +140,20 @@ public class VisualizationUtils {
 //		renderer.setRenderingAttribute(mode.toString() + "_accessibility");
 //		writer.addLayer(accessibilityLayer);
 
-		if (includeDensityLayer) {
-			VectorLayer densityLayer = new VectorLayer(
-					"density", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
-			densityLayer.setXField(Labels.X_COORDINATE);
-			densityLayer.setYField(Labels.Y_COORDINATE);
-			GraduatedSymbolRenderer dRenderer = RendererFactory.createDensitiesRenderer(densityLayer, populationThreshold, symbolSize);
-			dRenderer.setRenderingAttribute(Labels.POPULATION_DENSITIY);
-			writer.addLayer(0,densityLayer);
-		}
-
 		VectorLayer accessibilityLayer = new VectorLayer(
-				"accessibility", actSpecificWorkingDirectory + "../../voronoi_test/voronoi_test.shp", QGisConstants.geometryType.Polygon, false);
+				"accessibility", actSpecificWorkingDirectory + "/result.shp", QGisConstants.geometryType.Polygon, false);
 		// there are two ways to set x and y fields for csv geometry files
 		// 1) if there is a header, you can set the members xField and yField to the name of the column headers
 		// 2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
-		accessibilityLayer.setXField(Integer.parseInt(Labels.X_COORDINATE));
-		accessibilityLayer.setYField(Integer.parseInt(Labels.Y_COORDINATE));
+//		accessibilityLayer.setXField(Labels.X_COORDINATE);
+//		accessibilityLayer.setYField(Labels.Y_COORDINATE);
 		PolygonLayerRenderer renderer = new PolygonLayerRenderer(accessibilityLayer, lowerBound, upperBound, range,
-				colorRange, mode,
-				Labels.POPULATION_DENSITIY, populationThreshold);
+				colorRange, mode, Labels.DENSITIY, populationThreshold);
 		renderer.setRenderingAttribute(mode);
 //		renderer.setRenderingAttribute(mode.toString() + "_accessibility");
 		accessibilityLayer.setLayerClass(QGisConstants.layerClass.SimpleFill);
 		accessibilityLayer.setSrs("EPSG:4326");
+		accessibilityLayer.setLayerTransparency(50);
 		writer.addLayer(0,accessibilityLayer);
 
 		writer.write(qGisProjectFile);
