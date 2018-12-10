@@ -40,7 +40,7 @@ public class TestHbefaWarmEmissionFactorKey{
 	private String hbefaRoadCategory;
 	private HbefaTrafficSituation hbefaTrafficSituation;
 	private HbefaVehicleCategory hbefaVehicleCategory;
-	private WarmPollutant warmPollutant;
+	private String warmPollutant;
 	private String message;
     private String message2;
 	private HbefaWarmEmissionFactorKey normal;
@@ -56,7 +56,7 @@ public class TestHbefaWarmEmissionFactorKey{
 		hbefaRoadCategory = "road type";		
 		hbefaTrafficSituation = HbefaTrafficSituation.FREEFLOW;
 		hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
-		warmPollutant = WarmPollutant.FC;
+		warmPollutant = "FC";
 		
 	}
 
@@ -70,7 +70,7 @@ public class TestHbefaWarmEmissionFactorKey{
 		
 		// generate a warm emission factor key equal to 'normal' 
 		HbefaWarmEmissionFactorKey compare = new HbefaWarmEmissionFactorKey();
-		compare.setHbefaComponent(WarmPollutant.FC);
+		compare.setHbefaComponent("FC");
 		compare.setHbefaRoadCategory(hbefaRoadCategory);
 		compare.setHbefaTrafficSituation(hbefaTrafficSituation);
 		compare.setHbefaVehicleAttributes(hbefaVehicleAttributes);
@@ -82,7 +82,7 @@ public class TestHbefaWarmEmissionFactorKey{
 		
 		//two unequal but complete objects
 		HbefaWarmEmissionFactorKey different = new HbefaWarmEmissionFactorKey();
-		different.setHbefaComponent(WarmPollutant.CO);
+		different.setHbefaComponent("CO");
 		different.setHbefaRoadCategory("another road category");
 		different.setHbefaTrafficSituation(HbefaTrafficSituation.SATURATED);
 		HbefaVehicleAttributes attrForDifferent = new HbefaVehicleAttributes();

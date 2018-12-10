@@ -36,7 +36,7 @@ public class TestHbefaColdEmissionFactorKey {
 	
 	private Integer distance;
     private Integer parkingTime;
-	private ColdPollutant coldPollutant;
+	private String coldPollutant;
 	private HbefaVehicleAttributes hbefaVehicleAttributes;
 	private HbefaVehicleCategory hbefaVehCategory;
 	private String message;
@@ -52,7 +52,7 @@ public class TestHbefaColdEmissionFactorKey {
 		hbefaVehicleAttributes.setHbefaTechnology("technology");
 		distance = 4;
 		parkingTime = 5;
-		coldPollutant = ColdPollutant.FC;
+		coldPollutant = "FC";
 		hbefaVehCategory = HbefaVehicleCategory.PASSENGER_CAR;
 		equalErr = false;
 	}
@@ -85,7 +85,7 @@ public class TestHbefaColdEmissionFactorKey {
 		
 		//different HbefaColdEmissionFactorKey, does not equal 'normal'
 		HbefaColdEmissionFactorKey different = new HbefaColdEmissionFactorKey();
-		different.setHbefaComponent(ColdPollutant.CO);
+		different.setHbefaComponent("CO");
 		different.setHbefaDistance(2);
 		different.setHbefaParkingTime(50);
 		HbefaVehicleAttributes attForDifferent= new HbefaVehicleAttributes();
