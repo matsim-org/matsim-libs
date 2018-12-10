@@ -174,8 +174,8 @@ public final class AccessibilityModule extends AbstractModule {
 				LOG.warn("Pure car network now has " + carNetwork.getNodes().size() + " nodes.");
 				// End AV stuff -------------------------------------------------------------
 				
-				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, network);
-//				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, carNetwork);
+//				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, network);
+				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, carNetwork);
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
 					AccessibilityContributionCalculator calculator = null ;
 					switch(mode) {
@@ -186,14 +186,14 @@ public final class AccessibilityModule extends AbstractModule {
 						final TravelTime travelTime = travelTimes.get(mode.name());
 						Gbl.assertNotNull(travelTime);
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
-						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario, network);
-//						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario, carNetwork);
+//						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario, network);
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario, carNetwork);
 						break; }
 					case freespeed: {
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
 						Gbl.assertNotNull(travelDisutilityFactory);
-						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario, network);
-//						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario, carNetwork);
+//						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario, network);
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario, carNetwork);
 						break; }
 					case walk:
 						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), config, network);
