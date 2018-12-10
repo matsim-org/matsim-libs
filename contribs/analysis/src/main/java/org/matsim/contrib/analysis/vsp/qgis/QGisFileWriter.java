@@ -563,7 +563,7 @@ public class QGisFileWriter {
 		out.write("\t\t\t\t\t\t\t<prop k=\"offset_map_unit_scale\" v=\"" + offsetMapUnitScale + "\"/>\n");
 		out.write("\t\t\t\t\t\t\t<prop k=\"offset_unit\" v=\"" + psl.getSizeUnits().toString() + "\"/>\n");
 		out.write("\t\t\t\t\t\t\t<prop k=\"outline_color\" v=\"" + outlineColor + "\"/>\n");
-		out.write("\t\t\t\t\t\t\t<prop k=\"outline_style\" v=\"" + psl.getPenStyle().toString() + "\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"outline_style\" v=\"" + psl.getPenStyleBorder().toString() + "\"/>\n");
 		out.write("\t\t\t\t\t\t\t<prop k=\"outline_width\" v=\"" + psl.getOutlineWidth() + "\"/>\n");
 		out.write("\t\t\t\t\t\t\t<prop k=\"outline_width_unit\" v=\"" + psl.getSizeUnits().toString() + "\"/>\n");
 		out.write("\t\t\t\t\t\t\t<prop k=\"style\" v=\"" + psl.getPenStyle().toString() + "\"/>\n");
