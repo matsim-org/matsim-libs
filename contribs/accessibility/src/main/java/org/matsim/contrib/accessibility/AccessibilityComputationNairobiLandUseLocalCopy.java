@@ -57,18 +57,17 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		config.network().setInputFile("/Users/dominik/Workspace/nairobi/data/nairobi/input/2015-10-15_network.xml");
 		config.facilities().setInputFile("/Users/dominik/Workspace/nairobi/data/land_use/Nairobi_LU_2010/facilities.xml");
 		String runId = "ke_nairobi_landuse_hexagons_" + tileSize_m;
-		config.controler().setOutputDirectory("/Users/dominik/Workspace/nairobi/data/nairobi/output/" + runId + "_new/");
+		config.controler().setOutputDirectory("/Users/dominik/Workspace/nairobi/data/nairobi/output/" + runId + "_2/");
 		config.controler().setRunId(runId);
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(0);
 		
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-//		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBoxHexagons);
 		acg.setEnvelope(envelope);
 		acg.setTileSize_m(tileSize_m);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		acg.setOutputCrs(scenarioCRS);
 		
@@ -94,8 +93,8 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		
 		if (createQGisOutput) {
 			final Integer range = 9; // In the current implementation, this must always be 9
-			final Double lowerBound = -7.; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
-			final Double upperBound = 7.;
+			final Double lowerBound = -3.5; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
+			final Double upperBound = 3.5;
 			final int populationThreshold = (int) (10 / (1000/tileSize_m * 1000/tileSize_m)); // People per km^2 or roads (?)
 			
 			String osName = System.getProperty("os.name");
