@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.inject.Provider;
 
@@ -68,7 +69,7 @@ public final class AccessibilityModule extends AbstractModule {
 
 	private List<FacilityDataExchangeInterface> facilityDataListeners = new ArrayList<>() ; 
 	private ActivityFacilities measuringPoints;
-	private List<ActivityFacilities> additionalFacs = new ArrayList<>() ;
+	private Map<String, ActivityFacilities> additionalFacs = new TreeMap<>() ;
 	private String activityType;
 	private boolean pushing2Geoserver;
 	private String crs;
@@ -163,6 +164,8 @@ public final class AccessibilityModule extends AbstractModule {
 					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
 				}
 				
+				AccessibilityUtils.assignAdditionalFacilitiesDataToMeasurePoint(measuringPoints, measurePointGeometryMap, additionalFacs);
+				
 				// TODO Need to find a stable way for multi-modal networks
 				// AV stuff -------------------------------------------------------------
 				TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
@@ -211,20 +214,22 @@ public final class AccessibilityModule extends AbstractModule {
 					accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calculator);
 				}
 				
+				String outputDirectory = scenario.getConfig().controler().getOutputDirectory() + "/" + activityType;
+				
 				if (pushing2Geoserver == true) {
 					if (measurePointGeometryMap == null) {
 						throw new IllegalArgumentException("measure-point-to-geometry map must not be null if push to Geoserver is intended.");
 					}
+					Set <String> additionalFacInfo = additionalFacs.keySet();
 					accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs,
-							config.controler().getRunId() + "_" + activityType, measurePointGeometryMap));
+							config.controler().getRunId() + "_" + activityType, measurePointGeometryMap, additionalFacInfo, outputDirectory));
 				}
 				
-				String outputDirectory = scenario.getConfig().controler().getOutputDirectory();
 
 				AccessibilityShutdownListenerV4 accessibilityShutdownListener = new AccessibilityShutdownListenerV4(accessibilityCalculator, 
-						opportunities, ptMatrix, outputDirectory, acg, measurePointGeometryMap, measuringPoints);
+						opportunities, outputDirectory, acg);
 				
-				for (ActivityFacilities fac : additionalFacs) {
+				for (ActivityFacilities fac : additionalFacs.values()) {
 					accessibilityShutdownListener.addAdditionalFacilityData(fac);
 				}
 				
@@ -232,7 +237,6 @@ public final class AccessibilityModule extends AbstractModule {
 					accessibilityShutdownListener.addFacilityDataExchangeListener(listener);
 				}
 				
-				accessibilityShutdownListener.writeToSubdirectoryWithName(activityType);
 				return accessibilityShutdownListener;
 			}
 		});
@@ -250,12 +254,20 @@ public final class AccessibilityModule extends AbstractModule {
 	 * Add additional facility data that will generate an additional column for each (x,y,t)-Entry. The facilities are aggregated to
 	 * the measurement points in downstream code.
 	 */
-	public void addAdditionalFacilityData(ActivityFacilities facilities) {
-		additionalFacs.add(facilities) ;
+	public void addAdditionalFacilityData(ActivityFacilities facilities) { // TDO cleanu up this method
+		if (facilities.getName() == null || facilities.getName().equals("")) {
+			throw new RuntimeException("Cannot add unnamed facility containers here. A key is required to identify them.") ;
+		}
+		for (ActivityFacilities existingFacilities : this.additionalFacs.values()) {
+			if (existingFacilities.getName().equals(facilities.getName())) {
+				throw new RuntimeException("Additional facilities under the name of + " + facilities.getName() + 
+						" already exist. Cannot add additional facilities under the same name twice.") ;
+			}
+		}
+		this.additionalFacs.put(facilities.getName(), facilities);
 	}
 	
 	public void setConsideredActivityType(String activityType) {
-		// yyyy could be done via config (list of activities)
 		this.activityType = activityType ;
 	}
 }
