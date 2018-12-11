@@ -52,9 +52,8 @@ public class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 		super(GROUP_NAME);
 
 	}
-	@SuppressWarnings("deprecation")
 	public static TaxiFareConfigGroup get(Config config) {
-		return (TaxiFareConfigGroup)config.getModule(GROUP_NAME);
+        return (TaxiFareConfigGroup) config.getModules().get(GROUP_NAME);
 	}
 	
     @Override
