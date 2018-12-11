@@ -264,12 +264,12 @@ public class ColdEmissionAnalysisModule {
             if(this.detailedHbefaColdTable.containsKey(key)){
                 generatedEmissions = this.detailedHbefaColdTable.get(key).getColdEmissionFactor();
             } else {
-			if(vehAttributesNotSpecifiedCnt < maxWarnCnt) {
+				if(vehAttributesNotSpecifiedCnt < maxWarnCnt) {
 				vehAttributesNotSpecifiedCnt++;
 				logger.warn("No detailed entry (for vehicle `" + vehicleId + "') corresponds to `" + vehicleInformationTuple.getSecond() + "'. Falling back on fleet average values.");
 				if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
-
+				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
                 generatedEmissions = this.avgHbefaColdTable.get(key).getColdEmissionFactor();
             }
         } else {
