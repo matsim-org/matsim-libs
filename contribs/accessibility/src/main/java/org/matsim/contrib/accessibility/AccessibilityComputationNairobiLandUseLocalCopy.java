@@ -57,18 +57,17 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		config.network().setInputFile("/Users/dominik/Workspace/nairobi/data/nairobi/input/2015-10-15_network.xml");
 		config.facilities().setInputFile("/Users/dominik/Workspace/nairobi/data/land_use/Nairobi_LU_2010/facilities.xml");
 		String runId = "ke_nairobi_landuse_hexagons_" + tileSize_m;
-		config.controler().setOutputDirectory("/Users/dominik/Workspace/nairobi/data/nairobi/output/" + runId + "/");
+		config.controler().setOutputDirectory("/Users/dominik/Workspace/nairobi/data/nairobi/output/" + runId + "_2/");
 		config.controler().setRunId(runId);
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(0);
 		
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-//		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBoxHexagons);
 		acg.setEnvelope(envelope);
 		acg.setTileSize_m(tileSize_m);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		acg.setOutputCrs(scenarioCRS);
 		
@@ -78,7 +77,7 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		
 //		final List<String> activityTypes = Arrays.asList(new String[]{"educational", "commercial", "industrial", "recreational", "water_body"});
 		final List<String> activityTypes = Arrays.asList(new String[]{"educational"});
-		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(Labels.POPULATION_DENSITIY, scenario.getNetwork());
+		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(Labels.DENSITIY, scenario.getNetwork());
 		
 		final Controler controler = new Controler(scenario);
 		
@@ -93,10 +92,9 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		controler.run();
 		
 		if (createQGisOutput) {
-			final boolean includeDensityLayer = true;
 			final Integer range = 9; // In the current implementation, this must always be 9
-			final Double lowerBound = -7.; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
-			final Double upperBound = 7.;
+			final Double lowerBound = -3.5; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
+			final Double upperBound = 3.5;
 			final int populationThreshold = (int) (10 / (1000/tileSize_m * 1000/tileSize_m)); // People per km^2 or roads (?)
 			
 			String osName = System.getProperty("os.name");
@@ -105,8 +103,7 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
 					VisualizationUtils.createQGisOutputRuleBasedStandardColorRange(actType, mode.toString(), envelope, workingDirectory,
-//					VisualizationUtils.createQGisOutputGraduatedStandardColorRange(actType, mode.toString(), envelope, workingDirectory,
-							scenarioCRS, includeDensityLayer, lowerBound, upperBound, range, tileSize_m, populationThreshold);
+							scenarioCRS, lowerBound, upperBound, range, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode.toString(), osName);
 				}
 			}

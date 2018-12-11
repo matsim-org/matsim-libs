@@ -25,19 +25,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
-import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author dziemke
@@ -49,28 +42,19 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 	private String outputDirectory;
 	private AccessibilityConfigGroup acg;
 	
-	private String outputSubdirectory; // For consideration of different activity types subdirectories are required in order not to confuse the output
 	private AccessibilityAggregator accessibilityAggregator;
-	private PtMatrix ptMatrix;
 	private ActivityFacilities opportunities;
-	
-	private ActivityFacilities measurePoints;
-	private Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap;
 
 	
 	public AccessibilityShutdownListenerV4(AccessibilityCalculator accessibilityCalculator, ActivityFacilities opportunities, 
-			PtMatrix ptMatrix, String outputDirectory, AccessibilityConfigGroup acg, Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap, ActivityFacilities measurePoints) {
-		this.ptMatrix = ptMatrix;
+			String outputDirectory, AccessibilityConfigGroup acg) {
 		this.opportunities = opportunities;
 		this.accessibilityCalculator = accessibilityCalculator;
 		this.outputDirectory = outputDirectory;
 		this.acg = acg;
-		this.measurePointGeometryMap = measurePointGeometryMap;
-		this.measurePoints = measurePoints;
 	}
 
 	private List<ActivityFacilities> additionalFacilityData = new ArrayList<>() ;
-	private boolean lockedForAdditionalFacilityData = false;
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
@@ -81,54 +65,19 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 		accessibilityAggregator = new AccessibilityAggregator();
 		accessibilityCalculator.addFacilityDataExchangeListener(accessibilityAggregator);
 
-		lockedForAdditionalFacilityData = true;
-
-		if (outputSubdirectory != null) {
-			File file = new File(outputDirectory + "/" + outputSubdirectory);
+		if (outputDirectory != null) {
+			File file = new File(outputDirectory);
 			file.mkdirs();
 		}
-
-		assignAdditionalFacilitiesDataToMeasurePoint();
 
 		LOG.info("Start computing accessibilities.");
 		accessibilityCalculator.computeAccessibilities(acg.getTimeOfDay(), opportunities);
 		LOG.info("Finished computing accessibilities.");
 
-		// In case multiple accessibility listeners are used, subdirectories are required in order not to confuse the output
-		if (outputSubdirectory == null) {
-			writeOutputFile(outputDirectory);
-		} else {
-			writeOutputFile(outputDirectory + "/" + outputSubdirectory);
-		}
+		writeCSVFile(outputDirectory);
 	}
 
-	private void assignAdditionalFacilitiesDataToMeasurePoint() {
-		LOG.info("Start assigning additional facilities data to measure point.");
-		GeometryFactory geometryFactory = new GeometryFactory();
-		
-		for (ActivityFacilities additionalDataFacilities : this.additionalFacilityData) { // Iterate over all additional data collections
-			String additionalDataName = additionalDataFacilities.getName();
-			int additionalDataFacilitiesToAssign = additionalDataFacilities.getFacilities().size();
-			
-			for (Id<ActivityFacility> measurePointId : measurePoints.getFacilities().keySet()) { // Iterate over all measure points
-				ActivityFacility measurePoint = measurePoints.getFacilities().get(measurePointId);
-				measurePoint.getAttributes().putAttribute(additionalDataName, 0);
-				Geometry geometry = measurePointGeometryMap.get(measurePointId);
-				
-				for (ActivityFacility facility : additionalDataFacilities.getFacilities().values()) { // Iterate over additional-data facilities
-					Point point = geometryFactory.createPoint(new Coordinate(facility.getCoord().getX(), facility.getCoord().getY()));
-					if (geometry.contains(point)) {
-						measurePoint.getAttributes().putAttribute(additionalDataName, (int) measurePoint.getAttributes().getAttribute(additionalDataName) + 1);
-						additionalDataFacilitiesToAssign--;
-					}
-				}
-			}
-			LOG.warn(additionalDataFacilitiesToAssign + " have not been assigned to a measure point geometry.");
-		}
-		LOG.info("Finished assigning additional facilities data to measure point.");
-	}
-
-	private void writeOutputFile(String adaptedOutputDirectory) {
+	private void writeCSVFile(String adaptedOutputDirectory) {
 		LOG.info("Start writing accessibility output to " + adaptedOutputDirectory + ".");
 
 		Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = accessibilityAggregator.getAccessibilitiesMap();
@@ -144,7 +93,6 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 		for (ActivityFacilities additionalDataFacilities : this.additionalFacilityData) { // Iterate over all additional data collections
 			String additionalDataName = additionalDataFacilities.getName();
 			writer.writeField(additionalDataName);
-			writer.writeField(additionalDataName); // TODO Only here for backwards comparability
 		}
 		writer.writeNewLine();
 
@@ -167,7 +115,6 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 				String additionalDataName = additionalDataFacilities.getName();
 				int value = (int) facility.getAttributes().getAttribute(additionalDataName);
 				writer.writeField(value);
-				writer.writeField(value); // TODO Only here for backwards comparability
 			}
 			writer.writeNewLine();
 		}
@@ -176,28 +123,7 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 	}
 	
 	public void addAdditionalFacilityData(ActivityFacilities facilities) {
-		if (this.lockedForAdditionalFacilityData) {
-			throw new RuntimeException("too late for adding additional facility data; spatial grids have already been generated.  Needs"
-					+ " to be called before generating the spatial grids.  (This design should be improved ..)") ;
-		}
-		if (facilities.getName() == null || facilities.getName().equals("")) {
-			throw new RuntimeException("Cannot add unnamed facility containers here. A key is required to identify them.") ;
-		}
-		for (ActivityFacilities existingFacilities : this.additionalFacilityData) {
-			if (existingFacilities.getName().equals(facilities.getName())) {
-				throw new RuntimeException("Additional facilities under the name of + " + facilities.getName() + 
-						" already exist. Cannot add additional facilities under the same name twice.") ;
-			}
-		}
-		this.additionalFacilityData.add( facilities ) ;
-	}
-
-	/**
-	 * Use this method to change the folder structure of the output. The output will be written into the subfolder, which is needed if
-	 * more than one listener is added since otherwise the output would be overwritten and not be available for analyses anymore.
-	 */
-	public void writeToSubdirectoryWithName(String subdirectory) {
-		this.outputSubdirectory = subdirectory;
+		this.additionalFacilityData.add(facilities);
 	}
 	
 	public void addFacilityDataExchangeListener( FacilityDataExchangeInterface facilityDataExchangeListener ) {
