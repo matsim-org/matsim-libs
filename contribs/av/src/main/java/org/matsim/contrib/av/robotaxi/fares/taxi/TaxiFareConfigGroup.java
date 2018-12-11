@@ -24,8 +24,6 @@ package org.matsim.contrib.av.robotaxi.fares.taxi;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
-import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
 
 import java.util.Map;
 
@@ -46,7 +44,7 @@ public class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 	public static final String MODE = "mode";
 
 	private double basefare;
-    private double minFarePerTrip = 0;
+    private double minFarePerTrip = 0.0;
 	private double dailySubscriptionFee;
 	private double timeFare_h;
 	private double distanceFare_m;
