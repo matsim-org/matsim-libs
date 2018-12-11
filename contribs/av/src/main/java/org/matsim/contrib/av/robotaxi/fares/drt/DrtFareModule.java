@@ -33,7 +33,7 @@ public class DrtFareModule extends AbstractModule {
             addEventHandlerBinding().toInstance(new DrtFareHandler(DrtFareConfigGroup.get(getConfig())));
         } else {
             DrtFaresConfigGroup drtFaresConfigGroup = DrtFaresConfigGroup.get(getConfig());
-            drtFaresConfigGroup.getTaxiFareConfigGroups().forEach(drtFareConfigGroup -> addEventHandlerBinding().toInstance(new DrtFareHandler(drtFareConfigGroup)));
+            drtFaresConfigGroup.getDrtFareConfigGroups().forEach(drtFareConfigGroup -> addEventHandlerBinding().toInstance(new DrtFareHandler(drtFareConfigGroup)));
         }
     }
 }

@@ -39,7 +39,7 @@ import java.util.Set;
 
 /**
  * @author jbischoff
- * A simple implementation for taxi fares.
+ * A simple implementation for drt fares.
  * Note that these fares are scored in excess to anything set in the modeparams in the config file.
  */
 public class DrtFareHandler
