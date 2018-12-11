@@ -43,7 +43,7 @@ public class DrtFareConfigGroup extends ReflectiveConfigGroup {
     public static final String MODE = "mode";
 
     private double basefare;
-    private double minFarePerTrip = 0;
+    private double minFarePerTrip = 0.0;
     private double dailySubscriptionFee;
     private double timeFare_h;
     private double distanceFare_m;
