@@ -20,12 +20,12 @@
 /**
  * 
  */
-package org.matsim.contrib.av.robotaxi.scoring;
-
-import java.util.Map;
+package org.matsim.contrib.av.robotaxi.fares.taxi;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
+
+import java.util.Map;
 
 /**
  * @author  jbischoff
@@ -65,7 +65,7 @@ public class TaxiFareConfigGroup extends ReflectiveConfigGroup {
         map.put(DAILY_FEE, "Daily subscription fee (fee = positive value)");
         map.put(TIMEFARE , "taxi fare per hour (fee = positive value)");
         map.put(DISTANCEFARE, "taxi fare per meter (fee = positive value)");
-        map.put(MODE, "taxi / drt mode (passengers'/customers' perspective; default: taxi)");
+        map.put(MODE, "transport mode for which the fare applies. Default: taxi");
 		return map;
     }
 
