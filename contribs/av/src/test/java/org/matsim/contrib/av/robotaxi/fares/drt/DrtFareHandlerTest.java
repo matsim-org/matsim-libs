@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -57,9 +56,9 @@ public class DrtFareHandlerTest {
         tccg.setBasefare(1);
         tccg.setDailySubscriptionFee(1);
         tccg.setDistanceFare_m(1.0 / 1000.0);
-        tccg.setTimeFare_h(36);
-        TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-        config.addModule(taxiCfg);
+        tccg.setTimeFare_h(15);
+        tccg.setMode(TransportMode.drt);
+
         final MutableDouble fare = new MutableDouble(0);
         EventsManager events = EventsUtils.createEventsManager();
         DrtFareHandler tfh = new DrtFareHandler(tccg, events);
@@ -76,12 +75,12 @@ public class DrtFareHandlerTest {
         });
         Id<Person> p1 = Id.createPersonId("p1");
 
-        events.processEvent(new PersonDepartureEvent(0.0, p1, Id.createLinkId("12"), taxiCfg.getMode()));
+        events.processEvent(new PersonDepartureEvent(0.0, p1, Id.createLinkId("12"), TransportMode.drt));
         events.processEvent(new DrtRequestSubmittedEvent(0.0, TransportMode.drt, Id.create(0, Request.class), p1, Id.createLinkId("12"), Id.createLinkId("23"), 240, 1000));
-        events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("23"), taxiCfg.getMode()));
+        events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("23"), TransportMode.drt));
 
-        //fare: 1 (daily fee) +2*1(basefare)+ 2*1 (distance) + (36/60)*2 = -(1+2+2+0,12) = -6.2
-        Assert.assertEquals(-4.4, fare.getValue());
+        //fare: 1 (daily fee) + 1 (distance()+ 1 basefare + 1 (time)
+        Assert.assertEquals(-4.0, fare.getValue());
     }
 
 
