@@ -48,7 +48,7 @@ public class DrtFaresConfigGroup extends ReflectiveConfigGroup {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<DrtFareConfigGroup> getTaxiFareConfigGroups() {
+    public Collection<DrtFareConfigGroup> getDrtFareConfigGroups() {
         return (Collection<DrtFareConfigGroup>) getParameterSets(DrtFareConfigGroup.GROUP_NAME);
     }
 }
