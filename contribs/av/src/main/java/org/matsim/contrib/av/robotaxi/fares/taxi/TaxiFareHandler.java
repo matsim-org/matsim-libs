@@ -57,6 +57,7 @@ public class TaxiFareHandler
 
 	private final double distanceFare_Meter;
 	private final double baseFare;
+    private final double minFarePerTrip;
 	private final double timeFare_hour;
 	private final double dailyFee;
 
@@ -74,6 +75,7 @@ public class TaxiFareHandler
 		this.mode = taxiFareConfigGroup.getMode();
 		this.distanceFare_Meter = taxiFareConfigGroup.getDistanceFare_m();
 		this.baseFare = taxiFareConfigGroup.getBasefare();
+        this.minFarePerTrip = taxiFareConfigGroup.getMinFarePerTrip();
 		this.dailyFee = taxiFareConfigGroup.getDailySubscriptionFee();
 		this.timeFare_hour = taxiFareConfigGroup.getTimeFare_h();
 	}
@@ -100,8 +102,11 @@ public class TaxiFareHandler
 			Id<Vehicle> vid = currentVehicle.remove(event.getPersonId());
 			double distance = currentRideDistance.remove(vid).doubleValue();
 			double rideTime = (event.getTime() - vehicleEnterTime.remove(event.getPersonId())) / 3600.0;
-			double fare = -(baseFare + distance * distanceFare_Meter + rideTime * timeFare_hour);
-			events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), fare));
+			double fare = baseFare + distance * distanceFare_Meter + rideTime * timeFare_hour;
+            if (fare < minFarePerTrip) {
+            	fare = minFarePerTrip;
+            }
+			events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -fare));
 		}
 	}
 
