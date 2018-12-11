@@ -20,18 +20,14 @@
 /**
  * 
  */
-package org.matsim.contrib.av.robotaxi.scoring;
+package org.matsim.contrib.av.robotaxi.fares.taxi;
 
 import org.apache.commons.lang.mutable.MutableDouble;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -51,7 +47,7 @@ import org.matsim.vehicles.Vehicle;
 public class TaxiFareHandlerTest {
 
 	/**
-	 * Test method for {@link TaxiFareHandler#TaxiFareHandler(Config, EventsManager, Network)}.
+     * Test method for {@link TaxiFareHandler}.
 	 */
 	@Test
 	public void testTaxiFareHandler() {
@@ -67,7 +63,7 @@ public class TaxiFareHandlerTest {
 		config.addModule(taxiCfg);
 		final MutableDouble fare = new MutableDouble(0);
 		EventsManager events = EventsUtils.createEventsManager();
-		TaxiFareHandler tfh = new TaxiFareHandler(config, events, network);
+        TaxiFareHandler tfh = new TaxiFareHandler(tccg, network, events);
 		events.addHandler(tfh);
 		events.addHandler(new PersonMoneyEventHandler() {
 						
