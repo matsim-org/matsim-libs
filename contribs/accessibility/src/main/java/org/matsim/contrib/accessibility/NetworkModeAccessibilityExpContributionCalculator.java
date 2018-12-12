@@ -105,23 +105,14 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense. (comment by thibaut?)
 		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);	
 		
-		// TODO Revise AV integration
-//		if (AccessibilityAVUtils.avMode) {
-//			waitingTime_h = (Double) origin.getAttributes().getAttribute("waitingTime") / 3600.;
-//		}
 		// (a) disutilities to get on or off the network
-		double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT);
 		// NEW AV MODE
-//		if (AccessibilityAVUtils.avMode) {
-//			walkDisutilityMeasuringPoint2Road = ((walkTravelTimeMeasuringPoint2Road_h + waitingTime_h) * betaWalkTT)
-//					+ (distance.getDistancePoint2Intersection() * betaWalkTD);
-//		} else {
-//			// END NEW AV MODE
-//			walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT)
-//					+ (distance.getDistancePoint2Intersection() * betaWalkTD);
-//		}
-//		System.out.println("walkDisutilityMeasuringPoint2Road = " + walkDisutilityMeasuringPoint2Road);
-		
+		double waitingTime_h = (Double) origin.getAttributes().getAttribute("waitingTime") / 3600.;
+		double walkUtilityMeasuringPoint2Road = ((walkTravelTimeMeasuringPoint2Road_h + waitingTime_h) * betaWalkTT)
+					+ (distance.getDistancePoint2Intersection() * betaWalkTD);
+		// END NEW AV MODE
+//		double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT)
+//					+ (distance.getDistancePoint2Intersection() * betaWalkTD);		
 		
 		// (b) TRAVEL ON NETWORK to FIRST NODE:
 		double toll_money = getTollMoney(departureTime, nearestLink, distance);
