@@ -20,20 +20,12 @@
 /**
  *
  */
-package org.matsim.contrib.av.robotaxi.scoring;
+package org.matsim.contrib.av.robotaxi.fares.taxi;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.inject.Inject;
 import org.apache.commons.lang.mutable.MutableDouble;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
@@ -41,25 +33,31 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author jbischoff
- * A simple implementation for taxi or drt fares.
+ * A simple implementation for taxi fares.
  * Note that these fares are scored in excess to anything set in the modeparams in the config file.
  */
 public class TaxiFareHandler
 		implements LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonDepartureEventHandler,
 		PersonArrivalEventHandler {
 
-	private final EventsManager events;
-	private final Network network;
+
+	@Inject
+	private EventsManager events;
+	@Inject
+	private Network network;
 
 	private final double distanceFare_Meter;
 	private final double baseFare;
+    private final double minFarePerTrip;
 	private final double timeFare_hour;
 	private final double dailyFee;
 
@@ -71,18 +69,22 @@ public class TaxiFareHandler
 	private String mode;
 
 	/**
-	 * @params config: A Matsim config that contains a TaxiFareConfigGroup
+	 * @params taxiFareConfigGroup: TaxiFareConfigGroup for the specific mode
 	 */
-	@Inject
-	public TaxiFareHandler(Config config, EventsManager events, Network network) {
-		TaxiFareConfigGroup taxiFareConfigGroup = TaxiFareConfigGroup.get(config);
+	public TaxiFareHandler(TaxiFareConfigGroup taxiFareConfigGroup) {
 		this.mode = taxiFareConfigGroup.getMode();
-		this.events = events;
-		this.network = network;
 		this.distanceFare_Meter = taxiFareConfigGroup.getDistanceFare_m();
 		this.baseFare = taxiFareConfigGroup.getBasefare();
+        this.minFarePerTrip = taxiFareConfigGroup.getMinFarePerTrip();
 		this.dailyFee = taxiFareConfigGroup.getDailySubscriptionFee();
 		this.timeFare_hour = taxiFareConfigGroup.getTimeFare_h();
+	}
+
+	TaxiFareHandler(TaxiFareConfigGroup taxiFareConfigGroup, Network network, EventsManager events) {
+		this(taxiFareConfigGroup);
+		this.network = network;
+		this.events = events;
+
 	}
 
 	@Override
@@ -100,8 +102,11 @@ public class TaxiFareHandler
 			Id<Vehicle> vid = currentVehicle.remove(event.getPersonId());
 			double distance = currentRideDistance.remove(vid).doubleValue();
 			double rideTime = (event.getTime() - vehicleEnterTime.remove(event.getPersonId())) / 3600.0;
-			double fare = -(baseFare + distance * distanceFare_Meter + rideTime * timeFare_hour);
-			events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), fare));
+			double fare = baseFare + distance * distanceFare_Meter + rideTime * timeFare_hour;
+            if (fare < minFarePerTrip) {
+            	fare = minFarePerTrip;
+            }
+			events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -fare));
 		}
 	}
 
