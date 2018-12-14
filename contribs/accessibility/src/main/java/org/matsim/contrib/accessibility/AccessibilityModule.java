@@ -105,35 +105,20 @@ public final class AccessibilityModule extends AbstractModule {
 				}
 				
 				if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromShapeFile) {
-//					int tileSize_m = acg.getTileSize();
-//					if (tileSize_m <= 0) {
-//						LOG.error("Tile Size needs to be assigned a value greater than zero.");
-//					}
 					Geometry boundary = GridUtils.getBoundary(acg.getShapeFileCellBasedAccessibility());
 					Envelope envelope = boundary.getEnvelopeInternal();
 					boundingBox = BoundingBox.createBoundingBox(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, tileSize_m);
-//					measurePointGeometryMap = VoronoiGeometryUtils.buildMeasurePointGeometryMap(measuringPoints, boundingBox, tileSize_m);
 					LOG.info("Using shape file to determine the area for accessibility computation.");
 					
 				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromBoundingBox) {
-//					int tileSize_m = acg.getTileSize();
-//					if (tileSize_m <= 0) {
-//						LOG.error("Tile Size needs to be assigned a value greater than zero.");
-//					}
 					boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, tileSize_m);
-//					measurePointGeometryMap = VoronoiGeometryUtils.buildMeasurePointGeometryMap(measuringPoints, boundingBox, tileSize_m);
 					LOG.info("Using custom bounding box to determine the area for accessibility computation.");
 					
 				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromBoundingBoxHexagons) {
-//					int tileSize_m = acg.getTileSize();
-//					if (tileSize_m <= 0) {
-//						LOG.error("Tile Size needs to be assigned a value greater than zero.");
-//					}
 					boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
 					measuringPoints = GridUtils.createHexagonLayer(boundingBox, tileSize_m);
-//					measurePointGeometryMap = VoronoiGeometryUtils.buildMeasurePointGeometryMap(measuringPoints, boundingBox, tileSize_m);
 					LOG.info("Using custom bounding box to determine the area for accessibility computation.");
 					
 				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromFacilitiesFile) {
@@ -156,14 +141,8 @@ public final class AccessibilityModule extends AbstractModule {
 				} else { // This covers also the "fromNetwork" case
 					LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
 					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
-
-//					int tileSize_m = acg.getTileSize();
-//					if (tileSize_m <= 0) {
-//						LOG.error("Tile Size needs to be assigned a value greater than zero.");
-//					}
 					boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, tileSize_m);
-//					measurePointGeometryMap = VoronoiGeometryUtils.buildMeasurePointGeometryMap(measuringPoints, boundingBox, tileSize_m);
 					LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
 					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
 				}
@@ -182,8 +161,8 @@ public final class AccessibilityModule extends AbstractModule {
 				LOG.warn("Pure car network now has " + carNetwork.getNodes().size() + " nodes.");
 				// End AV stuff -------------------------------------------------------------
 				
-//				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, network);
-				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, carNetwork);
+				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, network);
+//				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, carNetwork);
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
 					AccessibilityContributionCalculator calculator = null ;
 					switch(mode) {
@@ -194,14 +173,14 @@ public final class AccessibilityModule extends AbstractModule {
 						final TravelTime travelTime = travelTimes.get(mode.name());
 						Gbl.assertNotNull(travelTime);
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
-//						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario, network);
-						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario, carNetwork);
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario, network);
+//						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario, carNetwork);
 						break; }
 					case freespeed: {
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
 						Gbl.assertNotNull(travelDisutilityFactory);
-//						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario, network);
-						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario, carNetwork);
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario, network);
+//						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario, carNetwork);
 						break; }
 					case walk:
 						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), config, network);
