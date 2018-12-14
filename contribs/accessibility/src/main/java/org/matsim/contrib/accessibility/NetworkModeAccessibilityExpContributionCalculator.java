@@ -107,12 +107,12 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		
 		// (a) disutilities to get on or off the network
 		// NEW AV MODE
-		double waitingTime_h = (Double) origin.getAttributes().getAttribute("waitingTime") / 3600.;
-		double walkUtilityMeasuringPoint2Road = ((walkTravelTimeMeasuringPoint2Road_h + waitingTime_h) * betaWalkTT)
-					+ (distance.getDistancePoint2Intersection() * betaWalkTD);
+//		double waitingTime_h = (Double) origin.getAttributes().getAttribute("waitingTime_s") / 3600.;
+//		double walkUtilityMeasuringPoint2Road = ((walkTravelTimeMeasuringPoint2Road_h + waitingTime_h) * betaWalkTT)
+//					+ (distance.getDistancePoint2Intersection() * betaWalkTD);
 		// END NEW AV MODE
-//		double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT)
-//					+ (distance.getDistancePoint2Intersection() * betaWalkTD);		
+		double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT)
+					+ (distance.getDistancePoint2Intersection() * betaWalkTD);		
 		
 		// (b) TRAVEL ON NETWORK to FIRST NODE:
 		double toll_money = getTollMoney(departureTime, nearestLink, distance);
