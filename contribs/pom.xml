@@ -226,13 +226,17 @@
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
-		<!--MATSim examples.  Not inherited from matsim since it is in test scope there-->
 		<dependency>
+		  <!--MATSim examples.  Not inherited from matsim since it-->
+		  <!--is in test scope there.  Leave in test scope since-->
+		  <!--it is not in weekly releases and then causes problems.  -->
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
  			<!--<version>0.10.0</version>-->
 			<!--<version>0.11.0-apr17</version>-->
+			<scope>test</scope>
 			<version>0.11.0-SNAPSHOT</version>
+			<!--(This has possibly no effect here, don't know.)-->
 		</dependency>
 	</dependencies>
 

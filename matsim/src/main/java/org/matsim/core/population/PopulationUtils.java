@@ -79,7 +79,9 @@ import org.matsim.utils.objectattributes.attributable.AttributesUtils;
  */
 public final class PopulationUtils {
 	private static final Logger log = Logger.getLogger( PopulationUtils.class );
-	private static final PopulationFactory populationFactory = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory() ;
+//	private static final PopulationFactory populationFactory = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory() ;
+	private static final PopulationFactory populationFactory = createPopulation( new PlansConfigGroup(), null  ).getFactory() ;
+	// try to avoid misleading comment about config context.  kai, dec'18
 
 	/**
 	 * Is a namespace, so don't instantiate:
