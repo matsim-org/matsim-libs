@@ -56,6 +56,7 @@ public class TaxiFareHandlerTest {
 		TaxiFareConfigGroup tccg = new TaxiFareConfigGroup();
 		config.addModule(tccg);
 		tccg.setBasefare(1);
+        tccg.setMinFarePerTrip(1.5);
 		tccg.setDailySubscriptionFee(1);
 		tccg.setDistanceFare_m(1.0/1000.0);
 		tccg.setTimeFare_h(36);
@@ -90,6 +91,18 @@ public class TaxiFareHandlerTest {
 		
 		//fare: 1 (daily fee) +2*1(basefare)+ 2*1 (distance) + (36/60)*2 = -(1+2+2+0,12) = -6.2 
 		Assert.assertEquals(-6.2, fare.getValue());
+		
+        // test minFarePerTrip
+		events.processEvent(new PersonDepartureEvent(360.0, p1 , Id.createLinkId("23"), taxiCfg.getMode()));
+		events.processEvent(new PersonEntersVehicleEvent(400.0, p1 , t1));
+		events.processEvent(new LinkEnterEvent(401,t1,Id.createLinkId("34")));
+		events.processEvent(new PersonArrivalEvent(410.0, p1, Id.createLinkId("34"), taxiCfg.getMode()));
+		
+        /* 
+         * fare new trip: 0 (daily fee already paid) + 0.1 (distance)+ 1 basefare + 0.1 (time) = 1.2 < minFarePerTrip = 1.5
+         * --> new total fare: 6.2 (previous trip) + 1.5 (minFarePerTrip for new trip) = 7.7
+         */
+		Assert.assertEquals(-7.7, fare.getValue());
 	}
 
 	private Network createNetwork(){
@@ -97,11 +110,14 @@ public class TaxiFareHandlerTest {
 		Node n1 = NetworkUtils.createNode( Id.createNodeId(1), new Coord(0,0));
 		Node n2 = NetworkUtils.createNode(Id.createNodeId(2), new Coord(2000,0));
 		Node n3 = NetworkUtils.createNode(Id.createNodeId(3), new Coord(2000,2000));
+		Node n4 = NetworkUtils.createNode(Id.createNodeId(4), new Coord(2100,2000));
 		network.addNode(n1);
 		network.addNode(n2);
 		network.addNode(n3);
+		network.addNode(n4);
 		NetworkUtils.createAndAddLink(network, Id.createLinkId(12), n1, n2, 1000.0, 100 , 100 , 1 , "1", "");
 		NetworkUtils.createAndAddLink(network, Id.createLinkId(23), n2, n3, 1000.0, 100 , 100 , 1 , "1", "");
+		NetworkUtils.createAndAddLink(network, Id.createLinkId(34), n3, n4, 100.0, 100 , 100 , 1 , "1", "");
 		return network;
 			
 	}

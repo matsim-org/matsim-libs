@@ -39,7 +39,7 @@ import java.util.Set;
 
 /**
  * @author jbischoff
- * A simple implementation for taxi fares.
+ * A simple implementation for drt fares.
  * Note that these fares are scored in excess to anything set in the modeparams in the config file.
  */
 public class DrtFareHandler
@@ -51,10 +51,11 @@ public class DrtFareHandler
 
     private final double distanceFare_Meter;
     private final double baseFare;
+    private final double minFarePerTrip;
     private final double timeFare_sec;
     private final double dailyFee;
     Set<Id<Person>> dailyFeeCharged = new HashSet<>();
-    Map<Id<Person>, DrtRequestSubmittedEvent> lastRequestSubmission = new HashMap();
+    Map<Id<Person>, DrtRequestSubmittedEvent> lastRequestSubmission = new HashMap<>();
     private String mode;
 
     /**
@@ -64,6 +65,7 @@ public class DrtFareHandler
         this.mode = drtFareConfigGroup.getMode();
         this.distanceFare_Meter = drtFareConfigGroup.getDistanceFare_m();
         this.baseFare = drtFareConfigGroup.getBasefare();
+        this.minFarePerTrip = drtFareConfigGroup.getMinFarePerTrip();
         this.dailyFee = drtFareConfigGroup.getDailySubscriptionFee();
         this.timeFare_sec = drtFareConfigGroup.getTimeFare_h() / 3600.0;
     }
@@ -88,6 +90,9 @@ public class DrtFareHandler
             }
             DrtRequestSubmittedEvent e = this.lastRequestSubmission.get(event.getPersonId());
             double fare = distanceFare_Meter * e.getUnsharedRideDistance() + timeFare_sec * e.getUnsharedRideTime() + baseFare;
+            if (fare < minFarePerTrip) {
+            	fare = minFarePerTrip;
+            }
             events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -fare));
         }
 

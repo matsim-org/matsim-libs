@@ -36,12 +36,14 @@ public class DrtFareConfigGroup extends ReflectiveConfigGroup {
     public static final String GROUP_NAME = "drtfare";
 
     public static final String BASEFARE = "basefare";
+    public static final String MINFARE_PER_TRIP = "minFarePerTrip";
     public static final String DAILY_FEE = "dailySubscriptionFee";
     public static final String TIMEFARE = "timeFare_h";
     public static final String DISTANCEFARE = "distanceFare_m";
     public static final String MODE = "mode";
 
     private double basefare;
+    private double minFarePerTrip = 0.0;
     private double dailySubscriptionFee;
     private double timeFare_h;
     private double distanceFare_m;
@@ -60,6 +62,7 @@ public class DrtFareConfigGroup extends ReflectiveConfigGroup {
     public Map<String, String> getComments() {
         Map<String, String> map = super.getComments();
         map.put(BASEFARE, "Basefare per Trip (fare = positive value)");
+        map.put(MINFARE_PER_TRIP, "Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, fee = positive value).");
         map.put(DAILY_FEE, "Daily subscription fee (fee = positive value)");
         map.put(TIMEFARE, "drt fare per hour (fee = positive value)");
         map.put(DISTANCEFARE, "drt fare per meter (fee = positive value)");
@@ -76,6 +79,16 @@ public class DrtFareConfigGroup extends ReflectiveConfigGroup {
     @StringSetter(BASEFARE)
     public void setBasefare(double basefare) {
         this.basefare = basefare;
+    }
+    
+    @StringGetter(MINFARE_PER_TRIP)
+    public double getMinFarePerTrip() {
+        return minFarePerTrip;
+    }
+
+    @StringSetter(MINFARE_PER_TRIP)
+    public void setMinFarePerTrip(double minFarePerTrip) {
+        this.minFarePerTrip = minFarePerTrip;
     }
 
     @StringGetter(DAILY_FEE)

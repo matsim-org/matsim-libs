@@ -54,6 +54,7 @@ public class DrtFareHandlerTest {
         DrtFareConfigGroup tccg = new DrtFareConfigGroup();
         config.addModule(tccg);
         tccg.setBasefare(1);
+        tccg.setMinFarePerTrip(1.5);
         tccg.setDailySubscriptionFee(1);
         tccg.setDistanceFare_m(1.0 / 1000.0);
         tccg.setTimeFare_h(15);
@@ -81,6 +82,17 @@ public class DrtFareHandlerTest {
 
         //fare: 1 (daily fee) + 1 (distance()+ 1 basefare + 1 (time)
         Assert.assertEquals(-4.0, fare.getValue());
+        
+        // test minFarePerTrip
+        events.processEvent(new PersonDepartureEvent(0.0, p1, Id.createLinkId("45"), TransportMode.drt));
+        events.processEvent(new DrtRequestSubmittedEvent(0.0, TransportMode.drt, Id.create(0, Request.class), p1, Id.createLinkId("45"), Id.createLinkId("56"), 24, 100));
+        events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("56"), TransportMode.drt));
+        
+        /* 
+         * fare new trip: 0 (daily fee already paid) + 0.1 (distance)+ 1 basefare + 0.1 (time) = 1.2 < minFarePerTrip = 1.5
+         * --> new total fare: 4 (previous trip) + 1.5 (minFarePerTrip for new trip) = 5.5
+         */
+        Assert.assertEquals(-5.5, fare.getValue());
     }
 
 
