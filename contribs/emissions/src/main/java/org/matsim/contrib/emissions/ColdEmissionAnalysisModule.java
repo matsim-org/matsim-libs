@@ -253,29 +253,35 @@ public class ColdEmissionAnalysisModule {
 
     private double getTableEmissions(Id<Vehicle> vehicleId, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km, HbefaColdEmissionFactorKey key, String coldPollutant) {
         key.setHbefaDistance(distance_km);
-        double generatedEmissions;
+        HbefaColdEmissionFactor generatedEmissions = null;
 
         key.setHbefaComponent(coldPollutant);
+		key.setHbefaVehicleAttributes(vehicleInformationTuple.getSecond());
 
-        if(this.detailedHbefaColdTable != null){ // check if detailed emission factors file is set in config
+        if(this.detailedHbefaColdTable != null && key.getHbefaVehicleAttributes().isDetailed()) { // check if detailed emission factors file is set in config
 //		  HbefaVehicleAttributes hbefaVehicleAttributes = createHbefaVehicleAttributes( vehicleInformationTuple.getSecond() );
-		  key.setHbefaVehicleAttributes(vehicleInformationTuple.getSecond());
-
-            if(this.detailedHbefaColdTable.containsKey(key)){
-                generatedEmissions = this.detailedHbefaColdTable.get(key).getColdEmissionFactor();
-            } else {
-				if(vehAttributesNotSpecifiedCnt < maxWarnCnt) {
+			generatedEmissions = this.detailedHbefaColdTable.get(key);
+		}
+		if(generatedEmissions == null){
+			if(vehAttributesNotSpecifiedCnt < maxWarnCnt) {
 				vehAttributesNotSpecifiedCnt++;
 				logger.warn("No detailed entry (for vehicle `" + vehicleId + "') corresponds to `" + vehicleInformationTuple.getSecond() + "'. Falling back on fleet average values.");
 				if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
-				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
-                generatedEmissions = this.avgHbefaColdTable.get(key).getColdEmissionFactor();
-            }
-        } else {
-            generatedEmissions = this.avgHbefaColdTable.get(key).getColdEmissionFactor();
+
+			//try just with engine technoogy
+			HbefaVehicleAttributes hbva = new HbefaVehicleAttributes();
+			hbva.setHbefaTechnology(key.getHbefaVehicleAttributes().getHbefaTechnology());
+			key.setHbefaVehicleAttributes(hbva);
+			generatedEmissions = this.avgHbefaColdTable.get(key);
+
         }
-        return generatedEmissions;
+		if (generatedEmissions == null) {
+			//revert way back to fleet averages, not just fuel type
+			key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
+			generatedEmissions = this.avgHbefaColdTable.get(key);
+		}
+        return generatedEmissions.getColdEmissionFactor();
 	    
 	    // yy when thinking about the above, it is actually not so clear what that "fallback" actually means ... since
 	    // the exact key now just needs to be in the avg table.  So it is not really a fallback, but rather just
