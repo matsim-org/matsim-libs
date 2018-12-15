@@ -26,5 +26,32 @@
         <artifactId>sf-geojson</artifactId>
         <version>2.0.0</version>
     </dependency>
+      <!-- https://mvnrepository.com/artifact/org.geotools/gt-geojson -->
+      <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-geojson</artifactId>
+          <version>14.0</version>
+      </dependency>
+
   </dependencies>
+
+    <repositories>
+        <repository>
+            <id>locationtech-releases</id>
+            <url>https://repo.locationtech.org/content/groups/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jts-snapshots</id>
+            <url>https://repo.locationtech.org/content/repositories/jts-snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 </project>

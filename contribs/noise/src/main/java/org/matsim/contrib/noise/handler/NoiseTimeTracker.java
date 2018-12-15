@@ -727,7 +727,7 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 			 		if (noiseLink != null) {
 						if (!(noiseLink.getEmission() == 0.)) {
 							noiseImmission = noiseLink.getEmission()
-									+ distanceCorrection + angleCorrection + shieldingCorrection;
+									+ distanceCorrection + angleCorrection - shieldingCorrection;
 							
 							if (noiseImmission < 0.) {
 								noiseImmission = 0.;
@@ -736,7 +736,7 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 						
 						if (!(noiseLink.getEmissionPlusOneCar() == 0.)) {
 							noiseImmissionPlusOneCar = noiseLink.getEmissionPlusOneCar()
-									+ distanceCorrection + angleCorrection + shieldingCorrection;
+									+ distanceCorrection + angleCorrection - shieldingCorrection;
 							
 							if (noiseImmissionPlusOneCar < 0.) {
 								noiseImmissionPlusOneCar = 0.;
@@ -745,7 +745,7 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 						
 						if (!(noiseLink.getEmissionPlusOneHGV() == 0.)) {
 							noiseImmissionPlusOneHGV = noiseLink.getEmissionPlusOneHGV()
-									+ distanceCorrection + angleCorrection + shieldingCorrection;
+									+ distanceCorrection + angleCorrection - shieldingCorrection;
 							
 							if (noiseImmissionPlusOneHGV < 0.) {
 								noiseImmissionPlusOneHGV = 0.;

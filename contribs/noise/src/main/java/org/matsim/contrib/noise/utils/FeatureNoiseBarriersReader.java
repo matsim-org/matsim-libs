@@ -1,16 +1,28 @@
 package org.matsim.contrib.noise.utils;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import mil.nga.sf.GeometryType;
-import mil.nga.sf.geojson.*;
+import com.vividsolutions.jts.geom.CoordinateFilter;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
 import org.apache.log4j.Logger;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
+import org.geotools.geojson.GeoJSONUtil;
+import org.geotools.geojson.feature.FeatureJSON;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.noise.data.FeatureNoiseBarrierImpl;
+import org.matsim.contrib.noise.data.NoiseBarrier;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -25,32 +37,60 @@ public class FeatureNoiseBarriersReader {
     private final static String LEVELS = "levels";
     private final static String HEIGHT = "height";
     private final static int DEFAULT_HEIGHT = 10;
+    private final static InvertCoordinateFilter FILTER = new InvertCoordinateFilter();
 
-    public static Collection<FeatureNoiseBarrierImpl> read(String path) {
+    public static Collection<FeatureNoiseBarrierImpl> read(String path, String sourceCrs, String targetCrs) {
 
         logger.info("Reading noise shielding objects geojson from " + path);
-        String geoJson = null;
+
+        FeatureJSON json = new FeatureJSON();
+        FeatureCollection featureCollection = null;
         try {
-            geoJson = readFile(path, Charset.defaultCharset());
+            final Reader reader = GeoJSONUtil.toReader(new FileInputStream(path));
+            featureCollection = json.readFeatureCollection(reader);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        FeatureCollection featureCollection = FeatureConverter.toFeatureCollection(geoJson);
 
         List<FeatureNoiseBarrierImpl> barriers = new ArrayList<>();
 
-        for (Feature feature : featureCollection.getFeatures()) {
-            final GeometryType type = feature.getGeometryType();
-            if (type != GeometryType.POLYGON) {
+        MathTransform transform = null;
+        try {
+            CoordinateReferenceSystem sourceCRS = CRS.decode(sourceCrs);
+            CoordinateReferenceSystem targetCRS = CRS.decode(targetCrs);
+            transform = CRS.findMathTransform(sourceCRS, targetCRS);
+        } catch (FactoryException e) {
+            e.printStackTrace();
+        }
+
+        final FeatureIterator features = featureCollection.features();
+        while (features.hasNext()) {
+            SimpleFeature feature = (SimpleFeature) features.next();
+
+            final Object geometry = feature.getAttribute("geometry");
+            if(!(geometry instanceof  Polygon)) {
+                System.out.println("test1");
                 continue;
             }
-
-            com.vividsolutions.jts.geom.Polygon geom = createPolygon(feature);
-
+            Polygon polygon = (Polygon) geometry;
+            polygon.apply(FILTER);
+            Geometry transformedPolygon = null;
+            try {
+                transformedPolygon = JTS.transform(polygon, transform);;
+            } catch (TransformException e) {
+                e.printStackTrace();
+            }
+            transformedPolygon.apply(FILTER);
+            if(!polygon.isValid()) {
+                System.out.println("test");
+                continue;
+            }
+            Id<NoiseBarrier> id = Id.create((String) feature.getAttribute("id"), NoiseBarrier.class);
             double height = getHeight(feature);
 
-            FeatureNoiseBarrierImpl noiseBarrier = new FeatureNoiseBarrierImpl(geom, height);
-            if (Double.isNaN(geom.getCentroid().getX()) || Double.isNaN(geom.getCentroid().getY())) {
+
+            FeatureNoiseBarrierImpl noiseBarrier = new FeatureNoiseBarrierImpl(id, transformedPolygon, height);
+            if (Double.isNaN(polygon.getCentroid().getX()) || Double.isNaN(polygon.getCentroid().getY())) {
                 logger.debug("Noise barrier ignored due to invalid centroid coordinates.");
             } else {
                 barriers.add(noiseBarrier);
@@ -59,51 +99,26 @@ public class FeatureNoiseBarriersReader {
         return barriers;
     }
 
-    private static com.vividsolutions.jts.geom.Polygon createPolygon(Feature feature) {
-        int noCoordinates = 0;
-        for (List<Position> positions : ((Polygon) feature.getGeometry()).getCoordinates()) {
-            noCoordinates += positions.size();
-        }
-
-        //Last coordinate must be the same as first
-        Coordinate[] coordinates = new Coordinate[noCoordinates+1];
-
-        int idx = 0;
-        for (List<Position> positions : ((Polygon) feature.getGeometry()).getCoordinates()) {
-            for (Position position : positions) {
-                coordinates[idx] = new Coordinate(position.getX(), position.getY());
-                idx++;
-            }
-        }
-        coordinates[coordinates.length-1] = coordinates[0];
-        return new GeometryFactory().createPolygon(coordinates);
-    }
-
-    private static double getHeight(Feature feature) {
+    private static double getHeight(SimpleFeature feature) {
         double height = DEFAULT_HEIGHT;
-        if (feature.getProperties().containsKey(FeatureNoiseBarriersReader.HEIGHT)) {
-            Object value = feature.getProperties().get(FeatureNoiseBarriersReader.HEIGHT);
-            height = parse(value);
-        } else if (feature.getProperties().containsKey(LEVELS)) {
-            Object value = feature.getProperties().get(LEVELS);
-            double levels = parse(value);
-            height = levels * HEIGHT_PER_LEVEL;
+        final Double height1 = (Double) feature.getAttribute(HEIGHT);
+        if (height1 != null) {
+            height = height1;
+        } else {
+            final Double levels = (Double) feature.getAttribute(LEVELS);
+            if (levels != null) {
+                height = levels * HEIGHT_PER_LEVEL;
+            }
         }
         return height;
     }
 
-    private static double parse(Object o) {
-        if(o instanceof Double) {
-            return (Double) o;
-        } else if(o instanceof  Integer){
-            return (Integer) o;
-        } else {
-            throw new NumberFormatException("Could not parse value for height.");
+    private static class InvertCoordinateFilter implements CoordinateFilter {
+        @Override
+        public void filter(Coordinate coord) {
+            double oldX = coord.x;
+            coord.x = coord.y;
+            coord.y = oldX;
         }
-    }
-
-    private static String readFile(String path, Charset encoding) throws IOException {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return new String(encoded, encoding);
     }
 }

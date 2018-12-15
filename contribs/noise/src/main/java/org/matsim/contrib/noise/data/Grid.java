@@ -218,7 +218,7 @@ public class Grid {
 	private void setActivityCoord2NearestReceiverPointId () {
 		double gap = noiseParams.getReceiverPointGap();
 		Counter counter = new Counter("fill quadtree #") ;
-		QuadTree<ReceiverPoint> qTree = new QuadTree<>(xCoordMin - 4*gap, yCoordMin - 4* gap, xCoordMax + 4*gap, yCoordMax + 4*gap);
+		QuadTree<ReceiverPoint> qTree = new QuadTree<>(xCoordMin - 15*gap, yCoordMin - 15* gap, xCoordMax + 15*gap, yCoordMax + 15*gap);
 		for(ReceiverPoint p: receiverPoints.values()) {
 			qTree.put(p.getCoord().getX(), p.getCoord().getY(), p);
 			counter.incCounter();
