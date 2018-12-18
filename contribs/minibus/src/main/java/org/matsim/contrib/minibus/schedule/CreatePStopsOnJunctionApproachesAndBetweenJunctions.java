@@ -297,7 +297,7 @@ public final class CreatePStopsOnJunctionApproachesAndBetweenJunctions{
 			
 			@Override
 			public boolean judgeLink(Link l) {
-				if (l.getCapacity() > pConfigGroup.getMinCapacityForStops()) return true;
+				if (l.getCapacity() >= pConfigGroup.getMinCapacityForStops()) return true;
 				else return false;
 			}
 		});
