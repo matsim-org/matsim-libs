@@ -23,51 +23,59 @@ import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimAgent.State;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.ActivityEngine.AgentEntry;
 import org.matsim.core.mobsim.qsim.ActivityEngine.AgentEntryComparator;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler.TripInfo;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.Facility;
 import org.matsim.withinday.utils.EditPlans;
 import org.matsim.withinday.utils.EditTrips;
-import org.opengis.filter.spatial.Within;
-import sun.management.resources.agent;
 
 import javax.inject.Inject;
 
 public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	private static final Logger log = Logger.getLogger( ActivityEngine.class ) ;
 	private final EditTrips editTrips;
+	private final EditPlans editPlans;
+	// after mobsim the alterations to the plans are deleted (a reset is needed before next iteration in any case)? Don't we need rather something like "executed plan"
 
 	private final Map<String, DepartureHandler> departureHandlers;
 	private final Scenario scenario;
+	private final ActivityFacilities facilities;
+	private final double beelineWalkSpeed;
 
 	private ActivityEngine delegate ;
 
 	@Inject
 	public ActivityEngineWithWakeup( EventsManager eventsManager, Map<String, DepartureHandler> departureHandlers,
-				     TripRouter tripRouter, Scenario scenario ) {
+				     TripRouter tripRouter, Scenario scenario, QSim qsim, Config config ) {
 		this.departureHandlers = departureHandlers;
 		this.editTrips = new EditTrips( tripRouter, scenario ) ;
+		this.editPlans = new EditPlans(qsim, tripRouter, editTrips);
 		this.delegate = new ActivityEngine( eventsManager ) ;
 		this.scenario = scenario ;
+		this.facilities = scenario.getActivityFacilities();
+		
+		PlansCalcRouteConfigGroup pcrConfig = config.plansCalcRoute();
+		double beelineDistanceFactor = pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
+		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk)
+				/ beelineDistanceFactor ;
 	}
 
 	private final Queue<AgentEntry> wakeUpList = new PriorityBlockingQueue<>(500, new AgentEntryComparator() );
@@ -82,25 +90,58 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 		while ( !wakeUpList.isEmpty() ) {
 			if ( wakeUpList.peek().time <= time ) {
 				MobsimAgent agent = wakeUpList.poll().agent ;
+				Plan plan;
+				// option 1 - better, because creates a copy 
+				plan = WithinDayAgentUtils.getModifiablePlan(agent);
+				
+				// option 2
+				if (agent instanceof PlanAgent) {
+					plan = ((PlanAgent) agent).getCurrentPlan();
+				}
+				
+				// TODO: later write ExperiencedPlans (in PlansCalcScoreConfigGroup) as debug output
+				
+				// TODO: somehow find out for which activity the agent was woken up
+				// quick and dirty temporary solution:
+				int currentIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
+				if ( !(plan.getPlanElements().get(currentIndex) instanceof Activity) || 
+						! (plan.getPlanElements().get(currentIndex + 2) instanceof Activity) ) {
+					currentIndex++;
+				}
+				Facility fromFacility = toFacility((Activity) plan.getPlanElements().get(currentIndex));
+				Facility toFacility = toFacility((Activity) plan.getPlanElements().get(currentIndex + 2));
+				
 				Collection<TripInfo> allTripInfos  = new ArrayList<>() ;
 				for ( DepartureHandler handler : departureHandlers.values() ) {
 					allTripInfos.addAll( handler.getTripInfos() ) ;
 				}
-				decide( agent, allTripInfos, editTrips ) ;
+				decide( agent, allTripInfos, editTrips, editPlans, fromFacility, toFacility) ;
 			}
 		}
 		delegate.doSimStep( time );
 	}
+	
+	private Facility toFacility(final Activity act) {
+		// use facility first if available i.e. reversing the logic above Amit July'18
+		if (	facilities != null &&
+				! facilities.getFacilities().isEmpty() &&
+				act.getFacilityId() != null ) {
+			return facilities.getFacilities().get( act.getFacilityId() );
+		}
 
-	private void decide( MobsimAgent agent, Collection<TripInfo> allTripInfos, EditTrips editTrips, EditPlans editPlans ){
+		return new ActivityWrapperFacility( act );
+	}
+
+	private void decide( MobsimAgent agent, Collection<TripInfo> allTripInfos, EditTrips editTrips, EditPlans editPlans, Facility fromFacility, Facility toFacility ){
 		Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement( agent );
 		Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ;
 		String mode = editPlans.getModeOfCurrentOrNextTrip( agent );;
 		if ( !TransportMode.drt.equals( mode ) ) {
 			return ;
 		}
-
-		TripInfo tripinfo = null;
+		
+		// TODO: Decision logic between multiple offers / tripInfos --> some simple score prognosis?
+		TripInfo tripinfo = allTripInfos.iterator().next();
 
 		tripinfo.accept();
 
@@ -108,16 +149,22 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 
 		List<PlanElement> newTrip = new ArrayList<>(  ) ;
 		PopulationFactory pf = scenario.getPopulation().getFactory() ;
-		double walkTime = 60. ;
+		
+        double pickupBeelineDistance = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), tripinfo.getPickupLocation().getCoord());
+        double pickupWalkTime = pickupBeelineDistance / beelineWalkSpeed;
+
+		double buffer = 60. ;
 		{
 			Leg leg = pf.createLeg( TransportMode.access_walk );
 			// also add generic route
-			leg.setTravelTime( walkTime );
+			leg.setTravelTime( pickupWalkTime );
 			newTrip.add( leg ) ;
 		}
 		{
 			Activity activity = pf.createActivityFromCoord( "drt_interaction", tripinfo.getPickupLocation().getCoord() ) ;
-			activity.setFacilityId( tripinfo.getPickupLocation().getId() ); // how is this solved in transit router?
+//			activity.setFacilityId( tripinfo.getPickupLocation().getId() ); // how is this solved in transit router? -- TransitRouterWrapper.fillWithActivities() -- no facility id is set !
+			activity.setLinkId(tripinfo.getPickupLocation().getLinkId());
+			activity.setCoord(tripinfo.getPickupLocation().getCoord());
 			newTrip.add( activity ) ;
 		}
 		{
@@ -127,18 +174,23 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 		}
 		{
 			Activity activity = pf.createActivityFromCoord( "drt_interaction", tripinfo.getDropoffLocation().getCoord() ) ;
-			activity.setFacilityId( tripinfo.getDropoffLocation().getId() ); // how is this solved in transit router?
+//			activity.setFacilityId( tripinfo.getDropoffLocation().getId() ); // how is this solved in transit router? -- no facility id is set !
+			activity.setLinkId(tripinfo.getDropoffLocation().getLinkId());
+			activity.setCoord(tripinfo.getDropoffLocation().getCoord());
 			newTrip.add( activity ) ;
 		}
 		{
 			Leg leg = pf.createLeg( TransportMode.egress_walk ) ;
 			// also add generic route
+	        double dropoffBeelineDistance = CoordUtils.calcEuclideanDistance(tripinfo.getDropoffLocation().getCoord(), toFacility.getCoord());
+	        double dropoffWalkTime = dropoffBeelineDistance / beelineWalkSpeed;
+	        leg.setTravelTime(dropoffWalkTime);
 			newTrip.add( leg ) ;
 		}
 		TripRouter.insertTrip( plan, currentActivity, newTrip, trip.getDestinationActivity() ) ;
 
 		Integer index = WithinDayAgentUtils.getCurrentPlanElementIndex( agent );;
-		editPlans.rescheduleActivityEndtime( agent, index, tripinfo.getExpectedBoardingTime() - walkTime - buffer );
+		editPlans.rescheduleActivityEndtime( agent, index, tripinfo.getExpectedBoardingTime() - pickupWalkTime - buffer );
 
 		rescheduleActivityEnd( agent ); // not sure if this is necessary; might be contained in the above
 	}
