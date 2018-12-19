@@ -22,19 +22,14 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import com.google.inject.*;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Named;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.components.ComponentRegistry;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
@@ -44,7 +39,9 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 
-import com.google.inject.name.Named;
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.List;
 
 public class QSimProvider implements Provider<QSim> {
 	private static final Logger log = Logger.getLogger(QSimProvider.class);
@@ -74,19 +71,6 @@ public class QSimProvider implements Provider<QSim> {
 
 		modules.forEach(m -> m.setConfig(config));
 		overridingModules.forEach(m -> m.setConfig(config));
-
-        new AbstractModule() {
-            @Override
-            protected void configure() {
-                for (Object annotation : components.getActiveComponents()) {
-                    if (annotation instanceof Annotation) {
-                        Multibinder.newSetBinder(binder(), QSimComponent.class, (Annotation) annotation);
-                    } else {
-                        Multibinder.newSetBinder(binder(), QSimComponent.class, (Class<? extends Annotation>) annotation);
-                    }
-                }
-            }
-        };
 
         AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, overridingModules);
 

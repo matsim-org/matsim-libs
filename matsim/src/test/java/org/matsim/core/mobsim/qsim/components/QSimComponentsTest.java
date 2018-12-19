@@ -111,7 +111,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindNamedComponent("MockEngine").toInstance(mockEngine);
+						addComponentBindingNamed("MockEngine").toInstance(mockEngine);
 					}
 				}) //
 				.configureQSimComponents( components -> {
@@ -142,7 +142,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindNamedComponent("MockEngine").toInstance(mockEngine);
+						addComponentBindingNamed("MockEngine").toInstance(mockEngine);
 					}
 				}) //
 				.build(scenario, eventsManager) //

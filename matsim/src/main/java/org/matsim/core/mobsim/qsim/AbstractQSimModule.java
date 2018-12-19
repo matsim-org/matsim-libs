@@ -32,16 +32,13 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule {
 		return multibinder.addBinding();
 	}
 	
-	protected LinkedBindingBuilder<QSimComponent> bindNamedComponent(String name) {
-		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class, Names.named(name));
-		multibinder.permitDuplicates();
-		return multibinder.addBinding();
+	protected LinkedBindingBuilder<QSimComponent> addComponentBindingNamed(String name) {
+		return addComponentBindingAnnotatedWith(Names.named(name));
 	}
 
+	//TODO: Inline
 	protected <T extends QSimComponent> void addNamedComponent(Class<T> componentClass, String name) {
-		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class, Names.named(name));
-		multibinder.permitDuplicates();
-		multibinder.addBinding().to(componentClass);
+		addComponentBindingNamed(name).to(componentClass);
 	}
 
 	protected abstract void configureQSim();
