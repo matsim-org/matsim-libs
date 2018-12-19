@@ -46,7 +46,7 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 	
 	public static void main(String[] args) {
 		int tileSize_m = 500;
-		boolean push2Geoserver = true; // Set true for run on server
+		boolean push2Geoserver = false; // Set true for run on server
 		boolean createQGisOutput = true; // Set false for run on server
 		
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
@@ -57,7 +57,7 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		config.network().setInputFile("/Users/dominik/Workspace/nairobi/data/nairobi/input/2015-10-15_network.xml");
 		config.facilities().setInputFile("/Users/dominik/Workspace/nairobi/data/land_use/Nairobi_LU_2010/facilities.xml");
 		String runId = "ke_nairobi_landuse_hexagons_" + tileSize_m;
-		config.controler().setOutputDirectory("/Users/dominik/Workspace/nairobi/data/nairobi/output/" + runId + "_2/");
+		config.controler().setOutputDirectory("/Users/dominik/Workspace/nairobi/data/nairobi/output/" + runId + "_3/");
 		config.controler().setRunId(runId);
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -67,7 +67,8 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBoxHexagons);
 		acg.setEnvelope(envelope);
 		acg.setTileSize_m(tileSize_m);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
+//		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		acg.setOutputCrs(scenarioCRS);
 		
@@ -86,6 +87,7 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 			module.setConsideredActivityType(activityType);
 			module.addAdditionalFacilityData(densityFacilities);
 			module.setPushing2Geoserver(push2Geoserver);
+			module.setCreateQGisOutput(createQGisOutput);
 			controler.addOverridingModule(module);
 		}
 		

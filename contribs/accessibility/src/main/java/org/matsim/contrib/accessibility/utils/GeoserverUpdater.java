@@ -58,16 +58,21 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 
 	private String crs;
 	private String name;
-	Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap;
-	Set<String> additionalFacInfo;
-	String outputDirectory;
+	private Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap;
+	private Set<String> additionalFacInfo;
+	private String outputDirectory;
+	private boolean pushing2Geoserver;
+	private boolean createQGisOutput;
 
-	public GeoserverUpdater (String crs, String name, Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap, Set<String> additionalFacInfo, String outputDirectory) {
+	public GeoserverUpdater (String crs, String name, Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap, Set<String> additionalFacInfo,
+			String outputDirectory, boolean pushing2Geoserver, boolean createQGisOutput) {
 		this.crs = crs;
 		this.name = name;
 		this.measurePointGeometryMap = measurePointGeometryMap;
 		this.additionalFacInfo = additionalFacInfo;
 		this.outputDirectory = outputDirectory;
+		this.pushing2Geoserver = pushing2Geoserver;
+		this.createQGisOutput = createQGisOutput;
 	}
 	
 	private Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>() ;
@@ -89,10 +94,13 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 			file.mkdirs();
 		}
 		
-		// TODO Maybe find a better location for this shape-file writing
-	    ShapeFileWriter.writeGeometries(featureCollection, outputDirectory + "/result.shp");
+		if (createQGisOutput) {
+			ShapeFileWriter.writeGeometries(featureCollection, outputDirectory + "/result.shp");
+		}
 	    
-		updateOnGeoserver(featureType, featureCollection);
+		if (pushing2Geoserver) {
+			updateOnGeoserver(featureType, featureCollection);
+		}
 	}
 
 	private SimpleFeatureTypeBuilder createFeatureTypeBuilder() {

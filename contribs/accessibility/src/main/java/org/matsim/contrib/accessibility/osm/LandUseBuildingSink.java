@@ -140,7 +140,7 @@ public class LandUseBuildingSink implements Sink {
 				matsimActivityType = getActivityType(landuseType, this.landUseTypeMap);
 			}
 			if(matsimActivityType != null){
-				Coord[] coords = CoordUtils.getAllWayCoords((Way) entity, this.ct, this.nodeMap);
+				Coord[] coords = OSMCoordUtils.getAllWayCoords((Way) entity, this.ct, this.nodeMap);
 				SimpleFeature feature = createLandUseFeature(coords, matsimActivityType);
 				if (feature == null) {
 					continue;
@@ -224,8 +224,8 @@ public class LandUseBuildingSink implements Sink {
 					}
 				}
 								
-				Coord coord = CoordUtils.getCentroidCoord(entity, ct, nodeMap, wayMap, relationMap);
-				Coord[] buildingCoords = CoordUtils.getAllWayCoords((Way) entity, this.ct, this.nodeMap);
+				Coord coord = OSMCoordUtils.getCentroidCoord(entity, ct, nodeMap, wayMap, relationMap);
+				Coord[] buildingCoords = OSMCoordUtils.getAllWayCoords((Way) entity, this.ct, this.nodeMap);
 				SimpleFeature buildingAsFeature = createLandUseFeature(buildingCoords, null);
 				if (buildingAsFeature == null) {
 					log.error("The feature of building " + entityKey + " is null!");
