@@ -27,7 +27,7 @@ public class QSimComponentsTest {
 		AbstractQSimModule module = new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				addComponent(MockMobsimListener.class, MockComponentAnnotation.class);
+				addComponentBindingAnnotatedWith(MockComponentAnnotation.class).to(MockMobsimListener.class);
 			}
 		};
 		
@@ -53,8 +53,8 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bind(MockEngineA.class).annotatedWith(MockComponentAnnotation.class).toInstance(mockEngineA);
-						bind(MockEngineB.class).annotatedWith(MockComponentAnnotation.class).toInstance(mockEngineB);
+						addComponentBindingAnnotatedWith(MockComponentAnnotation.class).toInstance(mockEngineA);
+						addComponentBindingAnnotatedWith(MockComponentAnnotation.class).toInstance(mockEngineB);
 					}
 				}) //
 				.configureQSimComponents( components -> {
@@ -87,7 +87,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindComponent(MockEngine.class, MockComponentAnnotation.class).toInstance(mockEngine);
+						addComponentBindingAnnotatedWith(MockComponentAnnotation.class).toInstance(mockEngine);
 					}
 				}) //
 				.configureQSimComponents( components -> {
@@ -111,7 +111,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindNamedComponent(MockEngine.class, "MockEngine").toInstance(mockEngine);
+						bindNamedComponent("MockEngine").toInstance(mockEngine);
 					}
 				}) //
 				.configureQSimComponents( components -> {
@@ -142,7 +142,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindNamedComponent(MockEngine.class, "MockEngine").toInstance(mockEngine);
+						bindNamedComponent("MockEngine").toInstance(mockEngine);
 					}
 				}) //
 				.build(scenario, eventsManager) //

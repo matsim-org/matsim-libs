@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.run;
 
 import java.util.function.Function;
 
+import com.google.inject.binder.ScopedBindingBuilder;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
@@ -51,12 +52,14 @@ public abstract class AbstractMultiModeQSimModule extends AbstractQSimModule {
 		return bind(modalKey(type));
 	}
 
-	protected <T extends QSimComponent> LinkedBindingBuilder<T> bindModalComponent(Class<T> componentClass) {
-		return bindComponent(componentClass).annotatedWith(DvrpModes.mode(mode));
+	protected <T extends QSimComponent> ScopedBindingBuilder addModalComponent(Class<T> componentClass, Provider<T> componentProvider) {
+		bind(componentClass).annotatedWith(DvrpModes.mode(mode)).toProvider(componentProvider).asEagerSingleton();
+		return addComponentBindingAnnotatedWith(DvrpModes.mode(mode)).to(Key.get(componentClass, DvrpModes.mode(mode)));
 	}
 
 	protected <T extends QSimComponent> void addModalComponent(Class<T> componentClass) {
-		bindModalComponent(componentClass).to(componentClass);
+		bind(componentClass).annotatedWith(DvrpModes.mode(mode)).to(componentClass).asEagerSingleton();
+		addComponentBindingAnnotatedWith(DvrpModes.mode(mode)).to(Key.get(componentClass, DvrpModes.mode(mode)));
 	}
 
 	protected <T> Provider<T> modalProvider(Function<ModalProviders.InstanceGetter, T> delegate) {

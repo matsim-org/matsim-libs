@@ -4,15 +4,10 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.List;
 
+import com.google.inject.multibindings.Multibinder;
 import org.matsim.core.mobsim.framework.AbstractMobsimModule;
-import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
-import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
@@ -24,33 +19,29 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule {
 	protected final void configureMobsim() {
 		configureQSim();
 	}
-	
-	protected <T extends QSimComponent> AnnotatedBindingBuilder<T> bindComponent(Class<T> componentClass) {
-		return binder().bind(componentClass);
+
+	protected LinkedBindingBuilder<QSimComponent> addComponentBindingAnnotatedWith(Annotation annotation) {
+		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class, annotation);
+		multibinder.permitDuplicates();
+		return multibinder.addBinding();
+	}
+
+	protected LinkedBindingBuilder<QSimComponent> addComponentBindingAnnotatedWith(Class<? extends Annotation> annotationClass) {
+		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class, annotationClass);
+		multibinder.permitDuplicates();
+		return multibinder.addBinding();
 	}
 	
-	protected <T extends QSimComponent> LinkedBindingBuilder<T> bindComponent(Class<T> componentClass, Annotation annotation) {
-		return bindComponent(componentClass).annotatedWith(annotation);
+	protected LinkedBindingBuilder<QSimComponent> bindNamedComponent(String name) {
+		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class, Names.named(name));
+		multibinder.permitDuplicates();
+		return multibinder.addBinding();
 	}
-	
-	protected <T extends QSimComponent> LinkedBindingBuilder<T> bindComponent(Class<T> componentClass, Class<? extends Annotation> annotationClass) {
-		return bindComponent(componentClass).annotatedWith(annotationClass);
-	}
-	
-	protected <T extends QSimComponent> LinkedBindingBuilder<T> bindNamedComponent(Class<T> componentClass, String name) {
-		return bindComponent(componentClass).annotatedWith(Names.named(name));
-	}
-	
-	protected <T extends QSimComponent> void addComponent(Class<T> componentClass, Annotation annotation) {
-		bindComponent(componentClass, annotation).to(componentClass);
-	}
-	
-	protected <T extends QSimComponent> void addComponent(Class<T> componentClass, Class<? extends Annotation> annotationClass) {
-		bindComponent(componentClass, annotationClass).to(componentClass);
-	}
-	
+
 	protected <T extends QSimComponent> void addNamedComponent(Class<T> componentClass, String name) {
-		bindNamedComponent(componentClass, name).to(componentClass);
+		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class, Names.named(name));
+		multibinder.permitDuplicates();
+		multibinder.addBinding().to(componentClass);
 	}
 
 	protected abstract void configureQSim();

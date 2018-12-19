@@ -22,9 +22,13 @@
 
 package org.matsim.core.mobsim.qsim;
 
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
+import com.google.inject.*;
+import com.google.inject.multibindings.Multibinder;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationCounter;
@@ -40,12 +44,6 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.ConfigurationException;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.Provider;
 import com.google.inject.name.Named;
 
 public class QSimProvider implements Provider<QSim> {
@@ -77,7 +75,20 @@ public class QSimProvider implements Provider<QSim> {
 		modules.forEach(m -> m.setConfig(config));
 		overridingModules.forEach(m -> m.setConfig(config));
 
-		AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, overridingModules);
+        new AbstractModule() {
+            @Override
+            protected void configure() {
+                for (Object annotation : components.getActiveComponents()) {
+                    if (annotation instanceof Annotation) {
+                        Multibinder.newSetBinder(binder(), QSimComponent.class, (Annotation) annotation);
+                    } else {
+                        Multibinder.newSetBinder(binder(), QSimComponent.class, (Class<? extends Annotation>) annotation);
+                    }
+                }
+            }
+        };
+
+        AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, overridingModules);
 
 		AbstractModule module = new AbstractModule() {
 			@Override
@@ -96,44 +107,51 @@ public class QSimProvider implements Provider<QSim> {
 		}
 		QSim qSim = qsimInjector.getInstance(QSim.class);
 
-		ComponentRegistry componentRegistry = ComponentRegistry.create(qsimInjector);
-
-		for (Key<? extends QSimComponent> component : componentRegistry.getOrderedComponents(components)) {
-			// if
-			// (component.getTypeLiteral().getRawType().isAssignableFrom(MobsimEngine.class))
-			// {
-			if (MobsimEngine.class.isAssignableFrom(component.getTypeLiteral().getRawType())) {
-				MobsimEngine instance = (MobsimEngine) qsimInjector.getInstance(component);
-				qSim.addMobsimEngine(instance);
-				log.info("Added MobsimEngine " + instance.getClass());
+        for (Object activeComponent : components.getActiveComponents()) {
+			Key<Collection<Provider<QSimComponent>>> activeComponentKey;
+			if (activeComponent instanceof Annotation) {
+				activeComponentKey = Key.get(new TypeLiteral<Collection<Provider<QSimComponent>>>(){}, (Annotation) activeComponent);
+			} else {
+				activeComponentKey = Key.get(new TypeLiteral<Collection<Provider<QSimComponent>>>(){}, (Class<? extends Annotation>) activeComponent);
 			}
 
-			if (ActivityHandler.class.isAssignableFrom(component.getTypeLiteral().getRawType())) {
-				ActivityHandler instance = (ActivityHandler) qsimInjector.getInstance(component);
-				qSim.addActivityHandler(instance);
-				log.info("Added Activityhandler " + instance.getClass());
-			}
+			Collection<Provider<QSimComponent>> providers = qsimInjector.getInstance(activeComponentKey);
+            for (Provider<QSimComponent> provider : providers) {
+                QSimComponent qSimComponent = provider.get();
+                if (qSimComponent instanceof MobsimEngine) {
+                    MobsimEngine instance = (MobsimEngine) qSimComponent;
+                    qSim.addMobsimEngine(instance);
+                    log.info("Added MobsimEngine " + instance.getClass());
+                }
 
-			if (DepartureHandler.class.isAssignableFrom(component.getTypeLiteral().getRawType())) {
-				DepartureHandler instance = (DepartureHandler) qsimInjector.getInstance(component);
-				qSim.addDepartureHandler(instance);
-				log.info("Added DepartureHandler " + instance.getClass());
-			}
+                if (qSimComponent instanceof ActivityHandler) {
+                    ActivityHandler instance = (ActivityHandler) qSimComponent;
+                    qSim.addActivityHandler(instance);
+                    log.info("Added Activityhandler " + instance.getClass());
+                }
 
-			if (AgentSource.class.isAssignableFrom(component.getTypeLiteral().getRawType())) {
-				AgentSource instance = (AgentSource) qsimInjector.getInstance(component);
-				qSim.addAgentSource(instance);
-				log.info("Added AgentSource " + instance.getClass());
-			}
+                if (qSimComponent instanceof DepartureHandler) {
+                    DepartureHandler instance = (DepartureHandler) qSimComponent;
+                    qSim.addDepartureHandler(instance);
+                    log.info("Added DepartureHandler " + instance.getClass());
+                }
 
-			if (MobsimListener.class.isAssignableFrom(component.getTypeLiteral().getRawType())) {
-				MobsimListener instance = (MobsimListener) qsimInjector.getInstance(component);
-				qSim.addQueueSimulationListeners(instance);
-				log.info("Added MobsimListener " + instance.getClass());
-			}
-		}
+                if (qSimComponent instanceof AgentSource) {
+                    AgentSource instance = (AgentSource) qSimComponent;
+                    qSim.addAgentSource(instance);
+                    log.info("Added AgentSource " + instance.getClass());
+                }
 
-		return qSim;
+                if (qSimComponent instanceof MobsimListener) {
+                    MobsimListener instance = (MobsimListener) qSimComponent;
+                    qSim.addQueueSimulationListeners(instance);
+                    log.info("Added MobsimListener " + instance.getClass());
+                }
+
+            }
+        }
+
+        return qSim;
 	}
 
 	/**

@@ -36,7 +36,7 @@ public class VrpAgentSourceQSimModule extends AbstractMultiModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bindModalComponent(VrpAgentSource.class).toProvider(
+		addModalComponent(VrpAgentSource.class,
 				new ModalProviders.AbstractProvider<VrpAgentSource>(getMode()) {
 					@Inject
 					private QSim qSim;
