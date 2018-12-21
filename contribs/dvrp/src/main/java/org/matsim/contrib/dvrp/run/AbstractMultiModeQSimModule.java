@@ -22,13 +22,13 @@ package org.matsim.contrib.dvrp.run;
 
 import java.util.function.Function;
 
-import com.google.inject.binder.ScopedBindingBuilder;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.binder.LinkedBindingBuilder;
+import com.google.inject.binder.ScopedBindingBuilder;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -52,7 +52,14 @@ public abstract class AbstractMultiModeQSimModule extends AbstractQSimModule {
 		return bind(modalKey(type));
 	}
 
-	protected <T extends QSimComponent> ScopedBindingBuilder addModalComponent(Class<T> componentClass, Provider<T> componentProvider) {
+	protected <T extends QSimComponent> ScopedBindingBuilder addModalComponent(Class<T> componentClass,
+			Key<? extends T> key) {
+		bind(componentClass).annotatedWith(DvrpModes.mode(mode)).to(key).asEagerSingleton();
+		return addComponentBindingAnnotatedWith(DvrpModes.mode(mode)).to(Key.get(componentClass, DvrpModes.mode(mode)));
+	}
+
+	protected <T extends QSimComponent> ScopedBindingBuilder addModalComponent(Class<T> componentClass,
+			Provider<T> componentProvider) {
 		bind(componentClass).annotatedWith(DvrpModes.mode(mode)).toProvider(componentProvider).asEagerSingleton();
 		return addComponentBindingAnnotatedWith(DvrpModes.mode(mode)).to(Key.get(componentClass, DvrpModes.mode(mode)));
 	}
