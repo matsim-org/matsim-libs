@@ -91,6 +91,9 @@ public class DynModeTripsAnalyser {
 
 	public static void analyzeBoardingsAndDeboardings(List<DynModeTrip> trips, String delimiter, double startTime,
 			double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
+		if (endTime < startTime) {
+			throw new IllegalArgumentException("endTime < startTime");
+		}
 		Map<Id<Link>, int[]> boardings = new HashMap<>();
 		Map<Id<Link>, int[]> deboardings = new HashMap<>();
 		double actualstartTime = Math.max(startTime, 0.0);
