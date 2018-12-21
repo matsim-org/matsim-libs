@@ -29,8 +29,8 @@ public class HbefaColdEmissionFactorKey {
 	
 	private HbefaVehicleCategory hbefaVehicleCategory;
 	private String hbefaComponent;
-	private Integer hbefaParkingTime;
-	private Integer hbefaDistance;
+	private int hbefaParkingTime;
+	private int hbefaDistance;
 	private HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 	
 	public HbefaColdEmissionFactorKey(){
@@ -44,7 +44,7 @@ public class HbefaColdEmissionFactorKey {
 		this.hbefaVehicleCategory = hbefaVehicleCategory;
 	}
 
-	String getHbefaComponent() {
+	public String getHbefaComponent() {
 		return hbefaComponent;
 	}
 
@@ -52,7 +52,7 @@ public class HbefaColdEmissionFactorKey {
 		this.hbefaComponent = hbefaComponent;
 	}
 
-	Integer getHbefaParkingTime() {
+	public int getHbefaParkingTime() {
 		return hbefaParkingTime;
 	}
 
@@ -60,7 +60,7 @@ public class HbefaColdEmissionFactorKey {
 		this.hbefaParkingTime = hbefaParkingTime;
 	}
 
-	Integer getHbefaDistance() {
+	public int getHbefaDistance() {
 		return hbefaDistance;
 	}
 
@@ -68,7 +68,7 @@ public class HbefaColdEmissionFactorKey {
 		this.hbefaDistance = hbefaDistance;
 	}
 		
-	HbefaVehicleAttributes getHbefaVehicleAttributes() {
+	public HbefaVehicleAttributes getHbefaVehicleAttributes() {
 		return hbefaVehicleAttributes;
 	}
 
@@ -89,8 +89,8 @@ public class HbefaColdEmissionFactorKey {
 	         HbefaColdEmissionFactorKey key = (HbefaColdEmissionFactorKey) obj;
 	         return hbefaVehicleCategory.equals(key.getHbefaVehicleCategory())
 	         && hbefaComponent.equals(key.getHbefaComponent())
-	         && hbefaParkingTime.equals(key.getHbefaParkingTime())
-	         && hbefaDistance.equals(key.getHbefaDistance())
+	         && hbefaParkingTime == (key.getHbefaParkingTime())
+	         && hbefaDistance == (key.getHbefaDistance())
 	         && hbefaVehicleAttributes.equals(key.getHbefaVehicleAttributes());
 	}
 
