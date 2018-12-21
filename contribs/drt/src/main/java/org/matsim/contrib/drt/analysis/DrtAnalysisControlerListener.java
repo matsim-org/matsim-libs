@@ -107,7 +107,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		DynModeTripsAnalyser.analyseDetours(network, trips, drtCfg, filename(event, "drt_detours"));
 		DynModeTripsAnalyser.analyseWaitTimes(filename(event, "waitStats"), trips, 1800);
 			DynModeTripsAnalyser.analyzeBoardingsAndDeboardings(trips, ";", qSimCfg.getStartTime(),
-					qSimCfg.getEndTime(), 3600, filename(event, "drt_boardings", ".csv"),
+					trips.get(trips.size() - 1).getDepartureTime(), 3600, filename(event, "drt_boardings", ".csv"),
 					filename(event, "drt_alightments", ".csv"), network);
 
     }
