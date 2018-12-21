@@ -72,7 +72,7 @@ public class MultiModeDrtQSimModule extends AbstractMultiModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bindModal(DrtOptimizer.class).toProvider(modalProvider(
+		addModalComponent(DrtOptimizer.class, modalProvider(
 				getter -> new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 						getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
 						getter.getModal(DrtScheduleInquiry.class), getter.getModal(DrtScheduleTimingUpdater.class),
