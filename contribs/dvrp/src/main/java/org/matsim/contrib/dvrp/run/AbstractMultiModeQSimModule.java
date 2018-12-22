@@ -55,18 +55,18 @@ public abstract class AbstractMultiModeQSimModule extends AbstractQSimModule {
 	protected <T extends QSimComponent> ScopedBindingBuilder addModalComponent(Class<T> componentClass,
 			Key<? extends T> key) {
 		bind(componentClass).annotatedWith(DvrpModes.mode(mode)).to(key).asEagerSingleton();
-		return addComponentBindingAnnotatedWith(DvrpModes.mode(mode)).to(Key.get(componentClass, DvrpModes.mode(mode)));
+		return addQSimComponentBinding(DvrpModes.mode(mode)).to(Key.get(componentClass, DvrpModes.mode(mode)));
 	}
 
 	protected <T extends QSimComponent> ScopedBindingBuilder addModalComponent(Class<T> componentClass,
 			Provider<T> componentProvider) {
 		bind(componentClass).annotatedWith(DvrpModes.mode(mode)).toProvider(componentProvider).asEagerSingleton();
-		return addComponentBindingAnnotatedWith(DvrpModes.mode(mode)).to(Key.get(componentClass, DvrpModes.mode(mode)));
+		return addQSimComponentBinding(DvrpModes.mode(mode)).to(Key.get(componentClass, DvrpModes.mode(mode)));
 	}
 
 	protected <T extends QSimComponent> void addModalComponent(Class<T> componentClass) {
 		bind(componentClass).annotatedWith(DvrpModes.mode(mode)).to(componentClass).asEagerSingleton();
-		addComponentBindingAnnotatedWith(DvrpModes.mode(mode)).to(Key.get(componentClass, DvrpModes.mode(mode)));
+		addQSimComponentBinding(DvrpModes.mode(mode)).to(Key.get(componentClass, DvrpModes.mode(mode)));
 	}
 
 	protected <T> Provider<T> modalProvider(Function<ModalProviders.InstanceGetter, T> delegate) {

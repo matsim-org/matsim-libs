@@ -9,7 +9,6 @@ import org.matsim.core.mobsim.framework.AbstractMobsimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
 import com.google.inject.Module;
-import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
@@ -20,25 +19,26 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule {
 		configureQSim();
 	}
 
-	protected LinkedBindingBuilder<QSimComponent> addComponentBindingAnnotatedWith(Annotation annotation) {
+	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding(Annotation annotation) {
 		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class, annotation);
 		multibinder.permitDuplicates();
 		return multibinder.addBinding();
 	}
 
-	protected LinkedBindingBuilder<QSimComponent> addComponentBindingAnnotatedWith(Class<? extends Annotation> annotationClass) {
+	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding(Class<? extends Annotation> annotationClass) {
 		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class, annotationClass);
 		multibinder.permitDuplicates();
 		return multibinder.addBinding();
 	}
 	
-	protected LinkedBindingBuilder<QSimComponent> addComponentBindingNamed(String name) {
-		return addComponentBindingAnnotatedWith(Names.named(name));
+	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding(String name) {
+		return addQSimComponentBinding(Names.named(name));
 	}
 
-	//TODO: Inline
+	// Use methods above
+	@Deprecated
 	protected <T extends QSimComponent> void addNamedComponent(Class<T> componentClass, String name) {
-		addComponentBindingNamed(name).to(componentClass);
+		addQSimComponentBinding(name).to(componentClass);
 	}
 
 	protected abstract void configureQSim();

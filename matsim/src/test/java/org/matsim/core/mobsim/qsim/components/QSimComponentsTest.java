@@ -27,7 +27,7 @@ public class QSimComponentsTest {
 		AbstractQSimModule module = new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				addComponentBindingAnnotatedWith(MockComponentAnnotation.class).to(MockMobsimListener.class);
+				addQSimComponentBinding(MockComponentAnnotation.class).to(MockMobsimListener.class);
 			}
 		};
 		
@@ -53,8 +53,8 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						addComponentBindingAnnotatedWith(MockComponentAnnotation.class).toInstance(mockEngineA);
-						addComponentBindingAnnotatedWith(MockComponentAnnotation.class).toInstance(mockEngineB);
+						addQSimComponentBinding(MockComponentAnnotation.class).toInstance(mockEngineA);
+						addQSimComponentBinding(MockComponentAnnotation.class).toInstance(mockEngineB);
 					}
 				}) //
 				.configureQSimComponents( components -> {
@@ -87,7 +87,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						addComponentBindingAnnotatedWith(MockComponentAnnotation.class).toInstance(mockEngine);
+						addQSimComponentBinding(MockComponentAnnotation.class).toInstance(mockEngine);
 					}
 				}) //
 				.configureQSimComponents( components -> {
@@ -111,7 +111,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						addComponentBindingNamed("MockEngine").toInstance(mockEngine);
+						addQSimComponentBinding("MockEngine").toInstance(mockEngine);
 					}
 				}) //
 				.configureQSimComponents( components -> {
@@ -142,7 +142,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						addComponentBindingNamed("MockEngine").toInstance(mockEngine);
+						addQSimComponentBinding("MockEngine").toInstance(mockEngine);
 					}
 				}) //
 				.build(scenario, eventsManager) //

@@ -123,7 +123,7 @@ public class AbstractQSimModuleTest {
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				addComponentBindingNamed("MyEngine").toInstance(engine);
+				addQSimComponentBinding("MyEngine").toInstance(engine);
 			}
 		});
 
