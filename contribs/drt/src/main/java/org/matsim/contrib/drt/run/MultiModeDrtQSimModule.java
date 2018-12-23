@@ -72,14 +72,14 @@ public class MultiModeDrtQSimModule extends AbstractMultiModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bindModal(DrtOptimizer.class).toProvider(modalProvider(
+		addModalComponent(DrtOptimizer.class, modalProvider(
 				getter -> new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 						getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
 						getter.getModal(DrtScheduleInquiry.class), getter.getModal(DrtScheduleTimingUpdater.class),
 						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class))))
 				.asEagerSingleton();
 
-		bindModal(DefaultUnplannedRequestInserter.class).toProvider(modalProvider(
+		addModalComponent(DefaultUnplannedRequestInserter.class, modalProvider(
 				getter -> new DefaultUnplannedRequestInserter(drtCfg, getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class), getter.get(EventsManager.class),
 						getter.getModal(RequestInsertionScheduler.class),
@@ -135,7 +135,7 @@ public class MultiModeDrtQSimModule extends AbstractMultiModeQSimModule {
 			}
 		}).asEagerSingleton();
 
-		bindModal(ParallelPathDataProvider.class).toProvider(new Provider<ParallelPathDataProvider>() {
+		addModalComponent(ParallelPathDataProvider.class, new Provider<ParallelPathDataProvider>() {
 			@Inject
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
 			private Network network;
