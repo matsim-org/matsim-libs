@@ -33,10 +33,10 @@ import com.google.inject.binder.ScopedBindingBuilder;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public abstract class AbstractMultiModeQSimModule extends AbstractQSimModule {
+public abstract class AbstractDvrpModeQSimModule extends AbstractQSimModule {
 	private final String mode;
 
-	protected AbstractMultiModeQSimModule(String mode) {
+	protected AbstractDvrpModeQSimModule(String mode) {
 		this.mode = mode;
 	}
 

@@ -53,7 +53,7 @@ public class DvrpModeQSimModule extends AbstractQSimModule {
 			install(new PassengerEngineQSimModule(mode));
 		}
 
-		install(new AbstractMultiModeQSimModule(mode) {
+		install(new AbstractDvrpModeQSimModule(mode) {
 			@Override
 			protected void configureQSim() {
 				listeners.stream().forEach(this::addModalComponent);
