@@ -76,8 +76,8 @@ class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 				getter -> new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 						getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
 						getter.getModal(DrtScheduleInquiry.class), getter.getModal(DrtScheduleTimingUpdater.class),
-						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class))))
-				.asEagerSingleton();
+						getter.getModal(EmptyVehicleRelocator.class),
+						getter.getModal(UnplannedRequestInserter.class))));
 
 		addModalComponent(DefaultUnplannedRequestInserter.class, modalProvider(
 				getter -> new DefaultUnplannedRequestInserter(drtCfg, getter.getModal(Fleet.class),
@@ -85,7 +85,7 @@ class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(RequestInsertionScheduler.class),
 						getter.getModal(VehicleData.EntryFactory.class),
 						getter.getModal(PrecalculablePathDataProvider.class),
-						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class)))).asEagerSingleton();
+						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class))));
 		bindModal(UnplannedRequestInserter.class).to(modalKey(DefaultUnplannedRequestInserter.class));
 
 		bindModal(VehicleData.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl(drtCfg));
@@ -150,7 +150,7 @@ class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 			public ParallelPathDataProvider get() {
 				return new ParallelPathDataProvider(network, travelTime, travelDisutility, drtCfg);
 			}
-		}).asEagerSingleton();
+		});
 		bindModal(PrecalculablePathDataProvider.class).to(modalKey(ParallelPathDataProvider.class));
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).

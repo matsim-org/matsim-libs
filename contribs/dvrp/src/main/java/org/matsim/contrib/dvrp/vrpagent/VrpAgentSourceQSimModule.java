@@ -46,6 +46,6 @@ public class VrpAgentSourceQSimModule extends AbstractDvrpModeQSimModule {
 						return new VrpAgentSource(getModalInstance(VrpAgentLogic.DynActionCreator.class),
 								getModalInstance(Fleet.class), getModalInstance(VrpOptimizer.class), qSim);
 					}
-				}).asEagerSingleton();
+				});
 	}
 }

@@ -33,6 +33,6 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 								getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
 								network, getModalInstance(PassengerRequestValidator.class));
 					}
-				}).asEagerSingleton();
+				});
 	}
 }

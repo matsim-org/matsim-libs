@@ -85,7 +85,7 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 						return new DefaultTaxiOptimizerProvider(taxiCfg, fleet, network, timer, travelTime,
 								travelDisutility, taxiScheduler).get();
 					}
-				}).asEagerSingleton();
+				});
 
 		bindModal(TaxiScheduler.class).toProvider(
 				new ModalProviders.AbstractProvider<TaxiScheduler>(taxiCfg.getMode()) {
