@@ -70,5 +70,7 @@ public final class MultiModeTaxiModule extends AbstractMultiModeModule {
 		}
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
+
+		installQSimModule(new MultiModeTaxiQSimModule(taxiCfg));
 	}
 }

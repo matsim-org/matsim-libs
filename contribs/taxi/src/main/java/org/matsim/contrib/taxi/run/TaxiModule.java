@@ -31,6 +31,7 @@ import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
 import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 import com.google.inject.Inject;
@@ -39,8 +40,19 @@ import com.google.inject.Inject;
  * @author michalm
  */
 public final class TaxiModule extends AbstractModule {
+
+	private final AbstractQSimModule taxiQSimModule;
+
 	@Inject
 	private TaxiConfigGroup taxiCfg;
+
+	public TaxiModule() {
+		this(new TaxiQSimModule());
+	}
+
+	public TaxiModule(AbstractQSimModule taxiQSimModule) {
+		this.taxiQSimModule = taxiQSimModule;
+	}
 
 	@Override
 	public void install() {
@@ -66,5 +78,7 @@ public final class TaxiModule extends AbstractModule {
 
 		bind(DvrpModes.key(PassengerRequestValidator.class, mode)).to(DefaultPassengerRequestValidator.class)
 				.asEagerSingleton();
+
+		installQSimModule(taxiQSimModule);
 	}
 }

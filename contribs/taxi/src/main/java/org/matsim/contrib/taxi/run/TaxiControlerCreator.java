@@ -49,7 +49,6 @@ public class TaxiControlerCreator {
 	}
 
 	public static void addTaxiWithoutDvrpModuleToControler(Controler controler) {
-		controler.addQSimModule(new TaxiQSimModule());
 		controler.addOverridingModule(new TaxiModule());
 	}
 

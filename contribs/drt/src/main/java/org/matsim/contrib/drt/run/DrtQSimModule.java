@@ -52,7 +52,7 @@ import com.google.inject.Key;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DrtQSimModule extends AbstractQSimModule {
+class DrtQSimModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();

@@ -107,7 +107,6 @@ public final class DrtControlerCreator {
 	}
 
 	public static void addDrtWithoutDvrpModuleToControler(Controler controler) {
-		controler.addQSimModule(new DrtQSimModule());
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
 	}
