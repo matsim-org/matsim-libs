@@ -25,6 +25,7 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -38,8 +39,19 @@ import com.google.inject.Inject;
  * @author michalm (Michal Maciejewski)
  */
 public final class DrtModule extends AbstractModule {
+
+	private final AbstractQSimModule drtQSimModule;
+
 	@Inject
 	private DrtConfigGroup drtCfg;
+
+	public DrtModule() {
+		this(new DrtQSimModule());
+	}
+
+	public DrtModule(AbstractQSimModule drtQSimModule) {
+		this.drtQSimModule = drtQSimModule;
+	}
 
 	@Override
 	public void install() {
@@ -85,12 +97,12 @@ public final class DrtModule extends AbstractModule {
 		bind(DrtRouteUpdater.class).to(DefaultDrtRouteUpdater.class).asEagerSingleton();
 		addControlerListenerBinding().to(DrtRouteUpdater.class);
 
-		installQSimModule(new DrtQSimModule());
+		installQSimModule(drtQSimModule);
 	}
 
 	static TransitSchedule readTransitSchedule(URL url) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReader(scenario).readURL(url );
+		new TransitScheduleReader(scenario).readURL(url);
 		return scenario.getTransitSchedule();
 	}
 }
