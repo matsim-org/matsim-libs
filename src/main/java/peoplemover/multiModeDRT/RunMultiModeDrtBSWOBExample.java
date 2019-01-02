@@ -66,11 +66,8 @@ public class RunMultiModeDrtBSWOBExample {
         config.controler().setRunId(runId);
         config.controler().setOutputDirectory(INPUTDIR + "../output/" + runId);
 
-
-        MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(config);
-        for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
-            DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
-        }
+		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(config);
+		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtCfg, config.planCalcScore());
         config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
         config.checkConsistency();
 
@@ -81,7 +78,7 @@ public class RunMultiModeDrtBSWOBExample {
 
         List<DvrpModeQSimModule> dvrpModeQSimModules = new ArrayList<>();
         for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
-            dvrpModeQSimModules.add(new DvrpModeQSimModule.Builder(drtCfg.getMode()).build());
+			dvrpModeQSimModules.add(new DvrpModeQSimModule(drtCfg.getMode()));
             controler.addOverridingModule(new DrtModeModule(drtCfg));
             controler.addOverridingModule(new DrtModeAnalysisModule(drtCfg));
         }
