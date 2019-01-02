@@ -18,14 +18,9 @@
 
 package org.matsim.vsp.edvrp.edrt.run;
 
-import java.util.Arrays;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
-import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
-import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
-import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -58,9 +53,7 @@ public class EDrtControlerCreator {
 	public static void addEDrtToController(Controler controler) {
 		String mode = DrtConfigGroup.get(controler.getConfig()).getMode();
 		controler.addQSimModule(new EDrtQSimModule());
-		controler.addOverridingModule(DvrpModule.createModule(mode,
-				Arrays.asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class,
-						ParallelPathDataProvider.class)));
+		controler.addOverridingModule(DvrpModule.createModuleWithDefaultDvrpModeQSimModule(mode));
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
 		controler.addOverridingModule(new AbstractModule() {
