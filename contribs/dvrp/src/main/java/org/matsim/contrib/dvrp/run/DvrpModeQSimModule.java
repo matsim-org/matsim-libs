@@ -20,13 +20,8 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 
@@ -36,13 +31,10 @@ import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 public class DvrpModeQSimModule extends AbstractQSimModule {
 	private final String mode;
 	private final boolean installPassengerEngineModule;
-	private final Set<Class<? extends MobsimListener>> listeners;
 
-	public DvrpModeQSimModule(String mode, boolean installPassengerEngineModule,
-			Set<Class<? extends MobsimListener>> listeners) {
+	public DvrpModeQSimModule(String mode, boolean installPassengerEngineModule) {
 		this.mode = mode;
 		this.installPassengerEngineModule = installPassengerEngineModule;
-		this.listeners = listeners;
 	}
 
 	@Override
@@ -52,13 +44,6 @@ public class DvrpModeQSimModule extends AbstractQSimModule {
 		if (installPassengerEngineModule) {
 			install(new PassengerEngineQSimModule(mode));
 		}
-
-		install(new AbstractDvrpModeQSimModule(mode) {
-			@Override
-			protected void configureQSim() {
-				listeners.stream().forEach(this::addModalComponent);
-			}
-		});
 	}
 
 	public void configureComponents(QSimComponentsConfig components) {
@@ -67,24 +52,11 @@ public class DvrpModeQSimModule extends AbstractQSimModule {
 
 	public static class Builder {
 		private final String mode;
-		private final Set<Class<? extends MobsimListener>> listeners = new HashSet<>();
 
 		private boolean installPassengerEngineModule = true;
 
 		public Builder(String mode) {
 			this.mode = mode;
-		}
-
-		public Builder addListener(Class<? extends MobsimListener> listener) {
-			if (!listeners.add(listener)) {
-				throw new IllegalArgumentException("Listener: " + listener + " has been already added.");
-			}
-			return this;
-		}
-
-		public Builder addListeners(Collection<Class<? extends MobsimListener>> listener) {
-			listener.forEach(this::addListener);
-			return this;
 		}
 
 		public Builder setInstallPassengerEngineModule(boolean installPassengerEngineModule) {
@@ -93,7 +65,7 @@ public class DvrpModeQSimModule extends AbstractQSimModule {
 		}
 
 		public DvrpModeQSimModule build() {
-			return new DvrpModeQSimModule(mode, installPassengerEngineModule, listeners);
+			return new DvrpModeQSimModule(mode, installPassengerEngineModule);
 		}
 	}
 }
