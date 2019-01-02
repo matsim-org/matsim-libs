@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.taxi.run.examples;
 
-import java.util.Collections;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Request;
@@ -70,7 +68,7 @@ public class RunTaxiExample {
 			// (implement your own taxi optimizer)
 		}
 
-		controler.addOverridingModule(DvrpModule.createModule(mode, Collections.singleton(TaxiOptimizer.class)));
+		controler.addOverridingModule(DvrpModule.createModuleWithDefaultDvrpModeQSimModule(mode));
 		controler.addOverridingModule(new TaxiModule());
 
 		if (otfvis) {

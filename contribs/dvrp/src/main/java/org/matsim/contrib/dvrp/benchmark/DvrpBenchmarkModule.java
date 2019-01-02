@@ -18,15 +18,12 @@
 
 package org.matsim.contrib.dvrp.benchmark;
 
-import java.util.Collection;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
 import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 
@@ -40,8 +37,8 @@ import com.google.inject.name.Names;
 public class DvrpBenchmarkModule extends AbstractModule {
 	private final DvrpModeQSimModule qsimModule;
 
-	public static DvrpBenchmarkModule createModule(String mode, Collection<Class<? extends MobsimListener>> listeners) {
-		return new DvrpBenchmarkModule(new DvrpModeQSimModule.Builder(mode).addListeners(listeners).build());
+	public static DvrpBenchmarkModule createModule(String mode) {
+		return new DvrpBenchmarkModule(new DvrpModeQSimModule.Builder(mode).build());
 	}
 
 	public DvrpBenchmarkModule(DvrpModeQSimModule qsimModule) {
