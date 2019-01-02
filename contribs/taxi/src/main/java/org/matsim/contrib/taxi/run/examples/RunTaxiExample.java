@@ -26,7 +26,6 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiModule;
-import org.matsim.contrib.taxi.run.TaxiQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -64,35 +63,5 @@ public class RunTaxiExample {
 
 	public static void main(String[] args) {
 		RunTaxiExample.run(false, 0); // switch to 'true' to turn on visualisation
-	}
-
-	/**
-	 * See {@link DefaultTaxiOptimizerProvider} for examples.
-	 */
-	private static class MyTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
-		@Override
-		public TaxiOptimizer get() {
-			return new TaxiOptimizer() {
-				@Override
-				public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
-					// TODO Auto-generated method stub
-				}
-
-				@Override
-				public void requestSubmitted(Request request) {
-					// TODO Auto-generated method stub
-				}
-
-				@Override
-				public void nextTask(Vehicle vehicle) {
-					// TODO Auto-generated method stub
-				}
-
-				@Override
-				public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-					// TODO Auto-generated method stub
-				}
-			};
-		}
 	}
 }
