@@ -45,10 +45,7 @@ public class RunMultiModeDrtExample {
 		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 
-		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(config);
-		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
-			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
-		}
+		DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore());
 		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
 		config.checkConsistency();
 
