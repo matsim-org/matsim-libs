@@ -24,15 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.analysis.MultiModeDrtAnalysisModule;
+import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
 import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
 import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.DrtModeModule;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
@@ -82,8 +82,8 @@ public class RunMultiModeDrtBSWOBExample {
         List<DvrpModeQSimModule> dvrpModeQSimModules = new ArrayList<>();
         for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
             dvrpModeQSimModules.add(new DvrpModeQSimModule.Builder(drtCfg.getMode()).build());
-            controler.addOverridingModule(new MultiModeDrtModule(drtCfg));
-            controler.addOverridingModule(new MultiModeDrtAnalysisModule(drtCfg));
+            controler.addOverridingModule(new DrtModeModule(drtCfg));
+            controler.addOverridingModule(new DrtModeAnalysisModule(drtCfg));
         }
 
         controler.addOverridingModule(new DvrpModule(dvrpModeQSimModules.stream().toArray(DvrpModeQSimModule[]::new)));
