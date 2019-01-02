@@ -38,7 +38,7 @@ public class DvrpBenchmarkModule extends AbstractModule {
 	private final DvrpModeQSimModule qsimModule;
 
 	public static DvrpBenchmarkModule createModule(String mode) {
-		return new DvrpBenchmarkModule(new DvrpModeQSimModule.Builder(mode).build());
+		return new DvrpBenchmarkModule(new DvrpModeQSimModule(mode));
 	}
 
 	public DvrpBenchmarkModule(DvrpModeQSimModule qsimModule) {

@@ -51,7 +51,7 @@ public final class MultiModeDrtModule extends AbstractModule {
 	public void install() {
 		List<DvrpModeQSimModule> dvrpModeQSimModules = new ArrayList<>();
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
-			dvrpModeQSimModules.add(new DvrpModeQSimModule.Builder(drtCfg.getMode()).build());
+			dvrpModeQSimModules.add(new DvrpModeQSimModule(drtCfg.getMode()));
 			install(new DrtModeModule(drtCfg));
 			install(new DrtModeAnalysisModule(drtCfg));
 		}

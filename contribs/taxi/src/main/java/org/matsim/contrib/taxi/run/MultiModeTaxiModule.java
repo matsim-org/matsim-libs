@@ -47,7 +47,7 @@ public class MultiModeTaxiModule extends AbstractModule {
 	public void install() {
 		List<DvrpModeQSimModule> dvrpModeQSimModules = new ArrayList<>();
 		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getTaxiConfigGroups()) {
-			dvrpModeQSimModules.add(new DvrpModeQSimModule.Builder(taxiCfg.getMode()).build());
+			dvrpModeQSimModules.add(new DvrpModeQSimModule(taxiCfg.getMode()));
 			install(new TaxiModeModule(taxiCfg));
 		}
 

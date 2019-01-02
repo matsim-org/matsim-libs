@@ -41,7 +41,7 @@ public final class DvrpModule extends AbstractModule {
 	private final List<DvrpModeQSimModule> qsimModules;
 
 	public static DvrpModule createModuleWithDefaultDvrpModeQSimModule(String mode) {
-		return new DvrpModule(new DvrpModeQSimModule.Builder(mode).build());
+		return new DvrpModule(new DvrpModeQSimModule(mode));
 	}
 
 	public DvrpModule(DvrpModeQSimModule... qsimModules) {

@@ -32,6 +32,10 @@ public class DvrpModeQSimModule extends AbstractQSimModule {
 	private final String mode;
 	private final boolean installPassengerEngineModule;
 
+	public DvrpModeQSimModule(String mode) {
+		this(mode, true);
+	}
+
 	public DvrpModeQSimModule(String mode, boolean installPassengerEngineModule) {
 		this.mode = mode;
 		this.installPassengerEngineModule = installPassengerEngineModule;
@@ -48,24 +52,5 @@ public class DvrpModeQSimModule extends AbstractQSimModule {
 
 	public void configureComponents(QSimComponentsConfig components) {
 		components.addComponent(DvrpModes.mode(mode));
-	}
-
-	public static class Builder {
-		private final String mode;
-
-		private boolean installPassengerEngineModule = true;
-
-		public Builder(String mode) {
-			this.mode = mode;
-		}
-
-		public Builder setInstallPassengerEngineModule(boolean installPassengerEngineModule) {
-			this.installPassengerEngineModule = installPassengerEngineModule;
-			return this;
-		}
-
-		public DvrpModeQSimModule build() {
-			return new DvrpModeQSimModule(mode, installPassengerEngineModule);
-		}
 	}
 }
