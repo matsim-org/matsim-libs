@@ -187,8 +187,8 @@ public class TestHbefaColdEmissionFactorKey {
 			equalErr = true;
 		}
 		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noParkingTime.toString();
-		message2 = "this key should not be comparable since no parking time is set";
-		Assert.assertTrue(message2, equalErr);
+		message2 = "this key should be comparable even though no parking time is set";
+		Assert.assertFalse(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noParkingTime));
 	}
 	
@@ -215,8 +215,8 @@ public class TestHbefaColdEmissionFactorKey {
 			equalErr = true;
 		}	
 		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noDistance.toString();
-		message2 = "this key should not be comparable since no distance is set";
-		Assert.assertTrue(message2, equalErr);
+		message2 = "this key should be comparable even though no distance is set";
+		Assert.assertFalse(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noDistance));
 	}
 	

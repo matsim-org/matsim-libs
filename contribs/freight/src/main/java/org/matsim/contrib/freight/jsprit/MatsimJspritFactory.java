@@ -511,7 +511,7 @@ public class MatsimJspritFactory {
 					fromCoordinate = fromLink.getCoord();
 					toCoordinate = toLink.getCoord();
 				}  else 
-					throw new IllegalStateException("cannot create shipment " + carrierShipment.getId().toString() + " since either fromLinkId " + carrierShipment.getTo() + " or toLinkId " + carrierShipment.getTo() + " exists in network.");
+					throw new IllegalStateException("cannot create shipment " + carrierShipment.getId().toString() + " since either fromLinkId " + carrierShipment.getFrom() + " or toLinkId " + carrierShipment.getTo() + " exists in network.");
 					
 			}
 			shipmentInVrp = true;

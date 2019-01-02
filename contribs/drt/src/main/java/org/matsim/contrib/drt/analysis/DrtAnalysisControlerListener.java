@@ -19,7 +19,13 @@
 
 package org.matsim.contrib.drt.analysis;
 
-import com.google.inject.Inject;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.List;
+import java.util.Locale;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -30,13 +36,9 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.List;
-import java.util.Locale;
+import com.google.inject.Inject;
 
 /**
  * @author jbischoff
@@ -106,10 +108,13 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 				filename(event, "vehicleDistanceStats", ".csv"));
 		DynModeTripsAnalyser.analyseDetours(network, trips, drtCfg, filename(event, "drt_detours"));
 		DynModeTripsAnalyser.analyseWaitTimes(filename(event, "waitStats"), trips, 1800);
-			DynModeTripsAnalyser.analyzeBoardingsAndDeboardings(trips, ";", qSimCfg.getStartTime(),
-					qSimCfg.getEndTime(), 3600, filename(event, "drt_boardings", ".csv"),
-					filename(event, "drt_alightments", ".csv"), network);
 
+		double endTime = qSimCfg.getEndTime();
+		if (Time.isUndefinedTime(endTime)) {
+			endTime = trips.isEmpty() ? qSimCfg.getStartTime() : trips.get(trips.size() - 1).getDepartureTime();
+		}
+		DynModeTripsAnalyser.analyzeBoardingsAndDeboardings(trips, ";", qSimCfg.getStartTime(), endTime, 3600,
+				filename(event, "drt_boardings", ".csv"), filename(event, "drt_alightments", ".csv"), network);
     }
 
 	private String filename(IterationEndsEvent event, String prefix) {

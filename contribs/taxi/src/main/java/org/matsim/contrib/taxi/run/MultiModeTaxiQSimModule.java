@@ -51,14 +51,14 @@ import com.google.inject.name.Named;
 public class MultiModeTaxiQSimModule extends AbstractMultiModeQSimModule {
 	private final TaxiConfigGroup taxiCfg;
 
-	public MultiModeTaxiQSimModule(TaxiConfigGroup taxiCfg) {
+	MultiModeTaxiQSimModule(TaxiConfigGroup taxiCfg) {
 		super(taxiCfg.getMode());
 		this.taxiCfg = taxiCfg;
 	}
 
 	@Override
 	protected void configureQSim() {
-		bindModal(TaxiOptimizer.class).toProvider(
+		addModalComponent(TaxiOptimizer.class,
 				new ModalProviders.AbstractProvider<TaxiOptimizer>(taxiCfg.getMode()) {
 					@Inject
 					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)

@@ -33,7 +33,6 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
-import org.matsim.contrib.taxi.run.MultiModeTaxiQSimModule;
 import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -68,7 +67,6 @@ public class RunMultiModeTaxiExample {
 		List<DvrpModeQSimModule> dvrpModeQSimModules = new ArrayList<>();
 		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getTaxiConfigGroups()) {
 			dvrpModeQSimModules.add(new DvrpModeQSimModule.Builder(taxiCfg.getMode()).build());
-			controler.addQSimModule(new MultiModeTaxiQSimModule(taxiCfg));
 			controler.addOverridingModule(new MultiModeTaxiModule(taxiCfg));
 		}
 

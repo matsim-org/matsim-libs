@@ -52,7 +52,7 @@ import com.google.inject.Key;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DrtQSimModule extends AbstractQSimModule {
+class DrtQSimModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
@@ -76,6 +76,9 @@ public class DrtQSimModule extends AbstractQSimModule {
 
 		DvrpMode dvrpMode = DvrpModes.mode(DrtConfigGroup.get(getConfig()).getMode());
 		bind(VrpOptimizer.class).annotatedWith(dvrpMode).to(DrtOptimizer.class);
+		addQSimComponentBinding(dvrpMode).to(DrtOptimizer.class);
+		addQSimComponentBinding(dvrpMode).to(ParallelPathDataProvider.class);
+		addQSimComponentBinding(dvrpMode).to(DefaultUnplannedRequestInserter.class);
 		bind(VrpAgentLogic.DynActionCreator.class).annotatedWith(dvrpMode)
 				.to(DrtActionCreator.class)
 				.asEagerSingleton();

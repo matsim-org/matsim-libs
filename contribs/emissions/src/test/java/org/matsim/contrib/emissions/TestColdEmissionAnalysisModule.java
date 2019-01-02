@@ -79,8 +79,8 @@ public class TestColdEmissionAnalysisModule {
 	
 	// first case: complete data - corresponding entry in average table
 	private static final String petrol_technology = "petrol";
-	private static final String none_sizeClass = "none";
-	private static final String none_emConcept = "none";
+	private static final String none_sizeClass = "average";
+	private static final String none_emConcept = "average";
 	// second case: complete data - corresponding entry in detailed table
 	private static final String petrol_technology2 = "petrol";  // maybe use same as above? kai, jul'18
 	private static final String leq14l_sizeClass = "<1,4L";
@@ -186,7 +186,7 @@ public class TestColdEmissionAnalysisModule {
 		// seventh case: no corresponding entry either in the detailed nor the average table
 		Id<VehicleType> vehicleInfoForNoCase = Id.create( "PASSENGER_CAR;PC diesel;;>=2L", VehicleType.class );
 //		Id<VehicleType> vehicleInfoForNoCase = Id.create( "PASSENGER_CAR;"+diesel_technology+";" + geq2l_sizeClass + ";", VehicleType.class );
-		testCasesExceptions.add( vehicleInfoForNoCase );
+//		testCasesExceptions.add( vehicleInfoForNoCase ); //this will return the average passenger car value
 		// eighth case: vehicle category not specified
 		testCasesExceptions.add( Id.create( ";;;", VehicleType.class ) );
 		// ninth case: empty string as id

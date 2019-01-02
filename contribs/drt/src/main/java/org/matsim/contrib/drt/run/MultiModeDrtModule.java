@@ -140,6 +140,8 @@ public final class MultiModeDrtModule extends AbstractMultiModeModule {
 		}).asEagerSingleton();
 
 		addControlerListenerBinding().to(modalKey(DrtRouteUpdater.class));
+
+		installQSimModule(new MultiModeDrtQSimModule(drtCfg));
 	}
 
 	private static class DrtRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRoutingModule> {

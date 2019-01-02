@@ -22,15 +22,11 @@
  */
 package org.matsim.contrib.drt.run;
 
-import java.util.Arrays;
 import java.util.function.Function;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
-import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
-import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -106,13 +102,11 @@ public final class DrtControlerCreator {
 
 	public static void addDrtAsSingleDvrpModeToControler(Controler controler) {
 		addDrtWithoutDvrpModuleToControler(controler);
-		controler.addOverridingModule(DvrpModule.createModule(DrtConfigGroup.get(controler.getConfig()).getMode(),
-				Arrays.asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class,
-						ParallelPathDataProvider.class)));
+		controler.addOverridingModule(DvrpModule.createModuleWithDefaultDvrpModeQSimModule(
+				DrtConfigGroup.get(controler.getConfig()).getMode()));
 	}
 
 	public static void addDrtWithoutDvrpModuleToControler(Controler controler) {
-		controler.addQSimModule(new DrtQSimModule());
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
 	}

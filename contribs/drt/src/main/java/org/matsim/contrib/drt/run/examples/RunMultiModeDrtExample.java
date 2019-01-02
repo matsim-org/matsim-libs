@@ -20,10 +20,19 @@
 
 package org.matsim.contrib.drt.run.examples;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.analysis.MultiModeDrtAnalysisModule;
 import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
-import org.matsim.contrib.drt.run.*;
+import org.matsim.contrib.drt.run.Drt;
+import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtConfigs;
+import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
@@ -41,9 +50,6 @@ import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author michal.mac
@@ -71,7 +77,6 @@ public class RunMultiModeDrtExample {
 		List<DvrpModeQSimModule> dvrpModeQSimModules = new ArrayList<>();
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
 			dvrpModeQSimModules.add(new DvrpModeQSimModule.Builder(drtCfg.getMode()).build());
-			controler.addQSimModule(new MultiModeDrtQSimModule(drtCfg));
 			controler.addOverridingModule(new MultiModeDrtModule(drtCfg));
 			controler.addOverridingModule(new MultiModeDrtAnalysisModule(drtCfg));
 		}

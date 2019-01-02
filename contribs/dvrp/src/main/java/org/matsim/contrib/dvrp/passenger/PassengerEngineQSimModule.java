@@ -18,7 +18,7 @@ public class PassengerEngineQSimModule extends AbstractMultiModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bindModalComponent(PassengerEngine.class).toProvider(
+		addModalComponent(PassengerEngine.class,
 				new ModalProviders.AbstractProvider<PassengerEngine>(getMode()) {
 					@Inject
 					private EventsManager eventsManager;

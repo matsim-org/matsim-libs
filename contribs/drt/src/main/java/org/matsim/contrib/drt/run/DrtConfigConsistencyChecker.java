@@ -59,7 +59,9 @@ public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
 			// Not an issue if all request rejections are immediate (i.e. happen during request submission)
 			log.warn("qsim.endTime should be specified and qsim.simEndtimeInterpretation should be 'onlyUseEndtime'"
 					+ " if postponed request rejection is allowed. Otherwise, rejected passengers"
-					+ " (who are stuck endlessly waiting for a DRT vehicle) will prevent QSim from stopping");
+                    + " (who are stuck endlessly waiting for a DRT vehicle) will prevent QSim from stopping."
+                    + " Keep also in mind that not setting an end time may result in agents " +
+                    "attempting to travel without vehicles being available.");
 		}
 		if (config.qsim().getNumberOfThreads() != 1) {
 			throw new RuntimeException("Only a single-threaded QSim allowed");
