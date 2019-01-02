@@ -84,6 +84,8 @@ public final class DrtModule extends AbstractModule {
 
 		bind(DrtRouteUpdater.class).to(DefaultDrtRouteUpdater.class).asEagerSingleton();
 		addControlerListenerBinding().to(DrtRouteUpdater.class);
+
+		installQSimModule(new DrtQSimModule());
 	}
 
 	static TransitSchedule readTransitSchedule(URL url) {

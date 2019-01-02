@@ -62,7 +62,7 @@ import com.google.inject.name.Named;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModeDrtQSimModule extends AbstractMultiModeQSimModule {
+class MultiModeDrtQSimModule extends AbstractMultiModeQSimModule {
 	private final DrtConfigGroup drtCfg;
 
 	public MultiModeDrtQSimModule(DrtConfigGroup drtCfg) {
