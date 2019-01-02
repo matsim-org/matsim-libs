@@ -73,7 +73,7 @@ public class RunBSWOBDrtScenarioWithVariableStopTimes {
 
         //these two lines enable the variable stop time
         BusStopDurationCalculator busStopDurationCalculator = new LinearBusStopDurationCalculator(pickupTimePerPassenger, dropoffTimePerPassenger, fixedStopTime);
-        controler.addOverridingQSimModule(new VariableDurationQSimModule(busStopDurationCalculator));
+        controler.addOverridingQSimModule(new VariableDurationBusStopQSimModule(busStopDurationCalculator));
 
         controler.run();
     }

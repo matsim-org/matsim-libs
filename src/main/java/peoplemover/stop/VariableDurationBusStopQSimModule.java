@@ -29,10 +29,10 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class VariableDurationQSimModule extends AbstractQSimModule {
+public class VariableDurationBusStopQSimModule extends AbstractQSimModule {
 	private final BusStopDurationCalculator busStopDurationCalculator;
 
-	public VariableDurationQSimModule(BusStopDurationCalculator busStopDurationCalculator) {
+	public VariableDurationBusStopQSimModule(BusStopDurationCalculator busStopDurationCalculator) {
 		this.busStopDurationCalculator = busStopDurationCalculator;
 	}
 
