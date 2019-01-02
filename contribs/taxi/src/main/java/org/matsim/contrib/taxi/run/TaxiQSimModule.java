@@ -37,20 +37,13 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 import com.google.inject.Key;
-import com.google.inject.Provider;
 
 /**
  * @author michalm
  */
 public class TaxiQSimModule extends AbstractQSimModule {
-	private final Class<? extends Provider<? extends TaxiOptimizer>> providerClass;
 
 	public TaxiQSimModule() {
-		this(DefaultTaxiOptimizerProvider.class);
-	}
-
-	public TaxiQSimModule(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
-		this.providerClass = providerClass;
 	}
 
 	@Override
@@ -58,7 +51,7 @@ public class TaxiQSimModule extends AbstractQSimModule {
 		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Taxi.class);
 
-		bind(TaxiOptimizer.class).toProvider(providerClass).asEagerSingleton();
+		bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
 		bind(TaxiScheduler.class).asEagerSingleton();
 
 		DvrpMode dvrpMode = DvrpModes.mode(TaxiConfigGroup.get(getConfig()).getMode());
