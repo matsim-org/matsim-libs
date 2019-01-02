@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
@@ -39,7 +39,7 @@ import com.google.inject.name.Names;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class OneTruckModule extends AbstractMultiModeModule {
+public class OneTruckModule extends AbstractDvrpModeModule {
 	private final String trucksFile;
 
 	public OneTruckModule(String truckFile) {

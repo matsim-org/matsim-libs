@@ -31,10 +31,10 @@ import com.google.inject.binder.LinkedBindingBuilder;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public abstract class AbstractMultiModeModule extends AbstractModule {
+public abstract class AbstractDvrpModeModule extends AbstractModule {
 	private final String mode;
 
-	protected AbstractMultiModeModule(String mode) {
+	protected AbstractDvrpModeModule(String mode) {
 		this.mode = mode;
 	}
 

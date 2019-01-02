@@ -28,16 +28,16 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebal
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
  * @author michalm
  */
-public class MultiModeMinCostFlowRebalancingModule extends AbstractMultiModeModule {
+public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule {
 	private final DrtConfigGroup drtCfg;
 
-	public MultiModeMinCostFlowRebalancingModule(DrtConfigGroup drtCfg) {
+	public DrtModeMinCostFlowRebalancingModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
 	}

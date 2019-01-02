@@ -24,7 +24,7 @@ import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
@@ -36,10 +36,10 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 /**
  * @author michalm
  */
-public final class MultiModeTaxiModule extends AbstractMultiModeModule {
+public final class TaxiModeModule extends AbstractDvrpModeModule {
 	private final TaxiConfigGroup taxiCfg;
 
-	public MultiModeTaxiModule(TaxiConfigGroup taxiCfg) {
+	public TaxiModeModule(TaxiConfigGroup taxiCfg) {
 		super(taxiCfg.getMode());
 		this.taxiCfg = taxiCfg;
 	}

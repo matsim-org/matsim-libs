@@ -27,7 +27,7 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
@@ -35,7 +35,7 @@ import org.matsim.contrib.dynagent.run.DynRoutingModule;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class OneTaxiModule extends AbstractMultiModeModule {
+public class OneTaxiModule extends AbstractDvrpModeModule {
 	private final String taxisFile;
 
 	public OneTaxiModule(String taxisFile) {

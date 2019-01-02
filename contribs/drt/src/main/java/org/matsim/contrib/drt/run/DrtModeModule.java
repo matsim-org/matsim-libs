@@ -29,8 +29,8 @@ import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MultiModeMinCostFlowRebalancingModule;
 import org.matsim.contrib.drt.routing.ClosestAccessEgressStopFinder;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
@@ -42,7 +42,7 @@ import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
@@ -59,10 +59,10 @@ import com.google.inject.name.Named;
 /**
  * @author michalm (Michal Maciejewski)
  */
-public final class MultiModeDrtModule extends AbstractMultiModeModule {
+public final class DrtModeModule extends AbstractDvrpModeModule {
 	private final DrtConfigGroup drtCfg;
 
-	public MultiModeDrtModule(DrtConfigGroup drtCfg) {
+	public DrtModeModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
 	}
@@ -76,7 +76,7 @@ public final class MultiModeDrtModule extends AbstractMultiModeModule {
 				modalProvider(getter -> new NearestStartLinkAsDepot(getter.getModal(Fleet.class))));
 
 		if (MinCostFlowRebalancingParams.isRebalancingEnabled(drtCfg.getMinCostFlowRebalancing())) {
-			install(new MultiModeMinCostFlowRebalancingModule(drtCfg));
+			install(new DrtModeMinCostFlowRebalancingModule(drtCfg));
 		} else {
 			bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
 		}
