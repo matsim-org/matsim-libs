@@ -56,7 +56,7 @@ public class OneTruckModule extends AbstractDvrpModeModule {
 		installQSimModule(new AbstractDvrpModeQSimModule(TransportMode.truck) {
 			@Override
 			protected void configureQSim() {
-				bind(OneTruckRequestCreator.class).asEagerSingleton();
+				addModalComponent(OneTruckRequestCreator.class);
 				bindModal(VrpOptimizer.class).to(OneTruckOptimizer.class).asEagerSingleton();
 				bindModal(VrpAgentLogic.DynActionCreator.class).to(OneTruckActionCreator.class).asEagerSingleton();
 			}

@@ -55,7 +55,6 @@ public final class RunOneTruckExample {
 
 		DvrpModeQSimModule oneTruckQSimModule = new DvrpModeQSimModule.Builder(
 				TransportMode.truck).setInstallPassengerEngineModule(false)
-				.addListener(OneTruckRequestCreator.class)
 				.build();
 		controler.addOverridingModule(new DvrpModule(oneTruckQSimModule));
 
