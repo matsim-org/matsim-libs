@@ -52,6 +52,7 @@ public class ETaxiQSimModule extends AbstractQSimModule {
 
 		DvrpMode dvrpMode = DvrpModes.mode(TaxiConfigGroup.get(getConfig()).getMode());
 		bind(VrpOptimizer.class).annotatedWith(dvrpMode).to(TaxiOptimizer.class);
+		addQSimComponentBinding(dvrpMode).to(TaxiOptimizer.class);
 		bind(DynActionCreator.class).annotatedWith(dvrpMode).to(ETaxiActionCreator.class).asEagerSingleton();
 		bind(PassengerRequestCreator.class).annotatedWith(dvrpMode).to(TaxiRequestCreator.class).asEagerSingleton();
 		bind(PassengerEngine.class).annotatedWith(Taxi.class).to(Key.get(PassengerEngine.class, dvrpMode));
