@@ -49,7 +49,6 @@ public class RunTaxiExample {
 
 		// setup controler
 		Controler controler = new Controler(scenario);
-		controler.addQSimModule(new TaxiQSimModule());
 		controler.addOverridingModule(DvrpModule.createModuleWithDefaultDvrpModeQSimModule(mode));
 		controler.addOverridingModule(new TaxiModule());
 

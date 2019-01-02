@@ -43,7 +43,7 @@ import com.google.inject.Key;
  */
 public class TaxiQSimModule extends AbstractQSimModule {
 
-	public TaxiQSimModule() {
+	TaxiQSimModule() {
 	}
 
 	@Override
