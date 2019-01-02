@@ -76,6 +76,9 @@ public class DrtQSimModule extends AbstractQSimModule {
 
 		DvrpMode dvrpMode = DvrpModes.mode(DrtConfigGroup.get(getConfig()).getMode());
 		bind(VrpOptimizer.class).annotatedWith(dvrpMode).to(DrtOptimizer.class);
+		addQSimComponentBinding(dvrpMode).to(DrtOptimizer.class);
+		addQSimComponentBinding(dvrpMode).to(ParallelPathDataProvider.class);
+		addQSimComponentBinding(dvrpMode).to(DefaultUnplannedRequestInserter.class);
 		bind(VrpAgentLogic.DynActionCreator.class).annotatedWith(dvrpMode)
 				.to(DrtActionCreator.class)
 				.asEagerSingleton();
