@@ -20,9 +20,6 @@
 
 package peoplemover.multiModeDRT;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
 import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
@@ -76,9 +73,7 @@ public class RunMultiModeDrtBSWOBExample {
 
 		Controler controler = new Controler(scenario);
 
-		List<String> modes = new ArrayList<>();
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
-			modes.add(drtCfg.getMode());
 			controler.addOverridingModule(new DrtModeModule(drtCfg));
 			controler.addOverridingModule(new DrtModeAnalysisModule(drtCfg));
 		}
