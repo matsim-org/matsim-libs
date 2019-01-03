@@ -26,6 +26,7 @@ import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.DrtModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
@@ -52,7 +53,7 @@ public class EDrtControlerCreator {
 
 	public static void addEDrtToController(Controler controler) {
 		String mode = DrtConfigGroup.get(controler.getConfig()).getMode();
-		controler.addOverridingModule(new DvrpModule(mode));
+		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new DrtModule(new EDrtQSimModule()));
 		controler.addOverridingModule(new DrtAnalysisModule());
 		controler.addOverridingModule(new AbstractModule() {
@@ -61,5 +62,6 @@ public class EDrtControlerCreator {
 				bind(DepotFinder.class).to(NearestChargerAsDepot.class);
 			}
 		});
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
 	}
 }

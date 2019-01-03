@@ -24,6 +24,7 @@ import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkTravelTimeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -69,7 +70,8 @@ public class RunETaxiBenchmark {
 		controler.addOverridingModule(new EvModule());
 
 		controler.addQSimModule(new ETaxiQSimModule());
-		controler.addOverridingModule(new DvrpModule(taxiCfg.getMode()));
+		controler.addOverridingModule(new DvrpModule());
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(taxiCfg.getMode()));
 
 		controler.addOverridingModule(RunETaxiScenario.createEvDvrpIntegrationModule(taxiCfg));
 

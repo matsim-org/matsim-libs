@@ -22,6 +22,7 @@ package org.matsim.vsp.edvrp.etaxi.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
@@ -61,7 +62,8 @@ public class RunETaxiScenario {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new TaxiModule(new ETaxiQSimModule()));
 		controler.addOverridingModule(new EvModule());
-		controler.addOverridingModule(new DvrpModule(taxiCfg.getMode()));
+		controler.addOverridingModule(new DvrpModule());
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(taxiCfg.getMode()));
 
 		controler.addOverridingModule(createEvDvrpIntegrationModule(taxiCfg));
 
