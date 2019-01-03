@@ -33,7 +33,7 @@ public class DrtConfigs {
 
 	public static void adjustMultiModeDrtConfig(MultiModeDrtConfigGroup multiModeDrtCfg,
 			PlanCalcScoreConfigGroup planCalcScoreCfg) {
-		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
+		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
 			DrtConfigs.adjustDrtConfig(drtCfg, planCalcScoreCfg);
 		}
 	}

@@ -50,13 +50,9 @@ public class MultiModeDrtConfigGroup extends ReflectiveConfigGroup implements Mu
 		throw new IllegalArgumentException(type);
 	}
 
-	@SuppressWarnings("unchecked")
-	public Collection<DrtConfigGroup> getDrtConfigGroups() {
-		return (Collection<DrtConfigGroup>)getParameterSets(DrtConfigGroup.GROUP_NAME);
-	}
-
 	@Override
+	@SuppressWarnings("unchecked")
 	public Collection<DrtConfigGroup> getModalElements() {
-		return getDrtConfigGroups();
+		return (Collection<DrtConfigGroup>)getParameterSets(DrtConfigGroup.GROUP_NAME);
 	}
 }

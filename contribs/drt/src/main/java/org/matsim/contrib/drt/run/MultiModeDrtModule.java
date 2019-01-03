@@ -45,7 +45,7 @@ public final class MultiModeDrtModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
+		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
 			install(new DrtModeModule(drtCfg));
 			install(new DrtModeAnalysisModule(drtCfg));
 		}
