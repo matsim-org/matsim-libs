@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.taxi.run;
 
+import org.matsim.contrib.dvrp.run.ConfigConsistencyCheckers;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
-import org.matsim.contrib.dvrp.run.MultiModal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 
@@ -29,22 +29,8 @@ public class TaxiConfigConsistencyChecker implements ConfigConsistencyChecker {
 	public void checkConsistency(Config config) {
 		new DvrpConfigConsistencyChecker().checkConsistency(config);
 
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
-		MultiModeTaxiConfigGroup multiModeTaxiCfg = MultiModeTaxiConfigGroup.get(config);
-		if (taxiCfg != null) {
-			if (multiModeTaxiCfg != null) {
-				throw new RuntimeException("Either TaxiConfigGroup or MultiModeTaxiConfigGroup must be defined");
-			}
-			checkTaxiConfigConsistency(taxiCfg);
-		} else {
-			if (multiModeTaxiCfg == null) {
-				throw new RuntimeException("Either TaxiConfigGroup or MultiModeTaxiConfigGroup must be defined");
-			}
-			multiModeTaxiCfg.getTaxiConfigGroups().stream().forEach(this::checkTaxiConfigConsistency);
-			if (!MultiModal.areModesUnique(multiModeTaxiCfg)) {
-				throw new RuntimeException("Taxi modes are not unique");
-			}
-		}
+		ConfigConsistencyCheckers.checkSingleOrMultiModeConsistency(TaxiConfigGroup.get(config),
+				MultiModeTaxiConfigGroup.get(config), this::checkTaxiConfigConsistency);
 
 		if (config.qsim().getNumberOfThreads() != 1) {
 			throw new RuntimeException("Only a single-threaded QSim allowed");
