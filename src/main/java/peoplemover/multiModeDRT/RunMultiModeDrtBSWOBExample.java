@@ -77,7 +77,7 @@ public class RunMultiModeDrtBSWOBExample {
 		Controler controler = new Controler(scenario);
 
 		List<String> modes = new ArrayList<>();
-		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
+		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
 			modes.add(drtCfg.getMode());
 			controler.addOverridingModule(new DrtModeModule(drtCfg));
 			controler.addOverridingModule(new DrtModeAnalysisModule(drtCfg));
