@@ -35,7 +35,6 @@ import org.matsim.contrib.drt.run.DrtModeModule;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
@@ -57,57 +56,56 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
  */
 public class RunMultiModeDrtBSWOBExample {
 
-    private static final String INPUTDIR = "D:/BS_DRT/input/";
+	private static final String INPUTDIR = "D:/BS_DRT/input/";
 
-    public static void run() {
-        Config config = ConfigUtils.loadConfig(INPUTDIR + "/multimode-drt-config_run2.xml", new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
-                new OTFVisConfigGroup());
-        String runId = "multiModeDRT2";
-        config.controler().setRunId(runId);
-        config.controler().setOutputDirectory(INPUTDIR + "../output/" + runId);
+	public static void run() {
+		Config config = ConfigUtils.loadConfig(INPUTDIR + "/multimode-drt-config_run2.xml",
+				new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+		String runId = "multiModeDRT2";
+		config.controler().setRunId(runId);
+		config.controler().setOutputDirectory(INPUTDIR + "../output/" + runId);
 
 		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(config);
 		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtCfg, config.planCalcScore());
-        config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-        config.checkConsistency();
+		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
+		config.checkConsistency();
 
-        Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
-        ScenarioUtils.loadScenario(scenario);
+		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
+		ScenarioUtils.loadScenario(scenario);
 
-        Controler controler = new Controler(scenario);
+		Controler controler = new Controler(scenario);
 
-        List<DvrpModeQSimModule> dvrpModeQSimModules = new ArrayList<>();
-        for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
-			dvrpModeQSimModules.add(new DvrpModeQSimModule(drtCfg.getMode()));
-            controler.addOverridingModule(new DrtModeModule(drtCfg));
-            controler.addOverridingModule(new DrtModeAnalysisModule(drtCfg));
-        }
+		List<String> modes = new ArrayList<>();
+		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
+			modes.add(drtCfg.getMode());
+			controler.addOverridingModule(new DrtModeModule(drtCfg));
+			controler.addOverridingModule(new DrtModeAnalysisModule(drtCfg));
+		}
 
-        controler.addOverridingModule(new DvrpModule(dvrpModeQSimModules.stream().toArray(DvrpModeQSimModule[]::new)));
-        controler.addOverridingModule(new SwissRailRaptorModule());
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bind(TravelDisutilityFactory.class).annotatedWith(Drt.class)
-                        .toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
-                bind(MainModeIdentifier.class).toInstance(new MultiModeDrtMainModeIdentifier(multiModeDrtCfg));
+		controler.addOverridingModule(new DvrpModule(modes.stream().toArray(String[]::new)));
+		controler.addOverridingModule(new SwissRailRaptorModule());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(TravelDisutilityFactory.class).annotatedWith(Drt.class)
+						.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
+				bind(MainModeIdentifier.class).toInstance(new MultiModeDrtMainModeIdentifier(multiModeDrtCfg));
 
-            }
-        });
+			}
+		});
 
-        controler.addQSimModule(new AbstractQSimModule() {
-            @Override
-            protected void configureQSim() {
-                bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-                DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Drt.class);
-            }
-        });
+		controler.addQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
+				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Drt.class);
+			}
+		});
 
+		controler.run();
+	}
 
-        controler.run();
-    }
-
-    public static void main(String[] args) {
-        run();
-    }
+	public static void main(String[] args) {
+		run();
+	}
 }
