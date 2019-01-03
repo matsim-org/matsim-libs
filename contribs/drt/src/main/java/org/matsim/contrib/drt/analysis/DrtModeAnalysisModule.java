@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileWriter;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
@@ -35,10 +35,10 @@ import org.matsim.core.controler.MatsimServices;
 /**
  * @author michalm (Michal Maciejewski)
  */
-public class MultiModeDrtAnalysisModule extends AbstractMultiModeModule {
+public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 	private final DrtConfigGroup drtCfg;
 
-	public MultiModeDrtAnalysisModule(DrtConfigGroup drtCfg) {
+	public DrtModeAnalysisModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
 	}

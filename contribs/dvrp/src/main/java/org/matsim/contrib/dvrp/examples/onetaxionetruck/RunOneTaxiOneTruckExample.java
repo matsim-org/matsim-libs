@@ -24,10 +24,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiModule;
 import org.matsim.contrib.dvrp.examples.onetruck.OneTruckModule;
-import org.matsim.contrib.dvrp.examples.onetruck.OneTruckRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
@@ -58,13 +56,7 @@ public class RunOneTaxiOneTruckExample {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new OneTaxiModule(TAXIS_FILE));
 		controler.addOverridingModule(new OneTruckModule(TRUCKS_FILE));
-
-		DvrpModeQSimModule oneTaxiQSimModule = new DvrpModeQSimModule.Builder(TransportMode.taxi).build();
-		DvrpModeQSimModule oneTruckQSimModule = new DvrpModeQSimModule.Builder(
-				TransportMode.truck).setInstallPassengerEngineModule(false)
-				.addListener(OneTruckRequestCreator.class)
-				.build();
-		controler.addOverridingModule(new DvrpModule(oneTaxiQSimModule, oneTruckQSimModule));
+		controler.addOverridingModule(new DvrpModule(TransportMode.taxi, TransportMode.truck));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation

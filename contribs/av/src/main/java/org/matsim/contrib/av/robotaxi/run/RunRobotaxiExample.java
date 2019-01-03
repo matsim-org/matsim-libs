@@ -64,7 +64,7 @@ public class RunRobotaxiExample {
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new TaxiFareModule());
-		controler.addOverridingModule(DvrpModule.createModuleWithDefaultDvrpModeQSimModule(mode));
+		controler.addOverridingModule(new DvrpModule(mode));
 		controler.addOverridingModule(new TaxiModule());
 
 		if (otfvis) {

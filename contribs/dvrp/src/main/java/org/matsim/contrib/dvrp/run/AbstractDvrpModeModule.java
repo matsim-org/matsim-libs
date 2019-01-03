@@ -22,21 +22,19 @@ package org.matsim.contrib.dvrp.run;
 
 import java.util.function.Function;
 
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponent;
+import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.binder.LinkedBindingBuilder;
-import com.google.inject.binder.ScopedBindingBuilder;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public abstract class AbstractMultiModeQSimModule extends AbstractQSimModule {
+public abstract class AbstractDvrpModeModule extends AbstractModule {
 	private final String mode;
 
-	protected AbstractMultiModeQSimModule(String mode) {
+	protected AbstractDvrpModeModule(String mode) {
 		this.mode = mode;
 	}
 
@@ -50,23 +48,6 @@ public abstract class AbstractMultiModeQSimModule extends AbstractQSimModule {
 
 	protected <T> LinkedBindingBuilder<T> bindModal(Class<T> type) {
 		return bind(modalKey(type));
-	}
-
-	protected <T extends QSimComponent> ScopedBindingBuilder addModalComponent(Class<T> componentClass,
-			Key<? extends T> key) {
-		bind(componentClass).annotatedWith(DvrpModes.mode(mode)).to(key).asEagerSingleton();
-		return addQSimComponentBinding(DvrpModes.mode(mode)).to(Key.get(componentClass, DvrpModes.mode(mode)));
-	}
-
-	protected <T extends QSimComponent> ScopedBindingBuilder addModalComponent(Class<T> componentClass,
-			Provider<T> componentProvider) {
-		bind(componentClass).annotatedWith(DvrpModes.mode(mode)).toProvider(componentProvider).asEagerSingleton();
-		return addQSimComponentBinding(DvrpModes.mode(mode)).to(Key.get(componentClass, DvrpModes.mode(mode)));
-	}
-
-	protected <T extends QSimComponent> void addModalComponent(Class<T> componentClass) {
-		bind(componentClass).annotatedWith(DvrpModes.mode(mode)).to(componentClass).asEagerSingleton();
-		addQSimComponentBinding(DvrpModes.mode(mode)).to(Key.get(componentClass, DvrpModes.mode(mode)));
 	}
 
 	protected <T> Provider<T> modalProvider(Function<ModalProviders.InstanceGetter, T> delegate) {

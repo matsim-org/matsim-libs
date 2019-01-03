@@ -92,7 +92,7 @@ public class RunTaxiPTIntermodalExample {
 
 		Controler controler = new Controler(scenario);
 
-		controler.addOverridingModule(DvrpModule.createModuleWithDefaultDvrpModeQSimModule(mode));
+		controler.addOverridingModule(new DvrpModule(mode));
 
 		controler.addOverridingModule(new TaxiModule());
 

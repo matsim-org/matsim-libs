@@ -22,7 +22,8 @@ package org.matsim.contrib.dvrp.run;
 
 import java.util.function.Function;
 
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
 import com.google.inject.Key;
 import com.google.inject.Provider;
@@ -31,26 +32,46 @@ import com.google.inject.binder.LinkedBindingBuilder;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public abstract class AbstractMultiModeModule extends AbstractModule {
+public abstract class AbstractDvrpModeQSimModule extends AbstractQSimModule {
 	private final String mode;
 
-	protected AbstractMultiModeModule(String mode) {
+	protected AbstractDvrpModeQSimModule(String mode) {
 		this.mode = mode;
 	}
 
-	protected String getMode() {
+	public final String getMode() {
 		return mode;
 	}
 
-	protected <T> Key<T> modalKey(Class<T> type) {
-		return Key.get(type, DvrpModes.mode(mode));
+	public final DvrpMode getDvrpMode() {
+		return DvrpModes.mode(mode);
 	}
 
-	protected <T> LinkedBindingBuilder<T> bindModal(Class<T> type) {
+	protected final <T> Key<T> modalKey(Class<T> type) {
+		return Key.get(type, getDvrpMode());
+	}
+
+	protected final <T> LinkedBindingBuilder<T> bindModal(Class<T> type) {
 		return bind(modalKey(type));
 	}
 
-	protected <T> Provider<T> modalProvider(Function<ModalProviders.InstanceGetter, T> delegate) {
+	protected final <T extends QSimComponent> void addModalComponent(Class<T> componentClass, Key<? extends T> key) {
+		bind(componentClass).annotatedWith(getDvrpMode()).to(key).asEagerSingleton();
+		addQSimComponentBinding(getDvrpMode()).to(Key.get(componentClass, getDvrpMode()));
+	}
+
+	protected final <T extends QSimComponent> void addModalComponent(Class<T> componentClass,
+			Provider<T> componentProvider) {
+		bind(componentClass).annotatedWith(getDvrpMode()).toProvider(componentProvider).asEagerSingleton();
+		addQSimComponentBinding(getDvrpMode()).to(Key.get(componentClass, getDvrpMode()));
+	}
+
+	protected final <T extends QSimComponent> void addModalComponent(Class<T> componentClass) {
+		bind(componentClass).annotatedWith(getDvrpMode()).to(componentClass).asEagerSingleton();
+		addQSimComponentBinding(getDvrpMode()).to(Key.get(componentClass, getDvrpMode()));
+	}
+
+	protected final <T> Provider<T> modalProvider(Function<ModalProviders.InstanceGetter, T> delegate) {
 		return ModalProviders.createProvider(mode, delegate);
 	}
 }

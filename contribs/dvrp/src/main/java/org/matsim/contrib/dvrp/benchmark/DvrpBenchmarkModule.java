@@ -20,7 +20,7 @@ package org.matsim.contrib.dvrp.benchmark;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
@@ -35,14 +35,10 @@ import com.google.inject.name.Names;
  * @author michalm
  */
 public class DvrpBenchmarkModule extends AbstractModule {
-	private final DvrpModeQSimModule qsimModule;
+	private final String mode;
 
-	public static DvrpBenchmarkModule createModule(String mode) {
-		return new DvrpBenchmarkModule(new DvrpModeQSimModule.Builder(mode).build());
-	}
-
-	public DvrpBenchmarkModule(DvrpModeQSimModule qsimModule) {
-		this.qsimModule = qsimModule;
+	public DvrpBenchmarkModule(String mode) {
+		this.mode = mode;
 	}
 
 	@Provides
@@ -51,7 +47,7 @@ public class DvrpBenchmarkModule extends AbstractModule {
 		QSimComponentsConfig components = new QSimComponentsConfig();
 		new StandardQSimComponentConfigurator(config).configure(components);
 		DynActivityEngineModule.configureComponents(components);
-		qsimModule.configureComponents(components);
+		components.addComponent(DvrpModes.mode(mode));
 		return components;
 	}
 
@@ -64,6 +60,5 @@ public class DvrpBenchmarkModule extends AbstractModule {
 				.asEagerSingleton();
 
 		installQSimModule(new DynActivityEngineModule());
-		installQSimModule(qsimModule);
 	}
 }

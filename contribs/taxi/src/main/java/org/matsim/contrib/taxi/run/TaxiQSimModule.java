@@ -22,12 +22,14 @@ package org.matsim.contrib.taxi.run;
 
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
@@ -48,13 +50,17 @@ public class TaxiQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
+		String mode = TaxiConfigGroup.get(getConfig()).getMode();
+		install(new VrpAgentSourceQSimModule(mode));
+		install(new PassengerEngineQSimModule(mode));
+
 		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Taxi.class);
 
 		bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
 		bind(TaxiScheduler.class).asEagerSingleton();
 
-		DvrpMode dvrpMode = DvrpModes.mode(TaxiConfigGroup.get(getConfig()).getMode());
+		DvrpMode dvrpMode = DvrpModes.mode(mode);
 		bind(VrpOptimizer.class).annotatedWith(dvrpMode).to(TaxiOptimizer.class);
 		addQSimComponentBinding(dvrpMode).to(TaxiOptimizer.class);
 		bind(DynActionCreator.class).annotatedWith(dvrpMode).to(TaxiActionCreator.class).asEagerSingleton();

@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,57 +20,47 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.file.FleetProvider;
-import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
-import org.matsim.contrib.dynagent.run.DynRoutingModule;
-import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
-import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
-import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
-import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+
+import com.google.inject.Inject;
 
 /**
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public final class MultiModeTaxiModule extends AbstractMultiModeModule {
-	private final TaxiConfigGroup taxiCfg;
+public class MultiModeTaxiModule extends AbstractModule {
 
-	public MultiModeTaxiModule(TaxiConfigGroup taxiCfg) {
-		super(taxiCfg.getMode());
-		this.taxiCfg = taxiCfg;
-	}
+	@Inject
+	private MultiModeTaxiConfigGroup multiModeTaxiCfg;
 
 	@Override
 	public void install() {
-		bindModal(Fleet.class).toProvider(new FleetProvider(taxiCfg.getTaxisFile())).asEagerSingleton();
-
-		bindModal(SubmittedTaxiRequestsCollector.class).to(SubmittedTaxiRequestsCollector.class).asEagerSingleton();
-		addControlerListenerBinding().to(modalKey(SubmittedTaxiRequestsCollector.class));
-
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new TaxiSimulationConsistencyChecker(getter.getModal(SubmittedTaxiRequestsCollector.class),
-						taxiCfg)));
-
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new TaxiStatsDumper(getter.getModal(Fleet.class), taxiCfg,
-						getter.get(OutputDirectoryHierarchy.class))));
-
-		addRoutingModuleBinding(taxiCfg.getMode()).toInstance(new DynRoutingModule(taxiCfg.getMode()));
-
-		if (taxiCfg.getTimeProfiles()) {
-			addMobsimListenerBinding().toProvider(modalProvider(
-					getter -> new TaxiStatusTimeProfileCollectorProvider(getter.getModal(Fleet.class),
-							getter.get(MatsimServices.class), getter.getModal(SubmittedTaxiRequestsCollector.class),
-							taxiCfg).get()));
-			// add more time profiles if necessary
+		List<String> modes = new ArrayList<>();
+		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getTaxiConfigGroups()) {
+			modes.add(taxiCfg.getMode());
+			install(new TaxiModeModule(taxiCfg));
 		}
 
-		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
+		install(new DvrpModule(modes.stream().toArray(String[]::new)));
 
-		installQSimModule(new MultiModeTaxiQSimModule(taxiCfg));
+		bind(TravelDisutilityFactory.class).annotatedWith(Taxi.class)
+				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
+
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
+				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Taxi.class);
+			}
+		});
 	}
 }
