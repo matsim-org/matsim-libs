@@ -37,12 +37,14 @@ import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.vsp.edvrp.edrt.EDrtActionCreator;
@@ -59,6 +61,10 @@ import com.google.inject.Key;
 public class EDrtQSimModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
+		String mode = DrtConfigGroup.get(getConfig()).getMode();
+		install(new VrpAgentSourceQSimModule(mode));
+		install(new PassengerEngineQSimModule(mode));
+
 		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Drt.class);
 
@@ -82,7 +88,7 @@ public class EDrtQSimModule extends AbstractQSimModule {
 		bind(ParallelPathDataProvider.class).asEagerSingleton();
 		bind(PrecalculablePathDataProvider.class).to(ParallelPathDataProvider.class);
 
-		DvrpMode dvrpMode = DvrpModes.mode(DrtConfigGroup.get(getConfig()).getMode());
+		DvrpMode dvrpMode = DvrpModes.mode(mode);
 		bind(VrpOptimizer.class).annotatedWith(dvrpMode).to(DrtOptimizer.class);
 		addQSimComponentBinding(dvrpMode).to(DrtOptimizer.class);
 		addQSimComponentBinding(dvrpMode).to(ParallelPathDataProvider.class);
