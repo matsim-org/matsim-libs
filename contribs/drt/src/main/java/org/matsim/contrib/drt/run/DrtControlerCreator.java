@@ -30,6 +30,7 @@ import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -102,8 +103,9 @@ public final class DrtControlerCreator {
 
 	public static void addDrtAsSingleDvrpModeToControler(Controler controler) {
 		addDrtWithoutDvrpModuleToControler(controler);
-		controler.addOverridingModule(new DvrpModule(
-				DrtConfigGroup.get(controler.getConfig()).getMode()));
+		controler.addOverridingModule(new DvrpModule());
+		controler.configureQSimComponents(
+				DvrpQSimComponents.activateModes(DrtConfigGroup.get(controler.getConfig()).getMode()));
 	}
 
 	public static void addDrtWithoutDvrpModuleToControler(Controler controler) {

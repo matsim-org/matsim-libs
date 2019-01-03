@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,41 +18,18 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.taxi.run;
+package org.matsim.contrib.dvrp.run;
 
 import java.util.Collection;
-
-import org.matsim.contrib.dvrp.run.MultiModal;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
+import java.util.stream.Stream;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements MultiModal<TaxiConfigGroup> {
-	public static final String GROUP_NAME = "multiModeTaxi";
+public interface MultiModal<M extends Modal> {
+	Collection<M> getModalElements();
 
-	@SuppressWarnings("deprecation")
-	public static MultiModeTaxiConfigGroup get(Config config) {
-		return (MultiModeTaxiConfigGroup)config.getModule(GROUP_NAME);
-	}
-
-	public MultiModeTaxiConfigGroup() {
-		super(GROUP_NAME);
-	}
-
-	@Override
-	public ConfigGroup createParameterSet(String type) {
-		if (type.equals(TaxiConfigGroup.GROUP_NAME)) {
-			return new TaxiConfigGroup();
-		}
-		throw new IllegalArgumentException(type);
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public Collection<TaxiConfigGroup> getModalElements() {
-		return (Collection<TaxiConfigGroup>)getParameterSets(TaxiConfigGroup.GROUP_NAME);
+	default Stream<String> modes() {
+		return getModalElements().stream().map(Modal::getMode);
 	}
 }

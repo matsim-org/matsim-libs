@@ -20,9 +20,6 @@
 
 package org.matsim.contrib.taxi.run;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
@@ -44,13 +41,10 @@ public class MultiModeTaxiModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		List<String> modes = new ArrayList<>();
-		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getTaxiConfigGroups()) {
-			modes.add(taxiCfg.getMode());
+		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getModalElements()) {
 			install(new TaxiModeModule(taxiCfg));
 		}
-
-		install(new DvrpModule(modes.stream().toArray(String[]::new)));
+		install(new DvrpModule());
 
 		bind(TravelDisutilityFactory.class).annotatedWith(Taxi.class)
 				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));

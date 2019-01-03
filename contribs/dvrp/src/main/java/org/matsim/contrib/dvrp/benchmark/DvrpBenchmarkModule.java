@@ -20,37 +20,15 @@ package org.matsim.contrib.dvrp.benchmark;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
-import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
 /**
  * @author michalm
  */
 public class DvrpBenchmarkModule extends AbstractModule {
-	private final String mode;
-
-	public DvrpBenchmarkModule(String mode) {
-		this.mode = mode;
-	}
-
-	@Provides
-	@Singleton
-	public QSimComponentsConfig provideQSimComponentsConfig(Config config) {
-		QSimComponentsConfig components = new QSimComponentsConfig();
-		new StandardQSimComponentConfigurator(config).configure(components);
-		DynActivityEngineModule.configureComponents(components);
-		components.addComponent(DvrpModes.mode(mode));
-		return components;
-	}
-
 	@Override
 	public void install() {
 		install(new DvrpBenchmarkTravelTimeModule());// fixed travel times

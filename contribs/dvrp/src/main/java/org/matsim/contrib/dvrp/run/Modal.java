@@ -18,41 +18,11 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.taxi.run;
-
-import java.util.Collection;
-
-import org.matsim.contrib.dvrp.run.MultiModal;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
+package org.matsim.contrib.dvrp.run;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements MultiModal<TaxiConfigGroup> {
-	public static final String GROUP_NAME = "multiModeTaxi";
-
-	@SuppressWarnings("deprecation")
-	public static MultiModeTaxiConfigGroup get(Config config) {
-		return (MultiModeTaxiConfigGroup)config.getModule(GROUP_NAME);
-	}
-
-	public MultiModeTaxiConfigGroup() {
-		super(GROUP_NAME);
-	}
-
-	@Override
-	public ConfigGroup createParameterSet(String type) {
-		if (type.equals(TaxiConfigGroup.GROUP_NAME)) {
-			return new TaxiConfigGroup();
-		}
-		throw new IllegalArgumentException(type);
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public Collection<TaxiConfigGroup> getModalElements() {
-		return (Collection<TaxiConfigGroup>)getParameterSets(TaxiConfigGroup.GROUP_NAME);
-	}
+public interface Modal {
+	String getMode();
 }

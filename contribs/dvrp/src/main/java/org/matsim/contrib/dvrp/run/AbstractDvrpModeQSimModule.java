@@ -39,11 +39,11 @@ public abstract class AbstractDvrpModeQSimModule extends AbstractQSimModule {
 		this.mode = mode;
 	}
 
-	public final String getMode() {
+	protected final String getMode() {
 		return mode;
 	}
 
-	public final DvrpMode getDvrpMode() {
+	protected final DvrpMode getDvrpMode() {
 		return DvrpModes.mode(mode);
 	}
 

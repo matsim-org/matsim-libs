@@ -43,11 +43,11 @@ public class MultiModeDrtMainModeIdentifier implements MainModeIdentifier {
 
 	@Inject
 	public MultiModeDrtMainModeIdentifier(MultiModeDrtConfigGroup drtCfg) {
-		drtStageActivityTypes = drtCfg.getDrtConfigGroups()
+		drtStageActivityTypes = drtCfg.getModalElements()
 				.stream()
 				.map(drtConfigGroup -> drtConfigGroup.getMode())
 				.collect(Collectors.toMap(s -> new DrtStageActivityType(s).drtStageActivity, s -> s));
-		drtWalkTypes = drtCfg.getDrtConfigGroups()
+		drtWalkTypes = drtCfg.getModalElements()
 				.stream()
 				.map(drtConfigGroup -> drtConfigGroup.getMode())
 				.collect(Collectors.toMap(s -> new DrtStageActivityType(s).drtWalk, s -> s));

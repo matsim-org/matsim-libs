@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,41 +18,36 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.taxi.run;
+package org.matsim.contrib.dvrp.run;
 
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.function.Consumer;
 
-import org.matsim.contrib.dvrp.run.MultiModal;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements MultiModal<TaxiConfigGroup> {
-	public static final String GROUP_NAME = "multiModeTaxi";
-
-	@SuppressWarnings("deprecation")
-	public static MultiModeTaxiConfigGroup get(Config config) {
-		return (MultiModeTaxiConfigGroup)config.getModule(GROUP_NAME);
-	}
-
-	public MultiModeTaxiConfigGroup() {
-		super(GROUP_NAME);
-	}
-
-	@Override
-	public ConfigGroup createParameterSet(String type) {
-		if (type.equals(TaxiConfigGroup.GROUP_NAME)) {
-			return new TaxiConfigGroup();
+public class ConfigConsistencyCheckers {
+	public static <C extends ConfigGroup & Modal> void checkSingleOrMultiModeConsistency(C cfg,
+			MultiModal<C> multiModeCfg, Consumer<C> consistencyChecker) {
+		if (cfg != null) {
+			if (multiModeCfg != null) {
+				throw new RuntimeException("Either single or multi-mode " + cfg.getName() + " must be defined");
+			}
+			consistencyChecker.accept(cfg);
+		} else {
+			if (multiModeCfg == null) {
+				throw new RuntimeException("Either single or multi-mode " + cfg.getName() + " must be defined");
+			}
+			multiModeCfg.getModalElements().stream().forEach(consistencyChecker);
+			if (!areModesUnique(multiModeCfg)) {
+				throw new RuntimeException("Modes in multi-mode config are not unique");
+			}
 		}
-		throw new IllegalArgumentException(type);
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public Collection<TaxiConfigGroup> getModalElements() {
-		return (Collection<TaxiConfigGroup>)getParameterSets(TaxiConfigGroup.GROUP_NAME);
+	public static boolean areModesUnique(MultiModal<?> multiModal) {
+		return multiModal.modes().allMatch(new HashSet<>()::add);
 	}
 }
