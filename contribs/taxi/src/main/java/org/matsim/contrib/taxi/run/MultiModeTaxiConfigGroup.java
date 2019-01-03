@@ -50,13 +50,9 @@ public class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements M
 		throw new IllegalArgumentException(type);
 	}
 
-	@SuppressWarnings("unchecked")
-	public Collection<TaxiConfigGroup> getTaxiConfigGroups() {
-		return (Collection<TaxiConfigGroup>)getParameterSets(TaxiConfigGroup.GROUP_NAME);
-	}
-
 	@Override
+	@SuppressWarnings("unchecked")
 	public Collection<TaxiConfigGroup> getModalElements() {
-		return getTaxiConfigGroups();
+		return (Collection<TaxiConfigGroup>)getParameterSets(TaxiConfigGroup.GROUP_NAME);
 	}
 }

@@ -41,7 +41,7 @@ public class MultiModeTaxiModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getTaxiConfigGroups()) {
+		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getModalElements()) {
 			install(new TaxiModeModule(taxiCfg));
 		}
 		install(new DvrpModule());
