@@ -87,7 +87,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:
-				addRoutingModuleBinding(drtCfg.getMode()).toProvider(
+				addRoutingModuleBinding(getMode()).toProvider(
 						new DrtRoutingModuleProvider(drtCfg));//not singleton
 				break;
 
@@ -97,7 +97,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 				bindModal(DrtRoutingModule.class).toProvider(new DrtRoutingModuleProvider(drtCfg));//not singleton
 
-				addRoutingModuleBinding(drtCfg.getMode()).toProvider(modalProvider(
+				addRoutingModuleBinding(getMode()).toProvider(modalProvider(
 						getter -> new StopBasedDrtRoutingModule(getter.get(PopulationFactory.class),
 								getter.getModal(DrtRoutingModule.class),
 								getter.getNamed(RoutingModule.class, TransportMode.walk),

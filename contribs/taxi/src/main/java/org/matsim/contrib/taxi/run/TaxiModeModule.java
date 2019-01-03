@@ -59,7 +59,7 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 				getter -> new TaxiStatsDumper(getter.getModal(Fleet.class), taxiCfg,
 						getter.get(OutputDirectoryHierarchy.class))));
 
-		addRoutingModuleBinding(taxiCfg.getMode()).toInstance(new DynRoutingModule(taxiCfg.getMode()));
+		addRoutingModuleBinding(getMode()).toInstance(new DynRoutingModule(getMode()));
 
 		if (taxiCfg.getTimeProfiles()) {
 			addMobsimListenerBinding().toProvider(modalProvider(

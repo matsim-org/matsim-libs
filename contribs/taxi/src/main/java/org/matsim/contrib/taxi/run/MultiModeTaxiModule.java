@@ -21,7 +21,6 @@
 package org.matsim.contrib.taxi.run;
 
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.core.controler.AbstractModule;
@@ -44,7 +43,6 @@ public class MultiModeTaxiModule extends AbstractModule {
 		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getModalElements()) {
 			install(new TaxiModeModule(taxiCfg));
 		}
-		install(new DvrpModule());
 
 		bind(TravelDisutilityFactory.class).annotatedWith(Taxi.class)
 				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));

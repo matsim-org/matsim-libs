@@ -23,7 +23,6 @@ package org.matsim.contrib.drt.run;
 import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
 import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.core.controler.AbstractModule;
@@ -49,8 +48,6 @@ public final class MultiModeDrtModule extends AbstractModule {
 			install(new DrtModeModule(drtCfg));
 			install(new DrtModeAnalysisModule(drtCfg));
 		}
-
-		install(new DvrpModule());
 
 		bind(TravelDisutilityFactory.class).annotatedWith(Drt.class)
 				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
