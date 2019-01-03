@@ -36,6 +36,7 @@ import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.core.config.Config;
@@ -82,7 +83,9 @@ public class RunMultiModeDrtBSWOBExample {
 			controler.addOverridingModule(new DrtModeAnalysisModule(drtCfg));
 		}
 
-		controler.addOverridingModule(new DvrpModule(modes.stream().toArray(String[]::new)));
+		controler.addOverridingModule(new DvrpModule());
+		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtCfg));
+
 		controler.addOverridingModule(new SwissRailRaptorModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
