@@ -102,7 +102,7 @@ public final class DrtControlerCreator {
 
 	public static void addDrtAsSingleDvrpModeToControler(Controler controler) {
 		addDrtWithoutDvrpModuleToControler(controler);
-		controler.addOverridingModule(DvrpModule.createModuleWithDefaultDvrpModeQSimModule(
+		controler.addOverridingModule(new DvrpModule(
 				DrtConfigGroup.get(controler.getConfig()).getMode()));
 	}
 

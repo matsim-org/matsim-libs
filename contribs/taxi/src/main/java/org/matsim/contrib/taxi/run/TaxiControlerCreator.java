@@ -44,7 +44,7 @@ public class TaxiControlerCreator {
 
 	public static void addTaxiAsSingleDvrpModeToControler(Controler controler) {
 		addTaxiWithoutDvrpModuleToControler(controler);
-		controler.addOverridingModule(DvrpModule.createModuleWithDefaultDvrpModeQSimModule(
+		controler.addOverridingModule(new DvrpModule(
 				TaxiConfigGroup.get(controler.getConfig()).getMode()));
 	}
 

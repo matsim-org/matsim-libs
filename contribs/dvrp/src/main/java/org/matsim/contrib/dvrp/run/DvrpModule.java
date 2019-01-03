@@ -40,10 +40,6 @@ import com.google.inject.name.Names;
 public final class DvrpModule extends AbstractModule {
 	private final List<String> modes;
 
-	public static DvrpModule createModuleWithDefaultDvrpModeQSimModule(String mode) {
-		return new DvrpModule(mode);
-	}
-
 	public DvrpModule(String... modes) {
 		this.modes = ImmutableList.copyOf(modes);
 	}
