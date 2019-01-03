@@ -38,14 +38,14 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
 public final class DvrpModule extends AbstractModule {
-	private final List<DvrpModeQSimModule> qsimModules;
+	private final List<String> modes;
 
 	public static DvrpModule createModuleWithDefaultDvrpModeQSimModule(String mode) {
-		return new DvrpModule(new DvrpModeQSimModule(mode));
+		return new DvrpModule(mode);
 	}
 
-	public DvrpModule(DvrpModeQSimModule... qsimModules) {
-		this.qsimModules = ImmutableList.copyOf(qsimModules);
+	public DvrpModule(String... modes) {
+		this.modes = ImmutableList.copyOf(modes);
 	}
 
 	@Provides
@@ -54,7 +54,7 @@ public final class DvrpModule extends AbstractModule {
 		QSimComponentsConfig components = new QSimComponentsConfig();
 		new StandardQSimComponentConfigurator(config).configure(components);
 		DynActivityEngineModule.configureComponents(components);
-		qsimModules.forEach(m -> components.addComponent(m.getDvrpMode()));
+		modes.forEach(m -> components.addComponent(DvrpModes.mode(m)));
 		return components;
 	}
 

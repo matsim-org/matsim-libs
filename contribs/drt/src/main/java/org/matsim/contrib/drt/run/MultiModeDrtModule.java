@@ -26,7 +26,6 @@ import java.util.List;
 import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
 import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
@@ -49,14 +48,14 @@ public final class MultiModeDrtModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		List<DvrpModeQSimModule> dvrpModeQSimModules = new ArrayList<>();
+		List<String> modes = new ArrayList<>();
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getDrtConfigGroups()) {
-			dvrpModeQSimModules.add(new DvrpModeQSimModule(drtCfg.getMode()));
+			modes.add(drtCfg.getMode());
 			install(new DrtModeModule(drtCfg));
 			install(new DrtModeAnalysisModule(drtCfg));
 		}
 
-		install(new DvrpModule(dvrpModeQSimModules.stream().toArray(DvrpModeQSimModule[]::new)));
+		install(new DvrpModule(modes.stream().toArray(String[]::new)));
 
 		bind(TravelDisutilityFactory.class).annotatedWith(Drt.class)
 				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
