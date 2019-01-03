@@ -46,8 +46,4 @@ public class DvrpModeQSimModule extends AbstractDvrpModeQSimModule {
 			install(new PassengerEngineQSimModule(getMode()));
 		}
 	}
-
-	public void configureComponents(QSimComponentsConfig components) {
-		components.addComponent(DvrpModes.mode(mode));
-	}
 }

@@ -51,7 +51,7 @@ public class DvrpBenchmarkModule extends AbstractModule {
 		QSimComponentsConfig components = new QSimComponentsConfig();
 		new StandardQSimComponentConfigurator(config).configure(components);
 		DynActivityEngineModule.configureComponents(components);
-		qsimModule.configureComponents(components);
+		components.addComponent(qsimModule.getDvrpMode());
 		return components;
 	}
 

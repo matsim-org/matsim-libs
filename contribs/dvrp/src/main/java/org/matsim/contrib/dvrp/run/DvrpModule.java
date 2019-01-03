@@ -54,7 +54,7 @@ public final class DvrpModule extends AbstractModule {
 		QSimComponentsConfig components = new QSimComponentsConfig();
 		new StandardQSimComponentConfigurator(config).configure(components);
 		DynActivityEngineModule.configureComponents(components);
-		qsimModules.forEach(m -> m.configureComponents(components));
+		qsimModules.forEach(m -> components.addComponent(m.getDvrpMode()));
 		return components;
 	}
 
