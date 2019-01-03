@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.config.Config;
@@ -66,7 +67,8 @@ public class RunTaxiBenchmark {
 
 		Controler controler = new Controler(scenario);
 		controler.setModules(new DvrpBenchmarkControlerModule());
-		controler.addOverridingModule(new DvrpBenchmarkModule(mode));
+		controler.addOverridingModule(new DvrpBenchmarkModule());
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
 
 		controler.addOverridingModule(new TaxiModule());
 		controler.addOverridingModule(new AbstractModule() {

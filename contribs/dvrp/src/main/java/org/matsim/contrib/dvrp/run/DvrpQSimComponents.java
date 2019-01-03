@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,16 +20,23 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import java.util.HashSet;
-import java.util.stream.Stream;
+import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public interface HasMode {
-	String getMode();
+public class DvrpQSimComponents {
+	public static QSimComponentsConfigurator activateModes(String... modes) {
+		return components -> {
+			DynActivityEngineModule.configureComponents(components);
+			for (String m : modes) {
+				components.addComponent(DvrpModes.mode(m));
+			}
+		};
+	}
 
-	static boolean areModesUnique(Stream<? extends HasMode> elementsWithModes) {
-		return elementsWithModes.map(HasMode::getMode).allMatch(new HashSet<>()::add);
+	public static QSimComponentsConfigurator activateAllModes(MultiModal<?> multiModal) {
+		return activateModes(multiModal.modes().toArray(String[]::new));
 	}
 }

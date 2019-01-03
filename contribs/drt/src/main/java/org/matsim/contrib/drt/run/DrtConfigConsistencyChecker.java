@@ -24,7 +24,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebal
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParamsConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup.OperationalScheme;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
-import org.matsim.contrib.dvrp.run.HasMode;
+import org.matsim.contrib.dvrp.run.MultiModal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.groups.GlobalConfigGroup;
@@ -50,7 +50,7 @@ public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
 				throw new RuntimeException("Either DrtConfigGroup or MultiModeDrtConfigGroup must be defined");
 			}
 			multiModeDrtCfg.getDrtConfigGroups().stream().forEach(c -> checkDrtConfigConsistency(c, config.global()));
-			if (!HasMode.areModesUnique(multiModeDrtCfg.getDrtConfigGroups().stream())) {
+			if (!MultiModal.areModesUnique(multiModeDrtCfg)) {
 				throw new RuntimeException("Drt modes are not unique");
 			}
 		}
@@ -59,9 +59,9 @@ public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
 			// Not an issue if all request rejections are immediate (i.e. happen during request submission)
 			log.warn("qsim.endTime should be specified and qsim.simEndtimeInterpretation should be 'onlyUseEndtime'"
 					+ " if postponed request rejection is allowed. Otherwise, rejected passengers"
-                    + " (who are stuck endlessly waiting for a DRT vehicle) will prevent QSim from stopping."
-                    + " Keep also in mind that not setting an end time may result in agents " +
-                    "attempting to travel without vehicles being available.");
+					+ " (who are stuck endlessly waiting for a DRT vehicle) will prevent QSim from stopping."
+					+ " Keep also in mind that not setting an end time may result in agents "
+					+ "attempting to travel without vehicles being available.");
 		}
 		if (config.qsim().getNumberOfThreads() != 1) {
 			throw new RuntimeException("Only a single-threaded QSim allowed");

@@ -24,6 +24,7 @@ import org.matsim.contrib.av.robotaxi.fares.taxi.TaxiFareModule;
 import org.matsim.contrib.av.robotaxi.fares.taxi.TaxiFaresConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -64,8 +65,9 @@ public class RunRobotaxiExample {
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new TaxiFareModule());
-		controler.addOverridingModule(new DvrpModule(mode));
+		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new TaxiModule());
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

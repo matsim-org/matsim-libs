@@ -18,43 +18,23 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.taxi.run;
+package org.matsim.contrib.dvrp.run;
 
-import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-
-import com.google.inject.Inject;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.stream.Stream;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModeTaxiModule extends AbstractModule {
+public interface MultiModal<M extends Modal> {
+	Collection<M> getModalElements();
 
-	@Inject
-	private MultiModeTaxiConfigGroup multiModeTaxiCfg;
+	default Stream<String> modes() {
+		return getModalElements().stream().map(Modal::getMode);
+	}
 
-	@Override
-	public void install() {
-		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getTaxiConfigGroups()) {
-			install(new TaxiModeModule(taxiCfg));
-		}
-		install(new DvrpModule());
-
-		bind(TravelDisutilityFactory.class).annotatedWith(Taxi.class)
-				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
-
-		installQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Taxi.class);
-			}
-		});
+	static boolean areModesUnique(MultiModal<?> multiModal) {
+		return multiModal.modes().allMatch(new HashSet<>()::add);
 	}
 }

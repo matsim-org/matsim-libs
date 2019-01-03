@@ -18,45 +18,11 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.run;
-
-import java.util.Collection;
-
-import org.matsim.contrib.dvrp.run.MultiModal;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
+package org.matsim.contrib.dvrp.run;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModeDrtConfigGroup extends ReflectiveConfigGroup implements MultiModal<DrtConfigGroup> {
-	public static final String GROUP_NAME = "multiModeDrt";
-
-	@SuppressWarnings("deprecation")
-	public static MultiModeDrtConfigGroup get(Config config) {
-		return (MultiModeDrtConfigGroup)config.getModule(GROUP_NAME);
-	}
-
-	public MultiModeDrtConfigGroup() {
-		super(GROUP_NAME);
-	}
-
-	@Override
-	public ConfigGroup createParameterSet(String type) {
-		if (type.equals(DrtConfigGroup.GROUP_NAME)) {
-			return new DrtConfigGroup();
-		}
-		throw new IllegalArgumentException(type);
-	}
-
-	@SuppressWarnings("unchecked")
-	public Collection<DrtConfigGroup> getDrtConfigGroups() {
-		return (Collection<DrtConfigGroup>)getParameterSets(DrtConfigGroup.GROUP_NAME);
-	}
-
-	@Override
-	public Collection<DrtConfigGroup> getModalElements() {
-		return getDrtConfigGroups();
-	}
+public interface Modal {
+	String getMode();
 }

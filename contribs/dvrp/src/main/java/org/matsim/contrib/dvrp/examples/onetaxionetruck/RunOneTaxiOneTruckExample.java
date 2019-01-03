@@ -27,6 +27,7 @@ import org.matsim.contrib.dvrp.examples.onetruck.OneTruckModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -56,7 +57,8 @@ public class RunOneTaxiOneTruckExample {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new OneTaxiModule(TAXIS_FILE));
 		controler.addOverridingModule(new OneTruckModule(TRUCKS_FILE));
-		controler.addOverridingModule(new DvrpModule(TransportMode.taxi, TransportMode.truck));
+		controler.addOverridingModule(new DvrpModule());
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.taxi, TransportMode.truck));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation

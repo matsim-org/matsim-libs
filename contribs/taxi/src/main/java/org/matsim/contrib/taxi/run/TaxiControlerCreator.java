@@ -22,6 +22,7 @@ package org.matsim.contrib.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -44,8 +45,9 @@ public class TaxiControlerCreator {
 
 	public static void addTaxiAsSingleDvrpModeToControler(Controler controler) {
 		addTaxiWithoutDvrpModuleToControler(controler);
-		controler.addOverridingModule(new DvrpModule(
-				TaxiConfigGroup.get(controler.getConfig()).getMode()));
+		controler.addOverridingModule(new DvrpModule());
+		controler.configureQSimComponents(
+				DvrpQSimComponents.activateModes(TaxiConfigGroup.get(controler.getConfig()).getMode()));
 	}
 
 	public static void addTaxiWithoutDvrpModuleToControler(Controler controler) {
