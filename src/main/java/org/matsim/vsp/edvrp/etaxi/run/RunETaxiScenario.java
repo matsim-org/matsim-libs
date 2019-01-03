@@ -61,7 +61,7 @@ public class RunETaxiScenario {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new TaxiModule(new ETaxiQSimModule()));
 		controler.addOverridingModule(new EvModule());
-		controler.addOverridingModule(DvrpModule.createModuleWithDefaultDvrpModeQSimModule(taxiCfg.getMode()));
+		controler.addOverridingModule(new DvrpModule(taxiCfg.getMode()));
 
 		controler.addOverridingModule(createEvDvrpIntegrationModule(taxiCfg));
 

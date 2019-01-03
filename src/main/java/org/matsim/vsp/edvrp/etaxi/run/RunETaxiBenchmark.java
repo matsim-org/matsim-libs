@@ -69,7 +69,7 @@ public class RunETaxiBenchmark {
 		controler.addOverridingModule(new EvModule());
 
 		controler.addQSimModule(new ETaxiQSimModule());
-		controler.addOverridingModule(DvrpModule.createModuleWithDefaultDvrpModeQSimModule(taxiCfg.getMode()));
+		controler.addOverridingModule(new DvrpModule(taxiCfg.getMode()));
 
 		controler.addOverridingModule(RunETaxiScenario.createEvDvrpIntegrationModule(taxiCfg));
 

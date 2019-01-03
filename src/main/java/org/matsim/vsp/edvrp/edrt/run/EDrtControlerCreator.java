@@ -52,7 +52,7 @@ public class EDrtControlerCreator {
 
 	public static void addEDrtToController(Controler controler) {
 		String mode = DrtConfigGroup.get(controler.getConfig()).getMode();
-		controler.addOverridingModule(DvrpModule.createModuleWithDefaultDvrpModeQSimModule(mode));
+		controler.addOverridingModule(new DvrpModule(mode));
 		controler.addOverridingModule(new DrtModule(new EDrtQSimModule()));
 		controler.addOverridingModule(new DrtAnalysisModule());
 		controler.addOverridingModule(new AbstractModule() {
