@@ -71,6 +71,5 @@ public final class DvrpModule extends AbstractModule {
 				.asEagerSingleton();
 
 		installQSimModule(new DynActivityEngineModule());
-		qsimModules.forEach(this::installQSimModule);
 	}
 }

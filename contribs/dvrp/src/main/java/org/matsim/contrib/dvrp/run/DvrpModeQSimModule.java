@@ -20,30 +20,15 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DvrpModeQSimModule extends AbstractDvrpModeQSimModule {
-	private final boolean installPassengerEngineModule;
-
 	public DvrpModeQSimModule(String mode) {
-		this(mode, true);
-	}
-
-	public DvrpModeQSimModule(String mode, boolean installPassengerEngineModule) {
 		super(mode);
-		this.installPassengerEngineModule = installPassengerEngineModule;
 	}
 
 	@Override
 	protected void configureQSim() {
-		install(new VrpAgentSourceQSimModule(getMode()));
-
-		if (installPassengerEngineModule) {
-			install(new PassengerEngineQSimModule(getMode()));
-		}
 	}
 }

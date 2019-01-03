@@ -29,6 +29,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
@@ -56,6 +57,8 @@ public class OneTruckModule extends AbstractDvrpModeModule {
 		installQSimModule(new AbstractDvrpModeQSimModule(TransportMode.truck) {
 			@Override
 			protected void configureQSim() {
+				install(new VrpAgentSourceQSimModule(getMode()));
+
 				addModalComponent(OneTruckRequestCreator.class);
 				bindModal(VrpOptimizer.class).to(OneTruckOptimizer.class).asEagerSingleton();
 				bindModal(VrpAgentLogic.DynActionCreator.class).to(OneTruckActionCreator.class).asEagerSingleton();

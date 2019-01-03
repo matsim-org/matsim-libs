@@ -64,6 +64,5 @@ public class DvrpBenchmarkModule extends AbstractModule {
 				.asEagerSingleton();
 
 		installQSimModule(new DynActivityEngineModule());
-		installQSimModule(qsimModule);
 	}
 }

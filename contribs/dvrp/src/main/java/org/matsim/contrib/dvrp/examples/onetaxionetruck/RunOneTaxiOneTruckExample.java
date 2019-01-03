@@ -59,7 +59,7 @@ public class RunOneTaxiOneTruckExample {
 		controler.addOverridingModule(new OneTruckModule(TRUCKS_FILE));
 
 		DvrpModeQSimModule oneTaxiQSimModule = new DvrpModeQSimModule(TransportMode.taxi);
-		DvrpModeQSimModule oneTruckQSimModule = new DvrpModeQSimModule(TransportMode.truck, false);
+		DvrpModeQSimModule oneTruckQSimModule = new DvrpModeQSimModule(TransportMode.truck);
 		controler.addOverridingModule(new DvrpModule(oneTaxiQSimModule, oneTruckQSimModule));
 
 		if (otfvis) {
