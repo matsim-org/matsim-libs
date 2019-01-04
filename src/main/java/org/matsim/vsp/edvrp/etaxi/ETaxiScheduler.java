@@ -46,13 +46,11 @@ import org.matsim.vsp.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.vsp.ev.data.Charger;
 import org.matsim.vsp.ev.data.ElectricVehicle;
 
-import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 public class ETaxiScheduler extends TaxiScheduler {
 
-	@Inject
-	public ETaxiScheduler(TaxiConfigGroup taxiCfg, @Taxi Fleet fleet,
+	public ETaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			@Taxi TravelDisutility travelDisutility) {

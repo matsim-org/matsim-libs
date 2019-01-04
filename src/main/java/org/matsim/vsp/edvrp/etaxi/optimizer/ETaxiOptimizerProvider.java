@@ -38,7 +38,6 @@ import org.matsim.vsp.edvrp.etaxi.optimizer.rules.RuleBasedETaxiOptimizer;
 import org.matsim.vsp.edvrp.etaxi.optimizer.rules.RuleBasedETaxiOptimizerParams;
 import org.matsim.vsp.ev.data.ChargingInfrastructure;
 
-import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
 
@@ -58,8 +57,7 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final ETaxiScheduler eScheduler;
 	private final ChargingInfrastructure chargingInfrastructure;
 
-	@Inject
-	public ETaxiOptimizerProvider(TaxiConfigGroup taxiCfg, @Taxi Fleet fleet,
+	public ETaxiOptimizerProvider(TaxiConfigGroup taxiCfg, Fleet fleet,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, @Taxi TravelDisutility travelDisutility,
 			ETaxiScheduler eScheduler, ChargingInfrastructure chargingInfrastructure) {
