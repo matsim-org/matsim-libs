@@ -23,14 +23,18 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.FixedIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
@@ -74,7 +78,10 @@ public class RunTaxiBenchmark {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addControlerListenerBinding().to(TaxiBenchmarkStats.class).asEagerSingleton();
+				addControlerListenerBinding().toProvider(ModalProviders.createProvider(mode,
+						getter -> new TaxiBenchmarkStats(getter.getModal(Fleet.class),
+								getter.getModal(SubmittedTaxiRequestsCollector.class),
+								getter.get(OutputDirectoryHierarchy.class))));
 			}
 		});
 
