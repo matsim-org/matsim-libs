@@ -20,6 +20,9 @@
 
 package org.matsim.contrib.drt.run;
 
+import java.net.URL;
+
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -46,11 +49,14 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -87,13 +93,11 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:
-				addRoutingModuleBinding(getMode()).toProvider(
-						new DrtRoutingModuleProvider(drtCfg));//not singleton
+				addRoutingModuleBinding(getMode()).toProvider(new DrtRoutingModuleProvider(drtCfg));//not singleton
 				break;
 
 			case stopbased:
-				bindModal(TransitSchedule.class).toInstance(
-						DrtModule.readTransitSchedule(drtCfg.getTransitStopsFileUrl(getConfig().getContext())));
+				bindModal(TransitSchedule.class).toInstance(readTransitSchedule());
 
 				bindModal(DrtRoutingModule.class).toProvider(new DrtRoutingModuleProvider(drtCfg));//not singleton
 
@@ -175,4 +179,12 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 					walkRouter);
 		}
 	}
+
+	private TransitSchedule readTransitSchedule() {
+		URL url = drtCfg.getTransitStopsFileUrl(getConfig().getContext());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new TransitScheduleReader(scenario).readURL(url);
+		return scenario.getTransitSchedule();
+	}
+
 }

@@ -26,7 +26,6 @@ import java.util.function.Function;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -110,6 +109,5 @@ public final class DrtControlerCreator {
 
 	public static void addDrtWithoutDvrpModuleToControler(Controler controler) {
 		controler.addOverridingModule(new DrtModule());
-		controler.addOverridingModule(new DrtAnalysisModule());
 	}
 }

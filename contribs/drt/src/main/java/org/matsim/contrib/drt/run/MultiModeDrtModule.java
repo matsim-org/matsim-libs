@@ -48,10 +48,9 @@ public final class MultiModeDrtModule extends AbstractModule {
 			install(new DrtModeAnalysisModule(drtCfg));
 		}
 
-		bind(TravelDisutilityFactory.class).annotatedWith(Drt.class)
-				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
 		bind(MainModeIdentifier.class).toInstance(new MultiModeDrtMainModeIdentifier(multiModeDrtCfg));
 
+		bind(TravelDisutilityFactory.class).annotatedWith(Drt.class).toInstance(TimeAsTravelDisutility::new);
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
