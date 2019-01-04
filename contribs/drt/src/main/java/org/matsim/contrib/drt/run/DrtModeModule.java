@@ -140,8 +140,6 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		}).asEagerSingleton();
 
 		addControlerListenerBinding().to(modalKey(DrtRouteUpdater.class));
-
-		installQSimModule(new DrtModeQSimModule(drtCfg));
 	}
 
 	private static class DrtRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRoutingModule> {
