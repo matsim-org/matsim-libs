@@ -40,7 +40,6 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
 
@@ -59,8 +58,7 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final TravelDisutility travelDisutility;
 	private final TaxiScheduler scheduler;
 
-	@Inject
-	public DefaultTaxiOptimizerProvider(TaxiConfigGroup taxiCfg, @Taxi Fleet fleet,
+	public DefaultTaxiOptimizerProvider(TaxiConfigGroup taxiCfg, Fleet fleet,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, @Taxi TravelDisutility travelDisutility,
 			TaxiScheduler scheduler) {
