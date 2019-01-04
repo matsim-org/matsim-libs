@@ -19,11 +19,8 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityModule;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 import com.google.inject.Inject;
 
@@ -40,14 +37,6 @@ public final class TaxiModule extends AbstractModule {
 		install(new TaxiModeModule(taxiCfg));
 		installQSimModule(new TaxiModeQSimModule(taxiCfg));
 
-		bind(TravelDisutilityFactory.class).annotatedWith(Taxi.class)
-				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
-
-		installQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Taxi.class);
-			}
-		});
+		install(DvrpTravelDisutilityModule.createWithTimeAsTravelDisutility(Taxi.class));
 	}
 }
