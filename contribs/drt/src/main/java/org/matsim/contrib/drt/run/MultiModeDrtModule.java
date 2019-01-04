@@ -23,11 +23,8 @@ package org.matsim.contrib.drt.run;
 import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
 import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -47,19 +44,16 @@ public final class MultiModeDrtModule extends AbstractModule {
 	public void install() {
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
 			install(new DrtModeModule(drtCfg));
+			installQSimModule(new DrtModeQSimModule(drtCfg));
 			install(new DrtModeAnalysisModule(drtCfg));
 		}
 
-		install(new DvrpModule());
-
-		bind(TravelDisutilityFactory.class).annotatedWith(Drt.class)
-				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
 		bind(MainModeIdentifier.class).toInstance(new MultiModeDrtMainModeIdentifier(multiModeDrtCfg));
 
+		bind(TravelDisutilityFactory.class).annotatedWith(Drt.class).toInstance(TimeAsTravelDisutility::new);
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Drt.class);
 			}
 		});

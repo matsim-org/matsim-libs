@@ -19,17 +19,8 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.file.FleetProvider;
-import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dynagent.run.DynRoutingModule;
-import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
-import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
-import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -41,44 +32,22 @@ import com.google.inject.Inject;
  */
 public final class TaxiModule extends AbstractModule {
 
-	private final AbstractQSimModule taxiQSimModule;
-
 	@Inject
 	private TaxiConfigGroup taxiCfg;
 
-	public TaxiModule() {
-		this(new TaxiQSimModule());
-	}
-
-	public TaxiModule(AbstractQSimModule taxiQSimModule) {
-		this.taxiQSimModule = taxiQSimModule;
-	}
-
 	@Override
 	public void install() {
-		String mode = taxiCfg.getMode();
-		bind(DvrpModes.key(Fleet.class, mode)).toProvider(new FleetProvider(taxiCfg.getTaxisFile())).asEagerSingleton();
-		bind(Fleet.class).annotatedWith(Taxi.class).to(DvrpModes.key(Fleet.class, mode));
+		install(new TaxiModeModule(taxiCfg));
+		installQSimModule(new TaxiModeQSimModule(taxiCfg));
 
 		bind(TravelDisutilityFactory.class).annotatedWith(Taxi.class)
 				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
 
-		bind(SubmittedTaxiRequestsCollector.class).asEagerSingleton();
-		addControlerListenerBinding().to(SubmittedTaxiRequestsCollector.class);
-
-		addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
-		addControlerListenerBinding().to(TaxiStatsDumper.class);
-
-		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
-
-		if (taxiCfg.getTimeProfiles()) {
-			addMobsimListenerBinding().toProvider(TaxiStatusTimeProfileCollectorProvider.class);
-			// add more time profiles if necessary
-		}
-
-		bind(DvrpModes.key(PassengerRequestValidator.class, mode)).to(DefaultPassengerRequestValidator.class)
-				.asEagerSingleton();
-
-		installQSimModule(taxiQSimModule);
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Taxi.class);
+			}
+		});
 	}
 }

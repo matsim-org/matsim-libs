@@ -25,6 +25,8 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
 import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
 import com.google.inject.name.Names;
@@ -43,5 +45,11 @@ public final class DvrpModule extends AbstractModule {
 				.asEagerSingleton();
 
 		installQSimModule(new DynActivityEngineModule());
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
+			}
+		});
 	}
 }

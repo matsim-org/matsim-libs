@@ -21,11 +21,8 @@
 package org.matsim.contrib.taxi.run;
 
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
@@ -43,8 +40,8 @@ public class MultiModeTaxiModule extends AbstractModule {
 	public void install() {
 		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getModalElements()) {
 			install(new TaxiModeModule(taxiCfg));
+			installQSimModule(new TaxiModeQSimModule(taxiCfg));
 		}
-		install(new DvrpModule());
 
 		bind(TravelDisutilityFactory.class).annotatedWith(Taxi.class)
 				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
@@ -52,7 +49,6 @@ public class MultiModeTaxiModule extends AbstractModule {
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Taxi.class);
 			}
 		});

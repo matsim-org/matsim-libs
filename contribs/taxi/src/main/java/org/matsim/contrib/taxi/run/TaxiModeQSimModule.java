@@ -53,7 +53,7 @@ import com.google.inject.name.Named;
 public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 	private final TaxiConfigGroup taxiCfg;
 
-	TaxiModeQSimModule(TaxiConfigGroup taxiCfg) {
+	public TaxiModeQSimModule(TaxiConfigGroup taxiCfg) {
 		super(taxiCfg.getMode());
 		this.taxiCfg = taxiCfg;
 	}
