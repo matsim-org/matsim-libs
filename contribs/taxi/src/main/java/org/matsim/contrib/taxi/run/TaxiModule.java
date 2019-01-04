@@ -37,7 +37,8 @@ public final class TaxiModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		install(new TaxiModeModule(taxiCfg, new TaxiModeQSimModule(taxiCfg)));
+		install(new TaxiModeModule(taxiCfg));
+		installQSimModule(new TaxiModeQSimModule(taxiCfg));
 
 		bind(TravelDisutilityFactory.class).annotatedWith(Taxi.class)
 				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));

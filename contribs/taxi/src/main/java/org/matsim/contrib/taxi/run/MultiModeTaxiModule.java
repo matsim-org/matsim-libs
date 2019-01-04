@@ -40,6 +40,7 @@ public class MultiModeTaxiModule extends AbstractModule {
 	public void install() {
 		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getModalElements()) {
 			install(new TaxiModeModule(taxiCfg));
+			installQSimModule(new TaxiModeQSimModule(taxiCfg));
 		}
 
 		bind(TravelDisutilityFactory.class).annotatedWith(Taxi.class)

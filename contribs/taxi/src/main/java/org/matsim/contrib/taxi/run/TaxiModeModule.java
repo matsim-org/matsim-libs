@@ -70,7 +70,5 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 		}
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
-
-		installQSimModule(new TaxiModeQSimModule(taxiCfg));
 	}
 }
