@@ -20,7 +20,6 @@
 package org.matsim.contrib.drt.vrpagent;
 
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
@@ -35,8 +34,6 @@ import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
-import com.google.inject.Inject;
-
 /**
  * @author michalm
  */
@@ -46,8 +43,7 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final PassengerEngine passengerEngine;
 	private final VrpLegFactory legFactory;
 
-	@Inject
-	public DrtActionCreator(@Drt PassengerEngine passengerEngine, DrtOptimizer optimizer, MobsimTimer timer,
+	public DrtActionCreator(PassengerEngine passengerEngine, DrtOptimizer optimizer, MobsimTimer timer,
 			DvrpConfigGroup dvrpCfg) {
 		this(passengerEngine, v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v, optimizer, timer));
 	}

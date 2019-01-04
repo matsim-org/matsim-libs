@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.core.config.Config;
@@ -37,8 +36,6 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-
-import com.google.inject.Inject;
 
 /**
  * @author jbischoff
@@ -57,8 +54,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private final DecimalFormat format = new DecimalFormat();
 	private final int maxcap;
 
-	@Inject
-	public DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, @Drt Fleet fleet,
+	public DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, Fleet fleet,
 			DynModePassengerStats drtPassengerStats, MatsimServices matsimServices, Network network,
 			DrtRequestAnalyzer drtRequestAnalyzer) {
 		this.drtPassengerStats = drtPassengerStats;
@@ -115,7 +111,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		}
 		DynModeTripsAnalyser.analyzeBoardingsAndDeboardings(trips, ";", qSimCfg.getStartTime(), endTime, 3600,
 				filename(event, "drt_boardings", ".csv"), filename(event, "drt_alightments", ".csv"), network);
-    }
+	}
 
 	private String filename(IterationEndsEvent event, String prefix) {
 		return filename(event, prefix, "");
