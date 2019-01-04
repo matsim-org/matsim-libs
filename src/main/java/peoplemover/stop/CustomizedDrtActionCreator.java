@@ -20,9 +20,7 @@
 
 package peoplemover.stop;
 
-import com.google.inject.Inject;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
@@ -40,38 +38,37 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class CustomizedDrtActionCreator implements VrpAgentLogic.DynActionCreator {
-    public static final String DRT_STAY_NAME = "DrtStay";
-    public final static String DRT_STOP_NAME = "DrtBusStop";
+	public static final String DRT_STAY_NAME = "DrtStay";
+	public final static String DRT_STOP_NAME = "DrtBusStop";
 
-    private final PassengerEngine passengerEngine;
-    private final VrpLegFactory legFactory;
-    private final BusStopDurationCalculator busStopDurationCalculator;
+	private final PassengerEngine passengerEngine;
+	private final VrpLegFactory legFactory;
+	private final BusStopDurationCalculator busStopDurationCalculator;
 
-    @Inject
-    public CustomizedDrtActionCreator(@Drt PassengerEngine passengerEngine, DrtOptimizer optimizer, MobsimTimer timer,
-                                      DvrpConfigGroup dvrpCfg, BusStopDurationCalculator busStopDurationCalculator) {
-        this.passengerEngine = passengerEngine;
-        this.legFactory = v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v, optimizer, timer);
-        this.busStopDurationCalculator = busStopDurationCalculator;
-    }
+	public CustomizedDrtActionCreator(PassengerEngine passengerEngine, DrtOptimizer optimizer, MobsimTimer timer,
+			DvrpConfigGroup dvrpCfg, BusStopDurationCalculator busStopDurationCalculator) {
+		this.passengerEngine = passengerEngine;
+		this.legFactory = v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v, optimizer, timer);
+		this.busStopDurationCalculator = busStopDurationCalculator;
+	}
 
-    @Override
-    public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
-        DrtTask task = (DrtTask) vehicle.getSchedule().getCurrentTask();
-        switch (task.getDrtTaskType()) {
-            case DRIVE:
-                return legFactory.create(vehicle);
+	@Override
+	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
+		DrtTask task = (DrtTask)vehicle.getSchedule().getCurrentTask();
+		switch (task.getDrtTaskType()) {
+			case DRIVE:
+				return legFactory.create(vehicle);
 
-            case STOP:
-                DrtStopTask t = (DrtStopTask) task;
-                double duration = busStopDurationCalculator.calcDuration(t);
-                return new VariableDurationBusStopActivity(passengerEngine, dynAgent, t, duration, DRT_STOP_NAME);
+			case STOP:
+				DrtStopTask t = (DrtStopTask)task;
+				double duration = busStopDurationCalculator.calcDuration(t);
+				return new VariableDurationBusStopActivity(passengerEngine, dynAgent, t, duration, DRT_STOP_NAME);
 
-            case STAY:
-                return new VrpActivity(DRT_STAY_NAME, (DrtStayTask) task);
+			case STAY:
+				return new VrpActivity(DRT_STAY_NAME, (DrtStayTask)task);
 
-            default:
-                throw new IllegalStateException();
-        }
-    }
+			default:
+				throw new IllegalStateException();
+		}
+	}
 }
