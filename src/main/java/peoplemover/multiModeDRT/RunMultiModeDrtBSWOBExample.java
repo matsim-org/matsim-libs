@@ -34,13 +34,11 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -95,7 +93,6 @@ public class RunMultiModeDrtBSWOBExample {
 		controler.addQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Drt.class);
 			}
 		});
