@@ -64,7 +64,7 @@ import com.google.inject.name.Named;
 /**
  * @author Michal Maciejewski (michalm)
  */
-class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
+public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 	private final DrtConfigGroup drtCfg;
 
 	public DrtModeQSimModule(DrtConfigGroup drtCfg) {
