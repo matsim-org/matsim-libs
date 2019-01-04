@@ -42,11 +42,9 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 import com.google.inject.Key;
@@ -61,7 +59,6 @@ class DrtQSimModule extends AbstractQSimModule {
 		install(new VrpAgentSourceQSimModule(mode));
 		install(new PassengerEngineQSimModule(mode));
 
-		bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 		DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Drt.class);
 
 		bind(DrtOptimizer.class).to(DefaultDrtOptimizer.class).asEagerSingleton();
