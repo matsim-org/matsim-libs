@@ -1,0 +1,46 @@
+/*
+ * *********************************************************************** *
+ * project: org.matsim.*
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** *
+ */
+
+package org.matsim.vsp.edvrp.etaxi.run;
+
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityModule;
+import org.matsim.contrib.taxi.run.Taxi;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.run.TaxiModeModule;
+import org.matsim.core.controler.AbstractModule;
+
+import com.google.inject.Inject;
+
+/**
+ * @author michalm
+ */
+public final class ETaxiModule extends AbstractModule {
+
+	@Inject
+	private TaxiConfigGroup taxiCfg;
+
+	@Override
+	public void install() {
+		install(new TaxiModeModule(taxiCfg));
+		installQSimModule(new ETaxiModeQSimModule(taxiCfg));
+
+		install(DvrpTravelDisutilityModule.createWithTimeAsTravelDisutility(Taxi.class));
+	}
+}

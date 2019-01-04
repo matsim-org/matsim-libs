@@ -37,14 +37,14 @@ import org.matsim.vsp.edvrp.edrt.scheduler.EmptyVehicleChargingScheduler;
 public class EDrtOptimizer implements DrtOptimizer {
 	private final DefaultDrtOptimizer optimizer;
 	private final EmptyVehicleChargingScheduler chargingScheduler;
+	private final MobsimTimer timer;
 
 	@Inject
-	private MobsimTimer timer;
-
-	@Inject
-	public EDrtOptimizer(DefaultDrtOptimizer optimizer, EmptyVehicleChargingScheduler chargingScheduler) {
+	public EDrtOptimizer(DefaultDrtOptimizer optimizer, EmptyVehicleChargingScheduler chargingScheduler,
+			MobsimTimer timer) {
 		this.optimizer = optimizer;
 		this.chargingScheduler = chargingScheduler;
+		this.timer = timer;
 	}
 
 	@Override

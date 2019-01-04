@@ -69,7 +69,7 @@ public class RunETaxiBenchmark {
 		controler.addOverridingModule(new TaxiModule());
 		controler.addOverridingModule(new EvModule());
 
-		controler.addQSimModule(new ETaxiQSimModule());
+		controler.addQSimModule(new ETaxiModeQSimModule(taxiCfg));
 		controler.addOverridingModule(new DvrpModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(taxiCfg.getMode()));
 
