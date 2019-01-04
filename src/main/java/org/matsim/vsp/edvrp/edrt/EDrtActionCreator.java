@@ -20,7 +20,6 @@
 package org.matsim.vsp.edvrp.edrt;
 
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
@@ -41,8 +40,6 @@ import org.matsim.vsp.ev.dvrp.EvDvrpVehicle;
 import org.matsim.vsp.ev.dvrp.tracker.OfflineETaskTracker;
 import org.matsim.vsp.ev.dvrp.tracker.OnlineEDriveTaskTracker;
 
-import com.google.inject.Inject;
-
 /**
  * @author michalm
  */
@@ -50,8 +47,7 @@ public class EDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final DrtActionCreator drtActionCreator;
 	private final MobsimTimer timer;
 
-	@Inject
-	public EDrtActionCreator(@Drt PassengerEngine passengerEngine, DrtOptimizer optimizer, MobsimTimer timer,
+	public EDrtActionCreator(PassengerEngine passengerEngine, DrtOptimizer optimizer, MobsimTimer timer,
 			DvrpConfigGroup dvrpCfg) {
 		this.timer = timer;
 		drtActionCreator = new DrtActionCreator(passengerEngine,
