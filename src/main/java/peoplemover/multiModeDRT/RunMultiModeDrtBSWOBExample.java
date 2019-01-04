@@ -21,27 +21,17 @@
 package peoplemover.multiModeDRT;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
-import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
-import org.matsim.contrib.drt.run.DrtModeModule;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -71,31 +61,13 @@ public class RunMultiModeDrtBSWOBExample {
 
 		Controler controler = new Controler(scenario);
 
-		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
-			controler.addOverridingModule(new DrtModeModule(drtCfg));
-			controler.addOverridingModule(new DrtModeAnalysisModule(drtCfg));
-		}
+		controler.addOverridingModule(new MultiModeDrtModule());
 
 		controler.addOverridingModule(new DvrpModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtCfg));
 
 		controler.addOverridingModule(new SwissRailRaptorModule());
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(TravelDisutilityFactory.class).annotatedWith(Drt.class)
-						.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
-				bind(MainModeIdentifier.class).toInstance(new MultiModeDrtMainModeIdentifier(multiModeDrtCfg));
 
-			}
-		});
-
-		controler.addQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Drt.class);
-			}
-		});
 
 		controler.run();
 	}
