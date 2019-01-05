@@ -18,8 +18,6 @@
 
 package org.matsim.vsp.edvrp.edrt.optimizer;
 
-import javax.inject.Inject;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
@@ -39,7 +37,6 @@ public class EDrtOptimizer implements DrtOptimizer {
 	private final EmptyVehicleChargingScheduler chargingScheduler;
 	private final MobsimTimer timer;
 
-	@Inject
 	public EDrtOptimizer(DefaultDrtOptimizer optimizer, EmptyVehicleChargingScheduler chargingScheduler,
 			MobsimTimer timer) {
 		this.optimizer = optimizer;
