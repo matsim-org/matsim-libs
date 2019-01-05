@@ -23,8 +23,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.matsim.api.core.v01.Coord;
@@ -49,7 +47,6 @@ public class AggregatedMinCostRelocationCalculator implements MinCostRelocationC
 	private final DrtZonalSystem zonalSystem;
 	private final Network network;
 
-	@Inject
 	public AggregatedMinCostRelocationCalculator(DrtZonalSystem zonalSystem,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network) {
 		this.zonalSystem = zonalSystem;
