@@ -76,18 +76,14 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 			private TravelTime travelTime;
 
 			@Inject
-			@Taxi
-			private TravelDisutility travelDisutility;
-
-			@Inject
 			private EventsManager events;
 
 			@Override
 			public TaxiOptimizer get() {
 				Fleet fleet = getModalInstance(Fleet.class);
 				TaxiScheduler taxiScheduler = getModalInstance(TaxiScheduler.class);
-				return new DefaultTaxiOptimizerProvider(taxiCfg, fleet, network, timer, travelTime, travelDisutility,
-						taxiScheduler).get();
+				return new DefaultTaxiOptimizerProvider(taxiCfg, fleet, network, timer, travelTime,
+						getModalInstance(TravelDisutility.class), taxiScheduler).get();
 			}
 		});
 
@@ -104,14 +100,11 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 					private TravelTime travelTime;
 
-					@Inject
-					@Taxi
-					private TravelDisutility travelDisutility;
-
 					@Override
 					public TaxiScheduler get() {
 						Fleet fleet = getModalInstance(Fleet.class);
-						return new TaxiScheduler(taxiCfg, fleet, network, timer, travelTime, travelDisutility);
+						return new TaxiScheduler(taxiCfg, fleet, network, timer, travelTime,
+								getModalInstance(TravelDisutility.class));
 					}
 				}).asEagerSingleton();
 

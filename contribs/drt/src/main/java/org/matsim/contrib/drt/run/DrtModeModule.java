@@ -47,6 +47,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpModeTravelDisutilityModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -59,7 +60,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.name.Named;
 
 /**
@@ -75,6 +75,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
+		install(DvrpModeTravelDisutilityModule.createWithTimeAsTravelDisutility(drtCfg.getMode()));
+
 		bindModal(Fleet.class).toProvider(new FleetProvider(drtCfg.getVehiclesFile())).asEagerSingleton();
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
@@ -117,7 +119,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 				throw new IllegalStateException();
 		}
 
-		bindModal(DrtRouteUpdater.class).toProvider(new Provider<DrtRouteUpdater>() {
+		bindModal(DrtRouteUpdater.class).toProvider(new ModalProviders.AbstractProvider<DrtRouteUpdater>(getMode()) {
 			@Inject
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
 			private Network network;
@@ -127,10 +129,6 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			private TravelTime travelTime;
 
 			@Inject
-			@Drt
-			private TravelDisutilityFactory travelDisutilityFactory;
-
-			@Inject
 			private Population population;
 
 			@Inject
@@ -138,8 +136,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 			@Override
 			public DefaultDrtRouteUpdater get() {
-				return new DefaultDrtRouteUpdater(drtCfg, network, travelTime, travelDisutilityFactory, population,
-						config);
+				return new DefaultDrtRouteUpdater(drtCfg, network, travelTime,
+						getModalInstance(TravelDisutilityFactory.class), population, config);
 			}
 		}).asEagerSingleton();
 
@@ -158,10 +156,6 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		private TravelTime travelTime;
 
 		@Inject
-		@Drt
-		private TravelDisutilityFactory travelDisutilityFactory;
-
-		@Inject
 		private PopulationFactory populationFactory;
 
 		@Inject
@@ -175,8 +169,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		@Override
 		public DrtRoutingModule get() {
-			return new DrtRoutingModule(drtCfg, network, travelTime, travelDisutilityFactory, populationFactory,
-					walkRouter);
+			return new DrtRoutingModule(drtCfg, network, travelTime, getModalInstance(TravelDisutilityFactory.class),
+					populationFactory, walkRouter);
 		}
 	}
 

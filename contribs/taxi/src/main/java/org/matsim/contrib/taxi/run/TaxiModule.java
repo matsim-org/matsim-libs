@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityModule;
 import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Inject;
@@ -36,7 +35,5 @@ public final class TaxiModule extends AbstractModule {
 	public void install() {
 		install(new TaxiModeModule(taxiCfg));
 		installQSimModule(new TaxiModeQSimModule(taxiCfg));
-
-		install(DvrpTravelDisutilityModule.createWithTimeAsTravelDisutility(Taxi.class));
 	}
 }
