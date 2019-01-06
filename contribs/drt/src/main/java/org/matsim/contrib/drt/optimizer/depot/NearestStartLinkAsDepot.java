@@ -23,11 +23,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Vehicle;
-
-import com.google.inject.Inject;
 
 /**
  * @author michalm
@@ -35,8 +32,7 @@ import com.google.inject.Inject;
 public class NearestStartLinkAsDepot implements DepotFinder {
 	private final Set<Link> startLinks = new HashSet<>();
 
-	@Inject
-	public NearestStartLinkAsDepot(@Drt Fleet fleet) {
+	public NearestStartLinkAsDepot(Fleet fleet) {
 		for (Vehicle v : fleet.getVehicles().values()) {
 			startLinks.add(v.getStartLink());
 		}

@@ -21,15 +21,12 @@ package org.matsim.contrib.drt.routing;
 import java.util.Comparator;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -45,8 +42,7 @@ public class ClosestAccessEgressStopFinder implements AccessEgressStopFinder {
 	private final Network network;
 	private final Map<Id<TransitStopFacility>, TransitStopFacility> stops;
 
-	@Inject
-	public ClosestAccessEgressStopFinder(@Drt TransitSchedule transitSchedule, DrtConfigGroup drtconfig,
+	public ClosestAccessEgressStopFinder(TransitSchedule transitSchedule, DrtConfigGroup drtconfig,
 			PlansCalcRouteConfigGroup planscCalcRouteCfg, Network network) {
 		this.network = network;
 		this.stops = transitSchedule.getFacilities();
@@ -67,7 +63,7 @@ public class ClosestAccessEgressStopFinder implements AccessEgressStopFinder {
 		Coord coord = StopBasedDrtRoutingModule.getFacilityCoord(facility, network);
 
 		TransitStopFacility closest = stops.values().stream()//
-                .min(Comparator.comparing(s -> DistanceUtils.calculateSquaredDistance(coord, s.getCoord())))//
+				.min(Comparator.comparing(s -> DistanceUtils.calculateSquaredDistance(coord, s.getCoord())))//
 				.orElse(null);
 
 		return closest;

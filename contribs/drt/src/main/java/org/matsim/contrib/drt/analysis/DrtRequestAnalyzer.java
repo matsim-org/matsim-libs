@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -68,7 +66,6 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 	private final Network network;
 	private final DrtConfigGroup drtCfg;
 
-	@Inject
 	public DrtRequestAnalyzer(EventsManager events, Network network, DrtConfigGroup drtCfg) {
 		events.addHandler(this);
 		this.network = network;

@@ -24,7 +24,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.matsim.api.core.v01.Id;
@@ -65,7 +64,6 @@ public class ParallelPathDataProvider implements PrecalculablePathDataProvider, 
 	private Map<Id<Link>, PathData> pathsToDropoffMap;
 	private Map<Id<Link>, PathData> pathsFromDropoffMap;
 
-	@Inject
 	public ParallelPathDataProvider(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, @Drt TravelDisutility travelDisutility,
 			DrtConfigGroup drtCfg) {

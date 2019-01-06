@@ -23,11 +23,13 @@ import java.lang.annotation.Annotation;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Named;
@@ -35,30 +37,42 @@ import com.google.inject.name.Named;
 /**
  * @author michalm
  */
-public class DvrpTravelDisutilityProvider implements Provider<TravelDisutility> {
-	public static void bindTravelDisutilityForOptimizer(Binder binder, Class<? extends Annotation> annotationType) {
-		binder.bind(TravelDisutility.class)
-				.annotatedWith(annotationType)
-				.toProvider(new DvrpTravelDisutilityProvider(annotationType))
-				.asEagerSingleton();
+public class DvrpTravelDisutilityModule extends AbstractModule {
+	public static AbstractModule createWithTimeAsTravelDisutility(Class<? extends Annotation> annotationType) {
+		return new DvrpTravelDisutilityModule(annotationType, TimeAsTravelDisutility::new);
 	}
 
-	@Inject
-	private Injector injector;
-
-	@Inject
-	@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-	private TravelTime travelTime;
-
 	private final Class<? extends Annotation> annotationType;
+	private final TravelDisutilityFactory travelDisutilityFactory;
 
-	public DvrpTravelDisutilityProvider(Class<? extends Annotation> annotationType) {
+	public DvrpTravelDisutilityModule(Class<? extends Annotation> annotationType,
+			TravelDisutilityFactory travelDisutilityFactory) {
 		this.annotationType = annotationType;
+		this.travelDisutilityFactory = travelDisutilityFactory;
 	}
 
 	@Override
-	public TravelDisutility get() {
-		return injector.getInstance(Key.get(TravelDisutilityFactory.class, annotationType))
-				.createTravelDisutility(travelTime);
+	public void install() {
+		bind(TravelDisutilityFactory.class).annotatedWith(annotationType).toInstance(travelDisutilityFactory);
+
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(TravelDisutility.class).annotatedWith(annotationType).toProvider(new Provider<TravelDisutility>() {
+					@Inject
+					private Injector injector;
+
+					@Inject
+					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
+					private TravelTime travelTime;
+
+					@Override
+					public TravelDisutility get() {
+						return injector.getInstance(Key.get(TravelDisutilityFactory.class, annotationType))
+								.createTravelDisutility(travelTime);
+					}
+				}).asEagerSingleton();
+			}
+		});
 	}
 }

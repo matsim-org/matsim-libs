@@ -2,12 +2,9 @@ package org.matsim.contrib.drt.run;
 
 import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
 import org.matsim.contrib.drt.routing.DrtMainModeIdentifier;
-import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityModule;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 import com.google.inject.Inject;
 
@@ -27,13 +24,6 @@ public final class DrtModule extends AbstractModule {
 		install(new DrtModeAnalysisModule(drtCfg));
 
 		bind(MainModeIdentifier.class).to(DrtMainModeIdentifier.class).asEagerSingleton();
-
-		bind(TravelDisutilityFactory.class).annotatedWith(Drt.class).toInstance(TimeAsTravelDisutility::new);
-		installQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), Drt.class);
-			}
-		});
+		install(DvrpTravelDisutilityModule.createWithTimeAsTravelDisutility(Drt.class));
 	}
 }
