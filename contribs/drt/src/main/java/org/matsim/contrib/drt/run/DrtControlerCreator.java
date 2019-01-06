@@ -93,21 +93,15 @@ public final class DrtControlerCreator {
 		Scenario scenario = scenarioLoader.apply(config);
 
 		Controler controler = new Controler(scenario);
-		addDrtAsSingleDvrpModeToControler(controler);
+		controler.addOverridingModule(new DrtModule());
+		controler.addOverridingModule(new DvrpModule());
+		controler.configureQSimComponents(
+				DvrpQSimComponents.activateModes(DrtConfigGroup.get(controler.getConfig()).getMode()));
+
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
 		return controler;
 	}
 
-	public static void addDrtAsSingleDvrpModeToControler(Controler controler) {
-		addDrtWithoutDvrpModuleToControler(controler);
-		controler.addOverridingModule(new DvrpModule());
-		controler.configureQSimComponents(
-				DvrpQSimComponents.activateModes(DrtConfigGroup.get(controler.getConfig()).getMode()));
-	}
-
-	public static void addDrtWithoutDvrpModuleToControler(Controler controler) {
-		controler.addOverridingModule(new DrtModule());
-	}
 }
