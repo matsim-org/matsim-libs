@@ -31,7 +31,6 @@ import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.StaticDynActivity;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.QSim;
 
 import com.google.inject.Inject;
 
@@ -42,8 +41,8 @@ final class OneTruckActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final MobsimTimer timer;
 
 	@Inject
-	public OneTruckActionCreator(QSim qSim) {
-		this.timer = qSim.getSimTimer();
+	public OneTruckActionCreator(MobsimTimer timer) {
+		this.timer = timer;
 	}
 
 	@Override

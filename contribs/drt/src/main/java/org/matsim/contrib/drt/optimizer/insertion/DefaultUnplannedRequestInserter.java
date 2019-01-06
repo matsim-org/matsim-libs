@@ -30,7 +30,6 @@ import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.dvrp.data.Fleet;
@@ -39,8 +38,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-
-import com.google.inject.Inject;
 
 /**
  * @author michalm
@@ -59,8 +56,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final ForkJoinPool forkJoinPool;
 	private final ParallelMultiVehicleInsertionProblem insertionProblem;
 
-	@Inject
-	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, @Drt Fleet fleet, MobsimTimer mobsimTimer,
+	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
 			VehicleData.EntryFactory vehicleDataEntryFactory, PrecalculablePathDataProvider pathDataProvider,
 			InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {

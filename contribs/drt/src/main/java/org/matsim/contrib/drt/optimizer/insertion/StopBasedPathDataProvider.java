@@ -21,7 +21,6 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.matsim.api.core.v01.Id;
@@ -58,10 +57,9 @@ public class StopBasedPathDataProvider implements PrecalculablePathDataProvider 
 	private Map<Id<Link>, PathData> pathsToDropoffMap;
 	private Map<Id<Link>, PathData> pathsFromDropoffMap;
 
-	@Inject
 	public StopBasedPathDataProvider(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, @Drt TravelDisutility travelDisutility,
-			@Drt TransitSchedule schedule, TravelTimeCalculatorConfigGroup ttcConfig, DrtConfigGroup drtCfg) {
+			TransitSchedule schedule, TravelTimeCalculatorConfigGroup ttcConfig, DrtConfigGroup drtCfg) {
 		stopDuration = drtCfg.getStopDuration();
 
 		List<Link> stopLinks = schedule.getFacilities()

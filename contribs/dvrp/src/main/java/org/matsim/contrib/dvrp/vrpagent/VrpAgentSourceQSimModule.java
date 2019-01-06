@@ -22,13 +22,13 @@ package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.core.mobsim.qsim.QSim;
 
 import com.google.inject.Inject;
 
-public class VrpAgentSourceQSimModule extends AbstractMultiModeQSimModule {
+public class VrpAgentSourceQSimModule extends AbstractDvrpModeQSimModule {
 
 	public VrpAgentSourceQSimModule(String mode) {
 		super(mode);
@@ -46,6 +46,6 @@ public class VrpAgentSourceQSimModule extends AbstractMultiModeQSimModule {
 						return new VrpAgentSource(getModalInstance(VrpAgentLogic.DynActionCreator.class),
 								getModalInstance(Fleet.class), getModalInstance(VrpOptimizer.class), qSim);
 					}
-				}).asEagerSingleton();
+				});
 	}
 }

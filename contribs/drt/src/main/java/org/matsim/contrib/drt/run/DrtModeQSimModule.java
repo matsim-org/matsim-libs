@@ -43,13 +43,15 @@ import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
@@ -62,22 +64,25 @@ import com.google.inject.name.Named;
 /**
  * @author Michal Maciejewski (michalm)
  */
-class MultiModeDrtQSimModule extends AbstractMultiModeQSimModule {
+public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 	private final DrtConfigGroup drtCfg;
 
-	public MultiModeDrtQSimModule(DrtConfigGroup drtCfg) {
+	public DrtModeQSimModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
 	}
 
 	@Override
 	protected void configureQSim() {
+		install(new VrpAgentSourceQSimModule(getMode()));
+		install(new PassengerEngineQSimModule(getMode()));
+
 		addModalComponent(DrtOptimizer.class, modalProvider(
 				getter -> new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 						getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
 						getter.getModal(DrtScheduleInquiry.class), getter.getModal(DrtScheduleTimingUpdater.class),
-						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class))))
-				.asEagerSingleton();
+						getter.getModal(EmptyVehicleRelocator.class),
+						getter.getModal(UnplannedRequestInserter.class))));
 
 		addModalComponent(DefaultUnplannedRequestInserter.class, modalProvider(
 				getter -> new DefaultUnplannedRequestInserter(drtCfg, getter.getModal(Fleet.class),
@@ -85,7 +90,7 @@ class MultiModeDrtQSimModule extends AbstractMultiModeQSimModule {
 						getter.getModal(RequestInsertionScheduler.class),
 						getter.getModal(VehicleData.EntryFactory.class),
 						getter.getModal(PrecalculablePathDataProvider.class),
-						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class)))).asEagerSingleton();
+						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class))));
 		bindModal(UnplannedRequestInserter.class).to(modalKey(DefaultUnplannedRequestInserter.class));
 
 		bindModal(VehicleData.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl(drtCfg));
@@ -150,7 +155,7 @@ class MultiModeDrtQSimModule extends AbstractMultiModeQSimModule {
 			public ParallelPathDataProvider get() {
 				return new ParallelPathDataProvider(network, travelTime, travelDisutility, drtCfg);
 			}
-		}).asEagerSingleton();
+		});
 		bindModal(PrecalculablePathDataProvider.class).to(modalKey(ParallelPathDataProvider.class));
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).

@@ -19,12 +19,9 @@ package org.matsim.contrib.drt.util.stats;
 
 import java.util.stream.IntStream;
 
-import javax.inject.Inject;
-
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYSeries;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
@@ -47,8 +44,7 @@ public class DrtVehicleOccupancyProfileWriter implements MobsimBeforeCleanupList
 	private final MatsimServices matsimServices;
 	private final DrtConfigGroup drtCfg;
 
-	@Inject
-	public DrtVehicleOccupancyProfileWriter(@Drt Fleet fleet, MatsimServices matsimServices, DrtConfigGroup drtCfg) {
+	public DrtVehicleOccupancyProfileWriter(Fleet fleet, MatsimServices matsimServices, DrtConfigGroup drtCfg) {
 		this.fleet = fleet;
 		this.matsimServices = matsimServices;
 		this.drtCfg = drtCfg;

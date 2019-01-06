@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,37 +20,16 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import java.util.function.Function;
-
-import org.matsim.core.controler.AbstractModule;
-
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.binder.LinkedBindingBuilder;
+import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public abstract class AbstractMultiModeModule extends AbstractModule {
-	private final String mode;
+public interface MultiModal<M extends Modal> {
+	Collection<M> getModalElements();
 
-	protected AbstractMultiModeModule(String mode) {
-		this.mode = mode;
-	}
-
-	protected String getMode() {
-		return mode;
-	}
-
-	protected <T> Key<T> modalKey(Class<T> type) {
-		return Key.get(type, DvrpModes.mode(mode));
-	}
-
-	protected <T> LinkedBindingBuilder<T> bindModal(Class<T> type) {
-		return bind(modalKey(type));
-	}
-
-	protected <T> Provider<T> modalProvider(Function<ModalProviders.InstanceGetter, T> delegate) {
-		return ModalProviders.createProvider(mode, delegate);
+	default Stream<String> modes() {
+		return getModalElements().stream().map(Modal::getMode);
 	}
 }

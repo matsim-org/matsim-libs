@@ -19,45 +19,19 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
 import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
-import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
-import com.google.common.collect.ImmutableList;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
 public final class DvrpModule extends AbstractModule {
-	private final List<DvrpModeQSimModule> qsimModules;
-
-	public static DvrpModule createModuleWithDefaultDvrpModeQSimModule(String mode) {
-		return new DvrpModule(new DvrpModeQSimModule.Builder(mode).build());
-	}
-
-	public DvrpModule(DvrpModeQSimModule... qsimModules) {
-		this.qsimModules = ImmutableList.copyOf(qsimModules);
-	}
-
-	@Provides
-	@Singleton
-	public QSimComponentsConfig provideQSimComponentsConfig(Config config) {
-		QSimComponentsConfig components = new QSimComponentsConfig();
-		new StandardQSimComponentConfigurator(config).configure(components);
-		DynActivityEngineModule.configureComponents(components);
-		qsimModules.forEach(m -> m.configureComponents(components));
-		return components;
-	}
-
 	@Override
 	public void install() {
 		// Visualisation of schedules for DVRP DynAgents
@@ -71,6 +45,11 @@ public final class DvrpModule extends AbstractModule {
 				.asEagerSingleton();
 
 		installQSimModule(new DynActivityEngineModule());
-		qsimModules.forEach(this::installQSimModule);
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
+			}
+		});
 	}
 }

@@ -25,17 +25,19 @@ import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
+import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class OneTaxiModule extends AbstractMultiModeModule {
+public class OneTaxiModule extends AbstractDvrpModeModule {
 	private final String taxisFile;
 
 	public OneTaxiModule(String taxisFile) {
@@ -49,9 +51,12 @@ public class OneTaxiModule extends AbstractMultiModeModule {
 		bindModal(Fleet.class).toProvider(new FleetProvider(taxisFile)).asEagerSingleton();
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class);
 
-		installQSimModule(new AbstractMultiModeQSimModule(TransportMode.taxi) {
+		installQSimModule(new AbstractDvrpModeQSimModule(TransportMode.taxi) {
 			@Override
 			protected void configureQSim() {
+				install(new VrpAgentSourceQSimModule(getMode()));
+				install(new PassengerEngineQSimModule(getMode()));
+
 				// optimizer that dispatches taxis
 				bindModal(VrpOptimizer.class).to(OneTaxiOptimizer.class).asEagerSingleton();
 				// converts departures of the "taxi" mode into taxi requests

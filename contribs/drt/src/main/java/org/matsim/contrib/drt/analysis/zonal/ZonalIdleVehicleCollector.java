@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -44,7 +42,6 @@ public class ZonalIdleVehicleCollector implements ActivityStartEventHandler, Act
 	private Map<Id<Vehicle>, String> zonePerVehicle = new HashMap<>();
 	private final DrtZonalSystem zonalSystem;
 
-	@Inject
 	public ZonalIdleVehicleCollector(EventsManager events, DrtZonalSystem zonalSystem) {
 		events.addHandler(this);
 		this.zonalSystem = zonalSystem;

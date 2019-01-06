@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,27 +15,28 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
+
+package org.matsim.contrib.dvrp.run;
+
+import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 
 /**
- * 
+ * @author Michal Maciejewski (michalm)
  */
-package org.matsim.contrib.drt.analysis;
+public class DvrpQSimComponents {
+	public static QSimComponentsConfigurator activateModes(String... modes) {
+		return components -> {
+			DynActivityEngineModule.configureComponents(components);
+			for (String m : modes) {
+				components.addComponent(DvrpModes.mode(m));
+			}
+		};
+	}
 
-import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileWriter;
-import org.matsim.core.controler.AbstractModule;
-
-/**
- * @author jbischoff
- *
- */
-public class DrtAnalysisModule extends AbstractModule {
-
-	@Override
-	public void install() {
-		bind(DynModePassengerStats.class).asEagerSingleton();
-		bind(DrtRequestAnalyzer.class).asEagerSingleton();
-		addControlerListenerBinding().to(DrtAnalysisControlerListener.class).asEagerSingleton();
-		addMobsimListenerBinding().to(DrtVehicleOccupancyProfileWriter.class);
+	public static QSimComponentsConfigurator activateAllModes(MultiModal<?> multiModal) {
+		return activateModes(multiModal.modes().toArray(String[]::new));
 	}
 }
