@@ -20,8 +20,6 @@
 
 package org.matsim.vsp.edvrp.etaxi.run;
 
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityModule;
-import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiModeModule;
 import org.matsim.core.controler.AbstractModule;
@@ -40,7 +38,5 @@ public final class ETaxiModule extends AbstractModule {
 	public void install() {
 		install(new TaxiModeModule(taxiCfg));
 		installQSimModule(new ETaxiModeQSimModule(taxiCfg));
-
-		install(DvrpTravelDisutilityModule.createWithTimeAsTravelDisutility(Taxi.class));
 	}
 }

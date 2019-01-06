@@ -35,7 +35,6 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
-import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -77,10 +76,6 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 			private TravelTime travelTime;
 
 			@Inject
-			@Taxi
-			private TravelDisutility travelDisutility;
-
-			@Inject
 			private EventsManager events;
 
 			@Inject
@@ -90,8 +85,8 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 			public TaxiOptimizer get() {
 				Fleet fleet = getModalInstance(Fleet.class);
 				ETaxiScheduler eTaxiScheduler = getModalInstance(ETaxiScheduler.class);
-				return new ETaxiOptimizerProvider(taxiCfg, fleet, network, timer, travelTime, travelDisutility,
-						eTaxiScheduler, chargingInfrastructure).get();
+				return new ETaxiOptimizerProvider(taxiCfg, fleet, network, timer, travelTime,
+						getModalInstance(TravelDisutility.class), eTaxiScheduler, chargingInfrastructure).get();
 			}
 		});
 
@@ -108,14 +103,11 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 					private TravelTime travelTime;
 
-					@Inject
-					@Taxi
-					private TravelDisutility travelDisutility;
-
 					@Override
 					public ETaxiScheduler get() {
 						Fleet fleet = getModalInstance(Fleet.class);
-						return new ETaxiScheduler(taxiCfg, fleet, network, timer, travelTime, travelDisutility);
+						return new ETaxiScheduler(taxiCfg, fleet, network, timer, travelTime,
+								getModalInstance(TravelDisutility.class));
 					}
 				}).asEagerSingleton();
 

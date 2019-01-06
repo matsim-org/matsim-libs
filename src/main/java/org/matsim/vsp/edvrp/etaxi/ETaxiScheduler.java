@@ -33,7 +33,6 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
@@ -52,8 +51,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 
 	public ETaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Taxi TravelDisutility travelDisutility) {
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility) {
 		super(taxiCfg, fleet, network, timer, travelTime, travelDisutility);
 	}
 
