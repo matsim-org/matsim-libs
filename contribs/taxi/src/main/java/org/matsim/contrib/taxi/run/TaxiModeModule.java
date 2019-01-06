@@ -25,6 +25,7 @@ import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpModeTravelDisutilityModule;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
@@ -46,6 +47,8 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
+		install(DvrpModeTravelDisutilityModule.createWithTimeAsTravelDisutility(taxiCfg.getMode()));
+
 		bindModal(Fleet.class).toProvider(new FleetProvider(taxiCfg.getTaxisFile())).asEagerSingleton();
 
 		bindModal(SubmittedTaxiRequestsCollector.class).to(SubmittedTaxiRequestsCollector.class).asEagerSingleton();

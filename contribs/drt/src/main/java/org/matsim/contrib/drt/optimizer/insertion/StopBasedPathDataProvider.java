@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.ManyToManyPathData;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -58,7 +57,7 @@ public class StopBasedPathDataProvider implements PrecalculablePathDataProvider 
 	private Map<Id<Link>, PathData> pathsFromDropoffMap;
 
 	public StopBasedPathDataProvider(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, @Drt TravelDisutility travelDisutility,
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
 			TransitSchedule schedule, TravelTimeCalculatorConfigGroup ttcConfig, DrtConfigGroup drtCfg) {
 		stopDuration = drtCfg.getStopDuration();
 

@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -46,7 +45,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
 
-import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 /**
@@ -64,10 +62,9 @@ public class DrtRoutingModule implements RoutingModule {
 	private final RoutingModule walkRouter;
 	private final DrtStageActivityType drtStageActivityType;
 
-	@Inject
 	public DrtRoutingModule(DrtConfigGroup drtCfg, @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Drt TravelDisutilityFactory travelDisutilityFactory, PopulationFactory populationFactory,
+			TravelDisutilityFactory travelDisutilityFactory, PopulationFactory populationFactory,
 			@Named(TransportMode.walk) RoutingModule walkRouter) {
 		this.drtCfg = drtCfg;
 		this.network = network;

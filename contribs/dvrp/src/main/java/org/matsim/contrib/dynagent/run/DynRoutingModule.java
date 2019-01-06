@@ -47,11 +47,11 @@ import com.google.inject.Inject;
 public class DynRoutingModule implements RoutingModule {
 	private final String stageActivityType;
 	@Inject
-	Network network;
+	private Network network;
 	@Inject
-	Population population;
+	private Population population;
 	@Inject
-	PlansCalcRouteConfigGroup calcRouteConfig;
+	private PlansCalcRouteConfigGroup calcRouteConfig;
 
 	private final String mode;
 	private StageActivityTypes stageActivityTypes;
