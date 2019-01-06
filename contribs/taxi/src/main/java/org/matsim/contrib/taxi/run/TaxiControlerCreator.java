@@ -33,30 +33,20 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class TaxiControlerCreator {
 	public static Controler createControler(Config config, boolean otfvis) {
-		adjustTaxiConfig(config);
+		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
+		config.checkConsistency();
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		addTaxiAsSingleDvrpModeToControler(controler);
+
+		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new TaxiModule());
+		controler.configureQSimComponents(
+				DvrpQSimComponents.activateModes(TaxiConfigGroup.get(controler.getConfig()).getMode()));
+
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
 		return controler;
-	}
-
-	public static void addTaxiAsSingleDvrpModeToControler(Controler controler) {
-		addTaxiWithoutDvrpModuleToControler(controler);
-		controler.addOverridingModule(new DvrpModule());
-		controler.configureQSimComponents(
-				DvrpQSimComponents.activateModes(TaxiConfigGroup.get(controler.getConfig()).getMode()));
-	}
-
-	public static void addTaxiWithoutDvrpModuleToControler(Controler controler) {
-		controler.addOverridingModule(new TaxiModule());
-	}
-
-	public static void adjustTaxiConfig(Config config) {
-		//no special adjustments (in contrast to Drt)
-		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
-		config.checkConsistency();
 	}
 }
