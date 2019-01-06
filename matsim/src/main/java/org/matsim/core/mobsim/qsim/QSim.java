@@ -145,7 +145,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 
 		@Override
-		public Netsim getMobsim() {
+		public QSim getMobsim() {
 			return QSim.this;
 		}
 
@@ -164,15 +164,15 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			return null;
 		}
 
-		@Override
-		@Deprecated // use same method from QSim directly and try to get rid of the handle to internal interface. kai, mar'15
-		public void rescheduleActivityEnd(MobsimAgent agent) {
-			// yy my current intuition would be that this could become a public QSim method.  The original idea was that I wanted external
-			// code only to insert agents into the QSim, and from then on the QSim handles it internally.  However, the main thing that truly seems to be
-			// done internally is to move the agents between the engines, e.g. around endActivity and endLeg.  In consequence, 
-			// "arrangeNextAgentState" and "(un)registerAgentOnLink" need to be protected.  But not this one.  kai, mar'15
-			QSim.this.activityEngine.rescheduleActivityEnd(agent);
-		}
+//		@Override
+//		@Deprecated // use same method from QSim directly and try to get rid of the handle to internal interface. kai, mar'15
+//		public void rescheduleActivityEnd(MobsimAgent agent) {
+//			// yy my current intuition would be that this could become a public QSim method.  The original idea was that I wanted external
+//			// code only to insert agents into the QSim, and from then on the QSim handles it internally.  However, the main thing that truly seems to be
+//			// done internally is to move the agents between the engines, e.g. around endActivity and endLeg.  In consequence,
+//			// "arrangeNextAgentState" and "(un)registerAgentOnLink" need to be protected.  But not this one.  kai, mar'15
+//			QSim.this.activityEngine.rescheduleActivityEnd(agent);
+//		}
 	};
 
 	private Collection<AgentTracker> agentTrackers = new ArrayList<>() ;
