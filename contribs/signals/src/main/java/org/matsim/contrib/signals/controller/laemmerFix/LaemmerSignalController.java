@@ -20,8 +20,10 @@
 package org.matsim.contrib.signals.controller.laemmerFix;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
@@ -67,7 +69,6 @@ public final class LaemmerSignalController extends AbstractSignalController impl
     private final LaemmerConfigGroup laemmerConfig;
     
     private double tIdle;
-    // TODO this should be a constant. can be calculated once in simulationInitialized. tt, dez'17
     private double systemOutflowCapacity;
 
 	public final static class LaemmerFactory implements SignalControllerFactory {
@@ -103,6 +104,11 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 			this.system.scheduleDropping(simStartTimeSeconds, group.getId());
 			LaemmerSignal laemmerSignal = new LaemmerSignal(group);
 			laemmerSignals.add(laemmerSignal);
+			
+			// initialize capacity 
+			/* (in reality one also has to initialize this value and cannot update it every second, 
+			 * even if this would be better to react to e.g. lane closures) */
+            systemOutflowCapacity += laemmerSignal.signalOutflowCapacityPerS;
 		}
 	}
 
@@ -119,6 +125,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
         
         // TODO test what happens, when I move this up to the first line of this method. should save runtime. tt, dez'17
         // note: stabilization has still to be done to increment 'a'... tt, dez'17
+        // if 'a' is be dependent on the time and not on the number of calls (as it is best anyway), this could be moved up. tt, dec'18
         if(activeRequest != null && activeRequest.signal.group.getState().equals(SignalGroupState.GREEN)) {
             double remainingMinG = activeRequest.onsetTime + laemmerConfig.getMinGreenTime() - now;
             if (remainingMinG > 0) {
@@ -210,11 +217,9 @@ public final class LaemmerSignalController extends AbstractSignalController impl
      * 3. calculates the remaining cycle time tIdle
      */
     private void updateRepresentativeDriveways(double now) {
-        systemOutflowCapacity = 0;
         tIdle = laemmerConfig.getDesiredCycleTime();
         for (LaemmerSignal signal : laemmerSignals) {
             signal.determineRepresentativeDriveway(now);
-            systemOutflowCapacity += signal.signalOutflowCapacity;
             tIdle -= Math.max(signal.determiningLoad * laemmerConfig.getDesiredCycleTime() + laemmerConfig.getIntergreenTime(), laemmerConfig.getMinGreenTime());
         }
         tIdle = Math.max(0, tIdle);
@@ -301,26 +306,44 @@ public final class LaemmerSignalController extends AbstractSignalController impl
         private Id<Link> determiningLink;
         private double determiningArrivalRate;
         private double determiningLoad;
-        // this actually is a constant, but I guess it's ok to calculate it again every second, because lane/link outflow has to be calculated anyway... tt,jan'18 
-        private double signalOutflowCapacity;
+        private double signalOutflowCapacityPerS;
+        private Map<Id<Lane>, Double> laneOutflowCapacitiesPerS = new HashMap<>();
+        private Map<Id<Link>, Double> linkOutflowCapacitiesPerS = new HashMap<>();
 
         LaemmerSignal(SignalGroup signalGroup) {
             this.group = signalGroup;
+            
+            // calculate outflow capacity once (in reality one also has to initialize this value and cannot update it every second)
+            for (Signal signal : group.getSignals().values()) {
+				if (signal.getLaneIds() != null && !signal.getLaneIds().isEmpty()
+						&& lanes.getLanesToLinkAssignments().get(signal.getLinkId()).getLanes().size() > 1) {
+					for (Id<Lane> laneId : signal.getLaneIds()) {
+						double laneOutflow = lanes.getLanesToLinkAssignments().get(signal.getLinkId()).getLanes()
+								.get(laneId).getCapacityVehiclesPerHour() * config.qsim().getFlowCapFactor() / 3600;
+						laneOutflowCapacitiesPerS.put(laneId, laneOutflow);
+						signalOutflowCapacityPerS += laneOutflow;
+					}
+				} else {
+					double linkOutflowPerS = network.getLinks().get(signal.getLinkId()).getCapacity()
+							* config.qsim().getFlowCapFactor() / 3600;
+					linkOutflowCapacitiesPerS.put(signal.getLinkId(), linkOutflowPerS);
+					signalOutflowCapacityPerS += linkOutflowPerS;
+
+				}
+			}
         }
 
         private void determineRepresentativeDriveway(double now) {
             this.determiningLoad = 0;
             this.determiningLink = null;
             this.determiningLane = null;
-            this.signalOutflowCapacity = 0;
             for (Signal signal : group.getSignals().values()) {
                 if (signal.getLaneIds() != null && !signal.getLaneIds().isEmpty()
                 		&& lanes.getLanesToLinkAssignments().get(signal.getLinkId()).getLanes().size() > 1) {
                     for (Id<Lane> laneId : signal.getLaneIds()) {
                         double arrivalRate = getAverageLaneArrivalRate(now, signal.getLinkId(), laneId);
-                        double laneOutflow = lanes.getLanesToLinkAssignments().get(signal.getLinkId()).getLanes().get(laneId).getCapacityVehiclesPerHour() * config.qsim().getFlowCapFactor() / 3600;
-                        signalOutflowCapacity += laneOutflow;
-                        double tempLoad = arrivalRate / laneOutflow;
+                        /* bound load by 1 (i.e. 100%) as calculation of nCrit etc depend on that. tt, dec'18 */
+                        double tempLoad = Math.min(1, arrivalRate / laneOutflowCapacitiesPerS.get(laneId));
                         if (tempLoad >= this.determiningLoad) {
                             this.determiningLoad = tempLoad;
                             this.determiningArrivalRate = arrivalRate;
@@ -329,10 +352,9 @@ public final class LaemmerSignalController extends AbstractSignalController impl
                         }
                     }
                 } else {
-                    double linkOutflow = network.getLinks().get(signal.getLinkId()).getCapacity() * config.qsim().getFlowCapFactor() / 3600;
-                    signalOutflowCapacity += linkOutflow;
                     double arrivalRate = getAverageArrivalRate(now, signal.getLinkId());
-                    double tempLoad = arrivalRate / linkOutflow;
+                    /* bound load by 1 (i.e. 100%) as calculation of nCrit etc depend on that. tt, dec'18 */
+                    double tempLoad = Math.min(1, arrivalRate / linkOutflowCapacitiesPerS.get(signal.getLinkId()));
                     if (tempLoad >= this.determiningLoad) {
                         this.determiningLoad = tempLoad;
                         this.determiningArrivalRate = arrivalRate;
@@ -402,8 +424,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
                             for (Id<Lane> laneId : signal.getLaneIds()) {
                                 double nTemp = getNumberOfExpectedVehiclesOnLane(now + i + remainingMinG, signal.getLinkId(), laneId);
                                 nExpected += nTemp;
-                                double laneFlow = lanes.getLanesToLinkAssignments().get(signal.getLinkId()).getLanes().get(laneId).getCapacityVehiclesPerHour() * config.qsim().getFlowCapFactor() / 3600;
-                                double tempGreenTime = nTemp / laneFlow;
+                                double tempGreenTime = nTemp / laneOutflowCapacitiesPerS.get(laneId);
                                 if (tempGreenTime > reqGreenTime) {
                                     reqGreenTime = tempGreenTime;
                                 }
@@ -411,8 +432,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
                         } else {
                             double nTemp = getNumberOfExpectedVehiclesOnLink(now + i + remainingMinG, signal.getLinkId());
                             nExpected += nTemp;
-                            double linkFlow = network.getLinks().get(signal.getLinkId()).getCapacity() * config.qsim().getFlowCapFactor() / 3600;
-                            double tempGreenTime = nTemp / linkFlow;
+                            double tempGreenTime = nTemp / linkOutflowCapacitiesPerS.get(signal.getLinkId());
                             if (tempGreenTime > reqGreenTime) {
                                 reqGreenTime = tempGreenTime;
                             }
@@ -435,8 +455,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
                         for (Id<Lane> laneId : signal.getLaneIds()) {
                             double nTemp = getNumberOfExpectedVehiclesOnLane(now + laemmerConfig.getIntergreenTime() + laemmerConfig.getMinGreenTime(), signal.getLinkId(), laneId);
                             nExpected += nTemp;
-                            double laneFlow = lanes.getLanesToLinkAssignments().get(signal.getLinkId()).getLanes().get(laneId).getCapacityVehiclesPerHour() * config.qsim().getFlowCapFactor() / 3600;
-                            double tempGreenTime = nTemp / laneFlow;
+                            double tempGreenTime = nTemp / laneOutflowCapacitiesPerS.get(laneId);
                             if (tempGreenTime > reqGreenTime) {
                                 reqGreenTime = tempGreenTime;
                             }
@@ -444,8 +463,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
                     } else {
                         double nTemp = getNumberOfExpectedVehiclesOnLink(now + laemmerConfig.getIntergreenTime() + laemmerConfig.getMinGreenTime(), signal.getLinkId());
                         nExpected += nTemp;
-                        double linkFlow = network.getLinks().get(signal.getLinkId()).getCapacity() * config.qsim().getFlowCapFactor() / 3600;
-                        double tempGreenTime = nTemp / linkFlow;
+                        double tempGreenTime = nTemp / linkOutflowCapacitiesPerS.get(signal.getLinkId());
                         if (tempGreenTime > reqGreenTime) {
                             reqGreenTime = tempGreenTime;
                         }
@@ -489,6 +507,12 @@ public final class LaemmerSignalController extends AbstractSignalController impl
                     * ((laemmerConfig.getMaxCycleTime() - (a / (1 - determiningLoad)))
                     / (laemmerConfig.getMaxCycleTime() - laemmerConfig.getDesiredCycleTime()));
 
+			/*
+			 * note: if the arrival rate is higher than the outflow capacity of the signal,
+			 * determiningLoad is set to 1 (i.e. 100%) above. I.e. in this case, nCrit
+			 * becomes -Infinity and the signal is always selected for stabilization (which
+			 * makes sense). tt, dec'18
+			 */
             if (n >= nCrit) {
             	/* TODO actually, this is the wrong place to check downstream conditions, since situation can change until the group has moved up to the queue front. 
             	 * a better moment would be while polling from the queue: poll the first element with downstream empty. but we would need a linked list instead of queue for this
@@ -497,7 +521,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 					regulationQueue.add(this);
 					// signalLog.debug("Regulation time parameters: lambda: " + determiningLoad + " | T: " + desiredPeriod + " | qmax: " + determiningOutflow + " | qsum: " + flowSum + " | T_idle:" +
 					// tIdle);
-					this.regulationTime = Math.max(Math.rint(determiningLoad * laemmerConfig.getDesiredCycleTime() + (signalOutflowCapacity / systemOutflowCapacity) * tIdle), laemmerConfig.getMinGreenTime());
+					this.regulationTime = Math.max(Math.rint(determiningLoad * laemmerConfig.getDesiredCycleTime() + (signalOutflowCapacityPerS / systemOutflowCapacity) * tIdle), laemmerConfig.getMinGreenTime());
 					this.stabilize = true;
 				}
             }
