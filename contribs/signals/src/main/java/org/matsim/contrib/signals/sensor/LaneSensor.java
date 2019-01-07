@@ -55,7 +55,6 @@ final class LaneSensor {
 	private double currentBucketStartTime;
 	private AtomicInteger currentBucket;
 	private int numOfBucketsNeededForLookback;
-	private boolean hasCollectedEnoughBuckets;
 
 	public LaneSensor(Link link, Lane lane) {
 		this.link = link;
@@ -169,10 +168,8 @@ final class LaneSensor {
 	 */
 	private void queueFullBucket(AtomicInteger bucket) {
 		timeBuckets.add(bucket);
-		if (this.hasCollectedEnoughBuckets ) {
+		if (timeBuckets.size() > numOfBucketsNeededForLookback) {
 			timeBuckets.poll();
-		} else if (timeBuckets.size() >= numOfBucketsNeededForLookback) {
-			hasCollectedEnoughBuckets = true;
 		}	
 	}
 	

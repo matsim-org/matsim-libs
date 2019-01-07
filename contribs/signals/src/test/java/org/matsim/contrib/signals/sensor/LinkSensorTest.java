@@ -1,6 +1,7 @@
 package org.matsim.contrib.signals.sensor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -10,14 +11,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.signals.sensor.LinkSensor;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
@@ -190,8 +190,8 @@ public class LinkSensorTest {
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);
 		
-		VehicleEntersTrafficEvent wait2LinkEvent = new VehicleEntersTrafficEvent(120.0, agId2, link.getId(), vehId2, TransportMode.car, 1.0);
-		sensor.handleEvent(wait2LinkEvent);
+		PersonEntersVehicleEvent enterVehEvent = new PersonEntersVehicleEvent(120., agId2, vehId2);
+		sensor.handleEvent(enterVehEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
 
@@ -260,8 +260,8 @@ public class LinkSensorTest {
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 101.0);
 		Assert.assertEquals(0, numberOfCarsInDistance);
 		
-		VehicleEntersTrafficEvent wait2LinkEvent = new VehicleEntersTrafficEvent(120.0, agId2, link.getId(), vehId2, TransportMode.car, 1.0);
-		sensor.handleEvent(wait2LinkEvent);
+		PersonEntersVehicleEvent enterVehEvent = new PersonEntersVehicleEvent(120., agId2, vehId2);
+		sensor.handleEvent(enterVehEvent);
 
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 120.0);
 		Assert.assertEquals(1, numberOfCarsInDistance);

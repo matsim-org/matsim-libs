@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
@@ -57,8 +57,6 @@ final class LinkSensor {
 	private Queue<AtomicInteger> timeBuckets;
 	private double currentBucketStartTime;
 	private AtomicInteger currentBucket;
-
-	private boolean hasCollectedEnoughBuckets = false;
 
 	private int numOfBucketsNeededForLookback;
 
@@ -135,9 +133,9 @@ final class LinkSensor {
 	 * @author pschade
 	 */
 	public double getAvgVehiclesPerSecond(double now) {
-		if (now > monitoringStartTime) {
+		if (now >= monitoringStartTime) {
 			if (lookBackTime == Double.POSITIVE_INFINITY) {
-				return totalVehicles / ((now - monitoringStartTime)+1);
+				return totalVehicles / (now - monitoringStartTime + 1);
 			} else {
 				updateBucketsUntil(now);
 				//if we have less buckets collected than needed for lookback, we calculate the average only with the buckets we already have.
@@ -187,11 +185,9 @@ final class LinkSensor {
 	 */
 	private void queueFullBucket(AtomicInteger bucket) {
 		timeBuckets.add(bucket);
-		if (this.hasCollectedEnoughBuckets ) {
+		if (timeBuckets.size() > numOfBucketsNeededForLookback) {
 			timeBuckets.poll();
-		} else if (timeBuckets.size() >= numOfBucketsNeededForLookback) {
-			hasCollectedEnoughBuckets = true;
-		}	
+		}
 	}
 	
 	public void handleEvent(LinkEnterEvent event) {
@@ -213,11 +209,16 @@ final class LinkSensor {
 			}
 		}
 	}
-	
-	public void handleEvent(VehicleEntersTrafficEvent event) {
+
+	/*
+	 * we have to use PersonEntersVehicle instead of VehicleEntersTraffic because
+	 * vehicle are only allowed to enter traffic if flow capacity has accumulated.
+	 * If the sensor is not able to report waiting vehicles, signals that only
+	 * depend on sensor data will not give green to this link unless other vehicle
+	 * enter the link from further upstream. theresa, dec'18
+	 */
+	public void handleEvent(PersonEntersVehicleEvent event) {
 		this.vehiclesOnLink++;
-		/* the sensor so far may not work for doAverageVehiclesPerSecondMonitoring when vehicles enter traffic at this link.
-		 * the following is a quick suggestion how to fix it, but has to be tested. theresa, may'16 */
 		if(this.doAverageVehiclesPerSecondMonitoring) {
 			if (lookBackTime != Double.POSITIVE_INFINITY) {
 				updateBucketsUntil(event.getTime());
