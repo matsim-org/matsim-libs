@@ -54,6 +54,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -113,8 +114,9 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 					@Override
 					public EmptyVehicleRelocator get() {
 						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
-						return new EmptyVehicleRelocator(network, travelTime, getModalInstance(TravelDisutility.class),
-								timer, taskFactory);
+						TravelDisutility travelDisutility = getModalInstance(
+								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+						return new EmptyVehicleRelocator(network, travelTime, travelDisutility, timer, taskFactory);
 					}
 				}).asEagerSingleton();
 
@@ -149,8 +151,9 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 					@Override
 					public ParallelPathDataProvider get() {
-						return new ParallelPathDataProvider(network, travelTime,
-								getModalInstance(TravelDisutility.class), drtCfg);
+						TravelDisutility travelDisutility = getModalInstance(
+								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+						return new ParallelPathDataProvider(network, travelTime, travelDisutility, drtCfg);
 					}
 				});
 		bindModal(PrecalculablePathDataProvider.class).to(modalKey(ParallelPathDataProvider.class));
