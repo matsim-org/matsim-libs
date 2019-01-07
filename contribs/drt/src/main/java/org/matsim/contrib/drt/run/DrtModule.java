@@ -2,7 +2,6 @@ package org.matsim.contrib.drt.run;
 
 import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
 import org.matsim.contrib.drt.routing.DrtMainModeIdentifier;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.MainModeIdentifier;
 
@@ -24,6 +23,5 @@ public final class DrtModule extends AbstractModule {
 		install(new DrtModeAnalysisModule(drtCfg));
 
 		bind(MainModeIdentifier.class).to(DrtMainModeIdentifier.class).asEagerSingleton();
-		install(DvrpTravelDisutilityModule.createWithTimeAsTravelDisutility(Drt.class));
 	}
 }
