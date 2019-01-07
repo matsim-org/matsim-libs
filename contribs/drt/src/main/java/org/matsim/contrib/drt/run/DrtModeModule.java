@@ -45,9 +45,9 @@ import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpModeTravelDisutilityModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -75,7 +75,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		install(DvrpModeTravelDisutilityModule.createWithTimeAsTravelDisutility(drtCfg.getMode()));
+		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
 		bindModal(Fleet.class).toProvider(new FleetProvider(drtCfg.getVehiclesFile())).asEagerSingleton();
 
