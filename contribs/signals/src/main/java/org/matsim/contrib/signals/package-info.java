@@ -6,48 +6,26 @@
  *  
  *  If input files for signal systems are already available, simulation of traffic lights can be enabled via MATSim config options.
  *  <p>
- *  An example of such a configuration can be found in the input folder of the SignalSystemsIntegrationTest. If your data is in an older file format have a look at the
- *  package playground.dgrether.signalsystems.data.conversion for converters to the required file formats.
- *  </p>
- *  <p>
- *  For more information see the documentation in <code>contrib/signals/docs/user-guide</code>.
+ *  Examples of such configurations can be found as input of the code examples and tests in this package.
  *  </p>
  *  
  *  <h2>Data Model description</h2>
  *  
- *  Documentation of the data model can be found in the package-info.java of the subpackage data. If the corresponding files are set in the matsim config and
- *  signalsystems are enabled the data is loaded by the matsim ScenarioLoader into the Scenario and can be retrieved by calling 
- *  scenario.getScenarioElement(SignalsData.class). Thereby scenario is an instance of Scenario.
+ *  If the corresponding input files are set in the matsim config and
+ *  useSignalsystems are enabled the data is loaded into the Scenario and can be retrieved by calling 
+ *  <code>(SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME)</code>.
  *  
  *  <h2>Model description</h2>
  *  
  *  <h3>Overview</h3>
  *  
- *  The model consists of several logical layers:
+ *  The model consists of several logical layers that can be found as subpackages of this package.
  *  
- *	<ul>
- *		<li>A data layer</li>
- *		<li>A model layer</li>
- *		<li>A layer to couple the model to the mobility simulation</li>
- *		<li>A layer to build the other layers</li>
- *	</ul>
- * 
- * Each layer can be found in a subpackage of this package, namely:
- * 
- * <ul>
- *		<li><code>signalsystems.data</code> the package containing the data layer</li>
- *		<li><code>signalsystems.model</code> the package containing the model layer</li>
- *		<li><code>signalsystems.mobsim</code> the package containing the layer to couple the model to the mobility simulation</li>
- *		<li><code>signalsystems.builder</code> the package containing the layer to build the other layers</li>
- *	</ul>
- * 
- * Each layer is documented separately in the package-info.java of the subpackage.
- * <p>
- * In addition to the main layers, the package contains some utility classes. Furthermore in the 
- * <code>controler</code> package interfaces and default implementations can be found that
- *  plug the model into the MATSim Controler.
- * </p>
- * 
+ *  For more information see
+ *  <ul>
+ *   <li>Grether, D. S., 2014. Extension of a multi-agent transport simulation for traffic signal control and air transport systems. Ph.D. thesis, TU Berlin. </li>
+ * </ul>
+ *  
  * <h3>Extensibility</h3>
  * 
  * The layers of the model can be used separately and independently from each other. The default implementation 
@@ -55,28 +33,27 @@
  * a certain part of the model have a look at the factory and builders of the default implementation that create the components of
  * interest. Implement your customized factories and builders using or extending the provided interfaces and replace 
  * the factories/builders of the default implementation by your instances to get your extension or customization into the model. 
- * Also have a look at the package-info.java documentation in the subpackages to get an idea how the components work and what can be 
- * customized.
  * <p>
- * An example of an adaptive signal control implementation can be found in the package 
- * playground.dgrether.signalsystems.sylvia in the playground project. 
+ * An example of an adaptive signal control implementation and an example of an actuated signal control implementation can be found in 
+ * this package (in the controller subpackage). The code examples also point to this implementations. 
+ * See also the following publications, for more information on these traffic-responsive signals:
+ * <ul>
+ * 	<li>Grether, D., Bischoff, J., Nagel, K., 2011. Traffic-actuated signal control: Simulation of the user benefits in a big event real-world scenario. In: 2nd International Conference on Models and Technologies for ITS, Leuven, Belgium.</li>
+ *   <li>K&uuml;hnel, N., Thunig, T., Nagel, K., 2018. Implementing an adaptive traffic signal control algorithm in an agent-based transport simulation. Procedia Computer Science 130, 894–899.</li>
+ * 	<li>Thunig, T., K&uuml;hnel, N., Nagel, K., 2018. Adaptive traffic signal control for real-world scenarios in agent-based transport simulations. Transportation Research Procedia.</li>
+ * </ul>
  * </p>
  *  
  * <h2>Package Maintainer(s):</h2>
  * <ul>
- *   <li>Dominik Grether</li>
+ *   <li>Theresa Thunig</li>
  * </ul>
  * 
  * Changes by non-maintainers are prohibited. Patches very welcome!
  * 
  * @author dgrether
  * @author tthunig
- * 
- * @see org.matsim.contrib.signals.data
- * @see org.matsim.contrib.signals.model
- * @see org.matsim.contrib.signals.builder
- * @see org.matsim.contrib.signals.mobsim
- * @see org.matsim.contrib.signals.binder
  */
 package org.matsim.contrib.signals;
 
+import org.matsim.contrib.signals.data.SignalsData;
