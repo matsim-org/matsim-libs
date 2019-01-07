@@ -19,6 +19,8 @@
 
 package electric.edrt.run;
 
+import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
+import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.av.maxspeed.DvrpTravelTimeWithMaxSpeedLimitModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -46,9 +48,6 @@ import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
 import org.matsim.vsp.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.vsp.ev.temperature.TemperatureChangeConfigGroup;
 import org.matsim.vsp.ev.temperature.TemperatureChangeModule;
-
-import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
-import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 
 public class RunEDrtScenario {
 	private static final double CHARGING_SPEED_FACTOR = 1.; // full speed
@@ -117,8 +116,9 @@ public class RunEDrtScenario {
 			public void install() {
 				bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
 						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
-				bind(DriveEnergyConsumption.class).to(VwDrtDriveEnergyConsumption.class);
-				bind(AuxEnergyConsumption.class).to(VwAVAuxEnergyConsumptionWithTemperatures.class);
+				bind(DriveEnergyConsumption.Factory.class).toInstance(evconsumption -> new VwDrtDriveEnergyConsumption());
+				bind(AuxEnergyConsumption.Factory.class).to(VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
+
 			}
 		});
 

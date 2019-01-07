@@ -2,10 +2,12 @@ package electric.edrt.energyconsumption;
 
 import org.apache.commons.math.ArgumentOutsideDomainException;
 import org.apache.commons.math.analysis.interpolation.LinearInterpolator;
+import org.matsim.vsp.ev.data.ElectricVehicle;
 import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
 import org.matsim.vsp.ev.temperature.TemperatureService;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 
 /**
@@ -15,8 +17,18 @@ import javax.inject.Inject;
  */
 public class VwAVAuxEnergyConsumptionWithTemperatures implements AuxEnergyConsumption {
 
-    @Inject
-    TemperatureService temperatureService;
+    @Singleton
+    public static class VwAuxFactory implements VwAVAuxEnergyConsumptionWithTemperatures.Factory {
+
+        @Inject
+        TemperatureService temperatureService;
+
+        @Override
+        public AuxEnergyConsumption create(ElectricVehicle electricVehicle) {
+            return new VwAVAuxEnergyConsumptionWithTemperatures(temperatureService);
+        }
+    }
+
 
     //Verbrauch Bordnetz konstant 1,5KW -> 1,5kWh/h -> 0,025kWh/min
     private static double auxConsumption_per_s = 1500;
@@ -25,7 +37,12 @@ public class VwAVAuxEnergyConsumptionWithTemperatures implements AuxEnergyConsum
     private static double AVauxConsumption_per_s = 1500;
     private LinearInterpolator linearInterpolator = new LinearInterpolator();
     private double[] x = {-15, -10, -5, 0, 5, 10, 15, 20, 25, 30, 35, 40};
-    private double[] y = {2908, 2079, 1428, 1105, 773, 440, 214, -103, -205, -331, -498, -911};
+    private double[] y = {2908, 2079, 1428, 1105, 773, 440, 214, 103, 205, 331, 498, 911};
+    private final TemperatureService temperatureService;
+
+    VwAVAuxEnergyConsumptionWithTemperatures(TemperatureService temperatureService) {
+        this.temperatureService = temperatureService;
+    }
 
     @Override
     public double calcEnergyConsumption(double period) {
