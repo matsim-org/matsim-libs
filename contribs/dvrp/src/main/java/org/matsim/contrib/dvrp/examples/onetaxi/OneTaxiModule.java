@@ -60,7 +60,8 @@ public class OneTaxiModule extends AbstractDvrpModeModule {
 				// optimizer that dispatches taxis
 				bindModal(VrpOptimizer.class).to(OneTaxiOptimizer.class).asEagerSingleton();
 				// converts departures of the "taxi" mode into taxi requests
-				bindModal(PassengerRequestCreator.class).to(OneTaxiRequestCreator.class).asEagerSingleton();
+				bindModal(PassengerRequestCreator.class).to(OneTaxiRequest.OneTaxiRequestCreator.class)
+						.asEagerSingleton();
 				// converts scheduled tasks into simulated actions (legs and activities)
 				bindModal(VrpAgentLogic.DynActionCreator.class).to(OneTaxiActionCreator.class).asEagerSingleton();
 			}
