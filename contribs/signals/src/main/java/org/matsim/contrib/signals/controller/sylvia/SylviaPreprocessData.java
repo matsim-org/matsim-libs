@@ -56,7 +56,7 @@ public final class SylviaPreprocessData {
 
 	public static final String SYLVIA_PREFIX = "sylvia_plan_";
 
-	private static final int MIN_GREEN_SECONDS = 5; //see RILSA pp. 28
+	private static final int MIN_GREEN_SECONDS = 5; // RILSA pp. 28 says 5s
 	
 	
 	private static void convertFixedTimePlansToSylviaBasePlans(String signalControlInputFile, String signalControlOutputFile)
