@@ -41,6 +41,7 @@ import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -82,8 +83,10 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 			public TaxiOptimizer get() {
 				Fleet fleet = getModalInstance(Fleet.class);
 				TaxiScheduler taxiScheduler = getModalInstance(TaxiScheduler.class);
-				return new DefaultTaxiOptimizerProvider(taxiCfg, fleet, network, timer, travelTime,
-						getModalInstance(TravelDisutility.class), taxiScheduler).get();
+				TravelDisutility travelDisutility = getModalInstance(
+						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+				return new DefaultTaxiOptimizerProvider(taxiCfg, fleet, network, timer, travelTime, travelDisutility,
+						taxiScheduler).get();
 			}
 		});
 
@@ -103,8 +106,9 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 					@Override
 					public TaxiScheduler get() {
 						Fleet fleet = getModalInstance(Fleet.class);
-						return new TaxiScheduler(taxiCfg, fleet, network, timer, travelTime,
-								getModalInstance(TravelDisutility.class));
+						TravelDisutility travelDisutility = getModalInstance(
+								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+						return new TaxiScheduler(taxiCfg, fleet, network, timer, travelTime, travelDisutility);
 					}
 				}).asEagerSingleton();
 
