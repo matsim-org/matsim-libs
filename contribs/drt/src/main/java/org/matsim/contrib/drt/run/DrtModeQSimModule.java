@@ -108,16 +108,13 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 					private TravelTime travelTime;
 
 					@Inject
-					@Drt
-					private TravelDisutility travelDisutility;
-
-					@Inject
 					private MobsimTimer timer;
 
 					@Override
 					public EmptyVehicleRelocator get() {
 						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
-						return new EmptyVehicleRelocator(network, travelTime, travelDisutility, timer, taskFactory);
+						return new EmptyVehicleRelocator(network, travelTime, getModalInstance(TravelDisutility.class),
+								timer, taskFactory);
 					}
 				}).asEagerSingleton();
 
@@ -140,22 +137,22 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 			}
 		}).asEagerSingleton();
 
-		addModalComponent(ParallelPathDataProvider.class, new Provider<ParallelPathDataProvider>() {
-			@Inject
-			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-			private Network network;
-			@Inject
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-			private TravelTime travelTime;
-			@Inject
-			@Drt
-			private TravelDisutility travelDisutility;
+		addModalComponent(ParallelPathDataProvider.class,
+				new ModalProviders.AbstractProvider<ParallelPathDataProvider>(getMode()) {
+					@Inject
+					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
+					private Network network;
 
-			@Override
-			public ParallelPathDataProvider get() {
-				return new ParallelPathDataProvider(network, travelTime, travelDisutility, drtCfg);
-			}
-		});
+					@Inject
+					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
+					private TravelTime travelTime;
+
+					@Override
+					public ParallelPathDataProvider get() {
+						return new ParallelPathDataProvider(network, travelTime,
+								getModalInstance(TravelDisutility.class), drtCfg);
+					}
+				});
 		bindModal(PrecalculablePathDataProvider.class).to(modalKey(ParallelPathDataProvider.class));
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).
