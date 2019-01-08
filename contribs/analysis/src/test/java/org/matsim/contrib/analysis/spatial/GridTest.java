@@ -1,7 +1,6 @@
 package org.matsim.contrib.analysis.spatial;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.junit.Test;
 
@@ -17,7 +16,7 @@ public class GridTest {
     public void initializeSquareGrid() {
 
         final String testValue = "Test-value";
-        Grid<String> grid = new SquareGrid<>(2, () -> testValue, createRect(10, 10));
+        Grid<String> grid = new SquareGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
 
         Collection<Grid.Cell<String>> values = grid.getValues();
 
@@ -30,7 +29,7 @@ public class GridTest {
     public void initializeHexagonalGrid() {
 
         final String testValue = "test-value";
-        Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, createRect(10, 10));
+        Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
 
         Collection<Grid.Cell<String>> values = grid.getValues();
 
@@ -47,7 +46,7 @@ public class GridTest {
         final double horizontalDistance = 2;
         final double expected = 2 * 2; // area of square is d^2
 
-        Grid<String> grid = new SquareGrid<>(horizontalDistance, () -> "value", createRect(10, 10));
+        Grid<String> grid = new SquareGrid<>(horizontalDistance, () -> "value", SpatialTestUtils.createRect(10, 10));
 
         assertEquals(expected, grid.getCellArea(), 0.0001);
     }
@@ -59,7 +58,7 @@ public class GridTest {
         // area of hexagon is: 2 * sqrt(3*r^2)
         final double expected = 2 * Math.sqrt(3 * horizontalDistance * horizontalDistance / 4);
 
-        Grid<String> grid = new HexagonalGrid<>(horizontalDistance, () -> "value", createRect(10, 10));
+        Grid<String> grid = new HexagonalGrid<>(horizontalDistance, () -> "value", SpatialTestUtils.createRect(10, 10));
 
         assertEquals(expected, grid.getCellArea(), 0.0001);
     }
@@ -69,7 +68,7 @@ public class GridTest {
 
         final String testValue = "initialValue";
         final Coordinate expectedCoordinate = new Coordinate(2, 2.5);
-        Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, createRect(10, 10));
+        Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
 
         Grid.Cell<String> result = grid.getValue(expectedCoordinate);
 
@@ -80,7 +79,7 @@ public class GridTest {
     public void getValue_closeCoordinate() {
 
         final String testValue = "initialValue";
-        Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, createRect(10, 10));
+        Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
 
         // retrieve a cell somewhere near (2, 2.5)
         Grid.Cell<String> result = grid.getValue(new Coordinate(1.1, 2.3));
@@ -92,7 +91,7 @@ public class GridTest {
     public void getValue_coordOutsideOfGrid() {
 
         final String testValue = "initialValue";
-        Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, createRect(10, 10));
+        Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
 
         Grid.Cell<String> result = grid.getValue(new Coordinate(100, 100));
 
@@ -103,18 +102,10 @@ public class GridTest {
     public void getValues() {
 
         final String testValue = "initialValue";
-        Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, createRect(10, 10));
+        Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
 
-        Collection<Grid.Cell<String>> result = grid.getValues(createRect(5, 5));
+        Collection<Grid.Cell<String>> result = grid.getValues(SpatialTestUtils.createRect(5, 5));
 
         assertEquals(9, result.size());
-    }
-
-    private Geometry createRect(double maxX, double maxY) {
-        return geometryFactory.createPolygon(new Coordinate[]{
-                new Coordinate(0, 0), new Coordinate(maxX, 0),
-                new Coordinate(maxX, maxY), new Coordinate(0, maxY),
-                new Coordinate(0, 0) // close the ring
-        });
     }
 }
