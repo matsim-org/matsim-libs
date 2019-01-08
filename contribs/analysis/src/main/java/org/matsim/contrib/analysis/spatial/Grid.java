@@ -51,6 +51,8 @@ public abstract class Grid<T> {
 
     abstract double getCentroidDistanceY();
 
+    abstract double getCellArea();
+
     private void generateGrid(Supplier<T> initialValueSupplier, final Geometry bounds) {
 
         Envelope envelope = bounds.getEnvelopeInternal();

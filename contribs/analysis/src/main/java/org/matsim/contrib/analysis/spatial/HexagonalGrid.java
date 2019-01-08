@@ -35,4 +35,10 @@ public class HexagonalGrid<T> extends Grid<T> {
     double getCentroidDistanceY() {
         return horizontalCentroidDistance * 0.75;
     }
+
+    @Override
+    double getCellArea() {
+        // as in https://en.wikipedia.org/wiki/Hexagon#Parameters
+        return 2 * Math.sqrt(3 * (horizontalCentroidDistance * horizontalCentroidDistance / 4));
+    }
 }
