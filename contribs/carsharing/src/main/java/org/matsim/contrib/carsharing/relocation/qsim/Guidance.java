@@ -37,8 +37,8 @@ public class Guidance {
         Person person = null; // does this work?
         double departureTime = now;
         String mainMode = TransportMode.car;
-        Facility<ActivityFacility> startFacility = new LinkWrapperFacility(startLink);
-        Facility<ActivityFacility> destinationFacility = new LinkWrapperFacility(destinationLink);
+        Facility startFacility = new LinkWrapperFacility(startLink);
+        Facility destinationFacility = new LinkWrapperFacility(destinationLink);
         List<? extends PlanElement> trip = router.calcRoute(mainMode, startFacility, destinationFacility, departureTime, person);
         Path path = lcpc.calcLeastCostPath(startLink.getToNode(), destinationLink.getFromNode(), now, person, null);
         if (path.links.size() == 0)
@@ -49,8 +49,8 @@ public class Guidance {
     }
 
     public synchronized double getExpectedTravelTime(Link startLink, Link destinationLink, double departureTime, String mode, Person person) {
-        Facility<ActivityFacility> startFacility = new LinkWrapperFacility(startLink);
-        Facility<ActivityFacility> destinationFacility = new LinkWrapperFacility(destinationLink);
+        Facility startFacility = new LinkWrapperFacility(startLink);
+        Facility destinationFacility = new LinkWrapperFacility(destinationLink);
         List<? extends PlanElement> trip = router.calcRoute(mode, startFacility, destinationFacility, departureTime, person);
 		Route route = ((Leg) trip.get(0)).getRoute();
 
@@ -60,8 +60,8 @@ public class Guidance {
     }
 
     public synchronized double getExpectedTravelDistance(Link startLink, Link destinationLink, double departureTime, String mode, Person person) {
-        Facility<ActivityFacility> startFacility = new LinkWrapperFacility(startLink);
-        Facility<ActivityFacility> destinationFacility = new LinkWrapperFacility(destinationLink);
+        Facility startFacility = new LinkWrapperFacility(startLink);
+        Facility destinationFacility = new LinkWrapperFacility(destinationLink);
         List<? extends PlanElement> trip = router.calcRoute(mode, startFacility, destinationFacility, departureTime, person);
 		Route route = ((Leg) trip.get(0)).getRoute();
 
