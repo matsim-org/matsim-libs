@@ -32,22 +32,20 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
  */
 public class TaxiRequest implements PassengerRequest {
 	public enum TaxiRequestStatus {
-		// INACTIVE, // invisible to the dispatcher (ARTIFICIAL STATE!)
 		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
 		PLANNED, // planned - included into one of the routes
-
-		// we have to carry out the request
-		PICKUP, RIDE, DROPOFF,
-
-		PERFORMED, //
-		// REJECTED, // rejected by the DISPATCHER
-		// CANCELLED, // canceled by the CUSTOMER
-		;
+		PICKUP, // being picked up
+		RIDE, // on board
+		DROPOFF, // being dropped off
+		PERFORMED, // completed
+		REJECTED; // rejected by the DISPATCHER
 	}
 
 	private final Id<Request> id;
 	private final double submissionTime;
 	private final double earliestStartTime;
+
+	private boolean rejected = false;
 
 	private final MobsimPassengerAgent passenger;
 	private final Link fromLink;
@@ -94,6 +92,16 @@ public class TaxiRequest implements PassengerRequest {
 	@Override
 	public MobsimPassengerAgent getPassenger() {
 		return passenger;
+	}
+
+	@Override
+	public boolean isRejected() {
+		return rejected;
+	}
+
+	@Override
+	public void setRejected(boolean rejected) {
+		this.rejected = rejected;
 	}
 
 	public TaxiPickupTask getPickupTask() {

@@ -19,40 +19,21 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.file.FleetProvider;
-import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
-import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
-import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
-import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
-import com.google.inject.name.Names;
+import com.google.inject.Inject;
 
 /**
  * @author michalm
  */
 public final class TaxiModule extends AbstractModule {
+
+	@Inject
+	private TaxiConfigGroup taxiCfg;
+
 	@Override
 	public void install() {
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(getConfig());
-		bind(Fleet.class).toProvider(new FleetProvider(taxiCfg.getTaxisFileUrl(getConfig().getContext())))
-				.asEagerSingleton();
-		bind(TravelDisutilityFactory.class).annotatedWith(Names.named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER))
-				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
-		
-		bind(SubmittedTaxiRequestsCollector.class).toInstance(new SubmittedTaxiRequestsCollector());
-		addControlerListenerBinding().to(SubmittedTaxiRequestsCollector.class);
-
-		addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
-		addControlerListenerBinding().to(TaxiStatsDumper.class);
-
-		if (taxiCfg.getTimeProfiles()) {
-			addMobsimListenerBinding().toProvider(TaxiStatusTimeProfileCollectorProvider.class);
-			// add more time profiles if necessary
-		}
+		install(new TaxiModeModule(taxiCfg));
+		installQSimModule(new TaxiModeQSimModule(taxiCfg));
 	}
 }

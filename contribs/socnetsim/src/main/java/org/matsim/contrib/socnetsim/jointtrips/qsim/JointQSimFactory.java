@@ -32,7 +32,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
-import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -81,10 +80,10 @@ public class JointQSimFactory implements MobsimFactory, Provider<QSim> {
 		}
 		
 		return new QSimBuilder(config) //
-				.useDefaults() //
-				.addQSimModule(new JointQSimModule()) //
-				.configureComponents(JointQSimModule::configureComponents) //
-				.build(sc1, eventsManager);
+							 .useDefaults() //
+							 .addQSimModule(new JointQSimModule()) //
+							 .configureQSimComponents(JointQSimModule::configureComponents ) //
+							 .build(sc1, eventsManager);
 	}
 }
 

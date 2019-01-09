@@ -344,7 +344,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private void calculateStorageCapacity() {
 		// The following is not adjusted for time-dependence!! kai, apr'16
 		// No, I think that it simply assumes that the lookups are "now". kai, feb'18
-		double now = context.getSimTimer().getTimeOfDay() ;
+//		double now = context.getSimTimer().getTimeOfDay() ;
 		
 		// first guess at storageCapacity:
 		storageCapacity = this.length * this.effectiveNumberOfLanes / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
@@ -492,8 +492,12 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			}
 
 			// Check if veh has reached destination:
-			if ((driver.isWantingToArriveOnCurrentLink())) {
-				letVehicleArrive(veh);
+			if ( driver.isWantingToArriveOnCurrentLink() ) {
+				qLink.letVehicleArrive( veh );
+
+				// remove _after_ processing the arrival to keep link active:
+				removeVehicleFromQueue( veh ) ;
+
 				continue;
 			}
 
@@ -557,15 +561,6 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				break;
 			default: throw new RuntimeException("The traffic dynmics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
 		}
-	}
-
-	private void letVehicleArrive(QVehicle veh) {
-		qLink.addParkedVehicle(veh);
-		qLink.letVehicleArrive(veh);
-		qLink.makeVehicleAvailableToNextDriver(veh);
-
-		// remove _after_ processing the arrival to keep link active:
-		removeVehicleFromQueue( veh ) ;
 	}
 
 	@Override
@@ -804,7 +799,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				this.remainingHolesStorageCapacity -= veh.getSizeInEquivalents();
 				this.accumulatedInflowCap -= veh.getFlowCapacityConsumptionInEquivalents() ;
 				break;
-			default: throw new RuntimeException("The traffic dynmics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
+			default: throw new RuntimeException("The traffic dynamics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
 		}
 	}
 
@@ -865,17 +860,17 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		return this.id;
 	}
 
-	static final class Hole extends QItem {
+	static final class Hole implements QItem {
 		private double earliestLinkEndTime ;
 		private double pcu;
 
 		@Override
-		final double getEarliestLinkExitTime() {
+		public final double getEarliestLinkExitTime() {
 			return earliestLinkEndTime;
 		}
 
 		@Override
-		final void setEarliestLinkExitTime(double earliestLinkEndTime) {
+		public final void setEarliestLinkExitTime( double earliestLinkEndTime ) {
 			this.earliestLinkEndTime = earliestLinkEndTime;
 		}
 

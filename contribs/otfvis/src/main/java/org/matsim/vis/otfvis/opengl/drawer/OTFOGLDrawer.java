@@ -321,6 +321,11 @@ public class OTFOGLDrawer implements GLEventListener {
 	}
 
 	public static Component createGLCanvas(OTFVisConfigGroup otfVisConfig) {
+		//turn off HiDPI uiScaling in Windows (issue MATSIM-875)
+		if (System.getProperty("os.name").startsWith("Windows")) {
+			System.setProperty("sun.java2d.uiScale", "1.0");
+		}
+
 		GLCapabilities caps = new GLCapabilities(GLProfile.get(GLProfile.GL2));
 		if (otfVisConfig.isMapOverlayMode()) {
 			caps.setBackgroundOpaque(false);

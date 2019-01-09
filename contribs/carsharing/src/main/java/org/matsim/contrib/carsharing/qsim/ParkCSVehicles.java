@@ -10,6 +10,7 @@ import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -48,9 +49,14 @@ public class ParkCSVehicles implements AgentSource {
 		Map<CSVehicle, Link> allVehicleLocations = this.carsharingSupply.getAllVehicleLocations();
 
 		for (CSVehicle vehicle : allVehicleLocations.keySet()) {
+			final Vehicle basicVehicle = VehicleUtils.getFactory().createVehicle( Id.create( vehicle.getVehicleId(), Vehicle.class ),
+					modeVehicleTypes.get( vehicle.getCsType() ) );
+
+			final QVehicleImpl qvehicle = new QVehicleImpl( basicVehicle );;
+			// yyyyyy should react to new QVehicleFactory!  kai, nov'18
 			
-			qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create(vehicle.getVehicleId(), Vehicle.class),
-					modeVehicleTypes.get(vehicle.getCsType())), allVehicleLocations.get(vehicle).getId());
+//			qsim.createAndParkVehicleOnLink(, allVehicleLocations.get(vehicle).getId());
+			qsim.addParkedVehicle( qvehicle, allVehicleLocations.get(vehicle).getId() );
 		}
 		
 		

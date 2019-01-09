@@ -55,7 +55,7 @@ class PVehiclesFactory {
 		VehiclesFactory vehFactory = vehicles.getFactory();
 		VehicleType vehType = vehFactory.createVehicleType(Id.create(this.pConfig.getPIdentifier(), VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(this.pConfig.getPaxPerVehicle() + 1); // july 2011 the driver takes one seat
+		capacity.setSeats(this.pConfig.getPaxPerVehicle()); // 2018-11 the driver no longer takes one seat
 		capacity.setStandingRoom(0);
 		vehType.setCapacity(capacity);
 		vehType.setPcuEquivalents(this.pConfig.getPassengerCarEquivalents());

@@ -23,6 +23,7 @@ package org.matsim.core.utils.geometry;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.gbl.Gbl;
 
 public abstract class CoordUtils {
 	final private static Logger LOG = Logger.getLogger(CoordUtils.class);
@@ -245,6 +246,8 @@ public abstract class CoordUtils {
 	 *
 	 * @author mrieser, jwjoubert
 	 */
+	private static boolean onlyOnceWarnGiven = false;
+
 	public static double distancePointLinesegment(final Coord lineFrom, final Coord lineTo, final Coord point) {
 		if( !lineFrom.hasZ() && !lineTo.hasZ() && !point.hasZ() ){
 			/* All coordinates are 2D and in the XY plane. */
@@ -316,11 +319,15 @@ public abstract class CoordUtils {
 			Coord m = minus(point, p);
 			return Math.sqrt(dotProduct(m, m));
 		} else{
-			throw new RuntimeException("All given coordinates must either be 2D, or 3D. A mix is not allowed.");
+			if (!onlyOnceWarnGiven) {
+				Logger.getLogger(CoordUtils.class).warn("Mix of 2D / 3D coordinates. Assuming 2D only.\n" + Gbl.ONLYONCE);
+				onlyOnceWarnGiven = true;
+			}
+			return distancePointLinesegment(new Coord(lineFrom.getX(), lineFrom.getY()), new Coord(lineTo.getX(), lineTo.getY()), new Coord(point.getX(), point.getY()));
 		}
 	}
-	
-	
+
+
 	/**
 	 * Calculates the coordinate of the intersection point of the orthogonal projection
 	 * of a given point on a line segment with that line segment. The line segment
@@ -377,7 +384,12 @@ public abstract class CoordUtils {
 			Coord q = plus(lineFrom, scalarMult(t0, direction));
 			return q;
 		} else{
-			throw new RuntimeException("All given coordinates must either be 2D, or 3D. A mix is not allowed.");
+			if (!onlyOnceWarnGiven) {
+				Logger.getLogger(CoordUtils.class).warn("Mix of 2D / 3D coordinates. Assuming 2D only.\n" + Gbl.ONLYONCE);
+				onlyOnceWarnGiven = true;
+			}
+			return orthogonalProjectionOnLineSegment(new Coord(lineFrom.getX(), lineFrom.getY()), new Coord(lineTo.getX(), lineTo.getY()), new Coord(point.getX(), point.getY()));
+			//throw new RuntimeException("All given coordinates must either be 2D, or 3D. A mix is not allowed.");
 		}
 	}
 }

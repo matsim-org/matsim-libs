@@ -1,26 +1,13 @@
 package org.matsim.utils.objectattributes.attributable;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
-import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.jaxb.lanedefinitions20.ObjectFactory;
-import org.matsim.jaxb.lanedefinitions20.XMLAttributeType;
+import org.matsim.core.utils.io.XmlUtils;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesConverter;
-import org.matsim.utils.objectattributes.attributeconverters.BooleanConverter;
-import org.matsim.utils.objectattributes.attributeconverters.DoubleConverter;
-import org.matsim.utils.objectattributes.attributeconverters.FloatConverter;
-import org.matsim.utils.objectattributes.attributeconverters.IntegerConverter;
-import org.matsim.utils.objectattributes.attributeconverters.LongConverter;
-import org.matsim.utils.objectattributes.attributeconverters.StringConverter;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author thibautd
@@ -44,9 +31,9 @@ public class AttributesXmlWriterDelegate {
 				String converted = converter.convertToString(objAttribute.getValue());
 				if (converted != null) {
 					writer.write(indentation + "\t");
-					writer.write("<attribute name=\"" + objAttribute.getKey() + "\" ");
+					writer.write("<attribute name=\"" + XmlUtils.encodeAttributeValue(objAttribute.getKey()) + "\" ");
 					writer.write("class=\"" + clazz.getCanonicalName() + "\" >");
-					writer.write(converted);
+					writer.write(XmlUtils.encodeContent(converted));
 					writer.write("</attribute>");
 					writer.newLine();
 				}

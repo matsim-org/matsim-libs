@@ -1,16 +1,13 @@
 package org.matsim.core.mobsim.qsim;
 
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.List;
 
+import com.google.inject.multibindings.Multibinder;
 import org.matsim.core.mobsim.framework.AbstractMobsimModule;
-import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
-import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.name.Names;
@@ -22,24 +19,26 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule {
 		configureQSim();
 	}
 
-	protected LinkedBindingBuilder<MobsimEngine> bindMobsimEngine(String name) {
-		return binder().bind(Key.get(MobsimEngine.class, Names.named(name)));
+	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding(Annotation annotation) {
+		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class, annotation);
+		multibinder.permitDuplicates();
+		return multibinder.addBinding();
 	}
 
-	protected LinkedBindingBuilder<ActivityHandler> bindActivityHandler(String name) {
-		return binder().bind(Key.get(ActivityHandler.class, Names.named(name)));
+	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding(Class<? extends Annotation> annotationClass) {
+		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class, annotationClass);
+		multibinder.permitDuplicates();
+		return multibinder.addBinding();
+	}
+	
+	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding(String name) {
+		return addQSimComponentBinding(Names.named(name));
 	}
 
-	protected LinkedBindingBuilder<DepartureHandler> bindDepartureHandler(String name) {
-		return binder().bind(Key.get(DepartureHandler.class, Names.named(name)));
-	}
-
-	protected LinkedBindingBuilder<AgentSource> bindAgentSource(String name) {
-		return binder().bind(Key.get(AgentSource.class, Names.named(name)));
-	}
-
-	protected LinkedBindingBuilder<MobsimListener> bindMobsimListener(String name) {
-		return binder().bind(Key.get(MobsimListener.class, Names.named(name)));
+	// Use methods above
+	@Deprecated
+	protected <T extends QSimComponent> void addNamedComponent(Class<T> componentClass, String name) {
+		addQSimComponentBinding(name).to(componentClass);
 	}
 
 	protected abstract void configureQSim();

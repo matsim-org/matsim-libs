@@ -95,9 +95,6 @@ public class LinkLengthBasedParkingManagerWithRandomInitialUtilisation implement
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.jbischoff.parking.manager.ParkingManager#produceStatistics()
-	 */
 	@Override
 	public List<String> produceStatistics() {
 		List<String> stats = new ArrayList<>();
@@ -106,13 +103,8 @@ public class LinkLengthBasedParkingManagerWithRandomInitialUtilisation implement
 		return stats;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.jbischoff.parking.manager.ParkingManager#reset(int)
-	 */
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	

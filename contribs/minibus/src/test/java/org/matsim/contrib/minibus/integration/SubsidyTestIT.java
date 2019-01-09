@@ -49,8 +49,6 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class SubsidyTestIT implements TabularFileHandler {
 	
-	
-
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final ArrayList<String[]> pStatsResults = new ArrayList<>();
@@ -105,7 +103,7 @@ public class SubsidyTestIT implements TabularFileHandler {
 		new TabularFileParser().parse(tabFileParserConfig, this);
 
 		// Check final iteration
-		Assert.assertEquals("Number of budget (final iteration)", "196899309.0522222500", this.pStatsResults.get(2)[9]);	
+		Assert.assertEquals("Number of budget (final iteration)", "196009293.6253889000", this.pStatsResults.get(2)[9]);
 	}
 	
 	@Override

@@ -39,10 +39,11 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngineI;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -144,7 +145,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 
 		@Override
-		public Netsim getMobsim() {
+		public QSim getMobsim() {
 			return QSim.this;
 		}
 
@@ -163,21 +164,22 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			return null;
 		}
 
-		@Override
-		@Deprecated // use same method from QSim directly and try to get rid of the handle to internal interface. kai, mar'15
-		public void rescheduleActivityEnd(MobsimAgent agent) {
-			// yy my current intuition would be that this could become a public QSim method.  The original idea was that I wanted external
-			// code only to insert agents into the QSim, and from then on the QSim handles it internally.  However, the main thing that truly seems to be
-			// done internally is to move the agents between the engines, e.g. around endActivity and endLeg.  In consequence, 
-			// "arrangeNextAgentState" and "(un)registerAgentOnLink" need to be protected.  But not this one.  kai, mar'15
-			QSim.this.activityEngine.rescheduleActivityEnd(agent);
-		}
+//		@Override
+//		@Deprecated // use same method from QSim directly and try to get rid of the handle to internal interface. kai, mar'15
+//		public void rescheduleActivityEnd(MobsimAgent agent) {
+//			// yy my current intuition would be that this could become a public QSim method.  The original idea was that I wanted external
+//			// code only to insert agents into the QSim, and from then on the QSim handles it internally.  However, the main thing that truly seems to be
+//			// done internally is to move the agents between the engines, e.g. around endActivity and endLeg.  In consequence,
+//			// "arrangeNextAgentState" and "(un)registerAgentOnLink" need to be protected.  But not this one.  kai, mar'15
+//			QSim.this.activityEngine.rescheduleActivityEnd(agent);
+//		}
 	};
 
 	private Collection<AgentTracker> agentTrackers = new ArrayList<>() ;
 
 	private Injector childInjector;
-
+//	private QVehicleFactory qVehicleFactory;
+	
 	@Override
 	public final void rescheduleActivityEnd(MobsimAgent agent) {
 		this.activityEngine.rescheduleActivityEnd(agent);
@@ -192,21 +194,19 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	 *
 	 */
 	@Inject
-	private QSim(final Scenario sc, EventsManager events, Injector childInjector ) {
-		this( sc, events ) ;
-		this.childInjector = childInjector ;
-	}
-	private QSim(final Scenario sc, EventsManager events ) {
+	private QSim( final Scenario sc, EventsManager events, Injector childInjector ) {
 		this.scenario = sc;
-		if (sc.getConfig().qsim().getNumberOfThreads() > 1) {
-			this.events = EventsUtils.getParallelFeedableInstance(events);
+		if ( sc.getConfig().qsim().getNumberOfThreads() > 1) {
+			this.events = EventsUtils.getParallelFeedableInstance( events );
 		} else {
 			this.events = events;
 		}
-		this.listenerManager = new MobsimListenerManager(this);
+		this.listenerManager = new MobsimListenerManager( this );
 		this.agentCounter = new org.matsim.core.mobsim.qsim.AgentCounter();
-		this.simTimer = new MobsimTimer(sc.getConfig().qsim().getTimeStepSize());
+		this.simTimer = new MobsimTimer( sc.getConfig().qsim().getTimeStepSize());
 		
+		this.childInjector = childInjector ;
+//		this.qVehicleFactory = qVehicleFactory;
 	}
 
 	// ============================================================================================================================
@@ -217,7 +217,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		try {
 			// Teleportation must be last (default) departure handler, so add it
 			// only before running.
-			addDepartureHandler(this.teleportationEngine);
+			this.departureHandlers.add(this.teleportationEngine);
 			prepareSim();
 			this.listenerManager.fireQueueSimulationInitializedEvent();
 
@@ -273,11 +273,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 	}
 
-	private static int wrnCnt = 0;
-	public void createAndParkVehicleOnLink(Vehicle vehicle, Id<Link> linkId) {
-		QVehicle qveh = new QVehicle(vehicle);
-		addParkedVehicle ( qveh, linkId ) ;
-	}
+//	public void createAndParkVehicleOnLink(Vehicle vehicle, Id<Link> linkId) {
+//		QVehicle qveh = this.qVehicleFactory.createQVehicle( vehicle ) ;
+//		addParkedVehicle ( qveh, linkId ) ;
+//	}
 
 	private static int wrnCnt2 = 0;
 	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
@@ -580,7 +579,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	}
 
 	public void addDepartureHandler(DepartureHandler departureHandler) {
-		this.departureHandlers.add(departureHandler);
+		if (!(departureHandler instanceof TeleportationEngine)) {
+			// We add the teleportation handler manually later
+			this.departureHandlers.add(departureHandler);
+		}
 	}
 
 	public void addActivityHandler(ActivityHandler activityHandler) {

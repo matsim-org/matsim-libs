@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
@@ -40,6 +41,8 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
  * @author michalm
  */
 public class DefaultTaxiOptimizer implements TaxiOptimizer {
+	private static final Logger log = Logger.getLogger(DefaultTaxiOptimizer.class);
+
 	private final Fleet fleet;
 	private final TaxiScheduler scheduler;
 

@@ -26,15 +26,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Vehicle;
 
-import com.google.inject.Inject;
-
 /**
  * @author michalm
  */
 public class NearestStartLinkAsDepot implements DepotFinder {
 	private final Set<Link> startLinks = new HashSet<>();
 
-	@Inject
 	public NearestStartLinkAsDepot(Fleet fleet) {
 		for (Vehicle v : fleet.getVehicles().values()) {
 			startLinks.add(v.getStartLink());

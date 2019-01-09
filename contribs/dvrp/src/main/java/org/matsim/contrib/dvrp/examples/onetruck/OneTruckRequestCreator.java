@@ -26,10 +26,12 @@ import java.util.PriorityQueue;
 import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
@@ -38,13 +40,13 @@ import com.google.inject.name.Named;
 /**
  * @author michalm
  */
-final class OneTruckRequestCreator implements MobsimAfterSimStepListener {
+public final class OneTruckRequestCreator implements MobsimAfterSimStepListener {
 	private final VrpOptimizer optimizer;
 	private final PriorityQueue<OneTruckRequest> requests = new PriorityQueue<>(10,
 			Comparator.comparing(Request::getSubmissionTime));
 
 	@Inject
-	public OneTruckRequestCreator(VrpOptimizer optimizer,
+	public OneTruckRequestCreator(@DvrpMode(TransportMode.truck) VrpOptimizer optimizer,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network) {
 		this.optimizer = optimizer;
 		requests.addAll(Arrays.asList(createRequest("parcel_0", "114", "349", 0, network),

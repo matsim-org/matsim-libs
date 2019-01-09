@@ -6,15 +6,14 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
 public class CarSharingQSimModule extends AbstractQSimModule {
-	static public String CARSHARING_PARKING_VEHICLES_SOURCE = "CarsharingParkingVehiclesSource";
+	public final static String COMPONENT_NAME = "Carsharing";
 
 	private final CarsharingSupplyInterface carsharingSupply;
 	private final CarsharingManagerInterface carsharingManager;
@@ -27,10 +26,7 @@ public class CarSharingQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bind(PopulationAgentSource.class).asEagerSingleton();
-
-		bindAgentSource(PopulationModule.POPULATION_AGENT_SOURCE_NAME).to(PopulationAgentSource.class);
-		bindAgentSource(CARSHARING_PARKING_VEHICLES_SOURCE).to(ParkCSVehicles.class);
+		addNamedComponent(ParkCSVehicles.class, COMPONENT_NAME);
 	}
 
 	@Provides
@@ -45,7 +41,8 @@ public class CarSharingQSimModule extends AbstractQSimModule {
 		return new CSAgentFactory(netsim, carsharingManager);
 	}
 	
-	static public void configureComponents(QSimComponents components) {
-		components.activeAgentSources.add(CarSharingQSimModule.CARSHARING_PARKING_VEHICLES_SOURCE);
+	static public void configureComponents(QSimComponentsConfig components) {
+		components.removeNamedComponent(PopulationModule.COMPONENT_NAME);
+		components.addNamedComponent(COMPONENT_NAME);
 	}
 }

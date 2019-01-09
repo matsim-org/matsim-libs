@@ -3,6 +3,8 @@ package org.matsim.contrib.freight.carrier;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimReader;
 
+import java.net.URL;
+
 /**
  * A reader that reads carriers and their plans.
  * 
@@ -37,7 +39,12 @@ public class CarrierPlanXmlReaderV2 implements MatsimReader {
 		this.delegate.setValidating(false);
 		this.delegate.readFile(filename);
 		logger.info("done");
+	}
 
+	@Override
+	public void readURL( URL url  ) {
+		this.delegate.setValidating( false );
+		this.delegate.parse( url );
 	}
 
 }

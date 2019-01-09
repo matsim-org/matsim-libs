@@ -9,8 +9,8 @@ Case;VehCat;Year;TrafficScenario;Component;RoadCat;TrafficSit;Gradient;V_weighte
 2005HotAverage[3.1];pass. car;2005;"BAU" (D);NO2;Urban;URB/Local/50/St+Go;0%;12.72;0.11
 2005HotAverage[3.1];pass. car;2005;"BAU" (D);NOx;Urban;URB/Local/50/Freeflow;0%;46.63;0.37
 2005HotAverage[3.1];pass. car;2005;"BAU" (D);NOx;Urban;URB/Local/50/St+Go;0%;12.72;0.71
-2005HotAverage[3.1];pass. car;2005;"BAU" (D);CO2(total);Urban;URB/Local/50/Freeflow;0%;46.63;163.26
-2005HotAverage[3.1];pass. car;2005;"BAU" (D);CO2(total);Urban;URB/Local/50/St+Go;0%;12.72;340.53
+2005HotAverage[3.1];pass. car;2005;"BAU" (D);CO2_TOTAL;Urban;URB/Local/50/Freeflow;0%;46.63;163.26
+2005HotAverage[3.1];pass. car;2005;"BAU" (D);CO2_TOTAL;Urban;URB/Local/50/St+Go;0%;12.72;340.53
 2005HotAverage[3.1];pass. car;2005;"BAU" (D);PM;Urban;URB/Local/50/Freeflow;0%;46.63;0.01
 2005HotAverage[3.1];pass. car;2005;"BAU" (D);PM;Urban;URB/Local/50/St+Go;0%;12.72;0.03
 2005HotAverage[3.1];pass. car;2005;"BAU" (D);NMHC;Urban;URB/Local/50/Freeflow;0%;46.63;0.07
@@ -27,8 +27,8 @@ Case;VehCat;Year;TrafficScenario;Component;RoadCat;TrafficSit;Gradient;V_weighte
 2005HotAverage[3.1];HGV;2005;"BAU" (D);NO2;Urban;URB/Local/50/St+Go;0%;11.79;0.92
 2005HotAverage[3.1];HGV;2005;"BAU" (D);NOx;Urban;URB/Local/50/Freeflow;0%;41.43;6.17
 2005HotAverage[3.1];HGV;2005;"BAU" (D);NOx;Urban;URB/Local/50/St+Go;0%;11.79;12.83
-2005HotAverage[3.1];HGV;2005;"BAU" (D);CO2(total);Urban;URB/Local/50/Freeflow;0%;41.43;621.90
-2005HotAverage[3.1];HGV;2005;"BAU" (D);CO2(total);Urban;URB/Local/50/St+Go;0%;11.79;1305.46
+2005HotAverage[3.1];HGV;2005;"BAU" (D);CO2_TOTAL;Urban;URB/Local/50/Freeflow;0%;41.43;621.90
+2005HotAverage[3.1];HGV;2005;"BAU" (D);CO2_TOTAL;Urban;URB/Local/50/St+Go;0%;11.79;1305.46
 2005HotAverage[3.1];HGV;2005;"BAU" (D);PM;Urban;URB/Local/50/Freeflow;0%;41.43;0.16
 2005HotAverage[3.1];HGV;2005;"BAU" (D);PM;Urban;URB/Local/50/St+Go;0%;11.79;0.42
 2005HotAverage[3.1];HGV;2005;"BAU" (D);NMHC;Urban;URB/Local/50/Freeflow;0%;41.43;0.43

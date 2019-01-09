@@ -39,12 +39,10 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
 
 public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
-	public static final String TAXI_OPTIMIZER = "taxi_optimizer";
 	public static final String TYPE = "type";
 
 	public enum OptimizerType {
@@ -59,11 +57,10 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final TravelDisutility travelDisutility;
 	private final TaxiScheduler scheduler;
 
-	@Inject
 	public DefaultTaxiOptimizerProvider(TaxiConfigGroup taxiCfg, Fleet fleet,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Named(TAXI_OPTIMIZER) TravelDisutility travelDisutility, TaxiScheduler scheduler) {
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
+			TaxiScheduler scheduler) {
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
 		this.network = network;

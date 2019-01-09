@@ -20,14 +20,9 @@
 
 package org.matsim.pt.transitSchedule.api;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Stack;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.scenario.ProjectionUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -36,6 +31,10 @@ import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV2;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Stack;
 
 /**
  * Reads {@link TransitSchedule}s from file as long as the files are in one of the
@@ -49,7 +48,6 @@ public class TransitScheduleReader implements MatsimReader {
 
 	private final String externalInputCRS;
 	private final String targetCRS;
-	private CoordinateTransformation coordinateTransformation;
 
 	public TransitScheduleReader(
 	        final String targetCRS,
@@ -74,8 +72,8 @@ public class TransitScheduleReader implements MatsimReader {
 	public void readFile(final String filename) throws UncheckedIOException {
 		new XmlScheduleReader(externalInputCRS, targetCRS, this.scenario).readFile(filename);
 	}
-
-	public void readURL(final URL url) throws UncheckedIOException {
+	@Override
+	public void readURL( final URL url ) throws UncheckedIOException {
 		new XmlScheduleReader(externalInputCRS, targetCRS, this.scenario).parse(url);
 	}
 

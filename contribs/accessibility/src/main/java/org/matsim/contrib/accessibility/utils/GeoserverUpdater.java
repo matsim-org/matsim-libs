@@ -19,10 +19,12 @@
 
 package org.matsim.contrib.accessibility.utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.DataStore;
@@ -32,6 +34,7 @@ import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.core.utils.collections.Tuple;
@@ -39,11 +42,13 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.facilities.ActivityFacility;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -53,19 +58,28 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 
 	private String crs;
 	private String name;
-	private long cellSize;
+	private Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap;
+	private Set<String> additionalFacInfo;
+	private String outputDirectory;
+	private boolean pushing2Geoserver;
+	private boolean createQGisOutput;
 
-	public GeoserverUpdater (String crs, String name, long cellSize) {
+	public GeoserverUpdater (String crs, String name, Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap, Set<String> additionalFacInfo,
+			String outputDirectory, boolean pushing2Geoserver, boolean createQGisOutput) {
 		this.crs = crs;
 		this.name = name;
-		this.cellSize = cellSize;
+		this.measurePointGeometryMap = measurePointGeometryMap;
+		this.additionalFacInfo = additionalFacInfo;
+		this.outputDirectory = outputDirectory;
+		this.pushing2Geoserver = pushing2Geoserver;
+		this.createQGisOutput = createQGisOutput;
 	}
 	
 	private Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>() ;
 
 	@Override
 	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay,	Map<String, Double> accessibilities) {
-		accessibilitiesMap.put( new Tuple<>(measurePoint, timeOfDay), accessibilities ) ;
+		accessibilitiesMap.put(new Tuple<>(measurePoint, timeOfDay), accessibilities);
 	}
 
 	@Override
@@ -74,7 +88,19 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 		SimpleFeatureTypeBuilder featureTypeBuilder = createFeatureTypeBuilder();
 		SimpleFeatureType featureType = featureTypeBuilder.buildFeatureType();
 		DefaultFeatureCollection featureCollection = createFeatureCollection(geometryFactory, featureType);
-		updateOnGeoserver(featureType, featureCollection);
+		
+		if (outputDirectory != null) {
+			File file = new File(outputDirectory);
+			file.mkdirs();
+		}
+		
+		if (createQGisOutput) {
+			ShapeFileWriter.writeGeometries(featureCollection, outputDirectory + "/result.shp");
+		}
+	    
+		if (pushing2Geoserver) {
+			updateOnGeoserver(featureType, featureCollection);
+		}
 	}
 
 	private SimpleFeatureTypeBuilder createFeatureTypeBuilder() {
@@ -84,13 +110,12 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 			featureTypeBuilder.add("the_geom", Polygon.class);
 			featureTypeBuilder.add("id", Integer.class);
 			featureTypeBuilder.add("time", Double.class);
-			for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+			for (Modes4Accessibility mode : Modes4Accessibility.values()) { // TODO
 				featureTypeBuilder.add(mode.toString(), Double.class);
 			}
-	//		for (ActivityFacilities facilities : additionalFacilityData) {
-	//			b.add(facilities.getName(), Double.class);
-	//		}
-			// yyyyyy add population here
+			for (String currentAdditionalFacInfo : additionalFacInfo) {
+				featureTypeBuilder.add(currentAdditionalFacInfo, Double.class);
+			}
 			return featureTypeBuilder;
 		}
 
@@ -100,18 +125,21 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 		SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
 		
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(this.crs, TransformationFactory.WGS84);
-		int id = 0;
-		
+
 		for (Entry<Tuple<ActivityFacility, Double>, Map<String, Double>> entry : accessibilitiesMap.entrySet()) {
-			id++;
-			Coord coord = entry.getKey().getFirst().getCoord() ;
-			Coordinate coord1 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() - (cellSize / 2), coord.getY() - (cellSize / 2))));
-			Coordinate coord2 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() + (cellSize / 2), coord.getY() - (cellSize / 2))));
-			Coordinate coord3 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() + (cellSize / 2), coord.getY() + (cellSize / 2))));
-			Coordinate coord4 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() - (cellSize / 2), coord.getY() + (cellSize / 2))));
+			Polygon polygon = (Polygon) measurePointGeometryMap.get(entry.getKey().getFirst().getId());
+			Coordinate[] coordinates = polygon.getCoordinates();
+			Coordinate[] transformedCoordinates = new Coordinate[coordinates.length];
+			int i = 0;
+			for (Coordinate coordinate : coordinates) {
+				Coord transformedCoord = transformation.transform(CoordUtils.createCoord(coordinate));
+				Coordinate transformedCoordinate = MGC.coord2Coordinate(transformedCoord);
+				transformedCoordinates[i] = transformedCoordinate;
+				i++;
+			}
+			featureBuilder.add(geometryFactory.createPolygon(transformedCoordinates));
 			
-			featureBuilder.add(geometryFactory.createPolygon(new Coordinate[]{coord1, coord2, coord3, coord4, coord1}));
-			featureBuilder.add(id);
+			featureBuilder.add(Integer.parseInt(entry.getKey().getFirst().getId().toString()));
 			featureBuilder.add(entry.getKey().getSecond());
 			
 			for (Modes4Accessibility modeEnum : Modes4Accessibility.values()) {
@@ -123,7 +151,14 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 					featureBuilder.add(null);
 				}
 			}
-			// yyyyyy write population density here. Probably not aggregated to grid.
+			for (String currentAdditionalFacInfo : additionalFacInfo) {
+				Double additionalFacInfoValue = Double.parseDouble(entry.getKey().getFirst().getAttributes().getAttribute(currentAdditionalFacInfo).toString());
+				if (additionalFacInfoValue != null && !Double.isNaN(additionalFacInfoValue)) {
+					featureBuilder.add(additionalFacInfoValue);
+				} else {
+					featureBuilder.add(null);
+				}
+			}
 
 			SimpleFeature feature = featureBuilder.buildFeature(null);
 			featureCollection.add(feature);
@@ -143,8 +178,9 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 			params.put( "database", "vspgeodb");
 			params.put( "user", "vsppostgres");
 			params.put( "passwd", "jafs30_A");
+			// There have been errors with the data store if the dependency "gt-jdbc-postgis", version 13.0 was missing!
 			DataStore dataStore = DataStoreFinder.getDataStore(params);
-			System.out.println("dataStore = " + dataStore);
+			LOG.info("dataStore = " + dataStore);
 			
 			// Remove schema in case it already exists
 			try {

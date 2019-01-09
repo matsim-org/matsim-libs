@@ -19,33 +19,38 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.utils;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.emissions.types.ColdPollutant;
-import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.types.*;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.vehicles.VehicleType;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
  * @author ikaddoura, benjamin
  *
  */
-public final class EmissionUtils {
+public class EmissionUtils {
 	private static final Logger logger = Logger.getLogger(EmissionUtils.class);
 
-	private EmissionUtils(){}
+	public static Map<String, Integer> createIndexFromKey(String strLine) {
+		String[] keys = strLine.split(";") ;
+
+		Map<String, Integer> indexFromKey = new HashMap<>() ;
+		for ( int ii = 0; ii < keys.length; ii++ ) {
+			indexFromKey.put(keys[ii], ii ) ;
+		}
+		return indexFromKey ;
+	}
 
 	public static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
 	public static void setHbefaRoadType(Link link, String type){
@@ -57,95 +62,64 @@ public final class EmissionUtils {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
 
-	public static SortedSet<String> getListOfPollutants() {
-		SortedSet<String> listOfPollutants = new TreeSet<>();
+	public static Map<String, Double> sumUpEmissions(Map<String, Double> warmEmissions, Map<String, Double> coldEmissions) {
 
-		listOfPollutants = new TreeSet<>();
-		for(WarmPollutant wp : WarmPollutant.values()){
-			listOfPollutants.add(wp.toString());
-		}
-		for(ColdPollutant cp : ColdPollutant.values()){
-			listOfPollutants.add(cp.toString());
-		}
-		return listOfPollutants;
-	}
+		Map<String, Double> pollutant2sumOfEmissions =
+				Stream.concat(warmEmissions.entrySet().stream(), coldEmissions.entrySet().stream())
+					.collect(Collectors.toMap(
+							Entry::getKey, // The key
+							Entry::getValue, // The value
+							Double::sum
+							)
+					);
 
-	public static SortedMap<String, Double> sumUpEmissions(Map<WarmPollutant, Double> warmEmissions, Map<ColdPollutant, Double> coldEmissions) {
-		SortedMap<String, Double> pollutant2sumOfEmissions = new TreeMap<>();
-		SortedMap<String, Double> warmPollutant2emissions = convertWarmPollutantMap2String(warmEmissions);
-		SortedMap<String, Double> coldPollutant2emissions = convertColdPollutantMap2String(coldEmissions);
-		double sumOfPollutant;
-	
-		for(String pollutant : getListOfPollutants()){
-			if(warmPollutant2emissions.containsKey(pollutant)){
-				if(coldPollutant2emissions.containsKey(pollutant)){
-					sumOfPollutant = warmPollutant2emissions.get(pollutant) + coldPollutant2emissions.get(pollutant);
-				} else{
-					sumOfPollutant = warmPollutant2emissions.get(pollutant);
-				}
-			} else if(coldPollutant2emissions.containsKey(pollutant)){
-				sumOfPollutant = coldPollutant2emissions.get(pollutant);
-			} else {
-				sumOfPollutant = 0.0;
-				logger.warn("Pollutant " + pollutant + " is not found in the emission events file [probably an old file]." +
-						"Therefore setting it to " + sumOfPollutant);
-			}
-			pollutant2sumOfEmissions.put(pollutant, sumOfPollutant);
-		}
 		return pollutant2sumOfEmissions;
 	}
 	
-	public static <T> Map<Id<T>, SortedMap<String, Double>> sumUpEmissionsPerId(
-			Map<Id<T>, Map<WarmPollutant, Double>> warmEmissions,
-			Map<Id<T>, Map<ColdPollutant, Double>> coldEmissions) {
+	public static <T> Map<Id<T>, Map<String, Double>> sumUpEmissionsPerId(
+			Map<Id<T>, Map<String, Double>> warmEmissions,
+			Map<Id<T>, Map<String, Double>> coldEmissions) {
 
-		Map<Id<T>, SortedMap<String, Double>> totalEmissions = new HashMap<>();
-		Set<Id<T>> warmColdIds = new HashSet<>();
-		warmColdIds.addAll(warmEmissions.keySet());
-		warmColdIds.addAll(coldEmissions.keySet());
+		Map<Id<T>, Map<String, Double>> totalEmissions = warmEmissions.entrySet().stream().map(entry -> {
+			Id<T> id = entry.getKey();
+			Map<String, Double> warmEm = entry.getValue();
+			Map<String, Double> coldEm = coldEmissions.getOrDefault(id, new HashMap<>());
 
-		for (Id<T> id : warmColdIds) {
-			if (warmEmissions.containsKey(id)) {
-				if (coldEmissions.containsKey(id)) {
-					SortedMap<String, Double> idSumOfEmissions = sumUpEmissions(warmEmissions.get(id), coldEmissions.get(id));
-					totalEmissions.put(id, idSumOfEmissions);
-				} else {
-					SortedMap<String, Double> warmPollutantString2Values = convertWarmPollutantMap2String(warmEmissions.get(id));
-					totalEmissions.put(id, warmPollutantString2Values);
-				}
-			} else {
-				SortedMap<String, Double> coldPollutantString2Values = convertColdPollutantMap2String(coldEmissions.get(id));
-				totalEmissions.put(id, coldPollutantString2Values);
-			}
-		}
+			Map<String, Double> totalPollutantCounts = sumUpEmissions(warmEm, coldEm);
+			return new Tuple<>(id, totalPollutantCounts);
+		}).collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
+
 		return totalEmissions;
 	}
 
-	public static Map<Id<Person>, SortedMap<String, Double>> setNonCalculatedEmissionsForPopulation(Population population, Map<Id<Person>, SortedMap<String, Double>> totalEmissions) {
+	public static Map<Id<Person>, SortedMap<String, Double>> setNonCalculatedEmissionsForPopulation(Population population, Map<Id<Person>, SortedMap<String, Double>> totalEmissions, Set<String> pollutants) {
 		Map<Id<Person>, SortedMap<String, Double>> personId2Emissions = new HashMap<>();
-
 		for(Person person : population.getPersons().values()){
 			Id<Person> personId = person.getId();
 			SortedMap<String, Double> emissionType2Value;
 			if(totalEmissions.get(personId) == null){ // person not in map (e.g. pt user)
 				emissionType2Value = new TreeMap<>();
-				for(String pollutant : getListOfPollutants()){
+				for(String pollutant :  pollutants){
 					emissionType2Value.put(pollutant, 0.0);
 				}
 			} else { // person in map, but some emissions are not set; setting these to 0.0 
 				emissionType2Value = totalEmissions.get(personId);
-				for(String pollutant : getListOfPollutants()){
-					if(emissionType2Value.get(pollutant) == null){
-						emissionType2Value.put(pollutant, 0.0);
-					} // else do nothing
+				for(String pollutant :  emissionType2Value.keySet()){
+					// else do nothing
+					emissionType2Value.putIfAbsent(pollutant, 0.0);
 				}
 			}
 			personId2Emissions.put(personId, emissionType2Value);
 		}
 		return personId2Emissions;
 	}
-	
-	public static Map<Id<Link>, SortedMap<String, Double>> setNonCalculatedEmissionsForNetwork(Network network, Map<Id<Link>, SortedMap<String, Double>> totalEmissions) {
+
+	private static Set<String> getAllPollutants(Map<Id<Person>, SortedMap<String, Double>> totalEmissions) {
+		Set<String> pollutants = totalEmissions.values().stream().flatMap(m -> m.keySet().stream()).collect(Collectors.toSet());
+		return pollutants;
+	}
+
+	public static Map<Id<Link>, SortedMap<String, Double>> setNonCalculatedEmissionsForNetwork(Network network, Map<Id<Link>, SortedMap<String, Double>> totalEmissions, Set<String> pollutants) {
 		Map<Id<Link>, SortedMap<String, Double>> linkId2Emissions = new HashMap<>();
 
 		for(Link link: network.getLinks().values()){
@@ -154,15 +128,16 @@ public final class EmissionUtils {
 			
 			if(totalEmissions.get(linkId) == null){
 				emissionType2Value = new TreeMap<>();
-				for(String pollutant : getListOfPollutants()){
+				for(String pollutant : pollutants){
 					emissionType2Value.put(pollutant, 0.0);
 				}
 			} else {
 				emissionType2Value = totalEmissions.get(linkId);
-				for(String pollutant : getListOfPollutants()){
+				for(String pollutant :  pollutants){
 					if(emissionType2Value.get(pollutant) == null){
 						emissionType2Value.put(pollutant, 0.0);
 					} else {
+						//TODO: is this redundant?
 						emissionType2Value.put(pollutant, emissionType2Value.get(pollutant));
 					}
 				}
@@ -190,24 +165,60 @@ public final class EmissionUtils {
 		return totalEmissions;
 	}
 
-	public static SortedMap<String, Double> convertWarmPollutantMap2String(Map<WarmPollutant, Double> warmEmissions) {
-		SortedMap<String, Double> warmPollutantString2Values = new TreeMap<>();
-		for (Entry<WarmPollutant, Double> entry: warmEmissions.entrySet()){
-			String pollutant = entry.getKey().toString();
-			Double value = entry.getValue();
-			warmPollutantString2Values.put(pollutant, value);
+
+	public static void setHbefaVehicleDescription( final VehicleType vt, final String hbefaVehicleDescription ) {
+		// yyyy maybe this should use the vehicle information tuple (see below)?
+		// yyyy replace this by using Attributes.  kai, oct'18
+	    vt.setDescription(  vt.getDescription() + " " + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()+
+							hbefaVehicleDescription +
+			EmissionSpecificationMarker.END_EMISSIONS.toString() );
+	}
+	
+	public static Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple( String vehicleDescription ) {
+		// yyyy what is the advantage of having this as a tuple over just using a class with four entries?  kai, oct'18
+		
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
+		HbefaVehicleCategory hbefaVehicleCategory = null;
+		
+		// yyyy replace this by using Attributes.  kai, oct'18
+		int startIndex = vehicleDescription.indexOf(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
+		int endIndex = vehicleDescription.lastIndexOf(EmissionSpecificationMarker.END_EMISSIONS.toString());
+
+		String[] vehicleInformationArray = vehicleDescription.substring(startIndex, endIndex).split(";");
+
+		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
+			if(vehCat.toString().equals(vehicleInformationArray[0])){
+				hbefaVehicleCategory = vehCat;
+			}
 		}
-		return warmPollutantString2Values;
+		
+		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
+		if(vehicleInformationArray.length == 4){
+			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationArray[1]);
+			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationArray[2]);
+			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationArray[3]);
+		} // else interpretation as "average vehicle"
+
+		vehicleInformationTuple = new Tuple<>(hbefaVehicleCategory, hbefaVehicleAttributes);
+		return vehicleInformationTuple;
 	}
 
-	public static SortedMap<String, Double> convertColdPollutantMap2String(Map<ColdPollutant, Double> coldEmissions) {
-		SortedMap<String, Double> coldPollutantString2Values = new TreeMap<>();
-		for (Entry<ColdPollutant, Double> entry: coldEmissions.entrySet()){
-			String pollutant = entry.getKey().toString();
-			Double value = entry.getValue();
-			coldPollutantString2Values.put(pollutant, value);
-		}
-		return coldPollutantString2Values;
-	}
 
+	public static Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>>
+			createHBEFASpeedsTable(Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable) {
+
+		Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> table = new HashMap<>();
+
+		avgHbefaWarmTable.forEach((warmEmissionFactorKey, emissionFactor) -> {
+			HbefaRoadVehicleCategoryKey roadVehicleCategoryKey = new HbefaRoadVehicleCategoryKey(warmEmissionFactorKey);
+			HbefaTrafficSituation hbefaTrafficSituation = warmEmissionFactorKey.getHbefaTrafficSituation();
+			double speed = emissionFactor.getSpeed();
+
+			table.putIfAbsent(roadVehicleCategoryKey, new HashMap<>());
+			table.get(roadVehicleCategoryKey).put(hbefaTrafficSituation, speed);
+		});
+
+
+		return table;
+	}
 }

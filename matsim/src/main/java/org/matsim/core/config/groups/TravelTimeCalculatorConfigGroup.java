@@ -78,7 +78,9 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 		map.put(ANALYZEDMODES, "Transport modes that will be respected by the travel time collector. 'car' is default, which " +
 				"includes also busses from the pt simulation module. Use this parameter in combination with 'filterModes' = true!");
 		map.put(FILTERMODES, "If true, link travel times from legs performed on modes not included in the 'analyzedModes' parameter are ignored.");
-		map.put(SEPARATEMODES, "If true, link travel times are measured and calculated separately for each mode in analyzedModes. Other modes are ignored. If true, filterModes has no effect.");
+		map.put(SEPARATEMODES, "If true, link travel times are measured and calculated separately for each mode in analyzedModes; other modes are ignored even if " +
+						FILTERMODES + "=false." ) ;
+
 		// === 
 		StringBuilder str = new StringBuilder();
 		for ( TravelTimeCalculatorType type : TravelTimeCalculatorType.values() ) {
@@ -167,8 +169,7 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	}
 
 	@StringSetter( CALCULATE_LINKTOLINK_TRAVELTIMES )
-	public void setCalculateLinkToLinkTravelTimes(
-			final boolean calculateLinkToLinkTravelTimes) {
+	public void setCalculateLinkToLinkTravelTimes( final boolean calculateLinkToLinkTravelTimes) {
 		this.calculateLinkToLinkTravelTimes = calculateLinkToLinkTravelTimes;
 	}
 

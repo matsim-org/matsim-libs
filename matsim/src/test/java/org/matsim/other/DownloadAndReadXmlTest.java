@@ -61,5 +61,25 @@ public class DownloadAndReadXmlTest {
 		Assert.assertEquals(6 + 3 * 2 * 4 * 2, network.getLinks().size());
 	}
 	
+	@Test
+	public final void testHttpsFromSvn() {
+		
+		Config config = ConfigUtils.createConfig();
+		System.out.println(utils.getInputDirectory() + "../../");
+		config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/atlantis/minibus/input/network.xml");
+		
+		// See whether the file can be downloaded and read
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+		// Check whether all nodes and links were read
+		Network network = scenario.getNetwork();
+		
+		// 3 pt nodes and 4 x 4 car nodes
+		Assert.assertEquals(3 + 4 * 4, network.getNodes().size());
+		
+		// 6 pt links and 3 links * 2 directions * 4 times in parallel * 2 (horizontally and vertically)
+		Assert.assertEquals(6 + 3 * 2 * 4 * 2, network.getLinks().size());
+	}
+	
 }
 

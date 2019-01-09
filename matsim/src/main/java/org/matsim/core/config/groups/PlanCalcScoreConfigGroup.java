@@ -1086,7 +1086,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 					"[utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top "
 							+ "of the opportunity cost of time");
 			map.put("marginalUtilityOfDistance_util_m",
-					"[utils/m] utility of walking per m, normally negative.  this is "
+					"[utils/m] utility of traveling (e.g. walking or driving) per m, normally negative.  this is "
 							+ "on top of the time (dis)utility.");
 			map.put(MONETARY_DISTANCE_RATE, MONETARY_DISTANCE_RATE_CMT);
 			map.put(CONSTANT, "[utils] alternative-specific constant.");

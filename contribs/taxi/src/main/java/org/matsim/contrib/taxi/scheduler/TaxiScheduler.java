@@ -43,7 +43,6 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiEmptyDriveTask;
@@ -60,7 +59,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
-import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 public class TaxiScheduler implements TaxiScheduleInquiry {
@@ -70,11 +68,9 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	private final TravelTime travelTime;
 	private final LeastCostPathCalculator router;
 
-	@Inject
 	public TaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER) TravelDisutility travelDisutility) {
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility) {
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
 		this.timer = timer;
@@ -333,7 +329,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		TaxiPickupTask pickupStayTask = (TaxiPickupTask)Schedules.getLastTask(schedule);
 
 		// add DELIVERY after SERVE
-		TaxiRequest req = ((TaxiPickupTask)pickupStayTask).getRequest();
+		TaxiRequest req = pickupStayTask.getRequest();
 		Link reqFromLink = req.getFromLink();
 		Link reqToLink = req.getToLink();
 		double t3 = pickupStayTask.getEndTime();

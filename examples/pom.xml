@@ -6,6 +6,17 @@
 	<packaging>jar</packaging>
 	<version>0.11.0-SNAPSHOT</version>
 	<name>MATSim Examples</name>
+	<distributionManagement>
+		<repository>
+			<id>bintray</id>
+			<url>https://api.bintray.com/maven/matsim/matsim/matsim</url>
+		</repository>
+		<snapshotRepository>
+			<id>oss-jfrog-artifactory</id>
+			<name>artifactory-snapshots</name>
+			<url>http://oss.jfrog.org/oss-snapshot-local</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<build>
 		<resources>
 			<resource>
@@ -14,4 +25,12 @@
 			</resource>
 		</resources>
 	</build>
+
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
 </project>

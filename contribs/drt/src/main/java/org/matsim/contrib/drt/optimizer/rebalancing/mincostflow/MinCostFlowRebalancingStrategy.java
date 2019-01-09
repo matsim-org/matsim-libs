@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
@@ -53,7 +51,6 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 	private final MinCostRelocationCalculator minCostRelocationCalculator;
 	private final MinCostFlowRebalancingParams params;
 
-	@Inject
 	public MinCostFlowRebalancingStrategy(RebalancingTargetCalculator rebalancingTargetCalculator,
 			DrtZonalSystem zonalSystem, Fleet fleet, MinCostRelocationCalculator minCostRelocationCalculator,
 			DrtConfigGroup drtCfg) {

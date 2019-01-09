@@ -105,4 +105,8 @@ public class HbefaVehicleAttributes {
 		+ hbefaSizeClass + "; "
 		+ hbefaEmConcept;
 	}
+
+	public boolean isDetailed() {
+		return !hbefaEmConcept.equals("average") && !hbefaSizeClass.equals("average") && !hbefaEmConcept.equals("average");
+	}
 }

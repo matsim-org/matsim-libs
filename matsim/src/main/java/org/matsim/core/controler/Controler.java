@@ -44,10 +44,9 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponents;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsModule;
-import org.matsim.core.mobsim.qsim.components.StandardQSimComponentsConfigurator;
+import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.TripRouter;
@@ -64,7 +63,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -73,7 +71,7 @@ import java.util.function.Consumer;
  *
  * @author mrieser
  */
-public final class Controler implements ControlerI, MatsimServices {
+public final class Controler implements ControlerI, MatsimServices, AllowsConfiguration{
 	// yyyy Design thoughts:
 	// * Seems to me that we should try to get everything here final.  Flexibility is provided by the ability to set or add factories.  If this is
 	// not sufficient, people should use AbstractController.  kai, jan'13
@@ -452,13 +450,14 @@ public final class Controler implements ControlerI, MatsimServices {
 			}
         });
 	}
-
-    public final void addOverridingModule(AbstractModule abstractModule) {
-        if (this.injectorCreated) {
-            throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
-        }
-        this.overrides = AbstractModule.override(Collections.singletonList(this.overrides), abstractModule);
-    }
+	@Override
+	public final Controler addOverridingModule( AbstractModule abstractModule ) {
+		if (this.injectorCreated) {
+			throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
+		}
+		this.overrides = AbstractModule.override(Collections.singletonList(this.overrides), abstractModule);
+		return this ;
+	}
 
     public final void setModules(AbstractModule... modules) {
         if (this.injectorCreated) {
@@ -467,32 +466,35 @@ public final class Controler implements ControlerI, MatsimServices {
         this.modules = Arrays.asList(modules);
     }
 
-    public final void addOverridingQSimModule(AbstractQSimModule qsimModule) {
-        if (this.injectorCreated) {
-            throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
-        }
-        
-    	overridingQSimModules.add(qsimModule);
+    @Override
+    public final Controler addOverridingQSimModule( AbstractQSimModule qsimModule ) {
+	    if (this.injectorCreated) {
+		    throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
+	    }
+	    overridingQSimModules.add(qsimModule);
+	    return this ;
     }
-    
-    public final void addQSimModule(AbstractQSimModule qsimModule) {
+    @Override
+    public final Controler addQSimModule(AbstractQSimModule qsimModule) {
     	this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				installQSimModule(qsimModule);
 			}
 		});
+    	return this ;
     }
-    
-    public final void configureQSimComponents(QSimComponentsConfigurator configurator) {
+    @Override
+    public final Controler configureQSimComponents(QSimComponentsConfigurator configurator) {
     	this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				QSimComponents components = new QSimComponents();
-				new StandardQSimComponentsConfigurator(config).configure(components);
+				QSimComponentsConfig components = new QSimComponentsConfig();
+				new StandardQSimComponentConfigurator(config).configure(components);
 				configurator.configure(components);
-				bind(QSimComponents.class).toInstance(components);
+				bind(QSimComponentsConfig.class).toInstance(components);
 			}
 		});
+    	return this ;
     }
 }

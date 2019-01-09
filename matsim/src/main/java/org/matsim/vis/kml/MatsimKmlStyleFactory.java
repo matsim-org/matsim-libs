@@ -20,16 +20,15 @@
 
 package org.matsim.vis.kml;
 
-import java.io.IOException;
-
-import org.matsim.core.gbl.MatsimResource;
-
 import net.opengis.kml.v_2_2_0.DocumentType;
 import net.opengis.kml.v_2_2_0.IconStyleType;
 import net.opengis.kml.v_2_2_0.LineStyleType;
 import net.opengis.kml.v_2_2_0.LinkType;
 import net.opengis.kml.v_2_2_0.ObjectFactory;
 import net.opengis.kml.v_2_2_0.StyleType;
+import org.matsim.core.gbl.MatsimResource;
+
+import java.io.IOException;
 
 /**
  * @author dgrether
@@ -43,12 +42,12 @@ public class MatsimKmlStyleFactory implements NetworkKmlStyleFactory {
 	 */
 	public static final String DEFAULTNODEICONRESOURCE = "icon18.png";
 
-	private static final Double ICONSCALE = Double.valueOf(0.5);
+	private static final Double ICONSCALE = 0.5;
 
 	public static final byte[] MATSIMRED = new byte[]{(byte) 255, (byte) 15, (byte) 15, (byte) 190};
 //	public static final Color MATSIMBLUE = new Color(190, 190, 80, 90);
 	private static final byte[] MATSIMGREY = new byte[]{(byte) 210, (byte) 70, (byte) 50, (byte) 50};
-	protected static final byte[] MATSIMWHITE = new byte[]{(byte) 230, (byte) 230, (byte) 230, (byte) 230};
+	private static final byte[] MATSIMWHITE = new byte[]{(byte) 230, (byte) 230, (byte) 230, (byte) 230};
 
 	
 	// these come from CountsSimComparisonKMLWriter:
@@ -110,7 +109,7 @@ public class MatsimKmlStyleFactory implements NetworkKmlStyleFactory {
 			this.defaultnetworklinkstyle.setIconStyle(iStyle);
 			LineStyleType lineStyle = kmlObjectFactory.createLineStyleType();
 			lineStyle.setColor(MatsimKmlStyleFactory.MATSIMGREY);
-			lineStyle.setWidth(Double.valueOf(12.0));
+			lineStyle.setWidth(12.0);
 			this.defaultnetworklinkstyle.setLineStyle(lineStyle);
 			this.document.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(this.defaultnetworklinkstyle));
 		}

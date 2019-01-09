@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 /**
@@ -75,5 +76,18 @@ public final class OneTaxiRequest implements PassengerRequest {
 	@Override
 	public MobsimPassengerAgent getPassenger() {
 		return passenger;
+	}
+
+	@Override
+	public void setRejected(boolean rejected) {
+		throw new UnsupportedOperationException();
+	}
+
+	static final class OneTaxiRequestCreator implements PassengerRequestCreator {
+		@Override
+		public OneTaxiRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+				double departureTime, double submissionTime) {
+			return new OneTaxiRequest(id, passenger, fromLink, toLink, departureTime, submissionTime);
+		}
 	}
 }

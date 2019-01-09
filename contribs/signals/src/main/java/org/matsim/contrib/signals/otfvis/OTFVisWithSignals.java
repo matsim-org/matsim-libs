@@ -22,28 +22,17 @@
 
 package org.matsim.contrib.signals.otfvis;
 
-import java.util.Collections;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.builder.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.controler.Injector;
-import org.matsim.core.controler.NewControlerModule;
-import org.matsim.core.controler.PrepareForSimUtils;
-import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.AgentTracker;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.lanes.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -54,30 +43,45 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 public class OTFVisWithSignals {
 
+	/**
+	 *
+	 *
+	 * @param scenario
+	 * @param startOtfvis
+	 */
 	public static void playScenario(final Scenario scenario, boolean startOtfvis){
-		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override(Collections.singleton(new AbstractModule() {
-			@Override
-			public void install() {
-				// defaults
-				install(new NewControlerModule());
-				install(new ControlerDefaultCoreListenersModule());
-				install(new ControlerDefaultsModule());
-				install(new ScenarioByInstanceModule(scenario));
-			}
-		}), new SignalsModule()));
-	
-		EventsManager events = injector.getInstance(EventsManager.class);
-		
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		
-		QSim qSim = (QSim) injector.getInstance(Mobsim.class);
 
-		if (startOtfvis) {
-			OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
-			OTFClientLiveWithSignals.run(scenario.getConfig(), server);
-		}
+		// yyyyyy The following does not work any more, since {@link SignalsModule} is no longer public.  See explanation there.
+		// 	It seems that all the material from SignalsModule could now move to the QSim level.  Once that is done, for the
+		// following a Controler level injector would no longer be necessary.  Until then, code in {@link
+		// LinkSpeedCalculatorIntegrationTest#testIntegration_Default()} shows a way to repair the following.  I don't know how to
+		// do it here since there is no test.  kai, nov'18
 
-		qSim.run();
+		throw new RuntimeException("see comment in method") ;
+
+//		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override(Collections.singleton(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				// defaults
+//				install(new NewControlerModule());
+//				install(new ControlerDefaultCoreListenersModule());
+//				install(new ControlerDefaultsModule());
+//				install(new ScenarioByInstanceModule(scenario));
+//			}
+//		}), new SignalsModule()));
+//
+//		EventsManager events = injector.getInstance(EventsManager.class);
+//
+//		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+//
+//		QSim qSim = (QSim) injector.getInstance(Mobsim.class);
+//
+//		if (startOtfvis) {
+//			OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
+//			OTFClientLiveWithSignals.run(scenario.getConfig(), server);
+//		}
+//
+//		qSim.run();
 	}
 
 	public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {

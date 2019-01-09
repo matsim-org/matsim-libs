@@ -23,13 +23,14 @@ import java.util.List;
 
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.util.*;
+import org.matsim.contrib.util.CSVLineBuilder;
+import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.*;
-import org.matsim.core.controler.listener.*;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.io.IOUtils;
-
-import com.google.inject.Inject;
 
 public class TaxiStatsDumper implements AfterMobsimListener, ShutdownListener {
 	private static final String[] HEADER = { "iter", null, //
@@ -43,13 +44,12 @@ public class TaxiStatsDumper implements AfterMobsimListener, ShutdownListener {
 	private final OutputDirectoryHierarchy controlerIO;
 	private final CompactCSVWriter multiDayWriter;
 
-	@Inject
 	public TaxiStatsDumper(Fleet fleet, TaxiConfigGroup taxiCfg, OutputDirectoryHierarchy controlerIO) {
 		this.fleet = fleet;
 		this.taxiCfg = taxiCfg;
 		this.controlerIO = controlerIO;
-		multiDayWriter = new CompactCSVWriter(
-				IOUtils.getBufferedWriter(controlerIO.getOutputFilename("taxi_daily_stats.txt")));
+		multiDayWriter = new CompactCSVWriter(IOUtils.getBufferedWriter(
+				controlerIO.getOutputFilename("taxi_daily_stats_" + taxiCfg.getMode() + ".txt")));
 		multiDayWriter.writeNext(HEADER);
 	}
 
@@ -86,8 +86,8 @@ public class TaxiStatsDumper implements AfterMobsimListener, ShutdownListener {
 	private void writeDetailedStats(List<TaxiStats> taxiStats, AfterMobsimEvent event) {
 		String prefix = controlerIO.getIterationFilename(event.getIteration(), "taxi_");
 
-		new TaxiStatsWriter(taxiStats).write(prefix + "stats.txt");
-		new TaxiHistogramsWriter(taxiStats).write(prefix + "histograms.txt");
+		new TaxiStatsWriter(taxiStats).write(prefix + "stats_" + taxiCfg.getMode() + ".txt");
+		new TaxiHistogramsWriter(taxiStats).write(prefix + "histograms_" + taxiCfg.getMode() + ".txt");
 	}
 
 	@Override

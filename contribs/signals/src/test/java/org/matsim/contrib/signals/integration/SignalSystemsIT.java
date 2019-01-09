@@ -19,12 +19,14 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.integration;
 
-import java.io.File;
-
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.signals.builder.SignalsModule;
-import org.matsim.contrib.signals.data.*;
+import org.matsim.contrib.signals.builder.Signals;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
+import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -34,6 +36,8 @@ import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+
+import java.io.File;
 
 
 /**
@@ -74,7 +78,8 @@ public class SignalSystemsIT {
 		// ---
 		
 		Controler c = new Controler(scenario);
-		c.addOverridingModule(new SignalsModule());
+//		c.addOverridingModule(new SignalsModule());
+		Signals.configure(c);
 		
 		c.getConfig().controler().setDumpDataAtEnd(false);
 
@@ -99,7 +104,7 @@ public class SignalSystemsIT {
 			Assert.assertEquals("different events files after iteration 0 ", EventsFileComparator.compare(inputDirectory + "0.events.xml.gz", iterationOutput + "0.events.xml.gz"), EventsFileComparator.Result.FILES_ARE_EQUAL);
 			
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
-			new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(c.getConfig().network().getInputFileURL(c.getConfig().getContext()).getFile());
+			new MatsimNetworkReader(expectedPopulation.getNetwork()).parse(c.getConfig().network().getInputFileURL(c.getConfig().getContext()));
 			new PopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "0.plans.xml.gz");
 			
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
@@ -166,7 +171,8 @@ public class SignalSystemsIT {
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		
 		Controler c = new Controler(scenario);
-		c.addOverridingModule(new SignalsModule());
+//		c.addOverridingModule(new SignalsModule());
+		Signals.configure( c );
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
 		c.getConfig().controler().setCreateGraphs(false);
 		c.getConfig().controler().setDumpDataAtEnd(false);

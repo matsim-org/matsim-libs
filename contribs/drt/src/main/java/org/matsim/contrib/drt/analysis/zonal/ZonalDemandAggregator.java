@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.drt.analysis.zonal;
 
@@ -26,20 +26,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.misc.Time;
 
 /**
  * @author jbischoff
- *
  */
 public class ZonalDemandAggregator implements PersonDepartureEventHandler {
 
@@ -49,11 +45,9 @@ public class ZonalDemandAggregator implements PersonDepartureEventHandler {
 	private final Map<Double, Map<String, MutableInt>> departures = new HashMap<>();
 	private final Map<Double, Map<String, MutableInt>> previousIterationDepartures = new HashMap<>();
 
-	@Inject
-	public ZonalDemandAggregator(EventsManager events, DrtZonalSystem zonalSystem, DvrpConfigGroup dvrpCfg,
-			DrtConfigGroup drtCfg) {
+	public ZonalDemandAggregator(EventsManager events, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
-		mode = dvrpCfg.getMode();
+		mode = drtCfg.getMode();
 		timeBinSize = drtCfg.getMinCostFlowRebalancing().getInterval();
 		events.addHandler(this);
 	}

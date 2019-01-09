@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -52,7 +53,7 @@ public class WorldConnectLocations {
 
 	private final void connectByFile(final ActivityFacilities facilities, final Network network, final String file, final Set<Id<ActivityFacility>> remainingFacilities) {
 		log.info("    connecting facilities with links via "+CONFIG_F2L_INPUTF2LFile+"="+file);
-		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+		try (BufferedReader br = IOUtils.getBufferedReader(file)) {
 			int lineCnt = 0;
 			String currLine;
 			br.readLine(); lineCnt++; // Skip header
@@ -85,7 +86,7 @@ public class WorldConnectLocations {
 
 	private final void writeF2LFile(final ActivityFacilities facilities, final String file) {
 		log.info("    writing f<-->l connections to  "+CONFIG_F2L_OUTPUTF2LFile+"="+file);
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+		try (BufferedWriter bw = IOUtils.getBufferedWriter(file)) {
 			bw.write("fid\tlid\n");
 			for (ActivityFacility f : facilities.getFacilities().values()) {
 				bw.write(f.getId().toString()+"\t"+f.getLinkId().toString()+"\n");

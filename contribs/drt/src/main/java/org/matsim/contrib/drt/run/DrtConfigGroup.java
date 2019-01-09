@@ -19,22 +19,26 @@
 
 package org.matsim.contrib.drt.run;
 
-import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
 
-public class DrtConfigGroup extends ReflectiveConfigGroup {
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
+import org.matsim.contrib.dvrp.run.Modal;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
+
+public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 
 	public static final String GROUP_NAME = "drt";
 
@@ -43,6 +47,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 		return (DrtConfigGroup)config.getModule(GROUP_NAME);
 	}
 
+	public static final String MODE = "mode";
+	static final String MODE_EXP = "Mode which will be handled by PassengerEngine and VrpOptimizer "
+			+ "(passengers'/customers' perspective)";
+
 	public static final String STOP_DURATION = "stopDuration";
 	static final String STOP_DURATION_EXP = "Bus stop duration.";
 
@@ -50,14 +58,16 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	static final String MAX_WAIT_TIME_EXP = "Max wait time for the bus to come (optimisation constraint).";
 
 	public static final String MAX_TRAVEL_TIME_ALPHA = "maxTravelTimeAlpha";
-	static final String MAX_TRAV_ALPHA_EXP = "Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "
-			+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
-			+ "Alpha should not be smaller than 1.";
+	static final String MAX_TRAV_ALPHA_EXP =
+			"Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "
+					+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
+					+ "Alpha should not be smaller than 1.";
 
 	public static final String MAX_TRAVEL_TIME_BETA = "maxTravelTimeBeta";
-	static final String MAX_TRAVEL_TIME_BETA_EXP = "Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. "
-			+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
-			+ "Beta should not be smaller than 0.";
+	static final String MAX_TRAVEL_TIME_BETA_EXP =
+			"Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. "
+					+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
+					+ "Beta should not be smaller than 0.";
 
 	public static final String REQUEST_REJECTION = "requestRejection";
 	static final String REQUEST_REJECTION_EXP = "If true, the max travel and wait times of a submitted request"
@@ -67,10 +77,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 			+ " it relatively less attractive). Penalisation of insertions can be customised by injecting a customised"
 			+ " InsertionCostCalculator.PenaltyCalculator";
 
-
 	public static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE = "changeStartLinkToLastLinkInSchedule";
-	static final String CHANGE_START_EXP = "If true, the startLink is changed to last link in the current schedule, so the taxi starts the next "
-			+ "day at the link where it stopped operating the day before. False by default.";
+	static final String CHANGE_START_EXP =
+			"If true, the startLink is changed to last link in the current schedule, so the taxi starts the next "
+					+ "day at the link where it stopped operating the day before. False by default.";
 
 	public static final String IDLE_VEHICLES_RETURN_TO_DEPOTS = "idleVehiclesReturnToDepots";
 	static final String IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP = "Idle vehicles return to the nearest of all start links. See: Vehicle.getStartLink()";
@@ -82,8 +92,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	static final String MAX_WALK_EXP = "Maximum desired walk distance (in meters) to next stop location in stopbased system. If no suitable stop is found in that range, the search radius will be extended in steps of maxWalkDistance until a stop is found.";
 
 	public static final String ESTIMATED_DRT_SPEED = "estimatedDrtSpeed";
-	static final String ESTIMATED_DRT_SPEED_EXP = "Beeline-speed estimate for DRT. Used in analysis, optimisation constraints "
-			+ "and in plans file, [m/s]. The default value is 25 km/h";
+	static final String ESTIMATED_DRT_SPEED_EXP =
+			"Beeline-speed estimate for DRT. Used in analysis, optimisation constraints "
+					+ "and in plans file, [m/s]. The default value is 25 km/h";
 
 	public static final String ESTIMATED_BEELINE_DISTANCE_FACTOR = "estimatedBeelineDistanceFactor";
 	static final String ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP = "Beeline distance factor for DRT. Used in analyis and in plans file. The default value is 1.3.";
@@ -92,19 +103,24 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	static final String VEH_FILE_EXP = "An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd";
 
 	public static final String TRANSIT_STOP_FILE = "transitStopFile";
-	static final String TRANSIT_STOP_FILE_EXP = "Stop locations file (transit schedule format, but without lines) for DRT stops. "
-			+ "Used only for the stopbased mode";
+	static final String TRANSIT_STOP_FILE_EXP =
+			"Stop locations file (transit schedule format, but without lines) for DRT stops. "
+					+ "Used only for the stopbased mode";
 
 	public static final String PLOT_CUST_STATS = "writeDetailedCustomerStats";
-	static final String CUST_STATS_EXP = "Writes out detailed DRT customer stats in each iteration. True by default.";
+	static final String PLOT_CUST_STATS_EXP = "Writes out detailed DRT customer stats in each iteration. True by default.";
 
 	public static final String PRINT_WARNINGS = "plotDetailedWarnings";
-	static final String PRINT_WARNINGS_EXP = "Prints detailed warnings for DRT customers that cannot be served or routed. Default is false.";
+	static final String PRINT_WARNINGS_EXP = "Prints detailed warnings for DRT customers that cannot be served or routed. Default is true.";
 
 	public static final String NUMBER_OF_THREADS = "numberOfThreads";
-	static final String NUMBER_OF_THREADS_EXP = "Number of threads used for parallel evaluation of request insertion into existing schedules."
-			+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
-			+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
+	static final String NUMBER_OF_THREADS_EXP =
+			"Number of threads used for parallel evaluation of request insertion into existing schedules."
+					+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
+					+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
+
+	@NotBlank
+	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
 	@PositiveOrZero
 	private double stopDuration = Double.NaN;// seconds
@@ -164,13 +180,14 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
+		map.put(MODE, MODE_EXP);
 		map.put(STOP_DURATION, STOP_DURATION_EXP);
 		map.put(MAX_WAIT_TIME, MAX_WAIT_TIME_EXP);
 		map.put(MAX_TRAVEL_TIME_ALPHA, MAX_TRAV_ALPHA_EXP);
 		map.put(MAX_TRAVEL_TIME_BETA, MAX_TRAVEL_TIME_BETA_EXP);
 		map.put(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE, CHANGE_START_EXP);
 		map.put(VEHICLES_FILE, VEH_FILE_EXP);
-		map.put(PLOT_CUST_STATS, CUST_STATS_EXP);
+		map.put(PLOT_CUST_STATS, PLOT_CUST_STATS_EXP);
 		map.put(IDLE_VEHICLES_RETURN_TO_DEPOTS, IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP);
 		map.put(OPERATIONAL_SCHEME, OP_SCHEME_EXP);
 		map.put(MAX_WALK_DISTANCE, MAX_WALK_EXP);
@@ -184,6 +201,23 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
+	 * @return {@value #MODE_EXP}
+	 */
+	@Override
+	@StringGetter(MODE)
+	public String getMode() {
+		return mode;
+	}
+
+	/**
+	 * @param mode {@value #MODE_EXP}
+	 */
+	@StringSetter(MODE)
+	public void setMode(String mode) {
+		this.mode = mode;
+	}
+
+	/**
 	 * @return -- {@value #STOP_DURATION_EXP}
 	 */
 	@StringGetter(STOP_DURATION)
@@ -192,8 +226,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param --
-	 *            {@value #STOP_DURATION_EXP}
+	 * @param -- {@value #STOP_DURATION_EXP}
 	 */
 	@StringSetter(STOP_DURATION)
 	public void setStopDuration(double stopDuration) {
@@ -209,8 +242,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param --
-	 *            {@value #MAX_WAIT_TIME_EXP}
+	 * @param -- {@value #MAX_WAIT_TIME_EXP}
 	 */
 	@StringSetter(MAX_WAIT_TIME)
 	public void setMaxWaitTime(double maxWaitTime) {
@@ -226,8 +258,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param maxTravelTimeAlpha
-	 *            {@value #MAX_TRAV_ALPHA_EXP}
+	 * @param maxTravelTimeAlpha {@value #MAX_TRAV_ALPHA_EXP}
 	 */
 	@StringSetter(MAX_TRAVEL_TIME_ALPHA)
 	public void setMaxTravelTimeAlpha(double maxTravelTimeAlpha) {
@@ -243,8 +274,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param maxTravelTimeBeta
-	 *            -- {@value #MAX_TRAVEL_TIME_BETA_EXP}
+	 * @param maxTravelTimeBeta -- {@value #MAX_TRAVEL_TIME_BETA_EXP}
 	 */
 	@StringSetter(MAX_TRAVEL_TIME_BETA)
 	public void setMaxTravelTimeBeta(double maxTravelTimeBeta) {
@@ -260,8 +290,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param requestRejection
-	 *            -- {@value #REQUEST_REJECTION_EXP}
+	 * @param requestRejection -- {@value #REQUEST_REJECTION_EXP}
 	 */
 	@StringSetter(REQUEST_REJECTION)
 	public void setRequestRejection(boolean requestRejection) {
@@ -277,8 +306,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param changeStartLinkToLastLinkInSchedule
-	 *            -- {@value #CHANGE_START_EXP}
+	 * @param changeStartLinkToLastLinkInSchedule -- {@value #CHANGE_START_EXP}
 	 */
 	@StringSetter(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE)
 	public void setChangeStartLinkToLastLinkInSchedule(boolean changeStartLinkToLastLinkInSchedule) {
@@ -294,8 +322,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param vehiclesFile
-	 *            -- {@value #VEH_FILE_EXP}
+	 * @param vehiclesFile -- {@value #VEH_FILE_EXP}
 	 */
 	@StringSetter(VEHICLES_FILE)
 	public void setVehiclesFile(String vehiclesFile) {
@@ -318,8 +345,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param idleVehiclesReturnToDepots
-	 *            -- {@value #IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP}
+	 * @param idleVehiclesReturnToDepots -- {@value #IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP}
 	 */
 	@StringSetter(IDLE_VEHICLES_RETURN_TO_DEPOTS)
 	public void setIdleVehiclesReturnToDepots(boolean idleVehiclesReturnToDepots) {
@@ -335,8 +361,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param operationalScheme
-	 *            -- {@value #OP_SCHEME_EXP}
+	 * @param operationalScheme -- {@value #OP_SCHEME_EXP}
 	 */
 	@StringSetter(OPERATIONAL_SCHEME)
 	public void setOperationalScheme(String operationalScheme) {
@@ -384,7 +409,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * 
 	 * @return -- {@value #ESTIMATED_DRT_SPEED_EXP}
 	 */
 	@StringGetter(ESTIMATED_DRT_SPEED)
@@ -417,7 +441,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return -- {@value #CUST_STATS_EXP}
+	 * @return -- {@value #PLOT_CUST_STATS_EXP}
 	 */
 	@StringGetter(PLOT_CUST_STATS)
 	public boolean isPlotDetailedCustomerStats() {
@@ -425,8 +449,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param --
-	 *            {@value #CUST_STATS_EXP}
+	 * @param -- {@value #PLOT_CUST_STATS_EXP}
 	 */
 	@StringSetter(PLOT_CUST_STATS)
 	public void setPlotDetailedCustomerStats(boolean plotDetailedCustomerStats) {
@@ -458,8 +481,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param --
-	 *            {@value #PRINT_WARNINGS_EXP}
+	 * @param -- {@value #PRINT_WARNINGS_EXP}
 	 */
 	@StringSetter(PRINT_WARNINGS)
 	public void setPrintDetailedWarnings(boolean printDetailedWarnings) {
@@ -467,9 +489,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * 
 	 * @return 'minCostFlowRebalancing' parameter set defined in the DRT config or null if the parameters were not
-	 *         specified
+	 * specified
 	 */
 	@Valid
 	public MinCostFlowRebalancingParams getMinCostFlowRebalancing() {

@@ -41,7 +41,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 
 /**
@@ -62,8 +61,8 @@ public final class AccessibilityCalculator {
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 	
 
-	public AccessibilityCalculator(Scenario scenario, ActivityFacilities measuringPoints) {
-		this.network = scenario.getNetwork();
+	public AccessibilityCalculator(Scenario scenario, ActivityFacilities measuringPoints, Network network) {
+		this.network = network;
 		this.measuringPoints = measuringPoints;
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 		this.cnScoringGroup = scenario.getConfig().planCalcScore();
@@ -204,11 +203,11 @@ public final class AccessibilityCalculator {
 				// "impact". Leave it as is for the time being as urbanSim code uses this, dz, july'17
 				opportunityClusterMap.put(nearestNode.getId(), jco); 
 			}
-			if (acg.getUseOpportunityWeights()) {
-				if (opportunity.getCustomAttributes().get("weight") == null) {
-					throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key \"weight\"");
+			if (acg.isUseOpportunityWeights()) {
+				if (opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT) == null) {
+					throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key " + AccessibilityAttributes.WEIGHT + ".");
 				} else {
-					double weight = (double) opportunity.getCustomAttributes().get("weight");
+					double weight = Double.parseDouble(opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT).toString());
 					jco.addObject(opportunity.getId(), expVjk * Math.pow(weight, acg.getWeightExponent()));
 				}
 			} else {

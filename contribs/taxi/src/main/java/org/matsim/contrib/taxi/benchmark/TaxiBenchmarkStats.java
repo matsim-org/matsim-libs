@@ -3,14 +3,16 @@ package org.matsim.contrib.taxi.benchmark;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
-import org.matsim.contrib.taxi.util.stats.*;
-import org.matsim.contrib.util.*;
+import org.matsim.contrib.taxi.util.stats.TaxiStats;
+import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculator;
+import org.matsim.contrib.util.CSVLineBuilder;
+import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.*;
-import org.matsim.core.controler.listener.*;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.io.IOUtils;
-
-import com.google.inject.Inject;
 
 public class TaxiBenchmarkStats implements AfterMobsimListener, ShutdownListener {
 	public static final String[] HEADER = { "n", "m", //
@@ -31,7 +33,6 @@ public class TaxiBenchmarkStats implements AfterMobsimListener, ShutdownListener
 	private final SummaryStatistics emptyDriveRatio = new SummaryStatistics();
 	private final SummaryStatistics stayRatio = new SummaryStatistics();
 
-	@Inject
 	public TaxiBenchmarkStats(Fleet fleet, SubmittedTaxiRequestsCollector requestCollector,
 			OutputDirectoryHierarchy controlerIO) {
 		this.fleet = fleet;

@@ -48,7 +48,7 @@ public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 	/**
 	 * Initializes an instance mutating all activities in a plan
 	 * @param mutationRange
-	 * @param affectingDuration TODO
+	 * @param affectingDuration
 	 * @param random
 	 */
 	public PlanMutateTimeAllocationSimplified(final double mutationRange, boolean affectingDuration, final Random random) {
@@ -57,7 +57,7 @@ public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 	/**
 	 * Initializes an instance mutating all non-stage activities in a plan
 	 * @param mutationRange
-	 * @param affectingDuration TODO
+	 * @param affectingDuration
 	 * @param random
 	 */
 	public PlanMutateTimeAllocationSimplified(final StageActivityTypes blackList, final double mutationRange, boolean affectingDuration, final Random random) {
@@ -71,11 +71,11 @@ public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 	public void run(final Plan plan) {
 		for ( Activity act : TripStructureUtils.getActivities( plan , blackList ) ) {
 			// this is deliberately simplistic.  Cleanup up of the time information should be done somewhere else.
-			if (act.getEndTime() != Time.UNDEFINED_TIME) {
+			if ( !Time.isUndefinedTime( act.getEndTime() ) ) {
 				act.setEndTime(mutateTime(act.getEndTime()));
 			}
 			if ( affectingDuration ) {
-				if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
+				if ( !Time.isUndefinedTime( act.getMaximumDuration() ) ) {
 					act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
 				}
 			}
