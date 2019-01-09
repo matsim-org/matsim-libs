@@ -20,15 +20,10 @@
 
 package org.matsim.core.scoring;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicReference;
-
+import com.google.inject.Inject;
+import gnu.trove.TDoubleCollection;
+import gnu.trove.iterator.TDoubleIterator;
+import gnu.trove.list.array.TDoubleArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -41,7 +36,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
@@ -50,23 +44,23 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.pt.PtConstants;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
 
-import gnu.trove.TDoubleCollection;
-import gnu.trove.iterator.TDoubleIterator;
-import gnu.trove.list.array.TDoubleArrayList;
-
-import static org.matsim.core.router.TripStructureUtils.*;
+import static org.matsim.core.router.TripStructureUtils.Trip;
 
 /**
  * This class helps EventsToScore by keeping ScoringFunctions for the entire Population - one per Person -, and dispatching Activities
@@ -128,14 +122,14 @@ import static org.matsim.core.router.TripStructureUtils.*;
 		eventsToActivities.addActivityHandler(this);
 		eventsToLegs.addLegHandler(this);
 //		if ( passLinkEventsToPerson ) {
-			eventsManager.addHandler(vehicles2Drivers);
+			eventsManager.addHandler(this.vehicles2Drivers);
 //		}
 //		stageActivityTypes = tripRouter.getStageActivityTypes() ;
 //		stageActivityTypes = new StageActivityTypesImpl( new String [] {PtConstants.TRANSIT_ACTIVITY_TYPE} ) ;
-		if ( tripRouter!=null ) {
-			stageActivityTypes = tripRouter.getStageActivityTypes() ;
+		if (this.tripRouter !=null ) {
+			this.stageActivityTypes = this.tripRouter.getStageActivityTypes() ;
 		} else {
-			stageActivityTypes = new StageActivityTypes() {
+			this.stageActivityTypes = new StageActivityTypes() {
 				@Override public boolean isStageActivity( final String activityType ) {
 					if ( activityType.contains( "_interaction" ) ) {
 						return true;
@@ -149,11 +143,11 @@ import static org.matsim.core.router.TripStructureUtils.*;
 	}
 
 	private void init() {
-		for (Person person : population.getPersons().values()) {
-			ScoringFunction data = scoringFunctionFactory.createNewScoringFunction(person);
+		for (Person person : this.population.getPersons().values()) {
+			ScoringFunction data = this.scoringFunctionFactory.createNewScoringFunction(person);
 			this.agentScorers.put(person.getId(), data);
 			this.partialScores.put(person.getId(), new TDoubleArrayList());
-			tripRecords.put(person.getId(), PopulationUtils.createPlan());
+			this.tripRecords.put(person.getId(), PopulationUtils.createPlan());
 		}
 	}
 	
@@ -184,15 +178,15 @@ import static org.matsim.core.router.TripStructureUtils.*;
 //		if ( passLinkEventsToPerson ) {
 			// Establish and end connection between driver and vehicle
 			if (o instanceof VehicleEntersTrafficEvent) {
-				vehicles2Drivers.handleEvent((VehicleEntersTrafficEvent) o);
+				this.vehicles2Drivers.handleEvent((VehicleEntersTrafficEvent) o);
 			}
 			if (o instanceof VehicleLeavesTrafficEvent) {
-				vehicles2Drivers.handleEvent((VehicleLeavesTrafficEvent) o);
+				this.vehicles2Drivers.handleEvent((VehicleLeavesTrafficEvent) o);
 			}
 			// Pass LinkEnterEvent to person scoring, required e.g. for bicycle where link attributes are observed in scoring
 			if ( o instanceof LinkEnterEvent ) {
 				Id<Vehicle> vehicleId = ((LinkEnterEvent)o).getVehicleId() ;
-				Id<Person> driverId = vehicles2Drivers.getDriverOfVehicle(vehicleId) ;
+				Id<Person> driverId = this.vehicles2Drivers.getDriverOfVehicle(vehicleId) ;
 				ScoringFunction scoringFunction = getScoringFunctionForAgent( driverId );
 				// (this will NOT do the scoring function lookup twice since LinkEnterEvent is not an instance of HasPersonId.  kai, mar'17)
 				if (scoringFunction != null) {
@@ -216,17 +210,12 @@ import static org.matsim.core.router.TripStructureUtils.*;
 		ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(agentId);
 		if (scoringFunction != null) {
 			scoringFunction.handleLeg(leg);
-			TDoubleCollection partialScoresForAgent = partialScores.get(agentId);
+			TDoubleCollection partialScoresForAgent = this.partialScores.get(agentId);
 			partialScoresForAgent.add(scoringFunction.getScore());
 		}
-		Plan plan = tripRecords.get( agentId ) ; // as container for trip
+		Plan plan = this.tripRecords.get( agentId ) ; // as container for trip
 		if ( plan!=null ) {
 			plan.addLeg( leg );
-//			log.warn( "" );
-//			log.warn( "just added leg to tripRecords; plan=" + plan );
-//			for ( PlanElement pe : plan.getPlanElements() ) {
-//				log.warn( pe.toString() );
-//			}
 		}
 	}
 
@@ -237,25 +226,20 @@ import static org.matsim.core.router.TripStructureUtils.*;
 		ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(agentId);
 		if (scoringFunction != null) {
 			scoringFunction.handleActivity(activity);
-			TDoubleCollection partialScoresForAgent = partialScores.get(agentId);
+			TDoubleCollection partialScoresForAgent = this.partialScores.get(agentId);
 			partialScoresForAgent.add(scoringFunction.getScore());
 		}
 		
-		Plan plan = tripRecords.get( agentId ); // as container for trip
+		Plan plan = this.tripRecords.get( agentId ); // as container for trip
 		if ( plan!= null ) {
 			if ( !plan.getPlanElements().isEmpty() ) {
 				// plan != null, meaning we already have pre-existing material
-				if ( stageActivityTypes.isStageActivity( activity.getType() ) ) {
+				if (this.stageActivityTypes.isStageActivity( activity.getType() ) ) {
 					// we are at a stage activity.  Don't do anything ; activity will be added later
 				} else {
 					// we are at a real activity, which is not the first one we see for this agent.  output the trip ...
 					plan.addActivity( activity );
-//					log.warn( "" );
-//					log.warn( "just added FINAL activity to tripRecords; plan=" + plan );
-//					for ( PlanElement pe : plan.getPlanElements() ) {
-//						log.warn( pe.toString() );
-//					}
-					final List<Trip> trips = TripStructureUtils.getTrips( plan, stageActivityTypes );
+					final List<Trip> trips = TripStructureUtils.getTrips( plan, this.stageActivityTypes);
 					// yyyyyy should in principle only return one trip.  There are, however, situations where
 					// it returns two trips, in particular in conjunction with the minibus raptor.  Possibly
 					// something that has to do with not alternativing between acts and legs.
@@ -266,7 +250,6 @@ import static org.matsim.core.router.TripStructureUtils.*;
 					
 					for ( Trip trip : trips ) {
 						if ( trip != null ) {
-							// (yyyy lots of hedging ...)
 							scoringFunction.handleTrip( trip );
 						}
 					}
@@ -276,11 +259,6 @@ import static org.matsim.core.router.TripStructureUtils.*;
 				}
 			}
 			plan.addActivity( activity );
-//			log.warn( "" );
-//			log.warn( "just added activity to tripRecords; plan=" + plan );
-//			for ( PlanElement pe : plan.getPlanElements() ) {
-//				log.warn( pe.toString() );
-//			}
 		}
 	}
 
@@ -300,7 +278,7 @@ import static org.matsim.core.router.TripStructureUtils.*;
 
 	public void finishScoringFunctions() {
 		// Rethrow an exception in a scoring function (user code) if there was one.
-		Throwable throwable = exception.get();
+		Throwable throwable = this.exception.get();
 		if (throwable != null) {
 			if (throwable instanceof RuntimeException) {
 				throw ((RuntimeException) throwable);
