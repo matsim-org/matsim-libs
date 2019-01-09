@@ -23,7 +23,7 @@ public class CompanyAgentImpl implements CompanyAgent {
 			
 			//Depending on the company strategy
 			//here the company just provides the closest vehicle in the search radius
-			CSVehicle vehicle = vehiclesContainer.findClosestAvailableVehicle(locationLink, vehicleType, 1000.0);
+			CSVehicle vehicle = vehiclesContainer.findClosestAvailableVehicle(locationLink, vehicleType, 500.0);
 			
 			return vehicle;
 		}

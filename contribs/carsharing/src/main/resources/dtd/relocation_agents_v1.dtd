@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- ============================================================ -->
+
+
+<!ELEMENT relocationAgentBases (company)*>
+
+<!ELEMENT company (relocationAgentBase)*>
+<!ATTLIST company   name    CDATA #REQUIRED>
+
+<!ELEMENT relocationAgentBase EMPTY>
+<!ATTLIST relocationAgentBase	id 		CDATA #REQUIRED
+								number	CDATA #REQUIRED
+								x		CDATA #REQUIRED
+                				y   	CDATA #REQUIRED>
+
+<!-- ============================================================ -->
+
