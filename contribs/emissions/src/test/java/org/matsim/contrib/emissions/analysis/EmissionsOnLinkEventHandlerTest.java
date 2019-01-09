@@ -34,10 +34,10 @@ public class EmissionsOnLinkEventHandlerTest {
 
         handler.handleEvent(event);
 
-        TimeBinMap.TimeBin<Id<Link>, LinkEmissions> timeBin = handler.getTimeBins().getTimeBin(time);
+        TimeBinMap.TimeBin<Map<Id<Link>, LinkEmissions>> timeBin = handler.getTimeBins().getTimeBin(time);
 
-        assertTrue(timeBin.containsKey(linkId));
-        emissions.forEach((key, value) -> assertEquals(value, timeBin.get(linkId).getEmission(key), 0.0001));
+        assertTrue(timeBin.hasValue());
+        emissions.forEach((key, value) -> assertEquals(value, timeBin.getValue().get(linkId).getEmission(key), 0.0001));
     }
 
     @Test
@@ -56,10 +56,10 @@ public class EmissionsOnLinkEventHandlerTest {
 
         handler.handleEvent(event);
 
-        TimeBinMap.TimeBin<Id<Link>, LinkEmissions> timeBin = handler.getTimeBins().getTimeBin(time);
+        TimeBinMap.TimeBin<Map<Id<Link>, LinkEmissions>> timeBin = handler.getTimeBins().getTimeBin(time);
 
-        assertTrue(timeBin.containsKey(linkId));
-        emissions.forEach((key, value) -> assertEquals(value, timeBin.get(linkId).getEmission(key), 0.0001));
+        assertTrue(timeBin.hasValue());
+        emissions.forEach((key, value) -> assertEquals(value, timeBin.getValue().get(linkId).getEmission(key), 0.0001));
     }
 
     @Test
@@ -78,16 +78,16 @@ public class EmissionsOnLinkEventHandlerTest {
         secondTimestep.forEach(handler::handleEvent);
         thirdTimestep.forEach(handler::handleEvent);
 
-        TimeBinMap<Id<Link>, LinkEmissions> summedEmissions = handler.getTimeBins();
+        TimeBinMap<Map<Id<Link>, LinkEmissions>> summedEmissions = handler.getTimeBins();
 
         assertEquals(2, summedEmissions.getAllTimeBins().size());
-        TimeBinMap.TimeBin<Id<Link>, LinkEmissions> firstBin = summedEmissions.getTimeBin(18);
-        assertTrue(firstBin.containsKey(linkId));
-        assertEquals(numberOfEvents * emissionValue * 2, firstBin.get(linkId).getEmission(Pollutant.NO2), 0.001);
+        TimeBinMap.TimeBin<Map<Id<Link>, LinkEmissions>> firstBin = summedEmissions.getTimeBin(18);
+        assertTrue(firstBin.hasValue());
+        assertEquals(numberOfEvents * emissionValue * 2, firstBin.getValue().get(linkId).getEmission(Pollutant.NO2), 0.001);
 
-        TimeBinMap.TimeBin<Id<Link>, LinkEmissions> secondBin = summedEmissions.getTimeBin(20);
-        assertTrue(secondBin.containsKey(linkId));
-        assertEquals(numberOfEvents * emissionValue, secondBin.get(linkId).getEmission(Pollutant.HC));
+        TimeBinMap.TimeBin<Map<Id<Link>, LinkEmissions>> secondBin = summedEmissions.getTimeBin(20);
+        assertTrue(secondBin.hasValue());
+        assertEquals(numberOfEvents * emissionValue, secondBin.getValue().get(linkId).getEmission(Pollutant.HC));
     }
 
     private Collection<WarmEmissionEvent> createWarmEmissionEvents(Id<Link> linkId, double time, double emissionValue, int numberOfEvents) {

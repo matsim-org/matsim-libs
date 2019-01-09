@@ -4,9 +4,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TimeBinMap<K, V> {
+public class TimeBinMap<T> {
 
-    private final Map<Integer, TimeBin<K, V>> bins = new HashMap<>();
+    private final Map<Integer, TimeBin<T>> bins = new HashMap<>();
     private final double binSize;
     private final double startTime;
     private double endTimeOfLastBucket;
@@ -20,7 +20,7 @@ public class TimeBinMap<K, V> {
         this.startTime = startTimeOfFirstBin;
     }
 
-    public TimeBin<K, V> getTimeBin(double forTime) {
+    public TimeBin<T> getTimeBin(double forTime) {
 
         if (forTime < startTime)
             throw new IllegalArgumentException("only times greater than startTime of: " + startTime + " allowed");
@@ -37,7 +37,7 @@ public class TimeBinMap<K, V> {
         return endTimeOfLastBucket;
     }
 
-    public Collection<TimeBin<K, V>> getAllTimeBins() {
+    public Collection<TimeBin<T>> getAllTimeBins() {
         return bins.values();
     }
 
@@ -51,10 +51,10 @@ public class TimeBinMap<K, V> {
             endTimeOfLastBucket = startTime + binSize + newBinIndex * binSize;
     }
 
-    public static class TimeBin<K, V> {
+    public static class TimeBin<T> {
 
         private double startTime;
-        private Map<K, V> values = new HashMap<>();
+        private T value;
 
         private TimeBin(double startTime) {
             this.startTime = startTime;
@@ -64,16 +64,16 @@ public class TimeBinMap<K, V> {
             return startTime;
         }
 
-        public V get(K key) {
-            return values.get(key);
+        public T getValue() {
+            return value;
         }
 
-        public V put(K key, V value) {
-            return values.put(key, value);
+        public void setValue(T value) {
+            this.value = value;
         }
 
-        public boolean containsKey(K key) {
-            return values.containsKey(key);
+        public boolean hasValue() {
+            return this.value != null;
         }
     }
 }

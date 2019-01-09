@@ -9,19 +9,20 @@ import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.contrib.emissions.types.Pollutant;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
 
-    private final TimeBinMap<Id<Link>, LinkEmissions> timeBins;
+    private final TimeBinMap<Map<Id<Link>, LinkEmissions>> timeBins;
 
     public EmissionsOnLinkEventHandler(double timeBinSizeInSeconds) {
 
         this.timeBins = new TimeBinMap<>(timeBinSizeInSeconds);
     }
 
-    public TimeBinMap<Id<Link>, LinkEmissions> getTimeBins() {
+    public TimeBinMap<Map<Id<Link>, LinkEmissions>> getTimeBins() {
         return timeBins;
     }
 
@@ -44,14 +45,16 @@ public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, Co
 
     private void handleEmissionEvent(double time, Id<Link> linkId, Map<String, Double> emissions) {
 
-        TimeBinMap.TimeBin<Id<Link>, LinkEmissions> currentBin = timeBins.getTimeBin(time);
+        TimeBinMap.TimeBin<Map<Id<Link>, LinkEmissions>> currentBin = timeBins.getTimeBin(time);
 
         Map<Pollutant, Double> typedEmissions = emissions.entrySet().stream()
                 .collect(Collectors.toMap(entry -> Pollutant.valueOf(entry.getKey()), Map.Entry::getValue));
 
-        if (!currentBin.containsKey(linkId))
-            currentBin.put(linkId, new LinkEmissions(linkId, typedEmissions));
+        if (!currentBin.hasValue())
+            currentBin.setValue(new HashMap<>());
+        if (!currentBin.getValue().containsKey(linkId))
+            currentBin.getValue().put(linkId, new LinkEmissions(linkId, typedEmissions));
         else
-            currentBin.get(linkId).addEmissions(typedEmissions);
+            currentBin.getValue().get(linkId).addEmissions(typedEmissions);
     }
 }
