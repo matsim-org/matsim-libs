@@ -40,7 +40,6 @@ import org.matsim.contrib.carsharing.relocation.events.handlers.DemandDistributi
 import org.matsim.contrib.carsharing.relocation.infrastructure.AverageDemandRelocationListener;
 import org.matsim.contrib.carsharing.relocation.listeners.CarSharingDemandTracker;
 import org.matsim.contrib.carsharing.relocation.listeners.KmlWriterListener;
-import org.matsim.contrib.carsharing.relocation.qsim.RelocationQSimModule;
 import org.matsim.contrib.carsharing.relocation.replanning.RelocationPlanStrategyModule;
 import org.matsim.contrib.carsharing.relocation.utils.ChooseTheCompanyPriceBased;
 import org.matsim.contrib.carsharing.relocation.utils.FFVehiclesRentalsWriterListener;
@@ -66,7 +65,7 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 public class RelocationExample {
-	public static void main(final String[] args) {
+	/*public static void main(final String[] args) {
 		Logger.getLogger("org.matsim.core.controler.Injector").setLevel(Level.OFF);
 
 		final Config config = ConfigUtils.loadConfig(args[0]);
@@ -199,5 +198,5 @@ public class RelocationExample {
 
 		// === routing moduels for carsharing trips ===
 		controler.addOverridingModule(CarsharingUtils.createRoutingModule());
-	}
+	}*/
 }

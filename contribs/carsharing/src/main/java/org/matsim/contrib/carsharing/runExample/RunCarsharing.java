@@ -32,7 +32,7 @@ import org.matsim.contrib.carsharing.models.ChooseVehicleType;
 import org.matsim.contrib.carsharing.models.ChooseVehicleTypeExample;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModelExample;
-import org.matsim.contrib.carsharing.qsim.CarsharingQSimModule;
+import org.matsim.contrib.carsharing.qsim.CarSharingQSimModule;
 import org.matsim.contrib.carsharing.readers.CarsharingXmlReaderNew;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
@@ -123,8 +123,9 @@ public class RunCarsharing {
 		final RouteCarsharingTrip routeCarsharingTrip = new RouteCarsharingTripImpl();
 		final VehicleChoiceAgent vehicleChoiceAgent = new VehicleChoiceAgentImpl();
 		// ===adding carsharing objects on supply and demand infrastructure ===
-		controler.addOverridingModule(new CarsharingQSimModule());
+		controler.addOverridingQSimModule(new CarSharingQSimModule());
 		controler.addOverridingModule(new DvrpTravelTimeModule());
+		controler.configureQSimComponents(CarSharingQSimModule::configureComponents);
 
 		controler.addOverridingModule(new AbstractModule() {
 
