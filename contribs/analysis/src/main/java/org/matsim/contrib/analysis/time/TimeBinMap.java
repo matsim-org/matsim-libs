@@ -1,5 +1,6 @@
 package org.matsim.contrib.analysis.time;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,6 +9,7 @@ public class TimeBinMap<K, V> {
     private final Map<Integer, TimeBin<K, V>> bins = new HashMap<>();
     private final double binSize;
     private final double startTime;
+    private double endTimeOfLastBucket;
 
     public TimeBinMap(final double timeBinSize) {
         this(timeBinSize, 0);
@@ -24,13 +26,29 @@ public class TimeBinMap<K, V> {
             throw new IllegalArgumentException("only times greater than startTime of: " + startTime + " allowed");
 
         int binIndex = (int) ((forTime - startTime) / binSize);
-        if (!bins.containsKey(binIndex))
+        if (!bins.containsKey(binIndex)) {
             bins.put(binIndex, new TimeBin<>(startTime + binIndex * binSize));
+            adjustEndTime(binIndex);
+        }
         return bins.get(binIndex);
+    }
+
+    public double getEndTimeOfLastBucket() {
+        return endTimeOfLastBucket;
+    }
+
+    public Collection<TimeBin<K, V>> getAllTimeBins() {
+        return bins.values();
     }
 
     public void clear() {
         bins.clear();
+    }
+
+    private void adjustEndTime(int newBinIndex) {
+
+        if (startTime + binSize + newBinIndex * binSize > endTimeOfLastBucket)
+            endTimeOfLastBucket = startTime + binSize + newBinIndex * binSize;
     }
 
     public static class TimeBin<K, V> {

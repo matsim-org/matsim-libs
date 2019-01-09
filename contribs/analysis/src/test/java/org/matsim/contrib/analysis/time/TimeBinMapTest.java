@@ -54,6 +54,32 @@ public class TimeBinMapTest {
     }
 
     @Test
+    public void getEndOfLastTimeBucket() {
+
+        TimeBinMap<String, String> map = new TimeBinMap<>(10);
+
+        map.getTimeBin(15);
+        map.getTimeBin(111);
+        map.getTimeBin(0);
+        map.getTimeBin(30);
+
+        assertEquals(120, map.getEndTimeOfLastBucket(), 0.0001);
+    }
+
+    @Test
+    public void getAllTimeBins() {
+
+        TimeBinMap<String, String> map = new TimeBinMap<>(10);
+
+        map.getTimeBin(15);
+        map.getTimeBin(111);
+        map.getTimeBin(0);
+        map.getTimeBin(30);
+
+        assertEquals(4, map.getAllTimeBins().size());
+    }
+
+    @Test
     public void timeBin_putEntry_testContains_retrieve() {
 
         final String testKey = "some-key";
