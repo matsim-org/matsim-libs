@@ -19,27 +19,33 @@
 
 package org.matsim.contrib.taxi.schedule.reconstruct;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
-import org.junit.*;
-import org.matsim.contrib.dvrp.data.*;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
-import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
-import org.matsim.core.config.*;
-import org.matsim.core.controler.*;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-
-import com.google.inject.Key;
 
 public class ScheduleReconstructionIT {
 	@Rule
@@ -73,9 +79,10 @@ public class ScheduleReconstructionIT {
 
 		ScheduleReconstructor scheduleReconstructor = controler.getInjector().getInstance(ScheduleReconstructor.class);
 
-		Fleet fleet = controler.getInjector().getInstance(Key.get(Fleet.class, Taxi.class));
+		String mode = TaxiConfigGroup.get(config).getMode();
+		Fleet fleet = controler.getInjector().getInstance(DvrpModes.key(Fleet.class, mode));
 		SubmittedTaxiRequestsCollector requestCollector = controler.getInjector()
-				.getInstance(SubmittedTaxiRequestsCollector.class);
+				.getInstance(DvrpModes.key(SubmittedTaxiRequestsCollector.class, mode));
 
 		Assert.assertNotEquals(fleet, scheduleReconstructor.fleet);
 

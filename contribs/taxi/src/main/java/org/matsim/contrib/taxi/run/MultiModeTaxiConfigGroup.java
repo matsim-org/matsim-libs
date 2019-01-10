@@ -22,6 +22,7 @@ package org.matsim.contrib.taxi.run;
 
 import java.util.Collection;
 
+import org.matsim.contrib.dvrp.run.MultiModal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -29,7 +30,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup {
+public class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements MultiModal<TaxiConfigGroup> {
 	public static final String GROUP_NAME = "multiModeTaxi";
 
 	@SuppressWarnings("deprecation")
@@ -49,8 +50,9 @@ public class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup {
 		throw new IllegalArgumentException(type);
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
-	public Collection<TaxiConfigGroup> getTaxiConfigGroups() {
+	public Collection<TaxiConfigGroup> getModalElements() {
 		return (Collection<TaxiConfigGroup>)getParameterSets(TaxiConfigGroup.GROUP_NAME);
 	}
 }

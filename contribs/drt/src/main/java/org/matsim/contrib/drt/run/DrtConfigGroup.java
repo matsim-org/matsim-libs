@@ -33,11 +33,12 @@ import javax.validation.constraints.PositiveOrZero;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
+import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-public class DrtConfigGroup extends ReflectiveConfigGroup {
+public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 
 	public static final String GROUP_NAME = "drt";
 
@@ -110,7 +111,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	static final String PLOT_CUST_STATS_EXP = "Writes out detailed DRT customer stats in each iteration. True by default.";
 
 	public static final String PRINT_WARNINGS = "plotDetailedWarnings";
-	static final String PRINT_WARNINGS_EXP = "Prints detailed warnings for DRT customers that cannot be served or routed. Default is false.";
+	static final String PRINT_WARNINGS_EXP = "Prints detailed warnings for DRT customers that cannot be served or routed. Default is true.";
 
 	public static final String NUMBER_OF_THREADS = "numberOfThreads";
 	static final String NUMBER_OF_THREADS_EXP =
@@ -120,7 +121,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
-	
+
 	@PositiveOrZero
 	private double stopDuration = Double.NaN;// seconds
 
@@ -202,6 +203,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	/**
 	 * @return {@value #MODE_EXP}
 	 */
+	@Override
 	@StringGetter(MODE)
 	public String getMode() {
 		return mode;
@@ -214,7 +216,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public void setMode(String mode) {
 		this.mode = mode;
 	}
-	
+
 	/**
 	 * @return -- {@value #STOP_DURATION_EXP}
 	 */

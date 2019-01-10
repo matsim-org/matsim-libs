@@ -20,52 +20,32 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
-import javax.inject.Provider;
-
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
+import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 
 import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
-public class VrpAgentSourceQSimModule extends AbstractQSimModule {
-	private final String mode;
+public class VrpAgentSourceQSimModule extends AbstractDvrpModeQSimModule {
 
 	public VrpAgentSourceQSimModule(String mode) {
-		this.mode = mode;
+		super(mode);
 	}
 
 	@Override
 	protected void configureQSim() {
-		bindNamedComponent(VrpAgentSource.class, mode).toProvider(new VrpAgentSourceProvider(mode)).asEagerSingleton();
-	}
+		addModalComponent(VrpAgentSource.class,
+				new ModalProviders.AbstractProvider<VrpAgentSource>(getMode()) {
+					@Inject
+					private QSim qSim;
 
-	public static class VrpAgentSourceProvider implements Provider<VrpAgentSource> {
-		private final String mode;
-
-		@Inject
-		private Injector injector;
-		@Inject
-		private QSim qSim;
-
-		public VrpAgentSourceProvider(String mode) {
-			this.mode = mode;
-		}
-
-		@Override
-		public VrpAgentSource get() {
-			Named modeNamed = Names.named(mode);
-			VrpAgentLogic.DynActionCreator actionCreator = injector.getInstance(
-					Key.get(VrpAgentLogic.DynActionCreator.class, modeNamed));
-			Fleet fleet = injector.getInstance(Key.get(Fleet.class, modeNamed));
-			VrpOptimizer optimizer = injector.getInstance(Key.get(VrpOptimizer.class, modeNamed));
-			return new VrpAgentSource(actionCreator, fleet, optimizer, qSim);
-		}
+					@Override
+					public VrpAgentSource get() {
+						return new VrpAgentSource(getModalInstance(VrpAgentLogic.DynActionCreator.class),
+								getModalInstance(Fleet.class), getModalInstance(VrpOptimizer.class), qSim);
+					}
+				});
 	}
 }

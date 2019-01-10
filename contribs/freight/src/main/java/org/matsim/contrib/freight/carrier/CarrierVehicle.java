@@ -161,7 +161,7 @@ public class CarrierVehicle {
 	}
 
 	
-	Id<VehicleType> getVehicleTypeId() {
+	public Id<VehicleType> getVehicleTypeId() {
 		return typeId;
 	}
 

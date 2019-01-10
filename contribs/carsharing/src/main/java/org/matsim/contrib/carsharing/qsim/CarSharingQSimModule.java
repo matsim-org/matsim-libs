@@ -6,7 +6,6 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
@@ -43,6 +42,7 @@ public class CarSharingQSimModule extends AbstractQSimModule {
 	}
 	
 	static public void configureComponents(QSimComponentsConfig components) {
+		components.removeNamedComponent(PopulationModule.COMPONENT_NAME);
 		components.addNamedComponent(COMPONENT_NAME);
 	}
 }

@@ -32,6 +32,7 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -40,7 +41,6 @@ import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
@@ -65,8 +65,8 @@ final class OneTruckOptimizer implements VrpOptimizer {
 
 	@Inject
 	public OneTruckOptimizer(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			@Named(TransportMode.truck) Fleet fleet, QSim qSim) {
-		timer = qSim.getSimTimer();
+			@DvrpMode(TransportMode.truck) Fleet fleet, MobsimTimer timer) {
+		this.timer = timer;
 		travelTime = new FreeSpeedTravelTime();
 		router = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime),
 				travelTime);

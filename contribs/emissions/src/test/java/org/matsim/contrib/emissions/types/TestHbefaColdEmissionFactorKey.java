@@ -36,7 +36,7 @@ public class TestHbefaColdEmissionFactorKey {
 	
 	private Integer distance;
     private Integer parkingTime;
-	private ColdPollutant coldPollutant;
+	private String coldPollutant;
 	private HbefaVehicleAttributes hbefaVehicleAttributes;
 	private HbefaVehicleCategory hbefaVehCategory;
 	private String message;
@@ -52,7 +52,7 @@ public class TestHbefaColdEmissionFactorKey {
 		hbefaVehicleAttributes.setHbefaTechnology("technology");
 		distance = 4;
 		parkingTime = 5;
-		coldPollutant = ColdPollutant.FC;
+		coldPollutant = "FC";
 		hbefaVehCategory = HbefaVehicleCategory.PASSENGER_CAR;
 		equalErr = false;
 	}
@@ -85,7 +85,7 @@ public class TestHbefaColdEmissionFactorKey {
 		
 		//different HbefaColdEmissionFactorKey, does not equal 'normal'
 		HbefaColdEmissionFactorKey different = new HbefaColdEmissionFactorKey();
-		different.setHbefaComponent(ColdPollutant.CO);
+		different.setHbefaComponent("CO");
 		different.setHbefaDistance(2);
 		different.setHbefaParkingTime(50);
 		HbefaVehicleAttributes attForDifferent= new HbefaVehicleAttributes();
@@ -187,8 +187,8 @@ public class TestHbefaColdEmissionFactorKey {
 			equalErr = true;
 		}
 		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noParkingTime.toString();
-		message2 = "this key should not be comparable since no parking time is set";
-		Assert.assertTrue(message2, equalErr);
+		message2 = "this key should be comparable even though no parking time is set";
+		Assert.assertFalse(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noParkingTime));
 	}
 	
@@ -215,8 +215,8 @@ public class TestHbefaColdEmissionFactorKey {
 			equalErr = true;
 		}	
 		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noDistance.toString();
-		message2 = "this key should not be comparable since no distance is set";
-		Assert.assertTrue(message2, equalErr);
+		message2 = "this key should be comparable even though no distance is set";
+		Assert.assertFalse(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noDistance));
 	}
 	

@@ -8,5 +8,4 @@ public interface FacilityDataExchangeInterface {
 	void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, Map<String, Double> accessibilities);
 
 	void finish();
-	
 }

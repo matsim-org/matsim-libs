@@ -22,7 +22,6 @@ package org.matsim.contrib.taxi.util.stats;
 import java.util.List;
 
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.util.CSVLineBuilder;
 import org.matsim.contrib.util.CompactCSVWriter;
@@ -32,8 +31,6 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.io.IOUtils;
-
-import com.google.inject.Inject;
 
 public class TaxiStatsDumper implements AfterMobsimListener, ShutdownListener {
 	private static final String[] HEADER = { "iter", null, //
@@ -47,8 +44,7 @@ public class TaxiStatsDumper implements AfterMobsimListener, ShutdownListener {
 	private final OutputDirectoryHierarchy controlerIO;
 	private final CompactCSVWriter multiDayWriter;
 
-	@Inject
-	public TaxiStatsDumper(@Taxi Fleet fleet, TaxiConfigGroup taxiCfg, OutputDirectoryHierarchy controlerIO) {
+	public TaxiStatsDumper(Fleet fleet, TaxiConfigGroup taxiCfg, OutputDirectoryHierarchy controlerIO) {
 		this.fleet = fleet;
 		this.taxiCfg = taxiCfg;
 		this.controlerIO = controlerIO;

@@ -21,6 +21,8 @@ package org.matsim.contrib.emissions.utils;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import org.apache.log4j.Logger;
@@ -45,12 +47,13 @@ public class EmissionWriter {
 	public void writeHomeLocation2TotalEmissions(
 			Population population,
 			Map<Id<Person>, SortedMap<String, Double>> totalEmissions,
+			Collection<String> pollutants,
 			String outFile) {
 		try{
 			FileWriter fstream = new FileWriter(outFile);			
 			BufferedWriter out = new BufferedWriter(fstream);
 			out.append("personId \t xHome \t yHome \t");
-			for (String pollutant : EmissionUtils.getListOfPollutants()){
+			for (String pollutant : pollutants){
 				out.append(pollutant + "[g] \t");
 			}
 			out.append("\n");
@@ -66,7 +69,7 @@ public class EmissionWriter {
 				out.append(personId + "\t" + xHome + "\t" + yHome + "\t");
 
 				Map<String, Double> emissionType2Value = totalEmissions.get(personId);
-				for(String pollutant : EmissionUtils.getListOfPollutants()){
+				for(String pollutant : pollutants){
 					if(emissionType2Value.get(pollutant) != null){
 						out.append(emissionType2Value.get(pollutant) + "\t");
 					} else{
@@ -82,5 +85,4 @@ public class EmissionWriter {
 			throw new RuntimeException(e);
 		}
 	}
-
 }

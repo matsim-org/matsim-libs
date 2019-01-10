@@ -97,10 +97,6 @@ public class FlexibleDistanceBasedVariableAccessModule implements VariableAccess
 		
 	}
 	
-	
-	/* (non-Javadoc)
-	 * @see playground.jbischoff.pt.VariableAccessEgressTravelDisutility#getAccessEgressModeAndTraveltime(org.matsim.api.core.v01.population.Person, org.matsim.api.core.v01.Coord, org.matsim.api.core.v01.Coord)
-	 */
 	@Override
 	public Leg getAccessEgressModeAndTraveltime(Person person, Coord coord, Coord toCoord, double time) {
 		double egressDistance = CoordUtils.calcEuclideanDistance(coord, toCoord);
@@ -177,9 +173,6 @@ public class FlexibleDistanceBasedVariableAccessModule implements VariableAccess
 	}
 
 
-	/* (non-Javadoc)
-	 * @see playground.jbischoff.pt.VariableAccessEgressTravelDisutility#isTeleportedAccessEgressMode(java.lang.String)
-	 */
 	@Override
 	public boolean isTeleportedAccessEgressMode(String mode) {
 		return this.teleportedModes.get(mode);

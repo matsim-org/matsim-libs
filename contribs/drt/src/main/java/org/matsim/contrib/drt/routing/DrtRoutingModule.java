@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -46,7 +45,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
 
-import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 /**
@@ -64,10 +62,9 @@ public class DrtRoutingModule implements RoutingModule {
 	private final RoutingModule walkRouter;
 	private final DrtStageActivityType drtStageActivityType;
 
-	@Inject
 	public DrtRoutingModule(DrtConfigGroup drtCfg, @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Drt TravelDisutilityFactory travelDisutilityFactory, PopulationFactory populationFactory,
+			TravelDisutilityFactory travelDisutilityFactory, PopulationFactory populationFactory,
 			@Named(TransportMode.walk) RoutingModule walkRouter) {
 		this.drtCfg = drtCfg;
 		this.network = network;
@@ -102,7 +99,7 @@ public class DrtRoutingModule implements RoutingModule {
 		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(fromLink, toLink, departureTime, router,
 				travelTime);
 		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
-		double maxTravelTime = drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta();
+		double maxTravelTime = getMaxTravelTime(drtCfg, unsharedRideTime);
 		double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
 
 		DrtRoute route = populationFactory.getRouteFactories()
@@ -127,5 +124,16 @@ public class DrtRoutingModule implements RoutingModule {
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
 		return EmptyStageActivityTypes.INSTANCE;
+	}
+
+	/**
+	 * Calculates the maximum travel time defined as: drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta()
+	 *
+	 * @param drtCfg
+	 * @param unsharedRideTime ride time of the direct (shortest-time) route
+	 * @return maximum travel time
+	 */
+	public static double getMaxTravelTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
+		return drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta();
 	}
 }

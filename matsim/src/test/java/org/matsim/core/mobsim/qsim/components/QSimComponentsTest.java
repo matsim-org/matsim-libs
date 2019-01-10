@@ -17,8 +17,6 @@ import org.matsim.core.mobsim.qsim.components.mock.MockMobsimListener;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.google.inject.Key;
-
 public class QSimComponentsTest {
 	@Test
 	public void testGenericAddComponentMethod() {
@@ -29,15 +27,15 @@ public class QSimComponentsTest {
 		AbstractQSimModule module = new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				addComponent(MockMobsimListener.class, MockComponentAnnotation.class);
+				addQSimComponentBinding(MockComponentAnnotation.class).to(MockMobsimListener.class);
 			}
 		};
 		
 		new QSimBuilder(config) //
 		.addQSimModule(module) //
-		.configureComponents(components -> {
+		.configureQSimComponents( components -> {
 			components.addComponent(MockComponentAnnotation.class);
-		}) //
+		} ) //
 		.build(scenario, eventsManager) //
 		.run();
 	}
@@ -55,13 +53,13 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bind(MockEngineA.class).annotatedWith(MockComponentAnnotation.class).toInstance(mockEngineA);
-						bind(MockEngineB.class).annotatedWith(MockComponentAnnotation.class).toInstance(mockEngineB);
+						addQSimComponentBinding(MockComponentAnnotation.class).toInstance(mockEngineA);
+						addQSimComponentBinding(MockComponentAnnotation.class).toInstance(mockEngineB);
 					}
 				}) //
-				.configureComponents(components -> {
+				.configureQSimComponents( components -> {
 					components.addComponent(MockComponentAnnotation.class);
-				}) //
+				} ) //
 				.build(scenario, eventsManager) //
 				.run();
 
@@ -89,12 +87,12 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindComponent(MockEngine.class, MockComponentAnnotation.class).toInstance(mockEngine);
+						addQSimComponentBinding(MockComponentAnnotation.class).toInstance(mockEngine);
 					}
 				}) //
-				.configureComponents(components -> {
+				.configureQSimComponents( components -> {
 					components.addComponent(MockComponentAnnotation.class);
-				}) //
+				} ) //
 				.build(scenario, eventsManager) //
 				.run();
 
@@ -113,12 +111,12 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindNamedComponent(MockEngine.class, "MockEngine").toInstance(mockEngine);
+						addQSimComponentBinding("MockEngine").toInstance(mockEngine);
 					}
 				}) //
-				.configureComponents(components -> {
+				.configureQSimComponents( components -> {
 					components.addNamedComponent("MockEngine");
-				}) //
+				} ) //
 				.build(scenario, eventsManager) //
 				.run();
 
@@ -144,7 +142,7 @@ public class QSimComponentsTest {
 				.addQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
-						bindNamedComponent(MockEngine.class, "MockEngine").toInstance(mockEngine);
+						addQSimComponentBinding("MockEngine").toInstance(mockEngine);
 					}
 				}) //
 				.build(scenario, eventsManager) //

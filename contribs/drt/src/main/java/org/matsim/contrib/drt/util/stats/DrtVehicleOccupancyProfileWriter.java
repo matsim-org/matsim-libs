@@ -19,12 +19,10 @@ package org.matsim.contrib.drt.util.stats;
 
 import java.util.stream.IntStream;
 
-import javax.inject.Inject;
-
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYSeries;
-import org.matsim.contrib.drt.run.Drt;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.util.CompactCSVWriter;
@@ -44,11 +42,12 @@ public class DrtVehicleOccupancyProfileWriter implements MobsimBeforeCleanupList
 
 	private final Fleet fleet;
 	private final MatsimServices matsimServices;
+	private final DrtConfigGroup drtCfg;
 
-	@Inject
-	public DrtVehicleOccupancyProfileWriter(@Drt Fleet fleet, MatsimServices matsimServices) {
+	public DrtVehicleOccupancyProfileWriter(Fleet fleet, MatsimServices matsimServices, DrtConfigGroup drtCfg) {
 		this.fleet = fleet;
 		this.matsimServices = matsimServices;
+		this.drtCfg = drtCfg;
 	}
 
 	@Override
@@ -58,8 +57,7 @@ public class DrtVehicleOccupancyProfileWriter implements MobsimBeforeCleanupList
 		TimeDiscretizer timeDiscretizer = calculator.getTimeDiscretizer();
 		calculator.calculate();
 
-		String file = matsimServices.getControlerIO()
-				.getIterationFilename(matsimServices.getIterationNumber(), OUTPUT_FILE);
+		String file = filename(OUTPUT_FILE);
 		String timeFormat = timeDiscretizer.getTimeInterval() % 60 == 0 ? Time.TIMEFORMAT_HHMM : Time.TIMEFORMAT_HHMMSS;
 
 		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"))) {
@@ -117,8 +115,12 @@ public class DrtVehicleOccupancyProfileWriter implements MobsimBeforeCleanupList
 
 	private void generateImage(DefaultTableXYDataset createXYDataset, TimeProfileCharts.ChartType chartType) {
 		JFreeChart chart = TimeProfileCharts.chartProfile(createXYDataset, chartType);
-		String imageFile = matsimServices.getControlerIO()
-				.getIterationFilename(matsimServices.getIterationNumber(), OUTPUT_FILE + "_" + chartType.name());
+		String imageFile = filename(OUTPUT_FILE + "_" + chartType.name());
 		ChartSaveUtils.saveAsPNG(chart, imageFile, 1500, 1000);
+	}
+
+	private String filename(String prefix) {
+		return matsimServices.getControlerIO()
+				.getIterationFilename(matsimServices.getIterationNumber(), prefix + "_" + drtCfg.getMode());
 	}
 }

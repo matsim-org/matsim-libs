@@ -3,7 +3,7 @@ package org.matsim.codeexamples.adaptiveSignals;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.builder.SignalsModule;
+import org.matsim.contrib.signals.builder.Signals;
 import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfigGroup;
 import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfigGroup.Regime;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -75,7 +75,8 @@ public class RunAdaptiveSignalsExample {
         
 		// add the signals module if signal systems are used
 		if (signalsConfigGroup.isUseSignalSystems()) {
-			controler.addOverridingModule(new SignalsModule());
+//			controler.addOverridingModule(new SignalsModule());
+			Signals.configure( controler );
 			/*
 			 * The signals module binds everything that is necessary for the simulation with
 			 * signals. If you like to use your own signal controller you can add it to the

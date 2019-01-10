@@ -19,14 +19,13 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
-import javax.inject.Named;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -36,7 +35,6 @@ import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.QSim;
 
 import com.google.inject.Inject;
 
@@ -49,10 +47,10 @@ final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final String mobsimMode;
 
 	@Inject
-	public OneTaxiActionCreator(@Named(TransportMode.taxi) PassengerEngine passengerEngine, QSim qSim,
+	public OneTaxiActionCreator(@DvrpMode(TransportMode.taxi) PassengerEngine passengerEngine, MobsimTimer timer,
 			DvrpConfigGroup dvrpCfg) {
 		this.passengerEngine = passengerEngine;
-		this.timer = qSim.getSimTimer();
+		this.timer = timer;
 		this.mobsimMode = dvrpCfg.getMobsimMode();
 	}
 

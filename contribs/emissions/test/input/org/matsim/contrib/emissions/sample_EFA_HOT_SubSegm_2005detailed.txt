@@ -19,10 +19,10 @@ Case;VehCat;Year;TrafficScenario;Component;RoadCat;TrafficSit;Gradient;IDSubsegm
 2005HotDetailed[3.1];pass. car;2010;;NOx;;URB/Local/50/Freeflow;0%;121130;PC diesel <1,4L Euro-3;diesel;<1,4L;PC-D-Euro-3;50000.00;1.00;46.64;;;0.61;;;;;;;;
 2005HotDetailed[3.1];pass. car;2010;;NOx;;URB/Local/50/St+Go;0%;111310;PC petrol >=2L Euro-1;petrol (4S);>=2L;PC-P-Euro-1;50000.00;1.00;12.72;;;0.60;;;;;;;;
 2005HotDetailed[3.1];pass. car;2010;;NOx;;URB/Local/50/St+Go;0%;121130;PC diesel <1,4L Euro-3;diesel;<1,4L;PC-D-Euro-3;50000.00;1.00;12.72;;;0.97;;;;;;;;
-2005HotDetailed[3.1];pass. car;2010;;CO2(total);;URB/Local/50/Freeflow;0%;111310;PC petrol >=2L Euro-1;petrol (4S);>=2L;PC-P-Euro-1;50000.00;1.00;46.63;;;245.25;;;;;;;;
-2005HotDetailed[3.1];pass. car;2010;;CO2(total);;URB/Local/50/Freeflow;0%;121130;PC diesel <1,4L Euro-3;diesel;<1,4L;PC-D-Euro-3;50000.00;1.00;46.64;;;90.85;;;;;;;;
-2005HotDetailed[3.1];pass. car;2010;;CO2(total);;URB/Local/50/St+Go;0%;111310;PC petrol >=2L Euro-1;petrol (4S);>=2L;PC-P-Euro-1;50000.00;1.00;12.72;;;527.43;;;;;;;;
-2005HotDetailed[3.1];pass. car;2010;;CO2(total);;URB/Local/50/St+Go;0%;121130;PC diesel <1,4L Euro-3;diesel;<1,4L;PC-D-Euro-3;50000.00;1.00;12.72;;;176.79;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;CO2_TOTAL;;URB/Local/50/Freeflow;0%;111310;PC petrol >=2L Euro-1;petrol (4S);>=2L;PC-P-Euro-1;50000.00;1.00;46.63;;;245.25;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;CO2_TOTAL;;URB/Local/50/Freeflow;0%;121130;PC diesel <1,4L Euro-3;diesel;<1,4L;PC-D-Euro-3;50000.00;1.00;46.64;;;90.85;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;CO2_TOTAL;;URB/Local/50/St+Go;0%;111310;PC petrol >=2L Euro-1;petrol (4S);>=2L;PC-P-Euro-1;50000.00;1.00;12.72;;;527.43;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;CO2_TOTAL;;URB/Local/50/St+Go;0%;121130;PC diesel <1,4L Euro-3;diesel;<1,4L;PC-D-Euro-3;50000.00;1.00;12.72;;;176.79;;;;;;;;
 2005HotDetailed[3.1];pass. car;2010;;PM;;URB/Local/50/Freeflow;0%;111310;PC petrol >=2L Euro-1;petrol (4S);>=2L;PC-P-Euro-1;50000.00;1.00;46.63;;;3.13999992795289e-03;;;;;;;;
 2005HotDetailed[3.1];pass. car;2010;;PM;;URB/Local/50/Freeflow;0%;121130;PC diesel <1,4L Euro-3;diesel;<1,4L;PC-D-Euro-3;50000.00;1.00;46.64;;;0.03;;;;;;;;
 2005HotDetailed[3.1];pass. car;2010;;PM;;URB/Local/50/St+Go;0%;111310;PC petrol >=2L Euro-1;petrol (4S);>=2L;PC-P-Euro-1;50000.00;1.00;12.72;;;4.55000018700957e-03;;;;;;;;
