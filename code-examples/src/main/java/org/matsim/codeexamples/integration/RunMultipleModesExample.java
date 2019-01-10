@@ -5,12 +5,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -19,7 +16,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.*;
+import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import static org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode;
 
 class RunMultipleModesExample{
