@@ -1,11 +1,30 @@
 <html>
 <body>
 The MATSim contrib for traffic lights is able to simulate traffic signals microscopically. 
-For fixed-time control a default implementation is provided.  
-No programming is required to simulate fixed-time traffic signal control. 
-Traffic-responsive signal control needs custom implementation but can benefit from the provided infrastructure. 
+For fixed-time control a default implementation is provided. 
+Because of the modular structure of MATSim and the signals extension, 
+own signal control approaches (e.g. for traffic-responsive signal control methods) can be easily included.
+Some implementations of traffic-responsive signal control approaches are also provided by this contrib.
+It is possible to use different signal control methods for different intersections in MATSim 
+(e.g. some fixed-time, some adaptive).
 <p>
-As a starting point please have a look at the code examples in this contrib (see above) and the code examples in the matsim-code-examples project.
+Necessary input data can either be provided by specifying the corresponding input files in the config 
+or by adding the signal elements directly into the scenario via code. 
+For both ways, examples are given in the code examples package in this contrib (see above).
+<p>
+To help you to understand xml formats and code better, here some translations between MATSim terms and real world terms:
+<li>Signal: Traffic light, traffic signal, i.e. a physical box standing somewhere on the transport network indicating driving allowed/permited</li>
+<li>Signal Group: Logical group of traffic lights, all lights display same color at the same time</li>
+<li>Signal Control: Algorithm or control scheme that determines which colors are displayed by the different Signal Groups (e.g. fixed-time control)</li>
+<li>Signal System: Collection of Signal Groups that is controlled by the same Signal Control (e.g. an intersection)</li>
+<p>
+As a starting point please have a look at the code examples in this contrib (see above: <code>codeexamples</code>) 
+and the code examples in the <code>matsim-code-examples</code> project.
+The best starting point is the class <code>RunSignalSystemsExample</code> in the package <code>fixedTimeSignals</code>.
+<p>
+If you want to visualize the created scenario try to get and run the OTFVis contribution to MATSim, 
+see OTFVis (this contribution is unsupported). 
+An example is also given in the code examples package: <code>VisualizeSignalScenario</code>.
 <p>
 For more information and documentation see the javadoc in the subpackage org.matsim.contrib.signals.
  </body>
