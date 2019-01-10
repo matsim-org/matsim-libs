@@ -12,9 +12,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import static org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode;
@@ -35,13 +33,23 @@ class RunMultipleModesExample{
 
 			config.changeMode().setModes( new String [] { TransportMode.car, TransportMode.bike} );
 
-			config.plansCalcRoute().setNetworkModes( Arrays.asList( TransportMode.car, TransportMode.bike ) );
-			// yyyy the above line (by itself) leads to failure.  kai, jan'18
 		}
 		{ // bike:
+			// one needs to remove the default teleportation bike router:
+			config.plansCalcRoute().removeModeRoutingParams( TransportMode.bike );
 
+			// then add it to the list of network modes:
+			List<String> networkModes = new ArrayList<>( config.plansCalcRoute().getNetworkModes() ) ;
+			// (need to make copy since otherwise we cannot modify it)
+			networkModes.add( TransportMode.bike ) ;
+			config.plansCalcRoute().setNetworkModes( networkModes );
 
-			// scoring:
+			// say that the the travel times need to be analyzed also for the bike mode:
+			String analyzedModes = config.travelTimeCalculator().getAnalyzedModes();
+			analyzedModes += "," + TransportMode.bike ;
+			config.travelTimeCalculator().setAnalyzedModes( analyzedModes );
+
+			// set up bike scoring:
 			ModeParams params = new ModeParams( TransportMode.bike ) ;
 			config.planCalcScore().addModeParams( params );
 		}
@@ -50,8 +58,9 @@ class RunMultipleModesExample{
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		for( Link link : scenario.getNetwork().getLinks().values() ){
-
-			Set<String> modes = new HashSet<>(  Arrays.asList( TransportMode.car, TransportMode.bike ) ) ;
+			Set<String> modes = new HashSet<>( link.getAllowedModes() ) ;
+			// (need to make copy since otherwise we cannot modify it)
+			modes.add( TransportMode.bike ) ;
 			link.setAllowedModes( modes );
 		}
 
