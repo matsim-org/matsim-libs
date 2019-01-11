@@ -1,5 +1,8 @@
 package org.matsim.contrib.emissions.analysis;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -18,6 +21,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,11 +52,34 @@ public class EmissionGridAnalyzer {
         TimeBinMap<Map<Id<Link>, LinkEmissions>> timeBinsWithEmissions = processEventsFile(eventsFile);
         TimeBinMap<Grid<Map<Pollutant, Double>>> result = new TimeBinMap<>(binSize);
 
-        timeBinsWithEmissions.getAllTimeBins().forEach(bin -> {
+        timeBinsWithEmissions.getTimeBins().forEach(bin -> {
             Grid<Map<Pollutant, Double>> grid = writeAllLinksToGrid(bin.getValue());
             result.getTimeBin(bin.getStartTime()).setValue(grid);
         });
         return result;
+    }
+
+    public String processToJsonString(String eventsFile) {
+
+        ObjectMapper mapper = createObjectMapper();
+        TimeBinMap<Grid<Map<Pollutant, Double>>> result = process(eventsFile);
+        try {
+            return mapper.writeValueAsString(result);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void processToJsonFile(String eventsFile, String jsonFile) {
+
+        ObjectMapper mapper = createObjectMapper();
+        TimeBinMap<Grid<Map<Pollutant, Double>>> result = process(eventsFile);
+
+        try {
+            mapper.writeValue(new File(jsonFile), result);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private TimeBinMap<Map<Id<Link>, LinkEmissions>> processEventsFile(String eventsFile) {
@@ -64,14 +92,46 @@ public class EmissionGridAnalyzer {
         return handler.getTimeBins();
     }
 
+    private Grid<Map<Pollutant, Double>> writeAllLinksToGrid(Map<Id<Link>, LinkEmissions> linksWithEmissions) {
+
+        Grid<Map<Pollutant, Double>> grid = createGrid();
+
+        linksWithEmissions.forEach((id, emission) -> {
+            Link link = network.getLinks().get(id);
+            if (network.getLinks().containsKey(id))
+                processLink(link, emission, grid);
+        });
+        return grid;
+    }
+
     private void processLink(Link link, LinkEmissions emissions, Grid<Map<Pollutant, Double>> grid) {
 
-        grid.getValues().forEach(cell -> {
+        grid.getCells().forEach(cell -> {
             double weight = SpatialInterpolation.calculateWeightFromLine(
                     transformToCoordinate(link.getFromNode()), transformToCoordinate(link.getToNode()),
                     cell.getCoordinate(), smoothingRadius);
             processCell(cell, emissions, weight);
         });
+    }
+
+    private void processCell(Grid.Cell<Map<Pollutant, Double>> cell, LinkEmissions emissions, double weight) {
+
+        // merge both maps from cell and linkemissions and sum up values, while the link emissions are multiplied by
+        // the cell weight
+        Map<Pollutant, Double> newValues = Stream.concat(cell.getValue().entrySet().stream(), emissions.getEmissions().entrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (cellValue, linkValue) -> cellValue + linkValue * weight));
+        cell.setValue(newValues);
+    }
+
+    private Geometry getBoundsFromNetwork() {
+        double[] box = NetworkUtils.getBoundingBox(network.getNodes().values());
+        return factory.createPolygon(new Coordinate[]{
+                new Coordinate(box[0], box[1]),
+                new Coordinate(box[2], box[1]),
+                new Coordinate(box[2], box[3]),
+                new Coordinate(box[0], box[3]),
+                new Coordinate(box[0], box[1])});
     }
 
     private Grid<Map<Pollutant, Double>> createGrid() {
@@ -83,28 +143,17 @@ public class EmissionGridAnalyzer {
             return new SquareGrid<>(gridSize, HashMap::new, bounds);
     }
 
-    private Grid<Map<Pollutant, Double>> writeAllLinksToGrid(Map<Id<Link>, LinkEmissions> linksWithEmissions) {
+    private ObjectMapper createObjectMapper() {
+        ObjectMapper result = new ObjectMapper();
+        result.addMixIn(Coordinate.class, CoordinateMixin.class);
+        return result;
+    }
 
-        Grid<Map<Pollutant, Double>> grid = createGrid();
-
-        linksWithEmissions.forEach((id, emission) -> {
-            Link link = network.getLinks().get(id);
-            processLink(link, emission, grid);
-        });
-        return grid;
+    private Coordinate transformToCoordinate(Node node) {
+        return new Coordinate(node.getCoord().getX(), node.getCoord().getY());
     }
 
     public enum GridType {Square, Hexagonal}
-
-    private void processCell(Grid.Cell<Map<Pollutant, Double>> cell, LinkEmissions emissions, double weight) {
-
-        // merge both maps from cell and linkemissions and sum up values, while the link emissions are multiplied by
-        // the cell weight
-        Map<Pollutant, Double> newValues = Stream.concat(cell.getValue().entrySet().stream(), emissions.getEmissions().entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (cellValue, linkValue) -> cellValue + linkValue * weight));
-        cell.setValue(newValues);
-    }
 
     public static class Builder {
         private double binSize;
@@ -151,17 +200,12 @@ public class EmissionGridAnalyzer {
         }
     }
 
-    private Geometry getBoundsFromNetwork() {
-        double[] box = NetworkUtils.getBoundingBox(network.getNodes().values());
-        return factory.createPolygon(new Coordinate[]{
-                new Coordinate(box[0], box[1]),
-                new Coordinate(box[2], box[1]),
-                new Coordinate(box[2], box[3]),
-                new Coordinate(box[0], box[3]),
-                new Coordinate(box[0], box[1])});
-    }
+    /**
+     * Mixin to supress the printing of z-coordinates when grid is serialized to json
+     */
+    private static class CoordinateMixin {
 
-    private Coordinate transformToCoordinate(Node node) {
-        return new Coordinate(node.getCoord().getX(), node.getCoord().getY());
+        @JsonIgnore
+        double z;
     }
 }

@@ -78,7 +78,7 @@ public class TimeBinMapTest {
         map.getTimeBin(0);
         map.getTimeBin(30);
 
-        assertEquals(4, map.getAllTimeBins().size());
+        assertEquals(4, map.getTimeBins().size());
     }
 
     @Test

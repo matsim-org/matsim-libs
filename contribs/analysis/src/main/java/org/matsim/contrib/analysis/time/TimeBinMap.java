@@ -37,7 +37,7 @@ public class TimeBinMap<T> {
         return endTimeOfLastBucket;
     }
 
-    public Collection<TimeBin<T>> getAllTimeBins() {
+    public Collection<TimeBin<T>> getTimeBins() {
         return bins.values();
     }
 

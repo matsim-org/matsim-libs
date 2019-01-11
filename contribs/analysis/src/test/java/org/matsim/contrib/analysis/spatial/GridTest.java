@@ -18,7 +18,7 @@ public class GridTest {
         final String testValue = "Test-value";
         Grid<String> grid = new SquareGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
 
-        Collection<Grid.Cell<String>> values = grid.getValues();
+        Collection<Grid.Cell<String>> values = grid.getCells();
 
         // a grid with an area of 10x10 and a cell diameter of 2 should have 25 cells 10 * 10 / 2 = 25
         assertEquals(25, values.size());
@@ -31,7 +31,7 @@ public class GridTest {
         final String testValue = "test-value";
         Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
 
-        Collection<Grid.Cell<String>> values = grid.getValues();
+        Collection<Grid.Cell<String>> values = grid.getCells();
 
         // a hexagonal grid with an area of 10x10 and diameter 2 will have 7 rows
         // there will be 4 rows with 5 cells and 3 rows with 5 cells
@@ -70,7 +70,7 @@ public class GridTest {
         final Coordinate expectedCoordinate = new Coordinate(2, 2.5);
         Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
 
-        Grid.Cell<String> result = grid.getValue(expectedCoordinate);
+        Grid.Cell<String> result = grid.getCell(expectedCoordinate);
 
         assertEquals(expectedCoordinate, result.getCoordinate());
     }
@@ -82,7 +82,7 @@ public class GridTest {
         Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
 
         // retrieve a cell somewhere near (2, 2.5)
-        Grid.Cell<String> result = grid.getValue(new Coordinate(1.1, 2.3));
+        Grid.Cell<String> result = grid.getCell(new Coordinate(1.1, 2.3));
 
         assertEquals(new Coordinate(2, 2.5), result.getCoordinate());
     }
@@ -93,7 +93,7 @@ public class GridTest {
         final String testValue = "initialValue";
         Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
 
-        Grid.Cell<String> result = grid.getValue(new Coordinate(100, 100));
+        Grid.Cell<String> result = grid.getCell(new Coordinate(100, 100));
 
         assertEquals(new Coordinate(9, 10), result.getCoordinate());
     }
@@ -104,7 +104,7 @@ public class GridTest {
         final String testValue = "initialValue";
         Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
 
-        Collection<Grid.Cell<String>> result = grid.getValues(SpatialTestUtils.createRect(5, 5));
+        Collection<Grid.Cell<String>> result = grid.getCells(SpatialTestUtils.createRect(5, 5));
 
         assertEquals(9, result.size());
     }

@@ -25,12 +25,12 @@ public abstract class Grid<T> {
         generateGrid(initialValueSupplier, bounds);
     }
 
-    public Cell<T> getValue(Coordinate coordinate) {
+    public Cell<T> getCell(Coordinate coordinate) {
 
         return quadTree.getClosest(coordinate.x, coordinate.y);
     }
 
-    public Collection<Cell<T>> getValues(Geometry bounds) {
+    public Collection<Cell<T>> getCells(Geometry bounds) {
 
         return quadTree.getRectangle(
                 bounds.getEnvelopeInternal().getMinX(), bounds.getEnvelopeInternal().getMinY(),
@@ -39,7 +39,7 @@ public abstract class Grid<T> {
         );
     }
 
-    public Collection<Cell<T>> getValues() {
+    public Collection<Cell<T>> getCells() {
         return quadTree.values();
     }
 

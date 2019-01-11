@@ -19,14 +19,15 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class EmissionGridAnalyzerTest {
 
@@ -46,6 +47,7 @@ public class EmissionGridAnalyzerTest {
         network.getLinks().values().forEach(link -> {
             for (int i = fromTime; i <= toTime; i++) {
                 eventsManager.processEvent(createEmissionEvent(i, link, pollutant, pollutionPerEvent));
+                eventsManager.processEvent(createEmissionEvent(i, link, Pollutant.CO, pollutionPerEvent));
             }
         });
         writer.closeFile();
@@ -103,10 +105,10 @@ public class EmissionGridAnalyzerTest {
 
         TimeBinMap<Grid<Map<Pollutant, Double>>> timeBins = analyzer.process(eventsFile.toString());
 
-        assertEquals(10, timeBins.getAllTimeBins().size());
-        timeBins.getAllTimeBins().forEach(bin -> {
+        assertEquals(10, timeBins.getTimeBins().size());
+        timeBins.getTimeBins().forEach(bin -> {
             assertTrue(bin.hasValue());
-            bin.getValue().getValues().forEach(cell -> assertTrue(cell.getValue().get(pollutant) > pollutionPerEvent));
+            bin.getValue().getCells().forEach(cell -> assertTrue(cell.getValue().get(pollutant) > pollutionPerEvent));
         });
     }
 
@@ -129,13 +131,60 @@ public class EmissionGridAnalyzerTest {
 
         TimeBinMap<Grid<Map<Pollutant, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
 
-        assertEquals(1, timeBinMap.getAllTimeBins().size());
+        assertEquals(1, timeBinMap.getTimeBins().size());
 
         TimeBinMap.TimeBin<Grid<Map<Pollutant, Double>>> bin = timeBinMap.getTimeBin(time);
         assertTrue(bin.hasValue());
 
         // we parse 1 event for 1 link with an emission value of 1. Each grid cell should have an emission of 1 if the link
         // directly crosses the cell. Or less but greater 0 if just adjacent.
-        bin.getValue().getValues().forEach(cell -> assertTrue(0 < cell.getValue().get(pollutant) && cell.getValue().get(pollutant) <= 1.0));
+        bin.getValue().getCells().forEach(cell -> assertTrue(0 < cell.getValue().get(pollutant) && cell.getValue().get(pollutant) <= 1.0));
+    }
+
+    @Test
+    public void processToJson() {
+
+        final Pollutant pollutant = Pollutant.NO2;
+        final double pollutionPerEvent = 1;
+        final int time = 1;
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString());
+        final Network network = createRandomNetwork(1, 1000, 1000);
+        writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time + 3);
+
+        EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
+                .withSmoothingRadius(1)
+                .withNetwork(network)
+                .withTimeBinSize(1)
+                .withGridSize(100)
+                .build();
+
+        String json = analyzer.processToJsonString(eventsFile.toString());
+
+        assertNotNull(json);
+    }
+
+    @Test
+    public void processToJsonFile() throws IOException {
+
+        final Pollutant pollutant = Pollutant.NO2;
+        final double pollutionPerEvent = 1;
+        final int time = 1;
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString());
+        final Path jsonFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString());
+        final Network network = createRandomNetwork(1, 1000, 1000);
+        writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time + 3);
+
+        EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
+                .withSmoothingRadius(1)
+                .withNetwork(network)
+                .withTimeBinSize(1)
+                .withGridSize(100)
+                .build();
+
+        analyzer.processToJsonFile(eventsFile.toString(), jsonFile.toString());
+
+        byte[] jsonFileData = Files.readAllBytes(jsonFile);
+
+        assertTrue(jsonFileData.length > 0);
     }
 }
