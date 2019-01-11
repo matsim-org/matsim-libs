@@ -18,7 +18,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,25 +25,26 @@ import java.util.stream.Stream;
 
 public class EmissionGridAnalyzer {
 
+    private final double binSize;
+    private final double smoothingRadius;
+
     private static GeometryFactory factory = new GeometryFactory();
-
-    private final int binSize;
+    private final GridType gridType;
     private final double gridSize;
-    private final Path eventsFile;
     private final Network network;
-    private final SpatialInterpolation.GridType gridType;
 
-    public EmissionGridAnalyzer(final int binSizeInSeconds, final double gridSize, final SpatialInterpolation.GridType gridType, final Network network, final Path eventsFile) {
-        this.binSize = binSizeInSeconds;
-        this.eventsFile = eventsFile;
+    private EmissionGridAnalyzer(final double binSize, final double gridSize, final double smoothingRadius,
+                                 final GridType gridType, final Network network) {
+        this.binSize = binSize;
         this.network = network;
         this.gridType = gridType;
         this.gridSize = gridSize;
+        this.smoothingRadius = smoothingRadius;
     }
 
-    public TimeBinMap<Grid<Map<Pollutant, Double>>> process() {
+    public TimeBinMap<Grid<Map<Pollutant, Double>>> process(String eventsFile) {
 
-        TimeBinMap<Map<Id<Link>, LinkEmissions>> timeBinsWithEmissions = processEventsFile();
+        TimeBinMap<Map<Id<Link>, LinkEmissions>> timeBinsWithEmissions = processEventsFile(eventsFile);
         TimeBinMap<Grid<Map<Pollutant, Double>>> result = new TimeBinMap<>(binSize);
 
         timeBinsWithEmissions.getAllTimeBins().forEach(bin -> {
@@ -54,14 +54,33 @@ public class EmissionGridAnalyzer {
         return result;
     }
 
-    private TimeBinMap<Map<Id<Link>, LinkEmissions>> processEventsFile() {
+    private TimeBinMap<Map<Id<Link>, LinkEmissions>> processEventsFile(String eventsFile) {
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
         EmissionEventsReader eventsReader = new EmissionEventsReader(eventsManager);
         EmissionsOnLinkEventHandler handler = new EmissionsOnLinkEventHandler(binSize);
         eventsManager.addHandler(handler);
-        eventsReader.readFile(eventsFile.toString());
+        eventsReader.readFile(eventsFile);
         return handler.getTimeBins();
+    }
+
+    private void processLink(Link link, LinkEmissions emissions, Grid<Map<Pollutant, Double>> grid) {
+
+        grid.getValues().forEach(cell -> {
+            double weight = SpatialInterpolation.calculateWeightFromLine(
+                    transformToCoordinate(link.getFromNode()), transformToCoordinate(link.getToNode()),
+                    cell.getCoordinate(), smoothingRadius);
+            processCell(cell, emissions, weight);
+        });
+    }
+
+    private Grid<Map<Pollutant, Double>> createGrid() {
+
+        Geometry bounds = getBoundsFromNetwork();
+        if (gridType == GridType.Hexagonal)
+            return new HexagonalGrid<>(gridSize, HashMap::new, bounds);
+        else
+            return new SquareGrid<>(gridSize, HashMap::new, bounds);
     }
 
     private Grid<Map<Pollutant, Double>> writeAllLinksToGrid(Map<Id<Link>, LinkEmissions> linksWithEmissions) {
@@ -75,15 +94,7 @@ public class EmissionGridAnalyzer {
         return grid;
     }
 
-    private void processLink(Link link, LinkEmissions emissions, Grid<Map<Pollutant, Double>> grid) {
-
-        grid.getValues().forEach(cell -> {
-            double weight = SpatialInterpolation.calculateWeightFromLine(
-                    transformToCoordinate(link.getFromNode()), transformToCoordinate(link.getToNode()),
-                    cell.getCoordinate(), 500);
-            processCell(cell, emissions, weight);
-        });
-    }
+    public enum GridType {Square, Hexagonal}
 
     private void processCell(Grid.Cell<Map<Pollutant, Double>> cell, LinkEmissions emissions, double weight) {
 
@@ -95,13 +106,49 @@ public class EmissionGridAnalyzer {
         cell.setValue(newValues);
     }
 
-    private Grid<Map<Pollutant, Double>> createGrid() {
+    public static class Builder {
+        private double binSize;
+        private double gridSize;
+        private double smoothingRadius = 1.0;
+        private Network network;
+        private GridType gridType = GridType.Square;
 
-        Geometry bounds = getBoundsFromNetwork();
-        if (gridType == SpatialInterpolation.GridType.Hexagonal)
-            return new HexagonalGrid<>(gridSize, HashMap::new, bounds);
-        else
-            return new SquareGrid<>(gridSize, HashMap::new, bounds);
+        public Builder withTimeBinSize(double size) {
+            this.binSize = size;
+            return this;
+        }
+
+        public Builder withGridType(GridType type) {
+            this.gridType = type;
+            return this;
+        }
+
+        public Builder withGridSize(double size) {
+            gridSize = size;
+            return this;
+        }
+
+        public Builder withSmoothingRadius(double radius) {
+            smoothingRadius = radius;
+            return this;
+        }
+
+        public Builder withNetwork(Network network) {
+            this.network = network;
+            return this;
+        }
+
+        public EmissionGridAnalyzer build() {
+
+            if (!isValid())
+                throw new IllegalArgumentException("binSize, gridSize, smoothingRadius must be set and greater 0, Also network must be set");
+
+            return new EmissionGridAnalyzer(binSize, gridSize, smoothingRadius, gridType, network);
+        }
+
+        private boolean isValid() {
+            return binSize > 0 && gridSize > 0 && smoothingRadius > 0 && network != null;
+        }
     }
 
     private Geometry getBoundsFromNetwork() {

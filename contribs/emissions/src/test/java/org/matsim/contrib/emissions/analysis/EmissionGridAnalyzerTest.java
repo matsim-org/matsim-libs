@@ -8,15 +8,49 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.analysis.spatial.Grid;
+import org.matsim.contrib.analysis.time.TimeBinMap;
+import org.matsim.contrib.emissions.events.WarmEmissionEvent;
+import org.matsim.contrib.emissions.types.Pollutant;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.EventWriter;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class EmissionGridAnalyzerTest {
 
     @Rule
     public MatsimTestUtils testUtils = new MatsimTestUtils();
+
+    private static double getRandomValue(double upperBounds) {
+        return Math.random() * upperBounds;
+    }
+
+    private void writeEventsToFile(Path eventsFile, Network network, Pollutant pollutant, double pollutionPerEvent, int fromTime, int toTime) {
+
+        EventsManager eventsManager = EventsUtils.createEventsManager();
+        EventWriter writer = new EventWriterXML(eventsFile.toString());
+        eventsManager.addHandler(writer);
+
+        network.getLinks().values().forEach(link -> {
+            for (int i = fromTime; i <= toTime; i++) {
+                eventsManager.processEvent(createEmissionEvent(i, link, pollutant, pollutionPerEvent));
+            }
+        });
+        writer.closeFile();
+    }
+
 
     private static Network createRandomNetwork(int numberOfLinks, double maxX, double maxY) {
 
@@ -43,20 +77,65 @@ public class EmissionGridAnalyzerTest {
         return factory.createNode(Id.createNodeId(UUID.randomUUID().toString()), coord);
     }
 
-    static double getRandomValue(double upperBounds) {
-        return Math.random() * upperBounds;
+    private WarmEmissionEvent createEmissionEvent(double time, Link link, Pollutant pollutant, double pollutionPerEvent) {
+
+        Map<String, Double> emissions = new HashMap<>();
+        emissions.put(pollutant.getText(), pollutionPerEvent);
+        return new WarmEmissionEvent(time, link.getId(), Id.createVehicleId(UUID.randomUUID().toString()), emissions);
     }
 
     @Test
     public void process() {
 
-        String workingDirectory = testUtils.getClassInputDirectory();
-        int numberOfLinks = 1000;
-        Network network = createRandomNetwork(numberOfLinks, 1000, 1000);
+        final Pollutant pollutant = Pollutant.HC;
+        final double pollutionPerEvent = 1;
+        Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString());
+        Network network = createRandomNetwork(100, 1000, 1000);
+        writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, 1, 99);
 
-        /*EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer(10, 10, SpatialInterpolation.GridType.Square,
-                network, )*/
 
+        EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
+                .withGridSize(100)
+                .withTimeBinSize(10)
+                .withNetwork(network)
+                .withSmoothingRadius(200)
+                .build();
 
+        TimeBinMap<Grid<Map<Pollutant, Double>>> timeBins = analyzer.process(eventsFile.toString());
+
+        assertEquals(10, timeBins.getAllTimeBins().size());
+        timeBins.getAllTimeBins().forEach(bin -> {
+            assertTrue(bin.hasValue());
+            bin.getValue().getValues().forEach(cell -> assertTrue(cell.getValue().get(pollutant) > pollutionPerEvent));
+        });
+    }
+
+    @Test
+    public void process_singleLinkAndSingleEvent() {
+
+        final Pollutant pollutant = Pollutant.NO2;
+        final double pollutionPerEvent = 1;
+        final int time = 1;
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString());
+        final Network network = createRandomNetwork(1, 1000, 1000);
+        writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time);
+
+        EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
+                .withSmoothingRadius(1)
+                .withNetwork(network)
+                .withTimeBinSize(10)
+                .withGridSize(100)
+                .build();
+
+        TimeBinMap<Grid<Map<Pollutant, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
+
+        assertEquals(1, timeBinMap.getAllTimeBins().size());
+
+        TimeBinMap.TimeBin<Grid<Map<Pollutant, Double>>> bin = timeBinMap.getTimeBin(time);
+        assertTrue(bin.hasValue());
+
+        // we parse 1 event for 1 link with an emission value of 1. Each grid cell should have an emission of 1 if the link
+        // directly crosses the cell. Or less but greater 0 if just adjacent.
+        bin.getValue().getValues().forEach(cell -> assertTrue(0 < cell.getValue().get(pollutant) && cell.getValue().get(pollutant) <= 1.0));
     }
 }

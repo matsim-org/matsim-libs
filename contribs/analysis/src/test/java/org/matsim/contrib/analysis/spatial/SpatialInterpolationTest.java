@@ -2,135 +2,58 @@ package org.matsim.contrib.analysis.spatial;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.junit.Test;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.NetworkUtils;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import static junit.framework.TestCase.*;
 
 public class SpatialInterpolationTest {
 
-    private static final String EMISSION_KEY = "emmission-value";
-
-    private static Network createRandomNetworkWithRandomEmissionValue(int numberOfLinks, double maxX, double maxY) {
-
-        Network network = NetworkUtils.createNetwork();
-
-        for (long i = 0; i < numberOfLinks; i++) {
-
-            Link link = SpatialTestUtils.createRandomLink(network.getFactory(), maxX, maxY);
-            network.addNode(link.getFromNode());
-            network.addNode(link.getToNode());
-            network.addLink(link);
-            link.getAttributes().putAttribute(EMISSION_KEY, Math.random());
-        }
-        return network;
-    }
-
-    private static Collection<Grid.Cell<Double>> createRandomPointsWithValues(int numberOfPoints, double maxX, double maxY) {
-
-        List<Grid.Cell<Double>> cells = new ArrayList<>();
-
-        for (int i = 0; i < numberOfPoints; i++) {
-
-            Coordinate coordinate = new Coordinate(SpatialTestUtils.getRandomValue(maxX), SpatialTestUtils.getRandomValue(maxY));
-            Grid.Cell<Double> cell = new Grid.Cell<>(coordinate, SpatialTestUtils.getRandomValue(1));
-            cells.add(cell);
-        }
-
-        return cells;
-    }
-
-    private static Coordinate transformToCoodinate(Coord coord) {
-        return new Coordinate(coord.getX(), coord.getY(), coord.getY());
-    }
-
     @Test
-    public void initialize() {
+    public void calculateWeightFromLine() {
 
-        SpatialInterpolation result = new SpatialInterpolation.Builder()
-                .withBounds(SpatialTestUtils.createRect(1000, 1000))
-                .withGridCellSize(200)
-                .withGridType(SpatialInterpolation.GridType.Hexagonal)
-                .withSmoothingRadius(500)
-                .build();
+        final Coordinate from = new Coordinate(0, 1);
+        final Coordinate to = new Coordinate(10, 1);
+        final Coordinate cellCentroid = new Coordinate(5, 1);
+        final double smoothingRadius = 1;
 
-        assertNotNull(result);
+        double weight = SpatialInterpolation.calculateWeightFromLine(from, to, cellCentroid, smoothingRadius);
+
+        assertTrue(0 < weight && weight < 1);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void initialize_noGridCellSize() {
+    public void calculateWeightFromLine_invalidSmoothingRadius() {
 
-        new SpatialInterpolation.Builder()
-                .withBounds(SpatialTestUtils.createRect(1000, 1000))
-                .withGridType(SpatialInterpolation.GridType.Hexagonal)
-                .withSmoothingRadius(500)
-                .build();
+        final Coordinate from = new Coordinate(0, 1);
+        final Coordinate to = new Coordinate(10, 1);
+        final Coordinate cellCentroid = new Coordinate(5, 1);
+        final double smoothingRadius = 0;
 
-        fail("missing parameters should cause exception");
+        double weight = SpatialInterpolation.calculateWeightFromLine(from, to, cellCentroid, smoothingRadius);
+
+        fail("smoothing radius <= 0 should cause exception");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void initialize_noBounds() {
+    public void calculateWeightFromPoint_invalidSmoothingRadius() {
 
-        new SpatialInterpolation.Builder()
-                .withGridCellSize(200)
-                .withGridType(SpatialInterpolation.GridType.Hexagonal)
-                .withSmoothingRadius(500)
-                .build();
+        final Coordinate source = new Coordinate(10, 10);
+        final Coordinate centroid = new Coordinate(10, 10);
+        final double smoothingRadius = 0;
 
-        fail("missing parameters should cause exception");
+        double weight = SpatialInterpolation.calculateWeightFromPoint(source, centroid, smoothingRadius);
+
+        fail("smoothing radius <= 0 should cause exception");
     }
 
     @Test
-    public void processLine() {
+    public void calculateWeightFromPoint() {
 
-        final int numberOfLinks = 1000;
-        final double maxX = 1000;
-        final double maxY = 1000;
-        Network network = createRandomNetworkWithRandomEmissionValue(numberOfLinks, maxX, maxY);
+        final Coordinate source = new Coordinate(10, 10);
+        final Coordinate centroid = new Coordinate(10, 10);
+        final double smoothingRadius = 1;
 
-        SpatialInterpolation interpolation = new SpatialInterpolation.Builder()
-                .withBounds(SpatialTestUtils.createRect(1000, 1000))
-                .withGridCellSize(200)
-                .withGridType(SpatialInterpolation.GridType.Square)
-                .withSmoothingRadius(500)
-                .build();
+        double weight = SpatialInterpolation.calculateWeightFromPoint(source, centroid, smoothingRadius);
 
-        network.getLinks().values().forEach(link -> interpolation.processLine(
-                transformToCoodinate(link.getFromNode().getCoord()),
-                transformToCoodinate(link.getToNode().getCoord()),
-                (double) link.getAttributes().getAttribute(EMISSION_KEY)
-        ));
-
-        Collection<Grid.Cell<SpatialInterpolation.CellValue>> cells = interpolation.getCells();
-        cells.forEach(cell -> assertTrue(cell.getValue().getDoubleValue() > 0));
-    }
-
-    @Test
-    public void processPoint() {
-
-        final int numberOfPoints = 1000;
-        final double maxX = 1000;
-        final double maxY = 1000;
-
-        Collection<Grid.Cell<Double>> points = createRandomPointsWithValues(numberOfPoints, maxX, maxY);
-
-        SpatialInterpolation interpolation = new SpatialInterpolation.Builder()
-                .withBounds(SpatialTestUtils.createRect(1000, 1000))
-                .withGridCellSize(200)
-                .withGridType(SpatialInterpolation.GridType.Square)
-                .withSmoothingRadius(500)
-                .build();
-
-        points.forEach(point -> interpolation.processPoint(point.getCoordinate(), point.getValue()));
-
-        Collection<Grid.Cell<SpatialInterpolation.CellValue>> cells = interpolation.getCells();
-        cells.forEach(cell -> assertTrue(cell.getValue().getDoubleValue() > 0));
+        assertEquals(1, weight, 0.001);
     }
 }
