@@ -51,8 +51,8 @@ public final class RunOneTruckExample {
 
 		// setup controler
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new OneTruckModule(TRUCKS_FILE));
 		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new OneTruckModule(TRUCKS_FILE));
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.truck));
 
 		if (otfvis) {

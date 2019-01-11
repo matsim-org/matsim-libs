@@ -34,40 +34,25 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
 public class VrpAgentSource implements AgentSource {
-	public static final String DVRP_VEHICLE_TYPE = "dvrp_vehicle_type";
-
 	private final DynActionCreator nextActionCreator;
 	private final Fleet fleet;
 	private final VrpOptimizer optimizer;
 	private final QSim qSim;
+	private final VehicleType vehicleType;
 
-	@Inject(optional = true)
-	private @Named(DVRP_VEHICLE_TYPE)
-	VehicleType vehicleType;
-
-	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, QSim qSim) {
+	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, QSim qSim,
+			VehicleType vehicleType) {
 		this.nextActionCreator = nextActionCreator;
 		this.fleet = fleet;
 		this.optimizer = optimizer;
 		this.qSim = qSim;
-	}
-
-	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, QSim qSim,
-			VehicleType vehicleType) {
-		this(nextActionCreator, fleet, optimizer, qSim);
 		this.vehicleType = vehicleType;
 	}
 
 	@Override
 	public void insertAgentsIntoMobsim() {
 		VehiclesFactory vehicleFactory = VehicleUtils.getFactory();
-		if (vehicleType == null) {
-			vehicleType = VehicleUtils.getDefaultVehicleType();
-		}
 
 		for (Vehicle vrpVeh : fleet.getVehicles().values()) {
 			Id<Vehicle> id = vrpVeh.getId();
