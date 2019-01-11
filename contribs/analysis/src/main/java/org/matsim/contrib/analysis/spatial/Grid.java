@@ -76,7 +76,7 @@ public abstract class Grid<T> {
         }
     }
 
-    static class Cell<T> {
+    public static class Cell<T> {
 
         private Coordinate coordinate;
         private T value;
@@ -92,6 +92,10 @@ public abstract class Grid<T> {
 
         public T getValue() {
             return value;
+        }
+
+        public void setValue(T value) {
+            this.value = value;
         }
     }
 }

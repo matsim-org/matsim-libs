@@ -26,26 +26,6 @@ public class SpatialInterpolation {
         return grid.getValues();
     }
 
-    public void processLine(final Coordinate from, final Coordinate to, final double intensityOnLine) {
-
-        grid.getValues().forEach(cell -> {
-            double weight = calculateWeightFromLine(from, to, cell.getCoordinate());
-            cell.getValue().value += intensityOnLine * weight;
-        });
-    }
-
-    public void processPoint(final Coordinate point, final double intensityOnPoint) {
-
-        grid.getValues().forEach(cell -> {
-
-            double smoothingArea = Math.PI * smoothingRadius * smoothingRadius;
-            double normalizationFactor = grid.getCellArea() / smoothingArea;
-            double weight = calculateWeightFromPoint(point, cell.getCoordinate());
-
-            cell.getValue().value += intensityOnPoint * weight * normalizationFactor;
-        });
-    }
-
     /**
      * This uses a gaussinan distance weighting to calculate the impact of link based emissions onto the centroid of a
      * grid cell. The level of emission is assumed to be linear over the link.
@@ -55,7 +35,7 @@ public class SpatialInterpolation {
      * @param cellCentroid centroid of the impacted cell
      * @return weight factor by which the emission value should be multiplied to calculate the impact of the cell
      */
-    private double calculateWeightFromLine(final Coordinate from, final Coordinate to, final Coordinate cellCentroid) {
+    public static double calculateWeightFromLine(final Coordinate from, final Coordinate to, final Coordinate cellCentroid, final double smoothingRadius) {
 
         double a = from.distance(cellCentroid) * from.distance(cellCentroid);
         double b = (to.x - from.x) * (from.x - cellCentroid.x) + (to.y - from.y) * (from.y - cellCentroid.y);
@@ -74,6 +54,26 @@ public class SpatialInterpolation {
         return weight;
     }
 
+    public void processPoint(final Coordinate point, final double intensityOnPoint) {
+
+        grid.getValues().forEach(cell -> {
+
+            double smoothingArea = Math.PI * smoothingRadius * smoothingRadius;
+            double normalizationFactor = grid.getCellArea() / smoothingArea;
+            double weight = calculateWeightFromPoint(point, cell.getCoordinate());
+
+            cell.getValue().value += intensityOnPoint * weight * normalizationFactor;
+        });
+    }
+
+    public void processLine(final Coordinate from, final Coordinate to, final double intensityOnLine) {
+
+        grid.getValues().forEach(cell -> {
+            double weight = calculateWeightFromLine(from, to, cell.getCoordinate(), smoothingRadius);
+            cell.getValue().value += intensityOnLine * weight;
+        });
+    }
+
     /**
      * This uses an exponential distance weighting to calculate the impact of point based emissions onto the centroid of
      * a grid cell.
@@ -82,7 +82,7 @@ public class SpatialInterpolation {
      * @param cellCentroid   Centroid of the impacted cell
      * @return weight factor by which the emission value should be multiplied to calculate the impact of the cell
      */
-    private double calculateWeightFromPoint(final Coordinate emissionSource, final Coordinate cellCentroid) {
+    public double calculateWeightFromPoint(final Coordinate emissionSource, final Coordinate cellCentroid) {
 
         double dist = emissionSource.distance(cellCentroid);
         return Math.exp((-dist * dist) / (smoothingRadius * smoothingRadius));
