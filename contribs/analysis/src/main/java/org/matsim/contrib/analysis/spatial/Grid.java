@@ -15,12 +15,12 @@ import java.util.function.Supplier;
  *
  * @param <T>
  */
-public abstract class Grid<T> {
+abstract class Grid<T> {
 
     final double horizontalCentroidDistance;
     QuadTree<Cell<T>> quadTree;
 
-    public Grid(final double horizontalCentroidDistance, final Supplier<T> initialValueSupplier, final Geometry bounds) {
+    Grid(final double horizontalCentroidDistance, final Supplier<T> initialValueSupplier, final Geometry bounds) {
         this.horizontalCentroidDistance = horizontalCentroidDistance;
         generateGrid(initialValueSupplier, bounds);
     }

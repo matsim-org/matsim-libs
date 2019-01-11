@@ -4,8 +4,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import java.util.function.Supplier;
 
-public class HexagonalGrid<T> extends Grid<T> {
-
+public final class HexagonalGrid<T> extends Grid<T> {
 
     public HexagonalGrid(double horizontalCentroidDistance, Supplier<T> initialValueSupplier, Geometry bounds) {
         super(horizontalCentroidDistance, initialValueSupplier, bounds);
