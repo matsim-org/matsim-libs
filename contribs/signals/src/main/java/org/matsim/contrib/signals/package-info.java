@@ -4,9 +4,9 @@
  *  
  *  <h2>Usage</h2>
  *  
- *  If input files for signal systems are already available, simulation of traffic lights can be enabled via MATSim config options.
+ *  If input files for signal systems are already available, simulation of traffic lights can be enabled via MATSim config options and by adding the signals extension to the simulation (i.e. to the controler).
  *  <p>
- *  Examples of such configurations can be found as input of the code examples and tests in this package.
+ *  Examples of such configurations can be found as input of the code examples and tests in this package. Also, you can find examples how to add the signals extension to the simulation there.
  *  </p>
  *  
  *  <h2>Data Model description</h2>
@@ -55,5 +55,3 @@
  * @author tthunig
  */
 package org.matsim.contrib.signals;
-
-import org.matsim.contrib.signals.data.SignalsData;
