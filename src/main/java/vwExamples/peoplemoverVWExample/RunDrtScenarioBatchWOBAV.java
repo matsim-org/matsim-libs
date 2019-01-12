@@ -19,14 +19,12 @@
 
 package vwExamples.peoplemoverVWExample;
 
-import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -170,12 +168,6 @@ public class RunDrtScenarioBatchWOBAV {
                 }
             });
 
-            controler.addOverridingModule(new AbstractModule() {
-                @Override
-                public void install() {
-                    bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSource.DVRP_VEHICLE_TYPE)).toInstance(avType);
-                }
-            });
 
             //We finally run the controller to start MATSim
             controler.run();
