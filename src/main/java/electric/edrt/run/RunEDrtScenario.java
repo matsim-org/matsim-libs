@@ -42,6 +42,9 @@ import org.matsim.vsp.edvrp.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehic
 import org.matsim.vsp.edvrp.edrt.run.EDrtControlerCreator;
 import org.matsim.vsp.ev.EvConfigGroup;
 import org.matsim.vsp.ev.EvModule;
+import org.matsim.vsp.ev.charging.ChargingLogic;
+import org.matsim.vsp.ev.charging.ChargingWithQueueingLogic;
+import org.matsim.vsp.ev.charging.FastThenSlowCharging;
 import org.matsim.vsp.ev.charging.FixedSpeedChargingStrategy;
 import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
 import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
@@ -118,7 +121,7 @@ public class RunEDrtScenario {
 						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
 				bind(DriveEnergyConsumption.Factory.class).toInstance(evconsumption -> new VwDrtDriveEnergyConsumption());
 				bind(AuxEnergyConsumption.Factory.class).to(VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
-
+                bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingLogic(charger, new FastThenSlowCharging(charger.getPower())));
 			}
 		});
 
