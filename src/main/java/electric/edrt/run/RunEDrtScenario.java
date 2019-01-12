@@ -19,6 +19,7 @@
 
 package electric.edrt.run;
 
+import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
 import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import org.matsim.api.core.v01.Id;
@@ -43,7 +44,7 @@ import org.matsim.vsp.edvrp.edrt.run.EDrtControlerCreator;
 import org.matsim.vsp.ev.EvConfigGroup;
 import org.matsim.vsp.ev.EvModule;
 import org.matsim.vsp.ev.charging.ChargingLogic;
-import org.matsim.vsp.ev.charging.ChargingWithQueueingLogic;
+import org.matsim.vsp.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.vsp.ev.charging.FastThenSlowCharging;
 import org.matsim.vsp.ev.charging.FixedSpeedChargingStrategy;
 import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
@@ -65,7 +66,7 @@ public class RunEDrtScenario {
 				new TemperatureChangeConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.plans().setInputFile("population/vw219_it_1_sampleRate0.1replaceRate_bs_drt.xml.gz");
-		config.controler().setLastIteration(1); // Number of simulation iterations
+		config.controler().setLastIteration(0); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(1); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(1); // Write Plan file every x-Iterations
 		config.network().setInputFile("network/modifiedNetwork.xml.gz");
@@ -121,7 +122,8 @@ public class RunEDrtScenario {
 						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
 				bind(DriveEnergyConsumption.Factory.class).toInstance(evconsumption -> new VwDrtDriveEnergyConsumption());
 				bind(AuxEnergyConsumption.Factory.class).to(VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
-                bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingLogic(charger, new FastThenSlowCharging(charger.getPower())));
+				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
+				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
 			}
 		});
 
