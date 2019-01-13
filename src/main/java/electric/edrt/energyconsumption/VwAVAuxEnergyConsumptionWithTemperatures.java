@@ -38,6 +38,14 @@ public class VwAVAuxEnergyConsumptionWithTemperatures implements AuxEnergyConsum
     private final ElectricVehicle ev;
     private final VehicleAtChargerLinkTracker tracker;
 
+
+    //Verbrauch Bordnetz konstant 1,5KW -> 1,5kWh/h -> 0,025kWh/min
+    private static double auxConsumption_per_s = 1500;
+
+    //Verbrauch Systeme automatische Fahren konstant 1,5KW -> 1,5kWh/h --> 1500Ws/s
+    private static double AVauxConsumption_per_s = 1500;
+
+
     VwAVAuxEnergyConsumptionWithTemperatures(TemperatureService temperatureService, ElectricVehicle ev, VehicleAtChargerLinkTracker tracker) {
         this.temperatureService = temperatureService;
         this.ev = ev;
@@ -55,7 +63,7 @@ public class VwAVAuxEnergyConsumptionWithTemperatures implements AuxEnergyConsum
             throw new IllegalArgumentException("Reported temperature " + temp + " is out of bound.");
 
         }
-        return period * consumptionTemp;
+        return period * (AVauxConsumption_per_s + auxConsumption_per_s + consumptionTemp);
     }
 
 }
