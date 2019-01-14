@@ -4,8 +4,20 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import java.util.function.Supplier;
 
+/**
+ * Hexagonal Grid which holds values
+ *
+ * @param <T> value of each cell
+ */
 public final class HexagonalGrid<T> extends Grid<T> {
 
+    /**
+     * New Instance of HexagonalGrid
+     *
+     * @param horizontalCentroidDistance horizontal distance between cell centroids
+     * @param initialValueSupplier       function to deliver a initial value when cells are created
+     * @param bounds                     outer bounds of the grid
+     */
     public HexagonalGrid(double horizontalCentroidDistance, Supplier<T> initialValueSupplier, Geometry bounds) {
         super(horizontalCentroidDistance, initialValueSupplier, bounds);
     }

@@ -65,7 +65,7 @@ public class TimeBinMapTest {
         map.getTimeBin(0);
         map.getTimeBin(30);
 
-        assertEquals(120, map.getEndTimeOfLastBucket(), 0.0001);
+        assertEquals(120, map.getEndTimeOfLastBin(), 0.0001);
     }
 
     @Test

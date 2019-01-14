@@ -6,7 +6,7 @@ import org.apache.commons.math3.special.Erf;
 public abstract class SpatialInterpolation {
 
     /**
-     * This uses a gaussinan distance weighting to calculate the impact of link based emissions onto the centroid of a
+     * This uses a gaussian distance weighting to calculate the impact of link based emissions onto the centroid of a
      * grid cell. The level of emission is assumed to be linear over the link.
      *
      * @param from         Link from coordinate
