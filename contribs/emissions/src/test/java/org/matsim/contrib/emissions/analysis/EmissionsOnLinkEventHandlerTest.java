@@ -34,7 +34,7 @@ public class EmissionsOnLinkEventHandlerTest {
 
         handler.handleEvent(event);
 
-        TimeBinMap.TimeBin<Map<Id<Link>, LinkEmissions>> timeBin = handler.getTimeBins().getTimeBin(time);
+        TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> timeBin = handler.getTimeBins().getTimeBin(time);
 
         assertTrue(timeBin.hasValue());
         emissions.forEach((key, value) -> assertEquals(value, timeBin.getValue().get(linkId).getEmission(key), 0.0001));
@@ -56,7 +56,7 @@ public class EmissionsOnLinkEventHandlerTest {
 
         handler.handleEvent(event);
 
-        TimeBinMap.TimeBin<Map<Id<Link>, LinkEmissions>> timeBin = handler.getTimeBins().getTimeBin(time);
+        TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> timeBin = handler.getTimeBins().getTimeBin(time);
 
         assertTrue(timeBin.hasValue());
         emissions.forEach((key, value) -> assertEquals(value, timeBin.getValue().get(linkId).getEmission(key), 0.0001));
@@ -78,14 +78,14 @@ public class EmissionsOnLinkEventHandlerTest {
         secondTimestep.forEach(handler::handleEvent);
         thirdTimestep.forEach(handler::handleEvent);
 
-        TimeBinMap<Map<Id<Link>, LinkEmissions>> summedEmissions = handler.getTimeBins();
+        TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> summedEmissions = handler.getTimeBins();
 
         assertEquals(2, summedEmissions.getTimeBins().size());
-        TimeBinMap.TimeBin<Map<Id<Link>, LinkEmissions>> firstBin = summedEmissions.getTimeBin(18);
+        TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> firstBin = summedEmissions.getTimeBin(18);
         assertTrue(firstBin.hasValue());
         assertEquals(numberOfEvents * emissionValue * 2, firstBin.getValue().get(linkId).getEmission(Pollutant.NO2), 0.001);
 
-        TimeBinMap.TimeBin<Map<Id<Link>, LinkEmissions>> secondBin = summedEmissions.getTimeBin(20);
+        TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> secondBin = summedEmissions.getTimeBin(20);
         assertTrue(secondBin.hasValue());
         assertEquals(numberOfEvents * emissionValue, secondBin.getValue().get(linkId).getEmission(Pollutant.HC));
     }

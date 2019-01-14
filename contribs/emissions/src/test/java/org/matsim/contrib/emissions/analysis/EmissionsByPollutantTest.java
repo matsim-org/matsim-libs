@@ -1,27 +1,23 @@
 package org.matsim.contrib.emissions.analysis;
 
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.types.Pollutant;
 import org.matsim.contrib.emissions.utils.TestEmissionUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
-public class LinkEmissionsTest {
+public class EmissionsByPollutantTest {
 
     @Test
     public void initialize() {
 
-        Id<Link> linkId = Id.createLinkId(UUID.randomUUID().toString());
         Map<Pollutant, Double> emissions = TestEmissionUtils.createEmissions();
 
-        LinkEmissions linkEmissions = new LinkEmissions(linkId, emissions);
+        EmissionsByPollutant linkEmissions = new EmissionsByPollutant(emissions);
 
         Map<Pollutant, Double> emissionsByPollutant = linkEmissions.getEmissions();
 
@@ -34,15 +30,14 @@ public class LinkEmissionsTest {
     @Test
     public void addEmission() {
 
-        Id<Link> linkId = Id.createLinkId(UUID.randomUUID().toString());
         Map<Pollutant, Double> emissions = TestEmissionUtils.createEmissions();
         final double valueToAdd = 5;
         final Pollutant pollutant = Pollutant.CO;
         final double expectedValue = emissions.get(pollutant) + valueToAdd;
-        LinkEmissions linkEmissions = new LinkEmissions(linkId, emissions);
+        EmissionsByPollutant emissionsByPollutant = new EmissionsByPollutant(emissions);
 
-        double result = linkEmissions.addEmission(pollutant, valueToAdd);
-        double retrievedResult = linkEmissions.getEmission(pollutant);
+        double result = emissionsByPollutant.addEmission(pollutant, valueToAdd);
+        double retrievedResult = emissionsByPollutant.getEmission(pollutant);
 
         assertEquals(expectedValue, result);
         assertEquals(expectedValue, retrievedResult);
@@ -51,15 +46,14 @@ public class LinkEmissionsTest {
     @Test
     public void addEmission_PollutantNotPresentYet() {
 
-        Id<Link> linkId = Id.createLinkId(UUID.randomUUID().toString());
         Map<Pollutant, Double> initialPollutants = new HashMap<>();
         initialPollutants.put(Pollutant.CO, Math.random());
         final double valueToAdd = 5;
         final Pollutant pollutantToAdd = Pollutant.NO2;
-        LinkEmissions linkEmissions = new LinkEmissions(linkId, initialPollutants);
+        EmissionsByPollutant emissionsByPollutant = new EmissionsByPollutant(initialPollutants);
 
-        double result = linkEmissions.addEmission(pollutantToAdd, valueToAdd);
-        double retrievedResult = linkEmissions.getEmission(pollutantToAdd);
+        double result = emissionsByPollutant.addEmission(pollutantToAdd, valueToAdd);
+        double retrievedResult = emissionsByPollutant.getEmission(pollutantToAdd);
 
         assertEquals(valueToAdd, result);
         assertEquals(valueToAdd, retrievedResult);
@@ -68,9 +62,8 @@ public class LinkEmissionsTest {
     @Test
     public void addEmissions() {
 
-        Id<Link> linkId = Id.createLinkId(UUID.randomUUID().toString());
         Map<Pollutant, Double> emissions = TestEmissionUtils.createEmissions();
-        LinkEmissions linkEmissions = new LinkEmissions(linkId, new HashMap<>(emissions));
+        EmissionsByPollutant linkEmissions = new EmissionsByPollutant(new HashMap<>(emissions));
 
         linkEmissions.addEmissions(emissions);
 

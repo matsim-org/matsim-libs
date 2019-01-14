@@ -13,16 +13,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Collects Warm- and Cold-Emission-Events by time bin and by link-id
+ */
 public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
 
-    private final TimeBinMap<Map<Id<Link>, LinkEmissions>> timeBins;
+    private final TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> timeBins;
 
-    public EmissionsOnLinkEventHandler(double timeBinSizeInSeconds) {
+    EmissionsOnLinkEventHandler(double timeBinSizeInSeconds) {
 
         this.timeBins = new TimeBinMap<>(timeBinSizeInSeconds);
     }
 
-    public TimeBinMap<Map<Id<Link>, LinkEmissions>> getTimeBins() {
+    /**
+     * Yields collected emissions
+     *
+     * @return Collected emissions by time bin and by link id
+     */
+    TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> getTimeBins() {
         return timeBins;
     }
 
@@ -45,7 +53,7 @@ public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, Co
 
     private void handleEmissionEvent(double time, Id<Link> linkId, Map<String, Double> emissions) {
 
-        TimeBinMap.TimeBin<Map<Id<Link>, LinkEmissions>> currentBin = timeBins.getTimeBin(time);
+        TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> currentBin = timeBins.getTimeBin(time);
 
         Map<Pollutant, Double> typedEmissions = emissions.entrySet().stream()
                 .collect(Collectors.toMap(entry -> Pollutant.valueOf(entry.getKey()), Map.Entry::getValue));
@@ -53,7 +61,7 @@ public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, Co
         if (!currentBin.hasValue())
             currentBin.setValue(new HashMap<>());
         if (!currentBin.getValue().containsKey(linkId))
-            currentBin.getValue().put(linkId, new LinkEmissions(linkId, typedEmissions));
+            currentBin.getValue().put(linkId, new EmissionsByPollutant(typedEmissions));
         else
             currentBin.getValue().get(linkId).addEmissions(typedEmissions);
     }

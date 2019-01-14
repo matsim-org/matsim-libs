@@ -28,6 +28,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * This class may be used to collect emission events of some events file and assign those emissions to a grid structure.
+ * Additionally those emissions are divided into time bins
+ */
 public class EmissionGridAnalyzer {
 
     private final double binSize;
@@ -47,9 +51,19 @@ public class EmissionGridAnalyzer {
         this.smoothingRadius = smoothingRadius;
     }
 
+    /**
+     * Processes the events file of the given path. The events file must already contain emission events. The emission
+     * events will be divided into time bins, as configured by the binSize parameter in the constructor. Within each time
+     * bin all the emission events for each link are collected and their emissions are summed up by pollutant. After
+     * processing the events the impact of the emissions per link onto each grid cell is calculated by using a gaussian
+     * blur.
+     *
+     * @param eventsFile Path to the events file e.g. '/path/to/events.xml.gz
+     * @return TimeBinMap containing a grid which maps pollutants to values.
+     */
     public TimeBinMap<Grid<Map<Pollutant, Double>>> process(String eventsFile) {
 
-        TimeBinMap<Map<Id<Link>, LinkEmissions>> timeBinsWithEmissions = processEventsFile(eventsFile);
+        TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> timeBinsWithEmissions = processEventsFile(eventsFile);
         TimeBinMap<Grid<Map<Pollutant, Double>>> result = new TimeBinMap<>(binSize);
 
         timeBinsWithEmissions.getTimeBins().forEach(bin -> {
@@ -59,6 +73,13 @@ public class EmissionGridAnalyzer {
         return result;
     }
 
+    /**
+     * Works like {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer#process(String)} but writes the
+     * result into a Json-String
+     *
+     * @param eventsFile Path to the events file e.g. '/path/to/events.xml.gz
+     * @return TimeBinMap containing a grid which maps pollutants to values as JSON-String
+     */
     public String processToJsonString(String eventsFile) {
 
         ObjectMapper mapper = createObjectMapper();
@@ -70,6 +91,12 @@ public class EmissionGridAnalyzer {
         }
     }
 
+    /**
+     * Works like {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer#process(String)} but writes the
+     * result into a JSON-File
+     * @param eventsFile Path to the events file e.g. '/path/to/events.xml.gz
+     * @param jsonFile Path to the output file e.g. '/path/to/emissions.json
+     */
     public void processToJsonFile(String eventsFile, String jsonFile) {
 
         ObjectMapper mapper = createObjectMapper();
@@ -82,7 +109,7 @@ public class EmissionGridAnalyzer {
         }
     }
 
-    private TimeBinMap<Map<Id<Link>, LinkEmissions>> processEventsFile(String eventsFile) {
+    private TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> processEventsFile(String eventsFile) {
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
         EmissionEventsReader eventsReader = new EmissionEventsReader(eventsManager);
@@ -92,7 +119,7 @@ public class EmissionGridAnalyzer {
         return handler.getTimeBins();
     }
 
-    private Grid<Map<Pollutant, Double>> writeAllLinksToGrid(Map<Id<Link>, LinkEmissions> linksWithEmissions) {
+    private Grid<Map<Pollutant, Double>> writeAllLinksToGrid(Map<Id<Link>, EmissionsByPollutant> linksWithEmissions) {
 
         Grid<Map<Pollutant, Double>> grid = createGrid();
 
@@ -104,7 +131,7 @@ public class EmissionGridAnalyzer {
         return grid;
     }
 
-    private void processLink(Link link, LinkEmissions emissions, Grid<Map<Pollutant, Double>> grid) {
+    private void processLink(Link link, EmissionsByPollutant emissions, Grid<Map<Pollutant, Double>> grid) {
 
         grid.getCells().forEach(cell -> {
             double weight = SpatialInterpolation.calculateWeightFromLine(
@@ -114,7 +141,7 @@ public class EmissionGridAnalyzer {
         });
     }
 
-    private void processCell(Grid.Cell<Map<Pollutant, Double>> cell, LinkEmissions emissions, double weight) {
+    private void processCell(Grid.Cell<Map<Pollutant, Double>> cell, EmissionsByPollutant emissions, double weight) {
 
         // merge both maps from cell and linkemissions and sum up values, while the link emissions are multiplied by
         // the cell weight
@@ -155,6 +182,9 @@ public class EmissionGridAnalyzer {
 
     public enum GridType {Square, Hexagonal}
 
+    /**
+     * Builder to configure a new {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer} instance
+     */
     public static class Builder {
         private double binSize;
         private double gridSize;
@@ -162,31 +192,63 @@ public class EmissionGridAnalyzer {
         private Network network;
         private GridType gridType = GridType.Square;
 
+        /**
+         * Sets the duration of a time bin
+         * @param size duration of a time bin. Usually MATSim uses seconds as time unit but the implementation doesn't
+         *             really care.
+         * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer.Builder}
+         */
         public Builder withTimeBinSize(double size) {
             this.binSize = size;
             return this;
         }
 
+        /**
+         * Sets the used grid type. Default is Square
+         * @param type The grid type. Currently either Square or Hexagonal
+         * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer.Builder}
+         */
         public Builder withGridType(GridType type) {
             this.gridType = type;
             return this;
         }
 
+        /**
+         * Sets the horizontal distance between grid cells.
+         * @param size The horizontal distance between grid cells. Should conform to the units used by the supplied network.
+         * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer.Builder}
+         */
         public Builder withGridSize(double size) {
             gridSize = size;
             return this;
         }
 
+        /**
+         * Sets the smoothing radius for the spatial interpolation of pollution over grid cells
+         * @param radius The radius where things are smoothed. Should be the same unit as the gridSize
+         * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer.Builder}
+         */
         public Builder withSmoothingRadius(double radius) {
             smoothingRadius = radius;
             return this;
         }
 
+        /**
+         * MATSim network that was used for the simulation run
+         * @param network a network
+         * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer.Builder}
+         */
         public Builder withNetwork(Network network) {
             this.network = network;
             return this;
         }
 
+        /**
+         * Builds a new Instance of {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer}
+         * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer}
+         * @throws java.lang.IllegalArgumentException if binSize, gridSize, smoothingRadius are <= 0, and if
+         * network was not set
+         */
         public EmissionGridAnalyzer build() {
 
             if (!isValid())
@@ -201,7 +263,7 @@ public class EmissionGridAnalyzer {
     }
 
     /**
-     * Mixin to supress the printing of z-coordinates when grid is serialized to json
+     * Mixin to suppress the printing of z-coordinates when grid is serialized to json
      */
     private static class CoordinateMixin {
 
