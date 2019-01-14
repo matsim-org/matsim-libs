@@ -19,11 +19,12 @@
 
 package org.matsim.contrib.accessibility.utils;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.DataStore;
@@ -35,7 +36,6 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.VoronoiGeometryUtils;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -58,19 +58,28 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 
 	private String crs;
 	private String name;
-	Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap;
+	private Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap;
+	private Set<String> additionalFacInfo;
+	private String outputDirectory;
+	private boolean pushing2Geoserver;
+	private boolean createQGisOutput;
 
-	public GeoserverUpdater (String crs, String name, Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap) {
+	public GeoserverUpdater (String crs, String name, Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap, Set<String> additionalFacInfo,
+			String outputDirectory, boolean pushing2Geoserver, boolean createQGisOutput) {
 		this.crs = crs;
 		this.name = name;
 		this.measurePointGeometryMap = measurePointGeometryMap;
+		this.additionalFacInfo = additionalFacInfo;
+		this.outputDirectory = outputDirectory;
+		this.pushing2Geoserver = pushing2Geoserver;
+		this.createQGisOutput = createQGisOutput;
 	}
 	
 	private Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>() ;
 
 	@Override
 	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay,	Map<String, Double> accessibilities) {
-		accessibilitiesMap.put( new Tuple<>(measurePoint, timeOfDay), accessibilities ) ;
+		accessibilitiesMap.put(new Tuple<>(measurePoint, timeOfDay), accessibilities);
 	}
 
 	@Override
@@ -80,12 +89,18 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 		SimpleFeatureType featureType = featureTypeBuilder.buildFeatureType();
 		DefaultFeatureCollection featureCollection = createFeatureCollection(geometryFactory, featureType);
 		
-		//
-		// temporary shapefile-write-out for testing...
-	    ShapeFileWriter.writeGeometries(featureCollection, "/Users/dominik/voronoi_test.shp");
-		//
+		if (outputDirectory != null) {
+			File file = new File(outputDirectory);
+			file.mkdirs();
+		}
+		
+		if (createQGisOutput) {
+			ShapeFileWriter.writeGeometries(featureCollection, outputDirectory + "/result.shp");
+		}
 	    
-		updateOnGeoserver(featureType, featureCollection);
+		if (pushing2Geoserver) {
+			updateOnGeoserver(featureType, featureCollection);
+		}
 	}
 
 	private SimpleFeatureTypeBuilder createFeatureTypeBuilder() {
@@ -95,13 +110,12 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 			featureTypeBuilder.add("the_geom", Polygon.class);
 			featureTypeBuilder.add("id", Integer.class);
 			featureTypeBuilder.add("time", Double.class);
-			for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+			for (Modes4Accessibility mode : Modes4Accessibility.values()) { // TODO
 				featureTypeBuilder.add(mode.toString(), Double.class);
 			}
-	//		for (ActivityFacilities facilities : additionalFacilityData) {
-	//			b.add(facilities.getName(), Double.class);
-	//		}
-			// yyyyyy add population here
+			for (String currentAdditionalFacInfo : additionalFacInfo) {
+				featureTypeBuilder.add(currentAdditionalFacInfo, Double.class);
+			}
 			return featureTypeBuilder;
 		}
 
@@ -137,7 +151,14 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 					featureBuilder.add(null);
 				}
 			}
-			// yyyyyy write population density here. Probably not aggregated to grid.
+			for (String currentAdditionalFacInfo : additionalFacInfo) {
+				Double additionalFacInfoValue = Double.parseDouble(entry.getKey().getFirst().getAttributes().getAttribute(currentAdditionalFacInfo).toString());
+				if (additionalFacInfoValue != null && !Double.isNaN(additionalFacInfoValue)) {
+					featureBuilder.add(additionalFacInfoValue);
+				} else {
+					featureBuilder.add(null);
+				}
+			}
 
 			SimpleFeature feature = featureBuilder.buildFeature(null);
 			featureCollection.add(feature);

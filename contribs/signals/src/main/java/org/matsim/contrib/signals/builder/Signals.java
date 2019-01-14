@@ -14,9 +14,17 @@ public class Signals{
 
     public static class Configurator{
         private final SignalsModule signalsModule;
-        private Configurator( SignalsModule signalsModule ){
-            this.signalsModule = signalsModule;
+        public Configurator( AllowsConfiguration ao ){
+            this.signalsModule = new SignalsModule() ;
+            ao.addOverridingModule( this.signalsModule ) ;
+            ao.addOverridingQSimModule( new SignalsQSimModule() ) ;
         }
+        
+        /**
+         * Call this method when you want to add your own SignalController.
+         * E.g. via 
+         *  new Configurator(controler).addSignalControllerFactory(LaemmerSignalController.IDENTIFIER, LaemmerSignalController.LaemmerFactory.class);
+         */
         public final void addSignalControllerFactory( String key, Class<? extends SignalControllerFactory> signalControllerFactoryClassName ) {
             signalsModule.addSignalControllerFactory( key, signalControllerFactoryClassName );
         }

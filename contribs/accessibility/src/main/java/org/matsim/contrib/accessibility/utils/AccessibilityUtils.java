@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -47,7 +48,10 @@ import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.facilities.FacilitiesUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author dziemke
@@ -238,8 +242,6 @@ public class AccessibilityUtils {
 				}
 			}
 		}
-//		FacilitiesWriter facilitiesWriter = new FacilitiesWriter(facilities);
-//		facilitiesWriter.write("../../../public-svn/matsim/specifiy_location/...xml.gz");
 		return facilities;
 	}
 
@@ -252,5 +254,32 @@ public class AccessibilityUtils {
 		String date = cal.get(Calendar.YEAR) + "-" 
 				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
 		return date;
+	}
+	
+	public static void assignAdditionalFacilitiesDataToMeasurePoint(ActivityFacilities measurePoints, Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap,
+			Map<String, ActivityFacilities> additionalFacilityData) {
+		LOG.info("Start assigning additional facilities data to measure point.");
+		GeometryFactory geometryFactory = new GeometryFactory();
+		
+		for (ActivityFacilities additionalDataFacilities : additionalFacilityData.values()) { // Iterate over all additional data collections
+			String additionalDataName = additionalDataFacilities.getName();
+			int additionalDataFacilitiesToAssign = additionalDataFacilities.getFacilities().size();
+			
+			for (Id<ActivityFacility> measurePointId : measurePoints.getFacilities().keySet()) { // Iterate over all measure points
+				ActivityFacility measurePoint = measurePoints.getFacilities().get(measurePointId);
+				measurePoint.getAttributes().putAttribute(additionalDataName, 0);
+				Geometry geometry = measurePointGeometryMap.get(measurePointId);
+				
+				for (ActivityFacility facility : additionalDataFacilities.getFacilities().values()) { // Iterate over additional-data facilities
+					Point point = geometryFactory.createPoint(new Coordinate(facility.getCoord().getX(), facility.getCoord().getY()));
+					if (geometry.contains(point)) {
+						measurePoint.getAttributes().putAttribute(additionalDataName, (int) measurePoint.getAttributes().getAttribute(additionalDataName) + 1);
+						additionalDataFacilitiesToAssign--;
+					}
+				}
+			}
+			LOG.warn(additionalDataFacilitiesToAssign + " have not been assigned to a measure point geometry.");
+		}
+		LOG.info("Finished assigning additional facilities data to measure point.");
 	}
 }

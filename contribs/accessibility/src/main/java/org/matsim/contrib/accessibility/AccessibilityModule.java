@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.inject.Provider;
 
@@ -68,9 +69,10 @@ public final class AccessibilityModule extends AbstractModule {
 
 	private List<FacilityDataExchangeInterface> facilityDataListeners = new ArrayList<>() ; 
 	private ActivityFacilities measuringPoints;
-	private List<ActivityFacilities> additionalFacs = new ArrayList<>() ;
+	private Map<String, ActivityFacilities> additionalFacs = new TreeMap<>() ;
 	private String activityType;
-	private boolean pushing2Geoserver;
+	private boolean pushing2Geoserver = false;
+	private boolean createQGisOutput = false;
 	private String crs;
 
 	@Override
@@ -97,36 +99,26 @@ public final class AccessibilityModule extends AbstractModule {
 				Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap = null;
 				final BoundingBox boundingBox;
 				
+				int tileSize_m = acg.getTileSize();
+				if (tileSize_m <= 0) {
+					LOG.error("Tile Size needs to be assigned a value greater than zero.");
+				}
+				
 				if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromShapeFile) {
-					int tileSize_m = acg.getTileSize();
-					if (tileSize_m <= 0) {
-						LOG.error("Tile Size needs to be assigned a value greater than zero.");
-					}
 					Geometry boundary = GridUtils.getBoundary(acg.getShapeFileCellBasedAccessibility());
 					Envelope envelope = boundary.getEnvelopeInternal();
 					boundingBox = BoundingBox.createBoundingBox(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, tileSize_m);
-					measurePointGeometryMap = VoronoiGeometryUtils.buildMeasurePointGeometryMap(measuringPoints, boundingBox, tileSize_m);
 					LOG.info("Using shape file to determine the area for accessibility computation.");
 					
 				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromBoundingBox) {
-					int tileSize_m = acg.getTileSize();
-					if (tileSize_m <= 0) {
-						LOG.error("Tile Size needs to be assigned a value greater than zero.");
-					}
 					boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, tileSize_m);
-					measurePointGeometryMap = VoronoiGeometryUtils.buildMeasurePointGeometryMap(measuringPoints, boundingBox, tileSize_m);
 					LOG.info("Using custom bounding box to determine the area for accessibility computation.");
 					
 				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromBoundingBoxHexagons) {
-					int tileSize_m = acg.getTileSize();
-					if (tileSize_m <= 0) {
-						LOG.error("Tile Size needs to be assigned a value greater than zero.");
-					}
 					boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
 					measuringPoints = GridUtils.createHexagonLayer(boundingBox, tileSize_m);
-					measurePointGeometryMap = VoronoiGeometryUtils.buildMeasurePointGeometryMap(measuringPoints, boundingBox, tileSize_m);
 					LOG.info("Using custom bounding box to determine the area for accessibility computation.");
 					
 				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromFacilitiesFile) {
@@ -135,13 +127,11 @@ public final class AccessibilityModule extends AbstractModule {
 					String measuringPointsFile = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class ).getMeasuringPointsFile();
 					new MatsimFacilitiesReader(measuringPointsSc).readFile(measuringPointsFile);
 					measuringPoints = (ActivityFacilitiesImpl) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(measuringPointsSc, null);
-//					measurePointGeometryMap
 					LOG.info("Using measuring points from file: " + measuringPointsFile);
 					
 				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromFacilitiesObject) {
 					boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
 					measuringPoints = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class ).getMeasuringPointsFacilities();
-//					measurePointGeometryMap
 					LOG.warn("Number of measuringPoints = " +  measuringPoints.getFacilities().size());
 					if (measuringPoints == null) {
 						throw new RuntimeException("Measuring points should have been set direclty if from-facilities-object mode is used.");
@@ -151,17 +141,14 @@ public final class AccessibilityModule extends AbstractModule {
 				} else { // This covers also the "fromNetwork" case
 					LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
 					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
-
-					int tileSize_m = acg.getTileSize();
-					if (tileSize_m <= 0) {
-						LOG.error("Tile Size needs to be assigned a value greater than zero.");
-					}
 					boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, tileSize_m);
-					measurePointGeometryMap = VoronoiGeometryUtils.buildMeasurePointGeometryMap(measuringPoints, boundingBox, tileSize_m);
 					LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
 					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
 				}
+				
+				measurePointGeometryMap = VoronoiGeometryUtils.buildMeasurePointGeometryMap(measuringPoints, boundingBox, tileSize_m);
+				AccessibilityUtils.assignAdditionalFacilitiesDataToMeasurePoint(measuringPoints, measurePointGeometryMap, additionalFacs);
 				
 				// TODO Need to find a stable way for multi-modal networks
 				// AV stuff -------------------------------------------------------------
@@ -211,20 +198,22 @@ public final class AccessibilityModule extends AbstractModule {
 					accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calculator);
 				}
 				
-				if (pushing2Geoserver == true) {
+				String outputDirectory = scenario.getConfig().controler().getOutputDirectory() + "/" + activityType;
+				
+				if (pushing2Geoserver || createQGisOutput) {
 					if (measurePointGeometryMap == null) {
 						throw new IllegalArgumentException("measure-point-to-geometry map must not be null if push to Geoserver is intended.");
 					}
+					Set <String> additionalFacInfo = additionalFacs.keySet();
 					accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs,
-							config.controler().getRunId() + "_" + activityType, measurePointGeometryMap));
-				}
-				
-				String outputDirectory = scenario.getConfig().controler().getOutputDirectory();
+							config.controler().getRunId() + "_" + activityType, measurePointGeometryMap, additionalFacInfo,
+							outputDirectory, pushing2Geoserver, createQGisOutput));
+				}				
 
 				AccessibilityShutdownListenerV4 accessibilityShutdownListener = new AccessibilityShutdownListenerV4(accessibilityCalculator, 
-						opportunities, ptMatrix, outputDirectory, acg, measurePointGeometryMap, measuringPoints);
+						opportunities, outputDirectory, acg);
 				
-				for (ActivityFacilities fac : additionalFacs) {
+				for (ActivityFacilities fac : additionalFacs.values()) {
 					accessibilityShutdownListener.addAdditionalFacilityData(fac);
 				}
 				
@@ -232,14 +221,17 @@ public final class AccessibilityModule extends AbstractModule {
 					accessibilityShutdownListener.addFacilityDataExchangeListener(listener);
 				}
 				
-				accessibilityShutdownListener.writeToSubdirectoryWithName(activityType);
 				return accessibilityShutdownListener;
 			}
 		});
 	}
 	
-	public final void setPushing2Geoserver( boolean pushing2Geoserver ) {
-		this.pushing2Geoserver = pushing2Geoserver ;
+	public final void setPushing2Geoserver(boolean pushing2Geoserver) {
+		this.pushing2Geoserver = pushing2Geoserver;
+	}
+	
+	public final void setCreateQGisOutput(boolean createQGisOutput) {
+		this.createQGisOutput = createQGisOutput;
 	}
 	
 	public final void addFacilityDataExchangeListener(FacilityDataExchangeInterface listener) {
@@ -250,12 +242,20 @@ public final class AccessibilityModule extends AbstractModule {
 	 * Add additional facility data that will generate an additional column for each (x,y,t)-Entry. The facilities are aggregated to
 	 * the measurement points in downstream code.
 	 */
-	public void addAdditionalFacilityData(ActivityFacilities facilities) {
-		additionalFacs.add(facilities) ;
+	public void addAdditionalFacilityData(ActivityFacilities facilities) { // TDO cleanu up this method
+		if (facilities.getName() == null || facilities.getName().equals("")) {
+			throw new RuntimeException("Cannot add unnamed facility containers here. A key is required to identify them.") ;
+		}
+		for (ActivityFacilities existingFacilities : this.additionalFacs.values()) {
+			if (existingFacilities.getName().equals(facilities.getName())) {
+				throw new RuntimeException("Additional facilities under the name of + " + facilities.getName() + 
+						" already exist. Cannot add additional facilities under the same name twice.") ;
+			}
+		}
+		this.additionalFacs.put(facilities.getName(), facilities);
 	}
 	
 	public void setConsideredActivityType(String activityType) {
-		// yyyy could be done via config (list of activities)
 		this.activityType = activityType ;
 	}
 }

@@ -39,6 +39,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -71,6 +72,26 @@ public class ShapeFileReader implements MatsimSomeReader {
 			log.info( "will try to read from " + dataFile.getAbsolutePath() ) ;
 			Gbl.assertIf( dataFile.exists() );
 			FileDataStore store = FileDataStoreFinder.getDataStore(dataFile);
+			SimpleFeatureSource featureSource = store.getFeatureSource();
+
+			SimpleFeatureIterator it = featureSource.getFeatures().features();
+			List<SimpleFeature> featureSet = new ArrayList<SimpleFeature>();
+			while (it.hasNext()) {
+				SimpleFeature ft = it.next();
+				featureSet.add(ft);
+			}
+			it.close();
+			store.dispose();
+			return featureSet;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public static Collection<SimpleFeature> getAllFeatures(final URL url) {
+		try {
+			log.info( "will try to read from " + url.getPath() ) ;
+			FileDataStore store = FileDataStoreFinder.getDataStore(url);
 			SimpleFeatureSource featureSource = store.getFeatureSource();
 
 			SimpleFeatureIterator it = featureSource.getFeatures().features();

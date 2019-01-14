@@ -33,7 +33,6 @@ import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
@@ -45,8 +44,6 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-
-import com.google.inject.Inject;
 
 /**
  * @author michalm
@@ -70,9 +67,8 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 			PassengerRequests.ABSOLUTE_COMPARATOR);
 	private boolean requiresReoptimization = false;
 
-	@Inject
-	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, @Drt Fleet fleet, MobsimTimer mobsimTimer,
-			DepotFinder depotFinder, RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
+	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, DepotFinder depotFinder,
+			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
 			DrtScheduleTimingUpdater scheduleTimingUpdater, EmptyVehicleRelocator relocator,
 			UnplannedRequestInserter requestInserter) {
 		this.drtCfg = drtCfg;

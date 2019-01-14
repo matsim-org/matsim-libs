@@ -25,10 +25,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeModule;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
@@ -39,7 +39,7 @@ import com.google.inject.name.Names;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class OneTruckModule extends AbstractMultiModeModule {
+public class OneTruckModule extends AbstractDvrpModeModule {
 	private final String trucksFile;
 
 	public OneTruckModule(String truckFile) {
@@ -49,14 +49,16 @@ public class OneTruckModule extends AbstractMultiModeModule {
 
 	@Override
 	public void install() {
-		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSource.DVRP_VEHICLE_TYPE))
+		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
 				.toInstance(createTruckType());
 		bindModal(Fleet.class).toProvider(new FleetProvider(trucksFile)).asEagerSingleton();
 
-		installQSimModule(new AbstractMultiModeQSimModule(TransportMode.truck) {
+		installQSimModule(new AbstractDvrpModeQSimModule(TransportMode.truck) {
 			@Override
 			protected void configureQSim() {
-				bind(OneTruckRequestCreator.class).asEagerSingleton();
+				install(new VrpAgentSourceQSimModule(getMode()));
+
+				addModalComponent(OneTruckRequestCreator.class);
 				bindModal(VrpOptimizer.class).to(OneTruckOptimizer.class).asEagerSingleton();
 				bindModal(VrpAgentLogic.DynActionCreator.class).to(OneTruckActionCreator.class).asEagerSingleton();
 			}

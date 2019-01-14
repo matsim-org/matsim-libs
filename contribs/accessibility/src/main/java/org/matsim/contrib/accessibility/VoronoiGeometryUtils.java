@@ -31,6 +31,7 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -52,15 +53,14 @@ public class VoronoiGeometryUtils {
 	
 	private static GeometryFactory geometryFactory = new GeometryFactory();
 	
-	static Map<Id<ActivityFacility>, Geometry> buildMeasurePointGeometryMap(ActivityFacilities measuringPoints, BoundingBox box, int tileSize_m) {
+	static Map<Id<ActivityFacility>, Geometry> buildMeasurePointGeometryMap(ActivityFacilities measuringPoints, BoundingBox boundingBox, int tileSize_m) {
 		LOG.warn("Started building measure-point-to-geometry map.");
+		if (boundingBox == null) {
+			throw new IllegalArgumentException("Bounding box must be specified.");
+		}
 		Map<Id<ActivityFacility>, Geometry> measurePointPolygons = new HashMap<>();
 		
-		Collection<Geometry> geometries = determineVoronoiShapes(measuringPoints, box);
-		
-		// Write geometries to file
-//		Collection<SimpleFeature> features = VoronoiGeometryUtils.createFeaturesFromPolygons(geometries);
-//	    ShapeFileWriter.writeGeometries(features, "/Users/dominik/voronoi_test.shp");
+		Collection<Geometry> geometries = determineVoronoiShapes(measuringPoints, boundingBox);
 		
 		if (geometries.size() != measuringPoints.getFacilities().size()) {
 			throw new RuntimeException("Number of Voronoi polygons and measure points must be equal.");
@@ -68,11 +68,11 @@ public class VoronoiGeometryUtils {
 		
 		for (ActivityFacility measurePoint : measuringPoints.getFacilities().values()) {
 			Id<ActivityFacility> measurePointId = measurePoint.getId();
-			Point point = geometryFactory.createPoint(new Coordinate(measurePoint.getCoord().getX(), measurePoint.getCoord().getY()));
+			Coord coord = measurePoint.getCoord();
 			
 			boolean polygonFound = false;
 			for (Geometry geometry : geometries) {
-				if (geometry.covers(point)) {
+				if (geometry.covers(geometryFactory.createPoint(CoordUtils.createGeotoolsCoordinate(coord)))) {
 					if (!measurePointPolygons.containsKey(measurePointId)) {
 						measurePointPolygons.put(measurePointId, geometry);
 						polygonFound = true;
@@ -82,9 +82,9 @@ public class VoronoiGeometryUtils {
 				}
 			}
 			if (!polygonFound) {
-				throw new RuntimeException("There must be one Voronoi polygon for each measure point.");
+				throw new RuntimeException("No polygon found for measure point " + measurePointId + " with coord = " + coord + ".");
 			}
-		}
+		}		
 		Map<Id<ActivityFacility>, Geometry> revisedMeasurePointPolygons = reduceEdgePolygons(measuringPoints, tileSize_m, measurePointPolygons);
 		
 		LOG.warn("Finished building measure-point-to-geometry map.");

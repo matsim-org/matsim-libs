@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
@@ -33,7 +31,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -51,8 +48,7 @@ public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 	private final double maxWalkDistance;
 	private final double walkBeelineFactor;
 
-	@Inject
-	public DefaultAccessEgressStopFinder(@Drt TransitSchedule transitSchedule, DrtConfigGroup drtconfig,
+	public DefaultAccessEgressStopFinder(TransitSchedule transitSchedule, DrtConfigGroup drtconfig,
 			PlansCalcRouteConfigGroup planscCalcRouteCfg, Network network) {
 		this.network = network;
 		this.stops = transitSchedule.getFacilities();

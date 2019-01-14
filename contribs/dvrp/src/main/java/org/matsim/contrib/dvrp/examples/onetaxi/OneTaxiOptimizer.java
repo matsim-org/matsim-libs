@@ -41,7 +41,6 @@ import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
@@ -66,8 +65,8 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 
 	@Inject
 	public OneTaxiOptimizer(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			@DvrpMode(TransportMode.taxi) Fleet fleet, QSim qSim) {
-		timer = qSim.getSimTimer();
+			@DvrpMode(TransportMode.taxi) Fleet fleet, MobsimTimer timer) {
+		this.timer = timer;
 		travelTime = new FreeSpeedTravelTime();
 		router = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime),
 				travelTime);

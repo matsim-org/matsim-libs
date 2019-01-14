@@ -26,7 +26,6 @@ import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithPathData;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -49,7 +48,6 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 /**
@@ -63,8 +61,7 @@ public class RequestInsertionScheduler {
 	private final DrtScheduleTimingUpdater scheduleTimingUpdater;
 	private final DrtTaskFactory taskFactory;
 
-	@Inject
-	public RequestInsertionScheduler(DrtConfigGroup drtCfg, @Drt Fleet fleet, MobsimTimer timer,
+	public RequestInsertionScheduler(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer timer,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			DrtScheduleTimingUpdater scheduleTimingUpdater, DrtTaskFactory taskFactory) {
 		this.fleet = fleet;

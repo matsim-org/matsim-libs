@@ -20,12 +20,10 @@
 
 package org.matsim.contrib.taxi.run;
 
-import java.util.Collections;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -35,30 +33,20 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class TaxiControlerCreator {
 	public static Controler createControler(Config config, boolean otfvis) {
-		adjustTaxiConfig(config);
+		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
+		config.checkConsistency();
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		addTaxiAsSingleDvrpModeToControler(controler);
+
+		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new TaxiModule());
+		controler.configureQSimComponents(
+				DvrpQSimComponents.activateModes(TaxiConfigGroup.get(controler.getConfig()).getMode()));
+
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
 		return controler;
-	}
-
-	public static void addTaxiAsSingleDvrpModeToControler(Controler controler) {
-		addTaxiWithoutDvrpModuleToControler(controler);
-		controler.addOverridingModule(DvrpModule.createModule(TaxiConfigGroup.get(controler.getConfig()).getMode(),
-				Collections.singleton(TaxiOptimizer.class)));
-	}
-
-	public static void addTaxiWithoutDvrpModuleToControler(Controler controler) {
-		controler.addQSimModule(new TaxiQSimModule());
-		controler.addOverridingModule(new TaxiModule());
-	}
-
-	public static void adjustTaxiConfig(Config config) {
-		//no special adjustments (in contrast to Drt)
-		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
-		config.checkConsistency();
 	}
 }

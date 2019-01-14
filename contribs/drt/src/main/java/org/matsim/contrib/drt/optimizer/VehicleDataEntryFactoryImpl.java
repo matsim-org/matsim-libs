@@ -21,8 +21,6 @@ package org.matsim.contrib.drt.optimizer;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.EntryFactory;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
@@ -46,7 +44,6 @@ import com.google.common.collect.ImmutableList;
 public class VehicleDataEntryFactoryImpl implements EntryFactory {
 	private final double lookAhead;
 
-	@Inject
 	public VehicleDataEntryFactoryImpl(DrtConfigGroup drtCfg) {
 		lookAhead = drtCfg.getMaxWaitTime() - drtCfg.getStopDuration();
 		if (lookAhead < 0) {

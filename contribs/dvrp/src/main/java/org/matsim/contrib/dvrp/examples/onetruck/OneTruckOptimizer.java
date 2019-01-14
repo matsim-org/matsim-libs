@@ -41,7 +41,6 @@ import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
@@ -61,13 +60,13 @@ final class OneTruckOptimizer implements VrpOptimizer {
 
 	private final Vehicle vehicle;// we have only one vehicle
 
-	public static final double PICKUP_DURATION = 120;
-	public static final double DROPOFF_DURATION = 60;
+	private static final double PICKUP_DURATION = 120;
+	private static final double DELIVERY_DURATION = 60;
 
 	@Inject
 	public OneTruckOptimizer(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			@DvrpMode(TransportMode.truck) Fleet fleet, QSim qSim) {
-		timer = qSim.getSimTimer();
+			@DvrpMode(TransportMode.truck) Fleet fleet, MobsimTimer timer) {
+		this.timer = timer;
 		travelTime = new FreeSpeedTravelTime();
 		router = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime),
 				travelTime);
@@ -119,7 +118,7 @@ final class OneTruckOptimizer implements VrpOptimizer {
 		schedule.addTask(new DriveTaskImpl(pathWithCustomer));
 
 		double t3 = pathWithCustomer.getArrivalTime();
-		double t4 = t3 + DROPOFF_DURATION;// 1 minute for dropping off the passenger
+		double t4 = t3 + DELIVERY_DURATION;// 1 minute for dropping off the passenger
 		schedule.addTask(new OneTruckServeTask(t3, t4, toLink, false, req));
 
 		// just wait (and be ready) till the end of the vehicle's time window (T1)
@@ -135,7 +134,7 @@ final class OneTruckOptimizer implements VrpOptimizer {
 
 	/**
 	 * Simplified version. For something more advanced, see
-	 * {@link org.matsim.contrib.taxi.scheduler.TaxiScheduler#updateBeforeNextTask(Schedule)} in the taxi contrib
+	 * {@link org.matsim.contrib.taxi.scheduler.TaxiScheduler#updateBeforeNextTask(Vehicle)} in the taxi contrib
 	 */
 	private void updateTimings() {
 		Schedule schedule = vehicle.getSchedule();

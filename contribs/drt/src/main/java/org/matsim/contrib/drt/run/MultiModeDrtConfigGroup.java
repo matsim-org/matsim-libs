@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.run;
 
 import java.util.Collection;
 
+import org.matsim.contrib.dvrp.run.MultiModal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -29,7 +30,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModeDrtConfigGroup extends ReflectiveConfigGroup {
+public class MultiModeDrtConfigGroup extends ReflectiveConfigGroup implements MultiModal<DrtConfigGroup> {
 	public static final String GROUP_NAME = "multiModeDrt";
 
 	@SuppressWarnings("deprecation")
@@ -49,8 +50,9 @@ public class MultiModeDrtConfigGroup extends ReflectiveConfigGroup {
 		throw new IllegalArgumentException(type);
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
-	public Collection<DrtConfigGroup> getDrtConfigGroups() {
+	public Collection<DrtConfigGroup> getModalElements() {
 		return (Collection<DrtConfigGroup>)getParameterSets(DrtConfigGroup.GROUP_NAME);
 	}
 }

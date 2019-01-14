@@ -33,12 +33,12 @@ import javax.validation.constraints.PositiveOrZero;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-import org.matsim.contrib.dvrp.run.HasMode;
+import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-public class DrtConfigGroup extends ReflectiveConfigGroup implements HasMode {
+public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 
 	public static final String GROUP_NAME = "drt";
 

@@ -35,7 +35,6 @@ import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.QSim;
 
 import com.google.inject.Inject;
 
@@ -48,10 +47,10 @@ final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final String mobsimMode;
 
 	@Inject
-	public OneTaxiActionCreator(@DvrpMode(TransportMode.taxi) PassengerEngine passengerEngine, QSim qSim,
+	public OneTaxiActionCreator(@DvrpMode(TransportMode.taxi) PassengerEngine passengerEngine, MobsimTimer timer,
 			DvrpConfigGroup dvrpCfg) {
 		this.passengerEngine = passengerEngine;
-		this.timer = qSim.getSimTimer();
+		this.timer = timer;
 		this.mobsimMode = dvrpCfg.getMobsimMode();
 	}
 

@@ -22,13 +22,16 @@ package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.run.AbstractMultiModeQSimModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.vehicles.VehicleType;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
-public class VrpAgentSourceQSimModule extends AbstractMultiModeQSimModule {
+public class VrpAgentSourceQSimModule extends AbstractDvrpModeQSimModule {
+	public static final String DVRP_VEHICLE_TYPE = "dvrp_vehicle_type";
 
 	public VrpAgentSourceQSimModule(String mode) {
 		super(mode);
@@ -36,16 +39,19 @@ public class VrpAgentSourceQSimModule extends AbstractMultiModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bindModalComponent(VrpAgentSource.class).toProvider(
-				new ModalProviders.AbstractProvider<VrpAgentSource>(getMode()) {
-					@Inject
-					private QSim qSim;
+		addModalComponent(VrpAgentSource.class, new ModalProviders.AbstractProvider<VrpAgentSource>(getMode()) {
+			@Inject
+			private QSim qSim;
 
-					@Override
-					public VrpAgentSource get() {
-						return new VrpAgentSource(getModalInstance(VrpAgentLogic.DynActionCreator.class),
-								getModalInstance(Fleet.class), getModalInstance(VrpOptimizer.class), qSim);
-					}
-				}).asEagerSingleton();
+			@Inject
+			@Named(DVRP_VEHICLE_TYPE)
+			private VehicleType vehicleType;
+
+			@Override
+			public VrpAgentSource get() {
+				return new VrpAgentSource(getModalInstance(VrpAgentLogic.DynActionCreator.class),
+						getModalInstance(Fleet.class), getModalInstance(VrpOptimizer.class), qSim, vehicleType);
+			}
+		});
 	}
 }
