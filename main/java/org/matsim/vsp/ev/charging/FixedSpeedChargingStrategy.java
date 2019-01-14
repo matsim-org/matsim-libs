@@ -25,31 +25,29 @@ import org.matsim.vsp.ev.data.ElectricVehicle;
  * @author michalm
  */
 public class FixedSpeedChargingStrategy implements ChargingStrategy {
-	private final double effectivePower;
+	private final double chargingPower;
 	private final double maxRelativeSoc;
 
-	// XXX effectivePower may be lower than the nominal charger power (e.g. low-temp mode)
-	public FixedSpeedChargingStrategy(double effectivePower) {
-		this(effectivePower, 1);
+	public FixedSpeedChargingStrategy(double chargingPower) {
+		this(chargingPower, 1);
 	}
 
 	// e.g. maxRelativeSoc = 0.8 to model linear (fast) charging up to 80% of the battery capacity
-	public FixedSpeedChargingStrategy(double effectivePower, double maxRelativeSoc) {
-		if (effectivePower <= 0) {
-			throw new IllegalArgumentException("effectivePower must be positive");
+	public FixedSpeedChargingStrategy(double chargingPower, double maxRelativeSoc) {
+		if (chargingPower <= 0) {
+			throw new IllegalArgumentException("chargingPower must be positive");
 		}
-
 		if (maxRelativeSoc <= 0 || maxRelativeSoc > 1) {
 			throw new IllegalArgumentException("maxRelativeSoc must be in (0,1]");
 		}
 
-		this.effectivePower = effectivePower;
+		this.chargingPower = chargingPower;
 		this.maxRelativeSoc = maxRelativeSoc;
 	}
 
 	@Override
 	public double calcEnergyCharge(ElectricVehicle ev, double chargePeriod) {
-		return effectivePower * chargePeriod;
+		return chargingPower * chargePeriod;
 	}
 
 	@Override
@@ -65,6 +63,6 @@ public class FixedSpeedChargingStrategy implements ChargingStrategy {
 
 	@Override
 	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
-		return calcRemainingEnergyToCharge(ev) / effectivePower;
+		return calcRemainingEnergyToCharge(ev) / chargingPower;
 	}
 }
