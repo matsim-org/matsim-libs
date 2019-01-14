@@ -1,11 +1,13 @@
 package org.matsim.contrib.emissions.analysis;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -21,12 +23,12 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * This class may be used to collect emission events of some events file and assign those emissions to a grid structure.
@@ -34,6 +36,7 @@ import java.util.stream.Stream;
  */
 public class EmissionGridAnalyzer {
 
+	private final static Logger log = Logger.getLogger(EmissionGridAnalyzer.class);
     private final double binSize;
     private final double smoothingRadius;
     private final double countScaleFactor;
@@ -42,6 +45,8 @@ public class EmissionGridAnalyzer {
     private final GridType gridType;
     private final double gridSize;
     private final Network network;
+    
+    private int counter = 0;
 
     private EmissionGridAnalyzer(final double binSize, final double gridSize, final double smoothingRadius,
                                  final double countScaleFactor, final GridType gridType, final Network network) {
@@ -64,10 +69,12 @@ public class EmissionGridAnalyzer {
      * @return TimeBinMap containing a grid which maps pollutants to values.
      */
     public TimeBinMap<Grid<Map<Pollutant, Double>>> process(String eventsFile) {
-
+    	
         TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> timeBinsWithEmissions = processEventsFile(eventsFile);
         TimeBinMap<Grid<Map<Pollutant, Double>>> result = new TimeBinMap<>(binSize);
 
+        log.info("Starting grid computation...");
+        
         timeBinsWithEmissions.getTimeBins().forEach(bin -> {
             Grid<Map<Pollutant, Double>> grid = writeAllLinksToGrid(bin.getValue());
             result.getTimeBin(bin.getStartTime()).setValue(grid);
@@ -124,8 +131,12 @@ public class EmissionGridAnalyzer {
     private Grid<Map<Pollutant, Double>> writeAllLinksToGrid(Map<Id<Link>, EmissionsByPollutant> linksWithEmissions) {
 
         Grid<Map<Pollutant, Double>> grid = createGrid();
-
+        counter = 0;
         linksWithEmissions.forEach((id, emission) -> {
+        	
+        	if (counter%1000 == 0) log.info("#" + counter);
+        	counter++;
+        	
             Link link = network.getLinks().get(id);
             if (network.getLinks().containsKey(id))
                 processLink(link, emission, grid);
