@@ -19,16 +19,20 @@
 
 package org.matsim.vsp.ev.data.file;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.vsp.ev.EvUnitConversions;
-import org.matsim.vsp.ev.data.*;
-import org.xml.sax.Attributes;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.vsp.ev.EvUnits;
+import org.matsim.vsp.ev.data.BatteryImpl;
+import org.matsim.vsp.ev.data.ChargerImpl;
+import org.matsim.vsp.ev.data.ElectricFleetImpl;
+import org.matsim.vsp.ev.data.ElectricVehicle;
+import org.matsim.vsp.ev.data.ElectricVehicleImpl;
+import org.xml.sax.Attributes;
 
 public class ElectricVehicleReader extends MatsimXmlParser {
 	private static final String VEHICLE = "vehicle";
@@ -54,12 +58,15 @@ public class ElectricVehicleReader extends MatsimXmlParser {
 		Id<ElectricVehicle> id = Id.create(atts.getValue("id"), ElectricVehicle.class);
 		double batteryCapacity_kWh = Double.parseDouble(atts.getValue("battery_capacity"));
 		double initialSoc_kWh = Double.parseDouble(atts.getValue("initial_soc"));
-        String chargerType = atts.getValue("chargerTypes");
-        List<String> chargerTypes = chargerType != null ? Arrays.asList(chargerType.split(",")) : Collections.singletonList(ChargerImpl.DEFAULT_CHARGER_TYPE);
-        String vehicleType = atts.getValue("vehicleType");
-        vehicleType = vehicleType != null ? vehicleType : ElectricVehicleImpl.DEFAULTVEHICLETYPE;
+		String chargerType = atts.getValue("chargerTypes");
+		List<String> chargerTypes = chargerType != null ?
+				Arrays.asList(chargerType.split(",")) :
+				Collections.singletonList(ChargerImpl.DEFAULT_CHARGER_TYPE);
+		String vehicleType = atts.getValue("vehicleType");
+		vehicleType = vehicleType != null ? vehicleType : ElectricVehicleImpl.DEFAULTVEHICLETYPE;
 
-		return new ElectricVehicleImpl(id, new BatteryImpl(batteryCapacity_kWh * EvUnitConversions.J_PER_kWh,
-                initialSoc_kWh * EvUnitConversions.J_PER_kWh), chargerTypes, vehicleType);
+		return new ElectricVehicleImpl(id,
+				new BatteryImpl(EvUnits.kWh_to_J(batteryCapacity_kWh), EvUnits.kWh_to_J(initialSoc_kWh)), chargerTypes,
+				vehicleType);
 	}
 }

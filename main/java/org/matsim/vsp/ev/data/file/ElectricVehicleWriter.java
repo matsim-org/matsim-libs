@@ -19,11 +19,6 @@
 
 package org.matsim.vsp.ev.data.file;
 
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.vsp.ev.EvUnitConversions;
-import org.matsim.vsp.ev.data.ElectricVehicle;
-
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -32,9 +27,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.vsp.ev.EvUnits;
+import org.matsim.vsp.ev.data.ElectricVehicle;
+
 public class ElectricVehicleWriter extends MatsimXmlWriter {
 	private Iterable<ElectricVehicle> vehicles;
 	private DecimalFormat format;
+
 	public ElectricVehicleWriter(Iterable<ElectricVehicle> vehicles) {
 		this.vehicles = vehicles;
 		this.format = new DecimalFormat();
@@ -47,22 +48,24 @@ public class ElectricVehicleWriter extends MatsimXmlWriter {
 	public void write(String file) {
 		openFile(file);
 		writeDoctype("vehicles", "http://matsim.org/files/dtd/electric_vehicles_v1.dtd");
-		writeStartTag("vehicles", Collections.<Tuple<String, String>> emptyList());
+		writeStartTag("vehicles", Collections.<Tuple<String, String>>emptyList());
 		writeVehicles();
 		writeEndTag("vehicles");
 		close();
 	}
 
 	private void writeVehicles() {
-		for (ElectricVehicle v: vehicles) {
+		for (ElectricVehicle v : vehicles) {
 			List<Tuple<String, String>> atts = new ArrayList<>();
 			atts.add(new Tuple<String, String>("id", v.getId().toString()));
-			atts.add(new Tuple<String, String>("battery_capacity",format.format(v.getBattery().getCapacity()/EvUnitConversions.J_PER_kWh) + ""));
-			atts.add(new Tuple<String, String>("initial_soc", format.format(v.getBattery().getSoc()/EvUnitConversions.J_PER_kWh) + ""));
-            atts.add(new Tuple<>("chargerTypes", v.getChargingTypes().stream().collect(Collectors.joining(","))));
+			atts.add(new Tuple<String, String>("battery_capacity",
+					format.format(EvUnits.J_to_kWh(v.getBattery().getCapacity())) + ""));
+			atts.add(new Tuple<String, String>("initial_soc",
+					format.format(EvUnits.J_to_kWh(v.getBattery().getSoc())) + ""));
+			atts.add(new Tuple<>("chargerTypes", v.getChargingTypes().stream().collect(Collectors.joining(","))));
 			atts.add(new Tuple<>("vehicleType", v.getVehicleType()));
-			writeStartTag("vehicle",atts,true);
+			writeStartTag("vehicle", atts, true);
 		}
-		
+
 	}
 }

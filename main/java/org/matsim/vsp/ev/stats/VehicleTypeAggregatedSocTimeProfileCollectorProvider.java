@@ -19,19 +19,20 @@
 
 package org.matsim.vsp.ev.stats;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.vsp.ev.EvUnitConversions;
+import org.matsim.vsp.ev.EvUnits;
 import org.matsim.vsp.ev.data.ElectricFleet;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class VehicleTypeAggregatedSocTimeProfileCollectorProvider implements Provider<MobsimListener> {
     private final ElectricFleet evFleet;
@@ -58,10 +59,16 @@ public class VehicleTypeAggregatedSocTimeProfileCollectorProvider implements Pro
                     Double[] result = new Double[header.length];
                     for (int i = 0; i < header.length - 1; i++) {
                         String type = header[i];
-                        result[i] = evFleet.getElectricVehicles().values().stream().filter(electricVehicle -> electricVehicle.getVehicleType().equals(type)).mapToDouble(ev -> ev.getBattery().getSoc() / EvUnitConversions.J_PER_kWh).average().orElse(Double.NaN);
+						result[i] = evFleet.getElectricVehicles()
+								.values()
+								.stream()
+								.filter(electricVehicle -> electricVehicle.getVehicleType().equals(type))
+								.mapToDouble(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()))
+								.average()
+								.orElse(Double.NaN);
                     }
                     result[header.length - 1] = evFleet.getElectricVehicles().values().stream()//
-                            .mapToDouble(ev -> ev.getBattery().getSoc() / EvUnitConversions.J_PER_kWh).average().getAsDouble();
+							.mapToDouble(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc())).average().getAsDouble();
                     return result;
                 }
         );

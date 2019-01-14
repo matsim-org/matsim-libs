@@ -21,17 +21,18 @@ package org.matsim.vsp.ev.stats;/*
  * created by jbischoff, 26.10.2018
  */
 
-import com.google.inject.Inject;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.vsp.ev.EvUnitConversions;
+import org.matsim.vsp.ev.EvUnits;
 import org.matsim.vsp.ev.discharging.DriveDischargingHandler;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import com.google.inject.Inject;
 
 public class EVControlerListener implements IterationEndsListener {
 
@@ -49,8 +50,10 @@ public class EVControlerListener implements IterationEndsListener {
         try {
             Files.write(Paths.get(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "chargingStats.csv")), () ->
                     chargerPowerCollector.getLogList().stream().<CharSequence>map(e -> e.toString()).iterator());
-            Files.write(Paths.get(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "evConsumptionPerLink.csv")), () -> driveDischargingHandler.getEnergyConsumptionPerLink().entrySet().stream()
-                    .<CharSequence>map(e -> e.getKey() + ";" + (e.getValue() / EvUnitConversions.J_PER_kWh) / (network.getLinks().get(e.getKey()).getLength() / 1000.0) + ";" + e.getValue() / EvUnitConversions.J_PER_kWh)
+            Files.write(Paths.get(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "evConsumptionPerLink.csv")), () -> driveDischargingHandler.getEnergyConsumptionPerLink().entrySet().stream().<CharSequence>map(
+					e -> e.getKey() + ";" + (EvUnits.J_to_kWh(e.getValue())) / (network.getLinks()
+							.get(e.getKey())
+							.getLength() / 1000.0) + ";" + EvUnits.J_to_kWh(e.getValue()))
                     .iterator());
         } catch (IOException e) {
             e.printStackTrace();

@@ -19,19 +19,19 @@
 
 package org.matsim.vsp.ev.data.file;
 
+import java.util.Map;
+import java.util.Stack;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.file.ReaderUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.vsp.ev.EvUnitConversions;
+import org.matsim.vsp.ev.EvUnits;
 import org.matsim.vsp.ev.data.Charger;
 import org.matsim.vsp.ev.data.ChargerImpl;
 import org.matsim.vsp.ev.data.ChargingInfrastructureImpl;
 import org.xml.sax.Attributes;
-
-import java.util.Map;
-import java.util.Stack;
 
 public class ChargerReader extends MatsimXmlParser {
 	private final static String CHARGER = "charger";
@@ -63,7 +63,7 @@ public class ChargerReader extends MatsimXmlParser {
 		Link link = links.get(Id.createLinkId(atts.getValue("link")));
 		double power_kW = ReaderUtils.getDouble(atts, "power", DEFAULT_CHARGER_POWER_kW);
 		int plugs = ReaderUtils.getInt(atts, "capacity", DEFAULT_CHARGER_CAPACITY);
-        String chargerType = ReaderUtils.getString(atts, "type", ChargerImpl.DEFAULT_CHARGER_TYPE);
-        return new ChargerImpl(id, power_kW * EvUnitConversions.W_PER_kW, plugs, link, link.getCoord(), chargerType);
+		String chargerType = ReaderUtils.getString(atts, "type", ChargerImpl.DEFAULT_CHARGER_TYPE);
+		return new ChargerImpl(id, EvUnits.kW_to_W(power_kW), plugs, link, link.getCoord(), chargerType);
 	}
 }

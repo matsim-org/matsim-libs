@@ -21,13 +21,15 @@ package org.matsim.vsp.ev.stats;/*
  * created by jbischoff, 26.10.2018
  */
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import com.google.inject.Inject;
-import javafx.util.Pair;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vsp.ev.EvUnitConversions;
+import org.matsim.vsp.ev.EvUnits;
 import org.matsim.vsp.ev.charging.ChargingEndEvent;
 import org.matsim.vsp.ev.charging.ChargingEndEventHandler;
 import org.matsim.vsp.ev.charging.ChargingStartEvent;
@@ -37,10 +39,9 @@ import org.matsim.vsp.ev.data.ChargingInfrastructure;
 import org.matsim.vsp.ev.data.ElectricFleet;
 import org.matsim.vsp.ev.data.ElectricVehicle;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.inject.Inject;
+
+import javafx.util.Pair;
 
 public class ChargerPowerCollector implements ChargingEndEventHandler, ChargingStartEventHandler {
 
@@ -120,7 +121,7 @@ public class ChargerPowerCollector implements ChargingEndEventHandler, ChargingS
 
         @Override
         public String toString() {
-            double energyKWh = Math.round(transmitted_Energy / EvUnitConversions.J_PER_kWh * 10.) / 10.;
+			double energyKWh = Math.round(EvUnits.J_to_kWh(transmitted_Energy) * 10.) / 10.;
             return charger.getId().toString() + ";" + Time.writeTime(chargeStart) + ";" + Time.writeTime(chargeEnd) + ";" + Time.writeTime(chargeEnd - chargeStart)
                     + ";" + charger.getCoord().getX() + ";" + charger.getCoord().getY() + ";" + vehicleId.toString() + ";" + energyKWh;
         }

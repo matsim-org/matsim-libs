@@ -21,8 +21,6 @@ package org.matsim.vsp.ev.discharging;/*
  * created by jbischoff, 23.08.2018
  */
 
-import com.google.common.primitives.Doubles;
-import com.google.inject.OutOfScopeException;
 import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolatingFunction;
 import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolator;
 import org.apache.log4j.Logger;
@@ -30,99 +28,105 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vsp.ev.EvUnitConversions;
+import org.matsim.vsp.ev.EvUnits;
 
+import com.google.common.primitives.Doubles;
+import com.google.inject.OutOfScopeException;
 
 public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 
-    private PiecewiseBicubicSplineInterpolator splineInterpolater = new PiecewiseBicubicSplineInterpolator();
-    private PiecewiseBicubicSplineInterpolatingFunction function;
+	private PiecewiseBicubicSplineInterpolator splineInterpolater = new PiecewiseBicubicSplineInterpolator();
+	private PiecewiseBicubicSplineInterpolatingFunction function;
 
-    private final double minSpeed;
-    private final double maxSpeed;
-    private final double minSlope;
-    private final double maxSlope;
+	private final double minSpeed;
+	private final double maxSpeed;
+	private final double minSlope;
+	private final double maxSlope;
 
-    private boolean hasWarnedMaxSpeed = false;
-    private boolean hasWarnedMinSpeed = false;
+	private boolean hasWarnedMaxSpeed = false;
+	private boolean hasWarnedMinSpeed = false;
 
-    private final Id<VehicleType> vehicleTypeId;
-    private final boolean crashIfOutOfBoundValue;
+	private final Id<VehicleType> vehicleTypeId;
+	private final boolean crashIfOutOfBoundValue;
 
-    public LTHDriveEnergyConsumption(double[] speeds, double[] slopes, double[][] consumptionPerSpeedAndSlope, Id<VehicleType> vehicleTypeId, boolean crashIfOutOfBoundValue) {
-        this.function = splineInterpolater.interpolate(speeds, slopes, consumptionPerSpeedAndSlope);
-        this.minSpeed = Doubles.min(speeds);
-        this.maxSpeed = Doubles.max(speeds);
-        this.minSlope = Doubles.min(slopes);
-        this.maxSlope = Doubles.max(slopes);
-        this.vehicleTypeId = vehicleTypeId;
-        this.crashIfOutOfBoundValue = crashIfOutOfBoundValue;
-    }
+	public LTHDriveEnergyConsumption(double[] speeds, double[] slopes, double[][] consumptionPerSpeedAndSlope,
+			Id<VehicleType> vehicleTypeId, boolean crashIfOutOfBoundValue) {
+		this.function = splineInterpolater.interpolate(speeds, slopes, consumptionPerSpeedAndSlope);
+		this.minSpeed = Doubles.min(speeds);
+		this.maxSpeed = Doubles.max(speeds);
+		this.minSlope = Doubles.min(slopes);
+		this.maxSlope = Doubles.max(slopes);
+		this.vehicleTypeId = vehicleTypeId;
+		this.crashIfOutOfBoundValue = crashIfOutOfBoundValue;
+	}
 
-    @Override
-    public double calcEnergyConsumption(Link link, double travelTime) {
-        double length = link.getLength();
-        double speed = length / travelTime;
+	@Override
+	public double calcEnergyConsumption(Link link, double travelTime) {
+		double length = link.getLength();
+		double speed = length / travelTime;
 
-        if (speed > maxSpeed) {
-            if (crashIfOutOfBoundValue) {
-                throw new OutOfScopeException("Speed not covered" + speed);
-            } else {
-                if (!hasWarnedMaxSpeed) {
-                    Logger.getLogger(getClass()).warn("Assuming maxSpeed, as Speed not covered by consumption data " + speed);
-                    Logger.getLogger(getClass()).warn(Gbl.ONLYONCE);
-                    hasWarnedMaxSpeed = true;
-                }
-                speed = maxSpeed;
-            }
-        }
+		if (speed > maxSpeed) {
+			if (crashIfOutOfBoundValue) {
+				throw new OutOfScopeException("Speed not covered" + speed);
+			} else {
+				if (!hasWarnedMaxSpeed) {
+					Logger.getLogger(getClass())
+							.warn("Assuming maxSpeed, as Speed not covered by consumption data " + speed);
+					Logger.getLogger(getClass()).warn(Gbl.ONLYONCE);
+					hasWarnedMaxSpeed = true;
+				}
+				speed = maxSpeed;
+			}
+		}
 
-        if (speed < minSpeed) {
-            if (crashIfOutOfBoundValue) {
-                throw new OutOfScopeException("Speed not covered" + speed);
-            } else {
-                if (!hasWarnedMinSpeed) {
-                    Logger.getLogger(getClass()).warn("Assuming minSpeed, as Speed not covered by consumption data " + speed);
-                    Logger.getLogger(getClass()).warn(Gbl.ONLYONCE);
-                    hasWarnedMinSpeed = true;
-                }
-                speed = minSpeed;
+		if (speed < minSpeed) {
+			if (crashIfOutOfBoundValue) {
+				throw new OutOfScopeException("Speed not covered" + speed);
+			} else {
+				if (!hasWarnedMinSpeed) {
+					Logger.getLogger(getClass())
+							.warn("Assuming minSpeed, as Speed not covered by consumption data " + speed);
+					Logger.getLogger(getClass()).warn(Gbl.ONLYONCE);
+					hasWarnedMinSpeed = true;
+				}
+				speed = minSpeed;
 
-            }
+			}
 
-        }
+		}
 
+		double[] linkslopes = (double[])link.getAttributes().getAttribute("slopes");
+		if (linkslopes == null) {
+			linkslopes = new double[] { 0.0 };
+		}
+		double slopeSegmentTravelDistance = (link.getLength() / 1000.0) / (double)linkslopes.length;
+		double consumption = 0;
+		for (int i = 0; i < linkslopes.length; i++) {
+			double currentSlope = checkSlope(linkslopes[i]);
+			double currentEnergyuse = function.value(speed, currentSlope);
+			consumption += currentEnergyuse * slopeSegmentTravelDistance;
+		}
+		return EvUnits.kWh_to_J(consumption);
+	}
 
-        double[] linkslopes = (double[]) link.getAttributes().getAttribute("slopes");
-        if (linkslopes == null) {
-            linkslopes = new double[]{0.0};
-        }
-        double slopeSegmentTravelDistance = (link.getLength() / 1000.0) / (double) linkslopes.length;
-        double consumption = 0;
-        for (int i = 0; i < linkslopes.length; i++) {
-            double currentSlope = checkSlope(linkslopes[i]);
-            double currentEnergyuse = function.value(speed, currentSlope);
-            consumption += currentEnergyuse * slopeSegmentTravelDistance;
-        }
-        return consumption * EvUnitConversions.J_PER_kWh;
-    }
-
-    private double checkSlope(double currentSlope) {
-        if (currentSlope < minSlope) {
-            if (crashIfOutOfBoundValue) {
-                throw new OutOfScopeException("Slope not covered" + currentSlope);
-            } else {
-                Logger.getLogger(getClass()).warn("Assuming minSlope, as Slope not covered by consumption data" + currentSlope);
-                currentSlope = minSlope;
-            }
-        } else if (currentSlope > maxSlope) {
-            if (crashIfOutOfBoundValue) {
-                throw new OutOfScopeException("Slope not covered" + currentSlope);
-            } else {
-                Logger.getLogger(getClass()).warn("Assuming maxSlope, as Slope not covered by consumption data" + currentSlope);
-                currentSlope = maxSlope;
-            }
-        }
-        return currentSlope;
-    }
+	private double checkSlope(double currentSlope) {
+		if (currentSlope < minSlope) {
+			if (crashIfOutOfBoundValue) {
+				throw new OutOfScopeException("Slope not covered" + currentSlope);
+			} else {
+				Logger.getLogger(getClass())
+						.warn("Assuming minSlope, as Slope not covered by consumption data" + currentSlope);
+				currentSlope = minSlope;
+			}
+		} else if (currentSlope > maxSlope) {
+			if (crashIfOutOfBoundValue) {
+				throw new OutOfScopeException("Slope not covered" + currentSlope);
+			} else {
+				Logger.getLogger(getClass())
+						.warn("Assuming maxSlope, as Slope not covered by consumption data" + currentSlope);
+				currentSlope = maxSlope;
+			}
+		}
+		return currentSlope;
+	}
 }
