@@ -19,7 +19,6 @@
 package org.matsim.codeexamples.extensions.freight;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 
 import javax.management.InvalidAttributeValueException;
@@ -42,18 +41,14 @@ import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerUtils;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
@@ -83,17 +78,19 @@ public class RunFreightExample {
 		// ### config stuff: ###
 		Config config = createConfig();
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
 		ControlerUtils.checkConfigConsistencyAndWriteToLog(config, "dump");
 
 		// ### scenario stuff: ###
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		//Building the Carriers with jsprit, incl jspritOutput KT 03.12.2014
+		//Building the Carriers, running jsprit for solving the VRP 
 		Carriers carriers = jspritRun(config, scenario.getNetwork());
 
 		//final MATSim configurations and start of the MATSim-Run:
 		matsimRun(scenario, carriers);
+		
+		//write out some additonal output
+		writeAdditionalRunOutput(config, carriers);
 	}
 
 	private static Config createConfig() {
@@ -101,7 +98,8 @@ public class RunFreightExample {
 		Config config = ConfigUtils.loadConfig(configURL  );
 		config.controler().setOverwriteFileSetting( overwriteExistingFiles );
 		config.global().setRandomSeed(4177);
-		config.controler().setOutputDirectory("./output/");
+		config.controler().setOutputDirectory("./output/freight");
+		config.controler().setLastIteration(0);
 
 		//Vehicles should not start at midnight. They should start after first "start" activity.
 		config.plans().setActivityDurationInterpretation( tryEndTimeThenDuration );
@@ -110,17 +108,30 @@ public class RunFreightExample {
 	}
 
 	private static Carriers jspritRun(Config config, Network network) throws InvalidAttributeValueException {
+		File outputFile = new File(config.controler().getOutputDirectory());
+			outputFile.mkdirs();
+		
+		//create or load carrier vehicle types
 		CarrierVehicleTypes vehicleTypes = createVehicleTypes();
 
+		//create or laod the carrier(s) including assignment of vehicle types to the carrier(s)
 		Carriers carriers = createCarriers(vehicleTypes);
 
-		generateCarrierPlans(network, carriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs
+		//Solving the VRP (generate carrier's tour plans)
+		generateCarrierPlans(network, carriers, vehicleTypes, config);
 
-		//### Output nach Jsprit Iteration
+		//### Output after jsprit run
 		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "/jsprit_plannedCarriers.xml") ;
 		return carriers;
 	}
 
+	private static CarrierVehicleTypes createVehicleTypes() {
+		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
+		final URL vehicleTypesURL = IOUtils.newUrl(scenarioUrl, "vehicleTypes.xml");
+		new CarrierVehicleTypeReader(vehicleTypes).readURL(vehicleTypesURL) ;
+		return vehicleTypes;
+	}
+	
 	private static Carriers createCarriers(CarrierVehicleTypes vehicleTypes) {
 		Carriers carriers = new Carriers() ;
 		final URL carrierURL = IOUtils.newUrl(scenarioUrl, "singleCarrier.xml");
@@ -131,12 +142,6 @@ public class RunFreightExample {
 		return carriers;
 	}
 
-	private static CarrierVehicleTypes createVehicleTypes() {
-		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-		final URL vehicleTypesURL = IOUtils.newUrl(scenarioUrl, "vehicleTypes.xml");
-		new CarrierVehicleTypeReader(vehicleTypes).readURL(vehicleTypesURL) ;
-		return vehicleTypes;
-	}
 
 	/**
 	 * Creates and solves the Vehicle Routing Problem using jsprit
@@ -157,12 +162,15 @@ public class RunFreightExample {
 			vrpBuilder.setRoutingCost(netBasedCosts) ;
 			VehicleRoutingProblem vrp = vrpBuilder.build() ;
 
-			//				//Build algorithm out of the box
-			//				VehicleRoutingAlgorithm vra = Jsprit.Builder.newInstance(vrp).setProperty(Jsprit.Parameter.THREADS, "5").buildAlgorithm();
-			// or read it from file
-			final URL algorithmURL = IOUtils.newUrl(scenarioUrl, "algorithm_v2.xml");
-			VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmURL);
+			//Build algorithm out of the box
+			VehicleRoutingAlgorithm vra = Jsprit.Builder.newInstance(vrp).setProperty(Jsprit.Parameter.THREADS, "5").buildAlgorithm();
 
+			//			// or read it from file
+//			final URL algorithmURL = IOUtils.newUrl(scenarioUrl, "algorithm_v2.xml");
+//			VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmURL);
+//			//TODO initial soultion needed
+			
+			
 			vra.getAlgorithmListeners().addListener(new StopWatch(), Priority.HIGH);
 			vra.setMaxIterations(100);
 			VehicleRoutingProblemSolution solution = Solutions.bestOf(vra.searchSolutions());
@@ -184,22 +192,23 @@ public class RunFreightExample {
 	}
 
 
-	//Ausgangspunkt für die MATSim-Simulation
+	//Running it in MATSim
 	private static void matsimRun(Scenario scenario, Carriers carriers) {
 		final Controler controler = new Controler( scenario ) ;
 
-		CarrierScoringFunctionFactory scoringFunctionFactory = createMyScoringFunction2(scenario);
-		CarrierPlanStrategyManagerFactory planStrategyManagerFactory =  createMyStrategymanager(); //Benötigt, da listener kein "Null" als StrategyFactory mehr erlaubt, KT 17.04.2015
+		CarrierScoringFunctionFactory scoringFunctionFactory = new CarrierScoringFunctionFactoryImpl(scenario.getNetwork());
+		//Needed, because listener does not allow "null" as strategyFactory any more.
+		CarrierPlanStrategyManagerFactory planStrategyManagerFactory =  createMyStrategymanager(); 
 
 		CarrierModule listener = new CarrierModule(carriers, planStrategyManagerFactory, scoringFunctionFactory) ;
-		listener.setPhysicallyEnforceTimeWindowBeginnings(true);
+		listener.setPhysicallyEnforceTimeWindowBeginnings(true); //otherweise vehicles would NOT wait until service/shipment timne window starts.
 		controler.addOverridingModule(listener) ;
 		controler.run();
 	}
 
 
-	//Benötigt, da listener kein "Null" als StrategyFactory mehr erlaubt, KT 17.04.2015
-	//Da keine Strategy notwendig, hier zunächst eine "leere" Factory
+	//Needed, because listener does not allow "null" as strategyFactory any more.
+	//No strategy needed here -> create empty CarrierPlanStrategyManager
 	private static CarrierPlanStrategyManagerFactory createMyStrategymanager(){
 		return new CarrierPlanStrategyManagerFactory() {
 			@Override
@@ -209,8 +218,6 @@ public class RunFreightExample {
 		};
 	}
 
-
-
 	private static void writeAdditionalRunOutput(Config config, Carriers carriers) {
 		// ### some final output: ###
 		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "/output_carriers.xml") ;
@@ -219,6 +226,4 @@ public class RunFreightExample {
 		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(config.controler().getOutputDirectory() + "/output_vehicleTypes.xml.gz");
 	}
 
-
-}
 }
