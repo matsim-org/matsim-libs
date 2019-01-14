@@ -44,7 +44,7 @@ import org.matsim.vehicles.Vehicles;
 /**
  * @author benjamin
  */
-public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
+final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
 
     private final Logger logger = Logger.getLogger(ColdEmissionHandler.class);
 

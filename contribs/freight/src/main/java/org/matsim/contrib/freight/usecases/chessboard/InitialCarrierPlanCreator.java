@@ -33,7 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class InitialCarrierPlanCreator {
+final class InitialCarrierPlanCreator {
 
     private Network network;
 

@@ -33,7 +33,7 @@ import org.matsim.vehicles.Vehicle;
  * @author stefan
  *
  */
-public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunctionFactory{
+final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunctionFactory{
 
     /**
      *
