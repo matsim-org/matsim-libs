@@ -53,6 +53,9 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	@Override
 	public DrtRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
 			double departureTime, double submissionTime) {
+		// yyyy remove parameter MobsimPassengerAgent and get necessary info from somewhere else.
+		// (Also in reality, such information is not pushed into the person, but stored somewhere on the provider side.)
+		// kai, gregor, jan'19
 
 		//XXX this will not work if pre-booking is allowed in DRT
 		Leg leg = (Leg)((PlanAgent)passenger).getCurrentPlanElement();

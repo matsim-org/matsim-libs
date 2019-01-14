@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.ActivityEngine.AgentEntry;
@@ -46,8 +47,11 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.Facility;
 import org.matsim.withinday.utils.EditPlans;
 import org.matsim.withinday.utils.EditTrips;
+import sun.management.resources.agent;
 
 import javax.inject.Inject;
+
+import static org.matsim.core.mobsim.qsim.interfaces.DepartureHandler.TimeInterpretation.departure;
 
 public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	private static final Logger log = Logger.getLogger( ActivityEngine.class ) ;
@@ -112,8 +116,14 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 				Facility toFacility = toFacility((Activity) plan.getPlanElements().get(currentIndex + 2));
 				
 				Collection<TripInfo> allTripInfos  = new ArrayList<>() ;
+
+				Person person = null ;
+				if ( agent instanceof HasPerson  ){
+					person = ((HasPerson) agent).getPerson();
+				}
 				for ( DepartureHandler handler : departureHandlers.values() ) {
-					allTripInfos.addAll( handler.getTripInfos() ) ;
+					List<TripInfo> tripInfos = handler.getTripInfos( fromFacility, toFacility, time, departure, person );
+					allTripInfos.addAll( tripInfos ) ;
 				}
 				decide( agent, allTripInfos, editTrips, editPlans, fromFacility, toFacility) ;
 			}

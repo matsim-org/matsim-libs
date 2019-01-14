@@ -19,20 +19,25 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -41,6 +46,10 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.Facility;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class PassengerEngine implements MobsimEngine, DepartureHandler {
 	private static final Logger LOGGER = Logger.getLogger(PassengerEngine.class);
@@ -89,6 +98,89 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 
 	@Override
 	public void afterSim() {
+	}
+
+	@Override
+	public final List<TripInfo> getTripInfos( Facility fromFacility, Facility toFacility, double time, TimeInterpretation interpretation, Person person ) {
+		Gbl.assertIf( interpretation==TimeInterpretation.departure );
+		Link pickupLink = FacilitiesUtils.decideOnLink( fromFacility, network );
+		Link dropoffLink = FacilitiesUtils.decideOnLink( toFacility, network ) ;
+		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
+
+		MobsimPassengerAgent passenger = null ;
+		PassengerRequest request = createValidateAndSubmitRequest(passenger, pickupLink.getId(), dropoffLink.getId(), time, now );
+		// yyyy remove parameter MobsimPassengerAgent. kai/gregor, jan'19
+
+		TripInfo info = new TripInfo(){
+			@Override public Facility getPickupLocation(){
+				return new Facility(){
+					@Override public Id<Link> getLinkId(){
+						return pickupLink.getId() ;
+					}
+					@Override public Coord getCoord(){
+						throw new RuntimeException( "not implemented" );
+					}
+					@Override public Map<String, Object> getCustomAttributes(){
+						throw new RuntimeException( "not implemented" );
+					}
+				}
+			}
+
+			@Override
+			public double getExpectedBoardingTime(){
+				return request.getEarliestStartTime() ;
+			}
+
+			@Override
+			public Facility getDropoffLocation(){
+				return new Facility(){
+					@Override public Map<String, Object> getCustomAttributes(){
+						throw new RuntimeException( "not implemented" );
+					}
+					@Override public Coord getCoord(){
+						throw new RuntimeException( "not implemented" );
+					}
+
+					@Override public Id<Link> getLinkId(){
+						return dropoffLink.getId() ;
+					}
+				};
+			}
+
+			@Override
+			public double getExpectedTravelTime(){
+				throw new RuntimeException( "not implemented" );
+			}
+
+			@Override
+			public double getMonetaryPrice(){
+				throw new RuntimeException( "not implemented" );
+			}
+
+			@Override
+			public Map<String, String> getAdditionalAttributes(){
+				throw new RuntimeException( "not implemented" );
+			}
+
+			@Override
+			public String getMode(){
+				throw new RuntimeException( "not implemented" );
+			}
+
+			@Override
+			public void accept(){
+				throw new RuntimeException( "not implemented" );
+			}
+
+			@Override
+			public double getLatestDecisionTime(){
+				throw new RuntimeException( "not implemented" );
+			}
+		}
+		// wrap into list and return:
+		List list = new ArrayList<>() ;
+		list.add(info) ;
+		return list ;
 	}
 
 	/**
@@ -142,6 +234,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 
 	private PassengerRequest createValidateAndSubmitRequest(MobsimPassengerAgent passenger, Id<Link> fromLinkId,
 			Id<Link> toLinkId, double departureTime, double now) {
+		// yyyy remove parameter MobsimPassengerAgent. kai/gregor, jan'19
 		PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime, now);
 		rejectInvalidRequest(request);
 		if (!request.isRejected()) {
@@ -154,6 +247,8 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 
 	private PassengerRequest createRequest(MobsimPassengerAgent passenger, Id<Link> fromLinkId, Id<Link> toLinkId,
 			double departureTime, double now) {
+		// yyyy remove parameter MobsimPassengerAgent. kai/gregor, jan'19
+
 		Map<Id<Link>, ? extends Link> links = network.getLinks();
 		Link fromLink = links.get(fromLinkId);
 		Link toLink = links.get(toLinkId);
