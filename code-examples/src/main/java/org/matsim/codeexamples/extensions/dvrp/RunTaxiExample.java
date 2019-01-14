@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.matsim.codeexamples.extensions.dvrpetc;
+package org.matsim.codeexamples.extensions.dvrp;
 
 /**
  * Simple "empty" example to plug in your own taxi dispatcher.

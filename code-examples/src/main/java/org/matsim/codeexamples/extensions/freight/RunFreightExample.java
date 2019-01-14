@@ -48,6 +48,9 @@ import javax.management.InvalidAttributeValueException;
 import java.net.URL;
 
 
+/**
+ * @see org.matsim.contrib.freight
+ */
 public class RunFreightExample {
 
 	private static URL scenarioUrl ;
@@ -55,7 +58,7 @@ public class RunFreightExample {
 		scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
 	}
 
-	public static void main(String[] args) throws InvalidAttributeValueException {
+	public static void main(String[] args){
 
 		// ### config stuff: ###
 		Config config = createConfig();
@@ -65,14 +68,16 @@ public class RunFreightExample {
 		// ### scenario stuff: ###
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		//Building the Carriers, running jsprit for solving the VRP
-
+		//Building the Carriers, running jsprit for solving the VRP:
 		final Carriers carriers = jspritRun( config, scenario.getNetwork() );
 		scenario.addScenarioElement( Freight.CARRIERS, carriers );
 
 		//final MATSim configurations and start of the MATSim-Run:
-		matsimRun(scenario );
-		
+		final Controler controler = new Controler( scenario ) ;
+		Freight.configure( controler );
+
+		// run the matsim controler:
+		controler.run();
 	}
 
 	private static Config createConfig() {
@@ -85,39 +90,35 @@ public class RunFreightExample {
 		// (the directory structure is needed for jsprit output, which is before the controler starts.  Maybe there is a better alternative ...)
 
 		config.global().setRandomSeed(4177);
+
 		config.controler().setLastIteration(0);
+		// yyyyyy iterations currently do not work; needs to be fixed.
+
 		return config;
 	}
 
 	private static Carriers jspritRun(Config config, Network network) {
 
 		//create or load carrier vehicle types
-		CarrierVehicleTypes vehicleTypes = createVehicleTypes();
+		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
+		new CarrierVehicleTypeReader( vehicleTypes ).readURL( IOUtils.newUrl(scenarioUrl, "vehicleTypes.xml" ) ) ;
 
 		//create or laod the carrier(s) including assignment of vehicle types to the carrier(s)
-		Carriers carriers = createCarriers(vehicleTypes);
+		Carriers carriers = new Carriers() ;
+		new CarrierPlanXmlReaderV2( carriers ).readURL( IOUtils.newUrl(scenarioUrl, "singleCarrier.xml" ) ) ;
+
+		// assign vehicle types to the carriers
+		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehicleTypes ) ;
+
+		//### Output before jsprit run
+		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "/jsprit_unplannedCarriers.xml") ;
 
 		//Solving the VRP (generate carrier's tour plans)
 		generateCarrierPlans(network, carriers, vehicleTypes, config);
 
 		//### Output after jsprit run
-		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "jsprit_plannedCarriers.xml") ;
+		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "/jsprit_plannedCarriers.xml") ;
 
-		return carriers;
-	}
-
-	private static CarrierVehicleTypes createVehicleTypes() {
-		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-		new CarrierVehicleTypeReader(vehicleTypes).readURL( IOUtils.newUrl(scenarioUrl, "vehicleTypes.xml" ) ) ;
-		return vehicleTypes;
-	}
-	
-	private static Carriers createCarriers(CarrierVehicleTypes vehicleTypes) {
-		Carriers carriers = new Carriers() ;
-		new CarrierPlanXmlReaderV2(carriers).readURL( IOUtils.newUrl(scenarioUrl, "singleCarrier.xml" ) ) ;
-
-		// assign vehicle types to the carriers
-		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
 		return carriers;
 	}
 
@@ -142,13 +143,14 @@ public class RunFreightExample {
 			VehicleRoutingProblem vrp = vrpBuilder.build() ;
 
 			//Build algorithm out of the box
-			VehicleRoutingAlgorithm vra = Jsprit.Builder.newInstance(vrp).setProperty(Jsprit.Parameter.THREADS, "5").buildAlgorithm();
+			final Jsprit.Builder algoBuilder = Jsprit.Builder.newInstance( vrp );
+			algoBuilder.setProperty( Jsprit.Parameter.THREADS,"5" ) ;
+			VehicleRoutingAlgorithm vra = algoBuilder.buildAlgorithm();
 
 			//			// or read it from file
 //			final URL algorithmURL = IOUtils.newUrl(scenarioUrl, "algorithm_v2.xml");
 //			VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmURL);
 //			//TODO initial soultion needed
-			
 			
 			vra.getAlgorithmListeners().addListener(new StopWatch(), Priority.HIGH);
 			vra.setMaxIterations(100);
@@ -170,15 +172,5 @@ public class RunFreightExample {
 		}
 	}
 
-
-	//Running it in MATSim
-	private static void matsimRun( Scenario scenario ) {
-
-		final Controler controler = new Controler( scenario ) ;
-
-		Freight.configure( controler );
-
-		controler.run();
-	}
 
 }

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.matsim.codeexamples.extensions.dvrpetc;
+package org.matsim.codeexamples.extensions.dvrp;
 
 /**
  * Default taxi plugin, should work out of the box with corresponding input files.  Very similar to {@link RunTaxiExample}.

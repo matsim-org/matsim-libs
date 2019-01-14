@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.matsim.codeexamples.extensions.dvrpetc;
+package org.matsim.codeexamples.extensions.dvrp;
 
 /**
  * Maybe somewhat in contrast to intuition, this example is not the simplest one, since it already plugs 3 things together:<ul>

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.matsim.codeexamples.extensions.dvrpetc;
+package org.matsim.codeexamples.extensions.dvrp;
 
 /**
  * @author kainagel
