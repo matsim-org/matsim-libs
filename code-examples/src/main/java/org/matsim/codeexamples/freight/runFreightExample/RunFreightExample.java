@@ -97,8 +97,7 @@ public class RunFreightExample {
 	}
 
 	private static Config createConfig() {
-		final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
-		final URL configURL = IOUtils.newUrl(url, "config.xml");
+		final URL configURL = IOUtils.newUrl(scenarioUrl, "config.xml");
 		Config config = ConfigUtils.loadConfig(configURL  );
 		config.controler().setOverwriteFileSetting( overwriteExistingFiles );
 		config.global().setRandomSeed(4177);
@@ -124,8 +123,7 @@ public class RunFreightExample {
 
 	private static Carriers createCarriers(CarrierVehicleTypes vehicleTypes) {
 		Carriers carriers = new Carriers() ;
-		final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
-		final URL carrierURL = IOUtils.newUrl(url, "singleCarrier.xml");
+		final URL carrierURL = IOUtils.newUrl(scenarioUrl, "singleCarrier.xml");
 		new CarrierPlanXmlReaderV2(carriers).readURL(carrierURL) ;
 
 		// assign vehicle types to the carriers
@@ -135,8 +133,7 @@ public class RunFreightExample {
 
 	private static CarrierVehicleTypes createVehicleTypes() {
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-		final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
-		final URL vehicleTypesURL = IOUtils.newUrl(url, "vehicleTypes.xml");
+		final URL vehicleTypesURL = IOUtils.newUrl(scenarioUrl, "vehicleTypes.xml");
 		new CarrierVehicleTypeReader(vehicleTypes).readURL(vehicleTypesURL) ;
 		return vehicleTypes;
 	}
@@ -163,9 +160,8 @@ public class RunFreightExample {
 			//				//Build algorithm out of the box
 			//				VehicleRoutingAlgorithm vra = Jsprit.Builder.newInstance(vrp).setProperty(Jsprit.Parameter.THREADS, "5").buildAlgorithm();
 			// or read it from file
-			final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
-			final URL algortihmURL = IOUtils.newUrl(url, "algorithm_v2.xml");
-			VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algortihmURL);
+			final URL algorithmURL = IOUtils.newUrl(scenarioUrl, "algorithm_v2.xml");
+			VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmURL);
 
 			vra.getAlgorithmListeners().addListener(new StopWatch(), Priority.HIGH);
 			vra.setMaxIterations(100);
