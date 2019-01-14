@@ -35,7 +35,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vsp.ev.EvConfigGroup;
 import org.matsim.vsp.ev.EvModule;
-import org.matsim.vsp.ev.charging.FixedSpeedChargingStrategy;
+import org.matsim.vsp.ev.charging.VariableSpeedCharging;
 import org.matsim.vsp.ev.dvrp.EvDvrpIntegrationModule;
 
 public class RunETaxiScenario {
@@ -75,9 +75,8 @@ public class RunETaxiScenario {
 
 	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(TaxiConfigGroup taxiCfg) {
 		return new EvDvrpIntegrationModule(taxiCfg.getMode())//
-				.setChargingStrategyFactory(
-						charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
-								MAX_RELATIVE_SOC))//
+				.setChargingStrategyFactory(charger -> VariableSpeedCharging.createStrategyForNissanLeaf(
+						charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC))//
 				.setTemperatureProvider(() -> TEMPERATURE)//
 				.setTurnedOnPredicate(vehicle -> vehicle.getSchedule().getStatus() == ScheduleStatus.STARTED)//
 				.setVehicleFile(taxiCfg.getTaxisFile());
