@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -94,6 +95,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 
 	@Override
 	public void doSimStep(double time) {
+		// for all offers, delete those that are not confirmed within confirmation time (garbage collection)
 	}
 
 	@Override
@@ -102,6 +104,10 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 
 	@Override
 	public final List<TripInfo> getTripInfos( Facility fromFacility, Facility toFacility, double time, TimeInterpretation interpretation, Person person ) {
+		// idea is to be able to return multiple trip options, cf. public transit router.  In the case here, we will need only one.  I.e. goals of this method are:
+		// (1) fill out TripInfo
+		// (2) keep handle so that passenger can accept, or not-confirmed request is eventually deleted again.  Also see doSimStet(...) ;
+
 		Gbl.assertIf( interpretation==TimeInterpretation.departure );
 		Link pickupLink = FacilitiesUtils.decideOnLink( fromFacility, network );
 		Link dropoffLink = FacilitiesUtils.decideOnLink( toFacility, network ) ;
@@ -109,8 +115,9 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 
 		MobsimPassengerAgent passenger = null ;
 		PassengerRequest request = createValidateAndSubmitRequest(passenger, pickupLink.getId(), dropoffLink.getId(), time, now );
-		// yyyy remove parameter MobsimPassengerAgent. kai/gregor, jan'19
+		// yyyy we think that it is possible to remove parameter MobsimPassengerAgent from this method. kai/gregor, jan'19
 
+		// generating the TripInfo object that will be returned to the potential passenger:
 		TripInfo info = new TripInfo(){
 			@Override public Facility getPickupLocation(){
 				return new Facility(){
@@ -125,14 +132,10 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 					}
 				}
 			}
-
-			@Override
-			public double getExpectedBoardingTime(){
+			@Override public double getExpectedBoardingTime(){
 				return request.getEarliestStartTime() ;
 			}
-
-			@Override
-			public Facility getDropoffLocation(){
+			@Override public Facility getDropoffLocation(){
 				return new Facility(){
 					@Override public Map<String, Object> getCustomAttributes(){
 						throw new RuntimeException( "not implemented" );
@@ -140,41 +143,32 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 					@Override public Coord getCoord(){
 						throw new RuntimeException( "not implemented" );
 					}
-
 					@Override public Id<Link> getLinkId(){
 						return dropoffLink.getId() ;
 					}
 				};
 			}
-
-			@Override
-			public double getExpectedTravelTime(){
+			@Override public double getExpectedTravelTime(){
 				throw new RuntimeException( "not implemented" );
 			}
-
 			@Override
 			public double getMonetaryPrice(){
 				throw new RuntimeException( "not implemented" );
 			}
-
-			@Override
-			public Map<String, String> getAdditionalAttributes(){
-				throw new RuntimeException( "not implemented" );
+			@Override public Map<String, String> getAdditionalAttributes(){
+				return null ;
 			}
-
-			@Override
-			public String getMode(){
-				throw new RuntimeException( "not implemented" );
+			@Override public String getMode(){
+				return TransportMode.drt ;
 			}
-
-			@Override
-			public void accept(){
-				throw new RuntimeException( "not implemented" );
+			@Override public void accept(){
+				// this is the handle by which the passenger can accept.  This would, we think, easiest go to a container that keeps track of unconfirmed
+				// offers.  We cannot say if advanceRequestStorage is the correct container for this, probably not and you will need yet another one.
+				advanceRequestStorage.accept(...) ;
 			}
-
-			@Override
-			public double getLatestDecisionTime(){
-				throw new RuntimeException( "not implemented" );
+			@Override public double getLatestDecisionTime(){
+				// we currently allow only one time step to make the decision:
+				return now+1 ;
 			}
 		}
 		// wrap into list and return:
