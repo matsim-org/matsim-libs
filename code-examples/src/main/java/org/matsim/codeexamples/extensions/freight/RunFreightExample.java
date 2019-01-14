@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.codeexamples.freight.runFreightExample;
+package org.matsim.codeexamples.extensions.freight;
 
 import java.io.File;
 import java.io.IOException;
