@@ -1,12 +1,12 @@
 package org.matsim.contrib.emissions.analysis;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -23,12 +23,12 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class may be used to collect emission events of some events file and assign those emissions to a grid structure.
@@ -36,7 +36,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  */
 public class EmissionGridAnalyzer {
 
-	private final static Logger log = Logger.getLogger(EmissionGridAnalyzer.class);
+    private static final Logger logger = Logger.getLogger(EmissionGridAnalyzer.class);
+
     private final double binSize;
     private final double smoothingRadius;
     private final double countScaleFactor;
@@ -45,17 +46,18 @@ public class EmissionGridAnalyzer {
     private final GridType gridType;
     private final double gridSize;
     private final Network network;
-    
-    private int counter = 0;
+    private final Geometry bounds;
 
     private EmissionGridAnalyzer(final double binSize, final double gridSize, final double smoothingRadius,
-                                 final double countScaleFactor, final GridType gridType, final Network network) {
+                                 final double countScaleFactor, final GridType gridType, final Network network,
+                                 final Geometry bounds) {
         this.binSize = binSize;
         this.network = network;
         this.gridType = gridType;
         this.gridSize = gridSize;
         this.smoothingRadius = smoothingRadius;
         this.countScaleFactor = countScaleFactor;
+        this.bounds = bounds;
     }
 
     /**
@@ -73,7 +75,7 @@ public class EmissionGridAnalyzer {
         TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> timeBinsWithEmissions = processEventsFile(eventsFile);
         TimeBinMap<Grid<Map<Pollutant, Double>>> result = new TimeBinMap<>(binSize);
 
-        log.info("Starting grid computation...");
+        logger.info("Starting grid computation...");
         
         timeBinsWithEmissions.getTimeBins().forEach(bin -> {
             Grid<Map<Pollutant, Double>> grid = writeAllLinksToGrid(bin.getValue());
@@ -131,15 +133,14 @@ public class EmissionGridAnalyzer {
     private Grid<Map<Pollutant, Double>> writeAllLinksToGrid(Map<Id<Link>, EmissionsByPollutant> linksWithEmissions) {
 
         Grid<Map<Pollutant, Double>> grid = createGrid();
-        counter = 0;
+
+        logger.info("start copying link emissions to grid. This may take a while...");
         linksWithEmissions.forEach((id, emission) -> {
-        	
-        	if (counter%1000 == 0) log.info("#" + counter);
-        	counter++;
-        	
-            Link link = network.getLinks().get(id);
-            if (network.getLinks().containsKey(id))
-                processLink(link, emission, grid);
+            if (network.getLinks().containsKey(id)) {
+                Link link = network.getLinks().get(id);
+                if (isWithinBounds(link))
+                    processLink(link, emission, grid);
+            }
         });
         return grid;
     }
@@ -159,24 +160,20 @@ public class EmissionGridAnalyzer {
         // merge both maps from cell and linkemissions and sum up values, while the link emissions are multiplied by
         // the cell weight
         Map<Pollutant, Double> newValues = Stream.concat(cell.getValue().entrySet().stream(), emissions.getEmissions().entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue() * weight * countScaleFactor,
                         (cellValue, linkValue) -> cellValue + linkValue * weight * countScaleFactor));
         cell.setValue(newValues);
     }
 
-    private Geometry getBoundsFromNetwork() {
-        double[] box = NetworkUtils.getBoundingBox(network.getNodes().values());
-        return factory.createPolygon(new Coordinate[]{
-                new Coordinate(box[0], box[1]),
-                new Coordinate(box[2], box[1]),
-                new Coordinate(box[2], box[3]),
-                new Coordinate(box[0], box[3]),
-                new Coordinate(box[0], box[1])});
+    private boolean isWithinBounds(Link link) {
+        Point linkCentroid = factory.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
+        return bounds.contains(linkCentroid);
     }
 
     private Grid<Map<Pollutant, Double>> createGrid() {
 
-        Geometry bounds = getBoundsFromNetwork();
         if (gridType == GridType.Hexagonal)
             return new HexagonalGrid<>(gridSize, HashMap::new, bounds);
         else
@@ -204,6 +201,7 @@ public class EmissionGridAnalyzer {
         private double smoothingRadius = 1.0;
         private double countScaleFactor = 1.0;
         private Network network;
+        private Geometry bounds;
         private GridType gridType = GridType.Square;
 
         /**
@@ -268,6 +266,11 @@ public class EmissionGridAnalyzer {
             return this;
         }
 
+        public Builder withBounds(Geometry bounds) {
+            this.bounds = bounds;
+            return this;
+        }
+
         /**
          * Builds a new Instance of {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer}
          * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer}
@@ -279,13 +282,29 @@ public class EmissionGridAnalyzer {
             if (!isValid())
                 throw new IllegalArgumentException("binSize, gridSize, smoothingRadius must be set and greater 0, Also network must be set");
 
-            return new EmissionGridAnalyzer(binSize, gridSize, smoothingRadius, countScaleFactor, gridType, network);
+            if (bounds == null)
+                bounds = createBounds();
+            return new EmissionGridAnalyzer(binSize, gridSize, smoothingRadius, countScaleFactor, gridType, network, bounds);
         }
 
         private boolean isValid() {
             return binSize > 0 && gridSize > 0 && smoothingRadius > 0 && network != null;
         }
+
+        private Geometry createBounds() {
+            if (bounds != null)
+                return bounds;
+
+            double[] box = NetworkUtils.getBoundingBox(network.getNodes().values());
+            return factory.createPolygon(new Coordinate[]{
+                    new Coordinate(box[0], box[1]),
+                    new Coordinate(box[2], box[1]),
+                    new Coordinate(box[2], box[3]),
+                    new Coordinate(box[0], box[3]),
+                    new Coordinate(box[0], box[1])});
+        }
     }
+
 
     /**
      * Mixin to suppress the printing of z-coordinates when grid is serialized to json
