@@ -23,8 +23,6 @@ import java.util.stream.Stream;
 import org.matsim.vsp.ev.data.Charger;
 import org.matsim.vsp.ev.data.ElectricVehicle;
 
-import com.google.common.collect.Streams;
-
 /**
  * TODO Does not include future energy demand (e.g. AUX for plugged/queued vehs)
  * 
@@ -41,12 +39,12 @@ public class ChargingEstimations {
 
 	public static double estimateTotalTimeToCharge(ChargingLogic logic) {
 		return estimateTotalTimeToCharge(logic.getChargingStrategy(),
-				Streams.concat(logic.getPluggedVehicles().stream(), logic.getQueuedVehicles().stream()));
+				Stream.concat(logic.getPluggedVehicles().stream(), logic.getQueuedVehicles().stream()));
 	}
 
 	public static double estimateTotalEnergyToCharge(ChargingLogic logic) {
 		return estimateTotalEnergyToCharge(logic.getChargingStrategy(),
-				Streams.concat(logic.getPluggedVehicles().stream(), logic.getQueuedVehicles().stream()));
+				Stream.concat(logic.getPluggedVehicles().stream(), logic.getQueuedVehicles().stream()));
 	}
 
 	public static double estimateTotalTimeToCharge(ChargingStrategy strategy, Stream<ElectricVehicle> vehicles) {
