@@ -32,40 +32,44 @@ import org.matsim.vsp.ev.data.ElectricVehicle;
 
 public class FastThenSlowCharging implements ChargingStrategy {
 
-    private final double effectiveChargingPower;
+	private final double chargingPower;
 
-    public FastThenSlowCharging(double effectiveChargingPower) {
-        this.effectiveChargingPower = effectiveChargingPower;
-    }
+	public FastThenSlowCharging(double chargingPower) {
+		if (chargingPower <= 0) {
+			throw new IllegalArgumentException("chargingPower must be positive");
+		}
+		this.chargingPower = chargingPower;
+	}
 
-    @Override
-    public double calcEnergyCharge(ElectricVehicle ev, double chargePeriod) {
-        Battery b = ev.getBattery();
-        double relativeSoc = b.getSoc() / b.getCapacity();
-        double c = b.getCapacity() / 3600;
-        double currentPower;
-        if (relativeSoc <= 0.5) {
-            currentPower = Math.min(effectiveChargingPower, 1.75 * c);
-        } else if (relativeSoc <= 0.75) {
-            currentPower = Math.min(effectiveChargingPower, 1.25 * c);
-        } else
-            currentPower = Math.min(effectiveChargingPower, 0.5 * c);
-        return currentPower * chargePeriod;
-    }
+	@Override
+	public double calcEnergyCharge(ElectricVehicle ev, double chargePeriod) {
+		Battery b = ev.getBattery();
+		double relativeSoc = b.getSoc() / b.getCapacity();
+		double c = b.getCapacity() / 3600;
+		double currentPower;
+		if (relativeSoc <= 0.5) {
+			currentPower = Math.min(chargingPower, 1.75 * c);
+		} else if (relativeSoc <= 0.75) {
+			currentPower = Math.min(chargingPower, 1.25 * c);
+		} else {
+			currentPower = Math.min(chargingPower, 0.5 * c);
+		}
+		return currentPower * chargePeriod;
+	}
 
-    @Override
-    public boolean isChargingCompleted(ElectricVehicle ev) {
-        return calcRemainingEnergyToCharge(ev) <= 0;
-    }
+	@Override
+	public boolean isChargingCompleted(ElectricVehicle ev) {
+		return calcRemainingEnergyToCharge(ev) <= 0;
+	}
 
-    @Override
-    public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
-        Battery b = ev.getBattery();
-        return b.getCapacity() - b.getSoc();
-    }
+	@Override
+	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
+		Battery b = ev.getBattery();
+		return b.getCapacity() - b.getSoc();
+	}
 
-    @Override
-    public double calcRemainingTimeToCharge(ElectricVehicle ev) {
-        return calcRemainingEnergyToCharge(ev) / effectiveChargingPower;
-    }
+	@Override
+	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
+		return calcRemainingEnergyToCharge(ev) / chargingPower;//TODO should consider variable charging speed
+	}
 }
