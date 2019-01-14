@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 /**
  * Collects Warm- and Cold-Emission-Events by time bin and by link-id
  */
-public class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
+class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
 
     private final TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> timeBins;
 

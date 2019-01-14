@@ -36,6 +36,7 @@ public class EmissionGridAnalyzer {
 
     private final double binSize;
     private final double smoothingRadius;
+    private final double countScaleFactor;
 
     private static GeometryFactory factory = new GeometryFactory();
     private final GridType gridType;
@@ -43,12 +44,13 @@ public class EmissionGridAnalyzer {
     private final Network network;
 
     private EmissionGridAnalyzer(final double binSize, final double gridSize, final double smoothingRadius,
-                                 final GridType gridType, final Network network) {
+                                 final double countScaleFactor, final GridType gridType, final Network network) {
         this.binSize = binSize;
         this.network = network;
         this.gridType = gridType;
         this.gridSize = gridSize;
         this.smoothingRadius = smoothingRadius;
+        this.countScaleFactor = countScaleFactor;
     }
 
     /**
@@ -147,7 +149,7 @@ public class EmissionGridAnalyzer {
         // the cell weight
         Map<Pollutant, Double> newValues = Stream.concat(cell.getValue().entrySet().stream(), emissions.getEmissions().entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (cellValue, linkValue) -> cellValue + linkValue * weight));
+                        (cellValue, linkValue) -> cellValue + linkValue * weight * countScaleFactor));
         cell.setValue(newValues);
     }
 
@@ -189,6 +191,7 @@ public class EmissionGridAnalyzer {
         private double binSize;
         private double gridSize;
         private double smoothingRadius = 1.0;
+        private double countScaleFactor = 1.0;
         private Network network;
         private GridType gridType = GridType.Square;
 
@@ -234,6 +237,17 @@ public class EmissionGridAnalyzer {
         }
 
         /**
+         * Sets the count scale factor by which the emission values for each link are multiplied
+         *
+         * @param factor count scale factor of the scenario
+         * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer.Builder}
+         */
+        public Builder withCountScaleFactor(double factor) {
+            this.countScaleFactor = factor;
+            return this;
+        }
+
+        /**
          * MATSim network that was used for the simulation run
          * @param network a network
          * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer.Builder}
@@ -254,7 +268,7 @@ public class EmissionGridAnalyzer {
             if (!isValid())
                 throw new IllegalArgumentException("binSize, gridSize, smoothingRadius must be set and greater 0, Also network must be set");
 
-            return new EmissionGridAnalyzer(binSize, gridSize, smoothingRadius, gridType, network);
+            return new EmissionGridAnalyzer(binSize, gridSize, smoothingRadius, countScaleFactor, gridType, network);
         }
 
         private boolean isValid() {
