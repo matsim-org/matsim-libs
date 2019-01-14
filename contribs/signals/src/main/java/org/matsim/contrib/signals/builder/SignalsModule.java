@@ -113,7 +113,7 @@ class SignalsModule extends AbstractModule {
 	 * 
 	 * @param signalControllerFactoryClassName
 	 */
-	public final void addSignalControllerFactory(String key, Class<? extends SignalControllerFactory> signalControllerFactoryClassName) {
+	final void addSignalControllerFactory(String key, Class<? extends SignalControllerFactory> signalControllerFactoryClassName) {
 		this.signalControllerFactoryClassNames.put(key, signalControllerFactoryClassName);
 	}
 }

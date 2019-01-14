@@ -19,9 +19,14 @@ public class Signals{
             ao.addOverridingModule( this.signalsModule ) ;
             ao.addOverridingQSimModule( new SignalsQSimModule() ) ;
         }
+        
+        /**
+         * Call this method when you want to add your own SignalController.
+         * E.g. via 
+         *  new Configurator(controler).addSignalControllerFactory(LaemmerSignalController.IDENTIFIER, LaemmerSignalController.LaemmerFactory.class);
+         */
         public final void addSignalControllerFactory( String key, Class<? extends SignalControllerFactory> signalControllerFactoryClassName ) {
             signalsModule.addSignalControllerFactory( key, signalControllerFactoryClassName );
-            // it is not _totally_ sure that adding this after adding it as an overridingModule will work, but I think that it will.  kai, dec'19
         }
     }
 
