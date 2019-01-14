@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.Freight;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.Carriers;
@@ -88,7 +89,8 @@ public class EquilWithCarrierWithPassIT {
 	public void testScoringInMeters(){
 		Carriers carriers = new Carriers();
 		new CarrierPlanXmlReaderV2(carriers).readFile(planFile);
-		controler.addOverridingModule(new CarrierModule(carriers));
+//		controler.addOverridingModule(new CarrierModule(carriers));
+		Freight.configure( controler );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

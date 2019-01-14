@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.Freight;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
@@ -76,12 +77,14 @@ public final class RunChessboard {
         final CarrierPlanStrategyManagerFactory strategyManagerFactory = new MyCarrierPlanStrategyManagerFactory(types);
         final CarrierScoringFunctionFactory scoringFunctionFactory = new MyCarrierScoringFunctionFactory();
 
+        Freight.configure( controler );
+
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                CarrierModule carrierModule = new CarrierModule(carriers);
-                carrierModule.setPhysicallyEnforceTimeWindowBeginnings(true);
-                install(carrierModule);
+//                CarrierModule carrierModule = new CarrierModule(carriers);
+//                carrierModule.setPhysicallyEnforceTimeWindowBeginnings(true);
+//                install(carrierModule);
                 bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);
                 bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
             }
