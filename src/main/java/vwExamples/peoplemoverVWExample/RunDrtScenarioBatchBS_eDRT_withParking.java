@@ -43,6 +43,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vsp.ev.EvConfigGroup;
 import org.matsim.vsp.ev.temperature.TemperatureChangeConfigGroup;
+
+import analysis.drtOccupancy.DynModeTrip;
 import parking.ParkingRouterConfigGroup;
 import parking.ParkingRouterModule;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
@@ -71,7 +73,7 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
         String runId = "ptToDrt_temp_new";
         boolean rebalancing = true;
 
-        String inbase = "D:\\Steffen\\";
+        String inbase = "C:\\Temp\\";
 
         final Config config = ConfigUtils.loadConfig(inbase + "conf_BS_DRT_10pct_eDRT.xml", new DrtConfigGroup(),
                 new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(), new TemperatureChangeConfigGroup());
@@ -81,7 +83,7 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 
         //config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
         // Overwrite existing configuration parameters
-        config.plans().setInputFile(inbase + "\\plans\\ptToDrt.0.plans.xml.gz");
+        config.plans().setInputFile(inbase + "\\plans\\drtSelected_small.xml.gz");
         config.controler().setLastIteration(2); // Number of simulation iterations
         config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
         config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
@@ -143,11 +145,12 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
         //Define infrastructure for eDRT (vehicles, depots and chargers)
         CreateEDRTVehiclesAndChargers vehiclesAndChargers = new CreateEDRTVehiclesAndChargers();
         Map<Id<Link>, Integer> depotsAndVehicles = new HashMap<>();
-        depotsAndVehicles.put(Id.createLinkId(40158), 5); //BS HBF
-        depotsAndVehicles.put(Id.createLinkId(8097), 5); //Zentrum SO
-        depotsAndVehicles.put(Id.createLinkId(13417), 5); //Zentrum N
-        depotsAndVehicles.put(Id.createLinkId(14915), 5); //Flugplatz
-
+        depotsAndVehicles.put(Id.createLinkId(40158), 20); //BS HBF
+        depotsAndVehicles.put(Id.createLinkId(8097), 20); //Zentrum SO
+        depotsAndVehicles.put(Id.createLinkId(13417), 20); //Zentrum N
+        depotsAndVehicles.put(Id.createLinkId(14915), 20); //Flugplatz
+        
+       
         vehiclesAndChargers.CHARGER_FILE = inbase + "\\chargers\\chargers.xml.gz";
         vehiclesAndChargers.NETWORKFILE = inbase + "\\network\\drtServiceAreaNetwork.xml.gz";
         vehiclesAndChargers.DRT_VEHICLE_FILE = inbase + "\\fleets\\fleet.xml.gz";
@@ -162,8 +165,8 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
         drt.setVehiclesFile(inbase + "\\fleets\\fleet.xml.gz");
         drt.setIdleVehiclesReturnToDepots(true);
         drt.setOperationalScheme("stopbased");
-
-
+        drt.setPlotDetailedCustomerStats(true);
+        
         EvConfigGroup eDrt = (EvConfigGroup) config.getModules().get(EvConfigGroup.GROUP_NAME);
         eDrt.setChargersFile(inbase + "\\chargers\\chargers.xml.gz");
         eDrt.setVehiclesFile(inbase + "\\fleets\\eFleet.xml.gz");
