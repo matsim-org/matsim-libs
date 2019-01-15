@@ -48,6 +48,7 @@ import analysis.drtOccupancy.DynModeTrip;
 import parking.ParkingRouterConfigGroup;
 import parking.ParkingRouterModule;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
+import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
 import vwExamples.utils.parking.createParkingNetwork.CreateParkingNetwork;
 
 import java.io.IOException;
@@ -145,10 +146,10 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
         //Define infrastructure for eDRT (vehicles, depots and chargers)
         CreateEDRTVehiclesAndChargers vehiclesAndChargers = new CreateEDRTVehiclesAndChargers();
         Map<Id<Link>, Integer> depotsAndVehicles = new HashMap<>();
-        depotsAndVehicles.put(Id.createLinkId(40158), 20); //BS HBF
-        depotsAndVehicles.put(Id.createLinkId(8097), 20); //Zentrum SO
-        depotsAndVehicles.put(Id.createLinkId(13417), 20); //Zentrum N
-        depotsAndVehicles.put(Id.createLinkId(14915), 20); //Flugplatz
+        depotsAndVehicles.put(Id.createLinkId(40158), 5); //BS HBF
+        depotsAndVehicles.put(Id.createLinkId(8097), 5); //Zentrum SO
+        depotsAndVehicles.put(Id.createLinkId(13417), 5); //Zentrum N
+        depotsAndVehicles.put(Id.createLinkId(14915), 5); //Flugplatz
         
        
         vehiclesAndChargers.CHARGER_FILE = inbase + "\\chargers\\chargers.xml.gz";
@@ -238,11 +239,17 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
                 DvrpConfigGroup.get(config).setTravelTimeEstimationBeta(600);
                 //bind(RelocationWriter.class).asEagerSingleton();
                 //addControlerListenerBinding().to(RelocationWriter.class);
+                
+                
 
             }
         });
+        
+        
+        
         controler.addOverridingModule(new ParkingRouterModule());
         controler.addOverridingModule(new SwissRailRaptorModule());
+        controler.addOverridingModule(new MyDrtTrajectoryAnalysisModule(drt));
 
         // We finally run the controller to start MATSim
 
