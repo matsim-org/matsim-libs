@@ -43,7 +43,7 @@ import static org.matsim.contrib.emissions.EmissionUtils.createIndexFromKey;
  * @author benjamin
  *
  */
-public class EmissionModule {
+public final class EmissionModule {
 	private static final Logger logger = Logger.getLogger(EmissionModule.class);
 	
 	private final Scenario scenario;

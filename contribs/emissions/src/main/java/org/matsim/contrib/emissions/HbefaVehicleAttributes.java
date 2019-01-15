@@ -24,6 +24,8 @@ package org.matsim.contrib.emissions;
  *
  */
 public final class HbefaVehicleAttributes {
+	// yy I can see what this is good for.  I am at this point not totally sure if it makes a lot of sense to use this outside the emissions contrib.  kai, jan'19
+
 	private String hbefaTechnology = "average";
 	private String hbefaSizeClass = "average";
 	private String hbefaEmConcept = "average";

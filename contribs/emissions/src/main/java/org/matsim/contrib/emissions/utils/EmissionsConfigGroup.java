@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class EmissionsConfigGroup
+public final class EmissionsConfigGroup
 extends ReflectiveConfigGroup
 {
 	public static final String GROUP_NAME = "emissions";

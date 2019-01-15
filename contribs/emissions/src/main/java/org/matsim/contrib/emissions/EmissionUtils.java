@@ -38,7 +38,7 @@ import java.util.stream.Stream;
  * @author ikaddoura, benjamin
  *
  */
-public class EmissionUtils {
+public final class EmissionUtils {
 	private static final Logger logger = Logger.getLogger(EmissionUtils.class);
 
 	static Map<String, Integer> createIndexFromKey( String strLine ) {

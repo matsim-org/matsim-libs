@@ -37,7 +37,7 @@ import java.util.SortedMap;
  * @author benjamin
  *
  */
-public class EmissionWriter {
+public final class EmissionWriter {
 	private static final Logger logger = Logger.getLogger(EmissionWriter.class);
 	
 
