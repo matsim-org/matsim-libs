@@ -37,7 +37,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vsp.ev.EvUnitConversions;
+import org.matsim.vsp.ev.EvUnits;
 import org.matsim.vsp.ev.data.BatteryImpl;
 import org.matsim.vsp.ev.data.Charger;
 import org.matsim.vsp.ev.data.ChargerImpl;
@@ -104,14 +104,15 @@ public class CreateEDRTVehiclesAndChargers {
 				
 				Vehicle v = new VehicleImpl(Id.create("taxi_"+startLink.getId().toString()+"_"+i, Vehicle.class), startLink, SEATS, OPERATIONSTARTTIME, OPERATIONENDTIME);
 				vehicles.add(v);
-				double initialSoc_kWh = MIN_START_CAPACITY_KWH + random.nextDouble()*(MAX_START_CAPACITY_KWH-MIN_START_CAPACITY_KWH); 
-				ElectricVehicle ev = new ElectricVehicleImpl(Id.create(v.getId(), ElectricVehicle.class), new BatteryImpl(BATTERY_CAPACITY_KWH * EvUnitConversions.J_PER_kWh,
-						initialSoc_kWh * EvUnitConversions.J_PER_kWh));
+				double initialSoc_kWh = MIN_START_CAPACITY_KWH + random.nextDouble()*(MAX_START_CAPACITY_KWH-MIN_START_CAPACITY_KWH);
+				ElectricVehicle ev = new ElectricVehicleImpl(Id.create(v.getId(), ElectricVehicle.class),
+						new BatteryImpl(BATTERY_CAPACITY_KWH * EvUnits.J_PER_kWh, initialSoc_kWh * EvUnits.J_PER_kWh));
 				evehicles.add(ev);
 				
 			}
 			int chargersPerDepot = (int) (e.getValue()*FRACTION_OF_CHARGERS_PER_DEPOT);
-			Charger charger = new ChargerImpl(Id.create("charger_"+startLink.getId(),Charger.class), CHARGINGPOWER_KW*EvUnitConversions.W_PER_kW,chargersPerDepot , startLink);
+			Charger charger = new ChargerImpl(Id.create("charger_" + startLink.getId(), Charger.class),
+					CHARGINGPOWER_KW * EvUnits.W_PER_kW, chargersPerDepot, startLink);
 			chargers.add(charger);
 			
 		}

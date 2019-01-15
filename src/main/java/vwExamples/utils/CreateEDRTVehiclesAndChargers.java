@@ -19,6 +19,13 @@
 
 package vwExamples.utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -30,13 +37,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vsp.ev.EvUnitConversions;
-import org.matsim.vsp.ev.data.*;
+import org.matsim.vsp.ev.EvUnits;
+import org.matsim.vsp.ev.data.BatteryImpl;
+import org.matsim.vsp.ev.data.Charger;
+import org.matsim.vsp.ev.data.ChargerImpl;
+import org.matsim.vsp.ev.data.ElectricVehicle;
+import org.matsim.vsp.ev.data.ElectricVehicleImpl;
 import org.matsim.vsp.ev.data.file.ChargerWriter;
 import org.matsim.vsp.ev.data.file.ElectricVehicleWriter;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * @author axer
@@ -90,13 +98,14 @@ public class CreateEDRTVehiclesAndChargers {
                 Vehicle v = new VehicleImpl(Id.create(drtTag + "_" + startLink.getId().toString() + "_" + i, Vehicle.class), startLink, SEATS, OPERATIONSTARTTIME, OPERATIONENDTIME);
                 vehicles.add(v);
                 double initialSoc_kWh = MIN_START_CAPACITY_KWH + random.nextDouble() * (MAX_START_CAPACITY_KWH - MIN_START_CAPACITY_KWH);
-                ElectricVehicle ev = new ElectricVehicleImpl(Id.create(v.getId(), ElectricVehicle.class), new BatteryImpl(BATTERY_CAPACITY_KWH * EvUnitConversions.J_PER_kWh,
-                        initialSoc_kWh * EvUnitConversions.J_PER_kWh));
+                ElectricVehicle ev = new ElectricVehicleImpl(Id.create(v.getId(), ElectricVehicle.class),
+                        new BatteryImpl(BATTERY_CAPACITY_KWH * EvUnits.J_PER_kWh, initialSoc_kWh * EvUnits.J_PER_kWh));
                 evehicles.add(ev);
 
             }
             int chargersPerDepot = (int) (e.getValue() * FRACTION_OF_CHARGERS_PER_DEPOT);
-            Charger charger = new ChargerImpl(Id.create("charger_" + startLink.getId(), Charger.class), CHARGINGPOWER_KW * EvUnitConversions.W_PER_kW, chargersPerDepot, startLink);
+            Charger charger = new ChargerImpl(Id.create("charger_" + startLink.getId(), Charger.class),
+                    CHARGINGPOWER_KW * EvUnits.W_PER_kW, chargersPerDepot, startLink);
             chargers.add(charger);
 
         }
