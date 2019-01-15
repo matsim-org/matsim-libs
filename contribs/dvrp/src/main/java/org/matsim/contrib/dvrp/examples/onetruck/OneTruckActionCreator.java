@@ -50,8 +50,8 @@ final class OneTruckActionCreator implements VrpAgentLogic.DynActionCreator {
 		Task task = vehicle.getSchedule().getCurrentTask();
 		if (task instanceof DriveTask) {
 			return VrpLegFactory.createWithOfflineTracker(TransportMode.truck, vehicle, timer);
-		} else if (task instanceof OneTruckServeTask) { // PICKUP or DROPOFF
-			return new StaticDynActivity(((OneTruckServeTask)task).isPickup() ? "pickup" : "dropoff",
+		} else if (task instanceof OneTruckServeTask) { // PICKUP or DELIVERY
+			return new StaticDynActivity(((OneTruckServeTask)task).isPickup() ? "pickup" : "delivery",
 					task.getEndTime());
 		} else { // WAIT
 			return new VrpActivity("OneTaxiStay", (StayTask)task);

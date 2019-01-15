@@ -51,8 +51,8 @@ public final class RunOneTaxiExample {
 
 		// setup controler
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new OneTaxiModule(TAXIS_FILE));
 		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new OneTaxiModule(TAXIS_FILE));
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.taxi));
 
 		if (otfvis) {

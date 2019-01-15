@@ -19,21 +19,25 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.sensor;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
@@ -43,8 +47,8 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.Lanes;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 
 /**
@@ -53,7 +57,7 @@ import java.util.Map;
  */
 @Singleton
 public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-	VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler{
+	VehicleLeavesTrafficEventHandler, PersonEntersVehicleEventHandler, PersonDepartureEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler{
 
 	private static final Logger log = Logger.getLogger(LinkSensorManager.class);
 	
@@ -68,6 +72,8 @@ public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeave
 
 	private Network network;
 	private Lanes laneDefinitions = null;
+	
+	private Map<Id<Person>, Id<Link>> personDepartureLinks = new HashMap<>();
 	
 	@Inject
 	public LinkSensorManager(Scenario scenario, EventsManager events){
@@ -280,9 +286,14 @@ public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeave
 	}
 	
 	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
-		if (this.linkIdSensorMap.containsKey(event.getLinkId())){
-			this.linkIdSensorMap.get(event.getLinkId()).handleEvent(event);		
+	public void handleEvent(PersonDepartureEvent event) {
+		personDepartureLinks.put(event.getPersonId(), event.getLinkId());
+	}
+
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (this.linkIdSensorMap.containsKey(personDepartureLinks.get(event.getPersonId()))){
+			this.linkIdSensorMap.get(personDepartureLinks.get(event.getPersonId())).handleEvent(event);		
 		}
 	}
 	

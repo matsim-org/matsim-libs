@@ -27,10 +27,10 @@ import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
  */
 public class OneTruckServeTask extends StayTaskImpl {
 	private final OneTruckRequest request;
-	private final boolean isPickup;// pickup or dropoff
+	private final boolean isPickup;// pickup or delivery
 
 	public OneTruckServeTask(double beginTime, double endTime, Link link, boolean isPickup, OneTruckRequest request) {
-		super(beginTime, endTime, link, isPickup ? "pickup" : "dropoff");
+		super(beginTime, endTime, link, isPickup ? "pickup" : "delivery");
 		this.request = request;
 		this.isPickup = isPickup;
 	}
