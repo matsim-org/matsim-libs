@@ -25,8 +25,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
-import org.matsim.contrib.emissions.types.*;
-import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -39,7 +37,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-import static org.matsim.contrib.emissions.utils.EmissionUtils.createIndexFromKey;
+import static org.matsim.contrib.emissions.EmissionUtils.createIndexFromKey;
 
 /**
  * @author benjamin

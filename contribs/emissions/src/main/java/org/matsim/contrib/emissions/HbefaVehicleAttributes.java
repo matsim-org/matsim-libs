@@ -17,13 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.types;
+package org.matsim.contrib.emissions;
 
 /**
  * @author benjamin
  *
  */
-public class HbefaVehicleAttributes {
+public final class HbefaVehicleAttributes {
 	private String hbefaTechnology = "average";
 	private String hbefaSizeClass = "average";
 	private String hbefaEmConcept = "average";

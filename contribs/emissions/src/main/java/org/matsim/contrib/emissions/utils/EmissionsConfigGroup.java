@@ -19,13 +19,14 @@
 
 package org.matsim.contrib.emissions.utils;
 
+import org.matsim.contrib.emissions.EmissionSpecificationMarker;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
+
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class EmissionsConfigGroup
 extends ReflectiveConfigGroup

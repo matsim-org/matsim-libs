@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.utils;
+package org.matsim.contrib.emissions;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.emissions.types.*;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.VehicleType;
 
@@ -42,7 +41,7 @@ import java.util.stream.Stream;
 public class EmissionUtils {
 	private static final Logger logger = Logger.getLogger(EmissionUtils.class);
 
-	public static Map<String, Integer> createIndexFromKey(String strLine) {
+	static Map<String, Integer> createIndexFromKey( String strLine ) {
 		String[] keys = strLine.split(";") ;
 
 		Map<String, Integer> indexFromKey = new HashMap<>() ;
@@ -52,13 +51,14 @@ public class EmissionUtils {
 		return indexFromKey ;
 	}
 
-	public static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
-	public static void setHbefaRoadType(Link link, String type){
+	private static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
+	static void setHbefaRoadType( Link link, String type ){
 		if (type!=null){
 			link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);
 		}
 	}
-	public static String getHbefaRoadType (Link link) {
+
+	static String getHbefaRoadType( Link link ) {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
 
@@ -174,7 +174,7 @@ public class EmissionUtils {
 			EmissionSpecificationMarker.END_EMISSIONS.toString() );
 	}
 	
-	public static Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple( String vehicleDescription ) {
+	static Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple( String vehicleDescription ) {
 		// yyyy what is the advantage of having this as a tuple over just using a class with four entries?  kai, oct'18
 		
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
@@ -204,8 +204,8 @@ public class EmissionUtils {
 	}
 
 
-	public static Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>>
-			createHBEFASpeedsTable(Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable) {
+	static Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>>
+			createHBEFASpeedsTable( Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable ) {
 
 		Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> table = new HashMap<>();
 

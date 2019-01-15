@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HbefaWarmEmissionFactor.java
+ * HbefaTrafficSituation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,34 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.types;
-
+package org.matsim.contrib.emissions;
 
 /**
  * @author benjamin
  *
  */
-public class HbefaWarmEmissionFactor {
-
-	private double speed;
-	private double warmEmissionFactor;
-
-	public HbefaWarmEmissionFactor(){
-	}
-
-	public double getSpeed() {
-		return speed;
-	}
+ enum HbefaTrafficSituation {
 	
-	public void setSpeed(double speed) {
-		this.speed = speed;
-	}
+	FREEFLOW, HEAVY, SATURATED, STOPANDGO;
 	
-	public double getWarmEmissionFactor() {
-		return this.warmEmissionFactor;
-	}
-	
-	public void setWarmEmissionFactor(double warmEmissionFactor) {
-		this.warmEmissionFactor = warmEmissionFactor;
+	HbefaTrafficSituation(){
 	}
 }

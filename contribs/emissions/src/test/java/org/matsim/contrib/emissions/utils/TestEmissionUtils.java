@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.emissions.EmissionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -560,7 +561,7 @@ public class TestEmissionUtils {
 		pop.addPerson(p6);
 
 		//empty emissions map
-		Map<Id<Person>, SortedMap<String, Double>> finalMap = EmissionUtils.setNonCalculatedEmissionsForPopulation(pop, totalEmissions, pollsFromEU);
+		Map<Id<Person>, SortedMap<String, Double>> finalMap = EmissionUtils.setNonCalculatedEmissionsForPopulation(pop, totalEmissions, pollsFromEU );
 		
 		//check: all persons added to the population are contained in the finalMap
 		Assert.assertTrue("the calculated map should contain person 5", finalMap.containsKey(idp5));
