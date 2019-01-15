@@ -22,10 +22,7 @@ class EmissionsByPollutant {
 
     double addEmission(Pollutant pollutant, double value) {
 
-        if (emissionByPollutant.containsKey(pollutant))
-            value += emissionByPollutant.get(pollutant);
-        emissionByPollutant.put(pollutant, value);
-        return value;
+        return emissionByPollutant.merge(pollutant, value, Double::sum);
     }
 
     Map<Pollutant, Double> getEmissions() {

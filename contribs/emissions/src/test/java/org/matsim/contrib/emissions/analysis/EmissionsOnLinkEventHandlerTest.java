@@ -63,6 +63,54 @@ public class EmissionsOnLinkEventHandlerTest {
     }
 
     @Test
+    public void handleSingleLinkWithSingleEvent() {
+
+        Id<Link> linkId = Id.createLinkId(UUID.randomUUID().toString());
+        Id<Vehicle> vehicleId = Id.createVehicleId(UUID.randomUUID().toString());
+        double time = 1;
+        double emissionValue = 1;
+        Map<Pollutant, Double> emissions = TestEmissionUtils.createEmissionsWithFixedValue(emissionValue);
+        Map<String, Double> weaklyTypedEmissions = emissions.entrySet().stream()
+                .collect(Collectors.toMap(entry -> entry.getKey().getText(), Map.Entry::getValue));
+
+        WarmEmissionEvent event = new WarmEmissionEvent(time, linkId, vehicleId, weaklyTypedEmissions);
+
+        EmissionsOnLinkEventHandler handler = new EmissionsOnLinkEventHandler(10);
+
+        handler.handleEvent(event);
+
+        TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> timeBin = handler.getTimeBins().getTimeBin(time);
+
+        timeBin.getValue().values().forEach(emissionsByPollutant -> {
+            emissionsByPollutant.getEmissions().values().forEach(value -> assertEquals(emissionValue, value, 0.0001));
+        });
+    }
+
+    @Test
+    public void handleSingleLinkWithMultipleEvents() {
+
+        Id<Link> linkId = Id.createLinkId(UUID.randomUUID().toString());
+        Id<Vehicle> vehicleId = Id.createVehicleId(UUID.randomUUID().toString());
+        double time = 1;
+        double emissionValue = 1;
+        Map<Pollutant, Double> emissions = TestEmissionUtils.createEmissionsWithFixedValue(emissionValue);
+        Map<String, Double> weaklyTypedEmissions = emissions.entrySet().stream()
+                .collect(Collectors.toMap(entry -> entry.getKey().getText(), Map.Entry::getValue));
+
+        EmissionsOnLinkEventHandler handler = new EmissionsOnLinkEventHandler(10);
+
+        handler.handleEvent(new WarmEmissionEvent(time, linkId, vehicleId, weaklyTypedEmissions));
+        handler.handleEvent(new WarmEmissionEvent(time, linkId, vehicleId, weaklyTypedEmissions));
+        handler.handleEvent(new WarmEmissionEvent(time, linkId, vehicleId, weaklyTypedEmissions));
+
+        TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> timeBin = handler.getTimeBins().getTimeBin(time);
+
+        timeBin.getValue().values().forEach(emissionsByPollutant -> {
+            emissionsByPollutant.getEmissions().values().forEach(value -> assertEquals(emissionValue * 3, value, 0.0001));
+        });
+    }
+
+    @Test
     public void handleMultipleEvents() {
 
         final Id<Link> linkId = Id.createLinkId(UUID.randomUUID().toString());

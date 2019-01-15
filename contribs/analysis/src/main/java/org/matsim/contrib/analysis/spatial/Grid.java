@@ -1,9 +1,7 @@
 package org.matsim.contrib.analysis.spatial;
 
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.*;
 import org.matsim.core.utils.collections.QuadTree;
 
 import java.util.ArrayList;
@@ -17,6 +15,7 @@ import java.util.function.Supplier;
  */
 public abstract class Grid<T> {
 
+    private static final GeometryFactory geometryFactory = new GeometryFactory();
     final double horizontalCentroidDistance;
     QuadTree<Cell<T>> quadTree;
 
@@ -92,21 +91,22 @@ public abstract class Grid<T> {
         Envelope envelope = bounds.getEnvelopeInternal();
 
         quadTree = new QuadTree<>(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY());
-        generateAllRows(initialValueSupplier);
+        generateAllRows(initialValueSupplier, bounds);
     }
 
-    private void generateAllRows(final Supplier<T> initialValueSupplier) {
+    private void generateAllRows(final Supplier<T> initialValueSupplier, final Geometry bounds) {
 
         for (double y = getMinY(); y <= quadTree.getMaxNorthing(); y += getCentroidDistanceY()) {
-            generateRow(y, initialValueSupplier);
+            generateRow(y, initialValueSupplier, bounds);
         }
     }
 
-    private void generateRow(final double y, final Supplier<T> initialValueSupplier) {
+    private void generateRow(final double y, final Supplier<T> initialValueSupplier, final Geometry bounds) {
 
         for (double x = getMinX(y); x <= quadTree.getMaxEasting(); x += getCentroidDistanceX()) {
             Coordinate coord = new Coordinate(x, y);
-            quadTree.put(x, y, new Cell<>(coord, initialValueSupplier.get()));
+            if (bounds.contains(geometryFactory.createPoint(coord)))
+                quadTree.put(x, y, new Cell<>(coord, initialValueSupplier.get()));
         }
     }
 

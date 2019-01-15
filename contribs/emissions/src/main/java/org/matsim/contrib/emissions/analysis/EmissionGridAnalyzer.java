@@ -25,6 +25,7 @@ import org.matsim.core.network.NetworkUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,6 +48,8 @@ public class EmissionGridAnalyzer {
     private final double gridSize;
     private final Network network;
     private final Geometry bounds;
+
+    private double shortestDistanceWithWeightToZero = Double.MAX_VALUE;
 
     private EmissionGridAnalyzer(final double binSize, final double gridSize, final double smoothingRadius,
                                  final double countScaleFactor, final GridType gridType, final Network network,
@@ -78,6 +81,7 @@ public class EmissionGridAnalyzer {
         logger.info("Starting grid computation...");
         
         timeBinsWithEmissions.getTimeBins().forEach(bin -> {
+            logger.info("creating grid for time bin with start time: " + bin.getStartTime());
             Grid<Map<Pollutant, Double>> grid = writeAllLinksToGrid(bin.getValue());
             result.getTimeBin(bin.getStartTime()).setValue(grid);
         });
@@ -133,13 +137,11 @@ public class EmissionGridAnalyzer {
     private Grid<Map<Pollutant, Double>> writeAllLinksToGrid(Map<Id<Link>, EmissionsByPollutant> linksWithEmissions) {
 
         Grid<Map<Pollutant, Double>> grid = createGrid();
-
-        logger.info("start copying link emissions to grid. This may take a while...");
         int counter = 0;
 
         for (Id<Link> id : linksWithEmissions.keySet()) {
             counter++;
-            if (counter % 1000 == 0)
+            if (counter * 100 / linksWithEmissions.keySet().size() % 10 == 0)
                 logger.info("processing: " + counter * 100 / linksWithEmissions.keySet().size() + "% done");
             if (network.getLinks().containsKey(id)) {
                 Link link = network.getLinks().get(id);
@@ -153,14 +155,17 @@ public class EmissionGridAnalyzer {
 
     private void processLink(Link link, EmissionsByPollutant emissions, Grid<Map<Pollutant, Double>> grid) {
 
-        // create a circle with a
-        Geometry clip = factory.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY())).buffer(smoothingRadius * 10);
+        // create a clipping area to speed up calculation time
+        // use 5*smoothing radius as longer distances result in a weighting of effectively 0
+        Geometry clip = factory.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY())).buffer(smoothingRadius * 5);
 
         grid.getCells(clip).forEach(cell -> {
-            //grid.getCells().forEach(cell -> {
             double weight = SpatialInterpolation.calculateWeightFromLine(
                     transformToCoordinate(link.getFromNode()), transformToCoordinate(link.getToNode()),
                     cell.getCoordinate(), smoothingRadius);
+            double distance = cell.getCoordinate().distance(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
+            if (distance < shortestDistanceWithWeightToZero)
+                shortestDistanceWithWeightToZero = distance;
             processCell(cell, emissions, weight);
         });
     }
@@ -169,11 +174,10 @@ public class EmissionGridAnalyzer {
 
         // merge both maps from cell and linkemissions and sum up values, while the link emissions are multiplied by
         // the cell weight
-        Map<Pollutant, Double> newValues = Stream.concat(cell.getValue().entrySet().stream(), emissions.getEmissions().entrySet().stream())
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> entry.getValue() * weight * countScaleFactor,
-                        (cellValue, linkValue) -> cellValue + linkValue * weight * countScaleFactor));
+        Map<Pollutant, Double> newValues = Stream.concat(cell.getValue().entrySet().stream(),
+                emissions.getEmissions().entrySet().stream()
+                        .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue() * weight * countScaleFactor)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Double::sum));
         cell.setValue(newValues);
     }
 
