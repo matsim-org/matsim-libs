@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.Freight;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
@@ -46,7 +47,7 @@ import org.matsim.examples.ExamplesUtils;
 
 import javax.inject.Inject;
 
-public class RunChessboard {
+public final class RunChessboard {
 
     Config config ;
 
@@ -62,13 +63,13 @@ public class RunChessboard {
         Controler controler = new Controler(config);
 
         final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
-        
+
         final Carriers carriers = new Carriers();
         final URL carrierPlansURL = IOUtils.newUrl(url, "carrierPlans.xml");
-		new CarrierPlanXmlReaderV2(carriers).readURL(carrierPlansURL);
+        new CarrierPlanXmlReaderV2(carriers).readURL(carrierPlansURL);
 
         final CarrierVehicleTypes types = new CarrierVehicleTypes();
-        
+
         final URL vehTypesURL = IOUtils.newUrl(url, "vehicleTypes.xml");
         new CarrierVehicleTypeReader(types).readURL(vehTypesURL);
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
@@ -76,12 +77,14 @@ public class RunChessboard {
         final CarrierPlanStrategyManagerFactory strategyManagerFactory = new MyCarrierPlanStrategyManagerFactory(types);
         final CarrierScoringFunctionFactory scoringFunctionFactory = new MyCarrierScoringFunctionFactory();
 
+        Freight.configure( controler );
+
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                CarrierModule carrierModule = new CarrierModule(carriers);
-                carrierModule.setPhysicallyEnforceTimeWindowBeginnings(true);
-                install(carrierModule);
+//                CarrierModule carrierModule = new CarrierModule(carriers);
+//                carrierModule.setPhysicallyEnforceTimeWindowBeginnings(true);
+//                install(carrierModule);
                 bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);
                 bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
             }
@@ -128,9 +131,9 @@ public class RunChessboard {
     }
 
     public Config prepareConfig(){
-    	final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
+        final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
         final URL configURL = IOUtils.newUrl(url, "config.xml");
-		config = ConfigUtils.loadConfig(configURL  );
+        config = ConfigUtils.loadConfig(configURL  );
         config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
         config.global().setRandomSeed(4177);
         config.controler().setOutputDirectory("./output/");

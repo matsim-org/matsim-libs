@@ -71,7 +71,7 @@ import org.matsim.vehicles.Vehicle;
  * 
  * @author benjamin
  */
-public class ColdEmissionAnalysisModule {
+final class ColdEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(ColdEmissionAnalysisModule.class);
 	
 	private final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
