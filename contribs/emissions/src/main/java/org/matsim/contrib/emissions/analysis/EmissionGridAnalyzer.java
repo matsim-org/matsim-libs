@@ -135,19 +135,29 @@ public class EmissionGridAnalyzer {
         Grid<Map<Pollutant, Double>> grid = createGrid();
 
         logger.info("start copying link emissions to grid. This may take a while...");
-        linksWithEmissions.forEach((id, emission) -> {
+        int counter = 0;
+
+        for (Id<Link> id : linksWithEmissions.keySet()) {
+            counter++;
+            if (counter % 1000 == 0)
+                logger.info("processing: " + counter * 100 / linksWithEmissions.keySet().size() + "% done");
             if (network.getLinks().containsKey(id)) {
                 Link link = network.getLinks().get(id);
-                if (isWithinBounds(link))
-                    processLink(link, emission, grid);
+                if (isWithinBounds(link)) {
+                    processLink(link, linksWithEmissions.get(id), grid);
+                }
             }
-        });
+        }
         return grid;
     }
 
     private void processLink(Link link, EmissionsByPollutant emissions, Grid<Map<Pollutant, Double>> grid) {
 
-        grid.getCells().forEach(cell -> {
+        // create a circle with a
+        Geometry clip = factory.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY())).buffer(smoothingRadius * 10);
+
+        grid.getCells(clip).forEach(cell -> {
+            //grid.getCells().forEach(cell -> {
             double weight = SpatialInterpolation.calculateWeightFromLine(
                     transformToCoordinate(link.getFromNode()), transformToCoordinate(link.getToNode()),
                     cell.getCoordinate(), smoothingRadius);
