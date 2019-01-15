@@ -17,7 +17,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class PlotPlans {
+final class PlotPlans {
 
     public static void main(String[] args) {
         Config config = new Config();
