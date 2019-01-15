@@ -24,7 +24,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class PassengerScenarioCreator {
+final class PassengerScenarioCreator {
 	
 	static int agentCounter = 1;
 	

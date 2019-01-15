@@ -46,7 +46,7 @@ import org.matsim.examples.ExamplesUtils;
 
 import javax.inject.Inject;
 
-public class RunChessboard {
+public final class RunChessboard {
 
     Config config ;
 
@@ -62,13 +62,13 @@ public class RunChessboard {
         Controler controler = new Controler(config);
 
         final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
-        
+
         final Carriers carriers = new Carriers();
         final URL carrierPlansURL = IOUtils.newUrl(url, "carrierPlans.xml");
-		new CarrierPlanXmlReaderV2(carriers).readURL(carrierPlansURL);
+        new CarrierPlanXmlReaderV2(carriers).readURL(carrierPlansURL);
 
         final CarrierVehicleTypes types = new CarrierVehicleTypes();
-        
+
         final URL vehTypesURL = IOUtils.newUrl(url, "vehicleTypes.xml");
         new CarrierVehicleTypeReader(types).readURL(vehTypesURL);
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
@@ -128,9 +128,9 @@ public class RunChessboard {
     }
 
     public Config prepareConfig(){
-    	final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
+        final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
         final URL configURL = IOUtils.newUrl(url, "config.xml");
-		config = ConfigUtils.loadConfig(configURL  );
+        config = ConfigUtils.loadConfig(configURL  );
         config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
         config.global().setRandomSeed(4177);
         config.controler().setOutputDirectory("./output/");
