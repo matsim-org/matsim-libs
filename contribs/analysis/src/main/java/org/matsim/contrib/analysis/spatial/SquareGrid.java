@@ -45,7 +45,7 @@ public final class SquareGrid<T> extends Grid<T> {
     }
 
     @Override
-    double getCellArea() {
+    public double getCellArea() {
         return horizontalCentroidDistance * horizontalCentroidDistance;
     }
 }

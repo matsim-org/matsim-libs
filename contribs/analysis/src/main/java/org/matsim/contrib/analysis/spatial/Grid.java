@@ -1,7 +1,10 @@
 package org.matsim.contrib.analysis.spatial;
 
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import org.matsim.core.utils.collections.QuadTree;
 
 import java.util.ArrayList;
@@ -84,7 +87,7 @@ public abstract class Grid<T> {
     /**
      * @return area of one cell (assumes that all cells have the same area)
      */
-    abstract double getCellArea();
+    public abstract double getCellArea();
 
     private void generateGrid(Supplier<T> initialValueSupplier, final Geometry bounds) {
 

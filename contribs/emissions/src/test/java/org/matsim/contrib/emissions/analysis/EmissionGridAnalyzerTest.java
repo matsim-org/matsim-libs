@@ -3,6 +3,7 @@ package org.matsim.contrib.emissions.analysis;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -34,6 +35,7 @@ import static org.junit.Assert.*;
 
 public class EmissionGridAnalyzerTest {
 
+    private static Logger logger = Logger.getLogger(EmissionGridAnalyzerTest.class);
     @Rule
     public MatsimTestUtils testUtils = new MatsimTestUtils();
 
@@ -106,7 +108,6 @@ public class EmissionGridAnalyzerTest {
         Network network = createRandomNetwork(100, 1000, 1000);
         writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, 1, 99);
 
-
         EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
                 .withGridSize(100)
                 .withTimeBinSize(10)
@@ -155,8 +156,134 @@ public class EmissionGridAnalyzerTest {
         Grid.Cell<Map<Pollutant, Double>> fromCell = bin.getValue().getCell(new Coordinate(5, 5));
         double valueOfCellWithLink = fromCell.getValue().get(pollutant);
 
+        // deterministic value assumed to be valid due to comparison with old implementation
+        assertEquals(3046.32241, valueOfCellWithLink, 0.0001);
+
         // try to make sure that values decrease with increasing distance
         bin.getValue().getCells().forEach(cell -> assertTrue(cell.getValue().get(pollutant) <= valueOfCellWithLink));
+    }
+
+    @Test
+    public void process_singleLinkWithTwoEvents() {
+
+        final Pollutant pollutant = Pollutant.CO;
+        final double pollutionPerEvent = 1000;
+        final int time = 1;
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + "xml");
+        final Network network = NetworkUtils.createNetwork();
+        Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
+        network.addNode(from);
+        Node to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(6, 6));
+        network.addNode(to);
+        network.addLink(network.getFactory().createLink(Id.createLinkId("link"), from, to));
+        writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time + 1);
+
+        EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
+                .withSmoothingRadius(1)
+                .withNetwork(network)
+                .withTimeBinSize(10)
+                .withGridSize(4)
+                .withBounds(createRect(12, 12))
+                .build();
+
+        TimeBinMap<Grid<Map<Pollutant, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
+
+        assertEquals(1, timeBinMap.getTimeBins().size());
+        TimeBinMap.TimeBin<Grid<Map<Pollutant, Double>>> bin = timeBinMap.getTimeBin(time);
+        assertTrue(bin.hasValue());
+
+        Grid.Cell<Map<Pollutant, Double>> fromCell = bin.getValue().getCell(new Coordinate(5, 5));
+        double valueOfCellWithLink = fromCell.getValue().get(pollutant);
+
+        // deterministic value assumed to be valid due to comparison with old implementation
+        assertEquals(3046.32241 * 2, valueOfCellWithLink, 0.0001);
+
+        // try to make sure that values decrease with increasing distance
+        bin.getValue().getCells().forEach(cell -> assertTrue(cell.getValue().get(pollutant) <= valueOfCellWithLink));
+    }
+
+    @Test
+    public void process_twoLinksWithOneEventEach() {
+
+        final Pollutant pollutant = Pollutant.CO;
+        final double pollutionPerEvent = 1000;
+        final int time = 1;
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + "xml");
+        final Network network = NetworkUtils.createNetwork();
+        Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
+        network.addNode(from);
+        Node to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(6, 6));
+        network.addNode(to);
+        network.addLink(network.getFactory().createLink(Id.createLinkId("link"), from, to));
+        Node from2 = network.getFactory().createNode(Id.createNodeId("from2"), new Coord(2, 2));
+        network.addNode(from2);
+        Node to2 = network.getFactory().createNode(Id.createNodeId("to2"), new Coord(3, 3));
+        network.addNode(to2);
+        network.addLink(network.getFactory().createLink(Id.createLinkId("link2"), from2, to2));
+        writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time);
+
+        EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
+                .withSmoothingRadius(1)
+                .withNetwork(network)
+                .withTimeBinSize(10)
+                .withGridSize(4)
+                .withBounds(createRect(12, 12))
+                .build();
+
+        TimeBinMap<Grid<Map<Pollutant, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
+
+        assertEquals(1, timeBinMap.getTimeBins().size());
+        TimeBinMap.TimeBin<Grid<Map<Pollutant, Double>>> bin = timeBinMap.getTimeBin(time);
+        assertTrue(bin.hasValue());
+
+        Grid.Cell<Map<Pollutant, Double>> fromCell = bin.getValue().getCell(new Coordinate(5, 5));
+        double valueOfCellWithLink = fromCell.getValue().get(pollutant);
+
+        assertEquals(3046.32241, valueOfCellWithLink, 0.0001);
+        // try to make sure that values decrease with increasing distance. Give some padding to the value
+        bin.getValue().getCells().forEach(cell -> assertTrue(cell.getValue().get(pollutant) <= valueOfCellWithLink + 0.1));
+    }
+
+    @Test
+    public void process_twoLinksWithTwoEventsEach() {
+
+        final Pollutant pollutant = Pollutant.CO;
+        final double pollutionPerEvent = 1000;
+        final int time = 1;
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + "xml");
+        final Network network = NetworkUtils.createNetwork();
+        Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
+        network.addNode(from);
+        Node to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(6, 6));
+        network.addNode(to);
+        network.addLink(network.getFactory().createLink(Id.createLinkId("link"), from, to));
+        Node from2 = network.getFactory().createNode(Id.createNodeId("from2"), new Coord(2, 2));
+        network.addNode(from2);
+        Node to2 = network.getFactory().createNode(Id.createNodeId("to2"), new Coord(3, 3));
+        network.addNode(to2);
+        network.addLink(network.getFactory().createLink(Id.createLinkId("link2"), from2, to2));
+        writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time + 1);
+
+        EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
+                .withSmoothingRadius(1)
+                .withNetwork(network)
+                .withTimeBinSize(10)
+                .withGridSize(4)
+                .withBounds(createRect(12, 12))
+                .build();
+
+        TimeBinMap<Grid<Map<Pollutant, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
+
+        assertEquals(1, timeBinMap.getTimeBins().size());
+        TimeBinMap.TimeBin<Grid<Map<Pollutant, Double>>> bin = timeBinMap.getTimeBin(time);
+        assertTrue(bin.hasValue());
+
+        Grid.Cell<Map<Pollutant, Double>> fromCell = bin.getValue().getCell(new Coordinate(5, 5));
+        double valueOfCellWithLink = fromCell.getValue().get(pollutant);
+
+        assertEquals(3046.32241 * 2, valueOfCellWithLink, 0.0001);
+        // try to make sure that values decrease with increasing distance. give some padding to the value
+        bin.getValue().getCells().forEach(cell -> assertTrue(cell.getValue().get(pollutant) <= valueOfCellWithLink + 0.1));
     }
 
     @Test

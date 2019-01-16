@@ -48,7 +48,7 @@ public final class HexagonalGrid<T> extends Grid<T> {
     }
 
     @Override
-    double getCellArea() {
+    public double getCellArea() {
         // as in https://en.wikipedia.org/wiki/Hexagon#Parameters
         return 2 * Math.sqrt(3 * (horizontalCentroidDistance * horizontalCentroidDistance / 4));
     }

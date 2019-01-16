@@ -2,8 +2,11 @@ package org.matsim.contrib.analysis.spatial;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.commons.math3.special.Erf;
+import org.apache.log4j.Logger;
 
 public abstract class SpatialInterpolation {
+
+    private static Logger logger = Logger.getLogger(SpatialInterpolation.class);
 
     /**
      * This uses a gaussian distance weighting to calculate the impact of link based emissions onto the centroid of a
@@ -34,6 +37,8 @@ public abstract class SpatialInterpolation {
 
         if (weight < 0)
             throw new RuntimeException("Weight may not be negative! Value: " + weight);
+
+        //logger.info("upper: " + upperLimit + ", lower: "  + lowerLimit + ", weight: " + weight + ", R: " + smoothingRadius);
         return weight;
     }
 

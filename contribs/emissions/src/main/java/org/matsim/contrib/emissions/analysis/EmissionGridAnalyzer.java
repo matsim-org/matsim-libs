@@ -85,6 +85,8 @@ public class EmissionGridAnalyzer {
             Grid<Map<Pollutant, Double>> grid = writeAllLinksToGrid(bin.getValue());
             result.getTimeBin(bin.getStartTime()).setValue(grid);
         });
+
+        logger.info("Shortest distance with weight equal to 0: " + shortestDistanceWithWeightToZero);
         return result;
     }
 
@@ -141,7 +143,7 @@ public class EmissionGridAnalyzer {
 
         for (Id<Link> id : linksWithEmissions.keySet()) {
             counter++;
-            if (counter * 100 / linksWithEmissions.keySet().size() % 10 == 0)
+            if (counter % 10000 == 0)
                 logger.info("processing: " + counter * 100 / linksWithEmissions.keySet().size() + "% done");
             if (network.getLinks().containsKey(id)) {
                 Link link = network.getLinks().get(id);
@@ -160,13 +162,15 @@ public class EmissionGridAnalyzer {
         Geometry clip = factory.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY())).buffer(smoothingRadius * 5);
 
         grid.getCells(clip).forEach(cell -> {
+            double normalizationFactor = grid.getCellArea() / (Math.PI * smoothingRadius * smoothingRadius);
             double weight = SpatialInterpolation.calculateWeightFromLine(
                     transformToCoordinate(link.getFromNode()), transformToCoordinate(link.getToNode()),
                     cell.getCoordinate(), smoothingRadius);
             double distance = cell.getCoordinate().distance(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
             if (distance < shortestDistanceWithWeightToZero)
                 shortestDistanceWithWeightToZero = distance;
-            processCell(cell, emissions, weight);
+            processCell(cell, emissions, weight * normalizationFactor);
+            //logger.info(cell.getCoordinate().toString() + " normalization: " + normalizationFactor +  ", weight: " + weight);
         });
     }
 
@@ -176,7 +180,11 @@ public class EmissionGridAnalyzer {
         // the cell weight
         Map<Pollutant, Double> newValues = Stream.concat(cell.getValue().entrySet().stream(),
                 emissions.getEmissions().entrySet().stream()
-                        .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue() * weight * countScaleFactor)))
+                        .map(e -> {
+                            //if (e.getValue() > 0.00001)
+                            //logger.info("value: " + e.getValue()*weight*countScaleFactor);
+                            return new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue() * weight * countScaleFactor);
+                        }))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Double::sum));
         cell.setValue(newValues);
     }
