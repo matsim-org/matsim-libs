@@ -38,6 +38,8 @@ import java.util.SortedMap;
  *
  */
 public final class EmissionWriter {
+	// is this useful as a publicly available class?  kai, jan'19
+
 	private static final Logger logger = Logger.getLogger(EmissionWriter.class);
 	
 

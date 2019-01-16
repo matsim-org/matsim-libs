@@ -11,6 +11,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 
 public class Freight{
+	// yyyy todo:
+	// * introduce freight config group
+	// * read freight input files in module
+	// * repair execution path where config instead of scenario is given to controler
 
 	public static final String CARRIERS = "carriers" ;
 
