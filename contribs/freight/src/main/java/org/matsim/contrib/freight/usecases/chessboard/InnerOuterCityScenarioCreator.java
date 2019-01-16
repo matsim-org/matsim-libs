@@ -7,7 +7,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-public class InnerOuterCityScenarioCreator {
+final class InnerOuterCityScenarioCreator {
 	
 
 	public List<Id<Link>> getInnerCityLinks(){

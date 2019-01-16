@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -33,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
  * @author stefan
  *
  */
-public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunctionFactory{
+public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunctionFactory{
 
     /**
      *
@@ -270,6 +271,7 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 
     private Network network;
 
+    @Inject
     public CarrierScoringFunctionFactoryImpl(Network network) {
         super();
         this.network = network;

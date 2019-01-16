@@ -48,7 +48,9 @@ import static org.matsim.contrib.emissions.types.HbefaTrafficSituation.*;
  * @author benjamin
  *
  */
-public class WarmEmissionAnalysisModule {
+public final class WarmEmissionAnalysisModule {
+	// cannot make non-public: used at least twice outside package.  kai, jan'19
+
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
 
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>  avgHbefaWarmTable;
