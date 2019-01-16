@@ -37,11 +37,11 @@ public class TimeAllocationMutator implements Provider<PlanStrategy> {
 	@Inject private PlansConfigGroup plansConfigGroup;
 	@Inject private Provider<org.matsim.core.router.TripRouter> tripRouterProvider;
 	@Inject private Population population;
-	
+
 	@Override
 	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		org.matsim.core.replanning.modules.TimeAllocationMutator tam = new org.matsim.core.replanning.modules.TimeAllocationMutator(this.tripRouterProvider, 
+		TimeAllocationMutatorModule tam = new TimeAllocationMutatorModule(this.tripRouterProvider,
 				this.plansConfigGroup, this.timeAllocationMutatorConfigGroup, this.globalConfigGroup, population);
 		strategy.addStrategyModule(tam);
 		return strategy;

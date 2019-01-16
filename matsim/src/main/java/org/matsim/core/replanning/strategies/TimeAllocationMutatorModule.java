@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.replanning.modules;
+package org.matsim.core.replanning.strategies;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,6 +39,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.algorithms.PlanMutateTimeAllocationSimplified;
 import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -50,9 +51,9 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * @author mrieser
  * @see org.matsim.core.population.algorithms.PlanMutateTimeAllocation
  */
-public class TimeAllocationMutator extends AbstractMultithreadedModule {
+class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 
-	private static final Logger log = Logger.getLogger(TimeAllocationMutator.class);
+	private static final Logger log = Logger.getLogger( TimeAllocationMutatorModule.class );
 	
 	private final Provider<TripRouter> tripRouterProvider;
 	private final double mutationRange;
@@ -68,7 +69,7 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 	 * the configuration (module "TimeAllocationMutator", param "mutationRange").
 	 */
 	@Deprecated
-	public TimeAllocationMutator(Config config, Provider<TripRouter> tripRouterProvider, final double mutationRange, boolean affectingDuration) {
+	TimeAllocationMutatorModule( Config config, Provider<TripRouter> tripRouterProvider, final double mutationRange, boolean affectingDuration ) {
 		super(config.global());
 		this.tripRouterProvider = tripRouterProvider;
 		this.affectingDuration = affectingDuration;
@@ -81,12 +82,12 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 		log.warn("deprecated constructor was used - individual time allocation mutator settings for subpopulations is not supported!");
 	}
 	
-	public TimeAllocationMutator(Provider<TripRouter> tripRouterProvider, PlansConfigGroup plansConfigGroup, TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup, GlobalConfigGroup globalConfigGroup) {
+	TimeAllocationMutatorModule( Provider<TripRouter> tripRouterProvider, PlansConfigGroup plansConfigGroup, TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup, GlobalConfigGroup globalConfigGroup ) {
 		this(tripRouterProvider, plansConfigGroup, timeAllocationMutatorConfigGroup, globalConfigGroup, null);
 	}
 	
-	public TimeAllocationMutator(Provider<TripRouter> tripRouterProvider, PlansConfigGroup plansConfigGroup, TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup, GlobalConfigGroup globalConfigGroup,
-			final Population population) {
+	TimeAllocationMutatorModule( Provider<TripRouter> tripRouterProvider, PlansConfigGroup plansConfigGroup, TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup, GlobalConfigGroup globalConfigGroup,
+							final Population population ) {
 		super(globalConfigGroup);
 		this.tripRouterProvider = tripRouterProvider;
 		this.activityDurationInterpretation = plansConfigGroup.getActivityDurationInterpretation();
