@@ -34,9 +34,9 @@ public class GridTest {
         Collection<Grid.Cell<String>> values = grid.getCells();
 
         // a hexagonal grid with an area of 10x10 and diameter 2 will have 7 rows
-        // there will be 4 rows with 5 cells and 3 rows with 5 cells
-        // 4 * 5 + 3 * 6 = 38
-        assertEquals(38, values.size());
+        // there will be 3 rows with 5 cells and 3 rows with 4 cells
+        // 3 * 5 + 3 * 4 = 27
+        assertEquals(27, values.size());
         values.forEach(value -> assertEquals(testValue, value.getValue()));
     }
 
@@ -95,7 +95,7 @@ public class GridTest {
 
         Grid.Cell<String> result = grid.getCell(new Coordinate(100, 100));
 
-        assertEquals(new Coordinate(9, 10), result.getCoordinate());
+        assertEquals(new Coordinate(8, 8.5), result.getCoordinate());
     }
 
     @Test
@@ -106,6 +106,6 @@ public class GridTest {
 
         Collection<Grid.Cell<String>> result = grid.getCells(SpatialTestUtils.createRect(5, 5));
 
-        assertEquals(9, result.size());
+        assertEquals(8, result.size());
     }
 }

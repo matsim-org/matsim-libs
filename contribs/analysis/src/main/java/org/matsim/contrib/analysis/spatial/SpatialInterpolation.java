@@ -7,7 +7,8 @@ public abstract class SpatialInterpolation {
 
     /**
      * This uses a gaussian distance weighting to calculate the impact of link based emissions onto the centroid of a
-     * grid cell. The level of emission is assumed to be linear over the link.
+     * grid cell. The level of emission is assumed to be linear over the link. The calculation is described in Argawal's
+     * PhD thesis https://depositonce.tu-berlin.de/handle/11303/6266 in Appendix A.2
      *
      * @param from         Link from coordinate
      * @param to           Link to coordinate
@@ -38,7 +39,8 @@ public abstract class SpatialInterpolation {
 
     /**
      * This uses an exponential distance weighting to calculate the impact of point based emissions onto the centroid of
-     * a grid cell.
+     * a grid cell. The calculation is described in Kickhoefer's PhD thesis https://depositonce.tu-berlin.de/handle/11303/4386
+     * in Appendix A.2
      *
      * @param emissionSource Centroid of the link
      * @param cellCentroid   Centroid of the impacted cell
