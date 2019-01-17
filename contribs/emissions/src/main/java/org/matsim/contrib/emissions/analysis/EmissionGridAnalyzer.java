@@ -301,16 +301,23 @@ public class EmissionGridAnalyzer {
          */
         public EmissionGridAnalyzer build() {
 
-            if (!isValid())
+            if (!isValidParameters())
                 throw new IllegalArgumentException("binSize, gridSize, smoothingRadius must be set and greater 0, Also network must be set");
+
+            if (!isValidSmoothingRadiusToGridSizeRatio())
+                throw new IllegalArgumentException("A smoothing radius smaller than the grid size may lead to artifacts.In fact: Smoothing radius should be much bigger than grid size!");
 
             if (bounds == null)
                 bounds = createBounds();
             return new EmissionGridAnalyzer(binSize, gridSize, smoothingRadius, countScaleFactor, gridType, network, bounds);
         }
 
-        private boolean isValid() {
+        private boolean isValidParameters() {
             return binSize > 0 && gridSize > 0 && smoothingRadius > 0 && network != null;
+        }
+
+        private boolean isValidSmoothingRadiusToGridSizeRatio() {
+            return smoothingRadius >= gridSize;
         }
 
         private Geometry createBounds() {

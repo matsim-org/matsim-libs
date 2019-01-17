@@ -99,6 +99,19 @@ public class EmissionGridAnalyzerTest {
                 new Coordinate(0, 0)});
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void initialize_invalidGridSizeToSmoothingRadiusRatio_exception() {
+
+        new EmissionGridAnalyzer.Builder()
+                .withSmoothingRadius(1)
+                .withGridSize(1000)
+                .withNetwork(NetworkUtils.createNetwork())
+                .withTimeBinSize(1)
+                .build();
+
+        fail("invalid grid size to smoothing radius ratio should cause exception");
+    }
+
     @Test
     public void process() {
 
@@ -140,7 +153,7 @@ public class EmissionGridAnalyzerTest {
         writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time);
 
         EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
-                .withSmoothingRadius(1)
+                .withSmoothingRadius(5)
                 .withNetwork(network)
                 .withTimeBinSize(10)
                 .withGridSize(4)
@@ -157,7 +170,7 @@ public class EmissionGridAnalyzerTest {
         double valueOfCellWithLink = fromCell.getValue().get(pollutant);
 
         // deterministic value assumed to be valid due to comparison with old implementation
-        assertEquals(3046.32241, valueOfCellWithLink, 0.0001);
+        assertEquals(198.41377287035186, valueOfCellWithLink, 0.0001);
 
         // try to make sure that values decrease with increasing distance
         bin.getValue().getCells().forEach(cell -> assertTrue(cell.getValue().get(pollutant) <= valueOfCellWithLink));
@@ -179,7 +192,7 @@ public class EmissionGridAnalyzerTest {
         writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time + 1);
 
         EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
-                .withSmoothingRadius(1)
+                .withSmoothingRadius(5)
                 .withNetwork(network)
                 .withTimeBinSize(10)
                 .withGridSize(4)
@@ -196,7 +209,7 @@ public class EmissionGridAnalyzerTest {
         double valueOfCellWithLink = fromCell.getValue().get(pollutant);
 
         // deterministic value assumed to be valid due to comparison with old implementation
-        assertEquals(3046.32241 * 2, valueOfCellWithLink, 0.0001);
+        assertEquals(396.8275457407037, valueOfCellWithLink, 0.0001);
 
         // try to make sure that values decrease with increasing distance
         bin.getValue().getCells().forEach(cell -> assertTrue(cell.getValue().get(pollutant) <= valueOfCellWithLink));
@@ -223,7 +236,7 @@ public class EmissionGridAnalyzerTest {
         writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time);
 
         EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
-                .withSmoothingRadius(1)
+                .withSmoothingRadius(5)
                 .withNetwork(network)
                 .withTimeBinSize(10)
                 .withGridSize(4)
@@ -239,7 +252,7 @@ public class EmissionGridAnalyzerTest {
         Grid.Cell<Map<Pollutant, Double>> fromCell = bin.getValue().getCell(new Coordinate(5, 5));
         double valueOfCellWithLink = fromCell.getValue().get(pollutant);
 
-        assertEquals(3046.32241, valueOfCellWithLink, 0.0001);
+        assertEquals(275.3558600648614, valueOfCellWithLink, 0.0001);
         // try to make sure that values decrease with increasing distance. Give some padding to the value
         bin.getValue().getCells().forEach(cell -> assertTrue(cell.getValue().get(pollutant) <= valueOfCellWithLink + 0.1));
     }
@@ -265,7 +278,7 @@ public class EmissionGridAnalyzerTest {
         writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time + 1);
 
         EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
-                .withSmoothingRadius(1)
+                .withSmoothingRadius(5)
                 .withNetwork(network)
                 .withTimeBinSize(10)
                 .withGridSize(4)
@@ -281,7 +294,7 @@ public class EmissionGridAnalyzerTest {
         Grid.Cell<Map<Pollutant, Double>> fromCell = bin.getValue().getCell(new Coordinate(5, 5));
         double valueOfCellWithLink = fromCell.getValue().get(pollutant);
 
-        assertEquals(3046.32241 * 2, valueOfCellWithLink, 0.0001);
+        assertEquals(550.7117201297228, valueOfCellWithLink, 0.0001);
         // try to make sure that values decrease with increasing distance. give some padding to the value
         bin.getValue().getCells().forEach(cell -> assertTrue(cell.getValue().get(pollutant) <= valueOfCellWithLink + 0.1));
     }
@@ -300,7 +313,7 @@ public class EmissionGridAnalyzerTest {
                 .withGridSize(20)
                 .withTimeBinSize(100)
                 .withNetwork(network)
-                .withSmoothingRadius(1)
+                .withSmoothingRadius(100)
                 .build();
 
         TimeBinMap<Grid<Map<Pollutant, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
@@ -323,7 +336,7 @@ public class EmissionGridAnalyzerTest {
         writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time + 3);
 
         EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
-                .withSmoothingRadius(1)
+                .withSmoothingRadius(200)
                 .withNetwork(network)
                 .withTimeBinSize(1)
                 .withGridSize(100)
@@ -346,7 +359,7 @@ public class EmissionGridAnalyzerTest {
         writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time + 3);
 
         EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
-                .withSmoothingRadius(1)
+                .withSmoothingRadius(100)
                 .withNetwork(network)
                 .withTimeBinSize(1)
                 .withGridSize(100)
