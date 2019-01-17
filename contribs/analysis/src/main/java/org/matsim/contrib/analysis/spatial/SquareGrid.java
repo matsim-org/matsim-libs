@@ -11,7 +11,6 @@ import java.util.function.Supplier;
  */
 public final class SquareGrid<T> extends Grid<T> {
 
-
     /**
      * New Instance of SquareGrid
      *
@@ -25,7 +24,6 @@ public final class SquareGrid<T> extends Grid<T> {
 
     @Override
     double getMinX(double forY) {
-
         return quadTree.getMinEasting() + horizontalCentroidDistance / 2;
     }
 

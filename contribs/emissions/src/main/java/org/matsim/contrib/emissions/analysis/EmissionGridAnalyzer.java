@@ -166,11 +166,7 @@ public class EmissionGridAnalyzer {
             double weight = SpatialInterpolation.calculateWeightFromLine(
                     transformToCoordinate(link.getFromNode()), transformToCoordinate(link.getToNode()),
                     cell.getCoordinate(), smoothingRadius);
-            double distance = cell.getCoordinate().distance(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
-            if (distance < shortestDistanceWithWeightToZero)
-                shortestDistanceWithWeightToZero = distance;
             processCell(cell, emissions, weight * normalizationFactor);
-            //logger.info(cell.getCoordinate().toString() + " normalization: " + normalizationFactor +  ", weight: " + weight);
         });
     }
 
@@ -180,11 +176,7 @@ public class EmissionGridAnalyzer {
         // the cell weight
         Map<Pollutant, Double> newValues = Stream.concat(cell.getValue().entrySet().stream(),
                 emissions.getEmissions().entrySet().stream()
-                        .map(e -> {
-                            //if (e.getValue() > 0.00001)
-                            //logger.info("value: " + e.getValue()*weight*countScaleFactor);
-                            return new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue() * weight * countScaleFactor);
-                        }))
+                        .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue() * weight * countScaleFactor)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Double::sum));
         cell.setValue(newValues);
     }
