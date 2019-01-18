@@ -31,11 +31,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
@@ -46,11 +48,11 @@ import org.matsim.contrib.drt.analysis.DynModeTripsAnalyser;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
@@ -58,12 +60,13 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author saxer
  */
-public class MyDynModePassengerStats
+public class MyDynModeTrajectoryStats
 		implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
-		LinkEnterEventHandler, ActivityEndEventHandler, DrtRequestSubmittedEventHandler,
+		LinkEnterEventHandler,LinkLeaveEventHandler,  ActivityEndEventHandler, DrtRequestSubmittedEventHandler,
 		PassengerRequestRejectedEventHandler {
 
 	private final Map<Id<Person>, Double> departureTimes = new HashMap<>();
+	public final Map<Id<Vehicle>, List<String>> vehicleTrajectoryMap = new HashMap<>();
 	private final Map<Id<Person>, Id<Link>> departureLinks = new HashMap<>();
 	private final List<DynModeTrip> drtTrips = new ArrayList<>();
 	private final Map<Id<Vehicle>, Map<Id<Person>, MutableDouble>> inVehicleDistance = new HashMap<>();
@@ -78,7 +81,7 @@ public class MyDynModePassengerStats
 	private final Network network;
 	private final Fleet fleet;
 
-	public MyDynModePassengerStats(Network network, EventsManager events, DrtConfigGroup drtCfg, Fleet fleet) {
+	public MyDynModeTrajectoryStats(Network network, EventsManager events, DrtConfigGroup drtCfg, Fleet fleet) {
 		this.fleet = fleet;
 		this.mode = drtCfg.getMode();
 		this.network = network;
@@ -109,6 +112,8 @@ public class MyDynModePassengerStats
 		}
 	}
 
+	
+
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		
@@ -126,10 +131,20 @@ public class MyDynModePassengerStats
 			String vehicleID = event.getVehicleId().toString();
 			double dist = this.vehicleDistances.get(event.getVehicleId())[0];
 			int occupancy = inVehicleDistance.get(event.getVehicleId()).size();
+			DrtTask actualTask = (DrtTask) fleet.getVehicles().get(event.getVehicleId()).getSchedule().getCurrentTask();
+			String actualTaskType = actualTask.getDrtTaskType().toString();
+						
+			String line = (vehicleID +"\t"+ acutalTime +"\t"+ occupancy +"\t"+ dist +"\t"+ actualTaskType );
 			
-			String actualTask = fleet.getVehicles().get(event.getVehicleId()).getSchedule().getCurrentTask().getStatus().toString();
+			if (vehicleTrajectoryMap.containsKey(event.getVehicleId()))
+			{
+				vehicleTrajectoryMap.get(event.getVehicleId()).add(line);
+			}
+			else {
+				//Add the first line to the list and initialize the list
+				vehicleTrajectoryMap.put(event.getVehicleId(), new ArrayList<>());
+			}
 			
-			System.out.println(vehicleID +" | "+ acutalTime +" | "+ occupancy +" | "+ dist +" | "+ actualTask );
 			
 			this.vehicleDistances.get(event.getVehicleId())[1] += distance * occupancy; // overall revenue distance
 			if (occupancy > 0) {
@@ -140,6 +155,12 @@ public class MyDynModePassengerStats
 			}
 		}
 
+	}
+	
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
@@ -227,4 +248,10 @@ public class MyDynModePassengerStats
 		}
 		rejectedPersons.add(request2person.get(event.getRequestId()));
 	}
+
+
+
+
+	
+	
 }

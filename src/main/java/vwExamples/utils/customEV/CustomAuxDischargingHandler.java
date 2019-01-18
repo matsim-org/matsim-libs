@@ -20,10 +20,27 @@
 package vwExamples.utils.customEV;
 
 import com.google.inject.Inject;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -36,74 +53,91 @@ import org.matsim.vsp.ev.data.ChargingInfrastructure;
 import org.matsim.vsp.ev.data.ElectricFleet;
 import org.matsim.vsp.ev.data.ElectricVehicle;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * This AUX Discharge runs also when vehicles are not in use. This is handy for
  * vehicles with idle engines, such as taxis (where heating is on while the
  * vehicle is idle), but should not be used with ordinary passenger cars.
  */
-public class CustomAuxDischargingHandler implements MobsimAfterSimStepListener, IterationStartsListener {
-    private final ElectricFleet evFleet;
-    private final int auxDischargeTimeStep;
-    private final Fleet fleet;
-    private final ChargingInfrastructure chargers;
-    private final Set<Id<Link>> chargerLinkIdSet = new HashSet<>();
+public class CustomAuxDischargingHandler
+		implements MobsimAfterSimStepListener, IterationStartsListener, LinkLeaveEventHandler, LinkEnterEventHandler {
+	private final ElectricFleet evFleet;
+	private final int auxDischargeTimeStep;
+	private final ChargingInfrastructure chargers;
+	private final Set<Id<Link>> chargerLinkIdSet = new HashSet<>();
+	Set<String> isVehicleInDepotSet = new HashSet<>();
 
-    @Inject
-    public CustomAuxDischargingHandler(ElectricFleet evFleet, Fleet fleet, ChargingInfrastructure chargers,
-                                       EvConfigGroup evConfig) {
-        this.evFleet = evFleet;
-        this.fleet = fleet;
-        this.auxDischargeTimeStep = evConfig.getAuxDischargeTimeStep();
-        this.chargers = chargers;
-    }
+	@Inject
+	public CustomAuxDischargingHandler(ElectricFleet evFleet, ChargingInfrastructure chargers, EvConfigGroup evConfig) {
+		this.evFleet = evFleet;
+		this.auxDischargeTimeStep = evConfig.getAuxDischargeTimeStep();
+		this.chargers = chargers;
+	}
+	
+	@Override
+	public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
+		if ((e.getSimulationTime() + 1) % auxDischargeTimeStep == 0) {
 
-    @Override
-    public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
-        if ((e.getSimulationTime() + 1) % auxDischargeTimeStep == 0) {
+			for (ElectricVehicle ev : evFleet.getElectricVehicles().values()) {
 
-            for (ElectricVehicle ev : evFleet.getElectricVehicles().values()) {
+				if (isVehicleInDepotSet.contains(ev.getId().toString())) {
+					 double energy = 0.0;
+					 ev.getBattery().discharge(energy);
+					 //System.out.println("Do not discharge " + ev.getId());
 
-                // Check if vehicle is actually at any depot/charger, in this case, aux energy
-                // consumption is zero
-                Vehicle veh = fleet.getVehicles().get(ev.getId());
+				} else {
+					double energy = ev.getAuxEnergyConsumption().calcEnergyConsumption(auxDischargeTimeStep);
+					ev.getBattery().discharge(energy);
+				}
 
-                Schedule currentSchedule = veh.getSchedule();
+			}
+		}
+	}
 
-                Id<Link> currentLinkId = null;
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		for (Charger charger : chargers.getChargers().values()) {
+			chargerLinkIdSet.add(charger.getLink().getId());
+		}
+		
+		//Add all vehicles at start of the iteration into the mode into isVehicleInDepotSet
+		for (ElectricVehicle ev : evFleet.getElectricVehicles().values()) {
+			isVehicleInDepotSet.add(ev.getId().toString());
+			System.out.println(ev.getId().toString() + " registered at charger");
+		}
+		
+		
 
-                if ((currentSchedule.getStatus() == ScheduleStatus.STARTED)) {
-                    System.out.println(currentSchedule.getStatus());
-//					currentLinkId = ((DrtStayTask) veh.getSchedule().getCurrentTask()).getLink().getId();
-//					System.out.println(currentLinkId);
+	}
 
-                }
 
-                // Id<Link> currentLinkId = ((DrtStayTask)
-                // veh.getSchedule().getCurrentTask()).getLink().getId();
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
 
-                // if (chargerLinkIdSet.contains(currentLinkId)) {
-                // double energy = 0.0;
-                // ev.getBattery().discharge(energy);
-                //
-                // } else {
-                // double energy =
-                // ev.getAuxEnergyConsumption().calcEnergyConsumption(auxDischargeTimeStep);
-                // ev.getBattery().discharge(energy);
-                // }
+		if (evFleet.getElectricVehicles().keySet().contains(event.getVehicleId())) {
 
-            }
-        }
-    }
+			// System.out.println(event.getVehicleId() + "enters link");
 
-    @Override
-    public void notifyIterationStarts(IterationStartsEvent event) {
-        for (Charger charger : chargers.getChargers().values()) {
-            chargerLinkIdSet.add(charger.getLink().getId());
-        }
+			if (chargerLinkIdSet.contains(event.getLinkId())) {
+				//System.out.println(event.getVehicleId() + " enters charger");
+				isVehicleInDepotSet.add(event.getVehicleId().toString());
+			}
+		}
 
-    }
+	}
+
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+
+		if (evFleet.getElectricVehicles().keySet().contains(event.getVehicleId())) {
+
+			// System.out.println(event.getVehicleId() + " leaves link");
+
+			if (chargerLinkIdSet.contains(event.getLinkId())) {
+				//System.out.println(event.getVehicleId() + "leaves charger");
+				isVehicleInDepotSet.remove(event.getVehicleId().toString());
+			}
+		}
+
+	}
 
 }
