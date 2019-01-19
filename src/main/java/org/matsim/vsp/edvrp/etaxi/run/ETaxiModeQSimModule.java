@@ -132,8 +132,8 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 					}
 				}).asEagerSingleton();
 
-		bindModal(PassengerRequestCreator.class).toProvider(
-				modalProvider(getter -> new TaxiRequestCreator(getter.getModal(SubmittedTaxiRequestsCollector.class))))
+		bindModal(PassengerRequestCreator.class).toProvider(modalProvider(
+				getter -> new TaxiRequestCreator(getMode(), getter.getModal(SubmittedTaxiRequestsCollector.class))))
 				.asEagerSingleton();
 
 		bindModal(VrpOptimizer.class).to(modalKey(TaxiOptimizer.class));
