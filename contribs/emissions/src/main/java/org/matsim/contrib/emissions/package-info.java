@@ -1,12 +1,12 @@
 /**
  * <h2>Usage</h2>
- * Execute {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig} and {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample RunEmissionToolOnlineExampleV2} or {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample RunEmissionToolOfflineExampleV2} from the example package.
+ * Execute {@link org.matsim.contrib.emissions.example.CreateEmissionConfig} and {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample} or {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample} from the example package.
  * <ul>
- * <li> {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig}: Creates a MATSim config file with links to emission related input files as {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup}. </li>
- * <li> {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample RunEmissionToolOnlineExampleV2}: Writes emission events to the events file during the simulation. </li>
- * <li> {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample RunEmissionToolOfflineExampleV2}: Writes emission events to the events file based on a standard MATSim events file. </li>
+ * <li> {@link org.matsim.contrib.emissions.example.CreateEmissionConfig}: Creates a MATSim config file with links to emission related input files as {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup}. </li>
+ * <li> {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample}: Writes emission events to the events file during the simulation. </li>
+ * <li> {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample}: Writes emission events to the events file based on a standard MATSim events file. </li>
  * </ul>
- * The online example as well as the offline example use a config file as created by {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig}. 
+ * The online example as well as the offline example use a config file as created by {@link org.matsim.contrib.emissions.example.CreateEmissionConfig}.
  * An example config and the associated files can be found at the test input directory.
  * The example config file allows you to directly run the online example.
  * <p>
@@ -36,49 +36,29 @@
  * 
  *  All these emission factor files need to be converted into *.txt or *.csv with ";" as delimiter.
  *  Their column headers should automatically match the parser definition
- *  in the respective method of the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule}.
+ *  in the respective method of the {@link org.matsim.contrib.emissions.EmissionModule}.
  *
  * <h2>Input files</h2>
  * Required files are:
  * <ul>
  * <li>roadTypeMappingFile: This file needs to map road types in your network to HBEFA 3.x road types.
- * Update (June'2018) one can now directly add HBEFA road type to link attributes using {@link org.matsim.contrib.emissions.utils.EmissionUtils#setHbefaRoadType(org.matsim.api.core.v01.network.Link, java.lang.String) setHbefaRoadType}
- * or see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup} for a detailed description.
+ * Update (June'2018) one can now directly add HBEFA road type to link attributes using {@link org.matsim.contrib.emissions.utils.EmissionUtils#setHbefaRoadType(org.matsim.api.core.v01.network.Link, java.lang.String)}
+ * or see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup} for a detailed description.
  * 
  * <li>emissionVehicleFile: This data type is defined in the EmissionsConfigGroup,
- * see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup}. The following information is surrounded by {@link org.matsim.contrib.emissions.utils.EmissionSpecificationMarker EmissionSpecificationMarker}. It is described as "definition of a vehicle
+ * see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup}. The following information is surrounded by {@link org.matsim.contrib.emissions.utils.EmissionSpecificationMarker}. It is described as "definition of a vehicle
  *  for every person (who is allowed to choose a vehicle in the simulation):
  *  <ul>
  *  <li> REQUIRED: Vehicle description must start with the respective HbefaVehicleCategory followed by ";"
  *  <li> OPTIONAL: If detailed emission calculation is switched on, the vehicle type Id should additionally contain
  *  HbefaVehicleAttributes ("Technology;SizeClasse;EmConcept"), corresponding to the strings in detailedWarmEmissionFactorsFile (see below) </li>
  * </ul>
- * <li>averageFleetWarmEmissionFactorsFile: This file can be exported from HBEFA 3.x (see above).
- * See the parser {@link org.matsim.contrib.emissions.EmissionModule#createAvgHbefaWarmTable createAvgHbefaWarmTable}
- *  at the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule} 
- *  or see the {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup} for a detailed description. </li>
- *
- * <li>averageFleetColdEmissionFactorsFile: This file can be exported from HBEFA 3.x (see above).
- * See the parser {@link org.matsim.contrib.emissions.EmissionModule#createAvgHbefaColdTable createAvgHbefaColdTable}
- * at the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule} 
- * or see the {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup} for a detailed description. </li>
- * </ul>
  *
  * Optional: If you want to use vehicle specific emission calculations, set isUsingDetailedEmissionCalculation to <code>true</code> in the
- * {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample RunEmissionToolOnlineExampleV2} or
- * {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample RunEmissionToolOfflineExampleV2} class.
+ * {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample} or
+ * {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample} class.
  * Define the input paths for
  * <ul>
- * 
- * <li>detailedWarmEmissionFactorsFile: See the parser 
- * {@link org.matsim.contrib.emissions.EmissionModule#createDetailedHbefaWarmTable createDetailedHbefaWarmTable}
- * at the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule} for details. </li>
- *
- * <li>and detailedColdEmissionFactorsFile: 
- * {@link org.matsim.contrib.emissions.EmissionModule#createDetailedHbefaColdTable createDetailedHbefaColdTable}
- * at the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule} for details.
- * </li>
- * </ul>
  *
  * <h2>Model description</h2>
  * 
@@ -87,7 +67,7 @@
  * maps to associate the emissions with corresponding vehicle types, speed, parking time, ... <br>
  *
  * <h3>Events</h3>
- * This class contains extensions of {@link org.matsim.api.core.v01.events.Event Event}
+ * This class contains extensions of {@link org.matsim.api.core.v01.events.Event}
  * to handle different types of emissions as events. <code> ColdEmissionAnalysisModule</code>
  * calculates emissions after a cold start, <code> WarmEmissionAnalysisModule</code> calculates
  * warm emissions.
@@ -97,12 +77,12 @@
  * some functions from {@link org.matsim.core.controler.Controler Controler}.
  *
  * <h3>Types</h3>
- * {@link org.matsim.contrib.emissions.types.HbefaVehicleAttributes HbefaVehicleAttributes} contains a default constructor, setting all values to average.
+ * {@link org.matsim.contrib.emissions.types.HbefaVehicleAttributes} contains a default constructor, setting all values to average.
  * This way a calculation of emissions for undefined vehicle types can be performed.
- * Any instance of {@link org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey HbefaWarmEmissionFactorKey} contains a vehicle category, a warm pollutant; a road category,
+ * Any instance of {@link org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey} contains a vehicle category, a warm pollutant; a road category,
  * a traffic situation and three vehicle attributes (technology, size class, em concept).
- * Any instance of {@link org.matsim.contrib.emissions.types.HbefaTrafficSituation HbefaTrafficSituation} specifies one of 4 traffic situations.
- * Instances of {@link org.matsim.contrib.emissions.types.HbefaColdEmissionFactorKey HbefaColdEmissionFactorKey} contain a vehicle category, a cold pollutant, a parking time range,
+ * Any instance of {@link org.matsim.contrib.emissions.types.HbefaTrafficSituation} specifies one of 4 traffic situations.
+ * Instances of {@link org.matsim.contrib.emissions.types.HbefaColdEmissionFactorKey} contain a vehicle category, a cold pollutant, a parking time range,
  * a distance, which is driven after parking and, again, vehicle attributes.
  * The cold/warm emission factor keys are mapped to the values of cold/warm emissions, the cold/warm emission factors.
  * <br> <br>
@@ -111,7 +91,3 @@
  */
 
 package org.matsim.contrib.emissions;
-
-//class EmissionsPackageInfo{
-//	
-//}
