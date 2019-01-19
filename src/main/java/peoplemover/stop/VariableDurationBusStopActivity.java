@@ -20,6 +20,8 @@
 
 package peoplemover.stop;
 
+import java.util.Set;
+
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerPickupActivity;
@@ -27,8 +29,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dynagent.AbstractDynActivity;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
-
-import java.util.Set;
 
 /**
  * Multiple passenger dropoff and pickup activity
@@ -108,7 +108,7 @@ public class VariableDurationBusStopActivity extends AbstractDynActivity impleme
 
     private PassengerRequest getRequestForPassenger(MobsimPassengerAgent passenger) {
         for (PassengerRequest request : pickupRequests) {
-            if (passenger == request.getPassenger()) {
+			if (passenger.getId().equals(request.getPassengerId())) {
                 return request;
             }
         }
