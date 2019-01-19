@@ -172,7 +172,7 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 			@Override
 			public DrtRequestCreator get() {
-				return new DrtRequestCreator(drtCfg, events, timer);
+				return new DrtRequestCreator(getMode(), events, timer);
 			}
 		}).asEagerSingleton();
 
