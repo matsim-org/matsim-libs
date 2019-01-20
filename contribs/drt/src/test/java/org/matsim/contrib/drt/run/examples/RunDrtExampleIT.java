@@ -89,7 +89,7 @@ public class RunDrtExampleIT {
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		Controler controler = DrtControlerCreator.createControler(config, false);
+		Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config, false);
 
 		PersonIdValidator personIdValidator = new PersonIdValidator();
 

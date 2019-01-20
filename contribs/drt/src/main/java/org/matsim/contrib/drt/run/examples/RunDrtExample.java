@@ -42,7 +42,7 @@ public class RunDrtExample {
 	private static final String MIELEC_CONFIG_FILE = "mielec_2014_02/mielec_drt_config.xml";
 
 	public static void run(Config config, boolean otfvis) {
-		DrtControlerCreator.createControler(config, otfvis).run();
+		DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis).run();
 	}
 
 	public static void main(String[] args) {
