@@ -19,7 +19,6 @@
 
 package org.matsim.vsp.edvrp.edrt;
 
-import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
@@ -28,6 +27,7 @@ import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTrackerImpl;
+import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
 import org.matsim.contrib.dvrp.tracker.TaskTrackers;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLeg;
@@ -47,11 +47,9 @@ public class EDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final DrtActionCreator drtActionCreator;
 	private final MobsimTimer timer;
 
-	public EDrtActionCreator(PassengerEngine passengerEngine, DrtOptimizer optimizer, MobsimTimer timer,
-			DvrpConfigGroup dvrpCfg) {
+	public EDrtActionCreator(PassengerEngine passengerEngine, MobsimTimer timer, DvrpConfigGroup dvrpCfg) {
 		this.timer = timer;
-		drtActionCreator = new DrtActionCreator(passengerEngine,
-				v -> createLeg(dvrpCfg.getMobsimMode(), v, optimizer, timer));
+		drtActionCreator = new DrtActionCreator(passengerEngine, v -> createLeg(dvrpCfg.getMobsimMode(), v, timer));
 	}
 
 	@Override
@@ -69,10 +67,11 @@ public class EDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 		}
 	}
 
-	private static VrpLeg createLeg(String mobsimMode, Vehicle vehicle, DrtOptimizer optimizer, MobsimTimer timer) {
+	private static VrpLeg createLeg(String mobsimMode, Vehicle vehicle, MobsimTimer timer) {
 		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
 		VrpLeg leg = new VrpLeg(mobsimMode, driveTask.getPath());
-		OnlineDriveTaskTracker onlineTracker = new OnlineDriveTaskTrackerImpl(vehicle, leg, optimizer, timer);
+		OnlineDriveTaskTracker onlineTracker = new OnlineDriveTaskTrackerImpl(vehicle, leg,
+				OnlineTrackerListener.NO_LISTENER, timer);
 		OnlineEDriveTaskTracker onlineETracker = new OnlineEDriveTaskTracker((EvDvrpVehicle)vehicle, timer,
 				onlineTracker);
 		TaskTrackers.initOnlineDriveTaskTracking(vehicle, leg, onlineETracker);

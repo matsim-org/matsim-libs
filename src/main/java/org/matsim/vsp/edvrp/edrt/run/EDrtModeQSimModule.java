@@ -188,8 +188,7 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).
 				toProvider(modalProvider(getter -> new EDrtActionCreator(getter.getModal(PassengerEngine.class),
-						getter.getModal(DrtOptimizer.class), getter.get(MobsimTimer.class),
-						getter.get(DvrpConfigGroup.class)))).
+						getter.get(MobsimTimer.class), getter.get(DvrpConfigGroup.class)))).
 				asEagerSingleton();
 
 		bindModal(PassengerRequestCreator.class).toProvider(new Provider<DrtRequestCreator>() {

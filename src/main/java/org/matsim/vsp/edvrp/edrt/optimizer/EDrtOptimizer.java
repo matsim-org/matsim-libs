@@ -18,7 +18,6 @@
 
 package org.matsim.vsp.edvrp.edrt.optimizer;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.dvrp.data.Request;
@@ -68,8 +67,4 @@ public class EDrtOptimizer implements DrtOptimizer {
 		optimizer.requestSubmitted(request);
 	}
 
-	@Override
-	public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
-		optimizer.vehicleEnteredNextLink(vehicle, nextLink);
-	}
 }
