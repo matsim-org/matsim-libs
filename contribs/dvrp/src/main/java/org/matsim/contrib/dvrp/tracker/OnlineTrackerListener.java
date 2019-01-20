@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,20 +15,26 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.dvrp.optimizer;
+package org.matsim.contrib.dvrp.tracker;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 
 /**
- * @author michalm
- * @author (of documentation) nagel
+ * @author Michal Maciejewski (michalm)
  */
-public interface VrpOptimizerWithOnlineTracking extends VrpOptimizer {
+public interface OnlineTrackerListener {
+	OnlineTrackerListener NO_LISTENER = (vehicle, link) -> {
+	};
+
 	/**
-	 * Notifies the optimizer that the next link was entered.
+	 * Notifies that the next link was entered.
+	 *
+	 * @param vehicle
+	 * @param nextLink
 	 */
 	void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink);
 }

@@ -20,7 +20,6 @@
 package org.matsim.contrib.dvrp.tracker;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -36,16 +35,10 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * <li>An offline tracker knows/uses only the corresponding task and the schedule (i.e. plan)</li>
  * <li>An online tracker knows/uses also the corresponding {@link DynAction} (i.e. execution)</li>
  * </ul>
- * 
+ *
  * @author michalm
  */
 public class TaskTrackers {
-	public static void initOnlineDriveTaskTracking(Vehicle vehicle, VrpLeg vrpDynLeg,
-			VrpOptimizerWithOnlineTracking optimizer, MobsimTimer timer) {
-		initOnlineDriveTaskTracking(vehicle, vrpDynLeg,
-				new OnlineDriveTaskTrackerImpl(vehicle, vrpDynLeg, optimizer, timer));
-	}
-
 	public static void initOnlineDriveTaskTracking(Vehicle vehicle, VrpLeg vrpDynLeg,
 			OnlineDriveTaskTracker onlineTracker) {
 		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
