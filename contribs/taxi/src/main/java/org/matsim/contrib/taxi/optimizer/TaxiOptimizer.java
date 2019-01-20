@@ -20,11 +20,10 @@
 package org.matsim.contrib.taxi.optimizer;
 
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
 /**
  * @author michalm
  */
-public interface TaxiOptimizer extends VrpOptimizer, OnlineTrackerListener, MobsimBeforeSimStepListener {
+public interface TaxiOptimizer extends VrpOptimizer, MobsimBeforeSimStepListener {
 }

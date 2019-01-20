@@ -49,10 +49,11 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final VrpLegFactory legFactory;
 	private final double pickupDuration;
 
-	public TaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg,
-			OnlineTrackerListener onlineTrackerListener, MobsimTimer timer, DvrpConfigGroup dvrpCfg) {
+	public TaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg, MobsimTimer timer,
+			DvrpConfigGroup dvrpCfg) {
 		this(passengerEngine, taxiCfg.isOnlineVehicleTracker() ?
-						v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v, onlineTrackerListener, timer) :
+						v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v,
+								OnlineTrackerListener.NO_LISTENER, timer) :
 						v -> VrpLegFactory.createWithOfflineTracker(dvrpCfg.getMobsimMode(), v, timer),
 				taxiCfg.getPickupDuration());
 	}
