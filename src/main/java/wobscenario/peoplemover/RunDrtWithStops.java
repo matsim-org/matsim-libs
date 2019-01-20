@@ -71,9 +71,7 @@ public class RunDrtWithStops {
 
 	public static Controler createControler(Config config, boolean otfvis) {
 
-
-		
-		Controler controler = DrtControlerCreator.createControler(config, otfvis);
+		Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
 	
 
 		if (otfvis) {

@@ -39,7 +39,7 @@ public class RunOneSharedTaxiWithVariableStopDurationExample {
                 new OTFVisConfigGroup());
         config.controler().setLastIteration(lastIteration);
         config.controler().setWriteEventsInterval(lastIteration);
-        Controler controler = DrtControlerCreator.createControler(config, otfvis);
+		Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
         BusStopDurationCalculator busStopDurationCalculator = new LinearBusStopDurationCalculator(120, 120, 10);
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.get(config);
 		controler.addOverridingQSimModule(

@@ -20,7 +20,10 @@
 
 package vwExamples.peoplemoverVWExample;
 
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,16 +47,12 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vsp.ev.EvConfigGroup;
 import org.matsim.vsp.ev.temperature.TemperatureChangeConfigGroup;
 
-import analysis.drtOccupancy.DynModeTrip;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import parking.ParkingRouterConfigGroup;
 import parking.ParkingRouterModule;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
 import vwExamples.utils.parking.createParkingNetwork.CreateParkingNetwork;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author axer
@@ -62,10 +61,10 @@ import java.util.Map;
 public class RunDrtScenarioBatchBS_eDRT_withParking {
 
     // Class to create the controller
-//	public static Controler createControler(Config config, boolean otfvis) {
+	//	public static Controler createControlerWithSingleModeDrt(Config config, boolean otfvis) {
 //		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
 //		config.checkConsistency();
-//		return DrtControlerCreator.createControler(config, otfvis);
+	//		return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
 //	}
 
     public static void main(String[] args) throws IOException {
@@ -195,7 +194,7 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 
         // Define the MATSim Controler
         // Based on the prepared configuration this part creates a controller that runs
-        // Controler controler = createControler(config, otfvis);
+		// Controler controler = createControlerWithSingleModeDrt(config, otfvis);
 
         Controler controler = electric.edrt.run.RunEDrtScenario.createControler(config);
 

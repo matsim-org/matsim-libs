@@ -19,6 +19,9 @@
 
 package vwExamples.peoplemoverVWExample;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
@@ -32,9 +35,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-
-import java.util.Arrays;
-import java.util.List;
 
 //import org.matsim.contrib.drt.analysis.zonal.DrtZonalModule;
 //import org.matsim.contrib.drt.optimizer.rebalancing.DemandBasedRebalancingStrategy;
@@ -50,7 +50,7 @@ public class RunDrtScenarioBatchWOBAV {
     public static Controler createControler(Config config, boolean otfvis) {
         config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
         config.checkConsistency();
-        return DrtControlerCreator.createControler(config, otfvis);
+        return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
     }
 
     public static void main(String[] args) {
