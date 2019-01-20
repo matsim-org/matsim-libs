@@ -21,8 +21,11 @@ package org.matsim.contrib.dvrp.passenger;
 
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dynagent.*;
+import org.matsim.contrib.dynagent.AbstractDynActivity;
+import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 public class MultiPassengerPickupActivity extends AbstractDynActivity implements PassengerPickupActivity {
@@ -86,11 +89,7 @@ public class MultiPassengerPickupActivity extends AbstractDynActivity implements
 
 	@Override
 	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
-		PassengerRequest request = getRequestForPassenger(passenger);
-
-		if (request == null) {
-			throw new IllegalArgumentException("I am waiting for different passengers!");
-		}
+		PassengerRequest request = getRequestForPassenger(passenger.getId());
 
 		if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
 			passengersPickedUp++;
@@ -103,13 +102,10 @@ public class MultiPassengerPickupActivity extends AbstractDynActivity implements
 		}
 	}
 
-	private PassengerRequest getRequestForPassenger(MobsimPassengerAgent passenger) {
-		for (PassengerRequest request : requests) {
-			if (passenger == request.getPassenger()) {
-				return request;
-			}
-		}
-
-		return null;
+	private PassengerRequest getRequestForPassenger(Id<Person> passengerId) {
+		return requests.stream()
+				.filter(r -> passengerId.equals(r.getPassengerId()))
+				.findAny()
+				.orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));
 	}
 }

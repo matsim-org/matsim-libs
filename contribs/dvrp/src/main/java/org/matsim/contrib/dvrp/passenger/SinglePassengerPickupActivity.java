@@ -20,7 +20,8 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dynagent.*;
+import org.matsim.contrib.dynagent.AbstractDynActivity;
+import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 public class SinglePassengerPickupActivity extends AbstractDynActivity implements PassengerPickupActivity {
@@ -75,7 +76,7 @@ public class SinglePassengerPickupActivity extends AbstractDynActivity implement
 
 	@Override
 	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
-		if (passenger != request.getPassenger()) {
+		if (passenger.getId().equals(request.getPassengerId())) {
 			throw new IllegalArgumentException("I am waiting for a different passenger!");
 		}
 

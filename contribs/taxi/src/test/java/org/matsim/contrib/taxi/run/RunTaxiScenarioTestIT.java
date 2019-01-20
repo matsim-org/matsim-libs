@@ -80,8 +80,8 @@ public class RunTaxiScenarioTestIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(DvrpModes.key(PassengerRequestValidator.class, taxiCfg.getMode()))
-						.toInstance(req -> req.getPassenger().getId().toString().equals("0000009") ?
+				bind(DvrpModes.key(PassengerRequestValidator.class, taxiCfg.getMode())).toInstance(
+						req -> req.getPassengerId().toString().equals("0000009") ?
 								Collections.singleton("REJECT_0000009") : Collections.emptySet());
 			}
 		});

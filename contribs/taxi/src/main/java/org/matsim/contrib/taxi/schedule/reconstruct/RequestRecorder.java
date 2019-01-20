@@ -53,7 +53,8 @@ public class RequestRecorder implements PersonDepartureEventHandler, PersonEnter
 			Id<Request> id = Id.create(requestCounter++, Request.class);
 			Link fromLink = reconstructor.links.get(event.getLinkId());
 			double time = event.getTime();
-			TaxiRequest request = new TaxiRequestWithModifiableToLink(id, fromLink, time);
+			TaxiRequest request = new TaxiRequestWithModifiableToLink(id, event.getPersonId(), event.getLegMode(),
+					fromLink, time);
 			TaxiRequest oldRequest = ongoingRequests.put(event.getPersonId(), request);
 			if (oldRequest != null) {
 				throw new IllegalStateException("Currently only one request per passenger");
