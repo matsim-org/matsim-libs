@@ -216,7 +216,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 	}
 
 	public void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now) {
-		MobsimPassengerAgent passenger = passengersByRequestId.get(request.getId());
+		MobsimPassengerAgent passenger = passengersByRequestId.remove(request.getId());
 		MobsimVehicle mobVehicle = driver.getVehicle();
 		mobVehicle.removePassenger(passenger);
 		passenger.setVehicle(null);
