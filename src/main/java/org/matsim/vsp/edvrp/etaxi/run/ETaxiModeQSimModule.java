@@ -126,9 +126,7 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 					@Override
 					public ETaxiActionCreator get() {
 						PassengerEngine passengerEngine = getModalInstance(PassengerEngine.class);
-						TaxiOptimizer optimizer = getModalInstance(TaxiOptimizer.class);
-						return new ETaxiActionCreator(
-								new TaxiActionCreator(passengerEngine, taxiCfg, optimizer, timer, dvrpCfg));
+						return new ETaxiActionCreator(new TaxiActionCreator(passengerEngine, taxiCfg, timer, dvrpCfg));
 					}
 				}).asEagerSingleton();
 
