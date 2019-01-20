@@ -20,5 +20,6 @@
 package org.matsim.contrib.dynagent;
 
 public interface DynAction {
-	void finalizeAction(double now);
+	default void finalizeAction(double now) {
+	}
 }
