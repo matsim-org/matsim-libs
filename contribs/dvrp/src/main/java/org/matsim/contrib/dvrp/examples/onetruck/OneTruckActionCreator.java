@@ -29,7 +29,6 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.contrib.dynagent.StaticDynActivity;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import com.google.inject.Inject;
@@ -51,8 +50,8 @@ final class OneTruckActionCreator implements VrpAgentLogic.DynActionCreator {
 		if (task instanceof DriveTask) {
 			return VrpLegFactory.createWithOfflineTracker(TransportMode.truck, vehicle, timer);
 		} else if (task instanceof OneTruckServeTask) { // PICKUP or DELIVERY
-			return new StaticDynActivity(((OneTruckServeTask)task).isPickup() ? "pickup" : "delivery",
-					task.getEndTime());
+			OneTruckServeTask serveTask = (OneTruckServeTask)task;
+			return new VrpActivity(serveTask.isPickup() ? "pickup" : "delivery", serveTask);
 		} else { // WAIT
 			return new VrpActivity("OneTaxiStay", (StayTask)task);
 		}

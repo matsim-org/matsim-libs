@@ -86,7 +86,6 @@ public class VrpAgentLogic implements DynAgentLogic {
 		return new AbstractDynActivity(BEFORE_SCHEDULE_ACTIVITY_TYPE) {
 			public double getEndTime() {
 				Schedule s = vehicle.getSchedule();
-
 				switch (s.getStatus()) {
 					case PLANNED:
 						return s.getBeginTime();
