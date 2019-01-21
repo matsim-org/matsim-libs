@@ -22,10 +22,10 @@ package org.matsim.contrib.dvrp.passenger;
 import java.util.Set;
 
 import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dynagent.AbstractDynActivity;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
 
-public class MultiPassengerDropoffActivity extends AbstractDynActivity {
+public class MultiPassengerDropoffActivity extends FirstLastSimStepDynActivity {
 	private final PassengerEngine passengerEngine;
 	private final DynAgent driver;
 	private final Set<? extends PassengerRequest> requests;
@@ -44,17 +44,15 @@ public class MultiPassengerDropoffActivity extends AbstractDynActivity {
 	}
 
 	@Override
-	public double getEndTime() {
-		return departureTime;
+	protected boolean isLastStep(double now) {
+		return now >= departureTime;
 	}
 
 	@Override
-	public void doSimStep(double now) {
-		if (now >= departureTime) {
-			// dropoff at the end of stop activity
-			for (PassengerRequest request : requests) {
-				passengerEngine.dropOffPassenger(driver, request, now);
-			}
+	protected void afterLastStep(double now) {
+		// dropoff at the end of stop activity
+		for (PassengerRequest request : requests) {
+			passengerEngine.dropOffPassenger(driver, request, now);
 		}
 	}
 }
