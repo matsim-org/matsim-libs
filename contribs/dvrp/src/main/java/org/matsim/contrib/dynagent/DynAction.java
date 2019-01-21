@@ -20,6 +20,18 @@
 package org.matsim.contrib.dynagent;
 
 public interface DynAction {
+	/**
+	 * Called _after_ the action has ended. It is meant for cleaning up, same way as the constructor is meant for initialization.
+	 * <p>
+	 * finalizeAction() is called after ActivityEndEvent/PersonArrivalEvent, so it SHOULD NOT be used for simulating
+	 * activities happening at the end of the activity. For that purpose, use DynActivity.doSimStep(timeStep) with a special
+	 * handling for the last time step.
+	 * <p>
+	 * Similarly, the constructor of both DynLeg and DynActivity are called before ActivityStartEvent/PersonDepartureEvent
+	 * and SHOULD NOT be used for simulating the initial time step.
+	 *
+	 * @param now
+	 */
 	default void finalizeAction(double now) {
 	}
 }
