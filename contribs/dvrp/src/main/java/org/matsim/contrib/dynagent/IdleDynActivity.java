@@ -26,7 +26,8 @@ import java.util.function.DoubleSupplier;
  *
  * @author michalm
  */
-public final class IdleDynActivity extends AbstractDynActivity {
+public final class IdleDynActivity implements DynActivity {
+	private final String activityType;
 	private final DoubleSupplier endTimeSupplier;
 
 	public IdleDynActivity(String activityType, double endTime) {
@@ -34,8 +35,13 @@ public final class IdleDynActivity extends AbstractDynActivity {
 	}
 
 	public IdleDynActivity(String activityType, DoubleSupplier endTimeSupplier) {
-		super(activityType);
+		this.activityType = activityType;
 		this.endTimeSupplier = endTimeSupplier;
+	}
+
+	@Override
+	public final String getActivityType() {
+		return activityType;
 	}
 
 	@Override
