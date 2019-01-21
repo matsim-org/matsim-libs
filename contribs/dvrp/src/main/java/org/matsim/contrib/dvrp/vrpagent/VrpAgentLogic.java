@@ -28,7 +28,7 @@ import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.DynAgentLogic;
-import org.matsim.contrib.dynagent.StaticDynActivity;
+import org.matsim.contrib.dynagent.IdleDynActivity;
 
 /**
  * @author michalm
@@ -103,7 +103,7 @@ public class VrpAgentLogic implements DynAgentLogic {
 	}
 
 	private DynActivity createAfterScheduleActivity() {
-		return new StaticDynActivity(AFTER_SCHEDULE_ACTIVITY_TYPE, Double.POSITIVE_INFINITY);
+		return new IdleDynActivity(AFTER_SCHEDULE_ACTIVITY_TYPE, Double.POSITIVE_INFINITY);
 	}
 
 	Vehicle getVehicle() {

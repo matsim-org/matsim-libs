@@ -24,10 +24,10 @@ package org.matsim.contrib.dynagent;
  *
  * @author michalm
  */
-public class StaticDynActivity extends AbstractDynActivity {
+public class IdleDynActivity extends AbstractDynActivity {
 	private final double endTime;
 
-	public StaticDynActivity(String activityType, double endTime) {
+	public IdleDynActivity(String activityType, double endTime) {
 		super(activityType);
 		this.endTime = endTime;
 	}
