@@ -46,21 +46,18 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 
 	private final PassengerEngine passengerEngine;
 	private final VrpLegFactory legFactory;
-	private final double pickupDuration;
 
 	public TaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg, MobsimTimer timer,
 			DvrpConfigGroup dvrpCfg) {
 		this(passengerEngine, taxiCfg.isOnlineVehicleTracker() ?
-						v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v,
-								OnlineTrackerListener.NO_LISTENER, timer) :
-						v -> VrpLegFactory.createWithOfflineTracker(dvrpCfg.getMobsimMode(), v, timer),
-				taxiCfg.getPickupDuration());
+				v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v,
+						OnlineTrackerListener.NO_LISTENER, timer) :
+				v -> VrpLegFactory.createWithOfflineTracker(dvrpCfg.getMobsimMode(), v, timer));
 	}
 
-	public TaxiActionCreator(PassengerEngine passengerEngine, VrpLegFactory legFactory, double pickupDuration) {
+	public TaxiActionCreator(PassengerEngine passengerEngine, VrpLegFactory legFactory) {
 		this.passengerEngine = passengerEngine;
 		this.legFactory = legFactory;
-		this.pickupDuration = pickupDuration;
 	}
 
 	@Override
@@ -74,7 +71,7 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 			case PICKUP:
 				final TaxiPickupTask pst = (TaxiPickupTask)task;
 				return new SinglePassengerPickupActivity(passengerEngine, dynAgent, pst, pst.getRequest(),
-						pickupDuration, PICKUP_ACTIVITY_TYPE);
+						PICKUP_ACTIVITY_TYPE);
 
 			case DROPOFF:
 				final TaxiDropoffTask dst = (TaxiDropoffTask)task;

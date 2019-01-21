@@ -63,7 +63,7 @@ final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 
 			if (serveTask.isPickup()) {
 				return new SinglePassengerPickupActivity(passengerEngine, dynAgent, serveTask, serveTask.getRequest(),
-						OneTaxiOptimizer.PICKUP_DURATION, "OneTaxiPickup");
+						"OneTaxiPickup");
 			} else {
 				return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, serveTask, serveTask.getRequest(),
 						"OneTaxiDropoff");
