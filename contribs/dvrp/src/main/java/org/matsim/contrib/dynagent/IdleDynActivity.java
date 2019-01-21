@@ -19,25 +19,31 @@
 
 package org.matsim.contrib.dynagent;
 
+import java.util.function.DoubleSupplier;
+
 /**
  * endTime is not subject to change
  *
  * @author michalm
  */
-public class IdleDynActivity extends AbstractDynActivity {
-	private final double endTime;
+public final class IdleDynActivity extends AbstractDynActivity {
+	private final DoubleSupplier endTimeSupplier;
 
 	public IdleDynActivity(String activityType, double endTime) {
+		this(activityType, () -> endTime);
+	}
+
+	public IdleDynActivity(String activityType, DoubleSupplier endTimeSupplier) {
 		super(activityType);
-		this.endTime = endTime;
+		this.endTimeSupplier = endTimeSupplier;
 	}
 
 	@Override
-	public double getEndTime() {
-		return endTime;
+	public final double getEndTime() {
+		return endTimeSupplier.getAsDouble();
 	}
 
 	@Override
-	public void doSimStep(double now) {
+	public final void doSimStep(double now) {
 	}
 }
