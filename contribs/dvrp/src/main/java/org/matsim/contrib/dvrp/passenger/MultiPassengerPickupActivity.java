@@ -34,7 +34,7 @@ public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity im
 	private final Set<? extends PassengerRequest> requests;
 	private final double expectedEndTime;
 
-	private int passengersPickedUp;
+	private int passengersPickedUp = 0;
 
 	public MultiPassengerPickupActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask pickupTask,
 			Set<? extends PassengerRequest> requests, String activityType) {
