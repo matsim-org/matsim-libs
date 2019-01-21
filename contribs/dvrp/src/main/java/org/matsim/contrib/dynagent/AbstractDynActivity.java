@@ -30,8 +30,4 @@ public abstract class AbstractDynActivity implements DynActivity {
 	public final String getActivityType() {
 		return activityType;
 	}
-
-	@Override
-	public void doSimStep(double now) {
-	}
 }

@@ -95,6 +95,10 @@ public class VrpAgentLogic implements DynAgentLogic {
 						throw new IllegalStateException();
 				}
 			}
+
+			@Override
+			public void doSimStep(double now) {
+			}
 		};
 	}
 

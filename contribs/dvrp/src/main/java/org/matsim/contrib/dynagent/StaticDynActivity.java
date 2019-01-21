@@ -21,7 +21,7 @@ package org.matsim.contrib.dynagent;
 
 /**
  * endTime is not subject to change
- * 
+ *
  * @author michalm
  */
 public class StaticDynActivity extends AbstractDynActivity {
@@ -35,5 +35,9 @@ public class StaticDynActivity extends AbstractDynActivity {
 	@Override
 	public double getEndTime() {
 		return endTime;
+	}
+
+	@Override
+	public void doSimStep(double now) {
 	}
 }

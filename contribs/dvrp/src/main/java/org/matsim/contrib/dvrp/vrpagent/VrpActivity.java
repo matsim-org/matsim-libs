@@ -34,4 +34,8 @@ public class VrpActivity extends AbstractDynActivity {
 	public double getEndTime() {
 		return stayTask.getEndTime();
 	}
+
+	@Override
+	public void doSimStep(double now) {
+	}
 }

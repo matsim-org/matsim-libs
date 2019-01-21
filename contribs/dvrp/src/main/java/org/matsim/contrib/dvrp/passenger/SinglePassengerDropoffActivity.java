@@ -50,4 +50,8 @@ public class SinglePassengerDropoffActivity extends AbstractDynActivity {
 	public double getEndTime() {
 		return departureTime;
 	}
+
+	@Override
+	public void doSimStep(double now) {
+	}
 }
