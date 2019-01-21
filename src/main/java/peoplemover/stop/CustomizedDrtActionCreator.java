@@ -20,18 +20,17 @@
 
 package peoplemover.stop;
 
-import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
-import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.IdleDynActivity;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
@@ -66,7 +65,7 @@ public class CustomizedDrtActionCreator implements VrpAgentLogic.DynActionCreato
 				return new VariableDurationBusStopActivity(passengerEngine, dynAgent, t, duration, DRT_STOP_NAME);
 
 			case STAY:
-				return new VrpActivity(DRT_STAY_NAME, (DrtStayTask)task);
+				return new IdleDynActivity(DRT_STAY_NAME, task::getEndTime);
 
 			default:
 				throw new IllegalStateException();
