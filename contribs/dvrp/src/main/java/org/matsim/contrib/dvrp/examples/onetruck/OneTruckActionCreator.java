@@ -22,13 +22,12 @@ package org.matsim.contrib.dvrp.examples.onetruck;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.IdleDynActivity;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import com.google.inject.Inject;
@@ -50,10 +49,9 @@ final class OneTruckActionCreator implements VrpAgentLogic.DynActionCreator {
 		if (task instanceof DriveTask) {
 			return VrpLegFactory.createWithOfflineTracker(TransportMode.truck, vehicle, timer);
 		} else if (task instanceof OneTruckServeTask) { // PICKUP or DELIVERY
-			OneTruckServeTask serveTask = (OneTruckServeTask)task;
-			return new VrpActivity(serveTask.isPickup() ? "pickup" : "delivery", serveTask);
+			return new IdleDynActivity(((OneTruckServeTask)task).isPickup() ? "pickup" : "delivery", task::getEndTime);
 		} else { // WAIT
-			return new VrpActivity("OneTaxiStay", (StayTask)task);
+			return new IdleDynActivity("OneTaxiStay", task::getEndTime);
 		}
 	}
 }

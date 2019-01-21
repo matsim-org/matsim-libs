@@ -27,13 +27,12 @@ import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.IdleDynActivity;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import com.google.inject.Inject;
@@ -70,7 +69,7 @@ final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 						"OneTaxiDropoff");
 			}
 		} else { // WAIT
-			return new VrpActivity("OneTaxiStay", (StayTask)task);
+			return new IdleDynActivity("OneTaxiStay", task::getEndTime);
 		}
 	}
 }

@@ -25,15 +25,14 @@ import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
-import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.IdleDynActivity;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
-import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
@@ -83,7 +82,7 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 						DROPOFF_ACTIVITY_TYPE);
 
 			case STAY:
-				return new VrpActivity(STAY_ACTIVITY_TYPE, (TaxiStayTask)task);
+				return new IdleDynActivity(STAY_ACTIVITY_TYPE, task::getEndTime);
 
 			default:
 				throw new IllegalStateException();
