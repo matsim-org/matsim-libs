@@ -27,6 +27,7 @@ package org.matsim.contrib.dynagent;
  * For that purpose, use DynActivity.doSimStep(timeStep) with a special handling for the first/last time step.
  */
 public interface DynActivity extends DynAction {
+	double END_ACTIVITY_NOW = -Double.MAX_VALUE;
 	double END_ACTIVITY_LATER = Double.MAX_VALUE;
 
 	String getActivityType();
@@ -37,8 +38,8 @@ public interface DynActivity extends DynAction {
 	 * @return There are three possible outcomes:
 	 * <ul>
 	 * <li>{@code endTime == Double.POSITIVE_INFINITY} ==> stop simulating the agent (permanent sleep)</li>
-	 * <li>{@code endTime <= timeStep} ==> end simulating the activity in this time step</li>
-	 * <li>{@code endTime > timeStep} ==> continue simulating the activity (e.g. END_ACTIVITY_LATER could be used)</li>
+	 * <li>{@code endTime <= timeStep} ==> end simulating the activity in this time step (e.g. END_ACTIVITY_NOW)</li>
+	 * <li>{@code endTime > timeStep} ==> continue simulating the activity (e.g. END_ACTIVITY_LATER)</li>
 	 * </ul>
 	 */
 	double getEndTime();
