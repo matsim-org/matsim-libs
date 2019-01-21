@@ -19,11 +19,11 @@
 
 package org.matsim.vsp.ev.dvrp;
 
-import org.matsim.contrib.dynagent.AbstractDynActivity;
+import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.vsp.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.vsp.ev.data.ElectricVehicle;
 
-public class ChargingActivity extends AbstractDynActivity {
+public class ChargingActivity implements DynActivity {
 	private static final String CHARGING_ACTIVITY_TYPE = "ChargingActivity";
 
 	private final ChargingTask chargingTask;
@@ -36,8 +36,12 @@ public class ChargingActivity extends AbstractDynActivity {
 	private State state = State.init;
 
 	public ChargingActivity(ChargingTask chargingTask) {
-		super(CHARGING_ACTIVITY_TYPE);
 		this.chargingTask = chargingTask;
+	}
+
+	@Override
+	public String getActivityType() {
+		return CHARGING_ACTIVITY_TYPE;
 	}
 
 	@Override
