@@ -52,6 +52,8 @@ public abstract class FirstLastSimStepDynActivity implements DynActivity {
 			beforeFirstStep = false;
 		}
 
+		simStep(now);
+
 		if (isLastStep(now)) {
 			afterLastStep(now);
 			afterLastStep = true;
@@ -64,5 +66,8 @@ public abstract class FirstLastSimStepDynActivity implements DynActivity {
 	}
 
 	protected void afterLastStep(double now) {
+	}
+
+	protected void simStep(double now) {
 	}
 }
