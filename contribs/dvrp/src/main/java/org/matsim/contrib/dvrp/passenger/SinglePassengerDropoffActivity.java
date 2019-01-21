@@ -42,16 +42,15 @@ public class SinglePassengerDropoffActivity extends AbstractDynActivity {
 	}
 
 	@Override
-	public void finalizeAction(double now) {
-		passengerEngine.dropOffPassenger(driver, request, now);
-	}
-
-	@Override
 	public double getEndTime() {
 		return departureTime;
 	}
 
 	@Override
 	public void doSimStep(double now) {
+		if (now >= departureTime) {
+			// dropoff at the end of stop activity
+			passengerEngine.dropOffPassenger(driver, request, now);
+		}
 	}
 }
