@@ -175,9 +175,7 @@ public class VoronoiGeometryUtils {
 	    SimpleFeatureBuilder fbuilder = new SimpleFeatureBuilder(type);
 
 	    for (Geometry geometry : geometries) {
-	        
-	        Object[] values = new Object[]{geometry};
-	        fbuilder.addAll(values);
+	    	fbuilder.add(geometry);
 	        SimpleFeature feature = fbuilder.buildFeature(null);
 	        features.add(feature);
 	    }
