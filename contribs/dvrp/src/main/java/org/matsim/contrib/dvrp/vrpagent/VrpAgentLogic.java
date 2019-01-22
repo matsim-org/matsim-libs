@@ -23,12 +23,11 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dynagent.AbstractDynActivity;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.DynAgentLogic;
-import org.matsim.contrib.dynagent.StaticDynActivity;
+import org.matsim.contrib.dynagent.IdleDynActivity;
 
 /**
  * @author michalm
@@ -83,24 +82,21 @@ public class VrpAgentLogic implements DynAgentLogic {
 	}
 
 	private DynActivity createBeforeScheduleActivity() {
-		return new AbstractDynActivity(BEFORE_SCHEDULE_ACTIVITY_TYPE) {
-			public double getEndTime() {
-				Schedule s = vehicle.getSchedule();
-
-				switch (s.getStatus()) {
-					case PLANNED:
-						return s.getBeginTime();
-					case UNPLANNED:
-						return vehicle.getServiceEndTime();
-					default:
-						throw new IllegalStateException();
-				}
+		return new IdleDynActivity(BEFORE_SCHEDULE_ACTIVITY_TYPE, () -> {
+			Schedule s = vehicle.getSchedule();
+			switch (s.getStatus()) {
+				case PLANNED:
+					return s.getBeginTime();
+				case UNPLANNED:
+					return vehicle.getServiceEndTime();
+				default:
+					throw new IllegalStateException();
 			}
-		};
+		});
 	}
 
 	private DynActivity createAfterScheduleActivity() {
-		return new StaticDynActivity(AFTER_SCHEDULE_ACTIVITY_TYPE, Double.POSITIVE_INFINITY);
+		return new IdleDynActivity(AFTER_SCHEDULE_ACTIVITY_TYPE, Double.POSITIVE_INFINITY);
 	}
 
 	Vehicle getVehicle() {

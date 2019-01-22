@@ -21,12 +21,10 @@ package org.matsim.contrib.dvrp.tracker;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.vrpagent.VrpLeg;
 import org.matsim.contrib.dynagent.DynAction;
-import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
@@ -44,10 +42,6 @@ public class TaskTrackers {
 		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
 		driveTask.initTaskTracker(onlineTracker);
 		vrpDynLeg.initOnlineTracking(onlineTracker);
-	}
-
-	public static void initOnlineStayTaskTracking(StayTask stayTask, final DynActivity dynActivity) {
-		stayTask.initTaskTracker(() -> dynActivity.getEndTime());
 	}
 
 	public static void initOfflineTaskTracking(final Task task, final MobsimTimer timer) {

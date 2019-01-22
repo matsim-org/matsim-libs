@@ -19,14 +19,19 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider.OptimizerType;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.core.config.*;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 
 public class TaxiOptimizerTests {
@@ -63,15 +68,15 @@ public class TaxiOptimizerTests {
 
 		// onlineVehicleTracker == false ==> vehicleDiversion == false
 		variants.add(new TaxiConfigVariant(false, false, 120, 60, 1.5, false));
-		variants.add(new TaxiConfigVariant(true, false, 0, 0, 1.5, false));
+		variants.add(new TaxiConfigVariant(true, false, 1, 1, 1.5, false));
 
 		if (diversionSupported) {
 			// onlineVehicleTracker == true
-			variants.add(new TaxiConfigVariant(false, true, 0, 0, 1.5, true));
+			variants.add(new TaxiConfigVariant(false, true, 1, 1, 1.5, true));
 			variants.add(new TaxiConfigVariant(true, true, 120, 60, 1.5, true));
 		} else {
 			// onlineVehicleTracker == true
-			variants.add(new TaxiConfigVariant(false, false, 0, 0, 1.5, true));
+			variants.add(new TaxiConfigVariant(false, false, 1, 1, 1.5, true));
 			variants.add(new TaxiConfigVariant(true, false, 120, 60, 1.5, true));
 		}
 

@@ -24,81 +24,49 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dynagent.AbstractDynActivity;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
-public class MultiPassengerPickupActivity extends AbstractDynActivity implements PassengerPickupActivity {
+public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity implements PassengerPickupActivity {
 	private final PassengerEngine passengerEngine;
 	private final DynAgent driver;
 	private final Set<? extends PassengerRequest> requests;
-	private final double pickupDuration;
+	private final double expectedEndTime;
 
-	private double maxRequestT0;
-
-	private int passengersPickedUp;
-	private double endTime;
+	private int passengersPickedUp = 0;
 
 	public MultiPassengerPickupActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask pickupTask,
-			Set<? extends PassengerRequest> requests, double pickupDuration, String activityType) {
+			Set<? extends PassengerRequest> requests, String activityType) {
 		super(activityType);
 
 		this.passengerEngine = passengerEngine;
 		this.driver = driver;
 		this.requests = requests;
-		this.pickupDuration = pickupDuration;
+		this.expectedEndTime = pickupTask.getEndTime();
+	}
 
-		double now = pickupTask.getBeginTime();
+	@Override
+	protected boolean isLastStep(double now) {
+		return passengersPickedUp == requests.size() && now >= expectedEndTime;
+	}
 
+	@Override
+	protected void beforeFirstStep(double now) {
 		for (PassengerRequest request : requests) {
 			if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
 				passengersPickedUp++;
 			}
-
-			if (request.getEarliestStartTime() > maxRequestT0) {
-				maxRequestT0 = request.getEarliestStartTime();
-			}
-		}
-
-		if (passengersPickedUp == requests.size()) {
-			endTime = now + pickupDuration;
-		} else {
-			setEndTimeIfWaitingForPassengers(now);
-		}
-	}
-
-	@Override
-	public double getEndTime() {
-		return endTime;
-	}
-
-	@Override
-	public void doSimStep(double now) {
-		if (passengersPickedUp < requests.size()) {
-			setEndTimeIfWaitingForPassengers(now);// TODO use DynActivityEngine.END_ACTIVITY_LATER instead?
-		}
-	}
-
-	private void setEndTimeIfWaitingForPassengers(double now) {
-		endTime = Math.max(now, maxRequestT0) + pickupDuration;
-
-		if (endTime == now) {// happens only if pickupDuration == 0
-			endTime += 1; // to prevent the driver departing now (before picking up the passenger)
 		}
 	}
 
 	@Override
 	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
 		PassengerRequest request = getRequestForPassenger(passenger.getId());
-
 		if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
 			passengersPickedUp++;
 		} else {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");
-		}
-
-		if (passengersPickedUp == requests.size()) {
-			endTime = now + pickupDuration;
 		}
 	}
 
