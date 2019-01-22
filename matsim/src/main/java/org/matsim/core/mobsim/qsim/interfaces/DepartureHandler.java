@@ -33,30 +33,9 @@ import java.util.Map;
 
 public interface DepartureHandler extends QSimComponent {
 
-	enum TimeInterpretation { departure, arrival } ;
-
-	
 	/**
 	 * @return <code>true</code> if the departure is handled, <code>false</code> if other DepartureHandlers should be tried as well.
 	 */
 	boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId);
-
-	default List<TripInfo> getTripInfos( Facility fromFacility, Facility toFacility, double time, TimeInterpretation timeInterpretation, Person person ) {
-		// yyyy maybe "Switches" instead of "Person"?  Similar to DB router (fast connections, regional trains only, ...)?
-		return null ;
-	}
-
-	interface TripInfo {
-		Facility getPickupLocation() ;
-		double getExpectedBoardingTime() ;
-		Facility getDropoffLocation() ;
-		double getExpectedTravelTime() ;
-		double getMonetaryPrice() ;
-		Map<String,String> getAdditionalAttributes() ;
-		String getMode() ;
-		void accept() ;
-		double getLatestDecisionTime() ;
-	}
-
 
 }

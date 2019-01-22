@@ -44,15 +44,12 @@ import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import sun.management.resources.agent;
 
-public class PassengerEngine implements MobsimEngine, DepartureHandler {
+public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfoProvider{
 	private static final Logger LOGGER = Logger.getLogger(PassengerEngine.class);
 
 	private final String mode;
@@ -66,6 +63,8 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 
 	private final AdvanceRequestStorage advanceRequestStorage;
 	private final AwaitingPickupStorage awaitingPickupStorage;
+
+	private final List<TripInfo> pendingRequests = new ArrayList<>() ;
 
 	public PassengerEngine(String mode, EventsManager eventsManager, PassengerRequestCreator requestCreator,
 			VrpOptimizer optimizer, Network network, PassengerRequestValidator requestValidator) {
@@ -96,6 +95,15 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 	@Override
 	public void doSimStep(double time) {
 		// for all offers, delete those that are not confirmed within confirmation time (garbage collection)
+
+		if ( ((int) time) % 60==0 ){
+			for( TripInfo pendingRequest : this.pendingRequests ){
+				// do precise computation
+				this.eventsManager.processEvent( new PersonInformationEvent(time, personId, message) );
+			}
+			this.pendingRequests.clear();
+		}
+
 	}
 
 	@Override
@@ -108,7 +116,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 		// (1) fill out TripInfo
 		// (2) keep handle so that passenger can accept, or not-confirmed request is eventually deleted again.  Also see doSimStet(...) ;
 
-		Gbl.assertIf( interpretation==TimeInterpretation.departure );
+		Gbl.assertIf( interpretation== TimeInterpretation.departure );
 		Link pickupLink = FacilitiesUtils.decideOnLink( fromFacility, network );
 		Link dropoffLink = FacilitiesUtils.decideOnLink( toFacility, network ) ;
 		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
@@ -118,59 +126,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 		// yyyy we think that it is possible to remove parameter MobsimPassengerAgent from this method. kai/gregor, jan'19
 
 		// generating the TripInfo object that will be returned to the potential passenger:
-		TripInfo info = new TripInfo(){
-			@Override public Facility getPickupLocation(){
-				return new Facility(){
-					@Override public Id<Link> getLinkId(){
-						return pickupLink.getId() ;
-					}
-					@Override public Coord getCoord(){
-						throw new RuntimeException( "not implemented" );
-					}
-					@Override public Map<String, Object> getCustomAttributes(){
-						throw new RuntimeException( "not implemented" );
-					}
-				}
-			}
-			@Override public double getExpectedBoardingTime(){
-				return request.getEarliestStartTime() ;
-			}
-			@Override public Facility getDropoffLocation(){
-				return new Facility(){
-					@Override public Map<String, Object> getCustomAttributes(){
-						throw new RuntimeException( "not implemented" );
-					}
-					@Override public Coord getCoord(){
-						throw new RuntimeException( "not implemented" );
-					}
-					@Override public Id<Link> getLinkId(){
-						return dropoffLink.getId() ;
-					}
-				};
-			}
-			@Override public double getExpectedTravelTime(){
-				throw new RuntimeException( "not implemented" );
-			}
-			@Override
-			public double getMonetaryPrice(){
-				throw new RuntimeException( "not implemented" );
-			}
-			@Override public Map<String, String> getAdditionalAttributes(){
-				return null ;
-			}
-			@Override public String getMode(){
-				return TransportMode.drt ;
-			}
-			@Override public void accept(){
-				// this is the handle by which the passenger can accept.  This would, we think, easiest go to a container that keeps track of unconfirmed
-				// offers.  We cannot say if advanceRequestStorage is the correct container for this, probably not and you will need yet another one.
-				advanceRequestStorage.accept(...) ;
-			}
-			@Override public double getLatestDecisionTime(){
-				// we currently allow only one time step to make the decision:
-				return now+1 ;
-			}
-		}
+		TripInfo info = new DrtTripInfo( pickupLink, request, dropoffLink, now );
 		// wrap into list and return:
 		List list = new ArrayList<>() ;
 		list.add(info) ;
@@ -180,8 +136,10 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 	/**
 	 * This is to register an advance booking. The method is called when, in reality, the request is made.
 	 */
-	public boolean prebookTrip(double now, MobsimPassengerAgent passenger, Id<Link> fromLinkId, Id<Link> toLinkId,
-			double departureTime) {
+	private boolean prebookTrip( double now, MobsimPassengerAgent passenger, Id<Link> fromLinkId, Id<Link> toLinkId,
+					    double departureTime ) {
+		// suggestion to make this private: only possible through the getTripInfos channel.  Could be called from "accept" method in there.
+
 		if (departureTime <= now) {
 			throw new IllegalStateException("This is not a call ahead");
 		}
@@ -196,7 +154,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> fromLinkId) {
-		if (!agent.getMode().equals(mode)) {
+		if (!agent.getMode().equals(mode )) {
 			return false;
 		}
 
@@ -312,5 +270,80 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 		passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());
 		passenger.endLegAndComputeNextState(now);
 		internalInterface.arrangeNextAgentState(passenger);
+	}
+
+	private class DrtTripInfo implements TripInfo, CanBeAccepted {
+		private final Link pickupLink;
+		private final PassengerRequest request;
+		private final Link dropoffLink;
+		private final double now;
+
+		public DrtTripInfo( Link pickupLink, PassengerRequest request, Link dropoffLink, double now ){
+			this.pickupLink = pickupLink;
+			this.request = request;
+			this.dropoffLink = dropoffLink;
+			this.now = now;
+		}
+
+		@Override public Facility getPickupLocation(){
+			return new Facility(){
+				@Override public Id<Link> getLinkId(){
+					return pickupLink.getId() ;
+				}
+				@Override public Coord getCoord(){
+					throw new RuntimeException( "not implemented" );
+				}
+				@Override public Map<String, Object> getCustomAttributes(){
+					throw new RuntimeException( "not implemented" );
+				}
+			} ;
+		}
+
+		@Override public double getExpectedBoardingTime(){
+			return request.getEarliestStartTime() ;
+		}
+
+		@Override public Facility getDropoffLocation(){
+			return new Facility(){
+				@Override public Map<String, Object> getCustomAttributes(){
+					throw new RuntimeException( "not implemented" );
+				}
+				@Override public Coord getCoord(){
+					throw new RuntimeException( "not implemented" );
+				}
+				@Override public Id<Link> getLinkId(){
+					return dropoffLink.getId() ;
+				}
+			};
+		}
+
+		@Override public double getExpectedTravelTime(){
+			throw new RuntimeException( "not implemented" );
+		}
+
+		@Override public double getMonetaryPrice(){
+			throw new RuntimeException( "not implemented" );
+		}
+
+		@Override public Map<String, String> getAdditionalAttributes(){
+			return null ;
+		}
+
+		@Override public String getMode(){
+			return TransportMode.drt ;
+		}
+
+		@Override public TripInfo accept(){
+			// this is the handle by which the passenger can accept.  This would, we think, easiest go to a container that keeps track of unconfirmed
+			// offers.  We cannot say if advanceRequestStorage is the correct container for this, probably not and you will need yet another one.
+
+			pendingRequests.add( this) ;
+
+			return this ;
+		}
+		@Override public double getLatestDecisionTime(){
+			// we currently allow only one time step to make the decision:
+			return now +1 ;
+		}
 	}
 }
