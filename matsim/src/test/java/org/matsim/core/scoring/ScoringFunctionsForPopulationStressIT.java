@@ -39,11 +39,15 @@ public class ScoringFunctionsForPopulationStressIT {
 		EventsManager events = EventsUtils.createEventsManager(config);
 		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
 		ScoringFunctionFactory throwingScoringFunctionFactory = new ThrowingScoringFunctionFactory();
+		EventsToActivities e2acts = new EventsToActivities(controlerListenerManager);
+		EventsToLegs e2legs = new EventsToLegs(scenario.getNetwork());
+		EventsToLegsAndActivities e2legsActs = new EventsToLegsAndActivities(e2legs, e2acts);
+		events.addHandler(e2legsActs);
 		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
 				controlerListenerManager,
 				events,
-				new EventsToActivities(controlerListenerManager, events),
-				new EventsToLegs(scenario.getNetwork(), events),
+				e2acts,
+				e2legs,
 				scenario.getPopulation(),
 				throwingScoringFunctionFactory
 		);
@@ -175,11 +179,16 @@ public class ScoringFunctionsForPopulationStressIT {
 				};
 			}
 		};
+		EventsToActivities e2acts = new EventsToActivities(controlerListenerManager);
+		EventsToLegs e2legs = new EventsToLegs(scenario.getNetwork());
+		EventsToLegsAndActivities e2legsActs = new EventsToLegsAndActivities(e2legs, e2acts);
+		events.addHandler(e2legsActs);
+
 		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
 				controlerListenerManager,
 				events,
-				new EventsToActivities(controlerListenerManager, events),
-				new EventsToLegs(scenario.getNetwork(), events),
+				e2acts,
+				e2legs,
 				scenario.getPopulation(),
 				scoringFunctionFactory
 		);
@@ -316,8 +325,8 @@ public class ScoringFunctionsForPopulationStressIT {
 		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
 				controlerListenerManager,
 				events,
-				new EventsToActivities(controlerListenerManager, events),
-				new EventsToLegs(scenario.getNetwork(), events),
+				new EventsToActivities(controlerListenerManager),
+				new EventsToLegs(scenario.getNetwork()),
 				scenario.getPopulation(),
 				scoringFunctionFactory
 		);
