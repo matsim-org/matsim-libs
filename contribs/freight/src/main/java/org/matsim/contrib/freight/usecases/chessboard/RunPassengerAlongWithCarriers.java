@@ -22,7 +22,7 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.SumScoringFunction;
 
-public class RunPassengerAlongWithCarriers {
+final class RunPassengerAlongWithCarriers {
 
     public static void main(String[] args) {
 
