@@ -139,7 +139,7 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 		}
 
 		StringBuilder builder = new StringBuilder();
-		String ColumnNamesList = "vehicleID" + "\t" + "time" + "\t" + "occ" + "\t" + "dist_m" + "\t" + "actualTaskType";
+		String ColumnNamesList = "vehicleID" + "," + "time" + "," + "occ" + "," + "dist_m" + "," + "actualTaskType" + "," + "x"  + "," + "y" + ","+ "tt_sec"+ ","+"v_meter_sec" ;
 
 		builder.append(ColumnNamesList + "\n");
 
