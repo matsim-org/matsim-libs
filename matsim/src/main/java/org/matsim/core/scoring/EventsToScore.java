@@ -30,6 +30,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.ControlerListenerManagerImpl;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 import javax.inject.Inject;
@@ -79,6 +80,7 @@ public final class EventsToScore {
 						bind(ControlerListenerManagerImpl.class).asEagerSingleton();
 						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
 						bind(EventsManager.class).toInstance(eventsManager);
+						bind(EventsManagerModule.EventHandlerRegistrator.class).asEagerSingleton();
 					}
 				});
 		return injector.getInstance(EventsToScore.class);
@@ -98,6 +100,7 @@ public final class EventsToScore {
 						bind(ControlerListenerManagerImpl.class).asEagerSingleton();
 						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
 						bind(EventsManager.class).toInstance(eventsManager);
+						bind(EventsManagerModule.EventHandlerRegistrator.class).asEagerSingleton();
 					}
 				});
 		return injector.getInstance(EventsToScore.class);
