@@ -19,32 +19,11 @@
 
 package vwExamples.utils.DrtTrajectoryAnalyzer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -60,9 +39,11 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vsp.ev.EvUnits;
+import org.matsim.vsp.ev.data.ElectricFleet;
+import org.matsim.vsp.ev.data.ElectricVehicle;
 
-
-
+import java.util.*;
 
 
 /**
@@ -90,18 +71,16 @@ public class MyDynModeTrajectoryStats
 	private final Network network;
 	private final Fleet fleet;
 	private String sep = ",";
-	
-	
+	private final ElectricFleet electricFleet;
 
-	
 
-	public MyDynModeTrajectoryStats(Network network, EventsManager events, DrtConfigGroup drtCfg, Fleet fleet) {
+	public MyDynModeTrajectoryStats(Network network, EventsManager events, DrtConfigGroup drtCfg, Fleet fleet, ElectricFleet electricFleet) {
 		this.fleet = fleet;
 		this.mode = drtCfg.getMode();
 		this.network = network;
 		events.addHandler(this);
 		maxcap = DynModeTripsAnalyser.findMaxCap(fleet);
-		
+		this.electricFleet = electricFleet;
 				
 	}
 	
@@ -170,8 +149,9 @@ public class MyDynModeTrajectoryStats
 			
 			double tt = Double.NaN;;
 			double v_meterPerSec = Double.NaN;
-			
-			String line = (vehicleID +sep+ acutalTime +sep+ occupancy +sep+ dist +sep+ actualTaskType +sep+ x  +sep+ y+ sep +tt + sep + v_meterPerSec);
+			Id<ElectricVehicle> evId = Id.create(vid, ElectricVehicle.class);
+			double currentSoc = EvUnits.J_to_kWh(electricFleet.getElectricVehicles().get(evId).getBattery().getSoc());
+			String line = (vehicleID + sep + acutalTime + sep + occupancy + sep + dist + sep + actualTaskType + sep + x + sep + y + sep + tt + sep + v_meterPerSec + sep + currentSoc);
 			
 			if (vehicleTrajectoryMap.containsKey(vid))
 			{
