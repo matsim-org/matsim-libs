@@ -86,6 +86,9 @@ extends ReflectiveConfigGroup
 	public enum NonScenarioVehicles { ignore, abort }
 	private static final String NON_SCENARIO_VEHICLES = "nonScenarioVehicles";
 	private NonScenarioVehicles nonScenarioVehicles = NonScenarioVehicles.abort;
+
+	private static final String USE_FRACTIONAL_APPROACH = "isUsingFractionalApproach";
+	private boolean isUsingFractionalApproach = true;
 	
 	@Deprecated // should be phased out.  kai, oct'18
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED if source of the HBEFA road type is set to "+HbefaRoadTypeSource.fromFile +". It maps from input road types to HBEFA 3.1 road type strings";
@@ -125,6 +128,8 @@ extends ReflectiveConfigGroup
 			+ NonScenarioVehicles.values()
 			+ " Should eventually be extended by 'getVehiclesFromMobsim'."
 	 ;
+
+	private static final String USE_FRACTIONAL_APPROACH_CMT = "if true, the original fractional method from Hülsmann et al (2011) will be used to calculate emission factors";
 
 
 	@Override
@@ -168,6 +173,8 @@ extends ReflectiveConfigGroup
 		map.put(HANDLE_HIGH_AVERAGE_SPEEDS, HANDLE_HIGH_AVERAGE_SPEEDS_CMT);
 		
 		map.put(NON_SCENARIO_VEHICLES, NON_SCENARIO_VEHICLES_CMT);
+
+        map.put(USE_FRACTIONAL_APPROACH, USE_FRACTIONAL_APPROACH_CMT);
 
 		return map;
 	}
@@ -379,4 +386,15 @@ extends ReflectiveConfigGroup
 	public void setNonScenarioVehicles(NonScenarioVehicles nonScenarioVehicles) {
 		this.nonScenarioVehicles = nonScenarioVehicles;
 	}
+
+    @StringGetter(USE_FRACTIONAL_APPROACH)
+    public boolean isUsingFractionalApproach() {
+        return isUsingFractionalApproach;
+    }
+
+    @StringSetter(USE_FRACTIONAL_APPROACH)
+    public void setUsingFractionalApproach(boolean useFractionalApproach) {
+        this.isUsingFractionalApproach = useFractionalApproach;
+    }
+
 }
