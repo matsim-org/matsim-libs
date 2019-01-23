@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-//import org.matsim.contrib.av.robotaxi.run.RunRobotaxiExample;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -33,13 +32,15 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
+//import org.matsim.contrib.av.robotaxi.run.RunRobotaxiExample;
+
 /**
  * @author axer
  */
 public class RunDrtScenario2Batch {
 	// Class to create the controller
 	public static Controler createControler(Config config, boolean otfvis) {
-		return DrtControlerCreator.createControler(config, otfvis);
+		return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
 	}
 
 	public static void main(String[] args) {

@@ -40,7 +40,7 @@ public class RunDrtExampleSimulation {
     public static Controler createControler(Config config, boolean otfvis) {
         config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
         config.checkConsistency();
-        return DrtControlerCreator.createControler(config, otfvis);
+        return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
     }
 
     public static void main(String[] args) {

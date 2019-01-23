@@ -63,8 +63,7 @@ public class RunBSWOBDrtScenarioWithVariableStopTimes {
 
         config.controler().setOutputDirectory(inputPath + "../output/" + runId);
 
-
-        Controler controler = DrtControlerCreator.createControler(config, false);
+        Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config, false);
 
         //Define the stop times below
         double pickupTimePerPassenger = 1.0;
@@ -72,8 +71,10 @@ public class RunBSWOBDrtScenarioWithVariableStopTimes {
         double fixedStopTime = 5.0;
 
         //these two lines enable the variable stop time
-        BusStopDurationCalculator busStopDurationCalculator = new LinearBusStopDurationCalculator(pickupTimePerPassenger, dropoffTimePerPassenger, fixedStopTime);
-        controler.addOverridingQSimModule(new VariableDurationBusStopQSimModule(busStopDurationCalculator));
+        BusStopDurationCalculator busStopDurationCalculator = new LinearBusStopDurationCalculator(
+                pickupTimePerPassenger, dropoffTimePerPassenger, fixedStopTime);
+        controler.addOverridingQSimModule(
+                new VariableDurationBusStopQSimModule(drt.getMode(), busStopDurationCalculator));
 
         controler.run();
     }

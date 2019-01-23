@@ -20,6 +20,9 @@
 
 package vwExamples.peoplemoverVWExample;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
@@ -32,10 +35,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vsp.ev.EvConfigGroup;
 import org.matsim.vsp.ev.temperature.TemperatureChangeConfigGroup;
-import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 
-import java.util.HashMap;
-import java.util.Map;
+import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 
 /**
  * @author axer
@@ -44,10 +45,10 @@ import java.util.Map;
 public class RunDrtScenarioBatchBS_eDRT {
 
     // Class to create the controller
-//	public static Controler createControler(Config config, boolean otfvis) {
+	//	public static Controler createControlerWithSingleModeDrt(Config config, boolean otfvis) {
 //		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
 //		config.checkConsistency();
-//		return DrtControlerCreator.createControler(config, otfvis);
+	//		return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
 //	}
 
     public static void main(String[] args) {
@@ -147,7 +148,7 @@ public class RunDrtScenarioBatchBS_eDRT {
 
         // Define the MATSim Controler
         // Based on the prepared configuration this part creates a controller that runs
-        //Controler controler = createControler(config, otfvis);
+		//Controler controler = createControlerWithSingleModeDrt(config, otfvis);
 
         Controler controler = electric.edrt.run.RunEDrtScenario.createControler(config);
 
