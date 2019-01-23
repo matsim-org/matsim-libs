@@ -19,8 +19,9 @@
 package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTrackerImpl;
+import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
 import org.matsim.contrib.dvrp.tracker.TaskTrackers;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
@@ -41,11 +42,12 @@ public interface VrpLegFactory {
 		return leg;
 	}
 
-	static VrpLeg createWithOnlineTracker(String mode, Vehicle vehicle, VrpOptimizerWithOnlineTracking optimizer,
+	static VrpLeg createWithOnlineTracker(String mode, Vehicle vehicle, OnlineTrackerListener onlineTrackerListener,
 			MobsimTimer timer) {
 		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
 		VrpLeg leg = new VrpLeg(mode, driveTask.getPath());
-		TaskTrackers.initOnlineDriveTaskTracking(vehicle, leg, optimizer, timer);
+		TaskTrackers.initOnlineDriveTaskTracking(vehicle, leg,
+				new OnlineDriveTaskTrackerImpl(vehicle, leg, onlineTrackerListener, timer));
 		return leg;
 	}
 }

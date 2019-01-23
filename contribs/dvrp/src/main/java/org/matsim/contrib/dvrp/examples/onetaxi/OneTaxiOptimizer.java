@@ -60,8 +60,8 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 
 	private final Vehicle vehicle;// we have only one vehicle
 
-	public static final double PICKUP_DURATION = 120;
-	public static final double DROPOFF_DURATION = 60;
+	private static final double PICKUP_DURATION = 120;
+	private static final double DROPOFF_DURATION = 60;
 
 	@Inject
 	public OneTaxiOptimizer(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,

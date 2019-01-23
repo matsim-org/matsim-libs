@@ -99,7 +99,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 		private void updateStats(Collection<Entry> vEntries, DetourLinksProvider detourLinksProvider) {
 			addSet(detourLinksProvider.getDetourLinksSet(), vEntries.size());
-			updateInsertionStats(vEntries, detourLinksProvider.getFilteredInsertions());
+			updateInsertionStats(detourLinksProvider.getFilteredInsertions());
 		}
 
 		private void addSet(DetourLinksSet set, int vEntriesCount) {
@@ -110,8 +110,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 			vEntriesStats.addValue(vEntriesCount);
 		}
 
-		private void updateInsertionStats(Collection<Entry> vEntries,
-				Map<Entry, List<Insertion>> filteredInsertionsPerVehicle) {
+		private void updateInsertionStats(Map<Entry, List<Insertion>> filteredInsertionsPerVehicle) {
 			int insertionCount = 0;
 			int insertionAtEndCount = 0;
 			int insertionAtEndToEmptyCount = 0;

@@ -51,7 +51,7 @@ public class TaxiSimulationConsistencyChecker implements AfterMobsimListener {
 				} else {
 					Logger.getLogger(getClass())
 							.warn("Taxi request not performed. Request time:\t" + Time.writeTime(
-									tr.getEarliestStartTime()) + "\tPassenger:\t" + tr.getPassenger().getId());
+									tr.getEarliestStartTime()) + "\tPassenger:\t" + tr.getPassengerId());
 				}
 			}
 		}
