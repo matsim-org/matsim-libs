@@ -406,11 +406,6 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 
 	private static Facility getFacility(Activity activity, Scenario scenario) {
 		ActivityFacility fac = scenario.getActivityFacilities().getFacilities().get( activity.getFacilityId() ) ;
-		if ( fac != null ) {
-			return fac ;
-		} else {
-			return new ActivityWrapperFacility( activity ) ;
-		}
+		return ( fac != null) ? fac : new ActivityWrapperFacility( activity );
 	}
-
 }
