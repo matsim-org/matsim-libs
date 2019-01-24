@@ -42,6 +42,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
 import static org.matsim.contrib.emissions.types.HbefaTrafficSituation.*;
+import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod.*;
 
 
 /**
@@ -257,7 +258,7 @@ public final class WarmEmissionAnalysisModule {
 		double freeFlowSpeed_kmh = freeVelocity * 3.6;
 		double averageSpeed_kmh = linkLength_km / travelTime_h;
 		
-		double ef_gpkm;
+		double ef_gpkm = 0.0;
 
 		if(averageSpeed_kmh <= 0.0){
 			throw new RuntimeException("Average speed has been calculated to 0.0 or a negative value. Aborting...");
@@ -273,7 +274,7 @@ public final class WarmEmissionAnalysisModule {
 
 		HbefaTrafficSituation trafficSituation;
 		double percentStopGo_km = 0;
-		if (!ecg.isUsingFractionalApproach()) {
+		if (ecg.getEmissionsComputationMethod() == AverageSpeed) {
 			trafficSituation = getTrafficSituation(efkey, averageSpeed_kmh, freeFlowSpeed_kmh);
 			efkey.setHbefaTrafficSituation(trafficSituation);
 		}
@@ -283,7 +284,7 @@ public final class WarmEmissionAnalysisModule {
 
 			efkey.setHbefaComponent(warmPollutant);
 
-			if (ecg.isUsingFractionalApproach()) {
+			if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
 				efkey.setHbefaTrafficSituation(STOPANDGO);
 				percentStopGo_km = getFractionStopAndGo(vehicleId, freeFlowSpeed_kmh, averageSpeed_kmh, vehicleInformationTuple, efkey);
 				double efStopGo_gpkm = getEf(vehicleId, vehicleInformationTuple, efkey).getWarmEmissionFactor();
@@ -294,17 +295,19 @@ public final class WarmEmissionAnalysisModule {
 				ef_gpkm = (percentFreeFlow_km * efFreeFlow_gpkm) + (percentStopGo_km * efStopGo_gpkm);
 
 
-			} else {
+			} else if (ecg.getEmissionsComputationMethod() == AverageSpeed){
 				ef_gpkm = getEf(vehicleId, vehicleInformationTuple, efkey).getWarmEmissionFactor();
 			}
 
 			generatedEmissions = linkLength_km * ef_gpkm;
 			warmEmissionsOfEvent.put(warmPollutant, generatedEmissions);
 		}
-		if (ecg.isUsingFractionalApproach()) {
+		if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
 			incrementCountersFractional(linkLength_km, percentStopGo_km);
 		}
-		else incrementCountersAverage(efkey.getHbefaTrafficSituation(), linkLength_km);
+		else if (ecg.getEmissionsComputationMethod() == AverageSpeed) {
+			incrementCountersAverage(efkey.getHbefaTrafficSituation(), linkLength_km);
+		}
 
 //		vehicleIdSet.add(personId);
 		return warmEmissionsOfEvent;

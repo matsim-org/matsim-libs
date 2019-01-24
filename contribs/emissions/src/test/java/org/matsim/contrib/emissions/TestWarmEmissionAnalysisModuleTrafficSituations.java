@@ -42,6 +42,7 @@ import org.matsim.vehicles.VehiclesFactory;
 import java.util.*;
 
 import static org.matsim.contrib.emissions.types.HbefaTrafficSituation.*;
+import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod.*;
 
 
 /**
@@ -107,7 +108,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
         EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
-		ecg.setUsingFractionalApproach(false);
+		ecg.setEmissionsComputationMethod(AverageSpeed);
 
 		WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(
 				avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);

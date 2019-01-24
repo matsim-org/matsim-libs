@@ -40,6 +40,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
+import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod.*;
 
 /**
  * @author julia
@@ -543,7 +544,7 @@ public class TestWarmEmissionAnalysisModule {
 	@Test
 	public void testCounters1fractional(){
 		setUp();
-		weam.getEcg().setUsingFractionalApproach(true);
+		weam.getEcg().setEmissionsComputationMethod(StopAndGoFraction);
 		weam.reset();
 
 		/*
@@ -768,8 +769,8 @@ public class TestWarmEmissionAnalysisModule {
 	@Test
 	public void testCounters6(){
 		setUp();
-		weam.getEcg().setUsingFractionalApproach(true);
-		weam.reset();
+		weam.getEcg().setEmissionsComputationMethod(StopAndGoFraction);
+        weam.reset();
 
 		// case 1 - data in both tables -> use detailed
 		// free flow velocity inconsistent -> different value in table
@@ -898,7 +899,7 @@ public class TestWarmEmissionAnalysisModule {
 
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
-		ecg.setUsingFractionalApproach(false);
+        ecg.setEmissionsComputationMethod(AverageSpeed);
 
 		WarmEmissionAnalysisModuleParameter weamParameter
 				= new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);
@@ -927,7 +928,7 @@ public class TestWarmEmissionAnalysisModule {
 		Assert.assertEquals(message, rescaleF*numberOfWarmEmissions*avgPcFactorFf, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
 
 		///test the fractional approach with rescaling as well
-		ecg.setUsingFractionalApproach(true);
+        weam.getEcg().setEmissionsComputationMethod(StopAndGoFraction);
 		HandlerToTestEmissionAnalysisModules.reset();
 
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicleForAvgTable, dieselLink, linkLength /dieselFreeVelocity*3.6);
@@ -956,7 +957,7 @@ public class TestWarmEmissionAnalysisModule {
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
         EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
-		ecg.setUsingFractionalApproach(false);
+        ecg.setEmissionsComputationMethod(AverageSpeed);
 
 		WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(
 				avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);
