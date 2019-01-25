@@ -23,20 +23,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.TimeAllocationMutator;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -50,7 +44,7 @@ import java.net.URL;
  * and specifically dealing with the replanning strategies for the different
  * subpopulations. Two subpopulations are created:
  * <ol>
- * 		<li> <b>time</b> - agents who will use the {@link TimeAllocationMutator}
+ * 		<li> <b>time</b> - agents who will use the {@link TimeAllocationMutatorModule}
  * 			 strategy to replan and adapt their departure times; and
  * 		<li> <b>reroute</b> - agents who will use the {@link ReRoute}
  * 			 strategy to replan and adapt their routes.

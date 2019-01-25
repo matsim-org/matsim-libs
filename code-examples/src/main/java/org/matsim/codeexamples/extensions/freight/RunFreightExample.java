@@ -44,7 +44,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
-import javax.management.InvalidAttributeValueException;
 import java.net.URL;
 
 
@@ -105,7 +104,7 @@ public class RunFreightExample {
 
 		//create or laod the carrier(s) including assignment of vehicle types to the carrier(s)
 		Carriers carriers = new Carriers() ;
-		new CarrierPlanXmlReaderV2( carriers ).readURL( IOUtils.newUrl(scenarioUrl, "singleCarrier.xml" ) ) ;
+		new CarrierPlanXmlReaderV2( carriers ).readURL( IOUtils.newUrl(scenarioUrl, "singleCarrierFiveActivitiesWithoutRoutes.xml" ) ) ;
 
 		// assign vehicle types to the carriers
 		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehicleTypes ) ;
