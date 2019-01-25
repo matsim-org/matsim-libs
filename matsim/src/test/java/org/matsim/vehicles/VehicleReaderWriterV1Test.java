@@ -33,19 +33,40 @@ import org.matsim.vehicles.VehicleType.DoorOperationMode;
  */
 public class VehicleReaderWriterV1Test extends MatsimTestCase {
 
-  private static final String TESTXML  = "testVehicles.xml";
+	private static final String TESTXML  = "testVehicles.xml";
+	private static final String TESTXML2  = "testVehicles_v2.xml";
 
   private final Id<Vehicle> id23 = Id.create("23", Vehicle.class);
   private final Id<Vehicle> id42 = Id.create("42", Vehicle.class);
   private final Id<Vehicle> id42_23 = Id.create(" 42  23", Vehicle.class); //indeed this should be double blank in the middle but due to collapse this is only one blank
-  
+
+	// todo: test for minimal vehicle (was kann man alles weglassen)?
+	//
+
 	public void testBasicParser() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		VehicleReaderV1 reader = new VehicleReaderV1(vehicles);
+		MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
-		
+
 		checkContent(vehicles);
-	}		
+	}
+
+	public void testBasicParser_v2() {
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+		MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
+		reader.readFile(this.getPackageInputDirectory() + TESTXML2);
+
+		checkContent(vehicles);
+
+		// @KMT: please put in real assertions
+		for( Map.Entry<Id<VehicleType>, VehicleType> entry : vehicles.getVehicleTypes().entrySet() ){
+			System.err.println( "key=" + entry.getKey() + "; val=" + entry.getValue() ) ;
+			for( Map.Entry<String, Object> entry2 : entry.getValue().getAttributes().getAsMap().entrySet() ){
+				System.err.println( "key=" + entry2.getKey() + "; val=" + entry2.getValue() ) ;
+			}
+		}
+
+	}
 
 	public void testWriter() throws FileNotFoundException, IOException {
 		
@@ -53,7 +74,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		
 		//read it
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		VehicleReaderV1 reader = new VehicleReaderV1(vehicles);
+		MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		//write it
 		VehicleWriterV1 writer = new VehicleWriterV1(vehicles);
@@ -61,7 +82,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		assertTrue(new File(outfileName).exists()); 
 		//read it again
 		vehicles = VehicleUtils.createVehiclesContainer();
-		reader = new VehicleReaderV1(vehicles);
+		reader = new MatsimVehicleReader(vehicles);
 		reader.readFile(this.getOutputDirectory() + "testOutputVehicles.xml");
 		
 		//check it, check it, check it now!

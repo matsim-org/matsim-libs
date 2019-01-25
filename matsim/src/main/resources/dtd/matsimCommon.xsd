@@ -137,4 +137,16 @@ xml:lang="en">
   </xs:restriction>
 </xs:simpleType>
 
+
+	<xs:complexType name="attributeType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="name" type="xs:string"/>
+				<xs:attribute name="class" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+
+
 </xs:schema>

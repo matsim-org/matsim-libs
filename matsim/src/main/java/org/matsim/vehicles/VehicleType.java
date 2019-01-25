@@ -20,12 +20,13 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 
 /**
  * @author dgrether
  */
-public interface VehicleType {
+public interface VehicleType extends Attributable{
 	
 	public enum DoorOperationMode {serial, parallel}
 
