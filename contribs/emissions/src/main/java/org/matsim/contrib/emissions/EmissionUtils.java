@@ -80,6 +80,11 @@ public final class EmissionUtils {
 			Map<Id<T>, Map<String, Double>> warmEmissions,
 			Map<Id<T>, Map<String, Double>> coldEmissions) {
 
+		if (warmEmissions == null)
+			return coldEmissions;
+		if (coldEmissions == null)
+			return warmEmissions;
+
 		Map<Id<T>, Map<String, Double>> totalEmissions = warmEmissions.entrySet().stream().map(entry -> {
 			Id<T> id = entry.getKey();
 			Map<String, Double> warmEm = entry.getValue();

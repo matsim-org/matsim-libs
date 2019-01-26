@@ -52,7 +52,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 			+ "(passengers'/customers' perspective)";
 
 	public static final String STOP_DURATION = "stopDuration";
-	static final String STOP_DURATION_EXP = "Bus stop duration.";
+	static final String STOP_DURATION_EXP = "Bus stop duration. Must be positive.";
 
 	public static final String MAX_WAIT_TIME = "maxWaitTime";
 	static final String MAX_WAIT_TIME_EXP = "Max wait time for the bus to come (optimisation constraint).";
@@ -122,7 +122,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
-	@PositiveOrZero
+	@Positive
 	private double stopDuration = Double.NaN;// seconds
 
 	@PositiveOrZero

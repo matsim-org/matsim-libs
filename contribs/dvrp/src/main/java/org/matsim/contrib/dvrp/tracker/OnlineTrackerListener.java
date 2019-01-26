@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,25 +15,26 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.dynagent;
+package org.matsim.contrib.dvrp.tracker;
+
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Vehicle;
 
 /**
- * endTime is not subject to change
- * 
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public class StaticDynActivity extends AbstractDynActivity {
-	private final double endTime;
+public interface OnlineTrackerListener {
+	OnlineTrackerListener NO_LISTENER = (vehicle, link) -> {
+	};
 
-	public StaticDynActivity(String activityType, double endTime) {
-		super(activityType);
-		this.endTime = endTime;
-	}
-
-	@Override
-	public double getEndTime() {
-		return endTime;
-	}
+	/**
+	 * Notifies that the next link was entered.
+	 *
+	 * @param vehicle
+	 * @param nextLink
+	 */
+	void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink);
 }

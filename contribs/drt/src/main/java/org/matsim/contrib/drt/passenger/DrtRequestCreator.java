@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.routing.DrtRoute;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -33,19 +32,16 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
 
-import com.google.inject.Inject;
-
 /**
  * @author michalm
  */
 public class DrtRequestCreator implements PassengerRequestCreator {
-	private final DrtConfigGroup drtCfg;
+	private final String mode;
 	private final EventsManager eventsManager;
 	private final MobsimTimer timer;
 
-	@Inject
-	public DrtRequestCreator(DrtConfigGroup drtCfg, EventsManager eventsManager, MobsimTimer timer) {
-		this.drtCfg = drtCfg;
+	public DrtRequestCreator(String mode, EventsManager eventsManager, MobsimTimer timer) {
+		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.timer = timer;
 	}
@@ -61,10 +57,10 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		double latestArrivalTime = departureTime + drtRoute.getTravelTime();
 
 		eventsManager.processEvent(
-				new DrtRequestSubmittedEvent(timer.getTimeOfDay(), drtCfg.getMode(), id, passenger.getId(),
-						fromLink.getId(), toLink.getId(), drtRoute.getDirectRideTime(), drtRoute.getDistance()));
+				new DrtRequestSubmittedEvent(timer.getTimeOfDay(), mode, id, passenger.getId(), fromLink.getId(),
+						toLink.getId(), drtRoute.getDirectRideTime(), drtRoute.getDistance()));
 
-		return new DrtRequest(id, passenger, fromLink, toLink, departureTime, latestDepartureTime, latestArrivalTime,
-				submissionTime);
+		return new DrtRequest(id, passenger.getId(), mode, fromLink, toLink, departureTime, latestDepartureTime,
+				latestArrivalTime, submissionTime);
 	}
 }

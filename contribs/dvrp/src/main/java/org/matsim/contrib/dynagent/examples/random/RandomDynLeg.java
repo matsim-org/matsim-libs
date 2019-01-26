@@ -21,8 +21,10 @@ package org.matsim.contrib.dynagent.examples.random;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dynagent.DriverDynLeg;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.vehicles.Vehicle;
@@ -39,10 +41,6 @@ public class RandomDynLeg implements DriverDynLeg {
 		currentLinkId = fromLinkId;
 
 		doRandomChoice();
-	}
-
-	@Override
-	public void finalizeAction(double now) {
 	}
 
 	@Override

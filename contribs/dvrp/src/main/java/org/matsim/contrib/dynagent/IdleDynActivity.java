@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.vrpagent;
+package org.matsim.contrib.dynagent;
 
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dynagent.AbstractDynActivity;
+import java.util.function.DoubleSupplier;
 
-public class VrpActivity extends AbstractDynActivity {
-	private final StayTask stayTask;
+/**
+ * endTime is not subject to change
+ *
+ * @author michalm
+ */
+public final class IdleDynActivity implements DynActivity {
+	private final String activityType;
+	private final DoubleSupplier endTimeSupplier;
 
-	public VrpActivity(String activityType, StayTask stayTask) {
-		super(activityType);
-		this.stayTask = stayTask;
+	public IdleDynActivity(String activityType, double endTime) {
+		this(activityType, () -> endTime);
+	}
+
+	public IdleDynActivity(String activityType, DoubleSupplier endTimeSupplier) {
+		this.activityType = activityType;
+		this.endTimeSupplier = endTimeSupplier;
 	}
 
 	@Override
-	public double getEndTime() {
-		return stayTask.getEndTime();
+	public final String getActivityType() {
+		return activityType;
+	}
+
+	@Override
+	public final double getEndTime() {
+		return endTimeSupplier.getAsDouble();
+	}
+
+	@Override
+	public final void doSimStep(double now) {
 	}
 }

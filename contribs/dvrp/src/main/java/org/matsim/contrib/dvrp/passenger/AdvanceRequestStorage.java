@@ -33,7 +33,7 @@ class AdvanceRequestStorage {
 	private final Map<Id<Person>, Queue<PassengerRequest>> advanceRequests = new HashMap<>();
 
 	public void storeAdvanceRequest(PassengerRequest request) {
-		Id<Person> passengerId = request.getPassenger().getId();
+		Id<Person> passengerId = request.getPassengerId();
 		Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passengerId);
 
 		if (passengerAdvReqs == null) {

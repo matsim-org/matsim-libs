@@ -54,7 +54,7 @@ public class RunDrtExampleIT {
 		@Override
 		public Set<String> validateRequest(PassengerRequest request) {
 			validateRequestWasCalled = true;
-			return request.getPassenger().getId().toString().equalsIgnoreCase("12052000_12052000_100") ?
+			return request.getPassengerId().toString().equalsIgnoreCase("12052000_12052000_100") ?
 					Collections.singleton("REJECT_12052000_12052000_100") :
 					Collections.emptySet();
 		}
@@ -89,7 +89,7 @@ public class RunDrtExampleIT {
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		Controler controler = DrtControlerCreator.createControler(config, false);
+		Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config, false);
 
 		PersonIdValidator personIdValidator = new PersonIdValidator();
 

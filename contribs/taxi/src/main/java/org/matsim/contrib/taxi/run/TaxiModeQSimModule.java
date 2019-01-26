@@ -123,13 +123,12 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 					@Override
 					public TaxiActionCreator get() {
 						PassengerEngine passengerEngine = getModalInstance(PassengerEngine.class);
-						TaxiOptimizer optimizer = getModalInstance(TaxiOptimizer.class);
-						return new TaxiActionCreator(passengerEngine, taxiCfg, optimizer, timer, dvrpCfg);
+						return new TaxiActionCreator(passengerEngine, taxiCfg, timer, dvrpCfg);
 					}
 				}).asEagerSingleton();
 
-		bindModal(PassengerRequestCreator.class).toProvider(
-				modalProvider(getter -> new TaxiRequestCreator(getter.getModal(SubmittedTaxiRequestsCollector.class))))
+		bindModal(PassengerRequestCreator.class).toProvider(modalProvider(
+				getter -> new TaxiRequestCreator(getMode(), getter.getModal(SubmittedTaxiRequestsCollector.class))))
 				.asEagerSingleton();
 
 		bindModal(VrpOptimizer.class).to(modalKey(TaxiOptimizer.class));

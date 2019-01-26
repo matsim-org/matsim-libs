@@ -20,8 +20,6 @@
 
 package org.matsim.contrib.emissions.utils;
 
-import java.util.*;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -33,12 +31,15 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.emissions.EmissionUtils;
+import org.matsim.contrib.emissions.types.Pollutant;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /*
@@ -544,7 +545,6 @@ public class TestEmissionUtils {
 		pop = sc.getPopulation();
 		populationFactory = pop.getFactory();
 		pollsFromEU = new HashSet<>(Arrays.asList("CO", "CO2(total)", "FC", "HC", "NMHC", "NOx", "NO2","PM", "SO2"));
-		;
 		nullPointerEx = false;
 	}
 	
@@ -561,7 +561,7 @@ public class TestEmissionUtils {
 		pop.addPerson(p6);
 
 		//empty emissions map
-		Map<Id<Person>, SortedMap<String, Double>> finalMap = EmissionUtils.setNonCalculatedEmissionsForPopulation(pop, totalEmissions, pollsFromEU );
+		Map<Id<Person>, SortedMap<String, Double>> finalMap = EmissionUtils.setNonCalculatedEmissionsForPopulation(pop, totalEmissions, pollsFromEU);
 		
 		//check: all persons added to the population are contained in the finalMap
 		Assert.assertTrue("the calculated map should contain person 5", finalMap.containsKey(idp5));
@@ -777,17 +777,27 @@ public class TestEmissionUtils {
 		Assert.assertEquals(totalEmissionsFilled.get(link24id).get(so), .0,  MatsimTestUtils.EPSILON);
 		
 	}
-	
+
+	public static Map<Pollutant, Double> createEmissions() {
+		return Arrays.stream(Pollutant.values())
+				.collect(Collectors.toMap(p -> p, p -> Math.random()));
+	}
+
+	public static Map<Pollutant, Double> createEmissionsWithFixedValue(double value) {
+		return Arrays.stream(Pollutant.values())
+				.collect(Collectors.toMap(p -> p, p -> value));
+	}
+
 	private void addLinksToNetwork(Scenario sc) {
 		//intern method to set up a network with nodes and links
-		Network network = (Network) sc.getNetwork();
+		Network network = sc.getNetwork();
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("node1", Node.class), new Coord(.0, .0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("node2", Node.class), new Coord(.0, 1000.));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("node3", Node.class), new Coord(1000., .0));
 		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("node4", Node.class), new Coord(1000., 1000.));
 		final Node fromNode = node1;
 		final Node toNode = node2;
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create("link12", Link.class), fromNode, toNode, 1000., 20., (double) 3600, (double) 2 );
 		final Node fromNode1 = node1;
 		final Node toNode1 = node3; //w/o orig id and type

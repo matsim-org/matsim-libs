@@ -21,7 +21,6 @@ package org.matsim.contrib.dvrp.tracker;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -38,7 +37,7 @@ public class OnlineDriveTaskTrackerImpl implements OnlineDriveTaskTracker {
 	private final DriveTask driveTask;
 	private final VrpLeg vrpDynLeg;
 
-	private final VrpOptimizerWithOnlineTracking optimizer;
+	private final OnlineTrackerListener onlineTrackerListener;
 	private final MobsimTimer timer;
 
 	private VrpPath path;
@@ -46,12 +45,12 @@ public class OnlineDriveTaskTrackerImpl implements OnlineDriveTaskTracker {
 	private double linkEnterTime;
 	private double[] remainingTTs;// excluding the current link
 
-	public OnlineDriveTaskTrackerImpl(Vehicle vehicle, VrpLeg vrpDynLeg, VrpOptimizerWithOnlineTracking optimizer,
+	public OnlineDriveTaskTrackerImpl(Vehicle vehicle, VrpLeg vrpDynLeg, OnlineTrackerListener onlineTrackerListener,
 			MobsimTimer timer) {
 		this.vehicle = vehicle;
 		this.driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
 		this.vrpDynLeg = vrpDynLeg;
-		this.optimizer = optimizer;
+		this.onlineTrackerListener = onlineTrackerListener;
 		this.timer = timer;
 
 		initForPath(driveTask.getPath());
@@ -84,7 +83,7 @@ public class OnlineDriveTaskTrackerImpl implements OnlineDriveTaskTracker {
 	public void movedOverNode(Link nextLink) {
 		currentLinkIdx++;
 		linkEnterTime = timer.getTimeOfDay();
-		optimizer.vehicleEnteredNextLink(vehicle, nextLink);
+		onlineTrackerListener.vehicleEnteredNextLink(vehicle, nextLink);
 	}
 
 	/**

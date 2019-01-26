@@ -140,12 +140,4 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 			}
 		}
 	}
-
-	@Override
-	public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
-		// scheduler.updateTimeline(vehicle);
-
-		// TODO we may here possibly decide whether or not to reoptimize
-		// if (delays/speedups encountered) {requiresReoptimization = true;}
-	}
 }

@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -129,15 +128,6 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 
 	protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask) {
 		return !destinationKnown && newCurrentTask.getTaxiTaskType() == TaxiTaskType.OCCUPIED_DRIVE;
-	}
-
-	@Override
-	public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
-		// TODO do we really need this??? timeline is updated always before reoptimisation
-		scheduler.updateTimeline(vehicle);// TODO comment this out...
-
-		// TODO we may here possibly decide whether or not to reoptimize
-		// if (delays/speedups encountered) {requiresReoptimization = true;}
 	}
 
 	protected void setRequiresReoptimization(boolean requiresReoptimization) {
