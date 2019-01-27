@@ -104,13 +104,11 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 //	private boolean passLinkEventsToPerson = false;
 	
 	private Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
-	
-	@Inject(optional=true)
-	TripRouter tripRouter;
+	private TripRouter tripRouter;
 
 	@Inject
 	ScoringFunctionsForPopulation( ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
-						 Population population, ScoringFunctionFactory scoringFunctionFactory ) {
+						 Population population, ScoringFunctionFactory scoringFunctionFactory, TripRouter tripRouter) {
 		controlerListenerManager.addControlerListener(new IterationStartsListener() {
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
@@ -119,6 +117,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		});
 		this.population = population;
 		this.scoringFunctionFactory = scoringFunctionFactory;
+		this.tripRouter = tripRouter;
 		eventsManager.addHandler(this);
 		eventsToActivities.addActivityHandler(this);
 		eventsToLegs.addLegHandler(this);
