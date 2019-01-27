@@ -49,8 +49,7 @@ public class ScoringFunctionsForPopulationStressIT {
 				e2acts,
 				e2legs,
 				scenario.getPopulation(),
-				throwingScoringFunctionFactory,
-				null
+				throwingScoringFunctionFactory
 		);
 		controlerListenerManager.fireControlerIterationStartsEvent(0);
 		events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4));
@@ -191,8 +190,7 @@ public class ScoringFunctionsForPopulationStressIT {
 				e2acts,
 				e2legs,
 				scenario.getPopulation(),
-				scoringFunctionFactory,
-				null
+				scoringFunctionFactory
 		);
 		controlerListenerManager.fireControlerIterationStartsEvent(0);
 		events.initProcessing();
@@ -330,8 +328,7 @@ public class ScoringFunctionsForPopulationStressIT {
 				new EventsToActivities(controlerListenerManager),
 				new EventsToLegs(scenario.getNetwork()),
 				scenario.getPopulation(),
-				scoringFunctionFactory,
-				null
+				scoringFunctionFactory
 		);
 		controlerListenerManager.fireControlerIterationStartsEvent(0);
 		int MAX = 10;

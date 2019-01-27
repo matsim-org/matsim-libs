@@ -80,7 +80,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	private final Population population;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	
-	private final StageActivityTypes stageActivityTypes;
+	private StageActivityTypes stageActivityTypes;
 
 	/*
 	 * Replaced TreeMaps with (Linked)HashMaps since they should perform much better. For 'partialScores'
@@ -104,11 +104,12 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 //	private boolean passLinkEventsToPerson = false;
 	
 	private Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
+	@Inject(optional = true)
 	private TripRouter tripRouter;
 
 	@Inject
 	ScoringFunctionsForPopulation( ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
-						 Population population, ScoringFunctionFactory scoringFunctionFactory, TripRouter tripRouter) {
+						 Population population, ScoringFunctionFactory scoringFunctionFactory) {
 		controlerListenerManager.addControlerListener(new IterationStartsListener() {
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
@@ -117,29 +118,12 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		});
 		this.population = population;
 		this.scoringFunctionFactory = scoringFunctionFactory;
-		this.tripRouter = tripRouter;
 		eventsManager.addHandler(this);
 		eventsToActivities.addActivityHandler(this);
 		eventsToLegs.addLegHandler(this);
 //		if ( passLinkEventsToPerson ) {
 			eventsManager.addHandler(this.vehicles2Drivers);
 //		}
-//		stageActivityTypes = tripRouter.getStageActivityTypes() ;
-//		stageActivityTypes = new StageActivityTypesImpl( new String [] {PtConstants.TRANSIT_ACTIVITY_TYPE} ) ;
-		if (this.tripRouter !=null ) {
-			this.stageActivityTypes = this.tripRouter.getStageActivityTypes() ;
-		} else {
-			this.stageActivityTypes = new StageActivityTypes() {
-				@Override public boolean isStageActivity( final String activityType ) {
-					if ( activityType.contains( "_interaction" ) ) {
-						return true;
-					} else {
-						return false;
-					}
-				}
-			};
-			// yyyyyy this is really terrible, needs to come from global data structure instead.
-		}
 	}
 
 	private void init() {
@@ -149,6 +133,26 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 			this.partialScores.put(person.getId(), new TDoubleArrayList());
 			this.tripRecords.put(person.getId(), PopulationUtils.createPlan());
 		}
+	}
+
+	private StageActivityTypes getStageActivities() {
+		if (this.stageActivityTypes == null) {
+			if (this.tripRouter !=null ) {
+				this.stageActivityTypes = this.tripRouter.getStageActivityTypes() ;
+			} else {
+				this.stageActivityTypes = new StageActivityTypes() {
+					@Override public boolean isStageActivity( final String activityType ) {
+						if ( activityType.contains( "_interaction" ) ) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+				};
+				// yyyyyy this is really terrible, needs to come from global data structure instead.
+			}
+		}
+		return this.stageActivityTypes;
 	}
 	
 
@@ -234,12 +238,12 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		if ( plan!= null ) {
 			if ( !plan.getPlanElements().isEmpty() ) {
 				// plan != null, meaning we already have pre-existing material
-				if (this.stageActivityTypes.isStageActivity( activity.getType() ) ) {
+				if (getStageActivities().isStageActivity( activity.getType() ) ) {
 					// we are at a stage activity.  Don't do anything ; activity will be added later
 				} else {
 					// we are at a real activity, which is not the first one we see for this agent.  output the trip ...
 					plan.addActivity( activity );
-					final List<Trip> trips = TripStructureUtils.getTrips( plan, this.stageActivityTypes);
+					final List<Trip> trips = TripStructureUtils.getTrips( plan, getStageActivities());
 					// yyyyyy should in principle only return one trip.  There are, however, situations where
 					// it returns two trips, in particular in conjunction with the minibus raptor.  Possibly
 					// something that has to do with not alternativing between acts and legs.
