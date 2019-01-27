@@ -105,7 +105,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	
 	private Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
 	
-//	@Inject(optional=true)
+	@Inject(optional=true)
 	TripRouter tripRouter;
 
 	@Inject
