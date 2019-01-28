@@ -1,13 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <groupId>org.matsim</groupId>
-    <artifactId>contrib</artifactId>
-    <version>0.11.0-SNAPSHOT</version>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.matsim.contrib</groupId>
-  <artifactId>noise</artifactId>
-  <name>noise</name>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>org.matsim</groupId>
+        <artifactId>contrib</artifactId>
+        <version>0.11.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.matsim.contrib</groupId>
+    <artifactId>noise</artifactId>
+    <name>noise</name>
     <build>
         <plugins>
             <plugin>
@@ -15,43 +16,18 @@
             </plugin>
         </plugins>
     </build>
-  <dependencies>
-  	<dependency>
-  		<groupId>org.matsim.contrib</groupId>
-  		<artifactId>analysis</artifactId>
-  		<version>0.11.0-SNAPSHOT</version>
-  	</dependency>
-    <dependency>
-        <groupId>mil.nga.sf</groupId>
-        <artifactId>sf-geojson</artifactId>
-        <version>2.0.0</version>
-    </dependency>
-      <!-- https://mvnrepository.com/artifact/org.geotools/gt-geojson -->
-      <dependency>
-          <groupId>org.geotools</groupId>
-          <artifactId>gt-geojson</artifactId>
-          <version>14.0</version>
-      </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.matsim.contrib</groupId>
+            <artifactId>analysis</artifactId>
+            <version>0.11.0-SNAPSHOT</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.geotools/gt-geojson -->
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-geojson</artifactId>
+            <version>14.0</version>
+        </dependency>
 
-  </dependencies>
-
-    <repositories>
-        <repository>
-            <id>locationtech-releases</id>
-            <url>https://repo.locationtech.org/content/groups/releases</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>jts-snapshots</id>
-            <url>https://repo.locationtech.org/content/repositories/jts-snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+    </dependencies>
 </project>
