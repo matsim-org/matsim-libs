@@ -214,6 +214,6 @@ public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProv
 	
 	@Override
 	public ActivityEndRescheduler getActivityRescheduler() {
-		return this.internalInterface;
+		return this.internalInterface.getMobsim();
 	}
 }

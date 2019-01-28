@@ -23,7 +23,6 @@
 package org.matsim.contrib.av.intermodal.router;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -51,7 +50,7 @@ public class VariableAccessTransitRouterModule extends AbstractModule {
         		scheduleFile = vaconfig.getTransitScheduleFileURL(getConfig().getContext());
         	}
         	
-        	new TransitScheduleReader(scenario2).readURL(scheduleFile);
+        	new TransitScheduleReader(scenario2).readURL(scheduleFile );
         	bind(MainModeIdentifier.class).to(VariableAccessMainModeIdentifier.class);
 			bind(TransitSchedule.class).annotatedWith(Names.named("variableAccess")).toInstance(scenario2.getTransitSchedule());
             bind(TransitRouter.class).annotatedWith(Names.named("variableAccess")).toProvider(VariableAccessTransitRouterImplFactory.class);

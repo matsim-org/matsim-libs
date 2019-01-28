@@ -22,18 +22,14 @@
  */
 package org.matsim.contrib.drt.run;
 
-import java.util.Arrays;
 import java.util.function.Function;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
-import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
-import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -72,8 +68,8 @@ public final class DrtControlerCreator {
 	 * @param otfvis
 	 * @return
 	 */
-	public static Controler createControler(Config config, boolean otfvis) {
-		return createControler(config, otfvis, cfg -> {
+	public static Controler createControlerWithSingleModeDrt(Config config, boolean otfvis) {
+		return createControlerWithSingleModeDrt(config, otfvis, cfg -> {
 			Scenario scenario = createScenarioWithDrtRouteFactory(cfg);
 			ScenarioUtils.loadScenario(scenario);
 			return scenario;
@@ -88,7 +84,8 @@ public final class DrtControlerCreator {
 	 * @param scenarioLoader
 	 * @return
 	 */
-	public static Controler createControler(Config config, boolean otfvis, Function<Config, Scenario> scenarioLoader) {
+	public static Controler createControlerWithSingleModeDrt(Config config, boolean otfvis,
+			Function<Config, Scenario> scenarioLoader) {
 		DrtConfigs.adjustDrtConfig(DrtConfigGroup.get(config), config.planCalcScore());
 
 		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
@@ -97,23 +94,15 @@ public final class DrtControlerCreator {
 		Scenario scenario = scenarioLoader.apply(config);
 
 		Controler controler = new Controler(scenario);
-		addDrtAsSingleDvrpModeToControler(controler);
+		controler.addOverridingModule(new DrtModule());
+		controler.addOverridingModule(new DvrpModule());
+		controler.configureQSimComponents(
+				DvrpQSimComponents.activateModes(DrtConfigGroup.get(controler.getConfig()).getMode()));
+
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
 		return controler;
 	}
 
-	public static void addDrtAsSingleDvrpModeToControler(Controler controler) {
-		addDrtWithoutDvrpModuleToControler(controler);
-		controler.addOverridingModule(DvrpModule.createModule(DrtConfigGroup.get(controler.getConfig()).getMode(),
-				Arrays.asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class,
-						ParallelPathDataProvider.class)));
-	}
-
-	public static void addDrtWithoutDvrpModuleToControler(Controler controler) {
-		controler.addQSimModule(new DrtQSimModule());
-		controler.addOverridingModule(new DrtModule());
-		controler.addOverridingModule(new DrtAnalysisModule());
-	}
 }

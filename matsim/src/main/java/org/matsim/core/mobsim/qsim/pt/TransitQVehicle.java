@@ -21,11 +21,12 @@
 package org.matsim.core.mobsim.qsim.pt;
 
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 
 
-public class TransitQVehicle extends QVehicle implements TransitVehicle {
+public class TransitQVehicle extends QVehicleImpl implements TransitVehicle {
 
 	private TransitStopHandler stopHandler;
 

@@ -24,21 +24,17 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
+import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
-import org.matsim.contrib.taxi.run.Taxi;
+import org.matsim.contrib.dynagent.IdleDynActivity;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
-import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-
-import com.google.inject.Inject;
 
 /**
  * @author michalm
@@ -50,21 +46,18 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 
 	private final PassengerEngine passengerEngine;
 	private final VrpLegFactory legFactory;
-	private final double pickupDuration;
 
-	@Inject
-	public TaxiActionCreator(@Taxi PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg,
-			TaxiOptimizer optimizer, MobsimTimer timer, DvrpConfigGroup dvrpCfg) {
+	public TaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg, MobsimTimer timer,
+			DvrpConfigGroup dvrpCfg) {
 		this(passengerEngine, taxiCfg.isOnlineVehicleTracker() ?
-						v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v, optimizer, timer) :
-						v -> VrpLegFactory.createWithOfflineTracker(dvrpCfg.getMobsimMode(), v, timer),
-				taxiCfg.getPickupDuration());
+				v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.getMobsimMode(), v,
+						OnlineTrackerListener.NO_LISTENER, timer) :
+				v -> VrpLegFactory.createWithOfflineTracker(dvrpCfg.getMobsimMode(), v, timer));
 	}
 
-	public TaxiActionCreator(PassengerEngine passengerEngine, VrpLegFactory legFactory, double pickupDuration) {
+	public TaxiActionCreator(PassengerEngine passengerEngine, VrpLegFactory legFactory) {
 		this.passengerEngine = passengerEngine;
 		this.legFactory = legFactory;
-		this.pickupDuration = pickupDuration;
 	}
 
 	@Override
@@ -78,7 +71,7 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 			case PICKUP:
 				final TaxiPickupTask pst = (TaxiPickupTask)task;
 				return new SinglePassengerPickupActivity(passengerEngine, dynAgent, pst, pst.getRequest(),
-						pickupDuration, PICKUP_ACTIVITY_TYPE);
+						PICKUP_ACTIVITY_TYPE);
 
 			case DROPOFF:
 				final TaxiDropoffTask dst = (TaxiDropoffTask)task;
@@ -86,7 +79,7 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 						DROPOFF_ACTIVITY_TYPE);
 
 			case STAY:
-				return new VrpActivity(STAY_ACTIVITY_TYPE, (TaxiStayTask)task);
+				return new IdleDynActivity(STAY_ACTIVITY_TYPE, task::getEndTime);
 
 			default:
 				throw new IllegalStateException();

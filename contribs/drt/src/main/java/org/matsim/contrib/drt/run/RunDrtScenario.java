@@ -31,7 +31,7 @@ public class RunDrtScenario {
 	public static void run(String configFile, boolean otfvis) {
 		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
-		DrtControlerCreator.createControler(config, otfvis).run();
+		DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis).run();
 	}
 
 	public static void main(String[] args) {

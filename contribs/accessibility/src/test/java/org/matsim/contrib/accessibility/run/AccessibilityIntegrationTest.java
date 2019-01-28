@@ -67,6 +67,8 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.testcases.MatsimTestUtils;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 /**
  * I can't say how similar or different to {@link AccessibilityIntegrationTest} this one here is.  kai, feb'17
  * 
@@ -312,6 +314,8 @@ public class AccessibilityIntegrationTest {
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		
 		acg.setTileSize_m(100);
+		
+		acg.setEnvelope(new Envelope(0, 200, 0, 200));
 		
 		acg.setMeasuringPointsFacilities(measuringPoints);
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromFacilitiesObject);

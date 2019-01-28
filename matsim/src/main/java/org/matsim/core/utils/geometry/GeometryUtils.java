@@ -3,18 +3,17 @@
  */
 package org.matsim.core.utils.geometry;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.vividsolutions.jts.geom.*;
 import org.geotools.geometry.jts.GeometryBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.opengis.feature.simple.SimpleFeature;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author kainagel
@@ -94,5 +93,19 @@ public class GeometryUtils {
 		}
 		return new GeometryFactory().createPolygon(coordinates);
 	}
-	
+
+	public static Point getRandomPointInFeature( Random rnd, SimpleFeature ft ) {
+		Gbl.assertNotNull(ft );
+		Point p = null;
+		double x, y;
+		// generate a random point until a point inside the feature geometry is found
+		do {
+			x = ft.getBounds().getMinX() + rnd.nextDouble() * (ft.getBounds().getMaxX() - ft.getBounds().getMinX());
+			y = ft.getBounds().getMinY() + rnd.nextDouble() * (ft.getBounds().getMaxY() - ft.getBounds().getMinY());
+			p = MGC.xy2Point(x, y);
+		} while ( ! (((Geometry) ft.getDefaultGeometry()).contains(p)) );
+		return p;
+	}
+
+
 }

@@ -143,7 +143,7 @@ public class NetworkChangeEventsEngineTest {
 		}
 
 		@Override
-		public Netsim getMobsim() {
+		public QSim getMobsim() {
 			return this.qsim;
 		}
 
@@ -160,9 +160,6 @@ public class NetworkChangeEventsEngineTest {
 			return null;
 		}
 
-		@Override
-		public void rescheduleActivityEnd(MobsimAgent agent) {
-		}
 	}
 
 }

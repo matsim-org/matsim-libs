@@ -116,6 +116,13 @@
 			<version>1.7.21</version>
 		</dependency> 
 		
+		<dependency>
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim-examples</artifactId>
+			<version>0.11.0-SNAPSHOT</version>
+		
+		</dependency>
+		
 	</dependencies>
 	 	
   <repositories>

@@ -31,6 +31,13 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 public class DrtConfigs {
 	private static final Logger LOGGER = Logger.getLogger(DrtControlerCreator.class);
 
+	public static void adjustMultiModeDrtConfig(MultiModeDrtConfigGroup multiModeDrtCfg,
+			PlanCalcScoreConfigGroup planCalcScoreCfg) {
+		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
+			DrtConfigs.adjustDrtConfig(drtCfg, planCalcScoreCfg);
+		}
+	}
+
 	public static void adjustDrtConfig(DrtConfigGroup drtCfg, PlanCalcScoreConfigGroup planCalcScoreCfg) {
 		DrtStageActivityType drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
 		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased)) {

@@ -38,7 +38,7 @@ import java.util.stream.Stream;
  *
  */
 public interface Schedule {
-	public enum ScheduleStatus {
+	enum ScheduleStatus {
 		UNPLANNED, PLANNED, STARTED, COMPLETED;
 	};
 

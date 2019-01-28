@@ -82,7 +82,7 @@ import org.matsim.vehicles.Vehicle;
  * @author mrieser
  */
  public class Dijkstra implements LeastCostPathCalculator {
- 	// yyyy I don't think that we should make this class publicly inheritable; as we know, will eventually lead
+ 	// yyyyyy I don't think that we should make this class publicly inheritable; as we know, will eventually lead
 	// to problems.  kai, feb'18
 
 	private final static Logger log = Logger.getLogger(Dijkstra.class);

@@ -19,11 +19,16 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Request;
@@ -39,24 +44,29 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
 public class PassengerEngine implements MobsimEngine, DepartureHandler {
-	private final String mode;
+	private static final Logger LOGGER = Logger.getLogger(PassengerEngine.class);
 
-	private EventsManager eventsManager;
-	private InternalInterface internalInterface;
+	private final String mode;
+	private final EventsManager eventsManager;
 	private final PassengerRequestCreator requestCreator;
 	private final VrpOptimizer optimizer;
 	private final Network network;
+	private final PassengerRequestValidator requestValidator;
+
+	private InternalInterface internalInterface;
 
 	private final AdvanceRequestStorage advanceRequestStorage;
 	private final AwaitingPickupStorage awaitingPickupStorage;
+	private final Map<Id<Request>, MobsimPassengerAgent> passengersByRequestId = new HashMap<>();
 
 	public PassengerEngine(String mode, EventsManager eventsManager, PassengerRequestCreator requestCreator,
-			VrpOptimizer optimizer, Network network) {
+			VrpOptimizer optimizer, Network network, PassengerRequestValidator requestValidator) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.requestCreator = requestCreator;
 		this.optimizer = optimizer;
 		this.network = network;
+		this.requestValidator = requestValidator;
 
 		advanceRequestStorage = new AdvanceRequestStorage();
 		awaitingPickupStorage = new AwaitingPickupStorage();
@@ -92,9 +102,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 			throw new IllegalStateException("This is not a call ahead");
 		}
 
-		PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime, now);
-		optimizer.requestSubmitted(request);
-
+		PassengerRequest request = createValidateAndSubmitRequest(passenger, fromLinkId, toLinkId, departureTime, now);
 		if (!request.isRejected()) {
 			advanceRequestStorage.storeAdvanceRequest(request);
 		}
@@ -109,20 +117,18 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 		}
 
 		MobsimPassengerAgent passenger = (MobsimPassengerAgent)agent;
-
 		Id<Link> toLinkId = passenger.getDestinationLinkId();
 		double departureTime = now;
-
 		internalInterface.registerAdditionalAgentOnLink(passenger);
 
-		PassengerRequest request = advanceRequestStorage.retrieveAdvanceRequest(passenger, fromLinkId, toLinkId, now);
-
-		if (request == null) {// this is an immediate request
-			request = createRequest(passenger, fromLinkId, toLinkId, departureTime, now);
-			optimizer.requestSubmitted(request);
+		PassengerRequest prebookedRequest = advanceRequestStorage.retrieveAdvanceRequest(passenger, fromLinkId,
+				toLinkId, now);
+		if (prebookedRequest == null) {// this is an immediate request
+			//TODO what if it was already rejected while prebooking??
+			createValidateAndSubmitRequest(passenger, fromLinkId, toLinkId, departureTime, now);
 		} else {
-			PassengerPickupActivity awaitingPickup = awaitingPickupStorage.retrieveAwaitingPickup(request);
-
+			passengersByRequestId.put(prebookedRequest.getId(), passenger);
+			PassengerPickupActivity awaitingPickup = awaitingPickupStorage.retrieveAwaitingPickup(prebookedRequest);
 			if (awaitingPickup != null) {
 				awaitingPickup.notifyPassengerIsReadyForDeparture(passenger, now);
 			}
@@ -135,12 +141,18 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 		return true;//!request.isRejected();
 	}
 
-	public void rejectRequest(PassengerRequest request, double now) {
-		request.getPassenger().setStateToAbort(now);
-		internalInterface.arrangeNextAgentState(request.getPassenger());
-	}
+	// ================ REQUESTS HANDLING
 
-	// ================ REQUESTS CREATION
+	private PassengerRequest createValidateAndSubmitRequest(MobsimPassengerAgent passenger, Id<Link> fromLinkId,
+			Id<Link> toLinkId, double departureTime, double now) {
+		PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime, now);
+		rejectInvalidRequest(request);
+		if (!request.isRejected()) {
+			passengersByRequestId.put(request.getId(), passenger);
+			optimizer.requestSubmitted(request);//optimizer can also reject request if cannot handle it
+		}
+		return request;
+	}
 
 	private long nextId = 0;
 
@@ -155,15 +167,34 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 		return request;
 	}
 
+	private void rejectInvalidRequest(PassengerRequest request) {
+		Set<String> violations = requestValidator.validateRequest(request);
+
+		if (!violations.isEmpty()) {
+			String causes = violations.stream().collect(Collectors.joining(", "));
+			LOGGER.warn("Request: "
+					+ request.getId()
+					+ "of mode: "
+					+ mode
+					+ " will not be served. The agent will get stuck. Causes: "
+					+ causes);
+			request.setRejected(true);
+			eventsManager.processEvent(
+					new PassengerRequestRejectedEvent(request.getSubmissionTime(), mode, request.getId(), causes));
+			eventsManager.processEvent(new PersonStuckEvent(request.getSubmissionTime(), request.getPassengerId(),
+					request.getFromLink().getId(), request.getMode()));
+		}
+	}
+
 	// ================ PICKUP / DROPOFF
 
 	public boolean pickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			PassengerRequest request, double now) {
-		MobsimPassengerAgent passenger = request.getPassenger();
 		Id<Link> linkId = driver.getCurrentLinkId();
+		MobsimPassengerAgent passenger = passengersByRequestId.get(request.getId());
 
-		if (passenger.getCurrentLinkId() != linkId || passenger.getState() != State.LEG
-				|| !passenger.getMode().equals(mode)) {
+		if (passenger.getCurrentLinkId() != linkId || passenger.getState() != State.LEG || !passenger.getMode()
+				.equals(mode)) {
 			awaitingPickupStorage.storeAwaitingPickup(request, pickupActivity);
 			return false;// wait for the passenger
 		}
@@ -185,8 +216,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 	}
 
 	public void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now) {
-		MobsimPassengerAgent passenger = request.getPassenger();
-
+		MobsimPassengerAgent passenger = passengersByRequestId.remove(request.getId());
 		MobsimVehicle mobVehicle = driver.getVehicle();
 		mobVehicle.removePassenger(passenger);
 		passenger.setVehicle(null);

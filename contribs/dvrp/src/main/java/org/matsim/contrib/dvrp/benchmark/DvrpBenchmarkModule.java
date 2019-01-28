@@ -18,48 +18,27 @@
 
 package org.matsim.contrib.dvrp.benchmark;
 
-import java.util.Collection;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.DvrpModeQSimModule;
+import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
-import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
 /**
  * @author michalm
  */
 public class DvrpBenchmarkModule extends AbstractModule {
-	private final DvrpModeQSimModule qsimModule;
-
-	public static DvrpBenchmarkModule createModule(String mode, Collection<Class<? extends MobsimListener>> listeners) {
-		return new DvrpBenchmarkModule(new DvrpModeQSimModule.Builder(mode).addListeners(listeners).build());
-	}
-
-	public DvrpBenchmarkModule(DvrpModeQSimModule qsimModule) {
-		this.qsimModule = qsimModule;
-	}
-
-	@Provides
-	@Singleton
-	public QSimComponentsConfig provideQSimComponentsConfig(Config config) {
-		QSimComponentsConfig components = new QSimComponentsConfig();
-		new StandardQSimComponentConfigurator(config).configure(components);
-		DynActivityEngineModule.configureComponents(components);
-		qsimModule.configureComponents(components);
-		return components;
-	}
-
 	@Override
 	public void install() {
+		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
+				.toInstance(VehicleUtils.getDefaultVehicleType());
 		install(new DvrpBenchmarkTravelTimeModule());// fixed travel times
 
 		bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))
@@ -67,6 +46,11 @@ public class DvrpBenchmarkModule extends AbstractModule {
 				.asEagerSingleton();
 
 		installQSimModule(new DynActivityEngineModule());
-		installQSimModule(qsimModule);
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
+			}
+		});
 	}
 }

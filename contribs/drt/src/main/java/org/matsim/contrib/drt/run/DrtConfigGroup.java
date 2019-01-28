@@ -33,12 +33,12 @@ import javax.validation.constraints.PositiveOrZero;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-import org.matsim.contrib.dvrp.run.HasMode;
+import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-public class DrtConfigGroup extends ReflectiveConfigGroup implements HasMode {
+public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 
 	public static final String GROUP_NAME = "drt";
 
@@ -52,7 +52,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements HasMode {
 			+ "(passengers'/customers' perspective)";
 
 	public static final String STOP_DURATION = "stopDuration";
-	static final String STOP_DURATION_EXP = "Bus stop duration.";
+	static final String STOP_DURATION_EXP = "Bus stop duration. Must be positive.";
 
 	public static final String MAX_WAIT_TIME = "maxWaitTime";
 	static final String MAX_WAIT_TIME_EXP = "Max wait time for the bus to come (optimisation constraint).";
@@ -111,7 +111,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements HasMode {
 	static final String PLOT_CUST_STATS_EXP = "Writes out detailed DRT customer stats in each iteration. True by default.";
 
 	public static final String PRINT_WARNINGS = "plotDetailedWarnings";
-	static final String PRINT_WARNINGS_EXP = "Prints detailed warnings for DRT customers that cannot be served or routed. Default is false.";
+	static final String PRINT_WARNINGS_EXP = "Prints detailed warnings for DRT customers that cannot be served or routed. Default is true.";
 
 	public static final String NUMBER_OF_THREADS = "numberOfThreads";
 	static final String NUMBER_OF_THREADS_EXP =
@@ -122,7 +122,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements HasMode {
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
-	@PositiveOrZero
+	@Positive
 	private double stopDuration = Double.NaN;// seconds
 
 	@PositiveOrZero

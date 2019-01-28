@@ -26,7 +26,7 @@ import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.router.util.TravelTime;
 
-public class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
+final class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 	
 	private Network network;
 	

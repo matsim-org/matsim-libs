@@ -49,9 +49,9 @@ public class MultimodalQSimFactory implements Provider<Mobsim> {
 	@Override
 	public Mobsim get() {
 		return new QSimBuilder(scenario.getConfig()) //
-				.useDefaults()
-				.addQSimModule(new MultiModalQSimModule(multiModalTravelTimes))
-				.configureComponents(MultiModalQSimModule::configureComponents) //
-				.build(scenario, eventsManager);
+									   .useDefaults()
+									   .addQSimModule(new MultiModalQSimModule(multiModalTravelTimes))
+									   .configureQSimComponents(MultiModalQSimModule::configureComponents ) //
+									   .build(scenario, eventsManager);
 	}
 }

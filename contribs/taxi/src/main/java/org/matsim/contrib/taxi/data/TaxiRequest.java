@@ -21,28 +21,24 @@ package org.matsim.contrib.taxi.data;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 /**
  * @author michalm
  */
 public class TaxiRequest implements PassengerRequest {
 	public enum TaxiRequestStatus {
-		// INACTIVE, // invisible to the dispatcher (ARTIFICIAL STATE!)
 		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
 		PLANNED, // planned - included into one of the routes
-
-		// we have to carry out the request
-		PICKUP, RIDE, DROPOFF,
-
-		PERFORMED, //
-		REJECTED, // rejected by the DISPATCHER
-		// CANCELLED, // canceled by the CUSTOMER
-		;
+		PICKUP, // being picked up
+		RIDE, // on board
+		DROPOFF, // being dropped off
+		PERFORMED, // completed
+		REJECTED; // rejected by the DISPATCHER
 	}
 
 	private final Id<Request> id;
@@ -50,20 +46,23 @@ public class TaxiRequest implements PassengerRequest {
 	private final double earliestStartTime;
 
 	private boolean rejected = false;
-	
-	private final MobsimPassengerAgent passenger;
+
+	private final Id<Person> passengerId;
+	private final String mode;
+
 	private final Link fromLink;
 	private final Link toLink;
 
 	private TaxiPickupTask pickupTask;
 	private TaxiDropoffTask dropoffTask;
 
-	public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+	public TaxiRequest(Id<Request> id, Id<Person> passengerId, String mode, Link fromLink, Link toLink,
 			double earliestStartTime, double submissionTime) {
 		this.id = id;
 		this.submissionTime = submissionTime;
 		this.earliestStartTime = earliestStartTime;
-		this.passenger = passenger;
+		this.passengerId = passengerId;
+		this.mode = mode;
 		this.fromLink = fromLink;
 		this.toLink = toLink;
 	}
@@ -94,15 +93,21 @@ public class TaxiRequest implements PassengerRequest {
 	}
 
 	@Override
-	public MobsimPassengerAgent getPassenger() {
-		return passenger;
+	public Id<Person> getPassengerId() {
+		return passengerId;
 	}
-	
+
+	@Override
+	public String getMode() {
+		return mode;
+	}
+
 	@Override
 	public boolean isRejected() {
 		return rejected;
 	}
 
+	@Override
 	public void setRejected(boolean rejected) {
 		this.rejected = rejected;
 	}

@@ -28,15 +28,8 @@ import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnaly
 import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
 import org.matsim.contrib.emissions.roadTypeMapping.OsmHbefaMapping;
 import org.matsim.contrib.emissions.roadTypeMapping.VisumHbefaRoadTypeMapping;
-import org.matsim.contrib.emissions.types.ColdPollutant;
-import org.matsim.contrib.emissions.types.HbefaColdEmissionFactor;
-import org.matsim.contrib.emissions.types.HbefaColdEmissionFactorKey;
-import org.matsim.contrib.emissions.types.HbefaTrafficSituation;
-import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
-import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
-import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactor;
-import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
-import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.types.*;
+import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -47,8 +40,7 @@ import org.matsim.vehicles.Vehicles;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.matsim.contrib.emissions.utils.EmissionUtils.createIndexFromKey;
 
@@ -82,6 +74,12 @@ public class EmissionModule {
 
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
+
+	private Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
+
+
+	private Set<String> warmPollutants = new HashSet<>();
+	private Set<String> coldPollutants = new HashSet<>();
 
 	@Inject
 	public EmissionModule(final Scenario scenario, final EventsManager eventsManager) {
@@ -135,6 +133,7 @@ public class EmissionModule {
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
 		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
+		hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
 
 		if(emissionConfigGroup.isUsingDetailedEmissionCalculation()){
 			detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
@@ -165,9 +164,10 @@ public class EmissionModule {
 
 		loadRoadTypeMappings();
 
-		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, detailedHbefaWarmTable,
+		WarmEmissionAnalysisModuleParameter parameterObject =
+				new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, warmPollutants,
 				emissionConfigGroup);
-		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable,
+		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable, coldPollutants,
 				emissionConfigGroup);
 
 		warmEmissionHandler = new WarmEmissionHandler(vehicles,	network, parameterObject, eventsManager, emissionConfigGroup
@@ -216,7 +216,11 @@ public class EmissionModule {
 				
 				HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
 				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
-				key.setHbefaComponent(mapComponent2WarmPollutant(array[indexFromKey.get("Component")]));
+
+				String pollutant = array[indexFromKey.get("Component")];
+				warmPollutants.add(pollutant);
+				key.setHbefaComponent(pollutant);
+
 				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
 				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
 				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
@@ -249,7 +253,11 @@ public class EmissionModule {
 				
 				HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
 				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
-				key.setHbefaComponent(mapComponent2ColdPollutant(array[indexFromKey.get("Component")]));
+
+				String pollutant = array[indexFromKey.get("Component")];
+				coldPollutants.add(pollutant);
+				key.setHbefaComponent(pollutant);
+
 				key.setHbefaParkingTime(mapAmbientCondPattern2ParkingTime(array[indexFromKey.get("AmbientCondPattern")]));
 				key.setHbefaDistance(mapAmbientCondPattern2Distance(array[indexFromKey.get("AmbientCondPattern")]));
 				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
@@ -282,7 +290,11 @@ public class EmissionModule {
 
 				HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
 				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
-				key.setHbefaComponent(mapComponent2WarmPollutant(array[indexFromKey.get("Component")]));
+
+				String pollutant = array[indexFromKey.get("Component")];
+				warmPollutants.add(pollutant);
+				key.setHbefaComponent(pollutant);
+
 				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
 				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
 				HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
@@ -318,7 +330,11 @@ public class EmissionModule {
 				
 				HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
 				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
-				key.setHbefaComponent(mapComponent2ColdPollutant(array[indexFromKey.get("Component")]));
+
+				String pollutant = array[indexFromKey.get("Component")];
+				coldPollutants.add(pollutant);
+				key.setHbefaComponent(pollutant);
+
 				key.setHbefaParkingTime(mapAmbientCondPattern2ParkingTime(array[indexFromKey.get("AmbientCondPattern")]));
 				key.setHbefaDistance(mapAmbientCondPattern2Distance(array[indexFromKey.get("AmbientCondPattern")]));
 				HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
@@ -340,6 +356,8 @@ public class EmissionModule {
 		return hbefaColdTableDetailed;
 	}
 
+
+
 	private Integer mapAmbientCondPattern2Distance(String string) {
 		Integer distance;
 		String distanceString = string.split(",")[2];
@@ -359,32 +377,21 @@ public class EmissionModule {
 		}
 		return parkingTime;
 	}
-	
-	private WarmPollutant mapComponent2WarmPollutant(String string) {
-		WarmPollutant warmPollutant = null;
-		for(WarmPollutant wp : WarmPollutant.values()){
-			if(string.equals(wp.getText())) {
-                warmPollutant = wp;
-            }
-		}
-		return warmPollutant;
-	}
-	
-	private ColdPollutant mapComponent2ColdPollutant(String string) {
-		ColdPollutant coldPollutant = null;
-		for(ColdPollutant cp : ColdPollutant.values()){
-			if(string.equals(cp.getText())) {
-                coldPollutant = cp;
-            }
-		}
-		return coldPollutant;
-	}
+
 
 	private String mapString2HbefaRoadCategory(String string) {
 		String hbefaRoadCategory;
 		String[] parts = string.split("/");
 		hbefaRoadCategory = parts[0] + "/" + parts[1] + "/" + parts[2];
 		return hbefaRoadCategory;
+	}
+
+	private SortedSet<String> getCombinedPollutantList() {
+		SortedSet<String> distinct = new TreeSet<String>();
+		distinct.addAll(warmPollutants);
+		distinct.addAll(coldPollutants);
+		return distinct;
+
 	}
 
 	private HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {

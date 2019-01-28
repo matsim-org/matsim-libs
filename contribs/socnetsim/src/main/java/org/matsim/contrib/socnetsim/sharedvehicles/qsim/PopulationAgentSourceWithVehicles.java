@@ -37,7 +37,10 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -89,11 +92,14 @@ public class PopulationAgentSourceWithVehicles implements AgentSource {
 						}
 
 						final Id vehicleLink = findVehicleLink(p);
-						qsim.createAndParkVehicleOnLink(
-								VehicleUtils.getFactory().createVehicle(
-									vehicleId,
-									modeVehicleTypes.get(leg.getMode())),
-								vehicleLink);
+						final Vehicle basicVehicle = VehicleUtils.getFactory().createVehicle(
+								vehicleId,
+								modeVehicleTypes.get( leg.getMode() ) );
+						
+//						qsim.createAndParkVehicleOnLink( basicVehicle, vehicleLink);
+						QVehicle veh = new QVehicleImpl( basicVehicle ) ;
+						// yyyyyy better use the (new) QVehicleFactory. kai, nov'18
+						qsim.addParkedVehicle( veh, vehicleLink );
 					}
 				}
 			}

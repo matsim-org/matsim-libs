@@ -21,26 +21,15 @@ package org.matsim.contrib.drt.data;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 /**
  * @author michalm
  */
 public class DrtRequest implements PassengerRequest {
-
-	public enum DrtRequestStatus {
-		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
-		PLANNED, // planned - included into one of the routes
-		PICKUP, // being picked up
-		RIDE, // on board
-		DROPOFF, // being dropped off
-		PERFORMED, // completed
-		REJECTED; // rejected by the DISPATCHER
-	}
-
 	private final Id<Request> id;
 	private final double submissionTime;
 	private final double earliestStartTime;
@@ -49,22 +38,24 @@ public class DrtRequest implements PassengerRequest {
 
 	private boolean rejected = false;
 
-	private final MobsimPassengerAgent passenger;
+	private final Id<Person> passengerId;
+	private final String mode;
+
 	private final Link fromLink;
 	private final Link toLink;
 
 	private DrtStopTask pickupTask = null;
 	private DrtStopTask dropoffTask = null;
 
-	public DrtRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+	public DrtRequest(Id<Request> id, Id<Person> passengerId, String mode, Link fromLink, Link toLink,
 			double earliestStartTime, double latestStartTime, double latestArrivalTime, double submissionTime) {
 		this.id = id;
 		this.submissionTime = submissionTime;
 		this.earliestStartTime = earliestStartTime;
 		this.latestStartTime = latestStartTime;
 		this.latestArrivalTime = latestArrivalTime;
-
-		this.passenger = passenger;
+		this.passengerId = passengerId;
+		this.mode = mode;
 		this.fromLink = fromLink;
 		this.toLink = toLink;
 	}
@@ -98,6 +89,7 @@ public class DrtRequest implements PassengerRequest {
 		return rejected;
 	}
 
+	@Override
 	public void setRejected(boolean rejected) {
 		this.rejected = rejected;
 	}
@@ -113,8 +105,13 @@ public class DrtRequest implements PassengerRequest {
 	}
 
 	@Override
-	public MobsimPassengerAgent getPassenger() {
-		return passenger;
+	public Id<Person> getPassengerId() {
+		return passengerId;
+	}
+
+	@Override
+	public String getMode() {
+		return mode;
 	}
 
 	public DrtStopTask getPickupTask() {
@@ -131,36 +128,6 @@ public class DrtRequest implements PassengerRequest {
 
 	public void setDropoffTask(DrtStopTask dropoffTask) {
 		this.dropoffTask = dropoffTask;
-	}
-
-	public DrtRequestStatus getStatus() {
-		if (pickupTask == null) {
-			return DrtRequestStatus.UNPLANNED;
-		}
-
-		switch (pickupTask.getStatus()) {
-			case PLANNED:
-				return DrtRequestStatus.PLANNED;
-
-			case STARTED:
-				return DrtRequestStatus.PICKUP;
-
-			case PERFORMED:// continue
-		}
-
-		switch (dropoffTask.getStatus()) {
-			case PLANNED:
-				return DrtRequestStatus.RIDE;
-
-			case STARTED:
-				return DrtRequestStatus.DROPOFF;
-
-			case PERFORMED:
-				return DrtRequestStatus.PERFORMED;
-
-		}
-
-		throw new IllegalStateException("Unreachable code");
 	}
 
 	@Override

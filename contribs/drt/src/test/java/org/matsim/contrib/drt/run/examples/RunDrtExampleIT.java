@@ -25,13 +25,16 @@ package org.matsim.contrib.drt.run.examples;
 import java.util.Collections;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.drt.data.DrtRequest;
-import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.dvrp.passenger.PassengerRequest;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -44,6 +47,24 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author jbischoff
  */
 public class RunDrtExampleIT {
+	
+	private class PersonIdValidator implements PassengerRequestValidator {
+		private boolean validateRequestWasCalled = false;
+		
+		@Override
+		public Set<String> validateRequest(PassengerRequest request) {
+			validateRequestWasCalled = true;
+			return request.getPassengerId().toString().equalsIgnoreCase("12052000_12052000_100") ?
+					Collections.singleton("REJECT_12052000_12052000_100") :
+					Collections.emptySet();
+		}
+
+		boolean isValidateRequestWasCalled() {
+			return validateRequestWasCalled;
+		}
+
+	}
+
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -68,22 +89,19 @@ public class RunDrtExampleIT {
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		Controler controler = DrtControlerCreator.createControler(config, false);
+		Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config, false);
+
+		PersonIdValidator personIdValidator = new PersonIdValidator();
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.bind(DrtRequestValidator.class).toInstance(new DrtRequestValidator() {
-					@Override
-					public Set<String> validateDrtRequest(DrtRequest request) {
-						return request.getPassenger().getId().toString().equals("12052000_12052000_100") ?
-								Collections.singleton("REJECT_passenger_12052000_12052000_100") :
-								Collections.emptySet();
-					}
-				});
+				this.bind(PassengerRequestValidator.class).annotatedWith(DvrpModes.mode(TransportMode.drt)).toInstance(personIdValidator);
 			}
 		});
 		controler.run();
+		
+		Assert.assertEquals("passenger request validator was not called", true, personIdValidator.isValidateRequestWasCalled());
 	}
 
 	@Test
