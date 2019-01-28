@@ -41,6 +41,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -189,8 +190,8 @@ public class NoiseContext {
 			}
 
 			// go through these potential relevant link Ids
-			Set<Id<Link>> relevantLinkIds = new HashSet<>();
-			for (Id<Link> linkId : potentialLinks){
+			Set<Id<Link>> relevantLinkIds = ConcurrentHashMap.newKeySet();
+			potentialLinks.parallelStream().forEach( linkId -> {
 				if (!(relevantLinkIds.contains(linkId))) {
 					Link candidateLink = scenario.getNetwork().getLinks().get(linkId);
 					double projectedDistance = CoordUtils.distancePointLinesegment(candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
@@ -202,7 +203,7 @@ public class NoiseContext {
 						if (projectedDistance == 0) {
 							double minimumDistance = 5.;
 							projectedDistance = minimumDistance;
-							log.warn("Distance between " + linkId + " and " + rp.getId() + " is 0. The calculation of the correction term Ds requires a distance > 0. Therefore, setting the distance to a minimum value of " + minimumDistance + ".");
+							log.warn("Distance between " + linkId + " and " + nrp.getId() + " is 0. The calculation of the correction term Ds requires a distance > 0. Therefore, setting the distance to a minimum value of " + minimumDistance + ".");
 						}
 						double correctionTermDs = NoiseEquations.calculateDistanceCorrection(projectedDistance);
 						double correctionTermAngle = calculateAngleImmissionCorrection(nrp.getCoord(), scenario.getNetwork().getLinks().get(linkId));
@@ -217,7 +218,7 @@ public class NoiseContext {
 						}
 					}
 				}
-			}
+			});
 			
 			this.noiseReceiverPoints.put(nrp.getId(), nrp);
 			cnt.incCounter();

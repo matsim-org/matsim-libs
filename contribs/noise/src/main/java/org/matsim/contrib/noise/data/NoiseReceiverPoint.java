@@ -86,7 +86,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		return Collections.unmodifiableMap(linkId2distanceCorrection);
 	}
 
-	public void setLinkId2distanceCorrection(Id<Link> linkId,  Double distanceCorrection) {
+	public synchronized void setLinkId2distanceCorrection(Id<Link> linkId,  Double distanceCorrection) {
 		if(linkId2distanceCorrection == null) {
 			linkId2distanceCorrection = new HashMap<>();
 		}
@@ -100,14 +100,14 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		return Collections.unmodifiableMap(linkId2angleCorrection);
 	}
 
-	public void setLinkId2angleCorrection(Id<Link> linkId, Double angleCorrection) {
+	public synchronized void setLinkId2angleCorrection(Id<Link> linkId, Double angleCorrection) {
 		if(linkId2angleCorrection== null) {
 			linkId2angleCorrection = new HashMap<>();
 		}
 		this.linkId2angleCorrection.put(linkId, angleCorrection);
 	}
 
-	public void setLinkId2ShieldingCorrection(Id<Link> linkId, Double shieldingCorrection) {
+	public synchronized void setLinkId2ShieldingCorrection(Id<Link> linkId, Double shieldingCorrection) {
 		if(linkId2ShieldingCorrection== null) {
 			linkId2ShieldingCorrection = new HashMap<>();
 		}
