@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+  [
+   <!ENTITY SEED	"4711">
+  ]
+>
+<config>
+
+<module name="p" >
+		<param name="pIdentifier" value="para_" />
+		<param name="operatorType" value="CarefulMultiPlanOperator" />		
+		<param name="numberOfOperators" value="10" />
+		<param name="numberOfIterationsForProspecting" value="10" />
+		<param name="initialBudget" value="200000.0" />
+		<param name="paxPerVehicle" value="10" />
+		<param name="passengerCarEquivalents" value="1.0" />
+		<param name="vehicleMaximumVelocity" value="6.0" />
+		<param name="delayPerBoardingPassenger" value="2.0" />
+		<param name="delayPerAlightingPassenger" value="1.0" />
+		<param name="doorOperationMode" value="parallel" />
+		<param name="costPerVehicleAndDay" value="100.00" />
+		<param name="costPerKilometer" value="0.30" />
+		<param name="costPerHour" value="10.00" />
+		<param name="earningsPerBoardingPassenger" value="1.0" />  <!-- default: 1.0 -->
+		<param name="earningsPerKilometerAndPassenger" value="0.0" />
+		<param name="pricePerVehicleBought" value="500.0" />
+		<param name="pricePerVehicleSold" value="500.0" />
+		<param name="startWith24Hours" value="false" />
+		<param name="minOperationTime" value="0.0" />
+		
+		<param name="minX" value="0.0" />
+		<param name="maxX" value="5000.0" />
+		<param name="minY" value="0.0" />
+		<param name="maxY" value="5000.0" />
+		
+		<param name="useFranchise" value="false" /> <!-- default: true -->
+		<param name="writeStatsInterval" value="1" />
+		<param name="logOperators" value="true" />
+		<param name="writeGexfStatsInterval" value="20" />
+		<param name="routeProvider" value="TimeAwareComplexCircleScheduleProvider" />
+		<param name="speedLimitForStops" value="10.0" />
+		<param name="planningSpeedFactor" value="1.0" />
+		<param name="gridSize" value="500.0" />
+		<param name="timeSlotSize" value="900.0" /> 
+		<param name="useAdaptiveNumberOfOperators" value="true" />
+		<param name="shareOfOperatorsWithProfit" value="0.90" />
+		<param name="disableCreationOfNewOperatorsInIteration" value="75" />
+		<param name="reRouteAgentsStuck" value="false" />
+		
+		<param name="Module_1" value="WeightedStartTimeExtension" />
+		<param name="ModuleProbability_1" value="0.10" />
+		<param name="ModuleDisableInIteration_1" value="25" />
+		<param name="ModuleParameter_1" value="" />
+		
+		<param name="Module_2" value="WeightedEndTimeExtension" />
+		<param name="ModuleProbability_2" value="0.10" />
+		<param name="ModuleDisableInIteration_2" value="25" />
+		<param name="ModuleParameter_2" value="" />
+		
+		<param name="Module_3" value="ReduceTimeServedRFare" />
+		<param name="ModuleProbability_3" value="0.30" />
+		<param name="ModuleDisableInIteration_3" value="25" />
+		<param name="ModuleParameter_3" value="1.0,900,false,true" />
+		
+		<param name="Module_4" value="EndRouteExtension" />
+		<param name="ModuleProbability_4" value="0.10" />
+		<param name="ModuleDisableInIteration_4" value="25" />
+		<param name="ModuleParameter_4" value="1500.0,0.2" />
+		
+		<param name="Module_5" value="SidewaysRouteExtension" />
+		<param name="ModuleProbability_5" value="0.10" />
+		<param name="ModuleDisableInIteration_5" value="25" />
+		<param name="ModuleParameter_5" value="1500.0,0.2,true" />
+		
+		<param name="Module_6" value="ReduceStopsToBeServedRFare" />
+		<param name="ModuleProbability_6" value="0.30" />
+		<param name="ModuleDisableInIteration_6" value="25" />
+		<param name="ModuleParameter_6" value="1.0,false" />
+	</module> 
+
+<!-- ====================================================================== -->
+	
+	<module name="controler" >
+		<param name="enableLinkToLinkRouting" value="false" />
+		
+		<param name="mobsim" value="qsim" />
+
+		<!-- Specifies the file format for writing events. Currently supported: txt, xml. Multiple values can be specified separated by commas (','). -->
+		<param name="eventsFileFormat" value="xml" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="30" />
+
+		<!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra or AStarLandmarks -->
+		<param name="routingAlgorithmType" value="AStarLandmarks" />
+
+		<!-- iterationNumber % writeEventsInterval == 0 defines in which iterations events are written to a file. `0' disables events writing completely. -->
+		<param name="writeEventsInterval" value="20" />
+		
+		<!-- iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written -->
+		<param name="writePlansInterval" value="20" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="global" >
+		<param name="coordinateSystem" value="GK4" />
+		<param name="numberOfThreads" value="2" />
+		<param name="randomSeed" value="&SEED;" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="network">
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="transitRouter">
+		<param name="searchRadius" value="1000" />
+		<param name="extensionRadius" value="200" />
+		<param name="maxBeelineWalkConnectionDistance" value="200" />
+		<param name="additionalTransferTime" value="60" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="planCalcScore">
+	
+		<!-- [1/utils] conversion factor of utility model for use in logit-based choice model.  Set to 1 if your utl function is estimated -->
+		<param name="BrainExpBeta" value="1.0" />
+		<param name="PathSizeLogitBeta" value="1.0" />
+
+		<!-- [utils/hr] utility for departing early (i.e. before the earliest end time).  Probably implemented correctly, but not tested. -->
+		<param name="earlyDeparture" value="-0.0" />
+
+		<!-- new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates close to zero emulate score averaging, but slow down initial convergence -->
+		<param name="learningRate" value="1.0" />
+
+		<!-- [utils/unit_of_money] conversion of money (e.g. toll, distance cost) into utils -->
+		<param name="marginalUtilityOfMoney" value="1.0" />
+
+		<!-- [utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of time if agent is doing nothing. -->
+		<param name="performing" value="6.0" />
+
+		<!-- [utils/hr] utility offset of traveling by pt.  normally negative.  this comes on top of the opportunity cost of time -->
+		<param name="travelingPt" value="-1.0" />
+
+		<!-- [utils/hr] utility offset of traveling by foot.  normally negative.  this comes on top of the opportunity cost of time.  also see marginalUtlOfDistanceWalk -->
+		<param name="travelingWalk" value="-1.25" />
+		
+		<param name="utilityOfLineSwitch" value="-0.3" />
+
+		<param name="activityType_0"            value="h" />
+		<param name="activityPriority_0"        value="1" />
+		<param name="activityTypicalDuration_0" value="24:00:00" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="plans" >
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="qsim" >
+		<param name="endTime" value="30:00:00" />
+		
+		<param name="flowCapacityFactor" value="1.0" />
+
+		<!-- Use number of threads > 1 for parallel version using the specified number of threads -->
+		<param name="numberOfThreads" value="1" />
+
+		<!-- Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice. -->
+		<param name="removeStuckVehicles" value="false" />
+
+		<!-- `maxOfStarttimeAndEarliestActivityEnd' (default behavior) or `onlyUseStarttime' -->
+		<param name="simStarttimeInterpretation" value="maxOfStarttimeAndEarliestActivityEnd" />
+
+		<param name="startTime" value="00:00:00" />
+		<param name="storageCapacityFactor" value="1.0" />
+
+		<param name="timeStepSize" value="00:00:01" />
+
+		<!-- `queue' for the standard queue model, `withHolesExperimental' (experimental!!) for the queue model with holes -->
+		<param name="trafficDynamics" value="queue" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="strategy" >
+		<param name="maxAgentPlanMemorySize" value="1" />
+
+		<param name="ModuleProbability_1" value="1.0" />
+		<param name="ModuleDisableAfterIteration_1" value="100" /> 
+		<param name="Module_1" value="org.matsim.contrib.minibus.performance.PReRoute" />
+
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="transit" >
+		<param name="useTransit" value="true" />
+		<param name="transitModes" value="pt" />
+	</module>
+
+<!-- ====================================================================== -->
+
+</config>

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!ELEMENT population     (person)*>
+<!ATTLIST population
+          desc           CDATA   #IMPLIED>
+
+<!ELEMENT person         (plan*)>
+<!ATTLIST person
+          id             CDATA                    #REQUIRED
+          sex            (f|m)                    #IMPLIED
+          age            CDATA                    #IMPLIED
+          license        (yes|no)                 #IMPLIED
+          car_avail      (always|never|sometimes) #IMPLIED
+          employed       (yes|no)                 #IMPLIED>
+
+<!ELEMENT plan           (act|leg)*>
+<!ATTLIST plan
+          score          CDATA    #IMPLIED
+          type           CDATA    #IMPLIED
+          selected       (yes|no) "no">
+
+<!ELEMENT act            EMPTY>
+<!ATTLIST act
+          type           CDATA #REQUIRED
+          x              CDATA #IMPLIED
+          y              CDATA #IMPLIED
+          link           CDATA #IMPLIED
+          facility       CDATA #IMPLIED
+          start_time     CDATA #IMPLIED
+          end_time       CDATA #IMPLIED
+          max_dur        CDATA #IMPLIED>
+
+<!ELEMENT leg            (route)?>
+<!ATTLIST leg
+          mode           CDATA                                                 #REQUIRED
+          dep_time       CDATA                                                 #IMPLIED
+          trav_time      CDATA                                                 #IMPLIED
+          arr_time       CDATA                                                 #IMPLIED>
+<!-- arr_time is not in the API and so should be removed from next version of the DTD.  kai, jun'16 -->
+
+<!ELEMENT route          (#PCDATA)>
+<!ATTLIST route
+          type           CDATA #IMPLIED
+          start_link	 CDATA #IMPLIED
+          end_link       CDATA #IMPLIED
+          trav_time		 CDATA #IMPLIED
+          distance		 CDATA #IMPLIED
+          vehicleRefId           CDATA #IMPLIED
+          >
+
+<!-- ============================================================ -->
+
+<!-- ROOT ELEMENT population:
+     In here all individuals are stored including their desired
+     plan. -->
+
+<!-- ATTRIBUTE desc:
+     It is always a good idea to give a plans file a description
+     for better identification.
+     Normally it should describe, which company / institute / etc..
+     created that plans file and / or what has been modified. -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT person:
+     Each individual is listed here. -->
+
+<!-- ATTRIBUTE id:
+     Each person holds a UNIQUE id for identification.
+     format := unsigned integer -->
+<!-- ATTRIBUTE sex:
+     If known, each person has a sex. -->
+<!-- ATTRIBUTE age:
+     If known, each person has an age.
+     format := unsigned integer (inclusive zero) -->
+<!-- ATTRIBUTE license:
+     Defines if this person holds a drivers-license. -->
+<!-- ATTRIBUTE car_avail:
+     Defines if this person has access to a car (always, sometimes
+     or never). -->
+<!-- ATTRIBUTE employed:
+     Defines if this person has a job. -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT plan:
+     Each person holds at least one plan.  A plan holds a sequence of
+     act-leg-act-leg... tags.  Such a chain has to start and end with
+     an act(ivity).  Between two acts there must be EXACTLY one
+     leg. -->
+
+<!-- ATTRIBUTE score:
+     Measures the "performance" of this plan based on the outcome of
+     the execution of this plan within the simulation (possibly
+     several simulations).  After a plan is chosen for a simulation
+     and is simulated by the sim, a score will be calculated.  So,
+     initial plans don't need to provide a score.  It is just for
+     internal use.
+     format := double -->
+
+<!-- ATTRIBUTE selected:
+     If a person has more than one plan, one is marked as the selected
+     plan, i.e., the one to be used by the simulation or other
+     modules.  For internal use.  Initial plans do not need to provide
+     this. -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT act:
+     Defines an activity of a person (like working, shopping, etc.).
+     An activity is placed on a defined coordinate/link of the given
+     network. -->
+
+<!-- ATTRIBUTE type:
+     Each activity has to have a type, like w(ork), l(eisure),
+     h(ome), s(hopping), e(ducation), etc.
+     format := string -->
+
+<!-- ATTRIBUTE x:
+     The x coordinate of the activity.
+     If x and y is not defined, the link id has to be given!
+     format := double
+     units  := meter -->
+
+<!-- ATTRIBUTE y:
+     The y coordinate of the activity.
+     If x and y is not defined, the link id has to be given!
+     format := double
+     units  := meter -->
+
+<!-- ATTRIBUTE link:
+     The id of the link where this activity will be performed.  If
+     this attribute is not given, the x and y attributes must be
+     defined.
+     format := unsigned integer
+     unit   := N/A -->
+
+<!-- NOTE: Either (x,y) or link must be defined, otherwise the
+           activity cannot be matched on the given network (see
+           network_v1.dtd on matsim.org). -->
+
+<!-- ATTRIBUTE facility:
+     The id of the facility where this activity will be performed. Optional.
+     format := unsigned integer
+     unit   := N/A -->
+
+<!-- ATTRIBUTE start_time:
+     Defines when an activity should start.
+     format := "hh:mm:ss" -->
+
+<!-- ATTRIBUTE end_time:
+     Defines when an activity should end.  This is a REQUIRED
+     attribute for the FIRST activity, and optional for the other
+     ones.
+     format := "hh:mm:ss" -->
+
+<!-- ATTRIBUTE max_dur:
+     Defines the maximum duration of an activity.
+     format := "hh:mm:ss" -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT leg:
+     Defines one part of the trip between two activities. (I.e. a
+     route with the car, a walk by foot, a change of the mode, a time
+     where it has to wait for the bus, and so on.)  At the moment,
+     MATSim provides only 'car mode' legs. (Oct. 2004) -->
+
+<!-- ATTRIBUTE mode:
+     Defines the mode of this leg (e.g. car, bus, foot, bike, etc.).
+     format := string -->
+
+<!-- ATTRIBUTE dep_time:
+     Expected departure time for this leg.
+     This is also for internal use.
+     format := "hh:mm:ss" -->
+
+<!-- ATTRIBUTE trav_time:
+     Expected travel time for this leg.
+     This is also for internal use.
+     format := "hh:mm:ss" -->
+
+<!-- ATTRIBUTE arr_time:
+     Expected arrival time for this leg.
+     This is also for internal use.
+     format := "hh:mm:ss" -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT route:
+     When a leg is a path through a network, it is defined here. -->
+
+<!-- ATTRIBUTE type:
+     Defines the kind of route, and in what "format" the route is encoded.
+     format := string -->
+
+<!-- ATTRIBUTE trav_time:
+     the estimated travel time of the given route
+     format := unsigned double -->
+
+<!-- #PCDATA:
+     encoding of the route, depending on the type specified -->
+
+<!-- ============================================================ -->

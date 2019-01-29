@@ -1,0 +1,98 @@
+/* Javadoc style sheet */
+
+/* Define colors, fonts and other style attributes here to override the defaults */
+
+/* Page background color */
+body { 
+	background-image:url(http://www.matsim.org/sites/all/themes/matsim/images/body.png);
+	background-repeat: repeat-x;
+	background-color: #FFFFFF;
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size: 100%;
+	margin-top: 10px;
+}
+
+/* Headings */
+h1 {
+	font-size: 145%;
+}
+
+/* Table colors */
+.TableHeadingColor     { background: #1860C0; color: #FFF; }
+.TableSubHeadingColor  { background: #BBDDFF }
+.TableRowColor         { background: #FFFFFF }
+
+/* Font used in left-hand frame lists */
+/*.FrameTitleFont   { font-size: 100%; font-family: Helvetica, Arial, sans-serif }
+.FrameHeadingFont { font-size:  90%; font-family: Helvetica, Arial, sans-serif }
+.FrameItemFont    { font-size:  90%; font-family: Helvetica, Arial, sans-serif }
+*/
+
+/* Navigation bar fonts and colors */
+.NavBarCell1    { background-color:#BBDDFF;}
+.NavBarCell1Rev { background-color:#1860C0;}
+.NavBarFont1    { font-family: Arial, Helvetica, sans-serif; color:#000000;}
+.NavBarFont1Rev { font-family: Arial, Helvetica, sans-serif; color:#FFFFFF;}
+
+.NavBarCell2    { font-family: Arial, Helvetica, sans-serif; background-color:#FFFFFF;}
+.NavBarCell3    { font-family: Arial, Helvetica, sans-serif; background-color:#FFFFFF;}
+
+a { color: #1860C0; }
+a:visited { color: #525151; }
+
+TD {
+	font-size: 80%;
+}
+TD CODE {
+	font-size: 130%;
+}
+PRE {
+	font-size: 110%;
+}
+H3 {
+	font-size: 100%;
+}
+.FrameTitleFont {
+	display: block;
+	color: white;
+	margin: 5px 0 5px 0;
+}
+.FrameTitleFont A {
+	color: white;
+	display: block;
+	padding: 35px 0 0 0;
+}
+.FrameHeadingFont {
+	display: block;
+	color: white;
+	margin: -10px 0 5px 0;
+}
+.FrameHeadingFont B {
+	display: block;
+	margin: 20px 0 60px 0;
+	color: white;
+}
+.NavBarCell1 {
+	background-color: transparent;
+}
+
+.NavBarCell2, .NavBarCell3 {
+	background-color: transparent;
+}
+.NavBarCell1 A, .NavBarCell1 A B, .NavBarCell2 A, .NavBarCell3 A {
+	color: #d2d2d2;
+}
+.NavBarCell1 A:hover, .NavBarCell1 A:hover B, .NavBarCell2 A:hover, .NavBarCell3 A:hover {
+	color: #aaa;
+}
+
+.NavBarCell1Rev {
+	background-color: transparent;
+	border: 1px solid #d2d2d2;
+}
+H1 {
+	margin-top: 70px;
+}
+H2 {
+	margin-top: 50px;
+}

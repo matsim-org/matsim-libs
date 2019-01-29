@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE network SYSTEM "http://matsim.org/files/dtd/network_v1.dtd">
+<network>
+<nodes>
+<node x="0.0" y="0.0" id="1" />
+<node x="10.0" y="0.0" id="2" />
+<node x="20.0" y="0.0" id="3" />
+<node x="2000.0" y="0.0" id="4" />
+<node x="2010.0" y="0.0" id="5" />
+<node x="2020.0" y="0.0" id="6" />
+</nodes>
+
+<links capperiod="10:00:00">
+<link id="1-2" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="10" to="2" from="1"/>
+<link id="2-3" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="10" to="3" from="2"/>
+<link id="3-4" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="1980" to="4" from="3"/>
+<link id="4-5" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="10" to="5" from="4"/>
+<link id="5-6" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="10" to="6" from="5"/>
+</links>
+</network>

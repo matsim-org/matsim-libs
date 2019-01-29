@@ -1,0 +1,10 @@
+This parser has been adapted from the parser found at:
+https://github.com/darius/expr
+======================
+The usage of the parser has been simplified:
+
+Parser parser=new Parser("x+y^2");
+parser.setVariable("x", 1);
+parser.setVariable("y", 2);
+double result=parser.parse();
+=> variable result should have value 5.0.

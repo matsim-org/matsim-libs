@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- $Id$ -->
+
+<!-- ============================================================ -->
+<!-- Date: 2013-11-21 -->
+<!-- A concise format to write the path-dependent complex network
+	 created from parsing Digicore vehicle activity chains.       -->
+
+<!-- For further information or questions, please contact
+     Johan Joubert, johan dot joubert at up dot ac dot za         -->
+
+<!-- ============================================================ -->
+
+<!ELEMENT digicoreNetwork			(node)+>
+<!ATTLIST digicoreNetwork
+		  desc			CDATA		#IMPLIED
+>
+
+<!ELEMENT node						(preceding)+>
+<!ATTLIST node
+		  id			CDATA		#REQUIRED
+		  x				CDATA		#REQUIRED
+		  y				CDATA		#REQUIRED
+>
+
+<!ELEMENT preceding					(following)+>
+<!ATTLIST preceding
+		  id			CDATA		#REQUIRED
+>
+
+<!ELEMENT following					EMPTY>
+<!ATTLIST following
+		  id			CDATA		#REQUIRED
+		  weight		CDATA		#REQUIRED
+>

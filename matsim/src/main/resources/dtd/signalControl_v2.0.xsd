@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://www.matsim.org/files/dtd" xmlns="http://www.matsim.org/files/dtd"
+		elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xml:lang="en">
+
+		<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
+		<!--
+				Description of the signal group system's plans for the traffic light system to be used in the
+				simulation
+		-->
+
+		<xs:include schemaLocation="matsimCommon.xsd" />
+
+		<xs:element name="signalControl">
+				<xs:complexType>
+						<xs:annotation>
+								<xs:documentation>
+										This is the root element for configuration of the traffic light system.
+								</xs:documentation>
+						</xs:annotation>
+						<xs:sequence>
+								<xs:element name="signalSystem" type="signalSystemType" minOccurs="0" maxOccurs="unbounded" />
+						</xs:sequence>
+				</xs:complexType>
+		</xs:element>
+
+		<xs:complexType name="signalSystemType">
+				<xs:annotation>
+						<xs:documentation>
+						</xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+						<xs:extension base="idRefType">
+								<xs:sequence>
+										<xs:element name="signalSystemController" type="signalSystemControllerType"
+												minOccurs="1" maxOccurs="1">
+												<xs:annotation>
+														<xs:documentation>
+														</xs:documentation>
+												</xs:annotation>
+										</xs:element>
+								</xs:sequence>
+						</xs:extension>
+				</xs:complexContent>
+		</xs:complexType>
+
+		<xs:complexType name="signalSystemControllerType">
+				<xs:annotation>
+						<xs:documentation>
+						</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+						<xs:element name="controllerIdentifier" type="xs:string" minOccurs="1" maxOccurs="1" />
+						<xs:element name="signalPlan" type="signalPlanType" minOccurs="0"
+								maxOccurs="unbounded">
+								<xs:annotation>
+										<xs:documentation>
+										</xs:documentation>
+								</xs:annotation>
+						</xs:element>
+				</xs:sequence>
+		</xs:complexType>
+
+		<xs:complexType name="signalPlanType">
+				<xs:annotation>
+						<xs:documentation> This type specifies a plan for a signal system.
+    </xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+						<xs:extension base="matsimObjectType">
+								<xs:sequence>
+										<xs:element name="start" minOccurs="0" maxOccurs="1">
+												<xs:annotation>
+														<xs:documentation>The time of day at which the plan should be activated, set start and stop to 00:00:00 if the plan shall be always active or simply remove start and stop element completely</xs:documentation>
+												</xs:annotation>
+												<xs:complexType>
+														<xs:attribute name="daytime" type="xs:time" use="required" />
+												</xs:complexType>
+										</xs:element>
+										<xs:element name="stop" minOccurs="0" maxOccurs="1">
+												<xs:annotation>
+														<xs:documentation>At which time of day to stop using this plan, set start and stop to 00:00:00 if the plan shall be always active or simply remove start and stop element completely</xs:documentation>
+												</xs:annotation>
+												<xs:complexType>
+														<xs:attribute name="daytime" type="xs:time" use="required" />
+												</xs:complexType>
+										</xs:element>
+										<xs:element name="cycleTime" minOccurs="0" maxOccurs="1">
+												<xs:annotation>
+														<xs:documentation>The time in seconds needed to process this plan.</xs:documentation>
+												</xs:annotation>
+												<xs:complexType>
+														<xs:attribute name="sec" type="xs:nonNegativeInteger" use="required" />
+												</xs:complexType>
+										</xs:element>
+										<xs:element name="offset" minOccurs="0" maxOccurs="1">
+												<xs:annotation>
+														<xs:documentation>The second of the circulation time which is used
+																for synchronization.
+														</xs:documentation>
+												</xs:annotation>
+												<xs:complexType>
+														<xs:attribute name="sec" type="xs:nonNegativeInteger" use="required"/>
+												</xs:complexType>
+										</xs:element>
+										<xs:element name="signalGroupSettings" type="signalGroupSettingsType"
+												minOccurs="0" maxOccurs="unbounded">
+												<xs:annotation>
+														<xs:documentation>This element contains information when to switch on or off a signal
+																group.</xs:documentation>
+												</xs:annotation>
+										</xs:element>
+								</xs:sequence>
+						</xs:extension>
+				</xs:complexContent>
+		</xs:complexType>
+
+		<xs:complexType name="signalGroupSettingsType">
+				<xs:complexContent>
+						<xs:extension base="idRefType">
+								<xs:sequence>
+										<xs:element name="onset" minOccurs="1" maxOccurs="1">
+												<xs:annotation>
+														<xs:documentation>The second of circulation when the signal switches to green.
+														</xs:documentation>
+												</xs:annotation>
+												<xs:complexType>
+														<xs:attribute name="sec" type="xs:nonNegativeInteger" use="required" />
+												</xs:complexType>
+										</xs:element>
+										<xs:element name="dropping" minOccurs="1" maxOccurs="1">
+												<xs:annotation>
+														<xs:documentation>The second of circulation when the signal switches to red.
+														</xs:documentation>
+												</xs:annotation>
+												<xs:complexType>
+														<xs:attribute name="sec" type="xs:nonNegativeInteger" use="required" />
+												</xs:complexType>
+										</xs:element>
+								</xs:sequence>
+						</xs:extension>
+				</xs:complexContent>
+		</xs:complexType>
+
+</xs:schema>

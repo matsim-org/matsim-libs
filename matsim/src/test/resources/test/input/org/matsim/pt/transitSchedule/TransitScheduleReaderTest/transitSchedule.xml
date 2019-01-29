@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="home" x="400.0" y="399.0" linkRefId="2" />
+		<stopFacility id="stop1" x="100.0" y="900.0" linkRefId="1" />
+		<stopFacility id="stop2" x="1000.0" y="500.0" linkRefId="3" />
+		<stopFacility id="stop3" x="2800.0" y="500.0" linkRefId="5" />
+		<stopFacility id="stop4" x="3300.0" y="500.0" linkRefId="5" />
+		<stopFacility id="stop5" x="4100.0" y="499.0" linkRefId="6" />
+		<stopFacility id="stop6" x="4800.0" y="200.0" linkRefId="8" />
+		<stopFacility id="work" x="4700.0" y="700.0" linkRefId="7" />
+	</transitStops>
+
+	<transitLine id="T1">
+		<transitRoute id="1">
+		<!-- the transitRoute-id must be unique within a transitLine only -->
+		<!-- different transitRoutes may be used to store the different directions
+		     of a line, day- vs. night-travel times, etc.
+		     Other data formats (e.g. VISUM) have an additional hierarchy:
+		     line > route > routeProfile(=time).
+		     I combined route and routeProfile on the same hierarchy-level (also
+		     see remark at the end of this file). -->
+			<description></description>
+			<transportMode>bus</transportMode>
+			<routeProfile>
+				 <!-- arrival is optional, departure required for all but last, time info are just offsets -->
+				<stop refId="stop1" departureOffset="00:00:00" />
+				<stop refId="stop2" arrivalOffset="00:01:20" departureOffset="00:01:40" />
+				<stop refId="stop3" departureOffset="00:03:00" />
+				<stop refId="stop4" departureOffset="00:03:50" />
+				<stop refId="stop5" departureOffset="00:04:50" />
+				<stop refId="stop6" arrivalOffset="00:05:30" />
+			</routeProfile>
+			<!-- routeProfile contains information required for routing algorithms
+			     (together with "departures", below). Data for this can come from
+			     any time table / train schedule available. -->
+			
+			<route>
+				<link refId="1" />
+				<link refId="3" />
+				<link refId="4" />
+				<link refId="5" />
+				<link refId="6" />
+				<link refId="8" />
+			</route>
+			<!-- the route contains the information required for the simulation, 
+			     together with "routeProfle" and "departures". It specifies on
+			     which links in the network the transit vehicles travels along.
+			     This is used for the plans for the transit driver agents. When
+			     stops are modeled as facilities, and as facilities are matched
+			     to a link, the bus-driver is able to figure out on which link
+			     which stops are and can handle them accordingly. -->
+			<!-- Die unabhaengige Spezifikation der route von den stops erlaubt,
+			     dass fahrplandaten netzwerk-unabhaengig gespeichert werden
+			     koennen sowie das spezielle Wendeschlaufen etc. explizit mit
+			     angegeben werden koennen, um eine realistische Routenfuehrung
+			     zu beschreiben (Bsp. gibt es in Zuerich eine Buslinie, die faehrt
+			     nach der Endhaltestelle noch gut 500m, bis es genuegend Platz gibt
+			     zu wenden, dort ist aber keine Haltestelle mehr, weil das schon 
+			     ausserhalb des Stadtgebiets liegt... -->
+
+			<departures>
+				<departure id="T1.1" departureTime="07:00:00" />
+				<departure id="T1.2" departureTime="07:10:00" />
+				<departure id="T1.3" departureTime="07:20:00" />
+			</departures>
+			<!-- the departure-id is meant to be the "Kurs-Nummer". Currently, it
+			     will not be of much use, but it may be used in an advanced setup
+			     with additional data to assigned persons as drivers for specific
+			     departures, thus allowing to simulate "Fahrereinsatzplaene". -->
+		</transitRoute>
+		
+	</transitLine>
+
+</transitSchedule>
+
+<!-- 
+Dieses Format wuerde fuer Simulation genuegen und haette alle benoetigten Daten.
+Aber fuer Router koennte es ineffizienter sein, weil er nicht 1 Route mit mehreren
+Fahrzeitprofilen als 1 Route/1 Link darstellen kann (zumindest nicht ohne komplexe
+Analyse). Das fuehrt dann zu mehr Links im Router, was auf die Performance schlaegt.
+
+Wenn man aber davon ausgeht, dass die Fahrzeitprofile i.A. zeitlich "blockweise"
+verwendet werden (also ein Fahrzeitprofil fuer Nacht, eines fuer Tag, eines fuer 
+Stosszeiten), dann ist es im Router auch nicht so tragisch: Zwar kann er mal einen
+Link eines anderen Fahrzeitprofils erwischen, wenn dort aber erst in 2 Stunden der
+naechste Kurs verkehrt, wird hoffentlich dieser Link von Dijkstra nie weiterverfolgt
+werden, weil er vorher am Ziel ankommt. Als Optimierung koennte man noch sicherstellen,
+dass Dijkstra nie versucht, von einem Fahrzeitprofil auf das naechste innerhalb einer
+Linie umzusteigen (hmm, sinnvoll? Was, wenn Hin- und Rueckrichtung einer Linie unterschiedlich
+fahren, z.B. 32er in Morgenthal/Wollishofen, und man genau zu einer Haltestelle im Einbahnbereich
+will? Muesste also richtungsabhaengig sein...).
+
+Wie auch immer: das Format kann problemlos fuer Routing verwendet werden und sollte 
+halbwegs performante Implementierungen ermoeglichen, ohne dass komplexes Pre-Processing
+notwendig waere.  
+ -->

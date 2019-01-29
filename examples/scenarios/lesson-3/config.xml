@@ -1,0 +1,883 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+
+	<!-- ====================================================================== -->
+	
+	<module name="global">
+		<param name="randomSeed" value="5399998864266990000" />
+		<param name="coordinateSystem" value="CH1903_LV03" />
+		<param name="numberOfThreads" value="4" />
+	</module>
+			
+	<!-- ====================================================================== -->
+
+	<module name="network">
+		<param name="inputNetworkFile" value="network.xml.gz" />
+	</module>
+	
+	<!-- ====================================================================== -->
+
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="facilities.xml.gz" />
+		<param name="facilitiesSource" value="fromFile"/>
+	</module>
+	
+	<!-- ====================================================================== -->
+
+	<module name="plans">
+		<param name="inputPlansFile" value="plans.xml.gz" />
+	</module>
+	
+	<!-- ====================================================================== -->
+		
+	<module name="qsim" >
+		<param name="flowCapacityFactor" value="1.0" />
+		<param name="storageCapacityFactor" value="1.0" />
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="00:00:00" />
+		<param name="snapshotperiod" value="00:00:10"/> <!-- 00:00:00 means NO snapshot writing -->
+	</module>
+	
+	<!-- ====================================================================== -->
+
+	<module name="controler">
+		<param name="outputDirectory" value="output" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="1" />		
+		<param name="runId" value="run0" />
+		<param name="routingAlgorithmType" value="Dijkstra" />
+		<param name="mobsim" value="qsim" />
+		<param name="writePlansInterval" value="1" />
+		<param name="snapshotFormat" value=""/>
+		<!-- iterationNumber % writeSnapshotsInterval == 0 defines in which iterations snapshots are written to a file. `0' disables snapshots writing completely -->
+		<param name="writeSnapshotsInterval" value="10" />
+	</module>
+		
+	<!-- ====================================================================== -->
+	
+	<module name="counts">
+		<param name="countsScaleFactor" value="1" />
+		<param name="inputCountsFile" value="null" />
+		<param name="outputformat" value="all" />
+		<param name="distanceFilter" value="12000.0" />
+		<param name="distanceFilterCenterNode" value="2531" />
+	</module>
+
+	<!-- ====================================================================== -->
+
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" />
+
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="BestScore"/>
+			<param name="weight" value="0.9"/>
+		</parameterset>
+
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="ReRoute"/>
+			<param name="weight" value="0.1"/>
+		</parameterset>
+
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="TimeAllocationMutator"/>
+			<param name="weight" value="0.1"/>
+		</parameterset>
+	</module>
+		
+	
+	<!-- ====================================================================== -->
+
+	<module name="planCalcScore">
+	
+		<param name="PathSizeLogitBeta" value="1.0" />
+		<param name="learningRate" value="1.0" />
+		<param name="BrainExpBeta" value="2.0" />
+		
+		<param name="lateArrival" value="-18.0" />
+		<param name="traveling" value="-6.0" /> 
+		<param name="travelingPt" value="-6.0" />
+		
+		<param name="performing" value="6.0" />
+		<param name="earlyDeparture" value="0" />
+		<param name="waiting" value="0" />
+
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h0.5" />
+			<param name="priority" value="1.0" />
+			<param name="typicalDuration" value="00:30:00" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h1" />
+			<param name="priority" value="1.0" />
+			<param name="typicalDuration" value="01:00:00" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h10" />
+			<param name="priority" value="1.0" />
+			<param name="typicalDuration" value="10:00:00" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="s12" />
+			<param name="priority" value="1.0" />
+			<param name="typicalDuration" value="12:00:00" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="tta" />
+			<param name="priority" value="1.0" />
+			<param name="typicalDuration" value="12:00:00" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h11" />
+			<param name="priority" value="1.0" />
+			<param name="typicalDuration" value="11:00:00" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h12" />
+			<param name="priority" value="1.0" />
+			<param name="typicalDuration" value="12:00:00" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h13" />
+			<param name="priority" value="1.0" />
+			<param name="typicalDuration" value="13:00:00" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h14" />
+			<param name="priority" value="1.0" />
+			<param name="typicalDuration" value="14:00:00" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h15" />
+			<param name="priority" value="1.0" />
+			<param name="typicalDuration" value="15:00:00" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h16" />
+			<param name="priority" value="1.0" />
+			<param name="typicalDuration" value="16:00:00" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h17" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="17:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h18" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="18:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h19" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="19:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h2" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="02:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h20" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="20:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h21" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="21:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h22" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="22:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h23" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="23:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h24" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="24:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w0.5" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="00:30:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w1" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="01:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w2" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="02:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w3" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="03:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w4" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="04:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h3" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="03:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w5" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="05:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w6" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="06:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w7" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="07:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w8" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="08:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w9" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="09:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w10" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="10:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w11" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="11:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w12" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="12:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w13" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="13:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w14" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="14:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h4" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="04:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w15" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="15:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w16" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="16:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w17" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="17:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w18" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="18:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w19" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="19:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w20" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="20:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e0.5" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="00:30:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e1" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="01:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e2" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="02:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e3" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="03:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h5" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="05:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e4" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="04:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e5" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="05:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e6" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="06:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e7" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="07:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e8" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="08:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e9" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="09:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e10" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="10:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e11" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="11:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e12" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="12:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e13" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="13:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h6" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="06:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e14" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="14:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e15" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="15:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e16" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="16:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e17" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="17:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e18" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="18:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e19" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="19:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="e20" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="20:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l0.5" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="00:30:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l1" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="01:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l2" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="02:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h7" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="07:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l3" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="03:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l4" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="04:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l5" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="05:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l6" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="06:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l7" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="07:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l8" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="08:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l9" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="09:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l10" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="10:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l11" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="11:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l12" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="12:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h8" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="08:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l13" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="13:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l14" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="14:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l15" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="15:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l16" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="16:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l17" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="17:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l18" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="18:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l19" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="19:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="l20" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="20:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="s0.5" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="00:30:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="s1" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="01:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h9" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="09:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="s2" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="02:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="s3" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="03:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="s4" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="04:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="s5" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="05:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="s6" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="06:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="s7" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="07:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="s8" />
+			
+			<param name="priority" value="1.0" />
+			
+			<param name="typicalDuration" value="08:00:00" />
+			
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="s9" />
+			<param name="priority" value="1.0" />
+			<param name="typicalDuration" value="09:00:00" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="s10" />
+			<param name="priority" value="1.0" />
+			<param name="typicalDuration" value="10:00:00" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="s11" />
+			<param name="priority" value="1.0" />
+			<param name="typicalDuration" value="11:00:00" />
+		</parameterset>
+	</module>
+	
+	<!-- ====================================================================== -->
+</config>

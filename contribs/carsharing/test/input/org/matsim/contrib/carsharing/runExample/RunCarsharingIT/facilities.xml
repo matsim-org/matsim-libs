@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE facilities SYSTEM "http://www.matsim.org/files/dtd/facilities_v1.dtd">
+
+<facilities name="barbell facilities">
+
+<!-- ====================================================================== -->
+         <facility id="0" x="0.0" y="-375.0">
+                  <activity type="h">
+                  </activity>
+         </facility>
+<!-- ====================================================================== -->
+         <facility id="1" x="-375.0" y="0.0">
+                  <activity type="h">
+                  </activity>
+         </facility>
+<!-- ====================================================================== -->
+         <facility id="2" x="0.0" y="375.0">
+                  <activity type="h">
+                  </activity>
+         </facility>
+<!-- ====================================================================== -->
+         <facility id="3" x="1000.0" y="-250.0">
+                  <activity type="w">
+                  </activity>
+         </facility>
+<!-- ====================================================================== -->
+          <facility id="4" x="1250.0" y="0.0">
+                   <activity type="w">
+                   </activity>
+         </facility>
+<!-- ====================================================================== -->
+         <facility id="5" x="1000.0" y="250.0">
+                  <activity type="w">
+                  </activity>
+         </facility>
+<!-- ====================================================================== -->
+
+</facilities>

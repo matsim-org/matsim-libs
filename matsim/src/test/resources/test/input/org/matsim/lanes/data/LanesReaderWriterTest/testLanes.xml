@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<laneDefinitions
+		xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
+		<lanesToLinkAssignment linkIdRef="23">
+				<lane id="3">
+						<leadsTo>
+								<toLink refId="1" />
+						</leadsTo>
+						<representedLanes number="1.0" />
+						<capacity vehiclesPerHour="0.725" />
+						<startsAt meterFromLinkEnd="45.0" />
+						<alignment>2</alignment>
+						<attributes/>
+				</lane>
+				<lane id="5">
+						<leadsTo>
+								<toLink refId="1" />
+						</leadsTo>
+						<representedLanes number="2.5" />
+						<capacity vehiclesPerHour="2" />	
+						<startsAt meterFromLinkEnd="60.0" />
+						<alignment>2</alignment>
+						<attributes/>
+				</lane>
+		</lanesToLinkAssignment>
+		<lanesToLinkAssignment linkIdRef="42">
+				<lane id="1">
+						<leadsTo>
+								<toLink refId="1" />
+						</leadsTo>
+						<capacity vehiclesPerHour="1900.0" />
+						<alignment>2</alignment>
+						<attributes/>
+				</lane>
+		</lanesToLinkAssignment>
+</laneDefinitions>

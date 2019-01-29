@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
+	<vehicleType id="car">
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="16.67"/>
+		<accessTime secondsPerPerson="1.0"/>
+		<egressTime secondsPerPerson="1.0"/>
+		<doorOperation mode="serial"/>
+		<passengerCarEquivalents pce="1.0"/>
+	</vehicleType>
+	<vehicleType id="bicycle">
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="4.17"/>
+		<accessTime secondsPerPerson="1.0"/>
+		<egressTime secondsPerPerson="1.0"/>
+		<doorOperation mode="serial"/>
+		<passengerCarEquivalents pce="0.25"/>
+	</vehicleType>
+	<vehicle id="1" type="car"/>
+	<vehicle id="2" type="car"/>
+	<vehicle id="3" type="car"/>
+	<vehicle id="4" type="car"/>
+	<vehicle id="5" type="car"/>
+	<vehicle id="6" type="bicycle"/>
+	<vehicle id="7" type="bicycle"/>
+	<vehicle id="8" type="bicycle"/>
+	<vehicle id="9" type="bicycle"/>
+	<vehicle id="10" type="bicycle"/>
+</vehicleDefinitions>

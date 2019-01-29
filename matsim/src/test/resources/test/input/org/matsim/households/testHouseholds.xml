@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<households
+  xmlns="http://www.matsim.org/files/dtd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/households_v1.0.xsd">
+  
+  <household id="23">
+    <members>
+      <personId refId="23" />
+      <personId refId="42" />
+      <personId refId="43" />
+    </members>
+    <vehicles>
+      <vehicleDefinitionId refId="23" />
+      <vehicleDefinitionId refId="42" />
+    </vehicles>
+    <income currency="eur" period="month">50000</income>
+    <attributes>
+      <attribute name="customAttribute1" class="java.lang.String" >customValue1</attribute>
+    </attributes>
+  </household>
+
+  <household id="24">
+    <members>
+      <personId refId="44" />
+      <personId refId="45" />
+    </members>
+    <vehicles>
+      <vehicleDefinitionId refId="23" />
+    </vehicles>
+    <income currency="eur" period="day">
+      1000
+    </income>    
+  </household>
+  
+  <household id="25">
+  </household>
+  </households>

@@ -1,0 +1,11 @@
+durationsOtherBins	0.0+	300.0+	900.0+	1800.0+	2700.0+	3600.0+	|	 average 	|	 cnt 	 | 	 sum
+act1---act2	0	0	1	0	0	0	|	1200.0	|	1	|	1200.0
+act2---act3	0	1	0	0	0	0	|	600.0	|	1	|	600.0
+act3---act4	0	1	0	0	0	0	|	600.0	|	1	|	600.0
+act4---act5	1	0	0	0	0	0	|	1.0	|	1	|	1.0
+yy_subpop_null	1	2	1	0	0	0	|	600.25	|	4	|	2401.0
+zz_mode_undefined	1	2	1	0	0	0	|	600.25	|	4	|	2401.0
+zzzzzzz_all	1	2	1	0	0	0	|	600.25	|	4	|	2401.0
+
+control statistics: average ttime = 600.25
+

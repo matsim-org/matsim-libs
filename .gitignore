@@ -1,0 +1,14 @@
+.settings/
+.project
+.metadata
+*.DS_Store
+# IntelliJ Files
+*.iml
+.idea
+matsimExamples
+**/target
+/log_projects.log
+*.orig
+
+# ignore output directories:
+output/

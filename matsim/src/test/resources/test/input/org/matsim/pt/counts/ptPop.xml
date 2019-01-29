@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+
+<plans>
+
+	<person id="1">
+		<plan selected="yes">
+			  <act type="h" link="44" x="1050" y="3000" end_time="07:50:00" /> 
+			<leg mode="pt" >
+				<route >
+				</route>
+			</leg>
+			<act type="w" link="12" x="1050" y="7000" end_time="16:00:00"/>
+		</plan>
+	</person>
+
+
+	<person id="2">
+		<plan selected="yes">
+			<act type="h" link="20" x="1000" y="2950" end_time="07:50:00" />
+			<leg mode="pt" >
+				<route >
+				</route>
+			</leg>
+			<act type="w" link="22" x="1000" y="6990" end_time="16:00:00"/>
+		</plan>
+
+	</person>
+
+	<person id="3">
+		<plan selected="yes">
+			<act type="h" link="44" x="1050" y="3000" end_time="07:50:00" />
+			<leg mode="pt" >
+				<route >
+				</route>
+			</leg>
+			<act type="w" link="22" x="1000" y="6990" end_time="16:00:00"/>
+		</plan>
+	</person>
+	
+	<person id="4">
+		<plan selected="yes">
+			<act type="h" link="20" x="1000" y="2950" end_time="07:50:00" />
+			<leg mode="pt" >
+				<route >
+				</route>
+			</leg>
+			<act type="w" link="12" x="1050" y="7000" end_time="16:00:00"/>
+		</plan>
+	</person>
+
+	<person id="5">
+		<plan selected="yes">
+			<act type="h" link="20" x="1000" y="2950" end_time="07:50:00" />
+			<leg mode="pt" >
+				<route >
+				</route>
+			</leg>
+			<!-- <act type="w" link="75" x="7000.0" y="8990.0" end_time="16:00:00" />  -->
+			<act type="w" link="18"  x="6980" y="9000" end_time="16:00:00" />
+		</plan>
+	</person>
+		
+		
+		
+		
+		
+</plans>

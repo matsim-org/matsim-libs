@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- ============================================================ -->
+
+<!ELEMENT network (attributes?,nodes,links)>
+<!ATTLIST network
+          name       CDATA #IMPLIED>
+
+<!ELEMENT attributes    (attribute*)>
+
+<!ELEMENT attribute       (#PCDATA)>
+<!ATTLIST attribute
+          name        CDATA #REQUIRED
+          class       CDATA #REQUIRED>
+
+<!ELEMENT nodes (node)*>
+
+<!ELEMENT links (link)*>
+<!ATTLIST links capperiod  CDATA "01:00:00"
+          effectivecellsize CDATA "7.5"
+          effectivelanewidth CDATA "3.75">
+
+<!ELEMENT node (attributes?)>
+<!ATTLIST node id          CDATA #REQUIRED
+               x           CDATA #REQUIRED
+               y           CDATA #REQUIRED
+               z           CDATA #IMPLIED
+               type        CDATA #IMPLIED
+               origid      CDATA #IMPLIED>
+
+<!ELEMENT link (attributes?)>
+<!ATTLIST link id          CDATA #REQUIRED
+               from        CDATA #REQUIRED
+               to          CDATA #REQUIRED
+               length      CDATA #REQUIRED
+               freespeed   CDATA #REQUIRED
+               capacity    CDATA #REQUIRED
+               permlanes   CDATA #REQUIRED
+               oneway      CDATA #FIXED    "1"
+               origid      CDATA #IMPLIED
+               type        CDATA #IMPLIED
+               modes       CDATA "car">
+
+<!-- ============================================================ -->
+
+<!-- ROOT ELEMENT network:
+     The network describes nodes and links of a given region.
+     It is spit up into three different networks: streets,
+     pedestrians and publictransport.
+
+     NOTE: At the moment (October 2004), Matsim only handles street
+     networks (motorized individual transport). The others are
+     included just for completeness. (They will be used in future.)
+     -->
+
+<!-- ATTRIBUTE name:
+     It is always a good idea to give a network a descriptive
+     name for better identification.
+     Normally the name should describe the region which is described
+     by the network (i.e. Switzerland, Berlin, ...).
+     format := string -->
+<!-- ATTRIBUTE type:
+     description of the type of the network (i.e. motorized individual
+     transport, public transport, etc.)
+     format := string -->
+<!-- ATTRIBUTE capDivider:
+     This is the same as the attribute 'capperiod' in the links element.
+     To be compatible with older scenarios, it is still there, but
+     should be removed somewhen. Note that it holds only the hours!
+     format := unsigned int
+     units  := hour -->
+<!-- ATTRIBUTE xml:lang:
+     Defines the language settings (see xml spec). -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT nodes:
+     Holds all the nodes of the network. -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT links:
+     Holds all the links of the network. -->
+
+<!-- ATTRIBUTE capperiod:
+     format := "hh:mm:ss"
+     meaning:  It defines the time period over which
+               the capacity of the given links has been measured.
+     NOTE:     It is "01:00:00" per default, i.e. 3600.0 sec   -->
+
+<!-- ATTRIBUTE effectivecellsize:
+     format := double
+     meaning:  It defines the effective length of the cells in meters. The default value is 7.5 -->
+     
+<!-- ATTRIBUTE effectivelanewidth:
+     format := double
+     meaning:  It defines the effective width of a lane in meters. The default value is 3.75 -->     
+
+<!-- ATTRIBUTE capDivider, capdivider and capPeriod:
+     DEPRECATED!!!
+     Do not use those attributes anymore. It will be ignored
+     by matsim -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT node:
+     A node of the network. -->
+
+<!-- ATTRIBUTE id:
+     Each node HAS to have a unique id!
+     format := unsigned integer -->
+
+<!-- ATTRIBUTE x:
+     Each node HAS to have an x coordinate!
+     format := double
+     units  := meter -->
+
+<!-- ATTRIBUTE y:
+     Each node HAS to have an y coordinate!
+     format := double
+     units  := meter -->
+
+<!-- ATTRIBUTE type:
+     Typically, networks are created by third party (i.e. GIS users).
+     So it makes sense (for completeness) to add the type of the node.
+     Note, sometimes, the type defines in which of the network categories
+     it belongs (streets, pedestrians, publictransport), so be sure,
+     that the type does not conflict with the network category.
+     format := string -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT link:
+     A link of the network. -->
+
+<!-- ATTRIBUTE id:
+     Each link HAS to have a unique id!
+     format := unsigned integer -->
+
+<!-- ATTRIBUTE from:
+     Each link HAS to have a fromnode-ID, which is part of the SAME
+     network category as this link.
+     format := unsigned integer -->
+
+<!-- ATTRIBUTE to:
+     Each link HAS to have a tonode-ID, which is part of the SAME network
+     category as this link.
+     format := unsigned integer -->
+
+<!-- ATTRIBUTE length:
+     Defines the real length of the link.  It must be (of course)
+     at least as long as the Euclidean distance between
+     the from and to nodes.
+     format := unsigned double
+     units  := meter -->
+
+<!-- ATTRIBUTE freespeed:
+     Defines the allowed maximum speed of the link (for street link).
+     defines the 'fixed' speed of the link (for publictransport links).
+     defines the 'typical' speed of the link (for pedestrian links).
+     format := double
+     units  := meter/seconds -->
+
+<!-- ATTRIBUTE capacity:
+     Defines the maximal capacity of this link for a given period (see
+     ATTRIBUTE capperiod).
+     format := double
+     units  := vehicles/[given period] -->
+
+<!-- ATTRIBUTE permlanes:
+     Defines the number of lanes of this link.
+     format := double 
+     units  := N/A -->
+
+<!-- ATTRIBUTE oneway:
+     Matsim handles ONLY oneway links.  A bidirectional link has to be
+     defined as two unidirectional links. -->
+
+<!-- ATTRIBUTE modes:
+     Comma-separated list of transportation modes that are allowed on
+     this link. -->
+
+<!-- The following attributes are special ones typically generated by
+     VISUM. -->
+
+<!-- ATTRIBUTE volume:
+     If available, it is possible to add measured/counted average
+     volume for this link.  It should respect the given period (see
+     capperiod).
+     format := double
+     units  := vehicles/[given period] -->
+
+<!-- ATTRIBUTE origid:
+     Since other programs (i.e. VISUM) provide bidirectional links,
+     those have to split up into two unidirectional links.  This
+     attribute holds the original id for comparison.
+     format := string
+     units  := N/A -->
+
+<!-- ATTRIBUTE nt_category:
+     Sometimes networks provide different kinds of classification.
+     It is possible to keep them there.
+     format := string -->
+
+<!-- ATTRIBUTE nt_type:
+     Sometimes networks provide different kinds of classification.
+     It is possible to keep them there.
+     format := string -->
+
+<!-- ATTRIBUTE type:
+     Typically, networks are created by third party (i.e. GIS users).
+     So it makes sense (for completeness) to add the type of the link.
+     Note, sometimes, the type defines in which of the network
+     categories it belongs (streets, pedestrians, publictransport), so
+     be sure, that the type does not conflict with the network
+     category.
+     format := string -->
+
+<!-- ============================================================ -->

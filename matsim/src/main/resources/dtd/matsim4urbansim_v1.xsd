@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<!-- Editor: Thomas Nicolai, VSP, Berlin Institute of Technology -->
+	<!-- This xml schema contains xml definitions used for MATSim4UrbanSim -->
+	
+	<!-- root element -->
+	<xs:element name="matsim_config" type="matsim_configType"/>
+	<!-- root elemet definition -->
+	<xs:complexType name="matsim_configType">
+		<xs:sequence>
+			<xs:element name="config" type="configType" minOccurs="1" 
+				maxOccurs="1"/>
+			<xs:element name="matsim4urbansim" type="matsim4urbansimType" minOccurs="1" 
+				maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- MATSim to UrbanSim integration element definition -->
+	<xs:complexType name="matsim4urbansimType">
+		<xs:sequence>
+			<xs:element name="urbansimParameter" type="urbansimParameterType" 
+				minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- MATSim config element definition -->
+	<xs:complexType name="configType">
+		<xs:sequence>
+			<xs:element name="network" type="networkType" minOccurs="1" 
+				maxOccurs="1"/>
+			<xs:element name="inputPlansFile" type="inputPlansFileType" minOccurs="1" 
+				maxOccurs="1"/>
+			<xs:element name="hotStartPlansFile" type="inputPlansFileType" minOccurs="1" 
+				maxOccurs="1"/>
+			<xs:element name="controler" type="controlerType" minOccurs="1" 
+				maxOccurs="1"/>
+			<xs:element name="planCalcScore" type="planCalcScoreType" 
+				minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- network element definition -->
+	<xs:complexType name="networkType">
+		<xs:sequence>
+			<xs:element name="inputFile" type="xs:token"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- input plans file element definition -->
+	<xs:complexType name="inputPlansFileType">
+		<xs:sequence>
+			<xs:element name="inputFile" type="xs:token"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- controler element definition -->
+	<xs:complexType name="controlerType">
+		<xs:sequence>
+			<xs:element name="firstIteration" type="xs:nonNegativeInteger"/>
+			<xs:element name="lastIteration" type="xs:nonNegativeInteger"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- planCalcScore element definition -->
+	<xs:complexType name="planCalcScoreType">
+		<xs:sequence>
+			<xs:element name="activityType_0" type="xs:token"/>
+			<xs:element name="activityType_1" type="xs:token"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- urbansimParameter element definition -->
+	<xs:complexType name="urbansimParameterType">
+		<xs:sequence>
+			<xs:element name="samplingRate" type="xs:double"/>
+			<xs:element name="year" type="xs:nonNegativeInteger"/>
+			<xs:element name="opusHome" type="xs:token"/>
+			<xs:element name="opusDataPath" type="xs:token"/>
+			<xs:element name="matsim4opus" type="xs:token"/>
+			<xs:element name="matsim4opusConfig" type="xs:token"/>
+			<xs:element name="matsim4opusOutput" type="xs:token"/>
+			<xs:element name="matsim4opusTemp" type="xs:token"/>
+			<xs:element name="isTestRun" type="xs:boolean"/>
+			<xs:element name="testParameter" type="xs:token"/>
+			<xs:element name="backupRunData" type="xs:boolean"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

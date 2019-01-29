@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+
+	<!-- ====================================================================== -->
+	<!-- = Sample configuration for the Triangle sample scenario             == -->
+	<!-- ====================================================================== -->
+	
+	<module name="primary location choice">
+		
+		<!-- Describe the primary activity in term of trip purpose. -->
+		<!-- The activity at the origin is implicitly set to "home" -->
+		<!-- To take multiple trips per person or other type of origins into account (e.g. shop-leisure trips)
+			one must extends the methods "setupNumberHomesPerZone" and "setupNumberJobsPerZone"
+			of class "PrimlocModule" --> 				
+		<param name="primary activity" value="work" />
+
+		<!-- Optional layer on which to aggregate facilities and residents -->
+		<!-- Otherwise the user has to specify a layer with PrimlocModule.setLayer() --> 
+		<param name="aggregation layer" value="municipality"/>
+		
+		<!-- Optional: use Euclidean crow-distance as a proxy for travel costs -->
+		<param name="euclidean distance costs" value="true" />
+		
+		<!-- calibrate the model or just simulate for a given mu -->
+		<param name="calibration" value="true"/>	
+				
+		<!-- Optional: Default value for the logit scale parameter. Units are in $
+			compared to travel costs. If ommitted then mu is chosen equal to average cost -->
+		<param name="mu" value="5.0" />
+		
+		<!-- Module can be silent/verbose -->
+		<param name="verbose" value="false" />
+		
+		<!-- Knowledge of the agent can be increased or modified -->
+		<param name="overwrite knowledge" value="true" />
+
+		<!-- Below are simulation parameters that can be safely left untouched -->
+		<param name="maxiter" value="100"/> <!-- maximum number of iterative substitutions -->
+		<param name="theta" value="0.3" /> <!-- adaptation factor of Newton method -->
+		<param name="threshold1" value="1E-3" /> <!-- stop criterion for substitutions -->
+		<param name="threshold2" value="1E-4" /> <!-- stop criterion for linear solver -->
+		<param name="threshold3" value="1E-3" /> <!-- stop criterion for calibration loop -->
+	</module>
+	<!-- ====================================================================== -->
+</config>

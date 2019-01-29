@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "./dtd/config_v2.dtd"
+	[
+		<!ENTITY OUTPUTBASE   "./output/angletest">
+	]
+>
+
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="network.xml.gz" />
+	</module>
+
+</config>

@@ -1,0 +1,94 @@
+# Status: Somehow, a stage does not seem to pick up the result of the
+# previous stage.  For example, even after "mvn package", it attempts to
+# download matsim snapshots from the internet.  My next attempt would now be along the lines of
+#
+# mvn -o -f ~/git/matsim/pom.xml --projects contribs/otfvis --also-make install -DskipTests
+# mvn -o -f ~/git/matsim/contribs/otfvis/pom.xml exec:java -Dexec.mainClass="org.matsim.contrib.otfvis.OTFVis" -Dexec.vmargs="-Xmx2000m" -Dexec.args="$*"
+#
+# Well, since the commit of this note will trigger another build, I am giving it a first shot, see below. kai
+
+language: java
+
+# jdk: oraclejdk8
+# addons:
+#   apt:
+#     packages:
+#       - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
+# https://github.com/travis-ci/travis-ci/issues/10247
+
+# This skips the mvn install that is otherwise run (implausibly, the setting has to be "true")
+# https://docs.travis-ci.com/user/customizing-the-build/#Skipping-the-Installation-Step
+install: true
+
+
+# For the following, see
+# https://blog.travis-ci.com/2017-09-12-build-stages-order-and-conditions.
+# Note that you cannot get rid of the "test" stage, and it is the only
+# stage that does get matrix-expanded.  So the IT tests need to be run
+# in stage called "test".  kai, dec'17
+
+# define the order of the stages:
+stages:
+  - package
+  - test
+
+# this is the script run in the "test" stage:
+# 'failsafe:verify' triggers travis failures for errors/failures of integration tests. 
+script: mvn install --also-make --projects ${MODULE} -DskipTests -Dmaven.javadoc.skip && cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn failsafe:integration-test failsafe:verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dmaven.javadoc.skip -Dsource.skip -Dassembly.skipAssembly=true -DskipTests
+
+# I just added -DskipTests here since I think that we only want to run the IT tests.  kai, sep'18
+
+# this defines all other stages.
+jobs:
+  include:
+    - stage: package
+      script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end 
+
+#-Dmaven.javadoc.skip # may need this for the weekly/monthly releases
+#-Dsource.skip # may need this for the weekly/monthly releases
+#-Dassembly.skipAssembly=true # if we skip this, then mvn package fails
+
+# (Would be nice to run this also in parallel with the others.  But it
+# is either the matrix thing and then exactly the same command for
+# each module.  Or hand-written entries (see .travis.yml.nomatrix),
+# which in particular has the disadvantage that one cannot see the
+# failing module at the travis toplevel.)
+
+cache:
+  directories:
+  - $HOME/.m2
+
+env:
+  global:
+    - MAVEN_OPTS="-Xmx2g"
+  matrix:
+    - MODULE=matsim                        
+    # sorted from longest to shortest (to minimise the overall test stage duration)
+    - MODULE=contribs/common
+    - MODULE=contribs/minibus
+    - MODULE=contribs/signals
+    - MODULE=contribs/taxi
+    - MODULE=contribs/cadytsIntegration
+    - MODULE=contribs/carsharing
+    - MODULE=contribs/locationchoice
+    - MODULE=contribs/drt
+    - MODULE=contribs/emissions
+    - MODULE=contribs/av
+    - MODULE=contribs/dvrp
+    - MODULE=contribs/decongestion
+    - MODULE=contribs/noise
+    - MODULE=contribs/integration
+    - MODULE=contribs/freight
+    - MODULE=contribs/parking
+    - MODULE=contribs/matrixbasedptrouter
+    - MODULE=contribs/accessibility
+    - MODULE=contribs/multimodal
+    - MODULE=contribs/otfvis
+    - MODULE=contribs/protobuf
+    - MODULE=contribs/socnetsim
+    - MODULE=contribs/bicycle
+    - MODULE=contribs/pseudosimulation
+    - MODULE=contribs/roadpricing
+    - MODULE=contribs/analysis
+    - MODULE=contribs/eventsBasedPTRouter
+    - MODULE=contribs/hybridsim

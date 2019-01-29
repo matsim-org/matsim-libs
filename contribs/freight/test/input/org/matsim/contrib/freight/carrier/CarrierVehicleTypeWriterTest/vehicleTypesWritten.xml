@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<vehicleTypes>
+		<vehicleType id="light">
+			<description>Light Vehicle</description>
+			<engineInformation fuelType="gasoline" gasConsumption="0.02"/>
+			<capacity>15</capacity>
+			<costInformation fix="20.0" perMeter="0.35" perSecond="30.0"/>
+		</vehicleType>
+		<vehicleType id="medium">
+			<description>Medium Vehicle</description>
+			<engineInformation fuelType="gasoline" gasConsumption="0.02"/>
+			<capacity>30</capacity>
+			<costInformation fix="50.0" perMeter="0.4" perSecond="30.0"/>
+		</vehicleType>
+	</vehicleTypes>
+

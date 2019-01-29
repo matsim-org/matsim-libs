@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!ELEMENT config	(module*)>
+<!ATTLIST config
+	xml:lang	NMTOKEN	"de-CH">
+
+<!ELEMENT module	(param|parameterset)*>
+<!ATTLIST module
+	name		CDATA	#REQUIRED>
+
+<!ELEMENT param		EMPTY>
+<!ATTLIST param
+	name		CDATA	#REQUIRED
+	value		CDATA	#REQUIRED>
+
+<!ELEMENT parameterset	(param|parameterset)*>
+<!ATTLIST parameterset
+	type		CDATA	#REQUIRED>
+

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- $Id$ -->
+
+<!-- ============================================================ -->
+
+<!-- generic version of a world description with unlimited number
+     of layers -->
+
+<!-- it is highly recommended to read the comments below! -->
+
+<!-- For further information or questions, please contact
+     Michael Balmer, balmermi at inf dot ethz dot ch -->
+
+<!-- ============================================================ -->
+
+
+<!ELEMENT world (layer+,mapping*)>
+<!ATTLIST world
+          name         CDATA        #IMPLIED
+          xml:lang     NMTOKEN      "de-CH">
+
+<!ELEMENT layer (zone*)>
+<!ATTLIST layer
+          type         CDATA        #REQUIRED
+          is_raster    (true|false) "false"
+          name         CDATA        #IMPLIED>
+
+<!ELEMENT zone EMPTY>
+<!ATTLIST zone
+          id           CDATA        #REQUIRED
+          center_x     CDATA        #IMPLIED
+          center_y     CDATA        #IMPLIED
+          min_x        CDATA        #IMPLIED
+          min_y        CDATA        #IMPLIED
+          max_x        CDATA        #IMPLIED
+          max_y        CDATA        #IMPLIED
+          area         CDATA        #IMPLIED
+          name         CDATA        #IMPLIED>
+
+<!ELEMENT mapping (ref*)>
+<!ATTLIST mapping
+          mapping_rule CDATA        #REQUIRED>
+
+<!ELEMENT ref EMPTY>
+<!ATTLIST ref
+          down_zone_id CDATA        #REQUIRED
+          up_zone_id   CDATA        #REQUIRED>
+
+<!-- ============================================================ -->
+
+<!-- ROOT ELEMENT world:
+     Describes the spatial inforamtion of the given scenario. It can
+     hold an unlimited amount of different layers of resolution, i.e.
+     base-raster,little-blocks,traffic-analysis-zones
+     and large municipalities. Each layer defines a specific level of
+     detail. Level 1 is the most detailed layer (i.e. raster layer)
+     while level 'N' is the less detailed one (i.e. municipality level).
+     Mappings between two layers can only exist if they are right after
+     each one.
+     Example:
+     - three different layers are available: raster-cells (most detailed),
+       blocks and traffic analysis zones (less detailed)
+     - A mapping can exist only between cells and block, blocks and
+       taz's. No mapping is allowed between cells and taz's.-->
+
+<!-- ATTRIBUTE name:
+     The name should describe of which kind of data this
+     file holds. I.e. "Kanton Zurich - 3 layers".
+     format: string -->
+<!-- ATTRIBUTE xml:lang:
+     Used by i.e. Java to know how to format and parse
+     times, dates, etc. according to a given locale (e.g. en_US, de_CH) -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT layer:
+     A layer of the scenario. -->
+
+<!-- ATTRIBUTE type:
+     Describes the type of the layer, i.e. cell,block,taz. To avoid
+     confusion, do not use 'zone' as a layer type.
+     Each layer must have a UNIQUE type!
+     format: string -->
+<!-- ATTRIBUTE is_raster:
+     A special information for layers which have a defined checker-bord
+     shape. With it, more consitency checks can be done.
+     format: (yes|no) -->
+<!-- ATTRIBUTE name:
+     can be used for additional description.
+     format: string -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT zone:
+     One zone of a specific layer. -->
+
+<!-- ATTRIBUTE id:
+     The unque id of a zone of the specified layer. It is not nessesary
+     to have uniqueness for the whole world description.
+     format: unsigned int
+     unit:   [-] -->
+<!-- ATTRIBUTE center_x, center_y:
+     Defines the center of the zone, which does not have to be the center
+     of the rectangle. Valid only if both or non are defined.
+     format: double
+     unit:   [m] -->
+<!-- ATTRIBUTE min_x, min_y, max_x, max_y:
+     Defines the upper left, resp. lower right corner of the rectangle.
+     Valid only if both 'min' or non are defined (both 'max' or non, resp.).
+     format: double
+     unit:   [m] -->
+<!-- ATTRIBUTE area:
+     Defines the area of the zone. not nessesraily the area of the
+     rectangle.
+     format: double
+     unit:   [m^2] -->
+<!-- ATTRIBUTE name:
+     can be used for additional description.
+     format: string -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT mapping:
+     defines the mapping between two 'neighbour' layers. -->
+
+<!-- ATTRIBUTE mapping_rule:
+     Describes the rule how they were mapped.
+
+     They is a defined syntax for the mapping rule:
+     "DOWNLAYERTYPE[MAPPING1]-[MAPPING2]UPLAYERTYPE"
+     - DOWNLAYERTYPE: the type of the more disaggregated layer defined above
+     - UPLAYERTYPE:   the type of the more aggregated layer defined above
+     - MAPPING1:   [?,*,1,+,m]: one zone of UPLAYERTYPE 'contains'
+                                MAPPING1 zones of DOWNLAYERTYPE
+     - MAPPING2:   [?,*,1,+,m]: one zone of DOWNLAYERTYPE 'belongs to'
+                                MAPPING2 zones of UPLAYERTYPE
+     - ?: zero or one
+     - *: zero, one or many
+     - 1: exactly one
+     - +: at least one
+     - m: If the mapping is, for example made by hand, then the
+          value 'm' can be used to ignore any validation. 'm' is only
+          allowed if it is used on both sides (LAYERTYPE1[m]-[m]LAYERTYPE2)
+
+     Examples:
+     - "block[+]-[1]taz":  one taz 'contains' at least one block while
+                           one block 'belongs to' exactly one taz
+     - "cell[+]-[*]block": one block 'contains' at least one cell while
+                           one cell 'belongs to' zero, one or many one taz's
+
+     NOTE: As already mentioned above, the left type must be the more
+           disaggregated layer, i.e.
+           "country[1]-[+]state" is not allowed! Instead write
+           "state[+]-[1]country".
+
+     NOTE: Some mapping rules do not make sense, i.e.
+           "block[1]-[1]taz" (identity). Avoid that!
+
+     format: special string syntax -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT ref:
+     one specific mapping. -->
+
+<!-- ATTRIBUTE zone_id1, zone_id2:
+     The id of the zone of layer type 1 (defined on the left side of
+     the mapping rule) mapped with the id of the
+     zone of layer type 2 (defined of the right side of the mapping rule).
+     format: unsigned int
+     unit:   [-] -->
+
+<!-- ============================================================ -->

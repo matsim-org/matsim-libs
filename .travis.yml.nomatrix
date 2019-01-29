@@ -1,0 +1,52 @@
+language: java
+jdk: oraclejdk8
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
+jobs:
+  include:
+    - stage: mvn package
+      script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
+    - stage: integration test
+      script: cd ${TRAVIS_BUILD_DIR}/contribs/accessibility       && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/av                  && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/analysis            && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/cadytsIntegration   && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/carsharing          && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/drt                 && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/dvrp                && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/taxi                && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/emissions           && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/freight             && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/signals             && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/locationchoice      && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/matsim4urbansim     && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/minibus             && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/networkEditor       && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/otfvis              && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/matrixbasedptrouter && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/parking             && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/socnetsim           && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/socnetgen           && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/transEnergySim      && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/roadpricing         && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/multimodal          && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/integration         && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/wagonSim            && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/pseudosimulation    && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/common              && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/eventsBasedPTRouter && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/travelsummary       && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/deprecated          && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/protobuf            && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/hybridsim           && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/noise               && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/bicycle             && ${MVN_IT_CMD} 
+env:
+  global:
+    - MAVEN_OPTS="-Xmx2g"
+    - MVN_IT_CMD="mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end"
+cache:
+  directories:
+  - $HOME/.m2

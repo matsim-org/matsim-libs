@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+targetNamespace="http://www.matsim.org/files/dtd"
+xmlns="http://www.matsim.org/files/dtd" elementFormDefault="qualified"
+xml:lang="en">
+<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
+<!-- This xml schema contains xml definitions used in the MATSim framework  -->
+
+
+<xs:simpleType name="matsimIdType">
+	<xs:annotation>
+		<xs:documentation>A Id in the MATSim framework is a string with no leading and trailing white
+		spaces, no carriage returns, line feeds, tabs and spaces. These items will be replaced
+		by the parser automatically, for further information see documentation of the
+		xs:collapse restriction.</xs:documentation>
+	</xs:annotation>
+ 	<xs:restriction base="xs:string">
+<!--  	<xs:whiteSpace value="collapse"/>-->
+  </xs:restriction> 
+</xs:simpleType>
+
+<xs:complexType name="matsimObjectType" >
+  <xs:annotation>
+    <xs:documentation>This is the base type for all matsim objects which have an type-wide unique id.
+    Be aware of the idRefType which has to be used in all cases where an Id is only referenced.
+    </xs:documentation>
+  </xs:annotation>
+  <xs:attribute name="id" type="matsimIdType" use="required" />
+</xs:complexType>
+
+<xs:complexType name="idRefType">
+	<xs:annotation>
+		<xs:documentation>This type can be used for all references to elements of type
+		matsimObjectType. In contrast to the matsimObjectType this type has to be used
+		for elements referencing an Id of an object defined elsewhere in the xml documents.
+		</xs:documentation>
+	</xs:annotation>
+  <xs:attribute name="refId" type="matsimIdType" use="required" />
+</xs:complexType>
+
+
+<xs:complexType name="matsimParameterType">
+  <xs:annotation>
+    <xs:documentation> This type is unfortunately quite central for the MATSim framework. One can
+    store any type of parameter in the well-known, however redoubtable name/value format.
+    The usage of this type should be avoided if other solutions exist!    
+    </xs:documentation>
+  </xs:annotation>
+  <xs:attribute name="name" type="xs:string" use="required"/>
+  <xs:attribute name="value" type="xs:string" use="required" />
+</xs:complexType>
+
+<xs:complexType name="matsimTimeAttributeType">
+  <xs:annotation>
+    <xs:documentation>Convenience type for attributes specifying a time in seconds</xs:documentation>  
+  </xs:annotation>
+  <xs:attribute name="seconds" type="xs:double" use="required"></xs:attribute>
+</xs:complexType>
+
+<xs:simpleType name="matsimFormattedTimeAttributeType">
+	<xs:annotation>
+		<xs:documentation>Like xs:time but allows hours > 24</xs:documentation>
+	</xs:annotation>
+ 	<xs:restriction base="xs:string">
+ 		<xs:pattern value="[0-9]+[0-9]:[0-5][0-9]:[0-5][0-9]" />
+  </xs:restriction> 
+</xs:simpleType>
+
+
+<xs:element name="coordinate" type="coordinateType" />
+
+
+<xs:complexType name="coordinateType">
+  <xs:annotation>
+    <xs:documentation>This type can be used for all georeferenced data within the 
+    framework. As we try to avoid reimplementing GIS functionality this is a very 
+    limited basic type without spatial reference system information. However it
+    seems to be useful to have a common type for such information, which can
+    be extended if needed.</xs:documentation>
+  </xs:annotation>
+  <xs:sequence>
+    <xs:element name="xCoord" type="xs:decimal" minOccurs="1" maxOccurs="1"/>
+    <xs:element name="yCoord" type="xs:decimal" minOccurs="1" maxOccurs="1"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:element name="facilityId">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="idRefType" />
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="linkId">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="idRefType" />
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:complexType name="actLocationType">
+  <xs:annotation>
+    <xs:appinfo>
+      <deprecate date="2009-03-13" />
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:sequence>
+        <xs:element ref="facilityId" minOccurs="0" maxOccurs="1" />
+        <xs:element ref="linkId" minOccurs="0" maxOccurs="1" />
+  </xs:sequence>
+</xs:complexType>
+
+
+<xs:element name="location">
+  <xs:annotation>
+    <xs:appinfo>
+      <deprecate date="2009-03-13" />
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element ref="coordinate" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="actLocation" type="actLocationType" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+<xs:simpleType name="probabilityType">
+  <xs:annotation>
+    <xs:documentation>A probability in the range [0,1]</xs:documentation>
+  </xs:annotation>
+  <xs:restriction base="xs:decimal">
+    <xs:maxInclusive value="1.0"></xs:maxInclusive>
+    <xs:minInclusive value="0.0"></xs:minInclusive>
+  </xs:restriction>
+</xs:simpleType>
+
+</xs:schema>

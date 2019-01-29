@@ -1,0 +1,148 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+    <module name="taxifares">
+        <!-- Define a parameterset for each taxi mode where fares should be charged -->
+
+        <parameterset type="taxifare">
+            <param name="mode" value="taxi"/>
+            <!-- transport mode for which this fare applies. Default: taxi -->
+            <param name="basefare" value="0.5"/>
+            <!-- Daily subscription fee (fee = positive value) -->
+            <param name="dailySubscriptionFee" value="0.0"/>
+            <!-- taxi fare per meter (fee = positive value) -->
+            <param name="distanceFare_m" value="0.0002"/>
+            <!-- taxi fare per hour (fee = positive value) -->
+            <param name="timeFare_h" value="3.6"/>
+        </parameterset>
+    </module>
+
+    <module name="dvrp">
+        <!-- Mode of which the network will be used for routing vehicles, calculating trave times etc. (fleet operator's perspective).
+                    If null, no mode filtering is done; the standard network (Scenario.getNetwork()) is used - usually, car -->
+        <param name="networkMode" value="null"/>
+    </module>
+
+    <module name="taxi">
+
+        <!-- Used in AStarEuclidean for shortest path search for occupied drives.
+            Values above 1.0 (typically, 1.5 to 3.0) speed up the search, but at the
+            cost of obtaining longer paths -->
+        <param name="AStarEuclideanOverdoFactor" value="1.0"/>
+
+        <param name="breakIfNotAllRequestsServed" value="false"/>
+
+        <param name="changeStartLinkToLastLinkInSchedule" value="true"/>
+
+        <!-- If false, the drop-off location remains unknown to the optimizer and
+            scheduler until the end of pickup -->
+        <param name="destinationKnown" value="false"/>
+
+        <!-- If true, detailed hourly taxi stats are dumped after each iteration. -->
+        <param name="detailedStats" value="true"/>
+
+        <!-- Typically, 60 seconds -->
+        <param name="dropoffDuration" value="60.0"/>
+
+        <!-- If true, vehicles are (GPS-like) monitored while moving. This helps
+            in getting more accurate estimates on the time of arrival. Online tracking
+            is necessary for vehicle diversion. -->
+        <param name="onlineVehicleTracker" value="false"/>
+
+        <!-- Typically, 120 seconds -->
+        <param name="pickupDuration" value="120.0"/>
+
+        <!-- An XML file specifying the taxi fleet. The file format according to
+            dvrp_vehicles_v1.dtd -->
+        <!-- To create your own vehicles, see org.matsim.contrib.av.vehicles.CreateTaxiVehicles  -->
+        <param name="taxisFile" value="taxis_5000.xml"/>
+        <!--  param name="taxisFile" value="taxis_2000.xml" /  -->
+
+        <!-- If true, time profiles of vehicle statuses (i.e. current task type)
+            and the number of unplanned requests -->
+        <param name="timeProfiles" value="true"/>
+
+        <!-- If true, vehicles can be diverted during empty trips. Requires online
+            tracking. -->
+        <param name="vehicleDiversion" value="false"/>
+
+        <parameterset type="optimizer">
+            <param name="cellSize" value="1000"/>
+            <param name="goal" value="DEMAND_SUPPLY_EQUIL"/>
+            <param name="id" value="example"/>
+            <param name="nearestRequestsLimit" value="99999"/>
+            <param name="nearestVehiclesLimit" value="99999"/>
+            <param name="type" value="RULE_BASED"/>
+        </parameterset>
+    </module>
+
+
+    <module name="network">
+        <param name="inputNetworkFile" value="network.xml.gz"/>
+        <!-- param name="timeVariantNetwork" value="false" / if timeVariantNetwork -->
+        <!-- param name="inputChangeEventsFile" value=""/ if timeVariantNetwork -->
+    </module>
+
+    <module name="plans">
+        <param name="inputPlansFile" value="cb-taxiplans.xml.gz"/>
+    </module>
+
+    <module name="qsim">
+        <param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
+        <param name="endTime" value="24:00:00"/>
+
+        <param name="insertingWaitingVehiclesBeforeDrivingVehicles"
+               value="true"/>
+        <param name="snapshotStyle" value="queue"/>
+    </module>
+
+    <module name="otfvis">
+        <param name="coloringScheme" value="taxicab"/>
+        <param name="drawNonMovingItems" value="true"/>
+    </module>
+
+    <module name="controler">
+        <param name="outputDirectory" value="output/robotaxi"/>
+        <param name="overwriteFiles" value="deleteDirectoryIfExists"/>
+        <param name="firstIteration" value="0"/>
+        <param name="lastIteration" value="10"/>
+    </module>
+
+    <module name="planCalcScore">
+        <parameterset type="activityParams">
+            <param name="activityType" value="work"/>
+            <param name="typicalDuration" value="08:00:00"/>
+            <param name="openingTime" value="06:00:00"/>
+            <param name="latestStartTime" value="09:00:00"/>
+            <param name="closingTime" value="17:00:00"/>
+
+        </parameterset>
+
+        <parameterset type="activityParams">
+            <param name="activityType" value="home"/>
+            <param name="typicalDuration" value="12:00:00"/>
+        </parameterset>
+
+        <parameterset type="modeParams">
+            <param name="constant" value="0.0"/>
+            <param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+            <param name="marginalUtilityOfTraveling_util_hr" value="0.0"/>
+            <param name="mode" value="taxi"/>
+            <param name="monetaryDistanceRate" value="0.0"/>
+        </parameterset>
+
+    </module>
+
+    <module name="strategy">
+        <param name="fractionOfIterationsToDisableInnovation" value="0.8"/>
+
+        <parameterset type="strategysettings">
+            <param name="strategyName" value="TimeAllocationMutator"/>
+            <param name="weight" value="0.1"/>
+        </parameterset>
+    </module>
+    <module name="TimeAllocationMutator">
+        <param name="mutationRange" value="900.0"/>
+
+    </module>
+</config>

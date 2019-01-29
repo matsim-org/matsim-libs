@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- $Id$ -->
+
+<!-- ============================================================ -->
+
+<!-- For further information or questions, please contact
+     Michael Balmer, balmermi at inf dot ethz dot ch -->
+
+<!-- ============================================================ -->
+
+<!ELEMENT matrices    (matrix+)>
+<!ATTLIST matrices
+          name        CDATA    #IMPLIED
+          xml:lang    NMTOKEN  "de-CH">
+
+<!ELEMENT matrix     (entry*)>
+<!ATTLIST matrix
+          id          CDATA    #REQUIRED
+          desc        CDATA    #IMPLIED>
+
+<!ELEMENT entry       EMPTY>
+<!ATTLIST entry
+          from_id     CDATA    #REQUIRED
+          to_id       CDATA    #REQUIRED
+          value       CDATA    #REQUIRED>
+
+<!-- ============================================================ -->
+
+<!-- ROOT ELEMENT matrices:
+     keeps all available matrices for a given scenario -->
+
+<!-- ATTRIBUTE name:
+     It is always a good idea to give a matrices file a descriptive
+     name for better identification.
+     Normally it should describe, which company / institute / etc..
+     created that matrices file and / or what has been modified.
+     format := string -->
+<!-- ATTRIBUTE xml:lang:
+     Defines the language settings (see xml spec). -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT matrix:
+     defines a single matrix based on a world layer (see world.dtd) -->
+
+<!-- ATTRIBUTE id:
+     Each matrix holds a UNIQUE id for the given scenario (for identification).
+     format := string -->
+<!-- ATTRIBUTE desc:
+     describes the meaning of that matrix.
+     format := string -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT entry:
+     one entry of the matrix. -->
+
+<!-- ATTRIBUTE from_id:
+     Typically the row name of the matrix. must be an identifier of
+     a given zone of the defined layer of the world
+     format := unsigned integer -->
+<!-- ATTRIBUTE to_id:
+     Typically the column name of the matrix. must be an identifier of
+     a given zone of the defined layer of the world.
+     format := unsigned integer -->
+<!-- ATTRIBUTE value:
+     the value of the entry.
+     format := double -->

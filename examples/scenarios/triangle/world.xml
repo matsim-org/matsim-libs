@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE world SYSTEM "http://www.matsim.org/files/dtd/world_v2.dtd">
+<world name="test triangle world">
+
+<!-- ====================================================================== -->
+
+	<layer type="cell" name="made by hand">
+		<zone id="0" center_x="10.0" center_y="10.0" min_x="0.0" min_y="0.0" max_x="20.0" max_y="20.0" area="400.0" name="cell(0,0)" />
+		<zone id="1" center_x="30.0" center_y="10.0" min_x="20.0" min_y="0.0" max_x="40.0" max_y="20.0" area="400.0" name="cell(0,1)" />
+		<zone id="10" center_x="210.0" center_y="10.0" min_x="200.0" min_y="0.0" max_x="220.0" max_y="20.0" area="400.0" name="cell(0,10)" />
+		<zone id="100" center_x="90.0" center_y="130.0" min_x="80.0" min_y="120.0" max_x="100.0" max_y="140.0" area="400.0" name="cell(6,4)" />
+		<zone id="101" center_x="110.0" center_y="130.0" min_x="100.0" min_y="120.0" max_x="120.0" max_y="140.0" area="400.0" name="cell(6,5)" />
+		<zone id="102" center_x="130.0" center_y="130.0" min_x="120.0" min_y="120.0" max_x="140.0" max_y="140.0" area="400.0" name="cell(6,6)" />
+		<zone id="103" center_x="150.0" center_y="130.0" min_x="140.0" min_y="120.0" max_x="160.0" max_y="140.0" area="400.0" name="cell(6,7)" />
+		<zone id="104" center_x="170.0" center_y="130.0" min_x="160.0" min_y="120.0" max_x="180.0" max_y="140.0" area="400.0" name="cell(6,8)" />
+		<zone id="105" center_x="190.0" center_y="130.0" min_x="180.0" min_y="120.0" max_x="200.0" max_y="140.0" area="400.0" name="cell(6,9)" />
+		<zone id="106" center_x="210.0" center_y="130.0" min_x="200.0" min_y="120.0" max_x="220.0" max_y="140.0" area="400.0" name="cell(6,10)" />
+		<zone id="107" center_x="230.0" center_y="130.0" min_x="220.0" min_y="120.0" max_x="240.0" max_y="140.0" area="400.0" name="cell(6,11)" />
+		<zone id="108" center_x="250.0" center_y="130.0" min_x="240.0" min_y="120.0" max_x="260.0" max_y="140.0" area="400.0" name="cell(6,12)" />
+		<zone id="109" center_x="270.0" center_y="130.0" min_x="260.0" min_y="120.0" max_x="280.0" max_y="140.0" area="400.0" name="cell(6,13)" />
+		<zone id="11" center_x="230.0" center_y="10.0" min_x="220.0" min_y="0.0" max_x="240.0" max_y="20.0" area="400.0" name="cell(0,11)" />
+		<zone id="110" center_x="290.0" center_y="130.0" min_x="280.0" min_y="120.0" max_x="300.0" max_y="140.0" area="400.0" name="cell(6,14)" />
+		<zone id="111" center_x="310.0" center_y="130.0" min_x="300.0" min_y="120.0" max_x="320.0" max_y="140.0" area="400.0" name="cell(6,15)" />
+		<zone id="112" center_x="10.0" center_y="150.0" min_x="0.0" min_y="140.0" max_x="20.0" max_y="160.0" area="400.0" name="cell(7,0)" />
+		<zone id="113" center_x="30.0" center_y="150.0" min_x="20.0" min_y="140.0" max_x="40.0" max_y="160.0" area="400.0" name="cell(7,1)" />
+		<zone id="114" center_x="50.0" center_y="150.0" min_x="40.0" min_y="140.0" max_x="60.0" max_y="160.0" area="400.0" name="cell(7,2)" />
+		<zone id="115" center_x="70.0" center_y="150.0" min_x="60.0" min_y="140.0" max_x="80.0" max_y="160.0" area="400.0" name="cell(7,3)" />
+		<zone id="116" center_x="90.0" center_y="150.0" min_x="80.0" min_y="140.0" max_x="100.0" max_y="160.0" area="400.0" name="cell(7,4)" />
+		<zone id="117" center_x="110.0" center_y="150.0" min_x="100.0" min_y="140.0" max_x="120.0" max_y="160.0" area="400.0" name="cell(7,5)" />
+		<zone id="118" center_x="130.0" center_y="150.0" min_x="120.0" min_y="140.0" max_x="140.0" max_y="160.0" area="400.0" name="cell(7,6)" />
+		<zone id="119" center_x="150.0" center_y="150.0" min_x="140.0" min_y="140.0" max_x="160.0" max_y="160.0" area="400.0" name="cell(7,7)" />
+		<zone id="12" center_x="250.0" center_y="10.0" min_x="240.0" min_y="0.0" max_x="260.0" max_y="20.0" area="400.0" name="cell(0,12)" />
+		<zone id="120" center_x="170.0" center_y="150.0" min_x="160.0" min_y="140.0" max_x="180.0" max_y="160.0" area="400.0" name="cell(7,8)" />
+		<zone id="121" center_x="190.0" center_y="150.0" min_x="180.0" min_y="140.0" max_x="200.0" max_y="160.0" area="400.0" name="cell(7,9)" />
+		<zone id="122" center_x="210.0" center_y="150.0" min_x="200.0" min_y="140.0" max_x="220.0" max_y="160.0" area="400.0" name="cell(7,10)" />
+		<zone id="123" center_x="230.0" center_y="150.0" min_x="220.0" min_y="140.0" max_x="240.0" max_y="160.0" area="400.0" name="cell(7,11)" />
+		<zone id="124" center_x="250.0" center_y="150.0" min_x="240.0" min_y="140.0" max_x="260.0" max_y="160.0" area="400.0" name="cell(7,12)" />
+		<zone id="125" center_x="270.0" center_y="150.0" min_x="260.0" min_y="140.0" max_x="280.0" max_y="160.0" area="400.0" name="cell(7,13)" />
+		<zone id="126" center_x="290.0" center_y="150.0" min_x="280.0" min_y="140.0" max_x="300.0" max_y="160.0" area="400.0" name="cell(7,14)" />
+		<zone id="127" center_x="310.0" center_y="150.0" min_x="300.0" min_y="140.0" max_x="320.0" max_y="160.0" area="400.0" name="cell(7,15)" />
+		<zone id="128" center_x="10.0" center_y="170.0" min_x="0.0" min_y="160.0" max_x="20.0" max_y="180.0" area="400.0" name="cell(8,0)" />
+		<zone id="129" center_x="30.0" center_y="170.0" min_x="20.0" min_y="160.0" max_x="40.0" max_y="180.0" area="400.0" name="cell(8,1)" />
+		<zone id="13" center_x="270.0" center_y="10.0" min_x="260.0" min_y="0.0" max_x="280.0" max_y="20.0" area="400.0" name="cell(0,13)" />
+		<zone id="130" center_x="50.0" center_y="170.0" min_x="40.0" min_y="160.0" max_x="60.0" max_y="180.0" area="400.0" name="cell(8,2)" />
+		<zone id="131" center_x="70.0" center_y="170.0" min_x="60.0" min_y="160.0" max_x="80.0" max_y="180.0" area="400.0" name="cell(8,3)" />
+		<zone id="132" center_x="90.0" center_y="170.0" min_x="80.0" min_y="160.0" max_x="100.0" max_y="180.0" area="400.0" name="cell(8,4)" />
+		<zone id="133" center_x="110.0" center_y="170.0" min_x="100.0" min_y="160.0" max_x="120.0" max_y="180.0" area="400.0" name="cell(8,5)" />
+		<zone id="134" center_x="130.0" center_y="170.0" min_x="120.0" min_y="160.0" max_x="140.0" max_y="180.0" area="400.0" name="cell(8,6)" />
+		<zone id="135" center_x="150.0" center_y="170.0" min_x="140.0" min_y="160.0" max_x="160.0" max_y="180.0" area="400.0" name="cell(8,7)" />
+		<zone id="136" center_x="170.0" center_y="170.0" min_x="160.0" min_y="160.0" max_x="180.0" max_y="180.0" area="400.0" name="cell(8,8)" />
+		<zone id="137" center_x="190.0" center_y="170.0" min_x="180.0" min_y="160.0" max_x="200.0" max_y="180.0" area="400.0" name="cell(8,9)" />
+		<zone id="138" center_x="210.0" center_y="170.0" min_x="200.0" min_y="160.0" max_x="220.0" max_y="180.0" area="400.0" name="cell(8,10)" />
+		<zone id="139" center_x="230.0" center_y="170.0" min_x="220.0" min_y="160.0" max_x="240.0" max_y="180.0" area="400.0" name="cell(8,11)" />
+		<zone id="14" center_x="290.0" center_y="10.0" min_x="280.0" min_y="0.0" max_x="300.0" max_y="20.0" area="400.0" name="cell(0,14)" />
+		<zone id="140" center_x="250.0" center_y="170.0" min_x="240.0" min_y="160.0" max_x="260.0" max_y="180.0" area="400.0" name="cell(8,12)" />
+		<zone id="141" center_x="270.0" center_y="170.0" min_x="260.0" min_y="160.0" max_x="280.0" max_y="180.0" area="400.0" name="cell(8,13)" />
+		<zone id="142" center_x="290.0" center_y="170.0" min_x="280.0" min_y="160.0" max_x="300.0" max_y="180.0" area="400.0" name="cell(8,14)" />
+		<zone id="143" center_x="310.0" center_y="170.0" min_x="300.0" min_y="160.0" max_x="320.0" max_y="180.0" area="400.0" name="cell(8,15)" />
+		<zone id="144" center_x="10.0" center_y="190.0" min_x="0.0" min_y="180.0" max_x="20.0" max_y="200.0" area="400.0" name="cell(9,0)" />
+		<zone id="145" center_x="30.0" center_y="190.0" min_x="20.0" min_y="180.0" max_x="40.0" max_y="200.0" area="400.0" name="cell(9,1)" />
+		<zone id="146" center_x="50.0" center_y="190.0" min_x="40.0" min_y="180.0" max_x="60.0" max_y="200.0" area="400.0" name="cell(9,2)" />
+		<zone id="147" center_x="70.0" center_y="190.0" min_x="60.0" min_y="180.0" max_x="80.0" max_y="200.0" area="400.0" name="cell(9,3)" />
+		<zone id="148" center_x="90.0" center_y="190.0" min_x="80.0" min_y="180.0" max_x="100.0" max_y="200.0" area="400.0" name="cell(9,4)" />
+		<zone id="149" center_x="110.0" center_y="190.0" min_x="100.0" min_y="180.0" max_x="120.0" max_y="200.0" area="400.0" name="cell(9,5)" />
+		<zone id="15" center_x="310.0" center_y="10.0" min_x="300.0" min_y="0.0" max_x="320.0" max_y="20.0" area="400.0" name="cell(0,15)" />
+		<zone id="150" center_x="130.0" center_y="190.0" min_x="120.0" min_y="180.0" max_x="140.0" max_y="200.0" area="400.0" name="cell(9,6)" />
+		<zone id="151" center_x="150.0" center_y="190.0" min_x="140.0" min_y="180.0" max_x="160.0" max_y="200.0" area="400.0" name="cell(9,7)" />
+		<zone id="152" center_x="170.0" center_y="190.0" min_x="160.0" min_y="180.0" max_x="180.0" max_y="200.0" area="400.0" name="cell(9,8)" />
+		<zone id="153" center_x="190.0" center_y="190.0" min_x="180.0" min_y="180.0" max_x="200.0" max_y="200.0" area="400.0" name="cell(9,9)" />
+		<zone id="154" center_x="210.0" center_y="190.0" min_x="200.0" min_y="180.0" max_x="220.0" max_y="200.0" area="400.0" name="cell(9,10)" />
+		<zone id="155" center_x="230.0" center_y="190.0" min_x="220.0" min_y="180.0" max_x="240.0" max_y="200.0" area="400.0" name="cell(9,11)" />
+		<zone id="156" center_x="250.0" center_y="190.0" min_x="240.0" min_y="180.0" max_x="260.0" max_y="200.0" area="400.0" name="cell(9,12)" />
+		<zone id="157" center_x="270.0" center_y="190.0" min_x="260.0" min_y="180.0" max_x="280.0" max_y="200.0" area="400.0" name="cell(9,13)" />
+		<zone id="158" center_x="290.0" center_y="190.0" min_x="280.0" min_y="180.0" max_x="300.0" max_y="200.0" area="400.0" name="cell(9,14)" />
+		<zone id="159" center_x="310.0" center_y="190.0" min_x="300.0" min_y="180.0" max_x="320.0" max_y="200.0" area="400.0" name="cell(9,15)" />
+		<zone id="16" center_x="10.0" center_y="30.0" min_x="0.0" min_y="20.0" max_x="20.0" max_y="40.0" area="400.0" name="cell(1,0)" />
+		<zone id="160" center_x="10.0" center_y="210.0" min_x="0.0" min_y="200.0" max_x="20.0" max_y="220.0" area="400.0" name="cell(10,0)" />
+		<zone id="161" center_x="30.0" center_y="210.0" min_x="20.0" min_y="200.0" max_x="40.0" max_y="220.0" area="400.0" name="cell(10,1)" />
+		<zone id="162" center_x="50.0" center_y="210.0" min_x="40.0" min_y="200.0" max_x="60.0" max_y="220.0" area="400.0" name="cell(10,2)" />
+		<zone id="163" center_x="70.0" center_y="210.0" min_x="60.0" min_y="200.0" max_x="80.0" max_y="220.0" area="400.0" name="cell(10,3)" />
+		<zone id="164" center_x="90.0" center_y="210.0" min_x="80.0" min_y="200.0" max_x="100.0" max_y="220.0" area="400.0" name="cell(10,4)" />
+		<zone id="165" center_x="110.0" center_y="210.0" min_x="100.0" min_y="200.0" max_x="120.0" max_y="220.0" area="400.0" name="cell(10,5)" />
+		<zone id="166" center_x="130.0" center_y="210.0" min_x="120.0" min_y="200.0" max_x="140.0" max_y="220.0" area="400.0" name="cell(10,6)" />
+		<zone id="167" center_x="150.0" center_y="210.0" min_x="140.0" min_y="200.0" max_x="160.0" max_y="220.0" area="400.0" name="cell(10,7)" />
+		<zone id="168" center_x="170.0" center_y="210.0" min_x="160.0" min_y="200.0" max_x="180.0" max_y="220.0" area="400.0" name="cell(10,8)" />
+		<zone id="169" center_x="190.0" center_y="210.0" min_x="180.0" min_y="200.0" max_x="200.0" max_y="220.0" area="400.0" name="cell(10,9)" />
+		<zone id="17" center_x="30.0" center_y="30.0" min_x="20.0" min_y="20.0" max_x="40.0" max_y="40.0" area="400.0" name="cell(1,1)" />
+		<zone id="170" center_x="210.0" center_y="210.0" min_x="200.0" min_y="200.0" max_x="220.0" max_y="220.0" area="400.0" name="cell(10,10)" />
+		<zone id="171" center_x="230.0" center_y="210.0" min_x="220.0" min_y="200.0" max_x="240.0" max_y="220.0" area="400.0" name="cell(10,11)" />
+		<zone id="172" center_x="250.0" center_y="210.0" min_x="240.0" min_y="200.0" max_x="260.0" max_y="220.0" area="400.0" name="cell(10,12)" />
+		<zone id="173" center_x="270.0" center_y="210.0" min_x="260.0" min_y="200.0" max_x="280.0" max_y="220.0" area="400.0" name="cell(10,13)" />
+		<zone id="174" center_x="290.0" center_y="210.0" min_x="280.0" min_y="200.0" max_x="300.0" max_y="220.0" area="400.0" name="cell(10,14)" />
+		<zone id="175" center_x="310.0" center_y="210.0" min_x="300.0" min_y="200.0" max_x="320.0" max_y="220.0" area="400.0" name="cell(10,15)" />
+		<zone id="176" center_x="10.0" center_y="230.0" min_x="0.0" min_y="220.0" max_x="20.0" max_y="240.0" area="400.0" name="cell(11,0)" />
+		<zone id="177" center_x="30.0" center_y="230.0" min_x="20.0" min_y="220.0" max_x="40.0" max_y="240.0" area="400.0" name="cell(11,1)" />
+		<zone id="178" center_x="50.0" center_y="230.0" min_x="40.0" min_y="220.0" max_x="60.0" max_y="240.0" area="400.0" name="cell(11,2)" />
+		<zone id="179" center_x="70.0" center_y="230.0" min_x="60.0" min_y="220.0" max_x="80.0" max_y="240.0" area="400.0" name="cell(11,3)" />
+		<zone id="18" center_x="50.0" center_y="30.0" min_x="40.0" min_y="20.0" max_x="60.0" max_y="40.0" area="400.0" name="cell(1,2)" />
+		<zone id="180" center_x="90.0" center_y="230.0" min_x="80.0" min_y="220.0" max_x="100.0" max_y="240.0" area="400.0" name="cell(11,4)" />
+		<zone id="181" center_x="110.0" center_y="230.0" min_x="100.0" min_y="220.0" max_x="120.0" max_y="240.0" area="400.0" name="cell(11,5)" />
+		<zone id="182" center_x="130.0" center_y="230.0" min_x="120.0" min_y="220.0" max_x="140.0" max_y="240.0" area="400.0" name="cell(11,6)" />
+		<zone id="183" center_x="150.0" center_y="230.0" min_x="140.0" min_y="220.0" max_x="160.0" max_y="240.0" area="400.0" name="cell(11,7)" />
+		<zone id="184" center_x="170.0" center_y="230.0" min_x="160.0" min_y="220.0" max_x="180.0" max_y="240.0" area="400.0" name="cell(11,8)" />
+		<zone id="185" center_x="190.0" center_y="230.0" min_x="180.0" min_y="220.0" max_x="200.0" max_y="240.0" area="400.0" name="cell(11,9)" />
+		<zone id="186" center_x="210.0" center_y="230.0" min_x="200.0" min_y="220.0" max_x="220.0" max_y="240.0" area="400.0" name="cell(11,10)" />
+		<zone id="187" center_x="230.0" center_y="230.0" min_x="220.0" min_y="220.0" max_x="240.0" max_y="240.0" area="400.0" name="cell(11,11)" />
+		<zone id="188" center_x="250.0" center_y="230.0" min_x="240.0" min_y="220.0" max_x="260.0" max_y="240.0" area="400.0" name="cell(11,12)" />
+		<zone id="189" center_x="270.0" center_y="230.0" min_x="260.0" min_y="220.0" max_x="280.0" max_y="240.0" area="400.0" name="cell(11,13)" />
+		<zone id="19" center_x="70.0" center_y="30.0" min_x="60.0" min_y="20.0" max_x="80.0" max_y="40.0" area="400.0" name="cell(1,3)" />
+		<zone id="190" center_x="290.0" center_y="230.0" min_x="280.0" min_y="220.0" max_x="300.0" max_y="240.0" area="400.0" name="cell(11,14)" />
+		<zone id="191" center_x="310.0" center_y="230.0" min_x="300.0" min_y="220.0" max_x="320.0" max_y="240.0" area="400.0" name="cell(11,15)" />
+		<zone id="192" center_x="10.0" center_y="250.0" min_x="0.0" min_y="240.0" max_x="20.0" max_y="260.0" area="400.0" name="cell(12,0)" />
+		<zone id="193" center_x="30.0" center_y="250.0" min_x="20.0" min_y="240.0" max_x="40.0" max_y="260.0" area="400.0" name="cell(12,1)" />
+		<zone id="194" center_x="50.0" center_y="250.0" min_x="40.0" min_y="240.0" max_x="60.0" max_y="260.0" area="400.0" name="cell(12,2)" />
+		<zone id="195" center_x="70.0" center_y="250.0" min_x="60.0" min_y="240.0" max_x="80.0" max_y="260.0" area="400.0" name="cell(12,3)" />
+		<zone id="196" center_x="90.0" center_y="250.0" min_x="80.0" min_y="240.0" max_x="100.0" max_y="260.0" area="400.0" name="cell(12,4)" />
+		<zone id="197" center_x="110.0" center_y="250.0" min_x="100.0" min_y="240.0" max_x="120.0" max_y="260.0" area="400.0" name="cell(12,5)" />
+		<zone id="198" center_x="130.0" center_y="250.0" min_x="120.0" min_y="240.0" max_x="140.0" max_y="260.0" area="400.0" name="cell(12,6)" />
+		<zone id="199" center_x="150.0" center_y="250.0" min_x="140.0" min_y="240.0" max_x="160.0" max_y="260.0" area="400.0" name="cell(12,7)" />
+		<zone id="2" center_x="50.0" center_y="10.0" min_x="40.0" min_y="0.0" max_x="60.0" max_y="20.0" area="400.0" name="cell(0,2)" />
+		<zone id="20" center_x="90.0" center_y="30.0" min_x="80.0" min_y="20.0" max_x="100.0" max_y="40.0" area="400.0" name="cell(1,4)" />
+		<zone id="200" center_x="170.0" center_y="250.0" min_x="160.0" min_y="240.0" max_x="180.0" max_y="260.0" area="400.0" name="cell(12,8)" />
+		<zone id="201" center_x="190.0" center_y="250.0" min_x="180.0" min_y="240.0" max_x="200.0" max_y="260.0" area="400.0" name="cell(12,9)" />
+		<zone id="202" center_x="210.0" center_y="250.0" min_x="200.0" min_y="240.0" max_x="220.0" max_y="260.0" area="400.0" name="cell(12,10)" />
+		<zone id="203" center_x="230.0" center_y="250.0" min_x="220.0" min_y="240.0" max_x="240.0" max_y="260.0" area="400.0" name="cell(12,11)" />
+		<zone id="204" center_x="250.0" center_y="250.0" min_x="240.0" min_y="240.0" max_x="260.0" max_y="260.0" area="400.0" name="cell(12,12)" />
+		<zone id="205" center_x="270.0" center_y="250.0" min_x="260.0" min_y="240.0" max_x="280.0" max_y="260.0" area="400.0" name="cell(12,13)" />
+		<zone id="206" center_x="290.0" center_y="250.0" min_x="280.0" min_y="240.0" max_x="300.0" max_y="260.0" area="400.0" name="cell(12,14)" />
+		<zone id="207" center_x="310.0" center_y="250.0" min_x="300.0" min_y="240.0" max_x="320.0" max_y="260.0" area="400.0" name="cell(12,15)" />
+		<zone id="208" center_x="10.0" center_y="270.0" min_x="0.0" min_y="260.0" max_x="20.0" max_y="280.0" area="400.0" name="cell(13,0)" />
+		<zone id="209" center_x="30.0" center_y="270.0" min_x="20.0" min_y="260.0" max_x="40.0" max_y="280.0" area="400.0" name="cell(13,1)" />
+		<zone id="21" center_x="110.0" center_y="30.0" min_x="100.0" min_y="20.0" max_x="120.0" max_y="40.0" area="400.0" name="cell(1,5)" />
+		<zone id="210" center_x="50.0" center_y="270.0" min_x="40.0" min_y="260.0" max_x="60.0" max_y="280.0" area="400.0" name="cell(13,2)" />
+		<zone id="211" center_x="70.0" center_y="270.0" min_x="60.0" min_y="260.0" max_x="80.0" max_y="280.0" area="400.0" name="cell(13,3)" />
+		<zone id="212" center_x="90.0" center_y="270.0" min_x="80.0" min_y="260.0" max_x="100.0" max_y="280.0" area="400.0" name="cell(13,4)" />
+		<zone id="213" center_x="110.0" center_y="270.0" min_x="100.0" min_y="260.0" max_x="120.0" max_y="280.0" area="400.0" name="cell(13,5)" />
+		<zone id="214" center_x="130.0" center_y="270.0" min_x="120.0" min_y="260.0" max_x="140.0" max_y="280.0" area="400.0" name="cell(13,6)" />
+		<zone id="215" center_x="150.0" center_y="270.0" min_x="140.0" min_y="260.0" max_x="160.0" max_y="280.0" area="400.0" name="cell(13,7)" />
+		<zone id="216" center_x="170.0" center_y="270.0" min_x="160.0" min_y="260.0" max_x="180.0" max_y="280.0" area="400.0" name="cell(13,8)" />
+		<zone id="217" center_x="190.0" center_y="270.0" min_x="180.0" min_y="260.0" max_x="200.0" max_y="280.0" area="400.0" name="cell(13,9)" />
+		<zone id="218" center_x="210.0" center_y="270.0" min_x="200.0" min_y="260.0" max_x="220.0" max_y="280.0" area="400.0" name="cell(13,10)" />
+		<zone id="219" center_x="230.0" center_y="270.0" min_x="220.0" min_y="260.0" max_x="240.0" max_y="280.0" area="400.0" name="cell(13,11)" />
+		<zone id="22" center_x="130.0" center_y="30.0" min_x="120.0" min_y="20.0" max_x="140.0" max_y="40.0" area="400.0" name="cell(1,6)" />
+		<zone id="220" center_x="250.0" center_y="270.0" min_x="240.0" min_y="260.0" max_x="260.0" max_y="280.0" area="400.0" name="cell(13,12)" />
+		<zone id="221" center_x="270.0" center_y="270.0" min_x="260.0" min_y="260.0" max_x="280.0" max_y="280.0" area="400.0" name="cell(13,13)" />
+		<zone id="222" center_x="290.0" center_y="270.0" min_x="280.0" min_y="260.0" max_x="300.0" max_y="280.0" area="400.0" name="cell(13,14)" />
+		<zone id="223" center_x="310.0" center_y="270.0" min_x="300.0" min_y="260.0" max_x="320.0" max_y="280.0" area="400.0" name="cell(13,15)" />
+		<zone id="23" center_x="150.0" center_y="30.0" min_x="140.0" min_y="20.0" max_x="160.0" max_y="40.0" area="400.0" name="cell(1,7)" />
+		<zone id="24" center_x="170.0" center_y="30.0" min_x="160.0" min_y="20.0" max_x="180.0" max_y="40.0" area="400.0" name="cell(1,8)" />
+		<zone id="25" center_x="190.0" center_y="30.0" min_x="180.0" min_y="20.0" max_x="200.0" max_y="40.0" area="400.0" name="cell(1,9)" />
+		<zone id="26" center_x="210.0" center_y="30.0" min_x="200.0" min_y="20.0" max_x="220.0" max_y="40.0" area="400.0" name="cell(1,10)" />
+		<zone id="27" center_x="230.0" center_y="30.0" min_x="220.0" min_y="20.0" max_x="240.0" max_y="40.0" area="400.0" name="cell(1,11)" />
+		<zone id="28" center_x="250.0" center_y="30.0" min_x="240.0" min_y="20.0" max_x="260.0" max_y="40.0" area="400.0" name="cell(1,12)" />
+		<zone id="29" center_x="270.0" center_y="30.0" min_x="260.0" min_y="20.0" max_x="280.0" max_y="40.0" area="400.0" name="cell(1,13)" />
+		<zone id="3" center_x="70.0" center_y="10.0" min_x="60.0" min_y="0.0" max_x="80.0" max_y="20.0" area="400.0" name="cell(0,3)" />
+		<zone id="30" center_x="290.0" center_y="30.0" min_x="280.0" min_y="20.0" max_x="300.0" max_y="40.0" area="400.0" name="cell(1,14)" />
+		<zone id="31" center_x="310.0" center_y="30.0" min_x="300.0" min_y="20.0" max_x="320.0" max_y="40.0" area="400.0" name="cell(1,15)" />
+		<zone id="32" center_x="10.0" center_y="50.0" min_x="0.0" min_y="40.0" max_x="20.0" max_y="60.0" area="400.0" name="cell(2,0)" />
+		<zone id="33" center_x="30.0" center_y="50.0" min_x="20.0" min_y="40.0" max_x="40.0" max_y="60.0" area="400.0" name="cell(2,1)" />
+		<zone id="34" center_x="50.0" center_y="50.0" min_x="40.0" min_y="40.0" max_x="60.0" max_y="60.0" area="400.0" name="cell(2,2)" />
+		<zone id="35" center_x="70.0" center_y="50.0" min_x="60.0" min_y="40.0" max_x="80.0" max_y="60.0" area="400.0" name="cell(2,3)" />
+		<zone id="36" center_x="90.0" center_y="50.0" min_x="80.0" min_y="40.0" max_x="100.0" max_y="60.0" area="400.0" name="cell(2,4)" />
+		<zone id="37" center_x="110.0" center_y="50.0" min_x="100.0" min_y="40.0" max_x="120.0" max_y="60.0" area="400.0" name="cell(2,5)" />
+		<zone id="38" center_x="130.0" center_y="50.0" min_x="120.0" min_y="40.0" max_x="140.0" max_y="60.0" area="400.0" name="cell(2,6)" />
+		<zone id="39" center_x="150.0" center_y="50.0" min_x="140.0" min_y="40.0" max_x="160.0" max_y="60.0" area="400.0" name="cell(2,7)" />
+		<zone id="4" center_x="90.0" center_y="10.0" min_x="80.0" min_y="0.0" max_x="100.0" max_y="20.0" area="400.0" name="cell(0,4)" />
+		<zone id="40" center_x="170.0" center_y="50.0" min_x="160.0" min_y="40.0" max_x="180.0" max_y="60.0" area="400.0" name="cell(2,8)" />
+		<zone id="41" center_x="190.0" center_y="50.0" min_x="180.0" min_y="40.0" max_x="200.0" max_y="60.0" area="400.0" name="cell(2,9)" />
+		<zone id="42" center_x="210.0" center_y="50.0" min_x="200.0" min_y="40.0" max_x="220.0" max_y="60.0" area="400.0" name="cell(2,10)" />
+		<zone id="43" center_x="230.0" center_y="50.0" min_x="220.0" min_y="40.0" max_x="240.0" max_y="60.0" area="400.0" name="cell(2,11)" />
+		<zone id="44" center_x="250.0" center_y="50.0" min_x="240.0" min_y="40.0" max_x="260.0" max_y="60.0" area="400.0" name="cell(2,12)" />
+		<zone id="45" center_x="270.0" center_y="50.0" min_x="260.0" min_y="40.0" max_x="280.0" max_y="60.0" area="400.0" name="cell(2,13)" />
+		<zone id="46" center_x="290.0" center_y="50.0" min_x="280.0" min_y="40.0" max_x="300.0" max_y="60.0" area="400.0" name="cell(2,14)" />
+		<zone id="47" center_x="310.0" center_y="50.0" min_x="300.0" min_y="40.0" max_x="320.0" max_y="60.0" area="400.0" name="cell(2,15)" />
+		<zone id="48" center_x="10.0" center_y="70.0" min_x="0.0" min_y="60.0" max_x="20.0" max_y="80.0" area="400.0" name="cell(3,0)" />
+		<zone id="49" center_x="30.0" center_y="70.0" min_x="20.0" min_y="60.0" max_x="40.0" max_y="80.0" area="400.0" name="cell(3,1)" />
+		<zone id="5" center_x="110.0" center_y="10.0" min_x="100.0" min_y="0.0" max_x="120.0" max_y="20.0" area="400.0" name="cell(0,5)" />
+		<zone id="50" center_x="50.0" center_y="70.0" min_x="40.0" min_y="60.0" max_x="60.0" max_y="80.0" area="400.0" name="cell(3,2)" />
+		<zone id="51" center_x="70.0" center_y="70.0" min_x="60.0" min_y="60.0" max_x="80.0" max_y="80.0" area="400.0" name="cell(3,3)" />
+		<zone id="52" center_x="90.0" center_y="70.0" min_x="80.0" min_y="60.0" max_x="100.0" max_y="80.0" area="400.0" name="cell(3,4)" />
+		<zone id="53" center_x="110.0" center_y="70.0" min_x="100.0" min_y="60.0" max_x="120.0" max_y="80.0" area="400.0" name="cell(3,5)" />
+		<zone id="54" center_x="130.0" center_y="70.0" min_x="120.0" min_y="60.0" max_x="140.0" max_y="80.0" area="400.0" name="cell(3,6)" />
+		<zone id="55" center_x="150.0" center_y="70.0" min_x="140.0" min_y="60.0" max_x="160.0" max_y="80.0" area="400.0" name="cell(3,7)" />
+		<zone id="56" center_x="170.0" center_y="70.0" min_x="160.0" min_y="60.0" max_x="180.0" max_y="80.0" area="400.0" name="cell(3,8)" />
+		<zone id="57" center_x="190.0" center_y="70.0" min_x="180.0" min_y="60.0" max_x="200.0" max_y="80.0" area="400.0" name="cell(3,9)" />
+		<zone id="58" center_x="210.0" center_y="70.0" min_x="200.0" min_y="60.0" max_x="220.0" max_y="80.0" area="400.0" name="cell(3,10)" />
+		<zone id="59" center_x="230.0" center_y="70.0" min_x="220.0" min_y="60.0" max_x="240.0" max_y="80.0" area="400.0" name="cell(3,11)" />
+		<zone id="6" center_x="130.0" center_y="10.0" min_x="120.0" min_y="0.0" max_x="140.0" max_y="20.0" area="400.0" name="cell(0,6)" />
+		<zone id="60" center_x="250.0" center_y="70.0" min_x="240.0" min_y="60.0" max_x="260.0" max_y="80.0" area="400.0" name="cell(3,12)" />
+		<zone id="61" center_x="270.0" center_y="70.0" min_x="260.0" min_y="60.0" max_x="280.0" max_y="80.0" area="400.0" name="cell(3,13)" />
+		<zone id="62" center_x="290.0" center_y="70.0" min_x="280.0" min_y="60.0" max_x="300.0" max_y="80.0" area="400.0" name="cell(3,14)" />
+		<zone id="63" center_x="310.0" center_y="70.0" min_x="300.0" min_y="60.0" max_x="320.0" max_y="80.0" area="400.0" name="cell(3,15)" />
+		<zone id="64" center_x="10.0" center_y="90.0" min_x="0.0" min_y="80.0" max_x="20.0" max_y="100.0" area="400.0" name="cell(4,0)" />
+		<zone id="65" center_x="30.0" center_y="90.0" min_x="20.0" min_y="80.0" max_x="40.0" max_y="100.0" area="400.0" name="cell(4,1)" />
+		<zone id="66" center_x="50.0" center_y="90.0" min_x="40.0" min_y="80.0" max_x="60.0" max_y="100.0" area="400.0" name="cell(4,2)" />
+		<zone id="67" center_x="70.0" center_y="90.0" min_x="60.0" min_y="80.0" max_x="80.0" max_y="100.0" area="400.0" name="cell(4,3)" />
+		<zone id="68" center_x="90.0" center_y="90.0" min_x="80.0" min_y="80.0" max_x="100.0" max_y="100.0" area="400.0" name="cell(4,4)" />
+		<zone id="69" center_x="110.0" center_y="90.0" min_x="100.0" min_y="80.0" max_x="120.0" max_y="100.0" area="400.0" name="cell(4,5)" />
+		<zone id="7" center_x="150.0" center_y="10.0" min_x="140.0" min_y="0.0" max_x="160.0" max_y="20.0" area="400.0" name="cell(0,7)" />
+		<zone id="70" center_x="130.0" center_y="90.0" min_x="120.0" min_y="80.0" max_x="140.0" max_y="100.0" area="400.0" name="cell(4,6)" />
+		<zone id="71" center_x="150.0" center_y="90.0" min_x="140.0" min_y="80.0" max_x="160.0" max_y="100.0" area="400.0" name="cell(4,7)" />
+		<zone id="72" center_x="170.0" center_y="90.0" min_x="160.0" min_y="80.0" max_x="180.0" max_y="100.0" area="400.0" name="cell(4,8)" />
+		<zone id="73" center_x="190.0" center_y="90.0" min_x="180.0" min_y="80.0" max_x="200.0" max_y="100.0" area="400.0" name="cell(4,9)" />
+		<zone id="74" center_x="210.0" center_y="90.0" min_x="200.0" min_y="80.0" max_x="220.0" max_y="100.0" area="400.0" name="cell(4,10)" />
+		<zone id="75" center_x="230.0" center_y="90.0" min_x="220.0" min_y="80.0" max_x="240.0" max_y="100.0" area="400.0" name="cell(4,11)" />
+		<zone id="76" center_x="250.0" center_y="90.0" min_x="240.0" min_y="80.0" max_x="260.0" max_y="100.0" area="400.0" name="cell(4,12)" />
+		<zone id="77" center_x="270.0" center_y="90.0" min_x="260.0" min_y="80.0" max_x="280.0" max_y="100.0" area="400.0" name="cell(4,13)" />
+		<zone id="78" center_x="290.0" center_y="90.0" min_x="280.0" min_y="80.0" max_x="300.0" max_y="100.0" area="400.0" name="cell(4,14)" />
+		<zone id="79" center_x="310.0" center_y="90.0" min_x="300.0" min_y="80.0" max_x="320.0" max_y="100.0" area="400.0" name="cell(4,15)" />
+		<zone id="8" center_x="170.0" center_y="10.0" min_x="160.0" min_y="0.0" max_x="180.0" max_y="20.0" area="400.0" name="cell(0,8)" />
+		<zone id="80" center_x="10.0" center_y="110.0" min_x="0.0" min_y="100.0" max_x="20.0" max_y="120.0" area="400.0" name="cell(5,0)" />
+		<zone id="81" center_x="30.0" center_y="110.0" min_x="20.0" min_y="100.0" max_x="40.0" max_y="120.0" area="400.0" name="cell(5,1)" />
+		<zone id="82" center_x="50.0" center_y="110.0" min_x="40.0" min_y="100.0" max_x="60.0" max_y="120.0" area="400.0" name="cell(5,2)" />
+		<zone id="83" center_x="70.0" center_y="110.0" min_x="60.0" min_y="100.0" max_x="80.0" max_y="120.0" area="400.0" name="cell(5,3)" />
+		<zone id="84" center_x="90.0" center_y="110.0" min_x="80.0" min_y="100.0" max_x="100.0" max_y="120.0" area="400.0" name="cell(5,4)" />
+		<zone id="85" center_x="110.0" center_y="110.0" min_x="100.0" min_y="100.0" max_x="120.0" max_y="120.0" area="400.0" name="cell(5,5)" />
+		<zone id="86" center_x="130.0" center_y="110.0" min_x="120.0" min_y="100.0" max_x="140.0" max_y="120.0" area="400.0" name="cell(5,6)" />
+		<zone id="87" center_x="150.0" center_y="110.0" min_x="140.0" min_y="100.0" max_x="160.0" max_y="120.0" area="400.0" name="cell(5,7)" />
+		<zone id="88" center_x="170.0" center_y="110.0" min_x="160.0" min_y="100.0" max_x="180.0" max_y="120.0" area="400.0" name="cell(5,8)" />
+		<zone id="89" center_x="190.0" center_y="110.0" min_x="180.0" min_y="100.0" max_x="200.0" max_y="120.0" area="400.0" name="cell(5,9)" />
+		<zone id="9" center_x="190.0" center_y="10.0" min_x="180.0" min_y="0.0" max_x="200.0" max_y="20.0" area="400.0" name="cell(0,9)" />
+		<zone id="90" center_x="210.0" center_y="110.0" min_x="200.0" min_y="100.0" max_x="220.0" max_y="120.0" area="400.0" name="cell(5,10)" />
+		<zone id="91" center_x="230.0" center_y="110.0" min_x="220.0" min_y="100.0" max_x="240.0" max_y="120.0" area="400.0" name="cell(5,11)" />
+		<zone id="92" center_x="250.0" center_y="110.0" min_x="240.0" min_y="100.0" max_x="260.0" max_y="120.0" area="400.0" name="cell(5,12)" />
+		<zone id="93" center_x="270.0" center_y="110.0" min_x="260.0" min_y="100.0" max_x="280.0" max_y="120.0" area="400.0" name="cell(5,13)" />
+		<zone id="94" center_x="290.0" center_y="110.0" min_x="280.0" min_y="100.0" max_x="300.0" max_y="120.0" area="400.0" name="cell(5,14)" />
+		<zone id="95" center_x="310.0" center_y="110.0" min_x="300.0" min_y="100.0" max_x="320.0" max_y="120.0" area="400.0" name="cell(5,15)" />
+		<zone id="96" center_x="10.0" center_y="130.0" min_x="0.0" min_y="120.0" max_x="20.0" max_y="140.0" area="400.0" name="cell(6,0)" />
+		<zone id="97" center_x="30.0" center_y="130.0" min_x="20.0" min_y="120.0" max_x="40.0" max_y="140.0" area="400.0" name="cell(6,1)" />
+		<zone id="98" center_x="50.0" center_y="130.0" min_x="40.0" min_y="120.0" max_x="60.0" max_y="140.0" area="400.0" name="cell(6,2)" />
+		<zone id="99" center_x="70.0" center_y="130.0" min_x="60.0" min_y="120.0" max_x="80.0" max_y="140.0" area="400.0" name="cell(6,3)" />
+	</layer>
+
+<!-- ====================================================================== -->
+
+	<layer type="blk" name="made by hand">
+		<zone id="1" center_x="30.0" center_y="20.0" min_x="0.0" min_y="0.0" max_x="60.0" max_y="40.0" area="2400.0" name="Ypslikon Blk1" />
+		<zone id="10" center_x="230.0" center_y="80.0" min_x="200.0" min_y="20.0" max_x="260.0" max_y="140.0" area="7200.0" name="Zethausen Blk1" />
+		<zone id="11" center_x="270.0" center_y="10.0" min_x="240.0" min_y="0.0" max_x="300.0" max_y="20.0" area="1200.0" name="Welikon Blk1" />
+		<zone id="12" center_x="280.0" center_y="30.0" min_x="260.0" min_y="20.0" max_x="300.0" max_y="40.0" area="800.0" name="Zethausen Blk2" />
+		<zone id="13" center_x="310.0" center_y="30.0" min_x="300.0" min_y="20.0" max_x="320.0" max_y="40.0" area="400.0" name="Zethausen Blk3" />
+		<zone id="14" center_x="290.0" center_y="60.0" min_x="260.0" min_y="40.0" max_x="320.0" max_y="80.0" area="2400.0" name="Zethausen Blk4" />
+		<zone id="15" center_x="280.0" center_y="110.0" min_x="260.0" min_y="80.0" max_x="300.0" max_y="140.0" area="2400.0" name="Zethausen Blk5" />
+		<zone id="16" center_x="310.0" center_y="110.0" min_x="300.0" min_y="80.0" max_x="320.0" max_y="140.0" area="1200.0" name="Zethausen Blk6" />
+		<zone id="17" center_x="80.0" center_y="100.0" min_x="40.0" min_y="80.0" max_x="120.0" max_y="120.0" area="3200.0" name="Vaukertswil Blk1" />
+		<zone id="18" center_x="60.0" center_y="150.0" min_x="40.0" min_y="120.0" max_x="80.0" max_y="180.0" area="2400.0" name="Vaukertswil Blk2" />
+		<zone id="19" center_x="100.0" center_y="140.0" min_x="80.0" min_y="120.0" max_x="120.0" max_y="160.0" area="1600.0" name="Vaukertswil Blk3" />
+		<zone id="2" center_x="30.0" center_y="60.0" min_x="0.0" min_y="40.0" max_x="60.0" max_y="80.0" area="2400.0" name="Ypslikon Blk2" />
+		<zone id="20" center_x="130.0" center_y="150.0" min_x="120.0" min_y="140.0" max_x="140.0" max_y="160.0" area="400.0" name="Vaukertswil Blk4" />
+		<zone id="21" center_x="210.0" center_y="150.0" min_x="180.0" min_y="140.0" max_x="240.0" max_y="160.0" area="1200.0" name="Uhlen Blk1" />
+		<zone id="22" center_x="220.0" center_y="200.0" min_x="200.0" min_y="160.0" max_x="240.0" max_y="240.0" area="3200.0" name="Uhlen Blk2" />
+		<zone id="23" center_x="270.0" center_y="190.0" min_x="240.0" min_y="140.0" max_x="300.0" max_y="240.0" area="6000.0" name="Uhlen Blk3" />
+		<zone id="24" center_x="50.0" center_y="230.0" min_x="20.0" min_y="200.0" max_x="80.0" max_y="260.0" area="3600.0" name="Telingen Blk1" />
+		<zone id="25" center_x="110.0" center_y="230.0" min_x="80.0" min_y="180.0" max_x="140.0" max_y="280.0" area="6000.0" name="Eslitz Blk1" />
+		<zone id="26" center_x="160.0" center_y="200.0" min_x="140.0" min_y="160.0" max_x="180.0" max_y="240.0" area="3200.0" name="Eslitz Blk2" />
+		<zone id="27" center_x="170.0" center_y="260.0" min_x="140.0" min_y="240.0" max_x="200.0" max_y="280.0" area="2400.0" name="Eslitz Blk3" />
+		<zone id="3" center_x="80.0" center_y="40.0" min_x="60.0" min_y="0.0" max_x="100.0" max_y="80.0" area="3200.0" name="Ypslikon Blk3" />
+		<zone id="4" center_x="110.0" center_y="10.0" min_x="100.0" min_y="0.0" max_x="120.0" max_y="20.0" area="400.0" name="Ypslikon Blk4" />
+		<zone id="5" center_x="110.0" center_y="50.0" min_x="100.0" min_y="20.0" max_x="120.0" max_y="80.0" area="1200.0" name="Ypslikon Blk5" />
+		<zone id="6" center_x="150.0" center_y="50.0" min_x="120.0" min_y="20.0" max_x="180.0" max_y="80.0" area="3600.0" name="Ixwil Blk1" />
+		<zone id="7" center_x="150.0" center_y="110.0" min_x="120.0" min_y="80.0" max_x="180.0" max_y="140.0" area="3600.0" name="Ixwil Blk2" />
+		<zone id="8" center_x="190.0" center_y="70.0" min_x="180.0" min_y="20.0" max_x="200.0" max_y="120.0" area="2000.0" name="Ixwil Blk3" />
+		<zone id="9" center_x="190.0" center_y="130.0" min_x="180.0" min_y="120.0" max_x="200.0" max_y="140.0" area="400.0" name="Ixwil Blk4" />
+	</layer>
+
+<!-- ====================================================================== -->
+
+	<layer type="municipality" name="made by hand">
+		<zone id="1" center_x="72.0" center_y="36.0" min_x="0.0" min_y="0.0" max_x="120.0" max_y="80.0" area="9600.0" name="Ypslikon" />
+		<zone id="2" center_x="170.0" center_y="90.0" min_x="120.0" min_y="20.0" max_x="200.0" max_y="140.0" area="9600.0" name="Ixwil" />
+		<zone id="3" center_x="283.3333333333333" center_y="70.0" min_x="200.0" min_y="20.0" max_x="320.0" max_y="140.0" area="14400.0" name="Zethausen" />
+		<zone id="4" center_x="270.0" center_y="10.0" min_x="240.0" min_y="0.0" max_x="300.0" max_y="20.0" area="1200.0" name="Welikon" />
+		<zone id="5" center_x="92.5" center_y="135.0" min_x="40.0" min_y="80.0" max_x="140.0" max_y="180.0" area="7600.0" name="Vaukertswil" />
+		<zone id="6" center_x="233.33333333333334" center_y="180.0" min_x="180.0" min_y="140.0" max_x="300.0" max_y="240.0" area="10400.0" name="Uhlen" />
+		<zone id="7" center_x="50.0" center_y="230.0" min_x="20.0" min_y="200.0" max_x="80.0" max_y="260.0" area="3600.0" name="Telingen" />
+		<zone id="8" center_x="146.66666666666666" center_y="230.0" min_x="80.0" min_y="160.0" max_x="200.0" max_y="280.0" area="11600.0" name="Eslitz" />
+	</layer>
+
+<!-- ====================================================================== -->
+
+	<mapping mapping_rule="cell[m]-[m]blk">
+		<ref down_zone_id="0" up_zone_id="1" />
+		<ref down_zone_id="1" up_zone_id="1" />
+		<ref down_zone_id="100" up_zone_id="19" />
+		<ref down_zone_id="101" up_zone_id="19" />
+		<ref down_zone_id="102" up_zone_id="7" />
+		<ref down_zone_id="103" up_zone_id="7" />
+		<ref down_zone_id="104" up_zone_id="7" />
+		<ref down_zone_id="105" up_zone_id="9" />
+		<ref down_zone_id="106" up_zone_id="10" />
+		<ref down_zone_id="107" up_zone_id="10" />
+		<ref down_zone_id="108" up_zone_id="10" />
+		<ref down_zone_id="109" up_zone_id="15" />
+		<ref down_zone_id="110" up_zone_id="15" />
+		<ref down_zone_id="111" up_zone_id="16" />
+		<ref down_zone_id="114" up_zone_id="18" />
+		<ref down_zone_id="115" up_zone_id="18" />
+		<ref down_zone_id="116" up_zone_id="19" />
+		<ref down_zone_id="117" up_zone_id="19" />
+		<ref down_zone_id="118" up_zone_id="20" />
+		<ref down_zone_id="12" up_zone_id="11" />
+		<ref down_zone_id="121" up_zone_id="21" />
+		<ref down_zone_id="122" up_zone_id="21" />
+		<ref down_zone_id="123" up_zone_id="21" />
+		<ref down_zone_id="124" up_zone_id="23" />
+		<ref down_zone_id="125" up_zone_id="23" />
+		<ref down_zone_id="126" up_zone_id="23" />
+		<ref down_zone_id="13" up_zone_id="11" />
+		<ref down_zone_id="130" up_zone_id="18" />
+		<ref down_zone_id="131" up_zone_id="18" />
+		<ref down_zone_id="135" up_zone_id="26" />
+		<ref down_zone_id="136" up_zone_id="26" />
+		<ref down_zone_id="138" up_zone_id="22" />
+		<ref down_zone_id="139" up_zone_id="22" />
+		<ref down_zone_id="14" up_zone_id="11" />
+		<ref down_zone_id="140" up_zone_id="23" />
+		<ref down_zone_id="141" up_zone_id="23" />
+		<ref down_zone_id="142" up_zone_id="23" />
+		<ref down_zone_id="148" up_zone_id="25" />
+		<ref down_zone_id="149" up_zone_id="25" />
+		<ref down_zone_id="150" up_zone_id="25" />
+		<ref down_zone_id="151" up_zone_id="26" />
+		<ref down_zone_id="152" up_zone_id="26" />
+		<ref down_zone_id="154" up_zone_id="22" />
+		<ref down_zone_id="155" up_zone_id="22" />
+		<ref down_zone_id="156" up_zone_id="23" />
+		<ref down_zone_id="157" up_zone_id="23" />
+		<ref down_zone_id="158" up_zone_id="23" />
+		<ref down_zone_id="16" up_zone_id="1" />
+		<ref down_zone_id="161" up_zone_id="24" />
+		<ref down_zone_id="162" up_zone_id="24" />
+		<ref down_zone_id="163" up_zone_id="24" />
+		<ref down_zone_id="164" up_zone_id="25" />
+		<ref down_zone_id="165" up_zone_id="25" />
+		<ref down_zone_id="166" up_zone_id="25" />
+		<ref down_zone_id="167" up_zone_id="26" />
+		<ref down_zone_id="168" up_zone_id="26" />
+		<ref down_zone_id="17" up_zone_id="1" />
+		<ref down_zone_id="170" up_zone_id="22" />
+		<ref down_zone_id="171" up_zone_id="22" />
+		<ref down_zone_id="172" up_zone_id="23" />
+		<ref down_zone_id="173" up_zone_id="23" />
+		<ref down_zone_id="174" up_zone_id="23" />
+		<ref down_zone_id="177" up_zone_id="24" />
+		<ref down_zone_id="178" up_zone_id="24" />
+		<ref down_zone_id="179" up_zone_id="24" />
+		<ref down_zone_id="18" up_zone_id="1" />
+		<ref down_zone_id="180" up_zone_id="25" />
+		<ref down_zone_id="181" up_zone_id="25" />
+		<ref down_zone_id="182" up_zone_id="25" />
+		<ref down_zone_id="183" up_zone_id="26" />
+		<ref down_zone_id="184" up_zone_id="26" />
+		<ref down_zone_id="186" up_zone_id="22" />
+		<ref down_zone_id="187" up_zone_id="22" />
+		<ref down_zone_id="188" up_zone_id="23" />
+		<ref down_zone_id="189" up_zone_id="23" />
+		<ref down_zone_id="19" up_zone_id="3" />
+		<ref down_zone_id="190" up_zone_id="23" />
+		<ref down_zone_id="193" up_zone_id="24" />
+		<ref down_zone_id="194" up_zone_id="24" />
+		<ref down_zone_id="195" up_zone_id="24" />
+		<ref down_zone_id="196" up_zone_id="25" />
+		<ref down_zone_id="197" up_zone_id="25" />
+		<ref down_zone_id="198" up_zone_id="25" />
+		<ref down_zone_id="199" up_zone_id="27" />
+		<ref down_zone_id="2" up_zone_id="1" />
+		<ref down_zone_id="20" up_zone_id="3" />
+		<ref down_zone_id="200" up_zone_id="27" />
+		<ref down_zone_id="201" up_zone_id="27" />
+		<ref down_zone_id="21" up_zone_id="5" />
+		<ref down_zone_id="212" up_zone_id="25" />
+		<ref down_zone_id="213" up_zone_id="25" />
+		<ref down_zone_id="214" up_zone_id="25" />
+		<ref down_zone_id="215" up_zone_id="27" />
+		<ref down_zone_id="216" up_zone_id="27" />
+		<ref down_zone_id="217" up_zone_id="27" />
+		<ref down_zone_id="22" up_zone_id="6" />
+		<ref down_zone_id="23" up_zone_id="6" />
+		<ref down_zone_id="24" up_zone_id="6" />
+		<ref down_zone_id="25" up_zone_id="8" />
+		<ref down_zone_id="26" up_zone_id="10" />
+		<ref down_zone_id="27" up_zone_id="10" />
+		<ref down_zone_id="28" up_zone_id="10" />
+		<ref down_zone_id="29" up_zone_id="12" />
+		<ref down_zone_id="3" up_zone_id="3" />
+		<ref down_zone_id="30" up_zone_id="12" />
+		<ref down_zone_id="31" up_zone_id="13" />
+		<ref down_zone_id="32" up_zone_id="2" />
+		<ref down_zone_id="33" up_zone_id="2" />
+		<ref down_zone_id="34" up_zone_id="2" />
+		<ref down_zone_id="35" up_zone_id="3" />
+		<ref down_zone_id="36" up_zone_id="3" />
+		<ref down_zone_id="37" up_zone_id="5" />
+		<ref down_zone_id="38" up_zone_id="6" />
+		<ref down_zone_id="39" up_zone_id="6" />
+		<ref down_zone_id="4" up_zone_id="3" />
+		<ref down_zone_id="40" up_zone_id="6" />
+		<ref down_zone_id="41" up_zone_id="8" />
+		<ref down_zone_id="42" up_zone_id="10" />
+		<ref down_zone_id="43" up_zone_id="10" />
+		<ref down_zone_id="44" up_zone_id="10" />
+		<ref down_zone_id="45" up_zone_id="14" />
+		<ref down_zone_id="46" up_zone_id="14" />
+		<ref down_zone_id="47" up_zone_id="14" />
+		<ref down_zone_id="48" up_zone_id="2" />
+		<ref down_zone_id="49" up_zone_id="2" />
+		<ref down_zone_id="5" up_zone_id="4" />
+		<ref down_zone_id="50" up_zone_id="2" />
+		<ref down_zone_id="51" up_zone_id="3" />
+		<ref down_zone_id="52" up_zone_id="3" />
+		<ref down_zone_id="53" up_zone_id="5" />
+		<ref down_zone_id="54" up_zone_id="6" />
+		<ref down_zone_id="55" up_zone_id="6" />
+		<ref down_zone_id="56" up_zone_id="6" />
+		<ref down_zone_id="57" up_zone_id="8" />
+		<ref down_zone_id="58" up_zone_id="10" />
+		<ref down_zone_id="59" up_zone_id="10" />
+		<ref down_zone_id="60" up_zone_id="10" />
+		<ref down_zone_id="61" up_zone_id="14" />
+		<ref down_zone_id="62" up_zone_id="14" />
+		<ref down_zone_id="63" up_zone_id="14" />
+		<ref down_zone_id="66" up_zone_id="17" />
+		<ref down_zone_id="67" up_zone_id="17" />
+		<ref down_zone_id="68" up_zone_id="17" />
+		<ref down_zone_id="69" up_zone_id="17" />
+		<ref down_zone_id="70" up_zone_id="7" />
+		<ref down_zone_id="71" up_zone_id="7" />
+		<ref down_zone_id="72" up_zone_id="7" />
+		<ref down_zone_id="73" up_zone_id="8" />
+		<ref down_zone_id="74" up_zone_id="10" />
+		<ref down_zone_id="75" up_zone_id="10" />
+		<ref down_zone_id="76" up_zone_id="10" />
+		<ref down_zone_id="77" up_zone_id="15" />
+		<ref down_zone_id="78" up_zone_id="15" />
+		<ref down_zone_id="79" up_zone_id="16" />
+		<ref down_zone_id="82" up_zone_id="17" />
+		<ref down_zone_id="83" up_zone_id="17" />
+		<ref down_zone_id="84" up_zone_id="17" />
+		<ref down_zone_id="85" up_zone_id="17" />
+		<ref down_zone_id="86" up_zone_id="7" />
+		<ref down_zone_id="87" up_zone_id="7" />
+		<ref down_zone_id="88" up_zone_id="7" />
+		<ref down_zone_id="89" up_zone_id="8" />
+		<ref down_zone_id="90" up_zone_id="10" />
+		<ref down_zone_id="91" up_zone_id="10" />
+		<ref down_zone_id="92" up_zone_id="10" />
+		<ref down_zone_id="93" up_zone_id="15" />
+		<ref down_zone_id="94" up_zone_id="15" />
+		<ref down_zone_id="95" up_zone_id="16" />
+		<ref down_zone_id="98" up_zone_id="18" />
+		<ref down_zone_id="99" up_zone_id="18" />
+	</mapping>
+
+<!-- ====================================================================== -->
+
+	<mapping mapping_rule="blk[m]-[m]municipality">
+		<ref down_zone_id="1" up_zone_id="1" />
+		<ref down_zone_id="10" up_zone_id="3" />
+		<ref down_zone_id="11" up_zone_id="4" />
+		<ref down_zone_id="12" up_zone_id="3" />
+		<ref down_zone_id="13" up_zone_id="3" />
+		<ref down_zone_id="14" up_zone_id="3" />
+		<ref down_zone_id="15" up_zone_id="3" />
+		<ref down_zone_id="16" up_zone_id="3" />
+		<ref down_zone_id="17" up_zone_id="5" />
+		<ref down_zone_id="18" up_zone_id="5" />
+		<ref down_zone_id="19" up_zone_id="5" />
+		<ref down_zone_id="2" up_zone_id="1" />
+		<ref down_zone_id="20" up_zone_id="5" />
+		<ref down_zone_id="21" up_zone_id="6" />
+		<ref down_zone_id="22" up_zone_id="6" />
+		<ref down_zone_id="23" up_zone_id="6" />
+		<ref down_zone_id="24" up_zone_id="7" />
+		<ref down_zone_id="25" up_zone_id="8" />
+		<ref down_zone_id="26" up_zone_id="8" />
+		<ref down_zone_id="27" up_zone_id="8" />
+		<ref down_zone_id="3" up_zone_id="1" />
+		<ref down_zone_id="4" up_zone_id="1" />
+		<ref down_zone_id="5" up_zone_id="1" />
+		<ref down_zone_id="6" up_zone_id="2" />
+		<ref down_zone_id="7" up_zone_id="2" />
+		<ref down_zone_id="8" up_zone_id="2" />
+		<ref down_zone_id="9" up_zone_id="2" />
+	</mapping>
+
+<!-- ====================================================================== -->
+
+</world>

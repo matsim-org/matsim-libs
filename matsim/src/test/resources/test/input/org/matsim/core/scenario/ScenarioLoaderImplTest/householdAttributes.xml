@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE objectAttributes SYSTEM "http://matsim.org/files/dtd/objectattributes_v1.dtd">
+<objectAttributes>
+	<object id="1">
+		<attribute name="hello" class="java.lang.String">world</attribute>
+	</object>
+</objectAttributes>

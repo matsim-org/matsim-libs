@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<laneDefinitions xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd" xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <lanesToLinkAssignment linkIdRef="23">
+        <lane id="23.ol">
+            <leadsTo>
+                <toLane refId="35"/>
+                <toLane refId="34"/>
+                <toLane refId="3"/>
+            </leadsTo>
+            <representedLanes number="6.0"/>
+            <capacity vehiclesPerHour="3600.0"/>
+            <startsAt meterFromLinkEnd="1000.0"/>
+            <alignment>0</alignment>
+        </lane>
+        <lane id="3">
+            <leadsTo>
+                <toLink refId="36"/>
+            </leadsTo>
+            <representedLanes number="3.0"/>
+            <capacity vehiclesPerHour="1800.0"/>
+            <startsAt meterFromLinkEnd="500.0"/>
+            <alignment>-1</alignment>
+        </lane>
+        <lane id="34">
+            <leadsTo>
+                <toLink refId="34"/>
+            </leadsTo>
+            <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="600.0"/>
+            <startsAt meterFromLinkEnd="500.0"/>
+            <alignment>1</alignment>
+        </lane>
+        <lane id="35">
+            <leadsTo>
+                <toLink refId="35"/>
+            </leadsTo>
+            <representedLanes number="2.0"/>
+            <capacity vehiclesPerHour="1200.0"/>
+            <startsAt meterFromLinkEnd="500.0"/>
+            <alignment>0</alignment>
+        </lane>
+    </lanesToLinkAssignment>
+</laneDefinitions>

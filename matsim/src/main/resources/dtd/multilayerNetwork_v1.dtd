@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- $Id$ -->
+
+<!-- ============================================================ -->
+<!-- Date: 2017-03-22
+     A concise format to capture the combination of a logical     
+     supply chain network, and a physical transport network, and  
+     the associations between the two networks. The container    
+     also stores optional shortest path sets between logical     
+     nodes.                                                        
+	 
+     References:
+	 T.B.C. Working paper for Viljoen, N.M., Joubert, J.W. in
+	 Data in Brief journal										  
+
+     For further information or questions, please contact
+     Johan Joubert, johan dot joubert at up dot ac dot za         -->
+
+<!-- ============================================================ -->
+
+<!ELEMENT multilayerNetwork			(physicalNetwork,logicalNetwork,associations,shortestPathSets*)>
+<!ATTLIST multilayerNetwork
+		  archetype		CDATA		#REQUIRED
+		  number		CDATA		#REQUIRED>
+		  
+<!ELEMENT physicalNetwork			(physicalNodes, physicalEdges)>
+
+<!ELEMENT physicalNodes				(physicalNode)*>
+
+<!ELEMENT physicalNode				EMPTY>
+<!ATTLIST physicalNode
+		  id			CDATA		#REQUIRED
+		  x				CDATA		#REQUIRED
+		  y				CDATA		#REQUIRED>
+
+<!ELEMENT physicalEdges				(physicalEdge)*>
+
+<!ELEMENT physicalEdge				EMPTY>
+<!ATTLIST physicalEdge
+		  fromId		CDATA		#REQUIRED
+		  toId			CDATA		#REQUIRED
+		  weight		CDATA		#IMPLIED>
+
+<!ELEMENT logicalNetwork			(logicalNodes, logicalEdges)>
+
+<!ELEMENT logicalNodes				(logicalNode)*>
+
+<!ELEMENT logicalNode				EMPTY>
+<!ATTLIST logicalNode
+		  id			CDATA		#REQUIRED
+		  name			CDATA		#IMPLIED
+		  capacity		CDATA		#IMPLIED>
+
+<!ELEMENT logicalEdges				(logicalEdge)*>
+
+<!ELEMENT logicalEdge				EMPTY>
+<!ATTLIST logicalEdge
+		  fromId		CDATA		#REQUIRED
+		  toId			CDATA		#REQUIRED
+	  	  weight		CDATA		#IMPLIED>
+
+<!ELEMENT associations				(association)*>
+
+<!ELEMENT association				EMPTY>
+<!ATTLIST association
+		  logicalId		CDATA		#REQUIRED
+		  physicalId	CDATA		#REQUIRED>
+
+<!ELEMENT shortestPathSets			(set)+>
+
+<!ELEMENT set						(path)+>
+<!ATTLIST set
+		  fromId		CDATA		#REQUIRED
+		  toId			CDATA		#REQUIRED>
+
+<!ELEMENT path			(#PCDATA)>

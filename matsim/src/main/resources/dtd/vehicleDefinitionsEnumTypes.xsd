@@ -1,0 +1,24 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+targetNamespace="http://www.matsim.org/files/dtd"
+xmlns="http://www.matsim.org/files/dtd" elementFormDefault="qualified"
+xmlns:xml="http://www.w3.org/XML/1998/namespace" 
+xml:lang="en">
+<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
+
+<xs:simpleType name="fuelTypeType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="diesel" />
+    <xs:enumeration value="gasoline" />
+    <xs:enumeration value="electricity" />
+    <xs:enumeration value="biodiesel" />
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="doorOperationModeType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="serial"/>
+    <xs:enumeration value="parallel"/>
+  </xs:restriction>
+</xs:simpleType>
+
+</xs:schema>

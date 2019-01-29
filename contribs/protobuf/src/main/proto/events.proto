@@ -1,0 +1,195 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * events.proto
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+syntax = "proto3";
+
+package protobuf;
+
+option java_multiple_files = false;
+option java_package = "org.matsim.contrib.protobuf.events";
+option java_outer_classname = "ProtobufEvents";
+
+
+message Event {
+	enum Type { ActivityEnd = 0; ActivityStart = 1; LinkEnter = 2; LinkLeave = 3; PersonArrival = 4; PersonDeparture = 5;
+		PersonEntersVehicle = 6; PersonLeavesVehicle = 7; PersonMoney = 8; PersonStuck = 9; TransitDriverStarts = 10;
+		VehicleAborts = 11; VehicleEntersTraffic = 12; VehicleLeavesTraffic = 13; GenericEvent = 14;}
+	Type type =  1;
+	ActivityEndEvent actEnd = 2;
+	ActivityStartEvent actStart = 3;
+	LinkEnterEvent linkEnter = 4;
+	LinkLeaveEvent linkLeave = 5;
+	PersonArrivalEvent personArrival = 6;
+	PersonDepartureEvent personDeparture = 7;
+	PersonEntersVehicleEvent personEntersVehicle = 8;
+	PersonLeavesVehicleEvent personLeavesVehicle = 9;
+	PersonMoneyEvent personMoney = 10;
+	PersonStuckEvent personStuck = 11;
+	TransitDriverStartsEvent transitDriverStarts = 12;
+	VehicleAbortsEvent vehicleAborts = 13;
+	VehicleEntersTrafficEvent vehicleEntersTraffic = 14;
+	VehicleLeavesTrafficEvent vehicleLeavesTraffic = 15;
+	GenericEvent genericEvent = 16;
+}
+
+message GenericEvent {
+	string type = 1;
+	double time = 2;
+	repeated AttrVal attrVal = 3;
+}
+
+message AttrVal {
+	string attribut = 1;
+	string value = 2;
+
+}
+
+message ActivityEndEvent {
+	//string type = 1;
+	double time = 1;
+	LinkId linkId = 2;
+	ActivityFacilityId facilityId = 3;
+	PersonId persId = 4;
+	string actType = 5;
+}
+
+message ActivityStartEvent {
+	double time = 1;
+	LinkId linkId = 2;
+	ActivityFacilityId facilityId = 3;
+	PersonId persId = 4;
+	string actType = 5;
+}
+
+message LinkEnterEvent {
+	double time = 1;
+	LinkId linkId = 2;
+	VehicleId vehId = 3;
+}
+
+message LinkLeaveEvent {
+	double time = 1;
+	LinkId linkId = 2;
+	VehicleId vehId = 3;
+}
+
+message PersonArrivalEvent {
+	double time = 1;
+	LinkId linkId = 2;
+	string legMode = 3;
+	PersonId persId = 4;
+}
+
+message PersonDepartureEvent {
+	double time = 1;
+	LinkId linkId = 2;
+	string legMode = 3;
+	PersonId persId = 4;
+}
+
+message PersonEntersVehicleEvent {
+	double time = 1;
+	PersonId persId = 2;
+	VehicleId vehId = 3;
+}
+
+message PersonLeavesVehicleEvent {
+	double time = 1;
+	PersonId persId = 2;
+	VehicleId vehId = 3;
+}
+
+message PersonMoneyEvent {
+	double time = 1;
+	PersonId persId = 2;
+	double amount = 3;
+}
+
+message PersonStuckEvent {
+	double time = 1;
+	PersonId persId = 2;
+	LinkId linkId = 3;
+	string legMode = 4;
+}
+
+message TransitDriverStartsEvent {
+	double time = 1;
+	PersonId driverId = 2;
+	VehicleId vehId = 3;
+	TransitRouteId transitRouteId = 4;
+	TransitLineId transitLineId = 5;
+	DepartureId departureId = 6;
+}
+
+message VehicleAbortsEvent {
+	double time = 1;
+	VehicleId vehId = 2;
+	LinkId linkId = 3;
+}
+
+message VehicleEntersTrafficEvent {
+	double time = 1;
+	PersonId driverId = 2;
+	LinkId linkId = 3;
+	VehicleId vehId = 4;
+	string networkMode = 5;
+	double relPosOnLink = 6;
+}
+
+message VehicleLeavesTrafficEvent {
+	double time = 1;
+	PersonId driverId = 2;
+	LinkId linkId = 3;
+	VehicleId vehId = 4;
+	string networkMode = 5;
+	double relPosOnLink = 6;
+}
+
+message DepartureId {
+	string id = 1;
+}
+
+message TransitRouteId {
+	string id = 1;
+}
+
+message TransitLineId {
+	string id = 1;
+}
+
+message DapartureId {
+	string id = 1;
+}
+
+message VehicleId {
+	string id = 1;
+}
+
+message LinkId {
+	string id = 1;
+}
+
+message PersonId {
+	string id = 1;
+}
+
+message ActivityFacilityId {
+	string id = 1;
+}

@@ -1,0 +1,640 @@
+\authorsOfDoc{Marcel Rieser}
+ 
+\bigskip
+
+\begin{chapter-intro}
+Starting a new scenario (our term for the application of MATSim to a 
+region/area) can appear quite cumbersome at the first glace, as a lot of data
+preparation may be required. This chapter gives first an overview of the input
+data typically required for running a MATSim scenario, and then gives examples
+how such data is generated for existing scenarios.
+\end{chapter-intro}
+
+
+\section{A Minimum Example}
+
+In order to work, MATSim requires at least a network and a travel demand.
+Alone with these two inputs and a configuration, MATSim can already be run.
+
+The following section will describe these input data, along with other additional
+and optional input data.
+
+\todo{MR Expand this section} 
+
+
+
+\section{Typical Input Data Sets}
+MATSim uses multiple files to store the different types of data it uses for the
+simulation. Tab.~\ref{tab:BuildingScenarios:InputDataSets} gives an
+overview over files you may typically encounter when working with MATSim.
+
+Not all files are always required. Very simple simulations can be run
+only with a configuration file and the description of the network and
+the population containing the agents' plans. For additional functionality, e.g.
+for the simulation of public transport, additional files might be required.
+
+\begin{table}[htp]
+\begin{tabular}{ll}
+\hline
+{\tt config.xml}          & configuration options for MATSim \\
+{\tt network.xml}         & description of the (road) network \\
+{\tt population.xml}      & the travel demand, i.e. the list of agents
+and their day plans
+\\
+{\tt facilities.xml}      & information about locations where
+activities can be performed\\
+{\tt transitSchedule.xml} & information about transit stop locations
+and transit services\\
+{\tt transitVehicles.xml} & description of the vehicles used for
+public transport services\\
+{\tt counts.xml}          & hourly volumes from real-world counting
+stations for comparison\\
+\hline
+\end{tabular}
+\caption{Files often used with MATSim}
+\label{tab:BuildingScenarios:InputDataSets}
+\end{table}
+
+In the following, small examples of these files will be shown and the data they
+contain discussed.
+
+\begin{note}
+Some of the files, especially {\tt population.xml}, but also {\tt network.xml} 
+or {\tt facilities.xml}, might get quite large. To save space, MATSim supports
+reading and writing the data in a compressed format. MATSim uses  
+GZIP-compression for this. Thus, in many cases, the file names have the 
+additional suffix {\tt .gz}, as in {\tt population.xml.gz}. MATSim automatically
+detects if files are compressed or should be written compressed based on the 
+filename.
+\end{note}
+
+\subsection{Configuration}
+
+\begin{xml-file}[caption=An example of a config.xml,
+label=lst:BuildingScenarios:configXml]
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="example/network.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="example/population.xml.gz" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="./output/" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="10" />
+	</module>
+	
+</config>
+\end{xml-file}
+
+The configuration file, often just referred to as \emph{config file}
+or as \emph{config.xml}, builds the connection between the user and MATSim.
+It contains a list of settings which influence how the simulation behaves.
+
+All configuration parameters are simple pairs of a parameter name and a
+parameter value. The parameters are grouped into logical groups. For example,
+there is a group with settings related to the Controler like the number of
+iterations, or there is another group with settings related to the simulation,
+e.g. the end time of the simulation.
+Listing~\ref{lst:BuildingScenarios:configXml} shows a very short example of a
+configuration file which specifies the network and travel demand data to be used
+along with some settings for the Controler.
+
+The list of available parameters and valid parameter values may vary from
+release to release. Although we try to keep this stable, due to changes in the
+software, most notably by new features, settings may change. To get a list of
+all available settings currently available, run the following command:
+\begin{lstlisting}
+java -cp matsim.jar org.matsim.run.CreateFullConfig fullConfig.xml
+\end{lstlisting}
+This command will create a new config file {\tt fullConfig.xml} which contains
+the full list of available parameters along with their default values. This
+makes it easy to see what settings are available. To use and modify certain
+settings, the lines with the corresponding parameters can be copied to the
+config file specific for the scenario to be simulated and the parameter values
+be modified in that file.
+
+
+\subsection{Network}
+
+\begin{xml-file}[caption=An example of a network.xml,
+label=lst:BuildingScenarios:networkXml]
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+
+<network name="example network">
+	<nodes>
+		<node id="1" x="0.0" y="0.0"/>
+		<node id="2" x="1000.0" y="0.0"/>
+		<node id="3" x="1000.0" y="1000.0"/>
+	</nodes>
+	<links>
+		<link id="1" from="1" to="2" length="3000.00" capacity="3600" 
+		                           freespeed="27.78" permlanes="2" modes="car" />
+		<link id="2" from="2" to="3" length="4000.00" capacity="1800" 
+		                           freespeed="27.78" permlanes="1" modes="car" />
+		<link id="3" from="3" to="2" length="4000.00" capacity="1800" 
+		                           freespeed="27.78" permlanes="1" modes="car" />
+		<link id="4" from="3" to="1" length="6000.00" capacity="3600" 
+		                           freespeed="27.78" permlanes="2" modes="car" />
+	</links>
+</network>
+\end{xml-file}
+
+The network describes the infrastucture on which the agents (or the vehicles,
+respectively), can move around. The network consists of \emph{nodes} and
+\emph{links} (in graph theory, these are typically called \emph{vertices} and
+\emph{edges}). Listing~\ref{lst:BuildingScenarios:networkXml} shows an example
+of a simple description of a network in MATSim's XML data format.
+
+Each element has an identifier \emph{id}. Nodes are described by an X and a Y
+coordinate value. Links have more attributes: The \emph{from} and \emph{to}
+attribute reference nodes and describe the geometry of the network. Additional
+attributes describe the traffic-related aspects of the network:
+\begin{itemize}\styleItemize
+  \item the \emph{length} of the link, typically in meters (see
+  Sec.~\ref{sec:BuildingScenarios:Units}).
+  \item the \emph{flow capacity} of the link, i.e. the number of vehicles that
+  can pass the link, typically in vehicles per hour.
+  \item the \emph{freespeed} is the maximum speed at which vehicles are allowed
+  to travel along the link, typically in meters per seconds.
+  \item the \emph{number of lanes} ({\tt} permlanes) available in the direction
+  specified by the {\tt from} and {\tt to} nodes.
+  \item the list of \emph{modes} allowed on the link. This is a comma-separated
+  list, e.g. {\tt modes="car,bike,taxi"}.
+\end{itemize}
+Note that all links are uni-directional. If a road can be travelled in both
+directions, two links have to be defined with alternating {\tt to} and {\tt
+from} attributes (see links with id {\tt 2} and {\tt 3} in the example given in
+Listing~\ref{lst:BuildingScenarios:networkXml}).
+Thus, the network can be seen as a directed graph.
+
+\configOptionsNote{network}
+
+\subsection{Demand}
+
+The travel demand for MATSim is described by the agents' day plans. The full set
+of agents is typically the \emph{population}, hence the filename {\tt
+population.xml}. Alternatively, {\tt plans.xml} is also commonly used in MATSim,
+as the population file essentially contains a list of day plans.
+
+The population contains the data in a hierarchical structure, as shown in
+Listing~\ref{lst:BuildingScenarios:populationXml}:
+\begin{itemize}\styleItemize
+  \item The population contains a list of persons.
+  \item Each person contains a list of plans.
+  \item Each plan contains a list of \emph{Activities} and \emph{Legs}.
+\end{itemize}
+Exactly one plan per person is marked as \emph{selected}. The selected plan of
+each agent is the plan that gets executed by the mobility simulation. During the
+replanning stage, a different plan might get marked as being selected. A plan
+can contain a score as attribute. The score gets calculated and stored in the
+plan during the scoring stage, after the plan was executed by the mobility
+simulation.
+
+The list of activities and legs in each plan describe the planned actions by
+each agent. Activities have a type assigned and have---except for the last
+activity in a day plan---an end time defined (There are some exceptions where
+activities have a duration instead of an end time. Such activities are often
+automatically generated by routing algorithms and are thus not described in
+this guide). To describe the location where an activity takes place, the
+activity is either assigned a coordinate by giving an x and y attribute value,
+or has a link assigned which describes from which link the activity can be
+reached. As the simulation requires the link attribute, the Controler calculates
+the nearest link for a given coordinate in the case the attribute is missing and
+only an x and y coordinate value is given or any activity.
+
+\begin{xml-file}[caption=An example of a population.xml,
+label=lst:BuildingScenarios:populationXml]
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v5.dtd">
+<population>
+	<person id="1">
+		<plan selected="yes" score="93.2987721">
+			<act type="home" link="1" end_time="07:16:23" />
+			<leg mode="car">
+				<route type="links">1 2 3</route>
+			</leg>
+			<act type="work" link="3" end_time="17:38:34" />
+			<leg mode="car">
+				<route type="links">3 1</route>
+			</leg>
+			<act type="home" link="1" />
+		</plan>
+	</person>
+	<person id="2">
+		<plan selected="yes" score="144.39002">
+			\ldots
+		</plan>
+	</person>
+</population>
+\end{xml-file}
+
+Legs describe how agents plan to travel from one location to the next one. Each
+leg must have a transport mode assigned. Optionally, legs may have an
+attribute {\tt trav\_time} which describes the expected travel time for this
+leg. For a leg to be simulated, it must contain a route. The format of a
+route depends on the mode of a leg. For car-legs, the route lists the links that
+the agent has to travel along in the given order, while for transit-legs
+information about the stop locations and expected transit services are stored.
+
+An agent starts a leg directly after the previous activity (or leg) has ended.
+Depending on the mode, the mobility simulation might handle the agent
+differently. By default, car- and transit-legs are well-supported by the
+mobility simulation. If the mobsim encounters a mode it does not know, it
+defaults to \emph{teleportation}: In this case, the agent is removed from the
+simulated reality, and after the leg's expected travel time has passed,
+re-inserted at the agent's target location.
+
+\bigskip
+
+The population data format is one of the most central data structures in
+MATSim and might be a bit overwhelming at first. Luckily, to get started, only a
+small subset must be known of it.
+Listing~\ref{lst:BuildingScenarios:minimalPopulationXml} shows how a minimal
+population file could look like. Most notably, the following simplications can
+be made:
+\begin{itemize}\styleItemize
+  \item Each person needs exactly one plan.
+  \item The plan does not need to be selected or have a score.
+  \item Activities can be located just by their coordinates.
+  \item Activities should have a somewhat meaningful end-time.
+  \item Legs only need a mode, but no routes.
+\end{itemize}
+When a simulation is started, MATSim's Controler will load such a file and then
+automatically assign the nearest linnk to each activity and calculate a suitable
+route for each leg. This makes it easy to get started quickly.
+
+\begin{xml-file}[caption=Minimal population.xml required to start MATSim,
+label=lst:BuildingScenarios:minimalPopulationXml]
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v5.dtd">
+<population>
+	<person id="1">
+		<plan>
+			<act type="home" x="5.0" y="8.0" end_time="08:00:00" />
+			<leg mode="car">
+			</leg>
+			<act type="work" x="1500.0" y="890.0" end_time="17:30:00" />
+			<leg mode="car">
+			</leg>
+			<act type="home" x="5.0" y="8.0" />
+		</plan>
+	</person>
+	<person id="2">
+		...
+	</person>
+</population>
+\end{xml-file}
+
+\configOptionsNote{plans}
+
+\subsection{Public Transport}
+
+To simulate public transport in MATSim, two additional input files are
+necessary: One describes the schedule, i.e. that lines, their routes, which
+stops they serve and the departure times. The other describes the vehicles which
+serve the lines: are they big busses, small buses, trains or light rail
+vehicles, and describes how many passengers each vehicle can transport.
+
+The description of public transport vehicles itself can be split into two parts:
+In a first part, vehicle types have to be described, specifying how many
+passengers such a vehicle can transport (Note that the term "vehicle" can refer
+to multiple vehicles in reality, e.g. a train with several wagons should be specified as
+one long vehicle with a high number of seats). In the second part, actual
+vehicles have to be listed. Each vehicle has an identifier and is of a previously
+specified vehicle type. Listing~\ref{lst:BuildingScenarios:ptVehicles.xml} shows
+an example of a such a file, describing one vehicle type and two vehicles of
+that type.
+
+\begin{xml-file}[caption=An example of transitVehicles.xml,
+label=lst:BuildingScenarios:ptVehicles.xml]
+<?xml version="1.0" encoding="UTF-8"?>
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.matsim.org/files/dtd 
+                     http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
+<vehicleType id="1">
+		<description>Small Train</description>
+		<capacity>
+			<seats persons="50"/>
+			<standingRoom persons="30"/>
+		</capacity>
+		<length meter="50.0"/>
+	</vehicleType>
+	<vehicle id="tr_1" type="1"/>
+	<vehicle id="tr_2" type="1"/>
+</vehicleDefinitions>
+\end{xml-file}
+
+The public transport schedule, often referred to as \emph{transitSchedule.xml}
+only, is a rather complex file. It contains information about stop facilities
+(these can be bus stops, train stations or other stop locations) and transit
+services.
+
+In the first part, the stop facilities need to be defined, giving each one a
+coordinate, an identifier and a reference to a link in the network. The stop can
+only be served by vehicles driving on that specified link. Optionally, it is
+possible to specify a name for the stop and if other vehicles are blocked
+when a transit vehicle is waiting at a stop. This last attribute is useful to
+model e.g. the difference of bus stops, where one bus stop has a bay, while at
+another stop, the bus has to stop on the actual road.
+
+After the stop facilities, the transit lines, their routes and schedules
+are described. This is a hierarchical data structure: Each line can have one or
+more \emph{routes}, each route has a \emph{route profile}, a \emph{network
+route} and a list of \emph{departures}.
+Listing~\ref{lst:BuildingScenarios:schedule.xml} has an example of a
+minimalistic but complete transit schedule.
+
+Each transit line must have a unique id. Each transit route has an id which must
+be unique within that one line, so the same route id can be used with different
+lines. The {\tt transportMode} describes on which links in the network the line
+runs (Actually, this is currently not yet enforced. It would be possible to let
+a bus run on train links in the simulation. It might be enforced in the future).
+
+The {\tt routeProfile} describes the stops this route serves, while {\tt route}
+itself describes the series of links in the network the transit vehicle's driver
+has to drive along (thus often referred to as \emph{network route}. Note that
+the complete route, i.e. all links the vehicle drives along, must be listed in
+the route, and not only the ones where stops are located. All the specified
+stops should occur along this route in the specified order. The time offsets
+given for each stop in the routeProfile describe the relative time offset to an
+actual departure time. If a bus is to depart at 7 o'clock in the morning, and
+stop 2 has a departureOffset of {\tt 00:03:00}, this must be read that the bus
+is expected to depart at 07:03 at the specific stop. All stops in the route
+profile must have a departure offset definded, except the last one. All stops,
+except the first one, can optionally have an arrival offset defined. This is
+mostly useful for large trains that stop for several minutes at a station to
+help the routing algorithm to find connecting services at the correct time,
+namely the expected arrival time of the train.
+
+As last part of the description of a transit
+route, the list of departures should be given. Each departure has an id, which must be unique within the
+route, and gives the departure time at the first stop of the specified
+route profile. In addition, the departure specifies with which vehicle the
+service should be run. This vehicle must be defined in the aforementioned
+list of transit vehicles.
+
+\begin{xml-file}[caption=An example of a schedule.xml,
+label=lst:BuildingScenarios:schedule.xml]
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
+<transitSchedule>
+	<transitStops>
+		<stopFacility id="1" x="990.0"  y="0.0"   name="Adorf"    
+		                                          linkRefId="1" isBlocking="false"/>
+		<stopFacility id="2" x="1100.0" y="980.0" name="Beweiler" 
+		                                          linkRefId="2" isBlocking="true"/>
+		<stopFacility id="3" x="0.0"    y="10.0"  name="Cestadt"  
+		                                          linkRefId="3" isBlocking="false"/>
+	</transitStops>
+	<transitLine id="Blue Line">
+		<transitRoute id="1">
+			<description>Just a comment.</description>
+			<transportMode>bus</transportMode>
+			<routeProfile>
+				<stop refId="1" departureOffset="00:00:00"/>
+				<stop refId="2" arrivalOffset="00:02:30" departureOffset="00:03:00" 
+				                                         awaitDeparture="true"/>
+				<stop refId="3" arrivalOffset="00:05:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="1"/>
+				<link refId="2"/>
+				<link refId="3"/>
+			</route>
+			<departures>
+				<departure id="1" departureTime="07:00:00" vehicleRefId="12"/>
+				<departure id="2" departureTime="07:05:00" vehicleRefId="23"/>
+				<departure id="3" departureTime="07:10:00" vehicleRefId="34"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>
+\end{xml-file}
+
+Because of its complexity, transit schedules often contain little mistakes that
+will return in an error when the simulation runs. Typical examples include that
+the network route is missing a link, or that the network route does not pass at
+all the defined stops in the right order. To make sure a schedule does not have
+any such issues before the simulation is started, a special validation routine
+is available:
+
+\begin{verbatim}
+java -Xmx512m -cp /path/to/matsim.jar 
+      org.matsim.pt.utils.TransitScheduleValidator
+      /path/to/transitSchedule.xml /path/to/network.xml
+\end{verbatim}
+
+If run, this validator will print out a list of errors or warnings, if any are
+found, or show a message that the schedule appears to be valid.
+
+\subsection{Counts}
+
+MATSim provides funtionality to compare traffic volumes from your simulation to
+real world values. The \emph{Counts} infrastructure allows to compare the 
+traffic volumes on links on an hourly basis. Listing~\ref{lst:BuildingScenarios:counts.xml}
+shows an example of a \emph{counts.xml} input file required to do traffic
+count comparisons. It starts with a header containing general descriptive 
+information about the counts, including a year to describe how current the 
+data is. Next, for each link having real world counts data, the hourly volumes
+can be specified. The network-link is referenced by the \emph{loc\_id} 
+attribute, in the example, it's link {\tt 2}. The attribute \emph{cs\_id}
+(counting station identifier) can be used to store an arbitrary description
+of the counting station. Most often it is used to note the original real
+word counting station to simplify future data comparison. The hourly volumes,
+specified by the hour of the day (counting starts with hour "1") and its value,
+are optional: That is, not for every hour a value must be given. If for a
+counting station data is only available for certain hours of the day (e.g. only
+during peak hours) it is possible to omit the other hours from the XML listing.  
+
+\configOptionsNote{counts}
+
+\begin{xml-file}[caption=An example of a counts.xml,
+label=lst:BuildingScenarios:counts.xml]
+<?xml version="1.0" encoding="UTF-8"?>
+<counts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:noNamespaceSchemaLocation="http://matsim.org/files/dtd/counts_v1.xsd" 
+        name="test" desc="test counting stations" year="2014">
+	<count loc_id="2" cs_id="005">
+		<volume h="1" val="10.0"></volume>
+		<volume h="2" val="1.0"></volume>
+		<volume h="3" val="2.0"></volume>
+		<volume h="4" val="3.0"></volume>
+		<volume h="5" val="4.0"></volume>
+		<volume h="6" val="5.0"></volume>
+		<volume h="7" val="6.0"></volume>
+		<volume h="8" val="7.0"></volume>
+		<volume h="9" val="8.0"></volume>
+		<volume h="10" val="9.0"></volume>
+		<volume h="11" val="10.0"></volume>
+		<volume h="12" val="11.0"></volume>
+		<volume h="13" val="12.0"></volume>
+		<volume h="14" val="13.0"></volume>
+		<volume h="15" val="14.0"></volume>
+		<volume h="16" val="15.0"></volume>
+		<volume h="17" val="16.0"></volume>
+		<volume h="18" val="17.0"></volume>
+		<volume h="19" val="18.0"></volume>
+		<volume h="20" val="19.0"></volume>
+		<volume h="21" val="20.0"></volume>
+		<volume h="22" val="21.0"></volume>
+		<volume h="23" val="22.0"></volume>
+		<volume h="24" val="23.0"></volume>
+	</count>
+</counts>
+\end{xml-file}
+
+\section{Units and Conventions Used}
+\label{sec:BuildingScenarios:Units}
+
+\subsection{Units}
+MATSim tries to make as few assumptions about actual units as is possible,
+but at some locations it cannot be done without any. In general, MATSim expects
+similar values (e.g. all distances) to be in the same unit wherever they are
+used. In the following, the most important (expected) units are listed in a 
+short overview.
+
+\paragraph{Distance} Distance units are most prominently used in links' length.
+They should be specified in the same unit that the coordinate system uses. This
+allows MATSim to use simple triangulation, e.g. with the nodes' coordinates,
+to calculate beeline distances. As most of the typically used, projected 
+coordinate systems (see Sec.~\ref{sec:BuildingScenarios:CoordinateSystems})
+use meters as unit of distance, this is the most common used unit of distance
+in MATSim.
+
+\paragraph{Time} While MATSim supports an \emph{hour:minute:second} notation
+in several places, internally it uses \emph{seconds} as the default time unit.
+This implies that for example link speeds must be specified in distance per 
+second, typically \emph{m/s}.
+
+One noteable exception from this rule are scoring parameters, where MATSim
+expects values per hour. This is due to the fact that most behavioral parameters
+like value of time are typically estimated per minute or hour, and that the 
+corresponding values for seconds are very small and thus errorprone to be
+configured.
+
+
+\subsection{Conventions}
+
+MATSim makes heavy uses of identifiers, short \emph{Id}s. This Ids can be
+arbitrary strings, with the following exceptions: Ids should not contain
+any spaces (incl. tabs, new lines, etc) or commas, as those characters
+are typically used for separating different Ids from each other in Id lists.
+
+
+\section{Coordinate Systems}
+\label{sec:BuildingScenarios:CoordinateSystems}
+
+\subsection{Preparing Your Data in the Right Coordinate System}
+
+In several input files, you need to specify coordinates, e.g. for the nodes of
+the network. It is strongly suggested \emph{not} to use WGS84 coordinates (i.e.
+GPS coordinates, or any other kind of spherical coordinates; coordinates ranging
+from -180 to +180 in west-east direction, and from -90 to +90 in south-north
+direction). MATSim needs to calculate distances between two points in several
+places of the code. The calculation of distances between spheric coordinates is
+very complex and potentially slow. Instead, MATSim uses the simple Pythagoras'
+theorem, but this requires the coordinates to be in a Cartesian coordinate
+system. Thus is is stronlgy advised to use a Cartesian coordinate system along
+with MATSim, preferably one where the distance unit corresponds to one meter.
+
+Many countries and regions have custom coordinate system defined, optimized for
+usages in their apropriet areas. It might be best to ask some GIS specialists in
+your region of interest what the most commonly used local coordinate system is
+and use that as well for your data. 
+
+If you don't have any clue about what coordinate system is used in your region,
+it might be best to use the Universal Transverse Mercator coordinate system.
+This coordinate system divides the world into multiple bands, each six degrees
+width and separated into a northern and southern part, which it calls UTM zones
+(see \url{http://en.wikipedia.org/wiki/UTM_zones#UTM_zone} for more details).
+For each zone, an optimized coordinate system is defined. Choose the UTM zone
+which covers your region (Wikipedia has a nice map showing the zones) and use
+its coordinate system.
+
+\subsection{Telling MATSim about Your Coordinate System}
+
+In some places, MATSim requires to know which coordinate system your data is in.
+You have multiple ways to specify the coordinate system you use. The easiest one
+is to use the so-called ``EPSG codes''. Most of the commonly used coordinate
+systems got standardized and numbered. The EPSG code uniquely identifies a
+coordinate system and can be directly used by MATSim. As an alternative, MATSim
+can also parse the description of a coordinate system in the so-called WKT
+format. As the WKT format is much more error-prone it is suggested to use EPSG
+codes whenever possible.
+
+To find the correct EPSG code for your coordinate system (e.g. for one of the
+UTM zones), the website \url{http://www.spatialreference.org} is of great use.
+Search on this website for your coordinate system, e.g. for ``WGS84 / UTM Zone
+8N'' (for the northern-hemisphere UTM Zone 8) to find a list of matching
+coordinate systems along with their EPSG codes.
+
+
+For some operations, MATSim must know the coordinate system your data is in.
+Some analyses may create output to be visualized in Google Earth for example,
+where the coordinates need to be converted back to WGS84. The coordinate system
+used by your data can be specified in the config file:
+
+\begin{lstlisting}{language=XML}
+<module name="global">
+  <param name="coordinateSystem" value="EPSG:32608" />
+</module>
+\end{lstlisting}
+
+This allows MATSim to work with your coordinates and convert them whenever
+needed.
+
+
+
+\section{Reusing Existing Data}
+
+Data from other modelling tools like PTV Visum or EMME can be partially reused.
+Converting the network topology is often possible with little work. For Visum,
+\href{http://matsim.org/javadoc/org/matsim/visum/package-summary.html}{some code
+exists} that converts the network into MATSim's format. But note that this only
+converts the network topology (location of nodes, and links with a limited set
+of attributes). Due to the different working of other modelling tools (e.g. the 
+use of speed-flow curves to describe links, with the BPR function being one of
+the better knowns), attributes might be 
+differently interpreted by MATSim (e.g. link capacities are hard limits in MATSim, 
+vs. part of a function in other tools), leading to manual edits being needed 
+after the initial conversion.
+
+Reusing demand data is typically more complex. If you have the output of an 
+agent-based and activity-based demand generation process, you might convert
+the data agent by agent to the MATSim format. If only aggregated data
+in the form of origin-destination matrices, or attraction matrices, is available,
+a simple conversion to complex agent plans is not possible and the demand must be 
+regenerated using other data sources.
+
+
+
+
+%% 
+%% ================
+%% old stuff from here
+%% 
+%% 
+%% Given these two data items, you can already start building your own
+%% scenario.The "\href{http://www.matsim.org/docs/tutorials/learningIn3days}{Learning MATSim in 3 days}"-Tutorial gives you an introduction on how to build your own scenario.
+%% 
+%% 
+%% \subsubsection{Programming}
+%% 
+%% In many cases, using pre-configured software is not possible because  there are just too many possibilities of how input could look like.  Although matsim is not there yet, these should be api-only use cases,  i.e. they should only use the "stable" api. Therefore, the  following are under the api-users section of the documentation:
+%% \begin{itemize}
+%% 	\item Additional information about network generation is \href{http://matsim.org/node/588}{here}.
+%% 	\item additional information about initial demand generation is \href{http://matsim.org/node/340}{here}.
+%% \end{itemize}
+%% 
+%% \subsubsection{Information concerning specific scenarios}
+%% 
+%% 

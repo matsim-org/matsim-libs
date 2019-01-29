@@ -1,0 +1,273 @@
+MATSim - Multi Agent Transport Simulation
+===============================================================================
+
+
+Release "unknown yet" (version 0.7.0)
+-------------------------------------------------------------------------------
+
+Changes:
+- Switch to Java 7
+- removed queueSimulation
+- removed single-threaded qsim. parallel qsim is now default mobsim.
+- made parallel eventshandling default, removed non-parallel option.
+- Use of typed Ids
+
+
+
+Release "Fall 2014" (version 0.6.0)
+-------------------------------------------------------------------------------
+
+This will be the last version of MATSim for Java 6.
+Future versions of MATSim will require Java 7.
+
+Changes:
+- a lot of internal changes to make MATSim more modular and more easily configurable
+
+
+
+
+Release "Spring 2013" (version 0.5.0)
+-------------------------------------------------------------------------------
+
+Changes:
+
+- Configuration Changes:
+  - Changed default population file format to v5 (r20926)
+  
+- New Features:
+  - VehicleType now has size in passenger car equivalents (pce), and QSim honors
+    this attribute as well as the maximum vehicle speed. This is important,
+    if you use transit, please check your vehicles.xml for possibly
+    incorrect default settings.
+
+- Feature Improvements:
+  - Loading Plans is now faster thanks to multithreading (r18639)
+  - Preprocessing for AStarLandmarks router is now faster thanks to multithreading (r18734)
+  - OTFVis now uses OpenGL2
+
+- BugFix:
+  - Fixed a bug during preprocessing for routing algorithms, removing the (wrong) warning "All incident nodes of X are dead ends" in the logfile. (mrieser, r20547)
+  - 
+
+- Changes for developers:
+  - Class hierarchy of events is now much simpler (r21016)
+  - Improved router integration for newer types of routers (e.g. transit router) (r21034 and other commits)
+  - config modules are no longer serializable (r21205)
+  - 
+
+
+
+Release Spring 2012b (version 0.4.1)
+-------------------------------------------------------------------------------
+
+Changes:
+- BugFix:
+  - Agents did not generate any AgentStuckEvents anymore, even when they got stuck
+    on a link and qsim was configured to remove stuck agents. 
+
+Release Spring 2012 (version 0.4.0)
+-------------------------------------------------------------------------------
+
+Main focus of this release:
+Maintenance Release
+
+
+Changes:
+
+- Configuration Changes:
+  - move the "snapshotFormat" entry which you may have in your "simulation" and/or in your "qsim" configuration group to the "controler" configuration group (mzilske, r16484)
+	- In module "controler" one can set the parameters  "writeSnapshotsInterval", "writePlansInterval", "writeEventsInterval" in order to reduce time needed for IO during the iterations.
+	- In module "controler" one should specify which mobility simulation shall be used via the "mobsim" parameter
+
+- New features:
+  - OTFVis can display OSM-maps as background. Set option "mapOverlayMode" to "true". Also set the coordinate system of your scenario in the "global" section of config. 
+
+- Feature improvements:
+  - Major memory improvements in OsmNetworkReader by using Long instead of String for osm-ids (r14944)
+  - CompressedRoutes can now be enabled using config file (plans.networkRouteType = CompressedNetworkRoute) (r17328)
+  - dump of configuration to logfile now uses os-specific line endings, making the dump reabable on Windows (r14945, #168)
+  - transit router now exposes additional attributes for configuration to config-file (r14860)
+  - improved OTFVis visualization of traffic signals and lanes (r18143, r18129, r18387, r18390)
+  - improved traffic light implementation: added a data model for intergreen times and a default implementation that checks if the minimum intergreen time between two signal groups is not violated 
+
+- BugFixes:
+  - The link to link routing feature could not be enabled via controler config module in xml config. Fixed (r15002)
+
+- Changes for developers:
+	- package org.matsim.lanes:
+		- moved classes of package: The classes mapping the XML data structures are moved to org.matsim.lanes.data.* (r18160)
+		- provided some additional factories for better extensibility of the packages
+		- provided convenience method in LanesUtils
+	- package org.matsim.signalsystems
+		- provided some additional factories for better extensibility of the packages
+		- provided convenience method in SignalUtils
+	- all persons now generate PersonEntersVehicleEvent/PersonLeavesVehicleEvent. Before, only pt passengers did that. Some event handlers may need to adapt. (r17776)
+
+	
+
+  Non-API Changes:
+	- org.matsim.lanes.* was split into two subpackages, one for each model: 
+		1. org.matsim.lanes.data.v11.*: A model written to simplify creation and modelling of lanes
+		2. org.matsim.lanes.data.v20.*: A model that is used as input for the simulation. 
+	- dtd/laneDefinitions_v2.0.xsd: added additional element to laneType in order to allow the user to calibrate the lanes model via the capacity of the lane. The capacity must be set explicitly in the xml otherwise the model will use some defaults with probably too high capacities. In order to avoid the usage of the defaults use LanesCapacityCalculator to preprocess the data using the same semantics that have been used on the fly in previous releases. The capacity calculation is done automaticall if the lane layout is modelled via the org.matsim.lanes.data.v11 package classes and then converted to with the LaneDefinitionsV11ToV20Conversion class into the 2.0 model. 
+	- config module signalsystems: added to parameters to switch on and off ambertimes and intergreen usage
+	- org.matsim.lanes & signalsystems can deal with not available turning moves
+
+
+
+Release Spring 2011 (version 0.3.0)
+-------------------------------------------------------------------------------
+
+Main focus of this release:
+Speed and memory improvements
+
+Changes:
+
+- Configuration Changes:
+  - Events are written by default in XML format (was TXT before)
+  - Events are written only every 10th iteration by default (was each and every iteration before) 
+  - selection, which mobsim should be used, simplified by specific config-parameter (controler.mobsim) (r14325)
+
+- New features:
+  - new population file format: population_v5 (r14369)
+
+- Feature improvements:
+  - transit router got faster (r13753, r13765) and uses less memory during parallel replanning (r13765)
+  - Swing-OTFVis now shows vehicles in different colors instead of just gray (r13751)
+  - OsmNetworkReader has option to reduce memory consumption, but will run slower (off by default) (r13910)
+  - Networks now need about 25% less memory to load (r14418) 
+
+- BugFixes:
+  - Controler ignored any custom-set leastCostPathCalculatorFactory (r14090)
+  - NetworkRoute.getSubRoute() now also handles cases where the routes contain circles (can happen with transit routes) (r14242, r14281) 
+  - ParallelEventHandler only worked in parallel during first iteration (r14553)
+
+- Changes for developers:
+
+  API-Changes:
+  - deprecated NetworkFactory.createLink(Id, Id, Id) (r13924)
+  - added NetworkFactory.createLink(Id, Node, Node) (r13924)
+  - ScenarioLoaderImpl now also loads transit-related data if transit is enabled in the configuration (r13950)
+  - ScenarioImpl is no longer in API, use ScenarioUtils.createScenario(ConfigUtils.createConfig()) to create a new scenario (r14551)
+  - Activity has two additional methods: get/setMaximumDuration() (r14319)
+  - New file format "population_v5" is available, but not yet used by default. Will replace "plans_v4" in the future (r14369)
+
+  Non-API Changes:
+  - ObjectAttributes: utility data structure to manage additional attributes for existing objects (r14189)
+  - SignalModelFactory now also has a createSignalPlan(...) method for SignalPlans (r14143)
+  - SignalScenarioLoader is not producing null pointer exceptions anymore if files are not set in config group (r14142)
+  - new, improved withinday-package available (r14364)
+  - deprecated class MatsimSignalSystemConfigurationReader is no longer available, constants can be found in MatsimSignalSystemsReader
+
+
+Please note that OTFVis may not be able to read mvi-files created with an older release of MATSim.
+Please make sure your mvi-files work as expected in OTFVis before deleting any older release of
+MATSim. In the case of problems, it might be useful to keep the old release around just for
+looking at old mvi-files.
+
+
+
+
+
+Release Fall 2010 (version 0.2.0)
+-------------------------------------------------------------------------------
+
+Main focus of this release:
+Simulation of public transport, Improvements to OTFVis, Code cleanup
+
+
+Changes:
+
+- New features:
+  - OTFVis (org.matsim.run.OTFVis) can now be started in Swing mode (-swing).
+    In Swing-Mode, no OpenGL is required, but only very limited capabilities
+    are available (Network-Viewing, simple visualization of vehicles)
+  - NetVis was removed from MATSim, use OTFVis in Swing mode instead.
+  - Simulation of public transport possible
+    see tutorial on http://matsim.org/docs/tutorials/transit
+
+- Feature improvements:
+  - improved stability of OsmNetworkReader to convert networks from OpenStreetMap
+  - Swing-OTFVis can open mvi-files created by conversion from events
+
+- Other changes for developers:
+
+  API-Changes:
+  - ScenarioImpl.getPopulation() returns Population instead of PopulationImpl (r11288)
+  - A bunch of classes no longer implement or extend Serializable, mostly for Network and Population data structure (r11637, r11638, r11650 - r11653, r11655)
+  - remove no longer supported config parameters (r11975, <http://sourceforge.net/mailarchive/forum.php?thread_name=F3A57F88000BEE4FBC74E5DC0562E8D987E9CF%40axonlu-msvr2.teledata.local&forum_name=matsim-devel>)
+  - Use String instead of enum TransportMode for specifying modes of transportation (r11985, r11987)
+
+  Non-API Changes:
+  - QVehicle.getBasicVehicle() has been renamed to QVehicle.getVehicle()
+  - org.matsim.withinday removed completely
+  - World, Layer data structures removed completely
+  - Completely re-engineered signalsystems implementation
+
+
+Please note that OTFVis may not be able to read mvi-files created with an older release of MATSim.
+Please make sure your mvi-files work as expected in OTFVis before deleting any older release of
+MATSim. In the case of problems, it might be useful to keep the old release around just for
+looking at old mvi-files.
+
+
+
+
+Release version 0.1.1
+-------------------------------------------------------------------------------
+
+Bugfixes:
+- two examples in tutorial.* did not work as expected
+
+
+
+Release Spring 2010 (version 0.1.0)
+-------------------------------------------------------------------------------
+
+Main focus of this release:
+Code stability and performance improvements, not so much about new features for users.
+
+
+Changes:
+
+- Changed System Requirements to Java 6
+
+- New features:
+  - handling events in a separate thread for speed up of runs (http://matsim.org/node/238)
+  - conversion of OpenStreetMap-data for networks (see org.matsim.core.utils.io.OsmNetworkReader)
+  - events can be written in an XML format to better accomodate attributes from new events
+
+- Feature improvements:
+  - improved visualizer OTFVis:
+    show middle line of a road, save configuration, save views, start without argument, change speed, etc.
+  - improved speed of default QueueSimulation
+  - Events can be configured to be written only every n-th iteration 
+    (speed due to less file I/O) (see http://matsim.org/node/344)
+  - routing algorithms (Dijkstra, A*Landmarks) run faster (commit r8399)
+  - faster writing of events and plans-files (commit r8867)
+  - Planomat can now also do mode choice (see http://matsim.org/node/381)
+
+- Other changes for users:
+  - use Dijkstra as default routing algorithm instead of A*-Landmarks
+  - improved travel time calculation (r6767)
+  - lots of bug fixes, too many to list them here
+  - Simulation can handle non-car legs by means of simple teleportation
+
+- Other changes for developers:
+  - moved project structure and Build process to Maven
+  - first steps towards stable API for programmers (see package org.matsim.api.*)
+    Developers which cannot commit to the MATSim repository should try to only use
+    classes/interfaces from this package. If you need additional functionality from
+    other classes, please speak to us, as we cannot guarantee for other classes to
+    remain stable to the next release!
+  - code cleanup towards API
+  - renamed several classes and packages
+  - improved code quality based on static code analysis
+  - made scoring function more modular (see http://matsim.org/node/263)
+  - introduce Scenario-class as Super-Element containing pointers to other data containers
+    (see org.matsim.api.Scenario)
+  - use Builders to create Population and Network
+  - use (API-)Interfaces instead of Implementations in many playces
+  - try domain driven design, ues Ids instead of object references between data containers (like Network, Population, ...)
+  - Bugfix: QuadTree.values().iterator() did not return all values (r8303, r8863)
+

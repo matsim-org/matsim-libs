@@ -1,0 +1,91 @@
+\authorsOfDoc{Marcel Rieser}
+ 
+\bigskip
+
+\begin{chapter-intro}
+MATSim comes without any easy to use graphical interface. Instead, it uses text
+files for configuration and uses a command line interface to start simulations.
+This chapter shows you how to start MATSim simulations in a number of different
+computing environments.
+\end{chapter-intro}
+
+
+\section{Prerequisites}
+
+MATSim is written in Java, a programming language which allows to write
+applications that run on a large variety of computers. As scenarios can become
+quite large, they may consume large amounts of memory (RAM). Very large
+scenarios should be run on dedicated servers with enough resources.
+
+In general, to use MATSim, the following requirements must be met:
+\begin{itemize}\styleItemize
+  \item Java SE 7 must be installed. The latest version of the Java Runtime
+  Environment (JRE) can be downloaded from \url{http://java.oracle.com}.
+  \item Have at least 2 GB memory for running the examples. For larger
+  scenarios, more memory will be required.
+  \item Have enough free hard drive space. The provided examples will occupy
+  only a few megabytes, but large scenarios can easily use multiple gigabytes of
+  disk space.
+  \item Last but not least, you need a version of MATSim.
+\end{itemize}
+This chapter assumes you are using a release (or nightly build) of MATSim which
+comes pre-packaged as a jar-file. This chapter will not explain how to compile
+and run MATSim based on its program source files. In the remainder of this
+chapter, {\tt matsim.jar} will be used to refer to the jar-file of MATSim. The
+actual name might differ, e.g. it might include a version number like {\tt
+matsim-0.6.0.jar} or {\tt matsim-20140114.jar}.
+
+
+\section{Using MATSim from a Command Line}
+To run MATSim, one needs a configuration file and an estimation, how much memory
+the simulation will consume (Don't fear this, you'll get used to this quite
+fast). As MATSim comes without graphical user interface, it needs to be run on
+the command line. In Linux or Mac OS X, this is typically done using a Terminal
+application. In Windows, the Power Shell or Command Prompt can be used.
+
+On the command line, type the following command, but substitute the correct
+paths:
+\begin{verbatim}
+java -Xmx512m -cp /path/to/matsim.jar
+      org.matsim.run.Controler /path/to/config.xml
+\end{verbatim}
+Note that the commands should always be written on one line, they are shown in
+this tutorial on multiple lines only for readability.
+
+As an example, on Linux this could look like:
+\begin{verbatim}
+java -Xmx512m -cp /home/username/matsim/matsim.jar 
+      org.matsim.run.Controler /home/user/matsim/input/config.xml
+\end{verbatim}
+
+On Mac OS X, it could look like this:
+\begin{verbatim}
+java -Xmx512m -cp /Users/username/matsim/matsim.jar 
+      org.matsim.run.Controler /Users/user/matsim/input/config.xml
+\end{verbatim}
+
+On Windows, an example command could be:
+\begin{verbatim}
+java -Xmx512m -cp C:\MATSim\matsim.jar 
+      org.matsim.run.Controler C:\MATSim\input\config.xml
+\end{verbatim}
+
+Such a command exists of multiple parts:
+\begin{itemize}
+  \item {\tt java} tells the system that you want to run Java.
+  \item {\tt -Xmx512m} tells Java that it should use up to 512 MB of memory.
+  This is typically enough to run the small examples. For larger scenarios, you
+  might need more memory: {\tt -Xmx3g} would allow Java to use up to 3 GB of
+  memory.
+  \item {\tt -cp /path/to/matsim.jar} tells Java where to find the MATSim code.
+  \item {\tt org.matsim.run.Controler} tells Java which class (think of ``entry
+  point'') it should start running. In most cases, the default MATSim Controler
+  is the class you'll need to run simulations.
+  \item {\tt /path/to/config.xml} tells MATSim which config file is to be used.
+\end{itemize}
+
+In the case you have relative paths in your config file, make sure to start
+MATSim in the correct directory. It will interpret all relative paths based on
+the directory where the Java process got started, and not where the config file
+is located.
+

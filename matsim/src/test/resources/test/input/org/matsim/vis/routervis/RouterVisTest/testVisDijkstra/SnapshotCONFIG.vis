@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<config>
+
+	<!--
+
+	Auto generated configuration file.
+
+	Used StreamWriter implementation: 
+	  org.matsim.vis.routervis.RouterNetStateWriter
+
+	 -->
+
+    <module name="general">
+    	<param name="netfile" value="test/input/org/matsim/vis/routervis/RouterVisTest/network.xml"/>
+    </module>
+
+    <module name="temporal">
+    	<param name="buffersize" value="100"/>
+    	<param name="endtime" value="00-01-15"/>
+    	<param name="starttime" value="00-00-00"/>
+    	<param name="timesteplength" value="00-00-01"/>
+    </module>
+
+    <module name="vis">
+    	<param name="antialiasing" value="true"/>
+    	<param name="delay" value="100"/>
+    	<param name="linkwidthfactor" value="20"/>
+    	<param name="logo" value="MATSim"/>
+    	<param name="showlinklabels" value="false"/>
+    	<param name="shownodelabels" value="false"/>
+    </module>
+
+    <module name="indexation">
+    	<network>
+    		<nodes>
+    			<node id="1"/>
+    			<node id="10"/>
+    			<node id="11"/>
+    			<node id="12"/>
+    			<node id="13"/>
+    			<node id="14"/>
+    			<node id="15"/>
+    			<node id="16"/>
+    			<node id="17"/>
+    			<node id="18"/>
+    			<node id="19"/>
+    			<node id="2"/>
+    			<node id="20"/>
+    			<node id="21"/>
+    			<node id="22"/>
+    			<node id="23"/>
+    			<node id="24"/>
+    			<node id="3"/>
+    			<node id="4"/>
+    			<node id="5"/>
+    			<node id="6"/>
+    			<node id="7"/>
+    			<node id="8"/>
+    			<node id="9"/>
+    		</nodes>
+    		<links>
+    			<link id="1"/>
+    			<link id="10"/>
+    			<link id="11"/>
+    			<link id="12"/>
+    			<link id="13"/>
+    			<link id="14"/>
+    			<link id="15"/>
+    			<link id="16"/>
+    			<link id="17"/>
+    			<link id="18"/>
+    			<link id="19"/>
+    			<link id="2"/>
+    			<link id="20"/>
+    			<link id="21"/>
+    			<link id="22"/>
+    			<link id="23"/>
+    			<link id="24"/>
+    			<link id="25"/>
+    			<link id="26"/>
+    			<link id="27"/>
+    			<link id="28"/>
+    			<link id="29"/>
+    			<link id="3"/>
+    			<link id="30"/>
+    			<link id="31"/>
+    			<link id="32"/>
+    			<link id="33"/>
+    			<link id="34"/>
+    			<link id="35"/>
+    			<link id="36"/>
+    			<link id="37"/>
+    			<link id="38"/>
+    			<link id="39"/>
+    			<link id="4"/>
+    			<link id="40"/>
+    			<link id="41"/>
+    			<link id="42"/>
+    			<link id="43"/>
+    			<link id="44"/>
+    			<link id="45"/>
+    			<link id="46"/>
+    			<link id="47"/>
+    			<link id="48"/>
+    			<link id="49"/>
+    			<link id="5"/>
+    			<link id="50"/>
+    			<link id="51"/>
+    			<link id="52"/>
+    			<link id="53"/>
+    			<link id="54"/>
+    			<link id="55"/>
+    			<link id="56"/>
+    			<link id="57"/>
+    			<link id="58"/>
+    			<link id="59"/>
+    			<link id="6"/>
+    			<link id="60"/>
+    			<link id="61"/>
+    			<link id="62"/>
+    			<link id="63"/>
+    			<link id="64"/>
+    			<link id="65"/>
+    			<link id="66"/>
+    			<link id="67"/>
+    			<link id="68"/>
+    			<link id="69"/>
+    			<link id="7"/>
+    			<link id="70"/>
+    			<link id="71"/>
+    			<link id="72"/>
+    			<link id="73"/>
+    			<link id="74"/>
+    			<link id="75"/>
+    			<link id="76"/>
+    			<link id="8"/>
+    			<link id="9"/>
+    		</links>
+    	</network>
+    </module>
+
+</config>

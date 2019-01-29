@@ -1,0 +1,39 @@
+There are two visualizers available for MATSim. The original, open source 
+visualizer is \href{http://matsim.org/docs/extensions/otfvis}{OTFVis}, which is
+a MATSim extension. It requires current OpenGL drivers. The source code is 
+available, so you can add your own information visualization code. On the 
+other hand, there is currently little support for it from our part.
+
+Then there is Via, a commercial visualizer developed by Senozon. It  has more
+features, a better UI, and it is more stable. On the other hand, it visualizes
+output files from simulation runs, whereas OTFVis runs in the same VM as
+MATSim and can peek into the running simulation.
+
+The supported way of programming your own data analysis or visualization code
+is to analyze MATSim output in the form of Events, either reading in the 
+events.xml file, or writing an EventHandler and receiving Events programmatically.
+
+\section{Senozon Via}
+
+Via can be obtained from the \href{http://senozon.com/products/via}{Senozon website}.
+While the application is commercial, a limited version is available freely from the website. 
+A brief introduction to using Senozon Via is part of the "Learning MATSim in 8 Lessons"
+tutorial in the \href{http://www.matsim.org/docs/tutorials/8lessons/getting-started}{Getting Started} lesson.
+
+Via is able to visualize most of MATSim's data (network, agent plans, transit schedule, facilities, counts)
+along additional data (e.g. shape files, GPS traces).
+It allows to analyze and visualize the outcome of MATSim simulations by loading the generated events-file.
+
+
+On the relation between Senozon (a private company), Senzon Via (a commercial software), 
+MATSim (an open source project/software) and MATSim OTFVis (an open source software):
+\begin{itemize}\styleItemize
+	\item Historically, MATSim is open source. An important reason for this was that multiple teams contribute, and we wanted to make progress rather than sorting out the intellectual property.
+	\item However, this community is unable to provide support for any and all requests that may come up. As a result, the commercial company \href{http://www.senzon.com/}{Senozon} was founded by two long-time MATSim developers, which provides commercial support for such situations.
+	\item Senozon also helps significantly with the development and maintenance of the MATSim core. The open source community and Senozon have a shared interest in a functional and robust MATSim core: Both our academic research and Senozon's commercial success depend on this.
+	\item In addition, Senozon has developed the \href{http://senozon.com/products/via}{MATSim visualization and analysis software Via}.  OTFVis remains available but maintenance is limited. In  particular, please understand that we are unable to provide support for specific hardware configurations or specific query requests.
+\end{itemize}
+
+\section{Events analysis}
+
+In  order to write MATSim events handlers, some amount of Java programming  is necessary. Material can thus found in the api-users section of the documentation, see \href{http://www.matsim.org/node/17}{here}.

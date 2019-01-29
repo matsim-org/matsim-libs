@@ -1,0 +1,87 @@
+\ProvidesPackage{user-guide}
+
+
+%%%%%% LIST / ENUMERATION
+
+% for info about styling lists:
+% http://www-h.eng.cam.ac.uk/help/tpl/textprocessing/teTeX/latex/latex2e-html/ltx-260.html
+
+\newcommand{\styleEnumerate}{%
+	\setlength{\itemsep}{-\parskip}%
+	\setlength{\topsep}{-5pt}%
+% 	\setlength{\partopsep}{-5pt}%
+% 	\setlength{\itemindent}{50pt}%
+}
+\newcommand{\styleItemize}{%
+	\styleEnumerate%
+	% at the moment, this does not differ from the enumeration-style
+}
+
+\newcommand{\styleDescription}{%
+	\styleEnumerate%
+	% at the moment, this does not differ from the enumeration-style
+}
+
+
+% ====================================================================
+% FONTS
+% ====================================================================
+
+\newcommand{\titleFontNormal}{\fontsize{16}{30}\sffamily\bfseries}
+\newcommand{\titleFontSmall}{\fontsize{12}{14}\sffamily\bfseries}
+
+
+% \usepackage{fourier} % use Utopia Fourier
+% \usepackage[T1]{fontenc}
+
+
+
+% ====================================================================
+% CHAPTER TITLES
+% ====================================================================
+
+\usepackage[sf]{titlesec}
+%\titleformat*{\chapter}{\color{blue}\huge\sf}
+\titleformat*{\section}{\color{blue}\LARGE\sf}
+\titleformat*{\subsection}{\color{blue}\Large\sf}
+\titleformat*{\subsubsection}{\color{blue}\large\sf}
+\titleformat*{\paragraph}{\color{blue}\sf}
+\titleformat*{\subparagraph}{\color{blue}\sf}
+
+
+\titleformat{name=\chapter}[display]
+	{\sf\bfseries\huge}
+	{\filleft \large\chaptertitlename~\Huge\thechapter}
+	{4ex}
+	{\filright}
+  [\vspace{2ex}%
+\titlerule]
+
+
+% ====================================================================
+% CUSTOM ENVIRONMENTS
+% ====================================================================
+\usepackage{framed,color}
+
+\newenvironment{chapter-intro}
+{% This is the begin code
+\definecolor{shadecolor}{RGB}{220,220,220}
+\sf
+\begin{shaded}
+\noindent\ignorespaces
+}
+{% This is the end code
+\end{shaded}
+\vskip\baselineskip }
+
+\newenvironment{note}
+{% This is the begin code
+\definecolor{shadecolor}{RGB}{255,255,150}
+\sf
+\begin{shaded}
+\noindent\ignorespaces
+}
+{% This is the end code
+\end{shaded}
+\vskip\baselineskip }
+

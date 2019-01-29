@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!ELEMENT transitSchedule  (transitStops?,transitLine*)>
+
+<!ELEMENT transitStops     (stopFacility)*>
+
+<!ELEMENT stopFacility     EMPTY>
+<!ATTLIST stopFacility
+          id               CDATA   #REQUIRED
+          x                CDATA   #REQUIRED
+          y                CDATA   #REQUIRED
+          linkRefId        CDATA   #IMPLIED
+          name             CDATA   #IMPLIED
+          isBlocking       (true|false)  "false">
+
+<!ELEMENT transitLine      (transitRoute)*>
+<!ATTLIST transitLine
+          id               CDATA   #REQUIRED
+          name             CDATA   #IMPLIED>
+
+<!ELEMENT transitRoute     (description?,transportMode,routeProfile,route?,departures)>
+<!ATTLIST transitRoute
+          id               CDATA   #REQUIRED>
+<!-- transitRoute.id must be unique within a transitLine only. -->
+
+<!ELEMENT description      (#PCDATA)>
+
+<!ELEMENT transportMode    (#PCDATA)>
+<!-- describes the mode of which vehicles are that serve that line/route -->
+
+<!ELEMENT routeProfile     (stop)*>
+
+<!ELEMENT stop             EMPTY>
+<!ATTLIST stop
+          refId            CDATA   #REQUIRED
+          departureOffset  CDATA   #IMPLIED
+          arrivalOffset    CDATA   #IMPLIED
+          awaitDeparture   (true|false)  "false">
+<!--
+ * stop.departureOffset is required for all stops but the last.
+   The offsets are to be added to the departure times of the single
+   departures listed in the transitRoute.
+ * stop.refId are id-references to facilities. -->
+
+<!ELEMENT route            (link)*>
+
+<!ELEMENT link             EMPTY>
+<!ATTLIST link
+          refId            CDATA   #REQUIRED>
+
+<!ELEMENT departures       (departure)*>
+<!-- the single departures along that transitRoute -->
+
+<!ELEMENT departure        EMPTY>
+<!ATTLIST departure
+          id               CDATA   #REQUIRED
+          departureTime    CDATA   #REQUIRED
+          vehicleRefId     CDATA   #IMPLIED>
+<!-- the departure.id must be unique within a transitLine only -->

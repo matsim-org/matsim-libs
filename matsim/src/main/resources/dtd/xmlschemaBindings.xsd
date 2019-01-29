@@ -1,0 +1,14 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="2.0">
+  
+  <annotation>
+    <appinfo>
+    <jaxb:schemaBindings>
+      <jaxb:package name="org.matsim.jaxb">
+      </jaxb:package>
+    </jaxb:schemaBindings>
+    </appinfo>
+  </annotation>
+</schema>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<events version="1.0">
+	<event time="18060.0" type="actend" person="1" link="1-2" actType="home"  />
+	<event time="18060.0" type="departure" person="1" link="1-2" legMode="transit_walk"  />
+	<event time="18089.0" type="travelled" person="1" distance="NaN"  />
+	<event time="18089.0" type="arrival" person="1" link="2-3" legMode="transit_walk"  />
+	<event time="18089.0" type="actstart" person="1" link="2-3" actType="pt interaction"  />
+	<event time="18089.0" type="actend" person="1" link="2-3" actType="pt interaction"  />
+	<event time="18089.0" type="departure" person="1" link="2-3" legMode="pt"  />
+	<event time="18089.0" type="waitingForPt" agent="1" atStop="293" destinationStop="495"  />
+	<event time="18300.0" type="TransitDriverStarts" driverId="pt_1000_1" vehicleId="1000" transitLineId="gelb" transitRouteId="gelb_1" departureId="1000"  />
+	<event time="18300.0" type="departure" person="pt_1000_1" link="1-2" legMode="car"  />
+	<event time="18300.0" type="PersonEntersVehicle" person="pt_1000_1" vehicle="1000"  />
+	<event time="18300.0" type="wait2link" person="pt_1000_1" link="1-2" vehicle="1000"  />
+	<event time="18300.0" type="VehicleArrivesAtFacility" vehicle="1000" facility="192" delay="0.0"  />
+	<event time="18300.0" type="VehicleDepartsAtFacility" vehicle="1000" facility="192" delay="0.0"  />
+	<event time="18301.0" type="left link" person="pt_1000_1" link="1-2" vehicle="1000"  />
+	<event time="18301.0" type="entered link" person="pt_1000_1" link="2-3" vehicle="1000"  />
+	<event time="18301.0" type="VehicleArrivesAtFacility" vehicle="1000" facility="293" delay="-29.0"  />
+	<event time="18302.0" type="PersonEntersVehicle" person="1" vehicle="1000"  />
+	<event time="18330.0" type="VehicleDepartsAtFacility" vehicle="1000" facility="293" delay="0.0"  />
+	<event time="18331.0" type="left link" person="pt_1000_1" link="2-3" vehicle="1000"  />
+	<event time="18331.0" type="entered link" person="pt_1000_1" link="3-4" vehicle="1000"  />
+	<event time="18422.0" type="left link" person="pt_1000_1" link="3-4" vehicle="1000"  />
+	<event time="18422.0" type="entered link" person="pt_1000_1" link="4-5" vehicle="1000"  />
+	<event time="18422.0" type="VehicleArrivesAtFacility" vehicle="1000" facility="495" delay="-1678.0"  />
+	<event time="18423.0" type="PersonLeavesVehicle" person="1" vehicle="1000"  />
+	<event time="18423.0" type="travelled" person="1" distance="NaN"  />
+	<event time="18423.0" type="arrival" person="1" link="4-5" legMode="pt"  />
+	<event time="18423.0" type="actstart" person="1" link="4-5" actType="pt interaction"  />
+	<event time="18423.0" type="actend" person="1" link="4-5" actType="pt interaction"  />
+	<event time="18423.0" type="departure" person="1" link="4-5" legMode="transit_walk"  />
+	<event time="18446.0" type="travelled" person="1" distance="NaN"  />
+	<event time="18446.0" type="arrival" person="1" link="5-6" legMode="transit_walk"  />
+	<event time="18446.0" type="actstart" person="1" link="5-6" actType="home"  />
+	<event time="20100.0" type="VehicleDepartsAtFacility" vehicle="1000" facility="495" delay="0.0"  />
+	<event time="20101.0" type="left link" person="pt_1000_1" link="4-5" vehicle="1000"  />
+	<event time="20101.0" type="entered link" person="pt_1000_1" link="5-6" vehicle="1000"  />
+	<event time="20101.0" type="VehicleArrivesAtFacility" vehicle="1000" facility="596" delay="-29.0"  />
+	<event time="20130.0" type="VehicleDepartsAtFacility" vehicle="1000" facility="596" delay="0.0"  />
+	<event time="20130.0" type="PersonLeavesVehicle" person="pt_1000_1" vehicle="1000"  />
+	<event time="20130.0" type="arrival" person="pt_1000_1" link="5-6" legMode="car"  />
+</events>

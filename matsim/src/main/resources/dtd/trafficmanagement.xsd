@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xml:lang="en">
+<!-- targetNamespace="http://www.matsim.org"
+xmlns="http://www.matsim.org" elementFormDefault="qualified" -->
+
+<xsd:element name="trafficmanagement" type="trafficmanagementType" />
+
+<xsd:complexType name="trafficmanagementType">
+  <xsd:sequence>
+<!--    <xsd:element name="accident" type="accidentType" minOccurs="0" maxOccurs="unbounded" />-->
+    <xsd:element name="guidanceDevice" type="guidanceDeviceType" minOccurs="0" maxOccurs="unbounded" />
+  </xsd:sequence>
+</xsd:complexType>
+
+<!--<xsd:complexType name="accidentType">-->
+<!--  <xsd:sequence>-->
+<!--    <xsd:element name="linkId" type="xsd:string" />-->
+<!--    <xsd:element name="capacityReductionFactor" type="xsd:decimal" />-->
+<!--    <xsd:element name="startTime" type="xsd:time" />-->
+<!--    <xsd:element name="endTime" type="xsd:time" />-->
+<!--  </xsd:sequence>-->
+<!--</xsd:complexType>-->
+
+<xsd:complexType name="guidanceDeviceType">
+  <xsd:sequence>
+    <xsd:element name="controlInput" type="controlInputType" />
+    <xsd:element name="feedbackControler" type="feedbackControlerType" />
+		<xsd:element name="messageHoldTime" type="xsd:integer" />
+		<xsd:element name="controlEvents" type="xsd:integer" />
+		<xsd:element name="nominalSplitting" type="xsd:decimal" />
+		<xsd:element name="deadZoneSystemOutput" type="xsd:decimal" />
+		<xsd:element name="deadZoneSystemInput" type="xsd:decimal" />
+		<xsd:element name="signLink" type="xsd:string" />
+		<xsd:element name="directionLink" type="xsd:string" />
+		<xsd:element name="compliance" type="xsd:decimal" />
+		<xsd:element name="benefitControl" type="xsd:boolean" />
+  	<xsd:element name="output" type="outputType" minOccurs="0"	maxOccurs="1" />
+  </xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="controlInputType">
+ <xsd:sequence>
+   <xsd:element name="controlInputClass" type="xsd:string" />
+   <xsd:element name="ignoredQueuingTime" minOccurs="0" maxOccurs="1">
+   	<xsd:complexType>
+   		<xsd:attribute name="sec" type="xsd:decimal" />
+   	</xsd:complexType>
+   </xsd:element>
+   <xsd:element name="distributionCheckActivated" minOccurs="0" maxOccurs="1">
+   	<xsd:complexType>
+   		<xsd:attribute name="value" type="xsd:boolean" />
+   	</xsd:complexType>
+   </xsd:element>
+   <xsd:element name="backgroundNoiseCompensationActivated" minOccurs="0" maxOccurs="1" >
+   	<xsd:complexType>
+   		<xsd:attribute name="value" type="xsd:boolean" />
+   	</xsd:complexType>
+   </xsd:element>
+   <xsd:element name="incidentDetectionActivated" minOccurs="0" maxOccurs="1" >
+   	<xsd:complexType>
+   		<xsd:attribute name="value" type="xsd:boolean" />
+   	</xsd:complexType>
+   </xsd:element>
+   <xsd:element name="updateTimeInOutFlow" minOccurs="0" maxOccurs="1" >
+   	<xsd:complexType>
+   		<xsd:attribute name="sec" type="xsd:decimal" />
+   	</xsd:complexType>
+   </xsd:element>
+   <xsd:element name="resetBottleNeckIntervall" minOccurs="0" maxOccurs="1" >
+   	<xsd:complexType>
+   		<xsd:attribute name="sec" type="xsd:decimal" />
+   	</xsd:complexType>
+   </xsd:element>
+   <xsd:element name="numberOfEventsDetection" minOccurs="0" maxOccurs="1" >
+   	<xsd:complexType>
+   		<xsd:attribute name="value" type="xsd:integer" />
+   	</xsd:complexType>
+   </xsd:element>
+   <xsd:element name="mainRoute" type="routeType" />
+   <xsd:element name="alternativeRoute" type="routeType" />
+ </xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="routeType">
+  <xsd:sequence>
+    <xsd:element name="node" minOccurs="2" maxOccurs="unbounded">
+      <xsd:complexType>
+        <xsd:attribute name="id" type="xsd:positiveInteger" use="required"/>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:sequence>
+</xsd:complexType>
+
+<xsd:simpleType name="feedbackControlerType">
+	<xsd:restriction base="xsd:string">
+	  <xsd:enumeration value="BangBangControler" />
+	  <xsd:enumeration value="NoControl" />
+	  <xsd:enumeration value="ConstantControler" />
+	  <xsd:enumeration value="PControler" />
+	  <xsd:enumeration value="PIDControler" />
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:complexType name="outputType">
+  <xsd:sequence>
+		<xsd:element name="spreadsheetfile" type="xsd:string" />
+  </xsd:sequence>
+</xsd:complexType>
+</xsd:schema>
+

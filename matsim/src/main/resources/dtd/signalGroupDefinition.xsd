@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://www.matsim.org/files/dtd"
+					 xmlns="http://www.matsim.org/files/dtd"
+					 elementFormDefault="qualified"
+					 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+					 xml:lang="en">
+
+<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
+<!-- Description of the signal groups for the traffic light system to be used in
+the simulation -->
+
+<xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+
+<xs:element name="signalGroups">
+  <xs:complexType>
+  <xs:sequence>
+    <xs:element name="signalGroup" type="signalGroupType" minOccurs="1" maxOccurs="unbounded" />
+  </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+<xs:complexType name="signalGroupType">
+  <xs:annotation>
+    <xs:documentation>Type describing a signal group.</xs:documentation>
+  </xs:annotation>
+  <xs:complexContent>
+		<xs:extension base="matsimObjectType">
+		<xs:sequence>
+			<xs:element name="fromLane" type="signalLaneType" minOccurs="1" maxOccurs="unbounded" />
+			<xs:element name="toLane" type="signalLaneType" minOccurs="1" maxOccurs="unbounded" />
+			<!-- optional elements -->
+			<xs:element name="turnIfRed" type="xs:boolean" default="false" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="passingClearingTime" type="xs:nonNegativeInteger" default="0" minOccurs="0" maxOccurs="1">
+			<xs:annotation>
+			  <xs:documentation>This value is the sum of two values: 1. In German "Überfahrzeit" which expresses the
+			  time cars are entering the node when the dropping already has occured. 2. In German "Räumzeit" which
+			  is the time needed for vehicles to clear the node. Combined with the "Einfahrzeit" of a roughcasting
+			  signalGroup the interim time can be computed as (Überfahrzeit + Räumzeit) - Einfahrzeit</xs:documentation>
+			</xs:annotation>
+			</xs:element>
+			<xs:element name="enteringTime" type="xs:nonNegativeInteger" default="0" minOccurs="0" maxOccurs="1" >
+				<xs:annotation>
+				  <xs:documentation>See documentation of element passingClearingTime.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		</xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="signalLaneType">
+	<xs:annotation>
+		<xs:documentation>Type extending an id reference to a Link by an attribute
+		specifying the number of lanes.</xs:documentation>
+	</xs:annotation>
+	<xs:complexContent>
+		<xs:extension base="matsimObjectType">
+			<xs:sequence>
+				<xs:element name="link" type="idRefType" minOccurs="1" maxOccurs="1" />
+			</xs:sequence>
+		  <xs:attribute name="length" type="xs:decimal" default="45.0">
+				<xs:annotation>
+					<xs:documentation>Optional argument capturing the length of this lane in meter.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+      <xs:attribute name="numberOfRepresentedLanes" type="xs:positiveInteger" default="1">
+        <xs:annotation>
+          <xs:documentation>Number of lanes in reality represented by this signal lane.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+		</xs:extension>
+	</xs:complexContent>
+</xs:complexType>
+
+</xs:schema>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE roadpricing SYSTEM "http://www.matsim.org/files/dtd/roadpricing_v1.dtd">
+
+<roadpricing type="area" name="Gebietsmaut Testnet">
+
+	<description>Eine Gebietsmaut für das einfache Test-Netzwerk.</description>
+
+	<links>
+		<link id="1" />
+		<link id="2" />
+		<link id="4" />
+	</links>
+
+	<!-- amount: [monetary unit] / [simulations] -->
+	<cost start_time="06:00" end_time="10:00" amount="2.00" />
+	<cost start_time="15:00" end_time="19:00" amount="2.00" />
+
+</roadpricing>

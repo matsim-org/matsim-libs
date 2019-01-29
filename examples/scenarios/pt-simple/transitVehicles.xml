@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
+<vehicleType id="1">
+   <description>pt</description>
+   <capacity>
+      <seats persons="50"/>
+      <standingRoom persons="100"/>
+   </capacity>
+   <length meter="12"/>
+</vehicleType>
+<vehicle id="1000" type="1"/>
+</vehicleDefinitions>

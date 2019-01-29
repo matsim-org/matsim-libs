@@ -1,0 +1,187 @@
+\authorsOfDoc{Kai Nagel}
+
+A discussion of policy measures that can be investigated with matsim is under \href{http://matsim.org/policy-measures}{matsim.org/policy-measures}  . It is not in the user section but in the developer section of  the documentation since, at this point, many of those measures need additional coding. 
+
+Clearly, something like adding or removing lanes or  links can be investigated without any coding.  Examples for use cases and policy measures that can be investigated without coding can be found in the following.
+
+\section{MATSim as tool for dynamic traffic assigment (DTA)}
+
+%%A MATSim iteration can be seen as consisting of the following steps:
+%%\begin{itemize}
+%%\item Physical simulation ($=$ network loading) and scoring
+%%\item Innovation and plans removal ($=$ modification of the choice sets)
+%%\item Choice
+%%\end{itemize}
+
+A typical MATSim use case is the use as dynamic traffic assignment (DTA) tool.  In DTA, trips are given by departure time, departure location, and destination, and the task of DTA is to find routes.  The task is typically solved by iterating between network loading and routing; possible outcomes are a Nash equilibrium (no traveller can improve its score/utility by switching to a different route) or SUE (so-called stochastic user equilibrium).
+
+In order to use MATSim for this, one needs to convert each trip into a pseudo-person.  I call this ``pseudo''-person since it does not correspond to a real person; rather, it is probably that multiple trips belong to one person.  The input file would look something like
+\begin{lstlisting}{language=xml}
+<population>
+<person>
+   <plan>
+      <act type="dummy" x="<dp loc x>" y="<dp loc y>" endTime="<dp time>" />
+      <act type="dummy" x="<dest x>" y="<dest y>" />
+   </plan>
+</person>
+<person>
+...
+</population>
+\end{lstlisting}
+where
+
+\begin{tabularx}{\hsize}{rX}
+\verb$dummy$ & arbitrary activity type, see below \\
+\verb$<dp time>$ & starting time of trip \\
+\verb$<dp loc x>$ & x coordinate of departure location \\
+\verb$<dest x>$ & x coordinate of destination \\
+\end{tabularx}
+
+Alternatively, one can use link ids for departure locations and destinations:
+\begin{lstlisting}{language=xml}
+<population>
+<person>
+   <plan>
+      <act type="dummy" link="<link id>" endTime="<dp time>" />
+      <act type="dummy" link="<link id>" x="<dest x>" y="<dest y>" />
+   </plan>
+</person>
+<person>
+...
+</population>
+\end{lstlisting}
+
+Note that MATSim trips start on links, not at nodes.  You somehow have to convert this.
+
+This file, together with the appropriate network file and an appropriate config file, will serve as input to MATSim.  The config file will look something like
+\begin{lstlisting}{language=xml}
+<module name="network" >
+	<param name="inputNetworkFile" value="..." /> 
+</module>
+<module name="plans" >
+	<param name="inputPlansFile" value="..." />
+</module>
+<module name="controler" >
+	<param name="firstIteration" value="0" />
+	<param name="lastIteration" value="100" />
+</module>
+<module name="planCalcScore" >
+	<param name="activityType_0" value="dummy" />
+        <!-- (same activity type as used in plans file) -->
+</module>
+<module name="strategy" >
+	<param name="Module_1" value="ChangeExpBeta" />
+	<param name="ModuleProbability_1" value="0.9" />
+
+	<param name="Module_2" value="ReRoute" />
+	<param name="ModuleProbability_2" value="0.1" />
+</module>
+\end{lstlisting}
+
+The overall calling syntax is something like
+\begin{lstlisting}
+java -cp matsim.jar -Xmx2000m org.matsim.run.Controler config.xml 
+\end{lstlisting}
+
+There is a corresponding example in recent releases; it should run (in the release directory) with 
+\begin{lstlisting}
+java -cp matsim-0.5.0.jar org.matsim.run.Controler examples/tutorial/config/example5-config.xml
+\end{lstlisting}
+\verb$-Xmx2000m$ needs to be added when the scenario gets larger.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Including one's own upstream module}
+\label{sec:including-ones-own}
+
+There is the possibility to call one's own upstream plans modification module.  The config is something like
+\begin{lstlisting}{language=xml}
+<module name="strategy" >
+	<param name="Module_1" value="ChangeExpBeta" />
+	<param name="ModuleProbability_1" value="0.9" />
+
+	<param name="Module_2" value="ReRoute" />
+	<param name="ModuleProbability_2" value="0.1" />
+
+	<param name="ModuleProbability_3" value="0.1" />
+	<param name="ModuleExePath_3" value="<some executable>" />
+</module>
+\end{lstlisting}
+where
+
+\begin{tabularx}{\hsize}{rX}
+\verb$<some executable>$ & is the (unix) call of some external executable, e.g.\ a shell script \\
+\end{tabularx}
+
+The external executable will be called with a config file as an argument.  The config file will contain, e.g., the iteration number, the full path name to the input plans file, the full path name to the output plans file, and the full path name to the (txt) events file.\footnote{%
+%
+If you would prefer the xml events here, please let us know, this is easy to change, in particular when someone else tries it out.
+%
+}
+The input plans file are the plans that come from MATSim.  The output plans is the place where the modified plans file should be written to  The events are the information on which the external module can base its computations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{MATSim for network loading only}
+
+Maybe one wants to use MATSim only for the network loading.  In this case, the plans file needs to look something like
+\begin{lstlisting}{language=xml}
+<population>
+<person>
+   <plan>
+      <act type="dummy" x="<dp loc x>" y="<dp loc y>" endTime="<dp time>" />
+      <leg mode="car">
+         <route> 18 24 45 </route>
+      </leg>
+      <act type="dummy" x="<dest x>" y="<dest y>" />
+   </plan>
+</person>
+<person>
+...
+</population>
+\end{lstlisting}
+where the route section needs to contain the route information. \kai{chk plans v5 fmt}
+
+The config file will be something like
+\begin{lstlisting}{language=xml}
+<module name="network" >
+	<param name="inputNetworkFile" value="..." /> 
+</module>
+<module name="plans" >
+	<param name="inputPlansFile" value="..." />
+</module>
+<module name="controler" >
+	<param name="firstIteration" value="0" />
+	<param name="lastIteration" value="0" />
+</module>
+
+<!-- don't know if the following is necessary: -->
+<module name="planCalcScore" >
+	<param name="activityType_0" value="dummy" />
+        <!-- (same activity type as used in plans file) -->
+</module>
+\end{lstlisting}
+
+The overall calling syntax is again something like (*)
+\begin{lstlisting}
+java -cp matsim.jar -Xmx2000m org.matsim.run.controler config.xml 
+\end{lstlisting}
+
+There are two obvious options how this can be used:
+\begin{itemize}
+\item There is some external mechanics, e.g.\ some external script, which keeps calling MATSim from the command line as in (*), and then takes the output events in order to update plans.
+\item One uses the MATSim iteration mechanics, as described in Sec.~\ref{sec:including-ones-own}, to call an external module, which also modifies routes. 
+\end{itemize}
+
+
+
+
+
+% Local Variables:
+% mode: latex
+% mode: reftex
+% mode: visual-line
+% TeX-master: "../user-guide.tex"
+% comment-padding: 1
+% fill-column: 9999
+% End: 

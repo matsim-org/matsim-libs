@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://www.matsim.org/files/dtd" xmlns="http://www.matsim.org/files/dtd"
+		elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xml:lang="en">
+
+		<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
+		<!-- Description of the signal systems to be used in the simulation -->
+
+		<xs:include schemaLocation="matsimCommon.xsd" />
+		
+		<xs:annotation>
+				<xs:documentation>Description of the signal systems to be used in the simulation
+				</xs:documentation>
+				<xs:appinfo xmlns:dc="http://purl.org/dc/elements/1.1/">
+						<dc:creator>
+								Dominik Grether, VSP, Berlin Institute of Technology
+    </dc:creator>
+						<dc:title>
+								Signal systems for MATSim
+    </dc:title>
+						<dc:date>
+								2010-06-07
+    </dc:date>
+						<dc:subject>
+								matsim, signal system, signal control, transportation, multiagent simulation
+						</dc:subject>
+						<dc:description>
+								Description of the signal systems to be used in the simulation of the MATSim
+								framework
+    </dc:description>
+				</xs:appinfo>
+		</xs:annotation>
+
+		<xs:element name="signalSystems">
+				<xs:complexType>
+						<xs:sequence>
+								<xs:element name="signalSystem" type="signalSystemType"
+										minOccurs="0" maxOccurs="unbounded" />
+						</xs:sequence>
+				</xs:complexType>
+		</xs:element>
+
+		<xs:complexType name="signalSystemType">
+				<xs:complexContent>
+						<xs:extension base="matsimObjectType">
+								<xs:sequence>
+										<xs:element name="signals" minOccurs="1" maxOccurs="1">
+												<xs:complexType>
+														<xs:sequence>
+																<xs:element name="signal" type="signalType"
+																		minOccurs="1" maxOccurs="unbounded" />
+														</xs:sequence>
+												</xs:complexType>
+										</xs:element>
+								</xs:sequence>
+						</xs:extension>
+				</xs:complexContent>
+		</xs:complexType>
+
+		<xs:complexType name="signalType">
+				<xs:complexContent>
+						<xs:extension base="matsimObjectType">
+								<xs:sequence>
+										<xs:element name="lane" minOccurs="0" maxOccurs="unbounded">
+												<xs:annotation>
+														<xs:documentation>
+                            </xs:documentation>
+												</xs:annotation>
+												<xs:complexType>
+														<xs:complexContent>
+																<xs:extension base="idRefType" />
+														</xs:complexContent>
+												</xs:complexType>
+										</xs:element>
+										
+										<xs:element name="turningMoveRestrictions" minOccurs="0" maxOccurs="1">
+												<xs:annotation>
+														<xs:documentation>
+														</xs:documentation>
+												</xs:annotation>
+												<xs:complexType>
+														<xs:sequence>
+																<xs:element name="toLink" type="idRefType" minOccurs="0" maxOccurs="unbounded"/>
+														</xs:sequence>
+												</xs:complexType>
+										</xs:element>
+								</xs:sequence>
+								<xs:attribute name="linkIdRef" type="matsimIdType" use="required"></xs:attribute>
+						</xs:extension>
+				</xs:complexContent>
+		</xs:complexType>
+</xs:schema>

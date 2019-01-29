@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE roadpricing SYSTEM "http://www.matsim.org/files/dtd/roadpricing_v1.dtd">
+
+<roadpricing type="distance" name="Distanzmaut Testnet">
+
+	<description>Eine distanzbasierte Maut für das einfache Test-Netzwerk.</description>
+
+	<links>
+		<link id="1" />
+		<link id="2" />
+    	<link id="3">
+     		<cost start_time="06:00" end_time="10:00" amount="0.00030" />
+     		<cost start_time="10:00" end_time="15:00" amount="0.00020" />
+     		<cost start_time="15:00" end_time="20:00" amount="0.00030" />
+    	</link>
+	</links>
+
+	<!-- amount: [monetary unit] / [link length unit] -->
+	<cost start_time="06:00" end_time="10:00" amount="0.00020" />
+	<cost start_time="10:00" end_time="15:00" amount="0.00010" />
+	<cost start_time="15:00" end_time="19:00" amount="0.00020" />
+
+</roadpricing>

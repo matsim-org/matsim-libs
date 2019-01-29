@@ -1,0 +1,4 @@
+
+no legs, therefore no data
+control statistics: average ttime = NaN
+

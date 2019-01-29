@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://www.matsim.org/files/dtd"
+					 xmlns="http://www.matsim.org/files/dtd"
+					 elementFormDefault="qualified"
+					 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+					 xml:lang="en">
+
+<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
+<!-- Description of the signal group system's plans for the traffic light system to be used in
+the simulation -->
+
+<xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+
+<xs:element name="lightSignalSystemConfig">
+  <xs:complexType>
+    <xs:annotation>
+      <xs:documentation>
+         This is the root element for configuration of the traffic light system.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+ 		  <xs:element name="lightSignalSystemConfiguration" type="lightSignalSystemConfigurationType" minOccurs="0" maxOccurs="unbounded" />
+ 		</xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+<xs:complexType name="lightSignalSystemConfigurationType">
+  <xs:annotation>
+    <xs:documentation>
+    This type is used to configure the signal groups, i.e. which signal groups are controlled together. Furthermore
+    the type of controlling applied to this group can be set. In case of a plan based controlling the plans
+    can be specified.
+    </xs:documentation>
+  </xs:annotation>
+  <xs:complexContent>
+    <xs:extension base="idRefType">
+		<xs:sequence>
+			<xs:element name="lightSignalSystemControlInfo" type="lightSignalSystemControlInfoType" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+				 	<xs:documentation>Each system may have a different control strategy. See also comments for the type
+				 	definition.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+    </xs:sequence>
+  </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="lightSignalSystemControlInfoType" abstract="true">
+  <xs:annotation>
+    <xs:documentation>
+    This type or more precisely its subtypes define how a signal group system is controlled. Control can be adaptive, plan based or both.
+    The attribute controlStrategy reflects the subtype choosen and is required for simplicity of parsing the
+    xml-files.
+    </xs:documentation>
+  </xs:annotation>
+</xs:complexType>
+
+
+
+<xs:complexType name="planbasedlightSignalSystemControlInfoType">
+  <xs:complexContent>
+		<xs:extension base="lightSignalSystemControlInfoType">
+			<xs:sequence>
+				<xs:element name="lightSignalSystemPlan" type="lightSignalSystemPlanType" minOccurs="1" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>A signal system's plan based control is given by one or more plans per
+						signal group. Which signal groups are controled by a plan based system can be determined
+						by examining the plans.
+						The system can switch to a new plan by time of day or by adaptive control
+						mechanisms.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+
+<xs:complexType name="adaptiveLightSignalSystemControlInfoType">
+	<xs:annotation>
+		<xs:documentation>If there is an adaptive control mechanism implemented its id or name
+		can be set in the element of this type.</xs:documentation>
+	</xs:annotation>
+  <xs:complexContent>
+		<xs:extension base="lightSignalSystemControlInfoType">
+			<xs:sequence>
+				<xs:element name="adaptiveControler" type="xs:string" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="signalGroup" type="idRefType" minOccurs="1" maxOccurs="unbounded">
+					<xs:annotation>
+					  <xs:documentation>When a signal system is operated by an adaptive controler the
+				  	signal groups of the system must be stated explicitly, even they are given implicitly when using
+				  	an adaptive plan based control.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+
+
+
+<xs:complexType name="adaptivePlanbasedLightSignalSystemControlInfoType">
+	<xs:annotation>
+		<xs:documentation>If there is an adaptive control mechanism implemented its id or name
+		can be set in the element of this type. For plan based adaptive control strategies
+		one or more plans can be added as well.</xs:documentation>
+	</xs:annotation>
+  <xs:complexContent>
+		<xs:extension base="adaptiveLightSignalSystemControlInfoType">
+			<xs:sequence>
+				<xs:element name="lightSignalSystemPlan" type="lightSignalSystemPlanType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>An adaptive control can use signal plans to control the system. How this
+						plans are used depends on the adaptive control strategy choosen.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+
+
+
+
+<xs:complexType name="lightSignalSystemPlanType">
+  <xs:annotation>
+    <xs:documentation> This type specifies a plan for a traffic light system.
+    </xs:documentation>
+  </xs:annotation>
+  <xs:complexContent>
+  	<xs:extension base="matsimObjectType" >
+  		<xs:sequence>
+				<xs:element name="start">
+					<xs:annotation>
+						<xs:documentation>At which time of day to start using this plan</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="daytime" type="xs:time" use="required"/>
+					</xs:complexType>
+  			</xs:element>
+				<xs:element name="stop">
+					<xs:annotation>
+						<xs:documentation>At which time of day to stop using this plan</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="daytime" type="xs:time" use="required"/>
+					</xs:complexType>
+  			</xs:element>
+        <xs:element name="circulationTime" type="matsimTimeAttributeType" minOccurs="0" maxOccurs="1" >
+          <xs:annotation>
+            <xs:documentation>Umlaufzeit</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="syncronizationOffset" type="matsimTimeAttributeType" minOccurs="0" maxOccurs="1" >
+          <xs:annotation>
+            <xs:documentation>Versatzzeit</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+    		<xs:element name="lightSignalGroupConfiguration" type="lightSignalGroupConfigurationType" minOccurs="1" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>This element contains information when to switch on or off a signal group.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+		  </xs:sequence>
+  	</xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="lightSignalGroupConfigurationType">
+	<xs:complexContent>
+		<xs:extension base="idRefType" >
+			<xs:sequence>
+				<xs:element name="roughcast" minOccurs="1" maxOccurs="1" >
+					<xs:annotation>
+						<xs:documentation>The second of circulation when the signal switches to green.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="sec" type="xs:nonNegativeInteger" use="required" />
+					</xs:complexType>
+				</xs:element>
+ 				<xs:element name="dropping" minOccurs="1" maxOccurs="1" >
+					<xs:annotation>
+						<xs:documentation>The second of circulation when the signal switches to red.</xs:documentation>
+					</xs:annotation>
+	 		  	<xs:complexType>
+						<xs:attribute name="sec" type="xs:nonNegativeInteger" use="required" />
+				  </xs:complexType>
+      	</xs:element>
+ 			  <xs:element name="interimTimeRoughcast" minOccurs="0" maxOccurs="1" >
+			  	<xs:annotation>
+						<xs:documentation>Number of seconds before the roughcast can be done.</xs:documentation>
+					</xs:annotation>
+	      	<xs:complexType>
+			     	<xs:attribute name="sec" type="xs:nonNegativeInteger" default="0" />
+			    </xs:complexType>
+		    </xs:element>
+ 				<xs:element name="interimTimeDropping" minOccurs="0" maxOccurs="1" >
+			  	<xs:annotation>
+			    	<xs:documentation>Number of seconds after the dropping. </xs:documentation>
+					</xs:annotation>
+	  		 	<xs:complexType>
+			  		<xs:attribute name="sec" type="xs:nonNegativeInteger" default="0" />
+			    </xs:complexType>
+		    </xs:element>
+			</xs:sequence>
+		</xs:extension>
+	</xs:complexContent>
+</xs:complexType>
+
+</xs:schema>

@@ -1,0 +1,25 @@
+\begin{titlepage}
+\makeatletter
+%\pdfbookmark[1]{Title}{bookmark:Title}
+\pagestyle{empty}
+
+\definecolor{Dark}{gray}{.2} 
+\definecolor{Medium}{gray}{.55} 
+\definecolor{Light}{gray}{.8} 
+
+\makebox(0,0){} % for some strange reason needed, otherwise vfill has no effect
+\vspace{3cm}
+\par
+\raggedright
+{\textcolor{Medium}{\fontsize{45}{60}\sffamily\bfseries \@title}}\par
+\vspace{1cm}
+% {\textcolor{Medium}{\titleFontSmall Release Fall 2014 (Version 0.6.0)}}\par
+{\textcolor{Medium}{\titleFontSmall Development Version\\last updated \@date}}\par
+\vspace{15cm}
+{\titleFontSmall \mdseries\par\@author}\\
+\vspace{2cm}
+\raggedleft
+\includegraphics[width=.33\textwidth]{figures/MATSimLogo_blue.png}
+
+\makeatother
+\end{titlepage}

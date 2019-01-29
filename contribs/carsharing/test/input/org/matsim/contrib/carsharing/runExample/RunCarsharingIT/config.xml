@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd"
+	[
+		<!ENTITY OUTBASE "test/output/org/matsim/contrib/carsharing/runExample/RunCarsharingTest/">
+	]
+>
+
+<config>
+
+<!-- ====================================================================== -->
+
+	<module name="controler" >
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="20" />
+		<param name="outputDirectory" value="&OUTBASE;" />
+				<param name="eventsFileFormat" value="xml" />
+		<param name="writePlansInterval" value="1" />
+		<param name="writeEventsInterval" value="1" />
+
+		<param name="runId" value="run1" />
+
+		<!-- optimistic, experimental_LastMile -->
+		<!--param name="travelTimeAggregator" value="optimistic" /-->
+		<!--param name="travelTimeBinSize" value="900" /-->
+
+		<!-- TravelTimeCalculatorArray, TravelTimeCalculatorHashMap -->
+		<!--param name="travelTimeCalculator" value="TravelTimeCalculatorArray" /-->
+	</module>
+
+<!-- ====================================================================== -->
+
+		<module name="qsim">
+			<param name="endTime" value="00:00:00"   />
+			<param name="flowCapacityFactor" value="1"   />
+			<param name="storageCapacityFactor" value="10.0"   />
+			<param name="mainMode" value="car,oneway_vehicle,twoway_vehicle,freefloating_vehicle"   />
+		</module>
+
+    <module name="Carsharing" >
+		<param name="statsWriterFrequency" value="1" />
+			<param name="vehiclelocations" value="CarsharingStations.xml" />
+			<param name="membership" value="CSMembership.xml" />
+	</module>
+
+
+	<module name="FreeFloating" >
+		<param name="areasFreefloating" value="freefloating_areas.xml" />
+		<param name="travelingFreeFloating" value="-0.1" />
+		<param name="constantFreeFloating" value="-0.0" />
+		<param name="timeFeeFreeFloating" value="-0.01" />
+		<param name="timeParkingFeeFreeFloating" value="-0.005" />
+		<param name="distanceFeeFreeFloating" value="-0.00" />
+		<param name="specialTimeStart" value="0" />
+		<param name="specialTimeEnd" value="0" />
+		<param name="specialTimeFee" value="0" />
+		<param name="useFreeFloating" value="true" />
+	</module>
+
+	<module name="OneWayCarsharing" >
+	    <param name="timeParkingFeeOneWayCarsharing" value="-0.005" />
+
+		<param name="vehiclelocationsOneWayCarsharing" value="Stations.txt" />
+		<param name="travelingOneWayCarsharing" value="-10.0" />
+		<param name="constantOneWayCarsharing" value="-0.4" />
+        <param name="timeFeeOneWayCarsharing" value="-0.0" />
+		<param name="distanceFeeOneWayCarsharing" value="-0.0" />
+        <param name="useOneWayCarsharing" value="true" />
+        <param name="searchDistanceOneWayCarsharing" value="1000.0" />
+	</module>
+
+	<module name="TwoWayCarsharing" >
+		<param name="vehiclelocationsTwoWayCarsharing" value="CarsharingStations.xml" />
+		<param name="travelingTwoWayCarsharing" value="-6.0" />
+		<param name="constantTwoWayCarsharing" value="-0.4" />
+        <param name="timeFeeTwoWayCarsharing" value="-0.0" />
+		<param name="distanceFeeTwoWayCarsharing" value="-0.0" />
+        <param name="useTwoWayCarsharing" value="true" />
+        <param name="searchDistanceTwoWayCarsharing" value="10000.0" />
+
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="facilities" >
+		<param name="inputFacilitiesFile" value="facilities.xml" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="global" >
+		<param name="coordinateSystem" value="Atlantis" /> <!-- Atlantis, CH1903_LV03 -->
+		<param name="numberOfThreads" value="4" />
+		<param name="randomSeed" value="4711" />
+	</module>
+
+
+<!-- ====================================================================== -->
+
+	<module name="network" >
+		<param name="inputNetworkFile" value="network.xml" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="plans" >
+		<param name="inputPersonAttributesFile" value="1000desiresAttributes.xml" />
+		<param name="inputPlansFile" value="10persons.xml" />
+	</module>
+
+
+<!-- ====================================================================== -->
+
+<module name="strategy">
+
+	<param name="ModuleProbability_1" value="0.0" />
+	<param name="Module_1" value="SelectExpBeta" />
+
+	<param name="maxAgentPlanMemorySize" value="5" />
+
+	<param name="ModuleProbability_2" value="0.5" />
+	<param name="Module_2" value="RandomTripToCarsharingStrategy" />
+	<param name="ModuleDisableAfterIteration_2" value="1000" />
+
+	<param name="ModuleProbability_3" value="1.0" />
+	<param name="Module_3" value="CarsharingSubtourModeChoiceStrategy" />
+	<param name="ModuleDisableAfterIteration_3" value="1000" />
+
+	<param name="ModuleProbability_4" value="1.0" />
+	<param name="Module_4" value="SubtourModeChoice" />
+	<param name="ModuleDisableAfterIteration_4" value="1000" />
+
+</module>
+
+
+
+<!-- ====================================================================== -->
+
+
+    <module name="subtourModeChoice" >
+		<param name="chainBasedModes" value="car,bike" />
+		<param name="considerCarAvailability" value="true" />
+		<param name="modes" value="car,bike,pt,walk" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<!-- triangle -->
+	<module name="planCalcScore" >
+		<param name="writeExperiencedPlans" value="true" />
+
+		<param name="PathSizeLogitBeta" value="1.0" />
+		<param name="learningRate" value="1.0" />
+		<param name="BrainExpBeta" value="2.0" />
+
+		<param name="lateArrival" value="-18.0" />
+		<param name="traveling" value="-6.0" />
+		<param name="travelingPt" value="-6.0" />
+		<param name="travelingBike" value="-26.0" />
+		<param name="traveling_access_walk_tw" value="-6"/>
+		<param name="traveling_egress_walk_tw" value="-6"/>
+		<param name="traveling_twoway_vehicle" value="-6"/>
+		
+		<param name="traveling_access_walk_ff" value="0"/>
+		<param name="traveling_egress_walk_ff" value="0"/>
+		<param name="traveling_freefloating_vehicle" value="0"/>
+		
+		<param name="traveling_access_walk_ow" value="0"/>
+		<param name="traveling_egress_walk_ow" value="0"/>
+		<param name="traveling_oneway_vehicle" value="0"/>
+		
+		<param name="constantCar" value="-0.4" />
+
+		<param name="constantBike" value="-0.4" />
+		<param name="constantPt" value="-4.0" />
+		<param name="constantWalk" value="-0.0" />
+
+		<param name="performing" value="6.0" />
+		<param name="earlyDeparture" value="0" />
+		<param name="waiting" value="0" />
+		<param name="activityType_0" value="h" />
+		<param name="activityClosingTime_0" value="23:59:59" />
+		<param name="activityEarliestEndTime_0" value="undefined" />
+		<param name="activityLatestStartTime_0" value="undefined" />
+		<param name="activityMinimalDuration_0" value="08:00:00" />
+		<param name="activityOpeningTime_0" value="00:00:00" />
+		<param name="activityTypicalDuration_0" value="08:00:00" />
+
+		<param name="activityType_7" value="w" />
+		<param name="activityClosingTime_7" value="23:59:59" />
+		<param name="activityEarliestEndTime_7" value="undefined" />
+		<param name="activityLatestStartTime_7" value="undefined" />
+		<param name="activityMinimalDuration_7" value="06:00:00" />
+		<param name="activityOpeningTime_7" value="08:00:00" />
+		<param name="activityTypicalDuration_7" value="06:00:00" />
+		<param name="activityType_8" value="ff_interaction" />
+		<param name="activityClosingTime_8" value="00:00:00" />
+		<param name="activityEarliestEndTime_8" value="undefined" />
+		<param name="activityLatestStartTime_8" value="undefined" />
+		<param name="activityMinimalDuration_8" value="00:00:00" />
+		<param name="activityOpeningTime_8" value="08:00:00" />
+		<param name="activityTypicalDuration_8" value="00:02:00" />
+		<param name="activityType_9" value="ow_interaction" />
+		<param name="activityClosingTime_9" value="00:00:00" />
+		<param name="activityEarliestEndTime_9" value="undefined" />
+		<param name="activityLatestStartTime_9" value="undefined" />
+		<param name="activityMinimalDuration_9" value="00:00:00" />
+		<param name="activityOpeningTime_9" value="08:00:00" />
+		<param name="activityTypicalDuration_9" value="00:02:00" />
+		<param name="activityType_10" value="tw_interaction" />
+		<param name="activityClosingTime_10" value="00:00:00" />
+		<param name="activityEarliestEndTime_10" value="undefined" />
+		<param name="activityLatestStartTime_10" value="undefined" />
+		<param name="activityMinimalDuration_10" value="00:00:00" />
+		<param name="activityOpeningTime_10" value="08:00:00" />
+		<param name="activityTypicalDuration_10" value="00:02:00" />
+	</module>
+<!-- ====================================================================== -->
+
+
+<module name="planscalcroute" >
+
+		<!-- All the modes for which the router is supposed to generate network routes (like car) -->
+		<param name="networkModes" value="car" />
+
+		<parameterset type="teleportedModeParameters" >
+			<param name="beelineDistanceFactor" value="1.3" />
+			<param name="mode" value="bike" />
+
+			<!-- Free-speed factor for a teleported mode. Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +teleportedModeFreespeedFactor wins over teleportedModeSpeed. -->
+			<param name="teleportedModeFreespeedFactor" value="null" />
+
+			<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
+			<param name="teleportedModeSpeed" value="4.166666666666667" />
+		</parameterset>
+
+		<parameterset type="teleportedModeParameters" >
+			<param name="beelineDistanceFactor" value="1.3" />
+			<param name="mode" value="walk" />
+
+			<!-- Free-speed factor for a teleported mode. Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +teleportedModeFreespeedFactor wins over teleportedModeSpeed. -->
+			<param name="teleportedModeFreespeedFactor" value="null" />
+
+			<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
+			<param name="teleportedModeSpeed" value="0.8333333333333333" />
+		</parameterset>
+
+		<parameterset type="teleportedModeParameters" >
+			<param name="beelineDistanceFactor" value="1.3" />
+			<param name="mode" value="undefined" />
+
+			<!-- Free-speed factor for a teleported mode. Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +teleportedModeFreespeedFactor wins over teleportedModeSpeed. -->
+			<param name="teleportedModeFreespeedFactor" value="null" />
+
+			<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
+			<param name="teleportedModeSpeed" value="13.88888888888889" />
+		</parameterset>
+
+		<parameterset type="teleportedModeParameters" >
+			<param name="beelineDistanceFactor" value="1.3" />
+			<param name="mode" value="pt" />
+
+			<!-- Free-speed factor for a teleported mode. Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +teleportedModeFreespeedFactor wins over teleportedModeSpeed. -->
+			<param name="teleportedModeFreespeedFactor" value="null" />
+
+			<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
+			<param name="teleportedModeSpeed" value="4.5" />
+		</parameterset>
+	</module>
+
+<!-- ====================================================================== -->
+
+</config>

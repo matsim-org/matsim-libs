@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<!--
+  ~ /* *********************************************************************** *
+  ~  * project: org.matsim.*
+  ~  * config.xml
+  ~  *                                                                         *
+  ~  * *********************************************************************** *
+  ~  *                                                                         *
+  ~  * copyright       : (C) 2014 by the members listed in the COPYING, *
+  ~  *                   LICENSE and WARRANTY file.                            *
+  ~  * email           : info at matsim dot org                                *
+  ~  *                                                                         *
+  ~  * *********************************************************************** *
+  ~  *                                                                         *
+  ~  *   This program is free software; you can redistribute it and/or modify  *
+  ~  *   it under the terms of the GNU General Public License as published by  *
+  ~  *   the Free Software Foundation; either version 2 of the License, or     *
+  ~  *   (at your option) any later version.                                   *
+  ~  *   See also COPYING, LICENSE and WARRANTY file                           *
+  ~  *                                                                         *
+  ~  * *********************************************************************** */
+  -->
+
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+    <module name="controler">
+        <param name="lastIteration" value="0" />
+    </module>
+    <module name="roadpricing">
+        <param name="tollLinksFile" value="roadpricing.xml" />
+    </module>
+</config>

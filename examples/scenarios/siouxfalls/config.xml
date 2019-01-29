@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="./network.xml" />
+	</module>
+
+</config>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<signalControl xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalControl_v2.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
+    <signalSystem refId="42">
+        <signalSystemController>
+	          <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="8">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="60"/>
+                <offset sec="3" />
+                <signalGroupSettings refId="23">
+                    <onset sec="0"/>
+                    <dropping sec="45"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    
+    <signalSystem refId="43">
+      <signalSystemController>
+          <controllerIdentifier>logicbasedActuatedController</controllerIdentifier>
+      </signalSystemController>
+    </signalSystem>
+</signalControl>

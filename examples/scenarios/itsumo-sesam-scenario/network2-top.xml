@@ -1,0 +1,5144 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<simulation>
+	<network_id> 1 </network_id>
+	<network_name> network1 </network_name>
+	<nodes>
+		<node>
+			<node_id> 2 </node_id>
+			<node_name> A6 </node_name>
+			<x_coord> 2000.0 </x_coord>
+			<y_coord> 2000.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 3 </node_id>
+			<node_name> A5 </node_name>
+			<x_coord> 2000.0 </x_coord>
+			<y_coord> 2300.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 4 </node_id>
+			<node_name> A4 </node_name>
+			<x_coord> 2000.0 </x_coord>
+			<y_coord> 2600.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 5 </node_id>
+			<node_name> A3 </node_name>
+			<x_coord> 2000.0 </x_coord>
+			<y_coord> 2900.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 6 </node_id>
+			<node_name> A2 </node_name>
+			<x_coord> 2000.0 </x_coord>
+			<y_coord> 3200.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 7 </node_id>
+			<node_name> A1 </node_name>
+			<x_coord> 2000.0 </x_coord>
+			<y_coord> 3500.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 24 </node_id>
+			<node_name> B6 </node_name>
+			<x_coord> 2300.0 </x_coord>
+			<y_coord> 2000.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 25 </node_id>
+			<node_name> C6 </node_name>
+			<x_coord> 2600.0 </x_coord>
+			<y_coord> 2000.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 26 </node_id>
+			<node_name> D6 </node_name>
+			<x_coord> 2900.0 </x_coord>
+			<y_coord> 2000.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 27 </node_id>
+			<node_name> E6 </node_name>
+			<x_coord> 3200.0 </x_coord>
+			<y_coord> 2000.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 28 </node_id>
+			<node_name> F6 </node_name>
+			<x_coord> 3500.0 </x_coord>
+			<y_coord> 2000.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 45 </node_id>
+			<node_name> F5 </node_name>
+			<x_coord> 3500.0 </x_coord>
+			<y_coord> 2300.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 46 </node_id>
+			<node_name> F4 </node_name>
+			<x_coord> 3500.0 </x_coord>
+			<y_coord> 2600.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 47 </node_id>
+			<node_name> F3 </node_name>
+			<x_coord> 3500.0 </x_coord>
+			<y_coord> 2900.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 48 </node_id>
+			<node_name> F2 </node_name>
+			<x_coord> 3500.0 </x_coord>
+			<y_coord> 3200.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 49 </node_id>
+			<node_name> F1 </node_name>
+			<x_coord> 3500.0 </x_coord>
+			<y_coord> 3500.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 50 </node_id>
+			<node_name> E1 </node_name>
+			<x_coord> 3200.0 </x_coord>
+			<y_coord> 3500.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 51 </node_id>
+			<node_name> D1 </node_name>
+			<x_coord> 2900.0 </x_coord>
+			<y_coord> 3500.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 52 </node_id>
+			<node_name> C1 </node_name>
+			<x_coord> 2600.0 </x_coord>
+			<y_coord> 3500.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 53 </node_id>
+			<node_name> B1 </node_name>
+			<x_coord> 2300.0 </x_coord>
+			<y_coord> 3500.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 54 </node_id>
+			<node_name> B3 </node_name>
+			<x_coord> 2300.0 </x_coord>
+			<y_coord> 2900.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 55 </node_id>
+			<node_name> B4 </node_name>
+			<x_coord> 2300.0 </x_coord>
+			<y_coord> 2600.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 56 </node_id>
+			<node_name> B5 </node_name>
+			<x_coord> 2300.0 </x_coord>
+			<y_coord> 2300.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 57 </node_id>
+			<node_name> B2 </node_name>
+			<x_coord> 2300.0 </x_coord>
+			<y_coord> 3200.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 58 </node_id>
+			<node_name> C2 </node_name>
+			<x_coord> 2600.0 </x_coord>
+			<y_coord> 3200.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 59 </node_id>
+			<node_name> C3 </node_name>
+			<x_coord> 2600.0 </x_coord>
+			<y_coord> 2900.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 60 </node_id>
+			<node_name> C4 </node_name>
+			<x_coord> 2600.0 </x_coord>
+			<y_coord> 2600.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 61 </node_id>
+			<node_name> C5 </node_name>
+			<x_coord> 2600.0 </x_coord>
+			<y_coord> 2300.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 62 </node_id>
+			<node_name> D2 </node_name>
+			<x_coord> 2900.0 </x_coord>
+			<y_coord> 3200.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 63 </node_id>
+			<node_name> D3 </node_name>
+			<x_coord> 2900.0 </x_coord>
+			<y_coord> 2900.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 64 </node_id>
+			<node_name> D4 </node_name>
+			<x_coord> 2900.0 </x_coord>
+			<y_coord> 2600.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 65 </node_id>
+			<node_name> D5 </node_name>
+			<x_coord> 2900.0 </x_coord>
+			<y_coord> 2300.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 66 </node_id>
+			<node_name> E4 </node_name>
+			<x_coord> 3200.0 </x_coord>
+			<y_coord> 2600.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 67 </node_id>
+			<node_name> E5 </node_name>
+			<x_coord> 3200.0 </x_coord>
+			<y_coord> 2300.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 69 </node_id>
+			<node_name> E2 </node_name>
+			<x_coord> 3200.0 </x_coord>
+			<y_coord> 3200.0 </y_coord>
+		</node>
+		<node>
+			<node_id> 70 </node_id>
+			<node_name> E3 </node_name>
+			<x_coord> 3200.0 </x_coord>
+			<y_coord> 2900.0 </y_coord>
+		</node>
+	</nodes>
+	<sources>
+	</sources>
+	<sinks>
+		<sink>
+			<sink_id> 243 </sink_id>
+			<first_activation_at> 100000 </first_activation_at>
+			<located_at_node> 67 </located_at_node>
+			<source_laneset> 129 </source_laneset>
+			<removal_probability> 1.0 </removal_probability>
+		</sink>
+	</sinks>
+	<traffic_lights>
+		<traffic_light>
+			<traffic_light_id> 256 </traffic_light_id>
+			<located_at_node> 25 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 35 </from_lane>
+									<to_laneset> 37 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 101 </from_lane>
+									<to_laneset> 37 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 35 </from_lane>
+									<to_laneset> 37 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 101 </from_lane>
+									<to_laneset> 37 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 35 </from_lane>
+									<to_laneset> 37 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 101 </from_lane>
+									<to_laneset> 37 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 257 </traffic_light_id>
+			<located_at_node> 51 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 117 </from_lane>
+									<to_laneset> 162 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 160 </from_lane>
+									<to_laneset> 162 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 117 </from_lane>
+									<to_laneset> 162 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 160 </from_lane>
+									<to_laneset> 162 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 117 </from_lane>
+									<to_laneset> 162 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 160 </from_lane>
+									<to_laneset> 162 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 258 </traffic_light_id>
+			<located_at_node> 62 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 114 </from_lane>
+									<to_laneset> 178 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 114 </from_lane>
+									<to_laneset> 116 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 176 </from_lane>
+									<to_laneset> 116 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 176 </from_lane>
+									<to_laneset> 178 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 114 </from_lane>
+									<to_laneset> 178 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 114 </from_lane>
+									<to_laneset> 116 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 176 </from_lane>
+									<to_laneset> 178 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 176 </from_lane>
+									<to_laneset> 116 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 114 </from_lane>
+									<to_laneset> 178 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 114 </from_lane>
+									<to_laneset> 116 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 176 </from_lane>
+									<to_laneset> 178 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 176 </from_lane>
+									<to_laneset> 116 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 259 </traffic_light_id>
+			<located_at_node> 63 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 111 </from_lane>
+									<to_laneset> 113 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 111 </from_lane>
+									<to_laneset> 197 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 237 </from_lane>
+									<to_laneset> 113 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 236 </from_lane>
+									<to_laneset> 113 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 195 </from_lane>
+									<to_laneset> 113 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 195 </from_lane>
+									<to_laneset> 197 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 236 </from_lane>
+									<to_laneset> 197 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 237 </from_lane>
+									<to_laneset> 197 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 111 </from_lane>
+									<to_laneset> 113 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 111 </from_lane>
+									<to_laneset> 197 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 237 </from_lane>
+									<to_laneset> 197 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 236 </from_lane>
+									<to_laneset> 197 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 195 </from_lane>
+									<to_laneset> 197 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 237 </from_lane>
+									<to_laneset> 113 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 236 </from_lane>
+									<to_laneset> 113 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 195 </from_lane>
+									<to_laneset> 113 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 111 </from_lane>
+									<to_laneset> 113 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 111 </from_lane>
+									<to_laneset> 197 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 237 </from_lane>
+									<to_laneset> 197 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 236 </from_lane>
+									<to_laneset> 197 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 195 </from_lane>
+									<to_laneset> 197 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 237 </from_lane>
+									<to_laneset> 113 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 236 </from_lane>
+									<to_laneset> 113 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 195 </from_lane>
+									<to_laneset> 113 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 260 </traffic_light_id>
+			<located_at_node> 64 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 108 </from_lane>
+									<to_laneset> 110 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 108 </from_lane>
+									<to_laneset> 210 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 208 </from_lane>
+									<to_laneset> 110 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 208 </from_lane>
+									<to_laneset> 210 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 108 </from_lane>
+									<to_laneset> 210 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 108 </from_lane>
+									<to_laneset> 110 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 208 </from_lane>
+									<to_laneset> 210 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 208 </from_lane>
+									<to_laneset> 110 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 108 </from_lane>
+									<to_laneset> 210 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 108 </from_lane>
+									<to_laneset> 110 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 208 </from_lane>
+									<to_laneset> 210 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 208 </from_lane>
+									<to_laneset> 110 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 261 </traffic_light_id>
+			<located_at_node> 65 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 105 </from_lane>
+									<to_laneset> 107 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 105 </from_lane>
+									<to_laneset> 229 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 227 </from_lane>
+									<to_laneset> 107 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 227 </from_lane>
+									<to_laneset> 229 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 105 </from_lane>
+									<to_laneset> 107 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 105 </from_lane>
+									<to_laneset> 229 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 227 </from_lane>
+									<to_laneset> 107 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 227 </from_lane>
+									<to_laneset> 229 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 105 </from_lane>
+									<to_laneset> 107 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 105 </from_lane>
+									<to_laneset> 229 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 227 </from_lane>
+									<to_laneset> 107 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 227 </from_lane>
+									<to_laneset> 229 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 262 </traffic_light_id>
+			<located_at_node> 69 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 121 </from_lane>
+									<to_laneset> 123 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 121 </from_lane>
+									<to_laneset> 175 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 173 </from_lane>
+									<to_laneset> 175 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 173 </from_lane>
+									<to_laneset> 123 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 121 </from_lane>
+									<to_laneset> 175 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 121 </from_lane>
+									<to_laneset> 123 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 173 </from_lane>
+									<to_laneset> 175 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 173 </from_lane>
+									<to_laneset> 123 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 121 </from_lane>
+									<to_laneset> 175 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 121 </from_lane>
+									<to_laneset> 123 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 173 </from_lane>
+									<to_laneset> 175 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 173 </from_lane>
+									<to_laneset> 123 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 263 </traffic_light_id>
+			<located_at_node> 70 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 124 </from_lane>
+									<to_laneset> 200 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 124 </from_lane>
+									<to_laneset> 126 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 239 </from_lane>
+									<to_laneset> 200 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 198 </from_lane>
+									<to_laneset> 200 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 238 </from_lane>
+									<to_laneset> 200 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 239 </from_lane>
+									<to_laneset> 126 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 198 </from_lane>
+									<to_laneset> 126 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 238 </from_lane>
+									<to_laneset> 126 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 124 </from_lane>
+									<to_laneset> 126 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 124 </from_lane>
+									<to_laneset> 200 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 239 </from_lane>
+									<to_laneset> 200 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 238 </from_lane>
+									<to_laneset> 200 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 198 </from_lane>
+									<to_laneset> 200 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 239 </from_lane>
+									<to_laneset> 126 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 238 </from_lane>
+									<to_laneset> 126 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 198 </from_lane>
+									<to_laneset> 126 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 124 </from_lane>
+									<to_laneset> 126 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 124 </from_lane>
+									<to_laneset> 200 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 239 </from_lane>
+									<to_laneset> 200 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 238 </from_lane>
+									<to_laneset> 200 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 198 </from_lane>
+									<to_laneset> 200 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 239 </from_lane>
+									<to_laneset> 126 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 238 </from_lane>
+									<to_laneset> 126 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 198 </from_lane>
+									<to_laneset> 126 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 264 </traffic_light_id>
+			<located_at_node> 66 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 127 </from_lane>
+									<to_laneset> 129 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 150 </from_lane>
+									<to_laneset> 129 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 151 </from_lane>
+									<to_laneset> 129 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 151 </from_lane>
+									<to_laneset> 207 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 150 </from_lane>
+									<to_laneset> 207 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 127 </from_lane>
+									<to_laneset> 207 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 205 </from_lane>
+									<to_laneset> 207 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 205 </from_lane>
+									<to_laneset> 129 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 151 </from_lane>
+									<to_laneset> 207 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 150 </from_lane>
+									<to_laneset> 207 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 127 </from_lane>
+									<to_laneset> 207 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 151 </from_lane>
+									<to_laneset> 129 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 150 </from_lane>
+									<to_laneset> 129 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 127 </from_lane>
+									<to_laneset> 129 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 205 </from_lane>
+									<to_laneset> 207 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 205 </from_lane>
+									<to_laneset> 129 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 151 </from_lane>
+									<to_laneset> 207 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 150 </from_lane>
+									<to_laneset> 207 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 127 </from_lane>
+									<to_laneset> 207 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 127 </from_lane>
+									<to_laneset> 129 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 150 </from_lane>
+									<to_laneset> 129 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 151 </from_lane>
+									<to_laneset> 129 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 205 </from_lane>
+									<to_laneset> 207 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 205 </from_lane>
+									<to_laneset> 129 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 265 </traffic_light_id>
+			<located_at_node> 67 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 152 </from_lane>
+									<to_laneset> 132 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 153 </from_lane>
+									<to_laneset> 132 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 130 </from_lane>
+									<to_laneset> 132 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 152 </from_lane>
+									<to_laneset> 232 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 153 </from_lane>
+									<to_laneset> 232 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 130 </from_lane>
+									<to_laneset> 232 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 230 </from_lane>
+									<to_laneset> 232 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 230 </from_lane>
+									<to_laneset> 132 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 152 </from_lane>
+									<to_laneset> 132 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 153 </from_lane>
+									<to_laneset> 132 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 130 </from_lane>
+									<to_laneset> 132 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 152 </from_lane>
+									<to_laneset> 232 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 153 </from_lane>
+									<to_laneset> 232 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 130 </from_lane>
+									<to_laneset> 232 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 230 </from_lane>
+									<to_laneset> 232 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 230 </from_lane>
+									<to_laneset> 132 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 152 </from_lane>
+									<to_laneset> 132 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 153 </from_lane>
+									<to_laneset> 132 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 130 </from_lane>
+									<to_laneset> 132 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 152 </from_lane>
+									<to_laneset> 232 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 153 </from_lane>
+									<to_laneset> 232 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 130 </from_lane>
+									<to_laneset> 232 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 230 </from_lane>
+									<to_laneset> 232 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 230 </from_lane>
+									<to_laneset> 132 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 266 </traffic_light_id>
+			<located_at_node> 27 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 41 </from_lane>
+									<to_laneset> 43 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 133 </from_lane>
+									<to_laneset> 43 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 41 </from_lane>
+									<to_laneset> 43 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 133 </from_lane>
+									<to_laneset> 43 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 41 </from_lane>
+									<to_laneset> 43 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 133 </from_lane>
+									<to_laneset> 43 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 267 </traffic_light_id>
+			<located_at_node> 47 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 143 </from_lane>
+									<to_laneset> 145 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 201 </from_lane>
+									<to_laneset> 145 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 143 </from_lane>
+									<to_laneset> 145 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 201 </from_lane>
+									<to_laneset> 145 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 143 </from_lane>
+									<to_laneset> 145 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 201 </from_lane>
+									<to_laneset> 145 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 268 </traffic_light_id>
+			<located_at_node> 45 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 137 </from_lane>
+									<to_laneset> 139 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 233 </from_lane>
+									<to_laneset> 139 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 137 </from_lane>
+									<to_laneset> 139 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 233 </from_lane>
+									<to_laneset> 139 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 137 </from_lane>
+									<to_laneset> 139 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 233 </from_lane>
+									<to_laneset> 139 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 244 </traffic_light_id>
+			<located_at_node> 6 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 185 </from_lane>
+									<to_laneset> 13 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 11 </from_lane>
+									<to_laneset> 13 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 59 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 185 </from_lane>
+									<to_laneset> 13 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 7 </phase_id>
+							<iteration_start> 60 </iteration_start>
+							<iteration_end> 69 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 11 </from_lane>
+									<to_laneset> 13 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 8 </phase_id>
+							<iteration_start> 50 </iteration_start>
+							<iteration_end> 79 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 11 </from_lane>
+									<to_laneset> 13 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 40 </iteration_start>
+							<iteration_end> 49 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 185 </from_lane>
+									<to_laneset> 13 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 245 </traffic_light_id>
+			<located_at_node> 5 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 14 </from_lane>
+									<to_laneset> 188 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 14 </from_lane>
+									<to_laneset> 16 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 14 </from_lane>
+									<to_laneset> 188 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 14 </from_lane>
+									<to_laneset> 16 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 14 </from_lane>
+									<to_laneset> 188 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 14 </from_lane>
+									<to_laneset> 16 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 246 </traffic_light_id>
+			<located_at_node> 4 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 217 </from_lane>
+									<to_laneset> 19 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 17 </from_lane>
+									<to_laneset> 19 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 217 </from_lane>
+									<to_laneset> 19 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 17 </from_lane>
+									<to_laneset> 19 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 217 </from_lane>
+									<to_laneset> 19 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 17 </from_lane>
+									<to_laneset> 19 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 247 </traffic_light_id>
+			<located_at_node> 53 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 85 </from_lane>
+									<to_laneset> 168 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 166 </from_lane>
+									<to_laneset> 168 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 85 </from_lane>
+									<to_laneset> 168 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 166 </from_lane>
+									<to_laneset> 168 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 85 </from_lane>
+									<to_laneset> 168 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 166 </from_lane>
+									<to_laneset> 168 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 248 </traffic_light_id>
+			<located_at_node> 57 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 82 </from_lane>
+									<to_laneset> 184 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 82 </from_lane>
+									<to_laneset> 84 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 182 </from_lane>
+									<to_laneset> 84 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 182 </from_lane>
+									<to_laneset> 184 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 82 </from_lane>
+									<to_laneset> 184 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 82 </from_lane>
+									<to_laneset> 84 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 182 </from_lane>
+									<to_laneset> 184 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 182 </from_lane>
+									<to_laneset> 84 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 82 </from_lane>
+									<to_laneset> 184 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 82 </from_lane>
+									<to_laneset> 84 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 182 </from_lane>
+									<to_laneset> 184 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 182 </from_lane>
+									<to_laneset> 84 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 249 </traffic_light_id>
+			<located_at_node> 54 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 79 </from_lane>
+									<to_laneset> 81 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 79 </from_lane>
+									<to_laneset> 191 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 189 </from_lane>
+									<to_laneset> 81 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 189 </from_lane>
+									<to_laneset> 191 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 79 </from_lane>
+									<to_laneset> 81 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 79 </from_lane>
+									<to_laneset> 191 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 189 </from_lane>
+									<to_laneset> 81 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 189 </from_lane>
+									<to_laneset> 191 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 79 </from_lane>
+									<to_laneset> 81 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 79 </from_lane>
+									<to_laneset> 191 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 189 </from_lane>
+									<to_laneset> 81 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 189 </from_lane>
+									<to_laneset> 191 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 250 </traffic_light_id>
+			<located_at_node> 55 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 76 </from_lane>
+									<to_laneset> 78 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 76 </from_lane>
+									<to_laneset> 216 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 214 </from_lane>
+									<to_laneset> 78 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 214 </from_lane>
+									<to_laneset> 216 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 76 </from_lane>
+									<to_laneset> 216 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 76 </from_lane>
+									<to_laneset> 78 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 214 </from_lane>
+									<to_laneset> 216 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 214 </from_lane>
+									<to_laneset> 78 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 76 </from_lane>
+									<to_laneset> 216 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 76 </from_lane>
+									<to_laneset> 78 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 214 </from_lane>
+									<to_laneset> 216 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 214 </from_lane>
+									<to_laneset> 78 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 251 </traffic_light_id>
+			<located_at_node> 56 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 221 </from_lane>
+									<to_laneset> 75 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 221 </from_lane>
+									<to_laneset> 223 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 73 </from_lane>
+									<to_laneset> 75 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 73 </from_lane>
+									<to_laneset> 223 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 221 </from_lane>
+									<to_laneset> 75 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 221 </from_lane>
+									<to_laneset> 223 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 73 </from_lane>
+									<to_laneset> 75 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 73 </from_lane>
+									<to_laneset> 223 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 221 </from_lane>
+									<to_laneset> 75 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 221 </from_lane>
+									<to_laneset> 223 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 73 </from_lane>
+									<to_laneset> 75 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 73 </from_lane>
+									<to_laneset> 223 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 252 </traffic_light_id>
+			<located_at_node> 58 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 89 </from_lane>
+									<to_laneset> 91 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 89 </from_lane>
+									<to_laneset> 181 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 179 </from_lane>
+									<to_laneset> 181 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 179 </from_lane>
+									<to_laneset> 91 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 89 </from_lane>
+									<to_laneset> 181 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 89 </from_lane>
+									<to_laneset> 91 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 179 </from_lane>
+									<to_laneset> 181 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 179 </from_lane>
+									<to_laneset> 91 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 89 </from_lane>
+									<to_laneset> 181 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 89 </from_lane>
+									<to_laneset> 91 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 179 </from_lane>
+									<to_laneset> 181 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 179 </from_lane>
+									<to_laneset> 91 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 253 </traffic_light_id>
+			<located_at_node> 59 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 234 </from_lane>
+									<to_laneset> 194 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 234 </from_lane>
+									<to_laneset> 94 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 235 </from_lane>
+									<to_laneset> 94 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 192 </from_lane>
+									<to_laneset> 94 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 235 </from_lane>
+									<to_laneset> 194 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 192 </from_lane>
+									<to_laneset> 194 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 92 </from_lane>
+									<to_laneset> 94 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 92 </from_lane>
+									<to_laneset> 194 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 235 </from_lane>
+									<to_laneset> 194 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 234 </from_lane>
+									<to_laneset> 194 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 192 </from_lane>
+									<to_laneset> 194 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 235 </from_lane>
+									<to_laneset> 94 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 234 </from_lane>
+									<to_laneset> 94 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 192 </from_lane>
+									<to_laneset> 94 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 92 </from_lane>
+									<to_laneset> 94 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 92 </from_lane>
+									<to_laneset> 194 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 235 </from_lane>
+									<to_laneset> 94 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 234 </from_lane>
+									<to_laneset> 94 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 192 </from_lane>
+									<to_laneset> 94 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 192 </from_lane>
+									<to_laneset> 194 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 234 </from_lane>
+									<to_laneset> 194 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 235 </from_lane>
+									<to_laneset> 194 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 92 </from_lane>
+									<to_laneset> 94 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 92 </from_lane>
+									<to_laneset> 194 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 254 </traffic_light_id>
+			<located_at_node> 60 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 95 </from_lane>
+									<to_laneset> 213 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 95 </from_lane>
+									<to_laneset> 97 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 211 </from_lane>
+									<to_laneset> 213 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 211 </from_lane>
+									<to_laneset> 97 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 95 </from_lane>
+									<to_laneset> 213 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 95 </from_lane>
+									<to_laneset> 97 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 211 </from_lane>
+									<to_laneset> 213 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 211 </from_lane>
+									<to_laneset> 97 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 95 </from_lane>
+									<to_laneset> 213 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 95 </from_lane>
+									<to_laneset> 97 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 211 </from_lane>
+									<to_laneset> 213 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 211 </from_lane>
+									<to_laneset> 97 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+		<traffic_light>
+			<traffic_light_id> 255 </traffic_light_id>
+			<located_at_node> 61 </located_at_node>
+			<signalplans>
+				<signalplan>
+					<signalplan_id> 1 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 1 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 19 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 98 </from_lane>
+									<to_laneset> 100 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 98 </from_lane>
+									<to_laneset> 226 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 2 </phase_id>
+							<iteration_start> 20 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 224 </from_lane>
+									<to_laneset> 226 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 224 </from_lane>
+									<to_laneset> 100 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 2 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 3 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 29 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 98 </from_lane>
+									<to_laneset> 226 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 98 </from_lane>
+									<to_laneset> 100 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 5 </phase_id>
+							<iteration_start> 30 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 224 </from_lane>
+									<to_laneset> 226 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 224 </from_lane>
+									<to_laneset> 100 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+				<signalplan>
+					<signalplan_id> 3 </signalplan_id>
+					<additional_info>  </additional_info>
+					<phases>
+						<phase>
+							<phase_id> 4 </phase_id>
+							<iteration_start> 0 </iteration_start>
+							<iteration_end> 9 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 98 </from_lane>
+									<to_laneset> 100 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 98 </from_lane>
+									<to_laneset> 226 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+						<phase>
+							<phase_id> 6 </phase_id>
+							<iteration_start> 10 </iteration_start>
+							<iteration_end> 39 </iteration_end>
+							<directions>
+								<direction>
+									<from_lane> 224 </from_lane>
+									<to_laneset> 226 </to_laneset>
+								</direction>
+								<direction>
+									<from_lane> 224 </from_lane>
+									<to_laneset> 100 </to_laneset>
+								</direction>
+							</directions>
+						</phase>
+					</phases>
+				</signalplan>
+			</signalplans>
+		</traffic_light>
+	</traffic_lights>
+	<streets>
+		<street>
+			<street_id> 68 </street_id>
+			<street_name> street B </street_name>
+			<sections>
+				<section>
+					<section_id> 80 </section_id>
+					<section_name> (B3) &lt;-&gt; (B2) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 54 </delimiting_node>
+					<delimiting_node> 57 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 81 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 54 </start_node>
+							<end_node> 57 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 184 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 84 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 82 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 74 </section_id>
+					<section_name> (B5) &lt;-&gt; (B4) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 56 </delimiting_node>
+					<delimiting_node> 55 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 75 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 56 </start_node>
+							<end_node> 55 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 216 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 78 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 76 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 83 </section_id>
+					<section_name> (B2) &lt;-&gt; (B1) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 57 </delimiting_node>
+					<delimiting_node> 53 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 84 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 57 </start_node>
+							<end_node> 53 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 168 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 85 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 77 </section_id>
+					<section_name> (B4) &lt;-&gt; (B3) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 55 </delimiting_node>
+					<delimiting_node> 54 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 78 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 55 </start_node>
+							<end_node> 54 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 81 </destination_laneset>
+								<probability> 20.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 191 </destination_laneset>
+								<probability> 80.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 79 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 71 </section_id>
+					<section_name> (B6) &lt;-&gt; (B5) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 24 </delimiting_node>
+					<delimiting_node> 56 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 72 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 24 </start_node>
+							<end_node> 56 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 75 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 223 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 73 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+			</sections>
+		</street>
+		<street>
+			<street_id> 118 </street_id>
+			<street_name> street E </street_name>
+			<sections>
+				<section>
+					<section_id> 128 </section_id>
+					<section_name> (E4) &lt;-&gt; (E5) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 66 </delimiting_node>
+					<delimiting_node> 67 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 129 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 66 </start_node>
+							<end_node> 67 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 232 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 132 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 152 </lane_id>
+									<lane_position> 2 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+								<lane>
+									<lane_id> 153 </lane_id>
+									<lane_position> 3 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+								<lane>
+									<lane_id> 130 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 122 </section_id>
+					<section_name> (E2) &lt;-&gt; (E3) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 69 </delimiting_node>
+					<delimiting_node> 70 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 123 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 69 </start_node>
+							<end_node> 70 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 200 </destination_laneset>
+								<probability> 20.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 126 </destination_laneset>
+								<probability> 80.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 124 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 131 </section_id>
+					<section_name> (E5) &lt;-&gt; (E6) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 67 </delimiting_node>
+					<delimiting_node> 27 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 132 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 67 </start_node>
+							<end_node> 27 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 43 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 133 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 125 </section_id>
+					<section_name> (E3) &lt;-&gt; (E4) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 70 </delimiting_node>
+					<delimiting_node> 66 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 126 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 70 </start_node>
+							<end_node> 66 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 129 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 207 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 127 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+								<lane>
+									<lane_id> 150 </lane_id>
+									<lane_position> 2 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+								<lane>
+									<lane_id> 151 </lane_id>
+									<lane_position> 3 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 119 </section_id>
+					<section_name> (E1) &lt;-&gt; (E2) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 50 </delimiting_node>
+					<delimiting_node> 69 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 120 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 50 </start_node>
+							<end_node> 69 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 123 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 175 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 121 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+			</sections>
+		</street>
+		<street>
+			<street_id> 102 </street_id>
+			<street_name> street D </street_name>
+			<sections>
+				<section>
+					<section_id> 112 </section_id>
+					<section_name> (D3) &lt;-&gt; (D2) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 63 </delimiting_node>
+					<delimiting_node> 62 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 113 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 63 </start_node>
+							<end_node> 62 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 178 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 116 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 114 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 106 </section_id>
+					<section_name> (D5) &lt;-&gt; (D4) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 65 </delimiting_node>
+					<delimiting_node> 64 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 107 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 65 </start_node>
+							<end_node> 64 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 210 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 110 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 108 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 115 </section_id>
+					<section_name> (D2) &lt;-&gt; (D1) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 62 </delimiting_node>
+					<delimiting_node> 51 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 116 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 62 </start_node>
+							<end_node> 51 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 162 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 117 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 109 </section_id>
+					<section_name> (D4) &lt;-&gt; (D3) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 64 </delimiting_node>
+					<delimiting_node> 63 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 110 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 64 </start_node>
+							<end_node> 63 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 113 </destination_laneset>
+								<probability> 20.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 197 </destination_laneset>
+								<probability> 80.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 111 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 103 </section_id>
+					<section_name> (D6) &lt;-&gt; (D5) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 26 </delimiting_node>
+					<delimiting_node> 65 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 104 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 26 </start_node>
+							<end_node> 65 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 107 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 229 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 105 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+			</sections>
+		</street>
+		<street>
+			<street_id> 8 </street_id>
+			<street_name> street A </street_name>
+			<sections>
+				<section>
+					<section_id> 9 </section_id>
+					<section_name> (A1) &lt;-&gt; (A2) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 7 </delimiting_node>
+					<delimiting_node> 6 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 10 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 7 </start_node>
+							<end_node> 6 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 13 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 11 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 18 </section_id>
+					<section_name> (A4) &lt;-&gt; (A5) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 4 </delimiting_node>
+					<delimiting_node> 3 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 19 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 4 </start_node>
+							<end_node> 3 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 220 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 22 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 20 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 12 </section_id>
+					<section_name> (A2) &lt;-&gt; (A3) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 6 </delimiting_node>
+					<delimiting_node> 5 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 13 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 6 </start_node>
+							<end_node> 5 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 16 </destination_laneset>
+								<probability> 20.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 188 </destination_laneset>
+								<probability> 80.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 14 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 21 </section_id>
+					<section_name> (A5) &lt;-&gt; (A6) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 3 </delimiting_node>
+					<delimiting_node> 2 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 22 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 3 </start_node>
+							<end_node> 2 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 31 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 23 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 15 </section_id>
+					<section_name> (A3) &lt;-&gt; (A4) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 5 </delimiting_node>
+					<delimiting_node> 4 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 16 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 5 </start_node>
+							<end_node> 4 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 19 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 17 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+			</sections>
+		</street>
+		<street>
+			<street_id> 170 </street_id>
+			<street_name> street 2 </street_name>
+			<sections>
+				<section>
+					<section_id> 177 </section_id>
+					<section_name> (D2) &lt;-&gt; (C2) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 62 </delimiting_node>
+					<delimiting_node> 58 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 178 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 62 </start_node>
+							<end_node> 58 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 91 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 181 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 179 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 171 </section_id>
+					<section_name> (F2) &lt;-&gt; (E2) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 48 </delimiting_node>
+					<delimiting_node> 69 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 172 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 48 </start_node>
+							<end_node> 69 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 123 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 175 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 173 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 180 </section_id>
+					<section_name> (C2) &lt;-&gt; (B2) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 58 </delimiting_node>
+					<delimiting_node> 57 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 181 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 58 </start_node>
+							<end_node> 57 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 184 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 84 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 182 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 174 </section_id>
+					<section_name> (E2) &lt;-&gt; (D2) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 69 </delimiting_node>
+					<delimiting_node> 62 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 175 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 69 </start_node>
+							<end_node> 62 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 178 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 116 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 176 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 183 </section_id>
+					<section_name> (B2) &lt;-&gt; (A2) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 57 </delimiting_node>
+					<delimiting_node> 6 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 184 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 57 </start_node>
+							<end_node> 6 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 13 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 185 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+			</sections>
+		</street>
+		<street>
+			<street_id> 86 </street_id>
+			<street_name> street C </street_name>
+			<sections>
+				<section>
+					<section_id> 96 </section_id>
+					<section_name> (C4) &lt;-&gt; (C5) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 60 </delimiting_node>
+					<delimiting_node> 61 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 97 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 60 </start_node>
+							<end_node> 61 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 226 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 100 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 98 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 90 </section_id>
+					<section_name> (C2) &lt;-&gt; (C3) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 58 </delimiting_node>
+					<delimiting_node> 59 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 91 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 58 </start_node>
+							<end_node> 59 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 194 </destination_laneset>
+								<probability> 80.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 94 </destination_laneset>
+								<probability> 20.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 92 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 99 </section_id>
+					<section_name> (C5) &lt;-&gt; (C6) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 61 </delimiting_node>
+					<delimiting_node> 25 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 100 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 61 </start_node>
+							<end_node> 25 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 37 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 101 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 93 </section_id>
+					<section_name> (C3) &lt;-&gt; (C4) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 59 </delimiting_node>
+					<delimiting_node> 60 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 94 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 59 </start_node>
+							<end_node> 60 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 97 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 213 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 95 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 87 </section_id>
+					<section_name> (C1) &lt;-&gt; (C2) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 52 </delimiting_node>
+					<delimiting_node> 58 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 88 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 52 </start_node>
+							<end_node> 58 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 91 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 181 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 89 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+			</sections>
+		</street>
+		<street>
+			<street_id> 186 </street_id>
+			<street_name> street 3 </street_name>
+			<sections>
+				<section>
+					<section_id> 193 </section_id>
+					<section_name> (C3) &lt;-&gt; (D3) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 59 </delimiting_node>
+					<delimiting_node> 63 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 194 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 59 </start_node>
+							<end_node> 63 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 113 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 197 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 195 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+								<lane>
+									<lane_id> 236 </lane_id>
+									<lane_position> 2 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+								<lane>
+									<lane_id> 237 </lane_id>
+									<lane_position> 3 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 187 </section_id>
+					<section_name> (A3) &lt;-&gt; (B3) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 5 </delimiting_node>
+					<delimiting_node> 54 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 188 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 5 </start_node>
+							<end_node> 54 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 81 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 191 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 189 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 196 </section_id>
+					<section_name> (D3) &lt;-&gt; (E3) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 63 </delimiting_node>
+					<delimiting_node> 70 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 197 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 63 </start_node>
+							<end_node> 70 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 200 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 126 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 238 </lane_id>
+									<lane_position> 2 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+								<lane>
+									<lane_id> 198 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+								<lane>
+									<lane_id> 239 </lane_id>
+									<lane_position> 3 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 190 </section_id>
+					<section_name> (B3) &lt;-&gt; (C3) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 54 </delimiting_node>
+					<delimiting_node> 59 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 191 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 54 </start_node>
+							<end_node> 59 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 194 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 94 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 192 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+								<lane>
+									<lane_id> 234 </lane_id>
+									<lane_position> 2 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+								<lane>
+									<lane_id> 235 </lane_id>
+									<lane_position> 3 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 199 </section_id>
+					<section_name> (E3) &lt;-&gt; (F3) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 70 </delimiting_node>
+					<delimiting_node> 47 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 200 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 70 </start_node>
+							<end_node> 47 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 145 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 201 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+			</sections>
+		</street>
+		<street>
+			<street_id> 218 </street_id>
+			<street_name> street 5 </street_name>
+			<sections>
+				<section>
+					<section_id> 225 </section_id>
+					<section_name> (C5) &lt;-&gt; (D5) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 61 </delimiting_node>
+					<delimiting_node> 65 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 226 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 61 </start_node>
+							<end_node> 65 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 107 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 229 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 227 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 219 </section_id>
+					<section_name> (A5) &lt;-&gt; (B5) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 3 </delimiting_node>
+					<delimiting_node> 56 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 220 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 3 </start_node>
+							<end_node> 56 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 75 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 223 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 221 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 228 </section_id>
+					<section_name> (D5) &lt;-&gt; (E5) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 65 </delimiting_node>
+					<delimiting_node> 67 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 229 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 65 </start_node>
+							<end_node> 67 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 232 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 132 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 230 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 222 </section_id>
+					<section_name> (B5) &lt;-&gt; (C5) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 56 </delimiting_node>
+					<delimiting_node> 61 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 223 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 56 </start_node>
+							<end_node> 61 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 226 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 100 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 224 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 231 </section_id>
+					<section_name> (E5) &lt;-&gt; (F5) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 67 </delimiting_node>
+					<delimiting_node> 45 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 232 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 67 </start_node>
+							<end_node> 45 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 139 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 233 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+			</sections>
+		</street>
+		<street>
+			<street_id> 202 </street_id>
+			<street_name> street 4 </street_name>
+			<sections>
+				<section>
+					<section_id> 209 </section_id>
+					<section_name> (D4) &lt;-&gt; (C4) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 64 </delimiting_node>
+					<delimiting_node> 60 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 210 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 64 </start_node>
+							<end_node> 60 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 97 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 213 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 211 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 203 </section_id>
+					<section_name> (F4) &lt;-&gt; (E4) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 46 </delimiting_node>
+					<delimiting_node> 66 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 204 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 46 </start_node>
+							<end_node> 66 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 129 </destination_laneset>
+								<probability> 80.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 207 </destination_laneset>
+								<probability> 20.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 205 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 212 </section_id>
+					<section_name> (C4) &lt;-&gt; (B4) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 60 </delimiting_node>
+					<delimiting_node> 55 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 213 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 60 </start_node>
+							<end_node> 55 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 216 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 78 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 214 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 206 </section_id>
+					<section_name> (E4) &lt;-&gt; (D4) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 66 </delimiting_node>
+					<delimiting_node> 64 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 207 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 66 </start_node>
+							<end_node> 64 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 210 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 110 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 208 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 215 </section_id>
+					<section_name> (B4) &lt;-&gt; (A4) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 55 </delimiting_node>
+					<delimiting_node> 4 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 216 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 55 </start_node>
+							<end_node> 4 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 19 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 217 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+			</sections>
+		</street>
+		<street>
+			<street_id> 154 </street_id>
+			<street_name> street 1 </street_name>
+			<sections>
+				<section>
+					<section_id> 161 </section_id>
+					<section_name> (D1) &lt;-&gt; (C1) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 51 </delimiting_node>
+					<delimiting_node> 52 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 162 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 51 </start_node>
+							<end_node> 52 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 88 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 165 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 163 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 155 </section_id>
+					<section_name> (F1) &lt;-&gt; (E1) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 49 </delimiting_node>
+					<delimiting_node> 50 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 156 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 49 </start_node>
+							<end_node> 50 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 120 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 159 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 157 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 164 </section_id>
+					<section_name> (C1) &lt;-&gt; (B1) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 52 </delimiting_node>
+					<delimiting_node> 53 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 165 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 52 </start_node>
+							<end_node> 53 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 168 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 166 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 158 </section_id>
+					<section_name> (E1) &lt;-&gt; (D1) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 50 </delimiting_node>
+					<delimiting_node> 51 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 159 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 50 </start_node>
+							<end_node> 51 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 162 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 160 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 167 </section_id>
+					<section_name> (B1) &lt;-&gt; (A1) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 53 </delimiting_node>
+					<delimiting_node> 7 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 168 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 53 </start_node>
+							<end_node> 7 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 10 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 169 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+			</sections>
+		</street>
+		<street>
+			<street_id> 29 </street_id>
+			<street_name> street 6 </street_name>
+			<sections>
+				<section>
+					<section_id> 33 </section_id>
+					<section_name> (B6) &lt;-&gt; (C6) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 24 </delimiting_node>
+					<delimiting_node> 25 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 34 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 24 </start_node>
+							<end_node> 25 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 37 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 35 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 42 </section_id>
+					<section_name> (E6) &lt;-&gt; (F6) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 27 </delimiting_node>
+					<delimiting_node> 28 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 43 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 27 </start_node>
+							<end_node> 28 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 136 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 44 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 36 </section_id>
+					<section_name> (C6) &lt;-&gt; (D6) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 25 </delimiting_node>
+					<delimiting_node> 26 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 37 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 25 </start_node>
+							<end_node> 26 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 40 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 104 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 38 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 30 </section_id>
+					<section_name> (A6) &lt;-&gt; (B6) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 2 </delimiting_node>
+					<delimiting_node> 24 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 31 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 2 </start_node>
+							<end_node> 24 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 72 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 34 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 32 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 39 </section_id>
+					<section_name> (D6) &lt;-&gt; (E6) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 26 </delimiting_node>
+					<delimiting_node> 27 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 40 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 26 </start_node>
+							<end_node> 27 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 43 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 41 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+			</sections>
+		</street>
+		<street>
+			<street_id> 134 </street_id>
+			<street_name> street F </street_name>
+			<sections>
+				<section>
+					<section_id> 144 </section_id>
+					<section_name> (F3) &lt;-&gt; (F2) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 47 </delimiting_node>
+					<delimiting_node> 48 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 145 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 47 </start_node>
+							<end_node> 48 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 172 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 148 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 146 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 138 </section_id>
+					<section_name> (F5) &lt;-&gt; (F4) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 45 </delimiting_node>
+					<delimiting_node> 46 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 139 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 45 </start_node>
+							<end_node> 46 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 204 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							<direction>
+								<destination_laneset> 142 </destination_laneset>
+								<probability> 50.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 140 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 147 </section_id>
+					<section_name> (F2) &lt;-&gt; (F1) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 48 </delimiting_node>
+					<delimiting_node> 49 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 148 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 48 </start_node>
+							<end_node> 49 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 156 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 149 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 141 </section_id>
+					<section_name> (F4) &lt;-&gt; (F3) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 46 </delimiting_node>
+					<delimiting_node> 47 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 142 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 46 </start_node>
+							<end_node> 47 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 145 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 143 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+				<section>
+					<section_id> 135 </section_id>
+					<section_name> (F6) &lt;-&gt; (F5) </section_name>
+					<is_preferencial> false </is_preferencial>
+					<delimiting_node> 28 </delimiting_node>
+					<delimiting_node> 45 </delimiting_node>
+					<lanesets>
+						<laneset>
+							<laneset_id> 136 </laneset_id>
+							<laneset_position> 1 </laneset_position>
+							<start_node> 28 </start_node>
+							<end_node> 45 </end_node>
+							<turning_probabilities>
+							<direction>
+								<destination_laneset> 139 </destination_laneset>
+								<probability> 100.0 </probability>
+							</direction>
+							</turning_probabilities>
+							<lanes>
+								<lane>
+									<lane_id> 137 </lane_id>
+									<lane_position> 1 </lane_position>
+									<maximum_speed> 3 </maximum_speed>
+									<deceleration_prob> 0.0 </deceleration_prob>
+								</lane>
+							</lanes>
+						</laneset>
+					</lanesets>
+				</section>
+			</sections>
+		</street>
+	</streets>
+</simulation>

@@ -1,0 +1,104 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+<plans>
+
+	<person id="1">
+		<plan>
+			<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
+			<leg mode="car"> </leg>
+			<act type="w" x="10000" y="0" link="20" dur="00:10" />
+			<leg mode="car"> </leg>
+			<act type="h" x="-25000" y="0" link="1" />
+		</plan>
+	</person>
+ 
+	<person id="2">
+		<plan>
+			<act type="h" x="-25000" y="0" link="1" end_time="05:59" />
+			<leg mode="car"> </leg>
+			<act type="w" x="10000" y="0" link="20" dur="02:30" />
+			<leg mode="car"> </leg>
+			<act type="h" x="-25000" y="0" link="1" />
+		</plan>
+	</person>
+
+	<person id="3">
+		<plan>
+			<act type="h" x="-25000" y="0" link="1" end_time="05:58:30" />
+			<leg mode="car"> </leg>
+			<act type="w" x="10000" y="0" link="20" dur="01:30" />
+			<leg mode="car"> </leg>
+			<act type="h" x="-25000" y="0" link="1" />
+		</plan>
+	</person>
+
+	<person id="4">
+		<plan>
+			<act type="h" x="-25000" y="0" link="1" end_time="05:59:30" />
+			<leg mode="car"> </leg>
+			<act type="w" x="10000" y="0" link="20" dur="02:30" />
+			<leg mode="car"> </leg>
+			<act type="h" x="-25000" y="0" link="1" />
+		</plan>
+	</person>
+
+	<person id="5">
+		<plan>
+			<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
+			<leg mode="car"> </leg>
+			<act type="w" x="10000" y="0" link="20" dur="06:30" />
+			<leg mode="car"> </leg>
+			<act type="h" x="-25000" y="0" link="1" />
+		</plan>
+	</person>
+
+	<person id="6">
+		<plan>
+			<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
+			<leg mode="bicycle"> </leg>
+			<act type="w" x="10000" y="0" link="20" dur="00:30" />
+			<leg mode="bicycle"> </leg>
+			<act type="h" x="-25000" y="0" link="1" />
+		</plan>
+	</person>
+
+	<person id="7">
+		<plan>
+			<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
+			<leg mode="bicycle"> </leg>
+			<act type="w" x="10000" y="0" link="20" dur="00:30" />
+			<leg mode="bicycle"> </leg>
+			<act type="h" x="-25000" y="0" link="1" />
+		</plan>
+	</person>
+
+	<person id="8">
+		<plan>
+			<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
+			<leg mode="bicycle"> </leg>
+			<act type="w" x="10000" y="0" link="20" dur="00:30" />
+			<leg mode="bicycle"> </leg>
+			<act type="h" x="-25000" y="0" link="1" />
+		</plan>
+	</person>
+
+	<person id="9">
+		<plan>
+			<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
+			<leg mode="bicycle"> </leg>
+			<act type="w" x="10000" y="0" link="20" dur="00:30" />
+			<leg mode="bicycle"> </leg>
+			<act type="h" x="-25000" y="0" link="1" />
+		</plan>
+	</person>
+
+	<person id="10">
+		<plan>
+			<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
+			<leg mode="bicycle"> </leg>
+			<act type="w" x="10000" y="0" link="20" dur="00:30" />
+			<leg mode="bicycle"> </leg>
+			<act type="h" x="-25000" y="0" link="1" />
+		</plan>
+	</person>
+</plans>

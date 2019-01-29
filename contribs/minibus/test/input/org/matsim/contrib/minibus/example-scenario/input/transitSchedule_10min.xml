@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
+
+<transitSchedule>
+	<transitStops>
+		<stopFacility id="1" x="1000" y="1000" linkRefId= "11"/>
+		<stopFacility id="2a" x="2050" y="2950" linkRefId= "12"/>
+		<stopFacility id="2b" x="2050" y="2950" linkRefId= "32"/>
+		<stopFacility id="3" x="3950" y="1050" linkRefId= "33"/>
+	</transitStops>
+	<transitLine id="Blue Line">
+		<transitRoute id="1to3to1">
+			<transportMode>train</transportMode>
+			<routeProfile>
+				<stop refId="1" departureOffset="00:00:00"/>
+				<stop refId="2a" arrivalOffset="00:03:05" departureOffset="00:03:20"/>
+				<stop refId="3" arrivalOffset="00:07:05" departureOffset="00:07:20"/>
+				<stop refId="2b" arrivalOffset="00:11:05" departureOffset="00:11:20"/>
+				<stop refId="1" arrivalOffset="00:14:25"/>
+			</routeProfile>
+			<route>
+				<link refId="11"/>
+				<link refId="12"/>
+				<link refId="23"/>
+				<link refId="33"/>
+				<link refId="32"/>
+				<link refId="21"/>
+				<link refId="11"/>
+			</route>
+			<departures>
+				<departure id="10001" departureTime="05:00:00" vehicleRefId="tr_0" />
+				<departure id="10002" departureTime="05:20:00" vehicleRefId="tr_0" />
+				<departure id="10003" departureTime="05:40:00" vehicleRefId="tr_0" />
+				<departure id="10004" departureTime="06:00:00" vehicleRefId="tr_0" />
+				<departure id="10005" departureTime="06:20:00" vehicleRefId="tr_0" />
+				<departure id="10006" departureTime="06:40:00" vehicleRefId="tr_0" />
+				<departure id="10007" departureTime="07:00:00" vehicleRefId="tr_0" />
+				<departure id="10008" departureTime="07:20:00" vehicleRefId="tr_0" />
+				<departure id="10009" departureTime="07:40:00" vehicleRefId="tr_0" />
+				<departure id="10010" departureTime="08:00:00" vehicleRefId="tr_0" />
+				<departure id="10011" departureTime="08:20:00" vehicleRefId="tr_0" />
+				<departure id="10012" departureTime="08:40:00" vehicleRefId="tr_0" />
+				<departure id="10013" departureTime="09:00:00" vehicleRefId="tr_0" />
+				<departure id="10014" departureTime="09:20:00" vehicleRefId="tr_0" />
+				<departure id="10015" departureTime="09:40:00" vehicleRefId="tr_0" />
+				<departure id="10016" departureTime="10:00:00" vehicleRefId="tr_0" />
+				<departure id="10017" departureTime="10:20:00" vehicleRefId="tr_0" />
+				<departure id="10018" departureTime="10:40:00" vehicleRefId="tr_0" />
+				<departure id="10019" departureTime="11:00:00" vehicleRefId="tr_0" />
+				<departure id="10020" departureTime="11:20:00" vehicleRefId="tr_0" />
+				<departure id="10021" departureTime="11:40:00" vehicleRefId="tr_0" />
+				<departure id="10022" departureTime="12:00:00" vehicleRefId="tr_0" />
+				<departure id="10023" departureTime="12:20:00" vehicleRefId="tr_0" />
+				<departure id="10024" departureTime="12:40:00" vehicleRefId="tr_0" />
+									
+				<departure id="11001" departureTime="05:10:00" vehicleRefId="tr_10" />
+				<departure id="11002" departureTime="05:30:00" vehicleRefId="tr_10" />
+				<departure id="11003" departureTime="05:50:00" vehicleRefId="tr_10" />
+				<departure id="11004" departureTime="06:10:00" vehicleRefId="tr_10" />
+				<departure id="11005" departureTime="06:30:00" vehicleRefId="tr_10" />
+				<departure id="11006" departureTime="06:50:00" vehicleRefId="tr_10" />
+				<departure id="11007" departureTime="07:10:00" vehicleRefId="tr_10" />
+				<departure id="11008" departureTime="07:30:00" vehicleRefId="tr_10" />
+				<departure id="11009" departureTime="07:50:00" vehicleRefId="tr_10" />
+				<departure id="11010" departureTime="08:10:00" vehicleRefId="tr_10" />
+				<departure id="11011" departureTime="08:30:00" vehicleRefId="tr_10" />
+				<departure id="11012" departureTime="08:50:00" vehicleRefId="tr_10" />
+				<departure id="11013" departureTime="09:10:00" vehicleRefId="tr_10" />
+				<departure id="11014" departureTime="09:30:00" vehicleRefId="tr_10" />
+				<departure id="11015" departureTime="09:50:00" vehicleRefId="tr_10" />
+				<departure id="11016" departureTime="10:10:00" vehicleRefId="tr_10" />
+				<departure id="11017" departureTime="10:30:00" vehicleRefId="tr_10" />
+				<departure id="11018" departureTime="10:50:00" vehicleRefId="tr_10" />
+				<departure id="11019" departureTime="11:10:00" vehicleRefId="tr_10" />
+				<departure id="11020" departureTime="11:30:00" vehicleRefId="tr_10" />
+				<departure id="11021" departureTime="11:50:00" vehicleRefId="tr_10" />
+				<departure id="11022" departureTime="12:10:00" vehicleRefId="tr_10" />
+				<departure id="11023" departureTime="12:30:00" vehicleRefId="tr_10" />
+				<departure id="11024" departureTime="12:50:00" vehicleRefId="tr_10" />
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

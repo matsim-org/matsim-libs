@@ -1,0 +1,13 @@
+.classpath
+.project
+test/output
+bin
+.settings
+bin
+target
+output
+out
+src/main/java/.gitignore
+/output_fastCapacityUpdate_false/
+/output_fastCapacityUpdate_true/
+/nullevents.xml.gz

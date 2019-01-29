@@ -1,0 +1,305 @@
+\documentclass[a4paper,11pt]{report}
+
+\usepackage{courier}
+% makes listings look much nicer, and also 
+% makes keywords in listings boldface (as they should be)
+
+\usepackage{user-guide} % custom style
+
+\makeatletter
+\@ifpackageloaded{tex4ht}{%
+	% packages/options only used for generating html
+	\usepackage{graphicx}	
+	
+}{%
+	% packages/options only used for generating pdf
+	\usepackage[pdftex]{graphicx}
+
+	% NextFile is defined by tex4ht, replace it with a NOOP if not generating html
+	\newcommand{\NextFile}[1]{}
+
+}
+\makeatother
+
+\usepackage[normalem]{ulem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[dvipsnames,svgnames]{xcolor}
+
+\usepackage{soul}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{tabularx}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{listings}
+
+\lstset{language=java,basicstyle=\ttfamily\footnotesize,lineskip=-1pt,keywordstyle=\bfseries\color{blue},commentstyle=\bfseries\color{red},stringstyle=\bfseries\color{ForestGreen},morekeywords={Link,Node,Vehicle},showstringspaces=false,frame=none}
+\lstset{language=XML,basicstyle=\ttfamily\footnotesize,tabsize=3,lineskip=-1pt,keywordstyle=\bfseries\color{blue},commentstyle=\bfseries\color{red},stringstyle=\bfseries\color{ForestGreen},showstringspaces=false,frame=none}
+% these are my own colors but I am not militant about them.
+% I am also not militant about the morekeywords.
+% I am, however, somewhat militant about ttfamily font. 
+% kai, jul'13
+
+
+% looks like a bug that listings cannot be defined to be floating except by defining a new environment
+% work-around from http://tex.stackexchange.com/questions/43509/lstlisting-ignores-float-setting
+\lstnewenvironment{xml-file}[1][]
+  {\lstset{language=XML,float=thb,frame=tb,#1}}% \begin{xml-file}[...]
+  {} % \end{javalisting}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \usepackage{a4wide}
+\usepackage{geometry}
+\geometry{a4paper,headsep=4mm,top=15mm,bottom=2cm,left=2.0cm,right=3.0cm}
+
+\parindent0pt
+\parskip0.3\baselineskip
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{fancyhdr}
+% needs to be after geometry!
+ 
+\lhead{\let\uppercase=\relax\sf\footnotesize\leftmark}
+\chead{}
+\rhead{\let\uppercase=\relax\sf\footnotesize\rightmark}
+
+\pagestyle{fancy}
+
+\renewcommand{\chaptermark}[1]{%
+%
+\markboth{\thechapter.\ #1\\}{}
+%
+}
+
+\renewcommand{\sectionmark}[1]{%
+%
+\markright{\thesection.\ #1}
+%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{ifthen}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\myemph}[1]{\textcolor{red}{\emph{#1}}}
+
+\newcommand{\todo}[1]{\hl{\emph{TODO #1}}}
+
+\newcommand{\kai}[1]{\textcolor{blue}{[[#1 kai]]}}
+
+\newcommand{\authorsOfDoc}[1]{\vspace{-.5em}\centerline{\hfill Author(s) of this document: #1}\medskip}
+\newcommand{\authorsOfCode}[1]{\vspace{-.5em}\centerline{\hfill Main author(s) of the code: #1}\medskip}
+\newcommand{\maintainers}[1]{\vspace{-.5em}\centerline{\hfill Maintainer(s): #1}\medskip}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{hyperref}
+% hyperref needs to be late in calling sequence!
+
+
+\def\umbruch{\vfill\eject}
+\def\umbruch{\relax}
+
+\def\configOptionsNote#1{%
+%
+\begin{note}
+Look into the file {\tt output\_config.xml.gz} in the section {\tt #1} for configuration options.
+\end{note}
+%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\NextFile{index.html}
+\tolerance10000
+
+\title{MATSim User Guide}
+
+\author{%
+Marcel~Rieser, % first
+%
+% everybody in between alphabetic???
+Christoph~Dobler,
+Thibaut~Dubernet,
+Dominik~Grether,
+Andreas~Horni, 
+Gregor~Lämmel,
+Rashid~Waraich,
+Michael~Zilske,
+%
+Kay~W.~Axhausen, % second-last
+Kai~Nagel % last
+}
+
+\include{chapters/titlepage}
+% \maketitle
+
+\umbruch
+
+\section*{Note}
+
+The material found in this document was originally maintained as a collection of web pages.  Those were eventually automatically converted to latex, and incrementally cleaned up since then.  
+
+As a result, leftovers from those web pages can still be found in the document, including lots of links to web pages which could be replaced by internal links in the document, and links to web pages where the material should be inlined into the document.
+
+%% \\
+%% \hrule
+
+%% Originally generated 2013-06-12T12:13:34+02:00
+%% \\from matsim.org/docs/userguide
+%% \\but changed since then.
+
+
+\section*{Note 2}
+
+The MATSim team is currently working on a MATSim book.  The relation between the book and the user guide is not yet fully resolved; for the time being, there is overlap in the treated materials.
+
+% http://ci.matsim.org:8080/view/All/job/MATSim-Book/ws/main.pdf 
+
+
+
+\umbruch
+
+\tableofcontents
+
+\newboolean{isDeprecated}
+\setboolean{isDeprecated}{true}
+%% \setboolean{isDeprecated}{false}
+
+\def\supertxt{Superseded by MATSim book and/or information in javadoc\\ \vfill\newpage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NextFile{Introduction.html}
+\chapter{Introduction}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/introduction}
+}
+%
+\NextFile{Overview.html}
+\chapter{Overview}
+\label{sec:Overview}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/overview}
+}
+%
+\NextFile{Terminology.html}
+\chapter{Terminology}
+\label{sec:Terminology}
+\input{chapters/terminology}
+%
+\NextFile{RunningMATSim.html}
+\chapter{Running MATSim}
+\label{sec:Running}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/running}
+}
+%
+\NextFile{BuildingScenarios.html}
+\chapter{Building New Scenarios}
+\label{sec:BuildingScenarios}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/buildingScenarios}
+}
+%
+\NextFile{ScoringFunction.html}
+\chapter{The MATSim default scoring function (= utility function)}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/scoringFunction}
+}
+%
+\NextFile{StrategyModules.html}
+\chapter{Strategy Modules}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/strategyModules}
+}
+%
+\NextFile{OtherModules.html}
+\chapter{MATSim input data (``MATSim containers'')}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/otherModules}
+}
+%
+\NextFile{Visualization.html}
+\chapter{Visualization and analysis}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/visualization}
+}
+%
+\NextFile{SystemRequirements.html}
+\chapter{System requirements and benchmark results}
+%% \ifthenelse{\boolean{isDeprecated}}{%
+%% \supertxt
+%% }{%
+\input{chapters/sysRequirements}
+%% }
+%
+\NextFile{PolicyMeasures.html}
+\chapter{Specific applications}
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
+\input{chapters/policyMeasures}
+}
+
+
+% no longer input extensions into user guide, decided at devmtg2013. mr/oct13
+%\input{chapters/extensions}
+
+%\appendix
+%\chapter*{Appendices}
+%\addcontentsline{toc}{chapter}{Appendices}
+%\markboth{Appendices}{}%fix headers
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\umbruch
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
+
+
+
+% Local Variables:
+% mode: latex
+% mode: reftex
+% mode: visual-line
+% comment-padding: 1
+% fill-column: 999
+% End: 

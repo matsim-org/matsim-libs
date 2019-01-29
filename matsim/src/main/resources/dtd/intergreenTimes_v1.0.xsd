@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://www.matsim.org/files/dtd" xmlns="http://www.matsim.org/files/dtd"
+		elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xml:lang="en">
+
+		<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
+
+		<xs:include schemaLocation="matsimCommon.xsd" />
+
+		<xs:element name="intergreenTimes">
+				<xs:complexType>
+						<xs:sequence>
+								<xs:element name="signalSystem" minOccurs="0" maxOccurs="unbounded">
+										<xs:complexType>
+												<xs:complexContent>
+														<xs:extension base="idRefType">
+																<xs:sequence>
+																		<xs:element name="endingSignalGroup" type="endingSignalGroupType"
+																				minOccurs="0" maxOccurs="unbounded" />
+																</xs:sequence>
+														</xs:extension>
+												</xs:complexContent>
+										</xs:complexType>
+								</xs:element>
+						</xs:sequence>
+				</xs:complexType>
+		</xs:element>
+
+		<xs:complexType name="endingSignalGroupType">
+				<xs:complexContent>
+						<xs:extension base="idRefType">
+								<xs:sequence>
+										<xs:element name="beginningSignalGroup" minOccurs="1" maxOccurs="unbounded">
+												<xs:complexType>
+														<xs:complexContent>
+																<xs:extension base="idRefType">
+																		<xs:attribute name="timeSeconds" type="xs:nonNegativeInteger" />
+																</xs:extension>
+														</xs:complexContent>
+												</xs:complexType>
+										</xs:element>
+								</xs:sequence>
+						</xs:extension>
+				</xs:complexContent>
+		</xs:complexType>
+</xs:schema>

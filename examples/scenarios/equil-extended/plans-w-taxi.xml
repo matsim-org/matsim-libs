@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+<plans>
+<!-- <person id="1"> -->
+<!-- 	<plan type="car"> -->
+<!-- 		<act type="h" x="-25000" y="0" link="1" end_time="06:45" /> -->
+<!-- 		<leg mode="car"> -->
+<!-- 			<route>2 7 12</route> -->
+<!-- 		</leg> -->
+<!-- 		<act type="w" x="10000" y="0" link="20" dur="1:59" /> -->
+<!-- 		<leg mode="car"> -->
+<!-- 			<route>13 14 15 1</route> -->
+<!-- 		</leg> -->
+<!-- 		<act type="h" x="-25000" y="0" link="1" /> -->
+<!-- 	</plan> -->
+<!-- </person> -->
+
+<!-- <person id="2"> -->
+<!-- 	<plan type="pt"> -->
+<!-- 		<act type="h" x="-25000" y="0" link="1" end_time="06:42:02" /> -->
+<!-- 		<leg mode="pt" trav_time="1800"> -->
+<!-- 		</leg> -->
+<!-- 		<act type="w" x="10000" y="0" link="20" dur="02:01" /> -->
+<!-- 		<leg mode="pt"> -->
+<!-- 		</leg> -->
+<!-- 		<act type="h" x="-25000" y="0" link="1" /> -->
+<!-- 	</plan> -->
+<!-- </person> -->
+
+<person id="3">
+	<plan >
+		<act type="h" x="-25000" y="0" link="1" end_time="06:42:02" />
+		<leg mode="taxi">
+		  <route/>
+		</leg>
+		<act type="w" x="10000" y="0" link="20" dur="09:02:22" />
+		<leg mode="taxi">
+		  <route/>
+		</leg>
+		<act type="h" x="-25000" y="0" link="1" />
+	</plan>
+</person>
+
+<!-- <person id="4"> -->
+<!-- 	<plan type="car"> -->
+<!-- 		<act type="h" x="-25000" y="0" link="1" end_time="05:58:30" /> -->
+<!-- 		<leg mode="car"> -->
+<!-- 			<route>2 7 12</route> -->
+<!-- 		</leg> -->
+<!-- 		<act type="w" x="10000" y="0" link="20" dur="09:59:00" /> -->
+<!-- 		<leg mode="car"> -->
+<!-- 			<route>13 14 15 1</route> -->
+<!-- 		</leg> -->
+<!-- 		<act type="h" x="-25000" y="0" link="1" /> -->
+<!-- 	</plan> -->
+<!-- </person> -->
+ 
+
+</plans>

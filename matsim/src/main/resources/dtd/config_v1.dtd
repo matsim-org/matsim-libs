@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- $Id$ -->
+
+<!-- ============================================================ -->
+
+<!-- For further information or questions, please contact
+     Michael Balmer, balmermi at inf dot ethz dot ch -->
+
+<!-- ============================================================ -->
+
+<!ELEMENT config      (config|include|module)*>
+<!ATTLIST config
+          xml:lang    NMTOKEN "de-CH">
+
+<!ELEMENT module (param)*>
+<!ATTLIST module
+          name        CDATA #REQUIRED>
+
+<!ELEMENT param       EMPTY>
+<!ATTLIST param
+          name        CDATA #REQUIRED
+          value       CDATA #REQUIRED>
+
+<!ELEMENT include     EMPTY>
+<!ATTLIST include
+          file        CDATA #REQUIRED>
+
+<!-- ============================================================ -->
+
+<!-- ROOT ELEMENT config:
+     The config XML file is the only input necessary for all the
+     Matsim modules.  It defines the type of run, the input, working
+     and output files, the paths, and so on.  For an example see
+     'complete_config_template.xml' in the Matsim project.  It allows
+     config to be within config so that included files may be
+     standalone. -->
+
+<!-- ATTRIBUTE xml:lang:
+     Defines the language settings (see xml spec). -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT module:
+     For each Matsim module (i.e. sim, router, etc.), specialized
+     parameters can be defined.-->
+
+<!-- ATTRIBUTE name:
+     Each module has to have a UNIQUE name (i.e. router, sim, etc.)
+     format := string -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT param:
+     A configuration parameter for a module. -->
+
+<!-- ATTRIBUTE name:
+     The name of this parameter (e.g. networkfile, etc.).
+     format := string -->
+
+<!-- ATTRIBUTE value:
+     The value of this parameter (e.g. /path/to/the/networkfile.xml,etc.).
+     format := string -->
+
+<!-- ============================================================ -->
+
+<!-- ELEMENT include:
+     It is possible to include other config files to encapsulate
+     information.  Duplicated data overrides previously read data. -->
+
+<!-- ATTRIBUTE file:
+     The full path and name of the config file which should be
+     included (i.e. /path/to/the/other/config_file.xml)
+     format := string -->
+
+<!-- ============================================================ -->

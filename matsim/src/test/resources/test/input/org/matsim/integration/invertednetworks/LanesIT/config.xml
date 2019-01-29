@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+  [
+   <!ENTITY INPUTBASE    "">
+   <!ENTITY OUTPUTBASE		"">
+     ]
+>
+<config>
+	<module name="global" >
+		<param name="numberOfThreads" value="1" />
+	</module>
+
+	<module name="controler" >
+		<param name="enableLinkToLinkRouting" value="true" />
+		<param name="eventsFileFormat" value="xml" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="100" />
+		<param name="writeEventsInterval" value="100" />
+		<param name="writePlansInterval" value="100" />
+		<param name="mobsim" value="qsim" />
+<!-- 		<param name="snapshotFormat" value="otfvis" /> -->
+<!-- 		<param name="writeEventsInterval" value="10" /> -->
+	</module>
+
+	<module name="planCalcScore" >
+		<param name="learningRate" value="1.0" />
+		<param name="BrainExpBeta" value="2.0" />
+
+		<param name="lateArrival" value="-18" />
+		<param name="performing" value="+6" />
+		<param name="traveling" value="-6" />
+		
+		<param name="activityType_0"            value="h" /> 
+		<param name="activityPriority_0"        value="1" />
+		<param name="activityTypicalDuration_0" value="24:00:00" />
+	</module>
+
+	<module name="qsim" >
+		<param name="numberOfThreads" value="1" />
+		<param name="removeStuckVehicles" value="false" />
+		<param name="stuckTime" value="100.0" />
+		<param name="flowCapacityFactor" value="1.0" />
+		<param name="storageCapacityFactor" value="1.0" />
+<!-- 		<param name="snapshotStyle" value="queue" /> -->
+<!-- 		<param name="snapshotperiod" value="00:05:00" /> -->
+ 		<param name="useLanes" value="true" />
+	</module>
+
+	<module name="strategy" >
+		<param name="Module_1" value="SelectRandom" />
+		<param name="Module_2" value="ReRoute" />
+		<param name="Module_3" value="ChangeExpBeta" />
+		<param name="ModuleProbability_1" value="0.1" />
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="ModuleProbability_3" value="0.9" />
+		<param name="ModuleDisableAfterIteration_1" value="40" />
+		<param name="ModuleDisableAfterIteration_2" value="40" />
+		<param name="maxAgentPlanMemorySize" value="5" />
+	</module>
+
+	<module name="travelTimeCalculator" >
+		<param name="calculateLinkToLinkTravelTimes" value="true" />
+		<param name="calculateLinkTravelTimes" value="true" />
+		<param name="travelTimeBinSize" value="900" />
+	</module>
+
+</config>

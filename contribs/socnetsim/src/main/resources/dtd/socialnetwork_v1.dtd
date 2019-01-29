@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!ELEMENT socialnet (metadata?,ego*,tie*)>
+<!ATTLIST socialnet
+	isReflective	CDATA	#REQUIRED>
+
+<!ELEMENT metadata (attribute*)>
+<!ELEMENT attribute EMPTY>
+<!ATTLIST attribute
+	name			CDATA 	#REQUIRED
+	value			CDATA 	#REQUIRED>
+
+<!ELEMENT ego EMPTY>
+<!ATTLIST ego
+	egoId			CDATA	#REQUIRED>
+
+<!ELEMENT tie EMPTY>
+<!ATTLIST tie
+	egoId			CDATA	#REQUIRED
+	alterId			CDATA	#REQUIRED>

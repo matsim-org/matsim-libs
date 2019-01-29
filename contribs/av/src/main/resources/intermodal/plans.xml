@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+
+<plans>
+
+<!-- ====================================================================== -->
+
+	<person id="1" employed="no">
+		<plan selected="yes">
+			<act type="h"  x="16000.0" y="4000.0" end_time="07:18:16" />
+			<leg mode="pt" >
+				
+			</leg>
+			<act type="w"  x="1010.0" y="1000.0" end_time="17:43:36" />
+			<leg mode="pt">
+				
+			</leg>
+			<act type="h"  x="16000.0" y="4000.0" />
+		</plan>
+
+	</person>
+
+
+</plans>

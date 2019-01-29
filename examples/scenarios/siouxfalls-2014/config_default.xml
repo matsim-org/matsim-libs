@@ -1,0 +1,182 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE config SYSTEM "./dtd/config_v2.dtd">
+
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="Siouxfalls_network_PT.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="Siouxfalls_population.xml.gz" />
+	</module>
+	
+	<module name="facilities" >
+		<param name="inputFacilitiesFile" value="Siouxfalls_facilities.xml.gz" />
+		<param name="facilitiesSource" value="fromFile"/>
+	</module>
+	
+	<module name="controler">
+		<param name="writeEventsInterval" value="1000" />
+		<param name="writePlansInterval" value="1000" />
+		<param name="eventsFileFormat" value="xml" />
+		<param name="outputDirectory" value="output/siouxfalls-2014"/>
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="3000" />
+		<param name="mobsim" value="qsim" />
+	</module>
+ 	
+ 	<module name="qsim" >
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="30:00:00" />
+		<param name="flowCapacityFactor" value="1.00" />
+		<param name="storageCapacityFactor" value="1.00" />
+		<param name="numberOfThreads" value="1" />
+		<param name = "snapshotperiod"	value = "00:00:01"/>
+
+		<!-- Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice. -->
+		<param name="removeStuckVehicles" value="false" />
+
+		<!-- time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move. -->
+		<param name="stuckTime" value="3600.0" />
+		<param name="timeStepSize" value="00:00:01" />
+
+		<!-- `queue' for the standard queue model, `withHolesExperimental' (experimental!!) for the queue model with holes -->
+		<param name="trafficDynamics" value="queue" />
+		
+	</module>
+
+	<module name="planCalcScore">
+
+
+		<param name="BrainExpBeta" value="1.0" />
+		<!-- new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates close to zero emulate score averaging, but slow down initial convergence -->
+		<param name="learningRate" value="1.0" />
+
+		<parameterset type="scoringParameters">
+		<param name="earlyDeparture" value="0.0" />
+		<param name="lateArrival" value="0.0" />
+		<param name="marginalUtilityOfMoney" value="0.062" />
+		<param name="performing" value="0.96" />
+		<param name="utilityOfLineSwitch" value="0.0"/>
+		<param name="waitingPt" value="-0.18" />
+
+		<parameterset type="modeParams">
+			<param name="mode" value="car"/>
+			<param name="marginalUtilityOfTraveling_util_hr" value="0.0" />
+			<param name="constant" value="-0.562"/>
+			<param name="monetaryDistanceRate" value="-0.0004"/>
+		</parameterset>
+		<parameterset type="modeParams">
+			<param name="mode" value="pt"/>
+			<param name="marginalUtilityOfTraveling_util_hr" value="-0.18" />
+			<param name="monetaryDistanceRate" value="0.0"/>
+			<param name="constant" value="-0.124"/>
+		</parameterset>
+		<parameterset type="modeParams">
+			<param name="mode" value="walk"/>
+			<param name="marginalUtilityOfTraveling_util_hr" value="-1.14" />
+			<param name="constant" value="0.0"/>
+			<param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+		</parameterset>
+
+		<parameterset type="activityParams">
+			<param name="activityType"    value="home" /> <!-- home -->
+			<param name="priority"        value="1" />
+			<param name="typicalDuration" value="13:00:00" />
+			<param name="minimalDuration" value="01:00:00" />
+		</parameterset>
+		<parameterset type="activityParams">
+			<param name="activityType"            value="work" />
+			<param name="priority"        value="1" />
+			<param name="typicalDuration" value="09:00:00" />
+			<param name="minimalDuration" value="08:00:00" />
+			<param name="openingTime"     value="08:00:00" />
+			<param name="earliestEndTime" value="17:00:00" />
+			<param name="latestStartTime" value="09:00:00" />
+			<param name="closingTime"     value="18:00:00" />
+		</parameterset>
+
+		<parameterset type="activityParams">
+			<param name="activityType"            value="secondary" />
+			<param name="priority"        value="1" />
+			<param name="typicalDuration" value="01:00:00" />
+			<param name="minimalDuration" value="00:30:00" />
+			<param name="openingTime"     value="08:00:00" />
+			<param name="closingTime"     value="20:00:00" />
+		</parameterset>
+		</parameterset>
+	</module>
+	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="6" /> <!-- 0 means unlimited -->
+
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="ChangeExpBeta"/>
+			<param name="weight" value="0.7"/>
+		</parameterset>
+
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="ReRoute"/>
+			<param name="disableAfterIteration" value="2900" />
+			<param name="weight" value="0.01"/>
+		</parameterset>
+
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="SubtourModeChoice"/>
+			<param name="disableAfterIteration" value="2900" />
+			<param name="weight" value="0.01"/>
+		</parameterset>
+
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="TimeAllocationMutator"/>
+			<param name="disableAfterIteration" value="2900" />
+			<param name="weight" value="0.01"/>
+		</parameterset>
+	</module>
+	
+<!-- ====================================================================== -->
+
+	<module name="TimeAllocationMutator" >
+		<param name="mutationRange" value="3600.00" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="transitRouter" >
+
+		<!-- additional time the router allocates when a line switch happens. Can be interpreted as a 'safety' time that agents need to safely transfer from one line to another -->
+		<param name="additionalTransferTime" value="0.0" />
+
+		<!-- step size to increase searchRadius if no stops are found -->
+		<param name="extensionRadius" value="500.0" />
+
+		<!-- maximum beeline distance between stops that agents could transfer to by walking -->
+		<param name="maxBeelineWalkConnectionDistance" value="300.0" />
+
+		<!-- the radius in which stop locations are searched, given a start or target coordinate -->
+		<param name="searchRadius" value="1500.0" />
+	</module>
+
+	
+	<module name="subtourModeChoice" >
+
+		<!-- Defines the chain-based modes, seperated by commas -->
+		<param name="chainBasedModes" value="car" />
+
+		<!-- Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car -->
+		<param name="considerCarAvailability" value="true" />
+
+		<!-- Defines all the modes available, including chain-based modes, seperated by commas -->
+		<param name="modes" value="car,pt,walk" />
+	</module>
+   
+  	<module name="transit">
+  	  	<param name="useTransit" value="true" />
+  	  		<param name="transitScheduleFile" value="Siouxfalls_transitSchedule.xml" />
+ 		<param name="vehiclesFile" value="Siouxfalls_vehicles.xml" />
+  	 	<param name="transitModes" value="pt,bus" />
+  	</module>
+	
+	
+</config>

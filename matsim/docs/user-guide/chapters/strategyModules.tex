@@ -1,0 +1,291 @@
+\authorsOfDoc{Kai Nagel}
+
+\bigskip
+
+\begin{chapter-intro}
+Strategies describe how agent plans' are modified and are thus an important
+part of MATSim's evolutionary optimization algorithm. 
+\end{chapter-intro}
+
+
+\section{Introduction}
+\label{sec:introduction}
+
+
+Strategy Modules can be configured in the configuration file via the following syntax:
+\begin{lstlisting}{language=XML}
+<module name="strategy" >
+    <param name="ModuleProbability_1" value="0.1" />
+    <param name="Module_1" value="ChangeLegMode" />
+    <param name="ModuleProbability_2" value="0.1" />
+    <param name="Module_2" value="TimeAllocationMutator" />
+</module>
+\end{lstlisting}
+
+In the configuration file, strategy modules are numbered. Also, each module is given a weight 
+which determines the probability by which the course of action represented by the module is taken. 
+In this example, each person stands a chance of 1/2 that their transport mode is changed,  and a chance of 1/2 that their time allocation is changed. (The  weights are renormalized so that they add up to one.)
+
+A strategy module is, in the code, always a combination of a plan  selector and zero or more strategy module elements. There are two cases,  which are handled differently:
+\begin{itemize}
+	\item If there are zero strategy module elements, the chosen plan is made "selected" for the person, and the method returns.
+	\item If there is at least one strategy module element, the chosen plan is  copied, that copy is added to the persons's set of plan, and the new  plan is made "selected". That new plan is then given to the  strategy module elements for modification. These latter strategy  modules, with at least one strategy module element, are sometimes called  "innovative".
+\end{itemize}
+
+The strategy modules that are understood by MATSim are defined in the class \href{http://www.matsim.org/xref/org/matsim/core/controler/PlanStrategyRegistrar.html}{PlanStrategyRegistrar}. In addition, you can program your own strategy modules; see tutorial.programming in matsim/src/main/java for examples.
+
+Unfortunately, the naming in the code is different from the naming in the config file:
+\begin{itemize}
+	\item "strategy" in config file $\rightarrow$ StrategyManager (or "set of strategies") in code
+	\item "strategy module" in config file $\rightarrow$ PlanStrategy in code
+	\item There is a PlanStrategyModule in the code; it corresponds to what was called strategy module element in the description above.
+\end{itemize}
+
+It is not clear which combinations of these modules can be used  together. Depending on required features, special variants sometimes  need to be used. This has not yet been sorted out. Also see \href{http://matsim.org/node/690}{here}.
+
+
+\umbruch
+
+\section{Selectors}
+\label{sec:selectors}
+
+Selectors are pure plan selecting (i.e.\ non-innovative) strategy module.
+
+\subsection{BestScore.  Status: works}
+
+Will select the plan with the highest score. The score will be updated after execution of the mobsim.
+
+Disadvantage: Will never try again plans that obtained a bad score  from a fluctuation (e.g.\ a rare traffic jam). It is therefore  recommended to either use this in conjunction with a small probability  for RandomPlanSelector, or to use ChangeExpBeta.
+
+\subsection{ChangeExpBeta. Status: works. RECOMMENDED!}
+
+Choice model between plans that \emph{converges} to a logit distribution.
+
+The scores $S_i$ are taken as utilities; the betaBrain parameter from the  config file is taken as the scale parameter. As equation:
+\[
+p_i = \frac{\exp( \beta_{brain} * S_i)}{\sum_j \exp( \beta_{brain} * S_j )} \ .
+\]
+
+\subsection{KeepLastSelected. Status: works}
+
+Pure plan selecting (i.e.\ non-innovative) strategy module.
+
+Will keep the selected plan selected.  This may be necessary since \emph{every} person will have to undergo plans selection.
+
+\subsection{SelectExpBeta. Status: works}
+
+Multinomial logit model choice between plans.
+
+The scores $S_i$ are taken as utilities; the betaBrain parameter from the  config file is taken as the scale parameter. As equation:
+\[
+p_i = \frac{\exp( \beta_{brain} * S_i)}{\sum_j \exp( \beta_{brain} * S_j )} \ .
+\]
+
+\subsection{SelectRandom.  Status: works}
+
+Pure plan selecting (i.e.\ non-innovative) strategy module.
+
+Will select a random plan.
+
+\umbruch
+\section{Innovative modules}
+
+Sec.~\ref{sec:selectors} was about strategy modules which would just select between plans.
+
+This section is about innovative modules which modify plans.
+
+Note that innovative modules first copy a plan and then modify it, i.e.\ they increase the choice set.  Pure selectors do not do this.
+
+\subsection{ReRoute.  Status: nearly indispensable}
+
+\maintainers{Marcel Rieser, Thibaut Dubernet}
+
+All routes of a plan are recomputed.
+
+The module is called by inserting the following lines into the "strategy" module:
+\begin{lstlisting}{language=XML}
+<module name="strategy" >
+    <param name="ModuleProbability_XXX" value="0.1" />
+    <param name="Module_XXX" value="ReRoute" />
+    ...
+</module>
+\end{lstlisting}
+
+
+The corresponding configuration module unfortunately has a different name:
+\begin{lstlisting}{language=XML}
+<module name="planscalcroute" >
+    <param name="beelineDistanceFactor" value="1.3" />
+    <param name="bikeSpeed" value="4.166666666666667" />
+    <param name="ptSpeedFactor" value="2.0" />
+    <param name="undefinedModeSpeed" value="13.88888888888889" />
+    <param name="walkSpeed" value="0.8333333333333333" />
+</module>
+\end{lstlisting}
+
+This works pretty reliably for car.
+
+It also works for other modes, as "pseudo"-mode, in the following way:
+\begin{itemize}
+	\item Travel times for these other modes are not obtained from true  routing on the corresponding network, but by some estimates. These  are configured by the parameters above, but no guarantee that they work  consistently.
+	\item The mobsim will not execute such routes on the network, but "teleport" them.
+	\item The scoring works quite normally, since it just takes the time from leg start to leg end by mode.
+\end{itemize}
+
+It is possible to route such legs on the network, by using a different router.
+
+It is \emph{not} possible to "physically" execute a leg in the  mobsim if it has not been routed before. That is, the capability  of the router needs to be $\ge$ the capability of the mobsim.  (Makes sense, if one thinks about it.)
+
+\subsection{TimeAllocationMutator.  Status: works}
+
+Simple  module that shifts activity end times randomly. ("Good" time  shifts will be selected through the matsim plans selection mechanism.)
+
+The maximum extent of the shifts can be configured; see the config  section of the log file. 
+%%It is, as of now (may'10), not possible  to add a comment to that parameter.
+% I think this has now been working for a long time, by making this a core config group. kai, oct'13
+
+The usage of the module is configured in the ``strategy'' section.
+
+\subsection{ChangeSingleLegMode. Status: works}
+
+\maintainers{Marcel Rieser}
+
+This replanning module randomly picks one of the plans of a person and changes the mode of transport of \textbf{one single leg}. The leg is picked randomly. For changing the mode of transport for all legs use \verb$ChangeLegMode$ (Sec.~\ref{sec:changeLegMode}). In contrast to \verb$ChangeLegMode$,  \verb$ChangeSingleLegMode$ allows for multiple modes in one plan. By default,  the supported modes are driving a car and using public transport. Also,  this module is able to (optionally) respect car-availability.
+
+Note that the configuration is done by \verb$<module name="changeLegMode">$ and not by \verb$<module name="changeSingleLegMode">$. The replanning module is configured like  this using the very same configuration module as \verb$ChangeLegMode$:
+\begin{lstlisting}{language=XML}
+<module name="changeLegMode">
+    <param name="modes" value="car,pt,bike,walk" />
+    <param name="ignoreCarAvailability" value="false" />
+</module>
+\end{lstlisting}
+
+Add the module to the replanning strategy like this:
+\begin{lstlisting}{language=XML}
+<param name="Module_X" value="ChangeSingleLegMode" />
+<param name="ModuleProbability_X" value="0.1" />
+\end{lstlisting}
+
+Replace the 'X' with the number you assign to this module. For some more details on the syntax of this section, see Sec.~\ref{sec:introduction}.
+
+By default, the simulation will handle legs with modes different from  ``car'' by using a delayed teleportation. If another behavior is  requested (e.g.\ detailed simulation of public transport), this needs to  be manually configured for the simulation.
+
+
+\subsection{ChangeLegMode. Status: works}
+\label{sec:changeLegMode}
+
+\maintainers{Michael Zilske}
+
+This replanning module randomly picks one of the plans of a person  and changes its mode of transport. By default, the supported modes  are driving a car and using public transport. Only one mode of transport  per plan is supported. For using different modes for sub-tours on a  single day see the "SubtourModeChoice" module. Also, this module is able  to (optionally) respect car-availability.
+
+The replanning module is configured like this, where the value  parameter lists the modes of transport from which the module randomly  chooses:
+\begin{lstlisting}{language=XML}
+<module name="changeLegMode">
+    <param name="modes" value="car,pt,bike,walk" />
+    <param name="ignoreCarAvailability" value="false" />
+</module>
+\end{lstlisting}
+
+Add the module to the replanning strategy like this:
+\begin{lstlisting}{language=XML}
+<param name="Module_X" value="ChangeLegMode" />
+<param name="ModuleProbability_X" value="0.1" />
+\end{lstlisting}
+
+Replace the 'X' with the number you assign to this module. For some more details on the syntax of this section, see \href{http://matsim.org/node/478}{here}.
+
+By default, the simulation will handle legs with modes different from  "car" by using a delayed teleportation. If another behavior is  requested (e.g.\ detailed simulation of public transport), this needs to  be manually configured for the simulation.
+
+This module can be used with the detailed simulation of public transport by changing the line
+
+\begin{lstlisting}{language=XML}
+<param name="Module_X" value="ChangeLegMode" />
+\end{lstlisting}
+
+to
+
+\begin{lstlisting}{language=XML}
+<param name="Module_X" value="TransitChangeLegMode" />
+\end{lstlisting}
+
+\subsubsection{Reference}
+
+M. Rieser, D. Grether, K. Nagel;\textbf{Adding mode choice to a multi-agent transport simulation}; TRB'09
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{SubtourModeChoice. Status: probably works}
+
+\maintainers{Michael Zilske}
+
+In contrast to "ChangeLegMode", which changes \emph{all} legs of a plan to a different mode, this module changes the modes of sub-tours separately.
+
+For example, somebody might take the car to work, walk to lunch and back, and take the car back home.
+
+"chainBasedModes" means modes where a vehicle (car, bicycle,  ...) is parked and in consequence needs to be picked up again.
+\begin{lstlisting}{language=XML}
+<module name="subtourModeChoice" >
+    <param name="chainBasedModes" value="car, bike" />
+    <param name="modes" value="car, bike, pt, walk" />
+</module>
+\end{lstlisting}
+
+
+The module is called by inserting the following lines into the "strategy" module:
+\begin{lstlisting}{language=XML}
+<module name="strategy" >
+    <param name="ModuleProbability_XXX" value="0.1" />
+    <param name="Module_XXX" value="SubtourModeChoice" />
+    ...
+</module>
+\end{lstlisting}
+
+
+For modes other than car, travel time and travel distance are  computed according to some heuristics, which are configured in the  router.
+
+\umbruch
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% after the cleaning up of the strategies, the following seems to be so obsolet that it feels better to not show it at all. kai, oct'13
+
+%%\section{Combination of strategy modules}
+
+%%It  is not clear which combinations of these modules can be used together.  Depending on required features, special variants sometimes need to be  used. This has not yet been sorted out.
+
+%%The following table tries to give an overview, but it is an old table  that has not been maintained (table status 2011; this sentence written  2012).
+%%\begin{center}
+%%\begin{tabularx}{\hsize}{|X|l|l|X|}
+%%\hline 
+%%\textbf{Choice dimension} & \textbf{Default Strategy} & \textbf{Transit} & \textbf{Transit \& Parking} \\ 
+%%\hline
+%%departure time choice & TimeAllocationMutator & TransitTimeAllocationMutator & ? \\ 
+%%\hline
+%%route choice & ReRoute & ReRoute & ? \\ 
+%%\hline
+%%mode choice (all legs get same mode) & ChangeLegMode & TransitChangeLegMode & ? \\ 
+%%\hline
+%%mode choice (each leg can have a different mode) & ChangeSingleLegMode & TransitChangeSingleLegMode & ? \\ 
+%%\hline
+%%mode choice (subtour-based) & SubtourModeChoice & TransitSubtourModeChoice & ? \\ 
+%%\hline
+%%location choice & LocationChoice & ? & ? \\ 
+%%\hline
+%%\end{tabularx}
+%%\end{center}
+
+%%Legend:
+%%\begin{itemize}
+%%	\item n/a means this choice dimension is not supported/available for the specified feature
+%%	\item ? means there is no known implementation available
+%%\end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Local Variables:
+% mode: latex
+% mode: reftex
+% mode: visual-line
+% TeX-master: "../user-guide.tex"
+% comment-padding: 1
+% fill-column: 9999
+% End: 

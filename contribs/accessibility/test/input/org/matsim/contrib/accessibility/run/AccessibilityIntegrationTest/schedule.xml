@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
+
+<transitSchedule>
+	<transitStops>
+		<stopFacility id="1" x="10" y="10" linkRefId="4"/>
+		<stopFacility id="2" x="10" y="190" linkRefId="2"/>
+		<stopFacility id="3" x="190" y="190" linkRefId="14"/>
+		<stopFacility id="4" x="190" y="10" linkRefId="16"/>
+	</transitStops>
+	<transitLine id="1">
+		<transitRoute id="1-1">
+			<transportMode>bus</transportMode>
+			<routeProfile>
+				<stop refId="1" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="2" arrivalOffset="00:01:00" departureOffset="00:01:00" awaitDeparture="false"/>
+				<stop refId="3" arrivalOffset="00:02:00" departureOffset="00:02:00" awaitDeparture="false"/>
+				<stop refId="4" arrivalOffset="00:03:00" departureOffset="00:03:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="4"/>
+				<link refId="1"/>
+				<link refId="2"/>
+				<link refId="5"/>
+				<link refId="7"/>
+				<link refId="13"/>
+				<link refId="14"/>
+				<link refId="8"/>
+				<link refId="9"/>
+				<link refId="15"/>
+				<link refId="16"/>
+			</route>
+			<departures>
+				<departure id="1-1a" departureTime="08:03:00" vehicleRefId="bus_1"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="1-2">
+			<transportMode>bus</transportMode>
+			<routeProfile>
+				<stop refId="4" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="3" arrivalOffset="00:01:00" departureOffset="00:01:00" awaitDeparture="false"/>
+				<stop refId="2" arrivalOffset="00:02:00" departureOffset="00:02:00" awaitDeparture="false"/>
+				<stop refId="1" arrivalOffset="00:03:00" departureOffset="00:03:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="16"/>
+				<link refId="10"/>
+				<link refId="7"/>
+				<link refId="13"/>
+				<link refId="14"/>
+				<link refId="8"/>
+				<link refId="6"/>
+				<link refId="1"/>
+				<link refId="2"/>
+				<link refId="3"/>
+				<link refId="4"/>
+			</route>
+			<departures>
+				<departure id="1-2a" departureTime="08:03:00" vehicleRefId="bus_2"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>
