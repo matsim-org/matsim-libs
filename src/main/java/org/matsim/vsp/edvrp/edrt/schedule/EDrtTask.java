@@ -19,7 +19,7 @@
 package org.matsim.vsp.edvrp.edrt.schedule;
 
 import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.ev.ev.dvrp.ETask;
+import org.matsim.contrib.ev.dvrp.ETask;
 
 /**
  * @author michalm

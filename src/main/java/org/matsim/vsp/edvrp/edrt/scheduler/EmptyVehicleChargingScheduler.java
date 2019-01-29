@@ -29,12 +29,12 @@ import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.ev.ev.charging.ChargingStrategy;
-import org.matsim.contrib.ev.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.ev.data.Charger;
-import org.matsim.contrib.ev.ev.data.ChargingInfrastructure;
-import org.matsim.contrib.ev.ev.data.ElectricVehicle;
-import org.matsim.contrib.ev.ev.dvrp.EvDvrpVehicle;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
+import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.data.Charger;
+import org.matsim.contrib.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.vsp.edvrp.edrt.schedule.EDrtTaskFactoryImpl;
 

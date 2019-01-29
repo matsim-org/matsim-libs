@@ -25,7 +25,7 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.contrib.ev.ev.dvrp.ChargingActivity;
+import org.matsim.contrib.ev.dvrp.ChargingActivity;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 
 /**

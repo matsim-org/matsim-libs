@@ -21,9 +21,9 @@ package org.matsim.vsp.edvrp.etaxi.optimizer.assignment;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
-import org.matsim.contrib.ev.ev.charging.ChargingEstimations;
-import org.matsim.contrib.ev.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.ev.data.Charger;
+import org.matsim.contrib.ev.charging.ChargingEstimations;
+import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.data.Charger;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
 

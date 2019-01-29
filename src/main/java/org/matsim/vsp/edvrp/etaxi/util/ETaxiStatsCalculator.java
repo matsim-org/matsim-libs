@@ -23,7 +23,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.ev.ev.dvrp.ChargingTask;
+import org.matsim.contrib.ev.dvrp.ChargingTask;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculators;
 import org.matsim.vsp.edvrp.etaxi.util.ETaxiStats.ETaxiState;
 

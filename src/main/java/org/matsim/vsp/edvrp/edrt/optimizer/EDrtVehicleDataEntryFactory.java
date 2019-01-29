@@ -28,10 +28,10 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
-import org.matsim.contrib.ev.ev.data.Battery;
-import org.matsim.contrib.ev.ev.dvrp.ChargingTask;
-import org.matsim.contrib.ev.ev.dvrp.EvDvrpVehicle;
-import org.matsim.contrib.ev.ev.dvrp.tracker.ETaskTracker;
+import org.matsim.contrib.ev.data.Battery;
+import org.matsim.contrib.ev.dvrp.ChargingTask;
+import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
+import org.matsim.contrib.ev.dvrp.tracker.ETaskTracker;
 import org.matsim.vsp.edvrp.edrt.schedule.EDrtTask;
 
 import javax.inject.Inject;

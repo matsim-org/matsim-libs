@@ -20,7 +20,7 @@
 package org.matsim.vsp.edvrp.etaxi.optimizer;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.ev.ev.data.Charger;
+import org.matsim.contrib.ev.data.Charger;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.util.LinkProvider;
