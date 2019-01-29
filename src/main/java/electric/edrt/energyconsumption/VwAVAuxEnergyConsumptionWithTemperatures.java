@@ -2,9 +2,9 @@ package electric.edrt.energyconsumption;
 
 import org.apache.commons.math.ArgumentOutsideDomainException;
 import org.apache.commons.math.analysis.interpolation.LinearInterpolator;
-import org.matsim.contrib.ev.ev.data.ElectricVehicle;
-import org.matsim.contrib.ev.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.ev.temperature.TemperatureService;
+import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
+import org.matsim.contrib.ev.temperature.TemperatureService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

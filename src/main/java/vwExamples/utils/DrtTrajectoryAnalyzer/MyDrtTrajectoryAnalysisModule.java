@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
-import org.matsim.contrib.ev.ev.data.ElectricFleet;
+import org.matsim.contrib.ev.data.ElectricFleet;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
