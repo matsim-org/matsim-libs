@@ -19,9 +19,7 @@
 
 package org.matsim.vsp.edvrp.etaxi;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.inject.name.Named;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
@@ -33,6 +31,10 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.contrib.ev.ev.charging.ChargingEstimations;
+import org.matsim.contrib.ev.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.ev.data.Charger;
+import org.matsim.contrib.ev.ev.data.ElectricVehicle;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
@@ -40,12 +42,9 @@ import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.vsp.ev.charging.ChargingEstimations;
-import org.matsim.vsp.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.vsp.ev.data.Charger;
-import org.matsim.vsp.ev.data.ElectricVehicle;
 
-import com.google.inject.name.Named;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ETaxiScheduler extends TaxiScheduler {
 

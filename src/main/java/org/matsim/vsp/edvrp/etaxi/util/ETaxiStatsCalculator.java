@@ -19,15 +19,15 @@
 
 package org.matsim.vsp.edvrp.etaxi.util;
 
-import java.util.List;
-
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.ev.ev.dvrp.ChargingTask;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculators;
 import org.matsim.vsp.edvrp.etaxi.util.ETaxiStats.ETaxiState;
-import org.matsim.vsp.ev.dvrp.ChargingTask;
+
+import java.util.List;
 
 public class ETaxiStatsCalculator {
 	private final int hours;

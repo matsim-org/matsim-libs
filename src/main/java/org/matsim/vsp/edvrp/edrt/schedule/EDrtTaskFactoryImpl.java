@@ -22,10 +22,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.vsp.ev.data.Charger;
-import org.matsim.vsp.ev.data.ElectricVehicle;
-import org.matsim.vsp.ev.dvrp.EvDvrpVehicle;
-import org.matsim.vsp.ev.dvrp.TaskEnergyConsumptions;
+import org.matsim.contrib.ev.ev.data.Charger;
+import org.matsim.contrib.ev.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.ev.dvrp.EvDvrpVehicle;
+import org.matsim.contrib.ev.ev.dvrp.TaskEnergyConsumptions;
 
 /**
  * @author michalm

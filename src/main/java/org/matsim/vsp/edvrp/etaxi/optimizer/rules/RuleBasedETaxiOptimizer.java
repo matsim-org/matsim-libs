@@ -19,11 +19,13 @@
 
 package org.matsim.vsp.edvrp.etaxi.optimizer.rules;
 
-import java.util.stream.Stream;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.ev.ev.data.Battery;
+import org.matsim.contrib.ev.ev.data.Charger;
+import org.matsim.contrib.ev.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
@@ -43,10 +45,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vsp.edvrp.etaxi.ETaxiChargingTask;
 import org.matsim.vsp.edvrp.etaxi.ETaxiScheduler;
 import org.matsim.vsp.edvrp.etaxi.optimizer.BestChargerFinder;
-import org.matsim.vsp.ev.data.Battery;
-import org.matsim.vsp.ev.data.Charger;
-import org.matsim.vsp.ev.data.ChargingInfrastructure;
-import org.matsim.vsp.ev.dvrp.EvDvrpVehicle;
+
+import java.util.stream.Stream;
 
 public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public static RuleBasedETaxiOptimizer create(TaxiConfigGroup taxiCfg, Fleet fleet, ETaxiScheduler eScheduler,

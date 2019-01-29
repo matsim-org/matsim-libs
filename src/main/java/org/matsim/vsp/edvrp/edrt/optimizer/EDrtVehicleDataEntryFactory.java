@@ -18,10 +18,7 @@
 
 package org.matsim.vsp.edvrp.edrt.optimizer;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
+import com.google.inject.Provider;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.EntryFactory;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
@@ -31,13 +28,14 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
+import org.matsim.contrib.ev.ev.data.Battery;
+import org.matsim.contrib.ev.ev.dvrp.ChargingTask;
+import org.matsim.contrib.ev.ev.dvrp.EvDvrpVehicle;
+import org.matsim.contrib.ev.ev.dvrp.tracker.ETaskTracker;
 import org.matsim.vsp.edvrp.edrt.schedule.EDrtTask;
-import org.matsim.vsp.ev.data.Battery;
-import org.matsim.vsp.ev.dvrp.ChargingTask;
-import org.matsim.vsp.ev.dvrp.EvDvrpVehicle;
-import org.matsim.vsp.ev.dvrp.tracker.ETaskTracker;
 
-import com.google.inject.Provider;
+import javax.inject.Inject;
+import java.util.List;
 
 /**
  * @author michalm

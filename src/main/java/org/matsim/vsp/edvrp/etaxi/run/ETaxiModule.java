@@ -20,11 +20,10 @@
 
 package org.matsim.vsp.edvrp.etaxi.run;
 
+import com.google.inject.Inject;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiModeModule;
 import org.matsim.core.controler.AbstractModule;
-
-import com.google.inject.Inject;
 
 /**
  * @author michalm

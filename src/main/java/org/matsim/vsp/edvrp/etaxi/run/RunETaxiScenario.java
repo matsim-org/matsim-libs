@@ -24,6 +24,10 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.ev.ev.EvConfigGroup;
+import org.matsim.contrib.ev.ev.EvModule;
+import org.matsim.contrib.ev.ev.charging.VariableSpeedCharging;
+import org.matsim.contrib.ev.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -33,10 +37,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import org.matsim.vsp.ev.EvConfigGroup;
-import org.matsim.vsp.ev.EvModule;
-import org.matsim.vsp.ev.charging.VariableSpeedCharging;
-import org.matsim.vsp.ev.dvrp.EvDvrpIntegrationModule;
 
 public class RunETaxiScenario {
 	private static final String CONFIG_FILE = "mielec_2014_02/mielec_etaxi_config.xml";

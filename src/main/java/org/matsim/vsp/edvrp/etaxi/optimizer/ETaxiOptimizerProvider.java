@@ -19,12 +19,15 @@
 
 package org.matsim.vsp.edvrp.etaxi.optimizer;
 
+import com.google.inject.Provider;
+import com.google.inject.name.Named;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.MapConfiguration;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.contrib.ev.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -35,10 +38,6 @@ import org.matsim.vsp.edvrp.etaxi.optimizer.assignment.AssignmentETaxiOptimizer;
 import org.matsim.vsp.edvrp.etaxi.optimizer.assignment.AssignmentETaxiOptimizerParams;
 import org.matsim.vsp.edvrp.etaxi.optimizer.rules.RuleBasedETaxiOptimizer;
 import org.matsim.vsp.edvrp.etaxi.optimizer.rules.RuleBasedETaxiOptimizerParams;
-import org.matsim.vsp.ev.data.ChargingInfrastructure;
-
-import com.google.inject.Provider;
-import com.google.inject.name.Named;
 
 public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	public static final String TYPE = "type";

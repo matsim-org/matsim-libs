@@ -19,6 +19,8 @@
 
 package org.matsim.vsp.edvrp.etaxi.run;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
@@ -32,6 +34,7 @@ import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
+import org.matsim.contrib.ev.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
@@ -45,10 +48,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vsp.edvrp.etaxi.ETaxiActionCreator;
 import org.matsim.vsp.edvrp.etaxi.ETaxiScheduler;
 import org.matsim.vsp.edvrp.etaxi.optimizer.ETaxiOptimizerProvider;
-import org.matsim.vsp.ev.data.ChargingInfrastructure;
-
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 

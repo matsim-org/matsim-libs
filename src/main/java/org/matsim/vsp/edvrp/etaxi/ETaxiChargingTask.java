@@ -19,10 +19,10 @@
 
 package org.matsim.vsp.edvrp.etaxi;
 
+import org.matsim.contrib.ev.ev.data.Charger;
+import org.matsim.contrib.ev.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.ev.dvrp.ChargingTaskImpl;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
-import org.matsim.vsp.ev.data.Charger;
-import org.matsim.vsp.ev.data.ElectricVehicle;
-import org.matsim.vsp.ev.dvrp.ChargingTaskImpl;
 
 public class ETaxiChargingTask extends ChargingTaskImpl implements TaxiTask {
 	public ETaxiChargingTask(double beginTime, double endTime, Charger charger, ElectricVehicle ev,

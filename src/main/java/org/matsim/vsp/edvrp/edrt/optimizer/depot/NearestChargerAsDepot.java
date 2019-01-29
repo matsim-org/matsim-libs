@@ -18,17 +18,16 @@
 
 package org.matsim.vsp.edvrp.edrt.optimizer.depot;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.Depots;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.vsp.ev.data.Charger;
-import org.matsim.vsp.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.ev.data.Charger;
+import org.matsim.contrib.ev.ev.data.ChargingInfrastructure;
 
-import com.google.inject.Inject;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author michalm

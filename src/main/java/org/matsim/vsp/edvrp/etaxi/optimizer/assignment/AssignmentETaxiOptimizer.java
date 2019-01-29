@@ -19,10 +19,7 @@
 
 package org.matsim.vsp.edvrp.etaxi.optimizer.assignment;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
+import com.google.common.collect.Maps;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
@@ -30,6 +27,9 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.contrib.ev.ev.data.Battery;
+import org.matsim.contrib.ev.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
 import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
@@ -53,11 +53,10 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vsp.edvrp.etaxi.ETaxiChargingTask;
 import org.matsim.vsp.edvrp.etaxi.ETaxiScheduler;
 import org.matsim.vsp.edvrp.etaxi.optimizer.assignment.AssignmentChargerPlugData.ChargerPlug;
-import org.matsim.vsp.ev.data.Battery;
-import org.matsim.vsp.ev.data.ChargingInfrastructure;
-import org.matsim.vsp.ev.dvrp.EvDvrpVehicle;
 
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Main assumptions:

@@ -19,15 +19,14 @@
 
 package org.matsim.vsp.edvrp.etaxi;
 
+import com.google.inject.Inject;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.ev.ev.dvrp.ChargingActivity;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
-import org.matsim.vsp.ev.dvrp.ChargingActivity;
-
-import com.google.inject.Inject;
 
 /**
  * @author michalm

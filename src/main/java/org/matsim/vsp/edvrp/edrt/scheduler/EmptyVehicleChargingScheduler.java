@@ -19,9 +19,8 @@
 
 package org.matsim.vsp.edvrp.edrt.scheduler;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -30,17 +29,17 @@ import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.ev.ev.charging.ChargingStrategy;
+import org.matsim.contrib.ev.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.ev.data.Charger;
+import org.matsim.contrib.ev.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.ev.dvrp.EvDvrpVehicle;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.vsp.edvrp.edrt.schedule.EDrtTaskFactoryImpl;
-import org.matsim.vsp.ev.charging.ChargingStrategy;
-import org.matsim.vsp.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.vsp.ev.data.Charger;
-import org.matsim.vsp.ev.data.ChargingInfrastructure;
-import org.matsim.vsp.ev.data.ElectricVehicle;
-import org.matsim.vsp.ev.dvrp.EvDvrpVehicle;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author michalm

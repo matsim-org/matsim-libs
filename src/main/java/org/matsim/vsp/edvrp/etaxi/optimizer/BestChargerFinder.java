@@ -19,13 +19,13 @@
 
 package org.matsim.vsp.edvrp.etaxi.optimizer;
 
-import java.util.stream.Stream;
-
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.ev.ev.data.Charger;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.util.LinkProvider;
-import org.matsim.vsp.ev.data.Charger;
+
+import java.util.stream.Stream;
 
 /**
  * @author michalm
