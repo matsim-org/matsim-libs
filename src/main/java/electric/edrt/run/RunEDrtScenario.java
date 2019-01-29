@@ -31,6 +31,17 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.ev.ev.EvConfigGroup;
+import org.matsim.contrib.ev.ev.EvModule;
+import org.matsim.contrib.ev.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.ev.charging.FastThenSlowCharging;
+import org.matsim.contrib.ev.ev.charging.FixedSpeedChargingStrategy;
+import org.matsim.contrib.ev.ev.discharging.AuxEnergyConsumption;
+import org.matsim.contrib.ev.ev.discharging.DriveEnergyConsumption;
+import org.matsim.contrib.ev.ev.dvrp.EvDvrpIntegrationModule;
+import org.matsim.contrib.ev.ev.temperature.TemperatureChangeConfigGroup;
+import org.matsim.contrib.ev.ev.temperature.TemperatureChangeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -41,17 +52,6 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vsp.edvrp.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.vsp.edvrp.edrt.run.EDrtControlerCreator;
-import org.matsim.vsp.ev.EvConfigGroup;
-import org.matsim.vsp.ev.EvModule;
-import org.matsim.vsp.ev.charging.ChargingLogic;
-import org.matsim.vsp.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.vsp.ev.charging.FastThenSlowCharging;
-import org.matsim.vsp.ev.charging.FixedSpeedChargingStrategy;
-import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
-import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
-import org.matsim.vsp.ev.dvrp.EvDvrpIntegrationModule;
-import org.matsim.vsp.ev.temperature.TemperatureChangeConfigGroup;
-import org.matsim.vsp.ev.temperature.TemperatureChangeModule;
 
 public class RunEDrtScenario {
 	private static final double CHARGING_SPEED_FACTOR = 1.; // full speed

@@ -37,11 +37,11 @@ import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
+import org.matsim.contrib.ev.ev.EvUnits;
+import org.matsim.contrib.ev.ev.data.ElectricFleet;
+import org.matsim.contrib.ev.ev.data.ElectricVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vsp.ev.EvUnits;
-import org.matsim.vsp.ev.data.ElectricFleet;
-import org.matsim.vsp.ev.data.ElectricVehicle;
 
 import java.util.*;
 

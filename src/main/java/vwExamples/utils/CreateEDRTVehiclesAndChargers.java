@@ -19,13 +19,6 @@
 
 package vwExamples.utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -33,18 +26,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
+import org.matsim.contrib.ev.ev.EvUnits;
+import org.matsim.contrib.ev.ev.data.*;
+import org.matsim.contrib.ev.ev.data.file.ChargerWriter;
+import org.matsim.contrib.ev.ev.data.file.ElectricVehicleWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vsp.ev.EvUnits;
-import org.matsim.vsp.ev.data.BatteryImpl;
-import org.matsim.vsp.ev.data.Charger;
-import org.matsim.vsp.ev.data.ChargerImpl;
-import org.matsim.vsp.ev.data.ElectricVehicle;
-import org.matsim.vsp.ev.data.ElectricVehicleImpl;
-import org.matsim.vsp.ev.data.file.ChargerWriter;
-import org.matsim.vsp.ev.data.file.ElectricVehicleWriter;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author axer

@@ -20,38 +20,24 @@
 package vwExamples.utils.customEV;
 
 import com.google.inject.Inject;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.ev.ev.EvConfigGroup;
+import org.matsim.contrib.ev.ev.data.Charger;
+import org.matsim.contrib.ev.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.ev.data.ElectricFleet;
+import org.matsim.contrib.ev.ev.data.ElectricVehicle;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
-import org.matsim.vsp.ev.EvConfigGroup;
-import org.matsim.vsp.ev.data.Charger;
-import org.matsim.vsp.ev.data.ChargingInfrastructure;
-import org.matsim.vsp.ev.data.ElectricFleet;
-import org.matsim.vsp.ev.data.ElectricVehicle;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This AUX Discharge runs also when vehicles are not in use. This is handy for
