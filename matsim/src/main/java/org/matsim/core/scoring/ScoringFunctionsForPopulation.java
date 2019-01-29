@@ -308,7 +308,6 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 				}
 				out.newLine();
 			}
-			out.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
