@@ -139,11 +139,6 @@
 			<artifactId>ev</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>org.matsim.vsp</groupId>
-			<artifactId>edvrp</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
-		</dependency>
 
 
 		<!-- https://mvnrepository.com/artifact/com.beust/jcommander -->
