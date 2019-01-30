@@ -18,6 +18,17 @@ public class CarrierPlan implements BasicPlan {
 
 	private Double score = null;
 
+	@Override
+	public String toString() {
+		StringBuilder strb = new StringBuilder(  ) ;
+		strb.append( "[" ).append( carrier.toString() ) ;
+		for( ScheduledTour tour : scheduledTours ){
+			strb.append( tour.toString() ) ;
+		}
+		strb.append( "]" ) ;
+		return strb.toString() ;
+	}
+
 	public CarrierPlan(final Carrier carrier, final Collection<ScheduledTour> scheduledTours) {
 		this.scheduledTours = scheduledTours;
 		this.carrier = carrier;
