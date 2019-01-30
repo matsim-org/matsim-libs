@@ -33,11 +33,11 @@ import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.vsp.edvrp.etaxi.ETaxiScheduler;
-import org.matsim.vsp.edvrp.etaxi.optimizer.assignment.AssignmentETaxiOptimizer;
-import org.matsim.vsp.edvrp.etaxi.optimizer.assignment.AssignmentETaxiOptimizerParams;
-import org.matsim.vsp.edvrp.etaxi.optimizer.rules.RuleBasedETaxiOptimizer;
-import org.matsim.vsp.edvrp.etaxi.optimizer.rules.RuleBasedETaxiOptimizerParams;
+import org.matsim.contrib.etaxi.ETaxiScheduler;
+import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentETaxiOptimizer;
+import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentETaxiOptimizerParams;
+import org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizer;
+import org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizerParams;
 
 public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	public static final String TYPE = "type";

@@ -38,7 +38,7 @@ import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.dvrp.tracker.OfflineETaskTracker;
 import org.matsim.contrib.ev.dvrp.tracker.OnlineEDriveTaskTracker;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.vsp.edvrp.edrt.schedule.EDrtChargingTask;
+import org.matsim.contrib.edrt.schedule.EDrtChargingTask;
 
 /**
  * @author michalm

@@ -8,8 +8,8 @@ import org.matsim.contrib.util.CSVLineBuilder;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.vsp.edvrp.etaxi.util.ETaxiStats;
-import org.matsim.vsp.edvrp.etaxi.util.ETaxiStatsCalculator;
+import org.matsim.contrib.etaxi.util.ETaxiStats;
+import org.matsim.contrib.etaxi.util.ETaxiStatsCalculator;
 
 import com.google.common.collect.ObjectArrays;
 

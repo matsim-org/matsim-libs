@@ -42,9 +42,9 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.vsp.edvrp.etaxi.ETaxiChargingTask;
-import org.matsim.vsp.edvrp.etaxi.ETaxiScheduler;
-import org.matsim.vsp.edvrp.etaxi.optimizer.BestChargerFinder;
+import org.matsim.contrib.etaxi.ETaxiChargingTask;
+import org.matsim.contrib.etaxi.ETaxiScheduler;
+import org.matsim.contrib.etaxi.optimizer.BestChargerFinder;
 
 import java.util.stream.Stream;
 

@@ -36,7 +36,7 @@ import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.data.ElectricVehicle;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.vsp.edvrp.edrt.schedule.EDrtTaskFactoryImpl;
+import org.matsim.contrib.edrt.schedule.EDrtTaskFactoryImpl;
 
 import java.util.Map;
 import java.util.stream.Collectors;

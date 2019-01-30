@@ -30,7 +30,7 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vsp.edvrp.edrt.optimizer.depot.NearestChargerAsDepot;
+import org.matsim.contrib.edrt.optimizer.depot.NearestChargerAsDepot;
 
 /**
  * @author michalm

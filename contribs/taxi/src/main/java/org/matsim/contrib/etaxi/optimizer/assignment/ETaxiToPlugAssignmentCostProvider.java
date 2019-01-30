@@ -25,7 +25,7 @@ import org.matsim.contrib.taxi.optimizer.VehicleData.Entry;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
 import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.AssignmentCost;
-import org.matsim.vsp.edvrp.etaxi.optimizer.assignment.AssignmentChargerPlugData.ChargerPlug;
+import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentChargerPlugData.ChargerPlug;
 
 public class ETaxiToPlugAssignmentCostProvider {
 	public enum Mode {

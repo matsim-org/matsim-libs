@@ -32,7 +32,7 @@ import org.matsim.contrib.ev.data.Battery;
 import org.matsim.contrib.ev.dvrp.ChargingTask;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.dvrp.tracker.ETaskTracker;
-import org.matsim.vsp.edvrp.edrt.schedule.EDrtTask;
+import org.matsim.contrib.edrt.schedule.EDrtTask;
 
 import javax.inject.Inject;
 import java.util.List;

@@ -45,9 +45,9 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.vsp.edvrp.etaxi.ETaxiActionCreator;
-import org.matsim.vsp.edvrp.etaxi.ETaxiScheduler;
-import org.matsim.vsp.edvrp.etaxi.optimizer.ETaxiOptimizerProvider;
+import org.matsim.contrib.etaxi.ETaxiActionCreator;
+import org.matsim.contrib.etaxi.ETaxiScheduler;
+import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
 
 public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 

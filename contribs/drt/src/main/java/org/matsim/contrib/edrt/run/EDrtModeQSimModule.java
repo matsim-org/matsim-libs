@@ -55,11 +55,11 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.vsp.edvrp.edrt.EDrtActionCreator;
-import org.matsim.vsp.edvrp.edrt.optimizer.EDrtOptimizer;
-import org.matsim.vsp.edvrp.edrt.optimizer.EDrtVehicleDataEntryFactory;
-import org.matsim.vsp.edvrp.edrt.schedule.EDrtTaskFactoryImpl;
-import org.matsim.vsp.edvrp.edrt.scheduler.EmptyVehicleChargingScheduler;
+import org.matsim.contrib.edrt.EDrtActionCreator;
+import org.matsim.contrib.edrt.optimizer.EDrtOptimizer;
+import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory;
+import org.matsim.contrib.edrt.schedule.EDrtTaskFactoryImpl;
+import org.matsim.contrib.edrt.scheduler.EmptyVehicleChargingScheduler;
 
 /**
  * @author Michal Maciejewski (michalm)

@@ -26,7 +26,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.vsp.edvrp.edrt.scheduler.EmptyVehicleChargingScheduler;
+import org.matsim.contrib.edrt.scheduler.EmptyVehicleChargingScheduler;
 
 /**
  * @author michalm

@@ -50,9 +50,9 @@ import org.matsim.core.router.MultiNodePathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.vsp.edvrp.etaxi.ETaxiChargingTask;
-import org.matsim.vsp.edvrp.etaxi.ETaxiScheduler;
-import org.matsim.vsp.edvrp.etaxi.optimizer.assignment.AssignmentChargerPlugData.ChargerPlug;
+import org.matsim.contrib.etaxi.ETaxiChargingTask;
+import org.matsim.contrib.etaxi.ETaxiScheduler;
+import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentChargerPlugData.ChargerPlug;
 
 import java.util.List;
 import java.util.Map;
