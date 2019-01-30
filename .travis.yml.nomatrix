@@ -17,6 +17,7 @@ jobs:
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/drt                 && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/dvrp                && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/taxi                && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/ev                  && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/emissions           && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/freight             && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/signals             && ${MVN_IT_CMD} 
