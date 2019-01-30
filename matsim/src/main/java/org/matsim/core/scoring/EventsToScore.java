@@ -23,7 +23,6 @@ package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -31,7 +30,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.ControlerListenerManagerImpl;
 import org.matsim.core.controler.Injector;
-import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 import javax.inject.Inject;
@@ -48,7 +47,7 @@ import javax.inject.Inject;
  *
  * @author mrieser, michaz
  */
-public final class EventsToScore implements BasicEventHandler {
+public final class EventsToScore {
 
 	private final NewScoreAssigner newScoreAssigner;
 	private final ControlerListenerManagerImpl controlerListenerManager;
@@ -60,12 +59,11 @@ public final class EventsToScore implements BasicEventHandler {
 	private int iteration = -1 ;
 
 	@Inject
-	private EventsToScore(ControlerListenerManagerImpl controlerListenerManager, EventsManager eventsManager, ScoringFunctionsForPopulation scoringFunctionsForPopulation, final Scenario scenario, NewScoreAssigner newScoreAssigner) {
+	private EventsToScore(ControlerListenerManagerImpl controlerListenerManager, ScoringFunctionsForPopulation scoringFunctionsForPopulation, final Scenario scenario, NewScoreAssigner newScoreAssigner) {
 		this.controlerListenerManager = controlerListenerManager;
 		this.scoringFunctionsForPopulation = scoringFunctionsForPopulation;
 		this.population = scenario.getPopulation();
 		this.newScoreAssigner = newScoreAssigner;
-		eventsManager.addHandler(this);
 	}
 
 	public static EventsToScore createWithScoreUpdating(final Scenario scenario, final ScoringFunctionFactory scoringFunctionFactory, final EventsManager eventsManager) {
@@ -82,6 +80,7 @@ public final class EventsToScore implements BasicEventHandler {
 						bind(ControlerListenerManagerImpl.class).asEagerSingleton();
 						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
 						bind(EventsManager.class).toInstance(eventsManager);
+						bind(EventsManagerModule.EventHandlerRegistrator.class).asEagerSingleton();
 					}
 				});
 		return injector.getInstance(EventsToScore.class);
@@ -101,6 +100,7 @@ public final class EventsToScore implements BasicEventHandler {
 						bind(ControlerListenerManagerImpl.class).asEagerSingleton();
 						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
 						bind(EventsManager.class).toInstance(eventsManager);
+						bind(EventsManagerModule.EventHandlerRegistrator.class).asEagerSingleton();
 					}
 				});
 		return injector.getInstance(EventsToScore.class);
@@ -141,19 +141,6 @@ public final class EventsToScore implements BasicEventHandler {
 		if (scoringFunction == null)
 			return null;
 		return scoringFunction.getScore();
-	}
-
-	@Override
-	public void reset(int iteration) {
-	}
-
-	@Override
-	public void handleEvent(Event event) {
-		// I have to be a BasicEventHandler so that my reset method is
-		// called, EVEN THOUGH reset is actually on EventHandler
-		// and not on BasicEventHandler. :-)
-		
-		// yy the "handleEvent" that passes only the person-related events (via HasPersonId) is in ScoringFunctionsForPopulation.  kai, sep'16
 	}
 
 	private static class NoopNewScoreAssignerImpl implements NewScoreAssigner {
