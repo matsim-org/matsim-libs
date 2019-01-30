@@ -21,7 +21,7 @@ public class CarrierPlan implements BasicPlan {
 	@Override
 	public String toString() {
 		StringBuilder strb = new StringBuilder(  ) ;
-		strb.append( "[" ).append( carrier.toString() ) ;
+		strb.append( "[carrierId=" ).append( carrier.getId() ).append("; score=").append( score ).append( "; tours=") ;
 		for( ScheduledTour tour : scheduledTours ){
 			strb.append( tour.toString() ) ;
 		}
