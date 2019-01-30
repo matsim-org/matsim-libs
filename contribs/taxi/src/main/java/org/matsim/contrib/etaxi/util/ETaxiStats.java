@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.edvrp.etaxi.util;
+package org.matsim.contrib.etaxi.util;
 
 import org.matsim.contrib.util.EnumAdder;
 import org.matsim.contrib.util.LongEnumAdder;

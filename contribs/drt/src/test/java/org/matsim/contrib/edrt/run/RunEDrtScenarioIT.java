@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.edvrp.edrt.run;
+package org.matsim.contrib.edrt.run;
 
 import org.junit.Test;
 

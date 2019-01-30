@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.edvrp.etaxi.optimizer;
+package org.matsim.contrib.etaxi.optimizer;
 
 import com.google.inject.Provider;
 import com.google.inject.name.Named;

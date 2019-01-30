@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.edvrp.etaxi;
+package org.matsim.contrib.etaxi;
 
 import org.matsim.contrib.ev.data.Charger;
 import org.matsim.contrib.ev.data.ElectricVehicle;

@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.vsp.edvrp.edrt.run;
+package org.matsim.contrib.edrt.run;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;

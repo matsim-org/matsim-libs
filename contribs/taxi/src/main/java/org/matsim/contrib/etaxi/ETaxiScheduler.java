@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.edvrp.etaxi;
+package org.matsim.contrib.etaxi;
 
 import com.google.inject.name.Named;
 import org.matsim.api.core.v01.network.Link;

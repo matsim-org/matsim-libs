@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.edvrp.etaxi.run;
+package org.matsim.contrib.etaxi.run;
 
 import org.junit.Test;
 

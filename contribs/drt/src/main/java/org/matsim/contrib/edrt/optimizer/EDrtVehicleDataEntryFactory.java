@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.edvrp.edrt.optimizer;
+package org.matsim.contrib.edrt.optimizer;
 
 import com.google.inject.Provider;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;

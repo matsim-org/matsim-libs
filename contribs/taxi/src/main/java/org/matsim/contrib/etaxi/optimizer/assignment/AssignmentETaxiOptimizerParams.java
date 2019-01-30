@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.edvrp.etaxi.optimizer.assignment;
+package org.matsim.contrib.etaxi.optimizer.assignment;
 
 import org.apache.commons.configuration.Configuration;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;

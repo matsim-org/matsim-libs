@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.edvrp.etaxi.optimizer;
+package org.matsim.contrib.etaxi.optimizer;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.ev.data.Charger;

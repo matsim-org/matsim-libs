@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.edvrp.etaxi;
+package org.matsim.contrib.etaxi;
 
 import com.google.inject.Inject;
 import org.matsim.contrib.dvrp.data.Vehicle;

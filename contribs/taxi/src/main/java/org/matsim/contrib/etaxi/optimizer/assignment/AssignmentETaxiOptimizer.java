@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.edvrp.etaxi.optimizer.assignment;
+package org.matsim.contrib.etaxi.optimizer.assignment;
 
 import com.google.common.collect.Maps;
 import org.matsim.api.core.v01.Id;

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.edvrp.etaxi.optimizer.assignment;
+package org.matsim.contrib.etaxi.optimizer.assignment;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;

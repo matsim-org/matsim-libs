@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.edvrp.edrt.scheduler;
+package org.matsim.contrib.edrt.scheduler;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;

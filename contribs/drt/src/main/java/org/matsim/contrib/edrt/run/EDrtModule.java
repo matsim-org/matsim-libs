@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.vsp.edvrp.edrt.run;
+package org.matsim.contrib.edrt.run;
 
 import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
 import org.matsim.contrib.drt.routing.DrtMainModeIdentifier;
