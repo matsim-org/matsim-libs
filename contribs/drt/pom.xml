@@ -24,6 +24,11 @@
 			<artifactId>dvrp</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
-	</dependencies>
 
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>ev</artifactId>
+			<version>0.11.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
 </project>
