@@ -1,19 +1,16 @@
 package lsp.controler;
 
-import java.util.Collection;
-
-import org.matsim.contrib.freight.CarrierConfig;
-import org.matsim.core.controler.AbstractModule;
-
 import com.google.inject.Provides;
-import com.google.inject.multibindings.Multibinder;
-
 import lsp.LSPs;
 import lsp.events.EventCreator;
 import lsp.mobsim.CarrierResourceTracker;
 import lsp.mobsim.FreightQSimFactory;
 import lsp.replanning.LSPReplanningModule;
 import lsp.scoring.LSPScoringModule;
+import org.matsim.contrib.freight.CarrierConfigGroup;
+import org.matsim.core.controler.AbstractModule;
+
+import java.util.Collection;
 
 
 public class LSPModule extends AbstractModule {
@@ -24,7 +21,7 @@ public class LSPModule extends AbstractModule {
 	private LSPScoringModule scoringModule;
 	private Collection<EventCreator> creators;
 	
-	private CarrierConfig carrierConfig = new CarrierConfig();
+	private CarrierConfigGroup carrierConfig = new CarrierConfigGroup();
 	
 	public LSPModule(LSPs  lsps, LSPReplanningModule replanningModule, LSPScoringModule scoringModule, Collection<EventCreator> creators) {
 	   this.lsps = lsps;
@@ -36,7 +33,7 @@ public class LSPModule extends AbstractModule {
 		    
 	@Override
 	public void install() {
-		bind(CarrierConfig.class).toInstance(carrierConfig);
+		bind(CarrierConfigGroup.class).toInstance(carrierConfig);
 		bind(LSPs.class).toInstance(lsps);
         if(replanningModule != null) {
         	bind(LSPReplanningModule.class).toInstance(replanningModule);

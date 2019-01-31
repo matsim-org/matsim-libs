@@ -11,7 +11,8 @@
 	<description>freight-dfg17 internal data not to be put on public github matsim/freight-contrib repository</description>
 
 	<properties>
-	  <matsim.version>0.11.0-2018w49</matsim.version>
+		<!--<matsim.version>0.11.0-2018w49</matsim.version>-->
+		<matsim.version>0.11.0-SNAPSHOT</matsim.version>
 	</properties>
 
 	<repositories>
