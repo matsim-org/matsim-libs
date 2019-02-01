@@ -14,7 +14,7 @@ import org.matsim.vehicles.VehicleType;
 public final class TravelDisutilities {
 	
 	public static TravelDisutility createBaseDisutility(final CarrierVehicleTypes vehicleTypes, final TravelTime travelTime){
-		
+
 		return new TravelDisutility() {
 
 			@Override
