@@ -43,7 +43,7 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 
 	private long randomSeed = 4711L;
 	private int numberOfThreads = 2;
-	private String coordinateSystem = "Atlantis";
+	private String coordinateSystem = null ; // this used to be "Atlantis" until feb'19.  kai
 	
 	@Override
 	public Map<String, String> getComments() {

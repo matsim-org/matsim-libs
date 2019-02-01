@@ -42,7 +42,7 @@ import com.google.inject.Inject;
  * 
  * @author tthunig
  */
-public class QSignalsNetworkFactory extends QNetworkFactory{
+public class QSignalsNetworkFactory implements QNetworkFactory{
 
 	private final QNetworkFactory delegate;
 	
@@ -63,7 +63,7 @@ public class QSignalsNetworkFactory extends QNetworkFactory{
 	}
 	
 	@Override
-	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface simEngine1) {
+	public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface simEngine1 ) {
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( scenario.getConfig().qsim().getLinkWidthForVis() );
 		linkWidthCalculator.setLaneWidth( scenario.getNetwork().getEffectiveLaneWidth() );
@@ -78,7 +78,7 @@ public class QSignalsNetworkFactory extends QNetworkFactory{
 	}
 
 	@Override
-	QNodeI createNetsimNode(Node node) {
+	public QNodeI createNetsimNode( Node node ) {
 		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
 		
 		// check whether turn acceptance logic is enabled
@@ -94,7 +94,7 @@ public class QSignalsNetworkFactory extends QNetworkFactory{
 	}
 
 	@Override
-	QLinkI createNetsimLink(Link link, QNodeI queueNode) {
+	public QLinkI createNetsimLink( Link link, QNodeI queueNode ) {
 		return delegate.createNetsimLink(link, queueNode);
 	}
 
