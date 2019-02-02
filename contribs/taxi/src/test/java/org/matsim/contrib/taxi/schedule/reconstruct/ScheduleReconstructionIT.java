@@ -26,8 +26,11 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -40,12 +43,16 @@ import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.name.Named;
 
 public class ScheduleReconstructionIT {
 	@Rule
@@ -68,16 +75,30 @@ public class ScheduleReconstructionIT {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setDumpDataAtEnd(false);
 
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 		Controler controler = RunTaxiBenchmark.createControler(config, 1);
-		controler.addOverridingModule(new AbstractModule() {
+		controler.addOverridingModule(new AbstractDvrpModeModule(taxiCfg.getMode()) {
 			@Override
 			public void install() {
-				bind(ScheduleReconstructor.class).asEagerSingleton();
+				bindModal(ScheduleReconstructor.class).toProvider(new Provider<ScheduleReconstructor>() {
+					@Inject
+					private @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
+					Network network;
+
+					@Inject
+					private EventsManager eventsManager;
+
+					@Override
+					public ScheduleReconstructor get() {
+						return new ScheduleReconstructor(network, eventsManager, getMode());
+					}
+				}).asEagerSingleton();
 			}
 		});
 		controler.run();
 
-		ScheduleReconstructor scheduleReconstructor = controler.getInjector().getInstance(ScheduleReconstructor.class);
+		ScheduleReconstructor scheduleReconstructor = controler.getInjector()
+				.getInstance(DvrpModes.key(ScheduleReconstructor.class, taxiCfg.getMode()));
 
 		String mode = TaxiConfigGroup.get(config).getMode();
 		Fleet fleet = controler.getInjector().getInstance(DvrpModes.key(Fleet.class, mode));
