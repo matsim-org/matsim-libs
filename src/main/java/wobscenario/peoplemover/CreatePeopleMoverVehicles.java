@@ -29,8 +29,9 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.data.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -55,7 +56,7 @@ public class CreatePeopleMoverVehicles {
 		int seats = 8;
 		String networkfile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/networkpt-av-mar17.xml";
 		String taxisFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/peoplemover/testscenario/pm_"+numberofVehicles+".xml";
-		List<Vehicle> vehicles = new ArrayList<>();
+		List<DvrpVehicleSpecification> vehicles = new ArrayList<>();
 		Random random = MatsimRandom.getLocalInstance();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfile);
 		List<Id<Link>> allLinks = new ArrayList<>();
@@ -68,11 +69,17 @@ public class CreatePeopleMoverVehicles {
 			}
 			while (!startLink.getAllowedModes().contains("av"));
 			//for multi-modal networks: Only links where cars can ride should be used.
-			Vehicle v = new VehicleImpl(Id.create("taxi"+i, Vehicle.class), startLink, seats, operationStartTime, operationEndTime);
+			DvrpVehicleSpecification v = ImmutableDvrpVehicleSpecification.newBuilder()
+					.id(Id.create("taxi" + i, Vehicle.class))
+					.startLinkId(startLink.getId())
+					.capacity(seats)
+					.serviceBeginTime(operationStartTime)
+					.serviceEndTime(operationEndTime)
+					.build();
 		    vehicles.add(v);    
 			
 		}
-		new VehicleWriter(vehicles).write(taxisFile);
+		new VehicleWriter(vehicles.stream()).write(taxisFile);
 	}
 
 }

@@ -22,21 +22,22 @@
  */
 package vwExamples.utils;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.data.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 /**
  * @author saxer
@@ -66,7 +67,7 @@ public class CreatePeopleMoverVehicles {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         String networkfolder = new File(networkfilePath).getParent();
         String drtFleetFile = networkfolder + "/../fleets/fleet.xml.gz";
-        List<Vehicle> vehicles = new ArrayList<>();
+        List<DvrpVehicleSpecification> vehicles = new ArrayList<>();
         Random random = MatsimRandom.getLocalInstance();
         new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfilePath);
         List<Id<Link>> allLinks = new ArrayList<>();
@@ -79,12 +80,18 @@ public class CreatePeopleMoverVehicles {
             }
             while (!startLink.getAllowedModes().contains(drtTag));
             //for multi-modal networks: Only links where cars can ride should be used.
-            Vehicle v = new VehicleImpl(Id.create("drt" + i, Vehicle.class), startLink, seats, operationStartTime, operationEndTime);
+            DvrpVehicleSpecification v = ImmutableDvrpVehicleSpecification.newBuilder()
+                    .id(Id.create("drt" + i, Vehicle.class))
+                    .startLinkId(startLink.getId())
+                    .capacity(seats)
+                    .serviceBeginTime(operationStartTime)
+                    .serviceEndTime(operationEndTime)
+                    .build();
             vehicles.add(v);
 
         }
         new File(new File(drtFleetFile).getParent()).mkdirs();
-        new VehicleWriter(vehicles).write(drtFleetFile);
+        new VehicleWriter(vehicles.stream()).write(drtFleetFile);
 
     }
 
