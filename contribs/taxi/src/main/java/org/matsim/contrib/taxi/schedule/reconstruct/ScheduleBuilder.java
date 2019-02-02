@@ -55,17 +55,14 @@ public class ScheduleBuilder {
 	void addStay(Stay stay) {
 		switch (stay.activityType) {
 			case TaxiActionCreator.STAY_ACTIVITY_TYPE:
-			case "Stay":// old naming (TODO to be removed soon)
 				vehicle.getSchedule().addTask(new TaxiStayTask(stay.startTime, stay.endTime, stay.link));
 				return;
 
 			case TaxiActionCreator.PICKUP_ACTIVITY_TYPE:
-			case "PassengerPickup":// old naming (TODO to be removed soon)
 				vehicle.getSchedule().addTask(new TaxiPickupTask(stay.startTime, stay.endTime, currentRequest));
 				return;
 
 			case TaxiActionCreator.DROPOFF_ACTIVITY_TYPE:
-			case "PassengerDropoff":// old naming (TODO to be removed soon)
 				// TODO setting 'toLink' should be moved to RequestRecorder once the events are re-ordered
 				((TaxiRequestWithModifiableToLink)currentRequest).setToLink(stay.link);
 				vehicle.getSchedule().addTask(new TaxiDropoffTask(stay.startTime, stay.endTime, currentRequest));

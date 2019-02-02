@@ -19,11 +19,14 @@
 
 package org.matsim.contrib.taxi.schedule.reconstruct;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -59,9 +62,7 @@ public class StayRecorder implements ActivityStartEventHandler, ActivityEndEvent
 		ScheduleBuilder builder = reconstructor.scheduleBuilders.get(personId);
 
 		if (builder != null) {
-			if (event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE)
-					|| event.getActType().equals("After schedule") // old naming (TODO to be removed soon)
-			) {
+			if (event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE)) {
 				builder.endSchedule(event.getTime());
 			} else {
 				Link link = reconstructor.links.get(event.getLinkId());
@@ -78,9 +79,7 @@ public class StayRecorder implements ActivityStartEventHandler, ActivityEndEvent
 		if (stay != null) {
 			stay.endTime = event.getTime();
 			reconstructor.scheduleBuilders.get(personId).addStay(stay);
-		} else if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)
-				|| event.getActType().equals("Before schedule") // old naming (TODO to be removed soon)
-		) {
+		} else if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)) {
 			Link startLink = reconstructor.links.get(event.getLinkId());
 			reconstructor.scheduleBuilders.put(personId,
 					new ScheduleBuilder(reconstructor.fleet, personId, startLink, event.getTime()));
