@@ -43,7 +43,8 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 
 	private long randomSeed = 4711L;
 	private int numberOfThreads = 2;
-	private String coordinateSystem = null ; // this used to be "Atlantis" until feb'19.  kai
+	private String coordinateSystem = "Atlantis" ;
+	// see https://matsim.atlassian.net/browse/MATSIM-898
 	
 	@Override
 	public Map<String, String> getComments() {
