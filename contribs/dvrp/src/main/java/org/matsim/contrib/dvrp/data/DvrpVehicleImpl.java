@@ -41,7 +41,7 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 
 	// time window
 	private final double serviceBeginTime;
-	private double serviceEndTime;
+	private final double serviceEndTime;
 
 	private Schedule schedule;
 
@@ -53,7 +53,7 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 		this.serviceBeginTime = serviceBeginTime;
 		this.serviceEndTime = serviceEndTime;
 
-		schedule = new ScheduleImpl(this);
+		schedule = new ScheduleImpl(createSpecification(this));
 	}
 
 	@Override
@@ -102,6 +102,16 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 
 	@Override
 	public void resetSchedule() {
-		schedule = new ScheduleImpl(this);
+		schedule = new ScheduleImpl(createSpecification(this));
+	}
+
+	private static DvrpVehicleSpecification createSpecification(DvrpVehicleImpl vehicle) {
+		return ImmutableDvrpVehicleSpecification.newBuilder()
+				.id(vehicle.id)
+				.startLinkId(vehicle.startLink.getId())
+				.capacity(vehicle.capacity)
+				.serviceBeginTime(vehicle.serviceBeginTime)
+				.serviceEndTime(vehicle.serviceEndTime)
+				.build();
 	}
 }
