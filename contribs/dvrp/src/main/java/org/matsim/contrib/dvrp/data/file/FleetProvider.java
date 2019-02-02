@@ -19,6 +19,7 @@
 package org.matsim.contrib.dvrp.data.file;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.DefaultFleetSpecification;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
@@ -48,8 +49,8 @@ public class FleetProvider implements Provider<Fleet> {
 
 	@Override
 	public Fleet get() {
-		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(network, fleet).parse(ConfigGroup.getInputFileURL(config.getContext(), file));
-		return fleet;
+		DefaultFleetSpecification fleetSpecification = new DefaultFleetSpecification();
+		new VehicleReader(fleetSpecification).parse(ConfigGroup.getInputFileURL(config.getContext(), file));
+		return FleetImpl.create(fleetSpecification, network.getLinks()::get);
 	}
 }

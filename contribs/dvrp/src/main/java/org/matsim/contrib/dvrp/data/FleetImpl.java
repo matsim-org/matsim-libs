@@ -19,14 +19,28 @@
 
 package org.matsim.contrib.dvrp.data;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.util.LinkProvider;
 
 /**
  * @author michalm
  */
 public class FleetImpl implements Fleet {
+	public static Fleet create(FleetSpecification fleetSpecification, LinkProvider<Id<Link>> linkProvider) {
+		FleetImpl fleet = new FleetImpl();
+		fleetSpecification.getSpecifications()
+				.values()
+				.stream()
+				.map(s -> VehicleImpl.createFromSpecification(s, linkProvider))
+				.forEach(fleet::addVehicle);
+		return fleet;
+	}
+
 	private final Map<Id<Vehicle>, Vehicle> vehicles = new LinkedHashMap<>();
 
 	@Override

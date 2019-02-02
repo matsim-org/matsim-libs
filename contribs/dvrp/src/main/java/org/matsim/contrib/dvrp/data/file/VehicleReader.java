@@ -19,18 +19,15 @@
 
 package org.matsim.contrib.dvrp.data.file;
 
+import java.util.Stack;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.FleetImpl;
+import org.matsim.contrib.dvrp.data.DefaultFleetSpecification;
+import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.data.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-
-import java.util.Map;
-import java.util.Objects;
-import java.util.Stack;
 
 /**
  * @author michalm
@@ -42,18 +39,16 @@ public class VehicleReader extends MatsimXmlParser {
 	private static final double DEFAULT_T_0 = 0;
 	private static final double DEFAULT_T_1 = 24 * 60 * 60;
 
-	private final FleetImpl fleet;
-	private final Map<Id<Link>, ? extends Link> links;
+	private final DefaultFleetSpecification fleet;
 
-	public VehicleReader(Network network, FleetImpl fleet) {
+	public VehicleReader(DefaultFleetSpecification fleet) {
 		this.fleet = fleet;
-		links = network.getLinks();
 	}
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (VEHICLE.equals(name)) {
-			fleet.addVehicle(createVehicle(atts));
+			fleet.addSpecification(createSpecification(atts));
 		}
 	}
 
@@ -61,22 +56,20 @@ public class VehicleReader extends MatsimXmlParser {
 	public void endTag(String name, String content, Stack<String> context) {
 	}
 
-	private Vehicle createVehicle(Attributes atts) {
-		Id<Vehicle> id = Id.create(atts.getValue("id"), Vehicle.class);
-		Link startLink = Objects.requireNonNull(links.get(Id.createLinkId(atts.getValue("start_link"))));
-        double cap = ReaderUtils.getDouble(atts, "capacity", DEFAULT_CAPACITY);
-        int capacity = (int) cap;
-        if (capacity != cap) {
-            throw new IllegalArgumentException("capacity must be an Integer value");
-        }
-		//for backwards compatibility when reading files. capacity used be double
-		double t0 = ReaderUtils.getDouble(atts, "t_0", DEFAULT_T_0);
-		double t1 = ReaderUtils.getDouble(atts, "t_1", DEFAULT_T_1);
-		return createVehicle(id, startLink, capacity, t0, t1, atts);
-	}
+	private DvrpVehicleSpecification createSpecification(Attributes atts) {
+		double capacity = ReaderUtils.getDouble(atts, "capacity", DEFAULT_CAPACITY);
+		int integerCapacity = (int)capacity;
+		if (integerCapacity != capacity) {
+			//for backwards compatibility: use double when reading files (capacity used to be double)
+			throw new IllegalArgumentException("capacity must be an integer value");
+		}
 
-	protected Vehicle createVehicle(Id<Vehicle> id, Link startLink, int capacity, double t0, double t1,
-			Attributes atts) {
-		return new VehicleImpl(id, startLink, capacity, t0, t1);
+		return ImmutableDvrpVehicleSpecification.newBuilder()
+				.id(Id.create(atts.getValue("id"), Vehicle.class))
+				.startLinkId(Id.createLinkId(atts.getValue("start_link")))
+				.capacity(integerCapacity)
+				.serviceBeginTime(ReaderUtils.getDouble(atts, "t_0", DEFAULT_T_0))
+				.serviceEndTime(ReaderUtils.getDouble(atts, "t_1", DEFAULT_T_1))
+				.build();
 	}
 }
