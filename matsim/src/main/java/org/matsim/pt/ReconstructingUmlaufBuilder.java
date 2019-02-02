@@ -110,7 +110,7 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 
 	private void createUmlaufStuecke() {
 		this.umlaufStuecke = new ArrayList<>();
-		log.info("Generating UmlaufStuecke");
+		log.info("Generating UmlaufStuecke ...");
 		int cnt = 0;
 		for (TransitLine line : transitLines) {
 			for (TransitRoute route : line.getRoutes().values()) {
@@ -123,6 +123,7 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 				}
 			}
 		}
+		log.info("... done generating UmlaufStuecke");
 		Collections.sort(this.umlaufStuecke, departureTimeComparator);
 	}
 	

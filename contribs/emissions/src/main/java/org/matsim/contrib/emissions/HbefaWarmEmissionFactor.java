@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HbefaVehicleCategory.java
+ * HbefaWarmEmissionFactor.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,10 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.types;
+package org.matsim.contrib.emissions;
+
 
 /**
  * @author benjamin
  *
  */
-public enum HbefaVehicleCategory { PASSENGER_CAR, HEAVY_GOODS_VEHICLE, ZERO_EMISSION_VEHICLE, MOTORCYCLE; }
+class HbefaWarmEmissionFactor {
+
+	private double speed;
+	private double warmEmissionFactor;
+
+	public HbefaWarmEmissionFactor(){
+	}
+
+	public double getSpeed() {
+		return speed;
+	}
+	
+	public void setSpeed(double speed) {
+		this.speed = speed;
+	}
+	
+	public double getWarmEmissionFactor() {
+		return this.warmEmissionFactor;
+	}
+	
+	public void setWarmEmissionFactor(double warmEmissionFactor) {
+		this.warmEmissionFactor = warmEmissionFactor;
+	}
+}

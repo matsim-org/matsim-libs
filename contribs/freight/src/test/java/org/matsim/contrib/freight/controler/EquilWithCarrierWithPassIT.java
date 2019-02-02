@@ -25,6 +25,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.freight.Freight;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.Carriers;
@@ -32,30 +34,27 @@ import org.matsim.contrib.freight.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class EquilWithCarrierWithPassIT {
-	
-	Controler controler;
 
-	private String planFile;
+	Controler controler;
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Before
-	public void setUp() throws Exception{
-		String NETWORK_FILENAME = testUtils.getClassInputDirectory() + "network.xml";
-		String PLANS_FILENAME = testUtils.getClassInputDirectory() + "plans100.xml";
-		Config config = new Config();
-		config.addCoreModules();
-		
+	public void setUp(){
+		Config config = ConfigUtils.createConfig() ;
 		ActivityParams workParams = new ActivityParams("w");
 		workParams.setTypicalDuration(60 * 60 * 8);
 		config.planCalcScore().addActivityParams(workParams);
@@ -66,8 +65,8 @@ public class EquilWithCarrierWithPassIT {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(2);
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config.network().setInputFile(NETWORK_FILENAME);
-		config.plans().setInputFile(PLANS_FILENAME);
+		config.network().setInputFile( testUtils.getClassInputDirectory() + "network.xml" );
+		config.plans().setInputFile( testUtils.getClassInputDirectory() + "plans100.xml" );
 		StrategySettings bestScore = new StrategySettings();
 		bestScore.setStrategyName("BestScore");
 		bestScore.setWeight(1.0);
@@ -78,17 +77,21 @@ public class EquilWithCarrierWithPassIT {
 		config.strategy().setMaxAgentPlanMemorySize(5);
 		config.strategy().addStrategySettings(bestScore);
 		config.strategy().addStrategySettings(reRoute);
-		controler = new Controler(config);
+
+		Scenario scenario = ScenarioUtils.loadScenario( config );
+		Carriers carriers = new Carriers();
+		new CarrierPlanXmlReaderV2(carriers).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
+		scenario.addScenarioElement( FreightUtils.CARRIERS, carriers );
+
+		controler = new Controler(scenario);
 		controler.getConfig().controler().setWriteEventsInterval(1);
-        controler.getConfig().controler().setCreateGraphs(false);
-		planFile = testUtils.getClassInputDirectory() + "carrierPlansEquils.xml";
+		controler.getConfig().controler().setCreateGraphs(false);
 	}
 
 	@Test
 	public void testScoringInMeters(){
-		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).readFile(planFile);
-		controler.addOverridingModule(new CarrierModule(carriers));
+		//		controler.addOverridingModule(new CarrierModule(carriers));
+		Freight.configure( controler );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -100,10 +103,10 @@ public class EquilWithCarrierWithPassIT {
 		controler.run();
 
 		Carrier carrier1 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier1", Carrier.class));
-		Assert.assertEquals(-170000.0, carrier1.getSelectedPlan().getScore().doubleValue(), 0.0);
+		Assert.assertEquals(-170000.0, carrier1.getSelectedPlan().getScore(), 0.0 );
 
 		Carrier carrier2 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier2", Carrier.class));
-		Assert.assertEquals(-85000.0, carrier2.getSelectedPlan().getScore().doubleValue(), 0.0);
+		Assert.assertEquals(-85000.0, carrier2.getSelectedPlan().getScore(), 0.0 );
 	}
 
 }

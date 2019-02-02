@@ -22,11 +22,17 @@
 
 package org.matsim.contrib.freight;
 
-public class CarrierConfig {
+import org.matsim.core.config.ReflectiveConfigGroup;
 
-    // Not a real config group yet, but could be one.
+public class CarrierConfigGroup extends ReflectiveConfigGroup {
 
-    private boolean physicallyEnforceTimeWindowBeginnings;
+    public static final String GROUPNAME="carrier" ;
+
+    private boolean physicallyEnforceTimeWindowBeginnings = true ;
+
+    public CarrierConfigGroup(  ){
+        super( GROUPNAME );
+    }
 
     public boolean getPhysicallyEnforceTimeWindowBeginnings() {
         return physicallyEnforceTimeWindowBeginnings;

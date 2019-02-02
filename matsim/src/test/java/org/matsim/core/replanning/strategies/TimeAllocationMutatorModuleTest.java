@@ -18,9 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.replanning.modules;
-
-import javax.inject.Provider;
+package org.matsim.core.replanning.strategies;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -43,6 +41,7 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.core.population.algorithms.PlanMutateTimeAllocationSimplified;
 import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
+import org.matsim.core.replanning.strategies.TimeAllocationMutatorModule;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -50,13 +49,15 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestCase;
 
+import javax.inject.Provider;
+
 /**
- * Tests the functionality of {@link TimeAllocationMutator}, mainly that the
+ * Tests the functionality of {@link TimeAllocationMutatorModule}, mainly that the
  * correct mutation range is handed over to the underlying {@link PlanMutateTimeAllocation}.
  *
  * @author mrieser
  */
-public class TimeAllocationMutatorTest extends MatsimTestCase {
+public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 
 	/**
 	 * Tests that the mutation range given in the constructor is respected.
@@ -101,11 +102,11 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		
 		Provider<TripRouter> tripRouterProvider = null;
 		
-		TimeAllocationMutator mutator = new TimeAllocationMutator(tripRouterProvider, config.plans(), config.timeAllocationMutator(), config.global());
+		TimeAllocationMutatorModule mutator = new TimeAllocationMutatorModule(tripRouterProvider, config.plans(), config.timeAllocationMutator(), config.global());
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		TimeAllocationMutator cbMutator = new TimeAllocationMutator(tripRouterProvider, config.plans(), config.timeAllocationMutator(), config.global(), scenario.getPopulation());
+		TimeAllocationMutatorModule cbMutator = new TimeAllocationMutatorModule(tripRouterProvider, config.plans(), config.timeAllocationMutator(), config.global(), scenario.getPopulation());
 //		assertEquals(false, cbMutator.affectingDuration);
 //		assertEquals(100.0, cbMutator.mutationRange);
 //		

@@ -33,7 +33,7 @@ import java.util.Collection;
 import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.CarrierConfig;
+import org.matsim.contrib.freight.CarrierConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -49,10 +49,10 @@ public class FreightQSimFactory implements Provider<Mobsim> {
 	private final Scenario scenario;
 	private EventsManager eventsManager;
 	private CarrierAgentTracker carrierAgentTracker;
-	private CarrierConfig carrierConfig;
+	private CarrierConfigGroup carrierConfig;
 
 	@Inject
-	public FreightQSimFactory(Scenario scenario, EventsManager eventsManager, CarrierAgentTracker carrierAgentTracker, CarrierConfig carrierConfig) {
+	public FreightQSimFactory(Scenario scenario, EventsManager eventsManager, CarrierAgentTracker carrierAgentTracker, CarrierConfigGroup carrierConfig ) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.carrierAgentTracker = carrierAgentTracker;

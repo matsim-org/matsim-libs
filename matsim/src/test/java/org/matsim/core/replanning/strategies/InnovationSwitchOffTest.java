@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.core.replanning;
+package org.matsim.core.replanning.strategies;
 
 import com.google.inject.*;
 import org.junit.Assert;
@@ -39,9 +39,8 @@ import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModu
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.TimeAllocationMutator;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioByConfigModule;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -129,7 +128,7 @@ public class InnovationSwitchOffTest {
 					}
 				}));
 				install(new ScenarioByConfigModule());
-				final Provider<StrategyManager> strategyManagerProvider = binder().getProvider(StrategyManager.class);
+				final Provider<StrategyManager> strategyManagerProvider = binder().getProvider(StrategyManager.class );
 				addControlerListenerBinding().toInstance(new BeforeMobsimListener() {
 					@Override
 					public void notifyBeforeMobsim(BeforeMobsimEvent event) {
@@ -144,10 +143,12 @@ public class InnovationSwitchOffTest {
 							if (event.getIteration() == 12 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains(ReRoute.class.getSimpleName())) {
 								Assert.assertEquals(0., sm.getWeightsOfDefaultSubpopulation().get(ii), 0.000001);
 							}
-							if (event.getIteration() == 13 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains(TimeAllocationMutator.class.getSimpleName())) {
+							if (event.getIteration() == 13 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains(
+								  TimeAllocationMutatorModule.class.getSimpleName() )) {
 								Assert.assertEquals(0.1, sm.getWeightsOfDefaultSubpopulation().get(ii), 0.000001);
 							}
-							if (event.getIteration() == 14 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains(TimeAllocationMutator.class.getSimpleName())) {
+							if (event.getIteration() == 14 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains(
+								  TimeAllocationMutatorModule.class.getSimpleName() )) {
 								Assert.assertEquals(0.0, sm.getWeightsOfDefaultSubpopulation().get(ii), 0.000001);
 							}
 						}

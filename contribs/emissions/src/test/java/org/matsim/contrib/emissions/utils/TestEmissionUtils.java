@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.emissions.EmissionUtils;
 import org.matsim.contrib.emissions.types.Pollutant;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -110,7 +111,7 @@ public class TestEmissionUtils {
 		coldEmissions.put("NOx", cnxv);
 		coldEmissions.put("PM", cpmv);
 		
-		Map<String, Double> sum = EmissionUtils.sumUpEmissions(warmEmissions, coldEmissions);
+		Map<String, Double> sum = EmissionUtils.sumUpEmissions(warmEmissions, coldEmissions );
 
 		Double cov = sum.get(co);
 		Double c2v = sum.get(c2);

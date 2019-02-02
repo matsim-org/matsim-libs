@@ -17,13 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.types;
+package org.matsim.contrib.emissions;
 
 /**
  * @author benjamin
  *
  */
-public class HbefaColdEmissionFactor {
+class HbefaColdEmissionFactor {
 	// yy not sure if it really makes sense to have an object for this.  But at least it should be immutable
 	// (set from constructor). Going one step in that direction by introducing a corresponding constructor.
 	// kai, jul'18

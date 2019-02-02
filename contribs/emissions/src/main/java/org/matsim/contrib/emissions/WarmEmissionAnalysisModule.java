@@ -21,29 +21,22 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
-import org.matsim.contrib.emissions.types.*;
-import org.matsim.contrib.emissions.utils.EmissionSpecificationMarker;
-import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
-import static org.matsim.contrib.emissions.types.HbefaTrafficSituation.*;
-import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
+import static org.matsim.contrib.emissions.HbefaTrafficSituation.*;
 
 /**
  * @author benjamin
@@ -73,7 +66,6 @@ public final class WarmEmissionAnalysisModule {
 	private int saturatedCounter = 0;
 	private int heavyFlowCounter = 0;
 	private int stopGoCounter = 0;
-	private int fractionCounter = 0;
 	private int emissionEventCounter = 0;
 	
 	private double kmCounter = 0.0;
@@ -139,7 +131,6 @@ public final class WarmEmissionAnalysisModule {
 		freeFlowCounter = 0;
 		saturatedCounter = 0;
 		heavyFlowCounter = 0;
-		fractionCounter = 0;
 		stopGoCounter = 0;
 		emissionEventCounter = 0;
 		
@@ -258,7 +249,7 @@ public final class WarmEmissionAnalysisModule {
 		double freeFlowSpeed_kmh = freeVelocity * 3.6;
 		double averageSpeed_kmh = linkLength_km / travelTime_h;
 		
-		double ef_gpkm = 0.0;
+		double ef_gpkm;
 
 		if(averageSpeed_kmh <= 0.0){
 			throw new RuntimeException("Average speed has been calculated to 0.0 or a negative value. Aborting...");
@@ -272,86 +263,38 @@ public final class WarmEmissionAnalysisModule {
 			}
 		}
 
-		HbefaTrafficSituation trafficSituation;
-		double percentStopGo_km = 0;
-		if (ecg.getEmissionsComputationMethod() == AverageSpeed) {
-			trafficSituation = getTrafficSituation(efkey, averageSpeed_kmh, freeFlowSpeed_kmh);
-			efkey.setHbefaTrafficSituation(trafficSituation);
-		}
+		HbefaTrafficSituation trafficSituation = getTrafficSituation(efkey, averageSpeed_kmh, freeFlowSpeed_kmh);
+		efkey.setHbefaTrafficSituation(trafficSituation);
 
 		for (String warmPollutant : warmPollutants) {
 			double generatedEmissions;
 
 			efkey.setHbefaComponent(warmPollutant);
 
-			if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
-				efkey.setHbefaTrafficSituation(STOPANDGO);
-				percentStopGo_km = getFractionStopAndGo(vehicleId, freeFlowSpeed_kmh, averageSpeed_kmh, vehicleInformationTuple, efkey);
-				double efStopGo_gpkm = getEf(vehicleId, vehicleInformationTuple, efkey).getWarmEmissionFactor();
+			//TODO: opportunity for refactor of logic here jm oct '18
+			//The logic has changed here, now it will fall back to aggregate factors per traffic scenario, instead of if any scenarios are missing.
+			if(this.detailedHbefaWarmTable != null && this.detailedHbefaWarmTable.get(efkey) != null){
+					ef_gpkm = this.detailedHbefaWarmTable.get(efkey).getWarmEmissionFactor();
 
-				efkey.setHbefaTrafficSituation(FREEFLOW);
-				double percentFreeFlow_km = 1 - percentStopGo_km;
-				double efFreeFlow_gpkm = getEf(vehicleId, vehicleInformationTuple, efkey).getWarmEmissionFactor();
-				ef_gpkm = (percentFreeFlow_km * efFreeFlow_gpkm) + (percentStopGo_km * efStopGo_gpkm);
+			} else {
+				vehAttributesNotSpecifiedCnt++;
+				efkey.setHbefaVehicleAttributes(new HbefaVehicleAttributes()); //want to check for average vehicle
+				ef_gpkm = this.avgHbefaWarmTable.get(efkey).getWarmEmissionFactor();
 
-
-			} else if (ecg.getEmissionsComputationMethod() == AverageSpeed){
-				ef_gpkm = getEf(vehicleId, vehicleInformationTuple, efkey).getWarmEmissionFactor();
+				int maxWarnCnt = 3;
+				if(this.detailedHbefaWarmTable != null && vehAttributesNotSpecifiedCnt <= maxWarnCnt) {
+					logger.warn("Detailed vehicle attributes are not specified correctly for vehicle " + vehicleId + ": " +
+							"`" + vehicleInformationTuple.getSecond() + "'. Using fleet average values instead.");
+					if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+				}
 			}
 
 			generatedEmissions = linkLength_km * ef_gpkm;
 			warmEmissionsOfEvent.put(warmPollutant, generatedEmissions);
 		}
-		if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
-			incrementCountersFractional(linkLength_km, percentStopGo_km);
-		}
-		else if (ecg.getEmissionsComputationMethod() == AverageSpeed) {
-			incrementCountersAverage(efkey.getHbefaTrafficSituation(), linkLength_km);
-		}
-
+		incrementCounters(trafficSituation, linkLength_km);
 //		vehicleIdSet.add(personId);
 		return warmEmissionsOfEvent;
-	}
-
-	private double getFractionStopAndGo(Id<Vehicle> vehicleId,
-											 double freeFlowSpeed_kmh, double averageSpeed_kmh,
-											 Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple,
-											 HbefaWarmEmissionFactorKey efkey) {
-
-		efkey.setHbefaTrafficSituation(STOPANDGO);
-		double stopGoSpeedFromTable_kmh = getEf(vehicleId, vehicleInformationTuple, efkey).getSpeed();
-
-		double percentStopGo_km;
-
-		if((averageSpeed_kmh - freeFlowSpeed_kmh) >= -1.0) { // both speeds are assumed to be not very different > only freeFlow on link
-			percentStopGo_km = 0.0;
-		} else if ((averageSpeed_kmh - stopGoSpeedFromTable_kmh) <= 0.0) { // averageSpeed is less than stopGoSpeed > only stop&go on link
-			percentStopGo_km = 1.0;
-		} else {
-			percentStopGo_km = stopGoSpeedFromTable_kmh * (freeFlowSpeed_kmh - averageSpeed_kmh) / (averageSpeed_kmh * (freeFlowSpeed_kmh - stopGoSpeedFromTable_kmh));
-		}
-
-		return percentStopGo_km;
-	}
-
-	private HbefaWarmEmissionFactor getEf(Id<Vehicle> vehicleId, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey) {
-		HbefaWarmEmissionFactor ef;
-		//The logic has changed here, now it will fall back to aggregate factors per traffic scenario, instead of if any scenarios are missing.
-		if(this.detailedHbefaWarmTable != null && this.detailedHbefaWarmTable.get(efkey) != null){
-			ef = this.detailedHbefaWarmTable.get(efkey);
-        } else {
-            vehAttributesNotSpecifiedCnt++;
-            efkey.setHbefaVehicleAttributes(new HbefaVehicleAttributes()); //want to check for average vehicle
-			ef = this.avgHbefaWarmTable.get(efkey);
-
-            int maxWarnCnt = 3;
-            if(this.detailedHbefaWarmTable != null && vehAttributesNotSpecifiedCnt <= maxWarnCnt) {
-                logger.warn("Detailed vehicle attributes are not specified correctly for vehicle " + vehicleId + ": " +
-                        "`" + vehicleInformationTuple.getSecond() + "'. Using fleet average values instead.");
-                if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-            }
-        }
-		return ef;
 	}
 
 	//TODO: this is based on looking at the speeds in the HBEFA files, using an MFP, maybe from A.Loder would be nicer, jm  oct'18
@@ -380,24 +323,12 @@ public final class WarmEmissionAnalysisModule {
 		return trafficSituation;
 	}
 
+	private void incrementCounters(HbefaTrafficSituation trafficSituation, double linkLength_km) {
 
-	private void incrementCountersFractional(double linkLength_km, double fractionStopGo) {
 		kmCounter = kmCounter + linkLength_km;
 		emissionEventCounter++;
 
-		freeFlowKmCounter += linkLength_km * (1-fractionStopGo);
-		stopGoKmCounter += linkLength_km * fractionStopGo;
-
-		freeFlowCounter += 1-fractionStopGo;
-		stopGoCounter += fractionStopGo;
-		fractionCounter += (fractionStopGo < 1.0 && fractionStopGo > 0.0) ? 1 : 0;
-	}
-
-	private void incrementCountersAverage(HbefaTrafficSituation hbefaTrafficSituation, double linkLength_km) {
-		kmCounter = kmCounter + linkLength_km;
-		emissionEventCounter++;
-
-		switch (hbefaTrafficSituation) { // both speeds are assumed to be not very different > only freeFlow on link
+		switch(trafficSituation) { // both speeds are assumed to be not very different > only freeFlow on link
 			case FREEFLOW: {
 				freeFlowCounter++;
 				freeFlowKmCounter += linkLength_km;
@@ -418,6 +349,7 @@ public final class WarmEmissionAnalysisModule {
 				stopGoKmCounter += linkLength_km;
 				break;
 			}
+
 		}
 	}
 
@@ -487,10 +419,15 @@ public final class WarmEmissionAnalysisModule {
 		return emissionEventCounter;
 	}
 
+	@Deprecated
 	public int getFractionOccurences() {
-		return fractionCounter;
+		return getSaturatedOccurences() + getHeavyOccurences();
 	}
-
+	@Deprecated
+	public double getFractionKmCounter() {
+		return getSaturatedKmCounter() + getHeavyFlowKmCounter();
+	}
+  	
 	public EmissionsConfigGroup getEcg() {
 		return ecg;
 	}
