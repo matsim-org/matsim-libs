@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
  * @author Michal Maciejewski (michalm)
  */
 public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpecification {
-	private final Id<Vehicle> id;
+	private final Id<DvrpVehicle> id;
 	private final Id<Link> startLinkId;
 	private final int capacity;
 
@@ -60,7 +60,7 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 	}
 
 	@Override
-	public Id<Vehicle> getId() {
+	public Id<DvrpVehicle> getId() {
 		return id;
 	}
 
@@ -85,7 +85,7 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 	}
 
 	public static final class Builder {
-		private Id<Vehicle> id;
+		private Id<DvrpVehicle> id;
 		private Id<Link> startLinkId;
 		private int capacity;
 		private double serviceBeginTime;
@@ -94,7 +94,7 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 		private Builder() {
 		}
 
-		public Builder id(Id<Vehicle> val) {
+		public Builder id(Id<DvrpVehicle> val) {
 			id = val;
 			return this;
 		}

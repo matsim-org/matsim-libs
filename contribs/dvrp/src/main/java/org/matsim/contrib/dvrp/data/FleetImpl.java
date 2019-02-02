@@ -35,25 +35,24 @@ public class FleetImpl implements Fleet {
 		FleetImpl fleet = new FleetImpl();
 		fleetSpecification.getVehicleSpecifications()
 				.values()
-				.stream()
-				.map(s -> VehicleImpl.createFromSpecification(s, linkProvider))
+				.stream().map(s -> DvrpVehicleImpl.createFromSpecification(s, linkProvider))
 				.forEach(fleet::addVehicle);
 		return fleet;
 	}
 
-	private final Map<Id<Vehicle>, Vehicle> vehicles = new LinkedHashMap<>();
+	private final Map<Id<DvrpVehicle>, DvrpVehicle> vehicles = new LinkedHashMap<>();
 
 	@Override
-	public Map<Id<Vehicle>, ? extends Vehicle> getVehicles() {
+	public Map<Id<DvrpVehicle>, ? extends DvrpVehicle> getVehicles() {
 		return Collections.unmodifiableMap(vehicles);
 	}
 
-	public void addVehicle(Vehicle vehicle) {
+	public void addVehicle(DvrpVehicle vehicle) {
 		vehicles.put(vehicle.getId(), vehicle);
 	}
 
 	public void resetSchedules() {
-		for (Vehicle v : vehicles.values()) {
+		for (DvrpVehicle v : vehicles.values()) {
 			v.resetSchedule();
 		}
 	}

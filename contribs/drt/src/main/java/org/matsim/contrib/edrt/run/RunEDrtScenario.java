@@ -22,10 +22,11 @@ package org.matsim.contrib.edrt.run;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.FixedSpeedChargingStrategy;
@@ -37,7 +38,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 
 public class RunEDrtScenario {
 	private static final String CONFIG_FILE = "mielec_2014_02/mielec_edrt_config.xml";
@@ -82,7 +82,7 @@ public class RunEDrtScenario {
 				.setVehicleFile(drtCfg.getVehiclesFile());
 	}
 
-	private static boolean isTurnedOn(Vehicle vehicle) {
+	private static boolean isTurnedOn(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
 			DrtTaskType currentTaskType = ((DrtTask)schedule.getCurrentTask()).getDrtTaskType();

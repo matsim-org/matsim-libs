@@ -19,11 +19,13 @@
 
 package org.matsim.contrib.etaxi;
 
-import com.google.inject.name.Named;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -43,8 +45,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.inject.name.Named;
 
 public class ETaxiScheduler extends TaxiScheduler {
 
@@ -55,7 +56,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 	}
 
 	@Override
-	protected double calcNewEndTime(Vehicle vehicle, TaxiTask task, double newBeginTime) {
+	protected double calcNewEndTime(DvrpVehicle vehicle, TaxiTask task, double newBeginTime) {
 		if (task instanceof ETaxiChargingTask) {
 			// FIXME underestimated due to the ongoing AUX/drive consumption
 			double duration = task.getEndTime() - task.getBeginTime();
@@ -68,7 +69,8 @@ public class ETaxiScheduler extends TaxiScheduler {
 	// FIXME underestimated due to the ongoing AUX/drive consumption
 	// not a big issue for e-rule-based dispatching (no look ahead)
 	// more problematic for e-assignment dispatching
-	public void scheduleCharging(Vehicle vehicle, ElectricVehicle ev, Charger charger, VrpPathWithTravelData vrpPath) {
+	public void scheduleCharging(DvrpVehicle vehicle, ElectricVehicle ev, Charger charger,
+			VrpPathWithTravelData vrpPath) {
 		Schedule schedule = vehicle.getSchedule();
 		divertOrAppendDrive(schedule, vrpPath);
 
@@ -86,14 +88,14 @@ public class ETaxiScheduler extends TaxiScheduler {
 	// =========================================================================================
 
 	private boolean chargingTasksRemovalMode = false;
-	private List<Vehicle> vehiclesWithUnscheduledCharging;
+	private List<DvrpVehicle> vehiclesWithUnscheduledCharging;
 
 	public void beginChargingTaskRemoval() {
 		chargingTasksRemovalMode = true;
 		vehiclesWithUnscheduledCharging = new ArrayList<>();
 	}
 
-	public List<Vehicle> endChargingTaskRemoval() {
+	public List<DvrpVehicle> endChargingTaskRemoval() {
 		chargingTasksRemovalMode = false;
 		return vehiclesWithUnscheduledCharging;
 	}
@@ -134,7 +136,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 	//
 	// Maybe for a more complex algos we would like to interrupt charging tasks as well.
 	@Override
-	protected void removePlannedTasks(Vehicle vehicle, int newLastTaskIdx) {
+	protected void removePlannedTasks(DvrpVehicle vehicle, int newLastTaskIdx) {
 		Schedule schedule = vehicle.getSchedule();
 		List<? extends Task> tasks = schedule.getTasks();
 
@@ -167,7 +169,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 	}
 
 	@Override
-	protected void taskRemovedFromSchedule(Vehicle vehicle, TaxiTask task) {
+	protected void taskRemovedFromSchedule(DvrpVehicle vehicle, TaxiTask task) {
 		if (task instanceof ETaxiChargingTask) {
 			ETaxiChargingTask chargingTask = ((ETaxiChargingTask)task);
 			chargingTask.getChargingLogic().unassignVehicle(chargingTask.getElectricVehicle());

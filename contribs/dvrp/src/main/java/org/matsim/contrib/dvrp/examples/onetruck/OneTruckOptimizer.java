@@ -24,9 +24,9 @@ import java.util.List;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -58,7 +58,7 @@ final class OneTruckOptimizer implements VrpOptimizer {
 	private final TravelTime travelTime;
 	private final LeastCostPathCalculator router;
 
-	private final Vehicle vehicle;// we have only one vehicle
+	private final DvrpVehicle vehicle;// we have only one vehicle
 
 	private static final double PICKUP_DURATION = 120;
 	private static final double DELIVERY_DURATION = 60;
@@ -127,14 +127,14 @@ final class OneTruckOptimizer implements VrpOptimizer {
 	}
 
 	@Override
-	public void nextTask(Vehicle vehicle1) {
+	public void nextTask(DvrpVehicle vehicle1) {
 		updateTimings();
 		vehicle1.getSchedule().nextTask();
 	}
 
 	/**
 	 * Simplified version. For something more advanced, see
-	 * {@link org.matsim.contrib.taxi.scheduler.TaxiScheduler#updateBeforeNextTask(Vehicle)} in the taxi contrib
+	 * {@link org.matsim.contrib.taxi.scheduler.TaxiScheduler#updateBeforeNextTask(DvrpVehicle)} in the taxi contrib
 	 */
 	private void updateTimings() {
 		Schedule schedule = vehicle.getSchedule();

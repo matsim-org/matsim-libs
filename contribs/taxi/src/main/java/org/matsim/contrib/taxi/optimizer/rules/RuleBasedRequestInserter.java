@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
@@ -107,7 +107,7 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 		while (reqIter.hasNext() && idleCount > 0) {
 			TaxiRequest req = reqIter.next();
 
-			Stream<Vehicle> selectedVehs = idleCount > params.nearestVehiclesLimit//
+			Stream<DvrpVehicle> selectedVehs = idleCount > params.nearestVehiclesLimit//
 					? idleTaxiRegistry.findNearestVehicles(req.getFromLink().getFromNode(), params.nearestVehiclesLimit)
 					: idleTaxiRegistry.vehicles();
 
@@ -133,9 +133,9 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 
 	// vehicle-initiated scheduling
 	private void scheduleIdleVehiclesImpl(Collection<TaxiRequest> unplannedRequests) {
-		Iterator<Vehicle> vehIter = idleTaxiRegistry.vehicles().iterator();
+		Iterator<DvrpVehicle> vehIter = idleTaxiRegistry.vehicles().iterator();
 		while (vehIter.hasNext() && !unplannedRequests.isEmpty()) {
-			Vehicle veh = vehIter.next();
+			DvrpVehicle veh = vehIter.next();
 			Link link = ((TaxiStayTask)veh.getSchedule().getCurrentTask()).getLink();
 
 			Stream<TaxiRequest> selectedReqs = unplannedRequests.size() > params.nearestRequestsLimit

@@ -26,14 +26,14 @@ import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 
 /**
  * @author michalm
  */
 public class ScheduleImpl implements Schedule {
-	private final Vehicle vehicle;
+	private final DvrpVehicle vehicle;
 
 	private final List<AbstractTask> tasks = new ArrayList<>();
 	private final List<? extends Task> unmodifiableTasks = Collections.unmodifiableList(tasks);
@@ -41,7 +41,7 @@ public class ScheduleImpl implements Schedule {
 	private ScheduleStatus status = ScheduleStatus.UNPLANNED;
 	private AbstractTask currentTask = null;
 
-	public ScheduleImpl(Vehicle vehicle) {
+	public ScheduleImpl(DvrpVehicle vehicle) {
 		this.vehicle = vehicle;
 	}
 

@@ -22,10 +22,10 @@ package org.matsim.contrib.dvrp.data.file;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.data.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.data.ImmutableDvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -64,8 +64,7 @@ public class FleetReader extends MatsimXmlParser {
 			throw new IllegalArgumentException("capacity must be an integer value");
 		}
 
-		return ImmutableDvrpVehicleSpecification.newBuilder()
-				.id(Id.create(atts.getValue("id"), Vehicle.class))
+		return ImmutableDvrpVehicleSpecification.newBuilder().id(Id.create(atts.getValue("id"), DvrpVehicle.class))
 				.startLinkId(Id.createLinkId(atts.getValue("start_link")))
 				.capacity(integerCapacity)
 				.serviceBeginTime(ReaderUtils.getDouble(atts, "t_0", DEFAULT_T_0))

@@ -18,11 +18,13 @@
 
 package org.matsim.contrib.ev.dvrp;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
+import java.util.function.DoubleSupplier;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.ev.EvConfigGroup;
@@ -35,9 +37,8 @@ import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.core.controler.AbstractModule;
 
-import java.util.function.DoubleSupplier;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 /**
  * @author michalm
@@ -45,7 +46,7 @@ import java.util.function.Predicate;
 public class EvDvrpIntegrationModule extends AbstractModule {
     private Function<Charger, ChargingStrategy> chargingStrategyFactory;
     private DoubleSupplier temperatureProvider;
-    private Predicate<Vehicle> turnedOnPredicate;
+	private Predicate<DvrpVehicle> turnedOnPredicate;
 
     private final String mode;
     private String vehicleFile;
@@ -89,7 +90,7 @@ public class EvDvrpIntegrationModule extends AbstractModule {
         return this;
     }
 
-    public EvDvrpIntegrationModule setTurnedOnPredicate(Predicate<Vehicle> turnedOnPredicate) {
+	public EvDvrpIntegrationModule setTurnedOnPredicate(Predicate<DvrpVehicle> turnedOnPredicate) {
         this.turnedOnPredicate = turnedOnPredicate;
         return this;
     }

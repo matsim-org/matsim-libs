@@ -22,9 +22,9 @@ package org.matsim.contrib.taxi.schedule.reconstruct;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
@@ -36,11 +36,11 @@ import org.matsim.contrib.taxi.schedule.reconstruct.StayRecorder.Stay;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 
 public class ScheduleBuilder {
-	private VehicleImpl vehicle;
+	private DvrpVehicleImpl vehicle;
 	private TaxiRequest currentRequest = null;
 
 	ScheduleBuilder(FleetImpl fleet, Id<Person> personId, Link link, double t0) {
-		vehicle = new VehicleImpl(Id.create(personId, Vehicle.class), link, 1, t0, Double.NaN);
+		vehicle = new DvrpVehicleImpl(Id.create(personId, DvrpVehicle.class), link, 1, t0, Double.NaN);
 		fleet.addVehicle(vehicle);
 	}
 

@@ -28,14 +28,14 @@ import org.matsim.contrib.util.LinkProvider;
 /**
  * @author michalm
  */
-public class VehicleImpl implements Vehicle {
-	public static VehicleImpl createFromSpecification(DvrpVehicleSpecification specification,
+public class DvrpVehicleImpl implements DvrpVehicle {
+	public static DvrpVehicleImpl createFromSpecification(DvrpVehicleSpecification specification,
 			LinkProvider<Id<Link>> linkProvider) {
-		return new VehicleImpl(specification.getId(), linkProvider.apply(specification.getStartLinkId()),
+		return new DvrpVehicleImpl(specification.getId(), linkProvider.apply(specification.getStartLinkId()),
 				specification.getCapacity(), specification.getServiceBeginTime(), specification.getServiceEndTime());
 	}
 
-	private final Id<Vehicle> id;
+	private final Id<DvrpVehicle> id;
 	private Link startLink;
 	private final int capacity;
 
@@ -45,7 +45,8 @@ public class VehicleImpl implements Vehicle {
 
 	private Schedule schedule;
 
-	public VehicleImpl(Id<Vehicle> id, Link startLink, int capacity, double serviceBeginTime, double serviceEndTime) {
+	public DvrpVehicleImpl(Id<DvrpVehicle> id, Link startLink, int capacity, double serviceBeginTime,
+			double serviceEndTime) {
 		this.id = id;
 		this.startLink = startLink;
 		this.capacity = capacity;
@@ -56,7 +57,7 @@ public class VehicleImpl implements Vehicle {
 	}
 
 	@Override
-	public Id<Vehicle> getId() {
+	public Id<DvrpVehicle> getId() {
 		return id;
 	}
 

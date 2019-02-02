@@ -26,7 +26,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 /**
  * @author michalm
  */
-public interface Vehicle extends Identifiable<Vehicle> {
+public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
 
 	/**
 	 * @return the link at which vehicle starts operating (i.e. depot)

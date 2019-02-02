@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -52,7 +52,7 @@ public class DrtScheduleTimingUpdater {
 	 * Check and decide if the schedule should be updated due to if vehicle is Update timings (i.e. beginTime and
 	 * endTime) of all tasks in the schedule.
 	 */
-	public void updateBeforeNextTask(Vehicle vehicle) {
+	public void updateBeforeNextTask(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		// Assumption: there is no delay as long as the schedule has not been started (PLANNED)
 		if (schedule.getStatus() != ScheduleStatus.STARTED) {
@@ -62,7 +62,7 @@ public class DrtScheduleTimingUpdater {
 		updateTimingsStartingFromCurrentTask(vehicle, timer.getTimeOfDay());
 	}
 
-	public void updateTimings(Vehicle vehicle) {
+	public void updateTimings(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() != ScheduleStatus.STARTED) {
 			return;
@@ -72,7 +72,7 @@ public class DrtScheduleTimingUpdater {
 		updateTimingsStartingFromCurrentTask(vehicle, predictedEndTime);
 	}
 
-	private void updateTimingsStartingFromCurrentTask(Vehicle vehicle, double newEndTime) {
+	private void updateTimingsStartingFromCurrentTask(DvrpVehicle vehicle, double newEndTime) {
 		Schedule schedule = vehicle.getSchedule();
 		Task currentTask = schedule.getCurrentTask();
 		if (currentTask.getEndTime() != newEndTime) {
@@ -81,7 +81,7 @@ public class DrtScheduleTimingUpdater {
 		}
 	}
 
-	void updateTimingsStartingFromTaskIdx(Vehicle vehicle, int startIdx, double newBeginTime) {
+	void updateTimingsStartingFromTaskIdx(DvrpVehicle vehicle, int startIdx, double newBeginTime) {
 		Schedule schedule = vehicle.getSchedule();
 		List<? extends Task> tasks = schedule.getTasks();
 
@@ -102,7 +102,7 @@ public class DrtScheduleTimingUpdater {
 		}
 	}
 
-	private double calcNewEndTime(Vehicle vehicle, DrtTask task, double newBeginTime) {
+	private double calcNewEndTime(DvrpVehicle vehicle, DrtTask task, double newBeginTime) {
 		switch (task.getDrtTaskType()) {
 			case STAY: {
 				if (Schedules.getLastTask(vehicle.getSchedule()).equals(task)) {// last task

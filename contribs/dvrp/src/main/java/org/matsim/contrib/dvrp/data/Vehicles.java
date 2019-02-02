@@ -25,7 +25,7 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
  * @author michalm
  */
 public class Vehicles {
-	public static void changeStartLinkToLastLinkInSchedule(Vehicle vehicle) {
+	public static void changeStartLinkToLastLinkInSchedule(DvrpVehicle vehicle) {
 		vehicle.setStartLink(Schedules.getLastLinkInSchedule(vehicle));
 	}
 }

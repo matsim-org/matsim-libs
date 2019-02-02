@@ -23,12 +23,12 @@ import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 
 /**
  * @author michalm
  */
 public interface MinCostRelocationCalculator {
 	List<Relocation> calcRelocations(List<Pair<String, Integer>> supply, List<Pair<String, Integer>> demand,
-			Map<String, List<Vehicle>> rebalancableVehiclesPerZone);
+			Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone);
 }

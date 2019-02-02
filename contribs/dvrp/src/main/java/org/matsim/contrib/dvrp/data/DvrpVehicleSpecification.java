@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Link;
  * @author Michal Maciejewski (michalm)
  */
 public interface DvrpVehicleSpecification {
-	Id<Vehicle> getId();
+	Id<DvrpVehicle> getId();
 
 	Id<Link> getStartLinkId();
 

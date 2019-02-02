@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
  * @author michalm
  */
 public interface Fleet {
-	Map<Id<Vehicle>, ? extends Vehicle> getVehicles();
+	Map<Id<DvrpVehicle>, ? extends DvrpVehicle> getVehicles();
 
 	/**
 	 * 

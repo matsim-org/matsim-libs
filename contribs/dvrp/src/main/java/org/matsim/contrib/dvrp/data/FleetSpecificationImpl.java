@@ -31,10 +31,10 @@ import org.matsim.api.core.v01.Id;
  * @author Michal Maciejewski (michalm)
  */
 public final class FleetSpecificationImpl implements FleetSpecification {
-	private final Map<Id<Vehicle>, DvrpVehicleSpecification> specifications = new LinkedHashMap<>();
+	private final Map<Id<DvrpVehicle>, DvrpVehicleSpecification> specifications = new LinkedHashMap<>();
 
 	@Override
-	public Map<Id<Vehicle>, DvrpVehicleSpecification> getVehicleSpecifications() {
+	public Map<Id<DvrpVehicle>, DvrpVehicleSpecification> getVehicleSpecifications() {
 		return Collections.unmodifiableMap(specifications);
 	}
 

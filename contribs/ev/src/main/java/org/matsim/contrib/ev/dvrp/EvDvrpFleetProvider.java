@@ -19,11 +19,11 @@
 package org.matsim.contrib.ev.dvrp;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.FleetSpecificationImpl;
-import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.data.file.FleetReader;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.ev.data.ElectricFleet;
@@ -62,7 +62,7 @@ public class EvDvrpFleetProvider implements Provider<Fleet> {
 		FleetImpl evDvrpFleet = new FleetImpl();
 		for (DvrpVehicleSpecification s : fleetSpecification.getVehicleSpecifications().values()) {
 			evDvrpFleet.addVehicle(
-					EvDvrpVehicle.create(VehicleImpl.createFromSpecification(s, network.getLinks()::get), evFleet));
+					EvDvrpVehicle.create(DvrpVehicleImpl.createFromSpecification(s, network.getLinks()::get), evFleet));
 		}
 		return evDvrpFleet;
 	}

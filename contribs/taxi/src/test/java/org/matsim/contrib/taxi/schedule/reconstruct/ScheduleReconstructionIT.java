@@ -26,8 +26,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -92,14 +92,14 @@ public class ScheduleReconstructionIT {
 				scheduleReconstructor.taxiRequests.values());
 	}
 
-	private void compareVehicles(Collection<? extends Vehicle> originalVehs,
-			Collection<? extends Vehicle> reconstructedVehs) {
+	private void compareVehicles(Collection<? extends DvrpVehicle> originalVehs,
+			Collection<? extends DvrpVehicle> reconstructedVehs) {
 		Assert.assertNotEquals(originalVehs, reconstructedVehs);
 		Assert.assertEquals(originalVehs.size(), reconstructedVehs.size());
 
-		Iterator<? extends Vehicle> rIter = reconstructedVehs.iterator();
-		for (Vehicle o : originalVehs) {
-			Vehicle r = rIter.next();
+		Iterator<? extends DvrpVehicle> rIter = reconstructedVehs.iterator();
+		for (DvrpVehicle o : originalVehs) {
+			DvrpVehicle r = rIter.next();
 
 			Assert.assertEquals(o.getId(), r.getId());
 			Assert.assertEquals(o.getStartLink(), r.getStartLink());

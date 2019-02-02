@@ -23,14 +23,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 
 /**
  * @author michalm
  */
 public class NoRebalancingStrategy implements RebalancingStrategy {
 	@Override
-	public List<Relocation> calcRelocations(Stream<? extends Vehicle> rebalancableVehicles, double time) {
+	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
 		return Collections.emptyList();
 	}
 }
