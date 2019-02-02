@@ -170,6 +170,8 @@ public class DeterministicMultithreadedReplanningIT {
 		int lastIteration = 5;
 
 		Config config = testUtils.loadConfig("test/scenarios/equil/config.xml");
+		// yy this seems to be taking the input from the matsim-examples module.  No idea by what automagic it ends up there.  kai, feb'19
+
 		config.controler().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
 		config.plans().setInputFile(IOUtils.newUrl(testUtils.classInputResourcePath(), "plans1.xml").toString());
