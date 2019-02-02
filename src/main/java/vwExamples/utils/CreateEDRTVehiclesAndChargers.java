@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.data.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.file.VehicleWriter;
+import org.matsim.contrib.dvrp.data.file.FleetWriter;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.data.BatteryImpl;
 import org.matsim.contrib.ev.data.Charger;
@@ -116,7 +116,7 @@ public class CreateEDRTVehiclesAndChargers {
             chargers.add(charger);
 
         }
-        new VehicleWriter(vehicles.stream()).write(DRT_VEHICLE_FILE);
+        new FleetWriter(vehicles.stream()).write(DRT_VEHICLE_FILE);
         new ElectricVehicleWriter(evehicles).write(E_VEHICLE_FILE);
         new ChargerWriter(chargers).write(CHARGER_FILE);
     }

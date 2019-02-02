@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.data.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.file.VehicleWriter;
+import org.matsim.contrib.dvrp.data.file.FleetWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -79,7 +79,7 @@ public class CreatePeopleMoverVehicles {
 		    vehicles.add(v);    
 			
 		}
-		new VehicleWriter(vehicles.stream()).write(taxisFile);
+		new FleetWriter(vehicles.stream()).write(taxisFile);
 	}
 
 }

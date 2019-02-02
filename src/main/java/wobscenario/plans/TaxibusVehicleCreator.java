@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.data.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.file.VehicleWriter;
+import org.matsim.contrib.dvrp.data.file.FleetWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
@@ -77,7 +77,7 @@ public class TaxibusVehicleCreator
 		tvc.run(i, Id.createLinkId("40589"));
 		tvc.run(i, Id.createLinkId("55237"));
 
-		new VehicleWriter(tvc.vehicles.stream()).write(tvc.vehiclesFilePrefix + i + ".xml.gz");
+		new FleetWriter(tvc.vehicles.stream()).write(tvc.vehiclesFilePrefix + i + ".xml.gz");
 
 //		for (int i = 10; i<150 ; i=i+10 ){
 //			System.out.println(i);
@@ -108,7 +108,7 @@ public class TaxibusVehicleCreator
         vehicles.add(v);
 
 		}
-		new VehicleWriter(vehicles.stream()).write(vehiclesFilePrefix + amount + ".xml");
+		new FleetWriter(vehicles.stream()).write(vehiclesFilePrefix + amount + ".xml");
 	}
 	
 private void run(int amount, Id<Link> linkId) {
