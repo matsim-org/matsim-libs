@@ -24,7 +24,7 @@ import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.data.VehicleImpl;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.dvrp.data.file.FleetReader;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.ev.data.ElectricFleet;
 import org.matsim.core.config.Config;
@@ -57,7 +57,7 @@ public class EvDvrpFleetProvider implements Provider<Fleet> {
 	@Override
 	public Fleet get() {
 		FleetSpecificationImpl fleetSpecification = new FleetSpecificationImpl();
-		new VehicleReader(fleetSpecification).parse(ConfigGroup.getInputFileURL(config.getContext(), file));
+		new FleetReader(fleetSpecification).parse(ConfigGroup.getInputFileURL(config.getContext(), file));
 
 		FleetImpl evDvrpFleet = new FleetImpl();
 		for (DvrpVehicleSpecification s : fleetSpecification.getVehicleSpecifications().values()) {

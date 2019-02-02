@@ -50,7 +50,7 @@ public class FleetProvider implements Provider<Fleet> {
 	@Override
 	public Fleet get() {
 		FleetSpecificationImpl fleetSpecification = new FleetSpecificationImpl();
-		new VehicleReader(fleetSpecification).parse(ConfigGroup.getInputFileURL(config.getContext(), file));
+		new FleetReader(fleetSpecification).parse(ConfigGroup.getInputFileURL(config.getContext(), file));
 		return FleetImpl.create(fleetSpecification, network.getLinks()::get);
 	}
 }

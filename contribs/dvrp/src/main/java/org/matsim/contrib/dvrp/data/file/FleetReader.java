@@ -32,7 +32,7 @@ import org.xml.sax.Attributes;
 /**
  * @author michalm
  */
-public class VehicleReader extends MatsimXmlParser {
+public class FleetReader extends MatsimXmlParser {
 	private static final String VEHICLE = "vehicle";
 
 	private static final int DEFAULT_CAPACITY = 1;
@@ -41,7 +41,7 @@ public class VehicleReader extends MatsimXmlParser {
 
 	private final FleetSpecificationImpl fleet;
 
-	public VehicleReader(FleetSpecificationImpl fleet) {
+	public FleetReader(FleetSpecificationImpl fleet) {
 		this.fleet = fleet;
 	}
 
