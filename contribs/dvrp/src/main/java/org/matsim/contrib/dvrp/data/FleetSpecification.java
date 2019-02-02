@@ -30,5 +30,5 @@ import org.matsim.api.core.v01.Id;
  * @author Michal Maciejewski (michalm)
  */
 public interface FleetSpecification {
-	Map<Id<Vehicle>, DvrpVehicleSpecification> getSpecifications();
+	Map<Id<Vehicle>, DvrpVehicleSpecification> getVehicleSpecifications();
 }

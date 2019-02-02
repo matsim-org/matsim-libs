@@ -33,7 +33,7 @@ import org.matsim.contrib.util.LinkProvider;
 public class FleetImpl implements Fleet {
 	public static Fleet create(FleetSpecification fleetSpecification, LinkProvider<Id<Link>> linkProvider) {
 		FleetImpl fleet = new FleetImpl();
-		fleetSpecification.getSpecifications()
+		fleetSpecification.getVehicleSpecifications()
 				.values()
 				.stream()
 				.map(s -> VehicleImpl.createFromSpecification(s, linkProvider))

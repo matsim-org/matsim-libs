@@ -22,8 +22,8 @@ package org.matsim.contrib.dvrp.data.file;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.DefaultFleetSpecification;
 import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.data.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.data.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -39,16 +39,16 @@ public class VehicleReader extends MatsimXmlParser {
 	private static final double DEFAULT_T_0 = 0;
 	private static final double DEFAULT_T_1 = 24 * 60 * 60;
 
-	private final DefaultFleetSpecification fleet;
+	private final FleetSpecificationImpl fleet;
 
-	public VehicleReader(DefaultFleetSpecification fleet) {
+	public VehicleReader(FleetSpecificationImpl fleet) {
 		this.fleet = fleet;
 	}
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (VEHICLE.equals(name)) {
-			fleet.addSpecification(createSpecification(atts));
+			fleet.addVehicleSpecification(createSpecification(atts));
 		}
 	}
 
