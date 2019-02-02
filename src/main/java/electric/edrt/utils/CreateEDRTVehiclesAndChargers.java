@@ -30,9 +30,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.data.ImmutableDvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.file.FleetWriter;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.data.BatteryImpl;
@@ -104,7 +104,7 @@ public class CreateEDRTVehiclesAndChargers {
 			for (int i = 0; i< e.getValue();i++){
 
 				DvrpVehicleSpecification v = ImmutableDvrpVehicleSpecification.newBuilder()
-						.id(Id.create("taxi_" + startLink.getId().toString() + "_" + i, Vehicle.class))
+						.id(Id.create("taxi_" + startLink.getId().toString() + "_" + i, DvrpVehicle.class))
 						.startLinkId(startLink.getId())
 						.capacity(SEATS)
 						.serviceBeginTime(OPERATIONSTARTTIME)

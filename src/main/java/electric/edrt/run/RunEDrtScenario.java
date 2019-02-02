@@ -19,15 +19,12 @@
 
 package electric.edrt.run;
 
-import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
-import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
-import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.av.maxspeed.DvrpTravelTimeWithMaxSpeedLimitModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -52,6 +49,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
+import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
+import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 
 public class RunEDrtScenario {
 	private static final double CHARGING_SPEED_FACTOR = 1.; // full speed
@@ -140,7 +141,7 @@ public class RunEDrtScenario {
 				.setVehicleFile(drtCfg.getVehiclesFile());
 	}
 
-	private static boolean isTurnedOn(Vehicle vehicle) {
+	private static boolean isTurnedOn(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
 			DrtTaskType currentTaskType = ((DrtTask)schedule.getCurrentTask()).getDrtTaskType();

@@ -28,9 +28,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.data.ImmutableDvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.file.FleetWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -99,7 +99,7 @@ public class TaxibusVehicleCreator
 		final Coord coord = c;
 		Link link = NetworkUtils.getNearestLinkExactly(((Network) scenario.getNetwork()),coord);
 			DvrpVehicleSpecification v = ImmutableDvrpVehicleSpecification.newBuilder()
-					.id(Id.create("tb" + i, Vehicle.class))
+					.id(Id.create("tb" + i, DvrpVehicle.class))
 					.startLinkId(link.getId())
 					.capacity(8)
 					.serviceBeginTime(Math.round(1))
@@ -117,7 +117,7 @@ private void run(int amount, Id<Link> linkId) {
 	
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 			DvrpVehicleSpecification v = ImmutableDvrpVehicleSpecification.newBuilder()
-					.id(Id.create("tb" + ii, Vehicle.class))
+					.id(Id.create("tb" + ii, DvrpVehicle.class))
 					.startLinkId(link.getId())
 					.capacity(8)
 					.serviceBeginTime(Math.round(1))
