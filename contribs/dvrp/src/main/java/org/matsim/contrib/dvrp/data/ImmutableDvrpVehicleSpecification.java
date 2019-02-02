@@ -45,6 +45,20 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 		serviceEndTime = builder.serviceEndTime;
 	}
 
+	public static Builder newBuilder() {
+		return new Builder();
+	}
+
+	public static Builder newBuilder(DvrpVehicleSpecification copy) {
+		Builder builder = new Builder();
+		builder.id = copy.getId();
+		builder.startLinkId = copy.getStartLinkId();
+		builder.capacity = copy.getCapacity();
+		builder.serviceBeginTime = copy.getServiceBeginTime();
+		builder.serviceEndTime = copy.getServiceEndTime();
+		return builder;
+	}
+
 	@Override
 	public Id<Vehicle> getId() {
 		return id;
@@ -77,15 +91,7 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 		private double serviceBeginTime;
 		private double serviceEndTime;
 
-		public Builder() {
-		}
-
-		public Builder(DvrpVehicleSpecification copy) {
-			this.id = copy.getId();
-			this.startLinkId = copy.getStartLinkId();
-			this.capacity = copy.getCapacity();
-			this.serviceBeginTime = copy.getServiceBeginTime();
-			this.serviceEndTime = copy.getServiceEndTime();
+		private Builder() {
 		}
 
 		public Builder id(Id<Vehicle> val) {
