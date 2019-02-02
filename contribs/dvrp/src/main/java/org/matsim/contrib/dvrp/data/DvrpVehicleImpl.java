@@ -96,10 +96,6 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 		return "Vehicle_" + id;
 	}
 
-	public void setServiceEndTime(double serviceEndTime) {
-		this.serviceEndTime = serviceEndTime;
-	}
-
 	@Override
 	public void resetSchedule() {
 		schedule = new ScheduleImpl(createSpecification(this));

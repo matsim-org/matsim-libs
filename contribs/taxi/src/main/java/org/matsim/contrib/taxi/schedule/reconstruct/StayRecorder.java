@@ -81,8 +81,7 @@ public class StayRecorder implements ActivityStartEventHandler, ActivityEndEvent
 			reconstructor.scheduleBuilders.get(personId).addStay(stay);
 		} else if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)) {
 			Link startLink = reconstructor.links.get(event.getLinkId());
-			reconstructor.scheduleBuilders.put(personId,
-					new ScheduleBuilder(reconstructor.fleet, personId, startLink, event.getTime()));
+			reconstructor.scheduleBuilders.put(personId, new ScheduleBuilder(personId, startLink, event.getTime()));
 		}
 	}
 

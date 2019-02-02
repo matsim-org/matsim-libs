@@ -84,9 +84,9 @@ public class ScheduleReconstructionIT {
 		SubmittedTaxiRequestsCollector requestCollector = controler.getInjector()
 				.getInstance(DvrpModes.key(SubmittedTaxiRequestsCollector.class, mode));
 
-		Assert.assertNotEquals(fleet, scheduleReconstructor.fleet);
+		Assert.assertNotEquals(fleet, scheduleReconstructor.getFleet());
 
-		compareVehicles(fleet.getVehicles().values(), scheduleReconstructor.fleet.getVehicles().values());
+		compareVehicles(fleet.getVehicles().values(), scheduleReconstructor.getFleet().getVehicles().values());
 
 		compareRequests((Collection<TaxiRequest>)requestCollector.getRequests().values(),
 				scheduleReconstructor.taxiRequests.values());
