@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.dvrp.data;
 
+import java.util.Objects;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
@@ -38,11 +40,11 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 	private final double serviceEndTime;
 
 	private ImmutableDvrpVehicleSpecification(Builder builder) {
-		id = builder.id;
-		startLinkId = builder.startLinkId;
-		capacity = builder.capacity;
-		serviceBeginTime = builder.serviceBeginTime;
-		serviceEndTime = builder.serviceEndTime;
+		id = Objects.requireNonNull(builder.id);
+		startLinkId = Objects.requireNonNull(builder.startLinkId);
+		capacity = Objects.requireNonNull(builder.capacity);
+		serviceBeginTime = Objects.requireNonNull(builder.serviceBeginTime);
+		serviceEndTime = Objects.requireNonNull(builder.serviceEndTime);
 	}
 
 	public static Builder newBuilder() {
@@ -87,9 +89,9 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 	public static final class Builder {
 		private Id<DvrpVehicle> id;
 		private Id<Link> startLinkId;
-		private int capacity;
-		private double serviceBeginTime;
-		private double serviceEndTime;
+		private Integer capacity;
+		private Double serviceBeginTime;
+		private Double serviceEndTime;
 
 		private Builder() {
 		}
