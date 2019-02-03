@@ -25,7 +25,11 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 
 /**
- * DvrpVehicleSpecification is meant to be immutable.
+ * A container of DvrpVehicleSpecifications. Its lifespan covers all iterations.
+ * <p>
+ * It can be modified between iterations by add/replace/removeVehicleSpecification().
+ * <p>
+ * The contained DvrpVehicleSpecifications are (meant to be) immutable, so to modify them, use replaceVehicleSpecification()
  *
  * @author Michal Maciejewski (michalm)
  */

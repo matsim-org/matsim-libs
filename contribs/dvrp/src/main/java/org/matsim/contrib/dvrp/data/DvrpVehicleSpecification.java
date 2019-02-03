@@ -25,8 +25,10 @@ import org.matsim.api.core.v01.network.Link;
 
 /**
  * DvrpVehicleSpecification is assumed to be immutable.
- * Changing a vehicle specification (e.g. setting a different startLinkId)
- * should be done only "between" iterations by passing a new instance to FleetSpecification.
+ * <p>
+ * Its lifespan can span over all iterations, but can be also changed before each iteration.
+ * <p>
+ * Changing a vehicle specification (e.g. setting a different startLinkId) should be done only "between" iterations by passing a new instance to FleetSpecification.
  *
  * @author Michal Maciejewski (michalm)
  */

@@ -24,6 +24,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 
 /**
+ * DvrpVehicle is created from DvrpVehicleSpecification.
+ * Its lifespan is one QSim simulation (same as of the optimizer and schedules created during simulation).
+ *
  * @author michalm
  */
 public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
@@ -42,13 +45,13 @@ public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
 
 	/**
 	 * @return (desired) time when the vehicle should start operating (inclusive); can be different from
-	 *         {@link Schedule#getBeginTime()}
+	 * {@link Schedule#getBeginTime()}
 	 */
 	double getServiceBeginTime();
 
 	/**
 	 * @return (desired) time by which the vehicle should stop operating (exclusive); can be different from
-	 *         {@link Schedule#getEndTime()}
+	 * {@link Schedule#getEndTime()}
 	 */
 	double getServiceEndTime();
 
