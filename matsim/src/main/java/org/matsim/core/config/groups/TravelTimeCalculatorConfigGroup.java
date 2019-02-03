@@ -67,7 +67,7 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 
 	private Set<String> analyzedModes = new LinkedHashSet<>(  ) ;
 	private boolean filterModes = false;
-	private boolean separateModes = false;
+	private boolean separateModes = true;
 
 	public TravelTimeCalculatorConfigGroup() {
 		super(GROUPNAME);
