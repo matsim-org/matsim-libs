@@ -38,24 +38,25 @@ public final class FleetSpecificationImpl implements FleetSpecification {
 		return Collections.unmodifiableMap(specifications);
 	}
 
+	@Override
 	public void addVehicleSpecification(DvrpVehicleSpecification specification) {
 		if (specifications.putIfAbsent(specification.getId(), specification) != null) {
-			throw new RuntimeException(
-					"A vehicle specification for vehicle id=" + specification.getId() + " already exists");
+			throw new RuntimeException("A vehicle specification for vehicle id=" + specification.getId() + " already exists");
 		}
 	}
 
-	public void modifyVehicleSpecification(DvrpVehicleSpecification specification) {
+	@Override
+	public void replaceVehicleSpecification(DvrpVehicleSpecification specification) {
 		if (specifications.computeIfPresent(specification.getId(), (k, v) -> specification) != null) {
 			throw new RuntimeException(
 					"A vehicle specification for vehicle id=" + specification.getId() + " does not exist");
 		}
 	}
 
-	public void removeVehicleSpecification(DvrpVehicleSpecification specification) {
-		if (specifications.remove(Objects.requireNonNull(specification)) == null) {
-			throw new RuntimeException(
-					"A vehicle specification for vehicle id=" + specification.getId() + " does not exist");
+	@Override
+	public void removeVehicleSpecification(Id<DvrpVehicle> vehicleId) {
+		if (specifications.remove(Objects.requireNonNull(vehicleId)) == null) {
+			throw new RuntimeException("A vehicle specification for vehicle id=" + vehicleId + " does not exist");
 		}
 	}
 }
