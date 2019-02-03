@@ -521,6 +521,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 	@Override protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
+
 //		if ( this.insertingAccessEgressWalk ) {
 //			// we need scoring parameters for each resulting interaction activity
 //			for ( String mode : this.getNetworkModes() ) {
@@ -536,6 +537,17 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		// these are now added in the config consistency checker of PlanCalcScoreConfigGroup,
 		// so there is no point in checking here since the checker here might be called
 		// earlier. kai, jan'18
+
+		Set<String> modesRoutedAsTeleportation = this.getModeRoutingParams().keySet();
+		Collection<String> modesRoutedAsNetworkModes = this.getNetworkModes();
+
+		for( String mode : modesRoutedAsTeleportation ){
+			if ( modesRoutedAsNetworkModes.contains( mode ) ) {
+				throw new RuntimeException( "mode \"" + mode + "\" is defined both as teleportation (mode routing param) and for network routing.  You need to remove " +
+										"one or the other.") ;
+			}
+		}
+
 	}
 
 	public void printModeRoutingParams(){
