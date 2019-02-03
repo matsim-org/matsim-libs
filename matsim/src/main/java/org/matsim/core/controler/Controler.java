@@ -39,6 +39,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
+import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
@@ -219,7 +220,9 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		});
 
 		// check config consistency just before creating injector; sometimes, we can provide better error messages there:
+		config.removeConfigConsistencyChecker( UnmaterializedConfigGroupChecker.class );
 		config.checkConsistency();
+		config.addConfigConsistencyChecker( new UnmaterializedConfigGroupChecker() );
 
 		this.injector = Injector.createInjector(config, AbstractModule.override(Collections.singleton(new AbstractModule() {
 			@Override
