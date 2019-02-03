@@ -219,14 +219,4 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 		this.separateModes = separateModes;
 	}
 
-	@Override
-	public void checkConsistency( Config config ) {
-		if ( this.analyzedModes!=null && this.analyzedModes.size() > 0 ) {
-			// (= there is something in analyzedModes)
-			if ( !filterModes && !separateModes ) {
-
-			}
-		}
-	}
-
 }

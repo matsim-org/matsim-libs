@@ -57,7 +57,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 	static void checkConsistencyBetweenRouterAndTravelTimeCalculator( final Config config ) {
 		if ( config.travelTimeCalculator().getSeparateModes() ) {
 			if ( ! config.travelTimeCalculator().getAnalyzedModes().containsAll( config.plansCalcRoute().getNetworkModes() ) ) {
-				throw new RuntimeException( "analyzedModes in travelTimeCalculator config is not superset of network routing modes.  Aborting ... ") ;
+				log.warn("AnalyzedModes in travelTimeCalculator config is not superset of network routing modes.  Will fail later except when defined by other means.");
 			}
 		}
 	}
