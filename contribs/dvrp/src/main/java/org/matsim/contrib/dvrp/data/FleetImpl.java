@@ -34,8 +34,7 @@ public class FleetImpl implements Fleet {
 	public static Fleet create(FleetSpecification fleetSpecification, LinkProvider<Id<Link>> linkProvider) {
 		FleetImpl fleet = new FleetImpl();
 		fleetSpecification.getVehicleSpecifications()
-				.values()
-				.stream().map(s -> DvrpVehicleImpl.createFromSpecification(s, linkProvider))
+				.values().stream().map(s -> DvrpVehicleImpl.createWithLinkProvider(s, linkProvider))
 				.forEach(fleet::addVehicle);
 		return fleet;
 	}

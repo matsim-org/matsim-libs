@@ -31,36 +31,26 @@ import com.google.common.base.MoreObjects;
  * @author michalm
  */
 public class DvrpVehicleImpl implements DvrpVehicle {
-	public static DvrpVehicleImpl createFromSpecification(DvrpVehicleSpecification specification,
+
+	public static DvrpVehicleImpl createWithLinkProvider(DvrpVehicleSpecification specification,
 			LinkProvider<Id<Link>> linkProvider) {
-		return new DvrpVehicleImpl(specification.getId(), linkProvider.apply(specification.getStartLinkId()),
-				specification.getCapacity(), specification.getServiceBeginTime(), specification.getServiceEndTime());
+		return new DvrpVehicleImpl(specification, linkProvider.apply(specification.getStartLinkId()));
 	}
 
-	private final Id<DvrpVehicle> id;
-	private Link startLink;
-	private final int capacity;
-
-	// time window
-	private final double serviceBeginTime;
-	private final double serviceEndTime;
-
+	private final DvrpVehicleSpecification specification;
+	private Link startLink; //FIXME will be final after removing setStartLink
 	private Schedule schedule;
 
-	public DvrpVehicleImpl(Id<DvrpVehicle> id, Link startLink, int capacity, double serviceBeginTime,
-			double serviceEndTime) {
-		this.id = id;
+	public DvrpVehicleImpl(DvrpVehicleSpecification specification, Link startLink) {
+		this.specification = specification;
 		this.startLink = startLink;
-		this.capacity = capacity;
-		this.serviceBeginTime = serviceBeginTime;
-		this.serviceEndTime = serviceEndTime;
 
-		schedule = new ScheduleImpl(createSpecification(this));
+		schedule = new ScheduleImpl(specification);
 	}
 
 	@Override
 	public Id<DvrpVehicle> getId() {
-		return id;
+		return specification.getId();
 	}
 
 	@Override
@@ -68,6 +58,7 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 		return startLink;
 	}
 
+	//FIXME will be removed after limiting the DvrpVehicle lifespan to single QSim simulation
 	@Override
 	public void setStartLink(Link link) {
 		this.startLink = link;
@@ -75,17 +66,17 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 
 	@Override
 	public int getCapacity() {
-		return capacity;
+		return specification.getCapacity();
 	}
 
 	@Override
 	public double getServiceBeginTime() {
-		return serviceBeginTime;
+		return specification.getServiceBeginTime();
 	}
 
 	@Override
 	public double getServiceEndTime() {
-		return serviceEndTime;
+		return specification.getServiceEndTime();
 	}
 
 	@Override
@@ -106,16 +97,6 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 
 	@Override
 	public void resetSchedule() {
-		schedule = new ScheduleImpl(createSpecification(this));
-	}
-
-	private static DvrpVehicleSpecification createSpecification(DvrpVehicleImpl vehicle) {
-		return ImmutableDvrpVehicleSpecification.newBuilder()
-				.id(vehicle.id)
-				.startLinkId(vehicle.startLink.getId())
-				.capacity(vehicle.capacity)
-				.serviceBeginTime(vehicle.serviceBeginTime)
-				.serviceEndTime(vehicle.serviceEndTime)
-				.build();
+		schedule = new ScheduleImpl(specification);
 	}
 }

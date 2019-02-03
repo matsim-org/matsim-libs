@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.data.DvrpVehicleImpl;
+import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.data.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.data.TaxiRequest;
@@ -93,7 +95,14 @@ public class ScheduleBuilder {
 			throw new IllegalStateException();
 		}
 
-		vehicle = new DvrpVehicleImpl(id, startLink, 1, serviceBeginTime, serviceEndTime);
+		DvrpVehicleSpecification specification = ImmutableDvrpVehicleSpecification.newBuilder()
+				.id(id)
+				.startLinkId(startLink.getId())
+				.capacity(1)
+				.serviceBeginTime(serviceBeginTime)
+				.serviceEndTime(serviceEndTime)
+				.build();
+		vehicle = new DvrpVehicleImpl(specification, startLink);
 		tasks.forEach(vehicle.getSchedule()::addTask);
 	}
 

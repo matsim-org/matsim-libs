@@ -62,7 +62,7 @@ public class EvDvrpFleetProvider implements Provider<Fleet> {
 		FleetImpl evDvrpFleet = new FleetImpl();
 		for (DvrpVehicleSpecification s : fleetSpecification.getVehicleSpecifications().values()) {
 			evDvrpFleet.addVehicle(
-					EvDvrpVehicle.create(DvrpVehicleImpl.createFromSpecification(s, network.getLinks()::get), evFleet));
+					EvDvrpVehicle.create(DvrpVehicleImpl.createWithLinkProvider(s, network.getLinks()::get), evFleet));
 		}
 		return evDvrpFleet;
 	}
