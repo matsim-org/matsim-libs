@@ -33,7 +33,7 @@ public class TravelTimeCalculatorModuleTest {
 	@Test
 	public void testOneTravelTimeCalculatorForAll() {
 		Config config = ConfigUtils.createConfig();
-		config.travelTimeCalculator().setAnalyzedModes("car,bike");
+		config.travelTimeCalculator().setAnalyzedModesAsString("car,bike" );
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Node node0 = scenario.getNetwork().getFactory().createNode(Id.createNodeId(0), new Coord(0, 0));
 		Node node1 = scenario.getNetwork().getFactory().createNode(Id.createNodeId(1), new Coord(1, 0));
@@ -62,7 +62,7 @@ public class TravelTimeCalculatorModuleTest {
 	@Test
 	public void testOneTravelTimeCalculatorPerMode() {
 		Config config = ConfigUtils.createConfig();
-		config.travelTimeCalculator().setAnalyzedModes("car,bike");
+		config.travelTimeCalculator().setAnalyzedModesAsString("car,bike" );
 		config.travelTimeCalculator().setSeparateModes(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Node node0 = scenario.getNetwork().getFactory().createNode(Id.createNodeId(0), new Coord(0, 0));

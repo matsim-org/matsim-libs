@@ -56,7 +56,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 						+ "but I cannot say if it would be picked up correctly by downstream modules.  kai, nov'16") ;
 			}			
 			// go through all modes:
-			for (final String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
+			for (final String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModesAsString() )) {
 				
 				// generate and bind the observer:
 				bind(TravelTimeCalculator.class).annotatedWith(Names.named(mode)).toProvider(new SingleModeTravelTimeCalculatorProvider(mode)).in(Singleton.class);
@@ -77,7 +77,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 			
 			// bind the TravelTime objects.  In this case, this just passes on the same information from TravelTimeCalculator to each individual mode:
 			if (getConfig().travelTimeCalculator().isCalculateLinkTravelTimes()) {
-				for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
+				for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModesAsString() )) {
 					addTravelTimeBinding(mode).toProvider(ObservedLinkTravelTimes.class);
 				}
 			}
@@ -108,4 +108,27 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 		}
 	}
 
+	private static class ObservedLinkTravelTimes implements Provider<TravelTime> {
+
+		@Inject
+		TravelTimeCalculator travelTimeCalculator;
+
+		@Override
+		public TravelTime get() {
+			return travelTimeCalculator.getLinkTravelTimes();
+		}
+
+	}
+
+	private static class ObservedLinkToLinkTravelTimes implements Provider<LinkToLinkTravelTime> {
+
+		@Inject
+		TravelTimeCalculator travelTimeCalculator;
+
+		@Override
+		public LinkToLinkTravelTime get() {
+			return travelTimeCalculator.getLinkToLinkTravelTimes();
+		}
+
+	}
 }

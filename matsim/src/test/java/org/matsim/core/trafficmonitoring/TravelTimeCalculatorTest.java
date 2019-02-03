@@ -430,7 +430,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Network network = NetworkUtils.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
-		config.setAnalyzedModes("");
+		config.setAnalyzedModesAsString("" );
 		config.setFilterModes(true);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
 
@@ -466,7 +466,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Network network = NetworkUtils.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
-		config.setAnalyzedModes(TransportMode.car);
+		config.setAnalyzedModesAsString(TransportMode.car );
 		config.setFilterModes(true);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
 
@@ -507,7 +507,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Network network = NetworkUtils.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
-		config.setAnalyzedModes("");
+		config.setAnalyzedModesAsString("" );
 		config.setFilterModes(false);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
 

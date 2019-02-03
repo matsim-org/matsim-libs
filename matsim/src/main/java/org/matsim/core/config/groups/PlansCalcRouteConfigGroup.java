@@ -29,10 +29,7 @@ import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Config Module for PlansCalcRoute class.
@@ -65,7 +62,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	private static final Logger log = Logger.getLogger(PlansCalcRouteConfigGroup.class) ;
 	
-	private Collection<String> networkModes = Arrays.asList(TransportMode.car);
+	private Collection<String> networkModes = Collections.singletonList( TransportMode.car );
 
 	private boolean acceptModeParamsWithoutClearing = false;
 	
@@ -540,4 +537,11 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		// so there is no point in checking here since the checker here might be called
 		// earlier. kai, jan'18
 	}
+
+	public void printModeRoutingParams(){
+		for( Map.Entry<String, PlansCalcRouteConfigGroup.ModeRoutingParams> entry : this.getModeRoutingParams().entrySet() ){
+			log.warn( "key=" + entry.getKey() + "; value=" + entry.getValue() );
+		}
+	}
+
 }
