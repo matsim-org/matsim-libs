@@ -158,38 +158,41 @@ public class ConfigConsistencyCheckerImplTest {
 	@Test
 	public void checkConsistencyBetweenRouterAndTravelTimeCalculatorTest(){
 		{
-			int exceptionCnt = 0;
-
 			Config config = ConfigUtils.createConfig();
 
 			// first for separateModes=false:
 			config.travelTimeCalculator().setSeparateModes( false );
-
-			ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-
+			{
+				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
+				Assert.assertFalse( problem );
+			}
 			{
 				Set<String> modes = new LinkedHashSet<>( config.plansCalcRoute().getNetworkModes() );
 				modes.add( TransportMode.bike );
 				config.plansCalcRoute().setNetworkModes( modes );
-			}
 
+				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
+				Assert.assertFalse( problem );
+			}
 			{
 				Set<String> modes = new LinkedHashSet<>( config.travelTimeCalculator().getAnalyzedModes() );
 				modes.add( TransportMode.bike );
 				config.travelTimeCalculator().setAnalyzedModes( modes );
-			}
-			ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
 
+				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
+				Assert.assertFalse( problem );
+			}
 			{
 				Set<String> modes = new LinkedHashSet<>( config.travelTimeCalculator().getAnalyzedModes() );
 				modes.add( "abc" );
 				config.travelTimeCalculator().setAnalyzedModes( modes );
+
+				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
+				Assert.assertFalse( problem );
 			}
-			ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
 		}
 		{
 			// then for separateModes=true
-			int exceptionCnt = 0 ;
 
 			Config config = ConfigUtils.createConfig() ;
 
@@ -197,31 +200,30 @@ public class ConfigConsistencyCheckerImplTest {
 
 			ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
 
-			try{
-				{
-					Set<String> modes = new LinkedHashSet<>( config.plansCalcRoute().getNetworkModes() );
-					modes.add( TransportMode.bike );
-					config.plansCalcRoute().setNetworkModes( modes );
-				}
-				ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-			} catch( Exception ee ){
-				exceptionCnt++;
-			}
-			Assert.assertEquals( 1, exceptionCnt );
+			{
+				Set<String> modes = new LinkedHashSet<>( config.plansCalcRoute().getNetworkModes() );
+				modes.add( TransportMode.bike );
+				config.plansCalcRoute().setNetworkModes( modes );
 
+				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
+				Assert.assertTrue( problem ); // !!
+			}
 			{
 				Set<String> modes = new LinkedHashSet<>( config.travelTimeCalculator().getAnalyzedModes() );
 				modes.add( TransportMode.bike );
 				config.travelTimeCalculator().setAnalyzedModes( modes );
-			}
-			ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
 
+				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
+				Assert.assertFalse( problem );
+			}
 			{
 				Set<String> modes = new LinkedHashSet<>( config.travelTimeCalculator().getAnalyzedModes() );
 				modes.add( "abc" );
 				config.travelTimeCalculator().setAnalyzedModes( modes );
+
+				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
+				Assert.assertFalse( problem );
 			}
-			ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
 		}
 
 	}

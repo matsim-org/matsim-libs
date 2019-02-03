@@ -54,12 +54,15 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 		checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
 	}
 
-	static void checkConsistencyBetweenRouterAndTravelTimeCalculator( final Config config ) {
+	static boolean checkConsistencyBetweenRouterAndTravelTimeCalculator( final Config config ) {
+		boolean problem = false ;
 		if ( config.travelTimeCalculator().getSeparateModes() ) {
 			if ( ! config.travelTimeCalculator().getAnalyzedModes().containsAll( config.plansCalcRoute().getNetworkModes() ) ) {
 				log.warn("AnalyzedModes in travelTimeCalculator config is not superset of network routing modes.  Will fail later except when defined by other means.");
+				problem = true ;
 			}
 		}
+		return problem ;
 	}
 
 	/*package because of test */ static void checkPlanCalcScore(final Config c) {
