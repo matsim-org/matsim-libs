@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
-import org.matsim.contrib.emissions.types.*;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.testcases.MatsimTestUtils;
@@ -35,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import static org.matsim.contrib.emissions.types.HbefaVehicleCategory.*;
+import static org.matsim.contrib.emissions.HbefaVehicleCategory.*;
 
 
 /**

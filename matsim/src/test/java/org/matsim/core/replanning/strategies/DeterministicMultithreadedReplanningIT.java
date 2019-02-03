@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.integration.replanning;
+package org.matsim.core.replanning.strategies;
 
 import com.google.inject.Singleton;
 
@@ -33,7 +33,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.TimeAllocationMutator;
+import org.matsim.core.replanning.strategies.TimeAllocationMutatorModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -62,7 +62,7 @@ public class DeterministicMultithreadedReplanningIT {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	/**
-	 * Tests that the {@link TimeAllocationMutator} generates always the same results
+	 * Tests that the {@link TimeAllocationMutatorModule} generates always the same results
 	 * with the same number of threads.
 	 */
 	@Test
@@ -78,7 +78,7 @@ public class DeterministicMultithreadedReplanningIT {
 			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run1/");
 			TestControler controler = new TestControler(config, strategyManager);
 			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new TimeAllocationMutator(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario()), config.plans(), config.timeAllocationMutator(), config.global()));
+			strategy.addStrategyModule(new TimeAllocationMutatorModule(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario() ), config.plans(), config.timeAllocationMutator(), config.global()) );
 			strategyManager.addStrategyForDefaultSubpopulation(strategy, 1.0);
 			controler.run();
 		}
@@ -88,7 +88,7 @@ public class DeterministicMultithreadedReplanningIT {
 			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run2/");
 			TestControler controler = new TestControler(config, strategyManager);
 			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new TimeAllocationMutator(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario()), config.plans(), config.timeAllocationMutator(), config.global()));
+			strategy.addStrategyModule(new TimeAllocationMutatorModule(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario() ), config.plans(), config.timeAllocationMutator(), config.global()) );
 			strategyManager.addStrategyForDefaultSubpopulation(strategy, 1.0);
 			controler.run();
 		}
@@ -109,7 +109,7 @@ public class DeterministicMultithreadedReplanningIT {
 	}
 
 	/**
-	 * Tests that the combination of {@link ReRoute} and {@link TimeAllocationMutator} always generates 
+	 * Tests that the combination of {@link ReRoute} and {@link TimeAllocationMutatorModule} always generates
 	 * the same results with the same number of threads.
 	 */
 	@Test
@@ -129,7 +129,7 @@ public class DeterministicMultithreadedReplanningIT {
 			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run1/");
 			TestControler controler = new TestControler(config, strategyManager);
 			strategy.addStrategyModule(new ReRoute(controler.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario()))); // finish strategy configuration
-			strategy.addStrategyModule(new TimeAllocationMutator(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario()), config.plans(), config.timeAllocationMutator(), config.global()));
+			strategy.addStrategyModule(new TimeAllocationMutatorModule(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario() ), config.plans(), config.timeAllocationMutator(), config.global()) );
 			controler.run();
 		}
 		{
@@ -142,7 +142,7 @@ public class DeterministicMultithreadedReplanningIT {
 			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run2/");
 			TestControler controler2 = new TestControler(config, strategyManager2);
 			strategy2.addStrategyModule(new ReRoute(controler2.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler2.getScenario()))); // finish strategy configuration
-			strategy2.addStrategyModule(new TimeAllocationMutator(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler2.getScenario()), config.plans(), config.timeAllocationMutator(), config.global()));
+			strategy2.addStrategyModule(new TimeAllocationMutatorModule(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler2.getScenario() ), config.plans(), config.timeAllocationMutator(), config.global()) );
 			controler2.run();
 		}
 
@@ -170,6 +170,8 @@ public class DeterministicMultithreadedReplanningIT {
 		int lastIteration = 5;
 
 		Config config = testUtils.loadConfig("test/scenarios/equil/config.xml");
+		// yy this seems to be taking the input from the matsim-examples module.  No idea by what automagic it ends up there.  kai, feb'19
+
 		config.controler().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
 		config.plans().setInputFile(IOUtils.newUrl(testUtils.classInputResourcePath(), "plans1.xml").toString());

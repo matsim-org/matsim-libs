@@ -11,10 +11,10 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-final class TravelDisutilities {
+public final class TravelDisutilities {
 	
 	public static TravelDisutility createBaseDisutility(final CarrierVehicleTypes vehicleTypes, final TravelTime travelTime){
-		
+
 		return new TravelDisutility() {
 
 			@Override

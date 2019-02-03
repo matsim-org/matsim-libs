@@ -616,17 +616,8 @@ public final class PopulationUtils {
 	 */
 	public static boolean equalPopulation(final Population s1, final Population s2) {
 		try {
-			@SuppressWarnings("resource")
-			InputStream inputStream1 = null;
-			@SuppressWarnings("resource")
-			InputStream inputStream2 = null;
-			try {
-				inputStream1 = openPopulationInputStream(s1);
-				inputStream2 = openPopulationInputStream(s2);
-				return IOUtils.isEqual(inputStream1, inputStream2);
-			} finally {
-				if (inputStream1 != null) inputStream1.close();
-				if (inputStream2 != null) inputStream2.close();
+			try( InputStream inputStream1 = openPopulationInputStream( s1 ) ; InputStream inputStream2 = openPopulationInputStream( s2 ) ){
+				return IOUtils.isEqual( inputStream1, inputStream2 );
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

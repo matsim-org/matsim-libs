@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HbefaTrafficSituation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +16,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.types;
+
+
+package org.matsim.contrib.emissions;
 
 /**
- * @author benjamin
- *
+ * Created by amit on 29/09/16.
  */
-public enum HbefaTrafficSituation {
-	
-	FREEFLOW, HEAVY, SATURATED, STOPANDGO;
-	
-	HbefaTrafficSituation(){
-	}
+@Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
+public enum EmissionSpecificationMarker {
+    
+    @Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
+    BEGIN_EMISSIONS ,
+    @Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
+    END_EMISSIONS ;
 }

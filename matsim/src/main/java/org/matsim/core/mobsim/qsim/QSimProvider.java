@@ -84,11 +84,14 @@ public class QSimProvider implements Provider<QSim> {
 		};
 
 		Injector qsimInjector = injector.createChildInjector(module);
-		if (iterationCounter == null
-				|| config.controler().getFirstIteration() == iterationCounter.getIterationNumber()) {
-			// trying to somewhat reduce logfile verbosity. kai, aug'18
-			org.matsim.core.controler.Injector.printInjector(qsimInjector, log);
-		}
+
+//		if (iterationCounter == null
+//				|| config.controler().getFirstIteration() == iterationCounter.getIterationNumber()) {
+//			// trying to somewhat reduce logfile verbosity. kai, aug'18
+		// (does not work since iterationNumber is not defined here. kai, jan'19)
+//			org.matsim.core.controler.Injector.printInjector(qsimInjector, log);
+//		}
+
 		QSim qSim = qsimInjector.getInstance(QSim.class);
 
         for (Object activeComponent : components.getActiveComponents()) {

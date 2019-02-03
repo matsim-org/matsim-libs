@@ -41,7 +41,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  *
  * @author benjamin, julia
  */
-public class RunAverageEmissionToolOfflineExample{
+public final class RunAverageEmissionToolOfflineExample{
 	
 	private final static String runDirectory = "./test/output/";
 	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config_average.xml";
