@@ -18,48 +18,52 @@
 
 package org.matsim.contrib.ev.dvrp;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.name.Named;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.DvrpVehicleImpl;
+import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.dvrp.data.FleetSpecificationImpl;
+import org.matsim.contrib.dvrp.data.file.FleetReader;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.ev.data.ElectricFleet;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.name.Named;
+
 /**
  * @author michalm
  */
 public class EvDvrpFleetProvider implements Provider<Fleet> {
-    @Inject
-    @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-    private Network network;
+	@Inject
+	@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
+	private Network network;
 
-    @Inject
-    private Config config;
+	@Inject
+	private Config config;
 
-    @Inject
-    private ElectricFleet evFleet;
+	@Inject
+	private ElectricFleet evFleet;
 
-    private final String file;
+	private final String file;
 
-    public EvDvrpFleetProvider(String file) {
-        this.file = file;
-    }
+	public EvDvrpFleetProvider(String file) {
+		this.file = file;
+	}
 
-    @Override
-    public Fleet get() {
-        FleetImpl fleet = new FleetImpl();
-        new VehicleReader(network, fleet).parse(ConfigGroup.getInputFileURL(config.getContext(), file));
+	@Override
+	public Fleet get() {
+		FleetSpecificationImpl fleetSpecification = new FleetSpecificationImpl();
+		new FleetReader(fleetSpecification).parse(ConfigGroup.getInputFileURL(config.getContext(), file));
 
-        FleetImpl evDvrpFleet = new FleetImpl();
-        for (Vehicle v : fleet.getVehicles().values()) {
-            evDvrpFleet.addVehicle(EvDvrpVehicle.create(v, evFleet));
-        }
-        return evDvrpFleet;
-    }
+		FleetImpl evDvrpFleet = new FleetImpl();
+		for (DvrpVehicleSpecification s : fleetSpecification.getVehicleSpecifications().values()) {
+			evDvrpFleet.addVehicle(
+					EvDvrpVehicle.create(DvrpVehicleImpl.createWithLinkProvider(s, network.getLinks()::get), evFleet));
+		}
+		return evDvrpFleet;
+	}
 }

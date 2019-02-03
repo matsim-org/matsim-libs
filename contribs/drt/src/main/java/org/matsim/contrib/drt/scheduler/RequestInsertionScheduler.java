@@ -32,9 +32,9 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.Vehicles;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -74,7 +74,7 @@ public class RequestInsertionScheduler {
 
 	public void initSchedules(boolean changeStartLinkToLastLinkInSchedule) {
 		((FleetImpl)fleet).resetSchedules();
-		for (Vehicle veh : fleet.getVehicles().values()) {
+		for (DvrpVehicle veh : fleet.getVehicles().values()) {
 			if (changeStartLinkToLastLinkInSchedule) {
 				Vehicles.changeStartLinkToLastLinkInSchedule(veh);
 			}

@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.dvrp.optimizer;
 
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
+import org.matsim.contrib.dvrp.data.Request;
 
 /**
  * Minimal functionality of dvrp optimizers in the dvrp contrib. <br>
@@ -40,5 +41,5 @@ public interface VrpOptimizer {
 	 * Called by the framework when it moves on to the next task. It is presumably the task of the optimizer to update
 	 * the "currentTask" setting.
 	 */
-	void nextTask(Vehicle vehicle);
+	void nextTask(DvrpVehicle vehicle);
 }

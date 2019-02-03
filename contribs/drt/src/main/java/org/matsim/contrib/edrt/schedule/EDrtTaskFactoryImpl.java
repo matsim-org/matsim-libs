@@ -20,7 +20,7 @@ package org.matsim.contrib.edrt.schedule;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.ev.data.Charger;
 import org.matsim.contrib.ev.data.ElectricVehicle;
@@ -32,25 +32,25 @@ import org.matsim.contrib.ev.dvrp.TaskEnergyConsumptions;
  */
 public class EDrtTaskFactoryImpl implements DrtTaskFactory {
 	@Override
-	public EDrtDriveTask createDriveTask(Vehicle vehicle, VrpPathWithTravelData path) {
+	public EDrtDriveTask createDriveTask(DvrpVehicle vehicle, VrpPathWithTravelData path) {
 		ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
 		double totalEnergy = TaskEnergyConsumptions.calcTotalEnergyConsumption(ev, path);
 		return new EDrtDriveTask(path, totalEnergy);
 	}
 
 	@Override
-	public EDrtStopTask createStopTask(Vehicle vehicle, double beginTime, double endTime, Link link) {
+	public EDrtStopTask createStopTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
 		ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
 		double auxEnergy = TaskEnergyConsumptions.calcAuxEnergy(ev, beginTime, endTime);
 		return new EDrtStopTask(beginTime, endTime, link, auxEnergy);
 	}
 
 	@Override
-	public EDrtStayTask createStayTask(Vehicle vehicle, double beginTime, double endTime, Link link) {
+	public EDrtStayTask createStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
 		return new EDrtStayTask(beginTime, endTime, link, 0);// no energy consumption during STAY
 	}
 
-	public EDrtChargingTask createChargingTask(Vehicle vehicle, double beginTime, double endTime, Charger charger,
+	public EDrtChargingTask createChargingTask(DvrpVehicle vehicle, double beginTime, double endTime, Charger charger,
 			double totalEnergy) {
 		return new EDrtChargingTask(beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(),
 				totalEnergy);

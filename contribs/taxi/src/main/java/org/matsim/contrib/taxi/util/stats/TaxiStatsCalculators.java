@@ -19,16 +19,18 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 
 public class TaxiStatsCalculators {
 	public static final String DAILY_STATS_ID = "daily";
 
-	public static int calcHourCount(Iterable<? extends Vehicle> vehicles) {
+	public static int calcHourCount(Iterable<? extends DvrpVehicle> vehicles) {
 		double maxEndTime = 0;
-		for (Vehicle v : vehicles) {
+		for (DvrpVehicle v : vehicles) {
 			double endTime = v.getSchedule().getEndTime();
 			if (endTime > maxEndTime) {
 				maxEndTime = endTime;

@@ -19,22 +19,29 @@
 
 package org.matsim.contrib.dvrp.data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * @author michalm
  */
 public class VehicleCounter {
-	private final Collection<? extends Vehicle> vehicles;
-	private final Queue<Vehicle> waitingVehicles;
-	private final Queue<Vehicle> activeVehicles;
+	private final Collection<? extends DvrpVehicle> vehicles;
+	private final Queue<DvrpVehicle> waitingVehicles;
+	private final Queue<DvrpVehicle> activeVehicles;
 
-	public VehicleCounter(Collection<? extends Vehicle> vehicles) {
+	public VehicleCounter(Collection<? extends DvrpVehicle> vehicles) {
 		this.vehicles = vehicles;
 
 		int queueCapacity = vehicles.size();
-		this.waitingVehicles = new PriorityQueue<Vehicle>(queueCapacity, Vehicles.T0_COMPARATOR);
-		this.activeVehicles = new PriorityQueue<Vehicle>(queueCapacity, Vehicles.T1_COMPARATOR);
+		this.waitingVehicles = new PriorityQueue<>(queueCapacity,
+				Comparator.comparingDouble(DvrpVehicle::getServiceBeginTime));
+		this.activeVehicles = new PriorityQueue<>(queueCapacity,
+				Comparator.comparingDouble(DvrpVehicle::getServiceEndTime));
 	}
 
 	public List<Integer> countVehiclesOverTime(double timeStep) {
@@ -49,7 +56,7 @@ public class VehicleCounter {
 					break;
 				}
 
-				Vehicle newActiveVehicle = waitingVehicles.poll();
+				DvrpVehicle newActiveVehicle = waitingVehicles.poll();
 				activeVehicles.add(newActiveVehicle);
 			}
 

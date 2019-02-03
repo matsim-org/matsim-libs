@@ -19,18 +19,20 @@
 
 package org.matsim.contrib.ev.dvrp;
 
-import com.google.inject.Injector;
-import com.google.inject.Key;
+import java.util.function.DoubleSupplier;
+import java.util.function.Predicate;
+
+import javax.inject.Inject;
+
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.ev.data.ElectricVehicle;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.OhdeSlaskiAuxEnergyConsumption;
 
-import javax.inject.Inject;
-import java.util.function.DoubleSupplier;
-import java.util.function.Predicate;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 
 public class DvrpAuxConsumptionFactory implements AuxEnergyConsumption.Factory {
 	@Inject
@@ -38,10 +40,10 @@ public class DvrpAuxConsumptionFactory implements AuxEnergyConsumption.Factory {
 
 	private final String mode;
 	private final DoubleSupplier temperatureProvider;
-	private final Predicate<Vehicle> turnedOnPredicate;
+	private final Predicate<DvrpVehicle> turnedOnPredicate;
 
 	public DvrpAuxConsumptionFactory(String mode, DoubleSupplier temperatureProvider,
-			Predicate<Vehicle> turnedOnPredicate) {
+			Predicate<DvrpVehicle> turnedOnPredicate) {
 		this.mode = mode;
 		this.temperatureProvider = temperatureProvider;
 		this.turnedOnPredicate = turnedOnPredicate == null ? v -> true : turnedOnPredicate;
@@ -50,7 +52,7 @@ public class DvrpAuxConsumptionFactory implements AuxEnergyConsumption.Factory {
 	@Override
 	public AuxEnergyConsumption create(ElectricVehicle electricVehicle) {
 		Fleet fleet = injector.getInstance(Key.get(Fleet.class, DvrpModes.mode(mode)));
-		Vehicle vehicle = fleet.getVehicles().get(electricVehicle.getId());
+		DvrpVehicle vehicle = fleet.getVehicles().get(electricVehicle.getId());
 		return new OhdeSlaskiAuxEnergyConsumption(electricVehicle, temperatureProvider,
 				ev -> turnedOnPredicate.test(vehicle));
 	}

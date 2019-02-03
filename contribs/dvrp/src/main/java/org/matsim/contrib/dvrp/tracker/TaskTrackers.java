@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.tracker;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class TaskTrackers {
-	public static void initOnlineDriveTaskTracking(Vehicle vehicle, VrpLeg vrpDynLeg,
+	public static void initOnlineDriveTaskTracking(DvrpVehicle vehicle, VrpLeg vrpDynLeg,
 			OnlineDriveTaskTracker onlineTracker) {
 		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
 		driveTask.initTaskTracker(onlineTracker);

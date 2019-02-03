@@ -19,27 +19,39 @@
 
 package org.matsim.contrib.dvrp.data;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.util.LinkProvider;
 
 /**
  * @author michalm
  */
 public class FleetImpl implements Fleet {
-	private final Map<Id<Vehicle>, Vehicle> vehicles = new LinkedHashMap<>();
+	public static Fleet create(FleetSpecification fleetSpecification, LinkProvider<Id<Link>> linkProvider) {
+		FleetImpl fleet = new FleetImpl();
+		fleetSpecification.getVehicleSpecifications()
+				.values().stream().map(s -> DvrpVehicleImpl.createWithLinkProvider(s, linkProvider))
+				.forEach(fleet::addVehicle);
+		return fleet;
+	}
+
+	private final Map<Id<DvrpVehicle>, DvrpVehicle> vehicles = new LinkedHashMap<>();
 
 	@Override
-	public Map<Id<Vehicle>, ? extends Vehicle> getVehicles() {
+	public Map<Id<DvrpVehicle>, ? extends DvrpVehicle> getVehicles() {
 		return Collections.unmodifiableMap(vehicles);
 	}
 
-	public void addVehicle(Vehicle vehicle) {
+	public void addVehicle(DvrpVehicle vehicle) {
 		vehicles.put(vehicle.getId(), vehicle);
 	}
 
 	public void resetSchedules() {
-		for (Vehicle v : vehicles.values()) {
+		for (DvrpVehicle v : vehicles.values()) {
 			v.resetSchedule();
 		}
 	}

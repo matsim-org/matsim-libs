@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
@@ -55,7 +55,7 @@ public class EmptyVehicleRelocator {
 		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
 
-	public void relocateVehicle(Vehicle vehicle, Link link) {
+	public void relocateVehicle(DvrpVehicle vehicle, Link link) {
 		DrtStayTask currentTask = (DrtStayTask)vehicle.getSchedule().getCurrentTask();
 		Link currentLink = currentTask.getLink();
 
@@ -68,7 +68,7 @@ public class EmptyVehicleRelocator {
 		}
 	}
 
-	private void relocateVehicleImpl(Vehicle vehicle, VrpPathWithTravelData vrpPath) {
+	private void relocateVehicleImpl(DvrpVehicle vehicle, VrpPathWithTravelData vrpPath) {
 		Schedule schedule = vehicle.getSchedule();
 		DrtStayTask stayTask = (DrtStayTask)schedule.getCurrentTask();
 		if (stayTask.getTaskIdx() != schedule.getTaskCount() - 1) {
