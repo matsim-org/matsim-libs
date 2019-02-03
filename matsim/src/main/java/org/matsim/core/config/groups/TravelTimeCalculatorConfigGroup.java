@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
@@ -216,6 +217,16 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	@StringSetter(SEPARATEMODES)
 	public void setSeparateModes(boolean separateModes) {
 		this.separateModes = separateModes;
+	}
+
+	@Override
+	public void checkConsistency( Config config ) {
+		if ( this.analyzedModes!=null && this.analyzedModes.size() > 0 ) {
+			// (= there is something in analyzedModes)
+			if ( !filterModes && !separateModes ) {
+
+			}
+		}
 	}
 
 }

@@ -217,7 +217,10 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 				}, Names.named("overrides"))).toInstance(overridingQSimModules);
 			}
 		});
-		
+
+		// check config consistency just before creating injector; sometimes, we can provide better error messages there:
+		config.checkConsistency();
+
 		this.injector = Injector.createInjector(config, AbstractModule.override(Collections.singleton(new AbstractModule() {
 			@Override
 			public void install() {

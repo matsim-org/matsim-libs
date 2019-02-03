@@ -149,7 +149,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		return calculator;
 	}
 
-	@Inject
+	@Inject // yyyy why is this needed?  In general, this class is NOT injected, but explicitly constructed in TravelTimeCalculator.  kai, feb'19
 	TravelTimeCalculator(TravelTimeCalculatorConfigGroup ttconfigGroup, EventsManager eventsManager, Network network) {
 		// this injected constructor is not used when getSeparateModes is true
 		this(network, ttconfigGroup.getTraveltimeBinSize(), ttconfigGroup.getMaxTime(), ttconfigGroup.isCalculateLinkTravelTimes(),
