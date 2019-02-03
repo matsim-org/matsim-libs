@@ -25,6 +25,8 @@ import java.util.Objects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * Immutable implementation of DvrpVehicleSpecification
  *
@@ -84,6 +86,17 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 	@Override
 	public double getServiceEndTime() {
 		return serviceEndTime;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("id", id)
+				.add("startLinkId", startLinkId)
+				.add("capacity", capacity)
+				.add("serviceBeginTime", serviceBeginTime)
+				.add("serviceEndTime", serviceEndTime)
+				.toString();
 	}
 
 	public static final class Builder {

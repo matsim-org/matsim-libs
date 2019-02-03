@@ -25,6 +25,8 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.ScheduleImpl;
 import org.matsim.contrib.util.LinkProvider;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * @author michalm
  */
@@ -93,7 +95,13 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 
 	@Override
 	public String toString() {
-		return "Vehicle_" + id;
+		return MoreObjects.toStringHelper(this)
+				.add("id", getId())
+				.add("startLinkId", getStartLink().getId())
+				.add("capacity", getCapacity())
+				.add("serviceBeginTime", getServiceBeginTime())
+				.add("serviceEndTime", getServiceEndTime())
+				.toString();
 	}
 
 	@Override
