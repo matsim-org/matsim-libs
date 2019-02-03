@@ -3,8 +3,8 @@
 		<carrier id="carrier1">
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
-					<vehicle id="carrier_19_heavyVehicle" depotLinkId="j(0,1)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
-<!-- 					<vehicle id="carrier_19_lightVehicle" depotLinkId="j(0,1)R" typeId="light" earliestStart="06:00:00" latestEnd="16:00:00"/> -->
+					<!--<vehicle id="carrier_19_heavyVehicle" depotLinkId="j(0,1)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>-->
+ 					<vehicle id="carrier_19_lightVehicle" depotLinkId="j(0,1)R" typeId="light" earliestStart="06:00:00" latestEnd="16:00:00"/>
 				</vehicles>
 
 			</capabilities>

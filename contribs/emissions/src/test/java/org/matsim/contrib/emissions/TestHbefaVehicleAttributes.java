@@ -18,10 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.emissions.types;
+package org.matsim.contrib.emissions;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.contrib.emissions.HbefaVehicleAttributes;
 
 
 /*

@@ -43,7 +43,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInt
  * @see ConfigurableQNetworkFactory
  *
  */
-public abstract class QNetworkFactory implements MatsimFactory {
+public interface QNetworkFactory extends MatsimFactory {
 
 	/**
 	 * I need info from the mobsim.  However, as long as the factory is injected, it cannot get to "the" mobsim; at best, it
@@ -53,10 +53,10 @@ public abstract class QNetworkFactory implements MatsimFactory {
 	 * This could be solved using custom scopes.  They do, however, for the time being only exist in the guice inject framework, not
 	 * in javax.inject, and thus we do not want to use them (yet?).
 	 */
-	abstract void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface simEngine1 ) ;
+	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface simEngine1 ) ;
 
-	abstract QNodeI createNetsimNode(Node node);
+	QNodeI createNetsimNode(Node node);
 
-	abstract QLinkI createNetsimLink(Link link, QNodeI queueNode);
+	QLinkI createNetsimLink(Link link, QNodeI queueNode);
 
 }

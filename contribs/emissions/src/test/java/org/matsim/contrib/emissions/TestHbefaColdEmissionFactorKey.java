@@ -18,10 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.emissions.types;
+package org.matsim.contrib.emissions;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.contrib.emissions.HbefaColdEmissionFactorKey;
+import org.matsim.contrib.emissions.HbefaVehicleAttributes;
+import org.matsim.contrib.emissions.HbefaVehicleCategory;
 
 
 /*
@@ -91,7 +94,7 @@ public class TestHbefaColdEmissionFactorKey {
 		HbefaVehicleAttributes attForDifferent= new HbefaVehicleAttributes();
 		attForDifferent.setHbefaEmConcept("concept 2"); attForDifferent.setHbefaSizeClass("size class 2"); attForDifferent.setHbefaTechnology("technology 2");
 		different.setHbefaVehicleAttributes(attForDifferent);
-		different.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+		different.setHbefaVehicleCategory( HbefaVehicleCategory.HEAVY_GOODS_VEHICLE );
 		
 		message = "these two objects should not be the same: " + normal.toString() + " and " + different.toString();
 		

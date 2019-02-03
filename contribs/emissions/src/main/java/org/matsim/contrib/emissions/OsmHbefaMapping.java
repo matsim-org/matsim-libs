@@ -1,8 +1,7 @@
-package org.matsim.contrib.emissions.roadTypeMapping;
+package org.matsim.contrib.emissions;
 
 import com.google.inject.Provides;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +33,7 @@ import java.util.Map;
  *    living;Access
 
  */
-public class OsmHbefaMapping extends HbefaRoadTypeMapping {
+class OsmHbefaMapping extends HbefaRoadTypeMapping {
     private static final int MAX_SPEED = 130;
     private static final String OSM_HIGHWAY_TAG = "osm:way:highway";
     Map<String, Hbefa> hbfeaMap = new HashMap<>();

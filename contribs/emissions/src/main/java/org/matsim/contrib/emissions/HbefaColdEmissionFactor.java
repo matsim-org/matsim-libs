@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HbefaWarmEmissionFactor.java
+ * HbefaColdEmissionFactor.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,34 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.types;
-
+package org.matsim.contrib.emissions;
 
 /**
  * @author benjamin
  *
  */
-public class HbefaWarmEmissionFactor {
+class HbefaColdEmissionFactor {
+	// yy not sure if it really makes sense to have an object for this.  But at least it should be immutable
+	// (set from constructor). Going one step in that direction by introducing a corresponding constructor.
+	// kai, jul'18
 
-	private double speed;
-	private double warmEmissionFactor;
-
-	public HbefaWarmEmissionFactor(){
-	}
-
-	public double getSpeed() {
-		return speed;
+	private double coldEmissionFactor;
+	
+	public HbefaColdEmissionFactor( double coldEmissionFactor ){
+		this.coldEmissionFactor = coldEmissionFactor ;
 	}
 	
-	public void setSpeed(double speed) {
-		this.speed = speed;
+	public double getColdEmissionFactor() {
+		return coldEmissionFactor;
 	}
 	
-	public double getWarmEmissionFactor() {
-		return this.warmEmissionFactor;
-	}
-	
-	public void setWarmEmissionFactor(double warmEmissionFactor) {
-		this.warmEmissionFactor = warmEmissionFactor;
-	}
 }

@@ -24,7 +24,7 @@ package org.matsim.contrib.freight.controler;
 
 import com.google.inject.Inject;
 import com.google.inject.Provides;
-import org.matsim.contrib.freight.CarrierConfig;
+import org.matsim.contrib.freight.CarrierConfigGroup;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeWriter;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
@@ -41,7 +41,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 public class CarrierModule extends AbstractModule {
 
     // Not a real config group yet, but could be one.
-    private CarrierConfig carrierConfig = new CarrierConfig();
+    private CarrierConfigGroup carrierConfig = new CarrierConfigGroup();
 
     private Carriers carriers;
     private CarrierPlanStrategyManagerFactory strategyManagerFactory;
@@ -68,7 +68,7 @@ public class CarrierModule extends AbstractModule {
     @Override
     public void install() {
         // We put some things under dependency injection.
-        bind(CarrierConfig.class).toInstance(carrierConfig);
+        bind( CarrierConfigGroup.class ).toInstance(carrierConfig );
         bind(Carriers.class).toInstance(carriers);
         if (strategyManagerFactory != null) {
             bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);

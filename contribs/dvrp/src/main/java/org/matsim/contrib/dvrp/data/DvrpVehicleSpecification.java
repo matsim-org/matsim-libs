@@ -1,10 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- * HbefaVehicleCategory.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,11 +15,31 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-package org.matsim.contrib.emissions.types;
+ * *********************************************************************** *
+ */
+
+package org.matsim.contrib.dvrp.data;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 /**
- * @author benjamin
+ * DvrpVehicleSpecification is assumed to be immutable.
+ * <p>
+ * Its lifespan can span over all iterations, but can be also changed before each iteration.
+ * <p>
+ * Changing a vehicle specification (e.g. setting a different startLinkId) should be done only "between" iterations by passing a new instance to FleetSpecification.
  *
+ * @author Michal Maciejewski (michalm)
  */
-public enum HbefaVehicleCategory { PASSENGER_CAR, HEAVY_GOODS_VEHICLE, ZERO_EMISSION_VEHICLE, MOTORCYCLE; }
+public interface DvrpVehicleSpecification {
+	Id<DvrpVehicle> getId();
+
+	Id<Link> getStartLinkId();
+
+	int getCapacity();
+
+	double getServiceBeginTime();
+
+	double getServiceEndTime();
+}

@@ -62,7 +62,7 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
  * 
  * @see ConfigurableQNetworkFactory
  */
-public final class DefaultQNetworkFactory extends QNetworkFactory {
+public final class DefaultQNetworkFactory implements QNetworkFactory {
 	private EventsManager events ;
 	private Scenario scenario ;
 	// (vis needs network and may need population attributes and config; in consequence, makes sense to have scenario here. kai, apr'16)
@@ -74,7 +74,7 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 		this.scenario = scenario;
 	}
 	@Override
-	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
+	public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
 		this.netsimEngine = netsimEngine1;
 		double effectiveCellSize = scenario.getNetwork().getEffectiveCellSize() ;
 
@@ -88,12 +88,12 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 				mobsimTimer, linkWidthCalculator );
 	}
 	@Override
-	QLinkI createNetsimLink(final Link link, final QNodeI toQueueNode) {
+	public QLinkI createNetsimLink( final Link link, final QNodeI toQueueNode ) {
 		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
 		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override
-	QNodeI createNetsimNode(final Node node) {
+	public QNodeI createNetsimNode( final Node node ) {
 		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
 		return builder.build( node ) ;
 	}

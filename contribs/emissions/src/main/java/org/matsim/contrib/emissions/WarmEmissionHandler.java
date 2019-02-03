@@ -48,7 +48,7 @@ import org.matsim.vehicles.Vehicles;
  * @author benjamin
  *
  */
-public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
+class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
 	private static final Logger logger = Logger.getLogger(WarmEmissionHandler.class);
 
 	private final Network network;

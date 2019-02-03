@@ -78,4 +78,6 @@ public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier> {
 	 */
 	public abstract CarrierCapabilities getCarrierCapabilities();
 
+
+	void clearPlans();
 }

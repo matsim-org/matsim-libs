@@ -19,14 +19,20 @@
 
 package org.matsim.contrib.etaxi.optimizer.assignment;
 
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.contrib.etaxi.ETaxiChargingTask;
+import org.matsim.contrib.etaxi.ETaxiScheduler;
+import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentChargerPlugData.ChargerPlug;
 import org.matsim.contrib.ev.data.Battery;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
@@ -50,13 +56,8 @@ import org.matsim.core.router.MultiNodePathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.contrib.etaxi.ETaxiChargingTask;
-import org.matsim.contrib.etaxi.ETaxiScheduler;
-import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentChargerPlugData.ChargerPlug;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
+import com.google.common.collect.Maps;
 
 /**
  * Main assumptions:
@@ -95,7 +96,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 	private final Fleet fleet;
 	private final MobsimTimer timer;
 
-	private final Map<Id<Vehicle>, Vehicle> scheduledForCharging;
+	private final Map<Id<DvrpVehicle>, DvrpVehicle> scheduledForCharging;
 
 	public AssignmentETaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, MobsimTimer timer, TravelTime travelTime,
 			ETaxiScheduler eScheduler, ChargingInfrastructure chargingInfrastructure,
@@ -146,8 +147,8 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 	private void unscheduleAwaitingRequestsAndCharging() {
 		eScheduler.beginChargingTaskRemoval();
 		unscheduleAwaitingRequests();// and charging
-		List<Vehicle> vehiclesWithChargingTasksRemoved = eScheduler.endChargingTaskRemoval();
-		for (Vehicle v : vehiclesWithChargingTasksRemoved) {
+		List<DvrpVehicle> vehiclesWithChargingTasksRemoved = eScheduler.endChargingTaskRemoval();
+		for (DvrpVehicle v : vehiclesWithChargingTasksRemoved) {
 			if (scheduledForCharging.remove(v.getId()) == null) {
 				throw new RuntimeException();
 			}
@@ -180,7 +181,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 	}
 
 	@Override
-	public void nextTask(Vehicle vehicle) {
+	public void nextTask(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
 			if (schedule.getCurrentTask() instanceof ETaxiChargingTask) {

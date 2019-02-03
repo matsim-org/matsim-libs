@@ -41,7 +41,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  *
  * @author benjamin, julia
  */
-public class RunDetailedEmissionToolOfflineExample{
+public final class RunDetailedEmissionToolOfflineExample{
 	
 	private final static String runDirectory = "./test/output/";
 	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config_detailed.xml";

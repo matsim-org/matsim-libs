@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * HbefaWarmEmissionFactor.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,18 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.contrib.emissions;
 
-
-package org.matsim.contrib.emissions.utils;
 
 /**
- * Created by amit on 29/09/16.
+ * @author benjamin
+ *
  */
-@Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
-public enum EmissionSpecificationMarker {
-    
-    @Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
-    BEGIN_EMISSIONS ,
-    @Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
-    END_EMISSIONS ;
+class HbefaWarmEmissionFactor {
+
+	private double speed;
+	private double warmEmissionFactor;
+
+	public HbefaWarmEmissionFactor(){
+	}
+
+	public double getSpeed() {
+		return speed;
+	}
+	
+	public void setSpeed(double speed) {
+		this.speed = speed;
+	}
+	
+	public double getWarmEmissionFactor() {
+		return this.warmEmissionFactor;
+	}
+	
+	public void setWarmEmissionFactor(double warmEmissionFactor) {
+		this.warmEmissionFactor = warmEmissionFactor;
+	}
 }

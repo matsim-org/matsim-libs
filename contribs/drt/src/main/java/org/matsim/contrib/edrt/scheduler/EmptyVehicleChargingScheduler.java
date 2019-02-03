@@ -19,16 +19,18 @@
 
 package org.matsim.contrib.edrt.scheduler;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.data.Charger;
@@ -36,10 +38,9 @@ import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.data.ElectricVehicle;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.contrib.edrt.schedule.EDrtTaskFactoryImpl;
 
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * @author michalm
@@ -58,7 +59,7 @@ public class EmptyVehicleChargingScheduler {
 				.collect(Collectors.toMap(c -> c.getLink().getId(), c -> c));
 	}
 
-	public void chargeVehicle(Vehicle vehicle) {
+	public void chargeVehicle(DvrpVehicle vehicle) {
 		DrtStayTask currentTask = (DrtStayTask)vehicle.getSchedule().getCurrentTask();
 		Link currentLink = currentTask.getLink();
 		Charger charger = linkToChargerMap.get(currentLink.getId());
@@ -70,7 +71,7 @@ public class EmptyVehicleChargingScheduler {
 		}
 	}
 
-	private void chargeVehicleImpl(Vehicle vehicle, Charger charger) {
+	private void chargeVehicleImpl(DvrpVehicle vehicle, Charger charger) {
 		Schedule schedule = vehicle.getSchedule();
 		DrtStayTask stayTask = (DrtStayTask)schedule.getCurrentTask();
 		if (stayTask.getTaskIdx() != schedule.getTaskCount() - 1) {

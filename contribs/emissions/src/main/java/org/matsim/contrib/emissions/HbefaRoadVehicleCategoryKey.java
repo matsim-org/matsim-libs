@@ -1,8 +1,8 @@
-package org.matsim.contrib.emissions.types;
+package org.matsim.contrib.emissions;
 
 import java.util.Objects;
 
-public class HbefaRoadVehicleCategoryKey {
+class HbefaRoadVehicleCategoryKey {
     private HbefaVehicleCategory hbefaVehicleCategory;
     private String hbefaRoadCategory;
 
