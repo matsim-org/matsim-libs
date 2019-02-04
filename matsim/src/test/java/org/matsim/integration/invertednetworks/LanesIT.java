@@ -69,6 +69,8 @@ public class LanesIT {
 		config.controler().setLastIteration(lastIteration);
 		config.controler().setCreateGraphs(false);
 		config.vspExperimental().setWritingOutputEvents(false);
+		config.travelTimeCalculator().setSeparateModes( false );
+		// ---
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

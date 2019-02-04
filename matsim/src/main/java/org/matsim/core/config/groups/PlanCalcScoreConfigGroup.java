@@ -1048,6 +1048,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private static final String MARGINAL_UTILITY_OF_TRAVELING = "marginalUtilityOfTraveling_util_hr";
 
 		private static final String CONSTANT = "constant";
+		private static final String CONSTANT_CMT = "[utils] alternative-specific constant.  Normally per trip, but that is probably buggy for multi-leg trips.";
+
 		public static final String MODE = "mode";
 		
 		public static final String DAILY_MONETARY_CONSTANT = "dailyMonetaryConstant";
@@ -1089,7 +1091,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 					"[utils/m] utility of traveling (e.g. walking or driving) per m, normally negative.  this is "
 							+ "on top of the time (dis)utility.");
 			map.put(MONETARY_DISTANCE_RATE, MONETARY_DISTANCE_RATE_CMT);
-			map.put(CONSTANT, "[utils] alternative-specific constant.");
+			map.put(CONSTANT, CONSTANT_CMT );
 			map.put(DAILY_UTILITY_CONSTANT, "[utils] daily utility constant. "
 					+ "default=0 to be backwards compatible");
 			map.put(DAILY_MONETARY_CONSTANT, "[money] daily monetary constant. "
@@ -1102,50 +1104,64 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			testForLocked();
 			this.mode = mode;
 		}
-
 		@StringGetter(MODE)
 		public String getMode() {
 			return mode;
 		}
-
+		// ---
 		@StringSetter(MARGINAL_UTILITY_OF_TRAVELING)
 		public void setMarginalUtilityOfTraveling(double traveling) {
 			testForLocked();
 			this.traveling = traveling;
 		}
-
 		@StringGetter(MARGINAL_UTILITY_OF_TRAVELING)
 		public double getMarginalUtilityOfTraveling() {
 			return this.traveling;
 		}
-
+		// ---
 		@StringGetter("marginalUtilityOfDistance_util_m")
 		public double getMarginalUtilityOfDistance() {
 			return distance;
 		}
-
 		@StringSetter("marginalUtilityOfDistance_util_m")
 		public void setMarginalUtilityOfDistance(double distance) {
 			testForLocked();
 			this.distance = distance;
 		}
 
-		@StringGetter("constant")
+		/**
+		 * @return {@value #CONSTANT_CMT}
+		 */
+		// ---
+		@StringGetter(CONSTANT)
 		public double getConstant() {
 			return this.constant;
 		}
-
-		@StringSetter("constant")
+		/**
+		 * @param constant -- {@value #CONSTANT_CMT}
+		 */
+		@StringSetter(CONSTANT)
 		public void setConstant(double constant) {
 			testForLocked();
 			this.constant = constant;
 		}
-
+		// ---
+		/**
+		 * @return {@value #MONETARY_DISTANCE_RATE_CMT}
+		 */
 		@StringGetter(MONETARY_DISTANCE_RATE)
 		public double getMonetaryDistanceRate() {
 			return this.monetaryDistanceRate;
 		}
-		
+
+		/**
+		 * @param monetaryDistanceRate -- {@value #MONETARY_DISTANCE_RATE_CMT}
+		 */
+		@StringSetter(MONETARY_DISTANCE_RATE)
+		public void setMonetaryDistanceRate(double monetaryDistanceRate) {
+			testForLocked();
+			this.monetaryDistanceRate = monetaryDistanceRate;
+		}
 		@StringGetter(DAILY_MONETARY_CONSTANT)
 		public double getDailyMonetaryConstant() {
 			return dailyMonetaryConstant;
@@ -1166,15 +1182,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.dailyUtilityConstant = dailyUtilityConstant;
 		}
 
-		/**
-		 * @param monetaryDistanceRate
-		 *            -- {@value #MONETARY_DISTANCE_RATE_CMT}
-		 */
-		@StringSetter(MONETARY_DISTANCE_RATE)
-		public void setMonetaryDistanceRate(double monetaryDistanceRate) {
-			testForLocked();
-			this.monetaryDistanceRate = monetaryDistanceRate;
-		}
 
 	}
 
