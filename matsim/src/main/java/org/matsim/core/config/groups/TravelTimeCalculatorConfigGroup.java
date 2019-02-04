@@ -86,15 +86,10 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 				"supported: average, linearinterpolation");
 		map.put(TRAVEL_TIME_AGGREGATOR, "How to deal with congested time bins that have no link entry events. `optimistic' " +
 				"assumes free speed (too optimistic); 'experimental_LastMile' is experimental and probably too pessimistic.") ;
-		map.put(ANALYZEDMODES, "Transport modes that will be respected by the travel time collector. 'car' is default, which " +
-				"includes also buses from the pt simulation module.");
-
-		map.put(FILTERMODES, "If " + SEPARATEMODES + " is false, then modes not included in analyzedModes are filtered out.  If " + SEPARATEMODES + " is true, then the " +
-						     "setting of" +
-						     " this switch is ignored.");
-
-		map.put(SEPARATEMODES, "If true, link travel times are measured and calculated separately for each mode in analyzedModes; the setting of " +
-						FILTERMODES + " is then ignored," ) ;
+		map.put(ANALYZEDMODES, "(only for backwards compatibility; only used if " + SEPARATEMODES + "==false && + " + FILTERMODES + "==true)  Transport modes that will be " +
+							 "respected by the travel time collector. 'car' is default which includes also buses from the pt simulation module.");
+		map.put(FILTERMODES, "(only for backwards compatiblity; only used if " + SEPARATEMODES + "==false)  Only modes included in analyzedModes are included." ) ;
+		map.put(SEPARATEMODES, "(only for backwards compatibility) If false, link travel times are measured and aggregated over all vehicles using the link." ) ;
 		map.put( TRAVEL_TIME_CALCULATOR, "possible values: " + Arrays.stream( TravelTimeCalculatorType.values() ).map( type -> type.toString() + ' ' ).collect( Collectors.joining() ) );
 		return map;
 	}

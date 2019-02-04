@@ -24,6 +24,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -65,7 +66,11 @@ public class TravelTimeCalculatorModuleTest {
 	@Test
 	public void testOneTravelTimeCalculatorPerMode() {
 		Config config = ConfigUtils.createConfig();
-		config.travelTimeCalculator().setAnalyzedModesAsString("car,bike" );
+
+//		config.travelTimeCalculator().setAnalyzedModesAsString("car,bike" );
+		config.plansCalcRoute().setNetworkModes( new LinkedHashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ) ) );
+		// (this is now newly taken from the router network modes. kai, feb'19)
+
 		config.travelTimeCalculator().setSeparateModes(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Node node0 = scenario.getNetwork().getFactory().createNode(Id.createNodeId(0), new Coord(0, 0));
