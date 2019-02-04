@@ -28,6 +28,7 @@ public class RunTaxiScenario {
 	public static void run(String configFile, boolean otfvis) {
 		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
+		config.controler().setLastIteration(3);
 		TaxiControlerCreator.createControler(config, otfvis).run();
 	}
 
