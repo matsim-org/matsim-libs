@@ -19,11 +19,11 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 
 /**
  * @author michalm
  */
 public interface ScheduleInquiry {
-	boolean isIdle(Vehicle vehicle);
+	boolean isIdle(DvrpVehicle vehicle);
 }

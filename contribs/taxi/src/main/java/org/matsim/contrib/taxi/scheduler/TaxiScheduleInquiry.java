@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.taxi.scheduler;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
@@ -27,9 +27,9 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
  * @author michalm
  */
 public interface TaxiScheduleInquiry extends ScheduleInquiry {
-	LinkTimePair getImmediateDiversion(Vehicle veh);
+	LinkTimePair getImmediateDiversion(DvrpVehicle veh);
 
-	LinkTimePair getEarliestIdleness(Vehicle veh);
+	LinkTimePair getEarliestIdleness(DvrpVehicle veh);
 
-	LinkTimePair getImmediateDiversionOrEarliestIdleness(Vehicle veh);
+	LinkTimePair getImmediateDiversionOrEarliestIdleness(DvrpVehicle veh);
 }

@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import com.google.common.collect.ImmutableList;
@@ -42,12 +42,12 @@ import com.google.common.collect.ImmutableList;
  */
 public class VehicleData {
 	public static class Entry {
-		public final Vehicle vehicle;
+		public final DvrpVehicle vehicle;
 		public final LinkTimePair start;
 		public final int startOccupancy;
 		public final ImmutableList<Stop> stops;
 
-		public Entry(Vehicle vehicle, LinkTimePair start, int startOccupancy, ImmutableList<Stop> stops) {
+		public Entry(DvrpVehicle vehicle, LinkTimePair start, int startOccupancy, ImmutableList<Stop> stops) {
 			this.vehicle = vehicle;
 			this.start = start;
 			this.startOccupancy = startOccupancy;
@@ -100,14 +100,14 @@ public class VehicleData {
 	}
 
 	public interface EntryFactory {
-		Entry create(Vehicle vehicle, double currentTime);
+		Entry create(DvrpVehicle vehicle, double currentTime);
 	}
 
 	private final double currentTime;
 	private final EntryFactory entryFactory;
-	private final Map<Id<Vehicle>, Entry> entries;
+	private final Map<Id<DvrpVehicle>, Entry> entries;
 
-	public VehicleData(double currentTime, Stream<? extends Vehicle> vehicles, EntryFactory entryFactory,
+	public VehicleData(double currentTime, Stream<? extends DvrpVehicle> vehicles, EntryFactory entryFactory,
 			ForkJoinPool forkJoinPool) {
 		this.currentTime = currentTime;
 		this.entryFactory = entryFactory;
@@ -122,7 +122,7 @@ public class VehicleData {
 		}
 	}
 
-	public void updateEntry(Vehicle vehicle) {
+	public void updateEntry(DvrpVehicle vehicle) {
 		Entry e = entryFactory.create(vehicle, currentTime);
 		if (e != null) {
 			entries.put(vehicle.getId(), e);

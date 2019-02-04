@@ -19,81 +19,53 @@
 
 package org.matsim.contrib.dvrp.data;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 
 /**
+ * DvrpVehicle is created from DvrpVehicleSpecification.
+ * Its lifespan is one QSim simulation (same as of the optimizer and schedules created during simulation).
+ *
  * @author michalm
  */
-public class VehicleImpl implements Vehicle {
-	private final Id<Vehicle> id;
-	private Link startLink;
-	private final int capacity;
+public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
 
-	// time window
-	private final double serviceBeginTime;
-	private double serviceEndTime;
+	/**
+	 * @return the link at which vehicle starts operating (i.e. depot)
+	 */
+	Link getStartLink();
 
-	private Schedule schedule;
+	void setStartLink(Link link);
 
-	public VehicleImpl(Id<Vehicle> id, Link startLink, int capacity, double serviceBeginTime,
-			double serviceEndTime) {
-		this.id = id;
-		this.startLink = startLink;
-		this.capacity = capacity;
-		this.serviceBeginTime = serviceBeginTime;
-		this.serviceEndTime = serviceEndTime;
+	/**
+	 * @return the amount of people/goods that can be served/transported at the same time
+	 */
+	int getCapacity();
 
-		schedule = new ScheduleImpl(this);
-	}
+	/**
+	 * @return (desired) time when the vehicle should start operating (inclusive); can be different from
+	 * {@link Schedule#getBeginTime()}
+	 */
+	double getServiceBeginTime();
 
-	@Override
-	public Id<Vehicle> getId() {
-		return id;
-	}
+	/**
+	 * @return (desired) time by which the vehicle should stop operating (exclusive); can be different from
+	 * {@link Schedule#getEndTime()}
+	 */
+	double getServiceEndTime();
 
-	@Override
-	public Link getStartLink() {
-		return startLink;
-	}
+	/**
+	 * Design comment(s):
+	 * <ul>
+	 * <li>Typically, the Schedule is meant to be changed only by the optimizer. Note, however, that the present design
+	 * does not prevent other classes to change it, so be careful. kai, feb'17
+	 * </ul>
+	 */
+	Schedule getSchedule();
 
-	@Override
-	public void setStartLink(Link link) {
-		this.startLink = link;
-	}
-
-	@Override
-	public int getCapacity() {
-		return capacity;
-	}
-
-	@Override
-	public double getServiceBeginTime() {
-		return serviceBeginTime;
-	}
-
-	@Override
-	public double getServiceEndTime() {
-		return serviceEndTime;
-	}
-
-	@Override
-	public Schedule getSchedule() {
-		return schedule;
-	}
-
-	@Override
-	public String toString() {
-		return "Vehicle_" + id;
-	}
-
-	public void setServiceEndTime(double serviceEndTime) {
-		this.serviceEndTime = serviceEndTime;
-	}
-
-	@Override
-	public void resetSchedule() {
-		schedule = new ScheduleImpl(this);
-	}
+	/**
+	 * Resets the schedule. For instance, by creating a new Schedule object.
+	 */
+	void resetSchedule();
 }

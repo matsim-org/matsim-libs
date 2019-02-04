@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 
@@ -38,15 +38,15 @@ import org.matsim.core.api.experimental.events.EventsManager;
  */
 public class ZonalIdleVehicleCollector implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-	private Map<String, LinkedList<Id<Vehicle>>> vehiclesPerZone = new HashMap<>();
-	private Map<Id<Vehicle>, String> zonePerVehicle = new HashMap<>();
+	private Map<String, LinkedList<Id<DvrpVehicle>>> vehiclesPerZone = new HashMap<>();
+	private Map<Id<DvrpVehicle>, String> zonePerVehicle = new HashMap<>();
 	private final DrtZonalSystem zonalSystem;
 
 	public ZonalIdleVehicleCollector(EventsManager events, DrtZonalSystem zonalSystem) {
 		events.addHandler(this);
 		this.zonalSystem = zonalSystem;
 		for (String z : zonalSystem.getZones().keySet()) {
-			vehiclesPerZone.put(z, new LinkedList<Id<Vehicle>>());
+			vehiclesPerZone.put(z, new LinkedList<Id<DvrpVehicle>>());
 		}
 	}
 
@@ -55,7 +55,7 @@ public class ZonalIdleVehicleCollector implements ActivityStartEventHandler, Act
 		if (event.getActType().equals(DrtActionCreator.DRT_STAY_NAME)) {
 			String zone = zonalSystem.getZoneForLinkId(event.getLinkId());
 			if (zone != null) {
-				Id<Vehicle> vid = Id.create(event.getPersonId(), Vehicle.class);
+				Id<DvrpVehicle> vid = Id.create(event.getPersonId(), DvrpVehicle.class);
 				vehiclesPerZone.get(zone).add(vid);
 				zonePerVehicle.put(vid, zone);
 			}
@@ -64,7 +64,7 @@ public class ZonalIdleVehicleCollector implements ActivityStartEventHandler, Act
 		if (event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE)) {
 			String zone = zonalSystem.getZoneForLinkId(event.getLinkId());
 			if (zone != null) {
-				Id<Vehicle> vid = Id.create(event.getPersonId(), Vehicle.class);
+				Id<DvrpVehicle> vid = Id.create(event.getPersonId(), DvrpVehicle.class);
 				zonePerVehicle.remove(vid);
 				vehiclesPerZone.get(zone).remove(vid);
 			}
@@ -78,7 +78,7 @@ public class ZonalIdleVehicleCollector implements ActivityStartEventHandler, Act
 			String zone = zonalSystem.getZoneForLinkId(event.getLinkId());
 			if (zone != null) {
 
-				Id<Vehicle> vid = Id.create(event.getPersonId(), Vehicle.class);
+				Id<DvrpVehicle> vid = Id.create(event.getPersonId(), DvrpVehicle.class);
 				zonePerVehicle.remove(vid);
 				vehiclesPerZone.get(zone).remove(vid);
 
@@ -86,7 +86,7 @@ public class ZonalIdleVehicleCollector implements ActivityStartEventHandler, Act
 		}
 	}
 
-	public LinkedList<Id<Vehicle>> getIdleVehiclesPerZone(String zone) {
+	public LinkedList<Id<DvrpVehicle>> getIdleVehiclesPerZone(String zone) {
 		return this.vehiclesPerZone.get(zone);
 	}
 }

@@ -19,27 +19,32 @@
 
 package org.matsim.contrib.dvrp.data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
-import org.apache.commons.math3.stat.descriptive.rank.Max;
-import org.matsim.contrib.util.random.*;
+import org.matsim.contrib.util.random.RandomUtils;
+import org.matsim.contrib.util.random.UniformRandom;
 
 /**
  * @author michalm
  */
 public class VehicleGenerator {
-	public interface VehicleCreator {//move to generator
-		Vehicle createVehicle(double t0, double t1);
+	public interface VehicleCreator {
+		DvrpVehicleSpecification createVehicleSpecification(double t0, double t1);
 	}
-	
+
 	private final UniformRandom uniform = RandomUtils.getGlobalUniform();
-	private final List<VehicleImpl> vehicles = new ArrayList<>();
+	private final List<DvrpVehicleSpecification> vehicles = new ArrayList<>();
 
 	private final double minWorkTime;
 	private final double maxWorkTime;
 	private final VehicleCreator vehicleCreator;
 
-	private Queue<VehicleImpl> activeVehicles;
+	private Queue<DvrpVehicleSpecification> activeVehicles;
 	private double previousTime;
 	private double currentTime;
 
@@ -54,7 +59,8 @@ public class VehicleGenerator {
 			throw new IllegalArgumentException();
 		}
 
-		initQueue(vehicleCounts);
+		activeVehicles = new PriorityQueue<>((int)Arrays.stream(vehicleCounts).max().getAsDouble() + 1,
+				Comparator.comparingDouble(DvrpVehicleSpecification::getServiceEndTime));
 
 		// only iteration 0; in order to have zero vehicles before startTime
 		previousTime = startTime;
@@ -70,6 +76,8 @@ public class VehicleGenerator {
 		// get down to 0 after the last vehicle count
 		currentTime = previousTime;
 		reachExpectedVehicleCount(0);
+
+		vehicles.sort(Comparator.comparing(DvrpVehicleSpecification::getId));//or startTime??
 	}
 
 	// reach the expected vehicle count at currentTime
@@ -82,18 +90,13 @@ public class VehicleGenerator {
 		}
 	}
 
-	private void initQueue(double[] vehicleCounts) {
-		int queueCapacity = (int)new Max().evaluate(vehicleCounts) + 1;
-		activeVehicles = new PriorityQueue<>(queueCapacity, Vehicles.T1_COMPARATOR);
-	}
-
 	private void removeVehiclesOnT1() {
 		while (!activeVehicles.isEmpty()) {
 			if (activeVehicles.peek().getServiceEndTime() >= currentTime) {
 				return;
 			}
 
-			activeVehicles.poll();
+			vehicles.add(activeVehicles.poll());
 		}
 	}
 
@@ -109,21 +112,20 @@ public class VehicleGenerator {
 		for (int i = 0; i < count; i++) {
 			double t0 = Math.floor(uniform.nextDouble(previousTime, currentTime));
 			double workTime = Math.round(uniform.nextDouble(minWorkTime, maxWorkTime));
-			VehicleImpl veh = (VehicleImpl)vehicleCreator.createVehicle(t0, t0 + workTime);
-			activeVehicles.add(veh);
-			vehicles.add(veh);
+			DvrpVehicleSpecification specification = vehicleCreator.createVehicleSpecification(t0, t0 + workTime);
+			activeVehicles.add(specification);
 		}
 	}
 
 	private void removeVehiclesBeforeT1(int count) {
 		for (int i = 0; i < count; i++) {
-			VehicleImpl veh = activeVehicles.poll();
+			DvrpVehicleSpecification veh = activeVehicles.poll();
 			double t1 = Math.floor(uniform.nextDouble(previousTime, currentTime));
-			veh.setServiceEndTime(t1);
+			vehicles.add(ImmutableDvrpVehicleSpecification.newBuilder(veh).serviceEndTime(t1).build());
 		}
 	}
 
-	public List<? extends Vehicle> getVehicles() {
+	public List<DvrpVehicleSpecification> getVehicleSpecifications() {
 		return vehicles;
 	}
 }

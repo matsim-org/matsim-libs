@@ -18,7 +18,7 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTrackerImpl;
 import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
@@ -33,16 +33,16 @@ public interface VrpLegFactory {
 	 * @param vehicle for which the leg is created
 	 * @return fully initialised VrpLeg (e.g. with online tracking, etc.)
 	 */
-	VrpLeg create(Vehicle vehicle);
+	VrpLeg create(DvrpVehicle vehicle);
 
-	static VrpLeg createWithOfflineTracker(String mode, Vehicle vehicle, MobsimTimer timer) {
+	static VrpLeg createWithOfflineTracker(String mode, DvrpVehicle vehicle, MobsimTimer timer) {
 		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
 		VrpLeg leg = new VrpLeg(mode, driveTask.getPath());
 		TaskTrackers.initOfflineTaskTracking(driveTask, timer);
 		return leg;
 	}
 
-	static VrpLeg createWithOnlineTracker(String mode, Vehicle vehicle, OnlineTrackerListener onlineTrackerListener,
+	static VrpLeg createWithOnlineTracker(String mode, DvrpVehicle vehicle, OnlineTrackerListener onlineTrackerListener,
 			MobsimTimer timer) {
 		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
 		VrpLeg leg = new VrpLeg(mode, driveTask.getPath());

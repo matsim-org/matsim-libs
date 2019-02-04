@@ -29,8 +29,8 @@ import java.util.stream.Stream;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
@@ -51,7 +51,7 @@ import org.matsim.core.router.util.TravelTime;
  * @author michalm
  */
 public class ZonalRequestInserter implements UnplannedRequestInserter {
-	private static final Comparator<Vehicle> LONGEST_WAITING_FIRST = (v1, v2) -> Double.compare(
+	private static final Comparator<DvrpVehicle> LONGEST_WAITING_FIRST = (v1, v2) -> Double.compare(
 			v1.getSchedule().getCurrentTask().getBeginTime(), v2.getSchedule().getCurrentTask().getBeginTime());
 
 	private final Fleet fleet;
@@ -60,7 +60,7 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 	private final RuleBasedRequestInserter requestInserter;
 
 	private final Map<Id<Zone>, Zone> zones;
-	private Map<Id<Zone>, PriorityQueue<Vehicle>> zoneToIdleVehicleQueue;
+	private Map<Id<Zone>, PriorityQueue<DvrpVehicle>> zoneToIdleVehicleQueue;
 	private final Map<Id<Link>, Zone> linkToZone;
 
 	public ZonalRequestInserter(Fleet fleet, TaxiScheduler scheduler, MobsimTimer timer, Network network,
@@ -97,15 +97,15 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 
 		zoneToIdleVehicleQueue = new HashMap<>();
 		for (Id<Zone> zoneId : zones.keySet()) {
-			zoneToIdleVehicleQueue.put(zoneId, new PriorityQueue<Vehicle>(10, LONGEST_WAITING_FIRST));
+			zoneToIdleVehicleQueue.put(zoneId, new PriorityQueue<DvrpVehicle>(10, LONGEST_WAITING_FIRST));
 		}
 
-		for (Vehicle veh : fleet.getVehicles().values()) {
+		for (DvrpVehicle veh : fleet.getVehicles().values()) {
 			if (scheduler.isIdle(veh)) {
 				Link link = ((StayTask)veh.getSchedule().getCurrentTask()).getLink();
 				Zone zone = linkToZone.get(link.getId());
 				if (zone != null) {
-					PriorityQueue<Vehicle> queue = zoneToIdleVehicleQueue.get(zone.getId());
+					PriorityQueue<DvrpVehicle> queue = zoneToIdleVehicleQueue.get(zone.getId());
 					queue.add(veh);
 				}
 			}
@@ -122,12 +122,12 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 				continue;
 			}
 
-			PriorityQueue<Vehicle> idleVehsInZone = zoneToIdleVehicleQueue.get(zone.getId());
+			PriorityQueue<DvrpVehicle> idleVehsInZone = zoneToIdleVehicleQueue.get(zone.getId());
 			if (idleVehsInZone.isEmpty()) {
 				continue;
 			}
 
-			Stream<Vehicle> filteredVehs = Stream.of(idleVehsInZone.peek());
+			Stream<DvrpVehicle> filteredVehs = Stream.of(idleVehsInZone.peek());
 			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestVehicleForRequest(req, filteredVehs);
 
 			if (best != null) {

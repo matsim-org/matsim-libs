@@ -30,7 +30,7 @@ import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
@@ -52,7 +52,7 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		}
 	}
 
-	public Entry create(Vehicle vehicle, double currentTime) {
+	public Entry create(DvrpVehicle vehicle, double currentTime) {
 		if (!isEligibleForRequestInsertion(vehicle, currentTime)) {
 			return null;
 		}
@@ -111,7 +111,7 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		return new Entry(vehicle, start, outputOccupancy, ImmutableList.copyOf(stops));
 	}
 
-	public boolean isEligibleForRequestInsertion(Vehicle vehicle, double currentTime) {
+	public boolean isEligibleForRequestInsertion(DvrpVehicle vehicle, double currentTime) {
 		return !(currentTime + lookAhead < vehicle.getServiceBeginTime()//
 				|| currentTime >= vehicle.getServiceEndTime());
 	}

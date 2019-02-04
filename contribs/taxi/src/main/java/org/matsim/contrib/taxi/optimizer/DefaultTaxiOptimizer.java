@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.data.TaxiRequest;
@@ -76,7 +76,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 			// TODO update timeline only if the algo really wants to reschedule in this time step,
 			// perhaps by checking if there are any unplanned requests??
 			if (params.doUpdateTimelines) {
-				for (Vehicle v : fleet.getVehicles().values()) {
+				for (DvrpVehicle v : fleet.getVehicles().values()) {
 					scheduler.updateTimeline(v);
 				}
 			}
@@ -116,7 +116,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	}
 
 	@Override
-	public void nextTask(Vehicle vehicle) {
+	public void nextTask(DvrpVehicle vehicle) {
 		scheduler.updateBeforeNextTask(vehicle);
 
 		Task newCurrentTask = vehicle.getSchedule().nextTask();

@@ -1,8 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,72 +17,86 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.ev.dvrp;
+package org.matsim.contrib.dvrp.data;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.ev.data.ElectricFleet;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.dvrp.schedule.ScheduleImpl;
+import org.matsim.contrib.util.LinkProvider;
+
+import com.google.common.base.MoreObjects;
 
 /**
  * @author michalm
  */
-public class EvDvrpVehicle implements DvrpVehicle {
-	static EvDvrpVehicle create(DvrpVehicle vehicle, ElectricFleet evFleet) {
-		return new EvDvrpVehicle(vehicle, evFleet.getElectricVehicles().get(vehicle.getId()));
+public class DvrpVehicleImpl implements DvrpVehicle {
+
+	public static DvrpVehicleImpl createWithLinkProvider(DvrpVehicleSpecification specification,
+			LinkProvider<Id<Link>> linkProvider) {
+		return new DvrpVehicleImpl(specification, linkProvider.apply(specification.getStartLinkId()));
 	}
 
-	private final DvrpVehicle vehicle;
-	private final ElectricVehicle electricVehicle;
+	private final DvrpVehicleSpecification specification;
+	private Link startLink; //FIXME will be final after removing setStartLink
+	private Schedule schedule;
 
-	public EvDvrpVehicle(DvrpVehicle vehicle, ElectricVehicle electricVehicle) {
-		this.vehicle = vehicle;
-		this.electricVehicle = electricVehicle;
-	}
+	public DvrpVehicleImpl(DvrpVehicleSpecification specification, Link startLink) {
+		this.specification = specification;
+		this.startLink = startLink;
 
-	public ElectricVehicle getElectricVehicle() {
-		return electricVehicle;
+		schedule = new ScheduleImpl(specification);
 	}
 
 	@Override
 	public Id<DvrpVehicle> getId() {
-		return vehicle.getId();
+		return specification.getId();
 	}
 
 	@Override
 	public Link getStartLink() {
-		return vehicle.getStartLink();
+		return startLink;
+	}
+
+	//FIXME will be removed after limiting the DvrpVehicle lifespan to single QSim simulation
+	@Override
+	public void setStartLink(Link link) {
+		this.startLink = link;
 	}
 
 	@Override
 	public int getCapacity() {
-		return vehicle.getCapacity();
+		return specification.getCapacity();
 	}
 
 	@Override
 	public double getServiceBeginTime() {
-		return vehicle.getServiceBeginTime();
+		return specification.getServiceBeginTime();
 	}
 
 	@Override
 	public double getServiceEndTime() {
-		return vehicle.getServiceEndTime();
+		return specification.getServiceEndTime();
 	}
 
 	@Override
 	public Schedule getSchedule() {
-		return vehicle.getSchedule();
+		return schedule;
 	}
 
 	@Override
-	public void setStartLink(Link link) {
-		vehicle.setStartLink(link);
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("id", getId())
+				.add("startLinkId", getStartLink().getId())
+				.add("capacity", getCapacity())
+				.add("serviceBeginTime", getServiceBeginTime())
+				.add("serviceEndTime", getServiceEndTime())
+				.toString();
 	}
 
 	@Override
 	public void resetSchedule() {
-		vehicle.resetSchedule();
+		schedule = new ScheduleImpl(specification);
 	}
 }
