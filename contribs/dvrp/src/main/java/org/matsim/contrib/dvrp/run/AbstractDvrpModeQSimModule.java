@@ -55,6 +55,10 @@ public abstract class AbstractDvrpModeQSimModule extends AbstractQSimModule {
 		return bind(modalKey(type));
 	}
 
+	protected final LinkedBindingBuilder<QSimComponent> addModalQSimComponentBinding() {
+		return addQSimComponentBinding(getDvrpMode());
+	}
+
 	protected final <T extends QSimComponent> void addModalComponent(Class<T> componentClass, Key<? extends T> key) {
 		bind(componentClass).annotatedWith(getDvrpMode()).to(key).asEagerSingleton();
 		addQSimComponentBinding(getDvrpMode()).to(Key.get(componentClass, getDvrpMode()));
