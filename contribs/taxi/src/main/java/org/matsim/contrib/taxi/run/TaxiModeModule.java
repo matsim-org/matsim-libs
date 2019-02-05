@@ -30,6 +30,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
+import org.matsim.contrib.taxi.util.stats.FleetStatsCalculatorModule;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
 import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
 import org.matsim.core.controler.IterationCounter;
@@ -56,11 +57,9 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 
 		install(new FleetModule(getMode(), taxiCfg.getTaxisFile()));
 
-		bindModal(TaxiStatsDumper.class).
-				toProvider(modalProvider(
-						getter -> new TaxiStatsDumper(taxiCfg, getter.get(OutputDirectoryHierarchy.class),
-								getter.get(IterationCounter.class)))).asEagerSingleton();
-		addControlerListenerBinding().to(modalKey(TaxiStatsDumper.class));
+		install(FleetStatsCalculatorModule.createModule(getMode(), TaxiStatsDumper.class,
+				getter -> new TaxiStatsDumper(taxiCfg, getter.get(OutputDirectoryHierarchy.class),
+						getter.get(IterationCounter.class))));
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
@@ -70,10 +69,6 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 
 				addModalQSimComponentBinding().toProvider(modalProvider(getter -> new TaxiSimulationConsistencyChecker(
 						getter.getModal(SubmittedTaxiRequestsCollector.class), taxiCfg)));
-
-				addModalQSimComponentBinding().toProvider(modalProvider(
-						getter -> new TaxiStatsDumper.MobsimBeforeCleanupNotifier(
-								getter.getModal(TaxiStatsDumper.class), getter.getModal(Fleet.class))));
 
 				if (taxiCfg.getTimeProfiles()) {
 					addModalQSimComponentBinding().toProvider(modalProvider(

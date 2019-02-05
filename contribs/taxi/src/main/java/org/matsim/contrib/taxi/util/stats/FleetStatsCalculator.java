@@ -21,27 +21,10 @@
 package org.matsim.contrib.taxi.util.stats;
 
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public interface FleetStatsCalculator {
 	void updateStats(Fleet fleet);
-
-	class MobsimBeforeCleanupNotifier implements MobsimBeforeCleanupListener {
-		private final FleetStatsCalculator fleetStatsCalculator;
-		private final Fleet fleet;
-
-		public MobsimBeforeCleanupNotifier(FleetStatsCalculator fleetStatsCalculator, Fleet fleet) {
-			this.fleetStatsCalculator = fleetStatsCalculator;
-			this.fleet = fleet;
-		}
-
-		@Override
-		public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-			fleetStatsCalculator.updateStats(fleet);
-		}
-	}
 }
