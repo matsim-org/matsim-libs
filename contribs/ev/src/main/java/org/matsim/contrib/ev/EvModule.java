@@ -19,30 +19,34 @@
 
 package org.matsim.contrib.ev;
 
-import com.google.inject.name.Names;
-import org.matsim.api.core.v01.network.Network;
+import javax.inject.Inject;
+
 import org.matsim.contrib.ev.EvConfigGroup.AuxDischargingSimulation;
 import org.matsim.contrib.ev.charging.ChargingHandler;
 import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.contrib.ev.charging.ChargingWithQueueingLogic;
-import org.matsim.contrib.ev.charging.FixedSpeedChargingStrategy;
+import org.matsim.contrib.ev.charging.ChargingModule;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.data.ElectricFleet;
-import org.matsim.contrib.ev.data.file.ChargingInfrastructureProvider;
 import org.matsim.contrib.ev.data.file.ElectricFleetProvider;
-import org.matsim.contrib.ev.discharging.*;
-import org.matsim.contrib.ev.stats.*;
+import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
+import org.matsim.contrib.ev.discharging.DriveDischargingHandler;
+import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+import org.matsim.contrib.ev.discharging.OhdeSlaskiAuxEnergyConsumption;
+import org.matsim.contrib.ev.discharging.OhdeSlaskiDriveEnergyConsumption;
+import org.matsim.contrib.ev.stats.ChargerOccupancyTimeProfileCollectorProvider;
+import org.matsim.contrib.ev.stats.ChargerOccupancyXYDataProvider;
+import org.matsim.contrib.ev.stats.ChargerPowerCollector;
+import org.matsim.contrib.ev.stats.EVControlerListener;
+import org.matsim.contrib.ev.stats.IndividualSocTimeProfileCollectorProvider;
+import org.matsim.contrib.ev.stats.SocHistogramTimeProfileCollectorProvider;
+import org.matsim.contrib.ev.stats.VehicleTypeAggregatedSocTimeProfileCollectorProvider;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-import javax.inject.Inject;
-
 public class EvModule extends AbstractModule {
-	private static ChargingLogic.Factory DEFAULT_CHARGING_LOGIC_FACTORY = charger -> new ChargingWithQueueingLogic(
-			charger, new FixedSpeedChargingStrategy(charger.getPower()));
-
 	private static DriveEnergyConsumption.Factory DEFAULT_DRIVE_CONSUMPTION_FACTORY //
 			= ev -> new OhdeSlaskiDriveEnergyConsumption();
 
@@ -55,27 +59,18 @@ public class EvModule extends AbstractModule {
 	public void install() {
 		EvConfigGroup evCfg = EvConfigGroup.get(getConfig());
 
-		bind(ElectricFleet.class)
-				.toProvider(new ElectricFleetProvider(evCfg.getVehiclesFileUrl(getConfig().getContext())))
-				.asEagerSingleton();
+		bind(ElectricFleet.class).toProvider(
+				new ElectricFleetProvider(evCfg.getVehiclesFileUrl(getConfig().getContext()))).asEagerSingleton();
 		bind(DriveEnergyConsumption.Factory.class).toInstance(DEFAULT_DRIVE_CONSUMPTION_FACTORY);
 
-        if (evCfg.getAuxDischargingSimulation() == AuxDischargingSimulation.seperateAuxDischargingHandler) {
-			// "isTurnedOn" returns true ==> should not be used when for "seperateAuxDischargingHandler"
-			bind(AuxEnergyConsumption.Factory.class).toInstance(DEFAULT_AUX_CONSUMPTION_FACTORY);
-		}
-
-		bind(Network.class).annotatedWith(Names.named(ChargingInfrastructure.CHARGERS)).to(Network.class)
-				.asEagerSingleton();
-		bind(ChargingInfrastructure.class)
-				.toProvider(new ChargingInfrastructureProvider(evCfg.getChargersFileUrl(getConfig().getContext())))
-				.asEagerSingleton();
-		bind(ChargingLogic.Factory.class).toInstance(DEFAULT_CHARGING_LOGIC_FACTORY);
+		install(new ChargingModule(evCfg));
 
 		bind(DriveDischargingHandler.class).asEagerSingleton();
 		addEventHandlerBinding().to(DriveDischargingHandler.class);
 
 		if (evCfg.getAuxDischargingSimulation() == AuxDischargingSimulation.seperateAuxDischargingHandler) {
+			// "isTurnedOn" returns true ==> should not be used when for "seperateAuxDischargingHandler"
+			bind(AuxEnergyConsumption.Factory.class).toInstance(DEFAULT_AUX_CONSUMPTION_FACTORY);
 			bind(AuxDischargingHandler.class).asEagerSingleton();
 			addMobsimListenerBinding().to(AuxDischargingHandler.class);
 		}
@@ -91,8 +86,8 @@ public class EvModule extends AbstractModule {
 			addMobsimListenerBinding().toProvider(VehicleTypeAggregatedSocTimeProfileCollectorProvider.class);
 			// add more time profiles if necessary
 		}
-        addControlerListenerBinding().to(EVControlerListener.class).asEagerSingleton();
-        bind(ChargerPowerCollector.class).asEagerSingleton();
+		addControlerListenerBinding().to(EVControlerListener.class).asEagerSingleton();
+		bind(ChargerPowerCollector.class).asEagerSingleton();
 
 		bind(InitAtIterationStart.class).asEagerSingleton();
 		addControlerListenerBinding().to(InitAtIterationStart.class);
