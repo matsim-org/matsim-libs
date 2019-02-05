@@ -59,7 +59,7 @@ public class TravelTimeCalculatorModuleTest {
 		events.processEvent(new LinkLeaveEvent(8.0, Id.createVehicleId(1), linkId));
 		events.processEvent(new VehicleLeavesTrafficEvent(8.0, Id.createPersonId(1), linkId, Id.createVehicleId(1), "bike", 0.0));
 
-		assertThat(testee.getLinkTravelTime(link, 0.0), is(5.0));
+		assertThat(testee.getLinkTravelTimes().getLinkTravelTime(link, 0.0,null,null), is(5.0));
 	}
 
 
@@ -94,8 +94,8 @@ public class TravelTimeCalculatorModuleTest {
 		events.processEvent(new LinkLeaveEvent(8.0, Id.createVehicleId(1), linkId));
 		events.processEvent(new VehicleLeavesTrafficEvent(8.0, Id.createPersonId(1), linkId, Id.createVehicleId(1), "bike", 0.0));
 
-		assertThat(car.getLinkTravelTime(link, 0.0), is(2.0));
-		assertThat(bike.getLinkTravelTime(link, 0.0), is(8.0));
+		assertThat(car.getLinkTravelTimes().getLinkTravelTime(link, 0.0, null, null ), is(2.0));
+		assertThat(bike.getLinkTravelTimes().getLinkTravelTime(link, 0.0, null, null ), is(8.0));
 	}
 
 }

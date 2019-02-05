@@ -24,7 +24,7 @@ abstract class TravelTimeData {
 	// yyyy My (relative strong) intuition would be that the methods of this should accept time in seconds, and do the conversion to bins internally.  Otherwise, we bind the
 	// information of TravelTimeData to uniform time slices forever.  kai, feb'19
 
-	private boolean needsConsolidation;
+	private boolean needsConsolidation = true ;
 
 	public abstract void resetTravelTimes();
 	

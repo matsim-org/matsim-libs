@@ -155,6 +155,8 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	}
 
 	public final static class Builder {
+		// The idea here is that the config group will NOT be passed into this object any more. kai, feb'19
+
 		private final Network network ;
 		private int timeslice = 900 ;
 		private int maxTime = 36*3600 ; // yy replace by long or double!
@@ -359,7 +361,8 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	 * increases the router performance by 20-30%!
 	 * cdobler, aug'17
 	 */
-	public double getLinkTravelTime(final Link link, final double time) {
+	@Deprecated // should become non-public; use getLinkTravelTimes().... instead ...
+	private double getLinkTravelTime(final Link link, final double time) {
 		if (this.calculateLinkTravelTimes) {
 
 			TravelTimeData data = this.dataContainerProvider.getTravelTimeData(link, true);
@@ -400,7 +403,8 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 								    "if calculation is switched off by config option!");
 	}
 
-	public double getLinkToLinkTravelTime(final Id<Link> fromLinkId, final Id<Link> toLinkId, double time) {
+	@Deprecated // should become non-public; use getLinkToLinkTravelTimes()... instead.
+	private double getLinkToLinkTravelTime(final Id<Link> fromLinkId, final Id<Link> toLinkId, double time) {
 		if (!this.calculateLinkToLinkTravelTimes) {
 			throw new IllegalStateException("No link to link travel time is available " +
 									    "if calculation is switched off by config option!");

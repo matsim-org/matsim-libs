@@ -117,7 +117,9 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 			builder.setFilterModes( true ); // no point asking the config since we are in "separateModes" anyways.
 			builder.setAnalyzedModes( CollectionUtils.stringToSet( mode ) );
 			builder.configure( config );
-			return builder.build() ;
+			TravelTimeCalculator calculator = builder.build();
+			eventsManager.addHandler( calculator );
+			return calculator ;
 		}
 	}
 
