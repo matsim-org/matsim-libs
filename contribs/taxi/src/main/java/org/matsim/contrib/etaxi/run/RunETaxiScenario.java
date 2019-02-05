@@ -62,7 +62,7 @@ public class RunETaxiScenario {
 		controler.addOverridingModule(new DvrpModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(taxiCfg.getMode()));
 
-		controler.addOverridingModule(createEvDvrpIntegrationModule(taxiCfg));
+		controler.addOverridingModule(createEvDvrpIntegrationModule(taxiCfg.getMode()));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
@@ -71,8 +71,8 @@ public class RunETaxiScenario {
 		return controler;
 	}
 
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(TaxiConfigGroup taxiCfg) {
-		return new EvDvrpIntegrationModule(taxiCfg.getMode()).setChargingStrategyFactory(
+	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(String mode) {
+		return new EvDvrpIntegrationModule(mode).setChargingStrategyFactory(
 				charger -> VariableSpeedCharging.createStrategyForNissanLeaf(charger.getPower() * CHARGING_SPEED_FACTOR,
 						MAX_RELATIVE_SOC))
 				.setTemperatureProvider(() -> TEMPERATURE)
