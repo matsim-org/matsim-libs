@@ -55,7 +55,7 @@ public class TemperatureManager implements MobsimBeforeSimStepListener, MobsimIn
 
     private void readTemperatureFile(URL temperatureFileURL, String delimiter) {
         TabularFileParserConfig tabularFileParserConfig = new TabularFileParserConfig();
-        tabularFileParserConfig.setFileName(temperatureFileURL.getFile());
+        tabularFileParserConfig.setUrl(temperatureFileURL);
         tabularFileParserConfig.setDelimiterTags(new String[]{delimiter});
         new TabularFileParser().parse(tabularFileParserConfig, new TabularFileHandler() {
             @Override
