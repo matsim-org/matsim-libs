@@ -41,7 +41,7 @@ import org.matsim.contrib.drt.routing.DrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.file.FleetProvider;
+import org.matsim.contrib.dvrp.data.FleetModule;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
@@ -77,7 +77,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 	public void install() {
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
-		bindModal(Fleet.class).toProvider(new FleetProvider(drtCfg.getVehiclesFile())).asEagerSingleton();
+		install(new FleetModule(getMode(), drtCfg.getVehiclesFile()));
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 		bindModal(DepotFinder.class).toProvider(
