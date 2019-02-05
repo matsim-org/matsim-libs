@@ -29,7 +29,7 @@ import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.util.stats.FleetStatsCalculatorModule;
+import org.matsim.contrib.dvrp.fleet.FleetStatsCalculatorModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;

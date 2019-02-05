@@ -31,7 +31,7 @@ import org.matsim.contrib.ev.dvrp.EvDvrpFleetModule;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.FleetStatsCalculatorModule;
+import org.matsim.contrib.dvrp.fleet.FleetStatsCalculatorModule;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
 import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
 import org.matsim.core.controler.IterationCounter;

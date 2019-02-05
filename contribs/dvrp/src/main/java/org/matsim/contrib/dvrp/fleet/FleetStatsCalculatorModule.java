@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.taxi.util.stats;
+package org.matsim.contrib.dvrp.fleet;
 
 import java.util.function.Function;
 
