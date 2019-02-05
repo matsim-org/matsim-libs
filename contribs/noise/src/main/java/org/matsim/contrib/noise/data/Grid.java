@@ -24,12 +24,7 @@ package org.matsim.contrib.noise.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -83,7 +78,7 @@ public class Grid {
 	public Grid(Scenario scenario) {
 		this.scenario = scenario;	
 
-		if ((NoiseConfigGroup) this.scenario.getConfig().getModule("noise") == null) {
+		if (this.scenario.getConfig().getModule("noise") == null) {
 			throw new RuntimeException("Could not find a noise config group. "
 					+ "Check if the custom module is loaded, e.g. 'ConfigUtils.loadConfig(configFile, new NoiseConfigGroup())'"
 					+ " Aborting...");
@@ -91,17 +86,13 @@ public class Grid {
 		
 		this.noiseParams = (NoiseConfigGroup) this.scenario.getConfig().getModule("noise");
 		
-		this.receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
+		this.receiverPoints = new HashMap<>();
 		
 		String[] consideredActTypesForDamagesArray = noiseParams.getConsideredActivitiesForDamageCalculationArray();
-		for (int i = 0; i < consideredActTypesForDamagesArray.length; i++) {
-			this.consideredActivitiesForSpatialFunctionality.add(consideredActTypesForDamagesArray[i]);
-		}
+		Collections.addAll(this.consideredActivitiesForSpatialFunctionality, consideredActTypesForDamagesArray);
 		
 		String[] consideredActTypesForReceiverPointGridArray = noiseParams.getConsideredActivitiesForReceiverPointGridArray();
-		for (int i = 0; i < consideredActTypesForReceiverPointGridArray.length; i++) {
-			this.consideredActivitiesForReceiverPointGrid.add(consideredActTypesForReceiverPointGridArray[i]);
-		}
+		Collections.addAll(this.consideredActivitiesForReceiverPointGrid, consideredActTypesForReceiverPointGridArray);
 
 //		this.noiseParams.checkGridParametersForConsistency();
 		initialize();
@@ -131,13 +122,8 @@ public class Grid {
 
 			for(Activity activity: TripStructureUtils.getActivities(person.getSelectedPlan(), stages)){
 				if (this.consideredActivitiesForSpatialFunctionality.contains(activity.getType()) || consideredActivityPrefix(activity.getType(), this.consideredActivitiesForSpatialFunctionality)) {
-					List<Coord> activityCoordinates = personId2consideredActivityCoords.get(person.getId());//new ArrayList<Coord>();
-					
-					if (activityCoordinates == null) {
-						activityCoordinates = new ArrayList<>();
-						personId2consideredActivityCoords.put(person.getId(), activityCoordinates);
-					}
-					
+					List<Coord> activityCoordinates = personId2consideredActivityCoords.computeIfAbsent(person.getId(), value -> new ArrayList<>());
+
 					activityCoordinates.add(activity.getCoord());
 					
 					consideredActivityCoordsForSpatialFunctionality.add(activity.getCoord());
@@ -165,22 +151,11 @@ public class Grid {
 				
 		String gridCSVFile = this.noiseParams.getReceiverPointsCSVFile();
 		
-		Map<Id<ReceiverPoint>, Coord> gridPoints = null;
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(this.noiseParams.getReceiverPointsCSVFileCoordinateSystem(), this.scenario.getConfig().global().getCoordinateSystem());
 		try {
-			gridPoints = readCSVFile(gridCSVFile, ",", 0, 1, 2);
+			readReceiverPoints(gridCSVFile, ct);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(this.noiseParams.getReceiverPointsCSVFileCoordinateSystem(), this.scenario.getConfig().global().getCoordinateSystem());
-		
-		for (Id<ReceiverPoint> id : gridPoints.keySet()) {
-			
-			Coord coord = gridPoints.get(id);
-			Coord transformedCoord = ct.transform(coord);
-			
-			ReceiverPoint rp = new ReceiverPoint(id, transformedCoord);			
-			receiverPoints.put(id, rp);
 		}
 		
 		log.info("Total number of receiver points: " + receiverPoints.size());
@@ -243,7 +218,7 @@ public class Grid {
 	private void setActivityCoord2NearestReceiverPointId () {
 		double gap = noiseParams.getReceiverPointGap();
 		Counter counter = new Counter("fill quadtree #") ;
-		QuadTree<ReceiverPoint> qTree = new QuadTree<>(xCoordMin - 4*gap, yCoordMin - 4* gap, xCoordMax + 4*gap, yCoordMax + 4*gap);
+		QuadTree<ReceiverPoint> qTree = new QuadTree<>(xCoordMin - 15*gap, yCoordMin - 15* gap, xCoordMax + 15*gap, yCoordMax + 15*gap);
 		for(ReceiverPoint p: receiverPoints.values()) {
 			qTree.put(p.getCoord().getX(), p.getCoord().getY(), p);
 			counter.incCounter();
@@ -266,7 +241,7 @@ public class Grid {
 		counter.printCounter();
 	}
 
-	private Map<Id<ReceiverPoint>, Coord> readCSVFile(String file, String separator, int idColumn, int xCoordColumn, int yCoordColumn) throws IOException {
+	private void readReceiverPoints(String file, CoordinateTransformation ct) throws IOException {
 		
 		Map<Id<ReceiverPoint>, Coord> id2Coord = new HashMap<>();
 		
@@ -278,10 +253,10 @@ public class Grid {
 			e.printStackTrace();
 		}
 		
-		String[] headers = line.split(separator);
-		if (idColumn >= 0) log.info("id: " + headers[idColumn]);
-		log.info("xCoord: " + headers[xCoordColumn]);
-		log.info("yCoord: " + headers[yCoordColumn]);
+		String[] headers = line.split(",");
+		log.info("id: " + headers[0]);
+		log.info("xCoord: " + headers[1]);
+		log.info("yCoord: " + headers[2]);
 		
 		int lineCounter = 0;
 
@@ -291,7 +266,7 @@ public class Grid {
 				log.info("# " + lineCounter);
 			}
 
-			String[] columns = line.split(separator);
+			String[] columns = line.split(",");
 			if (line.isEmpty() || line.equals("") || columns.length != headers.length) {
 				log.warn("Skipping line " + lineCounter + ". Line is empty or the columns are inconsistent with the headers: [" + line.toString() + "]");
 			
@@ -301,27 +276,23 @@ public class Grid {
 				double y = 0;
 
 				for (int column = 0; column < columns.length; column++){					
-					if (column == idColumn) {
+					if (column == 0) {
 						id = columns[column];
-					} else if (column == xCoordColumn) {
+					} else if (column == 1) {
 						x = Double.valueOf(columns[column]);
-					} else if (column == yCoordColumn) {
+					} else if (column == 2) {
 						y = Double.valueOf(columns[column]);
 					}
 				}
-				if (idColumn >= 0) {
-					id2Coord.put(Id.create(id, ReceiverPoint.class), new Coord(x,y));
-				} else {
-					id2Coord.put(Id.create(String.valueOf(lineCounter), ReceiverPoint.class), new Coord(x,y));
-				}
-				
+
+                Coord coord = new Coord(x,y);
+                Coord transformedCoord = ct.transform(coord);
+                ReceiverPoint rp = new ReceiverPoint(Id.create(id, ReceiverPoint.class), transformedCoord);
+                receiverPoints.put(rp.getId(), rp);
 				lineCounter++;
 			}			
 		}
-		
 		log.info("Done. Number of read lines: " + lineCounter);
-		
-		return id2Coord;
 	}
 	
 	public Map<Id<Person>, List<Coord>> getPersonId2listOfConsideredActivityCoords() {
