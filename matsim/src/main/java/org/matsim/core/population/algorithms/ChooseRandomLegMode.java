@@ -132,8 +132,14 @@ public final class ChooseRandomLegMode implements PlanAlgorithm {
 				/* if the new Mode is after the currentMode in the list of possible
 				 * modes, go one further, as we have to ignore the current mode in
 				 * the list of possible modes. */
-				// yyyyyy This gives the mode after the current mode twice the weight.
-				// Not good.  kai, feb'18
+				// This gives the mode after the current mode twice the weight. Not good.  kai, feb'18
+				// No, it does not. It's good. We choose between 0 and possibleModes.length - 2
+				// (it's length - 1, but the upper bound of nextInt() is exclusive, thus it's essentially -2)
+				// This gives us exactly the number of possibilities of possibleModes with the current mode excluded.
+				// Instead of just accessing this.possibleModes[newModeIdx] we loop through the possible modes
+				// to figure out if currentMode is before or after the new mode. If it is before, we skip it
+				// by increasing the newModeIdx. In other words: If newModeIndex < currentModeIndex, we account for
+				// currentMode which we want to ignore by doing newModeIndex++.  mrieser, feb'19
 				newModeIdx++;
 				break;
 			}
