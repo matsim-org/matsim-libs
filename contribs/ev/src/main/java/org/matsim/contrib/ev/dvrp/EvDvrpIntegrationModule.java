@@ -24,79 +24,80 @@ import java.util.function.Predicate;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.DvrpVehicle;
-import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup.AuxDischargingSimulation;
-import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingModule;
 import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.contrib.ev.data.ElectricFleetModule;
+import org.matsim.contrib.ev.discharging.DischargingModule;
+import org.matsim.contrib.ev.discharging.OhdeSlaskiDriveEnergyConsumption;
+import org.matsim.contrib.ev.stats.EvStatsModule;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 /**
+ * Use this module instead of the default EvModule
+ *
  * @author michalm
  */
-public class EvDvrpIntegrationModule extends AbstractModule {
-    private Function<Charger, ChargingStrategy> chargingStrategyFactory;
-    private DoubleSupplier temperatureProvider;
+public class EvDvrpIntegrationModule extends AbstractDvrpModeModule {
+	private Function<Charger, ChargingStrategy> chargingStrategyFactory;
+	private DoubleSupplier temperatureProvider;
 	private Predicate<DvrpVehicle> turnedOnPredicate;
 
-    private final String mode;
-    private String vehicleFile;
+	private String vehicleFile;
 
-    public EvDvrpIntegrationModule(String mode) {
-        this.mode = mode;
-    }
+	public EvDvrpIntegrationModule(String mode) {
+		super(mode);
+	}
 
-    @Override
-    public void install() {
-        if (EvConfigGroup.get(getConfig()).getAuxDischargingSimulation()
-                == AuxDischargingSimulation.insideDriveDischargingHandler) {
-            if (turnedOnPredicate != null) {
-                throw new RuntimeException("turnedOnPredicate must not be set"
-                        + " if auxDischargingSimulation == 'insideDriveDischargingHandler'");
-            }
-        } else {
-            if (turnedOnPredicate == null) {
-                throw new RuntimeException("turnedOnPredicate must be set"
-                        + " if auxDischargingSimulation != 'insideDriveDischargingHandler'");
-            }
-        }
+	@Override
+	public void install() {
+		EvConfigGroup evCfg = EvConfigGroup.get(getConfig());
 
-        bind(Network.class).annotatedWith(Names.named(ChargingInfrastructure.CHARGERS))//
-                .to(Key.get(Network.class, Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))).asEagerSingleton();
-        bind(ChargingLogic.Factory.class).toInstance(
-                charger -> new ChargingWithQueueingAndAssignmentLogic(charger, chargingStrategyFactory.apply(charger)));
-        bind(AuxEnergyConsumption.Factory.class).toInstance(
-                new DvrpAuxConsumptionFactory(mode, temperatureProvider, turnedOnPredicate));
-        bind(DvrpModes.key(Fleet.class, mode)).toProvider(new EvDvrpFleetProvider(vehicleFile)).asEagerSingleton();
-    }
+		if (EvConfigGroup.get(getConfig()).getAuxDischargingSimulation()
+				== AuxDischargingSimulation.insideDriveDischargingHandler) {
+			if (turnedOnPredicate != null) {
+				throw new RuntimeException("turnedOnPredicate must not be set"
+						+ " if auxDischargingSimulation == 'insideDriveDischargingHandler'");
+			}
+		} else {
+			if (turnedOnPredicate == null) {
+				throw new RuntimeException("turnedOnPredicate must be set"
+						+ " if auxDischargingSimulation != 'insideDriveDischargingHandler'");
+			}
+		}
 
-    public EvDvrpIntegrationModule setChargingStrategyFactory(
-            Function<Charger, ChargingStrategy> chargingStrategyFactory) {
-        this.chargingStrategyFactory = chargingStrategyFactory;
-        return this;
-    }
+		install(new ElectricFleetModule(evCfg));
 
-    public EvDvrpIntegrationModule setTemperatureProvider(DoubleSupplier temperatureProvider) {
-        this.temperatureProvider = temperatureProvider;
-        return this;
-    }
+		install(new ChargingModule(evCfg, Key.get(Network.class, Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)),
+				charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+						chargingStrategyFactory.apply(charger))));
+
+		install(new DischargingModule(evCfg, ev -> new OhdeSlaskiDriveEnergyConsumption(),
+				new DvrpAuxConsumptionFactory(getMode(), temperatureProvider, turnedOnPredicate)));
+
+		install(new EvStatsModule(evCfg));
+	}
+
+	public EvDvrpIntegrationModule setChargingStrategyFactory(
+			Function<Charger, ChargingStrategy> chargingStrategyFactory) {
+		this.chargingStrategyFactory = chargingStrategyFactory;
+		return this;
+	}
+
+	public EvDvrpIntegrationModule setTemperatureProvider(DoubleSupplier temperatureProvider) {
+		this.temperatureProvider = temperatureProvider;
+		return this;
+	}
 
 	public EvDvrpIntegrationModule setTurnedOnPredicate(Predicate<DvrpVehicle> turnedOnPredicate) {
-        this.turnedOnPredicate = turnedOnPredicate;
-        return this;
-    }
-
-    public EvDvrpIntegrationModule setVehicleFile(String vehicleFile) {
-        this.vehicleFile = vehicleFile;
-        return this;
-    }
+		this.turnedOnPredicate = turnedOnPredicate;
+		return this;
+	}
 }
