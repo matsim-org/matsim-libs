@@ -21,18 +21,16 @@ package org.matsim.contrib.etaxi.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
-import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkTravelTimeModule;
+import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
+import org.matsim.contrib.dvrp.fleet.FleetStatsCalculatorModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.dvrp.fleet.FleetStatsCalculatorModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -66,23 +64,16 @@ public class RunETaxiBenchmark {
 
 		Controler controler = new Controler(scenario);
 		controler.setModules(new DvrpBenchmarkControlerModule());
-		controler.addOverridingModule(new ETaxiModule());
-
-		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new DvrpBenchmarkModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(taxiCfg.getMode()));
+
+		controler.addOverridingModule(new ETaxiModule());
 
 		controler.addOverridingModule(RunETaxiScenario.createEvDvrpIntegrationModule(taxiCfg));
 
 		controler.addOverridingModule(
 				FleetStatsCalculatorModule.createModule(taxiCfg.getMode(), ETaxiBenchmarkStats.class,
 						getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class))));
-
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				install(new DvrpBenchmarkTravelTimeModule());
-			}
-		});
 
 		return controler;
 	}
