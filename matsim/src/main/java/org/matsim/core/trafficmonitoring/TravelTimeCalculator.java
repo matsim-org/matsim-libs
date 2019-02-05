@@ -93,13 +93,15 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	@Inject private QSimConfigGroup qsimConfig ;
 	TravelTimeGetter travelTimeGetter ;
 
+	@Deprecated // user builder instead.  kai, feb'19
 	public static TravelTimeCalculator create(Network network, TravelTimeCalculatorConfigGroup group) {
 		TravelTimeCalculator calculator = new TravelTimeCalculator(network, group);
 		configure(calculator, group, network);
 		return calculator;
 	}
 
-	static TravelTimeCalculator configure(TravelTimeCalculator calculator, TravelTimeCalculatorConfigGroup config, Network network) {
+	@Deprecated // user builder instead.  kai, feb'19
+	private static TravelTimeCalculator configure(TravelTimeCalculator calculator, TravelTimeCalculatorConfigGroup config, Network network) {
 		// This should be replaced by a builder if we need the functionality.  kai/mads, feb'19
 
 
@@ -129,6 +131,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		return calculator;
 	}
 
+	@Deprecated // user builder instead.  kai, feb'19
 	@Inject // yyyy why is this needed?  In general, this class is NOT injected, but explicitly constructed in TravelTimeCalculatorModule.  kai, feb'19
 	TravelTimeCalculator(TravelTimeCalculatorConfigGroup ttconfigGroup, EventsManager eventsManager, Network network) {
 		// this injected constructor is not used when getSeparateModes is true
@@ -138,16 +141,82 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		configure(this, ttconfigGroup, network);
 	}
 
-	public TravelTimeCalculator(final Network network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
+	@Deprecated // user builder instead.  kai, feb'19
+	public TravelTimeCalculator( final Network network, TravelTimeCalculatorConfigGroup ttconfigGroup ) {
+		// one tests needs this public
+		// some tests currently use this. they are also quite happy without an events manager.  kai, feb'19
 		this(network, ttconfigGroup.getTraveltimeBinSize(), ttconfigGroup.getMaxTime(), ttconfigGroup);
 	}
 
+	@Deprecated // user builder instead.  kai, feb'19
 	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this(network, timeslice, maxTime, ttconfigGroup.isCalculateLinkTravelTimes(), ttconfigGroup.isCalculateLinkToLinkTravelTimes(), ttconfigGroup.isFilterModes(),
 			  CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModesAsString() ) );
 	}
 
-	TravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
+	public final static class Builder {
+		private final Network network ;
+		private int timeslice = 900 ;
+		private int maxTime = 36*3600 ; // yy replace by long or double!
+		private boolean calculateLinkTravelTimes = true ;
+		private boolean calculateLinkToLinkTravelTimes = false ;
+		private boolean filterModes = false ;
+		private Set<String> analyzedModes = null ;
+		private TravelTimeCalculatorConfigGroup ttcConfig;
+		private boolean toBeConfigured = false ;
+
+		public Builder( Network network ) {
+			this.network = network ;
+		}
+
+		public void setTimeslice( int timeslice ){
+			this.timeslice = timeslice;
+		}
+
+		public void setMaxTime( int maxTime ){
+			this.maxTime = maxTime;
+		}
+
+		public void setCalculateLinkTravelTimes( boolean calculateLinkTravelTimes ){
+			this.calculateLinkTravelTimes = calculateLinkTravelTimes;
+		}
+
+		public void setCalculateLinkToLinkTravelTimes( boolean calculateLinkToLinkTravelTimes ){
+			this.calculateLinkToLinkTravelTimes = calculateLinkToLinkTravelTimes;
+		}
+
+		public void setFilterModes( boolean filterModes ){
+			this.filterModes = filterModes;
+		}
+
+		public void setAnalyzedModes( Set<String> analyzedModes ){
+			this.analyzedModes = analyzedModes;
+		}
+
+		public void configure ( TravelTimeCalculatorConfigGroup ttcConfig ) {
+			// yyyyyy this is a fix to get the outward API sorted out somewhat better.  kai, feb'19
+			// yyyyyy presumably would like to replace this with setters for {@link TravelTimeDataFactory} and {@link TravelTimeGetter}.  But it ain't that easy because
+			// they again depend on material that (currently) is only available _after_ construction of {@link TravelTimeCalculator}.  kai, feb'19
+
+			this.ttcConfig = ttcConfig ;
+			this.toBeConfigured = true ;
+		}
+
+		public TravelTimeCalculator build() {
+			TravelTimeCalculator abc = new TravelTimeCalculator( network, timeslice, maxTime, calculateLinkTravelTimes, calculateLinkToLinkTravelTimes, filterModes,
+				  analyzedModes );
+			if( toBeConfigured ){
+				TravelTimeCalculator.configure( abc, this.ttcConfig, this.network );
+			}
+			return abc ;
+		}
+
+	}
+
+
+
+	@Deprecated // user builder instead.  kai, feb'19
+	private TravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
 				   boolean calculateLinkTravelTimes, boolean calculateLinkToLinkTravelTimes, boolean filterModes, Set<String> analyzedModes) {
 		this.calculateLinkTravelTimes = calculateLinkTravelTimes;
 		this.calculateLinkToLinkTravelTimes = calculateLinkToLinkTravelTimes;
@@ -198,7 +267,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		LinkEnterEvent oldEvent = this.linkEnterEvents.remove(e.getVehicleId());
 		if ((oldEvent != null) && this.calculateLinkToLinkTravelTimes) {
 			Tuple<Id<Link>, Id<Link>> fromToLink = new Tuple<>(oldEvent.getLinkId(), e.getLinkId());
-			TravelTimeData data = getLinkToLinkTravelTimeData(fromToLink, true);
+			TravelTimeData data = getLinkToLinkTravelTimeData(fromToLink );
 			double enterTime = oldEvent.getTime();
 
 			final int timeSlot = this.aggregator.getTimeSlotIndex(enterTime );
@@ -275,9 +344,9 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		if (filterAnalyzedModes) this.vehiclesToIgnore.remove(event.getVehicleId());
 	}
 
-	private TravelTimeData getLinkToLinkTravelTimeData(Tuple<Id<Link>, Id<Link>> fromLinkToLink, final boolean createIfMissing) {
+	private TravelTimeData getLinkToLinkTravelTimeData( Tuple<Id<Link>, Id<Link>> fromLinkToLink ) {
 		TravelTimeData data = this.linkToLinkData.get(fromLinkToLink);
-		if ((null == data) && createIfMissing) {
+		if ( null == data ) {
 			data = this.ttDataFactory.createTravelTimeData(fromLinkToLink.getFirst()) ;
 			this.linkToLinkData.put(fromLinkToLink, data);
 		}
@@ -336,7 +405,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 			throw new IllegalStateException("No link to link travel time is available " +
 									    "if calculation is switched off by config option!");
 		}
-		TravelTimeData data = this.getLinkToLinkTravelTimeData(new Tuple<>(fromLinkId, toLinkId), true);
+		TravelTimeData data = this.getLinkToLinkTravelTimeData(new Tuple<>(fromLinkId, toLinkId) );
 		if ( data.isNeedingConsolidation() ) {
 			consolidateData(data);
 		}
@@ -413,16 +482,16 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		}
 	}
 
-	public int getNumSlots() {
-		return this.numSlots;
-	}
+//	public int getNumSlots() {
+//		return this.numSlots;
+//	}
 
-	/**
-	 * @return the size of a time bin in seconds.
-	 */
-	public int getTimeSlice() {
-		return this.timeSlice;
-	}
+//	/**
+//	 * @return the size of a time bin in seconds.
+//	 */
+//	public int getTimeSlice() {
+//		return this.timeSlice;
+//	}
 
 //	/*package*/ static class DataContainer {
 //		/*package*/ private final TravelTimeData ttData;
@@ -439,7 +508,15 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 
 			@Override
 			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-				return TravelTimeCalculator.this.getLinkTravelTime(link, time);
+				// right now, the link speed limit comes from the travel time calculator, and this here just overrides it.  One might consider doing all of this here;
+				// possibly would make the code easier to read.  kai/mads, feb'19
+
+				double linkTtimeFromVehicle = 0. ;
+				if ( vehicle!=null ){
+					linkTtimeFromVehicle = link.getLength() / vehicle.getType().getMaximumVelocity();
+				}
+				double linkTTimeFromObservation = TravelTimeCalculator.this.getLinkTravelTime(link, time);
+				return Math.max( linkTtimeFromVehicle, linkTTimeFromObservation) ;
 			}
 
 		};
@@ -452,11 +529,14 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 			@Override
 			public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
 				return TravelTimeCalculator.this.getLinkToLinkTravelTime(fromLink.getId(), toLink.getId(), time);
+				// todo yyyy fix the above with maximum vehicle speeds as for plain links above.  kai, feb'19
 			}
 		};
 	}
 
+	@Deprecated // use builder.configure(config) instead.  kai, feb'19
 	public void setTtDataFactory( TravelTimeDataFactory ttDataFactory ){
+		// yyyyyy this is currently here for a test, but should be removed.  kai, feb'19
 		this.ttDataFactory = ttDataFactory;
 	}
 }

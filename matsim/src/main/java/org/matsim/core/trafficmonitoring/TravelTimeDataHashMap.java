@@ -42,7 +42,7 @@ public class TravelTimeDataHashMap extends TravelTimeData {
 	protected final Link link;
 
 	public TravelTimeDataHashMap(final Link link) {
-		this.travelTimes =  new ConcurrentHashMap<Integer,TimeStruct>();
+		this.travelTimes = new ConcurrentHashMap<>();
 		this.link = link;
 //		resetTravelTimes();
 	}

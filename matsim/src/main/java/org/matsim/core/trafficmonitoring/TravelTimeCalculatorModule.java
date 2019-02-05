@@ -105,10 +105,19 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
 		@Override
 		public TravelTimeCalculator get() {
-			TravelTimeCalculator calculator = new TravelTimeCalculator(network, config.getTraveltimeBinSize(), config.getMaxTime(), 
-					config.isCalculateLinkTravelTimes(), config.isCalculateLinkToLinkTravelTimes(), true, CollectionUtils.stringToSet(mode));
-			eventsManager.addHandler(calculator);
-			return TravelTimeCalculator.configure(calculator, config, network);
+//			TravelTimeCalculator calculator = new TravelTimeCalculator(network, config.getTraveltimeBinSize(), config.getMaxTime(),
+//					config.isCalculateLinkTravelTimes(), config.isCalculateLinkToLinkTravelTimes(), true, CollectionUtils.stringToSet(mode));
+//			eventsManager.addHandler(calculator);
+//			return TravelTimeCalculator.configure(calculator, config, network);
+			TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder( network );
+			builder.setTimeslice( config.getTraveltimeBinSize() );
+			builder.setMaxTime( config.getMaxTime() );
+			builder.setCalculateLinkTravelTimes( config.isCalculateLinkTravelTimes() );
+			builder.setCalculateLinkToLinkTravelTimes( config.isCalculateLinkToLinkTravelTimes() );
+			builder.setFilterModes( true ); // no point asking the config since we are in "separateModes" anyways.
+			builder.setAnalyzedModes( CollectionUtils.stringToSet( mode ) );
+			builder.configure( config );
+			return builder.build() ;
 		}
 	}
 
