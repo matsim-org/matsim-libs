@@ -28,10 +28,8 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.FixedSpeedChargingStrategy;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -54,9 +52,11 @@ public class RunEDrtScenario {
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
+		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		Controler controler = EDrtControlerCreator.createControler(config, otfvis);
-		controler.addOverridingModule(new EvModule());
-		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config)));
+
+		controler.addOverridingModule(createEvDvrpIntegrationModule(drtCfg.getMode()));
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -65,21 +65,14 @@ public class RunEDrtScenario {
 			}
 		});
 
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
-
 		return controler;
 	}
 
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
-		return new EvDvrpIntegrationModule(drtCfg.getMode())//
-				.setChargingStrategyFactory(
-						charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
-								MAX_RELATIVE_SOC))//
-				.setTemperatureProvider(() -> TEMPERATURE) //
-				.setTurnedOnPredicate(RunEDrtScenario::isTurnedOn)//
-				.setVehicleFile(drtCfg.getVehiclesFile());
+	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(String mode) {
+		return new EvDvrpIntegrationModule(mode).setChargingStrategyFactory(
+				charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC))
+				.setTemperatureProvider(() -> TEMPERATURE)
+				.setTurnedOnPredicate(RunEDrtScenario::isTurnedOn);
 	}
 
 	private static boolean isTurnedOn(DvrpVehicle vehicle) {

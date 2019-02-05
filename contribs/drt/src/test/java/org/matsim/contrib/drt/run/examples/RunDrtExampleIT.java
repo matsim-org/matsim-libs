@@ -33,11 +33,11 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.testcases.MatsimTestUtils;
@@ -47,10 +47,10 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author jbischoff
  */
 public class RunDrtExampleIT {
-	
+
 	private class PersonIdValidator implements PassengerRequestValidator {
 		private boolean validateRequestWasCalled = false;
-		
+
 		@Override
 		public Set<String> validateRequest(PassengerRequest request) {
 			validateRequestWasCalled = true;
@@ -93,15 +93,18 @@ public class RunDrtExampleIT {
 
 		PersonIdValidator personIdValidator = new PersonIdValidator();
 
-		controler.addOverridingModule(new AbstractModule() {
+		controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(DrtConfigGroup.get(config).getMode()) {
 			@Override
-			public void install() {
-				this.bind(PassengerRequestValidator.class).annotatedWith(DvrpModes.mode(TransportMode.drt)).toInstance(personIdValidator);
+			protected void configureQSim() {
+				this.bind(PassengerRequestValidator.class)
+						.annotatedWith(DvrpModes.mode(TransportMode.drt))
+						.toInstance(personIdValidator);
 			}
 		});
 		controler.run();
-		
-		Assert.assertEquals("passenger request validator was not called", true, personIdValidator.isValidateRequestWasCalled());
+
+		Assert.assertEquals("passenger request validator was not called", true,
+				personIdValidator.isValidateRequestWasCalled());
 	}
 
 	@Test
