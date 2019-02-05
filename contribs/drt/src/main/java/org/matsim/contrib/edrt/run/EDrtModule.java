@@ -23,7 +23,6 @@ package org.matsim.contrib.edrt.run;
 import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
 import org.matsim.contrib.drt.routing.DrtMainModeIdentifier;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtModeModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.MainModeIdentifier;
 
@@ -39,7 +38,7 @@ public class EDrtModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		install(new DrtModeModule(drtCfg));
+		install(new EDrtModeModule(drtCfg));
 		installQSimModule(new EDrtModeQSimModule(drtCfg));
 		install(new DrtModeAnalysisModule(drtCfg));
 
