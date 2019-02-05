@@ -31,8 +31,8 @@ import org.matsim.contrib.dvrp.data.DvrpVehicle;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -47,6 +47,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -93,22 +94,26 @@ public class ScheduleReconstructionIT {
 						return new ScheduleReconstructor(network, eventsManager, getMode());
 					}
 				}).asEagerSingleton();
+
+				installQSimModule(new AbstractDvrpModeQSimModule(taxiCfg.getMode()) {
+					@Override
+					protected void configureQSim() {
+						addModalQSimComponentBinding().toProvider(modalProvider(
+								getter -> (MobsimBeforeCleanupListener)(e -> assertScheduleReconstructor(
+										getter.getModal(ScheduleReconstructor.class), getter.getModal(Fleet.class),
+										getter.getModal(SubmittedTaxiRequestsCollector.class)))));
+					}
+				});
 			}
 		});
 		controler.run();
 
-		ScheduleReconstructor scheduleReconstructor = controler.getInjector()
-				.getInstance(DvrpModes.key(ScheduleReconstructor.class, taxiCfg.getMode()));
+	}
 
-		String mode = TaxiConfigGroup.get(config).getMode();
-		Fleet fleet = controler.getInjector().getInstance(DvrpModes.key(Fleet.class, mode));
-		SubmittedTaxiRequestsCollector requestCollector = controler.getInjector()
-				.getInstance(DvrpModes.key(SubmittedTaxiRequestsCollector.class, mode));
-
+	private void assertScheduleReconstructor(ScheduleReconstructor scheduleReconstructor, Fleet fleet,
+			SubmittedTaxiRequestsCollector requestCollector) {
 		Assert.assertNotEquals(fleet, scheduleReconstructor.getFleet());
-
 		compareVehicles(fleet.getVehicles().values(), scheduleReconstructor.getFleet().getVehicles().values());
-
 		compareRequests((Collection<TaxiRequest>)requestCollector.getRequests().values(),
 				scheduleReconstructor.taxiRequests.values());
 	}
