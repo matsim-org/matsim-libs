@@ -70,7 +70,7 @@ public class PopulationAgentSourceWithVehicles implements AgentSource {
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
-		this.modeVehicleTypes = new HashMap<String, VehicleType>();
+		this.modeVehicleTypes = new HashMap<>();
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
 		for (String mode : mainModes) {
 			modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
@@ -81,7 +81,7 @@ public class PopulationAgentSourceWithVehicles implements AgentSource {
 	public void insertAgentsIntoMobsim() {
 		Vehicles vehicles = this.qsim.getScenario().getVehicles();
 		VehiclesFactory vehiclesFactory = vehicles.getFactory();
-		final Set<Id> alreadyParked = new HashSet<Id>();
+		final Set<Id> alreadyParked = new HashSet<>();
 		for (Person p : population.getPersons().values()) {
 			final MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
 			final Plan plan = p.getSelectedPlan();

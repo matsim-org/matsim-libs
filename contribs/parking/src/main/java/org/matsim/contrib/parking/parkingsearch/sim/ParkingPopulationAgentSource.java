@@ -73,7 +73,7 @@ public final class ParkingPopulationAgentSource implements AgentSource {
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
 		this.modeVehicleTypes = new HashMap<>();
-		this.mainModes = new HashSet<String>( qsim.getScenario().getConfig().qsim().getMainModes());
+		this.mainModes = new HashSet<>(qsim.getScenario().getConfig().qsim().getMainModes());
 		switch ( qsimConfig.getVehiclesSource() ) {
 		case defaultVehicle:
 			for (String mode : mainModes) {
@@ -115,6 +115,8 @@ public final class ParkingPopulationAgentSource implements AgentSource {
 		VehiclesFactory vehiclesFactory = vehicles.getFactory();
 		Plan plan = p.getSelectedPlan();
 		Set<String> seenModes = new HashSet<>();
+		boolean usePersonIdForMissingVehicleId = qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId();
+		QSimConfigGroup.VehiclesSource vehiclesSource = qsim.getScenario().getConfig().qsim().getVehiclesSource();
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Leg) {
 				Leg leg = (Leg) planElement;
@@ -127,14 +129,14 @@ public final class ParkingPopulationAgentSource implements AgentSource {
 							vehicleId = ((NetworkRoute) route).getVehicleId(); // may be null!
 						}
 						if (vehicleId == null) {
-							if (qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
+							if (usePersonIdForMissingVehicleId) {
 								vehicleId = Id.create(p.getId(), Vehicle.class);
 							} else {
 								throw new IllegalStateException("Found a network route without a vehicle id.");
 							}
 						}
 						Vehicle vehicle = null ;
-						switch ( qsim.getScenario().getConfig().qsim().getVehiclesSource() ) {
+						switch ( vehiclesSource ) {
 						case defaultVehicle:
 						case modeVehicleTypesFromVehiclesData:
 							vehicle = vehiclesFactory.createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
