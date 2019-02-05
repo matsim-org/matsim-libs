@@ -73,10 +73,13 @@ public class RunETaxiBenchmark {
 
 		controler.addOverridingModule(RunETaxiScenario.createEvDvrpIntegrationModule(taxiCfg));
 
+		controler.addOverridingModule(
+				FleetStatsCalculatorModule.createModule(taxiCfg.getMode(), ETaxiBenchmarkStats.class,
+						getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class))));
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addControlerListenerBinding().to(ETaxiBenchmarkStats.class).asEagerSingleton();
 				install(new DvrpBenchmarkTravelTimeModule());
 			}
 		});
