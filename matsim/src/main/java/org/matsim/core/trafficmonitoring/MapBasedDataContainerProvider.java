@@ -20,34 +20,33 @@
 
 package org.matsim.core.trafficmonitoring;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator.DataContainer;
+
+import java.util.Map;
 
 public class MapBasedDataContainerProvider implements DataContainerProvider {
 
-	private final Map<Id<Link>, DataContainer> linkData;
+	private final Map<Id<Link>, TravelTimeData> linkData;
 	private final TravelTimeDataFactory ttDataFactory;
 	
-	public MapBasedDataContainerProvider(Map<Id<Link>, DataContainer> linkData, TravelTimeDataFactory ttDataFactory) {
+	public MapBasedDataContainerProvider(Map<Id<Link>, TravelTimeData> linkData, TravelTimeDataFactory ttDataFactory) {
 		this.linkData = linkData;
 		this.ttDataFactory = ttDataFactory;
 	}
 	
 	@Override 
-	public DataContainer getTravelTimeData(final Id<Link> linkId, final boolean createIfMissing) {
-		DataContainer data = this.linkData.get(linkId);
+	public TravelTimeData getTravelTimeData(final Id<Link> linkId, final boolean createIfMissing) {
+		TravelTimeData data = this.linkData.get(linkId);
 		if ((null == data) && createIfMissing) {
-			data = new DataContainer(this.ttDataFactory.createTravelTimeData(linkId));
+			data = this.ttDataFactory.createTravelTimeData(linkId) ;
 			this.linkData.put(linkId, data);
 		}
 		return data;
 	}
 		
 	@Override
-	public DataContainer getTravelTimeData(Link link, boolean createIfMissing) {
+	public TravelTimeData getTravelTimeData(Link link, boolean createIfMissing) {
 		return this.getTravelTimeData(link.getId(), createIfMissing);
 	}
 	

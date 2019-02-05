@@ -20,7 +20,9 @@
 
 package org.matsim.core.trafficmonitoring;
 
-public interface TravelTimeData {
+abstract class TravelTimeData {
+
+	private boolean needsConsolidation;
 
 	public abstract void resetTravelTimes();
 	
@@ -54,5 +56,12 @@ public interface TravelTimeData {
 	 * </ul> 
 	 */
 	abstract double getTravelTime(final int timeSlot, final double now);
+
+	void setNeedsConsolidation( boolean flag ) {
+		this.needsConsolidation = flag ;
+	}
+	boolean isNeedingConsolidation() {
+		return needsConsolidation ;
+	}
 
 }

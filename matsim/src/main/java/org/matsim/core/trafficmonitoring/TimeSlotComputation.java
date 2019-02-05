@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ProgressiveTravelTimeCalculator.java
+ * AbstractTravelTimeAggregator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,32 +20,18 @@
 
 package org.matsim.core.trafficmonitoring;
 
-/**
- * @author glaemmel
- */
-public final class PessimisticTravelTimeAggregator extends AbstractTravelTimeAggregator {
+ public final class TimeSlotComputation{
 
-	public PessimisticTravelTimeAggregator(int numSlots,int travelTimeBinSize) {
-		super(numSlots,travelTimeBinSize);
+	private final int travelTimeBinSize;
+	private final int numSlots;
+
+	 TimeSlotComputation( final int numSlots, final int travelTimeBinSize ) {
+		this.numSlots = numSlots;
+		this.travelTimeBinSize = travelTimeBinSize;
 	}
 
-	@Override
-	 void addTravelTime(TravelTimeData travelTimeData,
-			double enterTime, double leaveTime) {
-
-		double ttime = leaveTime - enterTime;
-		for (int slot = getTimeSlotIndex(enterTime); slot <= getTimeSlotIndex(leaveTime); slot++ ){
-			travelTimeData.addTravelTime(slot, ttime);
-		}		
+	 int getTimeSlotIndex(final double time) {
+	    return TimeBinUtils.getTimeBinIndex(time, travelTimeBinSize, numSlots);
 	}
 
-	@Override
-	 void addStuckEventTravelTime(TravelTimeData travelTimeData,
-			double enterTime, double stuckEventTime) {
-		double ttime = Double.POSITIVE_INFINITY;
-		for (int slot = getTimeSlotIndex(enterTime); slot <= getTimeSlotIndex(stuckEventTime); slot++ ){
-			travelTimeData.addTravelTime(slot, ttime);
-		}
-	}
-
-}
+ }

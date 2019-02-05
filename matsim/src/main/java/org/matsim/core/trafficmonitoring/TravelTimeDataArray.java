@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
  *
  * @author mrieser
  */
-public class TravelTimeDataArray implements TravelTimeData {
+public class TravelTimeDataArray extends TravelTimeData {
 	private final double[] timeSum;
 	private final int[] timeCnt;
 	private final double[] travelTimes;

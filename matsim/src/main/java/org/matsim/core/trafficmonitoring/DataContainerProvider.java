@@ -22,17 +22,16 @@ package org.matsim.core.trafficmonitoring;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator.DataContainer;
 
 public interface DataContainerProvider {
 	
 	/*
 	 * This method is called from the EventHandler part of the TravelTimeCalculator. 
 	 */
-	/*package*/ DataContainer getTravelTimeData(final Id<Link> linkId, final boolean createIfMissing);
+	/*package*/ TravelTimeData getTravelTimeData(final Id<Link> linkId, final boolean createIfMissing);
 	
 	/*
 	 * This method is called from the TravelTime part of the TravelTimeCalculator.
 	 */
-	/*package*/ DataContainer getTravelTimeData(final Link link, final boolean createIfMissing);
+	/*package*/ TravelTimeData getTravelTimeData(final Link link, final boolean createIfMissing);
 }

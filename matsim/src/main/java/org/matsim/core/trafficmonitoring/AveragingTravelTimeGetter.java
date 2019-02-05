@@ -26,10 +26,9 @@ package org.matsim.core.trafficmonitoring;
  */
 public class AveragingTravelTimeGetter implements TravelTimeGetter {
 
-	private AbstractTravelTimeAggregator travelTimeAggregator;
+	private TimeSlotComputation travelTimeAggregator;
 	
-	@Override
-	public void setTravelTimeAggregator(AbstractTravelTimeAggregator travelTimeAggregator) {
+	public AveragingTravelTimeGetter( TimeSlotComputation travelTimeAggregator ) {
 		this.travelTimeAggregator = travelTimeAggregator;		
 	}
 	
