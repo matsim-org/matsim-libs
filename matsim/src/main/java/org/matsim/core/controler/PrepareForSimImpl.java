@@ -1,11 +1,6 @@
 package org.matsim.core.controler;
 
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,6 +25,14 @@ import org.matsim.facilities.FacilitiesFromPopulation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim {
 	// I think it is ok to have this public final.  Since one may want to use it as a delegate.  kai, may'18
@@ -207,25 +210,27 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 	private void createAndAddVehicleIfNotPresent(Id<Vehicle> vehicleId, VehicleType vehicleType) {
 		// try to get vehicle from the vehicles container:
-		Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
+		Vehicles vehicles = scenario.getVehicles();
+		Vehicle vehicle = vehicles.getVehicles().get(vehicleId);
+		VehiclesFactory factory = vehicles.getFactory();
 
 		if ( vehicle==null ) {
 			// if it was not found, next step depends on config:
 			switch ( qSimConfigGroup.getVehiclesSource() ) {
 				case defaultVehicle:
-					vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, vehicleType);
-					scenario.getVehicles().addVehicle(vehicle);
+					vehicle = factory.createVehicle(vehicleId, vehicleType);
+					vehicles.addVehicle(vehicle);
 					break;
 				case modeVehicleTypesFromVehiclesData:
-					vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, vehicleType);
-					scenario.getVehicles().addVehicle(vehicle);
+					vehicle = factory.createVehicle(vehicleId, vehicleType);
+					vehicles.addVehicle(vehicle);
 					break;
 				case fromVehiclesData:
 					// otherwise complain:
 					throw new IllegalStateException("Expecting a vehicle id which is missing in the vehicles database: " + vehicleId);
 				default:
 					// also complain when someone added another config option here:
-					throw new RuntimeException("not implemented") ;
+					throw new RuntimeException("not implemented");
 			}
 		}
 	}

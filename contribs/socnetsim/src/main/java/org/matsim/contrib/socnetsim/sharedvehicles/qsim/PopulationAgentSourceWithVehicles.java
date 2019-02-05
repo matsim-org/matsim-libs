@@ -19,12 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.sharedvehicles.qsim;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -43,6 +37,14 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Inserts agent into the QSim, providing them with the vehicles specified in their
@@ -77,6 +79,8 @@ public class PopulationAgentSourceWithVehicles implements AgentSource {
 
 	@Override
 	public void insertAgentsIntoMobsim() {
+		Vehicles vehicles = this.qsim.getScenario().getVehicles();
+		VehiclesFactory vehiclesFactory = vehicles.getFactory();
 		final Set<Id> alreadyParked = new HashSet<Id>();
 		for (Person p : population.getPersons().values()) {
 			final MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
@@ -92,7 +96,7 @@ public class PopulationAgentSourceWithVehicles implements AgentSource {
 						}
 
 						final Id vehicleLink = findVehicleLink(p);
-						final Vehicle basicVehicle = VehicleUtils.getFactory().createVehicle(
+						final Vehicle basicVehicle = vehiclesFactory.createVehicle(
 								vehicleId,
 								modeVehicleTypes.get( leg.getMode() ) );
 						

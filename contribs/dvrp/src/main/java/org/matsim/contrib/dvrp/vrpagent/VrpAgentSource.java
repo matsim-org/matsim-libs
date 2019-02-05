@@ -31,7 +31,6 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
 public class VrpAgentSource implements AgentSource {
@@ -52,7 +51,7 @@ public class VrpAgentSource implements AgentSource {
 
 	@Override
 	public void insertAgentsIntoMobsim() {
-		VehiclesFactory vehicleFactory = VehicleUtils.getFactory();
+		VehiclesFactory vehicleFactory = this.qSim.getScenario().getVehicles().getFactory();
 
 		for (DvrpVehicle vrpVeh : fleet.getVehicles().values()) {
 			Id<DvrpVehicle> id = vrpVeh.getId();

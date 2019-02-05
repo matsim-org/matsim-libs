@@ -19,14 +19,6 @@
 
 package org.matsim.contrib.parking.parkingsearch.sim;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -52,6 +44,14 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
+
+import javax.inject.Inject;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 
 public final class ParkingPopulationAgentSource implements AgentSource {
@@ -111,6 +111,8 @@ public final class ParkingPopulationAgentSource implements AgentSource {
 	}
 
 	private void insertVehicles(Person p) {
+		Vehicles vehicles = this.qsim.getScenario().getVehicles();
+		VehiclesFactory vehiclesFactory = vehicles.getFactory();
 		Plan plan = p.getSelectedPlan();
 		Set<String> seenModes = new HashSet<>();
 		for (PlanElement planElement : plan.getPlanElements()) {
@@ -135,10 +137,10 @@ public final class ParkingPopulationAgentSource implements AgentSource {
 						switch ( qsim.getScenario().getConfig().qsim().getVehiclesSource() ) {
 						case defaultVehicle:
 						case modeVehicleTypesFromVehiclesData:
-							vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
+							vehicle = vehiclesFactory.createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
 							break;
 						case fromVehiclesData:
-							vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
+							vehicle = vehicles.getVehicles().get(vehicleId);
 							if (vehicle == null) {
 								throw new IllegalStateException("Expecting a vehicle id which is missing in the vehicles database: " + vehicleId);
 							}
