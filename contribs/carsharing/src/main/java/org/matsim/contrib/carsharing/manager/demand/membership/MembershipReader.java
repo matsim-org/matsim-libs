@@ -19,9 +19,11 @@ public class MembershipReader extends MatsimXmlParser{
 	private Map<String, Set<String>> membershipPerCSType;
 	private String personId;
 	private String companyId;
+	private HashMap<String, String> stringCache = new HashMap<>();
+
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
-		
+
 		if (name.equals("person")) {
 			
 			personId = atts.getValue("id");
@@ -31,11 +33,13 @@ public class MembershipReader extends MatsimXmlParser{
 		else if (name.equals("company")) {
 			
 			companyId = atts.getValue("id");
+			companyId = stringCache.computeIfAbsent(companyId, id -> id);
 			carsharingTypes = new TreeSet<>();
 		}
 		else if (name.equals("carsharing")) {
 			
 			String csType = atts.getValue("name");
+			csType = stringCache.computeIfAbsent(csType, type -> type);
 			if (this.membershipPerCSType.containsKey(csType)) {
 				
 				Set<String> companies = this.membershipPerCSType.get(csType);
