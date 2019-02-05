@@ -58,7 +58,7 @@ public class LeastCostPathTree {
 	// ////////////////////////////////////////////////////////////////////
 
 	private Node origin1 = null;
-	private double dTime = Time.UNDEFINED_TIME;
+	private double dTime = Time.getUndefinedTime();
 	
 	private final TravelTime ttFunction;
 	private final TravelDisutility tcFunction;
@@ -80,14 +80,14 @@ public class LeastCostPathTree {
 		this.origin1 = origin;
 		this.dTime = time;
 		
-		this.nodeData = new HashMap<Id<Node>, NodeData>((int) (network.getNodes().size() * 1.1), 0.95f);
+		this.nodeData = new HashMap<>((int) (network.getNodes().size() * 1.1), 0.95f);
 		NodeData d = new NodeData();
 		d.time = time;
 		d.cost = 0;
 		this.nodeData.put(origin.getId(), d);
 
 		ComparatorCost comparator = new ComparatorCost(this.nodeData);
-		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500, comparator);
+		PriorityQueue<Node> pendingNodes = new PriorityQueue<>(500, comparator);
 		relaxNode(origin, pendingNodes);
 		while (!pendingNodes.isEmpty()) {
 			Node n = pendingNodes.poll();

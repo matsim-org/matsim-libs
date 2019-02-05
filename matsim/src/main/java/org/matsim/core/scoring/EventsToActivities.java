@@ -76,7 +76,7 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
 
     @Override
     public void handleEvent(ActivityEndEvent event) {
-        Activity activity = activities.get(event.getPersonId());
+        Activity activity = activities.remove(event.getPersonId());
         if (activity == null) {
             Activity firstActivity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
             firstActivity.setFacilityId(event.getFacilityId());
@@ -86,7 +86,6 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
         for (ActivityHandler activityHandler : activityHandlers) {
             activityHandler.handleActivity(new PersonExperiencedActivity(event.getPersonId(), activity));
         }
-        activities.remove(event.getPersonId());
     }
 
     @Override
