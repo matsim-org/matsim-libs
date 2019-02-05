@@ -56,7 +56,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 						+ "but I cannot say if it would be picked up correctly by downstream modules.  kai, nov'16") ;
 			}			
 			// go through all modes:
-			for (final String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
+			for (final String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModesAsString() )) {
 				
 				// generate and bind the observer:
 				bind(TravelTimeCalculator.class).annotatedWith(Names.named(mode)).toProvider(new SingleModeTravelTimeCalculatorProvider(mode)).in(Singleton.class);
@@ -68,6 +68,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 						return injector.getInstance(Key.get(TravelTimeCalculator.class, Names.named(mode))).getLinkTravelTimes();
 					}
 				});
+
 			}
 		} else {
 			// (all analyzed modes are measured together, and the same result is returned to each mode)
@@ -77,7 +78,8 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 			
 			// bind the TravelTime objects.  In this case, this just passes on the same information from TravelTimeCalculator to each individual mode:
 			if (getConfig().travelTimeCalculator().isCalculateLinkTravelTimes()) {
-				for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
+//				for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModesAsString() )) {
+				for ( String mode : getConfig().plansCalcRoute().getNetworkModes() ) {
 					addTravelTimeBinding(mode).toProvider(ObservedLinkTravelTimes.class);
 				}
 			}
@@ -85,6 +87,10 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 				bind(LinkToLinkTravelTime.class).toProvider(ObservedLinkToLinkTravelTimes.class);
 			}
 		}
+
+		// yyyy does it really make a lot of sense to bind TravelTimeCalculator?  People have already tried to replace it, which does not really work since it is not an
+		// interface.  I have now made it final, getting rid of that situation.  However, I find it confusing that sometimes it seems to be injected and sometimes not.  kai,
+		// feb'19
 	}
 
 	private static class SingleModeTravelTimeCalculatorProvider implements Provider<TravelTimeCalculator> {
@@ -108,4 +114,27 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 		}
 	}
 
+	private static class ObservedLinkTravelTimes implements Provider<TravelTime> {
+
+		@Inject
+		TravelTimeCalculator travelTimeCalculator;
+
+		@Override
+		public TravelTime get() {
+			return travelTimeCalculator.getLinkTravelTimes();
+		}
+
+	}
+
+	private static class ObservedLinkToLinkTravelTimes implements Provider<LinkToLinkTravelTime> {
+
+		@Inject
+		TravelTimeCalculator travelTimeCalculator;
+
+		@Override
+		public LinkToLinkTravelTime get() {
+			return travelTimeCalculator.getLinkToLinkTravelTimes();
+		}
+
+	}
 }

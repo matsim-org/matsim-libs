@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
@@ -22,6 +23,8 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.util.Arrays;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -33,7 +36,7 @@ public class TravelTimeCalculatorModuleTest {
 	@Test
 	public void testOneTravelTimeCalculatorForAll() {
 		Config config = ConfigUtils.createConfig();
-		config.travelTimeCalculator().setAnalyzedModes("car,bike");
+		config.travelTimeCalculator().setSeparateModes(false);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Node node0 = scenario.getNetwork().getFactory().createNode(Id.createNodeId(0), new Coord(0, 0));
 		Node node1 = scenario.getNetwork().getFactory().createNode(Id.createNodeId(1), new Coord(1, 0));
@@ -62,7 +65,7 @@ public class TravelTimeCalculatorModuleTest {
 	@Test
 	public void testOneTravelTimeCalculatorPerMode() {
 		Config config = ConfigUtils.createConfig();
-		config.travelTimeCalculator().setAnalyzedModes("car,bike");
+		config.travelTimeCalculator().setAnalyzedModesAsString("car,bike" );
 		config.travelTimeCalculator().setSeparateModes(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Node node0 = scenario.getNetwork().getFactory().createNode(Id.createNodeId(0), new Coord(0, 0));

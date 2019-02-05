@@ -29,10 +29,7 @@ import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Config Module for PlansCalcRoute class.
@@ -65,7 +62,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	private static final Logger log = Logger.getLogger(PlansCalcRouteConfigGroup.class) ;
 	
-	private Collection<String> networkModes = Arrays.asList(TransportMode.car);
+	private Collection<String> networkModes = Collections.singletonList( TransportMode.car );
 
 	private boolean acceptModeParamsWithoutClearing = false;
 	
@@ -524,6 +521,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 	@Override protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
+
 //		if ( this.insertingAccessEgressWalk ) {
 //			// we need scoring parameters for each resulting interaction activity
 //			for ( String mode : this.getNetworkModes() ) {
@@ -539,5 +537,23 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		// these are now added in the config consistency checker of PlanCalcScoreConfigGroup,
 		// so there is no point in checking here since the checker here might be called
 		// earlier. kai, jan'18
+
+		Set<String> modesRoutedAsTeleportation = this.getModeRoutingParams().keySet();
+		Collection<String> modesRoutedAsNetworkModes = this.getNetworkModes();
+
+		for( String mode : modesRoutedAsTeleportation ){
+			if ( modesRoutedAsNetworkModes.contains( mode ) ) {
+				throw new RuntimeException( "mode \"" + mode + "\" is defined both as teleportation (mode routing param) and for network routing.  You need to remove " +
+										"one or the other.") ;
+			}
+		}
+
 	}
+
+	public void printModeRoutingParams(){
+		for( Map.Entry<String, PlansCalcRouteConfigGroup.ModeRoutingParams> entry : this.getModeRoutingParams().entrySet() ){
+			log.warn( "key=" + entry.getKey() + "; value=" + entry.getValue() );
+		}
+	}
+
 }

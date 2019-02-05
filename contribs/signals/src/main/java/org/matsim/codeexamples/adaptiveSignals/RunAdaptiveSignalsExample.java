@@ -53,7 +53,7 @@ public class RunAdaptiveSignalsExample {
 		OTFVisConfigGroup otfvisConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.class);
 		otfvisConfig.setDrawTime(true);
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.withHoles);
-		
+
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,

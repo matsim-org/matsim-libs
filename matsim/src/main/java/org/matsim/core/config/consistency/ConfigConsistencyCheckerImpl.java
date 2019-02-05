@@ -45,15 +45,27 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 
 	@Override
 	public void checkConsistency(final Config config) {
-		ConfigConsistencyCheckerImpl.checkScenarioFeaturesEnabled(config);
-		ConfigConsistencyCheckerImpl.checkEventsFormatLanesSignals(config);
-		ConfigConsistencyCheckerImpl.checkTravelTimeCalculationRoutingConfiguration(config);
-		ConfigConsistencyCheckerImpl.checkLaneDefinitionRoutingConfiguration(config);
-		ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
-		ConfigConsistencyCheckerImpl.checkTransit(config);
+		checkScenarioFeaturesEnabled(config);
+		checkEventsFormatLanesSignals(config);
+		checkTravelTimeCalculationRoutingConfiguration(config);
+		checkLaneDefinitionRoutingConfiguration(config);
+		checkPlanCalcScore(config);
+		checkTransit(config);
+		checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
 	}
 
-	/*package*/ static void checkPlanCalcScore(final Config c) {
+	static boolean checkConsistencyBetweenRouterAndTravelTimeCalculator( final Config config ) {
+		boolean problem = false ;
+		if ( config.travelTimeCalculator().getSeparateModes() ) {
+			if ( ! config.travelTimeCalculator().getAnalyzedModes().containsAll( config.plansCalcRoute().getNetworkModes() ) ) {
+				log.warn("AnalyzedModes in travelTimeCalculator config is not superset of network routing modes.  Will fail later except when defined by other means.");
+				problem = true ;
+			}
+		}
+		return problem ;
+	}
+
+	/*package because of test */ static void checkPlanCalcScore(final Config c) {
 		ModeParams ptModeParams = c.planCalcScore().getModes().get(TransportMode.pt);
 		if (ptModeParams!=null && ptModeParams.getMarginalUtilityOfTraveling() > 0) {
 			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingPt is > 0. This values specifies a utility. " +
@@ -85,7 +97,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 //				}
 //			}
 			if ( ptAct.isScoringThisActivityAtAll() ) {
-				if ( !c.vspExperimental().isAbleToOverwritePtInteractionParams()==true ) {
+				if ( !c.vspExperimental().isAbleToOverwritePtInteractionParams() ) {
 					throw new RuntimeException("Scoring " + ptAct.getActivityType() + " is not allowed because it breaks pt scoring." +
 					" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
 				}
