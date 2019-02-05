@@ -19,6 +19,7 @@
 package org.matsim.contrib.edrt.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -35,21 +36,23 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class EDrtControlerCreator {
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		DrtConfigs.adjustDrtConfig(DrtConfigGroup.get(config), config.planCalcScore());
+		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
+		DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
+
+		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
+		config.checkConsistency();
+
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
+
 		Controler controler = new Controler(scenario);
-		addEDrtToController(controler);
+		controler.addOverridingModule(new EDrtModule());
+		controler.addOverridingModule(new DvrpModule());
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(drtCfg.getMode()));
+
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
 		return controler;
-	}
-
-	public static void addEDrtToController(Controler controler) {
-		DrtConfigGroup drtCfg = DrtConfigGroup.get(controler.getConfig());
-		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new EDrtModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(drtCfg.getMode()));
 	}
 }
