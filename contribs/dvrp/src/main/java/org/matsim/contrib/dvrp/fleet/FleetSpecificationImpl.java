@@ -47,7 +47,7 @@ public final class FleetSpecificationImpl implements FleetSpecification {
 
 	@Override
 	public void replaceVehicleSpecification(DvrpVehicleSpecification specification) {
-		if (specifications.computeIfPresent(specification.getId(), (k, v) -> specification) != null) {
+		if (specifications.computeIfPresent(specification.getId(), (k, v) -> specification) == null) {
 			throw new RuntimeException(
 					"A vehicle specification for vehicle id=" + specification.getId() + " does not exist");
 		}
