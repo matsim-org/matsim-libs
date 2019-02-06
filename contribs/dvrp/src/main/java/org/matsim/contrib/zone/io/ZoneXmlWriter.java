@@ -1,6 +1,6 @@
 package org.matsim.contrib.zone.io;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +28,8 @@ public class ZoneXmlWriter extends MatsimXmlWriter {
 
 	private void writeZones() {
 		for (Zone z : zones.values()) {
-			List<Tuple<String, String>> atts = new ArrayList<>();
-			atts.add(new Tuple<>("id", z.getId().toString()));
-			atts.add(new Tuple<>("type", z.getType()));
+			List<Tuple<String, String>> atts = Arrays.asList(Tuple.of("id", z.getId().toString()),
+					Tuple.of("type", z.getType()));
 			writeStartTag("zone", atts, true);
 		}
 	}

@@ -87,7 +87,7 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 			DrtRequestSubmittedEvent submission = this.submittedRequests.remove(scheduled.getRequestId());
 			double actualWaitTime = event.getTime() - submission.getTime();
 			double estimatedWaitTime = scheduled.getPickupTime() - submission.getTime();
-			waitTimeCompare.put(submission.getRequestId(), new Tuple<>(actualWaitTime, estimatedWaitTime));
+			waitTimeCompare.put(submission.getRequestId(), Tuple.of(actualWaitTime, estimatedWaitTime));
 
 		}
 	}
