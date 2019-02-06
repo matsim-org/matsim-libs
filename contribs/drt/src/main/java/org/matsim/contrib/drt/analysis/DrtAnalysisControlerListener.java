@@ -28,7 +28,7 @@ import java.util.Locale;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.data.FleetSpecification;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -54,7 +54,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private final DecimalFormat format = new DecimalFormat();
 	private final int maxcap;
 
-	public DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, Fleet fleet,
+	public DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, FleetSpecification fleet,
 			DynModePassengerStats drtPassengerStats, MatsimServices matsimServices, Network network,
 			DrtRequestAnalyzer drtRequestAnalyzer) {
 		this.drtPassengerStats = drtPassengerStats;
