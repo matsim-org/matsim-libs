@@ -26,7 +26,7 @@ import java.util.concurrent.ForkJoinPool;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.contrib.drt.data.DrtRequest;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
