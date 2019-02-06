@@ -19,17 +19,6 @@
 
 package vwExamples.utils.DrtTrajectoryAnalyzer;
 
-import com.google.inject.Inject;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.vehicles.Vehicle;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -39,6 +28,18 @@ import java.text.DecimalFormatSymbols;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.vehicles.Vehicle;
+
+import com.google.inject.Inject;
 
 /**
  * @author saxer

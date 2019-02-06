@@ -22,7 +22,7 @@ package peoplemover.stop;
 
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;

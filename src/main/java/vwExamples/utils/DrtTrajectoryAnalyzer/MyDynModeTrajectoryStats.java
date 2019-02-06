@@ -52,10 +52,9 @@ import org.matsim.contrib.drt.analysis.DynModeTripsAnalyser;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
-import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -89,28 +88,28 @@ public class MyDynModeTrajectoryStats
 	private final String mode;
 	private final int maxcap;
 	private final Network network;
-	private final Fleet fleet;
+	private final FleetSpecification fleet;
 	private String sep = ",";
 	private final ElectricFleet electricFleet;
 
-
-	public MyDynModeTrajectoryStats(Network network, EventsManager events, DrtConfigGroup drtCfg, Fleet fleet, ElectricFleet electricFleet) {
+	public MyDynModeTrajectoryStats(Network network, EventsManager events, DrtConfigGroup drtCfg,
+			FleetSpecification fleet, ElectricFleet electricFleet) {
 		this.fleet = fleet;
 		this.mode = drtCfg.getMode();
 		this.network = network;
 		events.addHandler(this);
 		maxcap = DynModeTripsAnalyser.findMaxCap(fleet);
 		this.electricFleet = electricFleet;
-				
+
 	}
-	
+
 	private static class VehDrive {
 		private final Id<Vehicle> vehicleId;
-		private final DvrpVehicle veh;
+		private final DvrpVehicleSpecification veh;
 		public double movedOverNodeTime;
 		private final double distance_till_now;
 
-		public VehDrive(Id<Vehicle> vehicleId, DvrpVehicle vehicle) {
+		public VehDrive(Id<Vehicle> vehicleId, DvrpVehicleSpecification vehicle) {
 			this.vehicleId = vehicleId;
 			this.veh = vehicle;
 			movedOverNodeTime = Double.NaN;
@@ -121,13 +120,9 @@ public class MyDynModeTrajectoryStats
 			return Double.isNaN(movedOverNodeTime);
 		}
 	}
-	
+
 	private final Map<Id<Vehicle>, VehDrive> vehDrives = new HashMap<>();
-	
-	
-	
-	
-	
+
 
 	@Override
 	public void reset(int iteration) {
@@ -142,23 +137,20 @@ public class MyDynModeTrajectoryStats
 		rejectedPersons.clear();
 		request2person.clear();
 	}
-	
-	
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)) {
 			Id<Vehicle> vid = Id.createVehicleId(event.getPersonId().toString());
 			this.inVehicleDistance.put(vid, new HashMap<Id<Person>, MutableDouble>());
-			this.vehicleDistances.put(vid, new double[3 + maxcap]);	
+			this.vehicleDistances.put(vid, new double[3 + maxcap]);
 		}
-		
-		
+
+
 		if (event.getActType().equals("ChargingActivity"))
 		{
 			Id<Vehicle> vid = Id.createVehicleId(event.getPersonId().toString());
-			
-			
+
 			double acutalTime = event.getTime();
 			String vehicleID = vid.toString();
 			double dist = this.vehicleDistances.get(vid)[0];
@@ -166,13 +158,13 @@ public class MyDynModeTrajectoryStats
 			String actualTaskType = "CHARGE_END";
 			double x = network.getLinks().get(event.getLinkId()).getCoord().getX();
 			double y = network.getLinks().get(event.getLinkId()).getCoord().getY();
-			
+
 			double tt = Double.NaN;;
 			double v_meterPerSec = Double.NaN;
 			Id<ElectricVehicle> evId = Id.create(vid, ElectricVehicle.class);
 			double currentSoc = EvUnits.J_to_kWh(electricFleet.getElectricVehicles().get(evId).getBattery().getSoc());
 			String line = (vehicleID + sep + acutalTime + sep + occupancy + sep + dist + sep + actualTaskType + sep + x + sep + y + sep + tt + sep + v_meterPerSec + sep + currentSoc);
-			
+
 			if (vehicleTrajectoryMap.containsKey(vid))
 			{
 				vehicleTrajectoryMap.get(vid).add(line);
@@ -181,23 +173,21 @@ public class MyDynModeTrajectoryStats
 				//Add the first line to the list and initialize the list
 				vehicleTrajectoryMap.put(vid, new ArrayList<>());
 			}
-			
-			
+
 		}
-		
+
 	}
-	
-	
+
+
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 
 
-		
+
 		if (event.getActType().equals("ChargingActivity"))
 		{
 			Id<Vehicle> vid = Id.createVehicleId(event.getPersonId().toString());
-			
-			
+
 			double acutalTime = event.getTime();
 			String vehicleID = vid.toString();
 			double dist = this.vehicleDistances.get(vid)[0];
@@ -205,9 +195,9 @@ public class MyDynModeTrajectoryStats
 			String actualTaskType = "CHARGE_START";
 			double x = network.getLinks().get(event.getLinkId()).getCoord().getX();
 			double y = network.getLinks().get(event.getLinkId()).getCoord().getY();
-						
+
 			String line = (vehicleID +sep+ acutalTime +sep+ occupancy +sep+ dist +sep+ actualTaskType +sep+ x  +sep+ y);
-			
+
 			if (vehicleTrajectoryMap.containsKey(vid))
 			{
 				vehicleTrajectoryMap.get(vid).add(line);
@@ -216,41 +206,53 @@ public class MyDynModeTrajectoryStats
 				//Add the first line to the list and initialize the list
 				vehicleTrajectoryMap.put(vid, new ArrayList<>());
 			}
-			
-			
+
 		}
-		
-	
-		
+
+
+
 	}
 
 
-	
+
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		Id<Vehicle> vehicleId = event.getVehicleId();
-		if (fleet.getVehicles().containsKey(vehicleId)) {// handle all drt
+		if (fleet.getVehicleSpecifications().containsKey(vehicleId)) {// handle all drt
 			activeVehicle.add(vehicleId);
-			
-			
-			vehDrives.put(vehicleId, new VehDrive(vehicleId, fleet.getVehicles().get(vehicleId)));
-			
+
+			vehDrives.put(vehicleId, new VehDrive(vehicleId, fleet.getVehicleSpecifications().get(vehicleId)));
+
 			double acutalTime = event.getTime();
 			String vehicleID = event.getVehicleId().toString();
 			double dist = this.vehicleDistances.get(event.getVehicleId())[0];
 			int occupancy = inVehicleDistance.get(event.getVehicleId()).size();
-			DrtTask actualTask = (DrtTask) fleet.getVehicles().get(event.getVehicleId()).getSchedule().getCurrentTask();
-			String actualTaskType = actualTask.getDrtTaskType().toString();
 			double x = network.getLinks().get(event.getLinkId()).getCoord().getX();
 			double y = network.getLinks().get(event.getLinkId()).getCoord().getY();
-						
+
 			double tt =  Double.NaN;
-			
+
 			double v_meterPerSec = Double.NaN;
-			
-			String line = (vehicleID +sep+ acutalTime +sep+ occupancy +sep+ dist +sep+ actualTaskType +sep+ x  +sep+ y+ sep +tt + sep + v_meterPerSec);
-			
+
+			String line = (vehicleID
+					+ sep
+					+ acutalTime
+					+ sep
+					+ occupancy
+					+ sep
+					+ dist
+					+ sep
+					+ ""
+					+ sep
+					+ x
+					+ sep
+					+ y
+					+ sep
+					+ tt
+					+ sep
+					+ v_meterPerSec);
+
 			if (vehicleTrajectoryMap.containsKey(event.getVehicleId()))
 			{
 				vehicleTrajectoryMap.get(event.getVehicleId()).add(line);
@@ -260,35 +262,47 @@ public class MyDynModeTrajectoryStats
 				vehicleTrajectoryMap.put(event.getVehicleId(), new ArrayList<>());
 			}
 		}
-		
-		
-		
+
 	}
-	
+
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		Id<Vehicle> vehicleId = event.getVehicleId();
-		if (fleet.getVehicles().containsKey(vehicleId)) {// handle all drt
+		if (fleet.getVehicleSpecifications().containsKey(vehicleId)) {// handle all drt
 			activeVehicle.add(vehicleId);
-			
-			vehDrives.remove(vehicleId, new VehDrive(vehicleId, fleet.getVehicles().get(vehicleId)));
+
+			vehDrives.remove(vehicleId, new VehDrive(vehicleId, fleet.getVehicleSpecifications().get(vehicleId)));
 
 			double acutalTime = event.getTime();
 			String vehicleID = event.getVehicleId().toString();
 			double dist = this.vehicleDistances.get(event.getVehicleId())[0];
 			int occupancy = inVehicleDistance.get(event.getVehicleId()).size();
-			DrtTask actualTask = (DrtTask) fleet.getVehicles().get(event.getVehicleId()).getSchedule().getCurrentTask();
-			String actualTaskType = actualTask.getDrtTaskType().toString();
-						
+
 			double x = network.getLinks().get(event.getLinkId()).getCoord().getX();
 			double y = network.getLinks().get(event.getLinkId()).getCoord().getY();
-			
+
 			double tt =  Double.NaN;
-						
+
 			double v_meterPerSec = Double.NaN;
-			
-			String line = (vehicleID +sep+ acutalTime +sep+ occupancy +sep+ dist +sep+ actualTaskType +sep+ x  +sep+ y+ sep +tt + sep + v_meterPerSec);
-			
+
+			String line = (vehicleID
+					+ sep
+					+ acutalTime
+					+ sep
+					+ occupancy
+					+ sep
+					+ dist
+					+ sep
+					+ ""
+					+ sep
+					+ x
+					+ sep
+					+ y
+					+ sep
+					+ tt
+					+ sep
+					+ v_meterPerSec);
+
 			if (vehicleTrajectoryMap.containsKey(event.getVehicleId()))
 			{
 				vehicleTrajectoryMap.get(event.getVehicleId()).add(line);
@@ -298,10 +312,10 @@ public class MyDynModeTrajectoryStats
 				vehicleTrajectoryMap.put(event.getVehicleId(), new ArrayList<>());
 			}
 		}
-		
+
 	}
 
-	
+
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (inVehicleDistance.containsKey(event.getVehicleId())) {
@@ -309,7 +323,7 @@ public class MyDynModeTrajectoryStats
 			for (MutableDouble d : inVehicleDistance.get(event.getVehicleId()).values()) {
 				d.add(distance);
 			}
-			
+
 			this.vehicleDistances.get(event.getVehicleId())[0] += distance; // overall distance drive
 
 			//Cumulative DvrpVehicle Distance, actual occupancy
@@ -317,37 +331,48 @@ public class MyDynModeTrajectoryStats
 			String vehicleID = event.getVehicleId().toString();
 			double dist = this.vehicleDistances.get(event.getVehicleId())[0];
 			int occupancy = inVehicleDistance.get(event.getVehicleId()).size();
-			DrtTask actualTask = (DrtTask) fleet.getVehicles().get(event.getVehicleId()).getSchedule().getCurrentTask();
-			String actualTaskType = actualTask.getDrtTaskType().toString();
-						
+
 			double x = network.getLinks().get(event.getLinkId()).getCoord().getX();
 			double y = network.getLinks().get(event.getLinkId()).getCoord().getY();
-			
-			
+
 			//Assign first time stamp after having traversed the first link
 			VehDrive vehDrive =  vehDrives.get(event.getVehicleId());
 			double tt =  Double.NaN;
-			
-			
-			
+
 			if (!vehDrive.isOnFirstLink())
 			{
 				tt = event.getTime() - vehDrive.movedOverNodeTime;
-				
+
 			}
-			
+
 			if (vehDrive.isOnFirstLink())
 			{
 				double defaultSpeedOnFirstEdge = 7.0; //meter per second
 				tt = network.getLinks().get(event.getLinkId()).getLength()/defaultSpeedOnFirstEdge;
-				
+
 			}
-			
+
 			vehDrive.movedOverNodeTime = event.getTime();
-			double v_meterPerSec = distance/tt;	
-			
-			String line = (vehicleID +sep+ acutalTime +sep+ occupancy +sep+ dist +sep+ actualTaskType +sep+ x  +sep+ y+ sep +tt + sep + v_meterPerSec);
-			
+			double v_meterPerSec = distance / tt;
+
+			String line = (vehicleID
+					+ sep
+					+ acutalTime
+					+ sep
+					+ occupancy
+					+ sep
+					+ dist
+					+ sep
+					+ ""
+					+ sep
+					+ x
+					+ sep
+					+ y
+					+ sep
+					+ tt
+					+ sep
+					+ v_meterPerSec);
+
 			if (vehicleTrajectoryMap.containsKey(event.getVehicleId()))
 			{
 				vehicleTrajectoryMap.get(event.getVehicleId()).add(line);
@@ -356,8 +381,7 @@ public class MyDynModeTrajectoryStats
 				//Add the first line to the list and initialize the list
 				vehicleTrajectoryMap.put(event.getVehicleId(), new ArrayList<>());
 			}
-			
-			
+
 			this.vehicleDistances.get(event.getVehicleId())[1] += distance * occupancy; // overall revenue distance
 			if (occupancy > 0) {
 				this.vehicleDistances.get(event.getVehicleId())[2] += distance; // overall occupied distance
@@ -366,7 +390,7 @@ public class MyDynModeTrajectoryStats
 
 			}
 		}
-		
+
 	}
 
 	@Override
@@ -454,12 +478,4 @@ public class MyDynModeTrajectoryStats
 		}
 		rejectedPersons.add(request2person.get(event.getRequestId()));
 	}
-
-
-
-
-
-
-	
-	
 }
