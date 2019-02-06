@@ -39,7 +39,7 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 	}
 
 	private final DvrpVehicleSpecification specification;
-	private Link startLink; //FIXME will be final after removing setStartLink
+	private final Link startLink;
 	private final Schedule schedule;
 
 	public DvrpVehicleImpl(DvrpVehicleSpecification specification, Link startLink) {
@@ -56,12 +56,6 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 	@Override
 	public Link getStartLink() {
 		return startLink;
-	}
-
-	//FIXME will be removed after limiting the DvrpVehicle lifespan to single QSim simulation
-	@Override
-	public void setStartLink(Link link) {
-		this.startLink = link;
 	}
 
 	@Override

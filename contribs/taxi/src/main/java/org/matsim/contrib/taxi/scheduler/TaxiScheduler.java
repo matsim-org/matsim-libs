@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.Vehicles;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelDataImpl;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -78,16 +77,10 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 
 		router = new FastAStarEuclideanFactory(taxiCfg.getAStarEuclideanOverdoFactor()).createPathCalculator(network,
 				travelDisutility, travelTime);
-		initFleet(taxiCfg);
+		initFleet();
 	}
 
-	private void initFleet(TaxiConfigGroup taxiCfg) {
-		if (taxiCfg.isChangeStartLinkToLastLinkInSchedule()) {
-			for (DvrpVehicle veh : fleet.getVehicles().values()) {
-				Vehicles.changeStartLinkToLastLinkInSchedule(veh);
-			}
-		}
-
+	private void initFleet() {
 		for (DvrpVehicle veh : fleet.getVehicles().values()) {
 			veh.getSchedule()
 					.addTask(new TaxiStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));

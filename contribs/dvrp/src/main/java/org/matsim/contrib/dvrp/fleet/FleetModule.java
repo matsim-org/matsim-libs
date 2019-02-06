@@ -35,10 +35,16 @@ import com.google.inject.name.Named;
  */
 public class FleetModule extends AbstractDvrpModeModule {
 	private final String file;
+	private final boolean updateVehicleStartLinkToLastLink;
 
 	public FleetModule(String mode, String file) {
+		this(mode, file, false);
+	}
+
+	public FleetModule(String mode, String file, boolean updateVehicleStartLinkToLastLink) {
 		super(mode);
 		this.file = file;
+		this.updateVehicleStartLinkToLastLink = updateVehicleStartLinkToLastLink;
 	}
 
 	@Override
@@ -65,5 +71,10 @@ public class FleetModule extends AbstractDvrpModeModule {
 				}).asEagerSingleton();
 			}
 		});
+
+		if (updateVehicleStartLinkToLastLink) {
+			install(FleetStatsCalculatorModule.createModule(getMode(), VehicleStartLinkToLastLinkUpdater.class,
+					getter -> new VehicleStartLinkToLastLinkUpdater(getter.getModal(FleetSpecification.class))));
+		}
 	}
 }

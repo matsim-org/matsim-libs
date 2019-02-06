@@ -20,13 +20,44 @@
 
 package org.matsim.contrib.dvrp.fleet;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 
 /**
- * @author michalm
+ * 1. Collects information on fleet vehicles on MobsimBeforeCleanupEvent.
+ * 2. Updates vehicle fleet specifications on IterationEndsEvent.
+ *
+ * @author Michal Maciejewski (michalm)
  */
-public class Vehicles {
-	public static void changeStartLinkToLastLinkInSchedule(DvrpVehicle vehicle) {
-		vehicle.setStartLink(Schedules.getLastLinkInSchedule(vehicle));
+public class VehicleStartLinkToLastLinkUpdater implements FleetStatsCalculator, IterationEndsListener {
+	private final FleetSpecification fleetSpecification;
+	private List<DvrpVehicleSpecification> updatedVehSpecifications;
+
+	public VehicleStartLinkToLastLinkUpdater(FleetSpecification fleetSpecification) {
+		this.fleetSpecification = fleetSpecification;
+	}
+
+	@Override
+	public void updateStats(Fleet fleet) {
+		updatedVehSpecifications = fleet.getVehicles()
+				.values()
+				.stream()
+				.map(v -> ImmutableDvrpVehicleSpecification.newBuilder()
+						.id(v.getId())
+						.startLinkId(Schedules.getLastLinkInSchedule(v).getId())
+						.capacity(v.getCapacity())
+						.serviceBeginTime(v.getServiceBeginTime())
+						.serviceEndTime(v.getServiceEndTime())
+						.build())
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		updatedVehSpecifications.forEach(fleetSpecification::replaceVehicleSpecification);
 	}
 }

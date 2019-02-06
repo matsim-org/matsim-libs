@@ -47,7 +47,7 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 
 		addRoutingModuleBinding(getMode()).toInstance(new DynRoutingModule(getMode()));
 
-		install(new FleetModule(getMode(), taxiCfg.getTaxisFile()));
+		install(new FleetModule(getMode(), taxiCfg.getTaxisFile(), taxiCfg.isChangeStartLinkToLastLinkInSchedule()));
 
 		install(FleetStatsCalculatorModule.createModule(getMode(), TaxiStatsDumper.class,
 				getter -> new TaxiStatsDumper(taxiCfg, getter.get(OutputDirectoryHierarchy.class),

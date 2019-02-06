@@ -74,9 +74,4 @@ public class EvDvrpVehicle implements DvrpVehicle {
 	public Schedule getSchedule() {
 		return vehicle.getSchedule();
 	}
-
-	@Override
-	public void setStartLink(Link link) {
-		vehicle.setStartLink(link);
-	}
 }

@@ -26,9 +26,9 @@ import java.util.concurrent.ForkJoinPool;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
@@ -70,7 +70,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		forkJoinPool = new ForkJoinPool(drtCfg.getNumberOfThreads());
 		insertionProblem = new ParallelMultiVehicleInsertionProblem(pathDataProvider, drtCfg, mobsimTimer, forkJoinPool,
 				penaltyCalculator);
-		insertionScheduler.initSchedules(drtCfg.isChangeStartLinkToLastLinkInSchedule());
+		insertionScheduler.initSchedules();
 	}
 
 	@Override

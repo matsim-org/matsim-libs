@@ -71,7 +71,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 	public void install() {
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
-		install(new FleetModule(getMode(), drtCfg.getVehiclesFile()));
+		install(new FleetModule(getMode(), drtCfg.getVehiclesFile(), drtCfg.isChangeStartLinkToLastLinkInSchedule()));
 
 		if (MinCostFlowRebalancingParams.isRebalancingEnabled(drtCfg.getMinCostFlowRebalancing())) {
 			install(new DrtModeMinCostFlowRebalancingModule(drtCfg));

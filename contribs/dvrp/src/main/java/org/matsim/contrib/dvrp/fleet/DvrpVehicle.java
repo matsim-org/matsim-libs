@@ -37,8 +37,6 @@ public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
 	 */
 	Link getStartLink();
 
-	void setStartLink(Link link);
-
 	/**
 	 * @return the amount of people/goods that can be served/transported at the same time
 	 */
