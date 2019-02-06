@@ -23,7 +23,7 @@ package org.matsim.core.trafficmonitoring;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-public interface DataContainerProvider {
+interface DataContainerProvider {
 	
 	/*
 	 * This method is called from the EventHandler part of the TravelTimeCalculator. 

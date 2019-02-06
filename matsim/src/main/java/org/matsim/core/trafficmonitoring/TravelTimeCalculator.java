@@ -32,11 +32,13 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -507,6 +509,8 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 //
 //	}
 
+	private static int cnt = 0 ;
+
 	public TravelTime getLinkTravelTimes() {
 		return new TravelTime() {
 
@@ -517,7 +521,16 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 
 				double linkTtimeFromVehicle = 0. ;
 				if ( vehicle!=null ){
-					linkTtimeFromVehicle = link.getLength() / vehicle.getType().getMaximumVelocity();
+					final VehicleType vehicleType = vehicle.getType();
+					if ( vehicleType==null ){
+						if( cnt < 1 ){
+							cnt++;
+							log.warn( "encountered vehicle where vehicle.getType() returns null.  That should be repaired (whereever it comes from)." );
+							log.warn( Gbl.ONLYONCE );
+						}
+					} else{
+						linkTtimeFromVehicle = link.getLength() / vehicleType.getMaximumVelocity();
+					}
 				}
 				double linkTTimeFromObservation = TravelTimeCalculator.this.getLinkTravelTime(link, time);
 				return Math.max( linkTtimeFromVehicle, linkTTimeFromObservation) ;

@@ -36,7 +36,7 @@ import org.matsim.core.utils.misc.IntegerCache;
  * @author mrieser
  * @author glaemmel
  */
-public class TravelTimeDataHashMap extends TravelTimeData {
+class TravelTimeDataHashMap extends TravelTimeData {
 	private final Map<Integer,TimeStruct> travelTimes;
 	
 	protected final Link link;

@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import java.util.Map;
 
-public class MapBasedDataContainerProvider implements DataContainerProvider {
+class MapBasedDataContainerProvider implements DataContainerProvider {
 
 	private final Map<Id<Link>, TravelTimeData> linkData;
 	private final TravelTimeDataFactory ttDataFactory;

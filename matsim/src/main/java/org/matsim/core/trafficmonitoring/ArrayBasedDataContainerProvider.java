@@ -38,7 +38,7 @@ import java.util.Map;
  *  
  * @author cdobler
  */
-public class ArrayBasedDataContainerProvider implements DataContainerProvider {
+class ArrayBasedDataContainerProvider implements DataContainerProvider {
 
 	private final TravelTimeData[] arrayLinkData;
 	private final DataContainerProvider delegate;

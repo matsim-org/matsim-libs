@@ -20,7 +20,7 @@
 
 package org.matsim.core.trafficmonitoring;
 
- public final class TimeSlotComputation{
+final class TimeSlotComputation{
 
 	private final int travelTimeBinSize;
 	private final int numSlots;

@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Link;
  *
  * @author mrieser
  */
-public class TravelTimeDataArray extends TravelTimeData {
+class TravelTimeDataArray extends TravelTimeData {
 	private static final Logger log = Logger.getLogger( TravelTimeDataArray.class ) ;
 
 	private final double[] timeSum;
@@ -72,7 +72,6 @@ public class TravelTimeDataArray extends TravelTimeData {
 
 	@Override
 	public void addTravelTime(final int timeSlot, final double traveltime) {
-		log.warn("add ttime=" + traveltime + " to timeSlot=" + timeSlot ) ;
 		double sum = this.timeSum[timeSlot];
 		int cnt = this.timeCnt[timeSlot];
 		sum += traveltime;

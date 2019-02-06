@@ -20,7 +20,7 @@
 
 package org.matsim.core.trafficmonitoring;
 
-public class LinearInterpolatingTravelTimeGetter implements TravelTimeGetter {
+class LinearInterpolatingTravelTimeGetter implements TravelTimeGetter {
 
 	private final TimeSlotComputation travelTimeAggregator ;
 	private final int numSlots;
