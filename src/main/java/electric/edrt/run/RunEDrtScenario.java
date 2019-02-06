@@ -121,9 +121,13 @@ public class RunEDrtScenario {
 			public void install() {
 				bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
 						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
-				bind(DriveEnergyConsumption.Factory.class).toInstance(evconsumption -> new VwDrtDriveEnergyConsumption());
-				bind(AuxEnergyConsumption.Factory.class).to(VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
-				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
+				bind(DriveEnergyConsumption.Factory.class).toInstance(
+						evconsumption -> new VwDrtDriveEnergyConsumption());
+				bind(AuxEnergyConsumption.Factory.class).to(
+						VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
+				bind(ChargingLogic.Factory.class).toInstance(
+						charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+								new FastThenSlowCharging(charger.getPower())));
 				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
 			}
 		});
@@ -132,13 +136,10 @@ public class RunEDrtScenario {
 	}
 
 	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
-		return new EvDvrpIntegrationModule(drtCfg.getMode())//
-				.setChargingStrategyFactory(
-						charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
-								MAX_RELATIVE_SOC))//
-				.setTemperatureProvider(() -> TEMPERATURE) //
-				.setTurnedOnPredicate(RunEDrtScenario::isTurnedOn)//
-				.setVehicleFile(drtCfg.getVehiclesFile());
+		return new EvDvrpIntegrationModule(drtCfg.getMode()).setChargingStrategyFactory(
+				charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC))
+				.setTemperatureProvider(() -> TEMPERATURE)
+				.setTurnedOnPredicate(RunEDrtScenario::isTurnedOn);
 	}
 
 	private static boolean isTurnedOn(DvrpVehicle vehicle) {
