@@ -15,6 +15,7 @@
 			<param name="onlineVehicleTracker" value="false"/>
 
 			<param name="taxisFile" value="one_taxi_vehicles_A.xml"/>
+			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
 
 			<param name="timeProfiles" value="true"/>
 			<param name="detailedStats" value="true"/>
@@ -39,6 +40,7 @@
 			<param name="onlineVehicleTracker" value="false"/>
 
 			<param name="taxisFile" value="one_taxi_vehicles_B.xml"/>
+			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
 
 			<param name="timeProfiles" value="true"/>
 			<param name="detailedStats" value="true"/>
@@ -63,6 +65,7 @@
 			<param name="onlineVehicleTracker" value="false"/>
 
 			<param name="taxisFile" value="one_taxi_vehicles_C.xml"/>
+			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
 
 			<param name="timeProfiles" value="true"/>
 			<param name="detailedStats" value="true"/>
