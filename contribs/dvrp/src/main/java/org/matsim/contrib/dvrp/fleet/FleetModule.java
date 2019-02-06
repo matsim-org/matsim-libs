@@ -21,7 +21,6 @@
 package org.matsim.contrib.dvrp.fleet;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.file.FleetReader;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
