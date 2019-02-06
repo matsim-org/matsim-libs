@@ -23,7 +23,7 @@ import java.awt.Color;
 import java.awt.Paint;
 
 import org.jfree.data.xy.DefaultTableXYDataset;
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;

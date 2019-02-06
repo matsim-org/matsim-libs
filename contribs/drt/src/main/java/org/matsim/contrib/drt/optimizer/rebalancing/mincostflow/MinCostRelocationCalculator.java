@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * @author michalm

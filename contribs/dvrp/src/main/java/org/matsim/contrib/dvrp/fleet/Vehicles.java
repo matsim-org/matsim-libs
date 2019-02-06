@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,23 +15,18 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.dvrp.fleet;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.schedule.Schedules;
 
 /**
- * Contains all DvrpVehicles generated for a given iteration. Its lifespan is limited to a single QSim simulation.
- * <p>
- * Fleet (ond the contained DvrpVehicles) are created from FleetSpecification (and the contained DvrpVehicleSpecifications)
- *
  * @author michalm
  */
-public interface Fleet {
-	Map<Id<DvrpVehicle>, ? extends DvrpVehicle> getVehicles();
-
-	void resetSchedules();
+public class Vehicles {
+	public static void changeStartLinkToLastLinkInSchedule(DvrpVehicle vehicle) {
+		vehicle.setStartLink(Schedules.getLastLinkInSchedule(vehicle));
+	}
 }

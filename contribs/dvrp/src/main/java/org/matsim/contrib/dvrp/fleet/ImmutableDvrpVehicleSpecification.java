@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.dvrp.fleet;
 
 import java.util.Objects;
 

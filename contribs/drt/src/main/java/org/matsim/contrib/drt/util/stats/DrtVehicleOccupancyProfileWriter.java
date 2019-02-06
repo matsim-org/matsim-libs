@@ -23,7 +23,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.contrib.util.chart.ChartSaveUtils;

@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 

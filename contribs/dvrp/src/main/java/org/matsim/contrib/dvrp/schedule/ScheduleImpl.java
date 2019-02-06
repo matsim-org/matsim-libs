@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 
 /**

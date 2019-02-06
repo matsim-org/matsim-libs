@@ -21,13 +21,13 @@
 package org.matsim.contrib.ev.dvrp;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.DvrpVehicleImpl;
-import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.FleetSpecification;
-import org.matsim.contrib.dvrp.data.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.data.file.FleetReader;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.FleetImpl;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;

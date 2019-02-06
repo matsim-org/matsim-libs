@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.optimizer.fifo;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;

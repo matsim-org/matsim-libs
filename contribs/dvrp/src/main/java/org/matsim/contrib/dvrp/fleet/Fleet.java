@@ -18,27 +18,21 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.dvrp.fleet;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
 /**
- * A container of DvrpVehicleSpecifications. Its lifespan covers all iterations.
+ * Contains all DvrpVehicles generated for a given iteration. Its lifespan is limited to a single QSim simulation.
  * <p>
- * It can be modified between iterations by add/replace/removeVehicleSpecification().
- * <p>
- * The contained DvrpVehicleSpecifications are (meant to be) immutable, so to modify them, use replaceVehicleSpecification()
+ * Fleet (ond the contained DvrpVehicles) are created from FleetSpecification (and the contained DvrpVehicleSpecifications)
  *
- * @author Michal Maciejewski (michalm)
+ * @author michalm
  */
-public interface FleetSpecification {
-	Map<Id<DvrpVehicle>, DvrpVehicleSpecification> getVehicleSpecifications();
+public interface Fleet {
+	Map<Id<DvrpVehicle>, ? extends DvrpVehicle> getVehicles();
 
-	void addVehicleSpecification(DvrpVehicleSpecification specification);
-
-	void replaceVehicleSpecification(DvrpVehicleSpecification specification);
-
-	void removeVehicleSpecification(Id<DvrpVehicle> vehicleId);
+	void resetSchedules();
 }

@@ -20,8 +20,8 @@ package org.matsim.contrib.drt.util.stats;
 import org.apache.commons.math3.stat.descriptive.rank.Max;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 

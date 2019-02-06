@@ -18,28 +18,27 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.dvrp.fleet;
+
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
 /**
- * DvrpVehicleSpecification is assumed to be immutable.
+ * A container of DvrpVehicleSpecifications. Its lifespan covers all iterations.
  * <p>
- * Its lifespan can span over all iterations, but can be also changed before each iteration.
+ * It can be modified between iterations by add/replace/removeVehicleSpecification().
  * <p>
- * Changing a vehicle specification (e.g. setting a different startLinkId) should be done only "between" iterations by passing a new instance to FleetSpecification.
+ * The contained DvrpVehicleSpecifications are (meant to be) immutable, so to modify them, use replaceVehicleSpecification()
  *
  * @author Michal Maciejewski (michalm)
  */
-public interface DvrpVehicleSpecification {
-	Id<DvrpVehicle> getId();
+public interface FleetSpecification {
+	Map<Id<DvrpVehicle>, DvrpVehicleSpecification> getVehicleSpecifications();
 
-	Id<Link> getStartLinkId();
+	void addVehicleSpecification(DvrpVehicleSpecification specification);
 
-	int getCapacity();
+	void replaceVehicleSpecification(DvrpVehicleSpecification specification);
 
-	double getServiceBeginTime();
-
-	double getServiceEndTime();
+	void removeVehicleSpecification(Id<DvrpVehicle> vehicleId);
 }

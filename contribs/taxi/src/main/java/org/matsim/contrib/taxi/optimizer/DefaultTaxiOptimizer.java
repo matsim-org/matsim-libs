@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
-import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.data.TaxiRequest;

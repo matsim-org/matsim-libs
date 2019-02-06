@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.data.FleetModule;
+import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.fleet.FleetStatsCalculatorModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;

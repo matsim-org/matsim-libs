@@ -20,7 +20,7 @@ package org.matsim.contrib.ev.dvrp;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.ev.data.ElectricFleet;
 import org.matsim.contrib.ev.data.ElectricVehicle;

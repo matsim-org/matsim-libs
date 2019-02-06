@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 

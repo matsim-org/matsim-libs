@@ -22,10 +22,10 @@ package org.matsim.contrib.dvrp.data.file;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
-import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.data.FleetSpecificationImpl;
-import org.matsim.contrib.dvrp.data.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
+import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 

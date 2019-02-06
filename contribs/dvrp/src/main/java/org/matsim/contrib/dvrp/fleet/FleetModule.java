@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.dvrp.fleet;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.file.FleetReader;

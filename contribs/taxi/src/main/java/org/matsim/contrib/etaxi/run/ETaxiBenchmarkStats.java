@@ -1,7 +1,7 @@
 package org.matsim.contrib.etaxi.run;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.etaxi.util.ETaxiStats;
 import org.matsim.contrib.etaxi.util.ETaxiStatsCalculator;
 import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
