@@ -31,7 +31,7 @@ public class FleetWriter extends MatsimXmlWriter {
 	private void writeVehicles() {
 		vehicleSpecifications.forEach(veh -> {
 			List<Tuple<String, String>> atts = Arrays.asList(new Tuple<>("id", veh.getId().toString()),
-					new Tuple<>("start_link", veh.getStartLinkId().toString()),
+					new Tuple<>("start_link", veh.getStartLinkId() + ""),
 					new Tuple<>("t_0", veh.getServiceBeginTime() + ""),
 					new Tuple<>("t_1", veh.getServiceEndTime() + ""), new Tuple<>("capacity", veh.getCapacity() + ""));
 			writeStartTag("vehicle", atts, true);
