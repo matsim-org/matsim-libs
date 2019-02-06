@@ -26,7 +26,7 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;

@@ -21,8 +21,8 @@ package org.matsim.contrib.taxi.util;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
+import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
