@@ -21,7 +21,7 @@ package org.matsim.contrib.taxi.util.stats;
 
 import java.util.Collection;
 
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;

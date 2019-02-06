@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**

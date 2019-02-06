@@ -24,7 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 
 //TODO remove this class once taxi stats are refactored
 public class SubmittedTaxiRequestsCollector {

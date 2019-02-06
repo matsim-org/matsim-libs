@@ -20,7 +20,7 @@
 package org.matsim.contrib.taxi.util;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;

@@ -38,7 +38,7 @@ import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.DrtScheduleTimingUpdater;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerRequests;

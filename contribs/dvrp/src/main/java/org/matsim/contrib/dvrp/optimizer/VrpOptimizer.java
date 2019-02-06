@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.dvrp.optimizer;
 
-import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**

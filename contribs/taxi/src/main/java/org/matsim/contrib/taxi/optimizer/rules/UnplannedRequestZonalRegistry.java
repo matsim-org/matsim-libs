@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.zone.ZonalSystem;
 import org.matsim.contrib.zone.ZonalSystems;

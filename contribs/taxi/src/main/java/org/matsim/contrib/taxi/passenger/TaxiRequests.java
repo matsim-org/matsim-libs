@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.passenger;
 
 import java.util.stream.Stream;
 
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 
 public class TaxiRequests {

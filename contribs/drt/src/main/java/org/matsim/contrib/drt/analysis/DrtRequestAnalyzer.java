@@ -46,7 +46,7 @@ import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEventHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;

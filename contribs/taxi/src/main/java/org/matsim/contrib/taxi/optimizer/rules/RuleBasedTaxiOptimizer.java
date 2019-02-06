@@ -20,7 +20,7 @@
 package org.matsim.contrib.taxi.optimizer.rules;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Schedule;
