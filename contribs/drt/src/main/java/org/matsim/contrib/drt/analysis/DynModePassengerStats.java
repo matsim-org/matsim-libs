@@ -48,8 +48,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -83,7 +83,7 @@ public class DynModePassengerStats
 		this.mode = drtCfg.getMode();
 		this.network = network;
 		events.addHandler(this);
-		maxcap = DynModeTripsAnalyser.findMaxCap(fleet);
+		maxcap = DynModeTripsAnalyser.findMaxVehicleCapacity(fleet);
 	}
 
 	@Override

@@ -64,7 +64,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		this.drtCfg = drtCfg;
 		this.qSimCfg = config.qsim();
 		runId = config.controler().getRunId();
-		maxcap = DynModeTripsAnalyser.findMaxCap(fleet);
+		maxcap = DynModeTripsAnalyser.findMaxVehicleCapacity(fleet);
 
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 		format.setMinimumIntegerDigits(1);

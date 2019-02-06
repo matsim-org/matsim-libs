@@ -505,7 +505,7 @@ public class DynModeTripsAnalyser {
 	 * @param fleet
 	 * @return
 	 */
-	public static int findMaxCap(FleetSpecification fleet) {
+	public static int findMaxVehicleCapacity(FleetSpecification fleet) {
 		return fleet.getVehicleSpecifications()
 				.values()
 				.stream()
