@@ -18,27 +18,32 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.ev.stats;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 
 /**
- * A container of DvrpVehicleSpecifications. Its lifespan covers all iterations.
- * <p>
- * It can be modified between iterations by add/replace/removeVehicleSpecification().
- * <p>
- * The contained DvrpVehicleSpecifications are (meant to be) immutable, so to modify them, use replaceVehicleSpecification()
- *
  * @author Michal Maciejewski (michalm)
  */
-public interface FleetSpecification {
-	Map<Id<DvrpVehicle>, DvrpVehicleSpecification> getVehicleSpecifications();
+public class EvStatsModule extends AbstractModule {
+	private final EvConfigGroup evCfg;
 
-	void addVehicleSpecification(DvrpVehicleSpecification specification);
+	public EvStatsModule(EvConfigGroup evCfg) {
+		this.evCfg = evCfg;
+	}
 
-	void replaceVehicleSpecification(DvrpVehicleSpecification specification);
-
-	void removeVehicleSpecification(Id<DvrpVehicle> vehicleId);
+	@Override
+	public void install() {
+		if (evCfg.getTimeProfiles()) {
+			addMobsimListenerBinding().toProvider(SocHistogramTimeProfileCollectorProvider.class);
+			addMobsimListenerBinding().toProvider(IndividualSocTimeProfileCollectorProvider.class);
+			addMobsimListenerBinding().toProvider(ChargerOccupancyTimeProfileCollectorProvider.class);
+			addMobsimListenerBinding().toProvider(ChargerOccupancyXYDataProvider.class);
+			addMobsimListenerBinding().toProvider(VehicleTypeAggregatedSocTimeProfileCollectorProvider.class);
+			// add more time profiles if necessary
+		}
+		addControlerListenerBinding().to(EvControlerListener.class).asEagerSingleton();
+		bind(ChargerPowerCollector.class).asEagerSingleton();
+	}
 }

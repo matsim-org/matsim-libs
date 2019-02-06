@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.taxi.scheduler;
 
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 

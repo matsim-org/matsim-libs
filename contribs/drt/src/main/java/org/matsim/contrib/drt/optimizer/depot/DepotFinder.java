@@ -20,7 +20,7 @@
 package org.matsim.contrib.drt.optimizer.depot;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * @author michalm

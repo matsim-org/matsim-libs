@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,9 +15,10 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.dvrp.fleet;
 
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
@@ -35,8 +36,6 @@ public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
 	 * @return the link at which vehicle starts operating (i.e. depot)
 	 */
 	Link getStartLink();
-
-	void setStartLink(Link link);
 
 	/**
 	 * @return the amount of people/goods that can be served/transported at the same time
@@ -63,9 +62,4 @@ public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
 	 * </ul>
 	 */
 	Schedule getSchedule();
-
-	/**
-	 * Resets the schedule. For instance, by creating a new Schedule object.
-	 */
-	void resetSchedule();
 }

@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,17 +15,15 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.dvrp.data.file;
+package org.matsim.contrib.dvrp.fleet;
 
+import java.util.Optional;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
-import org.matsim.contrib.dvrp.data.DvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.data.FleetSpecificationImpl;
-import org.matsim.contrib.dvrp.data.ImmutableDvrpVehicleSpecification;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -36,8 +34,6 @@ public class FleetReader extends MatsimXmlParser {
 	private static final String VEHICLE = "vehicle";
 
 	private static final int DEFAULT_CAPACITY = 1;
-	private static final double DEFAULT_T_0 = 0;
-	private static final double DEFAULT_T_1 = 24 * 60 * 60;
 
 	private final FleetSpecificationImpl fleet;
 
@@ -57,18 +53,21 @@ public class FleetReader extends MatsimXmlParser {
 	}
 
 	private DvrpVehicleSpecification createSpecification(Attributes atts) {
-		double capacity = ReaderUtils.getDouble(atts, "capacity", DEFAULT_CAPACITY);
-		int integerCapacity = (int)capacity;
-		if (integerCapacity != capacity) {
+		return ImmutableDvrpVehicleSpecification.newBuilder()
+				.id(Id.create(atts.getValue("id"), DvrpVehicle.class))
+				.startLinkId(Id.createLinkId(atts.getValue("start_link")))
+				.capacity(getCapacity(atts.getValue("capacity")))
+				.serviceBeginTime(Double.parseDouble(atts.getValue("t_0")))
+				.serviceEndTime(Double.parseDouble(atts.getValue("t_1")))
+				.build();
+	}
+
+	private static int getCapacity(String capacityAttribute) {
+		double capacity = Double.parseDouble(Optional.ofNullable(capacityAttribute).orElse(DEFAULT_CAPACITY + ""));
+		if ((int)capacity != capacity) {
 			//for backwards compatibility: use double when reading files (capacity used to be double)
 			throw new IllegalArgumentException("capacity must be an integer value");
 		}
-
-		return ImmutableDvrpVehicleSpecification.newBuilder().id(Id.create(atts.getValue("id"), DvrpVehicle.class))
-				.startLinkId(Id.createLinkId(atts.getValue("start_link")))
-				.capacity(integerCapacity)
-				.serviceBeginTime(ReaderUtils.getDouble(atts, "t_0", DEFAULT_T_0))
-				.serviceEndTime(ReaderUtils.getDouble(atts, "t_1", DEFAULT_T_1))
-				.build();
+		return (int)capacity;
 	}
 }

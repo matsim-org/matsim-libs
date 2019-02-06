@@ -19,18 +19,18 @@
 
 package org.matsim.contrib.ev.data.file;
 
-import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.data.ElectricVehicle;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+
+import org.matsim.contrib.ev.EvUnits;
+import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
 public class ElectricVehicleWriter extends MatsimXmlWriter {
 	private Iterable<ElectricVehicle> vehicles;
@@ -56,14 +56,11 @@ public class ElectricVehicleWriter extends MatsimXmlWriter {
 
 	private void writeVehicles() {
 		for (ElectricVehicle v : vehicles) {
-			List<Tuple<String, String>> atts = new ArrayList<>();
-			atts.add(new Tuple<String, String>("id", v.getId().toString()));
-			atts.add(new Tuple<String, String>("battery_capacity",
-					format.format(EvUnits.J_to_kWh(v.getBattery().getCapacity())) + ""));
-			atts.add(new Tuple<String, String>("initial_soc",
-					format.format(EvUnits.J_to_kWh(v.getBattery().getSoc())) + ""));
-			atts.add(new Tuple<>("chargerTypes", v.getChargingTypes().stream().collect(Collectors.joining(","))));
-			atts.add(new Tuple<>("vehicleType", v.getVehicleType()));
+			List<Tuple<String, String>> atts = Arrays.asList(Tuple.of("id", v.getId().toString()),
+					Tuple.of("battery_capacity", format.format(EvUnits.J_to_kWh(v.getBattery().getCapacity())) + ""),
+					Tuple.of("initial_soc", format.format(EvUnits.J_to_kWh(v.getBattery().getSoc())) + ""),
+					Tuple.of("chargerTypes", v.getChargingTypes().stream().collect(Collectors.joining(","))),
+					Tuple.of("vehicleType", v.getVehicleType()));
 			writeStartTag("vehicle", atts, true);
 		}
 

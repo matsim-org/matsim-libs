@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,9 +15,10 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.dvrp.fleet;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -48,11 +49,5 @@ public class FleetImpl implements Fleet {
 
 	public void addVehicle(DvrpVehicle vehicle) {
 		vehicles.put(vehicle.getId(), vehicle);
-	}
-
-	public void resetSchedules() {
-		for (DvrpVehicle v : vehicles.values()) {
-			v.resetSchedule();
-		}
 	}
 }
