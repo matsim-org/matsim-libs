@@ -64,9 +64,4 @@ public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
 	 * </ul>
 	 */
 	Schedule getSchedule();
-
-	/**
-	 * Resets the schedule. For instance, by creating a new Schedule object.
-	 */
-	void resetSchedule();
 }

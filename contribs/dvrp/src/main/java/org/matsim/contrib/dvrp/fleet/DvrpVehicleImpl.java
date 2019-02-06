@@ -40,12 +40,11 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 
 	private final DvrpVehicleSpecification specification;
 	private Link startLink; //FIXME will be final after removing setStartLink
-	private Schedule schedule;
+	private final Schedule schedule;
 
 	public DvrpVehicleImpl(DvrpVehicleSpecification specification, Link startLink) {
 		this.specification = specification;
 		this.startLink = startLink;
-
 		schedule = new ScheduleImpl(specification);
 	}
 
@@ -94,10 +93,5 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 				.add("serviceBeginTime", getServiceBeginTime())
 				.add("serviceEndTime", getServiceEndTime())
 				.toString();
-	}
-
-	@Override
-	public void resetSchedule() {
-		schedule = new ScheduleImpl(specification);
 	}
 }

@@ -50,10 +50,4 @@ public class FleetImpl implements Fleet {
 	public void addVehicle(DvrpVehicle vehicle) {
 		vehicles.put(vehicle.getId(), vehicle);
 	}
-
-	public void resetSchedules() {
-		for (DvrpVehicle v : vehicles.values()) {
-			v.resetSchedule();
-		}
-	}
 }
