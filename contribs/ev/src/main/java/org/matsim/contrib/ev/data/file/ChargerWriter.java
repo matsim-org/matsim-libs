@@ -19,14 +19,14 @@
 
 package org.matsim.contrib.ev.data.file;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.data.Charger;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class ChargerWriter extends MatsimXmlWriter {
 	private Iterable<Charger> chargers;
@@ -46,13 +46,9 @@ public class ChargerWriter extends MatsimXmlWriter {
 
 	private void writeChargers() {
 		for (Charger c : chargers) {
-			List<Tuple<String, String>> atts = new ArrayList<>();
-			atts.add(new Tuple<>("id", c.getId().toString()));
-			atts.add(new Tuple<>("link", c.getLink().getId() + ""));
-			double power_kW = EvUnits.W_to_kW(c.getPower());
-			atts.add(new Tuple<>("power", power_kW + ""));
-			atts.add(new Tuple<>("capacity", c.getPlugs() + ""));
-			atts.add(new Tuple<>("type", c.getChargerType()));
+			List<Tuple<String, String>> atts = Arrays.asList(Tuple.of("id", c.getId().toString()),
+					Tuple.of("link", c.getLink().getId() + ""), Tuple.of("power", EvUnits.W_to_kW(c.getPower()) + ""),
+					Tuple.of("capacity", c.getPlugs() + ""), Tuple.of("type", c.getChargerType()));
 			writeStartTag("charger", atts, true);
 		}
 	}

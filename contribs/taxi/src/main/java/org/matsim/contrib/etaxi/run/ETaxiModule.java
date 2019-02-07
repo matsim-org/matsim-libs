@@ -20,10 +20,10 @@
 
 package org.matsim.contrib.etaxi.run;
 
-import com.google.inject.Inject;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiModeModule;
 import org.matsim.core.controler.AbstractModule;
+
+import com.google.inject.Inject;
 
 /**
  * @author michalm
@@ -35,7 +35,7 @@ public final class ETaxiModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		install(new TaxiModeModule(taxiCfg));
+		install(new ETaxiModeModule(taxiCfg));
 		installQSimModule(new ETaxiModeQSimModule(taxiCfg));
 	}
 }

@@ -19,8 +19,7 @@
 
 package org.matsim.contrib.dvrp.optimizer;
 
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * Minimal functionality of dvrp optimizers in the dvrp contrib. <br>

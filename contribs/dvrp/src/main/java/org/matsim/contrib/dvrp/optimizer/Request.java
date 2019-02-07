@@ -18,28 +18,33 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.dvrp.optimizer;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Identifiable;
 
 /**
- * DvrpVehicleSpecification is assumed to be immutable.
- * <p>
- * Its lifespan can span over all iterations, but can be also changed before each iteration.
- * <p>
- * Changing a vehicle specification (e.g. setting a different startLinkId) should be done only "between" iterations by passing a new instance to FleetSpecification.
- *
- * @author Michal Maciejewski (michalm)
+ * Represents a general request in DVRP.
+ * 
+ * For request rejection - adapt isRejected()
+ * 
+ * @author michalm
  */
-public interface DvrpVehicleSpecification {
-	Id<DvrpVehicle> getId();
+public interface Request extends Identifiable<Request> {
 
-	Id<Link> getStartLinkId();
+	/**
+	 * @return time at which the request was submitted
+	 */
+	double getSubmissionTime();
 
-	int getCapacity();
+	/**
+	 * @return indicates whether the request has been rejected by the service provider (optimizer/dispatcher)
+	 */
+	default boolean isRejected() {
+		return false;
+	}
 
-	double getServiceBeginTime();
-
-	double getServiceEndTime();
+	static String toString(Request request) {
+		return "[id=" + request.getId() + "][submissionTime=" + request.getSubmissionTime() + "][rejected="
+				+ request.isRejected() + "]";
+	}
 }

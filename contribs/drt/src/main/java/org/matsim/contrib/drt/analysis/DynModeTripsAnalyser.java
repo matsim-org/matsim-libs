@@ -22,6 +22,26 @@
  */
 package org.matsim.contrib.drt.analysis;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
@@ -39,22 +59,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-
-import java.awt.*;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.List;
-import java.util.Map.Entry;
 
 /**
  * @author jbischoff
@@ -495,8 +505,13 @@ public class DynModeTripsAnalyser {
 	 * @param fleet
 	 * @return
 	 */
-	public static int findMaxCap(Fleet fleet) {
-		return fleet.getVehicles().values().stream().mapToInt(v -> v.getCapacity()).max().getAsInt();
+	public static int findMaxVehicleCapacity(FleetSpecification fleet) {
+		return fleet.getVehicleSpecifications()
+				.values()
+				.stream()
+				.mapToInt(DvrpVehicleSpecification::getCapacity)
+				.max()
+				.getAsInt();
 	}
 
 	public static String summarizeDetailedOccupancyStats(Map<Id<Vehicle>, double[]> vehicleDistances, String del,

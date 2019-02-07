@@ -22,16 +22,14 @@ package org.matsim.contrib.edrt.run;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.FixedSpeedChargingStrategy;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -54,9 +52,11 @@ public class RunEDrtScenario {
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
+		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		Controler controler = EDrtControlerCreator.createControler(config, otfvis);
-		controler.addOverridingModule(new EvModule());
-		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config)));
+
+		controler.addOverridingModule(createEvDvrpIntegrationModule(drtCfg.getMode()));
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -65,21 +65,14 @@ public class RunEDrtScenario {
 			}
 		});
 
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
-
 		return controler;
 	}
 
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
-		return new EvDvrpIntegrationModule(drtCfg.getMode())//
-				.setChargingStrategyFactory(
-						charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
-								MAX_RELATIVE_SOC))//
-				.setTemperatureProvider(() -> TEMPERATURE) //
-				.setTurnedOnPredicate(RunEDrtScenario::isTurnedOn)//
-				.setVehicleFile(drtCfg.getVehiclesFile());
+	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(String mode) {
+		return new EvDvrpIntegrationModule(mode).setChargingStrategyFactory(
+				charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC))
+				.setTemperatureProvider(() -> TEMPERATURE)
+				.setTurnedOnPredicate(RunEDrtScenario::isTurnedOn);
 	}
 
 	private static boolean isTurnedOn(DvrpVehicle vehicle) {
@@ -92,9 +85,6 @@ public class RunEDrtScenario {
 	}
 
 	public static void main(String[] args) {
-		// String configFile = "./src/main/resources/one_etaxi/one_etaxi_config.xml";
-		// String configFile =
-		// "../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/mielec_etaxi_config.xml";
 		RunEDrtScenario.run(CONFIG_FILE, false);
 	}
 }

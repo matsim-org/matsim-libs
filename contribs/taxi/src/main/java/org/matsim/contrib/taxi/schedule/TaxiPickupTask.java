@@ -20,7 +20,7 @@
 package org.matsim.contrib.taxi.schedule;
 
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
 public class TaxiPickupTask extends StayTaskImpl implements TaxiTaskWithRequest {
 	private final TaxiRequest request;

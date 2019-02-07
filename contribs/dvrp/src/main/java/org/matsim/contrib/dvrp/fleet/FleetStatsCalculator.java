@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,17 +15,14 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.dvrp.data;
-
-import org.matsim.contrib.dvrp.schedule.Schedules;
+package org.matsim.contrib.dvrp.fleet;
 
 /**
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public class Vehicles {
-	public static void changeStartLinkToLastLinkInSchedule(DvrpVehicle vehicle) {
-		vehicle.setStartLink(Schedules.getLastLinkInSchedule(vehicle));
-	}
+public interface FleetStatsCalculator {
+	void updateStats(Fleet fleet);
 }

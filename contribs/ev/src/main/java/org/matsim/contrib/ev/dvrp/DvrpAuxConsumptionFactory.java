@@ -24,8 +24,8 @@ import java.util.function.Predicate;
 
 import javax.inject.Inject;
 
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.ev.data.ElectricVehicle;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;

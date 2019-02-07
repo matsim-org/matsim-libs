@@ -46,7 +46,7 @@ import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEventHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -87,7 +87,7 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 			DrtRequestSubmittedEvent submission = this.submittedRequests.remove(scheduled.getRequestId());
 			double actualWaitTime = event.getTime() - submission.getTime();
 			double estimatedWaitTime = scheduled.getPickupTime() - submission.getTime();
-			waitTimeCompare.put(submission.getRequestId(), new Tuple<>(actualWaitTime, estimatedWaitTime));
+			waitTimeCompare.put(submission.getRequestId(), Tuple.of(actualWaitTime, estimatedWaitTime));
 
 		}
 	}

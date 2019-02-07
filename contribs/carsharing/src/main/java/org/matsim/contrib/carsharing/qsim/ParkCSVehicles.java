@@ -1,9 +1,5 @@
 package org.matsim.contrib.carsharing.qsim;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
@@ -14,6 +10,11 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehiclesFactory;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /** 
  * @author balac
@@ -29,7 +30,7 @@ public class ParkCSVehicles implements AgentSource {
 			CarsharingSupplyInterface carsharingSupply) {
 		
 		this.qsim = qSim;  
-		this.modeVehicleTypes = new HashMap<String, VehicleType>();
+		this.modeVehicleTypes = new HashMap<>();
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
 	
 		for (String mode : mainModes) {
@@ -47,12 +48,13 @@ public class ParkCSVehicles implements AgentSource {
 	@Override
 	public void insertAgentsIntoMobsim() {
 		Map<CSVehicle, Link> allVehicleLocations = this.carsharingSupply.getAllVehicleLocations();
+		VehiclesFactory factory = this.qsim.getScenario().getVehicles().getFactory();
 
 		for (CSVehicle vehicle : allVehicleLocations.keySet()) {
-			final Vehicle basicVehicle = VehicleUtils.getFactory().createVehicle( Id.create( vehicle.getVehicleId(), Vehicle.class ),
+			final Vehicle basicVehicle = factory.createVehicle( Id.create( vehicle.getVehicleId(), Vehicle.class ),
 					modeVehicleTypes.get( vehicle.getCsType() ) );
 
-			final QVehicleImpl qvehicle = new QVehicleImpl( basicVehicle );;
+			final QVehicleImpl qvehicle = new QVehicleImpl( basicVehicle );
 			// yyyyyy should react to new QVehicleFactory!  kai, nov'18
 			
 //			qsim.createAndParkVehicleOnLink(, allVehicleLocations.get(vehicle).getId());

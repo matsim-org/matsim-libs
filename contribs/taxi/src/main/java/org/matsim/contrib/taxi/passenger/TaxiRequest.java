@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,26 +15,36 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.drt.data;
+package org.matsim.contrib.taxi.passenger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
+import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
+import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 
 /**
  * @author michalm
  */
-public class DrtRequest implements PassengerRequest {
+public class TaxiRequest implements PassengerRequest {
+	public enum TaxiRequestStatus {
+		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
+		PLANNED, // planned - included into one of the routes
+		PICKUP, // being picked up
+		RIDE, // on board
+		DROPOFF, // being dropped off
+		PERFORMED, // completed
+		REJECTED; // rejected by the DISPATCHER
+	}
+
 	private final Id<Request> id;
 	private final double submissionTime;
 	private final double earliestStartTime;
-	private final double latestStartTime;
-	private final double latestArrivalTime;
 
 	private boolean rejected = false;
 
@@ -44,16 +54,14 @@ public class DrtRequest implements PassengerRequest {
 	private final Link fromLink;
 	private final Link toLink;
 
-	private DrtStopTask pickupTask = null;
-	private DrtStopTask dropoffTask = null;
+	private TaxiPickupTask pickupTask;
+	private TaxiDropoffTask dropoffTask;
 
-	public DrtRequest(Id<Request> id, Id<Person> passengerId, String mode, Link fromLink, Link toLink,
-			double earliestStartTime, double latestStartTime, double latestArrivalTime, double submissionTime) {
+	public TaxiRequest(Id<Request> id, Id<Person> passengerId, String mode, Link fromLink, Link toLink,
+			double earliestStartTime, double submissionTime) {
 		this.id = id;
 		this.submissionTime = submissionTime;
 		this.earliestStartTime = earliestStartTime;
-		this.latestStartTime = latestStartTime;
-		this.latestArrivalTime = latestArrivalTime;
 		this.passengerId = passengerId;
 		this.mode = mode;
 		this.fromLink = fromLink;
@@ -76,25 +84,6 @@ public class DrtRequest implements PassengerRequest {
 	}
 
 	@Override
-	public double getLatestStartTime() {
-		return latestStartTime;
-	}
-
-	public double getLatestArrivalTime() {
-		return latestArrivalTime;
-	}
-
-	@Override
-	public boolean isRejected() {
-		return rejected;
-	}
-
-	@Override
-	public void setRejected(boolean rejected) {
-		this.rejected = rejected;
-	}
-
-	@Override
 	public Link getFromLink() {
 		return fromLink;
 	}
@@ -114,20 +103,59 @@ public class DrtRequest implements PassengerRequest {
 		return mode;
 	}
 
-	public DrtStopTask getPickupTask() {
+	@Override
+	public boolean isRejected() {
+		return rejected;
+	}
+
+	@Override
+	public void setRejected(boolean rejected) {
+		this.rejected = rejected;
+	}
+
+	public TaxiPickupTask getPickupTask() {
 		return pickupTask;
 	}
 
-	public void setPickupTask(DrtStopTask pickupTask) {
+	public void setPickupTask(TaxiPickupTask pickupTask) {
 		this.pickupTask = pickupTask;
 	}
 
-	public DrtStopTask getDropoffTask() {
+	public TaxiDropoffTask getDropoffTask() {
 		return dropoffTask;
 	}
 
-	public void setDropoffTask(DrtStopTask dropoffTask) {
+	public void setDropoffTask(TaxiDropoffTask dropoffTask) {
 		this.dropoffTask = dropoffTask;
+	}
+
+	public TaxiRequestStatus getStatus() {
+		if (pickupTask == null) {
+			return TaxiRequestStatus.UNPLANNED;
+		}
+
+		switch (pickupTask.getStatus()) {
+			case PLANNED:
+				return TaxiRequestStatus.PLANNED;
+
+			case STARTED:
+				return TaxiRequestStatus.PICKUP;
+
+			case PERFORMED:// continue
+		}
+
+		switch (dropoffTask.getStatus()) {
+			case PLANNED:
+				return TaxiRequestStatus.RIDE;
+
+			case STARTED:
+				return TaxiRequestStatus.DROPOFF;
+
+			case PERFORMED:
+				return TaxiRequestStatus.PERFORMED;
+		}
+
+		throw new IllegalStateException("Unreachable code");
 	}
 
 	@Override

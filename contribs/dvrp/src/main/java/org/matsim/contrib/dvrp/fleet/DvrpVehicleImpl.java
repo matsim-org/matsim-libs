@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,9 +15,10 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.dvrp.fleet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -38,13 +39,12 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 	}
 
 	private final DvrpVehicleSpecification specification;
-	private Link startLink; //FIXME will be final after removing setStartLink
-	private Schedule schedule;
+	private final Link startLink;
+	private final Schedule schedule;
 
 	public DvrpVehicleImpl(DvrpVehicleSpecification specification, Link startLink) {
 		this.specification = specification;
 		this.startLink = startLink;
-
 		schedule = new ScheduleImpl(specification);
 	}
 
@@ -56,12 +56,6 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 	@Override
 	public Link getStartLink() {
 		return startLink;
-	}
-
-	//FIXME will be removed after limiting the DvrpVehicle lifespan to single QSim simulation
-	@Override
-	public void setStartLink(Link link) {
-		this.startLink = link;
 	}
 
 	@Override
@@ -93,10 +87,5 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 				.add("serviceBeginTime", getServiceBeginTime())
 				.add("serviceEndTime", getServiceEndTime())
 				.toString();
-	}
-
-	@Override
-	public void resetSchedule() {
-		schedule = new ScheduleImpl(specification);
 	}
 }

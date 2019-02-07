@@ -2,7 +2,7 @@ package org.matsim.contrib.dvrp.passenger;
 
 import java.util.Comparator;
 
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 
 /**
  * @author michalm
