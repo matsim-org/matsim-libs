@@ -30,21 +30,21 @@ import org.matsim.vehicles.VehicleWriterV1;
 
 
 /**
- * @author jbischoff
+ * @author  jbischoff
+ *
  */
 public class CreateTransitVehicles {
 
-    public static void main(String[] args) {
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/braunschweig/bs-network.xml");
-        TransitScheduleReader reader = new TransitScheduleReader(scenario);
-        reader.readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/braunschweig/bs-scheduleNetwork.xml");
-
-        new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getTransitVehicles()).run();
-        ;
-        new VehicleWriterV1(scenario.getTransitVehicles()).writeFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/new/transitvehicles.xml");
-        new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/new/bs-scheduleNetwork.xml");
-    }
-
+	public static void main(String[] args) {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/braunschweig/bs-network.xml");
+		TransitScheduleReader reader = new TransitScheduleReader(scenario);
+		reader.readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/braunschweig/bs-scheduleNetwork.xml");
+		
+		new CreateVehiclesForSchedule(scenario.getTransitSchedule(),scenario.getTransitVehicles()).run();;
+		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/new/transitvehicles.xml");
+		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/new/bs-scheduleNetwork.xml");
+	}
+	
 
 }

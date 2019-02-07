@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- *
+ * 
  */
 package ft.cemdap4H.planspreprocessing;
 
@@ -32,37 +32,37 @@ import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * @author jbischoff
+ * @author  jbischoff
+ *
  */
-
 /**
  *
  */
 public class PlansMerger {
-
-
-    public static void main(String[] args) {
-        String inputFolder = "E:\\Thiel\\Programme\\MatSim\\00_HannoverModel_1.0\\Input\\Cemdap\\cemdap_output\\Hannover_big_wchildren\\";
-        new PlansMerger().run(inputFolder);
-    }
-
-    public void run(String inputFolder) {
-        Population[] population = new Population[5];
-        for (int i = 1; i <= 5; i++) {
-            String plansfile = inputFolder + "\\" + i + "\\plans.xml.gz";
-            Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-            population[i - 1] = scenario.getPopulation();
-            new PopulationReader(scenario).readFile(plansfile);
-        }
-
-        for (Person p : population[0].getPersons().values()) {
-            for (int i = 1; i < 5; i++) {
-                Plan plan = population[i].getPersons().get(p.getId()).getPlans().get(0);
-                p.addPlan(plan);
-            }
-        }
-        new PopulationWriter(population[0]).write(inputFolder + "\\mergedplans.xml.gz");
-
-
-    }
+	
+	
+	public static void main(String[] args) {
+		String inputFolder = "E:\\Thiel\\Programme\\MatSim\\00_HannoverModel_1.0\\Input\\Cemdap\\cemdap_output\\Hannover_big_wchildren\\";
+		new PlansMerger().run(inputFolder);
+	}
+	
+	public void run (String inputFolder){
+		Population[] population = new Population[5];
+		for (int i = 1; i<=5; i++){
+		String plansfile = inputFolder + "\\"+ i + "\\plans.xml.gz";
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		population[i-1] = scenario.getPopulation();
+		new PopulationReader(scenario).readFile(plansfile);
+		}
+		
+		for (Person p : population[0].getPersons().values()){
+			for (int i =1;i<5;i++){
+				Plan plan = population[i].getPersons().get(p.getId()).getPlans().get(0);
+				p.addPlan(plan);
+			}
+		}
+		new PopulationWriter(population[0]).write(inputFolder+"\\mergedplans.xml.gz");
+		
+		
+	}
 }

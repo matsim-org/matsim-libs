@@ -18,16 +18,21 @@
  * *********************************************************************** */
 
 /**
- *
+ * 
  */
 package ft.cemdap4H.planspreprocessing;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -36,86 +41,86 @@ import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
+
 import playground.jbischoff.utils.JbUtils;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
 /**
- * @author jbischoff
+ * @author  jbischoff
+ *
  */
-
 /**
  * renames the agents according to their home (and work) location, for an easier later filtering
  */
 public class RenameAgents {
-    Map<String, Geometry> locationShape;
-    private CoordinateTransformation ct;
-
-    public static void main(String args[]) {
+Map<String,Geometry> locationShape;
+private CoordinateTransformation ct;
+public static void main(String args[]){
 //	new RenameAgents().run();
-    }
+}
 
-    /**
-     *
-     */
-    public void run(String shapeFile, String inputpopfile, String outputpopfile, String keyInShape, CoordinateTransformation ct) {
-        locationShape = JbUtils.readShapeFileAndExtractGeometry(shapeFile, keyInShape);
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        this.ct = ct;
-        new PopulationReader(scenario).readFile(inputpopfile);
-        Population pop2 = PopulationUtils.createPopulation(ConfigUtils.createConfig());
-        for (Person p : scenario.getPopulation().getPersons().values()) {
-            String homeLocation = null;
-            String workLocation = null;
-            Plan plan = p.getSelectedPlan();
-            for (PlanElement pe : plan.getPlanElements()) {
-                if (pe instanceof Activity) {
-                    if (((Activity) pe).getType().startsWith("home")) {
-                        if (homeLocation == null) {
-                            homeLocation = findZone(((Activity) pe).getCoord());
-                        }
-                    }
-                    if (((Activity) pe).getType().startsWith("work") || ((Activity) pe).getType().startsWith("education")) {
-                        if (workLocation == null) {
-                            workLocation = findZone(((Activity) pe).getCoord());
-                        }
-                    }
-                }
+/**
+ * 
+ */
+public void run(String shapeFile, String inputpopfile, String outputpopfile, String keyInShape, CoordinateTransformation ct) {
+	locationShape = JbUtils.readShapeFileAndExtractGeometry(shapeFile, keyInShape);
+	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	this.ct = ct;
+	new PopulationReader(scenario).readFile(inputpopfile);
+	Population pop2 = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+	for (Person p : scenario.getPopulation().getPersons().values()){
+		String homeLocation = null;
+		String workLocation = null;
+		Plan plan = p.getSelectedPlan();
+		for (PlanElement pe : plan.getPlanElements()){
+			if (pe instanceof Activity){
+				if (((Activity) pe).getType().startsWith("home")){
+					if (homeLocation==null){
+						homeLocation = findZone(((Activity) pe).getCoord());
+					}
+				}
+				if (((Activity) pe).getType().startsWith("work")||((Activity) pe).getType().startsWith("education")){
+					if (workLocation==null){
+						workLocation = findZone(((Activity) pe).getCoord());
+					}
+				}
+			}
+			
+		}
+		if (homeLocation==null) homeLocation="na";
+		if (workLocation==null) workLocation="na";
+		Id<Person> newPersonId = Id.createPersonId(homeLocation+"_"+workLocation+"_"+p.getId());
+		Person p2 = pop2.getFactory().createPerson(newPersonId);
+		PersonUtils.setAge(p2, PersonUtils.getAge(p));
+		//If person has license --> car is available
+		//ToDo Share of car / license avail 
+		PersonUtils.setCarAvail(p2, PersonUtils.getLicense(p));
+		PersonUtils.setEmployed(p2, PersonUtils.isEmployed(p));
+		PersonUtils.setSex(p2, PersonUtils.getSex(p));
+		PersonUtils.setLicence(p2, PersonUtils.getLicense(p));
+		for (Plan plans : p.getPlans()){
+			p2.addPlan(plans);
+		}
+		pop2.addPerson(p2);
+}
+	new PopulationWriter(pop2).write(outputpopfile);
+}
 
-            }
-            if (homeLocation == null) homeLocation = "na";
-            if (workLocation == null) workLocation = "na";
-            Id<Person> newPersonId = Id.createPersonId(homeLocation + "_" + workLocation + "_" + p.getId());
-            Person p2 = pop2.getFactory().createPerson(newPersonId);
-            PersonUtils.setAge(p2, PersonUtils.getAge(p));
-            //If person has license --> car is available
-            //ToDo Share of car / license avail
-            PersonUtils.setCarAvail(p2, PersonUtils.getLicense(p));
-            PersonUtils.setEmployed(p2, PersonUtils.isEmployed(p));
-            PersonUtils.setSex(p2, PersonUtils.getSex(p));
-            PersonUtils.setLicence(p2, PersonUtils.getLicense(p));
-            for (Plan plans : p.getPlans()) {
-                p2.addPlan(plans);
-            }
-            pop2.addPerson(p2);
-        }
-        new PopulationWriter(pop2).write(outputpopfile);
-    }
-
-    /**
-     * @param coord
-     * @return
-     */
-    private String findZone(Coord coord) {
-        Point p = MGC.coord2Point(ct.transform(coord));
-        for (Entry<String, Geometry> e : this.locationShape.entrySet()) {
-            if (e.getValue().contains(p)) {
-                return e.getKey();
-            }
-        }
-
-        return null;
-    }
+/**
+ * @param coord
+ * @return
+ */
+private String findZone(Coord coord) {
+	Point p = MGC.coord2Point(ct.transform(coord));
+	for (Entry<String, Geometry> e : this.locationShape.entrySet()){
+		if (e.getValue().contains(p)){
+			return e.getKey();
+		}
+	}
+	
+	return null;
+}
 
 }

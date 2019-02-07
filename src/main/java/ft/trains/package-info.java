@@ -1,5 +1,5 @@
 /**
- * @author Joschka
+ * 
  */
 /**
  * @author Joschka

@@ -38,34 +38,35 @@ public class CempdapStops2MatsimPlans {
      */
 
     public static void main(String[] args) throws IOException {
+        
+    	String inbase = "E:/Thiel/Programme/MatSim/00_HannoverModel_1.0/Input/Cemdap/";
+        String cemdapDataRoot = inbase+"cemdap_output/Hannover_big_wchildren/";
+        for (int i = 1; i<=5;i++){
+        	//if (i == 4) continue;
+        int numberOfFirstCemdapOutputFile = i;
+        int numberOfPlans = 1;
+        int numberOfPlansFile = i;
+        String outputDirectory = cemdapDataRoot + numberOfPlansFile + "/";
+        String zonalShapeFile1 = inbase+ "add_data/shp/nssa.shp";
+        String zoneIdTag1 = "AGS";
+        String zonalShapeFile2 = inbase+ "add_data/shp/Statistische_Bezirke_Hannover_Region.shp";
+        String zoneIdTag2 = "NO";
+        boolean allowVariousWorkAndEducationLocations = true;
+        boolean addStayHomePlan = true;
+        boolean useLandCoverData = true;
+        String landCoverFile = inbase+ "add_data/shp/corine-nssa-NDS.shp";
+        String stopFile = "Stops.out";
+        String activityFile = "Activity.out";
+        boolean simplifyGeometries = true;
+        boolean assignCoordinatesToActivities = true;
+        boolean combiningGeoms = false;
 
-        String inbase = "E:/Thiel/Programme/MatSim/00_HannoverModel_1.0/Input/Cemdap/";
-        String cemdapDataRoot = inbase + "cemdap_output/Hannover_big_wchildren/";
-        for (int i = 1; i <= 5; i++) {
-            //if (i == 4) continue;
-            int numberOfFirstCemdapOutputFile = i;
-            int numberOfPlans = 1;
-            int numberOfPlansFile = i;
-            String outputDirectory = cemdapDataRoot + numberOfPlansFile + "/";
-            String zonalShapeFile1 = inbase + "add_data/shp/nssa.shp";
-            String zoneIdTag1 = "AGS";
-            String zonalShapeFile2 = inbase + "add_data/shp/Statistische_Bezirke_Hannover_Region.shp";
-            String zoneIdTag2 = "NO";
-            boolean allowVariousWorkAndEducationLocations = true;
-            boolean addStayHomePlan = true;
-            boolean useLandCoverData = true;
-            String landCoverFile = inbase + "add_data/shp/corine-nssa-NDS.shp";
-            String stopFile = "Stops.out";
-            String activityFile = "Activity.out";
-            boolean simplifyGeometries = true;
-            boolean assignCoordinatesToActivities = true;
-            boolean combiningGeoms = false;
+      
 
-
-            CemdapStops2MatsimPlansConverter.convert(cemdapDataRoot, numberOfFirstCemdapOutputFile, numberOfPlans, outputDirectory,
-                    zonalShapeFile1, zoneIdTag1, zonalShapeFile2, zoneIdTag2, allowVariousWorkAndEducationLocations, addStayHomePlan,
-                    useLandCoverData, landCoverFile, stopFile, activityFile, simplifyGeometries, combiningGeoms, assignCoordinatesToActivities);
-
-        }
+        CemdapStops2MatsimPlansConverter.convert(cemdapDataRoot, numberOfFirstCemdapOutputFile, numberOfPlans, outputDirectory,
+                zonalShapeFile1, zoneIdTag1, zonalShapeFile2, zoneIdTag2, allowVariousWorkAndEducationLocations, addStayHomePlan,
+                useLandCoverData, landCoverFile, stopFile, activityFile,simplifyGeometries, combiningGeoms, assignCoordinatesToActivities);
+        
+    }
     }
 }
