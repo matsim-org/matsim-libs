@@ -61,8 +61,8 @@ public class modalSplitEvaluator {
     String shapeFile = "C:\\Temp\\shp\\parking-bs.shp";
     String shapeFeature = "NO";
     StageActivityTypes stageActs;
-    static String inFileName = "C:\\Temp\\output\\ptToDrt\\ptToDrt.output_plans.xml.gz";
-    static String OutFileName = "C:\\Temp\\plans\\drt_old.xml.gz";
+    static String inFileName = "C:\\Temp\\plans\\vw219_100pct_withPark_1.5_3.output_plans_10pct.xml.gz";
+    static String OutFileName = "C:\\Temp\\plans\\vw219_10pct_drt_new.xml.gz";
 
     static List<String> primaryActivies = new ArrayList<>();
     static List<String> primaryLegModes = new ArrayList<>();
@@ -73,8 +73,8 @@ public class modalSplitEvaluator {
     // reduce it by factor 0.58, the get the correct amount of DRT users
     // Like Berlin
     static {
-        desiredModalShiftRatesMap.put("car", 0.0);
-        desiredModalShiftRatesMap.put("pt", 0.5);
+        desiredModalShiftRatesMap.put("car", 0.2);
+        desiredModalShiftRatesMap.put("pt", 0.3);
     }
 
     public static void main(String[] args) {

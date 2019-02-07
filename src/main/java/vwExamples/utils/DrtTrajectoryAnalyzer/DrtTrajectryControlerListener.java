@@ -125,7 +125,7 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 
 	private static void writeCSVExample(String csvfilepath, List<String> trajectroyList) throws IOException {
 
-		
+		String sep = ",";
 		PrintWriter pw = null;
 		try {
 			pw = new PrintWriter(new File(csvfilepath));
@@ -134,7 +134,7 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 		}
 
 		StringBuilder builder = new StringBuilder();
-		String ColumnNamesList = "vehicleID" + "," + "time" + "," + "occ" + "," + "dist_m" + "," + "actualTaskType" + "," + "x"  + "," + "y" + ","+ "tt_sec"+ ","+"v_meter_sec" ;
+		String ColumnNamesList = "vehicleID" + sep + "time" + sep + "occ" + sep + "dist_m" + sep + "actualTaskType" + sep + "x"  + sep + "y" + sep+ "tt_sec"+ sep+"v_meter_sec" + sep+ "SOC" ;
 
 		builder.append(ColumnNamesList + "\n");
 

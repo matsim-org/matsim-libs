@@ -39,8 +39,8 @@ public class SelectOnlySelectedPlans {
         //Create a Scenario
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         //Fill this Scenario with a population.
-        new PopulationReader(scenario).readFile("C:\\Temp\\plans\\drt.xml.gz");
-        String randomOrderedPop = "C:\\Temp\\plans\\drtSelected.xml.gz";
+        new PopulationReader(scenario).readFile("C:\\Temp\\plans\\vw219_10pct_drt_new.xml.gz");
+        String randomOrderedPop = "C:\\Temp\\plans\\drtSelected_new.xml.gz";
         StreamingPopulationWriter filteredPop = new StreamingPopulationWriter();
         filteredPop.startStreaming(randomOrderedPop);
 

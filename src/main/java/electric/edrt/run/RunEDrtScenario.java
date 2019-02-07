@@ -22,6 +22,8 @@ package electric.edrt.run;
 import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
 import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
+import vwExamples.utils.customEV.BatteryReplacementCharge;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.av.maxspeed.DvrpTravelTimeWithMaxSpeedLimitModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -122,7 +124,8 @@ public class RunEDrtScenario {
 						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
 				bind(DriveEnergyConsumption.Factory.class).toInstance(evconsumption -> new VwDrtDriveEnergyConsumption());
 				bind(AuxEnergyConsumption.Factory.class).to(VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
-				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
+				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
+				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(300.0)));
 				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
 			}
 		});

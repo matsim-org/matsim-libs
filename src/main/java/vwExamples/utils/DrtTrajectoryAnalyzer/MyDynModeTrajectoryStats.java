@@ -185,8 +185,16 @@ public class MyDynModeTrajectoryStats
 			String actualTaskType = "CHARGE_START";
 			double x = network.getLinks().get(event.getLinkId()).getCoord().getX();
 			double y = network.getLinks().get(event.getLinkId()).getCoord().getY();
-						
-			String line = (vehicleID +sep+ acutalTime +sep+ occupancy +sep+ dist +sep+ actualTaskType +sep+ x  +sep+ y);
+			
+			double tt =  Double.NaN;
+			
+			double v_meterPerSec = Double.NaN;
+			
+			
+			Id<ElectricVehicle> evId = Id.create(vid, ElectricVehicle.class);
+			double currentSoc = EvUnits.J_to_kWh(electricFleet.getElectricVehicles().get(evId).getBattery().getSoc());
+			
+			String line = (vehicleID +sep+ acutalTime +sep+ occupancy +sep+ dist +sep+ actualTaskType +sep+ x  +sep+ y+ sep +tt + sep + v_meterPerSec + sep + currentSoc);
 			
 			if (vehicleTrajectoryMap.containsKey(vid))
 			{
@@ -229,7 +237,10 @@ public class MyDynModeTrajectoryStats
 			
 			double v_meterPerSec = Double.NaN;
 			
-			String line = (vehicleID +sep+ acutalTime +sep+ occupancy +sep+ dist +sep+ actualTaskType +sep+ x  +sep+ y+ sep +tt + sep + v_meterPerSec);
+			Id<ElectricVehicle> evId = Id.create(event.getVehicleId(), ElectricVehicle.class);
+			double currentSoc = EvUnits.J_to_kWh(electricFleet.getElectricVehicles().get(evId).getBattery().getSoc());
+			
+			String line = (vehicleID +sep+ acutalTime +sep+ occupancy +sep+ dist +sep+ actualTaskType +sep+ x  +sep+ y+ sep +tt + sep + v_meterPerSec + sep + currentSoc);
 			
 			if (vehicleTrajectoryMap.containsKey(event.getVehicleId()))
 			{
@@ -267,7 +278,10 @@ public class MyDynModeTrajectoryStats
 						
 			double v_meterPerSec = Double.NaN;
 			
-			String line = (vehicleID +sep+ acutalTime +sep+ occupancy +sep+ dist +sep+ actualTaskType +sep+ x  +sep+ y+ sep +tt + sep + v_meterPerSec);
+			Id<ElectricVehicle> evId = Id.create(event.getVehicleId(), ElectricVehicle.class);
+			double currentSoc = EvUnits.J_to_kWh(electricFleet.getElectricVehicles().get(evId).getBattery().getSoc());
+			
+			String line = (vehicleID +sep+ acutalTime +sep+ occupancy +sep+ dist +sep+ actualTaskType +sep+ x  +sep+ y+ sep +tt + sep + v_meterPerSec + sep + currentSoc);
 			
 			if (vehicleTrajectoryMap.containsKey(event.getVehicleId()))
 			{
@@ -324,9 +338,11 @@ public class MyDynModeTrajectoryStats
 			}
 			
 			vehDrive.movedOverNodeTime = event.getTime();
-			double v_meterPerSec = distance/tt;	
+			double v_meterPerSec = distance/tt;
+			Id<ElectricVehicle> evId = Id.create(event.getVehicleId(), ElectricVehicle.class);
+			double currentSoc = EvUnits.J_to_kWh(electricFleet.getElectricVehicles().get(evId).getBattery().getSoc());
 			
-			String line = (vehicleID +sep+ acutalTime +sep+ occupancy +sep+ dist +sep+ actualTaskType +sep+ x  +sep+ y+ sep +tt + sep + v_meterPerSec);
+			String line = (vehicleID +sep+ acutalTime +sep+ occupancy +sep+ dist +sep+ actualTaskType +sep+ x  +sep+ y+ sep +tt + sep + v_meterPerSec + sep + currentSoc);
 			
 			if (vehicleTrajectoryMap.containsKey(event.getVehicleId()))
 			{

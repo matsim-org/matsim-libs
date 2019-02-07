@@ -60,240 +60,250 @@ import vwExamples.utils.parking.createParkingNetwork.CreateParkingNetwork;
 
 public class RunDrtScenarioBatchBS_eDRT_withParking {
 
-    // Class to create the controller
-	//	public static Controler createControlerWithSingleModeDrt(Config config, boolean otfvis) {
-//		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-//		config.checkConsistency();
-	//		return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
-//	}
+	// Class to create the controller
+	// public static Controler createControlerWithSingleModeDrt(Config config,
+	// boolean otfvis) {
+	// config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
+	// config.checkConsistency();
+	// return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
+	// }
 
-    public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException {
+		int count = 5;
+		int n = 5;
+		int vehicleBase= 7;
+		for (int it = 0; it < n; it++) {
+			for (int i = 0; i < count; i++) {
+				int vehiclePerDepot = (int) Math.ceil(vehicleBase * (1 + i / 10.0));
 
-        // Enable or Disable rebalancing
-        String runId = "ptToDrt_temp_new";
-        boolean rebalancing = true;
+				run(vehiclePerDepot, it);
+			}
 
-        String inbase = "C:\\Temp\\";
+		}
 
-        final Config config = ConfigUtils.loadConfig(inbase + "conf_BS_DRT_10pct_eDRT.xml", new DrtConfigGroup(),
-                new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(), new TemperatureChangeConfigGroup());
+	}
 
-        TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup) config.getModules().get(TemperatureChangeConfigGroup.GROUP_NAME);
-        tcg.setTempFile(inbase + "\\temp\\temperatures.csv");
+	public static void run(int vehiclePerDepot, int iterationIdx) throws IOException {
 
-        //config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-        // Overwrite existing configuration parameters
-        config.plans().setInputFile(inbase + "\\plans\\drtSelected_small.xml.gz");
-        config.controler().setLastIteration(2); // Number of simulation iterations
-        config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
-        config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
-        config.qsim().setStartTime(0);
+		// Enable or Disable rebalancing
+		String runId = "car_ptToDrt_Base_batteryChange_0C_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
+		boolean rebalancing = true;
 
-        String networkFilePath = inbase + "network\\vw219_SpeedCal.xml";
-        String shapeFilePath = inbase + "\\shp\\parking-bs.shp";
-        String shapeFeature = "NO"; //shapeFeature is used to read the shapeFilePath. All zones in shapeFile are used to generate a drt service area
-        String drtTag = "drt"; //drtTag is assigned to roads that should be used by the drt service
-        //Adding drtTag to the network in order to define a service area
-        vwExamples.utils.serviceAreaShapeToNetwork.run(networkFilePath, shapeFilePath, shapeFeature, drtTag);
+		String inbase = "C:\\Temp\\";
 
-        CreateParkingNetwork createParkingNetwork = new CreateParkingNetwork();
-        createParkingNetwork.customCapacityLinks.put("vw11", 5100.0);
-        createParkingNetwork.customCapacityLinks.put("vw14", 3000.0);
-        createParkingNetwork.customCapacityLinks.put("vwno", 3600.0);
-        createParkingNetwork.customCapacityLinks.put("vw7", 4400.0);
-        createParkingNetwork.customCapacityLinks.put("vw24", 3800.0);
-        createParkingNetwork.customCapacityLinks.put("vw222", 3800.0);
-        createParkingNetwork.customCapacityLinks.put("vw2", 3200.0);
+		final Config config = ConfigUtils.loadConfig(inbase + "conf_BS_DRT_10pct_eDRT.xml", new DrtConfigGroup(),
+				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
+				new TemperatureChangeConfigGroup());
 
-        createParkingNetwork.run(inbase + "\\shp\\parkinglocations.csv", inbase + "\\network\\drtServiceAreaNetwork.xml.gz", inbase + "\\network\\drtServiceAreaNetwork_withPark.xml.gz");
+		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup) config.getModules()
+				.get(TemperatureChangeConfigGroup.GROUP_NAME);
+		tcg.setTempFile(inbase + "\\temp\\temperatures_0.csv");
 
-        config.network().setInputFile(inbase + "\\network\\drtServiceAreaNetwork_withPark.xml.gz");
+		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		// Overwrite existing configuration parameters
+		config.plans().setInputFile(inbase + "\\plans\\drtSelected_new.xml.gz");
+		config.controler().setLastIteration(2); // Number of simulation iterations
+		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
+		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
+		config.qsim().setStartTime(0);
 
-        // This part allows to change dynamically DRT config parameters
-        DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		String networkFilePath = inbase + "network\\vw219_SpeedCal.xml";
+		String shapeFilePath = inbase + "\\shp\\parking-bs.shp";
+		String shapeFeature = "NO"; // shapeFeature is used to read the shapeFilePath. All zones in shapeFile are
+									// used to generate a drt service area
+		String drtTag = "drt"; // drtTag is assigned to roads that should be used by the drt service
+		// Adding drtTag to the network in order to define a service area
+		vwExamples.utils.serviceAreaShapeToNetwork.run(networkFilePath, shapeFilePath, shapeFeature, drtTag);
 
-        drt.setPrintDetailedWarnings(false);
-        //Parameters to setup the DRT service
-        drt.setMaxTravelTimeBeta(300.0);
-        drt.setMaxTravelTimeAlpha(1.3);
-        drt.setMaxWaitTime(300.0);
-        drt.setStopDuration(30.0);
+		CreateParkingNetwork createParkingNetwork = new CreateParkingNetwork();
+		createParkingNetwork.customCapacityLinks.put("vw11", 5100.0);
+		createParkingNetwork.customCapacityLinks.put("vw14", 3000.0);
+		createParkingNetwork.customCapacityLinks.put("vwno", 3600.0);
+		createParkingNetwork.customCapacityLinks.put("vw7", 4400.0);
+		createParkingNetwork.customCapacityLinks.put("vw24", 3800.0);
+		createParkingNetwork.customCapacityLinks.put("vw222", 3800.0);
+		createParkingNetwork.customCapacityLinks.put("vw2", 3200.0);
 
+		createParkingNetwork.run(inbase + "\\shp\\parkinglocations.csv",
+				inbase + "\\network\\drtServiceAreaNetwork.xml.gz",
+				inbase + "\\network\\drtServiceAreaNetwork_withPark.xml.gz");
 
-        //Create the virtual stops for the drt service
-        //VirtualStops are dynamically generated
-        vwExamples.utils.CreateStopsFromGrid.run(config.network().getInputFile(), 400.0, drtTag);
-        drt.setTransitStopFile(inbase + "\\network\\virtualStops.xml");
-        drt.setMaxWalkDistance(800.0);
+		config.network().setInputFile(inbase + "\\network\\drtServiceAreaNetwork_withPark.xml.gz");
 
-        config.controler().setRunId(runId);
-        //10 percent Scenario
-        config.qsim().setFlowCapFactor(0.12);
-        config.qsim().setStorageCapFactor(0.24);
+		// This part allows to change dynamically DRT config parameters
+		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 
+		drt.setPrintDetailedWarnings(false);
+		// Parameters to setup the DRT service
+		drt.setMaxTravelTimeBeta(500.0);
+		drt.setMaxTravelTimeAlpha(1.3);
+		drt.setMaxWaitTime(500.0);
+		drt.setStopDuration(30.0);
 
-//			config.qsim().setFlowCapFactor(0.85);
-//			config.qsim().setStorageCapFactor(1.00);
+		// Create the virtual stops for the drt service
+		// VirtualStops are dynamically generated
+		vwExamples.utils.CreateStopsFromGrid.run(config.network().getInputFile(), 400.0, drtTag);
+		drt.setTransitStopFile(inbase + "\\network\\virtualStops.xml");
+		drt.setMaxWalkDistance(800.0);
 
-        config.controler().setOutputDirectory(inbase + "\\output\\" + runId); // Define dynamically the the
-        // output path
+		config.controler().setRunId(runId);
+		// 10 percent Scenario
+		config.qsim().setFlowCapFactor(0.12);
+		config.qsim().setStorageCapFactor(0.24);
 
-        // For each demand scenario we are using a predefined drt vehicle fleet size
-        //int fleetSize = 50;
-        //CreatePeopleMoverVehicles.run(inbase+"/network/drtServiceAreaNetwork.xml.gz", fleetSize, drtTag);
+		// config.qsim().setFlowCapFactor(0.85);
+		// config.qsim().setStorageCapFactor(1.00);
 
-        //Define infrastructure for eDRT (vehicles, depots and chargers)
-        CreateEDRTVehiclesAndChargers vehiclesAndChargers = new CreateEDRTVehiclesAndChargers();
-        Map<Id<Link>, Integer> depotsAndVehicles = new HashMap<>();
-        depotsAndVehicles.put(Id.createLinkId(40158), 5); //BS HBF
-        depotsAndVehicles.put(Id.createLinkId(8097), 5); //Zentrum SO
-        depotsAndVehicles.put(Id.createLinkId(13417), 5); //Zentrum N
-        depotsAndVehicles.put(Id.createLinkId(14915), 5); //Flugplatz
-        
-       
-        vehiclesAndChargers.CHARGER_FILE = inbase + "\\chargers\\chargers.xml.gz";
-        vehiclesAndChargers.NETWORKFILE = inbase + "\\network\\drtServiceAreaNetwork.xml.gz";
-        vehiclesAndChargers.DRT_VEHICLE_FILE = inbase + "\\fleets\\fleet.xml.gz";
-        vehiclesAndChargers.E_VEHICLE_FILE = inbase + "\\fleets\\eFleet.xml.gz";
-        vehiclesAndChargers.drtTag = drtTag;
-        vehiclesAndChargers.SEATS = 6;
-        vehiclesAndChargers.MAX_START_CAPACITY_KWH = 45;
-        vehiclesAndChargers.MIN_START_CAPACITY_KWH = 45;
-        vehiclesAndChargers.BATTERY_CAPACITY_KWH = 45;
-        vehiclesAndChargers.run(depotsAndVehicles);
+		config.controler().setOutputDirectory(inbase + "\\output\\" + runId); // Define dynamically the the
+		// output path
 
-        drt.setVehiclesFile(inbase + "\\fleets\\fleet.xml.gz");
-        drt.setIdleVehiclesReturnToDepots(true);
-        drt.setOperationalScheme("stopbased");
-        drt.setPlotDetailedCustomerStats(true);
-        
-        EvConfigGroup eDrt = (EvConfigGroup) config.getModules().get(EvConfigGroup.GROUP_NAME);
-        eDrt.setChargersFile(inbase + "\\chargers\\chargers.xml.gz");
-        eDrt.setVehiclesFile(inbase + "\\fleets\\eFleet.xml.gz");
-        eDrt.setAuxDischargeTimeStep(10);
-        eDrt.setAuxDischargingSimulation(EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler);
-        eDrt.setTimeProfiles(true);
+		// For each demand scenario we are using a predefined drt vehicle fleet size
+		// int fleetSize = 50;
+		// CreatePeopleMoverVehicles.run(inbase+"/network/drtServiceAreaNetwork.xml.gz",
+		// fleetSize, drtTag);
 
+		// Define infrastructure for eDRT (vehicles, depots and chargers)
+		CreateEDRTVehiclesAndChargers vehiclesAndChargers = new CreateEDRTVehiclesAndChargers();
+		Map<Id<Link>, Integer> depotsAndVehicles = new HashMap<>();
+		depotsAndVehicles.put(Id.createLinkId(40158), vehiclePerDepot); // BS HBF
+		depotsAndVehicles.put(Id.createLinkId(8097), vehiclePerDepot); // Zentrum SO
+		depotsAndVehicles.put(Id.createLinkId(13417), vehiclePerDepot); // Zentrum N
+		depotsAndVehicles.put(Id.createLinkId(14915), vehiclePerDepot); // Flugplatz
 
-        config.addModule(new ParkingRouterConfigGroup());
-        ParkingRouterConfigGroup prc = ParkingRouterConfigGroup.get(config);
-        String shapeFile = inbase + "shp\\parking-zones.shp";
-        prc.setShapeFile(shapeFile);
-        prc.setCapacityCalculationMethod("useFromNetwork");
-        prc.setShape_key("NO");
+		vehiclesAndChargers.CHARGER_FILE = inbase + "\\chargers\\chargers.xml.gz";
+		vehiclesAndChargers.NETWORKFILE = inbase + "\\network\\drtServiceAreaNetwork.xml.gz";
+		vehiclesAndChargers.DRT_VEHICLE_FILE = inbase + "\\fleets\\fleet.xml.gz";
+		vehiclesAndChargers.E_VEHICLE_FILE = inbase + "\\fleets\\eFleet.xml.gz";
+		vehiclesAndChargers.drtTag = drtTag;
+		vehiclesAndChargers.SEATS = 6;
+		vehiclesAndChargers.MAX_START_CAPACITY_KWH = 78;
+		vehiclesAndChargers.MIN_START_CAPACITY_KWH = 78;
+		vehiclesAndChargers.BATTERY_CAPACITY_KWH = 78;
+		vehiclesAndChargers.run(depotsAndVehicles);
+		vehiclesAndChargers.CHARGINGPOWER_KW = 125;
 
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+		drt.setVehiclesFile(inbase + "\\fleets\\fleet.xml.gz");
+		drt.setIdleVehiclesReturnToDepots(true);
+		drt.setOperationalScheme("stopbased");
+		drt.setPlotDetailedCustomerStats(true);
 
+		EvConfigGroup eDrt = (EvConfigGroup) config.getModules().get(EvConfigGroup.GROUP_NAME);
+		eDrt.setChargersFile(inbase + "\\chargers\\chargers.xml.gz");
+		eDrt.setVehiclesFile(inbase + "\\fleets\\eFleet.xml.gz");
+		eDrt.setAuxDischargeTimeStep(10);
+		eDrt.setAuxDischargingSimulation(EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler);
+		eDrt.setTimeProfiles(true);
 
-        // Scale PT Network Capacities
-        adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());
+		config.addModule(new ParkingRouterConfigGroup());
+		ParkingRouterConfigGroup prc = ParkingRouterConfigGroup.get(config);
+		String shapeFile = inbase + "shp\\parking-zones.shp";
+		prc.setShapeFile(shapeFile);
+		prc.setCapacityCalculationMethod("useFromNetwork");
+		prc.setShape_key("NO");
 
-        // Filter Links with higher speeds than x km/h
-        setXY2Links(scenario, 80 / 3.6);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		// Scale PT Network Capacities
+		adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());
 
-        // Define the MATSim Controler
-        // Based on the prepared configuration this part creates a controller that runs
+		// Filter Links with higher speeds than x km/h
+		setXY2Links(scenario, 80 / 3.6);
+
+		// Define the MATSim Controler
+		// Based on the prepared configuration this part creates a controller that runs
 		// Controler controler = createControlerWithSingleModeDrt(config, otfvis);
 
-        Controler controler = electric.edrt.run.RunEDrtScenario.createControler(config);
+		Controler controler = electric.edrt.run.RunEDrtScenario.createControler(config);
 
-        if (rebalancing == true) {
+		if (rebalancing == true) {
 
-            // Every x-seconds the simulation calls a re-balancing process.
-            // Re-balancing has the task to move vehicles into cells or zones that fits
-            // typically with the demand situation
-            // The technically used re-balancing strategy is then installed/binded within
-            // the initialized controler
-            System.out.println("Rebalancing Online");
+			// Every x-seconds the simulation calls a re-balancing process.
+			// Re-balancing has the task to move vehicles into cells or zones that fits
+			// typically with the demand situation
+			// The technically used re-balancing strategy is then installed/binded within
+			// the initialized controler
+			System.out.println("Rebalancing Online");
 
-            MinCostFlowRebalancingParams rebalancingParams = new MinCostFlowRebalancingParams();
+			MinCostFlowRebalancingParams rebalancingParams = new MinCostFlowRebalancingParams();
 
-            rebalancingParams.setInterval(300);
-            rebalancingParams.setCellSize(1000);
-            rebalancingParams.setTargetAlpha(0.8);
-            rebalancingParams.setTargetBeta(0.8);
-            rebalancingParams.setMaxTimeBeforeIdle(300);
-            rebalancingParams.setMinServiceTime(3600);
-            drt.addParameterSet(rebalancingParams);
+			rebalancingParams.setInterval(300);
+			rebalancingParams.setCellSize(1000);
+			rebalancingParams.setTargetAlpha(0.8);
+			rebalancingParams.setTargetBeta(0.8);
+			rebalancingParams.setMaxTimeBeforeIdle(300);
+			rebalancingParams.setMinServiceTime(3600);
+			drt.addParameterSet(rebalancingParams);
 
-        }
+		}
 
+		// Change the routing module in this way, that agents are forced to go to their
+		// closest bus stop.
+		// If we would remove this part, agents are searching a bus stop which lies in
+		// the direction of their destination but is maybe far away.
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				// addRoutingModuleBinding(DvrpConfigGroup.get(config).getMode())
+				// .to(ClosestStopBasedDrtRoutingModule.class);
+				// Link travel times are iterativly updated between iteration
+				// tt[i] = alpha * experiencedTT + (1 - alpha) * oldEstimatedTT;
+				// Remark: Small alpha leads to more smoothing and longer lags in reaction.
+				// Default alpha is 0.05. Which means i.e. 0.3 is not smooth in comparison to
+				// 0.05
+				DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.15);
+				DvrpConfigGroup.get(config).setTravelTimeEstimationBeta(600);
+				// bind(RelocationWriter.class).asEagerSingleton();
+				// addControlerListenerBinding().to(RelocationWriter.class);
 
-        // Change the routing module in this way, that agents are forced to go to their
-        // closest bus stop.
-        // If we would remove this part, agents are searching a bus stop which lies in
-        // the direction of their destination but is maybe far away.
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                // addRoutingModuleBinding(DvrpConfigGroup.get(config).getMode())
-                //.to(ClosestStopBasedDrtRoutingModule.class);
-                // Link travel times are iterativly updated between iteration
-                // tt[i] = alpha * experiencedTT + (1 - alpha) * oldEstimatedTT;
-                // Remark: Small alpha leads to more smoothing and longer lags in reaction.
-                // Default alpha is 0.05. Which means i.e. 0.3 is not smooth in comparison to
-                // 0.05
-                DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.15);
-                DvrpConfigGroup.get(config).setTravelTimeEstimationBeta(600);
-                //bind(RelocationWriter.class).asEagerSingleton();
-                //addControlerListenerBinding().to(RelocationWriter.class);
-                
-                
+			}
+		});
 
-            }
-        });
-        
-        
-        
-        controler.addOverridingModule(new ParkingRouterModule());
-        controler.addOverridingModule(new SwissRailRaptorModule());
-        controler.addOverridingModule(new MyDrtTrajectoryAnalysisModule(drt));
+		controler.addOverridingModule(new ParkingRouterModule());
+		controler.addOverridingModule(new SwissRailRaptorModule());
+		controler.addOverridingModule(new MyDrtTrajectoryAnalysisModule(drt));
 
-        // We finally run the controller to start MATSim
+		// We finally run the controller to start MATSim
 
-        boolean deleteRoutes = false;
+		boolean deleteRoutes = false;
 
-        if (deleteRoutes) {
-            controler.getScenario().getPopulation().getPersons().values().stream().flatMap(p -> p.getPlans().stream())
-                    .flatMap(pl -> pl.getPlanElements().stream()).filter(Leg.class::isInstance)
-                    .forEach(pe -> ((Leg) pe).setRoute(null));
-        }
+		if (deleteRoutes) {
+			controler.getScenario().getPopulation().getPersons().values().stream().flatMap(p -> p.getPlans().stream())
+					.flatMap(pl -> pl.getPlanElements().stream()).filter(Leg.class::isInstance)
+					.forEach(pe -> ((Leg) pe).setRoute(null));
+		}
 
-        controler.run();
+		controler.run();
 
+		// }
+	}
 
-        // }
-    }
+	public static void adjustPtNetworkCapacity(Network network, double flowCapacityFactor) {
+		if (flowCapacityFactor < 1.0) {
+			for (Link l : network.getLinks().values()) {
+				if (l.getAllowedModes().contains(TransportMode.pt)) {
+					l.setCapacity(l.getCapacity() / flowCapacityFactor);
+				}
+			}
+		}
+	}
 
+	public static void setXY2Links(Scenario scenario, double maxspeed) {
+		Network network = NetworkUtils.createNetwork();
+		NetworkFilterManager networkFilterManager = new NetworkFilterManager(scenario.getNetwork());
+		networkFilterManager.addLinkFilter(new NetworkLinkFilter() {
+			@Override
+			public boolean judgeLink(Link l) {
+				if (l.getFreespeed() > maxspeed && l.getNumberOfLanes() > 1) {
+					return false;
+				} else
+					return true;
+			}
+		});
+		network = networkFilterManager.applyFilters();
+		XY2Links xy2Links = new XY2Links(network, null);
+		for (Person p : scenario.getPopulation().getPersons().values()) {
+			xy2Links.run(p);
+		}
 
-    public static void adjustPtNetworkCapacity(Network network, double flowCapacityFactor) {
-        if (flowCapacityFactor < 1.0) {
-            for (Link l : network.getLinks().values()) {
-                if (l.getAllowedModes().contains(TransportMode.pt)) {
-                    l.setCapacity(l.getCapacity() / flowCapacityFactor);
-                }
-            }
-        }
-    }
-
-    public static void setXY2Links(Scenario scenario, double maxspeed) {
-        Network network = NetworkUtils.createNetwork();
-        NetworkFilterManager networkFilterManager = new NetworkFilterManager(scenario.getNetwork());
-        networkFilterManager.addLinkFilter(new NetworkLinkFilter() {
-            @Override
-            public boolean judgeLink(Link l) {
-                if (l.getFreespeed() > maxspeed && l.getNumberOfLanes() > 1) {
-                    return false;
-                } else return true;
-            }
-        });
-        network = networkFilterManager.applyFilters();
-        XY2Links xy2Links = new XY2Links(network, null);
-        for (Person p : scenario.getPopulation().getPersons().values()) {
-            xy2Links.run(p);
-        }
-
-
-    }
+	}
 }
