@@ -45,7 +45,7 @@ public class MyDrtTrajectoryAnalysisModule extends AbstractDvrpModeModule {
 	public void install() {
 		bindModal(MyDynModeTrajectoryStats.class).toProvider(modalProvider(
 				getter -> new MyDynModeTrajectoryStats(getter.get(Network.class), getter.get(EventsManager.class),
-						drtCfg, getter.getModal(FleetSpecification.class), getter.get(ElectricFleet.class))))
+						drtCfg, getter.getModal(FleetSpecification.class), getter.getModal(Fleet.class), getter.get(ElectricFleet.class))))
 				.asEagerSingleton();
 
 		addControlerListenerBinding().toProvider(modalProvider(

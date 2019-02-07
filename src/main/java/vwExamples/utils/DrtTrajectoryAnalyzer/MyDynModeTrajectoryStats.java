@@ -19,32 +19,11 @@
 
 package vwExamples.utils.DrtTrajectoryAnalyzer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -53,7 +32,9 @@ import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTask;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
@@ -64,6 +45,8 @@ import org.matsim.contrib.ev.data.ElectricFleet;
 import org.matsim.contrib.ev.data.ElectricVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.*;
 
 
 /**
@@ -89,17 +72,19 @@ public class MyDynModeTrajectoryStats
 	private final String mode;
 	private final int maxcap;
 	private final Network network;
-	private final FleetSpecification fleet;
+	private final Fleet fleet;
+	private final FleetSpecification fleetSpecification;
 	private String sep = ",";
 	private final ElectricFleet electricFleet;
 
 	public MyDynModeTrajectoryStats(Network network, EventsManager events, DrtConfigGroup drtCfg,
-			FleetSpecification fleet, ElectricFleet electricFleet) {
+									FleetSpecification fleetSpecification, Fleet fleet, ElectricFleet electricFleet) {
+		this.fleetSpecification = fleetSpecification;
 		this.fleet = fleet;
 		this.mode = drtCfg.getMode();
 		this.network = network;
 		events.addHandler(this);
-		maxcap = DynModeTripsAnalyser.findMaxVehicleCapacity(fleet);
+		maxcap = DynModeTripsAnalyser.findMaxVehicleCapacity(fleetSpecification);
 		this.electricFleet = electricFleet;
 
 	}
@@ -225,11 +210,11 @@ public class MyDynModeTrajectoryStats
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		Id<Vehicle> vehicleId = event.getVehicleId();
-		if (fleet.getVehicleSpecifications().containsKey(vehicleId)) {// handle all drt
+		if (fleetSpecification.getVehicleSpecifications().containsKey(vehicleId)) {// handle all drt
 			activeVehicle.add(vehicleId);
 
-			
-			vehDrives.put(vehicleId, new VehDrive(vehicleId, fleet.getVehicleSpecifications().get(vehicleId)));
+
+			vehDrives.put(vehicleId, new VehDrive(vehicleId, fleetSpecification.getVehicleSpecifications().get(vehicleId)));
 
 			double acutalTime = event.getTime();
 			String vehicleID = event.getVehicleId().toString();
@@ -239,9 +224,8 @@ public class MyDynModeTrajectoryStats
 			double y = network.getLinks().get(event.getLinkId()).getCoord().getY();
 
 			double tt =  Double.NaN;
-			//DrtTask actualTask = (DrtTask) fleet.getVehicleSpecifications().get(event.getVehicleId()).getSchedule().getCurrentTask();
-			//String actualTaskType = actualTask.getDrtTaskType().toString();
-			String actualTaskType = "Missing";
+			DrtTask actualTask = (DrtTask) fleet.getVehicles().get(Id.create(vehicleID, DvrpVehicle.class)).getSchedule().getCurrentTask();
+			String actualTaskType = actualTask.getDrtTaskType().toString();
 
 			double v_meterPerSec = Double.NaN;
 			Id<ElectricVehicle> evId = Id.create(event.getVehicleId(), ElectricVehicle.class);
@@ -264,10 +248,10 @@ public class MyDynModeTrajectoryStats
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		Id<Vehicle> vehicleId = event.getVehicleId();
-		if (fleet.getVehicleSpecifications().containsKey(vehicleId)) {// handle all drt
+		if (fleetSpecification.getVehicleSpecifications().containsKey(vehicleId)) {// handle all drt
 			activeVehicle.add(vehicleId);
 
-			vehDrives.remove(vehicleId, new VehDrive(vehicleId, fleet.getVehicleSpecifications().get(vehicleId)));
+			vehDrives.remove(vehicleId, new VehDrive(vehicleId, fleetSpecification.getVehicleSpecifications().get(vehicleId)));
 
 			double acutalTime = event.getTime();
 			String vehicleID = event.getVehicleId().toString();
@@ -281,7 +265,7 @@ public class MyDynModeTrajectoryStats
 
 			double v_meterPerSec = Double.NaN;
 
-			//DrtTask actualTask = (DrtTask) fleet.getVehicleSpecifications().get(event.getVehicleId()).getSchedule().getCurrentTask();
+			//DrtTask actualTask = (DrtTask) fleetSpecification.getVehicleSpecifications().get(event.getVehicleId()).getSchedule().getCurrentTask();
 			//String actualTaskType = actualTask.getDrtTaskType().toString();
 			String actualTaskType = "Missing";
 
@@ -342,7 +326,7 @@ public class MyDynModeTrajectoryStats
 			vehDrive.movedOverNodeTime = event.getTime();
 			double v_meterPerSec = distance / tt;
 
-			//DrtTask actualTask = (DrtTask) fleet.getVehicleSpecifications().get(event.getVehicleId()).getSchedule().getCurrentTask();
+			//DrtTask actualTask = (DrtTask) fleetSpecification.getVehicleSpecifications().get(event.getVehicleId()).getSchedule().getCurrentTask();
 			//String actualTaskType = actualTask.getDrtTaskType().toString();
 			String actualTaskType = "Missing";
 
