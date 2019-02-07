@@ -39,7 +39,7 @@ import org.matsim.core.controler.MatsimServices;
  * @author benjamin, julia
  *
  */
-public class CreateEmissionConfig {
+public final class CreateEmissionConfig {
 
 		private static final String inputPath = "./test/input/org/matsim/contrib/emissions/";
 		private static final String networkFile = //inputPath + 

@@ -67,7 +67,7 @@ public class ScheduleBuilder {
 			case TaxiActionCreator.DROPOFF_ACTIVITY_TYPE:
 			case "PassengerDropoff":// old naming (TODO to be removed soon)
 				// TODO setting 'toLink' should be moved to RequestRecorder once the events are re-ordered
-				((TaxiRequestWithModifiableToLink)currentRequest).toLink = stay.link;
+				((TaxiRequestWithModifiableToLink)currentRequest).setToLink(stay.link);
 				vehicle.getSchedule().addTask(new TaxiDropoffTask(stay.startTime, stay.endTime, currentRequest));
 
 				currentRequest = null;

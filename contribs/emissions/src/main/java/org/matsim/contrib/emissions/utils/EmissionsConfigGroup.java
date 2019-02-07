@@ -19,15 +19,16 @@
 
 package org.matsim.contrib.emissions.utils;
 
+import org.matsim.contrib.emissions.EmissionSpecificationMarker;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
+
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
-public class EmissionsConfigGroup
+public final class EmissionsConfigGroup
 extends ReflectiveConfigGroup
 {
 	public static final String GROUP_NAME = "emissions";
@@ -86,6 +87,10 @@ extends ReflectiveConfigGroup
 	public enum NonScenarioVehicles { ignore, abort }
 	private static final String NON_SCENARIO_VEHICLES = "nonScenarioVehicles";
 	private NonScenarioVehicles nonScenarioVehicles = NonScenarioVehicles.abort;
+
+	public enum EmissionsComputationMethod {StopAndGoFraction,AverageSpeed}
+	private static final String EMISSIONS_COMPUTATION_METHOD = "emissionsComputationMethod";
+	private EmissionsComputationMethod emissionsComputationMethod = EmissionsComputationMethod.StopAndGoFraction;
 	
 	@Deprecated // should be phased out.  kai, oct'18
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED if source of the HBEFA road type is set to "+HbefaRoadTypeSource.fromFile +". It maps from input road types to HBEFA 3.1 road type strings";
@@ -125,6 +130,8 @@ extends ReflectiveConfigGroup
 			+ NonScenarioVehicles.values()
 			+ " Should eventually be extended by 'getVehiclesFromMobsim'."
 	 ;
+
+	private static final String EMISSIONS_COMPUTATION_METHOD_CMT = "if true, the original fractional method from Hülsmann et al (2011) will be used to calculate emission factors";
 
 
 	@Override
@@ -168,6 +175,8 @@ extends ReflectiveConfigGroup
 		map.put(HANDLE_HIGH_AVERAGE_SPEEDS, HANDLE_HIGH_AVERAGE_SPEEDS_CMT);
 		
 		map.put(NON_SCENARIO_VEHICLES, NON_SCENARIO_VEHICLES_CMT);
+
+        map.put(EMISSIONS_COMPUTATION_METHOD, EMISSIONS_COMPUTATION_METHOD_CMT);
 
 		return map;
 	}
@@ -379,4 +388,15 @@ extends ReflectiveConfigGroup
 	public void setNonScenarioVehicles(NonScenarioVehicles nonScenarioVehicles) {
 		this.nonScenarioVehicles = nonScenarioVehicles;
 	}
+
+    @StringGetter(EMISSIONS_COMPUTATION_METHOD)
+    public EmissionsComputationMethod getEmissionsComputationMethod() {
+        return emissionsComputationMethod;
+    }
+
+    @StringSetter(EMISSIONS_COMPUTATION_METHOD)
+    public void setEmissionsComputationMethod(EmissionsComputationMethod emissionsComputationMethod) {
+        this.emissionsComputationMethod = emissionsComputationMethod;
+    }
+
 }

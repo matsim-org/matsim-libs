@@ -58,8 +58,4 @@ public class StaticPassengerDynLeg implements PassengerDynLeg {
 	public Double getExpectedTravelDistance() {
 		return route.getDistance();
 	}
-
-	@Override
-	public void finalizeAction(double now) {
-	}
 }

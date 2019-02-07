@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
 
@@ -136,6 +137,11 @@ public final class ScoringFunctionAccumulator implements ScoringFunction {
 		for (AgentStuckScoring agentStuckScoringFunction : agentStuckScoringFunctions) {
 			agentStuckScoringFunction.agentStuck(time);
 		}
+	}
+
+	@Override
+	public void handleTrip( final TripStructureUtils.Trip trip ) {
+		throw new RuntimeException( "not implemented" );
 	}
 
 	@Override

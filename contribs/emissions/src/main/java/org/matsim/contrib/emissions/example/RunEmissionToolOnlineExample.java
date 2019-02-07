@@ -21,16 +21,12 @@ package org.matsim.contrib.emissions.example;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
-import org.matsim.contrib.emissions.roadTypeMapping.VisumHbefaRoadTypeMapping;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import java.net.URL;
 
 /**
  * 
@@ -45,7 +41,7 @@ import java.net.URL;
  * @author benjamin, julia
  */
 
-public class RunEmissionToolOnlineExample{
+public final class RunEmissionToolOnlineExample{
 
 	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config_detailed.xml";
 

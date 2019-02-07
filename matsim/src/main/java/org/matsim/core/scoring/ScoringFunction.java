@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.router.TripStructureUtils;
 
 /**
  * A scoring function calculates the score for one plan of an agent.  The score
@@ -92,5 +93,10 @@ public interface ScoringFunction {
 	public double getScore();
 
 	public void handleEvent( Event event ) ;
+	
+	default void handleTrip( TripStructureUtils.Trip trip ) {
+		// empty default implementation, since older implementations of the interface
+		// don't have this method, and work happily without. kai, sep'18
+	}
 
 }

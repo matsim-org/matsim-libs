@@ -385,13 +385,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		} else {
 			throw new RuntimeException("unexpected type of PlanElement") ;
 		}
-		ActivityFacility fac = this.scenario.getActivityFacilities().getFacilities().get( activity.getFacilityId() ) ;
-		if ( fac != null ) {
-			System.out.println("facility=" + fac );
-			return fac ;
-		} else {
-			return new ActivityWrapperFacility( activity ) ; 
-		}
+		return getFacility(activity, scenario);
 	}
 
 	@Override
@@ -400,12 +394,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		if ( pe instanceof Leg ) {
 			Activity activity = this.getNextActivity() ;
 			ActivityFacility fac = this.scenario.getActivityFacilities().getFacilities().get( activity.getFacilityId() ) ;
-			if ( fac != null ) {
-				System.out.println("facility=" + fac );
-				return fac ;
-			} else {
-				return new ActivityWrapperFacility( activity ) ; 
-			}
+			return getFacility(activity, scenario);
 			// the above assumes alternating acts/legs.  I start having the suspicion that we should revoke our decision to give that up.
 			// If not, one will have to use TripUtils to find the preceeding activity ... but things get more difficult.  Preferably, the
 			// factility should then sit in the leg (since there it is used for routing).  kai, dec'15
@@ -414,5 +403,9 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		}
 		throw new RuntimeException("unexpected type of PlanElement") ;
 	}
-	
+
+	private static Facility getFacility(Activity activity, Scenario scenario) {
+		ActivityFacility fac = scenario.getActivityFacilities().getFacilities().get( activity.getFacilityId() ) ;
+		return ( fac != null) ? fac : new ActivityWrapperFacility( activity );
+	}
 }

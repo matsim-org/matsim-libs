@@ -20,25 +20,34 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
 
-public class SinglePassengerDropoffActivity extends VrpActivity {
+public class SinglePassengerDropoffActivity extends FirstLastSimStepDynActivity {
 	private final PassengerEngine passengerEngine;
 	private final DynAgent driver;
 	private final PassengerRequest request;
 
+	private final double departureTime;
+
 	public SinglePassengerDropoffActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask dropoffTask,
 			PassengerRequest request, String activityType) {
-		super(activityType, dropoffTask);
+		super(activityType);
 
 		this.passengerEngine = passengerEngine;
 		this.driver = driver;
 		this.request = request;
+
+		departureTime = dropoffTask.getEndTime();
 	}
 
 	@Override
-	public void finalizeAction(double now) {
+	protected boolean isLastStep(double now) {
+		return now >= departureTime;
+	}
+
+	@Override
+	protected void afterLastStep(double now) {
 		passengerEngine.dropOffPassenger(driver, request, now);
 	}
 }

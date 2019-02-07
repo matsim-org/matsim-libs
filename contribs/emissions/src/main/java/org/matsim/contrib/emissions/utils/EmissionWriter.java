@@ -19,12 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.utils;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -33,11 +27,19 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.util.Collection;
+import java.util.Map;
+import java.util.SortedMap;
+
 /**
  * @author benjamin
  *
  */
-public class EmissionWriter {
+public final class EmissionWriter {
+	// is this useful as a publicly available class?  kai, jan'19
+
 	private static final Logger logger = Logger.getLogger(EmissionWriter.class);
 	
 

@@ -78,13 +78,6 @@ public class CarrierImpl implements Carrier {
 		this.selectedPlan = selectedPlan;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.mzilske.freight.Carrier#setCarrierCapabilities(playground.
-	 * mzilske.freight.CarrierCapabilities)
-	 */
 	@Override
 	public void setCarrierCapabilities(CarrierCapabilities carrierCapabilities) {
 		this.carrierCapabilities = carrierCapabilities;
@@ -131,6 +124,8 @@ public class CarrierImpl implements Carrier {
 	public boolean removePlan(CarrierPlan p) {
 		return this.plans.remove(p);
 	}
-	
+
+	@Override
+	public void clearPlans() { this.plans.clear(); }
 
 }

@@ -40,7 +40,8 @@ env:
     - MODULE=contribs/cadytsIntegration    
     - MODULE=contribs/carsharing           
     - MODULE=contribs/drt                  
-    - MODULE=contribs/dvrp                 
+    - MODULE=contribs/dvrp
+    - MODULE=contribs/ev
     - MODULE=contribs/taxi                 
     - MODULE=contribs/emissions            
     - MODULE=contribs/freight              

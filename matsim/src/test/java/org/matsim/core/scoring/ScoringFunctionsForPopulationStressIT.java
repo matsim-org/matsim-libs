@@ -1,9 +1,15 @@
 package org.matsim.core.scoring;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -11,10 +17,10 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.controler.ControlerListenerManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
@@ -33,7 +39,18 @@ public class ScoringFunctionsForPopulationStressIT {
 		EventsManager events = EventsUtils.createEventsManager(config);
 		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
 		ScoringFunctionFactory throwingScoringFunctionFactory = new ThrowingScoringFunctionFactory();
-		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(controlerListenerManager, events, new EventsToActivities(controlerListenerManager, events), new EventsToLegs(scenario.getNetwork(), events), scenario.getPopulation(), throwingScoringFunctionFactory);
+		EventsToActivities e2acts = new EventsToActivities(controlerListenerManager);
+		EventsToLegs e2legs = new EventsToLegs(scenario.getNetwork());
+		EventsToLegsAndActivities e2legsActs = new EventsToLegsAndActivities(e2legs, e2acts);
+		events.addHandler(e2legsActs);
+		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
+				controlerListenerManager,
+				events,
+				e2acts,
+				e2legs,
+				scenario.getPopulation(),
+				throwingScoringFunctionFactory
+		);
 		controlerListenerManager.fireControlerIterationStartsEvent(0);
 		events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4));
 		scoringFunctionsForPopulation.finishScoringFunctions();
@@ -57,7 +74,12 @@ public class ScoringFunctionsForPopulationStressIT {
 				public void agentStuck(double time) {
 					throw new RuntimeException();
 				}
-
+				
+				@Override
+				public void handleTrip( final TripStructureUtils.Trip trip ) {
+					throw new RuntimeException();
+				}
+				
 				@Override
 				public void addMoney(double amount) {
 					throw new RuntimeException();
@@ -129,7 +151,12 @@ public class ScoringFunctionsForPopulationStressIT {
 					public void agentStuck(double time) {
 						delegateFunction.agentStuck(time);
 					}
-
+					
+					@Override
+					public void handleTrip( final TripStructureUtils.Trip trip ) {
+						delegateFunction.handleTrip(trip);
+					}
+					
 					@Override
 					public void addMoney(double amount) {
 						delegateFunction.addMoney(amount);
@@ -152,7 +179,19 @@ public class ScoringFunctionsForPopulationStressIT {
 				};
 			}
 		};
-		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(controlerListenerManager, events, new EventsToActivities(controlerListenerManager, events), new EventsToLegs(scenario.getNetwork(), events), scenario.getPopulation(), scoringFunctionFactory);
+		EventsToActivities e2acts = new EventsToActivities(controlerListenerManager);
+		EventsToLegs e2legs = new EventsToLegs(scenario.getNetwork());
+		EventsToLegsAndActivities e2legsActs = new EventsToLegsAndActivities(e2legs, e2acts);
+		events.addHandler(e2legsActs);
+
+		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
+				controlerListenerManager,
+				events,
+				e2acts,
+				e2legs,
+				scenario.getPopulation(),
+				scoringFunctionFactory
+		);
 		controlerListenerManager.fireControlerIterationStartsEvent(0);
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {
@@ -173,7 +212,14 @@ public class ScoringFunctionsForPopulationStressIT {
 		assertEquals(1.0/6.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
 	}
 
-	@Test
+	/* I (mrieser, 2019-01-09) disabled this test. By definition, events for one person should come in the right sequence,
+	   so this tests actually tests some additional (and potentially optional) behavior. But, more importantly, it poses
+	   inherent problems with the addition of trip scoring: to detect trips, it is important that activities and legs
+	   occur in the correct sequence, which means that also the corresponding events must be in the right sequence.
+	   If the sequence is disturbed, the trip detection already fails. So, with trip scoring, this test would always fail
+	   as it tests some non-required functionality.
+	 */
+	@Test @Ignore
 	public void unlikelyTimingOfScoringFunctionStillWorks() {
 		Config config = ConfigUtils.createConfig();
 		config.parallelEventHandling().setNumberOfThreads(8);
@@ -227,7 +273,17 @@ public class ScoringFunctionsForPopulationStressIT {
 						}
 						delegateFunction.agentStuck(time);
 					}
-
+					
+					@Override
+					public void handleTrip( final TripStructureUtils.Trip trip ) {
+						try {
+							Thread.sleep(MatsimRandom.getRandom().nextInt(1000));
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						delegateFunction.handleTrip(trip);
+					}
+					
 					@Override
 					public void addMoney(double amount) {
 						try {
@@ -266,7 +322,14 @@ public class ScoringFunctionsForPopulationStressIT {
 			}
 		};
 		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
-		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(controlerListenerManager, events, new EventsToActivities(controlerListenerManager, events), new EventsToLegs(scenario.getNetwork(), events), scenario.getPopulation(), scoringFunctionFactory);
+		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
+				controlerListenerManager,
+				events,
+				new EventsToActivities(controlerListenerManager),
+				new EventsToLegs(scenario.getNetwork()),
+				scenario.getPopulation(),
+				scoringFunctionFactory
+		);
 		controlerListenerManager.fireControlerIterationStartsEvent(0);
 		int MAX = 10;
 		events.initProcessing();

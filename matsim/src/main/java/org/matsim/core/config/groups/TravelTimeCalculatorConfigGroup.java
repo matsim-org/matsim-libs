@@ -190,6 +190,8 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 
 	@StringSetter( ANALYZEDMODES )
 	public void setAnalyzedModes(final String analyzedModes) {
+		// yyyy this should be changed to accepting a set. kai, jan'19
+
 //		this.analyzedModes = analyzedModes.toLowerCase(Locale.ROOT);
 		// lower case is confusing here because at other places (qsimConfigGroup, planCalcRoute), it takes mode string as it is. Amit Aug'17
 		this.analyzedModes = analyzedModes;

@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd">
+
+<vehicles>
+	<vehicle id="taxi_1_1" start_link="385" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_1_2" start_link="385" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_1_3" start_link="385" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_1_4" start_link="385" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_1_5" start_link="385" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_2_1" start_link="499" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_2_2" start_link="499" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_2_3" start_link="499" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_2_4" start_link="499" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_2_5" start_link="499" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_3_1" start_link="277" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_3_2" start_link="277" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_3_3" start_link="277" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_3_4" start_link="277" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_3_5" start_link="277" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_4_1" start_link="52" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_4_2" start_link="52" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_4_3" start_link="52" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_4_4" start_link="52" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_4_5" start_link="52" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_5_1" start_link="449" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_5_2" start_link="449" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_5_3" start_link="449" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_5_4" start_link="449" t_0="21600" t_1="104400"/>
+	<vehicle id="taxi_5_5" start_link="449" t_0="21600" t_1="104400"/>
+</vehicles>

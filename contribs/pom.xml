@@ -160,6 +160,7 @@
 		<module>decongestion</module>
 		<module>drt</module>
 		<module>dvrp</module>
+		<module>ev</module>
 		<module>emissions</module>
 		<module>eventsBasedPTRouter</module>
 		<module>freight</module>

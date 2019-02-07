@@ -21,8 +21,16 @@ package org.matsim.contrib.dynagent.util;
 
 import java.util.Iterator;
 
-import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dynagent.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.DynActivity;
+import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.DynAgentLogic;
+import org.matsim.contrib.dynagent.IdleDynActivity;
+import org.matsim.contrib.dynagent.StaticDriverDynLeg;
 import org.matsim.core.population.routes.NetworkRoute;
 
 /**
@@ -49,7 +57,7 @@ public class PlanToDynAgentLogicAdapter implements DynAgentLogic {
 		this.agent = adapterAgent;
 
 		Activity act = (Activity)planElemIter.next();
-		return new StaticDynActivity(act.getType(), act.getEndTime());
+		return new IdleDynActivity(act.getType(), act.getEndTime());
 	}
 
 	@Override
@@ -63,7 +71,7 @@ public class PlanToDynAgentLogicAdapter implements DynAgentLogic {
 
 		if (planElem instanceof Activity) {
 			Activity act = (Activity)planElem;
-			return new StaticDynActivity(act.getType(), act.getEndTime());
+			return new IdleDynActivity(act.getType(), act.getEndTime());
 		}
 
 		// only the 'car' mode supported right now

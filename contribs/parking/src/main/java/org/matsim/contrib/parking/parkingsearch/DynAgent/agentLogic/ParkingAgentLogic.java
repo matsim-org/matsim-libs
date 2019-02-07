@@ -33,10 +33,10 @@ import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.DynAgentLogic;
-import org.matsim.contrib.dynagent.StaticDynActivity;
+import org.matsim.contrib.dynagent.IdleDynActivity;
 import org.matsim.contrib.dynagent.StaticPassengerDynLeg;
-import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.ParkingDynLeg;
+import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.contrib.parking.parkingsearch.manager.WalkLegFactory;
 import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
@@ -109,8 +109,8 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		this.currentPlanElement = planElemIter.next();
 		Activity act = (Activity) currentPlanElement;
 		//TODO: assume something different regarding initial parking location
-		
-		return new StaticDynActivity(act.getType(), act.getEndTime());
+
+		return new IdleDynActivity(act.getType(), act.getEndTime());
 	}
 
 	@Override
@@ -176,7 +176,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 	protected DynAction nextStateAfterWalkToPark(DynAction oldAction, double now) {
 		//walk2park is complete, we can unpark.
 		this.lastParkActionState = LastParkActionState.UNPARKACTIVITY;
-		return new StaticDynActivity(this.stageInteractionType, now + configGroup.getUnparkduration());
+		return new IdleDynActivity(this.stageInteractionType, now + configGroup.getUnparkduration());
 	}
 
 	protected DynAction nextStateAfterWalkFromPark(DynAction oldAction, double now) {
@@ -203,8 +203,8 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		if (endTime == Time.UNDEFINED_TIME){
 			endTime = Double.POSITIVE_INFINITY;
 		}
-			 
-		return new StaticDynActivity(nextPlannedActivity.getType(),endTime);
+
+		return new IdleDynActivity(nextPlannedActivity.getType(), endTime);
 		
 	}
 
@@ -214,7 +214,8 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		this.lastParkActionState = LastParkActionState.PARKACTIVITY;
 		this.currentlyAssignedVehicleId = null;
 		this.parkingLogic.reset();
-		return new StaticDynActivity(this.stageInteractionType,now + configGroup.getParkduration());}
+			return new IdleDynActivity(this.stageInteractionType, now + configGroup.getParkduration());
+		}
 		else throw new RuntimeException ("No parking possible");
 	}
 

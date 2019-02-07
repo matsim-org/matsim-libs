@@ -35,7 +35,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLink
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
-public class HybridNetworkFactory extends QNetworkFactory {
+public final class HybridNetworkFactory implements QNetworkFactory {
 	@Inject QSimConfigGroup qsimConfig ;
 	@Inject EventsManager events ;
 	@Inject Scenario scenario ;
@@ -48,7 +48,7 @@ public class HybridNetworkFactory extends QNetworkFactory {
 	private ExternalEngine externalEngine;
 
 	@Override
-	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface arg2) {
+	public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface arg2 ) {
 		network = arg2.getNetsimNetwork().getNetwork();
 		double effectiveCellSize = ( network).getEffectiveCellSize() ;
 
