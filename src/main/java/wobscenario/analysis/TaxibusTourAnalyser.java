@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -54,21 +54,20 @@ import playground.jbischoff.utils.JbUtils;
  *	The tool will produce less meaningful results if pickups and drop offs are mixed.
  */
 public class TaxibusTourAnalyser implements ActivityEndEventHandler, ActivityStartEventHandler, LinkEnterEventHandler {
-	
-	private HashSet<Id<Vehicle>> vehicles = new HashSet<>();
-	private Set<TaxibusTour> tours = new TreeSet<>();
-	
-	private Map<Id<Vehicle>,Integer> currentRidePax = new HashMap<>();
-	private Map<Id<Vehicle>,Integer> paxDroppedOff = new HashMap<>();
 
-	private Map<Id<Vehicle>,Double> lastPickupOnTour = new HashMap<>();
-	private Map<Id<Vehicle>,Double> firstPickupOnTour = new HashMap<>();
-	
-	private Map<Id<Vehicle>,Double> firstDropoffOnTour = new HashMap<>();
-	
-	
-	private Map<Id<Vehicle>,Double> overallDistanceOnTour = new HashMap<>();
-	private Map<Id<Vehicle>,Double> pickUpDistanceOnTour = new HashMap<>();
+	private HashSet<Id<DvrpVehicle>> vehicles = new HashSet<>();
+	private Set<TaxibusTour> tours = new TreeSet<>();
+
+	private Map<Id<DvrpVehicle>, Integer> currentRidePax = new HashMap<>();
+	private Map<Id<DvrpVehicle>, Integer> paxDroppedOff = new HashMap<>();
+
+	private Map<Id<DvrpVehicle>, Double> lastPickupOnTour = new HashMap<>();
+	private Map<Id<DvrpVehicle>, Double> firstPickupOnTour = new HashMap<>();
+
+	private Map<Id<DvrpVehicle>, Double> firstDropoffOnTour = new HashMap<>();
+
+	private Map<Id<DvrpVehicle>, Double> overallDistanceOnTour = new HashMap<>();
+	private Map<Id<DvrpVehicle>, Double> pickUpDistanceOnTour = new HashMap<>();
 
 	private final Network network;
 	
@@ -111,14 +110,14 @@ public class TaxibusTourAnalyser implements ActivityEndEventHandler, ActivitySta
 
 	private void handleStay(ActivityEndEvent event) {
 		//Stay Task ends - begin of dispatch == begin of tour
-		Id<Vehicle> vid = p2vid(event.getPersonId());
+		Id<DvrpVehicle> vid = p2vid(event.getPersonId());
 		this.overallDistanceOnTour.put(vid, 0.0);
 		
 		
 	}
 
 	private void handleDropoff(ActivityEndEvent event) {
-		Id<Vehicle> vid = p2vid(event.getPersonId());
+		Id<DvrpVehicle> vid = p2vid(event.getPersonId());
 		if (lastPickupOnTour.containsKey(vid)){
 		int dropoffNo= paxDroppedOff.get(vid);	
 		if (dropoffNo ==0){
@@ -155,8 +154,8 @@ public class TaxibusTourAnalyser implements ActivityEndEventHandler, ActivitySta
 
 	private void handlePickup(ActivityEndEvent event) {
 		int hour = JbUtils.getHour(event.getTime());
-		
-		Id<Vehicle> vid = p2vid(event.getPersonId());
+
+		Id<DvrpVehicle> vid = p2vid(event.getPersonId());
 		int pax = 1;
 		if (currentRidePax.containsKey(vid)){
 			pax += currentRidePax.get(vid); 
@@ -216,7 +215,8 @@ public class TaxibusTourAnalyser implements ActivityEndEventHandler, ActivitySta
 	private void writeTours(String toursFile) {
 		BufferedWriter writer = IOUtils.getBufferedWriter(toursFile);
 		try {
-			writer.append("Vehicle\tFirstPickUp\tlastPickup\tPickUpDuration\tfirstDropOff\tlastDropoff\tDropoffDuration\tTourDistance\tPickupDistance\tOccupancy");
+			writer.append(
+					"DvrpVehicle\tFirstPickUp\tlastPickup\tPickUpDuration\tfirstDropOff\tlastDropoff\tDropoffDuration\tTourDistance\tPickupDistance\tOccupancy");
 			for (TaxibusTour tour : this.tours){
 				writer.newLine();
 				writer.append(tour.toString());
@@ -230,13 +230,14 @@ public class TaxibusTourAnalyser implements ActivityEndEventHandler, ActivitySta
 			e.printStackTrace();
 		}
 	}
-	private Id<Vehicle> p2vid (Id<Person> pid){
-		Id<Vehicle> vid = Id.create(pid.toString(), Vehicle.class);
+
+	private Id<DvrpVehicle> p2vid(Id<Person> pid) {
+		Id<DvrpVehicle> vid = Id.create(pid.toString(), DvrpVehicle.class);
 		return vid;
 	}
-	
-	private Id<Vehicle> v2vid (Id<org.matsim.vehicles.Vehicle> vehicleId){
-		Id<Vehicle> vid = Id.create(vehicleId.toString(), Vehicle.class);
+
+	private Id<DvrpVehicle> v2vid(Id<org.matsim.vehicles.Vehicle> vehicleId) {
+		Id<DvrpVehicle> vid = Id.create(vehicleId.toString(), DvrpVehicle.class);
 		return vid;
 	}
 	
@@ -244,7 +245,7 @@ public class TaxibusTourAnalyser implements ActivityEndEventHandler, ActivitySta
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Vehicle> vid = v2vid(event.getVehicleId());
+		Id<DvrpVehicle> vid = v2vid(event.getVehicleId());
 		if (overallDistanceOnTour.containsKey(vid)){
 			double distance = overallDistanceOnTour.get(vid);
 			distance += network.getLinks().get(event.getLinkId()).getLength();
@@ -267,14 +268,13 @@ class TaxibusTour implements Comparable<TaxibusTour>{
 	
 	double pickupDistance;
 	double overallDistance;
-	
-	
-	Id<Vehicle> vid;
+
+	Id<DvrpVehicle> vid;
 	
 	
 	TaxibusTour(int occupancy, Double firstPickup, double lastPickup, double pickUpDuration, double firstDropoff,
 			double lastDropoff, double dropOffDuration, double pickupDistance, double overallDistance,
-			Id<Vehicle> vid) {
+			Id<DvrpVehicle> vid) {
 		this.occupancy = occupancy;
 		this.firstPickup = firstPickup;
 		this.lastPickup = lastPickup;

@@ -20,23 +20,22 @@
 
 package vwExamples.peoplemoverVWExample;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import org.matsim.vsp.ev.EvConfigGroup;
-import org.matsim.vsp.ev.temperature.TemperatureChangeConfigGroup;
-
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author axer

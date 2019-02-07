@@ -19,17 +19,6 @@
 
 package vwExamples.utils.DrtTrajectoryAnalyzer;
 
-import com.google.inject.Inject;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.vehicles.Vehicle;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -39,6 +28,18 @@ import java.text.DecimalFormatSymbols;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.vehicles.Vehicle;
+
+import com.google.inject.Inject;
 
 /**
  * @author saxer
@@ -66,7 +67,7 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 	 * 
 	 */
 	@Inject
-	public DrtTrajectryControlerListener(Config config, DrtConfigGroup drtCfg, Fleet fleet,
+	public DrtTrajectryControlerListener(Config config, DrtConfigGroup drtCfg,
                                          MyDynModeTrajectoryStats myDynModeTrajectoryStats, MatsimServices matsimServices, Network network) {
 		drtgroup = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 		runId = config.controler().getRunId();
@@ -125,7 +126,7 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 
 	private static void writeCSVExample(String csvfilepath, List<String> trajectroyList) throws IOException {
 
-		String sep = ",";
+		
 		PrintWriter pw = null;
 		try {
 			pw = new PrintWriter(new File(csvfilepath));
@@ -134,7 +135,7 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 		}
 
 		StringBuilder builder = new StringBuilder();
-		String ColumnNamesList = "vehicleID" + sep + "time" + sep + "occ" + sep + "dist_m" + sep + "actualTaskType" + sep + "x"  + sep + "y" + sep+ "tt_sec"+ sep+"v_meter_sec" + sep+ "SOC" ;
+		String ColumnNamesList = "vehicleID" + "," + "time" + "," + "occ" + "," + "dist_m" + "," + "actualTaskType" + "," + "x"  + "," + "y" + ","+ "tt_sec"+ ","+"v_meter_sec" + "," + "SOC" ;
 
 		builder.append(ColumnNamesList + "\n");
 

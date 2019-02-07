@@ -1,8 +1,8 @@
 package electric.edrt.energyconsumption;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.vsp.ev.EvUnits;
-import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
+import org.matsim.contrib.ev.EvUnits;
+import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 
 
 /**

@@ -30,21 +30,22 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.VehicleImpl;
-import org.matsim.contrib.dvrp.data.file.VehicleWriter;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.FleetWriter;
+import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.ev.EvUnits;
+import org.matsim.contrib.ev.data.BatteryImpl;
+import org.matsim.contrib.ev.data.Charger;
+import org.matsim.contrib.ev.data.ChargerImpl;
+import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.data.ElectricVehicleImpl;
+import org.matsim.contrib.ev.data.file.ChargerWriter;
+import org.matsim.contrib.ev.data.file.ElectricVehicleWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vsp.ev.EvUnits;
-import org.matsim.vsp.ev.data.BatteryImpl;
-import org.matsim.vsp.ev.data.Charger;
-import org.matsim.vsp.ev.data.ChargerImpl;
-import org.matsim.vsp.ev.data.ElectricVehicle;
-import org.matsim.vsp.ev.data.ElectricVehicleImpl;
-import org.matsim.vsp.ev.data.file.ChargerWriter;
-import org.matsim.vsp.ev.data.file.ElectricVehicleWriter;
 
 /**
  * @author axer
@@ -82,7 +83,7 @@ public class CreateEDRTVehiclesAndChargers {
 
     public void run(Map<Id<Link>, Integer> depotsAndVehicles) {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        List<Vehicle> vehicles = new ArrayList<>();
+        List<DvrpVehicleSpecification> vehicles = new ArrayList<>();
         List<ElectricVehicle> evehicles = new ArrayList<>();
         List<Charger> chargers = new ArrayList<>();
         Random random = MatsimRandom.getLocalInstance();
@@ -95,7 +96,13 @@ public class CreateEDRTVehiclesAndChargers {
             }
             for (int i = 0; i < e.getValue(); i++) {
 
-                Vehicle v = new VehicleImpl(Id.create(drtTag + "_" + startLink.getId().toString() + "_" + i, Vehicle.class), startLink, SEATS, OPERATIONSTARTTIME, OPERATIONENDTIME);
+                DvrpVehicleSpecification v = ImmutableDvrpVehicleSpecification.newBuilder()
+						.id(Id.create(drtTag + "_" + startLink.getId().toString() + "_" + i, DvrpVehicle.class))
+                        .startLinkId(startLink.getId())
+                        .capacity(SEATS)
+                        .serviceBeginTime(OPERATIONSTARTTIME)
+                        .serviceEndTime(OPERATIONENDTIME)
+                        .build();
                 vehicles.add(v);
                 double initialSoc_kWh = MIN_START_CAPACITY_KWH + random.nextDouble() * (MAX_START_CAPACITY_KWH - MIN_START_CAPACITY_KWH);
                 ElectricVehicle ev = new ElectricVehicleImpl(Id.create(v.getId(), ElectricVehicle.class),
@@ -109,7 +116,7 @@ public class CreateEDRTVehiclesAndChargers {
             chargers.add(charger);
 
         }
-        new VehicleWriter(vehicles).write(DRT_VEHICLE_FILE);
+        new FleetWriter(vehicles.stream()).write(DRT_VEHICLE_FILE);
         new ElectricVehicleWriter(evehicles).write(E_VEHICLE_FILE);
         new ChargerWriter(chargers).write(CHARGER_FILE);
     }

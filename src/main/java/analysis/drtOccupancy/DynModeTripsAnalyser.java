@@ -57,7 +57,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DensityScatterPlots;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -394,20 +393,6 @@ public class DynModeTripsAnalyser {
 		return driven.getSum();
 	}
 	
-	
-	/**
-	 * @param fleet
-	 * @return
-	 */
-	public static int findMaxCap(Fleet fleet) {
-		int maxCap = 0;
-		for (org.matsim.contrib.dvrp.data.Vehicle v : fleet.getVehicles().values()){
-			if (v.getCapacity()>maxCap){
-				maxCap = (int) v.getCapacity();
-			}
-		}
-		return maxCap;
-	}
 
 	public static String summarizeDetailedOccupancyStats(Map<Id<Vehicle>, double[]> vehicleDistances, String del, int maxcap) {
 		DecimalFormat format = new DecimalFormat();

@@ -22,12 +22,13 @@ package vwExamples.utils.DrtTrajectoryAnalyzer;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.ev.data.ElectricFleet;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.vsp.ev.data.ElectricFleet;
 
 /**
  * @author saxer
@@ -43,15 +44,13 @@ public class MyDrtTrajectoryAnalysisModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		bindModal(MyDynModeTrajectoryStats.class).toProvider(modalProvider(
-				getter -> new MyDynModeTrajectoryStats(getter.get(Network.class), getter.get(EventsManager.class), drtCfg,
-						getter.getModal(Fleet.class), getter.get(ElectricFleet.class)))).asEagerSingleton();
-		
+				getter -> new MyDynModeTrajectoryStats(getter.get(Network.class), getter.get(EventsManager.class),
+						drtCfg, getter.getModal(FleetSpecification.class), getter.get(ElectricFleet.class))))
+				.asEagerSingleton();
+
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new DrtTrajectryControlerListener(getter.get(Config.class), drtCfg,
-						getter.getModal(Fleet.class), getter.getModal(MyDynModeTrajectoryStats.class),
+						 getter.getModal(MyDynModeTrajectoryStats.class),
 						getter.get(MatsimServices.class), getter.get(Network.class))));
-
-
-
 	}
 }

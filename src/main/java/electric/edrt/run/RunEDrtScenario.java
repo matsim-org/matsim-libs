@@ -19,20 +19,28 @@
 
 package electric.edrt.run;
 
-import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
-import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
-import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
-import vwExamples.utils.customEV.BatteryReplacementCharge;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.av.maxspeed.DvrpTravelTimeWithMaxSpeedLimitModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
+import org.matsim.contrib.edrt.run.EDrtControlerCreator;
+import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.charging.FastThenSlowCharging;
+import org.matsim.contrib.ev.charging.FixedSpeedChargingStrategy;
+import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
+import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
+import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
+import org.matsim.contrib.ev.temperature.TemperatureChangeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -41,19 +49,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import org.matsim.vsp.edvrp.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
-import org.matsim.vsp.edvrp.edrt.run.EDrtControlerCreator;
-import org.matsim.vsp.ev.EvConfigGroup;
-import org.matsim.vsp.ev.EvModule;
-import org.matsim.vsp.ev.charging.ChargingLogic;
-import org.matsim.vsp.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.vsp.ev.charging.FastThenSlowCharging;
-import org.matsim.vsp.ev.charging.FixedSpeedChargingStrategy;
-import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
-import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
-import org.matsim.vsp.ev.dvrp.EvDvrpIntegrationModule;
-import org.matsim.vsp.ev.temperature.TemperatureChangeConfigGroup;
-import org.matsim.vsp.ev.temperature.TemperatureChangeModule;
+
+import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
+import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
+import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
+import vwExamples.utils.customEV.BatteryReplacementCharge;
 
 public class RunEDrtScenario {
 	private static final double CHARGING_SPEED_FACTOR = 1.; // full speed
@@ -122,8 +122,10 @@ public class RunEDrtScenario {
 			public void install() {
 				bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
 						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
-				bind(DriveEnergyConsumption.Factory.class).toInstance(evconsumption -> new VwDrtDriveEnergyConsumption());
-				bind(AuxEnergyConsumption.Factory.class).to(VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
+				bind(DriveEnergyConsumption.Factory.class).toInstance(
+						evconsumption -> new VwDrtDriveEnergyConsumption());
+				bind(AuxEnergyConsumption.Factory.class).to(
+						VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
 				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
 				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(300.0)));
 				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
@@ -134,16 +136,13 @@ public class RunEDrtScenario {
 	}
 
 	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
-		return new EvDvrpIntegrationModule(drtCfg.getMode())//
-				.setChargingStrategyFactory(
-						charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
-								MAX_RELATIVE_SOC))//
-				.setTemperatureProvider(() -> TEMPERATURE) //
-				.setTurnedOnPredicate(RunEDrtScenario::isTurnedOn)//
-				.setVehicleFile(drtCfg.getVehiclesFile());
+		return new EvDvrpIntegrationModule(drtCfg.getMode()).setChargingStrategyFactory(
+				charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC))
+				.setTemperatureProvider(() -> TEMPERATURE)
+				.setTurnedOnPredicate(RunEDrtScenario::isTurnedOn);
 	}
 
-	private static boolean isTurnedOn(Vehicle vehicle) {
+	private static boolean isTurnedOn(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
 			DrtTaskType currentTaskType = ((DrtTask)schedule.getCurrentTask()).getDrtTaskType();

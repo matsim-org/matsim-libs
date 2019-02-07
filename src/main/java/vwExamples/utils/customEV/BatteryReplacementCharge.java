@@ -23,10 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.vsp.ev.charging.ChargingStrategy;
-import org.matsim.vsp.ev.data.Battery;
-import org.matsim.vsp.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
+import org.matsim.contrib.ev.data.Battery;
+import org.matsim.contrib.ev.data.ElectricVehicle;
 
 public class BatteryReplacementCharge implements ChargingStrategy {
 	private final double timeForBatteryReplacement;

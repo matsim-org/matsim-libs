@@ -40,14 +40,13 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.analysis.DynModeTripsAnalyser;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -82,11 +81,12 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 	 * 
 	 */
 	@Inject
-	public DynModePassengerStats(Network network, EventsManager events, DrtConfigGroup drtConfigGroup, Fleet fleet) {
+	public DynModePassengerStats(Network network, EventsManager events, DrtConfigGroup drtConfigGroup,
+			FleetSpecification fleet) {
 		this.mode = drtConfigGroup.getMode();
 		this.network = network;
 		events.addHandler(this);
-		maxcap = DynModeTripsAnalyser.findMaxCap(fleet);
+		maxcap = DynModeTripsAnalyser.findMaxVehicleCapacity(fleet);
 	}
 
 	public DynModePassengerStats(Network network, String mode, int maxcap) {

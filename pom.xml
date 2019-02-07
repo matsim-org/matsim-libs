@@ -29,10 +29,6 @@
 			<url>https://jitpack.io</url>
 		</repository>
 		<repository>
-			<id>matsim-vsp-ev</id>
-			<url>https://packagecloud.io/matsim-vsp/ev/maven2</url>
-		</repository>
-		<repository>
 			<id>matsim-vsp-edvrp</id>
 			<url>https://packagecloud.io/matsim-vsp/edvrp/maven2</url>
 			<releases>
@@ -139,13 +135,8 @@
 			<version>0.11.0-2018w44</version>
 		</dependency>
 		<dependency>
-			<groupId>org.matsim.vsp</groupId>
+			<groupId>org.matsim.contrib</groupId>
 			<artifactId>ev</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.vsp</groupId>
-			<artifactId>edvrp</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
 
