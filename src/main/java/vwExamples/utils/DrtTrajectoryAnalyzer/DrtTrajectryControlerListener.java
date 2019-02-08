@@ -32,7 +32,6 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -68,7 +67,7 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 	 */
 	@Inject
 	public DrtTrajectryControlerListener(Config config, DrtConfigGroup drtCfg,
-			MyDynModeTrajectoryStats myDynModeTrajectoryStats, Fleet fleet, MatsimServices matsimServices,
+			MyDynModeTrajectoryStats myDynModeTrajectoryStats, MatsimServices matsimServices,
 			Network network) {
 		drtgroup = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 		runId = config.controler().getRunId();

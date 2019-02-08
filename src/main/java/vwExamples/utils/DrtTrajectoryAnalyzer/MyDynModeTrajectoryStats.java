@@ -91,21 +91,24 @@ public class MyDynModeTrajectoryStats
 	private final String mode;
 	private final int maxcap;
 	private final Network network;
-	private final Fleet fleet;
+	private Fleet fleet;
 	private final FleetSpecification fleetSpecification;
 	private String sep = ",";
 	private final ElectricFleet electricFleet;
 
 	public MyDynModeTrajectoryStats(Network network, EventsManager events, DrtConfigGroup drtCfg,
-									FleetSpecification fleetSpecification, Fleet fleet, ElectricFleet electricFleet) {
+			FleetSpecification fleetSpecification, ElectricFleet electricFleet) {
 		this.fleetSpecification = fleetSpecification;
-		this.fleet = fleet;
 		this.mode = drtCfg.getMode();
 		this.network = network;
 		events.addHandler(this);
 		maxcap = DynModeTripsAnalyser.findMaxVehicleCapacity(fleetSpecification);
 		this.electricFleet = electricFleet;
 
+	}
+
+	public void setFleetOnMobsimStart(Fleet fleet) {
+		this.fleet = fleet;
 	}
 
 	private static class VehDrive {
