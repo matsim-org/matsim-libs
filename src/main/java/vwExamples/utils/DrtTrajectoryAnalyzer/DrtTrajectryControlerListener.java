@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -67,7 +68,8 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 	 */
 	@Inject
 	public DrtTrajectryControlerListener(Config config, DrtConfigGroup drtCfg,
-                                         MyDynModeTrajectoryStats myDynModeTrajectoryStats, MatsimServices matsimServices, Network network) {
+			MyDynModeTrajectoryStats myDynModeTrajectoryStats, Fleet fleet, MatsimServices matsimServices,
+			Network network) {
 		drtgroup = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 		runId = config.controler().getRunId();
 
@@ -75,6 +77,7 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 		format.setMinimumIntegerDigits(1);
 		format.setMaximumFractionDigits(2);
 		format.setGroupingUsed(false);
+
 		this.myDynModeTrajectoryStats = myDynModeTrajectoryStats;
 		this.matsimServices = matsimServices;
 		this.drtCfg = drtCfg;
@@ -89,9 +92,7 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 	 */
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		
-		
-		System.out.println("Here I am!");
+
 		for (Entry<Id<Vehicle>, List<String>> entry : myDynModeTrajectoryStats.vehicleTrajectoryMap.entrySet()) {
 
 			String csvfilepath = filename(event, entry.getKey().toString(), ".csv");
