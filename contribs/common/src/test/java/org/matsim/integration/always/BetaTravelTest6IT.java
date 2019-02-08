@@ -437,7 +437,7 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
 					// invalidate previous activity times because durations will change
-					act.setStartTime(Time.UNDEFINED_TIME);
+					act.setStartTime(Time.getUndefinedTime());
 
 					// handle first activity
 					if (i == 0) {
@@ -449,14 +449,14 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 						// handle middle activities
 						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time
 						act.setMaximumDuration(6*3600); // <-- This line differs from the original PlanMutateTimeAllocation, use a fix time to minimize effect of act-duration on score
-						act.setEndTime(Time.UNDEFINED_TIME); // <-- This line differs from the original PlanMutateTimeAllocation
+						act.setEndTime(Time.getUndefinedTime()); // <-- This line differs from the original PlanMutateTimeAllocation
 						now += 6*3600.0;
 					} else {
 						// handle last activity
 						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time
 						// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-						act.setMaximumDuration(Time.UNDEFINED_TIME);
-						act.setEndTime(Time.UNDEFINED_TIME);
+						act.setMaximumDuration(Time.getUndefinedTime());
+						act.setEndTime(Time.getUndefinedTime());
 					}
 
 				}
@@ -467,7 +467,7 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 					// assume that there will be no delay between end time of previous activity and departure time
 					leg.setDepartureTime(now);
 					// let duration untouched. if defined add it to now
-					if (leg.getTravelTime() != Time.UNDEFINED_TIME) {
+					if (!Time.isUndefinedTime(leg.getTravelTime())) {
 						now += leg.getTravelTime();
 					}
 					// set planned arrival time accordingly
@@ -480,7 +480,7 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 
 		private double mutateTime(final double time) {
 			double t = time;
-			if (t != Time.UNDEFINED_TIME) {
+			if (!Time.isUndefinedTime(t)) {
 				t = t + (int)((MatsimRandom.getRandom().nextDouble() * 2.0 - 1.0) * this.mutationRange);
 				if (t < 0) t = 0;
 				if (t > 24*3600) t = 24*3600;

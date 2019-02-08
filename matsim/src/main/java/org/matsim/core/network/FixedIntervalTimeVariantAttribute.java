@@ -117,7 +117,7 @@ implements TimeVariantAttribute
 	@Override
 	public double getValue(final double time)
 	{
-		if (time == Time.UNDEFINED_TIME || eventsCount == 0) {
+		if (Time.isUndefinedTime(time) || eventsCount == 0) {
 			return baseValue;
 		}
 
