@@ -110,7 +110,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 					act.setStartTime(now);
 					if (!this.stageActivities.isStageActivity(act.getType())) {
 						if (this.useActivityDurations) {
-							if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
+							if (!Time.isUndefinedTime(act.getMaximumDuration())) {
 								// mutate the durations of all 'middle' activities
 								if (affectingDuration) {
 									act.setMaximumDuration(mutateTime(act.getMaximumDuration(), mutationRange));
@@ -130,7 +130,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 							}
 						}
 						else {
-							if (act.getEndTime() == Time.UNDEFINED_TIME) {
+							if (Time.isUndefinedTime(act.getEndTime())) {
 								throw new IllegalStateException("Can not mutate activity end time because it is not set for Person: " + plan.getPerson().getId());
 							}
 							double newEndTime = mutateTime(act.getEndTime(), mutationRange);
@@ -147,8 +147,8 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
 					// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-					act.setMaximumDuration(Time.UNDEFINED_TIME);
-					act.setEndTime(Time.UNDEFINED_TIME);
+					act.setMaximumDuration(Time.getUndefinedTime());
+					act.setEndTime(Time.getUndefinedTime());
 				}
 
 			} else {
@@ -157,7 +157,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepartureTime(now);
 				// let duration untouched. if defined add it to now
-				if (leg.getTravelTime() != Time.UNDEFINED_TIME) {
+				if (!Time.isUndefinedTime(leg.getTravelTime())) {
 					now += leg.getTravelTime();
 				}
 				final double arrTime = now;
@@ -169,7 +169,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 
 	private double mutateTime(final double time, final double mutationRange) {
 		double t = time;
-		if (t != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(t)) {
 			t = t + (int)((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);
 			if (t < 0) t = 0;
 			if (t > 24*3600) t = 24*3600;

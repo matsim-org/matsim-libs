@@ -188,19 +188,19 @@ public abstract class TransitScheduleValidator {
 				
 				if (stopCount > 0) {
 					TransitRouteStop stop = stops.get(0);
-					if (stop.getDepartureOffset() == Time.UNDEFINED_TIME) {
+					if (Time.isUndefinedTime(stop.getDepartureOffset())) {
 						result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": The first stop does not contain any departure offset.");
 					}
 					
 					for (int i = 1; i < stopCount - 1; i++) {
 						stop = stops.get(i);
-						if (stop.getDepartureOffset() == Time.UNDEFINED_TIME) {
+						if (Time.isUndefinedTime(stop.getDepartureOffset())) {
 							result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": Stop " + i + " does not contain any departure offset.");
 						}
 					}
 					
 					stop = stops.get(stopCount - 1);
-					if (stop.getArrivalOffset() == Time.UNDEFINED_TIME) {
+					if (Time.isUndefinedTime(stop.getArrivalOffset())) {
 						result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": The last stop does not contain any arrival offset.");
 					}
 				} else {

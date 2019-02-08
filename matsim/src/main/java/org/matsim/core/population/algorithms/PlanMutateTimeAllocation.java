@@ -20,16 +20,14 @@
 
 package org.matsim.core.population.algorithms;
 
-import java.util.List;
-import java.util.Random;
-
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.misc.Time;
+
+import java.util.List;
+import java.util.Random;
 
 /**
  * Mutates the duration of activities randomly within a specified range.
@@ -87,7 +85,7 @@ public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
-						if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
+						if (!Time.isUndefinedTime(act.getMaximumDuration())) {
 							// mutate the durations of all 'middle' activities
 							act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
 							now += act.getMaximumDuration();
@@ -107,8 +105,8 @@ public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
 					// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-					act.setMaximumDuration(Time.UNDEFINED_TIME);
-					act.setEndTime(Time.UNDEFINED_TIME);
+					act.setMaximumDuration(Time.getUndefinedTime());
+					act.setEndTime(Time.getUndefinedTime());
 
 				}
 
@@ -119,7 +117,7 @@ public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepartureTime(now);
 				// let duration untouched. if defined add it to now
-				if (leg.getTravelTime() != Time.UNDEFINED_TIME) {
+				if (!Time.isUndefinedTime(leg.getTravelTime())) {
 					now += leg.getTravelTime();
 				}
 				final double arrTime = now;
@@ -132,7 +130,7 @@ public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 	private double mutateTime(final double time) {
 		double t = time;
-		if (t != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(t)) {
 			t = t + (int)((this.random.nextDouble() * 2.0 - 1.0) * this.mutationRange);
 			if (t < 0) t = 0;
 			if (t > 24*3600) t = 24*3600;
