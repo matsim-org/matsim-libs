@@ -54,8 +54,8 @@ public class MyDrtTrajectoryAnalysisModule extends AbstractDvrpModeModule {
 								getter.getModal(Fleet.class), getter.get(ElectricFleet.class))))
 						.asEagerSingleton();
 
-				addControlerListenerBinding()
-						.toProvider(modalProvider(getter -> new DrtTrajectryControlerListener(getter.get(Config.class),
+				addMobsimListenerBinding().toProvider(
+						modalProvider(getter -> new DrtTrajectryMobsimListener(getter.get(Config.class),
 								drtCfg, getter.getModal(MyDynModeTrajectoryStats.class),
 								getter.get(MatsimServices.class), getter.get(Network.class))));
 						
