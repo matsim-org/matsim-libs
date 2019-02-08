@@ -41,6 +41,7 @@ import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -186,7 +187,7 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 
 		return new CharyparNagelLegScoring(
 				new ScoringParameters.Builder(conf, conf.getScoringParameters(null), scenarioConfig).build(),
-				network);
+				network, new TransitConfigGroup().getTransitModes());
 	}
 
 	private static CharyparNagelLegScoring createScoringOnlyConstants(final Network network) {
@@ -205,7 +206,7 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 
 		return new CharyparNagelLegScoring(
 				new ScoringParameters.Builder(conf, conf.getScoringParameters(null), scenarioConfig).build(),
-				network);
+				network, new TransitConfigGroup().getTransitModes());
 	}
 
 	private static Network createNetwork() {

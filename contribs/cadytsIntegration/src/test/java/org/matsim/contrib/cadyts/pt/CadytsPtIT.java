@@ -20,10 +20,10 @@
 
 package org.matsim.contrib.cadyts.pt;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
+import cadyts.measurements.SingleLinkMeasurement;
+import cadyts.utilities.io.tabularFileParser.TabularFileParser;
+import cadyts.utilities.misc.DynamicData;
+import com.google.inject.Provider;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,8 +57,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -66,13 +66,10 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.google.inject.Provider;
-
-import cadyts.measurements.SingleLinkMeasurement;
-import cadyts.utilities.io.tabularFileParser.TabularFileParser;
-import cadyts.utilities.misc.DynamicData;
-
 import javax.inject.Inject;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CadytsPtIT {
 
@@ -170,7 +167,7 @@ public class CadytsPtIT {
 				final ScoringParameters params = parameters.getScoringParameters(person);
 
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network, config.transit().getTransitModes()));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 

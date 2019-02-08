@@ -1,9 +1,5 @@
 package org.matsim.contrib.carsharing.scoring;
 
-import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -17,8 +13,6 @@ import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.functions.ScoringParameters;
-
-import com.google.common.collect.ImmutableSet;
 
 
 public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring {
@@ -42,7 +36,7 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 			CostsCalculatorContainer costsCalculatorContainer, CarsharingSupplyInterface carsharingSupplyContainer,
 			Person person)
 	{
-		super(params, network);
+		super(params, network, config.transit().getTransitModes());
 		this.config = config;
 		this.demandHandler = demandHandler;
 		this.carsharingSupplyContainer = carsharingSupplyContainer;
