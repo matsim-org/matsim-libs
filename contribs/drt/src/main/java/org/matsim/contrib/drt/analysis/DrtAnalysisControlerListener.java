@@ -74,9 +74,10 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
+		boolean createGraphs = event.getServices().getConfig().controler().isCreateGraphs();
 
 		drtRequestAnalyzer.writeAndPlotWaitTimeEstimateComparison(filename(event, "waitTimeComparison", ".png"),
-				filename(event, "waitTimeComparison", ".csv"));
+				filename(event, "waitTimeComparison", ".csv"), createGraphs);
 		List<DynModeTrip> trips = drtPassengerStats.getDrtTrips();
 
 		DynModeTripsAnalyser.collection2Text(drtRequestAnalyzer.getRejections(),
@@ -102,8 +103,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		}
 		DynModeTripsAnalyser.writeVehicleDistances(drtPassengerStats.getVehicleDistances(),
 				filename(event, "vehicleDistanceStats", ".csv"));
-		DynModeTripsAnalyser.analyseDetours(network, trips, drtCfg, filename(event, "drt_detours"));
-		DynModeTripsAnalyser.analyseWaitTimes(filename(event, "waitStats"), trips, 1800);
+		DynModeTripsAnalyser.analyseDetours(network, trips, drtCfg, filename(event, "drt_detours"), createGraphs);
+		DynModeTripsAnalyser.analyseWaitTimes(filename(event, "waitStats"), trips, 1800, createGraphs);
 
 		double endTime = qSimCfg.getEndTime();
 		if (Time.isUndefinedTime(endTime)) {
