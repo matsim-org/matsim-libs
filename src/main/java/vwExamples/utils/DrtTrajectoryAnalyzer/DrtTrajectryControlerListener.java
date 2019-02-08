@@ -68,7 +68,7 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 	 */
 	@Inject
 	public DrtTrajectryControlerListener(Config config, DrtConfigGroup drtCfg,
-                                         MyDynModeTrajectoryStats myDynModeTrajectoryStats,Fleet fleet, MatsimServices matsimServices, Network network) {
+                                         MyDynModeTrajectoryStats myDynModeTrajectoryStats, MatsimServices matsimServices, Network network) {
 		drtgroup = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 		runId = config.controler().getRunId();
 
@@ -76,7 +76,6 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 		format.setMinimumIntegerDigits(1);
 		format.setMaximumFractionDigits(2);
 		format.setGroupingUsed(false);
-
 		this.myDynModeTrajectoryStats = myDynModeTrajectoryStats;
 		this.matsimServices = matsimServices;
 		this.drtCfg = drtCfg;
@@ -93,7 +92,7 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
 		
-
+		System.out.println("Here I am!");
 		for (Entry<Id<Vehicle>, List<String>> entry : myDynModeTrajectoryStats.vehicleTrajectoryMap.entrySet()) {
 
 			String csvfilepath = filename(event, entry.getKey().toString(), ".csv");

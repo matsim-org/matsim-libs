@@ -25,6 +25,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.ev.data.ElectricFleet;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -43,15 +44,25 @@ public class MyDrtTrajectoryAnalysisModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		bindModal(MyDynModeTrajectoryStats.class)
-				.toProvider(modalProvider(getter -> new MyDynModeTrajectoryStats(getter.get(Network.class),
-						getter.get(EventsManager.class), drtCfg, getter.getModal(FleetSpecification.class),
-						getter.getModal(Fleet.class), getter.get(ElectricFleet.class))))
-				.asEagerSingleton();
 
-		addControlerListenerBinding()
-				.toProvider(modalProvider(getter -> new DrtTrajectryControlerListener(getter.get(Config.class), drtCfg,
-						getter.getModal(MyDynModeTrajectoryStats.class),getter.getModal(Fleet.class), getter.get(MatsimServices.class),
-						getter.get(Network.class))));
+		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
+			@Override
+			protected void configureQSim() {
+				bindModal(MyDynModeTrajectoryStats.class)
+						.toProvider(modalProvider(getter -> new MyDynModeTrajectoryStats(getter.get(Network.class),
+								getter.get(EventsManager.class), drtCfg, getter.getModal(FleetSpecification.class),
+								getter.getModal(Fleet.class), getter.get(ElectricFleet.class))))
+						.asEagerSingleton();
+
+				addControlerListenerBinding()
+						.toProvider(modalProvider(getter -> new DrtTrajectryControlerListener(getter.get(Config.class),
+								drtCfg, getter.getModal(MyDynModeTrajectoryStats.class),
+								getter.get(MatsimServices.class), getter.get(Network.class))));
+						
+
+			}
+		});
+
 	}
+
 }

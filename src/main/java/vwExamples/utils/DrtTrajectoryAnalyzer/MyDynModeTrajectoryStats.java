@@ -152,6 +152,7 @@ public class MyDynModeTrajectoryStats
 			String line = (vehicleID + sep + acutalTime + sep + occupancy + sep + dist + sep + actualTaskType + sep + x
 					+ sep + y + sep + tt + sep + v_meterPerSec + sep + currentSoc);
 
+			
 			if (vehicleTrajectoryMap.containsKey(vid))
 			{
 				vehicleTrajectoryMap.get(vid).add(line);
