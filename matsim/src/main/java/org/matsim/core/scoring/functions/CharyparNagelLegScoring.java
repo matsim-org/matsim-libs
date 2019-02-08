@@ -50,19 +50,21 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 	/** The parameters used for scoring */
 	protected final ScoringParameters params;
 	protected Network network;
-	private boolean nextEnterVehicleIsFirstOfTrip = true ;
-	private boolean nextStartPtLegIsFirstOfTrip = true ;
+	private boolean nextEnterVehicleIsFirstOfTrip = true;
+	private boolean nextStartPtLegIsFirstOfTrip = true;
 	private boolean currentLegIsPtLeg = false;
-	private double lastActivityEndTime = Time.UNDEFINED_TIME ;
+	private double lastActivityEndTime = Time.getUndefinedTime();
+	private final Set<String> ptModes;
 	
 	private Set<String> modesAlreadyConsideredForDailyConstants;
 	
-	public CharyparNagelLegScoring(final ScoringParameters params, Network network) {
+	public CharyparNagelLegScoring(final ScoringParameters params, Network network, Set<String> ptModes) {
 		this.params = params;
 		this.network = network;
 		this.nextEnterVehicleIsFirstOfTrip = true ;
 		this.nextStartPtLegIsFirstOfTrip = true ;
 		this.currentLegIsPtLeg = false;
+		this.ptModes = ptModes;
 		modesAlreadyConsideredForDailyConstants = new HashSet<>();
 	}
 
@@ -149,10 +151,10 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		if ( event instanceof PersonDepartureEvent ) {
 			String mode = ((PersonDepartureEvent)event).getLegMode();
 			
-			this.currentLegIsPtLeg = TransportMode.pt.equals( mode  );
+			this.currentLegIsPtLeg = this.ptModes.contains(mode);
 			if ( currentLegIsPtLeg ) {
 				if ( !this.nextStartPtLegIsFirstOfTrip ) {
-					this.score -= params.modeParams.get(TransportMode.pt).constant ;
+					this.score -= params.modeParams.get(mode).constant ;
 					// (yyyy deducting this again, since is it wrongly added above.  should be consolidated; this is so the code
 					// modification is minimally invasive.  kai, dec'12)
 				}

@@ -47,7 +47,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -157,20 +156,20 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 	 */
 	private static class LinkAnalyzer implements LinkEnterEventHandler, LinkLeaveEventHandler {
 		private final String linkId;
-		protected double firstCarEnter = Double.POSITIVE_INFINITY;
-		protected double lastCarEnter = Double.NEGATIVE_INFINITY;
-		protected double firstCarLeave = Double.POSITIVE_INFINITY;
-		protected double lastCarLeave = Double.NEGATIVE_INFINITY;
-		protected int maxCarsOnLink = Integer.MIN_VALUE;
-		protected double maxCarsOnLinkTime = Double.NEGATIVE_INFINITY;
+		double firstCarEnter = Double.POSITIVE_INFINITY;
+		double lastCarEnter = Double.NEGATIVE_INFINITY;
+		double firstCarLeave = Double.POSITIVE_INFINITY;
+		double lastCarLeave = Double.NEGATIVE_INFINITY;
+		int maxCarsOnLink = Integer.MIN_VALUE;
+		double maxCarsOnLinkTime = Double.NEGATIVE_INFINITY;
 		private int iteration = -1;
 
-		private final ArrayList<Double> enterTimes = new ArrayList<Double>(100);
-		private final ArrayList<Double> leaveTimes = new ArrayList<Double>(100);
+		private final ArrayList<Double> enterTimes = new ArrayList<>(100);
+		private final ArrayList<Double> leaveTimes = new ArrayList<>(100);
 
 		private static final Logger log = Logger.getLogger(TestControlerListener.class);
 
-		protected LinkAnalyzer(final String linkId) {
+		LinkAnalyzer(final String linkId) {
 			this.linkId = linkId;
 			reset(0);
 		}
@@ -267,10 +266,10 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 			StrategyManager manager = new StrategyManager();
 			manager.setMaxPlansPerAgent(5);
 
-			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector<Plan, Person>(config.planCalcScore()));
+			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector<>(config.planCalcScore()));
 			manager.addStrategyForDefaultSubpopulation(strategy1, 0.80);
 
-			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
+			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector<>());
 			strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(config.global().getNumberOfThreads()));
 			
 			// Trying to replace this by the standard mutator ...
@@ -302,7 +301,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 		private final LinkAnalyzer la = new LinkAnalyzer("15");
 		private BottleneckTravelTimeAnalyzer ttAnalyzer = null;
 
-		public TestControlerListener() {
+		TestControlerListener() {
 			// empty public constructor for private class
 		}
 
@@ -428,7 +427,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 
 		private final int mutationRange;
 
-		protected PlanMutateTimeAllocationBottleneck(final int mutationRange) {
+		PlanMutateTimeAllocationBottleneck(final int mutationRange) {
 			this.mutationRange = mutationRange;
 		}
 
@@ -448,7 +447,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
 					// invalidate previous activity times because durations will change
-					act.setStartTime(Time.UNDEFINED_TIME);
+					act.setStartTime(Time.getUndefinedTime());
 
 					// handle first activity
 					if (i == 0) {
@@ -460,14 +459,14 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 						// handle middle activities
 						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time
 						act.setMaximumDuration(6*3600); // <-- This line differs from the original PlanMutateTimeAllocation, use a fix time to minimize effect of act-duration on score
-						act.setEndTime(Time.UNDEFINED_TIME); // <-- This line differs from the original PlanMutateTimeAllocation
+						act.setEndTime(Time.getUndefinedTime()); // <-- This line differs from the original PlanMutateTimeAllocation
 						now += 6*3600.0;
 					} else {
 						// handle last activity
 						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time
 						// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-						act.setMaximumDuration(Time.UNDEFINED_TIME);
-						act.setEndTime(Time.UNDEFINED_TIME);
+						act.setMaximumDuration(Time.getUndefinedTime());
+						act.setEndTime(Time.getUndefinedTime());
 					}
 
 				}
@@ -478,7 +477,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 					// assume that there will be no delay between end time of previous activity and departure time
 					leg.setDepartureTime(now);
 					// let duration untouched. if defined add it to now
-					if (leg.getTravelTime() != Time.UNDEFINED_TIME) {
+					if (!Time.isUndefinedTime(leg.getTravelTime())) {
 						now += leg.getTravelTime();
 					}
 					// set planned arrival time accordingly
@@ -491,7 +490,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 
 		private double mutateTime(final double time) {
 			double t = time;
-			if (t != Time.UNDEFINED_TIME) {
+			if (!Time.isUndefinedTime(t)) {
 				t = t + (int)((MatsimRandom.getRandom().nextDouble() * 2.0 - 1.0) * this.mutationRange);
 				if (t < 0) t = 0;
 				if (t > 24*3600) t = 24*3600;
@@ -518,7 +517,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 		private final double[] depTimes;
 		private final double[] arrTimes;
 
-		protected BottleneckTravelTimeAnalyzer(final int popSize) {
+		BottleneckTravelTimeAnalyzer(final int popSize) {
 			this.depTimes = new double[popSize];
 			this.arrTimes = new double[popSize];
 		}
@@ -548,7 +547,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 			this.agentCounter = 0;
 		}
 
-		protected void plot(final String filename) {
+		void plot(final String filename) {
 			XYScatterChart graph = new XYScatterChart("Bottleneck Analysis", "departure time", "arrival time");
 			graph.addSeries("", this.depTimes, this.arrTimes);
 			graph.saveAsPng(filename, 800, 600);

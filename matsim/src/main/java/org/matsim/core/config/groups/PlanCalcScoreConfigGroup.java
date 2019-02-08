@@ -855,12 +855,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		// ---
 
 		private double priority = 1.0;
-		private double typicalDuration = Time.UNDEFINED_TIME;
-		private double minimalDuration = Time.UNDEFINED_TIME;
-		private double openingTime = Time.UNDEFINED_TIME;
-		private double latestStartTime = Time.UNDEFINED_TIME;
-		private double earliestEndTime = Time.UNDEFINED_TIME;
-		private double closingTime = Time.UNDEFINED_TIME;
+		private double typicalDuration = Time.getUndefinedTime();
+		private double minimalDuration = Time.getUndefinedTime();
+		private double openingTime = Time.getUndefinedTime();
+		private double latestStartTime = Time.getUndefinedTime();
+		private double earliestEndTime = Time.getUndefinedTime();
+		private double closingTime = Time.getUndefinedTime();
 
 		public ActivityParams() {
 			super(SET_TYPE);
@@ -878,10 +878,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			StringBuilder str = new StringBuilder();
 			str.append("method to compute score at typical duration.  Options: | ");
 			for (TypicalDurationScoreComputation value : TypicalDurationScoreComputation.values()) {
-				str.append(value.name() + " | ");
+				str.append(value.name());
+				str.append(" | ");
 			}
-			str.append("Use " + TypicalDurationScoreComputation.uniform.name()
-					+ " for backwards compatibility (all activities same score; higher proba to drop long acts).");
+			str.append("Use ");
+			str.append(TypicalDurationScoreComputation.uniform.name());
+			str.append(" for backwards compatibility (all activities same score; higher proba to drop long acts).");
 			map.put(TYPICAL_DURATION_SCORE_COMPUTATION, str.toString());
 			// ---
 			map.put(TYPICAL_DURATION, TYPICAL_DURATION_CMT);
@@ -930,7 +932,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		public void setMinimalDuration(final double minimalDuration) {
 			testForLocked();
-			if ((minimalDuration != Time.UNDEFINED_TIME) && (minDurCnt < 1)) {
+			if ((!Time.isUndefinedTime(minimalDuration)) && (minDurCnt < 1)) {
 				minDurCnt++;
 				log.warn(
 						"Setting minimalDuration different from zero is discouraged.  It is probably implemented correctly, "
@@ -1472,11 +1474,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 				if (actType.isScoringThisActivityAtAll()) {
 					// (checking consistency only if activity is scored at all)
 
-					if ((actType.getOpeningTime() != Time.UNDEFINED_TIME)
-							&& (actType.getClosingTime() != Time.UNDEFINED_TIME)) {
+					if ((!Time.isUndefinedTime(actType.getOpeningTime()))
+							&& (!Time.isUndefinedTime(actType.getClosingTime()))) {
 						hasOpeningAndClosingTime = true;
 					}
-					if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (getLateArrival_utils_hr() < -0.001)) {
+					if ((!Time.isUndefinedTime(actType.getOpeningTime())) && (getLateArrival_utils_hr() < -0.001)) {
 						hasOpeningTimeAndLatePenalty = true;
 					}
 					if (actType.getOpeningTime() == 0. && actType.getClosingTime() > 24. * 3600 - 1) {

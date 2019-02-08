@@ -209,7 +209,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public double getFlowCapacityPerSec() {
-		return getFlowCapacityPerSec(Time.UNDEFINED_TIME);
+		return getFlowCapacityPerSec(Time.getUndefinedTime());
 	}
 	@Override
 	public double getFlowCapacityPerSec(@SuppressWarnings("unused") final double time) {

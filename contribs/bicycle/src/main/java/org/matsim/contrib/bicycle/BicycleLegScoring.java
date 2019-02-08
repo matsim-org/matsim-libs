@@ -20,10 +20,6 @@
 
 package org.matsim.contrib.bicycle;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -31,6 +27,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author dziemke
@@ -42,8 +42,8 @@ public class BicycleLegScoring extends CharyparNagelLegScoring {
 	private final double marginalUtilityOfComfort_m;
 	private final double marginalUtilityOfGradient_m_100m;
 
-	public BicycleLegScoring(final ScoringParameters params, Network network, BicycleConfigGroup bicycleConfigGroup) {
-		super(params, network);
+	public BicycleLegScoring(final ScoringParameters params, Network network, Set<String> ptModes, BicycleConfigGroup bicycleConfigGroup) {
+		super(params, network, ptModes);
 
 		this.marginalUtilityOfInfrastructure_m = bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m();
 		this.marginalUtilityOfComfort_m = bicycleConfigGroup.getMarginalUtilityOfComfort_m();
