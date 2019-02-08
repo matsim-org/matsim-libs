@@ -68,6 +68,7 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 		super(nOfThreads);
 		this.availableModes = modes.clone();
 		this.ignoreCarAvailability = ignoreCarAvailabilty;
+		this.allowSwitchFromListedModesOnly = allowSwitchFromListedModesOnly;
 	}
 
 	@Override

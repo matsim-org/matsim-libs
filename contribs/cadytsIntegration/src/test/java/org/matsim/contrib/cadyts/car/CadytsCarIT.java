@@ -20,9 +20,9 @@
 
 package org.matsim.contrib.cadyts.car;
 
-import java.io.IOException;
-import java.util.Collections;
-
+import cadyts.measurements.SingleLinkMeasurement;
+import cadyts.utilities.io.tabularFileParser.TabularFileParser;
+import cadyts.utilities.misc.DynamicData;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,12 +41,16 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.*;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.ControlerI;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioByConfigModule;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -54,18 +58,16 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.testcases.MatsimTestUtils;
 
-import cadyts.measurements.SingleLinkMeasurement;
-import cadyts.utilities.io.tabularFileParser.TabularFileParser;
-import cadyts.utilities.misc.DynamicData;
-
 import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Collections;
 
 /**
  * This is a modified copy of CadytsIntegrationTest (which is used for the cadyts pt integration)
@@ -187,7 +189,7 @@ public class CadytsCarIT {
 								final ScoringParameters params = parameters.getScoringParameters(person);
 
 								SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-								scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));
+								scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network, config.transit().getTransitModes()));
 								scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 								scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 

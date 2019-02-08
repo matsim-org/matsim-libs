@@ -69,7 +69,7 @@ public class RunCadyts4CarExample {
 				final ScoringParameters params = parameters.getScoringParameters(person);
 				
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork(), config.transit().getTransitModes()));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 

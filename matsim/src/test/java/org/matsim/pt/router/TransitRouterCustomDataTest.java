@@ -78,7 +78,7 @@ public class TransitRouterCustomDataTest {
 	private static class MockingTransitTravelDisutility implements TransitTravelDisutility {
 
 		private final TransitRouterNetworkTravelTimeAndDisutility routerDisutility;
-		private ArrayList<String> states = new ArrayList<String>();
+		private ArrayList<String> states = new ArrayList<>();
 		
 		public MockingTransitTravelDisutility(final TransitRouterNetworkTravelTimeAndDisutility routerDisutility) {
 			this.routerDisutility = routerDisutility;
@@ -91,7 +91,7 @@ public class TransitRouterCustomDataTest {
 
 			System.out.print("handling link " + ((TransitRouterNetworkNode) link.getFromNode()).getStop().getStopFacility().getId() 
 					+ ">" + ((TransitRouterNetworkNode) link.getToNode()).getStop().getStopFacility().getId());
-			ArrayList<LoggerData> links = new ArrayList<LoggerData>();
+			ArrayList<LoggerData> links = new ArrayList<>();
 			Object o = dataManager.getFromNodeCustomData();
 			if (o instanceof ArrayList) {
 				links.addAll((Collection<? extends LoggerData>) o);
@@ -163,22 +163,22 @@ public class TransitRouterCustomDataTest {
 		schedule.addStopFacility(f5);
 		
 		TransitLine line1 = f.createTransitLine(Id.create("1", TransitLine.class));
-		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		stops.add(f.createTransitRouteStop(f1, Time.UNDEFINED_TIME, 0.0));
-		stops.add(f.createTransitRouteStop(f2, Time.UNDEFINED_TIME, 300.0));
-		stops.add(f.createTransitRouteStop(f3, Time.UNDEFINED_TIME, 600.0));
-		stops.add(f.createTransitRouteStop(f4, Time.UNDEFINED_TIME, 900.0));
-		stops.add(f.createTransitRouteStop(f5, 1200.0, Time.UNDEFINED_TIME));
+		List<TransitRouteStop> stops = new ArrayList<>();
+		stops.add(f.createTransitRouteStop(f1, Time.getUndefinedTime(), 0.0));
+		stops.add(f.createTransitRouteStop(f2, Time.getUndefinedTime(), 300.0));
+		stops.add(f.createTransitRouteStop(f3, Time.getUndefinedTime(), 600.0));
+		stops.add(f.createTransitRouteStop(f4, Time.getUndefinedTime(), 900.0));
+		stops.add(f.createTransitRouteStop(f5, 1200.0, Time.getUndefinedTime()));
 		TransitRoute route1 = f.createTransitRoute(Id.create("1", TransitRoute.class), null, stops, "pt");
 		line1.addRoute(route1);
 		schedule.addTransitLine(line1);
 		route1.addDeparture(f.createDeparture(Id.create("1", Departure.class), 6.0*3600));
 		
 		TransitLine line2 = f.createTransitLine(Id.create("2", TransitLine.class));
-		List<TransitRouteStop> stops2 = new ArrayList<TransitRouteStop>();
-		stops2.add(f.createTransitRouteStop(f1, Time.UNDEFINED_TIME, 0.0));
-		stops2.add(f.createTransitRouteStop(f3, Time.UNDEFINED_TIME, 750.0));
-		stops2.add(f.createTransitRouteStop(f5, 1100.0, Time.UNDEFINED_TIME));
+		List<TransitRouteStop> stops2 = new ArrayList<>();
+		stops2.add(f.createTransitRouteStop(f1, Time.getUndefinedTime(), 0.0));
+		stops2.add(f.createTransitRouteStop(f3, Time.getUndefinedTime(), 750.0));
+		stops2.add(f.createTransitRouteStop(f5, 1100.0, Time.getUndefinedTime()));
 		TransitRoute route2 = f.createTransitRoute(Id.create("2", TransitRoute.class), null, stops2, "pt");
 		line2.addRoute(route2);
 		schedule.addTransitLine(line2);
