@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -64,6 +65,7 @@ public class LanesIT {
 		config.network().setInputFile("network.xml");
 		config.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		config.plans().setInputFile("population.xml");
+		config.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra);
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "output");
 		final int lastIteration = 50;
 		config.controler().setLastIteration(lastIteration);
