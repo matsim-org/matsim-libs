@@ -68,7 +68,7 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 	 */
 	@Inject
 	public DrtTrajectryControlerListener(Config config, DrtConfigGroup drtCfg,
-                                         MyDynModeTrajectoryStats myDynModeTrajectoryStats, MatsimServices matsimServices, Network network) {
+                                         MyDynModeTrajectoryStats myDynModeTrajectoryStats,Fleet fleet, MatsimServices matsimServices, Network network) {
 		drtgroup = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 		runId = config.controler().getRunId();
 

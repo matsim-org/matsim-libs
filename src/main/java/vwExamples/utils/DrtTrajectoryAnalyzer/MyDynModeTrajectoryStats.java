@@ -265,9 +265,8 @@ public class MyDynModeTrajectoryStats
 
 			double v_meterPerSec = Double.NaN;
 
-			//DrtTask actualTask = (DrtTask) fleetSpecification.getVehicleSpecifications().get(event.getVehicleId()).getSchedule().getCurrentTask();
-			//String actualTaskType = actualTask.getDrtTaskType().toString();
-			String actualTaskType = "Missing";
+			DrtTask actualTask = (DrtTask) fleet.getVehicles().get(Id.create(vehicleID, DvrpVehicle.class)).getSchedule().getCurrentTask();
+			String actualTaskType = actualTask.getDrtTaskType().toString();
 
 			Id<ElectricVehicle> evId = Id.create(event.getVehicleId(), ElectricVehicle.class);
 			double currentSoc = EvUnits.J_to_kWh(electricFleet.getElectricVehicles().get(evId).getBattery().getSoc());
@@ -326,9 +325,8 @@ public class MyDynModeTrajectoryStats
 			vehDrive.movedOverNodeTime = event.getTime();
 			double v_meterPerSec = distance / tt;
 
-			//DrtTask actualTask = (DrtTask) fleetSpecification.getVehicleSpecifications().get(event.getVehicleId()).getSchedule().getCurrentTask();
-			//String actualTaskType = actualTask.getDrtTaskType().toString();
-			String actualTaskType = "Missing";
+			DrtTask actualTask = (DrtTask) fleet.getVehicles().get(Id.create(vehicleID, DvrpVehicle.class)).getSchedule().getCurrentTask();
+			String actualTaskType = actualTask.getDrtTaskType().toString();
 
 			Id<ElectricVehicle> evId = Id.create(event.getVehicleId(), ElectricVehicle.class);
 			double currentSoc = EvUnits.J_to_kWh(electricFleet.getElectricVehicles().get(evId).getBattery().getSoc());

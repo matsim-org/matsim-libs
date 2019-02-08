@@ -85,7 +85,7 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 	public static void run(int vehiclePerDepot, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "car_ptToDrt_Base_batteryChange_0C_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
+		String runId = "demo_car_ptToDrt_Base_batteryChange_0C_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
 		String inbase = "C:\\Temp\\";
