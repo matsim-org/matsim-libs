@@ -42,7 +42,7 @@ import javax.inject.Inject;
  */
 public final class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 
-	protected Network network;
+	private Network network;
 
 	private final ScoringParametersForPerson params;
 
