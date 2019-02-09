@@ -74,9 +74,11 @@ public class DrtVehicleOccupancyProfileWriter implements MobsimBeforeCleanupList
 			}
 		}
 
-		DefaultTableXYDataset createXYDataset = createXYDataset(calculator);
-		generateImage(createXYDataset, TimeProfileCharts.ChartType.Line);
-		generateImage(createXYDataset, TimeProfileCharts.ChartType.StackedArea);
+		if (this.matsimServices.getConfig().controler().isCreateGraphs()) {
+			DefaultTableXYDataset createXYDataset = createXYDataset(calculator);
+			generateImage(createXYDataset, TimeProfileCharts.ChartType.Line);
+			generateImage(createXYDataset, TimeProfileCharts.ChartType.StackedArea);
+		}
 	}
 
 	private String[] getOccupancyValues(double[][] vehicleOccupancyProfiles, int idx) {
