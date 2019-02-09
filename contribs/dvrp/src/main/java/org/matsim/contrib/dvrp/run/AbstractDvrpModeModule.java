@@ -43,7 +43,7 @@ public abstract class AbstractDvrpModeModule extends AbstractModule {
 	}
 
 	protected <T> Key<T> modalKey(Class<T> type) {
-		return Key.get(type, DvrpModes.mode(mode));
+		return DvrpModes.key(type, mode);
 	}
 
 	protected <T> LinkedBindingBuilder<T> bindModal(Class<T> type) {

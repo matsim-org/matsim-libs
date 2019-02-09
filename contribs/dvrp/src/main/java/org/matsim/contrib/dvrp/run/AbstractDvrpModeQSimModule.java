@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.run;
 
 import java.util.function.Function;
 
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
@@ -48,11 +49,35 @@ public abstract class AbstractDvrpModeQSimModule extends AbstractQSimModule {
 	}
 
 	protected final <T> Key<T> modalKey(Class<T> type) {
-		return Key.get(type, getDvrpMode());
+		return DvrpModes.key(type, mode);
 	}
 
 	protected final <T> LinkedBindingBuilder<T> bindModal(Class<T> type) {
 		return bind(modalKey(type));
+	}
+
+	/**
+	 * Adding this method to AbstractDvrpModeQSimModule prevents accidentally calling
+	 * AbstractModule.addMobsimListenerBinding() from the AbstractDvrpModeQSimModule.configureQSim() method.
+	 * (which has happened to me at least twice, michal.mac, feb'19)
+	 * <p>
+	 * Normally, if an AbstractQSimModule class is an inner class of an outer AbstractModule class,
+	 * addMobsimListenerBinding() will call AbstractModule.addMobsimListenerBinding(), which will have no effect (
+	 * too late for adding a listener with the controller scope).
+	 * <p>
+	 * However, quite likely, the programmer intention is to add a listener with the mobsim/QSim scope, as if
+	 * addQSimComponentBinding() or addModalQSimComponentBinding() were called.
+	 * <p>
+	 * Although less likely, other methods of AbstractModule could also be accidentally called. Therefore, one should
+	 * consider prefixing calls with "this" (e.g. this.addModalQSimComponentBinding()) when an AbstractQSimModule
+	 * is inside an AbstractModule.
+	 *
+	 * @throws RuntimeException
+	 */
+	@Deprecated
+	protected final LinkedBindingBuilder<MobsimListener> addMobsimListenerBinding() {
+		throw new UnsupportedOperationException(
+				"Very likely you wanted to call addQSimComponentBinding() or addModalQSimComponentBinding()");
 	}
 
 	protected final LinkedBindingBuilder<QSimComponent> addModalQSimComponentBinding() {
