@@ -28,14 +28,12 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -96,9 +94,7 @@ public class RunDrtExampleIT {
 		controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(DrtConfigGroup.get(config).getMode()) {
 			@Override
 			protected void configureQSim() {
-				this.bind(PassengerRequestValidator.class)
-						.annotatedWith(DvrpModes.mode(TransportMode.drt))
-						.toInstance(personIdValidator);
+				bindModal(PassengerRequestValidator.class).toInstance(personIdValidator);
 			}
 		});
 		controler.run();
