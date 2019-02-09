@@ -49,7 +49,7 @@ public abstract class AbstractDvrpModeQSimModule extends AbstractQSimModule {
 	}
 
 	protected final <T> Key<T> modalKey(Class<T> type) {
-		return Key.get(type, getDvrpMode());
+		return DvrpModes.key(type, mode);
 	}
 
 	protected final <T> LinkedBindingBuilder<T> bindModal(Class<T> type) {
