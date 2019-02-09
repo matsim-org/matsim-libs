@@ -64,7 +64,7 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
-				addMobsimListenerBinding().toProvider(modalProvider(
+				addModalQSimComponentBinding().toProvider(modalProvider(
 						getter -> new DrtVehicleOccupancyProfileWriter(getter.getModal(Fleet.class),
 								getter.get(MatsimServices.class), drtCfg)));
 			}
