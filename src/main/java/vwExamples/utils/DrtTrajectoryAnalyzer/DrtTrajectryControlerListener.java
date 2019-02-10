@@ -34,8 +34,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -44,7 +44,7 @@ import com.google.inject.Inject;
  * @author saxer
  *
  */
-public class DrtTrajectryMobsimListener implements MobsimBeforeSimStepListener {
+public class DrtTrajectryControlerListener implements IterationEndsListener {
 
 	@Inject
 	MyDynModeTrajectoryStats myDynModeTrajectoryStats;
@@ -66,8 +66,9 @@ public class DrtTrajectryMobsimListener implements MobsimBeforeSimStepListener {
 	 * 
 	 */
 	@Inject
-	public DrtTrajectryMobsimListener(Config config, DrtConfigGroup drtCfg,
-                                         MyDynModeTrajectoryStats myDynModeTrajectoryStats, MatsimServices matsimServices, Network network) {
+	public DrtTrajectryControlerListener(Config config, DrtConfigGroup drtCfg,
+			MyDynModeTrajectoryStats myDynModeTrajectoryStats, MatsimServices matsimServices,
+			Network network) {
 		drtgroup = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 		runId = config.controler().getRunId();
 
@@ -75,6 +76,7 @@ public class DrtTrajectryMobsimListener implements MobsimBeforeSimStepListener {
 		format.setMinimumIntegerDigits(1);
 		format.setMaximumFractionDigits(2);
 		format.setGroupingUsed(false);
+
 		this.myDynModeTrajectoryStats = myDynModeTrajectoryStats;
 		this.matsimServices = matsimServices;
 		this.drtCfg = drtCfg;
@@ -88,12 +90,11 @@ public class DrtTrajectryMobsimListener implements MobsimBeforeSimStepListener {
 	 * org.matsim.core.controler.events. IterationEndsEvent)
 	 */
 	@Override
-	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent event) {
-		
-		System.out.println("Here I am!");
+	public void notifyIterationEnds(IterationEndsEvent event) {
+
 		for (Entry<Id<Vehicle>, List<String>> entry : myDynModeTrajectoryStats.vehicleTrajectoryMap.entrySet()) {
 
-			String csvfilepath = filename(entry.getKey().toString(), ".csv");
+			String csvfilepath = filename(event, entry.getKey().toString(), ".csv");
 			
 			try {
 				writeCSVExample(csvfilepath, entry.getValue());
@@ -109,13 +110,13 @@ public class DrtTrajectryMobsimListener implements MobsimBeforeSimStepListener {
 
 	}
 
-	private String filename(String prefix) {
-		return filename(prefix, "");
+	private String filename(IterationEndsEvent event, String prefix) {
+		return filename(event, prefix, "");
 	}
 
-	private String filename(String prefix, String extension) {
+	private String filename(IterationEndsEvent event, String prefix, String extension) {
 		return matsimServices.getControlerIO()
-				.getIterationFilename(matsimServices.getIterationNumber(), prefix + "_" + drtCfg.getMode() + extension);
+				.getIterationFilename(event.getIteration(), prefix + "_" + drtCfg.getMode() + extension);
 	}
 
 	
@@ -144,4 +145,5 @@ public class DrtTrajectryMobsimListener implements MobsimBeforeSimStepListener {
 		pw.close();
 
 	}
+
 }

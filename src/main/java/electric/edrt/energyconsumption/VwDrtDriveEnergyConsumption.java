@@ -23,7 +23,8 @@ public class VwDrtDriveEnergyConsumption implements DriveEnergyConsumption {
 	public double calcEnergyConsumption(Link link, double travelTime) {
 
 		double speed_kmh = link.getLength() / travelTime * 3.6;
-		double energyConsumtion = (0.00215147989604308*Math.pow(speed_kmh,2.0)+ 0.0315951009941873 *speed_kmh + 14.1494158004944)*link.getLength()*EvUnits.J_m_PER_kWh_100km;
+//		double energyConsumtion = (0.00215147989604308*Math.pow(speed_kmh,2.0)+ 0.0315951009941873 *speed_kmh + 14.1494158004944)*link.getLength()*EvUnits.J_m_PER_kWh_100km;
+		double energyConsumtion = (0.0015 * Math.pow(speed_kmh, 2.0) + 13)*link.getLength()*EvUnits.J_m_PER_kWh_100km;
 		double defaultConsumption = link.getLength() * consumption_per_m;
 		return energyConsumtion;
 		

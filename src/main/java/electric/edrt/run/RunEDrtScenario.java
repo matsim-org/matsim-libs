@@ -127,7 +127,7 @@ public class RunEDrtScenario {
 				bind(AuxEnergyConsumption.Factory.class).to(
 						VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
 				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
-				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(300.0)));
+				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(240.0)));
 				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
 			}
 		});

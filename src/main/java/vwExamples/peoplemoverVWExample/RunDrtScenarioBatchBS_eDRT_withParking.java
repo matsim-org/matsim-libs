@@ -72,7 +72,7 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 		int n = 5;
 		int vehicleBase= 7;
 		for (int it = 0; it < n; it++) {
-			for (int i = 0; i < count; i++) {
+			for (int i = 4; i < count; i++) {
 				int vehiclePerDepot = (int) Math.ceil(vehicleBase * (1 + i / 10.0));
 
 				run(vehiclePerDepot, it);
@@ -85,7 +85,7 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 	public static void run(int vehiclePerDepot, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "demo_car_ptToDrt_Base_batteryChange_0C_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
+		String runId = "car_ptToDrt_Base_batteryChange_0C_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
 		String inbase = "C:\\Temp\\";
@@ -180,6 +180,7 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 		vehiclesAndChargers.BATTERY_CAPACITY_KWH = 78;
 		vehiclesAndChargers.run(depotsAndVehicles);
 		vehiclesAndChargers.CHARGINGPOWER_KW = 125;
+		vehiclesAndChargers.FRACTION_OF_CHARGERS_PER_DEPOT =1.0;
 
 		drt.setVehiclesFile(inbase + "\\fleets\\fleet.xml.gz");
 		drt.setIdleVehiclesReturnToDepots(true);

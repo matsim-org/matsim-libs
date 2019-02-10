@@ -30,6 +30,7 @@ import org.matsim.contrib.ev.data.ElectricFleet;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
 /**
  * @author saxer
@@ -44,25 +45,25 @@ public class MyDrtTrajectoryAnalysisModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
+		bindModal(MyDynModeTrajectoryStats.class).toProvider(modalProvider(
+				getter -> new MyDynModeTrajectoryStats(getter.get(Network.class), getter.get(EventsManager.class),
+						drtCfg, getter.getModal(FleetSpecification.class), getter.get(ElectricFleet.class))))
+				.asEagerSingleton();
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
-				bindModal(MyDynModeTrajectoryStats.class)
-						.toProvider(modalProvider(getter -> new MyDynModeTrajectoryStats(getter.get(Network.class),
-								getter.get(EventsManager.class), drtCfg, getter.getModal(FleetSpecification.class),
-								getter.getModal(Fleet.class), getter.get(ElectricFleet.class))))
-						.asEagerSingleton();
-
-				addMobsimListenerBinding().toProvider(
-						modalProvider(getter -> new DrtTrajectryMobsimListener(getter.get(Config.class),
-								drtCfg, getter.getModal(MyDynModeTrajectoryStats.class),
-								getter.get(MatsimServices.class), getter.get(Network.class))));
-						
-
+				// this is a mobsim listener that gets notified whenever a new mobsim starts in
+				// order to set Fleet inside MyDynModeTrajectoryStats
+				addModalQSimComponentBinding().toProvider(modalProvider(getter -> (MobsimInitializedListener) (e -> {
+					getter.getModal(MyDynModeTrajectoryStats.class).setFleetOnMobsimStart(getter.getModal(Fleet.class));
+				})));
 			}
 		});
 
+		addControlerListenerBinding()
+				.toProvider(modalProvider(getter -> new DrtTrajectryControlerListener(getter.get(Config.class), drtCfg,
+						getter.getModal(MyDynModeTrajectoryStats.class), getter.get(MatsimServices.class),
+						getter.get(Network.class))));
 	}
-
 }
