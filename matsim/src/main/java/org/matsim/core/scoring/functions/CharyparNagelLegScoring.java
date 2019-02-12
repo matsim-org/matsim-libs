@@ -33,6 +33,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -61,11 +63,15 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 	public CharyparNagelLegScoring(final ScoringParameters params, Network network, Set<String> ptModes) {
 		this.params = params;
 		this.network = network;
-		this.nextEnterVehicleIsFirstOfTrip = true ;
-		this.nextStartPtLegIsFirstOfTrip = true ;
-		this.currentLegIsPtLeg = false;
 		this.ptModes = ptModes;
 		modesAlreadyConsideredForDailyConstants = new HashSet<>();
+	}
+
+	/**
+	 * Scoring with pt modes set to 'pt'
+	 */
+	public CharyparNagelLegScoring(final ScoringParameters params, Network network) {
+		this(params, network, new HashSet<>(Collections.singletonList("pt")));
 	}
 
 	@Override
@@ -161,7 +167,6 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 				this.nextStartPtLegIsFirstOfTrip = false ;
 			}
 		}
-		
 	}
 
 	@Override
@@ -169,6 +174,4 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		double legScore = calcLegScore(leg.getDepartureTime(), leg.getDepartureTime() + leg.getTravelTime(), leg);
 		this.score += legScore;
 	}
-
-
 }
