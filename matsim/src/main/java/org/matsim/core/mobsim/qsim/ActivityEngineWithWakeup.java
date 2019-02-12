@@ -31,6 +31,8 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.jdeqsim.Message;
+import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.qsim.ActivityEngine.AgentEntry;
 import org.matsim.core.mobsim.qsim.ActivityEngine.AgentEntryComparator;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
@@ -57,6 +59,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	// after mobsim the alterations to the plans are deleted (a reset is needed before next iteration in any case)? Don't we need rather something like "executed plan"
 
 	private final Map<String, DepartureHandler> departureHandlers;
+	private final MessageQueue messageQueue;
 	private final Scenario scenario;
 	private final ActivityFacilities facilities;
 	private final double beelineWalkSpeed;
@@ -66,8 +69,9 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 
 	@Inject
 	public ActivityEngineWithWakeup( EventsManager eventsManager, Map<String, DepartureHandler> departureHandlers,
-				     TripRouter tripRouter, Scenario scenario, QSim qsim, Config config ) {
+						   TripRouter tripRouter, Scenario scenario, QSim qsim, Config config, MessageQueue messageQueue ) {
 		this.departureHandlers = departureHandlers;
+		this.messageQueue = messageQueue;
 		this.editTrips = new EditTrips( tripRouter, scenario ) ;
 		this.editPlans = new EditPlans(qsim, tripRouter, editTrips);
 		this.delegate = new ActivityEngine( eventsManager ) ;
@@ -246,6 +250,23 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
+
+		Message message = new Message(){
+
+			@Override
+			public void processEvent(){
+				throw new RuntimeException( "not implemented" );
+			}
+
+			@Override
+			public void handleMessage(){
+				throw new RuntimeException( "not implemented" );
+			}
+		} ;
+		message.setMessageArrivalTime( 900. );
+		message.
+		this.messageQueue.putMessage( message );
+
 		return delegate.handleActivity( agent ) ;
 	}
 
@@ -266,7 +287,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 		@Override
 		public void handleEvent( Event event ){
 			if ( event instanceof PersonInformationEvent ) {
-				delegate.
+//				delegate.
 			}
 		}
 	}
