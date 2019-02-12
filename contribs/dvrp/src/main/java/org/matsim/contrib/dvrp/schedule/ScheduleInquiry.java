@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * @author michalm

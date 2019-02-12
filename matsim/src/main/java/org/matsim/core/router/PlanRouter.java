@@ -172,7 +172,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			final Plan plan,
 			final Config config ) {
 		
-		if (activity.getEndTime() != Time.UNDEFINED_TIME) return activity.getEndTime();
+		if (!Time.isUndefinedTime(activity.getEndTime())) return activity.getEndTime();
 
 		// no sufficient information in the activity...
 		// do it the long way.
@@ -219,7 +219,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 //			}
 		}
 		double tt = ((Leg) pe).getTravelTime();
-		return now + (tt != Time.UNDEFINED_TIME ? tt : 0);
+		return now + (Time.isUndefinedTime(tt) ? 0 : tt);
 	}	
 }
 

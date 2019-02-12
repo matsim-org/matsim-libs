@@ -90,7 +90,7 @@ public class ChangeableNetworkCreator {
 		EventsManager manager = EventsUtils.createEventsManager();
 	
 		TravelTimeCalculatorConfigGroup ttccg = new TravelTimeCalculatorConfigGroup();
-		TravelTimeCalculator tc = new TravelTimeCalculator(sc.getNetwork(), ttccg);
+		TravelTimeCalculator tc = new TravelTimeCalculator( sc.getNetwork(), ttccg );
 		manager.addHandler(tc);
 		new MatsimEventsReader(manager).readFile(EVENTSFILE);
 		return tc;

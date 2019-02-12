@@ -1,15 +1,13 @@
 package org.matsim.contrib.etaxi.run;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
-import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
-import org.matsim.contrib.util.CSVLineBuilder;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.etaxi.util.ETaxiStats;
 import org.matsim.contrib.etaxi.util.ETaxiStatsCalculator;
+import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
+import org.matsim.contrib.util.CSVLineBuilder;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.ShutdownEvent;
 
 import com.google.common.collect.ObjectArrays;
 
@@ -18,14 +16,13 @@ public class ETaxiBenchmarkStats extends TaxiBenchmarkStats {
 
 	private final SummaryStatistics queuedTimeRatio = new SummaryStatistics();
 
-	public ETaxiBenchmarkStats(Fleet fleet, SubmittedTaxiRequestsCollector requestCollector,
-			OutputDirectoryHierarchy controlerIO) {
-		super(fleet, requestCollector, controlerIO);
+	public ETaxiBenchmarkStats(OutputDirectoryHierarchy controlerIO) {
+		super(controlerIO);
 	}
 
 	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		super.notifyAfterMobsim(event);
+	public void updateStats(Fleet fleet) {
+		super.updateStats(fleet);
 		ETaxiStats singleRunEStats = new ETaxiStatsCalculator(fleet.getVehicles().values()).getDailyEStats();
 		queuedTimeRatio.addValue(singleRunEStats.getFleetQueuedTimeRatio());
 	}

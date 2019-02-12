@@ -30,9 +30,9 @@ import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.drt.data.DrtRequest;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import com.google.common.collect.ImmutableList;

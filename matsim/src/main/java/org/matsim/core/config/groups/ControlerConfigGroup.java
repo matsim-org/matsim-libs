@@ -66,7 +66,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private String outputDirectory = "./output";
 	private int firstIteration = 0;
 	private int lastIteration = 1000;
-	private RoutingAlgorithmType routingAlgorithmType = RoutingAlgorithmType.Dijkstra;
+	private RoutingAlgorithmType routingAlgorithmType = RoutingAlgorithmType.AStarLandmarks;
 
 	private boolean linkToLinkRoutingEnabled = false;
 

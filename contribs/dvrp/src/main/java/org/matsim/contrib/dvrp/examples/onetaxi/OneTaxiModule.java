@@ -21,8 +21,7 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.file.FleetProvider;
+import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
@@ -47,11 +46,11 @@ public class OneTaxiModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		addRoutingModuleBinding(TransportMode.taxi).toInstance(new DynRoutingModule(TransportMode.taxi));
-		bindModal(Fleet.class).toProvider(new FleetProvider(taxisFile)).asEagerSingleton();
+		addRoutingModuleBinding(getMode()).toInstance(new DynRoutingModule(getMode()));
+		install(new FleetModule(getMode(), taxisFile));
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class);
 
-		installQSimModule(new AbstractDvrpModeQSimModule(TransportMode.taxi) {
+		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
 				install(new VrpAgentSourceQSimModule(getMode()));

@@ -41,17 +41,19 @@ import org.matsim.api.core.v01.population.Person;
  *
  */
 public class NoiseReceiverPoint extends ReceiverPoint {
-	
+
 	public NoiseReceiverPoint(Id<ReceiverPoint> id, Coord coord) {
 		super(id, coord);
 	}
 
+
 	private Map<Id<Person>, List<PersonActivityInfo>> personId2actInfos = null;//new HashMap<>(0);
-	
+
 	// initialization
 	private Map<Id<Link>, Double> linkId2distanceCorrection = null;//new HashMap<>(0);
 	private Map<Id<Link>, Double> linkId2angleCorrection = null;//new HashMap<>(0);
-			
+	private Map<Id<Link>, Double> linkId2ShieldingCorrection = null;
+
 	// time-specific information
 	private double finalImmission = 0.;
 	private double affectedAgentUnits = 0.;
@@ -84,7 +86,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		return Collections.unmodifiableMap(linkId2distanceCorrection);
 	}
 
-	public void setLinkId2distanceCorrection(Id<Link> linkId,  Double distanceCorrection) {
+	public synchronized void setLinkId2distanceCorrection(Id<Link> linkId,  Double distanceCorrection) {
 		if(linkId2distanceCorrection == null) {
 			linkId2distanceCorrection = new HashMap<>();
 		}
@@ -98,11 +100,25 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		return Collections.unmodifiableMap(linkId2angleCorrection);
 	}
 
-	public void setLinkId2angleCorrection(Id<Link> linkId, Double angleCorrection) {
+	public synchronized void setLinkId2angleCorrection(Id<Link> linkId, Double angleCorrection) {
 		if(linkId2angleCorrection== null) {
 			linkId2angleCorrection = new HashMap<>();
 		}
 		this.linkId2angleCorrection.put(linkId, angleCorrection);
+	}
+
+	public synchronized void setLinkId2ShieldingCorrection(Id<Link> linkId, Double shieldingCorrection) {
+		if(linkId2ShieldingCorrection== null) {
+			linkId2ShieldingCorrection = new HashMap<>();
+		}
+		this.linkId2ShieldingCorrection.put(linkId, shieldingCorrection);
+	}
+
+	public Map<Id<Link>, Double> getLinkId2ShieldingCorrection() {
+		if(linkId2ShieldingCorrection == null) {
+			linkId2ShieldingCorrection = new HashMap<>();
+		}
+		return Collections.unmodifiableMap(linkId2ShieldingCorrection);
 	}
 
 	public double getFinalImmission() {

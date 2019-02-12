@@ -2,7 +2,6 @@ package org.matsim.core.events;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Injector;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
@@ -42,7 +41,7 @@ public class EventsUtils {
 	}
 
 	public static EventsFileComparator.Result compareEventsFiles( String filename1, String filename2 ) {
-		EventsFileComparator.Result result = EventsFileComparator.compare( filename1, filename2 );;
+		EventsFileComparator.Result result = EventsFileComparator.compare( filename1, filename2 );
 		return result ;
 	}
 

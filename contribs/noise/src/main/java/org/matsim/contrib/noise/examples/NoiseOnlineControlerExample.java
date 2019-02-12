@@ -48,7 +48,7 @@ import java.io.IOException;
  */
 public class NoiseOnlineControlerExample {
 	
-	private static final String configFile = "./test/input/org/matsim/contrib/noise/config.xml";
+	private static final String configFile = "./contribs/noise/test/input/org/matsim/contrib/noise/config.xml";
 
 	public static void main(String[] args) throws IOException {
 				

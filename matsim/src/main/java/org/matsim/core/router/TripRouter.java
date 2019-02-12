@@ -258,7 +258,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 			final PlanElement pe, Config config) {
 		// yyyy see similar method in PlanRouter. kai, oct'17
 		
-		if (now == Time.UNDEFINED_TIME) {
+		if (Time.isUndefinedTime(now)) {
 			throw new RuntimeException("got undefined now to update with plan element" + pe);
 		}
 
@@ -288,10 +288,10 @@ public final class TripRouter implements MatsimExtensionPoint {
 		else {
 			Route route = ((Leg) pe).getRoute();
 
-			double travelTime = route != null ? route.getTravelTime() : Time.UNDEFINED_TIME;
-			travelTime = travelTime == Time.UNDEFINED_TIME ? ((Leg) pe).getTravelTime() : travelTime;
+			double travelTime = route != null ? route.getTravelTime() : Time.getUndefinedTime();
+			travelTime = Time.isUndefinedTime(travelTime) ? ((Leg) pe).getTravelTime() : travelTime;
 
-			return now + (travelTime != Time.UNDEFINED_TIME ? travelTime : 0);
+			return now + (Time.isUndefinedTime(travelTime) ? 0 : travelTime);
 		}
 	}
 

@@ -47,7 +47,8 @@ public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory 
 		scoringFunctionSum.addScoringFunction(
 				new CharyparNagelLegScoring(
 						params.getScoringParameters( person ),
-						this.scenario.getNetwork())
+						this.scenario.getNetwork(),
+						this.scenario.getConfig().transit().getTransitModes())
 			    );
 		//the remaining scoring functions can be changed and adapted to the needs of the user
 		scoringFunctionSum.addScoringFunction(

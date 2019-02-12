@@ -46,7 +46,7 @@ import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEventHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -87,7 +87,7 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 			DrtRequestSubmittedEvent submission = this.submittedRequests.remove(scheduled.getRequestId());
 			double actualWaitTime = event.getTime() - submission.getTime();
 			double estimatedWaitTime = scheduled.getPickupTime() - submission.getTime();
-			waitTimeCompare.put(submission.getRequestId(), new Tuple<>(actualWaitTime, estimatedWaitTime));
+			waitTimeCompare.put(submission.getRequestId(), Tuple.of(actualWaitTime, estimatedWaitTime));
 
 		}
 	}
@@ -151,7 +151,7 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 		return rejections;
 	}
 
-	public void writeAndPlotWaitTimeEstimateComparison(String plotFileName, String textFileName) {
+	public void writeAndPlotWaitTimeEstimateComparison(String plotFileName, String textFileName, boolean createChart) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(textFileName);
 
 		XYSeries times = new XYSeries("waittimes", true, true);
@@ -168,11 +168,13 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 			bw.flush();
 			bw.close();
 
-			final JFreeChart chart2 = DensityScatterPlots.createPlot("Wait times", "Actual wait time [s]",
-					"Initially planned wait time [s]", times, Pair.of(0., drtCfg.getMaxWaitTime()));
-			//			xAxis.setLowerBound(0);
-			//			yAxis.setLowerBound(0);
-			ChartUtilities.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);
+			if (createChart) {
+				final JFreeChart chart2 = DensityScatterPlots.createPlot("Wait times", "Actual wait time [s]",
+						"Initially planned wait time [s]", times, Pair.of(0., drtCfg.getMaxWaitTime()));
+				//			xAxis.setLowerBound(0);
+				//			yAxis.setLowerBound(0);
+				ChartUtilities.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

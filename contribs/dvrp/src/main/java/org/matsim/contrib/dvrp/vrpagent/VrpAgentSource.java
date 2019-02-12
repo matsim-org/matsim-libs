@@ -21,8 +21,8 @@ package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.DynAgent;
@@ -31,7 +31,6 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
 public class VrpAgentSource implements AgentSource {
@@ -52,7 +51,7 @@ public class VrpAgentSource implements AgentSource {
 
 	@Override
 	public void insertAgentsIntoMobsim() {
-		VehiclesFactory vehicleFactory = VehicleUtils.getFactory();
+		VehiclesFactory vehicleFactory = this.qSim.getScenario().getVehicles().getFactory();
 
 		for (DvrpVehicle vrpVeh : fleet.getVehicles().values()) {
 			Id<DvrpVehicle> id = vrpVeh.getId();

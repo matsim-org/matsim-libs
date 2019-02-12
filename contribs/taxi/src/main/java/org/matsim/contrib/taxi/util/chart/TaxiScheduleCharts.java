@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.Collection;
 
 import org.jfree.chart.JFreeChart;
-import org.matsim.contrib.dvrp.data.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts.DescriptionCreator;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts.PaintSelector;

@@ -35,6 +35,11 @@ import java.io.Serializable;
  */
 public class Tuple<A, B> implements Serializable{
 	private static final long serialVersionUID = 1L;
+
+	public static <A, B> Tuple<A, B> of(final A first, final B second) {
+		return new Tuple(first, second);
+	}
+
 	/**
 	 * First entry of the tuple
 	 */

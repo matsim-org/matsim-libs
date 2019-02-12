@@ -22,8 +22,7 @@ package org.matsim.contrib.dvrp.examples.onetruck;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.file.FleetProvider;
+import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -51,9 +50,9 @@ public class OneTruckModule extends AbstractDvrpModeModule {
 	public void install() {
 		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
 				.toInstance(createTruckType());
-		bindModal(Fleet.class).toProvider(new FleetProvider(trucksFile)).asEagerSingleton();
+		install(new FleetModule(getMode(), trucksFile));
 
-		installQSimModule(new AbstractDvrpModeQSimModule(TransportMode.truck) {
+		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
 				install(new VrpAgentSourceQSimModule(getMode()));
