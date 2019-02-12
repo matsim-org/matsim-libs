@@ -74,7 +74,7 @@ public class RunCleanBerlin {
                 final ScoringParameters params = parameters.getScoringParameters(person);
 
                 SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-                scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+                scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork(),scenario.getConfig().transit().getTransitModes()));
                 scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params));
                 scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 

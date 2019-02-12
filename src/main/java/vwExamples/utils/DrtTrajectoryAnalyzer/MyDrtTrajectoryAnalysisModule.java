@@ -53,16 +53,15 @@ public class MyDrtTrajectoryAnalysisModule extends AbstractDvrpModeModule {
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
-				// this is a mobsim listener that gets notified whenever a new mobsim starts in
-				// order to set Fleet inside MyDynModeTrajectoryStats
-				addModalQSimComponentBinding().toProvider(modalProvider(getter -> (MobsimInitializedListener) (e -> {
+				//this is a mobsim listener that gets notified whenever a new mobsim starts in order to set Fleet inside MyDynModeTrajectoryStats
+				addModalQSimComponentBinding().toProvider(modalProvider(getter -> (MobsimInitializedListener)(e -> {
 					getter.getModal(MyDynModeTrajectoryStats.class).setFleetOnMobsimStart(getter.getModal(Fleet.class));
 				})));
 			}
 		});
 
-		addControlerListenerBinding()
-				.toProvider(modalProvider(getter -> new DrtTrajectryControlerListener(getter.get(Config.class), drtCfg,
+		addControlerListenerBinding().toProvider(modalProvider(
+				getter -> new DrtTrajectryControlerListener(getter.get(Config.class), drtCfg,
 						getter.getModal(MyDynModeTrajectoryStats.class), getter.get(MatsimServices.class),
 						getter.get(Network.class))));
 	}
