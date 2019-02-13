@@ -91,7 +91,7 @@ public final class ParkingRouterNetworkRoutingModule implements RoutingModule {
     public final static String parkingStageActivityType = TransportMode.car + " parkingSearch";
 
     private ZonalLinkParkingInfo zoneToLinks;
-
+    private final Random random = MatsimRandom.getLocalInstance();
     private final Map<Id<Person>, Link> personToParkLink = new HashMap<>();
 
     public ParkingRouterNetworkRoutingModule(
@@ -186,7 +186,7 @@ public final class ParkingRouterNetworkRoutingModule implements RoutingModule {
             Leg newLeg = this.populationFactory.createLeg(this.mode);
             newLeg.setDepartureTime(now);
             // get egressActLink from zone and avg park time from Zone
-            Link parkEndLink = getParkLink(egressActLink);
+            Link parkEndLink = getParkLink(egressActLink, person);
             if (parkEndLink == null ) {
                 // vehicle is outside the study area or has garage
             } else {
@@ -242,11 +242,12 @@ public final class ParkingRouterNetworkRoutingModule implements RoutingModule {
         return result;
     }
 
-    private Link getParkLink(Link egressActLink) {
+    private Link getParkLink(Link egressActLink, Person person) {
         ParkingZone parkingZone = this.zoneToLinks.getParkingZone(egressActLink);
-        Random r = MatsimRandom.getRandom();
         if (parkingZone==null) return null;
-        if (r.nextDouble()<parkingZone.getGarageProbability()) {
+        double personSpecificZoneRandom = getPersonSpecificGarageRandom(person, parkingZone);
+
+        if (personSpecificZoneRandom < parkingZone.getGarageProbability()) {
         	return null;
         }
         
@@ -254,6 +255,15 @@ public final class ParkingRouterNetworkRoutingModule implements RoutingModule {
         parkingZone.getLinkParkingProbabilities().forEach((k,v)->wrs.add(k, v));
         return (network.getLinks().get(wrs.select()));
         }
+
+    private double getPersonSpecificGarageRandom(Person person, ParkingZone parkingZone) {
+        Double zoneRandom = (Double) person.getAttributes().getAttribute(parkingZone.getId().toString());
+        if (zoneRandom == null) {
+            zoneRandom = random.nextDouble();
+            person.getAttributes().putAttribute(parkingZone.getId().toString(), zoneRandom);
+        }
+        return zoneRandom;
+    }
 
     private Link decideOnLink(final Facility fromFacility) {
         Link accessActLink = null;
