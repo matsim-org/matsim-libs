@@ -33,6 +33,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.jdeqsim.Message;
 import org.matsim.core.mobsim.jdeqsim.MessageQueue;
+import org.matsim.core.mobsim.jdeqsim.SimUnit;
 import org.matsim.core.mobsim.qsim.ActivityEngine.AgentEntry;
 import org.matsim.core.mobsim.qsim.ActivityEngine.AgentEntryComparator;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
@@ -140,6 +141,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	
 	private Facility toFacility(final Activity act) {
 		// use facility first if available i.e. reversing the logic above Amit July'18
+		// yyyyyy these things need to be centralized!
 		if (	facilities != null &&
 				! facilities.getFacilities().isEmpty() &&
 				act.getFacilityId() != null ) {
@@ -256,15 +258,27 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 			@Override
 			public void processEvent(){
 				throw new RuntimeException( "not implemented" );
+				// here we would, if desired, generate and send a corresponding matsim event. kai, feb'19
 			}
 
 			@Override
 			public void handleMessage(){
+				// here we would need to put the material to be done. kai, feb'19
+				MobsimAgent agent = (MobsimAgent) this.getReceivingUnit();
+				// yy this seems to correspond to design, but feels stupid since we already have the agent.  kai, feb'19
+
+				// could now say something like
+				// agent.handleTaxiPrebookingIfNecessary(...) ;
+				// but could also use the dobler approach
+
+				// the main advantage of using the message queue instead of a separate wakeup queue would be to not go through the queue in every time step.  As long as
+				// we have only one central activity engine, this advantage would not be very large.  kai, feb'19
+
 				throw new RuntimeException( "not implemented" );
 			}
 		} ;
 		message.setMessageArrivalTime( 900. );
-		message.
+		message.setReceivingUnit( (SimUnit) agent );
 		this.messageQueue.putMessage( message );
 
 		return delegate.handleActivity( agent ) ;
