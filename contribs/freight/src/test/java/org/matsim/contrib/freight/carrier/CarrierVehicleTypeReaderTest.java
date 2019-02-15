@@ -37,9 +37,9 @@ public class CarrierVehicleTypeReaderTest extends MatsimTestCase{
 	
 	public void test_whenReadingTypeMedium_itReadsCostInfoCorrectly(){
 		CarrierVehicleType medium = types.getVehicleTypes().get(Id.create("medium", VehicleType.class));
-		assertEquals(50.0, medium.getVehicleCostInformation().fix,0.01);
-		assertEquals(0.4, medium.getVehicleCostInformation().perDistanceUnit,0.01);
-		assertEquals(30.0, medium.getVehicleCostInformation().perTimeUnit,0.01);
+		assertEquals(50.0, medium.getVehicleCostInformation().getFix(),0.01);
+		assertEquals(0.4, medium.getVehicleCostInformation().getPerDistanceUnit(),0.01);
+		assertEquals(30.0, medium.getVehicleCostInformation().getPerTimeUnit(),0.01);
 	}
 	
 	public void test_whenReadingTypeMedium_itReadsEngineInfoCorrectly(){

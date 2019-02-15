@@ -211,9 +211,8 @@ public class TestFreightUtils {
 		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWServices.getCarrierCapabilities().getVehicleTypes().size());
 		for (CarrierVehicleType carrierVehicleType : carrierWShipmentsOnlyFromCarrierWServices.getCarrierCapabilities().getVehicleTypes()){
 			Assert.assertEquals(3,carrierVehicleType.getCarrierVehicleCapacity());
-			Assert.assertEquals(130, carrierVehicleType.getVehicleCostInformation().fix, 0.0);
-			Assert.assertEquals(0.0001, carrierVehicleType.getVehicleCostInformation().perDistanceUnit, 0.0);
-			Assert.assertEquals(0.001, carrierVehicleType.getVehicleCostInformation().perTimeUnit, 0.0);
+			Assert.assertEquals(130, carrierVehicleType.getVehicleCostInformation().getFix(), 0.0);
+			Assert.assertEquals(0.0001, carrierVehicleType.getVehicleCostInformation().getPerDistanceUnit(), 0.0);
 			Assert.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
 			Assert.assertEquals(EngineInformation.FuelType.diesel, carrierVehicleType.getEngineInformation().getFuelType());
 			Assert.assertEquals(0.015, carrierVehicleType.getEngineInformation().getGasConsumption(), 0.0);
@@ -223,9 +222,9 @@ public class TestFreightUtils {
 		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getVehicleTypes().size());
 		for (CarrierVehicleType carrierVehicleType : carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getVehicleTypes()){
 			Assert.assertEquals(3,carrierVehicleType.getCarrierVehicleCapacity());
-			Assert.assertEquals(130, carrierVehicleType.getVehicleCostInformation().fix, 0.0);
-			Assert.assertEquals(0.0001, carrierVehicleType.getVehicleCostInformation().perDistanceUnit, 0.0);
-			Assert.assertEquals(0.001, carrierVehicleType.getVehicleCostInformation().perTimeUnit, 0.0);
+			Assert.assertEquals(130, carrierVehicleType.getVehicleCostInformation().getFix(), 0.0);
+			Assert.assertEquals(0.0001, carrierVehicleType.getVehicleCostInformation().getPerDistanceUnit(), 0.0);
+			Assert.assertEquals(0.001, carrierVehicleType.getVehicleCostInformation().getPerTimeUnit(), 0.0);
 			Assert.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
 			Assert.assertEquals(EngineInformation.FuelType.diesel, carrierVehicleType.getEngineInformation().getFuelType());
 			Assert.assertEquals(0.015, carrierVehicleType.getEngineInformation().getGasConsumption(), 0.0);

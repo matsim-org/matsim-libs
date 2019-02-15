@@ -14,6 +14,10 @@ import org.matsim.vehicles.VehicleTypeImpl;
  * @author sschroeder
  *
  */
+/**
+ * @author kturner
+ *
+ */
 public class CarrierVehicleType extends ForwardingVehicleType {
 
 	/**
@@ -155,14 +159,38 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 	
 	public static class VehicleCostInformation {
 
-		public final double fix;
-		public final double perDistanceUnit;
-		public final double perTimeUnit;
+		private double fix;
+		private double perDistanceUnit;
+		private double perTimeUnit;
 
 		public VehicleCostInformation(double fix, double perDistanceUnit, double perTimeUnit) {
 			super();
 			this.fix = fix;
 			this.perDistanceUnit = perDistanceUnit;
+			this.perTimeUnit = perTimeUnit;
+		}
+		
+		public double getFix() {
+			return fix;
+		}
+
+		public void setFix(double fix) {
+			this.fix = fix;
+		}
+
+		public double getPerDistanceUnit() {
+			return perDistanceUnit;
+		}
+
+		public void setPerDistanceUnit(double perDistanceUnit) {
+			this.perDistanceUnit = perDistanceUnit;
+		}
+
+		public double getPerTimeUnit() {
+			return perTimeUnit;
+		}
+
+		public void setPerTimeUnit(double perTimeUnit) {
 			this.perTimeUnit = perTimeUnit;
 		}
 
@@ -192,6 +220,7 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 		return vehicleCostInformation;
 	}
 	
+
 	/**
 	 * Returns the capacity of carrierVehicleType.
 	 * 
