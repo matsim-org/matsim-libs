@@ -14,10 +14,6 @@ import org.matsim.vehicles.VehicleTypeImpl;
  * @author sschroeder
  *
  */
-/**
- * @author kturner
- *
- */
 public class CarrierVehicleType extends ForwardingVehicleType {
 
 	/**
@@ -220,6 +216,26 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 		return vehicleCostInformation;
 	}
 	
+	
+	/**
+	 * Sets the cost values for this vehicle Type
+	 * 
+	 * @param vehicleCostInformation
+	 */
+	public void setVehicleCostInformation(VehicleCostInformation vehicleCostInformation) {
+		this.vehicleCostInformation = vehicleCostInformation;
+	}
+	
+	/**
+	 * Sets the capacity of carrierVehicleType
+	 * 
+	 * <p>This might be replaced in future by a more complex concept of capacity (considering volume and different units).
+	 * 
+	 * @param capacity
+	 */
+	public void setCarrierVehicleCapacity(int capacity) {
+		this.capacity = capacity;
+	}
 
 	/**
 	 * Returns the capacity of carrierVehicleType.
@@ -231,5 +247,7 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 	public int getCarrierVehicleCapacity(){
 		return capacity;
 	}
+
+
 	
 }
