@@ -460,7 +460,11 @@ public class TripStructureUtils {
 			return "Subtour: "+trips.toString();
 		}
 	}
-	public static Trip findCurrentTrip( PlanElement currentPlanElement, Plan plan, StageActivityTypes stageActivities ) {
+	@Deprecated // use findTripAtPlanElement(...) instead.
+	public static Trip findCurrentTrip( PlanElement pe, Plan plan, StageActivityTypes sat ) {
+		return findTripAtPlanElement( pe, plan, sat ) ;
+	}
+	public static Trip findTripAtPlanElement( PlanElement currentPlanElement, Plan plan, StageActivityTypes stageActivities ) {
 		if ( currentPlanElement instanceof Activity ) {
 			Gbl.assertIf( stageActivities.isStageActivity( ((Activity)currentPlanElement).getType() ) ) ;
 		}

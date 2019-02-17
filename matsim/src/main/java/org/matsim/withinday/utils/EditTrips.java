@@ -251,13 +251,8 @@ public final class EditTrips {
 		return true;
 	}
 
-	/** Convenience method, to be consistent with earlier syntax.  kai, may'16
-	 * @param trip
-	 * @param plan
-	 * @param mainMode
-	 * @param departureTime
-	 * @param network
-	 * @param tripRouter
+	/**
+	 * Convenience method, to be consistent with earlier syntax.  kai, may'16
 	 */
 	public static boolean relocateFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, Network network, TripRouter tripRouter) {
 		return replanFutureTrip(trip, plan, mainMode, departureTime, tripRouter );
