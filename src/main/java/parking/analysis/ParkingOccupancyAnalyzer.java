@@ -33,15 +33,15 @@ import parking.capacityCalculation.UseParkingCapacityFromNetwork;
 
 public class ParkingOccupancyAnalyzer {
 public static void main(String[] args) {
-	String basefolder = "D:/runs-svn/vw_rufbus/";
-	String runId = "vw220park10T";
+	String basefolder = "D:\\Matsim\\Axer\\BSWOB2.0\\output\\";
+	String runId = "vw219_10pct_withPark_59_newRouter";
 	String eventsFile = basefolder+runId+"/"+runId+".output_events.xml.gz";
 	String populationFile = basefolder+runId+"/"+runId+".output_plans.xml.gz";
 	String parkingOccupancyOutputFile = basefolder+runId+"/"+runId+".output_parkingOccupancy.csv";
 	String relparkingOccupancyOutputFile = basefolder + runId + "/" + runId + ".output_parkingOccupancy_relative.csv";
 	String parkingTripsOutputFile = basefolder+runId+"/"+runId+".output_parkingTrips.csv";
 	String networkFile = basefolder+runId+"/"+runId+".output_network.xml.gz";
-	String shapeFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/parking/bc-run/shp/parking-zones.shp";
+	String shapeFile = "D:\\Matsim\\Axer\\BSWOB2.0\\input\\shp\\parking-bs.shp";
 	String shapeString = "NO";
 	double endTime = 30*3600;
 	

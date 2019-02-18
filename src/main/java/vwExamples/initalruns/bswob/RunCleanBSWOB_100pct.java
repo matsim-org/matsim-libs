@@ -32,6 +32,7 @@ import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
@@ -43,111 +44,113 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
 import parking.ParkingRouterConfigGroup;
-import parking.ParkingRouterModule;
-
+import vwExamples.utils.parking.CustomParkingRouterModule;
 import javax.inject.Inject;
 
-//import org.matsim.contrib.drt.optimizer.rebalancing.DemandBasedRebalancingStrategy;
-
-/**
- * @author axer
- */
+/** * @author axer */
 
 public class RunCleanBSWOB_100pct {
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
 
-        String inbase = "D:\\Matsim\\Axer\\BSWOB2.0\\";
-        final Config config = ConfigUtils.loadConfig(inbase + "input\\config_100pct.xml");
+		String inbase = "D:\\Matsim\\Axer\\BSWOB2.0\\";
+		final Config config = ConfigUtils.loadConfig(inbase+"input\\config_100pct_vw219.xml");
 
-        // Start with the config
-        // Overwrite existing configuration parameters
-        String runId = "vw219_100pct_withPark_1.5_3";
+		// Start with the config
+		// Overwrite existing configuration parameters
+		String runId = "vw219_100pct_withPark_61_fixed_Parking";
+		
+		config.plans().setInputFile(inbase+"input\\plans\\vw219_100pct_withPark_55_newRouter_vw219params_3_8.output_plans.xml.gz");
+		config.network().setInputFile(inbase+"input\\network\\vw219_SpeedCalWithPark_rev2_1.0.xml.gz");
+		config.strategy().setFractionOfIterationsToDisableInnovation(0.7);
+		config.controler().setRunId(runId);
+		config.controler().setOutputDirectory(inbase + "output\\" + runId);
+		config.controler().setWritePlansInterval(20);
+		config.controler().setWriteEventsInterval(20);
+		config.controler().setLastIteration(120); // Number of simulation iterations
+		
+		// Add parking module
+		config.addModule(new ParkingRouterConfigGroup());
+		ParkingRouterConfigGroup prc = ParkingRouterConfigGroup.get(config);
+		String shapeFile = "shp\\parking-zones.shp";
+		prc.setShapeFile(shapeFile);
+		prc.setCapacityCalculationMethod("useFromNetwork");
+		prc.setShape_key("NO");
 
-        config.plans().setInputFile(inbase + "input\\plans\\vw219_100pct_withPark_1.5.106.plans.xml.gz");
-        config.network().setInputFile(inbase + "input\\network\\vw219_SpeedCalWithPark_rev2_1.5.xml.gz");
-        config.strategy().setFractionOfIterationsToDisableInnovation(0.7);
-        config.controler().setRunId(runId);
-        config.controler().setOutputDirectory(inbase + "output\\" + runId);
-        config.controler().setWritePlansInterval(1);
-        config.controler().setWriteEventsInterval(1);
-        config.controler().setLastIteration(100); // Number of simulation iterations
+		// LOAD the scenario (i.e., load all files!)
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        // Add parking module
-        config.addModule(new ParkingRouterConfigGroup());
-        ParkingRouterConfigGroup prc = ParkingRouterConfigGroup.get(config);
-        String shapeFile = "shp\\parking-zones.shp";
-        prc.setShapeFile(shapeFile);
-        prc.setCapacityCalculationMethod("useFromNetwork");
-        prc.setShape_key("NO");
-
-        // LOAD the scenario (i.e., load all files!)
-        Scenario scenario = ScenarioUtils.loadScenario(config);
-
-        boolean deleteRoutes = true;
-
-        if (deleteRoutes) {
-            scenario.getPopulation().getPersons().values().stream().flatMap(p -> p.getPlans().stream())
-                    .flatMap(pl -> pl.getPlanElements().stream()).filter(Leg.class::isInstance)
-                    .forEach(pe -> ((Leg) pe).setRoute(null));
-        }
+		boolean deleteRoutes = true;
+		
+		if (deleteRoutes) {
+			scenario.getPopulation().getPersons().values().stream().flatMap(p -> p.getPlans().stream())
+					.flatMap(pl -> pl.getPlanElements().stream()).filter(Leg.class::isInstance)
+					.forEach(pe -> ((Leg) pe).setRoute(null));
+		}
 
 
-        //////
-        adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());
-        setXY2Links(scenario, 80 / 3.6);
-        //////
 
-        // Use the scenario to create a controler.
+		//////
+		adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());
+		setXY2Links(scenario, 80 / 3.6);
+		//////
+		
+		// Use the scenario to create a controler.
 
-        Controler controler = new Controler(scenario);
+		Controler controler = new Controler(scenario);
 
-        controler.addOverridingModule(new CadytsCarModule());
-        controler.addOverridingModule(new ParkingRouterModule());
-        controler.addOverridingModule(new SwissRailRaptorModule());
+		controler.addOverridingModule(new CadytsCarModule());
+		controler.addOverridingModule(new CustomParkingRouterModule());
+		controler.addOverridingModule(new SwissRailRaptorModule());
+		
+		controler.addOverridingModule(new AbstractModule(){
+			@Override public void install() {
+				addTravelTimeBinding(TransportMode.ride).to(networkTravelTime());
+				addTravelDisutilityFactoryBinding(TransportMode.ride).to(carTravelDisutilityFactoryKey());		}
+		});
 
-        // include cadyts into the plan scoring (this will add the cadyts corrections to
-        // the scores):
-        controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-            private final ScoringParametersForPerson parameters = new SubpopulationScoringParameters(scenario);
-            @Inject
-            CadytsContext cContext;
+		// include cadyts into the plan scoring (this will add the cadyts corrections to
+		// the scores):
+		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			private final ScoringParametersForPerson parameters = new SubpopulationScoringParameters(scenario);
+			@Inject
+			CadytsContext cContext;
 
-            @Override
-            public ScoringFunction createNewScoringFunction(Person person) {
+			@Override
+			public ScoringFunction createNewScoringFunction(Person person) {
 
-                final ScoringParameters params = parameters.getScoringParameters(person);
+				final ScoringParameters params = parameters.getScoringParameters(person);
 
-                SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-                scoringFunctionAccumulator
-                        .addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork(),scenario.getConfig().transit().getTransitModes()));
-                scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params));
-                scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
+				scoringFunctionAccumulator
+						.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params));
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-                final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config,
-                        cContext);
-                final double cadytsScoringWeight = 20. * config.planCalcScore().getBrainExpBeta();
-                scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight);
-                scoringFunctionAccumulator.addScoringFunction(scoringFunction);
+				final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config,
+						cContext);
+				final double cadytsScoringWeight = 10. * config.planCalcScore().getBrainExpBeta();
+				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight);
+				scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 
-                return scoringFunctionAccumulator;
-            }
-        });
+				return scoringFunctionAccumulator;
+			}
+		});
 
-        controler.run();
+		controler.run();
 
-    }
+	}
 
-    public static void adjustPtNetworkCapacity(Network network, double flowCapacityFactor) {
-        if (flowCapacityFactor < 1.0) {
-            for (Link l : network.getLinks().values()) {
-                if (l.getAllowedModes().contains(TransportMode.pt)) {
-                    l.setCapacity(l.getCapacity() / flowCapacityFactor);
-                }
-            }
-        }
-    }
-
+	public static void adjustPtNetworkCapacity(Network network, double flowCapacityFactor) {
+		if (flowCapacityFactor < 1.0) {
+			for (Link l : network.getLinks().values()) {
+				if (l.getAllowedModes().contains(TransportMode.pt)) {
+					l.setCapacity(l.getCapacity() / flowCapacityFactor);
+				}
+			}
+		}
+	}
+	
     public static void setXY2Links(Scenario scenario, double maxspeed) {
         Network network = NetworkUtils.createNetwork();
         NetworkFilterManager networkFilterManager = new NetworkFilterManager(scenario.getNetwork());
