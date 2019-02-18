@@ -89,7 +89,7 @@ public class TravelDelayCalculator implements PersonDepartureEventHandler, Perso
                         t.getSecond().add(travelTime);
 
                         if (relevantAgents.contains(event.getPersonId())) {
-                            String result = event.getPersonId() + ";" + event.getTime() + ";" + t.getFirst().intValue() + ";" + t.getSecond().intValue();
+                            String result = event.getPersonId() + ";" + event.getTime() + ";" + t.getFirst().intValue() + ";" + t.getSecond().intValue() + ";" + (t.getSecond().intValue()-t.getFirst().intValue());
                             trips.add(result);
                         }
                     }
