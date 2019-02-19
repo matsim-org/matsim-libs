@@ -58,11 +58,11 @@ public class modalSplitCommuter {
     private Map<String, PersonValidator> groups = new HashMap<>();
     Set<String> zones = new HashSet<>();
     static Map<String, Geometry> zoneMap = new HashMap<>();
-    String shapeFile = "C:\\Temp\\shp\\parking-bs.shp";
+    String shapeFile = "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\shp\\parking-bs.shp";
     String shapeFeature = "NO";
     StageActivityTypes stageActs;
-    static String inFileName = "C:\\Temp\\plans\\vw219_100pct_withPark_1.5_3.output_plans_10pct.xml.gz";
-    static String OutFileName = "C:\\Temp\\plans\\vw219_10pct_drt_new.xml.gz";
+    static String inFileName = "D:\\Backup_Axer\\Axer\\MatsimDataStore\\BaseCases\\vw219\\vw219.output_plans.xml.gz";
+    static String OutFileName = "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\plans\\vw219.10pct_commuter_DRT.xml.gz";
 
     static List<String> primaryActivies = new ArrayList<>();
     static List<String> primaryLegModes = new ArrayList<>();
@@ -73,7 +73,7 @@ public class modalSplitCommuter {
     // reduce it by factor 0.58, the get the correct amount of DRT users
     // Like Berlin
     static {
-        desiredModalShiftRatesMap.put("car", 0.05);
+        desiredModalShiftRatesMap.put("car", 0.15);
     }
 
     public static void main(String[] args) {
@@ -656,7 +656,7 @@ public class modalSplitCommuter {
                                 double limit = maxShiftNumbersPerMode(SubtourMode, desiredModalShiftRatesMap,
                                         allTrafficModalShare.modeTripsMap, allTrafficModalShare.modeTripsMapRelative);
 
-                                if (limit >= LogReplacedTripsMap.get(SubtourMode).intValue() && p.nextDouble() < 0.1) {
+                                if (limit >= LogReplacedTripsMap.get(SubtourMode).intValue() && p.nextDouble() < 0.25) {
 
                                 	for (Trip trip : subTour.getTrips())
                                 	{
