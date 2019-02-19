@@ -1,10 +1,11 @@
 package org.matsim.contrib.freight.carrier;
 
+import org.junit.Test;
 import org.matsim.testcases.MatsimTestCase;
 
 public class CarrierVehicleTypeWriterTest extends MatsimTestCase{
 	
-	
+	@Test
 	public void testTypeWriter(){
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(types).readFile(getClassInputDirectory() + "vehicleTypes.xml");
