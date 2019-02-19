@@ -14,10 +14,6 @@ import org.matsim.vehicles.VehicleTypeImpl;
  * @author sschroeder
  *
  */
-/**
- * @author kturner
- *
- */
 public class CarrierVehicleType extends ForwardingVehicleType {
 
 	/**
@@ -38,6 +34,25 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 		 */
 		public static Builder newInstance(Id<VehicleType> typeId){
 			return new Builder(typeId);
+		}
+		
+		/**
+		 * Returns a new instance of builder initialized with the typeId and the values the given from existing CarrierVehicleType.
+		 * 
+		 * Can be used for create a new, modified CarrierVehicleType basing on an existing one. 
+		 * Values can be changed within the builder afterwards.
+		 * 
+		 * @param carrierVehicleType
+		 * @param typeId
+		 * @return a type builder
+		 */
+		public static Builder newInstance(Id<VehicleType> typeId, CarrierVehicleType carrierVehicleType){
+			return new Builder(typeId)
+					.setDescription(carrierVehicleType.getDescription())
+					.setEngineInformation(carrierVehicleType.getEngineInformation())
+					.setCapacity(carrierVehicleType.getCarrierVehicleCapacity())
+					.setMaxVelocity(carrierVehicleType.getMaximumVelocity())
+					.setVehicleCostInformation(carrierVehicleType.getVehicleCostInformation());		
 		}
 		
 		private Id<VehicleType> typeId;
