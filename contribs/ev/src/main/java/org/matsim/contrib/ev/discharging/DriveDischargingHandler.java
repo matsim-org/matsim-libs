@@ -108,7 +108,7 @@ public class DriveDischargingHandler
 			ElectricVehicle ev = evDrive.ev;
 			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt);
 			if (handleAuxDischarging) {
-				energy += ev.getAuxEnergyConsumption().calcEnergyConsumption(tt);
+				energy += ev.getAuxEnergyConsumption().calcEnergyConsumption(tt, eventTime);
 			}
 			ev.getBattery().discharge(energy);
             double linkConsumption = energy + energyConsumptionPerLink.getOrDefault(linkId, 0.0);
