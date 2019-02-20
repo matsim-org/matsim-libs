@@ -43,11 +43,7 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import parking.ParkingRouterConfigGroup;
-import parking.ParkingRouterModule;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
-import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
-import vwExamples.utils.parking.createParkingNetwork.CreateParkingNetwork;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -88,7 +84,7 @@ public class RunDrtScenarioBatchBS_eDRT_Commuter {
 		String runId = "5pct_carToDrt_batteryCharge_0C_2nd" + vehiclePerDepot + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
-		String inbase = "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\";
+        String inbase = "D:\\BSWOB2.0_Scenarios\\";
 
 		final Config config = ConfigUtils.loadConfig(inbase + "conf_BS_DRT_100pct_eDRT.xml", new DrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
@@ -100,7 +96,7 @@ public class RunDrtScenarioBatchBS_eDRT_Commuter {
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
-		config.plans().setInputFile(inbase + "\\plans\\vw219.5pct_commuter_DRT_selected.xml.gz");
+        config.plans().setInputFile(inbase + "\\plans\\vw219.10pct_commuter_DRT_selected_10pct.xml.gz");
 		config.controler().setLastIteration(2); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations

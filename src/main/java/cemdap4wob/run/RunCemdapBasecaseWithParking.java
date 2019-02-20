@@ -22,8 +22,7 @@
  */
 package cemdap4wob.run;
 
-import javax.inject.Inject;
-
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -41,16 +40,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
-
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import org.matsim.core.scoring.functions.*;
 import parking.ParkingRouterConfigGroup;
 import parking.ParkingRouterModule;
+
+import javax.inject.Inject;
 
 /**
  * @author  jbischoff
@@ -59,7 +53,7 @@ import parking.ParkingRouterModule;
 
 public class RunCemdapBasecaseWithParking {
 public static void main(String[] args) {
-	
+    /// see shared-svn\projects\vw_rufbus\projekt2\parking\bc-run for an example run
 	Config config = ConfigUtils.loadConfig(args[0], new CadytsConfigGroup(), new ParkingRouterConfigGroup());
 	Scenario scenario = ScenarioUtils.loadScenario(config);
 	adjustPtNetworkCapacity(scenario.getNetwork(),config.qsim().getFlowCapFactor());
