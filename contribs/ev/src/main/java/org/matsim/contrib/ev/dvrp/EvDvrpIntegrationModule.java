@@ -18,12 +18,10 @@
 
 package org.matsim.contrib.ev.dvrp;
 
-import java.util.function.DoubleSupplier;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.ev.EvConfigGroup;
@@ -33,12 +31,15 @@ import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.data.Charger;
 import org.matsim.contrib.ev.data.ElectricFleetModule;
+import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DischargingModule;
+import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.discharging.OhdeSlaskiDriveEnergyConsumption;
 import org.matsim.contrib.ev.stats.EvStatsModule;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
+import java.util.function.BiPredicate;
+import java.util.function.DoubleSupplier;
+import java.util.function.Function;
 
 /**
  * Use this module instead of the default EvModule
@@ -48,9 +49,11 @@ import com.google.inject.name.Names;
 public class EvDvrpIntegrationModule extends AbstractDvrpModeModule {
 	private Function<Charger, ChargingStrategy> chargingStrategyFactory;
 	private DoubleSupplier temperatureProvider;
-	private Predicate<DvrpVehicle> turnedOnPredicate;
+	private BiPredicate<DvrpVehicleSpecification, Double> turnedOnPredicate;
 
 	private String vehicleFile;
+	private AuxEnergyConsumption.Factory auxDischargingFactory;
+	private DriveEnergyConsumption.Factory driveDischargingFactory;
 
 	public EvDvrpIntegrationModule(String mode) {
 		super(mode);
@@ -79,7 +82,9 @@ public class EvDvrpIntegrationModule extends AbstractDvrpModeModule {
 				charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
 						chargingStrategyFactory.apply(charger))));
 
-		install(new DischargingModule(evCfg, ev -> new OhdeSlaskiDriveEnergyConsumption(),
+		install(new DischargingModule(evCfg,
+				(driveDischargingFactory != null) ? driveDischargingFactory : d -> new OhdeSlaskiDriveEnergyConsumption()
+				, (auxDischargingFactory != null) ? auxDischargingFactory :
 				new DvrpAuxConsumptionFactory(getMode(), temperatureProvider, turnedOnPredicate)));
 
 		install(new EvStatsModule(evCfg));
@@ -91,12 +96,24 @@ public class EvDvrpIntegrationModule extends AbstractDvrpModeModule {
 		return this;
 	}
 
+	public EvDvrpIntegrationModule setAuxDischargingFactory(
+			AuxEnergyConsumption.Factory auxDischargingFactory) {
+		this.auxDischargingFactory = auxDischargingFactory;
+		return this;
+	}
+
+	public EvDvrpIntegrationModule setDriveDischargingFactory(
+			DriveEnergyConsumption.Factory driveDischargingFactory) {
+		this.driveDischargingFactory = driveDischargingFactory;
+		return this;
+	}
+
 	public EvDvrpIntegrationModule setTemperatureProvider(DoubleSupplier temperatureProvider) {
 		this.temperatureProvider = temperatureProvider;
 		return this;
 	}
 
-	public EvDvrpIntegrationModule setTurnedOnPredicate(Predicate<DvrpVehicle> turnedOnPredicate) {
+	public EvDvrpIntegrationModule setTurnedOnPredicate(BiPredicate<DvrpVehicleSpecification, Double> turnedOnPredicate) {
 		this.turnedOnPredicate = turnedOnPredicate;
 		return this;
 	}
