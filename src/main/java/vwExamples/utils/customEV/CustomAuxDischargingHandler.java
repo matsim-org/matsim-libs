@@ -71,7 +71,7 @@ public class CustomAuxDischargingHandler
 					 //System.out.println("Do not discharge " + ev.getId());
 
 				} else {
-					double energy = ev.getAuxEnergyConsumption().calcEnergyConsumption(auxDischargeTimeStep);
+					double energy = ev.getAuxEnergyConsumption().calcEnergyConsumption(auxDischargeTimeStep, e.getSimulationTime());
 					ev.getBattery().discharge(energy);
 				}
 

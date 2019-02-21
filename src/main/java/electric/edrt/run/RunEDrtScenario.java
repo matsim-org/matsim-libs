@@ -25,12 +25,8 @@ import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.av.maxspeed.DvrpTravelTimeWithMaxSpeedLimitModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.edrt.run.EDrtControlerCreator;
 import org.matsim.contrib.ev.EvConfigGroup;
@@ -126,13 +122,9 @@ public class RunEDrtScenario {
 				setDriveDischargingFactory(f -> new VwDrtDriveEnergyConsumption()).setTurnedOnPredicate(RunEDrtScenario::isTurnedOn);
 	}
 
-	private static boolean isTurnedOn(DvrpVehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-		if (schedule.getStatus() == ScheduleStatus.STARTED) {
-			DrtTaskType currentTaskType = ((DrtTask)schedule.getCurrentTask()).getDrtTaskType();
-			return currentTaskType != DrtTaskType.STAY;// turned on only if DRIVE or STOP
-		}
-		return false;
+    private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
+        if (vehicle.getServiceBeginTime() <= time && time <= vehicle.getServiceEndTime()) return true;
+        else return false;
 	}
 
 }
