@@ -20,6 +20,8 @@
 
 package vwExamples.peoplemoverVWExample;
 
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import electric.edrt.run.RunVWEDrtScenario;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -34,6 +36,8 @@ import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -41,35 +45,21 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.filter.NetworkLinkFilter;
-import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.*;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
-
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-//import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import parking.ParkingRouterConfigGroup;
-import parking.ParkingRouterModule;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
-import vwExamples.utils.parking.capacityCalculation.UseParkingCapacityFromNetwork;
-import vwExamples.utils.parking.createParkingNetwork.CreateParkingNetwork;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
+//import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 /** * @author axer */
 
@@ -217,7 +207,7 @@ public class RunDrtScenarioBatchH_eDRT {
 		// Based on the prepared configuration this part creates a controller that runs
 		// Controler controler = createControler(config, otfvis);
 
-		Controler controler = electric.edrt.run.RunEDrtScenario.createControler(config);
+		Controler controler = RunVWEDrtScenario.createControler(config);
 
 		if (enableCadyts)
 		{

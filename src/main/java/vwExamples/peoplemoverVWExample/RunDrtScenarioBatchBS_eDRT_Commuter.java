@@ -21,6 +21,7 @@
 package vwExamples.peoplemoverVWExample;
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import electric.edrt.run.RunVWEDrtScenario;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -210,7 +211,7 @@ public class RunDrtScenarioBatchBS_eDRT_Commuter {
 		// Based on the prepared configuration this part creates a controller that runs
 		// Controler controler = createControlerWithSingleModeDrt(config, otfvis);
 
-		Controler controler = electric.edrt.run.RunEDrtScenario.createControler(config);
+		Controler controler = RunVWEDrtScenario.createControler(config);
 
 		if (rebalancing == true) {
 
