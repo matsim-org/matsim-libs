@@ -253,9 +253,9 @@ public class MatsimJspritFactory {
 		if(carrierVehicleType == null) throw new IllegalStateException("carrierVehicleType is null");
 		VehicleTypeImpl.Builder typeBuilder = VehicleTypeImpl.Builder.newInstance(carrierVehicleType.getId().toString());
 		typeBuilder.addCapacityDimension(0, carrierVehicleType.getCarrierVehicleCapacity());
-		typeBuilder.setCostPerDistance(carrierVehicleType.getVehicleCostInformation().perDistanceUnit);
-		typeBuilder.setCostPerTransportTime(carrierVehicleType.getVehicleCostInformation().perTimeUnit);
-		typeBuilder.setFixedCost(carrierVehicleType.getVehicleCostInformation().fix);
+		typeBuilder.setCostPerDistance(carrierVehicleType.getVehicleCostInformation().getPerDistanceUnit());
+		typeBuilder.setCostPerTransportTime(carrierVehicleType.getVehicleCostInformation().getPerTimeUnit());
+		typeBuilder.setFixedCost(carrierVehicleType.getVehicleCostInformation().getFix());
 		typeBuilder.setMaxVelocity(carrierVehicleType.getMaximumVelocity());
 		return typeBuilder.build();
 	}
