@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.VariableSpeedCharging;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
@@ -76,7 +75,7 @@ public class RunETaxiScenario {
 				charger -> VariableSpeedCharging.createStrategyForNissanLeaf(charger.getPower() * CHARGING_SPEED_FACTOR,
 						MAX_RELATIVE_SOC))
 				.setTemperatureProvider(() -> TEMPERATURE)
-				.setTurnedOnPredicate(vehicle -> vehicle.getSchedule().getStatus() == ScheduleStatus.STARTED);
+				.setTurnedOnPredicate((vehicle, time) -> (time >= vehicle.getServiceBeginTime() && time <= vehicle.getServiceEndTime()));
 	}
 
 	public static void main(String[] args) {

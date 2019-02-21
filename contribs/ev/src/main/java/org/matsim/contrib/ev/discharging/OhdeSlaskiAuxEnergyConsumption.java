@@ -21,8 +21,8 @@ package org.matsim.contrib.ev.discharging;
 
 import org.matsim.contrib.ev.data.ElectricVehicle;
 
+import java.util.function.BiPredicate;
 import java.util.function.DoubleSupplier;
-import java.util.function.Predicate;
 
 public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	private static final double a = 1.3;// [W]
@@ -44,22 +44,23 @@ public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 
 	public static OhdeSlaskiAuxEnergyConsumption createConsumptionForFixedTemperatureAndAlwaysOn(ElectricVehicle ev,
 			int temperature) {
-		return new OhdeSlaskiAuxEnergyConsumption(ev, () -> temperature, v -> true);
+		return new OhdeSlaskiAuxEnergyConsumption(ev, () -> temperature, (v, t) -> true);
 	}
 
 	private final ElectricVehicle ev;
 	private final DoubleSupplier temperatureProvider;
-	private final Predicate<ElectricVehicle> isTurnedOn;
+	private final BiPredicate<ElectricVehicle, Double> isTurnedOn;
 
 	public OhdeSlaskiAuxEnergyConsumption(ElectricVehicle ev, DoubleSupplier temperatureProvider,
-			Predicate<ElectricVehicle> isTurnedOn) {
+										  BiPredicate<ElectricVehicle, Double> isTurnedOn) {
 		this.ev = ev;
 		this.temperatureProvider = temperatureProvider;
 		this.isTurnedOn = isTurnedOn;
 	}
 
+
 	@Override
-	public double calcEnergyConsumption(double period) {
-		return isTurnedOn.test(ev) ? calcPower(temperatureProvider.getAsDouble()) * period : 0;
+	public double calcEnergyConsumption(double period, double timeOfDay) {
+		return isTurnedOn.test(ev, timeOfDay) ? calcPower(temperatureProvider.getAsDouble()) * period : 0;
 	}
 }

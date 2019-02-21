@@ -35,7 +35,7 @@ public class DischargingModule extends AbstractModule {
 	// TODO fixed temperature 15 oC
 	// FIXME reintroduce TemperatureProvider
 	private static AuxEnergyConsumption.Factory DEFAULT_AUX_CONSUMPTION_FACTORY //
-			= ev -> new OhdeSlaskiAuxEnergyConsumption(ev, () -> 15, v -> true);
+			= ev -> new OhdeSlaskiAuxEnergyConsumption(ev, () -> 15, (v, t) -> true);
 
 	private final DriveEnergyConsumption.Factory driveConsumptionFactory;
 	private final AuxEnergyConsumption.Factory auxConsumptionFactory;
@@ -53,7 +53,7 @@ public class DischargingModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind(DriveEnergyConsumption.Factory.class).toInstance(DEFAULT_DRIVE_CONSUMPTION_FACTORY);
+		bind(DriveEnergyConsumption.Factory.class).toInstance(driveConsumptionFactory);
 
 		bind(DriveDischargingHandler.class).asEagerSingleton();
 		addEventHandlerBinding().to(DriveDischargingHandler.class);
@@ -61,7 +61,7 @@ public class DischargingModule extends AbstractModule {
 		if (evCfg.getAuxDischargingSimulation()
 				== EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler) {
 			// "isTurnedOn" returns true ==> should not be used when for "seperateAuxDischargingHandler"
-			bind(AuxEnergyConsumption.Factory.class).toInstance(DEFAULT_AUX_CONSUMPTION_FACTORY);
+			bind(AuxEnergyConsumption.Factory.class).toInstance(auxConsumptionFactory);
 			bind(AuxDischargingHandler.class).asEagerSingleton();
 			addMobsimListenerBinding().to(AuxDischargingHandler.class);
 		}
