@@ -77,13 +77,13 @@ public class RunDrtScenarioBatchH_eDRT {
 		boolean enableCadyts = false;
 
 		// Enable or Disable rebalancing
-		String runId = "Moia_2";
+		String runId = "Moia_2_test10";
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Thiel\\Programme\\MatSim\\03_HannoverDRT\\input\\";
 		String outbase = "D:\\Thiel\\Programme\\MatSim\\03_HannoverDRT\\output\\";
 
-		final Config config = ConfigUtils.loadConfig(inbase + "config_H_DRT_1.0_0.25DRT.xml", new DrtConfigGroup(),
+		final Config config = ConfigUtils.loadConfig(inbase + "config_H_DRT_0.1_0.25DRT.xml", new DrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(), new TemperatureChangeConfigGroup(),
 				new CadytsConfigGroup());
 
@@ -93,7 +93,7 @@ public class RunDrtScenarioBatchH_eDRT {
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
-		config.plans().setInputFile(inbase + "\\plans\\vw235_nocad.1.0.output_plans.xml.gz");
+		config.plans().setInputFile(inbase + "\\plans\\Moia_1.output_plans.xml.gz");
 		config.controler().setLastIteration(300); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(50); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(50); // Write Plan file every x-Iterations
@@ -175,6 +175,8 @@ public class RunDrtScenarioBatchH_eDRT {
 		vehiclesAndChargers.MAX_START_CAPACITY_KWH = 45;
 		vehiclesAndChargers.MIN_START_CAPACITY_KWH = 45;
 		vehiclesAndChargers.BATTERY_CAPACITY_KWH = 45;
+		vehiclesAndChargers.CHARGINGPOWER_KW = (int) (125*0.85);
+		vehiclesAndChargers.FRACTION_OF_CHARGERS_PER_DEPOT = 1.0;
 		vehiclesAndChargers.run(depotsAndVehicles);
 
 		drt.setVehiclesFile(inbase + "\\fleets\\fleet.xml.gz");

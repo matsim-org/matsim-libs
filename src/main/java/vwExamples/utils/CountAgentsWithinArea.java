@@ -46,8 +46,8 @@ public class CountAgentsWithinArea {
     private Map<String, PersonValidator> groups = new HashMap<>();
     static Set<String> zones = new HashSet<>();
     static Map<String, Geometry> zoneMap = new HashMap<>();
-    static String shapeFile = "D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\shapes\\Prognoseraum_EPSG_31468_cleaned_small.shp";
-    static String shapeFeature = "SCHLUESSEL";
+    static String shapeFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Cemdap\\add_data\\shp\\Real_Region_Hannover.shp";
+    static String shapeFeature = "NO";
     StageActivityTypes stageActs;
     static Set<Id<Person>> relevantAgents = new HashSet<>();
     static Set<Id<Person>> allAgents = new HashSet<>();
@@ -56,8 +56,8 @@ public class CountAgentsWithinArea {
     public static void main(String[] args) {
 
 
-        String runDir = "D:\\Axer\\MatsimDataStore\\Berlin_DRT\\output\\be_as_beSmall_Beta900_4000veh_6pax\\";
-        String runId = "be_as_beSmall_Beta900_4000veh_6pax.";
+        String runDir = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw235_nocad.1.0\\";
+        String runId = "vw235_nocad.1.0.";
 
         readShape(shapeFile, shapeFeature);
 
