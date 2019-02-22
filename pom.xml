@@ -40,6 +40,16 @@
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
 			<version>${matsim.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>jgridshift</groupId>
+					<artifactId>jgridshift</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.media</groupId>
+					<artifactId>jai_core</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		<dependency>
