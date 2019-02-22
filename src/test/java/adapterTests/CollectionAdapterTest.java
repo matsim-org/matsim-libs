@@ -115,9 +115,9 @@ public class CollectionAdapterTest {
 				if(types.size() ==1) {
 					assertTrue(types.get(0) == collectionType);
 					assertTrue(collectionType.getCarrierVehicleCapacity() == 10);
-					assertTrue(collectionType.getVehicleCostInformation().perDistanceUnit == 0.0004);
-					assertTrue(collectionType.getVehicleCostInformation().perTimeUnit == 0.38);
-					assertTrue(collectionType.getVehicleCostInformation().fix == 49);
+					assertTrue(collectionType.getVehicleCostInformation().getPerDistanceUnit() == 0.0004);
+					assertTrue(collectionType.getVehicleCostInformation().getPerTimeUnit() == 0.38);
+					assertTrue(collectionType.getVehicleCostInformation().getFix() == 49);
 					assertTrue(collectionType.getMaximumVelocity() == (50/3.6));
 					
 				}

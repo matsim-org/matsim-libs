@@ -116,9 +116,9 @@ public class DistributionAdapterTest {
 					if(types.size() ==1) {
 						assertTrue(types.get(0) == distributionType);
 						assertTrue(distributionType.getCarrierVehicleCapacity() == 10);
-						assertTrue(distributionType.getVehicleCostInformation().perDistanceUnit == 0.0004);
-						assertTrue(distributionType.getVehicleCostInformation().perTimeUnit == 0.38);
-						assertTrue(distributionType.getVehicleCostInformation().fix == 49);
+						assertTrue(distributionType.getVehicleCostInformation().getPerDistanceUnit() == 0.0004);
+						assertTrue(distributionType.getVehicleCostInformation().getPerTimeUnit() == 0.38);
+						assertTrue(distributionType.getVehicleCostInformation().getFix() == 49);
 						assertTrue(distributionType.getMaximumVelocity() == (50/3.6));
 						
 					}
