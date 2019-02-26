@@ -59,7 +59,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -100,6 +101,9 @@ public class DynModeTripsAnalyser {
 
 	public static void analyzeBoardingsAndDeboardings(List<DynModeTrip> trips, String delimiter, double startTime,
 			double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
+		if (endTime < startTime) {
+			throw new IllegalArgumentException("endTime < startTime");
+		}
 		Map<Id<Link>, int[]> boardings = new HashMap<>();
 		Map<Id<Link>, int[]> deboardings = new HashMap<>();
 		double actualstartTime = Math.max(startTime, 0.0);
@@ -207,7 +211,7 @@ public class DynModeTripsAnalyser {
 	}
 
 	public static void analyseDetours(Network network, List<DynModeTrip> trips, DrtConfigGroup drtCfg,
-			String fileName) {
+			String fileName, boolean createGraphs) {
 		if (trips == null)
 			return;
 
@@ -246,22 +250,24 @@ public class DynModeTripsAnalyser {
 		collection2Text(detours, fileName + ".csv",
 				"person;distance;unsharedDistance;distanceDetour;time;unsharedTime;timeDetour");
 
-		final JFreeChart chart = DensityScatterPlots.createPlot("Travelled Distances", "travelled distance [m]",
-				"unshared ride distance [m]", distances);
-		ChartSaveUtils.saveAsPNG(chart, fileName + "_distancePlot", 1500, 1500);
+		if (createGraphs) {
+			final JFreeChart chart = DensityScatterPlots.createPlot("Travelled Distances", "travelled distance [m]",
+					"unshared ride distance [m]", distances);
+			ChartSaveUtils.saveAsPNG(chart, fileName + "_distancePlot", 1500, 1500);
 
-		final JFreeChart chart2 = DensityScatterPlots.createPlot("Travel Times", "travel time [s]",
-				"unshared ride time [s]", travelTimes,
-				Pair.of(drtCfg.getMaxTravelTimeAlpha(), drtCfg.getMaxTravelTimeBeta()));
-		ChartSaveUtils.saveAsPNG(chart2, fileName + "_travelTimePlot", 1500, 1500);
+			final JFreeChart chart2 = DensityScatterPlots.createPlot("Travel Times", "travel time [s]",
+					"unshared ride time [s]", travelTimes,
+					Pair.of(drtCfg.getMaxTravelTimeAlpha(), drtCfg.getMaxTravelTimeBeta()));
+			ChartSaveUtils.saveAsPNG(chart2, fileName + "_travelTimePlot", 1500, 1500);
 
-		final JFreeChart chart3 = DensityScatterPlots.createPlot("Ride Times", "ride time [s]",
-				"unshared ride time [s]", rideTimes,
-				Pair.of(drtCfg.getMaxTravelTimeAlpha(), drtCfg.getMaxTravelTimeBeta()));
-		ChartSaveUtils.saveAsPNG(chart3, fileName + "_rideTimePlot", 1500, 1500);
+			final JFreeChart chart3 = DensityScatterPlots.createPlot("Ride Times", "ride time [s]",
+					"unshared ride time [s]", rideTimes,
+					Pair.of(drtCfg.getMaxTravelTimeAlpha(), drtCfg.getMaxTravelTimeBeta()));
+			ChartSaveUtils.saveAsPNG(chart3, fileName + "_rideTimePlot", 1500, 1500);
+		}
 	}
 
-	public static void analyseWaitTimes(String fileName, List<DynModeTrip> trips, int binsize_s) {
+	public static void analyseWaitTimes(String fileName, List<DynModeTrip> trips, int binsize_s, boolean createGraphs) {
 		Collections.sort(trips);
 		if (trips.size() == 0)
 			return;
@@ -345,16 +351,18 @@ public class DynModeTripsAnalyser {
 			}
 			bw.flush();
 			bw.close();
-			dataset.addSeries(averageWaitC);
-			dataset.addSeries(medianWait);
-			dataset.addSeries(p_5Wait);
-			dataset.addSeries(p_95Wait);
-			datasetrequ.addSeries(requests);
-			JFreeChart chart = chartProfile(splitTrips.size(), dataset, "Waiting times", "Wait time (s)");
-			JFreeChart chart2 = chartProfile(splitTrips.size(), datasetrequ, "Ride requests per hour",
-					"Requests per hour (req/h)");
-			ChartSaveUtils.saveAsPNG(chart, fileName, 1500, 1000);
-			ChartSaveUtils.saveAsPNG(chart2, fileName + "_requests", 1500, 1000);
+			if (createGraphs) {
+				dataset.addSeries(averageWaitC);
+				dataset.addSeries(medianWait);
+				dataset.addSeries(p_5Wait);
+				dataset.addSeries(p_95Wait);
+				datasetrequ.addSeries(requests);
+				JFreeChart chart = chartProfile(splitTrips.size(), dataset, "Waiting times", "Wait time (s)");
+				JFreeChart chart2 = chartProfile(splitTrips.size(), datasetrequ, "Ride requests per hour",
+						"Requests per hour (req/h)");
+				ChartSaveUtils.saveAsPNG(chart, fileName, 1500, 1000);
+				ChartSaveUtils.saveAsPNG(chart2, fileName + "_requests", 1500, 1000);
+			}
 
 		} catch (IOException | ParseException e) {
 
@@ -401,7 +409,6 @@ public class DynModeTripsAnalyser {
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -439,7 +446,6 @@ public class DynModeTripsAnalyser {
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -503,8 +509,13 @@ public class DynModeTripsAnalyser {
 	 * @param fleet
 	 * @return
 	 */
-	public static int findMaxCap(Fleet fleet) {
-		return fleet.getVehicles().values().stream().mapToInt(v -> v.getCapacity()).max().getAsInt();
+	public static int findMaxVehicleCapacity(FleetSpecification fleet) {
+		return fleet.getVehicleSpecifications()
+				.values()
+				.stream()
+				.mapToInt(DvrpVehicleSpecification::getCapacity)
+				.max()
+				.getAsInt();
 	}
 
 	public static String summarizeDetailedOccupancyStats(Map<Id<Vehicle>, double[]> vehicleDistances, String del,

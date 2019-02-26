@@ -41,7 +41,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 
-public class QLanesNetworkFactory extends QNetworkFactory {
+public final class QLanesNetworkFactory implements QNetworkFactory {
 
 	private Lanes laneDefinitions;
 	
@@ -70,7 +70,7 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 	}
 
 	@Override
-	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
+	public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
 		this.netsimEngine = netsimEngine1 ;
 		double effectiveCellSize = network.getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();

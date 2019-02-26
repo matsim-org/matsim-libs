@@ -33,7 +33,7 @@ public final class CharyparNagelAgentStuckScoring implements org.matsim.core.sco
 	private static final double INITIAL_SCORE = 0.0;
 
 	/** The parameters used for scoring */
-	protected final ScoringParameters params;
+	private final ScoringParameters params;
 
 	public CharyparNagelAgentStuckScoring(final ScoringParameters params) {
 		this.params = params;

@@ -174,11 +174,11 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	@Override public void recalcTimeVariantAttributes() {
 		double now = context.getSimTimer().getTimeOfDay() ;
-		qlane.changeUnscaledFlowCapacityPerSecond( ((Link) this.getLink()).getFlowCapacityPerSec(now) );
+		qlane.changeUnscaledFlowCapacityPerSecond( this.getLink().getFlowCapacityPerSec(now ) );
 		qlane.changeEffectiveNumberOfLanes(this.getLink().getNumberOfLanes(now));
 
 		//		qlane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ; flowCap & nLanes are "push", freeSpeed is
-		//"pull".  This is, however, not completely honest w.r.t. freeSpeed consequences to the fdiag, but also wasn't correctly
+		//"pull".  This is not completely honest w.r.t. freeSpeed consequences to the fdiag, but also wasn't correctly
 		//thought through/implemented when I found it.  kai, feb'18
 
 		qlane.recalcTimeVariantAttributes();

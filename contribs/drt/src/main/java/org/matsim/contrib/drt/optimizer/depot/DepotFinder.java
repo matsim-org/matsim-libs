@@ -20,11 +20,11 @@
 package org.matsim.contrib.drt.optimizer.depot;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * @author michalm
  */
 public interface DepotFinder {
-	Link findDepot(Vehicle vehicle);
+	Link findDepot(DvrpVehicle vehicle);
 }

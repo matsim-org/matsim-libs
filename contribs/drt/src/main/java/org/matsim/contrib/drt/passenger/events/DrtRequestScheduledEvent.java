@@ -23,7 +23,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * @author michalm
@@ -31,19 +32,22 @@ import org.matsim.contrib.dvrp.data.*;
 public class DrtRequestScheduledEvent extends Event {
 	public static final String EVENT_TYPE = "DrtRequest scheduled";
 
+	public static final String ATTRIBUTE_MODE = "mode";
 	public static final String ATTRIBUTE_REQUEST = "request";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_PICKUP_TIME = "pickupTime";
 	public static final String ATTRIBUTE_DROPOFF_TIME = "dropoffTime";
 
+	private final String mode;
 	private final Id<Request> requestId;
-	private final Id<Vehicle> vehicleId;
+	private final Id<DvrpVehicle> vehicleId;
 	private final double pickupTime;
 	private final double dropoffTime;
 
-	public DrtRequestScheduledEvent(double time, Id<Request> requestId, Id<Vehicle> vehicleId, double pickupTime,
-			double dropoffTime) {
+	public DrtRequestScheduledEvent(double time, String mode, Id<Request> requestId, Id<DvrpVehicle> vehicleId,
+			double pickupTime, double dropoffTime) {
 		super(time);
+		this.mode = mode;
 		this.requestId = requestId;
 		this.vehicleId = vehicleId;
 		this.pickupTime = pickupTime;
@@ -53,6 +57,10 @@ public class DrtRequestScheduledEvent extends Event {
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
+	}
+
+	public String getMode() {
+		return mode;
 	}
 
 	/**
@@ -65,7 +73,7 @@ public class DrtRequestScheduledEvent extends Event {
 	/**
 	 * the vehicle scheduled to the request
 	 */
-	public Id<Vehicle> getVehicleId() {
+	public Id<DvrpVehicle> getVehicleId() {
 		return vehicleId;
 	}
 
@@ -86,6 +94,7 @@ public class DrtRequestScheduledEvent extends Event {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_MODE, mode);
 		attr.put(ATTRIBUTE_REQUEST, requestId + "");
 		attr.put(ATTRIBUTE_VEHICLE, vehicleId + "");
 		attr.put(ATTRIBUTE_PICKUP_TIME, pickupTime + "");

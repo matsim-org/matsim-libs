@@ -20,19 +20,16 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
  * @author nagel
@@ -60,18 +57,18 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String USE_PERSON_ID_FOR_MISSING_VEHICLE_ID = "usePersonIdForMissingVehicleId";
 	private static final String SIM_ENDTIME_INTERPRETATION = "simEndtimeInterpretation";
 	
-	public static enum TrafficDynamics { queue, withHoles,
+	public enum TrafficDynamics { queue, withHoles,
 		kinematicWaves //  MATSim-630; previously, the switch was InflowConstraint.maxflowFromFdiag. Amit Jan 2017.
-	} ;
+	}
 	
-	public static enum StarttimeInterpretation { maxOfStarttimeAndEarliestActivityEnd, onlyUseStarttime } ;
-	public static enum EndtimeInterpretation { minOfEndtimeAndMobsimFinished, onlyUseEndtime } ;
+	public enum StarttimeInterpretation { maxOfStarttimeAndEarliestActivityEnd, onlyUseStarttime }
+	public enum EndtimeInterpretation { minOfEndtimeAndMobsimFinished, onlyUseEndtime }
 
 	private static final String NODE_OFFSET = "nodeOffset";
 
 
-	private double startTime = Time.UNDEFINED_TIME;
-	private double endTime = Time.UNDEFINED_TIME;
+	private double startTime = Time.getUndefinedTime();
+	private double endTime = Time.getUndefinedTime();
 	private double timeStepSize = 1.0;
 	private double snapshotPeriod = 0; // off, no snapshots
 	private double flowCapFactor = 1.0;
@@ -102,12 +99,12 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	// ---
 	private static final String VEHICLE_BEHAVIOR = "vehicleBehavior";
-	public static enum VehicleBehavior { teleport, wait, exception } ;
+	public enum VehicleBehavior { teleport, wait, exception }
 	private VehicleBehavior vehicleBehavior = VehicleBehavior.teleport ;
 	// ---
 	private static final String SNAPSHOT_STYLE = "snapshotStyle";
-	public static enum SnapshotStyle { equiDist, queue, withHoles, withHolesAndShowHoles,
-		kinematicWaves /*kinematicWaves and withHoles produce same snapshots Amit Mar'17*/ } ;
+	public enum SnapshotStyle { equiDist, queue, withHoles, withHolesAndShowHoles,
+		kinematicWaves /*kinematicWaves and withHoles produce same snapshots Amit Mar'17*/ }
 	private SnapshotStyle snapshotStyle = SnapshotStyle.equiDist ;
 
 	// ---
@@ -116,7 +113,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 
 	// ---
-	public static enum LinkDynamics { FIFO, PassingQ, SeepageQ }
+	public enum LinkDynamics { FIFO, PassingQ, SeepageQ }
 	private LinkDynamics linkDynamics = LinkDynamics.FIFO ;
 	private static final String LINK_DYNAMICS = "linkDynamics" ;
 
@@ -226,23 +223,23 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		map.put(STUCK_TIME, STUCK_TIME_STRING );
 
 		{
-			String options = "" ;
+			StringBuilder options = new StringBuilder(60) ;
 			for ( TrafficDynamics dyn : TrafficDynamics.values() ) {
-				options += dyn + " " ;
+				options.append(dyn).append(' ');
 			}
-			map.put(TRAFFIC_DYNAMICS, "options: " + options ) ;
+			map.put(TRAFFIC_DYNAMICS, "options: " + options.toString() ) ;
 		}
 		{ 
-			String options = "" ;
+			StringBuilder options = new StringBuilder(60) ;
 			for ( StarttimeInterpretation ii : StarttimeInterpretation.values() ) {
-				options += ii + " " ;
+				options.append(ii).append(' ');
 			}
 			map.put(SIM_STARTTIME_INTERPRETATION, "Options: " + options ) ;
 		}
 		{
-			String options = "" ;
+			StringBuilder options = new StringBuilder(60) ;
 			for ( VehicleBehavior behav : VehicleBehavior.values() ) {
-				options += behav + " " ;
+				options.append(behav).append(' ');
 			}
 			map.put(VEHICLE_BEHAVIOR, "Defines what happens if an agent wants to depart, but the specified vehicle is not available. " +
 					"One of: " + options ) ;

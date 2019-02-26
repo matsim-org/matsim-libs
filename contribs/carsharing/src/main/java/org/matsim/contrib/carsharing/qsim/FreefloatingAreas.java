@@ -43,8 +43,8 @@ public class FreefloatingAreas {
 			}
 		}
 	}
-
-	public boolean contains(Coord coord) {
+	
+	public synchronized boolean contains(Coord coord) {
 		if (this.areas == null) {
 			return true;
 		}

@@ -23,11 +23,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.run.Drt;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Vehicle;
-
-import com.google.inject.Inject;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 
 /**
  * @author michalm
@@ -35,16 +32,15 @@ import com.google.inject.Inject;
 public class NearestStartLinkAsDepot implements DepotFinder {
 	private final Set<Link> startLinks = new HashSet<>();
 
-	@Inject
-	public NearestStartLinkAsDepot(@Drt Fleet fleet) {
-		for (Vehicle v : fleet.getVehicles().values()) {
+	public NearestStartLinkAsDepot(Fleet fleet) {
+		for (DvrpVehicle v : fleet.getVehicles().values()) {
 			startLinks.add(v.getStartLink());
 		}
 	}
 
 	// TODO a simple straight-line search (for the time being)... MultiNodeDijkstra should be the ultimate solution
 	@Override
-	public Link findDepot(Vehicle vehicle) {
+	public Link findDepot(DvrpVehicle vehicle) {
 		return Depots.findStraightLineNearestDepot(vehicle, startLinks);
 	}
 }

@@ -19,27 +19,41 @@
 
 package org.matsim.contrib.taxi.schedule.reconstruct;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
-import org.junit.*;
-import org.matsim.contrib.dvrp.data.*;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
+import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
-import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
-import org.matsim.core.config.*;
-import org.matsim.core.controler.*;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import com.google.inject.Key;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.name.Named;
 
 public class ScheduleReconstructionIT {
 	@Rule
@@ -62,37 +76,56 @@ public class ScheduleReconstructionIT {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setDumpDataAtEnd(false);
 
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 		Controler controler = RunTaxiBenchmark.createControler(config, 1);
-		controler.addOverridingModule(new AbstractModule() {
+		controler.addOverridingModule(new AbstractDvrpModeModule(taxiCfg.getMode()) {
 			@Override
 			public void install() {
-				bind(ScheduleReconstructor.class).asEagerSingleton();
+				bindModal(ScheduleReconstructor.class).toProvider(new Provider<ScheduleReconstructor>() {
+					@Inject
+					private @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
+					Network network;
+
+					@Inject
+					private EventsManager eventsManager;
+
+					@Override
+					public ScheduleReconstructor get() {
+						return new ScheduleReconstructor(network, eventsManager, getMode());
+					}
+				}).asEagerSingleton();
+
+				installQSimModule(new AbstractDvrpModeQSimModule(taxiCfg.getMode()) {
+					@Override
+					protected void configureQSim() {
+						addModalQSimComponentBinding().toProvider(modalProvider(
+								getter -> (MobsimBeforeCleanupListener)(e -> assertScheduleReconstructor(
+										getter.getModal(ScheduleReconstructor.class), getter.getModal(Fleet.class),
+										getter.getModal(SubmittedTaxiRequestsCollector.class)))));
+					}
+				});
 			}
 		});
 		controler.run();
 
-		ScheduleReconstructor scheduleReconstructor = controler.getInjector().getInstance(ScheduleReconstructor.class);
+	}
 
-		Fleet fleet = controler.getInjector().getInstance(Key.get(Fleet.class, Taxi.class));
-		SubmittedTaxiRequestsCollector requestCollector = controler.getInjector()
-				.getInstance(SubmittedTaxiRequestsCollector.class);
-
-		Assert.assertNotEquals(fleet, scheduleReconstructor.fleet);
-
-		compareVehicles(fleet.getVehicles().values(), scheduleReconstructor.fleet.getVehicles().values());
-
+	private void assertScheduleReconstructor(ScheduleReconstructor scheduleReconstructor, Fleet fleet,
+			SubmittedTaxiRequestsCollector requestCollector) {
+		Assert.assertNotEquals(fleet, scheduleReconstructor.getFleet());
+		compareVehicles(fleet.getVehicles().values(), scheduleReconstructor.getFleet().getVehicles().values());
 		compareRequests((Collection<TaxiRequest>)requestCollector.getRequests().values(),
 				scheduleReconstructor.taxiRequests.values());
 	}
 
-	private void compareVehicles(Collection<? extends Vehicle> originalVehs,
-			Collection<? extends Vehicle> reconstructedVehs) {
+	private void compareVehicles(Collection<? extends DvrpVehicle> originalVehs,
+			Collection<? extends DvrpVehicle> reconstructedVehs) {
 		Assert.assertNotEquals(originalVehs, reconstructedVehs);
 		Assert.assertEquals(originalVehs.size(), reconstructedVehs.size());
 
-		Iterator<? extends Vehicle> rIter = reconstructedVehs.iterator();
-		for (Vehicle o : originalVehs) {
-			Vehicle r = rIter.next();
+		Iterator<? extends DvrpVehicle> rIter = reconstructedVehs.iterator();
+		for (DvrpVehicle o : originalVehs) {
+			DvrpVehicle r = rIter.next();
 
 			Assert.assertEquals(o.getId(), r.getId());
 			Assert.assertEquals(o.getStartLink(), r.getStartLink());

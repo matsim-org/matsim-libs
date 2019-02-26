@@ -23,10 +23,9 @@ import java.awt.Color;
 import java.awt.Paint;
 
 import org.jfree.data.xy.DefaultTableXYDataset;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
-import org.matsim.contrib.taxi.run.Taxi;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts.ChartType;
@@ -36,7 +35,6 @@ import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
-import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class TaxiStatusTimeProfileCollectorProvider implements Provider<MobsimListener> {
@@ -45,8 +43,7 @@ public class TaxiStatusTimeProfileCollectorProvider implements Provider<MobsimLi
 	private final MatsimServices matsimServices;
 	private final String mode;
 
-	@Inject
-	public TaxiStatusTimeProfileCollectorProvider(@Taxi Fleet fleet, MatsimServices matsimServices,
+	public TaxiStatusTimeProfileCollectorProvider(Fleet fleet, MatsimServices matsimServices,
 			SubmittedTaxiRequestsCollector requestCollector, TaxiConfigGroup taxiCfg) {
 		this.fleet = fleet;
 		this.requestCollector = requestCollector;

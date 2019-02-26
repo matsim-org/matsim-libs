@@ -342,7 +342,7 @@ public final class ParallelEventsManager implements EventsManager {
 		private final Phaser simStepEndBarrier;
 		private final Phaser iterationEndBarrier;
 		private final BlockingQueue<Event[]> eventsQueue;
-		private double lastEventTime = Time.UNDEFINED_TIME;
+		private double lastEventTime = Time.getUndefinedTime();
 
 		public ProcessEventsRunnable(EventsManager eventsManager, ProcessedEventsChecker processedEventsChecker, 
 				Phaser waitForEmptyQueuesBarrier, Phaser simStepEndBarrier, Phaser iterationEndBarrier) {
@@ -365,7 +365,7 @@ public final class ParallelEventsManager implements EventsManager {
 			 */
 			try {
 				boolean foundLastEventOfIteration = false; 
-				while (true && !foundLastEventOfIteration) {
+				while (!foundLastEventOfIteration) {
 					Event[] events = this.eventsQueue.take();
 										
 					for (Event event : events) {
@@ -475,8 +475,8 @@ public final class ParallelEventsManager implements EventsManager {
 		private final Phaser iterationEndBarrier;
 		private final Phaser waitForEmptyQueuesBarrier;
 
-		public ExceptionHandler(final AtomicBoolean hadException, Phaser waitForEmptyQueuesBarrier,
-				Phaser simStepEndBarrier, Phaser iterationEndBarrier) {
+		ExceptionHandler(final AtomicBoolean hadException, Phaser waitForEmptyQueuesBarrier,
+										 Phaser simStepEndBarrier, Phaser iterationEndBarrier) {
 			this.hadException = hadException;
 			this.waitForEmptyQueuesBarrier = waitForEmptyQueuesBarrier;
 			this.simStepEndBarrier = simStepEndBarrier;

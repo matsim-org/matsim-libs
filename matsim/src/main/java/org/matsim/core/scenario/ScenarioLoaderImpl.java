@@ -235,7 +235,7 @@ class ScenarioLoaderImpl {
 			final String inputCRS = config.transit().getInputScheduleCRS();
 			final String internalCRS = config.global().getCoordinateSystem();
 
-            new TransitScheduleReader( inputCRS, internalCRS, this.scenario).readURL(transitScheduleFile);
+            new TransitScheduleReader( inputCRS, internalCRS, this.scenario).readURL(transitScheduleFile );
 		}
 		else {
 			log.info("no transit schedule file set in config, not loading any transit schedule");
@@ -283,7 +283,7 @@ class ScenarioLoaderImpl {
 		String filename = this.config.network().getLaneDefinitionsFile();
 		if (filename != null){
 			LanesReader reader = new LanesReader(this.scenario);
-			reader.readURL(ConfigGroup.getInputFileURL(this.config.getContext(), filename));
+			reader.readURL( ConfigGroup.getInputFileURL(this.config.getContext(), filename ) );
 		}
 		else {
 			log.info("no lanes file set in config, not loading any lanes");

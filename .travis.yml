@@ -8,11 +8,13 @@
 # Well, since the commit of this note will trigger another build, I am giving it a first shot, see below. kai
 
 language: java
-jdk: oraclejdk8
-addons:
-  apt:
-    packages:
-      - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
+
+# jdk: oraclejdk8
+# addons:
+#   apt:
+#     packages:
+#       - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
+# https://github.com/travis-ci/travis-ci/issues/10247
 
 # This skips the mvn install that is otherwise run (implausibly, the setting has to be "true")
 # https://docs.travis-ci.com/user/customizing-the-build/#Skipping-the-Installation-Step
@@ -71,6 +73,7 @@ env:
     - MODULE=contribs/locationchoice
     - MODULE=contribs/drt
     - MODULE=contribs/emissions
+    - MODULE=contribs/ev
     - MODULE=contribs/av
     - MODULE=contribs/dvrp
     - MODULE=contribs/decongestion

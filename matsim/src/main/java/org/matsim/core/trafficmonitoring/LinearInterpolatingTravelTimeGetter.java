@@ -20,24 +20,20 @@
 
 package org.matsim.core.trafficmonitoring;
 
-public class LinearInterpolatingTravelTimeGetter implements TravelTimeGetter {
+class LinearInterpolatingTravelTimeGetter implements TravelTimeGetter {
 
-	private AbstractTravelTimeAggregator travelTimeAggregator = null;
+	private final TimeSlotComputation travelTimeAggregator ;
 	private final int numSlots;
 	private final int travelTimeBinSize;
 	private final double halfBinSize;
 	
-	public LinearInterpolatingTravelTimeGetter(int numSlots, int travelTimeBinSize) {
+	public LinearInterpolatingTravelTimeGetter( int numSlots, int travelTimeBinSize, TimeSlotComputation aggregator ) {
 		this.numSlots = numSlots;
 		this.travelTimeBinSize = travelTimeBinSize;
 		this.halfBinSize = ((double) travelTimeBinSize) / 2;
+		this.travelTimeAggregator = aggregator ;
 	}
-	
-	@Override
-	public void setTravelTimeAggregator(AbstractTravelTimeAggregator travelTimeAggregator) {
-		this.travelTimeAggregator = travelTimeAggregator;		
-	}
-	
+
 	@Override
 	public double getTravelTime(TravelTimeData travelTimeData, double time) {
 		final int timeSlot = travelTimeAggregator.getTimeSlotIndex(time);

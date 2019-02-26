@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.matsim.org/files/dtd"
+           xmlns="http://www.matsim.org/files/dtd"
+           elementFormDefault="qualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xml:lang="en">
+           
+<!-- Editor: Kai Martins-turner, VSP, Berlin Institute of Technology -->
+<!-- Description of the vehicleTypes to be used in the simulation of freight traffic -->
+
+  <xs:element name="vehicleTypes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="vehicleType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="vehicleType">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="description"/>
+        <xs:element ref="allowableWeight"/>
+        <xs:element ref="capacity"/>
+        <xs:element ref="engineInformation"/>
+        <xs:element ref="costInformation"/>
+        <xs:element ref="maxVelocity"/>
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="description" type="xs:string"/>
+  
+  <xs:element name="allowableWeight">
+    <xs:complexType>
+      <xs:attribute name="weight" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="capacity">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:integer">
+          <xs:attribute name="unit" use="required"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="engineInformation">
+    <xs:complexType>
+      <xs:attribute name="fuelType" use="required" type="xs:NCName"/>
+      <xs:attribute name="gasConsumption" use="required" type="xs:decimal"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="costInformation">
+    <xs:complexType>
+      <xs:attribute name="fix" use="required" type="xs:integer"/>
+      <xs:attribute name="perMeter" use="required" type="xs:decimal"/>
+      <xs:attribute name="perSecond" use="required" type="xs:decimal"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="maxVelocity" type="xs:decimal"/>
+</xs:schema>

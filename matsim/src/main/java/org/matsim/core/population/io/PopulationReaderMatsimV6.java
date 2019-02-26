@@ -344,7 +344,7 @@ import java.util.Stack;
 				}
 			}
 		}
-		if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
+		if (Time.isUndefinedTime(this.currRoute.getTravelTime())) {
 			this.currRoute.setTravelTime(this.currleg.getTravelTime());
 		}
 
@@ -451,7 +451,7 @@ import java.util.Stack;
 				}
 			}
 		}
-		if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
+		if (Time.isUndefinedTime(this.currRoute.getTravelTime())) {
 			this.currRoute.setTravelTime(this.currleg.getTravelTime());
 		}
 

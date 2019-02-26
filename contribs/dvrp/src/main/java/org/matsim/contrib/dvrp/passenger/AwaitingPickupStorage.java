@@ -22,7 +22,7 @@ package org.matsim.contrib.dvrp.passenger;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 
 public class AwaitingPickupStorage {
 	// passenger's request id -> driver's stay task

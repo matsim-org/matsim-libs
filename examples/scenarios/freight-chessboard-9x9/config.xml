@@ -1,0 +1,79 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<!-- This is a fairly minimal config file; see console or logfile output for more options. -->
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="grid9x9.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="passengerPlans.xml" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="./output" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="100" />
+		<param name="eventsFileFormat" value="xml" />
+		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
+	</module>
+
+
+	<module name="qsim">
+		<param name="snapshotperiod" value="00:01:00" />
+	</module>
+
+	<module name="planCalcScore" >
+		<parameterset type="scoringParameters">
+		<param name="lateArrival" value="-18" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+6" />
+		<param name="waiting" value="-6" />
+
+			<parameterset type="modeParams">
+				<param name="mode" value="car"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="pt"/>
+			</parameterset>
+
+
+			<parameterset type="activityParams">
+				<param name="activityType"    value="home" /> <!-- home -->
+				<param name="typicalDuration" value="12:00:00" />
+			</parameterset>
+
+			<parameterset type="activityParams">
+				<param name="activityType"    value="work" /> <!-- home -->
+				<param name="typicalDuration" value="08:00:00" />
+				<param name="openingTime"     value="07:00:00" />
+				<param name="latestStartTime" value="09:00:00" />
+				<param name="closingTime"     value="18:00:00" />
+			</parameterset>
+		</parameterset>
+	</module>
+
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<parameterset type="strategysettings" >
+			<param name="strategyName" value="ChangeExpBeta" />
+			<param name="weight" value="0.8" />
+		</parameterset>
+
+		<parameterset type="strategysettings" >
+			<param name="strategyName" value="ReRoute" />
+			<param name="weight" value="0.1" />
+		</parameterset>
+
+		<parameterset type="strategysettings" >
+			<param name="strategyName" value="TimeAllocationMutator" />
+			<param name="weight" value="0.1" />
+		</parameterset>
+
+	</module>
+
+
+</config>

@@ -59,9 +59,9 @@ public class TestMatsimTransformer {
 		assertNotNull(matsimType);
 		assertEquals("myType",matsimType.getId().toString());
 		assertEquals(50, matsimType.getCarrierVehicleCapacity());
-		assertEquals(10.0, matsimType.getVehicleCostInformation().perDistanceUnit, 0.01);
-		assertEquals(5.0, matsimType.getVehicleCostInformation().perTimeUnit, 0.01);
-		assertEquals(100.0, matsimType.getVehicleCostInformation().fix, 0.01);
+		assertEquals(10.0, matsimType.getVehicleCostInformation().getPerDistanceUnit(), 0.01);
+		assertEquals(5.0, matsimType.getVehicleCostInformation().getPerTimeUnit(), 0.01);
+		assertEquals(100.0, matsimType.getVehicleCostInformation().getFix(), 0.01);
 	}
 	
 	@Test

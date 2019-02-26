@@ -22,7 +22,6 @@ package org.matsim.contrib.emissions.events;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
@@ -33,15 +32,15 @@ import java.util.Map.Entry;
  * @author benjamin
  *
  */
-public class WarmEmissionEvent extends Event {
+public final class WarmEmissionEvent extends Event {
     public final static String EVENT_TYPE = "warmEmissionEvent";
     public final static String ATTRIBUTE_LINK_ID = "linkId";
     public final static String ATTRIBUTE_VEHICLE_ID = "vehicleId";
     private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
-	private final Map<WarmPollutant, Double> warmEmissions;
+	private final Map<String, Double> warmEmissions;
 	
-	public WarmEmissionEvent(double time, Id<Link> linkId, Id<Vehicle> vehicleId, Map<WarmPollutant, Double> warmEmissions) {
+	public WarmEmissionEvent(double time, Id<Link> linkId, Id<Vehicle> vehicleId, Map<String, Double> warmEmissions) {
         super(time);
         this.linkId = linkId;
 		this.vehicleId = vehicleId;
@@ -56,7 +55,7 @@ public class WarmEmissionEvent extends Event {
 		return vehicleId;
 	}
 	
-	public Map<WarmPollutant, Double> getWarmEmissions() {
+	public Map<String, Double> getWarmEmissions() {
 		return warmEmissions;
 	}
 
@@ -65,10 +64,10 @@ public class WarmEmissionEvent extends Event {
 		Map<String, String> attributes = super.getAttributes();
 		attributes.put(ATTRIBUTE_LINK_ID, this.linkId.toString());
 		attributes.put(ATTRIBUTE_VEHICLE_ID, this.vehicleId.toString());
-		for(Entry<WarmPollutant, Double> entry : warmEmissions.entrySet()){
-			WarmPollutant pollutant = entry.getKey();
+		for(Entry<String, Double> entry : warmEmissions.entrySet()){
+			String pollutant = entry.getKey();
 			Double value = entry.getValue();
-			attributes.put(pollutant.toString(), value.toString());
+			attributes.put(pollutant, value.toString());
 		}
 		return attributes;
 	}

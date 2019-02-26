@@ -19,122 +19,110 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.events;
 
+import java.net.URL;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.emissions.types.ColdPollutant;
-import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.MatsimReader;
+import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import static org.matsim.core.events.EventsReaderXMLv1.*;
 
 
 /**
  * @author benjamin
  *
  */
-public class EmissionEventsReader extends MatsimXmlParser{
-	private static final Logger logger = Logger.getLogger(EmissionEventsReader.class);
+public final class EmissionEventsReader implements MatsimReader {
 
-	private static final String EVENT = "event";
+	private MatsimEventsReader delegate ;
 
-	private final EventsManager eventsManager;
+	public EmissionEventsReader( EventsManager events ){
+		this.delegate = new MatsimEventsReader( events );
 
-	public EmissionEventsReader(EventsManager events) {
-		super();
-		this.eventsManager = events;
-		setValidating(false); // events-files have no DTD, thus they cannot validate
-	}
+		// yyyy should be possible to make these mappers available to other readers (that may want to combine event types that are not in the core).  kai, jan'19
 
-	@Override
-	public void startTag(String name, Attributes atts, Stack<String> context) {
-		if (EVENT.equals(name)) {
-			startEvent(atts);
-		}
-	}
+		this.delegate.addCustomEventMapper( WarmEmissionEvent.EVENT_TYPE, (CustomEventMapper<WarmEmissionEvent>) event -> {
 
-	@Override
-	public void endTag(String name, String content, Stack<String> context) {
-	}
+			Map<String, String> attributes = event.getAttributes();
+			Map<String, Double> warmEmissions = new LinkedHashMap<>();
 
-	@Override
-	public void characters(char[] ch, int start, int length) throws SAXException {
-		// ignore characters to prevent OutOfMemoryExceptions
-		/* the events-file only contains empty tags with attributes,
-		 * but without the dtd or schema, all whitespace between tags is handled
-		 * by characters and added up by super.characters, consuming huge
-		 * amount of memory when large events-files are read in.
-		 */
-	}
+			double time = Time.getUndefinedTime();
+			Id<Link> linkId = null;
+			Id<Vehicle> vehicleId = null;
 
-	private void startEvent(final Attributes attributes){
+			// the loop is necessary since we do now know which pollutants are in the event.
+			for( Map.Entry<String, String> entry : attributes.entrySet() ){
 
-		String eventType = attributes.getValue("type");
-
-		Double time = 0.0;
-		Id<Link> linkId = null;
-		Id<Vehicle> vehicleId = null;
-		Map<WarmPollutant, Double> warmEmissions = new HashMap<>();
-		Map<ColdPollutant, Double> coldEmissions = new HashMap<>();
-
-		if(WarmEmissionEvent.EVENT_TYPE.equals(eventType)){
-			for (int i = 0; i < attributes.getLength(); i++){
-				if (attributes.getQName(i).equals("time")){
-					time = Double.parseDouble(attributes.getValue(i));
-				}
-				else if(attributes.getQName(i).equals("type")){
-					eventType = attributes.getValue(i);
-				}
-				else if(attributes.getQName(i).equals(WarmEmissionEvent.ATTRIBUTE_LINK_ID)){
-					linkId = Id.create((attributes.getValue(i)), Link.class);
-				}
-				else if(attributes.getQName(i).equals(WarmEmissionEvent.ATTRIBUTE_VEHICLE_ID)){
-					vehicleId = Id.create((attributes.getValue(i)), Vehicle.class);
-				}
-				else {
-					WarmPollutant pollutant = WarmPollutant.valueOf(attributes.getQName(i));
-					Double value = Double.parseDouble(attributes.getValue(i));
-					warmEmissions.put(pollutant, value);
+				if( "time".equals( entry.getKey() ) ){
+					time = Double.parseDouble( entry.getValue() );
+				} else if( "type".equals( entry.getKey() ) ){
+					// I don't think that we are doing anything here. kai, jan'19
+				} else if( WarmEmissionEvent.ATTRIBUTE_LINK_ID.equals( entry.getKey() ) ){
+					linkId = Id.createLinkId( entry.getValue() );
+				} else if( WarmEmissionEvent.ATTRIBUTE_VEHICLE_ID.equals( entry.getKey() ) ){
+					vehicleId = Id.createVehicleId( entry.getValue() );
+				} else{
+					String pollutant = entry.getKey();
+					Double value = Double.parseDouble( entry.getValue() );
+					warmEmissions.put( pollutant, value );
 				}
 			}
-			this.eventsManager.processEvent(new WarmEmissionEvent(
-					time,
-					linkId,
-					vehicleId,
-					warmEmissions
-			));
-		}
-		else if (ColdEmissionEvent.EVENT_TYPE.equals(eventType)){
-			for (int i = 0; i < attributes.getLength(); i++){
-				if (attributes.getQName(i).equals("time")){
-					time = Double.parseDouble(attributes.getValue(i));
-				}
-				else if(attributes.getQName(i).equals("type")){
-					eventType = attributes.getValue(i);
-				}
-				else if(attributes.getQName(i).equals(ColdEmissionEvent.ATTRIBUTE_LINK_ID)){
-					linkId = Id.create((attributes.getValue(i)), Link.class);
-				}
-				else if(attributes.getQName(i).equals(ColdEmissionEvent.ATTRIBUTE_VEHICLE_ID)){
-					vehicleId = Id.create((attributes.getValue(i)), Vehicle.class);
-				}
-				else {
-					ColdPollutant pollutant = ColdPollutant.valueOf(attributes.getQName(i));
-					Double value = Double.parseDouble(attributes.getValue(i));
-					coldEmissions.put(pollutant, value);
+
+			return new WarmEmissionEvent( time, linkId, vehicleId, warmEmissions );
+		} );
+
+		this.delegate.addCustomEventMapper( ColdEmissionEvent.EVENT_TYPE, (CustomEventMapper<ColdEmissionEvent>) event -> {
+
+			Map<String, String> attributes = event.getAttributes();
+			Map<String, Double> coldEmissions = new LinkedHashMap<>();
+
+			double time = Time.getUndefinedTime();
+			Id<Link> linkId = null;
+			Id<Vehicle> vehicleId = null;
+
+			// the loop is necessary since we do now know which pollutants are in the event.
+			for( Map.Entry<String, String> entry : attributes.entrySet() ){
+
+				if( "time".equals( entry.getKey() ) ){
+					time = Double.parseDouble( entry.getValue() );
+				} else if( "type".equals( entry.getKey() ) ){
+					// do nothing
+				} else if( ColdEmissionEvent.ATTRIBUTE_LINK_ID.equals( entry.getKey() ) ){
+					linkId = Id.createLinkId( entry.getValue() );
+				} else if( ColdEmissionEvent.ATTRIBUTE_VEHICLE_ID.equals( entry.getKey() ) ){
+					vehicleId = Id.createVehicleId( entry.getValue() );
+				} else{
+					String pollutant = entry.getKey();
+					Double value = Double.parseDouble( entry.getValue() );
+					coldEmissions.put( pollutant, value );
 				}
 			}
-			this.eventsManager.processEvent(new ColdEmissionEvent(
-					time,
-					linkId,
-					vehicleId,
-					coldEmissions
-			));
-		}
+			return new ColdEmissionEvent( time, linkId, vehicleId, coldEmissions );
+
+		} );
+	}
+
+	@Override
+	public void readFile( String filename ){
+		delegate.readFile( filename );
+	}
+
+	@Override
+	public void readURL( URL url ){
+		delegate.readURL( url );
 	}
 }

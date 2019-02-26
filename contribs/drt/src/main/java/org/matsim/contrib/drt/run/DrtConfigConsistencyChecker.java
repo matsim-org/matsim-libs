@@ -23,8 +23,8 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParamsConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup.OperationalScheme;
+import org.matsim.contrib.dvrp.run.ConfigConsistencyCheckers;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
-import org.matsim.contrib.dvrp.run.HasMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.groups.GlobalConfigGroup;
@@ -38,28 +38,17 @@ public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
 	public void checkConsistency(Config config) {
 		new DvrpConfigConsistencyChecker().checkConsistency(config);
 
-		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
-		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(config);
-		if (drtCfg != null) {
-			if (multiModeDrtCfg != null) {
-				throw new RuntimeException("Either DrtConfigGroup or MultiModeDrtConfigGroup must be defined");
-			}
-			checkDrtConfigConsistency(drtCfg, config.global());
-		} else {
-			if (multiModeDrtCfg == null) {
-				throw new RuntimeException("Either DrtConfigGroup or MultiModeDrtConfigGroup must be defined");
-			}
-			multiModeDrtCfg.getDrtConfigGroups().stream().forEach(c -> checkDrtConfigConsistency(c, config.global()));
-			if (!HasMode.areModesUnique(multiModeDrtCfg.getDrtConfigGroups().stream())) {
-				throw new RuntimeException("Drt modes are not unique");
-			}
-		}
+		ConfigConsistencyCheckers.checkSingleOrMultiModeConsistency(DrtConfigGroup.get(config),
+				MultiModeDrtConfigGroup.get(config), drtCfg -> checkDrtConfigConsistency(drtCfg, config.global()));
+
 		if (Time.isUndefinedTime(config.qsim().getEndTime())
 				&& config.qsim().getSimEndtimeInterpretation() != EndtimeInterpretation.onlyUseEndtime) {
 			// Not an issue if all request rejections are immediate (i.e. happen during request submission)
 			log.warn("qsim.endTime should be specified and qsim.simEndtimeInterpretation should be 'onlyUseEndtime'"
 					+ " if postponed request rejection is allowed. Otherwise, rejected passengers"
-					+ " (who are stuck endlessly waiting for a DRT vehicle) will prevent QSim from stopping");
+					+ " (who are stuck endlessly waiting for a DRT vehicle) will prevent QSim from stopping."
+					+ " Keep also in mind that not setting an end time may result in agents "
+					+ "attempting to travel without vehicles being available.");
 		}
 		if (config.qsim().getNumberOfThreads() != 1) {
 			throw new RuntimeException("Only a single-threaded QSim allowed");

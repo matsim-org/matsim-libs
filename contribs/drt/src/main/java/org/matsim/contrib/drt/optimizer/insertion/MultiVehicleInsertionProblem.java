@@ -21,7 +21,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.Collection;
 import java.util.Optional;
 
-import org.matsim.contrib.drt.data.DrtRequest;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 

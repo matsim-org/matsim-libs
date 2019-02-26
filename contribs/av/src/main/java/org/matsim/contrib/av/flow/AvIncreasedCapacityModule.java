@@ -20,7 +20,7 @@
 package org.matsim.contrib.av.flow;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -55,6 +55,7 @@ public class AvIncreasedCapacityModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSource.DVRP_VEHICLE_TYPE)).toInstance(vehicleType);
+		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
+				.toInstance(vehicleType);
 	}
 }

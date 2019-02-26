@@ -26,8 +26,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -47,7 +45,6 @@ public class ZonalDemandAggregator implements PersonDepartureEventHandler {
 	private final Map<Double, Map<String, MutableInt>> departures = new HashMap<>();
 	private final Map<Double, Map<String, MutableInt>> previousIterationDepartures = new HashMap<>();
 
-	@Inject
 	public ZonalDemandAggregator(EventsManager events, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();

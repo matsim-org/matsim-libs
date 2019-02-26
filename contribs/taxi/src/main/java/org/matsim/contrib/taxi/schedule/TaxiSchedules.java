@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.schedule;
 import java.util.stream.Stream;
 
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 
 public class TaxiSchedules {

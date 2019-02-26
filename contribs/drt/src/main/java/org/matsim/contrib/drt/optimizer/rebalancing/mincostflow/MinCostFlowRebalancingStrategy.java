@@ -25,16 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.StayTask;
@@ -54,9 +51,8 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 	private final MinCostRelocationCalculator minCostRelocationCalculator;
 	private final MinCostFlowRebalancingParams params;
 
-	@Inject
 	public MinCostFlowRebalancingStrategy(RebalancingTargetCalculator rebalancingTargetCalculator,
-			DrtZonalSystem zonalSystem, @Drt Fleet fleet, MinCostRelocationCalculator minCostRelocationCalculator,
+			DrtZonalSystem zonalSystem, Fleet fleet, MinCostRelocationCalculator minCostRelocationCalculator,
 			DrtConfigGroup drtCfg) {
 		this.rebalancingTargetCalculator = rebalancingTargetCalculator;
 		this.zonalSystem = zonalSystem;
@@ -66,18 +62,19 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 	}
 
 	@Override
-	public List<Relocation> calcRelocations(Stream<? extends Vehicle> rebalancableVehicles, double time) {
-		Map<String, List<Vehicle>> rebalancableVehiclesPerZone = groupRebalancableVehicles(rebalancableVehicles, time);
+	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
+		Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone = groupRebalancableVehicles(rebalancableVehicles,
+				time);
 		if (rebalancableVehiclesPerZone.isEmpty()) {
 			return Collections.emptyList();
 		}
-		Map<String, List<Vehicle>> soonIdleVehiclesPerZone = groupSoonIdleVehicles(time);
+		Map<String, List<DvrpVehicle>> soonIdleVehiclesPerZone = groupSoonIdleVehicles(time);
 		return calculateMinCostRelocations(time, rebalancableVehiclesPerZone, soonIdleVehiclesPerZone);
 	}
 
-	private Map<String, List<Vehicle>> groupRebalancableVehicles(Stream<? extends Vehicle> rebalancableVehicles,
+	private Map<String, List<DvrpVehicle>> groupRebalancableVehicles(Stream<? extends DvrpVehicle> rebalancableVehicles,
 			double time) {
-		Map<String, List<Vehicle>> rebalancableVehiclesPerZone = new HashMap<>();
+		Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone = new HashMap<>();
 		rebalancableVehicles.filter(v -> v.getServiceEndTime() > time + params.getMinServiceTime()).forEach(v -> {
 			Link link = ((StayTask)v.getSchedule().getCurrentTask()).getLink();
 			String zone = zonalSystem.getZoneForLinkId(link.getId());
@@ -90,9 +87,9 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 	}
 
 	// also include vehicles being right now relocated or recharged
-	private Map<String, List<Vehicle>> groupSoonIdleVehicles(double time) {
-		Map<String, List<Vehicle>> soonIdleVehiclesPerZone = new HashMap<>();
-		for (Vehicle v : fleet.getVehicles().values()) {
+	private Map<String, List<DvrpVehicle>> groupSoonIdleVehicles(double time) {
+		Map<String, List<DvrpVehicle>> soonIdleVehiclesPerZone = new HashMap<>();
+		for (DvrpVehicle v : fleet.getVehicles().values()) {
 			Schedule s = v.getSchedule();
 			StayTask stayTask = (StayTask)Schedules.getLastTask(s);
 			if (stayTask.getStatus() == TaskStatus.PLANNED
@@ -108,8 +105,8 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 	}
 
 	private List<Relocation> calculateMinCostRelocations(double time,
-			Map<String, List<Vehicle>> rebalancableVehiclesPerZone,
-			Map<String, List<Vehicle>> soonIdleVehiclesPerZone) {
+			Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone,
+			Map<String, List<DvrpVehicle>> soonIdleVehiclesPerZone) {
 		List<Pair<String, Integer>> supply = new ArrayList<>();
 		List<Pair<String, Integer>> demand = new ArrayList<>();
 

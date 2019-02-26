@@ -19,11 +19,15 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dynagent.*;
+import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.DynActivity;
+import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.DynAgentLogic;
+import org.matsim.contrib.dynagent.IdleDynActivity;
 
 /**
  * @author michalm
@@ -33,15 +37,15 @@ public class VrpAgentLogic implements DynAgentLogic {
 	public static final String AFTER_SCHEDULE_ACTIVITY_TYPE = "AfterVrpSchedule";
 
 	public interface DynActionCreator {
-		DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now);
+		DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now);
 	}
 
 	private final VrpOptimizer optimizer;
 	private final DynActionCreator dynActionCreator;
-	private final Vehicle vehicle;
+	private final DvrpVehicle vehicle;
 	private DynAgent agent;
 
-	public VrpAgentLogic(VrpOptimizer optimizer, DynActionCreator dynActionCreator, Vehicle vehicle) {
+	public VrpAgentLogic(VrpOptimizer optimizer, DynActionCreator dynActionCreator, DvrpVehicle vehicle) {
 		this.optimizer = optimizer;
 		this.dynActionCreator = dynActionCreator;
 		this.vehicle = vehicle;
@@ -74,33 +78,28 @@ public class VrpAgentLogic implements DynAgentLogic {
 			return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
 		}
 
-		DynAction action = dynActionCreator.createAction(agent, vehicle, now);
-
-		return action;
+		return dynActionCreator.createAction(agent, vehicle, now);
 	}
 
 	private DynActivity createBeforeScheduleActivity() {
-		return new AbstractDynActivity(BEFORE_SCHEDULE_ACTIVITY_TYPE) {
-			public double getEndTime() {
-				Schedule s = vehicle.getSchedule();
-
-				switch (s.getStatus()) {
-					case PLANNED:
-						return s.getBeginTime();
-					case UNPLANNED:
-						return vehicle.getServiceEndTime();
-					default:
-						throw new IllegalStateException();
-				}
+		return new IdleDynActivity(BEFORE_SCHEDULE_ACTIVITY_TYPE, () -> {
+			Schedule s = vehicle.getSchedule();
+			switch (s.getStatus()) {
+				case PLANNED:
+					return s.getBeginTime();
+				case UNPLANNED:
+					return vehicle.getServiceEndTime();
+				default:
+					throw new IllegalStateException();
 			}
-		};
+		});
 	}
 
 	private DynActivity createAfterScheduleActivity() {
-		return new StaticDynActivity(AFTER_SCHEDULE_ACTIVITY_TYPE, Double.POSITIVE_INFINITY);
+		return new IdleDynActivity(AFTER_SCHEDULE_ACTIVITY_TYPE, Double.POSITIVE_INFINITY);
 	}
 
-	Vehicle getVehicle() {
+	DvrpVehicle getVehicle() {
 		return vehicle;
 	}
 }

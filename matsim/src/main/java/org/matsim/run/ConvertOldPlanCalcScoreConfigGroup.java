@@ -551,12 +551,12 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 		final static String SET_TYPE = "activityParams";
 		private String type;
 		private double priority = 1.0;
-		private double typicalDuration = Time.UNDEFINED_TIME;
-		private double minimalDuration = Time.UNDEFINED_TIME;
-		private double openingTime = Time.UNDEFINED_TIME;
-		private double latestStartTime = Time.UNDEFINED_TIME;
-		private double earliestEndTime = Time.UNDEFINED_TIME;
-		private double closingTime = Time.UNDEFINED_TIME;
+		private double typicalDuration = Time.getUndefinedTime();
+		private double minimalDuration = Time.getUndefinedTime();
+		private double openingTime = Time.getUndefinedTime();
+		private double latestStartTime = Time.getUndefinedTime();
+		private double earliestEndTime = Time.getUndefinedTime();
+		private double closingTime = Time.getUndefinedTime();
 		private boolean scoringThisActivityAtAll = true ;
 
 		private TypicalDurationScoreComputation typicalDurationScoreComputation = TypicalDurationScoreComputation.uniform ;
@@ -649,7 +649,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 		private static int minDurCnt=0 ;
 		public void setMinimalDuration(final double minimalDuration) {
 			testForLocked() ;
-			if ((minimalDuration != Time.UNDEFINED_TIME) && (minDurCnt<1) ) {
+			if ((!Time.isUndefinedTime(minimalDuration)) && (minDurCnt<1) ) {
 				minDurCnt++ ;
 				log.warn("Setting minimalDuration different from zero is discouraged.  It is probably implemented correctly, " +
 						"but there is as of now no indication that it makes the results more realistic.  KN, Sep'08" + Gbl.ONLYONCE );

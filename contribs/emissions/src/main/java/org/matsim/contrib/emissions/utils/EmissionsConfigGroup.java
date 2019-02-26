@@ -19,15 +19,16 @@
 
 package org.matsim.contrib.emissions.utils;
 
+import org.matsim.contrib.emissions.EmissionSpecificationMarker;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
+
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
-public class EmissionsConfigGroup
+public final class EmissionsConfigGroup
 extends ReflectiveConfigGroup
 {
 	public static final String GROUP_NAME = "emissions";
@@ -83,6 +84,14 @@ extends ReflectiveConfigGroup
 	@Deprecated // my preference would be to phase out the "fromFile" option and use "fromLinkAttributes" only.  It can always be solved after reading the network.  kai, oct'18
 	private HbefaRoadTypeSource hbefaRoadTypeSource = HbefaRoadTypeSource.fromFile; // fromFile is to support backward compatibility
 
+	public enum NonScenarioVehicles { ignore, abort }
+	private static final String NON_SCENARIO_VEHICLES = "nonScenarioVehicles";
+	private NonScenarioVehicles nonScenarioVehicles = NonScenarioVehicles.abort;
+
+	public enum EmissionsComputationMethod {StopAndGoFraction,AverageSpeed}
+	private static final String EMISSIONS_COMPUTATION_METHOD = "emissionsComputationMethod";
+	private EmissionsComputationMethod emissionsComputationMethod = EmissionsComputationMethod.StopAndGoFraction;
+	
 	@Deprecated // should be phased out.  kai, oct'18
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED if source of the HBEFA road type is set to "+HbefaRoadTypeSource.fromFile +". It maps from input road types to HBEFA 3.1 road type strings";
 	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors";
@@ -114,6 +123,17 @@ extends ReflectiveConfigGroup
 
 	private static final String HANDLE_HIGH_AVERAGE_SPEEDS_CMT = "if true, don't fail when average speed is higher than the link freespeed, but cap it instead.";
 
+	private static final String NON_SCENARIO_VEHICLES_CMT = "Specifies the handling of non-scenario vehicles.  The options are: "
+//			+ Arrays.stream(NonScenarioVehicles.values()).map(handling -> " " + handling.toString()).collect(Collectors.joining()) +"."
+			//    https://stackoverflow.com/questions/48300252/getting-stackoverflowerror-while-initializing-a-static-variable .
+			// really ugly compilation error with java8, difficult to find.  kai, nov'18
+			+ NonScenarioVehicles.values()
+			+ " Should eventually be extended by 'getVehiclesFromMobsim'."
+	 ;
+
+	private static final String EMISSIONS_COMPUTATION_METHOD_CMT = "if true, the original fractional method from Hülsmann et al (2011) will be used to calculate emission factors";
+
+
 	@Override
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
@@ -124,8 +144,9 @@ extends ReflectiveConfigGroup
 		{
 			String Hbefa_ROADTYPE_SOURCE_CMT = "Source of the HBEFFA road type. The options are:"+ Arrays.stream(HbefaRoadTypeSource.values())
 																							 .map(source -> " " + source.toString())
-																							 .collect(Collectors.joining()) +"."+
-			"\n"+HbefaRoadTypeSource.fromLinkAttributes+" is default i.e. put HBEFA road type directly to the link attributes.";
+																							 .collect(Collectors.joining()) +"."
+//			"\n"+HbefaRoadTypeSource.fromLinkAttributes+" is default i.e. put HBEFA road type directly to the link attributes." // unfortunately not default
+			;
 
 			map.put(Hbefa_ROADTYPE_SOURCE, Hbefa_ROADTYPE_SOURCE_CMT);
 		}
@@ -152,6 +173,10 @@ extends ReflectiveConfigGroup
 		map.put(CONSIDERING_CO2_COSTS, CONSIDERING_CO2_COSTS_CMT);
 
 		map.put(HANDLE_HIGH_AVERAGE_SPEEDS, HANDLE_HIGH_AVERAGE_SPEEDS_CMT);
+		
+		map.put(NON_SCENARIO_VEHICLES, NON_SCENARIO_VEHICLES_CMT);
+
+        map.put(EMISSIONS_COMPUTATION_METHOD, EMISSIONS_COMPUTATION_METHOD_CMT);
 
 		return map;
 	}
@@ -353,4 +378,25 @@ extends ReflectiveConfigGroup
 	public void setHbefaRoadTypeSource(HbefaRoadTypeSource hbefaRoadTypeSource) {
 		this.hbefaRoadTypeSource = hbefaRoadTypeSource;
 	}
+
+	@StringGetter(NON_SCENARIO_VEHICLES)
+	public NonScenarioVehicles getNonScenarioVehicles() {
+		return nonScenarioVehicles;
+	}
+
+	@StringSetter(NON_SCENARIO_VEHICLES)
+	public void setNonScenarioVehicles(NonScenarioVehicles nonScenarioVehicles) {
+		this.nonScenarioVehicles = nonScenarioVehicles;
+	}
+
+    @StringGetter(EMISSIONS_COMPUTATION_METHOD)
+    public EmissionsComputationMethod getEmissionsComputationMethod() {
+        return emissionsComputationMethod;
+    }
+
+    @StringSetter(EMISSIONS_COMPUTATION_METHOD)
+    public void setEmissionsComputationMethod(EmissionsComputationMethod emissionsComputationMethod) {
+        this.emissionsComputationMethod = emissionsComputationMethod;
+    }
+
 }

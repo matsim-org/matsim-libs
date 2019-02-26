@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -33,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
  * @author stefan
  *
  */
-public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunctionFactory{
+public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunctionFactory{
 
     /**
      *
@@ -123,7 +124,7 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
             if(selectedPlan == null) return 0.;
             for(ScheduledTour tour : selectedPlan.getScheduledTours()){
                 if(!tour.getTour().getTourElements().isEmpty()){
-                    score += (-1)*tour.getVehicle().getVehicleType().getVehicleCostInformation().fix;
+                    score += (-1)*tour.getVehicle().getVehicleType().getVehicleCostInformation().getFix();
                 }
             }
             return score;
@@ -167,12 +168,12 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
         }
 
         private double getTimeParameter(CarrierVehicle vehicle) {
-            return vehicle.getVehicleType().getVehicleCostInformation().perTimeUnit;
+            return vehicle.getVehicleType().getVehicleCostInformation().getPerTimeUnit();
         }
 
 
         private double getDistanceParameter(CarrierVehicle vehicle) {
-            return vehicle.getVehicleType().getVehicleCostInformation().perDistanceUnit;
+            return vehicle.getVehicleType().getVehicleCostInformation().getPerDistanceUnit();
         }
 
 
@@ -270,6 +271,7 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 
     private Network network;
 
+    @Inject
     public CarrierScoringFunctionFactoryImpl(Network network) {
         super();
         this.network = network;

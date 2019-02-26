@@ -96,13 +96,7 @@ public class TabularFileParser implements MatsimSomeReader {
         boolean started = (config.getStartRegex() == null);
         boolean ended = false;
         
-        // this allows to read compressed files as well // DR feb, '14 
-//        try {
-//            reader = new BufferedReader(new FileReader(config.getFile()));
-//        } catch (FileNotFoundException e) {
-//            throw new RuntimeException(e);
-//        }
-        try ( BufferedReader reader = IOUtils.getBufferedReader(config.getFile(), config.getCharset()) ) {
+        try ( BufferedReader reader = config.getUrl() == null ? IOUtils.getBufferedReader(config.getFile(), config.getCharset()) : IOUtils.getBufferedReader(config.getUrl(), config.getCharset()) ) {
         	String line;
 	        while ((line = reader.readLine()) != null && !ended) {
 	            if (started) {

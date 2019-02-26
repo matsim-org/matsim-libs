@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 
 /**
  * @author michalm
@@ -33,6 +33,7 @@ import org.matsim.contrib.dvrp.data.Request;
 public class DrtRequestSubmittedEvent extends Event {
 	public static final String EVENT_TYPE = "DrtRequest submitted";
 
+	public static final String ATTRIBUTE_MODE = "mode";
 	public static final String ATTRIBUTE_REQUEST = "request";
 	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String ATTRIBUTE_FROM_LINK = "fromLink";
@@ -40,6 +41,7 @@ public class DrtRequestSubmittedEvent extends Event {
 	public static final String ATTRIBUTE_UNSHARED_RIDE_TIME = "unsharedRideTime";
 	public static final String ATTRIBUTE_UNSHARED_RIDE_DISTANCE = "unsharedRideDistance";
 
+	private final String mode;
 	private final Id<Request> requestId;
 	private final Id<Person> personId;
 	private final Id<Link> fromLinkId;
@@ -47,9 +49,10 @@ public class DrtRequestSubmittedEvent extends Event {
 	private final double unsharedRideTime;
 	private final double unsharedRideDistance;
 
-	public DrtRequestSubmittedEvent(double time, Id<Request> requestId, Id<Person> personId, Id<Link> fromLinkId,
-			Id<Link> toLinkId, double unsharedRideTime, double unsharedRideDistance) {
+	public DrtRequestSubmittedEvent(double time, String mode, Id<Request> requestId, Id<Person> personId,
+			Id<Link> fromLinkId, Id<Link> toLinkId, double unsharedRideTime, double unsharedRideDistance) {
 		super(time);
+		this.mode = mode;
 		this.requestId = requestId;
 		this.personId = personId;
 		this.fromLinkId = fromLinkId;
@@ -61,6 +64,10 @@ public class DrtRequestSubmittedEvent extends Event {
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
+	}
+
+	public String getMode() {
+		return mode;
 	}
 
 	/**
@@ -108,6 +115,7 @@ public class DrtRequestSubmittedEvent extends Event {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_MODE, mode);
 		attr.put(ATTRIBUTE_REQUEST, requestId + "");
 		attr.put(ATTRIBUTE_PERSON, personId + "");
 		attr.put(ATTRIBUTE_FROM_LINK, fromLinkId + "");

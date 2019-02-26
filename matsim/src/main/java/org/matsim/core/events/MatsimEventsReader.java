@@ -21,12 +21,16 @@
 package org.matsim.core.events;
 
 import java.io.InputStream;
+import java.net.URL;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimReader;
+import org.matsim.core.events.EventsReaderXMLv1.CustomEventMapper;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -41,6 +45,12 @@ public final class MatsimEventsReader implements MatsimReader {
 
 	private final static Logger log = Logger.getLogger(MatsimEventsReader.class);
 	private final EventsManager events;
+
+	private final Map<String, CustomEventMapper> map = new LinkedHashMap<>(  ) ;
+
+	public void addCustomEventMapper( String eventType, CustomEventMapper mapper ) {
+		map.put( eventType, mapper ) ;
+	}
 
 	/**
 	 * Creates a new reader for MATSim events files.
@@ -60,7 +70,7 @@ public final class MatsimEventsReader implements MatsimReader {
 	public void readFile(final String filename) {
 		String lcFilename = filename.toLowerCase(Locale.ROOT);
 		if (lcFilename.endsWith(".xml") || lcFilename.endsWith(".xml.gz")) {
-			new XmlEventsReader(this.events).readFile(filename);
+			new XmlEventsReader(this.events, map ).readFile(filename );
 		} else if (lcFilename.endsWith(".txt") || lcFilename.endsWith(".txt.gz")) {
 			throw new RuntimeException("text events are no longer supported. Please use MATSim 0.6.1 or earlier to read text events.");
 		} else {
@@ -69,17 +79,25 @@ public final class MatsimEventsReader implements MatsimReader {
 	}
 
 	public void readStream(final InputStream stream) {
-		new XmlEventsReader(this.events).parse(stream);
+		new XmlEventsReader(this.events, map ).parse(stream );
+	}
+
+	@Override
+	public void readURL( final URL url ) {
+		new XmlEventsReader( this.events, map ).readURL( url );
 	}
 
 	private static class XmlEventsReader extends MatsimXmlParser {
 
 		final EventsManager events;
 		private final static String EVENTS_V1 = "events_v1.dtd";
-		private MatsimXmlParser delegate = null;
+		private MatsimXmlEventsParser delegate = null;
 
-		public XmlEventsReader(final EventsManager events) {
+		private final Map<String, CustomEventMapper> map ;
+
+		private XmlEventsReader( final EventsManager events, Map<String, CustomEventMapper> map ) {
 			this.events = events;
+			this.map = map;
 			this.setValidating(false); // events-files have no DTD, thus they cannot validate
 			setDoctype("events_v1.dtd"); // manually set a doctype, otherwise delegate would not be initialized
 		}
@@ -91,7 +109,13 @@ public final class MatsimEventsReader implements MatsimReader {
 
 		@Override
 		public void characters(char[] ch, int start, int length) throws SAXException {
-			this.delegate.characters(ch, start, length);
+//			this.delegate.characters(ch, start, length);
+			// ignore characters to prevent OutOfMemoryExceptions
+			/* the events-file only contains empty tags with attributes,
+			 * but without the dtd or schema, all whitespace between tags is handled
+			 * by characters and added up by super.characters, consuming huge
+			 * amount of memory when large events-files are read in.
+			 */
 		}
 
 		@Override
@@ -105,6 +129,9 @@ public final class MatsimEventsReader implements MatsimReader {
 			// Currently the only events-type is v1
 			if (EVENTS_V1.equals(doctype)) {
 				this.delegate = new EventsReaderXMLv1(this.events);
+				for( Map.Entry<String, CustomEventMapper> entry : map.entrySet() ){
+					this.delegate.addCustomEventMapper( entry.getKey(),entry.getValue() );
+				}
 				log.info("using events_v1-reader.");
 			} else {
 				throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");

@@ -292,13 +292,13 @@ public class BlockingStopDemo {
 
 		final QSim sim = new QSimBuilder(scenario.getConfig()) //
 				.useDefaults() //
-				.addOverridingControllerModule(new AbstractModule() {
+				.addOverridingModule( new AbstractModule() {
 					@Override
 					public void install() {
 						bind(TransitStopHandlerFactory.class).to(SimpleTransitStopHandlerFactory.class)
 								.asEagerSingleton();
 					}
-				}) //
+				} ) //
 				.build(scenario, events);
 
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenario.getConfig(), this.scenario, events, sim);

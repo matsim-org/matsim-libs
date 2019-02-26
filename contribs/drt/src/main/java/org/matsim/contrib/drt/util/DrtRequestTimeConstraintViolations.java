@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.drt.util;
 
-import org.matsim.contrib.drt.data.DrtRequest;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
 
 /**
