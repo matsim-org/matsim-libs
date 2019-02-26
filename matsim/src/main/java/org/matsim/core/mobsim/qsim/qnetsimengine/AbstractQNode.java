@@ -28,7 +28,7 @@ abstract class AbstractQNode implements QNodeI {
 	// for Customizable
 	private final Map<String, Object> customAttributes = new HashMap<>();
 	
-	private final Node node;
+	final Node node;
 
 	
 	
@@ -38,7 +38,7 @@ abstract class AbstractQNode implements QNodeI {
 	
 	
 	@Override
-	public Node getNode() {
+	public final Node getNode() {
 		return this.node;
 	}
 	
@@ -72,7 +72,7 @@ abstract class AbstractQNode implements QNodeI {
 		return this.active.get();
 	}
 	
-	void setActive(boolean active) {
+	final void setActive(boolean active) {
 		this.active.set(active);
 	}
 
@@ -82,7 +82,7 @@ abstract class AbstractQNode implements QNodeI {
 	 * The ParallelQSim replaces the activator with the QSimEngineRunner 
 	 * that handles this node.
 	 */
-	/*package*/ void setNetElementActivationRegistry(NetElementActivationRegistry activator) {
+	/*package*/ final void setNetElementActivationRegistry(NetElementActivationRegistry activator) {
 		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
 		// not be a stable/robust API.  kai, jul'17
 		
@@ -90,7 +90,7 @@ abstract class AbstractQNode implements QNodeI {
 	}
 	
 	@Override
-	public Map<String, Object> getCustomAttributes() {
+	public final Map<String, Object> getCustomAttributes() {
 		return customAttributes;
 	}
 }
