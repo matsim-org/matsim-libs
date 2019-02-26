@@ -92,13 +92,13 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private static List<String> allTags = new LinkedList<>(Arrays.asList(TAG_LANES, TAG_LANES_FORWARD,
 			TAG_LANES_BACKWARD, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS));
 
-	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
-	private final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
-	private final Set<String> unknownHighways = new HashSet<String>();
-	private final Set<String> unknownMaxspeedTags = new HashSet<String>();
-	private final Set<String> unknownLanesTags = new HashSet<String>();
+	private final Map<Long, OsmNode> nodes = new HashMap<>();
+	private final Map<Long, OsmWay> ways = new HashMap<>();
+	private final Set<String> unknownHighways = new HashSet<>();
+	private final Set<String> unknownMaxspeedTags = new HashSet<>();
+	private final Set<String> unknownLanesTags = new HashSet<>();
 	private long id = 0;
-	protected final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
+	protected final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<>();
 	private final Network network;
 	private final CoordinateTransformation transform;
 	private boolean keepPaths = false;
@@ -108,7 +108,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	
 	private boolean useVspAdjustments = false; // Adjustments discussed on 2018-04-30, kn,ik,dz. apr'18 (Might become default after testing)
 	
-	/*package*/ final List<OsmFilter> hierarchyLayers = new ArrayList<OsmFilter>();
+	/*package*/ final List<OsmFilter> hierarchyLayers = new ArrayList<>();
 
 	// nodes that are definitely to be kept (e.g. for counts later)
 	private Set<Long> nodeIDsToKeep = null;
@@ -836,8 +836,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 	protected static class OsmWay {
 		public final long id;
-		public final List<Long> nodes = new ArrayList<Long>(4);
-		public final Map<String, String> tags = new HashMap<String, String>(4);
+		public final List<Long> nodes = new ArrayList<>(4);
+		public final Map<String, String> tags = new HashMap<>(4);
 		public int hierarchy = -1;
 
 		public OsmWay(final long id) {
@@ -983,7 +983,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	}
 
 	private static class StringCache {
-		private static ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<String, String>(10000);
+		private static ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<>(10000);
 		
 		/**
 		 * Returns the cached version of the given String. If the strings was
