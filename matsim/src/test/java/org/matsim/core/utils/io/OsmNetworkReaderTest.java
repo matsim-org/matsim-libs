@@ -19,10 +19,7 @@
 
 package org.matsim.core.utils.io;
 
-import java.io.ByteArrayInputStream;
-
 import org.junit.Assert;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -36,6 +33,8 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.io.ByteArrayInputStream;
 
 /**
  * @author mrieser
@@ -195,7 +194,7 @@ public class OsmNetworkReaderTest {
 				"    <tag k=\"highway\" v=\"motorway\"/>\n" +
 				"  </way>\n" +
 				"</osm>";
-		reader.parse(new ByteArrayInputStream(str.getBytes()));
+		reader.parse(() -> new ByteArrayInputStream(str.getBytes()));
 		Assert.assertEquals("incomplete ways should not be converted.", 0, net.getNodes().size());
 		Assert.assertEquals("incomplete ways should not be converted.", 0, net.getLinks().size());
 	}
@@ -236,7 +235,7 @@ public class OsmNetworkReaderTest {
 				"    <tag k=\"maxspeed\" v=\"60\"/>\n" + // higher speed limit than default
 				"  </way>\n" +
 				"</osm>";
-		reader.parse(new ByteArrayInputStream(str.getBytes()));
+		reader.parse(() -> new ByteArrayInputStream(str.getBytes()));
 
 		/* this creates 6 links:
 		 * - links 1 & 2: for way 1, in both directions
@@ -293,7 +292,7 @@ public class OsmNetworkReaderTest {
 				"    <tag k=\"highway\" v=\"motorway\"/>\n" +
 				"  </way>\n" +
 				"</osm>";
-		reader.parse(new ByteArrayInputStream(str.getBytes()));
+		reader.parse(() -> new ByteArrayInputStream(str.getBytes()));
 		
 		/* this creates 4 links:
 		 * - links 1 & 2: for way 1, in both directions

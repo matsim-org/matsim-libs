@@ -32,8 +32,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +47,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 /**
  * Reads in an OSM-File, exported from <a href="http://openstreetmap.org/" target="_blank">OpenStreetMap</a>,
@@ -209,22 +210,23 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 	/**
 	 * Parses the given input stream and creates a MATSim network from the data.
+	 * We need to pass a supplier as in some cases, the stream could be parsed multiple times.
 	 *
-	 * @param stream
+	 * @param streamSupplier
 	 * @throws UncheckedIOException
 	 */
-	public final void parse(final InputStream stream) throws UncheckedIOException {
-		parse(null, stream);
+	public final void parse(final Supplier<InputStream> streamSupplier) throws UncheckedIOException {
+		parse(null, streamSupplier);
 	}
 
 	/**
-	 * Either osmFilename or stream must be <code>null</code>, but not both.
+	 * Either osmFilename or streamSupplier must be <code>null</code>, but not both.
 	 *
 	 * @param osmFilename
-	 * @param stream
+	 * @param streamSupplier
 	 * @throws UncheckedIOException
 	 */
-	private void parse(final String osmFilename, final InputStream stream) throws UncheckedIOException {
+	private void parse(final String osmFilename, final Supplier<InputStream> streamSupplier) throws UncheckedIOException {
 		if(this.hierarchyLayers.isEmpty()){
 			log.warn("No hierarchy layer specified. Will convert every highway specified by setHighwayDefaults.");
 		}
@@ -234,23 +236,35 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			log.info("parsing osm file first time: identifying nodes used by ways");
 			parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
 			parser.enableOptimization(1);
-			if (stream != null) {
-				parser.parse(new InputSource(stream));
+			if (streamSupplier != null) {
+				try (InputStream is = streamSupplier.get()) {
+					parser.parse(is);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
 			} else {
 				parser.readFile(osmFilename);
 			}
 			log.info("parsing osm file second time: loading required nodes and ways");
 			parser.enableOptimization(2);
-			if (stream != null) {
-				parser.parse(new InputSource(stream));
+			if (streamSupplier != null) {
+				try (InputStream is = streamSupplier.get()) {
+					parser.parse(is);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
 			} else {
 				parser.readFile(osmFilename);
 			}
 			log.info("done loading data");
 		} else {
 			parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
-			if (stream != null) {
-				parser.parse(new InputSource(stream));
+			if (streamSupplier!= null) {
+				try (InputStream is = streamSupplier.get()) {
+					parser.parse(is);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
 			} else {
 				parser.readFile(osmFilename);
 			}
