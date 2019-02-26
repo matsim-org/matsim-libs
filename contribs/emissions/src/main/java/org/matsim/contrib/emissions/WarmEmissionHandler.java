@@ -41,6 +41,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
 
@@ -67,10 +68,10 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> vehicleEntersTraffic = new HashMap<>();
 
 	public WarmEmissionHandler(
-			Vehicles emissionVehicles,
-			final Network network,
-			WarmEmissionAnalysisModuleParameter parameterObject,
-			EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
+		  Vehicles emissionVehicles,
+		  final Network network,
+		  WarmEmissionAnalysisModuleParameter parameterObject,
+		  EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
 
 		this.emissionVehicles = emissionVehicles;
 		this.network = network;
@@ -173,40 +174,42 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 				travelTime = leaveTime - enterTime;
 			}
 			else if(!this.vehicleLeavesTraffic.get(vehicleId).getFirst().equals(event.getLinkId())
-					|| !this.vehicleEntersTraffic.get(vehicleId).getFirst().equals(event.getLinkId())){
+					    || !this.vehicleEntersTraffic.get(vehicleId).getFirst().equals(event.getLinkId())){
 
 				travelTime = leaveTime - enterTime;
 			} else {
-				double arrivalTime = this.vehicleLeavesTraffic.get(vehicleId).getSecond();		
-				double departureTime = this.vehicleEntersTraffic.get(vehicleId).getSecond();	
-				travelTime = leaveTime - enterTime - departureTime + arrivalTime;	
+				double arrivalTime = this.vehicleLeavesTraffic.get(vehicleId).getSecond();
+				double departureTime = this.vehicleEntersTraffic.get(vehicleId).getSecond();
+				travelTime = leaveTime - enterTime - departureTime + arrivalTime;
 			}
 
 			if (!this.emissionVehicles.getVehicles().containsKey(vehicleId)) {
 				if (this.warmEmissionAnalysisModule.getEcg().getNonScenarioVehicles().equals(NonScenarioVehicles.abort)) {
 					throw new RuntimeException(
-							"No vehicle defined for id " + vehicleId + ". " +
-							"Please make sure that requirements for emission vehicles in " + EmissionsConfigGroup.GROUP_NAME + " config group are met."
-									+ " Or set the parameter + 'nonScenarioVehicles' to 'ignore' in order to skip such vehicles."
-									+ " Aborting...");
+						  "No vehicle defined for id " + vehicleId + ". " +
+							    "Please make sure that requirements for emission vehicles in " + EmissionsConfigGroup.GROUP_NAME + " config group are met."
+							    + " Or set the parameter + 'nonScenarioVehicles' to 'ignore' in order to skip such vehicles."
+							    + " Aborting...");
 				} else if (this.warmEmissionAnalysisModule.getEcg().getNonScenarioVehicles().equals(NonScenarioVehicles.ignore)) {
 					if (noVehWarnCnt < 10) {
 						logger.warn(
-								"No vehicle defined for id " + vehicleId + ". The vehicle will be ignored.");
+							  "No vehicle defined for id " + vehicleId + ". The vehicle will be ignored.");
 						noVehWarnCnt++;
 						if (noVehWarnCnt == 10) logger.warn(Gbl.FUTURE_SUPPRESSED);
 					}
 				} else {
 					throw new RuntimeException("Not yet implemented. Aborting...");
 				}
-								
+
 			} else {
 				Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
+				VehicleType vehicleType = vehicle.getType() ;
 
-			Map<String, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
-					vehicle,
-					link,
-					travelTime);
+				Map<String, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
+					  vehicleType,
+					  vehicleId,
+					  link,
+					  travelTime);
 
 				warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
 			}

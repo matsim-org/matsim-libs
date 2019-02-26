@@ -31,6 +31,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -147,37 +148,44 @@ public final class WarmEmissionAnalysisModule {
 	}
 
 	public Map<String, Double> checkVehicleInfoAndCalculateWarmEmissions(
-			Vehicle vehicle,
-			Link link,
-			double travelTime) {
+		  Vehicle vehicle,
+		  Link link,
+		  double travelTime ){
+		return checkVehicleInfoAndCalculateWarmEmissions( vehicle.getType(), vehicle.getId(), link, travelTime );
+	}
+
+	public Map<String, Double> checkVehicleInfoAndCalculateWarmEmissions(
+		  VehicleType vehicleType,
+		  Id<Vehicle> vehicleId, Link link,
+		  double travelTime ) {
 
 		if(this.ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
-			if(vehicle.getType().getDescription()==null) { // emission specification is in vehicle type id
-				vehicle.getType().setDescription(EmissionSpecificationMarker.BEGIN_EMISSIONS
-						+vehicle.getType().getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS);
-			} else if( vehicle.getType().getDescription().contains(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()) ) {
+			if( vehicleType.getDescription()==null) { // emission specification is in vehicle type id
+				vehicleType.setDescription(EmissionSpecificationMarker.BEGIN_EMISSIONS
+						+ vehicleType.getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS );
+			} else if( vehicleType.getDescription().contains(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) ) {
 				// emission specification is in vehicle type id and in vehicle description too.
 			} else {
-				String vehicleDescription = vehicle.getType().getDescription() + EmissionSpecificationMarker.BEGIN_EMISSIONS
-						+ vehicle.getType().getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS;
-				vehicle.getType().setDescription(vehicleDescription);
+				String vehicleDescription = vehicleType.getDescription() + EmissionSpecificationMarker.BEGIN_EMISSIONS
+						+ vehicleType.getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS;
+				vehicleType.setDescription(vehicleDescription );
 			}
 		}
 
 		Map<String, Double> warmEmissions = new HashMap<>();
-		if(vehicle == null ||
-				(vehicle.getType() == null && vehicle.getType().getDescription() == null) // if both are null together; no vehicle type information.
+		if( vehicleType == null ||
+				(vehicleType == null && vehicleType.getDescription() == null) // if both are null together; no vehicle type information.
 				) {
-			throw new RuntimeException("Vehicle type description for vehicle " + vehicle + " is missing. " +
+			throw new RuntimeException("Vehicle type description for vehicle " + vehicleType + " is missing. " +
 					"Please make sure that requirements for emission vehicles in "
 					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
 
-		String vehicleDescription = vehicle.getType().getDescription();
+		String vehicleDescription = vehicleType.getDescription();
 
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleTypeId2VehicleInformationTuple(vehicleDescription);
 		if (vehicleInformationTuple.getFirst() == null){
-			throw new RuntimeException("Vehicle category for vehicle " + vehicle + " is not valid. " +
+			throw new RuntimeException("Vehicle category for vehicle " + vehicleType + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
@@ -186,7 +194,7 @@ public final class WarmEmissionAnalysisModule {
 		double linkLength = link.getLength();
 		String roadType = EmissionUtils.getHbefaRoadType(link);
 
-		warmEmissions = calculateWarmEmissions(vehicle.getId(), travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
+		warmEmissions = calculateWarmEmissions( vehicleId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple );
 
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){
