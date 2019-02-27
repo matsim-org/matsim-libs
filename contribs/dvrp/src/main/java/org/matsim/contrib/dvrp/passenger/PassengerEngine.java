@@ -131,7 +131,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		// yyyy we think that it is possible to remove parameter MobsimPassengerAgent from this method. kai/gregor, jan'19
 
 		// generating the TripInfo object that will be returned to the potential passenger:
-		TripInfo info = new DrtTripInfo( pickupLink, request, dropoffLink, now );
+		TripInfo info = new DrtTripInfo( null, request, null, time );
 		// wrap into list and return:
 		List list = new ArrayList<>() ;
 		list.add(info) ;

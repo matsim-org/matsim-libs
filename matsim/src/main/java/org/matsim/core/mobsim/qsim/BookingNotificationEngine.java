@@ -119,7 +119,7 @@ final class BookingNotificationEngine implements MobsimEngine {
 
 	}
 
-	public final void notifyChangedTripInformation( MobsimAgent agent, TripInfo tripinfo ) {
+	public synchronized final void notifyChangedTripInformation( MobsimAgent agent, TripInfo tripinfo ) {
 		// (we are in the mobsim, so we don't need to play around with IDs)
 
 		map.put( agent, tripinfo ) ;

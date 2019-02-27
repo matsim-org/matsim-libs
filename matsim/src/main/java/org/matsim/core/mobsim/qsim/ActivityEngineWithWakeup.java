@@ -179,54 +179,13 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 			}
 		}
 
-		TripStructureUtils.Trip trip = editTrips.findTripAfterActivity( plan, currentActivity ) ;
+		BookingNotificationEngine be = null ; // get from somewhere
 
-		List<PlanElement> newTrip = new ArrayList<>(  ) ;
-		PopulationFactory pf = scenario.getPopulation().getFactory() ;
-		
-        double pickupBeelineDistance = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), tripInfo.getPickupLocation().getCoord());
-        double pickupWalkTime = pickupBeelineDistance / beelineWalkSpeed;
-
-		double buffer = 60. ;
-		{
-			Leg leg = pf.createLeg( TransportMode.access_walk );
-			// also add generic route
-			leg.setTravelTime( pickupWalkTime );
-			newTrip.add( leg ) ;
+		if ( confirmation.getPickupLocation()!=null ) {
+			be.notifyChangedTripInformation( agent, confirmation );
+		} else{
+			// schedule activity end time of activity before drt walk to infinity so agent does not start drt walk before position is known.
 		}
-		{
-			Activity activity = pf.createActivityFromCoord( "drt_interaction", tripInfo.getPickupLocation().getCoord() ) ;
-//			activity.setFacilityId( tripinfo.getPickupLocation().getId() ); // how is this solved in transit router? -- TransitRouterWrapper.fillWithActivities() -- no facility id is set !
-			activity.setLinkId(tripInfo.getPickupLocation().getLinkId());
-			activity.setCoord(tripInfo.getPickupLocation().getCoord());
-			newTrip.add( activity ) ;
-		}
-		{
-			Leg leg = pf.createLeg( TransportMode.drt ) ;
-			// also add generic route
-			newTrip.add( leg ) ;
-		}
-		{
-			Activity activity = pf.createActivityFromCoord( "drt_interaction", tripInfo.getDropoffLocation().getCoord() ) ;
-//			activity.setFacilityId( tripinfo.getDropoffLocation().getId() ); // how is this solved in transit router? -- no facility id is set !
-			activity.setLinkId(tripInfo.getDropoffLocation().getLinkId());
-			activity.setCoord(tripInfo.getDropoffLocation().getCoord());
-			newTrip.add( activity ) ;
-		}
-		{
-			Leg leg = pf.createLeg( TransportMode.egress_walk ) ;
-			// also add generic route
-	        double dropoffBeelineDistance = CoordUtils.calcEuclideanDistance(tripInfo.getDropoffLocation().getCoord(), toFacility.getCoord());
-	        double dropoffWalkTime = dropoffBeelineDistance / beelineWalkSpeed;
-	        leg.setTravelTime(dropoffWalkTime);
-			newTrip.add( leg ) ;
-		}
-		TripRouter.insertTrip( plan, currentActivity, newTrip, trip.getDestinationActivity() ) ;
-
-		Integer index = WithinDayAgentUtils.getCurrentPlanElementIndex( agent );;
-		editPlans.rescheduleActivityEndtime( agent, index, tripInfo.getExpectedBoardingTime() - pickupWalkTime - buffer );
-
-		rescheduleActivityEnd( agent ); // not sure if this is necessary; might be contained in the above
 	}
 
 	@Override
@@ -253,33 +212,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
 
-		Message message = new Message(){
-
-			@Override
-			public void processEvent(){
-				throw new RuntimeException( "not implemented" );
-				// here we would, if desired, generate and send a corresponding matsim event. kai, feb'19
-			}
-
-			@Override
-			public void handleMessage(){
-				// here we would need to put the material to be done. kai, feb'19
-				MobsimAgent agent = (MobsimAgent) this.getReceivingUnit();
-				// yy this seems to correspond to design, but feels stupid since we already have the agent.  kai, feb'19
-
-				// could now say something like
-				// agent.handleTaxiPrebookingIfNecessary(...) ;
-				// but could also use the dobler approach
-
-				// the main advantage of using the message queue instead of a separate wakeup queue would be to not go through the queue in every time step.  As long as
-				// we have only one central activity engine, this advantage would not be very large.  kai, feb'19
-
-				throw new RuntimeException( "not implemented" );
-			}
-		} ;
-		message.setMessageArrivalTime( 900. );
-		message.setReceivingUnit( (SimUnit) agent );
-		this.messageQueue.putMessage( message );
+		this.wakeUpList.add( new AgentEntry( agent, agent.getActivityEndTime() - 900. ) ) ;
 
 		return delegate.handleActivity( agent ) ;
 	}
@@ -295,15 +228,6 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	@Override
 	public void rescheduleActivityEnd(final MobsimAgent agent) {
 		delegate.rescheduleActivityEnd( agent );
-	}
-
-	private class MyEventHandler implements BasicEventHandler {
-		@Override
-		public void handleEvent( Event event ){
-			if ( event instanceof PersonInformationEvent ) {
-//				delegate.
-			}
-		}
 	}
 
 }
