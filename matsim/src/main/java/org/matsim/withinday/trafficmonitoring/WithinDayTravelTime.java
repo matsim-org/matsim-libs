@@ -113,8 +113,8 @@ public class WithinDayTravelTime implements TravelTime,
 //		log.setLevel(Level.DEBUG);
 
 		if ( scenario.getConfig().controler().getRoutingAlgorithmType() != ControlerConfigGroup.RoutingAlgorithmType.Dijkstra ) {
-			throw new RuntimeException( "for me, this works with Dijkstra (default until spring 2019), and does not work with AStarLandmarks (default afterwards).  I have " +
-									"not tried the other options. KN, feb'19" ) ;
+			throw new RuntimeException( "for me, in KNAccidentScenario, this works with Dijkstra (default until spring 2019), and does not work with AStarLandmarks " +
+									"(default afterwards).  I have not tried the other routing options, nor have I systematically debugged. KN, feb'19" ) ;
 		}
 
 		/*
