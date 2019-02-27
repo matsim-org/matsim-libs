@@ -35,6 +35,7 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.*;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.withinday.utils.EditPlans;
 import org.matsim.withinday.utils.EditTrips;
@@ -89,9 +90,8 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 			if ( wakeUpList.peek().time <= time ) {
 				MobsimAgent agent = wakeUpList.poll().agent ;
 				Plan plan = WithinDayAgentUtils.getModifiablePlan( agent );
-				Integer index = WithinDayAgentUtils.getCurrentPlanElementIndex( agent );;
 
-				Activity currAct = (Activity) plan.getPlanElements().get(index ); // at this point, we are trying to get this up and running while being at an activity
+				Activity currAct = (Activity) WithinDayAgentUtils.getCurrentPlanElement( agent ); // at this point, we are trying to get this up and running while being at an activity
 
 				Trip trip = editTrips.findTripAfterActivity( plan, currAct ) ;
 
@@ -99,8 +99,8 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 				StageActivityTypesImpl drtStageActivities = new StageActivityTypesImpl( abc ) ;
 				Trip drtTrip = TripStructureUtils.getTrips( trip.getTripElements(), drtStageActivities ).get( 0 );; // we are assuming that the drt trip is the _next_ such trip
 
-				Facility fromFacility = toFacility( drtTrip.getOriginActivity() ) ;
-				Facility toFacility = toFacility( drtTrip.getDestinationActivity() ) ;
+				Facility fromFacility = FacilitiesUtils.toFacility( drtTrip.getOriginActivity(), facilities ) ;
+				Facility toFacility = FacilitiesUtils.toFacility( drtTrip.getDestinationActivity(), facilities ) ;
 
 				Map<TripInfo,DepartureHandler> allTripInfos  = new LinkedHashMap<>() ;
 
@@ -121,19 +121,6 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 			}
 		}
 		delegate.doSimStep( time );
-	}
-
-	@Deprecated // needs to be centrlalized
-	private Facility toFacility(final Activity act) {
-		// use facility first if available i.e. reversing the logic above Amit July'18
-		// yyyyyy these things need to be centralized!
-		if (	facilities != null &&
-				! facilities.getFacilities().isEmpty() &&
-				act.getFacilityId() != null ) {
-			return facilities.getFacilities().get( act.getFacilityId() );
-		}
-
-		return new ActivityWrapperFacility( act );
 	}
 
 	private void decide( MobsimAgent agent, Map<TripInfo, DepartureHandler> allTripInfos, Facility fromFacility, Facility toFacility ){
