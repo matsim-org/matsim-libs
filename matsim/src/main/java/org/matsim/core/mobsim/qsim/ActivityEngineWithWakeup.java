@@ -22,26 +22,18 @@ package org.matsim.core.mobsim.qsim;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.jdeqsim.Message;
 import org.matsim.core.mobsim.jdeqsim.MessageQueue;
-import org.matsim.core.mobsim.jdeqsim.SimUnit;
 import org.matsim.core.mobsim.qsim.ActivityEngine.AgentEntry;
 import org.matsim.core.mobsim.qsim.ActivityEngine.AgentEntryComparator;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.*;
-import org.matsim.core.router.ActivityWrapperFacility;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.router.*;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.Facility;
 import org.matsim.withinday.utils.EditPlans;
@@ -52,6 +44,7 @@ import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import static org.matsim.core.mobsim.qsim.interfaces.TripInfoProvider.*;
+import static org.matsim.core.router.TripStructureUtils.*;
 
 public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	private static final Logger log = Logger.getLogger( ActivityEngine.class ) ;
@@ -60,7 +53,6 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	// after mobsim the alterations to the plans are deleted (a reset is needed before next iteration in any case)? Don't we need rather something like "executed plan"
 
 	private final Map<String, DepartureHandler> departureHandlers;
-	private final MessageQueue messageQueue;
 	private final Scenario scenario;
 	private final ActivityFacilities facilities;
 	private final double beelineWalkSpeed;
@@ -72,7 +64,6 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	public ActivityEngineWithWakeup( EventsManager eventsManager, Map<String, DepartureHandler> departureHandlers,
 						   TripRouter tripRouter, Scenario scenario, QSim qsim, Config config, MessageQueue messageQueue ) {
 		this.departureHandlers = departureHandlers;
-		this.messageQueue = messageQueue;
 		this.editTrips = new EditTrips( tripRouter, scenario ) ;
 		this.editPlans = new EditPlans(qsim, tripRouter, editTrips);
 		this.delegate = new ActivityEngine( eventsManager ) ;
@@ -97,27 +88,20 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 		while ( !wakeUpList.isEmpty() ) {
 			if ( wakeUpList.peek().time <= time ) {
 				MobsimAgent agent = wakeUpList.poll().agent ;
-				Plan plan;
-				// option 1 - better, because creates a copy 
-				plan = WithinDayAgentUtils.getModifiablePlan(agent);
-				
-				// option 2
-				if (agent instanceof PlanAgent) {
-					plan = ((PlanAgent) agent).getCurrentPlan();
-				}
-				
-				// TODO: later write ExperiencedPlans (in PlansCalcScoreConfigGroup) as debug output
-				
-				// TODO: somehow find out for which activity the agent was woken up
-				// quick and dirty temporary solution:
-				int currentIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
-				if ( !(plan.getPlanElements().get(currentIndex) instanceof Activity) || 
-						! (plan.getPlanElements().get(currentIndex + 2) instanceof Activity) ) {
-					currentIndex++;
-				}
-				Facility fromFacility = toFacility((Activity) plan.getPlanElements().get(currentIndex));
-				Facility toFacility = toFacility((Activity) plan.getPlanElements().get(currentIndex + 2));
-				
+				Plan plan = WithinDayAgentUtils.getModifiablePlan( agent );
+				Integer index = WithinDayAgentUtils.getCurrentPlanElementIndex( agent );;
+
+				Activity currAct = (Activity) plan.getPlanElements().get(index ); // at this point, we are trying to get this up and running while being at an activity
+
+				Trip trip = editTrips.findTripAfterActivity( plan, currAct ) ;
+
+				String abc = "drt interaction" ; // yyyy find global constant
+				StageActivityTypesImpl drtStageActivities = new StageActivityTypesImpl( abc ) ;
+				Trip drtTrip = TripStructureUtils.getTrips( trip.getTripElements(), drtStageActivities ).get( 0 );; // we are assuming that the drt trip is the _next_ such trip
+
+				Facility fromFacility = toFacility( drtTrip.getOriginActivity() ) ;
+				Facility toFacility = toFacility( drtTrip.getDestinationActivity() ) ;
+
 				Map<TripInfo,DepartureHandler> allTripInfos  = new LinkedHashMap<>() ;
 
 				Person person = null ;
@@ -133,12 +117,13 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 					}
 				}
 				// add info for mode that is in agent plan, if not returned by departure handler.
-				decide( agent, allTripInfos, editTrips, editPlans, fromFacility, toFacility) ;
+				decide( agent, allTripInfos, fromFacility, toFacility ) ;
 			}
 		}
 		delegate.doSimStep( time );
 	}
-	
+
+	@Deprecated // needs to be centrlalized
 	private Facility toFacility(final Activity act) {
 		// use facility first if available i.e. reversing the logic above Amit July'18
 		// yyyyyy these things need to be centralized!
@@ -151,8 +136,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 		return new ActivityWrapperFacility( act );
 	}
 
-	private void decide( MobsimAgent agent, Map<TripInfo,DepartureHandler> allTripInfos, EditTrips editTrips, EditPlans editPlans, Facility fromFacility,
-				   Facility toFacility ){
+	private void decide( MobsimAgent agent, Map<TripInfo, DepartureHandler> allTripInfos, Facility fromFacility, Facility toFacility ){
 		Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement( agent );
 		Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ;
 		String mode = editPlans.getModeOfCurrentOrNextTrip( agent );;
