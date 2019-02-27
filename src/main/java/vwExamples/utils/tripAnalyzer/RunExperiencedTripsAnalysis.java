@@ -50,13 +50,13 @@ public class RunExperiencedTripsAnalysis {
     static Set<Id<Person>> relevantAgents = new HashSet<>();
     static Map<String, Geometry> zoneMap = new HashMap<>();
     static Set<String> zones = new HashSet<>();
-    static String shapeFile = "D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\input\\shapes\\wvi-zones-bsonly.shp";
+    static String shapeFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Cemdap\\add_data\\shp\\Real_Region_Hannover.shp";
     static String shapeFeature = "NO";
 
     public static void main(String[] args) {
 
-        String runDirectory = "D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\output\\bs_as_berlin__800m_800veh_6pax\\";
-        String runId = "bs_as_berlin__800m_800veh_6pax.";
+        String runDirectory = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw235_nocad.1.0\\";
+        String runId = "vw235_nocad.1.0.";
         String runPrefix = runDirectory + "/" + runId;
 
         boolean useTransitSchedule = true;

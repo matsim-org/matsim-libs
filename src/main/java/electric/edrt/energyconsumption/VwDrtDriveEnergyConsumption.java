@@ -1,5 +1,6 @@
 package electric.edrt.energyconsumption;
 
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
@@ -23,6 +24,13 @@ public class VwDrtDriveEnergyConsumption implements DriveEnergyConsumption {
 	public double calcEnergyConsumption(Link link, double travelTime) {
 
 		//double speed_kmh = link.getLength() / travelTime * 3.6;		
+		double speedControl_kmh = link.getLength() / travelTime * 3.6;
+		if (speedControl_kmh > 130) {
+			// Raserkante Ausgeben mit Geschwindigkeit
+			Log.warn("Kante:"+ link.getId()+" Geschwindigkeit zu hoch!:" + speedControl_kmh + "kmh");			
+		}
+	
+		
 		//Test von Joschka
 		double speed_kmh = Math.min(130,link.getLength() / travelTime * 3.6);
 		
