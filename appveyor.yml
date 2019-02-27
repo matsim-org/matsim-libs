@@ -19,9 +19,9 @@ install:
   - cmd: mvn --version
   - cmd: java -version
 build_script:
-  - mvn package -DskipTest
-test_script:
-  - mvn test
+  - mvn package -DskipTests
+# test_script:
+#   - mvn test
 cache:
   - C:\maven\
   - C:\Users\appveyor\.m2

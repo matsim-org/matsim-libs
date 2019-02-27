@@ -25,6 +25,7 @@ package org.matsim.withinday.controller;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -37,6 +38,7 @@ public class ExampleWithinDayControllerTest {
     public void testRun() {
         Config config = utils.loadConfig("test/scenarios/equil/config.xml");
         config.controler().setLastIteration(1);
+        config.controler().setRoutingAlgorithmType( ControlerConfigGroup.RoutingAlgorithmType.Dijkstra );
         Controler controler = new Controler(config);
         ExampleWithinDayController.configure(controler);
         controler.run();
