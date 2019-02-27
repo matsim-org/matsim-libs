@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
@@ -110,7 +111,12 @@ public class WithinDayTravelTime implements TravelTime,
 
 	public WithinDayTravelTime(Scenario scenario, Set<String> analyzedModes) {
 //		log.setLevel(Level.DEBUG);
-		
+
+		if ( scenario.getConfig().controler().getRoutingAlgorithmType() != ControlerConfigGroup.RoutingAlgorithmType.Dijkstra ) {
+			throw new RuntimeException( "for me, this works with Dijkstra (default until spring 2019), and does not work with AStarLandmarks (default afterwards).  I have " +
+									"not tried the other options. KN, feb'19" ) ;
+		}
+
 		/*
 		 * The parallelization should scale almost linear, therefore we do use
 		 * the number of available threads according to the config file.
