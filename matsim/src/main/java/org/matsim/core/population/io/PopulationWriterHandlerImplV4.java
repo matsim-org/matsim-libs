@@ -194,17 +194,17 @@ import java.io.IOException;
 			out.write(Double.toString( coord.getY() ));
 			out.write("\"");
 		}
-		if (act.getStartTime() != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(act.getStartTime())) {
 			out.write(" start_time=\"");
 			out.write(Time.writeTime(act.getStartTime()));
 			out.write("\"");
 		}
-			if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
+			if (!Time.isUndefinedTime(act.getMaximumDuration())) {
 				out.write(" dur=\"");
 				out.write(Time.writeTime(act.getMaximumDuration()));
 				out.write("\"");
 			}
-		if (act.getEndTime() != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(act.getEndTime())) {
 			out.write(" end_time=\"");
 			out.write(Time.writeTime(act.getEndTime()));
 			out.write("\"");
@@ -225,12 +225,12 @@ import java.io.IOException;
 		out.write("\t\t\t<leg mode=\"");
 		out.write(leg.getMode());
 		out.write("\"");
-		if (leg.getDepartureTime() != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(leg.getDepartureTime())) {
 			out.write(" dep_time=\"");
 			out.write(Time.writeTime(leg.getDepartureTime()));
 			out.write("\"");
 		}
-		if (leg.getTravelTime() != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(leg.getTravelTime())) {
 			out.write(" trav_time=\"");
 			out.write(Time.writeTime(leg.getTravelTime()));
 			out.write("\"");
@@ -264,7 +264,7 @@ import java.io.IOException;
 			out.write(Double.toString(route.getDistance()));
 			out.write("\"");
 		}
-		if (route.getTravelTime() != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(route.getTravelTime())) {
 			out.write(" trav_time=\"");
 			out.write(Time.writeTime(route.getTravelTime()));
 			out.write("\"");

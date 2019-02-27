@@ -18,24 +18,26 @@
 
 package org.matsim.contrib.edrt.optimizer;
 
-import com.google.inject.Provider;
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.EntryFactory;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
+import org.matsim.contrib.edrt.schedule.EDrtTask;
 import org.matsim.contrib.ev.data.Battery;
 import org.matsim.contrib.ev.dvrp.ChargingTask;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.dvrp.tracker.ETaskTracker;
-import org.matsim.contrib.edrt.schedule.EDrtTask;
 
-import javax.inject.Inject;
-import java.util.List;
+import com.google.inject.Provider;
 
 /**
  * @author michalm
@@ -59,7 +61,7 @@ public class EDrtVehicleDataEntryFactory implements EntryFactory {
 	}
 
 	@Override
-	public Entry create(Vehicle vehicle, double currentTime) {
+	public Entry create(DvrpVehicle vehicle, double currentTime) {
 		if (!entryFactory.isEligibleForRequestInsertion(vehicle, currentTime)) {
 			return null;
 		}

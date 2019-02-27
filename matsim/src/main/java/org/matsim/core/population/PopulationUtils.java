@@ -409,25 +409,23 @@ public final class PopulationUtils {
 		case endTimeOnly:
 			return act.getEndTime() ;
 		case tryEndTimeThenDuration:
-			if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
+			if ( !Time.isUndefinedTime(act.getEndTime()) ) {
 				return act.getEndTime() ;
-			} else if ( act.getMaximumDuration() != Time.UNDEFINED_TIME ) {
+			} else if ( !Time.isUndefinedTime(act.getMaximumDuration()) ) {
 				return now + act.getMaximumDuration() ;
 			} else {
-				return Time.UNDEFINED_TIME ;
+				return Time.getUndefinedTime();
 			}
 		case minOfDurationAndEndTime:
 			return Math.min( now + act.getMaximumDuration() , act.getEndTime() ) ;
 		default:
 			break ;
 		}
-		return Time.UNDEFINED_TIME ;
+		return Time.getUndefinedTime();
 	}
 
 	private static int missingFacilityCnt = 0 ;
-	/**
-	 * @param config
-	 */
+
 	@Deprecated // use decideOnLinkIdForActivity.  kai, sep'18
 	public static Id<Link> computeLinkIdFromActivity( Activity act, ActivityFacilities facs, Config config ) {
 		// the following might eventually become configurable by config. kai, feb'16
@@ -932,8 +930,8 @@ public final class PopulationUtils {
 			if (index != plan.getPlanElements().size()-2) {
 				// not the last leg
 				Leg next_leg = (Leg)plan.getPlanElements().get(index+2);
-				next_leg.setDepartureTime(Time.UNDEFINED_TIME);
-				next_leg.setTravelTime(Time.UNDEFINED_TIME);
+				next_leg.setDepartureTime(Time.getUndefinedTime());
+				next_leg.setTravelTime(Time.getUndefinedTime());
 				next_leg.setRoute(null);
 			}
 			plan.getPlanElements().remove(index+1); // following act
@@ -962,8 +960,8 @@ public final class PopulationUtils {
 			else {
 				// remove an in-between act
 				Leg prev_leg = (Leg)plan.getPlanElements().get(index-1); // prev leg;
-				prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
-				prev_leg.setTravelTime(Time.UNDEFINED_TIME);
+				prev_leg.setDepartureTime(Time.getUndefinedTime());
+				prev_leg.setTravelTime(Time.getUndefinedTime());
 				prev_leg.setRoute(null);
 
 				plan.getPlanElements().remove(index+1); // following leg

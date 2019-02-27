@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedules;
@@ -39,10 +39,10 @@ import org.opengis.feature.simple.SimpleFeature;
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class Schedules2GIS {
-	private final Iterable<? extends Vehicle> vehicles;
+	private final Iterable<? extends DvrpVehicle> vehicles;
 	private final PolylineFeatureFactory factory;
 
-	public Schedules2GIS(Iterable<? extends Vehicle> vehicles, String coordSystem) {
+	public Schedules2GIS(Iterable<? extends DvrpVehicle> vehicles, String coordSystem) {
 		this.vehicles = vehicles;
 
 		factory = new PolylineFeatureFactory.Builder().//
@@ -59,7 +59,7 @@ public class Schedules2GIS {
 		new File(vrpOutDir).mkdir();
 		String file = vrpOutDir + "\\route_";
 
-		for (Vehicle v : vehicles) {
+		for (DvrpVehicle v : vehicles) {
 			Stream<DriveTask> drives = Schedules.driveTasks(v.getSchedule());
 			Collection<SimpleFeature> features = new ArrayList<>();
 

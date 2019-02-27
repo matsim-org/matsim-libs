@@ -20,7 +20,7 @@
 package org.matsim.contrib.edrt;
 
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
@@ -33,12 +33,12 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLeg;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.edrt.schedule.EDrtChargingTask;
 import org.matsim.contrib.ev.dvrp.ChargingActivity;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.dvrp.tracker.OfflineETaskTracker;
 import org.matsim.contrib.ev.dvrp.tracker.OnlineEDriveTaskTracker;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.contrib.edrt.schedule.EDrtChargingTask;
 
 /**
  * @author michalm
@@ -53,7 +53,7 @@ public class EDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	}
 
 	@Override
-	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
+	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
 		Task task = vehicle.getSchedule().getCurrentTask();
 		if (task instanceof EDrtChargingTask) {
 			task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle)vehicle, timer));
@@ -67,7 +67,7 @@ public class EDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 		}
 	}
 
-	private static VrpLeg createLeg(String mobsimMode, Vehicle vehicle, MobsimTimer timer) {
+	private static VrpLeg createLeg(String mobsimMode, DvrpVehicle vehicle, MobsimTimer timer) {
 		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
 		VrpLeg leg = new VrpLeg(mobsimMode, driveTask.getPath());
 		OnlineDriveTaskTracker onlineTracker = new OnlineDriveTaskTrackerImpl(vehicle, leg,

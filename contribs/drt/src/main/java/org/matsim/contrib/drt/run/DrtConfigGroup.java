@@ -83,7 +83,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 					+ "day at the link where it stopped operating the day before. False by default.";
 
 	public static final String IDLE_VEHICLES_RETURN_TO_DEPOTS = "idleVehiclesReturnToDepots";
-	static final String IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP = "Idle vehicles return to the nearest of all start links. See: Vehicle.getStartLink()";
+	static final String IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP = "Idle vehicles return to the nearest of all start links. See: DvrpVehicle.getStartLink()";
 
 	public static final String OPERATIONAL_SCHEME = "operationalScheme";
 	static final String OP_SCHEME_EXP = "Operational Scheme, either door2door or stopbased. door2door by default";

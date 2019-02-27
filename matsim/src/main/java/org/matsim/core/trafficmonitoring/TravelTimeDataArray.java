@@ -20,6 +20,7 @@
 
 package org.matsim.core.trafficmonitoring;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 
 /**
@@ -29,7 +30,9 @@ import org.matsim.api.core.v01.network.Link;
  *
  * @author mrieser
  */
-public class TravelTimeDataArray implements TravelTimeData {
+class TravelTimeDataArray extends TravelTimeData {
+	private static final Logger log = Logger.getLogger( TravelTimeDataArray.class ) ;
+
 	private final double[] timeSum;
 	private final int[] timeCnt;
 	private final double[] travelTimes;

@@ -19,14 +19,15 @@
 
 package org.matsim.contrib.etaxi;
 
-import com.google.inject.Inject;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.ev.dvrp.ChargingActivity;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
+
+import com.google.inject.Inject;
 
 /**
  * @author michalm
@@ -40,7 +41,7 @@ public class ETaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	}
 
 	@Override
-	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
+	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
 		Task task = vehicle.getSchedule().getCurrentTask();
 		return task instanceof ETaxiChargingTask //
 				? new ChargingActivity((ETaxiChargingTask)task) //

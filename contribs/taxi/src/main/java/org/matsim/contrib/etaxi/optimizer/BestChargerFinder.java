@@ -19,13 +19,13 @@
 
 package org.matsim.contrib.etaxi.optimizer;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
+import java.util.stream.Stream;
+
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.ev.data.Charger;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.util.LinkProvider;
-
-import java.util.stream.Stream;
 
 /**
  * @author michalm
@@ -39,7 +39,7 @@ public class BestChargerFinder {
 		this.dispatchFinder = dispatchFinder;
 	}
 
-	public Dispatch<Charger> findBestChargerForVehicle(Vehicle veh, Stream<Charger> chargers) {
+	public Dispatch<Charger> findBestChargerForVehicle(DvrpVehicle veh, Stream<Charger> chargers) {
 		return dispatchFinder.findBestDestination(veh, chargers, CHARGER_TO_LINK);
 	}
 }

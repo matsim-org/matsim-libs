@@ -19,9 +19,14 @@
 
 package org.matsim.contrib.etaxi.optimizer.rules;
 
+import java.util.stream.Stream;
+
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.etaxi.ETaxiChargingTask;
+import org.matsim.contrib.etaxi.ETaxiScheduler;
+import org.matsim.contrib.etaxi.optimizer.BestChargerFinder;
 import org.matsim.contrib.ev.data.Battery;
 import org.matsim.contrib.ev.data.Charger;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
@@ -42,11 +47,6 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.contrib.etaxi.ETaxiChargingTask;
-import org.matsim.contrib.etaxi.ETaxiScheduler;
-import org.matsim.contrib.etaxi.optimizer.BestChargerFinder;
-
-import java.util.stream.Stream;
 
 public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public static RuleBasedETaxiOptimizer create(TaxiConfigGroup taxiCfg, Fleet fleet, ETaxiScheduler eScheduler,
@@ -94,7 +94,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 		if (isNewDecisionEpoch(e, params.socCheckTimeStep)) {
 			@SuppressWarnings("unchecked")
-			Stream<EvDvrpVehicle> eTaxis = (Stream<EvDvrpVehicle>)(Stream<? extends Vehicle>)idleTaxiRegistry.vehicles();
+			Stream<EvDvrpVehicle> eTaxis = (Stream<EvDvrpVehicle>)(Stream<? extends DvrpVehicle>)idleTaxiRegistry.vehicles();
 			chargeIdleUnderchargedVehicles(eTaxis.filter(this::isUndercharged));
 		}
 
@@ -110,7 +110,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	}
 
 	@Override
-	public void nextTask(Vehicle vehicle) {
+	public void nextTask(DvrpVehicle vehicle) {
 		super.nextTask(vehicle);
 
 		if (eScheduler.isIdle(vehicle)) {

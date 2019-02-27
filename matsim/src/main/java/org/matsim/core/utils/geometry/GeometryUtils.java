@@ -85,6 +85,7 @@ public class GeometryUtils {
 	}
 	
 	public static Polygon createGeotoolsPolygon(List<Coord> coords ) {
+		
 		// better way to do this is welcome.  kai, dec'17
 		double [] flatArray = new double[coords.size()*2] ;
 		int ii=0 ;
@@ -95,6 +96,17 @@ public class GeometryUtils {
 			ii++ ;
 		}
 		return new GeometryBuilder().polygon( flatArray ) ;
+		
+		// the following yields some failing tests in the minibus contrib. ihab, feb'19
+		
+//		Coordinate[] coordinates = new Coordinate[coords.size()] ;
+//		int ii=0 ;
+//		for ( Coord coord : coords ) {
+//			coordinates[ii] = new Coordinate(coord.getX(), coord.getY()); ;
+//			ii++ ;
+//		}
+//		return new GeometryFactory().createPolygon(coordinates);
+		
 	}
 
 	public static Point getRandomPointInFeature( Random rnd, SimpleFeature ft ) {

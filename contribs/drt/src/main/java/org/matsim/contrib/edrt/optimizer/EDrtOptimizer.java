@@ -20,13 +20,13 @@ package org.matsim.contrib.edrt.optimizer;
 
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.edrt.scheduler.EmptyVehicleChargingScheduler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.contrib.edrt.scheduler.EmptyVehicleChargingScheduler;
 
 /**
  * @author michalm
@@ -44,7 +44,7 @@ public class EDrtOptimizer implements DrtOptimizer {
 	}
 
 	@Override
-	public void nextTask(Vehicle vehicle) {
+	public void nextTask(DvrpVehicle vehicle) {
 		optimizer.nextTask(vehicle);
 
 		// if starting a STAY at depot then start charging

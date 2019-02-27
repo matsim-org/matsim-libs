@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.util.distance.DistanceUtils;
@@ -55,7 +55,7 @@ public class AggregatedMinCostRelocationCalculator implements MinCostRelocationC
 
 	@Override
 	public List<Relocation> calcRelocations(List<Pair<String, Integer>> supply, List<Pair<String, Integer>> demand,
-			Map<String, List<Vehicle>> rebalancableVehiclesPerZone) {
+			Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
 		List<Triple<String, String, Integer>> interZonalRelocations = new TransportProblem<String, String>(
 				this::calcStraightLineDistance).solve(supply, demand);
 		return calcRelocations(rebalancableVehiclesPerZone, interZonalRelocations);
@@ -66,11 +66,11 @@ public class AggregatedMinCostRelocationCalculator implements MinCostRelocationC
 				zonalSystem.getZoneCentroid(zone2));
 	}
 
-	private List<Relocation> calcRelocations(Map<String, List<Vehicle>> rebalancableVehiclesPerZone,
+	private List<Relocation> calcRelocations(Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone,
 			List<Triple<String, String, Integer>> interZonalRelocations) {
 		List<Relocation> relocations = new ArrayList<>();
 		for (Triple<String, String, Integer> r : interZonalRelocations) {
-			List<Vehicle> rebalancableVehicles = rebalancableVehiclesPerZone.get(r.getLeft());
+			List<DvrpVehicle> rebalancableVehicles = rebalancableVehiclesPerZone.get(r.getLeft());
 
 			String toZone = r.getMiddle();
 			Geometry z = zonalSystem.getZone(toZone);
@@ -80,7 +80,7 @@ public class AggregatedMinCostRelocationCalculator implements MinCostRelocationC
 			int flow = r.getRight();
 			for (int f = 0; f < flow; f++) {
 				// TODO use BestDispatchFinder (needs to be moved from taxi to dvrp) instead
-				Vehicle nearestVehicle = findNearestVehicle(rebalancableVehicles, destinationLink);
+				DvrpVehicle nearestVehicle = findNearestVehicle(rebalancableVehicles, destinationLink);
 				relocations.add(new Relocation(nearestVehicle, destinationLink));
 				rebalancableVehicles.remove(nearestVehicle);// TODO use map to have O(1) removal
 			}
@@ -88,7 +88,7 @@ public class AggregatedMinCostRelocationCalculator implements MinCostRelocationC
 		return relocations;
 	}
 
-	private Vehicle findNearestVehicle(List<Vehicle> rebalancableVehicles, Link destinationLink) {
+	private DvrpVehicle findNearestVehicle(List<DvrpVehicle> rebalancableVehicles, Link destinationLink) {
 		Coord toCoord = destinationLink.getFromNode().getCoord();
 		return rebalancableVehicles.stream().min(Comparator.comparing(v -> DistanceUtils.calculateSquaredDistance(//
 				Schedules.getLastLinkInSchedule(v).getToNode().getCoord(), toCoord))).get();

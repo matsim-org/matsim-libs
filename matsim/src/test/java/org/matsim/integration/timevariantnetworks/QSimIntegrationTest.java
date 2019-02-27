@@ -345,10 +345,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		private final Id<Link> linkId;
 		private Id<Vehicle> vehicleId1;
 		private Id<Vehicle> vehicleId2;
-		protected double person1enterTime = Time.UNDEFINED_TIME;
-		protected double person1leaveTime = Time.UNDEFINED_TIME;
-		protected double person2enterTime = Time.UNDEFINED_TIME;
-		protected double person2leaveTime = Time.UNDEFINED_TIME;
+		protected double person1enterTime = Time.getUndefinedTime();
+		protected double person1leaveTime = Time.getUndefinedTime();
+		protected double person2enterTime = Time.getUndefinedTime();
+		protected double person2leaveTime = Time.getUndefinedTime();
 
 		protected TestTravelTimeCalculator(final Id<Person> personId1, final Id<Person> personId2, final Id<Link> linkId) {
 			this.personId1 = personId1;

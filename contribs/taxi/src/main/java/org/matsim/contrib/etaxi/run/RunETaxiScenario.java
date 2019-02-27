@@ -23,9 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.VariableSpeedCharging;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -60,11 +58,10 @@ public class RunETaxiScenario {
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new ETaxiModule());
-		controler.addOverridingModule(new EvModule());
 		controler.addOverridingModule(new DvrpModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(taxiCfg.getMode()));
 
-		controler.addOverridingModule(createEvDvrpIntegrationModule(taxiCfg));
+		controler.addOverridingModule(createEvDvrpIntegrationModule(taxiCfg.getMode()));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
@@ -73,13 +70,12 @@ public class RunETaxiScenario {
 		return controler;
 	}
 
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(TaxiConfigGroup taxiCfg) {
-		return new EvDvrpIntegrationModule(taxiCfg.getMode())//
-				.setChargingStrategyFactory(charger -> VariableSpeedCharging.createStrategyForNissanLeaf(
-						charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC))//
-				.setTemperatureProvider(() -> TEMPERATURE)//
-				.setTurnedOnPredicate(vehicle -> vehicle.getSchedule().getStatus() == ScheduleStatus.STARTED)//
-				.setVehicleFile(taxiCfg.getTaxisFile());
+	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(String mode) {
+		return new EvDvrpIntegrationModule(mode).setChargingStrategyFactory(
+				charger -> VariableSpeedCharging.createStrategyForNissanLeaf(charger.getPower() * CHARGING_SPEED_FACTOR,
+						MAX_RELATIVE_SOC))
+				.setTemperatureProvider(() -> TEMPERATURE)
+				.setTurnedOnPredicate((vehicle, time) -> (time >= vehicle.getServiceBeginTime() && time <= vehicle.getServiceEndTime()));
 	}
 
 	public static void main(String[] args) {

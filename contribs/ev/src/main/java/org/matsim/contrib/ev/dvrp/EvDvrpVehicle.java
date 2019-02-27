@@ -20,7 +20,7 @@ package org.matsim.contrib.ev.dvrp;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.ev.data.ElectricFleet;
 import org.matsim.contrib.ev.data.ElectricVehicle;
@@ -28,15 +28,15 @@ import org.matsim.contrib.ev.data.ElectricVehicle;
 /**
  * @author michalm
  */
-public class EvDvrpVehicle implements Vehicle {
-	static EvDvrpVehicle create(Vehicle vehicle, ElectricFleet evFleet) {
+public class EvDvrpVehicle implements DvrpVehicle {
+	static EvDvrpVehicle create(DvrpVehicle vehicle, ElectricFleet evFleet) {
 		return new EvDvrpVehicle(vehicle, evFleet.getElectricVehicles().get(vehicle.getId()));
 	}
 
-	private final Vehicle vehicle;
+	private final DvrpVehicle vehicle;
 	private final ElectricVehicle electricVehicle;
 
-	public EvDvrpVehicle(Vehicle vehicle, ElectricVehicle electricVehicle) {
+	public EvDvrpVehicle(DvrpVehicle vehicle, ElectricVehicle electricVehicle) {
 		this.vehicle = vehicle;
 		this.electricVehicle = electricVehicle;
 	}
@@ -46,7 +46,7 @@ public class EvDvrpVehicle implements Vehicle {
 	}
 
 	@Override
-	public Id<Vehicle> getId() {
+	public Id<DvrpVehicle> getId() {
 		return vehicle.getId();
 	}
 
@@ -73,15 +73,5 @@ public class EvDvrpVehicle implements Vehicle {
 	@Override
 	public Schedule getSchedule() {
 		return vehicle.getSchedule();
-	}
-
-	@Override
-	public void setStartLink(Link link) {
-		vehicle.setStartLink(link);
-	}
-
-	@Override
-	public void resetSchedule() {
-		vehicle.resetSchedule();
 	}
 }

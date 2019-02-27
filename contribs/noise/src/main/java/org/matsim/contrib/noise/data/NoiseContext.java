@@ -23,14 +23,7 @@
 package org.matsim.contrib.noise.data;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
+import com.vividsolutions.jts.algorithm.Angle;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -39,13 +32,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.handler.NoiseEquations;
+import org.matsim.contrib.noise.utils.FeatureNoiseBarriersReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Contains the grid and further noise-specific information.
@@ -60,7 +57,8 @@ public class NoiseContext {
 	private final Scenario scenario;
 	private final NoiseConfigGroup noiseParams;
 	private final Grid grid;
-			
+	private final ShieldingContext shielding;
+
 	private final Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
 	private double xCoordMinLinkNode = Double.MAX_VALUE;
 //	private double xCoordMaxLinkNode = Double.MIN_VALUE;
@@ -103,10 +101,19 @@ public class NoiseContext {
 				
 		this.currentTimeBinEndTime = noiseParams.getTimeBinSizeNoiseComputation();
 		
-		this.noiseReceiverPoints = new HashMap<Id<ReceiverPoint>, NoiseReceiverPoint>();
-		this.noiseLinks = new HashMap<Id<Link>, NoiseLink>();
+		this.noiseReceiverPoints = new HashMap<>();
+		this.noiseLinks = new HashMap<>();
 		
 		checkConsistency();
+
+        if(noiseParams.isConsiderNoiseBarriers()) {
+            final Collection<FeatureNoiseBarrierImpl> barriers
+                    = FeatureNoiseBarriersReader.read(noiseParams.getNoiseBarriersFilePath(), "EPSG:4326", "EPSG:31468");
+            shielding = new ShieldingContext(barriers);
+        } else {
+            shielding = null;
+        }
+
 		setLinksMinMax();
 		setLinksToZones();
 		setRelevantLinkInfo();
@@ -114,9 +121,8 @@ public class NoiseContext {
 
 	// for routing purposes
 	public final void storeTimeInterval() {
-		
-		Map<Id<Link>, NoiseLink> noiseLinksThisTimeBinCopy = new HashMap<>();
-		noiseLinksThisTimeBinCopy.putAll(this.noiseLinks);
+
+		Map<Id<Link>, NoiseLink> noiseLinksThisTimeBinCopy = new HashMap<>(this.noiseLinks);
 		
 		double currentTimeIntervalCopy = this.currentTimeBinEndTime;
 		
@@ -132,13 +138,9 @@ public class NoiseContext {
 		List<String> consideredActivitiesForDamagesList = new ArrayList<String>();
 		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<String>();
 
-		for (int i = 0; i < this.grid.getGridParams().getConsideredActivitiesForDamageCalculationArray().length; i++) {
-			consideredActivitiesForDamagesList.add(this.grid.getGridParams().getConsideredActivitiesForDamageCalculationArray()[i]);
-		}
-		
-		for (int i = 0; i < this.grid.getGridParams().getConsideredActivitiesForReceiverPointGridArray().length; i++) {
-			consideredActivitiesForReceiverPointGridList.add(this.grid.getGridParams().getConsideredActivitiesForReceiverPointGridArray()[i]);
-		}
+		Collections.addAll(consideredActivitiesForDamagesList, this.grid.getGridParams().getConsideredActivitiesForDamageCalculationArray());
+
+		Collections.addAll(consideredActivitiesForReceiverPointGridList, this.grid.getGridParams().getConsideredActivitiesForReceiverPointGridArray());
 		
 		if (this.noiseParams.isComputeNoiseDamages()) {
 			
@@ -188,106 +190,40 @@ public class NoiseContext {
 			}
 
 			// go through these potential relevant link Ids
-			Set<Id<Link>> relevantLinkIds = new HashSet<>();
-			for (Id<Link> linkId : potentialLinks){
+			Set<Id<Link>> relevantLinkIds = ConcurrentHashMap.newKeySet();
+			potentialLinks.parallelStream().forEach( linkId -> {
 				if (!(relevantLinkIds.contains(linkId))) {
 					Link candidateLink = scenario.getNetwork().getLinks().get(linkId);
-					//maybe replace the disctance-calculation to remove dupolicated code. Not absolute sure, since tests are failing, when method is replaced.
-					//double distance = CoordUtils.distancePointLinesegment(candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
-					double distance = calcDistance(nrp, candidateLink);
-					
-					if (distance < noiseParams.getRelevantRadius()){
+					double projectedDistance = CoordUtils.distancePointLinesegment(candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
+
+					if (projectedDistance < noiseParams.getRelevantRadius()){
 						
 						relevantLinkIds.add(linkId);
 						// wouldn't it be good to check distance < minDistance here? DR20180215
-						if (distance == 0) {
+						if (projectedDistance == 0) {
 							double minimumDistance = 5.;
-							distance = minimumDistance;
-							log.warn("Distance between " + linkId + " and " + rp.getId() + " is 0. The calculation of the correction term Ds requires a distance > 0. Therefore, setting the distance to a minimum value of " + minimumDistance + ".");
+							projectedDistance = minimumDistance;
+							log.warn("Distance between " + linkId + " and " + nrp.getId() + " is 0. The calculation of the correction term Ds requires a distance > 0. Therefore, setting the distance to a minimum value of " + minimumDistance + ".");
 						}
-						double correctionTermDs = NoiseEquations.calculateDistanceCorrection(distance);
+						double correctionTermDs = NoiseEquations.calculateDistanceCorrection(projectedDistance);
 						double correctionTermAngle = calculateAngleImmissionCorrection(nrp.getCoord(), scenario.getNetwork().getLinks().get(linkId));
-						
 						nrp.setLinkId2distanceCorrection(linkId, correctionTermDs);
 						nrp.setLinkId2angleCorrection(linkId, correctionTermAngle);
+						if(noiseParams.isConsiderNoiseBarriers()) {
+							Coord projectedSourceCoord = CoordUtils.orthogonalProjectionOnLineSegment(
+									candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
+							double correctionTermShielding =
+                                    shielding.determineShieldingCorrection(nrp, candidateLink, projectedSourceCoord);
+							nrp.setLinkId2ShieldingCorrection(linkId, correctionTermShielding);
+						}
 					}
 				}
-			}
+			});
 			
 			this.noiseReceiverPoints.put(nrp.getId(), nrp);
 			cnt.incCounter();
 		}
 		cnt.printCounter();
-	}
-	
-	/**
-	 * @param nrp
-	 * @param candidateLink
-	 * @return
-	 */
-	private double calcDistance(NoiseReceiverPoint nrp, Link candidateLink) {
-		double pointCoordX = nrp.getCoord().getX();
-		double pointCoordY = nrp.getCoord().getY();
-		double fromCoordX = candidateLink.getFromNode().getCoord().getX();
-		double fromCoordY = candidateLink.getFromNode().getCoord().getY();
-		double toCoordX = candidateLink.getToNode().getCoord().getX();
-		double toCoordY = candidateLink.getToNode().getCoord().getY();
-	
-		double lotPointX = 0.;
-		double lotPointY = 0.;
-	
-		double vectorX = toCoordX - fromCoordX;
-		if (vectorX == 0.) {
-			vectorX = 0.00000001;
-			// dividing by zero is not possible
-		}
-		
-		double vectorY = toCoordY - fromCoordY;
-		double vector = vectorY/vectorX;
-		if (vector == 0.) {
-			vector = 0.00000001;
-			// dividing by zero is not possible
-		}
-	
-		double vector2 = (-1) * (1/vector);
-		double yAbschnitt = fromCoordY - (fromCoordX * vector);
-		double yAbschnittOriginal = fromCoordY - (fromCoordX * vector);
-	
-		double yAbschnitt2 = pointCoordY - (pointCoordX * vector2);
-	
-		double xValue = 0.;
-		double yValue = 0.;
-	
-		if (yAbschnitt<yAbschnitt2) {
-			yAbschnitt2 = yAbschnitt2 - yAbschnitt;
-			yAbschnitt = 0;
-			xValue = yAbschnitt2 / (vector - vector2);
-			yValue = yAbschnittOriginal + (xValue*vector);
-		} else if(yAbschnitt2<yAbschnitt) {
-			yAbschnitt = yAbschnitt - yAbschnitt2;
-			yAbschnitt2 = 0;
-			xValue = yAbschnitt / (vector2 - vector);
-			yValue = yAbschnittOriginal + (xValue*vector);
-		}
-	
-		lotPointX = xValue;
-		lotPointY = yValue;
-		double distance = 0.;
-		
-		if(((xValue>fromCoordX)&&(xValue<toCoordX))||((xValue>toCoordX)&&(xValue<fromCoordX))||((yValue>fromCoordY)&&(yValue<toCoordY))||((yValue>toCoordY)&&(yValue<fromCoordY))) {
-			// no edge solution
-			distance = Math.sqrt((Math.pow(lotPointX-pointCoordX, 2))+(Math.pow(lotPointY-pointCoordY, 2)));
-		} else {
-			// edge solution (Randloesung)
-			double distanceToFromNode = Math.sqrt((Math.pow(fromCoordX-pointCoordX, 2))+(Math.pow(fromCoordY-pointCoordY, 2)));
-			double distanceToToNode = Math.sqrt((Math.pow(toCoordX-pointCoordX, 2))+(Math.pow(toCoordY-pointCoordY, 2)));
-			if (distanceToFromNode > distanceToToNode) {
-				distance = distanceToToNode;
-			} else {
-				distance = distanceToFromNode;
-			}
-		}
-		return distance;
 	}
 
 	/**
@@ -354,11 +290,7 @@ public class NoiseContext {
 			
 			// go through these zone grid cells and save the link Id 			
 			for(Tuple<Integer,Integer> tuple : relevantTuples) {
-				List<Id<Link>> linkIds = zoneTuple2listOfLinkIds.get(tuple);
-				if(linkIds == null) {
-					linkIds = new ArrayList<>();
-					zoneTuple2listOfLinkIds.put(tuple, linkIds);
-				}
+				List<Id<Link>> linkIds = zoneTuple2listOfLinkIds.computeIfAbsent(tuple, k -> new ArrayList<>());
 				linkIds.add(link.getId());
 			}
 			cnt.incCounter();
@@ -373,9 +305,8 @@ public class NoiseContext {
 		
 		int xDirection = (int) ((xCoord - xCoordMinLinkNode) / (noiseParams.getRelevantRadius() / 1.));	
 		int yDirection = (int) ((yCoordMaxLinkNode - yCoord) / noiseParams.getRelevantRadius() / 1.);
-		
-		Tuple<Integer,Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
-		return zoneDefinition;
+
+		return new Tuple<>(xDirection, yDirection);
 	}
 	
 	private double calculateAngleImmissionCorrection(Coord receiverPointCoord, Link link) {
@@ -402,46 +333,12 @@ public class NoiseContext {
 			
 		} else {
 			// all other cases
-			double sc = (fromCoordX - pointCoordX) * (toCoordX - pointCoordX) + (fromCoordY - pointCoordY) * (toCoordY - pointCoordY);
-			double cosAngle = sc / (
-					Math.sqrt(
-							Math.pow(fromCoordX - pointCoordX, 2) + Math.pow(fromCoordY - pointCoordY, 2)
-							)
-							*
-					Math.sqrt(
-							Math.pow(toCoordX - pointCoordX, 2) + Math.pow(toCoordY - pointCoordY, 2)
-							)
-					);
-
-			//due to rounding errors, cosine sometimes is larger than one
-            // TODO: find cleaner way possibly.
-			if (cosAngle > 1.) {
-			    cosAngle = 1.;
-            } else if (cosAngle < -1.) {
-			    cosAngle = -1.;
-            }
-
-			angle = Math.toDegrees(Math.acos(cosAngle));
-
-			if (sc > 0) {
-				// spitzer winkel
-						
-				if (angle > 90) {
-					angle = 180 - angle;
-				}
-				
-			} else if (sc < 0) {
-				// stumpfer winkel
-				
-				if (angle < 90) {
-					angle = 180 - angle;
-				}
-				
-			} else {
-				angle = 0.;
-			}
+            angle = Angle.toDegrees(Angle.angleBetween(
+                    CoordUtils.createGeotoolsCoordinate(link.getFromNode().getCoord()),
+                    CoordUtils.createGeotoolsCoordinate(receiverPointCoord),
+                    CoordUtils.createGeotoolsCoordinate(link.getToNode().getCoord())));
 		}
-			
+
 		// since zero is not defined
 		if (angle == 0.) {
 			// zero degrees is not defined
@@ -449,8 +346,7 @@ public class NoiseContext {
 		}
 					
 //		System.out.println(receiverPointCoord + " // " + link.getId() + "(" + link.getFromNode().getCoord() + "-->" + link.getToNode().getCoord() + " // " + angle);
-		double immissionCorrection = NoiseEquations.calculateAngleCorrection(angle);
-		return immissionCorrection;
+        return NoiseEquations.calculateAngleCorrection(angle);
 	}
 	
 	public final Scenario getScenario() {

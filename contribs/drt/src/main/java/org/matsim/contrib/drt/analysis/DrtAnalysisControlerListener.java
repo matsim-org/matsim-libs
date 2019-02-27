@@ -28,7 +28,7 @@ import java.util.Locale;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -54,7 +54,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private final DecimalFormat format = new DecimalFormat();
 	private final int maxcap;
 
-	public DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, Fleet fleet,
+	public DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, FleetSpecification fleet,
 			DynModePassengerStats drtPassengerStats, MatsimServices matsimServices, Network network,
 			DrtRequestAnalyzer drtRequestAnalyzer) {
 		this.drtPassengerStats = drtPassengerStats;
@@ -64,7 +64,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		this.drtCfg = drtCfg;
 		this.qSimCfg = config.qsim();
 		runId = config.controler().getRunId();
-		maxcap = DynModeTripsAnalyser.findMaxCap(fleet);
+		maxcap = DynModeTripsAnalyser.findMaxVehicleCapacity(fleet);
 
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 		format.setMinimumIntegerDigits(1);
@@ -74,9 +74,10 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
+		boolean createGraphs = event.getServices().getConfig().controler().isCreateGraphs();
 
 		drtRequestAnalyzer.writeAndPlotWaitTimeEstimateComparison(filename(event, "waitTimeComparison", ".png"),
-				filename(event, "waitTimeComparison", ".csv"));
+				filename(event, "waitTimeComparison", ".csv"), createGraphs);
 		List<DynModeTrip> trips = drtPassengerStats.getDrtTrips();
 
 		DynModeTripsAnalyser.collection2Text(drtRequestAnalyzer.getRejections(),
@@ -102,8 +103,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		}
 		DynModeTripsAnalyser.writeVehicleDistances(drtPassengerStats.getVehicleDistances(),
 				filename(event, "vehicleDistanceStats", ".csv"));
-		DynModeTripsAnalyser.analyseDetours(network, trips, drtCfg, filename(event, "drt_detours"));
-		DynModeTripsAnalyser.analyseWaitTimes(filename(event, "waitStats"), trips, 1800);
+		DynModeTripsAnalyser.analyseDetours(network, trips, drtCfg, filename(event, "drt_detours"), createGraphs);
+		DynModeTripsAnalyser.analyseWaitTimes(filename(event, "waitStats"), trips, 1800, createGraphs);
 
 		double endTime = qSimCfg.getEndTime();
 		if (Time.isUndefinedTime(endTime)) {

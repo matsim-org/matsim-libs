@@ -92,6 +92,17 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log( lvl, "did not find xml as one of the events file formats. vsp default is using xml events.");
 		}
 
+		switch ( config.controler().getRoutingAlgorithmType() ) {
+			case Dijkstra:
+			case AStarLandmarks:
+			case FastDijkstra:
+				log.log( lvl, "you are not using FastAStarLandmarks as routing algorithm.  vsp default is to use FastAStarLandmarks.") ;
+				System.out.flush();
+				break;
+			case FastAStarLandmarks:
+				break;
+		}
+
 		// === location choice:
 		
 		boolean usingLocationChoice = false ;
@@ -322,6 +333,15 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				log.log( lvl, "	<param name=\"affectingDuration\" value=\"false\" />");
 				log.log( lvl, "</module>");
 			}
+		}
+
+		// === travelTimeCalculator:
+
+		// added feb'19
+		if ( !config.travelTimeCalculator().getSeparateModes() ) {
+			System.out.flush() ;
+			log.log( lvl, "travelTimeCalculator is not analyzing different modes separately; vsp default is to do that.  Otherwise, you are using the same travel times " +
+						    "for, say, bike and car.") ;
 		}
 		
 		// === interaction between config groups:

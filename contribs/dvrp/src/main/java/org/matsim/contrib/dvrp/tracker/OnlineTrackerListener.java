@@ -21,7 +21,7 @@
 package org.matsim.contrib.dvrp.tracker;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -36,5 +36,5 @@ public interface OnlineTrackerListener {
 	 * @param vehicle
 	 * @param nextLink
 	 */
-	void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink);
+	void vehicleEnteredNextLink(DvrpVehicle vehicle, Link nextLink);
 }

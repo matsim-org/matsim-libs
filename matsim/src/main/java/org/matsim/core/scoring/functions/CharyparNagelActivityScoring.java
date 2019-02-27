@@ -32,7 +32,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public final class CharyparNagelActivityScoring implements org.matsim.core.scoring.SumScoringFunction.ActivityScoring {
 
-	protected double score;
+	private double score;
 	private double currentActivityStartTime;
 	private double firstActivityEndTime;
 

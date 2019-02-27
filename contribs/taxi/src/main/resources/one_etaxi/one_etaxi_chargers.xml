@@ -2,5 +2,5 @@
 <!DOCTYPE chargers SYSTEM "http://matsim.org/files/dtd/chargers_v1.dtd">
 
 <chargers>
-	<charger id="charger_one" link="215" />
+	<charger id="charger_one" link="215" capacity="1" power="50"/>
 </chargers>

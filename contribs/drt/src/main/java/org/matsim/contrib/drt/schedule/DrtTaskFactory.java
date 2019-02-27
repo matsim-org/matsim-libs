@@ -19,16 +19,16 @@
 package org.matsim.contrib.drt.schedule;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
 /**
  * @author michalm
  */
 public interface DrtTaskFactory {
-	DrtDriveTask createDriveTask(Vehicle vehicle, VrpPathWithTravelData path);
+	DrtDriveTask createDriveTask(DvrpVehicle vehicle, VrpPathWithTravelData path);
 
-	DrtStopTask createStopTask(Vehicle vehicle, double beginTime, double endTime, Link link);
+	DrtStopTask createStopTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link);
 
-	DrtStayTask createStayTask(Vehicle vehicle, double beginTime, double endTime, Link link);
+	DrtStayTask createStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link);
 }
