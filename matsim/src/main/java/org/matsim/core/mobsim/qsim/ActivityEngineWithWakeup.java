@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -95,8 +96,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 
 				Trip trip = editTrips.findTripAfterActivity( plan, currAct ) ;
 
-				String abc = "drt interaction" ; // yyyy find global constant
-				StageActivityTypesImpl drtStageActivities = new StageActivityTypesImpl( abc ) ;
+				StageActivityTypesImpl drtStageActivities = new StageActivityTypesImpl( PlanCalcScoreConfigGroup.createStageActivityType( TransportMode.drt ) ) ;
 				Trip drtTrip = TripStructureUtils.getTrips( trip.getTripElements(), drtStageActivities ).get( 0 );; // we are assuming that the drt trip is the _next_ such trip
 
 				Facility fromFacility = FacilitiesUtils.toFacility( drtTrip.getOriginActivity(), facilities ) ;
@@ -126,7 +126,8 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	private void decide( MobsimAgent agent, Map<TripInfo, DepartureHandler> allTripInfos, Facility fromFacility, Facility toFacility ){
 		Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement( agent );
 		Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ;
-		String mode = editPlans.getModeOfCurrentOrNextTrip( agent );;
+		String mode = editPlans.getModeOfCurrentOrNextTrip( agent );
+		// yyyyyy will not work when drt is access or ecress mode!
 		if ( !TransportMode.drt.equals( mode ) ) {
 			return ;
 		}
