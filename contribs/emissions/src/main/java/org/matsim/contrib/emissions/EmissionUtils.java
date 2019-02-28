@@ -52,13 +52,13 @@ public final class EmissionUtils {
 	}
 
 	private static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
-	static void setHbefaRoadType( Link link, String type ){
+	public static void setHbefaRoadType( Link link, String type ){
 		if (type!=null){
 			link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);
 		}
 	}
 
-	static String getHbefaRoadType( Link link ) {
+	public static String getHbefaRoadType( Link link ) {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
 
