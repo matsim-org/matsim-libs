@@ -27,6 +27,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.jdeqsim.MessageQueue;
@@ -40,11 +41,13 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.withinday.utils.EditPlans;
 import org.matsim.withinday.utils.EditTrips;
+import org.matsim.withinday.utils.ReplanningException;
 
 import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
 import static org.matsim.core.mobsim.qsim.interfaces.TripInfoProvider.*;
 import static org.matsim.core.router.TripStructureUtils.*;
 
@@ -55,30 +58,31 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	// after mobsim the alterations to the plans are deleted (a reset is needed before next iteration in any case)? Don't we need rather something like "executed plan"
 
 	private final Map<String, DepartureHandler> departureHandlers;
-	private final Scenario scenario;
 	private final ActivityFacilities facilities;
 	private final double beelineWalkSpeed;
+	private final MainModeIdentifier mainModeIdentifier;
 
 	private ActivityEngine delegate ;
-	private TimeInterpretation departure;
+
+	StageActivityTypes drtStageActivities = new StageActivityTypesImpl( createStageActivityType( TransportMode.drt  ) , createStageActivityType( TransportMode.walk ) ) ;
+
+	private final Queue<AgentAndLegEntry> wakeUpList = new PriorityBlockingQueue<>(500, new AgentEntryComparator() );
 
 	@Inject
-	public ActivityEngineWithWakeup( EventsManager eventsManager, Map<String, DepartureHandler> departureHandlers,
-						   TripRouter tripRouter, Scenario scenario, QSim qsim, Config config, MessageQueue messageQueue ) {
+	ActivityEngineWithWakeup( EventsManager eventsManager, Map<String, DepartureHandler> departureHandlers,
+						   TripRouter tripRouter, Scenario scenario, QSim qsim, Config config ) {
 		this.departureHandlers = departureHandlers;
 		this.editTrips = new EditTrips( tripRouter, scenario ) ;
 		this.editPlans = new EditPlans(qsim, tripRouter, editTrips);
 		this.delegate = new ActivityEngine( eventsManager ) ;
-		this.scenario = scenario ;
 		this.facilities = scenario.getActivityFacilities();
+
+		this.mainModeIdentifier = tripRouter.getMainModeIdentifier() ;
 		
 		PlansCalcRouteConfigGroup pcrConfig = config.plansCalcRoute();
 		double beelineDistanceFactor = pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
-		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk)
-				/ beelineDistanceFactor ;
+		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk) / beelineDistanceFactor ;
 	}
-
-	private final Queue<AgentEntry> wakeUpList = new PriorityBlockingQueue<>(500, new AgentEntryComparator() );
 
 	@Override
 	public void onPrepareSim() {
@@ -89,28 +93,31 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	public void doSimStep(double time) {
 		while ( !wakeUpList.isEmpty() ) {
 			if ( wakeUpList.peek().time <= time ) {
-				MobsimAgent agent = wakeUpList.poll().agent ;
+				final AgentAndLegEntry entry = wakeUpList.poll();
+				MobsimAgent agent = entry.agent ;
 				Plan plan = WithinDayAgentUtils.getModifiablePlan( agent );
 
-				Activity currAct = (Activity) WithinDayAgentUtils.getCurrentPlanElement( agent ); // at this point, we are trying to get this up and running while being at an activity
-
-				Trip trip = editTrips.findTripAfterActivity( plan, currAct ) ;
-
-				StageActivityTypesImpl drtStageActivities = new StageActivityTypesImpl( PlanCalcScoreConfigGroup.createStageActivityType( TransportMode.drt ) ) ;
-				Trip drtTrip = TripStructureUtils.getTrips( trip.getTripElements(), drtStageActivities ).get( 0 );; // we are assuming that the drt trip is the _next_ such trip
+				// search for drt trip corresponding to drt leg:
+				List<Trip> trips = TripStructureUtils.getTrips( plan, this.drtStageActivities ) ;
+				Trip drtTrip = null ;
+				for ( Trip trip : trips ){
+					if( trip.getTripElements().contains( entry.leg ) ) {
+						drtTrip = trip;
+						break;
+					}
+				}
+				Gbl.assertNotNull( drtTrip );
 
 				Facility fromFacility = FacilitiesUtils.toFacility( drtTrip.getOriginActivity(), facilities ) ;
 				Facility toFacility = FacilitiesUtils.toFacility( drtTrip.getDestinationActivity(), facilities ) ;
 
 				Map<TripInfo,DepartureHandler> allTripInfos  = new LinkedHashMap<>() ;
 
-				Person person = null ;
-				if ( agent instanceof HasPerson  ){
-					person = ((HasPerson) agent).getPerson();
-				}
+				Person person = agent instanceof HasPerson ? ((HasPerson) agent).getPerson() : null ;
+
 				for ( DepartureHandler handler : departureHandlers.values() ) {
 					if ( handler instanceof TripInfoProvider ){
-						List<TripInfo> tripInfos = ((TripInfoProvider) handler).getTripInfos( fromFacility, toFacility, time, departure, person );
+						List<TripInfo> tripInfos = ((TripInfoProvider) handler).getTripInfos( fromFacility, toFacility, time, TimeInterpretation.departure, person );
 						for( TripInfo tripInfo : tripInfos ){
 							allTripInfos.put( tripInfo, handler ) ;
 						}
@@ -143,6 +150,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 //			((Prebookable) handler).prebookTrip(now, agent, fromLinkId, toLinkId, departureTime) ;
 //		}
 
+		// yyyy following is garbled
 		TripInfo confirmation = null ;
 		if ( tripInfo instanceof CanBeAccepted ) {
 			confirmation = ((CanBeAccepted)tripInfo).accept() ;
@@ -184,7 +192,23 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
 
-		this.wakeUpList.add( new AgentEntry( agent, agent.getActivityEndTime() - 900. ) ) ;
+		Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ;
+
+		// maybe prebookedDrt and drt are two different modes?  At least there needs to be some kind of attribute.  Something like this:
+
+		for( PlanElement pe : plan.getPlanElements() ){
+			if ( pe instanceof Leg ) {
+				if ( TransportMode.drt.equals(((Leg) pe).getMode()) ) {
+					double prebookingOffset_s = (double) pe.getAttributes().getAttribute( "prebookingOffset_s" );
+					final double prebookingTime = ((Leg) pe).getDepartureTime() - prebookingOffset_s;
+					if ( prebookingTime < agent.getActivityEndTime() ) {
+						// yyyy and here one sees that having this in the activity engine is not very practical
+						this.wakeUpList.add( new AgentAndLegEntry( agent, prebookingTime , (Leg)pe ) ) ;
+					}
+				}
+			}
+		}
+
 
 		return delegate.handleActivity( agent ) ;
 	}
@@ -201,5 +225,26 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	public void rescheduleActivityEnd(final MobsimAgent agent) {
 		delegate.rescheduleActivityEnd( agent );
 	}
+
+	/**
+	 * Agents cannot be added directly to the activityEndsList since that would
+	 * not be thread-safe when within-day replanning is used. There, an agent's
+	 * activity end time can be modified. As a result, the agent is located at
+	 * the wrong position in the activityEndsList until it is updated by using
+	 * rescheduleActivityEnd(...). However, if another agent is added to the list
+	 * in the mean time, it might be inserted at the wrong position.
+	 * cdobler, apr'12
+	 */
+	static class AgentAndLegEntry {
+		public AgentAndLegEntry(MobsimAgent agent, double time, Leg leg ) {
+			this.agent = agent;
+			this.time = time;
+			this.leg = leg ;
+		}
+		final MobsimAgent agent;
+		final double time;
+		final Leg leg ;
+	}
+
 
 }
