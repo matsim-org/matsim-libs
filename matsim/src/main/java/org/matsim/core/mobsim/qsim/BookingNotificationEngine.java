@@ -11,6 +11,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
@@ -22,7 +23,6 @@ import org.matsim.withinday.utils.EditTrips;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.matsim.core.mobsim.qsim.interfaces.TripInfoProvider.*;
 import static org.matsim.core.router.TripStructureUtils.*;
 
 final class BookingNotificationEngine implements MobsimEngine {

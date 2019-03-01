@@ -25,13 +25,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.jdeqsim.MessageQueue;
-import org.matsim.core.mobsim.qsim.ActivityEngine.AgentEntry;
 import org.matsim.core.mobsim.qsim.ActivityEngine.AgentEntryComparator;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.*;
@@ -41,14 +38,12 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.withinday.utils.EditPlans;
 import org.matsim.withinday.utils.EditTrips;
-import org.matsim.withinday.utils.ReplanningException;
 
 import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
-import static org.matsim.core.mobsim.qsim.interfaces.TripInfoProvider.*;
 import static org.matsim.core.router.TripStructureUtils.*;
 
 public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
@@ -97,7 +92,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 				MobsimAgent agent = entry.agent ;
 				Plan plan = WithinDayAgentUtils.getModifiablePlan( agent );
 
-				// search for drt trip corresponding to drt leg:
+				// search for drt trip corresponding to drt leg.  Trick is using our own stage activities.
 				List<Trip> trips = TripStructureUtils.getTrips( plan, this.drtStageActivities ) ;
 				Trip drtTrip = null ;
 				for ( Trip trip : trips ){
@@ -116,8 +111,9 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 				Person person = agent instanceof HasPerson ? ((HasPerson) agent).getPerson() : null ;
 
 				for ( DepartureHandler handler : departureHandlers.values() ) {
-					if ( handler instanceof TripInfoProvider ){
-						List<TripInfo> tripInfos = ((TripInfoProvider) handler).getTripInfos( fromFacility, toFacility, time, TimeInterpretation.departure, person );
+					if ( handler instanceof TripInfo.Provider ){
+						List<TripInfo> tripInfos = ((TripInfo.Provider) handler).getTripInfos( new TripInfoRequest.Builder().setFromFacility( fromFacility ).setToFacility( toFacility ).setTime(
+								    drtTrip.getOriginActivity().getEndTime() ).setRequestId( entry.leg.hashCode() ).createRequest() ) ;
 						for( TripInfo tripInfo : tripInfos ){
 							allTripInfos.put( tripInfo, handler ) ;
 						}

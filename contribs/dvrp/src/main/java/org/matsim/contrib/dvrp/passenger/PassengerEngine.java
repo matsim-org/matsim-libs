@@ -35,8 +35,6 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
@@ -48,12 +46,11 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
-import sun.management.resources.agent; 
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
-public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfoProvider{
+public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo.Provider{
 	private static final Logger LOGGER = Logger.getLogger(PassengerEngine.class);
 
 	private final String mode;
@@ -67,7 +64,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 
 	private final AdvanceRequestStorage advanceRequestStorage;
 	private final AwaitingPickupStorage awaitingPickupStorage;
-	private final Map<Id<Request>, MobsimPassengerAgent> passengersByRequestId = new HashMap<>();
+	private final Map<Id<org.matsim.contrib.dvrp.optimizer.Request>, MobsimPassengerAgent> passengersByRequestId = new HashMap<>();
 
 	private final List<TripInfo> pendingRequests = new ArrayList<>() ;
 
@@ -116,22 +113,22 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 	}
 
 	@Override
-	public final List<TripInfo> getTripInfos( Facility fromFacility, Facility toFacility, double time, TimeInterpretation interpretation, Person person ) {
+	public final List<TripInfo> getTripInfos( TripInfoRequest requestImpl ) {
 		// idea is to be able to return multiple trip options, cf. public transit router.  In the case here, we will need only one.  I.e. goals of this method are:
 		// (1) fill out TripInfo
 		// (2) keep handle so that passenger can accept, or not-confirmed request is eventually deleted again.  Also see doSimStet(...) ;
 
-		Gbl.assertIf( interpretation== TimeInterpretation.departure );
-		Link pickupLink = FacilitiesUtils.decideOnLink( fromFacility, network );
-		Link dropoffLink = FacilitiesUtils.decideOnLink( toFacility, network ) ;
+		Gbl.assertIf( requestImpl.getTimeInterpretation() == TripInfo.TimeInterpretation.departure );
+		Link pickupLink = FacilitiesUtils.decideOnLink( requestImpl.getFromFacility(), network );
+		Link dropoffLink = FacilitiesUtils.decideOnLink( requestImpl.getToFacility(), network ) ;
 		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
 
 		MobsimPassengerAgent passenger = null ;
-		PassengerRequest request = createValidateAndSubmitRequest(passenger, pickupLink.getId(), dropoffLink.getId(), time, now );
+		PassengerRequest request = createValidateAndSubmitRequest(passenger, pickupLink.getId(), dropoffLink.getId(), requestImpl.getTime(), now );
 		// yyyy we think that it is possible to remove parameter MobsimPassengerAgent from this method. kai/gregor, jan'19
 
 		// generating the TripInfo object that will be returned to the potential passenger:
-		TripInfo info = new DrtTripInfo( null, request, null, time );
+		TripInfo info = new DrtTripInfo( null, request, null, requestImpl.getTime() );
 		// wrap into list and return:
 		List list = new ArrayList<>() ;
 		list.add(info) ;
@@ -211,7 +208,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		Map<Id<Link>, ? extends Link> links = network.getLinks();
 		Link fromLink = links.get(fromLinkId);
 		Link toLink = links.get(toLinkId);
-		Id<Request> id = Id.create(mode + "_" + nextId++, Request.class);
+		Id<org.matsim.contrib.dvrp.optimizer.Request> id = Id.create(mode + "_" + nextId++, org.matsim.contrib.dvrp.optimizer.Request.class );
 
 		PassengerRequest request = requestCreator.createRequest(id, passenger, fromLink, toLink, departureTime, now);
 		return request;
