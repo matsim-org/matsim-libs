@@ -50,25 +50,27 @@ public class RunExperiencedTripsAnalysis {
     static Set<Id<Person>> relevantAgents = new HashSet<>();
     static Map<String, Geometry> zoneMap = new HashMap<>();
     static Set<String> zones = new HashSet<>();
-    static String shapeFile = "D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\input\\shapes\\wvi-zones-bsonly.shp";
+    static String shapeFile = "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\shp\\parking-bs.shp";
     static String shapeFeature = "NO";
 
     public static void main(String[] args) {
 
-        String runDirectory = "D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\output\\bs_as_berlin__800m_800veh_6pax\\";
-        String runId = "bs_as_berlin__800m_800veh_6pax.";
+        String runDirectory = "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\output\\vw219_netnet150_veh_idx0\\";
+        String runId = "vw219_netnet150_veh_idx0.";
         String runPrefix = runDirectory + "/" + runId;
 
         boolean useTransitSchedule = true;
 
         Set<String> monitoredModes = new HashSet<>();
         monitoredModes.add("pt");
-        monitoredModes.add("ptSlow");
         monitoredModes.add("transit_walk");
         monitoredModes.add("drt");
         monitoredModes.add("drt_walk");
+        monitoredModes.add("access_walk");
+        monitoredModes.add("egress_walk");
         monitoredModes.add("car");
         monitoredModes.add("walk");
+        monitoredModes.add("bike");
 
         readShape(shapeFile, shapeFeature);
 
@@ -86,22 +88,23 @@ public class RunExperiencedTripsAnalysis {
                 relevantAgents.add(person.getId());
 
 
-                for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-                    if (pe instanceof Activity) {
-                        if (((Activity) pe).getType().contains("home")) {
-
-                            Activity activity = ((Activity) pe);
-                            Coord coord = activity.getCoord();
-                            if (vwExamples.utils.modalSplitAnalyzer.modalSplitEvaluator.isWithinZone(coord, zoneMap)) {
-                                relevantAgents.add(person.getId());
-                                //System.out.println(person.getId().toString());
-                                break;
-
-                            }
-
-                        }
-                    }
-                }
+            	//Take only specific agents
+//				for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+//					if (pe instanceof Activity) {
+//						if (((Activity) pe).getType().contains("home")) {
+//
+//							Activity activity = ((Activity) pe);
+//							Coord coord = activity.getCoord();
+//							if (vwExamples.utils.modalSplitAnalyzer.modalSplitEvaluator.isWithinZone(coord, zoneMap)) {
+//								relevantAgents.add(person.getId());
+//								// System.out.println(person.getId().toString());
+//								break;
+//
+//							}
+//
+//						}
+//					}
+//				}
 
             }
 

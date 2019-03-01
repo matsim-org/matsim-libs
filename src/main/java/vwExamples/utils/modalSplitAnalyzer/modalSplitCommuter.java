@@ -62,7 +62,7 @@ public class modalSplitCommuter {
     String shapeFeature = "NO";
     StageActivityTypes stageActs;
     static String inFileName = "D:\\Backup_Axer\\Axer\\MatsimDataStore\\BaseCases\\vw219\\vw219.output_plans.xml.gz";
-    static String OutFileName = "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\plans\\vw219.10pct_commuter_DRT.xml.gz";
+    static String OutFileName = "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\plans\\vw219.20pct_commuter_DRT.xml.gz";
 
     static List<String> primaryActivies = new ArrayList<>();
     static List<String> primaryLegModes = new ArrayList<>();
@@ -73,7 +73,7 @@ public class modalSplitCommuter {
     // reduce it by factor 0.58, the get the correct amount of DRT users
     // Like Berlin
     static {
-        desiredModalShiftRatesMap.put("car", 0.15);
+        desiredModalShiftRatesMap.put("car", 0.20);
     }
 
     public static void main(String[] args) {
@@ -656,7 +656,7 @@ public class modalSplitCommuter {
                                 double limit = maxShiftNumbersPerMode(SubtourMode, desiredModalShiftRatesMap,
                                         allTrafficModalShare.modeTripsMap, allTrafficModalShare.modeTripsMapRelative);
 
-                                if (limit >= LogReplacedTripsMap.get(SubtourMode).intValue() && p.nextDouble() < 0.25) {
+                                if (limit >= LogReplacedTripsMap.get(SubtourMode).intValue() && p.nextDouble() < 0.20) {
 
                                 	for (Trip trip : subTour.getTrips())
                                 	{

@@ -49,17 +49,18 @@ import org.matsim.vehicles.Vehicles;
 public class RunDRTCountAnalysis {
 public static void main(String[] args) throws IOException {
 	
-	String folder = "D:/Scenario_1/matsim_output/at_case_car23cpm/";
+	String folder = "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\output\\20pct_carToDrt_batteryCharge_0C_2nd150_veh_idx0\\";
+	String runid = "20pct_carToDrt_batteryCharge_0C_2nd150_veh_idx0.";
 	
 	Network network = NetworkUtils.createNetwork();
-	new MatsimNetworkReader(network).readFile(folder+"output_network.xml.gz");
+	new MatsimNetworkReader(network).readFile(folder+runid+"output_network.xml.gz");
 	
 	EventsManager events = EventsUtils.createEventsManager();
 	
 	CountsAccumulator countsAccumulator = new CountsAccumulator(network);
 	events.addHandler(countsAccumulator);
-	new MatsimEventsReader(events).readFile(folder+"output_events.xml.gz");
-	BufferedWriter bw = IOUtils.getBufferedWriter(folder+"output_linkVolumes.txt");
+	new MatsimEventsReader(events).readFile(folder+runid+"output_events.xml.gz");
+	BufferedWriter bw = IOUtils.getBufferedWriter(folder+runid+"output_linkVolumes.txt");
 	bw.write("LinkId;carCount;drtCount");
 	for (Entry<Id<Link>, Tuple<MutableInt, MutableInt>> e : countsAccumulator.getLinkCounts().entrySet()) {
 		bw.newLine();

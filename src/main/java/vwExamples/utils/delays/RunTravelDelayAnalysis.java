@@ -47,13 +47,13 @@ public class RunTravelDelayAnalysis {
     static Set<Id<Person>> relevantAgents = new HashSet<>();
     static Map<String, Geometry> zoneMap = new HashMap<>();
     static Set<String> zones = new HashSet<>();
-    static String shapeFile = "C:\\Temp\\shp\\parking-bs.shp";
+    static String shapeFile = "D:\\\\Matsim\\\\Axer\\\\BSWOB2.0\\\\input\\\\shp\\\\parking-bs.shp";
     static String shapeFeature = "NO";
 
     public static void main(String[] args) {
 
-        String runDir = "Y:\\vw219\\";
-        String runId = "vw219.";
+        String runDir = "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\output\\vw219_netnet150_veh_idx0\\";
+        String runId = "vw219_netnet150_veh_idx0.";
 
         readShape(shapeFile, shapeFeature);
 
@@ -99,7 +99,7 @@ public class RunTravelDelayAnalysis {
         EventsManager events = EventsUtils.createEventsManager();
         events.addHandler(tdc);
         new MatsimEventsReader(events).readFile(runDir + runId + "output_events.xml.gz");
-        DynModeTripsAnalyser.collection2Text(tdc.getTrips(), runDir + "delays.csv", "PersonId;ArrivalTime;FreespeedTravelTime;ActualTravelTime;Delay");
+        DynModeTripsAnalyser.collection2Text(tdc.getTrips(), runDir +runId+ "delays.csv", "PersonId;ArrivalTime;FreespeedTravelTime;ActualTravelTime;Delay");
     }
 
     public static void readShape(String shapeFile, String featureKeyInShapeFile) {

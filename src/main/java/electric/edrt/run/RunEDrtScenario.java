@@ -56,11 +56,11 @@ import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import vwExamples.utils.customEV.BatteryReplacementCharge;
 
 public class RunEDrtScenario {
-	private static final double CHARGING_SPEED_FACTOR = 1.; // full speed
-	private static final double MAX_RELATIVE_SOC = 0.8;// charge up to 80% SOC
-	private static final double MIN_RELATIVE_SOC = 0.2;// send to chargers vehicles below 20% SOC
-	private static final double TEMPERATURE = 20;// oC
-	private static String inputPath = "D:\\BS_DRT\\input\\";
+	public static final double CHARGING_SPEED_FACTOR = 1.; // full speed
+	public static final double MAX_RELATIVE_SOC = 0.8;// charge up to 80% SOC
+	public static final double MIN_RELATIVE_SOC = 0.2;// send to chargers vehicles below 20% SOC
+	public static final double TEMPERATURE = 20;// oC
+	public static String inputPath = "D:\\BS_DRT\\input\\";
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(inputPath + "edrt-config.xml", new DrtConfigGroup(),
