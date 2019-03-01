@@ -7,14 +7,12 @@ public class TripInfoRequest{
 	private final Facility toFacility;
 	private final double time;
 	private final TripInfo.TimeInterpretation timeInterpretation;
-	private final long requestId;
 
-	private TripInfoRequest( Facility fromFacility, Facility toFacility, double time, TripInfo.TimeInterpretation timeInterpretation, long requestId ){
+	private TripInfoRequest( Facility fromFacility, Facility toFacility, double time, TripInfo.TimeInterpretation timeInterpretation ){
 		this.fromFacility = fromFacility;
 		this.toFacility = toFacility;
 		this.time = time;
 		this.timeInterpretation = timeInterpretation;
-		this.requestId = requestId;
 	}
 
 	public Facility getFromFacility(){
@@ -33,16 +31,14 @@ public class TripInfoRequest{
 		return timeInterpretation;
 	}
 
-	public long getRequestId(){
-		return requestId;
-	}
-
 	public static class Builder{
+		// this is deliberately a builder and not a constructor so that we can add arguments later without having to add constructors with longer and longer
+		// argument lists.  kai, mar'19
+
 		private Facility fromFacility;
 		private Facility toFacility;
 		private double time;
 		private TripInfo.TimeInterpretation timeInterpretation;
-		private long requestId;
 
 		public Builder setFromFacility( Facility fromFacility ){
 			this.fromFacility = fromFacility;
@@ -64,13 +60,8 @@ public class TripInfoRequest{
 			return this;
 		}
 
-		public Builder setRequestId( long requestId ){
-			this.requestId = requestId;
-			return this;
-		}
-
 		public TripInfoRequest createRequest(){
-			return new TripInfoRequest( fromFacility, toFacility, time, timeInterpretation, requestId );
+			return new TripInfoRequest( fromFacility, toFacility, time, timeInterpretation );
 		}
 	}
 }

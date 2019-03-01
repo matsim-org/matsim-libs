@@ -24,20 +24,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.ActivityEngine.AgentEntryComparator;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.*;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.withinday.utils.EditPlans;
-import org.matsim.withinday.utils.EditTrips;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -48,35 +42,31 @@ import static org.matsim.core.router.TripStructureUtils.*;
 
 public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	private static final Logger log = Logger.getLogger( ActivityEngine.class ) ;
-	private final EditTrips editTrips;
-	private final EditPlans editPlans;
-	// after mobsim the alterations to the plans are deleted (a reset is needed before next iteration in any case)? Don't we need rather something like "executed plan"
 
 	private final Map<String, DepartureHandler> departureHandlers;
 	private final ActivityFacilities facilities;
-	private final double beelineWalkSpeed;
-	private final MainModeIdentifier mainModeIdentifier;
+	private final BookingNotificationEngine bookingNotificationEngine;
 
 	private ActivityEngine delegate ;
 
-	StageActivityTypes drtStageActivities = new StageActivityTypesImpl( createStageActivityType( TransportMode.drt  ) , createStageActivityType( TransportMode.walk ) ) ;
+	static StageActivityTypes drtStageActivities = new StageActivityTypesImpl( createStageActivityType( TransportMode.drt ) , createStageActivityType( TransportMode.walk ) ) ;
 
-	private final Queue<AgentAndLegEntry> wakeUpList = new PriorityBlockingQueue<>(500, new AgentEntryComparator() );
+	private final Queue<AgentAndLegEntry> wakeUpList = new PriorityBlockingQueue<>( 500, ( o1, o2 ) -> {
+		int cmp = Double.compare( o1.time, o2.time ) ;
+		if ( cmp==0 ) {
+			return cmp ;
+		} else {
+			return o1.agent.getId().compareTo( o2.agent.getId() ) ;
+		}
+	} );
 
 	@Inject
-	ActivityEngineWithWakeup( EventsManager eventsManager, Map<String, DepartureHandler> departureHandlers,
-						   TripRouter tripRouter, Scenario scenario, QSim qsim, Config config ) {
-		this.departureHandlers = departureHandlers;
-		this.editTrips = new EditTrips( tripRouter, scenario ) ;
-		this.editPlans = new EditPlans(qsim, tripRouter, editTrips);
+	ActivityEngineWithWakeup( EventsManager eventsManager, Map<String, DepartureHandler> departureHandlers, Scenario scenario,
+					  BookingNotificationEngine bookingNotificationEngine ) {
 		this.delegate = new ActivityEngine( eventsManager ) ;
+		this.departureHandlers = departureHandlers;
 		this.facilities = scenario.getActivityFacilities();
-
-		this.mainModeIdentifier = tripRouter.getMainModeIdentifier() ;
-		
-		PlansCalcRouteConfigGroup pcrConfig = config.plansCalcRoute();
-		double beelineDistanceFactor = pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
-		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk) / beelineDistanceFactor ;
+		this.bookingNotificationEngine = bookingNotificationEngine;
 	}
 
 	@Override
@@ -89,78 +79,56 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 		while ( !wakeUpList.isEmpty() ) {
 			if ( wakeUpList.peek().time <= time ) {
 				final AgentAndLegEntry entry = wakeUpList.poll();
-				MobsimAgent agent = entry.agent ;
-				Plan plan = WithinDayAgentUtils.getModifiablePlan( agent );
+				Plan plan = WithinDayAgentUtils.getModifiablePlan( entry.agent );
 
 				// search for drt trip corresponding to drt leg.  Trick is using our own stage activities.
-				List<Trip> trips = TripStructureUtils.getTrips( plan, this.drtStageActivities ) ;
-				Trip drtTrip = null ;
-				for ( Trip trip : trips ){
-					if( trip.getTripElements().contains( entry.leg ) ) {
-						drtTrip = trip;
-						break;
-					}
-				}
+				Trip drtTrip = TripStructureUtils.findTripAtPlanElement( entry.leg, plan, this.drtStageActivities ) ;
 				Gbl.assertNotNull( drtTrip );
 
 				Facility fromFacility = FacilitiesUtils.toFacility( drtTrip.getOriginActivity(), facilities ) ;
 				Facility toFacility = FacilitiesUtils.toFacility( drtTrip.getDestinationActivity(), facilities ) ;
 
-				Map<TripInfo,DepartureHandler> allTripInfos  = new LinkedHashMap<>() ;
-
-				Person person = agent instanceof HasPerson ? ((HasPerson) agent).getPerson() : null ;
+				Map<TripInfo,TripInfo.Provider> allTripInfos  = new LinkedHashMap<>() ;
 
 				for ( DepartureHandler handler : departureHandlers.values() ) {
 					if ( handler instanceof TripInfo.Provider ){
-						List<TripInfo> tripInfos = ((TripInfo.Provider) handler).getTripInfos( new TripInfoRequest.Builder().setFromFacility( fromFacility ).setToFacility( toFacility ).setTime(
-								    drtTrip.getOriginActivity().getEndTime() ).setRequestId( entry.leg.hashCode() ).createRequest() ) ;
+						final TripInfoRequest request = new TripInfoRequest.Builder().setFromFacility( fromFacility ).setToFacility( toFacility ).setTime(
+							  drtTrip.getOriginActivity().getEndTime() ).createRequest();
+						List<TripInfo> tripInfos = ((TripInfo.Provider) handler).getTripInfos( request ) ;
 						for( TripInfo tripInfo : tripInfos ){
-							allTripInfos.put( tripInfo, handler ) ;
+							allTripInfos.put( tripInfo, (TripInfo.Provider) handler ) ;
 						}
 					}
 				}
-				// add info for mode that is in agent plan, if not returned by departure handler.
-				decide( agent, allTripInfos, fromFacility, toFacility ) ;
+
+				// TODO add info for mode that is in agent plan, if not returned by trip info provider
+
+				decide( entry.agent, allTripInfos ) ;
 			}
 		}
 		delegate.doSimStep( time );
 	}
 
-	private void decide( MobsimAgent agent, Map<TripInfo, DepartureHandler> allTripInfos, Facility fromFacility, Facility toFacility ){
-		Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement( agent );
-		Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ;
-		String mode = editPlans.getModeOfCurrentOrNextTrip( agent );
-		// yyyyyy will not work when drt is access or ecress mode!
-		if ( !TransportMode.drt.equals( mode ) ) {
-			return ;
-		}
-		
-		// TODO: Decision logic between multiple offers / tripInfos --> some simple score prognosis?
+	private void decide( MobsimAgent agent, Map<TripInfo, TripInfo.Provider> allTripInfos ){
+
+		// to get started, we assume that we are only getting one drt option back.
+		// TODO: make complete
 		TripInfo tripInfo = allTripInfos.keySet().iterator().next() ;
 
-//		tripInfo.accept();
-
-//		DepartureHandler handler = allTripInfos.get(tripInfo) ;
-//
-//		if ( handler instanceof Prebookable ) {
-//			((Prebookable) handler).prebookTrip(now, agent, fromLinkId, toLinkId, departureTime) ;
-//		}
-
-		// yyyy following is garbled
 		TripInfo confirmation = null ;
 		if ( tripInfo instanceof CanBeAccepted ) {
 			confirmation = ((CanBeAccepted)tripInfo).accept() ;
-			if( confirmation==null ) {
-				confirmation = tripInfo ;
-			}
+		}
+		if( confirmation==null ) {
+			confirmation = tripInfo ;
 		}
 
-		BookingNotificationEngine be = null ; // get from somewhere
-
 		if ( confirmation.getPickupLocation()!=null ) {
-			be.notifyChangedTripInformation( agent, confirmation );
+			bookingNotificationEngine.notifyChangedTripInformation( agent, confirmation );
 		} else{
-			// schedule activity end time of activity before drt walk to infinity so agent does not start drt walk before position is known.
+			// wait for notification:
+			((Activity)WithinDayAgentUtils.getCurrentPlanElement( agent )).setEndTime( Double.MAX_VALUE );
+			delegate.rescheduleActivityEnd( agent );
 		}
 	}
 
@@ -188,25 +156,30 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
 
-		Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ;
-
-		// maybe prebookedDrt and drt are two different modes?  At least there needs to be some kind of attribute.  Something like this:
-
-		for( PlanElement pe : plan.getPlanElements() ){
-			if ( pe instanceof Leg ) {
-				if ( TransportMode.drt.equals(((Leg) pe).getMode()) ) {
-					double prebookingOffset_s = (double) pe.getAttributes().getAttribute( "prebookingOffset_s" );
-					final double prebookingTime = ((Leg) pe).getDepartureTime() - prebookingOffset_s;
-					if ( prebookingTime < agent.getActivityEndTime() ) {
-						// yyyy and here one sees that having this in the activity engine is not very practical
-						this.wakeUpList.add( new AgentAndLegEntry( agent, prebookingTime , (Leg)pe ) ) ;
-					}
-				}
+		for( Leg drtLeg : findLegsWithModeInFuture( agent, TransportMode.drt ) ){
+			double prebookingOffset_s = (double) drtLeg.getAttributes().getAttribute( "prebookingOffset_s" );
+			final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
+			if ( prebookingTime < agent.getActivityEndTime() ) {
+				// yyyy and here one sees that having this in the activity engine is not very practical
+				this.wakeUpList.add( new AgentAndLegEntry( agent, prebookingTime , drtLeg ) ) ;
 			}
 		}
 
-
 		return delegate.handleActivity( agent ) ;
+	}
+
+	static List<Leg> findLegsWithModeInFuture( MobsimAgent agent, String mode ) {
+		List<Leg> retVal = new ArrayList<>() ;
+		Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ;
+		for( int ii = WithinDayAgentUtils.getCurrentPlanElementIndex( agent ) ; ii < plan.getPlanElements().size() ; ii++ ){
+			PlanElement pe = plan.getPlanElements().get( ii );;
+			if ( pe instanceof Leg ) {
+				if ( Objects.equals( mode, ((Leg) pe).getMode() ) ) {
+					retVal.add( (Leg) pe ) ;
+				}
+			}
+		}
+		return retVal ;
 	}
 
 	/**

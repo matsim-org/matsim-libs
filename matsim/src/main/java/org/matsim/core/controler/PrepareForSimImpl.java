@@ -107,10 +107,10 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			case onePerActivityLocationInPlansFile:
 				FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(activityFacilities, facilitiesConfigGroup);
 
-				facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing(true, network);
-				// (yy not sure if the false setting makes sense at all. kai, jul'18)
+				facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing( network );
 
-				facilitiesFromPopulation.assignOpeningTimes(facilitiesConfigGroup.isAssigningOpeningTime(), scenario.getConfig().planCalcScore());
+				facilitiesFromPopulation.assignOpeningTimes( scenario.getConfig().planCalcScore() );
+
 				facilitiesFromPopulation.run(population);
 				// Note that location choice, when switched on, should now either use the facilities generated here,
 				// or come with explicit pre-existing facilities.  kai, jul'18

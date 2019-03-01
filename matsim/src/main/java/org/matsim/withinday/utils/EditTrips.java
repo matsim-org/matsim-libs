@@ -184,11 +184,11 @@ public final class EditTrips {
 	 * @param mainMode
 	 * @return
 	 */
-	public final boolean replanFutureTrip(Trip trip, Plan plan, String mainMode) {
+	public final List<? extends PlanElement> replanFutureTrip( Trip trip, Plan plan, String mainMode ) {
 		double departureTime = PlanRouter.calcEndOfActivity( trip.getOriginActivity(), plan, tripRouter.getConfig() ) ;
 		return replanFutureTrip( trip, plan, mainMode, departureTime ) ;
 	}
-	public final boolean replanFutureTrip(Trip trip, Plan plan, String routingMode, double departureTime) {
+	public final List<? extends PlanElement> replanFutureTrip( Trip trip, Plan plan, String routingMode, double departureTime ) {
 		return replanFutureTrip(trip, plan, routingMode, departureTime, tripRouter);
 	}
 
@@ -233,7 +233,7 @@ public final class EditTrips {
 	 * by a new one. This is e.g. necessary when replacing a pt trip which might consists of multiple legs
 	 * and pt_interaction activities.  
 	 */
-	public static boolean replanFutureTrip(Trip trip, Plan plan, String routingMode, double departureTime, TripRouter tripRouter) {
+	public static List<? extends PlanElement> replanFutureTrip( Trip trip, Plan plan, String routingMode, double departureTime, TripRouter tripRouter ) {
 		Person person = plan.getPerson();
 
 		Facility fromFacility = new ActivityWrapperFacility( trip.getOriginActivity() ) ;
@@ -248,13 +248,13 @@ public final class EditTrips {
 
 		TripRouter.insertTrip(plan, trip.getOriginActivity(), newTrip, trip.getDestinationActivity());
 
-		return true;
+		return newTrip ;
 	}
 
 	/**
 	 * Convenience method, to be consistent with earlier syntax.  kai, may'16
 	 */
-	public static boolean relocateFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, Network network, TripRouter tripRouter) {
+	public static List<? extends PlanElement> relocateFutureTrip( Trip trip, Plan plan, String mainMode, double departureTime, Network network, TripRouter tripRouter ) {
 		return replanFutureTrip(trip, plan, mainMode, departureTime, tripRouter );
 	}
 	public StageActivityTypes getStageActivities() {

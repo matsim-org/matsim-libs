@@ -96,16 +96,6 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 
 	@Override
 	public void doSimStep(double time) {
-		// for all offers, delete those that are not confirmed within confirmation time (garbage collection)
-
-		if ( ((int) time) % 60==0 ){
-			for( TripInfo pendingRequest : this.pendingRequests ){
-				// do precise computation
-				this.eventsManager.processEvent( new PersonInformationEvent(time, personId, message) );
-			}
-			this.pendingRequests.clear();
-		}
-
 	}
 
 	@Override
@@ -138,9 +128,10 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 	/**
 	 * This is to register an advance booking. The method is called when, in reality, the request is made.
 	 */
-	private boolean prebookTrip( double now, MobsimPassengerAgent passenger, Id<Link> fromLinkId, Id<Link> toLinkId,
-					    double departureTime ) {
-		// suggestion to make this private: only possible through the getTripInfos channel.  Could be called from "accept" method in there.
+	void prebookTrip( double now, MobsimPassengerAgent passenger, Id<Link> fromLinkId, Id<Link> toLinkId,
+				double departureTime ) {
+		// suggestion to make this private: only possible through the getTripInfos channel.  Could be called from "accept" method in there. kai, feb'18
+		// no, currently also in PrebookingEngine. kai, mar'19
 
 		if (departureTime <= now) {
 			throw new IllegalStateException("This is not a call ahead");
@@ -151,7 +142,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 			advanceRequestStorage.storeAdvanceRequest(request);
 		}
 
-		return !request.isRejected();
+		request.isRejected();
 	}
 
 	@Override

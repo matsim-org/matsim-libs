@@ -16,10 +16,14 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.GeometryUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.withinday.utils.EditPlans;
 import org.matsim.withinday.utils.EditTrips;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -28,9 +32,8 @@ import static org.matsim.core.router.TripStructureUtils.*;
 final class BookingNotificationEngine implements MobsimEngine {
 
 	// Could implement this as a generalized version of the bdi-abm implementation: can send notifications to agent, and agent can react.  Similar to the drive-to action.
-	// Notifications and corresponding handlers could then be registered.
-
-	// On the other hand, it is easy to add an engine such as this one; how much does it help to have another layer of infrastructure?
+	// Notifications and corresponding handlers could then be registered. On the other hand, it is easy to add an engine such as this one; how much does it help to have another
+	// layer of infrastructure?  Am currently leaning towards the second argument.  kai, mar'19
 
 	private InternalInterface internalInterface;
 
@@ -68,52 +71,63 @@ final class BookingNotificationEngine implements MobsimEngine {
 		for( Map.Entry<MobsimAgent, TripInfo> entry : map.entrySet() ){
 			MobsimAgent agent = entry.getKey();;
 			TripInfo tripInfo = entry.getValue();
-			Facility pickupLocation = tripInfo.getPickupLocation();
-			double pickupTime = tripInfo.getExpectedBoardingTime();
-			String mode = tripInfo.getMode();;
 
-			Plan plan = WithinDayAgentUtils.getModifiablePlan( agent );
-			Integer currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex( agent );;
+			Gbl.assertIf( WithinDayAgentUtils.getCurrentPlanElement( agent ) instanceof  Activity );
 
-			// find next leg with given mode:
-//			PlanElement pe = null ;
+			Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ;
 
-			int drtLegPEIndex = -1 ;
-			for ( int ii = currentPlanElementIndex ; ii < plan.getPlanElements().size() ; ii++ ) {
-				PlanElement pe = plan.getPlanElements().get(ii) ;
-				if ( pe instanceof Leg && ((Leg) pe).getMode().equals( TransportMode.drt )) {
-					drtLegPEIndex = ii ;
-					break ;
+			Trip theTrip = null ;
+			for ( Trip drtTrip : TripStructureUtils.getTrips( plan, ActivityEngineWithWakeup.drtStageActivities ) ) {
+				// recall that we have set the activity end time of the current activity to infinity, so we cannot use that any more.  :-( ?!
+				// could instead use some kind of ID.  Not sure if that would really be better.
+				if ( CoordUtils.calcEuclideanDistance( drtTrip.getOriginActivity().getCoord(), tripInfo.getPickupLocation().getCoord() ) > 1000. ) {
+					continue ;
+				}
+				if ( CoordUtils.calcEuclideanDistance( drtTrip.getDestinationActivity().getCoord(), tripInfo.getDropoffLocation().getCoord() ) > 1000.  ) {
+					continue ;
+				}
+				theTrip = drtTrip ;
+				break ;
+			}
+			Gbl.assertNotNull( theTrip );
+			Iterator<Trip> walkTripsIter = TripStructureUtils.getTrips( theTrip.getTripElements(), new StageActivityTypesImpl( TransportMode.walk ) ).iterator();
+
+			// ---
+
+			Gbl.assertIf( walkTripsIter.hasNext() );
+			Trip accessWalkTrip = walkTripsIter.next();
+			accessWalkTrip.getDestinationActivity().setCoord( tripInfo.getPickupLocation().getCoord() );
+			accessWalkTrip.getDestinationActivity().setLinkId( tripInfo.getPickupLocation().getLinkId()  );
+			accessWalkTrip.getDestinationActivity().setFacilityId( null );
+
+			List<? extends PlanElement> pe = editTrips.replanFutureTrip( accessWalkTrip, plan, TransportMode.walk );
+			List<Leg> legs = TripStructureUtils.getLegs( pe );
+			double ttime = 0.;
+			for( Leg leg : legs ) {
+				if ( leg.getRoute() != null ) {
+					ttime += leg.getTravelTime() ;
+				} else {
+					ttime += leg.getTravelTime() ;
 				}
 			}
-			// several cases:
-			// (1) agent is still at previous activity
-			// (2) agent is at previous leg (e.g. in train)
-			// (3) agent is already on walk leg towards pickup location but needs to change destination
-			// (4) agent is already waiting but now needs to change position
+			double buffer = 300. ;
+			editPlans.rescheduleCurrentActivityEndtime( agent, tripInfo.getExpectedBoardingTime()-ttime-buffer );
 
-			// I think that the following, once debugged, would address (1) and (2), but not (3)
+			// ---
 
-			// using custom stage activities here, since we only want the drt part of the trip.  Normally we have
-			//   access_walk -- drt_interaction -- drt -- drt_interaction -- egress_walk .
-			// But we can have network walk, in which case it gets quite complicated
-			//   access_walk -- walk_interaction -- (network)walk -- walk_interaction -- egress(?)_walk -- drt_interaction -- drt -- ...
-			// since we need to end the initial walk at a facility and thus need to bushwhack to it.
-			StageActivityTypes stageActivitiesForWalk = new StageActivityTypesImpl( "walk_interaction" ) ;
-			// (only want to replan the walk part!)
+			Gbl.assertIf( walkTripsIter.hasNext() );
+			Trip egressWalkTrip = walkTripsIter.next() ;
+			final Activity egressWalkOriginActivity = egressWalkTrip.getOriginActivity() ;
+			egressWalkOriginActivity.setCoord( tripInfo.getDropoffLocation().getCoord() );
+			egressWalkOriginActivity.setLinkId( tripInfo.getDropoffLocation().getLinkId() );
+			egressWalkOriginActivity.setFacilityId( null );
 
-			Trip walkTrip = TripStructureUtils.findTripEndingAtActivity( (Activity) plan.getPlanElements().get(drtLegPEIndex-1 ), plan, stageActivitiesForWalk );
-			// MATSIM-481 = decision to always alternate acts and legs
+			editTrips.replanFutureTrip( egressWalkTrip, plan, TransportMode.walk ) ;
+			// yy maybe better do this at dropoff?
 
-			Gbl.assertNotNull( walkTrip );
+			// ----
 
-			int walkTripStartPEIndex = WithinDayAgentUtils.indexOfPlanElement( agent, walkTrip.getOriginActivity() );
-			Gbl.assertIf( currentPlanElementIndex <= walkTripStartPEIndex  );
-			// otherwise we are case (3) or (4) or completely confused
-
-			String technicalMainModeOfWalkTrip = tripRouter.getMainModeIdentifier().identifyMainMode( walkTrip.getTripElements() );
-			double dpTime = walkTrip.getOriginActivity().getEndTime() ; // yyyy will need other estimate of this
-			editTrips.replanFutureTrip( walkTrip, plan, technicalMainModeOfWalkTrip, dpTime ) ;
+			Gbl.assertIf( ! walkTripsIter.hasNext() );
 
 		}
 
