@@ -24,5 +24,13 @@ public interface FreightCapacity {
 	public double getVolume();
 
 	public void setVolume(double cubicMeters);
+
+	public double getWeight();
+
+	public void setWeight(double tons);
+
+	public int getUnits();
+
+	public void setUnits(int units);
 	
 }

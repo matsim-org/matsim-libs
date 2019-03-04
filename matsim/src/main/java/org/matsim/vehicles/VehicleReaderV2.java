@@ -16,7 +16,7 @@ class VehicleReaderV2 extends MatsimXmlParser{
 	private final VehiclesFactory builder;
 	private VehicleType currentVehType = null;
 	private VehicleCapacity currentCapacity = null;
-	private FreightCapacity currentFreightCap = null;
+	private FreightCapacity currentFreightCapacity = null;
 	private EngineInformation.FuelType currentFuelType = null;
 	private double currentGasConsumption = Double.NaN;
 
@@ -42,8 +42,8 @@ class VehicleReaderV2 extends MatsimXmlParser{
 		} else if( VehicleSchemaV1Names.FUELTYPE.equalsIgnoreCase( name ) ){
 			this.currentFuelType = this.parseFuelType( content.trim() );
 		} else if( VehicleSchemaV1Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){
-			this.currentCapacity.setFreightCapacity( this.currentFreightCap );
-			this.currentFreightCap = null;
+			this.currentCapacity.setFreightCapacity( this.currentFreightCapacity);
+			this.currentFreightCapacity = null;
 		} else if( VehicleSchemaV1Names.CAPACITY.equalsIgnoreCase( name ) ){
 			this.currentVehType.setCapacity( this.currentCapacity );
 			this.currentCapacity = null;
@@ -105,9 +105,13 @@ class VehicleReaderV2 extends MatsimXmlParser{
 		} else if( VehicleSchemaV1Names.STANDINGROOM.equalsIgnoreCase( name ) ){
 			this.currentCapacity.setStandingRoom( Integer.valueOf( atts.getValue( VehicleSchemaV1Names.PERSONS ) ) );
 		} else if( VehicleSchemaV1Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){
-			this.currentFreightCap = this.builder.createFreigthCapacity();
+			this.currentFreightCapacity = this.builder.createFreigthCapacity();
 		} else if( VehicleSchemaV1Names.VOLUME.equalsIgnoreCase( name ) ){
-			this.currentFreightCap.setVolume( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.CUBICMETERS ) ) );
+			this.currentFreightCapacity.setVolume( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.CUBICMETERS ) ) );
+		} else if( VehicleSchemaV1Names.WEIGHT.equalsIgnoreCase( name ) ){
+			this.currentFreightCapacity.setWeight( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.TONS) ) );
+		} else if( VehicleSchemaV1Names.UNIT.equalsIgnoreCase( name ) ){
+			this.currentFreightCapacity.setUnits( Integer.parseInt( atts.getValue( VehicleSchemaV1Names.UNITS ) ) );
 		} else if( VehicleSchemaV1Names.GASCONSUMPTION.equalsIgnoreCase( name ) ){
 			this.currentGasConsumption = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.LITERPERMETER ) );
 		} else if( VehicleSchemaV1Names.VEHICLE.equalsIgnoreCase( name ) ){

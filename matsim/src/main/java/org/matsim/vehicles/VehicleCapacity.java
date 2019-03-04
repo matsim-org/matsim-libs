@@ -35,5 +35,5 @@ public interface VehicleCapacity {
 	
 	public void setStandingRoom(Integer standingRoom);
 	
-	public void setFreightCapacity(FreightCapacity freightCap);
+	public void setFreightCapacity(FreightCapacity freightCapacity);
 }

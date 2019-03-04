@@ -34,6 +34,10 @@ public interface VehicleSchemaV1Names {
 	public static final String FREIGHTCAPACITY = "freightCapacity";
 	public static final String VOLUME = "volume";
 	public static final String CUBICMETERS = "cubicMeters";
+	public static final String WEIGHT = "weight";
+	public static final String TONS = "tons";
+	public static final String UNIT = "unit";
+	public static final String UNITS = "units";
 	public static final String LENGTH = "length";
 	public static final String METER = "meter";
 	public static final String WIDTH = "width";

@@ -33,6 +33,8 @@ public class VehicleTypeImpl implements VehicleType {
     private double pcuEquivalents = 1.0;
     private double flowEfficiencyFactor = 1.0;
 	private EngineInformation engineInformation;
+//	private CostInformation costInformation;		//TODO: Needs to be created, kmt feb19
+	private FreightCapacity freightCapacity;
 	private String description;
 	private VehicleCapacity capacity;
 	
@@ -56,55 +58,7 @@ public class VehicleTypeImpl implements VehicleType {
 		this.id = typeId;
 	}
 
-	@Override
-	public void setCapacity(VehicleCapacity capacity) {
-		this.capacity = capacity;
-	}
 
-	@Override
-	public void setDescription(String desc) {
-		this.description = desc;
-	}
-
-	@Override
-	public void setEngineInformation(EngineInformation engineInformation) {
-		this.engineInformation = engineInformation;
-	}
-
-	@Override
-	public void setLength(double length) {
-		this.length = length;
-	}
-
-	@Override
-	public void setMaximumVelocity(double meterPerSecond) {
-		this.maxVelocity = meterPerSecond;
-	}
-
-	@Override
-	public void setWidth(double width) {
-		this.width = width;
-	}
-
-	@Override
-	public double getWidth() {
-		return width;
-	}
-
-	@Override
-	public double getMaximumVelocity() {
-		return maxVelocity;
-	}
-
-	@Override
-	public double getLength() {
-		return length;
-	}
-
-	@Override
-	public EngineInformation getEngineInformation() {
-		return engineInformation;
-	}
 
 	@Override
 	public String getDescription() {
@@ -175,4 +129,60 @@ public class VehicleTypeImpl implements VehicleType {
 	public Attributes getAttributes() {
 		return attributes ;
     }
+
+	@Override
+	public void setCapacity(VehicleCapacity capacity) {
+		this.capacity = capacity;
+	}
+
+	@Override
+	public void setDescription(String desc) {
+		this.description = desc;
+	}
+
+	@Override
+	public void setEngineInformation(EngineInformation engineInformation) {
+		this.engineInformation = engineInformation;
+	}
+
+	@Override
+	public void setFreightCapacity(FreightCapacity freightCapacity) { this.freightCapacity = freightCapacity; }
+
+	@Override
+	public void setLength(double length) {
+		this.length = length;
+	}
+
+	@Override
+	public void setMaximumVelocity(double meterPerSecond) {
+		this.maxVelocity = meterPerSecond;
+	}
+
+	@Override
+	public void setWidth(double width) {
+		this.width = width;
+	}
+
+	@Override
+	public double getWidth() {
+		return width;
+	}
+
+	@Override
+	public double getMaximumVelocity() {
+		return maxVelocity;
+	}
+
+	@Override
+	public double getLength() {
+		return length;
+	}
+
+	@Override
+	public EngineInformation getEngineInformation() {
+		return engineInformation;
+	}
+
+	@Override
+	public FreightCapacity getFreightCapacity() { return freightCapacity;	}
 }

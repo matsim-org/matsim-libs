@@ -47,6 +47,7 @@
             </xs:complexType>
           </xs:element>
           <xs:element name="engineInformation" type="engineInformationType" minOccurs="0" maxOccurs="1" />
+          <xs:element name="costsInformation" type="costInformationType" minOccurs="0" maxOccurs="1" />
           <xs:element name="accessTime" minOccurs="0" maxOccurs="1">
             <xs:complexType>
               <xs:attribute name="secondsPerPerson" type="xs:decimal" default="1.0"></xs:attribute>
@@ -88,9 +89,19 @@
       <xs:element name="freightCapacity" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="volume" minOccurs="1" maxOccurs="1">
+            <xs:element name="volume" minOccurs="0" maxOccurs="1">
               <xs:complexType>
-                <xs:attribute name="cubicMeters" type="xs:double" use="required"/>
+                <xs:attribute name="cubicMeters" type="xs:double"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="weight" minOccurs="0" maxOccurs="1">
+              <xs:complexType>
+                <xs:attribute name="tons" type="xs:double"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="unit" minOccurs="0" maxOccurs="1">
+              <xs:complexType>
+                <xs:attribute name="units" type="xs:nonNegativeInteger"/>
               </xs:complexType>
             </xs:element>
           </xs:sequence>
@@ -106,6 +117,21 @@
       <xs:element name="gasConsumption" minOccurs="1" maxOccurs="1">
         <xs:complexType>
           <xs:attribute name="literPerMeter" type="xs:decimal">
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="costInformationType">
+    <xs:sequence>
+      <xs:element name="costInformation" minOccurs="1" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="fixedCosts" type="xs:decimal">
+          </xs:attribute>
+          <xs:attribute name="costsPerMeter" type="xs:decimal">
+          </xs:attribute>
+          <xs:attribute name="costsPerSecond" type="xs:decimal">
           </xs:attribute>
         </xs:complexType>
       </xs:element>

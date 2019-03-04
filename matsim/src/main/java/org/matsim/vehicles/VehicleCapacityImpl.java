@@ -47,8 +47,8 @@ public class VehicleCapacityImpl implements VehicleCapacity {
 	}
 
 	@Override
-	public void setFreightCapacity(FreightCapacity freightCap) {
-		this.freightCap = freightCap;
+	public void setFreightCapacity(FreightCapacity freightCapacity) {
+		this.freightCap = freightCapacity;
 	}
 
 	@Override

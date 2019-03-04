@@ -40,6 +40,8 @@ public interface VehicleType extends Attributable{
 
 	public void setEngineInformation(EngineInformation currentEngineInfo);
 
+	public void setFreightCapacity(FreightCapacity freightCapacity);
+
 	public void setCapacity(VehicleCapacity capacity);
 
 	public double getWidth();
@@ -49,6 +51,10 @@ public interface VehicleType extends Attributable{
 	public double getLength();
 	
 	public EngineInformation getEngineInformation();
+
+//	public CostInformation getCostInformation();
+
+	public FreightCapacity getFreightCapacity();
 	
 	public String getDescription();
 	

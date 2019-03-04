@@ -16,6 +16,8 @@
     <standingRoom persons="20" />
     <freightCapacity>
       <volume cubicMeters="23.23"/>
+      <weight tons="9.5"/>
+      <unit units="200"/>
     </freightCapacity>
   </capacity>
   <length meter="9.5" />

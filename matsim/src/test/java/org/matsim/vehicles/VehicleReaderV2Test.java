@@ -41,7 +41,6 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 	public void testBasicParser_v2() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
-//		VehicleReaderV2 reader = new VehicleReaderV2(vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML2);
 
 		checkContent(vehicles);
@@ -63,6 +62,8 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		assertEquals(Integer.valueOf(20), vehTypeNormalCar.getCapacity().getStandingRoom());
 		assertNotNull(vehTypeNormalCar.getCapacity().getFreightCapacity());
 		assertEquals(23.23, vehTypeNormalCar.getCapacity().getFreightCapacity().getVolume(), EPSILON);
+		assertEquals(9.5, vehTypeNormalCar.getCapacity().getFreightCapacity().getWeight(), EPSILON);
+		assertEquals(200, vehTypeNormalCar.getCapacity().getFreightCapacity().getUnits());
 		assertNotNull(vehTypeNormalCar.getEngineInformation());
 		assertEquals(EngineInformation.FuelType.diesel, vehTypeNormalCar.getEngineInformation().getFuelType());
 		assertEquals(0.23, vehTypeNormalCar.getEngineInformation().getGasConsumption(), EPSILON);

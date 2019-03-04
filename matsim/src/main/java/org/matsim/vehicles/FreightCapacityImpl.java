@@ -26,6 +26,8 @@ package org.matsim.vehicles;
 public class FreightCapacityImpl implements FreightCapacity {
 
 	private double volume;
+	private double weight;
+	private int unit;
 	
 	public FreightCapacityImpl(){}
 	
@@ -33,10 +35,22 @@ public class FreightCapacityImpl implements FreightCapacity {
 	public void setVolume(double cubicMeters) {
 		this.volume = cubicMeters;
 	}
-	
+
 	@Override
 	public double getVolume() {
 		return this.volume;
 	}
-	
+
+	@Override
+	public void setWeight(double tons) { this.weight = tons; }
+
+	@Override
+	public double getWeight() { return this.weight; }
+
+	@Override
+	public void setUnits(int units) {	this.unit = units; }
+
+	@Override
+	public int getUnits() {return this.unit; }
+
 }
