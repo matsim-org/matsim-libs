@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,25 +16,12 @@
  *                                                                         *
  * *********************************************************************** */
 
+
 package org.matsim.vehicles;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.vehicles.EngineInformation.FuelType;
+public interface CostInformation {
 
-public interface VehiclesFactory extends MatsimFactory {
-
-	public VehicleType createVehicleType(Id<VehicleType> type);
-
-	public VehicleCapacity createVehicleCapacity();
-
-	public FreightCapacity createFreigthCapacity();
-
-	public EngineInformation createEngineInformation(FuelType fuelType,
-			double gasConsumption);
-
-	public CostInformation createCostInformation(double fixedCosts, double costsPerMeter, double costsPerSecond);
-
-	public Vehicle createVehicle(Id<Vehicle> id, VehicleType type);
-
+    public double getFixedCosts();
+    public double getCostsPerMeter();
+    public double getCostsPerSecond();
 }

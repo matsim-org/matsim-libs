@@ -27,6 +27,9 @@
     <fuelType>diesel</fuelType>
     <gasConsumption literPerMeter="0.23"/>
   </engineInformation>
+  <costsInformation>
+    <costInformation fixedCosts="100.00" costsPerMeter="0.15" costsPerSecond="0.08"/>
+  </costsInformation>
   <accessTime secondsPerPerson="23.23" />
   <egressTime secondsPerPerson="42.42" />
   <doorOperation mode="parallel" />

@@ -19,6 +19,9 @@ class VehicleReaderV2 extends MatsimXmlParser{
 	private FreightCapacity currentFreightCapacity = null;
 	private EngineInformation.FuelType currentFuelType = null;
 	private double currentGasConsumption = Double.NaN;
+	private double fixedCosts = Double.NaN;
+	private double costsPerMeter = Double.NaN;
+	private double costsPerSecond = Double.NaN;
 
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
@@ -39,6 +42,12 @@ class VehicleReaderV2 extends MatsimXmlParser{
 			this.currentVehType.setEngineInformation( currentEngineInfo );
 			this.currentFuelType = null;
 			this.currentGasConsumption = Double.NaN;
+		} else if( VehicleSchemaV1Names.COSTSINFORMATION.equalsIgnoreCase( name ) ){
+			CostInformation currentCostInformation = this.builder.createCostInformation(this.fixedCosts, this.costsPerMeter, this.costsPerSecond);
+			this.currentVehType.setCostInformation(currentCostInformation);
+			this.fixedCosts = Double.NaN;
+			this.costsPerMeter = Double.NaN;
+			this.costsPerSecond = Double.NaN;
 		} else if( VehicleSchemaV1Names.FUELTYPE.equalsIgnoreCase( name ) ){
 			this.currentFuelType = this.parseFuelType( content.trim() );
 		} else if( VehicleSchemaV1Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){
@@ -112,6 +121,19 @@ class VehicleReaderV2 extends MatsimXmlParser{
 			this.currentFreightCapacity.setWeight( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.TONS) ) );
 		} else if( VehicleSchemaV1Names.UNIT.equalsIgnoreCase( name ) ){
 			this.currentFreightCapacity.setUnits( Integer.parseInt( atts.getValue( VehicleSchemaV1Names.UNITS ) ) );
+
+		} else if( VehicleSchemaV1Names.COSTINFORMATION.equalsIgnoreCase( name ) ){
+			this.fixedCosts = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.FIXEDCOSTS ) );
+			this.costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.COSTSPERMETER ) );
+			this.costsPerSecond = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.COSTSPERSECOND ) );
+
+//		} else if( VehicleSchemaV1Names.FIXEDCOSTS.equalsIgnoreCase( name ) ){
+//			this.fixedCosts = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.FIXEDCOSTS ) );
+//		} else if( VehicleSchemaV1Names.COSTSPERMETER.equalsIgnoreCase( name ) ){
+//			this.costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.COSTSPERMETER ) );
+//		} else if( VehicleSchemaV1Names.COSTSPERSECOND.equalsIgnoreCase( name ) ){
+//			this.costsPerSecond = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.COSTSPERSECOND ) );
+
 		} else if( VehicleSchemaV1Names.GASCONSUMPTION.equalsIgnoreCase( name ) ){
 			this.currentGasConsumption = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.LITERPERMETER ) );
 		} else if( VehicleSchemaV1Names.VEHICLE.equalsIgnoreCase( name ) ){

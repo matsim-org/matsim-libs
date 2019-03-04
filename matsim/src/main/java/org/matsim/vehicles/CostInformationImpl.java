@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,23 +18,30 @@
 
 package org.matsim.vehicles;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.vehicles.EngineInformation.FuelType;
+public class CostInformationImpl implements CostInformation {
+    private final double fixed ;
+    private final double perMeter;
+    private final double perSecond;
 
-public interface VehiclesFactory extends MatsimFactory {
+    public CostInformationImpl(double fixed, double perMeter, double perTimeUnit) {
+        this.fixed = fixed;
+        this.perMeter = perMeter;
+        this.perSecond = perTimeUnit;
+    }
 
-	public VehicleType createVehicleType(Id<VehicleType> type);
+    @Override
+    public double getFixedCosts() {
+        return fixed;
+    }
 
-	public VehicleCapacity createVehicleCapacity();
+    @Override
+    public double getCostsPerMeter() {
+        return perMeter;
+    }
 
-	public FreightCapacity createFreigthCapacity();
-
-	public EngineInformation createEngineInformation(FuelType fuelType,
-			double gasConsumption);
-
-	public CostInformation createCostInformation(double fixedCosts, double costsPerMeter, double costsPerSecond);
-
-	public Vehicle createVehicle(Id<Vehicle> id, VehicleType type);
+    @Override
+    public double getCostsPerSecond() {
+        return perSecond;
+    }
 
 }

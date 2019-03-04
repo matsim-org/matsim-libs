@@ -66,4 +66,9 @@ class VehiclesFactoryImpl implements VehiclesFactory {
 			double gasConsumption) {
 			return new EngineInformationImpl(fuelType, gasConsumption);
 	}
+
+	@Override
+	public CostInformation createCostInformation(double fixedCosts, double costsPerMeter, double costsPerSecond) {
+		return new CostInformationImpl(fixedCosts, costsPerMeter, costsPerSecond);
+	}
 }

@@ -33,7 +33,7 @@ public class VehicleTypeImpl implements VehicleType {
     private double pcuEquivalents = 1.0;
     private double flowEfficiencyFactor = 1.0;
 	private EngineInformation engineInformation;
-//	private CostInformation costInformation;		//TODO: Needs to be created, kmt feb19
+	private CostInformation costInformation;		//TODO: Needs to be created, kmt feb19
 	private FreightCapacity freightCapacity;
 	private String description;
 	private VehicleCapacity capacity;
@@ -149,6 +149,9 @@ public class VehicleTypeImpl implements VehicleType {
 	public void setFreightCapacity(FreightCapacity freightCapacity) { this.freightCapacity = freightCapacity; }
 
 	@Override
+	public void setCostInformation(CostInformation costInformation) {this.costInformation = costInformation; }
+
+	@Override
 	public void setLength(double length) {
 		this.length = length;
 	}
@@ -182,6 +185,9 @@ public class VehicleTypeImpl implements VehicleType {
 	public EngineInformation getEngineInformation() {
 		return engineInformation;
 	}
+
+	@Override
+	public CostInformation getCostInformation() { return costInformation;	}
 
 	@Override
 	public FreightCapacity getFreightCapacity() { return freightCapacity;	}

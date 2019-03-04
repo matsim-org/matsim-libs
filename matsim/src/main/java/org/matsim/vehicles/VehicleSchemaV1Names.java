@@ -41,6 +41,11 @@ public interface VehicleSchemaV1Names {
 	public static final String LENGTH = "length";
 	public static final String METER = "meter";
 	public static final String WIDTH = "width";
+	public static final String COSTINFORMATION = "costInformation";
+	public static final String COSTSINFORMATION = "costsInformation";
+	public static final String FIXEDCOSTS = "fixedCosts";
+	public static final String COSTSPERMETER = "costsPerMeter";
+	public static final String COSTSPERSECOND = "costsPerSecond";
 	public static final String MAXIMUMVELOCITY = "maximumVelocity";
 	public static final String METERPERSECOND = "meterPerSecond";
 	public static final String ENGINEINFORMATION = "engineInformation";
