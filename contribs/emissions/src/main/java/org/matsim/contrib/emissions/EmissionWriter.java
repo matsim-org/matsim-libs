@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.utils;
+package org.matsim.contrib.emissions;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;

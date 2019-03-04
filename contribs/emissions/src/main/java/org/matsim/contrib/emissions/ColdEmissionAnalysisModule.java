@@ -30,8 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
-import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
-import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.NonScenarioVehicles;
+import org.matsim.contrib.emissions.EmissionsConfigGroup.NonScenarioVehicles;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
@@ -145,13 +144,13 @@ final class ColdEmissionAnalysisModule {
 			
 			if(this.ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
 				if(vehicle.getType().getDescription()==null) { // emission specification is in vehicle type id
-					vehicle.getType().setDescription(EmissionSpecificationMarker.BEGIN_EMISSIONS
-							+vehicle.getType().getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS);
-				} else if( vehicle.getType().getDescription().contains(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()) ) {
+					vehicle.getType().setDescription( EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS
+							+vehicle.getType().getId().toString()+ EmissionUtils.EmissionSpecificationMarker.END_EMISSIONS );
+				} else if( vehicle.getType().getDescription().contains( EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) ) {
 					// emission specification is in vehicle type id and in vehicle description too.
 				} else {
-					String vehicleDescription = vehicle.getType().getDescription() + EmissionSpecificationMarker.BEGIN_EMISSIONS
-							+ vehicle.getType().getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS;
+					String vehicleDescription = vehicle.getType().getDescription() + EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS
+							+ vehicle.getType().getId().toString()+ EmissionUtils.EmissionSpecificationMarker.END_EMISSIONS;
 					vehicle.getType().setDescription(vehicleDescription);
 				}
 			}

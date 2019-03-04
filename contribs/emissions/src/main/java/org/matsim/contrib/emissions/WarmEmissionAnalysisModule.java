@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
-import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
@@ -142,7 +141,7 @@ public final class WarmEmissionAnalysisModule {
 		stopGoKmCounter = 0.0;
 	}
 
-	public void throwWarmEmissionEvent(double leaveTime, Id<Link> linkId, Id<Vehicle> vehicleId, Map<String, Double> warmEmissions){
+	void throwWarmEmissionEvent( double leaveTime, Id<Link> linkId, Id<Vehicle> vehicleId, Map<String, Double> warmEmissions ){
 		Event warmEmissionEvent = new WarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
@@ -159,29 +158,7 @@ public final class WarmEmissionAnalysisModule {
 		  Id<Vehicle> vehicleId, Link link,
 		  double travelTime ) {
 
-		if(this.ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
-			if( vehicleType.getDescription()==null) { // emission specification is in vehicle type id
-				vehicleType.setDescription(EmissionSpecificationMarker.BEGIN_EMISSIONS
-						+ vehicleType.getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS );
-			} else if( vehicleType.getDescription().contains(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) ) {
-				// emission specification is in vehicle type id and in vehicle description too.
-			} else {
-				String vehicleDescription = vehicleType.getDescription() + EmissionSpecificationMarker.BEGIN_EMISSIONS
-						+ vehicleType.getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS;
-				vehicleType.setDescription(vehicleDescription );
-			}
-		}
-
-		Map<String, Double> warmEmissions = new HashMap<>();
-		if( vehicleType == null ||
-				(vehicleType == null && vehicleType.getDescription() == null) // if both are null together; no vehicle type information.
-				) {
-			throw new RuntimeException("Vehicle type description for vehicle " + vehicleType + " is missing. " +
-					"Please make sure that requirements for emission vehicles in "
-					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-		}
-
-		String vehicleDescription = vehicleType.getDescription();
+		String vehicleDescription = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg );
 
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleTypeId2VehicleInformationTuple(vehicleDescription);
 		if (vehicleInformationTuple.getFirst() == null){
@@ -194,7 +171,7 @@ public final class WarmEmissionAnalysisModule {
 		double linkLength = link.getLength();
 		String roadType = EmissionUtils.getHbefaRoadType(link);
 
-		warmEmissions = calculateWarmEmissions( vehicleId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple );
+		Map<String, Double> warmEmissions = calculateWarmEmissions( vehicleId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple );
 
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){
@@ -202,7 +179,7 @@ public final class WarmEmissionAnalysisModule {
 		}
 		return warmEmissions;
 	}
-	
+
 	private Map<String, Double> rescaleWarmEmissions(Map<String, Double> warmEmissions) {
 		Map<String, Double> rescaledWarmEmissions = new HashMap<>();
 		
@@ -366,8 +343,9 @@ public final class WarmEmissionAnalysisModule {
 		HbefaVehicleCategory hbefaVehicleCategory = null;
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 
-		int startIndex = vehicleDescription.indexOf(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
-		int endIndex = vehicleDescription.lastIndexOf(EmissionSpecificationMarker.END_EMISSIONS.toString());
+		int startIndex = vehicleDescription.indexOf(
+			  EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) + EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
+		int endIndex = vehicleDescription.lastIndexOf( EmissionUtils.EmissionSpecificationMarker.END_EMISSIONS.toString() );
 
 		String[] vehicleInformationArray = vehicleDescription.substring(startIndex, endIndex).split(";");
 

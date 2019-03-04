@@ -156,7 +156,7 @@ public final class EmissionUtils {
 		SortedMap<String, Double> totalEmissions = new TreeMap<>();
 
 		for(Id<T> personId : person2TotalEmissions.keySet()){
-			SortedMap<String, Double> individualEmissions = person2TotalEmissions.get(personId);
+			Map<String, Double> individualEmissions = person2TotalEmissions.get(personId);
 			double sumOfPollutant;
 			for(String pollutant : individualEmissions.keySet()){
 				if(totalEmissions.containsKey(pollutant)){
@@ -225,5 +225,56 @@ public final class EmissionUtils {
 
 
 		return table;
+	}
+
+	public static String getHbefaVehicleDescription( VehicleType vehicleType, EmissionsConfigGroup emissionsConfigGroup ){
+		if( emissionsConfigGroup.isUsingVehicleTypeIdAsVehicleDescription() ) {
+			// (v1, hbefa vehicle description is in vehicle type id.  Move to where it is expected now)
+
+			if( vehicleType.getDescription()==null) {
+				// (vehicle type description is empty, so put the hbefa stuff there:)
+
+				vehicleType.setDescription( EmissionSpecificationMarker.BEGIN_EMISSIONS
+						+ vehicleType.getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS );
+			} else if( vehicleType.getDescription().contains(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) ) {
+				// (vehicle type description already contains the hbefa stuff, so do nothing)
+
+			} else {
+				// (vehicle type description is NOT empty, so append the hbefa material)
+
+				String vehicleDescription = vehicleType.getDescription() + EmissionSpecificationMarker.BEGIN_EMISSIONS
+						+ vehicleType.getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS;
+				vehicleType.setDescription(vehicleDescription );
+			}
+		}
+
+		// we should now have reached the "normal" state.
+
+		if (vehicleType==null ) {
+			throw new RuntimeException("vehicleType is null; not possible for emissions contrib.") ;
+		}
+		if ( vehicleType.getDescription()==null ) {
+			throw new RuntimeException( "vehicleType.getDescription() is null; not possible for emissions contrib" ) ;
+		}
+
+		return vehicleType.getDescription();
+	}
+
+	public static void setHbefaVehicleDescription( String description, VehicleType vehicleType, EmissionsConfigGroup emissionsConfigGroup ){
+		vehicleType.setDescription(
+			  EmissionSpecificationMarker.BEGIN_EMISSIONS + description + EmissionSpecificationMarker.END_EMISSIONS );
+	}
+
+	/**
+	 * Created by amit on 29/09/16.
+	 */
+	@Deprecated
+	public // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
+	enum EmissionSpecificationMarker {
+
+	    @Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
+	    BEGIN_EMISSIONS ,
+	    @Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
+	    END_EMISSIONS ;
 	}
 }

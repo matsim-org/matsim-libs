@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.emissions.example;
 
-import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.contrib.emissions.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.*;
@@ -31,7 +31,7 @@ import org.matsim.core.controler.MatsimServices;
 /**
  * 
  * Creates a config file 
- * with necessary emission input files for the {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup}.
+ * with necessary emission input files for the {@link EmissionsConfigGroup EmissionsConfigGroup}.
  * 
  * This config file is used by the {@link RunDetailedEmissionToolOfflineExample OfflineExample} and
  * the {@link RunEmissionToolOnlineExample OnlineExample}
