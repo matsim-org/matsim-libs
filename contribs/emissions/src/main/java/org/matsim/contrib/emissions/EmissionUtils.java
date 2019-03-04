@@ -233,32 +233,35 @@ public final class EmissionUtils {
 	}
 
 	public static String getHbefaVehicleDescription( VehicleType vehicleType, EmissionsConfigGroup emissionsConfigGroup ){
-		if (vehicleType==null ) {
-			throw new RuntimeException("vehicleType is null; not possible for emissions contrib.") ;
+		if( vehicleType == null ){
+			throw new RuntimeException( "vehicleType is null; not possible for emissions contrib." );
 		}
 
-		if ( emissionsConfigGroup.isUsingVehicleTypeIdAsVehicleDescription()==null ) {
+		if( emissionsConfigGroup.isUsingVehicleTypeIdAsVehicleDescription() == null ){
 			// "normal" case, do nothing
-		} else if( emissionsConfigGroup.isUsingVehicleTypeIdAsVehicleDescription() ) {
+		} else if( emissionsConfigGroup.isUsingVehicleTypeIdAsVehicleDescription() ){
 			// (v1, hbefa vehicle description is in vehicle type id.  Move to where it is expected now)
 
 			EmissionUtils.setHbefaVehicleDescription( vehicleType, vehicleType.getId().toString() );
 
-		} else {
+		} else{
 			// (v2, hbefa vehicle description is in vehicle type description.  Move to where it is expected now)
 
-			if ( vehicleType.getDescription()==null ) {
-				throw new RuntimeException( "vehicleType.getDescription() is null; not possible for selected config setting" ) ;
+			if( vehicleType.getDescription() == null ){
+				throw new RuntimeException( "vehicleType.getDescription() is null; not possible for selected config setting" );
 			}
 
-			int startIndex = vehicleType.getDescription().indexOf(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
-			int endIndex = vehicleType.getDescription().lastIndexOf(EmissionSpecificationMarker.END_EMISSIONS.toString() );
+			int startIndex = vehicleType.getDescription().indexOf(
+				  EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
+			int endIndex = vehicleType.getDescription().lastIndexOf( EmissionSpecificationMarker.END_EMISSIONS.toString() );
 
-			EmissionUtils.setHbefaVehicleDescription( vehicleType, vehicleType.getDescription().substring(startIndex, endIndex ) );
+			EmissionUtils.setHbefaVehicleDescription( vehicleType, vehicleType.getDescription().substring( startIndex, endIndex ) );
 		}
 
 		// we should now have reached the "normal" state.
-
+		return getHbefaVehicleDescription( vehicleType ) ;
+	}
+	public static String getHbefaVehicleDescription( VehicleType vehicleType ) {
 		return (String) vehicleType.getAttributes().getAttribute( HBEFA_VEHICLE_DESCRIPTION ) ;
 	}
 
