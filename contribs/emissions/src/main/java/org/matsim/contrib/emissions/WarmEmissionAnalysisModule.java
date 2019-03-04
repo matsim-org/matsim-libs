@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
@@ -158,9 +159,7 @@ public final class WarmEmissionAnalysisModule {
 		  Id<Vehicle> vehicleId, Link link,
 		  double travelTime ) {
 
-		String vehicleDescription = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg );
-
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleTypeId2VehicleInformationTuple(vehicleDescription);
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleTypeId2VehicleInformationTuple(vehicleType);
 		if (vehicleInformationTuple.getFirst() == null){
 			throw new RuntimeException("Vehicle category for vehicle " + vehicleType + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
@@ -338,16 +337,18 @@ public final class WarmEmissionAnalysisModule {
 		}
 	}
 
-	private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleTypeId2VehicleInformationTuple(String vehicleDescription) {
+	private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleTypeId2VehicleInformationTuple( VehicleType vehicleType ) {
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
 		HbefaVehicleCategory hbefaVehicleCategory = null;
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 
-		int startIndex = vehicleDescription.indexOf(
-			  EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) + EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
-		int endIndex = vehicleDescription.lastIndexOf( EmissionUtils.EmissionSpecificationMarker.END_EMISSIONS.toString() );
+//		int startIndex = vehicleDescription.indexOf(
+//			  EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) + EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
+//		int endIndex = vehicleDescription.lastIndexOf( EmissionUtils.EmissionSpecificationMarker.END_EMISSIONS.toString() );
+//
+//		String[] vehicleInformationArray = vehicleDescription.substring(startIndex, endIndex).split(";");
 
-		String[] vehicleInformationArray = vehicleDescription.substring(startIndex, endIndex).split(";");
+		String[] vehicleInformationArray = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg ).split( ";" ) ;
 
 		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
 			if(vehCat.toString().equals(vehicleInformationArray[0])){

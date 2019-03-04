@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.emissions;
+package org.matsim.contrib.emissions.utils;
 
 import com.sun.org.apache.bcel.internal.classfile.Unknown;
 import org.matsim.contrib.emissions.EmissionUtils;
@@ -28,9 +28,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.matsim.contrib.emissions.EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription;
-import static org.matsim.contrib.emissions.EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId;
 
 public final class EmissionsConfigGroup
 extends ReflectiveConfigGroup
@@ -105,11 +102,11 @@ extends ReflectiveConfigGroup
 			" - OPTIONAL: if detailed emission calculation is switched on, the emission specifications should aditionally contain" +
 			" HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED+"."+
 			"\n\t\t" +
-			"TRUE (DO NOT USE except for backwards compatibility): vehicle type id is used for the emission specifications." + "\n\t\t"+
-			"FALSE: vehicle description is used for the emission specifications." +
-			"The emission specifications of a vehicle type should be surrounded by emission specification markers i.e."+
-			EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS + " and " + EmissionUtils.EmissionSpecificationMarker.END_EMISSIONS + "." ;
-	
+			"TRUE (DO NOT USE except for backwards compatibility): vehicle type id is used for the emission specifications.\n\t\t" +
+			"FALSE (DO NOT USE except for backwards compability): vehicle description is used for the emission specifications. The emission specifications of a vehicle " +
+																   "type should be surrounded by emission specification markers.\n\t\t" +
+			"do not actively set (or set to null) (default): hbefa vehicle type description comes from attribute in vehicle type." ;
+
 	// yyyy the EmissionsSpecificationMarker thing should be replaced by link attributes.  Did not exist when this functionality was written.  kai, oct'18
 
 	private static final String WRITING_EMISSIONS_EVENTS_CMT = "if false, emission events will not appear in the events file.";
@@ -278,19 +275,20 @@ extends ReflectiveConfigGroup
 	{
 		super(GROUP_NAME);
 	}
-
+	// ============================================
+	// ============================================
 	@Deprecated // kai, oct'18
 	private static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION = "isUsingVehicleTypeIdAsVehicleDescription";
 	@StringGetter(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
 	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, oct'18
-	public boolean isUsingVehicleTypeIdAsVehicleDescription() {
+	public Boolean isUsingVehicleTypeIdAsVehicleDescription() {
 		switch ( this.getHbefaVehicleDescriptionSource() ) {
 			case usingVehicleTypeId:
 				return true ;
 			case fromVehicleTypeDescription:
 				return false ;
 			case asVehicleTypeAttribute:
-				throw new RuntimeException( "not implemented" ) ;
+				return null ;
 			default:
 				throw new RuntimeException( "config switch setting not understood" ) ;
 		}
@@ -300,26 +298,29 @@ extends ReflectiveConfigGroup
 	 */
 	@StringSetter(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
 	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, oct'18
-	public void setUsingVehicleTypeIdAsVehicleDescription(boolean usingVehicleIdAsVehicleDescription) {
-		if ( usingVehicleIdAsVehicleDescription ) {
-			this.setHbefaVehicleDescriptionSource( usingVehicleTypeId );
+	public void setUsingVehicleTypeIdAsVehicleDescription(Boolean usingVehicleIdAsVehicleDescription) {
+		if ( usingVehicleIdAsVehicleDescription==null ) {
+			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.asVehicleTypeAttribute );
+		} else if ( usingVehicleIdAsVehicleDescription ) {
+			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		} else {
-			this.setHbefaVehicleDescriptionSource( fromVehicleTypeDescription );
+			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		}
 	}
 	// ============================================
 	// ============================================
-	public static final String HBEFA_VEHICLE_DESCRIPTION_SOURCE="hbefaVehicleDescriptionSource" ;
-	public enum HbefaVehicleDescriptionSource { usingVehicleTypeId, fromVehicleTypeDescription, asVehicleTypeAttribute }
-	private HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource = fromVehicleTypeDescription ;
+	// yy I now think that one can get away without the following.  kai, mar'19
+//	private static final String HBEFA_VEHICLE_DESCRIPTION_SOURCE="hbefaVehicleDescriptionSource" ;
+	private enum HbefaVehicleDescriptionSource { usingVehicleTypeId, fromVehicleTypeDescription, asVehicleTypeAttribute }
+	private HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource = HbefaVehicleDescriptionSource.fromVehicleTypeDescription ;
 	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, mar'19
 //	@StringSetter(HBEFA_VEHICLE_DESCRIPTION_SOURCE)
-	public void setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource ) {
+	private void setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource ) {
 		this.hbefaVehicleDescriptionSource = hbefaVehicleDescriptionSource ;
 	}
 	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, mar'19
 //	@StringGetter( HBEFA_VEHICLE_DESCRIPTION_SOURCE )
-	public HbefaVehicleDescriptionSource getHbefaVehicleDescriptionSource() {
+	private HbefaVehicleDescriptionSource getHbefaVehicleDescriptionSource() {
 		return this.hbefaVehicleDescriptionSource ;
 	}
 	// ============================================

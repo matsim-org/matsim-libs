@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.VehicleType;
 
@@ -40,6 +41,7 @@ import java.util.stream.Stream;
  */
 public final class EmissionUtils {
 	private static final Logger logger = Logger.getLogger(EmissionUtils.class);
+	private static final String HBEFA_VEHICLE_DESCRIPTION = "hbefaVehicleTypeDescription";
 
 	static Map<String, Integer> createIndexFromKey( String strLine ) {
 		String[] keys = strLine.split(";") ;
@@ -171,25 +173,28 @@ public final class EmissionUtils {
 	}
 
 
+
 	public static void setHbefaVehicleDescription( final VehicleType vt, final String hbefaVehicleDescription ) {
 		// yyyy maybe this should use the vehicle information tuple (see below)?
-		// yyyy replace this by using Attributes.  kai, oct'18
-	    vt.setDescription(  vt.getDescription() + " " + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()+
-							hbefaVehicleDescription +
-			EmissionSpecificationMarker.END_EMISSIONS.toString() );
+
+		vt.getAttributes().putAttribute( HBEFA_VEHICLE_DESCRIPTION, hbefaVehicleDescription ) ;
 	}
 	
-	static Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple( String vehicleDescription ) {
+	static Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple( String hbefaVehicleTypeDescription ) {
 		// yyyy what is the advantage of having this as a tuple over just using a class with four entries?  kai, oct'18
 		
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
 		HbefaVehicleCategory hbefaVehicleCategory = null;
+
+
 		
 		// yyyy replace this by using Attributes.  kai, oct'18
-		int startIndex = vehicleDescription.indexOf(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
-		int endIndex = vehicleDescription.lastIndexOf(EmissionSpecificationMarker.END_EMISSIONS.toString());
+//		int startIndex = vehicleType.indexOf(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
+//		int endIndex = vehicleType.lastIndexOf(EmissionSpecificationMarker.END_EMISSIONS.toString() );
 
-		String[] vehicleInformationArray = vehicleDescription.substring(startIndex, endIndex).split(";");
+//		String[] vehicleInformationArray = vehicleType.substring(startIndex, endIndex ).split(";" );
+
+		String[] vehicleInformationArray = hbefaVehicleTypeDescription.split(";" ) ;
 
 		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
 			if(vehCat.toString().equals(vehicleInformationArray[0])){
@@ -228,53 +233,34 @@ public final class EmissionUtils {
 	}
 
 	public static String getHbefaVehicleDescription( VehicleType vehicleType, EmissionsConfigGroup emissionsConfigGroup ){
-		if( emissionsConfigGroup.isUsingVehicleTypeIdAsVehicleDescription() ) {
+		if (vehicleType==null ) {
+			throw new RuntimeException("vehicleType is null; not possible for emissions contrib.") ;
+		}
+
+		if ( emissionsConfigGroup.isUsingVehicleTypeIdAsVehicleDescription()==null ) {
+			// "normal" case, do nothing
+		} else if( emissionsConfigGroup.isUsingVehicleTypeIdAsVehicleDescription() ) {
 			// (v1, hbefa vehicle description is in vehicle type id.  Move to where it is expected now)
 
-			if( vehicleType.getDescription()==null) {
-				// (vehicle type description is empty, so put the hbefa stuff there:)
+			EmissionUtils.setHbefaVehicleDescription( vehicleType, vehicleType.getId().toString() );
 
-				vehicleType.setDescription( EmissionSpecificationMarker.BEGIN_EMISSIONS
-						+ vehicleType.getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS );
-			} else if( vehicleType.getDescription().contains(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) ) {
-				// (vehicle type description already contains the hbefa stuff, so do nothing)
+		} else {
+			// (v2, hbefa vehicle description is in vehicle type description.  Move to where it is expected now)
 
-			} else {
-				// (vehicle type description is NOT empty, so append the hbefa material)
-
-				String vehicleDescription = vehicleType.getDescription() + EmissionSpecificationMarker.BEGIN_EMISSIONS
-						+ vehicleType.getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS;
-				vehicleType.setDescription(vehicleDescription );
+			if ( vehicleType.getDescription()==null ) {
+				throw new RuntimeException( "vehicleType.getDescription() is null; not possible for selected config setting" ) ;
 			}
+
+			int startIndex = vehicleType.getDescription().indexOf(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
+			int endIndex = vehicleType.getDescription().lastIndexOf(EmissionSpecificationMarker.END_EMISSIONS.toString() );
+
+			EmissionUtils.setHbefaVehicleDescription( vehicleType, vehicleType.getDescription().substring(startIndex, endIndex ) );
 		}
 
 		// we should now have reached the "normal" state.
 
-		if (vehicleType==null ) {
-			throw new RuntimeException("vehicleType is null; not possible for emissions contrib.") ;
-		}
-		if ( vehicleType.getDescription()==null ) {
-			throw new RuntimeException( "vehicleType.getDescription() is null; not possible for emissions contrib" ) ;
-		}
-
-		return vehicleType.getDescription();
+		return (String) vehicleType.getAttributes().getAttribute( HBEFA_VEHICLE_DESCRIPTION ) ;
 	}
 
-	public static void setHbefaVehicleDescription( String description, VehicleType vehicleType, EmissionsConfigGroup emissionsConfigGroup ){
-		vehicleType.setDescription(
-			  EmissionSpecificationMarker.BEGIN_EMISSIONS + description + EmissionSpecificationMarker.END_EMISSIONS );
-	}
-
-	/**
-	 * Created by amit on 29/09/16.
-	 */
-	@Deprecated
-	public // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
-	enum EmissionSpecificationMarker {
-
-	    @Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
-	    BEGIN_EMISSIONS ,
-	    @Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
-	    END_EMISSIONS ;
-	}
+	private enum EmissionSpecificationMarker {BEGIN_EMISSIONS , END_EMISSIONS }
 }

@@ -30,7 +30,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
-import org.matsim.contrib.emissions.EmissionsConfigGroup.NonScenarioVehicles;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.NonScenarioVehicles;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
@@ -142,27 +143,35 @@ final class ColdEmissionAnalysisModule {
 							
 		} else {
 			
-			if(this.ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
-				if(vehicle.getType().getDescription()==null) { // emission specification is in vehicle type id
-					vehicle.getType().setDescription( EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS
-							+vehicle.getType().getId().toString()+ EmissionUtils.EmissionSpecificationMarker.END_EMISSIONS );
-				} else if( vehicle.getType().getDescription().contains( EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) ) {
-					// emission specification is in vehicle type id and in vehicle description too.
-				} else {
-					String vehicleDescription = vehicle.getType().getDescription() + EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS
-							+ vehicle.getType().getId().toString()+ EmissionUtils.EmissionSpecificationMarker.END_EMISSIONS;
-					vehicle.getType().setDescription(vehicleDescription);
-				}
-			}
+//			if(this.ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
+//				if(vehicle.getType().getDescription()==null) { // emission specification is in vehicle type id
+//					vehicle.getType().setDescription( EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS
+//							+vehicle.getType().getId().toString()+ EmissionUtils.EmissionSpecificationMarker.END_EMISSIONS );
+//				} else if( vehicle.getType().getDescription().contains( EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) ) {
+//					// emission specification is in vehicle type id and in vehicle description too.
+//				} else {
+//					String vehicleDescription = vehicle.getType().getDescription() + EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS
+//							+ vehicle.getType().getId().toString()+ EmissionUtils.EmissionSpecificationMarker.END_EMISSIONS;
+//					vehicle.getType().setDescription(vehicleDescription);
+//				}
+//			}
+//
+//			String vehicleDescription = vehicle.getType().getDescription();
+//
+//		if(vehicle.getType().getDescription() == null){
+//			throw new RuntimeException("Vehicle type description for vehicle " + vehicle + "is missing. " +
+//					"Please make sure that requirements for emission vehicles in "
+//					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
+//		}
 
-			String vehicleDescription = vehicle.getType().getDescription();
+			String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicle.getType(), this.ecg );
 
-		if(vehicle.getType().getDescription() == null){
-			throw new RuntimeException("Vehicle type description for vehicle " + vehicle + "is missing. " +
-					"Please make sure that requirements for emission vehicles in "
-					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-		}
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(vehicleDescription);
+			Gbl.assertNotNull( hbefaVehicleTypeDescription );
+
+			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(hbefaVehicleTypeDescription);
+
+			Gbl.assertNotNull( vehicleInformationTuple );
+
 		if (vehicleInformationTuple.getFirst() == null){
 			throw new RuntimeException("Vehicle category for vehicle " + vehicle + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 

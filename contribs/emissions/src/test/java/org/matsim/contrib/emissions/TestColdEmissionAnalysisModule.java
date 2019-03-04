@@ -20,8 +20,6 @@
 
 package org.matsim.contrib.emissions;
 
-import java.util.*;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -34,7 +32,10 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import static org.matsim.contrib.emissions.HbefaVehicleCategory.*;
+import java.util.*;
+
+import static org.matsim.contrib.emissions.HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
+import static org.matsim.contrib.emissions.HbefaVehicleCategory.PASSENGER_CAR;
 
 
 /**

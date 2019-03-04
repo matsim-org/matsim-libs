@@ -20,6 +20,7 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author dgrether
@@ -48,6 +49,7 @@ public class VehicleTypeImpl implements VehicleType {
 	private Id<VehicleType> id;
 
 	private DoorOperationMode doorOperationMode = DoorOperationMode.serial;
+	private Attributes attributes = new Attributes() ;
 
 	public VehicleTypeImpl(Id<VehicleType> typeId) {
 		this.id = typeId;
@@ -167,4 +169,9 @@ public class VehicleTypeImpl implements VehicleType {
     public void setFlowEfficiencyFactor(double flowEfficiencyFactor) {
         this.flowEfficiencyFactor = flowEfficiencyFactor;
     }
+
+	@Override
+	public Attributes getAttributes(){
+		return this.attributes ;
+	}
 }

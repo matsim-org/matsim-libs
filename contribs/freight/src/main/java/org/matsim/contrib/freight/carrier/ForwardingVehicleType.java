@@ -1,6 +1,7 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
@@ -8,7 +9,8 @@ import org.matsim.vehicles.VehicleType;
 public class ForwardingVehicleType implements VehicleType{
 
 	private VehicleType vType;
-	
+	private Attributes attributes = new Attributes() ;
+
 	public ForwardingVehicleType(VehicleType vType) {
 		super();
 		this.vType = vType;
@@ -86,4 +88,9 @@ public class ForwardingVehicleType implements VehicleType{
 
     @Override
     public void setFlowEfficiencyFactor(double flowEfficiencyFactor) { vType.setFlowEfficiencyFactor(flowEfficiencyFactor); }
+
+	@Override
+	public Attributes getAttributes(){
+		return this.attributes ;
+	}
 }

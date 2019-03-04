@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.emissions.example;
 
-import org.matsim.contrib.emissions.EmissionsConfigGroup;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.*;

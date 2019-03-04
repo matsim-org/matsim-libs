@@ -2,7 +2,7 @@
  * <h2>Usage</h2>
  * Execute {@link org.matsim.contrib.emissions.example.CreateEmissionConfig} and {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample} or {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample} from the example package.
  * <ul>
- * <li> {@link org.matsim.contrib.emissions.example.CreateEmissionConfig}: Creates a MATSim config file with links to emission related input files as {@link org.matsim.contrib.emissions.EmissionsConfigGroup}. </li>
+ * <li> {@link org.matsim.contrib.emissions.example.CreateEmissionConfig}: Creates a MATSim config file with links to emission related input files as {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup}. </li>
  * <li> {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample}: Writes emission events to the events file during the simulation. </li>
  * <li> {@link org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample}: Writes emission events to the events file based on a standard MATSim events file. </li>
  * </ul>
@@ -43,10 +43,10 @@
  * <ul>
  * <li>roadTypeMappingFile: This file needs to map road types in your network to HBEFA 3.x road types.
  * Update (June'2018) one can now directly add HBEFA road type to link attributes using {@link org.matsim.contrib.emissions.EmissionUtils#setHbefaRoadType(org.matsim.api.core.v01.network.Link, java.lang.String)}
- * or see {@link org.matsim.contrib.emissions.EmissionsConfigGroup} for a detailed description.
+ * or see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup} for a detailed description.
  * 
  * <li>emissionVehicleFile: This data type is defined in the EmissionsConfigGroup,
- * see {@link org.matsim.contrib.emissions.EmissionsConfigGroup}. The following information is surrounded by {@link org.matsim.contrib.emissions.EmissionUtils.EmissionSpecificationMarker}. It is described as "definition of a vehicle
+ * see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup}. The following information is surrounded by {@link org.matsim.contrib.emissions.EmissionUtils.EmissionSpecificationMarker}. It is described as "definition of a vehicle
  *  for every person (who is allowed to choose a vehicle in the simulation):
  *  <ul>
  *  <li> REQUIRED: Vehicle description must start with the respective HbefaVehicleCategory followed by ";"
