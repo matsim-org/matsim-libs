@@ -19,6 +19,7 @@ class VehicleReaderV1 extends MatsimXmlParser{
 	private double currentGasConsumption = Double.NaN;
 
 	public VehicleReaderV1( final Vehicles vehicles ){
+		log.info("Using " + this.getClass().getName());
 		this.vehicles = vehicles;
 		this.builder = this.vehicles.getFactory();
 	}

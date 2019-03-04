@@ -25,6 +25,7 @@ class VehicleReaderV2 extends MatsimXmlParser{
 		  new org.matsim.utils.objectattributes.attributable.Attributes();
 
 	public VehicleReaderV2( final Vehicles vehicles ){
+		log.info("Using " + this.getClass().getName());
 		this.vehicles = vehicles;
 		this.builder = this.vehicles.getFactory();
 	}

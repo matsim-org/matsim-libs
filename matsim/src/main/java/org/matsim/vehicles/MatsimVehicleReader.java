@@ -88,6 +88,7 @@ public final class MatsimVehicleReader implements MatsimReader{
 		public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 			if ( VehicleSchemaV1Names.VEHICLEDEFINITIONS.equalsIgnoreCase( name ) ) {
 				String str = atts.getValue( "xsi:schemaLocation" );
+				log.info("Found following schemeLocation in vehicle definition file: " + str);
 				if ( str.contains( "vehicleDefinitions_v1.0.xsd" ) ){
 					delegate = new VehicleReaderV1( vehicles );
 				} else if ( str.contains( "vehicleDefinitions_v2.0.xsd" ) ) {
@@ -117,31 +118,31 @@ public final class MatsimVehicleReader implements MatsimReader{
 //			}
 		}
 
-		@Override
-		protected void setDoctype(final String doctype) {
-			super.setDoctype(doctype);
-
-			switch ( doctype ) {
-//				case NETWORK_V1:
-//					this.delegate =
-//						  new NetworkReaderMatsimV1(
-//							    inputCRS != null ?
-//									TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS ) :
-//									new IdentityTransformation(),
-//							    this.network);
-//					log.info("using network_v1-reader.");
-//					break;
-//				case NETWORK_V2:
-//					this.delegate = new NetworkReaderMatsimV2(inputCRS, targetCRS, this.network);
-//					((NetworkReaderMatsimV2) delegate).putAttributeConverters( converters );
-//					log.info("using network_v2-reader.");
-//					break;
-				default:
-					this.delegate = new VehicleReaderV1( vehicles ) ;
-//					this.delegate.setValidating( false );
-					log.info( "using vehicle_v1 reader (xsd)" ) ;
-			}
-		}
+//		@Override
+//		protected void setDoctype(final String doctype) {
+//			super.setDoctype(doctype);
+//
+//			switch ( doctype ) {
+////				case NETWORK_V1:
+////					this.delegate =
+////						  new NetworkReaderMatsimV1(
+////							    inputCRS != null ?
+////									TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS ) :
+////									new IdentityTransformation(),
+////							    this.network);
+////					log.info("using network_v1-reader.");
+////					break;
+////				case NETWORK_V2:
+////					this.delegate = new NetworkReaderMatsimV2(inputCRS, targetCRS, this.network);
+////					((NetworkReaderMatsimV2) delegate).putAttributeConverters( converters );
+////					log.info("using network_v2-reader.");
+////					break;
+//				default:
+//					this.delegate = new VehicleReaderV1( vehicles ) ;
+////					this.delegate.setValidating( false );
+//					log.info( "using vehicle_v1 reader (xsd)" ) ;
+//			}
+//		}
 
 		public void putAttributeConverter(Class<?> clazz, AttributeConverter<?> converter) {
 			this.converters.put( clazz, converter );
