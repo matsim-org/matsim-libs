@@ -26,6 +26,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -40,10 +41,11 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Approximat
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.population.LCPlan;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
-import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -54,7 +56,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public final class BestResponseLocationMutator extends RecursiveLocationMutator {
+public final class BestResponseLocationMutator implements PlanAlgorithm {
 	
 	private final ActivityFacilities facilities;
 	private final ObjectAttributes personsMaxDCScoreUnscaled;
@@ -77,6 +79,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	 */
 	private TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType;
 	private final TripRouter tripRouter;
+	private final DestinationChoiceConfigGroup dccg;
+	private final Scenario scenario;
 
 	public BestResponseLocationMutator(
 			TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quad_trees,
@@ -86,7 +90,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 			BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, ScoringFunctionFactory scoringFunctionFactory,
 			int iteration, Map<Id<ActivityFacility>, Id<Link>> nearestLinks) {
 		// TODO: first null argument should be quad_trees...
-		super(lcContext.getScenario(), tripRouter, null, facilities_of_type, null);
+//		super(lcContext.getScenario(), tripRouter, null, facilities_of_type, null);
 		this.facilities = lcContext.getScenario().getActivityFacilities();
 		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
@@ -105,6 +109,9 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		
 		this.quadTreesOfType = quad_trees;
 		this.tripRouter = tripRouter;
+
+		scenario = this.lcContext.getScenario();
+		this.dccg = ConfigUtils.addOrGetModule( scenario.getConfig(), DestinationChoiceConfigGroup.class ) ;
 	}
 
 	@Override
@@ -112,11 +119,11 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		// if person is not in the analysis population
 		// TODO: replace this now by subpopulation!
 		final Person person = plan.getPerson();
-		
-		Long idExclusion = this.getDccg().getIdExclusion();
+
+		Long idExclusion = this.dccg.getIdExclusion();
 		if (idExclusion != null && Long.parseLong(person.getId().toString()) > idExclusion) return;
 
-		switch( this.getDccg().getInternalPlanDataStructure() ){
+		switch( this.dccg.getInternalPlanDataStructure() ){
 			case planImpl:{
 				// why is all this plans copying necessary?  Could you please explain the design a bit?  Thanks.  kai, jan'13
 				// (this may be done by now. kai, jan'13)
@@ -156,12 +163,12 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 				break;
 			}
 			default:
-				throw new RuntimeException( "Unknown InternalPlanDataStructure was found: " + this.getDccg().getInternalPlanDataStructure().toString() + ". Aborting!" );
+				throw new RuntimeException( "Unknown InternalPlanDataStructure was found: " + this.dccg.getInternalPlanDataStructure().toString() + ". Aborting!" );
 		}
 	}
 
 	private void handleActivities(final Plan plan, final Plan bestPlan, final int personIndex) {
-		ApproximationLevel travelTimeApproximationLevel = this.getDccg().getTravelTimeApproximationLevel();
+		ApproximationLevel travelTimeApproximationLevel = this.dccg.getTravelTimeApproximationLevel();
 
 		int actlegIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -212,6 +219,10 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 				}
 			}
 		}		
+	}
+
+	private Scenario getScenario() {
+		return this.scenario ;
 	}
 
 	private ChoiceSet createChoiceSetFromCircle(Plan plan, int personIndex,
@@ -295,10 +306,10 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 //		Plan planTmp = plan;
 
 		Plan planTmp = null;
-		if ( this.getDccg().getInternalPlanDataStructure() == InternalPlanDataStructure.planImpl) {
+		if ( this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.planImpl) {
 			planTmp = PopulationUtils.createPlan(plan.getPerson());
 			PlanUtils.copyFrom(plan, planTmp);
-		} else if ( this.getDccg().getInternalPlanDataStructure() == InternalPlanDataStructure.lcPlan) {
+		} else if ( this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.lcPlan) {
 			planTmp = new LCPlan(plan);
 		}
 
@@ -326,7 +337,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		/* 
 		 * here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
 		 */
-		double travelSpeedCrowFly = this.getDccg().getTravelSpeed_car();
+		double travelSpeedCrowFly = this.dccg.getTravelSpeed_car();
 		double betaTime = this.getScenario().getConfig().planCalcScore().getModes().get(TransportMode.car ).getMarginalUtilityOfTraveling();
 //		if ( Boolean.getBoolean(this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice)) ) {
 		if ( this.getScenario().getConfig().vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
@@ -346,8 +357,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		double maxDistance = travelSpeedCrowFly * maxTravelTime; 
 
 		// define a maximum distance choice set manually
-		if ( this.getDccg().getMaxDistanceDCScore() > 0.0) {
-			maxDistance = this.getDccg().getMaxDistanceDCScore();
+		if ( this.dccg.getMaxDistanceDCScore() > 0.0) {
+			maxDistance = this.dccg.getMaxDistanceDCScore();
 		}
 		return maxDistance;
 	}
