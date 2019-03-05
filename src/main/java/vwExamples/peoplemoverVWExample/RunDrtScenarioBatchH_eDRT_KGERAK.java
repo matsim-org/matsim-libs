@@ -24,6 +24,8 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
 import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
+import electric.edrt.run.RunVWEDrtScenario;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -36,6 +38,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -45,6 +48,7 @@ import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.charging.FastThenSlowCharging;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
@@ -340,17 +344,19 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		return controler;
 	}
 
+//	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
+//		return new EvDvrpIntegrationModule(drtCfg.getMode())
+//				.setTurnedOnPredicate(RunDrtScenarioBatchH_eDRT_KGERAK::isTurnedOn);
+//	}
+	
 	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
-		return new EvDvrpIntegrationModule(drtCfg.getMode())
-				.setTurnedOnPredicate(RunDrtScenarioBatchH_eDRT_KGERAK::isTurnedOn);
+		return new EvDvrpIntegrationModule(drtCfg.getMode()).
+				setAuxDischargingFactory(new VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory()).
+				setDriveDischargingFactory(f -> new VwDrtDriveEnergyConsumption()).setTurnedOnPredicate(RunDrtScenarioBatchH_eDRT_KGERAK::isTurnedOn);
 	}
 
-	private static boolean isTurnedOn(DvrpVehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-		if (schedule.getStatus() == ScheduleStatus.STARTED) {
-			DrtTaskType currentTaskType = ((DrtTask) schedule.getCurrentTask()).getDrtTaskType();
-			return currentTaskType != DrtTaskType.STAY;// turned on only if DRIVE or STOP
-		}
-		return false;
+    private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
+        if (vehicle.getServiceBeginTime() <= time && time <= vehicle.getServiceEndTime()) return true;
+        else return false;
 	}
 }
