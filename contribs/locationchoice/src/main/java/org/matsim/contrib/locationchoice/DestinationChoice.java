@@ -23,12 +23,10 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
-import org.matsim.contrib.locationchoice.random.RandomLocationMutator;
+import org.matsim.contrib.locationchoice.timegeography.RandomLocationMutator;
 import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.contrib.locationchoice.timegeography.SingleActLocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;

@@ -49,7 +49,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 
-public class ChoiceSet {
+class ChoiceSet {
 	
 	private int numberOfAlternatives;	
 	private ApproximationLevel approximationLevel;		

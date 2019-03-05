@@ -83,12 +83,11 @@ public final class BestResponseLocationMutator implements PlanAlgorithm {
 	private final Scenario scenario;
 
 	public BestResponseLocationMutator(
-			TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quad_trees,
-			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
-			ObjectAttributes personsMaxDCScoreUnscaled, DestinationChoiceContext lcContext,
-			DestinationSampler sampler, TripRouter tripRouter, MultiNodeDijkstra forwardMultiNodeDijkstra,
-			BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, ScoringFunctionFactory scoringFunctionFactory,
-			int iteration, Map<Id<ActivityFacility>, Id<Link>> nearestLinks) {
+		  TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quad_trees,
+		  ObjectAttributes personsMaxDCScoreUnscaled, DestinationChoiceContext lcContext,
+		  DestinationSampler sampler, TripRouter tripRouter, MultiNodeDijkstra forwardMultiNodeDijkstra,
+		  BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, ScoringFunctionFactory scoringFunctionFactory,
+		  int iteration, Map<Id<ActivityFacility>, Id<Link>> nearestLinks ) {
 		// TODO: first null argument should be quad_trees...
 //		super(lcContext.getScenario(), tripRouter, null, facilities_of_type, null);
 		this.facilities = lcContext.getScenario().getActivityFacilities();

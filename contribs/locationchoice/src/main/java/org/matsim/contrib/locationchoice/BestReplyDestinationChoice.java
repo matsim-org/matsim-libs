@@ -57,16 +57,15 @@ import javax.inject.Provider;
  * Idea of this should be as follows: all persons and all facilities have k values.  frozen epsilon will be generated on the fly from those two values.  together with frozen
  * epsilon, the location choice is indeed best reply.
  */
-public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
+public final class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
 	private static final Logger log = Logger.getLogger(BestReplyDestinationChoice.class);
 	private final Provider<TripRouter> tripRouterProvider;
 
-	private DestinationChoiceConfigGroup dccg;
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private DestinationSampler sampler;
-	protected TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new TreeMap<String, QuadTree<ActivityFacilityWithIndex>>();
-	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
+	private TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new TreeMap<>();
+//	private TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<>();
 	private final Scenario scenario;
 	private DestinationChoiceContext lcContext;
 	private HashSet<String> flexibleTypes;
@@ -87,8 +86,8 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		this.travelTimes = travelTimes;
 		this.travelDisutilities = travelDisutilities;
 
-		this.dccg = ConfigUtils.addOrGetModule(lcContext.getScenario().getConfig(), DestinationChoiceConfigGroup.class ) ;
-		if (!DestinationChoiceConfigGroup.Algotype.bestResponse.equals(this.dccg.getAlgorithm())) {
+		DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule( lcContext.getScenario().getConfig(), DestinationChoiceConfigGroup.class );
+		if (!DestinationChoiceConfigGroup.Algotype.bestResponse.equals( dccg.getAlgorithm() )) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}
 		this.lcContext = lcContext;
@@ -104,7 +103,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 			if (facility.getLinkId() != null)
 				this.nearestLinks.put(facility.getId(), facility.getLinkId());
 			else
-				this.nearestLinks.put(facility.getId(), NetworkUtils.getNearestLink(scenario.getNetwork(), facility.getCoord()).getId());
+				this.nearestLinks.put(facility.getId(), Objects.requireNonNull( NetworkUtils.getNearestLink( scenario.getNetwork(), facility.getCoord() ) ).getId() );
 		}
 
 		this.flexibleTypes = this.lcContext.getFlexibleTypes();
@@ -112,7 +111,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		this.sampler = new DestinationSampler(
 			  this.lcContext.getPersonsKValuesArray(),
 			  this.lcContext.getFacilitiesKValuesArray(),
-			  this.dccg);
+			  dccg );
 	}
 
 	/**
@@ -124,7 +123,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		for (String flexibleType : this.flexibleTypes) {
 			Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> tuple = this.lcContext.getQuadTreeAndFacilities(flexibleType);
 			this.quadTreesOfType.put(flexibleType, tuple.getFirst());
-			this.facilitiesOfType.put(flexibleType, tuple.getSecond());
+//			this.facilitiesOfType.put(flexibleType, tuple.getSecond());
 		}
 	}
 
@@ -150,7 +149,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		TripRouter tripRouter = tripRouterProvider.get();
 		int iteration = replanningContext.getIteration();
 
-		return new BestResponseLocationMutator(this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled,
+		return new BestResponseLocationMutator(this.quadTreesOfType, this.personsMaxEpsUnscaled,
 			  this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration, this.nearestLinks);
 	}
 }

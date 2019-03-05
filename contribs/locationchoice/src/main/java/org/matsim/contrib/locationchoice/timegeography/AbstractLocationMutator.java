@@ -18,13 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice;
+package org.matsim.contrib.locationchoice.timegeography;
 
 import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
@@ -33,7 +34,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
-public abstract class LocationMutator implements PlanAlgorithm {
+abstract class AbstractLocationMutator implements PlanAlgorithm {
 	// yy not clear why we need this as abstract class: does not have abstract methods.  Could as well be a final class that is used in the other classes.  kai, mar'19
 
 	private TreeMap<String, ? extends QuadTree<ActivityFacility>> quadTreesOfType;
@@ -49,7 +50,7 @@ public abstract class LocationMutator implements PlanAlgorithm {
 
 	// ----------------------------------------------------------
 
-	public LocationMutator(final Scenario scenario, Random random) {
+	public AbstractLocationMutator( final Scenario scenario, Random random ) {
 		this.dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		this.defineFlexibleActivities = new ActivitiesHandler(this.dccg);
 		this.quadTreesOfType = new TreeMap<>();
@@ -59,8 +60,8 @@ public abstract class LocationMutator implements PlanAlgorithm {
 		this.initLocal();
 	}
 
-	public LocationMutator(Scenario scenario, TreeMap<String, ? extends QuadTree<ActivityFacility>> quad_trees,
-			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
+	public AbstractLocationMutator( Scenario scenario, TreeMap<String, ? extends QuadTree<ActivityFacility>> quad_trees,
+						  TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random ) {
 		this.dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		this.defineFlexibleActivities = new ActivitiesHandler(this.dccg);
 		this.quadTreesOfType = quad_trees;

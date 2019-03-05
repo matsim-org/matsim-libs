@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.bestresponse;
+package org.matsim.contrib.locationchoice.zzunused;
 
 import java.util.ArrayList;
 
@@ -32,7 +32,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
-public class ForwardDijkstraMultipleDestinations extends Dijkstra {
+class ForwardDijkstraMultipleDestinations extends Dijkstra {
 		
 	public ForwardDijkstraMultipleDestinations(Network network, TravelDisutility costFunction, TravelTime timeFunction) {
 		super(network, costFunction, timeFunction);

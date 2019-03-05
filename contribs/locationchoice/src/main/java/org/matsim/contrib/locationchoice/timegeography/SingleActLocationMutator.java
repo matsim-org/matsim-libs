@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.LocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -46,7 +45,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
-public class SingleActLocationMutator extends LocationMutator {
+public class SingleActLocationMutator extends AbstractLocationMutator{
 
 	protected int unsuccessfullLC = 0;
 	private final ActivitiesHandler defineFlexibleActivities;

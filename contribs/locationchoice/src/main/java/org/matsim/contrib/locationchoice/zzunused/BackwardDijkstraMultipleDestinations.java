@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.bestresponse;
+package org.matsim.contrib.locationchoice.zzunused;
 
 import java.util.ArrayList;
 
@@ -36,7 +36,7 @@ import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
 
-public class BackwardDijkstraMultipleDestinations extends Dijkstra {
+class BackwardDijkstraMultipleDestinations extends Dijkstra {
 
 	private final static Logger log = Logger.getLogger(BackwardDijkstraMultipleDestinations.class);
 	final TravelDisutility costFunction;

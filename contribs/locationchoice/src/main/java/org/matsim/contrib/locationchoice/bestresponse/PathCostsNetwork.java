@@ -28,7 +28,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
-public class PathCostsNetwork extends PathCosts {
+class PathCostsNetwork extends PathCosts {
 	
 	public PathCostsNetwork(Network network) {
 		super(network);

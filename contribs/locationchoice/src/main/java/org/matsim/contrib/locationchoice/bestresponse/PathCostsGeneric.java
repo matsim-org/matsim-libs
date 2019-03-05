@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-public class PathCostsGeneric extends PathCosts {
+class PathCostsGeneric extends PathCosts {
 	
 	public PathCostsGeneric(Network network) {
 		super(network);

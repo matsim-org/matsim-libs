@@ -22,7 +22,7 @@ package org.matsim.contrib.locationchoice.bestresponse;
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacility;
 
-public class ScoredAlternative implements Comparable<ScoredAlternative> {
+class ScoredAlternative implements Comparable<ScoredAlternative> {
 
 	// numerics
 	private final static double epsilon = 0.000001;
