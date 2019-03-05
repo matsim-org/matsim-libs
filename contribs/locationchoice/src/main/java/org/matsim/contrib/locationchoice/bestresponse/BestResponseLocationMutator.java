@@ -75,8 +75,9 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	 * it expects a QuadTreeRing<ActivityFacility>. Find a better solution for this...
 	 * cdobler, oct'13.
 	 */
-	protected TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType;
-	
+	private TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType;
+	private final TripRouter tripRouter;
+
 	public BestResponseLocationMutator(
 			TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
@@ -103,6 +104,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		this.beelineDistanceFactors = this.lcContext.getScenario().getConfig().plansCalcRoute().getBeelineDistanceFactors();
 		
 		this.quadTreesOfType = quad_trees;
+		this.tripRouter = tripRouter;
 	}
 
 	@Override
@@ -111,51 +113,55 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		// TODO: replace this now by subpopulation!
 		final Person person = plan.getPerson();
 		
-		Long idExclusion = this.dccg.getIdExclusion();
+		Long idExclusion = this.getDccg().getIdExclusion();
 		if (idExclusion != null && Long.parseLong(person.getId().toString()) > idExclusion) return;
 
-		if (this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.planImpl) {
-			// why is all this plans copying necessary?  Could you please explain the design a bit?  Thanks.  kai, jan'13
-			// (this may be done by now. kai, jan'13)
-			
-			Plan bestPlan = PopulationUtils.createPlan(person);
-			
-			// bestPlan is initialized as a copy from the old/input plan:
-			PopulationUtils.copyFromTo(plan, bestPlan);
-			
-			// this will probably generate an improved bestPlan (?):
-			int personIndex = this.lcContext.getPersonIndex(person.getId());
-			this.handleActivities(plan, bestPlan, personIndex);
-			
-			// copy the best plan into replanned plan
-			// making a deep copy
-			PlanUtils.copyPlanFieldsToFrom(plan, bestPlan);
-			// yy ( the syntax of this is copy( to, from) !!! )
-			
-			PlanUtils.resetRoutes(plan);
-		} else if (this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.lcPlan) {
-			
-			// create a memory efficient version of the plan that can be copied easily
-			LCPlan lcPlan = new LCPlan(plan);
-			
-			LCPlan bestPlan = LCPlan.createCopy(lcPlan);
-			
-			// this will probably generate an improved bestPlan (?):
-			int personIndex = this.lcContext.getPersonIndex(person.getId());
-			this.handleActivities(lcPlan, bestPlan, personIndex);
-			
-			// copy the best plan into replanned plan
-			// making a deep copy
-//			PlanUtils.copyPlanFieldsToFrom((LCPlan) lcPlan, (LCPlan) bestPlan);
-			PlanUtils.copyPlanFieldsToFrom(plan, bestPlan);
-			// yy ( the syntax of this is copy( to, from) !!! )
-			
-			PlanUtils.resetRoutes(plan);
-		} else throw new RuntimeException("Unknown InternalPlanDataStructure was found: " + this.dccg.getInternalPlanDataStructure().toString() + ". Aborting!");
+		switch( this.getDccg().getInternalPlanDataStructure() ){
+			case planImpl:{
+				// why is all this plans copying necessary?  Could you please explain the design a bit?  Thanks.  kai, jan'13
+				// (this may be done by now. kai, jan'13)
+
+				Plan bestPlan = PopulationUtils.createPlan( person );
+
+				// bestPlan is initialized as a copy from the old/input plan:
+				PopulationUtils.copyFromTo( plan, bestPlan );
+
+				// this will probably generate an improved bestPlan (?):
+				int personIndex = this.lcContext.getPersonIndex( person.getId() );
+				this.handleActivities( plan, bestPlan, personIndex );
+
+				// copy the best plan into replanned plan
+				// making a deep copy
+				PlanUtils.copyPlanFieldsToFrom( plan, bestPlan );
+
+				PlanUtils.resetRoutes( plan );
+				break;
+			}
+			case lcPlan:{
+
+				// create a memory efficient version of the plan that can be copied easily
+				LCPlan lcPlan = new LCPlan( plan );
+
+				LCPlan bestPlan = LCPlan.createCopy( lcPlan );
+
+				// this will probably generate an improved bestPlan (?):
+				int personIndex = this.lcContext.getPersonIndex( person.getId() );
+				this.handleActivities( lcPlan, bestPlan, personIndex );
+
+				// copy the best plan into replanned plan
+				// making a deep copy
+				PlanUtils.copyPlanFieldsToFrom( plan, bestPlan );
+
+				PlanUtils.resetRoutes( plan );
+				break;
+			}
+			default:
+				throw new RuntimeException( "Unknown InternalPlanDataStructure was found: " + this.getDccg().getInternalPlanDataStructure().toString() + ". Aborting!" );
+		}
 	}
 
 	private void handleActivities(final Plan plan, final Plan bestPlan, final int personIndex) {
-		ApproximationLevel travelTimeApproximationLevel = this.dccg.getTravelTimeApproximationLevel();
+		ApproximationLevel travelTimeApproximationLevel = this.getDccg().getTravelTimeApproximationLevel();
 
 		int actlegIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -189,7 +195,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					// yy why? kai, feb'13
 
 					final Id<ActivityFacility> choice = cs.getWeightedRandomChoice(
-							actlegIndex, this.scoringFunctionFactory, plan, this.getTripRouter(), this.lcContext.getPersonsKValuesArray()[personIndex],
+							actlegIndex, this.scoringFunctionFactory, plan, this.tripRouter, this.lcContext.getPersonsKValuesArray()[personIndex],
 							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
 
 					this.setLocation(actToMove, choice);
@@ -212,7 +218,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 			final ApproximationLevel travelTimeApproximationLevel,
 			final Activity actToMove, double maxRadius, Coord center) {
 
-		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, this.scenario, this.nearestLinks, this.teleportedModeSpeeds, this.beelineDistanceFactors);
+		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, this.getScenario(), this.nearestLinks, this.teleportedModeSpeeds, this.beelineDistanceFactors);
 
 		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
 		Collection<ActivityFacilityWithIndex> list = this.quadTreesOfType.get(convertedType).getDisk(center.getX(), center.getY(), maxRadius);
@@ -289,10 +295,10 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 //		Plan planTmp = plan;
 
 		Plan planTmp = null;
-		if (this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.planImpl) {
+		if ( this.getDccg().getInternalPlanDataStructure() == InternalPlanDataStructure.planImpl) {
 			planTmp = PopulationUtils.createPlan(plan.getPerson());
 			PlanUtils.copyFrom(plan, planTmp);
-		} else if (this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.lcPlan) {
+		} else if ( this.getDccg().getInternalPlanDataStructure() == InternalPlanDataStructure.lcPlan) {
 			planTmp = new LCPlan(plan);
 		}
 
@@ -301,7 +307,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 						plan,
 						planTmp,
 						scoringFunction,
-						this.getTripRouter(),
+						this.tripRouter,
 						DestinationChoiceConfigGroup.ApproximationLevel.completeRouting );
 
 		PlanUtils.copyPlanFieldsToFrom(plan, planTmp);	// copy( to, from )
@@ -320,11 +326,11 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		/* 
 		 * here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
 		 */
-		double travelSpeedCrowFly = this.dccg.getTravelSpeed_car();
-		double betaTime = this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
+		double travelSpeedCrowFly = this.getDccg().getTravelSpeed_car();
+		double betaTime = this.getScenario().getConfig().planCalcScore().getModes().get(TransportMode.car ).getMarginalUtilityOfTraveling();
 //		if ( Boolean.getBoolean(this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice)) ) {
-		if ( this.scenario.getConfig().vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
-			betaTime -= this.scenario.getConfig().planCalcScore().getPerforming_utils_hr() ;
+		if ( this.getScenario().getConfig().vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
+			betaTime -= this.getScenario().getConfig().planCalcScore().getPerforming_utils_hr() ;
 			// needs to be negative (I think) since AH uses this as a cost parameter. kai, jan'13
 		}
 		double maxTravelTime = Double.MAX_VALUE;
@@ -340,8 +346,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		double maxDistance = travelSpeedCrowFly * maxTravelTime; 
 
 		// define a maximum distance choice set manually
-		if (this.dccg.getMaxDistanceDCScore() > 0.0) {
-			maxDistance = this.dccg.getMaxDistanceDCScore();
+		if ( this.getDccg().getMaxDistanceDCScore() > 0.0) {
+			maxDistance = this.getDccg().getMaxDistanceDCScore();
 		}
 		return maxDistance;
 	}

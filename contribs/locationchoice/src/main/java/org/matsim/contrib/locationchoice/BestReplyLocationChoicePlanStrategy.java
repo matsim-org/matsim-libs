@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -47,21 +48,13 @@ import java.util.Map;
 public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 
 	private PlanStrategyImpl delegate;
-	private Scenario scenario;
-	private final Provider<TripRouter> tripRouterProvider;
-	private ScoringFunctionFactory scoringFunctionFactory;
-	private Map<String, TravelTime> travelTimes;
-	private Map<String, TravelDisutilityFactory> travelDisutilities;
+	@Inject private Config config ;
+	@Inject private Scenario scenario;
+	@Inject private Provider<TripRouter> tripRouterProvider;
+	@Inject private ScoringFunctionFactory scoringFunctionFactory;
+	@Inject private Map<String, TravelTime> travelTimes;
+	@Inject private Map<String, TravelDisutilityFactory> travelDisutilities;
 
-	@Inject
-	BestReplyLocationChoicePlanStrategy(Scenario scenario, Provider<TripRouter> tripRouterProvider, ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities) {
-		this.scenario = scenario;
-		this.tripRouterProvider = tripRouterProvider;
-		this.scoringFunctionFactory = scoringFunctionFactory;
-		this.travelTimes = travelTimes;
-		this.travelDisutilities = travelDisutilities;
-	}
-		
 	@Override
 	public void run(HasPlansAndId<Plan, Person> person) {
 		delegate.run(person);
@@ -73,22 +66,29 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 		 * Somehow this is ugly. Should be initialized in the constructor. But I do not know, how to initialize the lc scenario elements
 		 * such that they are already available at the time of constructing this object. ah feb'13
 		 */
+		DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule( config, DestinationChoiceConfigGroup.class ) ;
+
 		DestinationChoiceContext lcContext = (DestinationChoiceContext) scenario.getScenarioElement(DestinationChoiceContext.ELEMENT_NAME);
-		Config config = lcContext.getScenario().getConfig();
-		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) config.getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+
 		MaxDCScoreWrapper maxDcScoreWrapper = (MaxDCScoreWrapper)scenario.getScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME);
+
 		if ( !DestinationChoiceConfigGroup.Algotype.bestResponse.equals(dccg.getAlgorithm())) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
-		}		
-		String planSelector = dccg.getPlanSelector();
-		if (planSelector.equals("BestScore")) {
-			delegate = new PlanStrategyImpl(new BestPlanSelector<Plan, Person>());
-		} else if (planSelector.equals("ChangeExpBeta")) {
-			delegate = new PlanStrategyImpl(new ExpBetaPlanChanger(config.planCalcScore().getBrainExpBeta()));
-		} else if (planSelector.equals("SelectRandom")) {
-			delegate = new PlanStrategyImpl(new RandomPlanSelector());
-		} else {
-			delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
+		}
+
+		switch( dccg.getPlanSelector() ){
+			case "BestScore":
+				delegate = new PlanStrategyImpl( new BestPlanSelector<>() );
+				break;
+			case "ChangeExpBeta":
+				delegate = new PlanStrategyImpl( new ExpBetaPlanChanger( config.planCalcScore().getBrainExpBeta() ) );
+				break;
+			case "SelectRandom":
+				delegate = new PlanStrategyImpl( new RandomPlanSelector() );
+				break;
+			default:
+				delegate = new PlanStrategyImpl( new ExpBetaPlanSelector( config.planCalcScore() ) );
+				break;
 		}
 		delegate.addStrategyModule(new TripsToLegsModule(tripRouterProvider, config.global()));
 		delegate.addStrategyModule(new BestReplyDestinationChoice(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory, travelTimes, travelDisutilities));

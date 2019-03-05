@@ -51,7 +51,7 @@ public class DestinationChoiceInitializer implements StartupListener {
   		// compute or read maxDCScore but do not add it to the context:
   		// context can then be given to scoring classes both during regular scoring and in pre-processing 
   		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(dcContext);
-        computer.readOrCreateMaxDCScore(controler.getConfig(), dcContext.kValsAreRead());
+        computer.readOrCreateMaxDCScore( dcContext.kValsAreRead() );
 		ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
   		
   		for (String actType : this.dcContext.getFlexibleTypes()) {

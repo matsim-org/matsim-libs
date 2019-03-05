@@ -32,6 +32,7 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext.A
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
@@ -46,19 +47,22 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import javax.inject.Provider;
 
+/**
+ * Idea of this should be as follows: all persons and all facilities have k values.  frozen epsilon will be generated on the fly from those two values.  together with frozen
+ * epsilon, the location choice is indeed best reply.
+ */
 public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
-    private static final Logger log = Logger.getLogger(BestReplyDestinationChoice.class);
+	private static final Logger log = Logger.getLogger(BestReplyDestinationChoice.class);
 	private final Provider<TripRouter> tripRouterProvider;
 
-    private DestinationChoiceConfigGroup dccg;
+	private DestinationChoiceConfigGroup dccg;
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private DestinationSampler sampler;
 	protected TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new TreeMap<String, QuadTree<ActivityFacilityWithIndex>>();
@@ -75,14 +79,15 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	private Map<String, TravelTime> travelTimes;
 	private Map<String, TravelDisutilityFactory> travelDisutilities;
 
-	public BestReplyDestinationChoice(Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled, ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities) {
+	public BestReplyDestinationChoice(Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled,
+						    ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities) {
 		super(lcContext.getScenario().getConfig().global());
 		this.tripRouterProvider = tripRouterProvider;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.travelTimes = travelTimes;
 		this.travelDisutilities = travelDisutilities;
 
-		this.dccg = (DestinationChoiceConfigGroup) lcContext.getScenario().getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		this.dccg = ConfigUtils.addOrGetModule(lcContext.getScenario().getConfig(), DestinationChoiceConfigGroup.class ) ;
 		if (!DestinationChoiceConfigGroup.Algotype.bestResponse.equals(this.dccg.getAlgorithm())) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}
@@ -91,7 +96,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		this.personsMaxEpsUnscaled = personsMaxDCScoreUnscaled;
 		this.forwardMultiNodeDijsktaFactory = new FastMultiNodeDijkstraFactory(true);
 		this.backwardMultiNodeDijsktaFactory = new BackwardFastMultiNodeDijkstraFactory(true);
-		
+
 		// create cache which is used in ChoiceSet
 		// instead of just the nearest link we probably should check whether the facility is attached to a link? cdobler, oct'14
 		this.nearestLinks = new HashMap<>();
@@ -99,29 +104,23 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 			if (facility.getLinkId() != null)
 				this.nearestLinks.put(facility.getId(), facility.getLinkId());
 			else
-				this.nearestLinks.put(facility.getId(), NetworkUtils.getNearestLink(scenario.getNetwork(),
-						facility.getCoord()).getId());
+				this.nearestLinks.put(facility.getId(), NetworkUtils.getNearestLink(scenario.getNetwork(), facility.getCoord()).getId());
 		}
-		
-		initLocal();
-	}
 
-	private void initLocal() {
-		this.flexibleTypes = this.lcContext.getFlexibleTypes();		
-//		((NetworkImpl) this.scenario.getNetwork()).connect();
-		this.initTrees(this.scenario.getActivityFacilities(), this.dccg);
+		this.flexibleTypes = this.lcContext.getFlexibleTypes();
+		this.initTrees();
 		this.sampler = new DestinationSampler(
-				this.lcContext.getPersonsKValuesArray(), 
-				this.lcContext.getFacilitiesKValuesArray(), 
-				this.dccg);
+			  this.lcContext.getPersonsKValuesArray(),
+			  this.lcContext.getFacilitiesKValuesArray(),
+			  this.dccg);
 	}
 
 	/**
 	 * Initialize the quadtrees of all available activity types
 	 */
-	private void initTrees(ActivityFacilities facilities, DestinationChoiceConfigGroup config) {
+	private void initTrees() {
 		log.info("Doing location choice for activities: " + this.flexibleTypes.toString());
-		
+
 		for (String flexibleType : this.flexibleTypes) {
 			Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> tuple = this.lcContext.getQuadTreeAndFacilities(flexibleType);
 			this.quadTreesOfType.put(flexibleType, tuple.getFirst());
@@ -136,22 +135,22 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
 	@Override
 	public final PlanAlgorithm getPlanAlgoInstance() {
-		
+
 		ReplanningContext replanningContext = this.getReplanningContext();
-		
-		MultiNodeDijkstra forwardMultiNodeDijkstra = (MultiNodeDijkstra) this.forwardMultiNodeDijsktaFactory.createPathCalculator(this.scenario.getNetwork(), 
-				travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car)), travelTimes.get(TransportMode.car));
+
+		MultiNodeDijkstra forwardMultiNodeDijkstra = (MultiNodeDijkstra) this.forwardMultiNodeDijsktaFactory.createPathCalculator(this.scenario.getNetwork(),
+			  travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car)), travelTimes.get(TransportMode.car));
 
 		BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra = (BackwardFastMultiNodeDijkstra) this.backwardMultiNodeDijsktaFactory.createPathCalculator(
-				this.scenario.getNetwork(), travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car)), travelTimes.get(TransportMode.car));
-		
+			  this.scenario.getNetwork(), travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car)), travelTimes.get(TransportMode.car));
+
 		// this one corresponds to the "frozen epsilon" paper(s)
 		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
 
 		TripRouter tripRouter = tripRouterProvider.get();
 		int iteration = replanningContext.getIteration();
-		
-		return new BestResponseLocationMutator(this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
-				this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration, this.nearestLinks);
+
+		return new BestResponseLocationMutator(this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled,
+			  this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration, this.nearestLinks);
 	}
 }

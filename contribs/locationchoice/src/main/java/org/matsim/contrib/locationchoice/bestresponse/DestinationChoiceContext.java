@@ -101,22 +101,25 @@ public class DestinationChoiceContext implements MatsimToplevelContainer {
 	public DestinationChoiceContext(Scenario scenario) {
 		this.scenario = scenario;	
 		log.info("dc context created but not yet initialized");
-		//this.init(); // actually wanted to leave this away to be able to create but not yet fill the context.
+		this.init(); // actually wanted to leave this away to be able to create but not yet fill the context.
 	}
 	
 	public void init() {
-		this.params = new ScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build();
-		this.dccg = ConfigUtils.addOrGetModule( this.scenario.getConfig(), DestinationChoiceConfigGroup.class );
-		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.dccg);
-		this.scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
-		this.actTypeConverter = defineFlexibleActivities.getConverter();
-		this.flexibleTypes = defineFlexibleActivities.getFlexibleTypes();
-		
-		this.readOrCreateKVals(dccg.getRandomSeed());
-		this.readFacilitesAttributesAndBetas();
-		this.readPrefs();
-		
-		log.info("dc context initialized");
+		if ( params==null ){
+			this.params = new ScoringParameters.Builder( scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters( null ),
+				  scenario.getConfig().scenario() ).build();
+			this.dccg = ConfigUtils.addOrGetModule( this.scenario.getConfig(), DestinationChoiceConfigGroup.class );
+			ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler( this.dccg );
+			this.scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
+			this.actTypeConverter = defineFlexibleActivities.getConverter();
+			this.flexibleTypes = defineFlexibleActivities.getFlexibleTypes();
+
+			this.readOrCreateKVals( dccg.getRandomSeed() );
+			this.readFacilitesAttributesAndBetas();
+			this.readPrefs();
+
+			log.info( "dc context initialized" );
+		}
 	}
 	
 	private void readOrCreateKVals(long seed) {
@@ -181,7 +184,7 @@ public class DestinationChoiceContext implements MatsimToplevelContainer {
 			log.warn("prefs are taken from the config and if available from the desires as there is no preferences file specified \n");
 			for (ActivityParams activityParams : this.scenario.getConfig().planCalcScore().getActivityParams()) {				
 				for (Person p : this.scenario.getPopulation().getPersons().values()) {
-                    prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(), activityParams.getTypicalDuration());
+					prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(), activityParams.getTypicalDuration());
 					prefsAttributes.putAttribute(p.getId().toString(), "latestStartTime_" + activityParams.getActivityType(), activityParams.getLatestStartTime());
 					prefsAttributes.putAttribute(p.getId().toString(), "earliestEndTime_" + activityParams.getActivityType(), activityParams.getEarliestEndTime());
 					prefsAttributes.putAttribute(p.getId().toString(), "minimalDuration_" + activityParams.getActivityType(), activityParams.getMinimalDuration());

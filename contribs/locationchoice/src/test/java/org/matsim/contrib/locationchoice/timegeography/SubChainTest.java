@@ -1,6 +1,5 @@
-package org.matsim.contrib.locationchoice.constrained;
+package org.matsim.contrib.locationchoice.timegeography;
 
-import org.matsim.contrib.locationchoice.timegeography.SubChain;
 import org.matsim.testcases.MatsimTestCase;
 
 public class SubChainTest extends MatsimTestCase {

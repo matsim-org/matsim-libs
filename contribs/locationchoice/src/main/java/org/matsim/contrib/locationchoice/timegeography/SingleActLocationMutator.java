@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -84,13 +83,13 @@ public class SingleActLocationMutator extends LocationMutator {
 		double travelDistancePost = 0.0;
 
 		if (legPre.getMode().compareTo(TransportMode.car) == 0) {
-			travelDistancePre = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) legPre.getRoute(), this.scenario.getNetwork());
+			travelDistancePre = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) legPre.getRoute(), this.getScenario().getNetwork() );
 		}
 		else {
 			travelDistancePre = CoordUtils.calcEuclideanDistance(actPre.getCoord(), actToMove.getCoord());
 		}
 		if (legPost.getMode().compareTo(TransportMode.car) == 0) {
-			travelDistancePost = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) legPost.getRoute(), this.scenario.getNetwork());
+			travelDistancePost = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) legPost.getRoute(), this.getScenario().getNetwork() );
 		}
 		else {
 			travelDistancePost = CoordUtils.calcEuclideanDistance(actToMove.getCoord(), actPost.getCoord());
@@ -119,18 +118,18 @@ public class SingleActLocationMutator extends LocationMutator {
 		double midPointX = (startCoord.getX() + endCoord.getX()) / 2.0;
 		double midPointY = (startCoord.getY() + endCoord.getY()) / 2.0;
 		ArrayList<ActivityFacility> facilitySet =
-				(ArrayList<ActivityFacility>) this.quadTreesOfType.get(this.defineFlexibleActivities.getConverter().convertType(act.getType())).
+				(ArrayList<ActivityFacility>) this.getQuadTreesOfType().get(this.defineFlexibleActivities.getConverter().convertType(act.getType() ) ).
 						getDisk(midPointX, midPointY, radius);
 
 		ActivityFacility facility = null;
 		if (facilitySet.size() > 1) {
-			facility = facilitySet.get(super.random.nextInt(facilitySet.size()));
+			facility = facilitySet.get( super.getRandom().nextInt(facilitySet.size() ) );
 		}
 		else {
 			return false;
 		}
 		act.setFacilityId(facility.getId());
-   		act.setLinkId(NetworkUtils.getNearestLink(((Network) this.scenario.getNetwork()), facility.getCoord()).getId());
+   		act.setLinkId(NetworkUtils.getNearestLink(((Network) this.getScenario().getNetwork()), facility.getCoord() ).getId() );
    		act.setCoord(facility.getCoord());
 
    		return true;

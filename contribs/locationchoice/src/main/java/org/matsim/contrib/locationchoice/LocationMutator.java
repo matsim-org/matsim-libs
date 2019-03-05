@@ -34,28 +34,29 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
 public abstract class LocationMutator implements PlanAlgorithm {
+	// yy not clear why we need this as abstract class: does not have abstract methods.  Could as well be a final class that is used in the other classes.  kai, mar'19
 
-	protected TreeMap<String, ? extends QuadTree<ActivityFacility>> quadTreesOfType;
+	private TreeMap<String, ? extends QuadTree<ActivityFacility>> quadTreesOfType;
 
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
-	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType;
-	protected ActivitiesHandler defineFlexibleActivities;
-	protected boolean locationChoiceBasedOnKnowledge = true;
-	protected final Random random;
+	private TreeMap<String, ActivityFacilityImpl []> facilitiesOfType;
+	private ActivitiesHandler defineFlexibleActivities;
+	private boolean locationChoiceBasedOnKnowledge = true;
+	private final Random random;
 
-	protected final Scenario scenario;
-	protected final DestinationChoiceConfigGroup dccg;
+	private final Scenario scenario;
+	private final DestinationChoiceConfigGroup dccg;
 
 	// ----------------------------------------------------------
 
 	public LocationMutator(final Scenario scenario, Random random) {
 		this.dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		this.defineFlexibleActivities = new ActivitiesHandler(this.dccg);
-		this.quadTreesOfType = new TreeMap<String, QuadTree<ActivityFacility>>();
-		this.facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
+		this.quadTreesOfType = new TreeMap<>();
+		this.facilitiesOfType = new TreeMap<>();
 		this.scenario = scenario;
 		this.random = random;
-		this.initLocal(scenario.getNetwork());
+		this.initLocal();
 	}
 
 	public LocationMutator(Scenario scenario, TreeMap<String, ? extends QuadTree<ActivityFacility>> quad_trees,
@@ -71,7 +72,7 @@ public abstract class LocationMutator implements PlanAlgorithm {
 		this.random = random;
 	}
 	
-	private void initLocal(final Network network) {
+	private void initLocal() {
 
 		if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
 			locationChoiceBasedOnKnowledge = false;
@@ -89,4 +90,47 @@ public abstract class LocationMutator implements PlanAlgorithm {
 		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
 	}
 
+	protected final TreeMap<String, ? extends QuadTree<ActivityFacility>> getQuadTreesOfType(){
+		return quadTreesOfType;
+	}
+
+	protected final void setQuadTreesOfType( TreeMap<String, ? extends QuadTree<ActivityFacility>> quadTreesOfType ){
+		this.quadTreesOfType = quadTreesOfType;
+	}
+
+	protected final TreeMap<String, ActivityFacilityImpl[]> getFacilitiesOfType(){
+		return facilitiesOfType;
+	}
+
+	protected final void setFacilitiesOfType( TreeMap<String, ActivityFacilityImpl[]> facilitiesOfType ){
+		this.facilitiesOfType = facilitiesOfType;
+	}
+
+	protected final ActivitiesHandler getDefineFlexibleActivities(){
+		return defineFlexibleActivities;
+	}
+
+	protected final void setDefineFlexibleActivities( ActivitiesHandler defineFlexibleActivities ){
+		this.defineFlexibleActivities = defineFlexibleActivities;
+	}
+
+	protected final boolean isLocationChoiceBasedOnKnowledge(){
+		return locationChoiceBasedOnKnowledge;
+	}
+
+	protected final void setLocationChoiceBasedOnKnowledge( boolean locationChoiceBasedOnKnowledge ){
+		this.locationChoiceBasedOnKnowledge = locationChoiceBasedOnKnowledge;
+	}
+
+	protected final Random getRandom(){
+		return random;
+	}
+
+	protected final Scenario getScenario(){
+		return scenario;
+	}
+
+	protected final DestinationChoiceConfigGroup getDccg(){
+		return dccg;
+	}
 }

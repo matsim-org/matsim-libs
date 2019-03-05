@@ -66,7 +66,7 @@ public class RunLocationChoiceFrozenEpsilons {
 		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME, lcContext);
 
 		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
-		computer.readOrCreateMaxDCScore(config, lcContext.kValsAreRead());
+		computer.readOrCreateMaxDCScore( lcContext.kValsAreRead() );
 
 		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
 		final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();

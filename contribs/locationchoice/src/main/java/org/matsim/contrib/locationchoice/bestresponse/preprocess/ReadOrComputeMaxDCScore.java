@@ -34,20 +34,20 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-public class ReadOrComputeMaxDCScore {	
-	
+public class ReadOrComputeMaxDCScore {
+
 	private final static Logger log = Logger.getLogger(ReadOrComputeMaxDCScore.class);
 
 	public static String maxEpsFile = "personsMaxDCScoreUnscaled.xml";
 
 	private Config config;
-	private Scenario scenario; 
+	private Scenario scenario;
 	private DestinationChoiceConfigGroup dccg;
 	private DestinationChoiceContext lcContext;
-	private ObjectAttributes personsMaxDCScoreUnscaled = new ObjectAttributes();	
-	private ScaleEpsilon scaleEpsilon;	
+	private ObjectAttributes personsMaxDCScoreUnscaled = new ObjectAttributes();
+	private ScaleEpsilon scaleEpsilon;
 	private HashSet<String> flexibleTypes;
-	
+
 	public ReadOrComputeMaxDCScore(DestinationChoiceContext lcContext) {
 		this.scenario = lcContext.getScenario();
 		this.config = this.scenario.getConfig();
@@ -57,8 +57,8 @@ public class ReadOrComputeMaxDCScore {
 		this.lcContext = lcContext;
 	}
 
-    public void readOrCreateMaxDCScore(Config config, boolean arekValsRead) {
-  		String maxEpsValuesFileName = this.dccg.getMaxEpsFile();
+	public void readOrCreateMaxDCScore( boolean arekValsRead ) {
+		String maxEpsValuesFileName = this.dccg.getMaxEpsFile();
 		if (maxEpsValuesFileName != null && arekValsRead) {
 			ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(this.personsMaxDCScoreUnscaled);
 			try {
@@ -67,7 +67,7 @@ public class ReadOrComputeMaxDCScore {
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
 				log.error("unsuccessful reading of maxDCScore from file!\nThe values are now computed" +
-				" and following files are not considered!:\n" + maxEpsValuesFileName);
+							" and following files are not considered!:\n" + maxEpsValuesFileName);
 				this.computeMaxDCScore();
 			}
 		}
@@ -76,37 +76,37 @@ public class ReadOrComputeMaxDCScore {
 			this.computeMaxDCScore();
 		}
 	}
-	
+
 	private void computeMaxDCScore() {
-		DestinationSampler sampler = new DestinationSampler(this.lcContext.getPersonsKValuesArray(), 
-				this.lcContext.getFacilitiesKValuesArray(), 
-				this.dccg);
-				
+		DestinationSampler sampler = new DestinationSampler(this.lcContext.getPersonsKValuesArray(),
+			  this.lcContext.getFacilitiesKValuesArray(),
+			  this.dccg);
+
 		log.info("Computing max epsilon ... for " + this.scenario.getPopulation().getPersons().size() + " persons");
 		for (String actType : this.scaleEpsilon.getFlexibleTypes()) {
 			log.info("Computing max epsilon for activity type " + actType);
 			ComputeMaxDCScoreMultiThreatedModule maxEpsilonComputer = new ComputeMaxDCScoreMultiThreatedModule(
-					actType, this.lcContext, sampler);
+				  actType, this.lcContext, sampler);
 			maxEpsilonComputer.prepareReplanning(null);
 			for (Person p : this.scenario.getPopulation().getPersons().values()) {
 				maxEpsilonComputer.handlePlan(p.getSelectedPlan());
 			}
 			maxEpsilonComputer.finishReplanning();
-		}		
+		}
 		this.writeMaxEps();
 	}
-	
+
 	private void writeMaxEps() {
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			for (String flexibleType : this.flexibleTypes) {
 				double maxType = (Double)person.getCustomAttributes().get(flexibleType);
 				this.personsMaxDCScoreUnscaled.putAttribute(person.getId().toString(), flexibleType, maxType);
-			}	
+			}
 		}
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.personsMaxDCScoreUnscaled);
 		attributesWriter.writeFile(this.config.controler().getOutputDirectory() + maxEpsFile);
 	}
-	
+
 	public ObjectAttributes getPersonsMaxEpsUnscaled() {
 		return personsMaxDCScoreUnscaled;
 	}

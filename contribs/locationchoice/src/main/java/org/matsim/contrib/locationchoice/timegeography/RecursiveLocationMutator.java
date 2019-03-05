@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -47,28 +46,28 @@ import org.matsim.facilities.ActivityFacilityImpl;
 
 public class RecursiveLocationMutator extends LocationMutator {
 
-//	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSet.class);
-	protected int unsuccessfullLC = 0;
+	//	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSet.class);
+	private int unsuccessfullLC = 0;
 	private double recursionTravelSpeedChange = 0.1;
 	private double recursionTravelSpeed = 30.0;
-	protected int maxRecursions = 10;
+	private int maxRecursions = 10;
 	private TripRouter router;
 
 	public RecursiveLocationMutator(final Scenario scenario, TripRouter router,
 			TreeMap<String, QuadTree<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 		super(scenario, quad_trees, facilities_of_type, random);
-		this.recursionTravelSpeedChange = this.dccg.getRecursionTravelSpeedChange();
-		this.maxRecursions = this.dccg.getMaxRecursions();
-		this.recursionTravelSpeed = this.dccg.getTravelSpeed_car();
+		this.recursionTravelSpeedChange = this.getDccg().getRecursionTravelSpeedChange();
+		this.maxRecursions = this.getDccg().getMaxRecursions();
+		this.recursionTravelSpeed = this.getDccg().getTravelSpeed_car();
 		this.router = router;
 	}
 
 	public RecursiveLocationMutator(final Scenario scenario, TripRouter router, Random random) {
 		super(scenario, random);
-		this.recursionTravelSpeedChange = this.dccg.getRecursionTravelSpeedChange();
-		this.maxRecursions = this.dccg.getMaxRecursions();
-		this.recursionTravelSpeed = this.dccg.getTravelSpeed_car();
+		this.recursionTravelSpeedChange = this.getDccg().getRecursionTravelSpeedChange();
+		this.maxRecursions = this.getDccg().getMaxRecursions();
+		this.recursionTravelSpeed = this.getDccg().getTravelSpeed_car();
 		this.router = router;
 	}
 
@@ -79,19 +78,15 @@ public class RecursiveLocationMutator extends LocationMutator {
 		PlanUtils.resetRoutes(plan);
 	}
 
-	protected TripRouter getTripRouter() {
-		return this.router;
-	}
-	
-	public int getNumberOfUnsuccessfull() {
+	public final int getNumberOfUnsuccessfull() {
 		return this.unsuccessfullLC;
 	}
 
-	public void resetUnsuccsessfull() {
+	public final void resetUnsuccsessfull() {
 		this.unsuccessfullLC = 0;
 	}
 
-	public void handleSubChains(final Plan plan, List<SubChain> subChains) {
+	private void handleSubChains(final Plan plan, List<SubChain> subChains) {
 		Iterator<SubChain> sc_it = subChains.iterator();
 		while (sc_it.hasNext()) {
 			SubChain sc = sc_it.next();
@@ -124,7 +119,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 		}
 	}
 
-	protected int handleSubChain(Person person, SubChain subChain, double speed, int trialNr){
+	private int handleSubChain(Person person, SubChain subChain, double speed, int trialNr){
 		if (trialNr > this.maxRecursions) {
 			this.unsuccessfullLC += 1;
 
@@ -166,17 +161,17 @@ public class RecursiveLocationMutator extends LocationMutator {
 		return 0;
 	}
 
-	protected boolean modifyLocation(Activity act, Coord startCoord, Coord endCoord, double radius, int trialNr) {
+	private boolean modifyLocation(Activity act, Coord startCoord, Coord endCoord, double radius, int trialNr) {
 
 		ArrayList<ActivityFacility> choiceSet = this.computeChoiceSetCircle(startCoord, endCoord, radius, act.getType());
 
 		if (choiceSet.size()>1) {
 			//final Facility facility=(Facility)choiceSet.toArray()[
            	//		           MatsimRandom.random.nextInt(choiceSet.size())];
-			final ActivityFacility facility = choiceSet.get(super.random.nextInt(choiceSet.size()));
+			final ActivityFacility facility = choiceSet.get( super.getRandom().nextInt(choiceSet.size() ) );
 
 			act.setFacilityId(facility.getId());
-       		act.setLinkId(NetworkUtils.getNearestLink(((Network) this.scenario.getNetwork()), facility.getCoord()).getId());
+       		act.setLinkId(NetworkUtils.getNearestLink(((Network) this.getScenario().getNetwork()), facility.getCoord() ).getId() );
        		act.setCoord(facility.getCoord());
        		return true;
 		}
@@ -184,7 +179,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 		return false;
 	}
 
-	protected double computeTravelTime(Person person, Activity fromAct, Activity toAct) {
+	private double computeTravelTime(Person person, Activity fromAct, Activity toAct) {
 		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
@@ -201,7 +196,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Activity act = (Activity)actslegs.get(j);
 
-			if (super.defineFlexibleActivities.getFlexibleTypes().contains(this.defineFlexibleActivities.getConverter().convertType(act.getType()))) { // found secondary activity
+			if ( super.getDefineFlexibleActivities().getFlexibleTypes().contains( this.getDefineFlexibleActivities().getConverter().convertType(act.getType() ) )) { // found secondary activity
 				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
 			}
 			else {		// found primary activity
@@ -216,32 +211,25 @@ public class RecursiveLocationMutator extends LocationMutator {
 		return manager.getSubChains();
 	}
 
-	public List<SubChain> calcActChains(final Plan plan) {
+	final List<SubChain> calcActChains(final Plan plan) {
 		return this.calcActChainsDefinedFixedTypes(plan);
 	}
 
-	public ArrayList<ActivityFacility>  computeChoiceSetCircle(Coord coordStart, Coord coordEnd,
+	private ArrayList<ActivityFacility>  computeChoiceSetCircle(Coord coordStart, Coord coordEnd,
 			double radius, String type) {
 		double midPointX = (coordStart.getX()+coordEnd.getX())/2.0;
 		double midPointY = (coordStart.getY()+coordEnd.getY())/2.0;
-		return (ArrayList<ActivityFacility>) this.quadTreesOfType.get(this.defineFlexibleActivities.getConverter().convertType(type)).
+		return (ArrayList<ActivityFacility>) this.getQuadTreesOfType().get( this.getDefineFlexibleActivities().getConverter().convertType(type ) ).
 				getDisk(midPointX, midPointY, radius);
 	}
 
-	// for test cases:
-	public double getRecursionTravelSpeedChange() {
+	double getRecursionTravelSpeedChange() {
 		return recursionTravelSpeedChange;
 	}
 
-	public void setRecursionTravelSpeedChange(double recursionTravelSpeedChange) {
-		this.recursionTravelSpeedChange = recursionTravelSpeedChange;
-	}
-
-	public int getMaxRecursions() {
+	final int getMaxRecursions() {
+		// (public for test cases)
 		return maxRecursions;
 	}
 
-	public void setMaxRecursions(int maxRecursions) {
-		this.maxRecursions = maxRecursions;
-	}
 }

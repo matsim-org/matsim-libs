@@ -26,7 +26,6 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.LocationMutator;
@@ -69,8 +68,8 @@ public class RandomLocationMutator extends LocationMutator {
 				final Activity act = (Activity) pe;
 	
 				// if home is accidentally not defined as primary
-				if (super.defineFlexibleActivities.getFlexibleTypes().contains(act.getType())) {
-					int length = this.facilitiesOfType.get(act.getType()).length;
+				if ( super.getDefineFlexibleActivities().getFlexibleTypes().contains(act.getType() )) {
+					int length = this.getFacilitiesOfType().get(act.getType() ).length;
 					// only one facility: do not need to do location choice
 					if (length > 1) {
 						this.setNewLocationForAct((Activity) act, length);
@@ -81,9 +80,9 @@ public class RandomLocationMutator extends LocationMutator {
 	}
 
 	private void setNewLocationForAct(Activity act, int length) {
-		ActivityFacilityImpl facility = this.facilitiesOfType.get(act.getType())[super.random.nextInt(length)];
+		ActivityFacilityImpl facility = this.getFacilitiesOfType().get(act.getType() )[super.getRandom().nextInt(length )];
 		act.setFacilityId(facility.getId());
-		act.setLinkId(NetworkUtils.getNearestLink(((Network) this.scenario.getNetwork()), facility.getCoord()).getId());
+		act.setLinkId(NetworkUtils.getNearestLink(((Network) this.getScenario().getNetwork()), facility.getCoord() ).getId() );
 		act.setCoord(facility.getCoord());
 	}
 }
