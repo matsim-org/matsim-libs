@@ -53,7 +53,7 @@ public class VwAVAuxEnergyConsumptionWithTemperatures implements AuxEnergyConsum
     }
 
     @Override
-    public double calcEnergyConsumption(double period) {
+    public double calcEnergyConsumption(double period, double timeOfDay) {
         if (tracker.isAtCharger(ev)) return 0;
         double temp = temperatureService.getCurrentTemperature();
         double consumptionTemp;

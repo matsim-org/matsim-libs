@@ -21,6 +21,7 @@
 package vwExamples.peoplemoverVWExample;
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import electric.edrt.run.RunVWEDrtScenario;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -68,8 +69,8 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 	// }
 
 	public static void main(String[] args) throws IOException {
-		int count = 7;
-		int n_iterations = 4;
+        int count = 1;
+        int n_iterations = 1;
 		int vehicleBase= 7;
 		for (int it = 0; it < n_iterations; it++) {
 			for (int i = 0; i < count; i++) {
@@ -85,10 +86,10 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 	public static void run(int vehiclePerDepot, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "car_ptToDrt_Base_batteryCharge_0C_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
+        String runId = "2it_personalgaragerandom_car_ptToDrt_Base_batteryCharge_0C_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
-		String inbase = "C:\\Temp\\";
+        String inbase = "d:\\input\\";
 
 		final Config config = ConfigUtils.loadConfig(inbase + "conf_BS_DRT_10pct_eDRT.xml", new DrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
@@ -102,8 +103,8 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 		// Overwrite existing configuration parameters
 		config.plans().setInputFile(inbase + "\\plans\\drtSelected_new.xml.gz");
 		config.controler().setLastIteration(2); // Number of simulation iterations
-		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
-		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
+        config.controler().setWriteEventsInterval(50); // Write Events file every x-Iterations
+        config.controler().setWritePlansInterval(50); // Write Plan file every x-Iterations
 		config.qsim().setStartTime(0);
 
 		String networkFilePath = inbase + "network\\vw219_SpeedCal.xml";
@@ -214,7 +215,7 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 		// Based on the prepared configuration this part creates a controller that runs
 		// Controler controler = createControlerWithSingleModeDrt(config, otfvis);
 
-		Controler controler = electric.edrt.run.RunEDrtScenario.createControler(config);
+		Controler controler = RunVWEDrtScenario.createControler(config);
 
 		if (rebalancing == true) {
 

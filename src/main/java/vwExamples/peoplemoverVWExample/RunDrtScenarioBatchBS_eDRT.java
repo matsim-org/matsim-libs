@@ -20,6 +20,7 @@
 
 package vwExamples.peoplemoverVWExample;
 
+import electric.edrt.run.RunVWEDrtScenario;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
@@ -149,7 +150,7 @@ public class RunDrtScenarioBatchBS_eDRT {
         // Based on the prepared configuration this part creates a controller that runs
 		//Controler controler = createControlerWithSingleModeDrt(config, otfvis);
 
-        Controler controler = electric.edrt.run.RunEDrtScenario.createControler(config);
+        Controler controler = RunVWEDrtScenario.createControler(config);
 
         if (rebalancing == true) {
 
