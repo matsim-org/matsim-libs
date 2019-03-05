@@ -81,13 +81,14 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static final double CHARGING_SPEED_FACTOR = 1.0;
 	public static final double BATTERYREPLACETIME = 180.0;
 
-	static boolean BatteryReplace = true;
+	static boolean BatteryReplace = false;
 	
-	static int[] fleetRange = {150,200,250,300};
+	static int[] fleetRange = {100,150,200,250,300};
+//	static int[] fleetRange = {100};
 
 	public static void main(String[] args) throws IOException {
 		//int count = 7;
-		int n_iterations = 2;
+		int n_iterations = 1;
 		for (int it = 0; it < n_iterations; it++) {
 			for (int fleet : fleetRange ) {
 				int vehiclePerDepot = fleet;
@@ -102,7 +103,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static void run(int vehiclePerDepot, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "h_1xRate_batteryReplace_0C_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
+		String runId = "H_1xRate_batteryRecharge_0C_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\K-GERAK\\";
@@ -118,9 +119,9 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
 		config.plans().setInputFile(inbase + "\\input\\plans\\vw235_drt_plan_1x_selected.xml.gz");
-		config.controler().setLastIteration(2); // Number of simulation iterations
-		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
-		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
+		config.controler().setLastIteration(4); // Number of simulation iterations
+		config.controler().setWriteEventsInterval(4); // Write Events file every x-Iterations
+		config.controler().setWritePlansInterval(4); // Write Plan file every x-Iterations
 		config.qsim().setStartTime(0);
 
 		String networkFilePath = inbase + "\\input\\network\\network.xml.gz";
@@ -142,6 +143,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		drt.setMaxTravelTimeAlpha(1.3);
 		drt.setMaxWaitTime(500.0);
 		drt.setStopDuration(30.0);
+		drt.setRequestRejection(true);
 
 		// Create the virtual stops for the drt service
 		// VirtualStops are dynamically generated
@@ -205,7 +207,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());
 
 		// Filter Links with higher speeds than x km/h
-		setXY2Links(scenario, 80 / 3.6);
+		//setXY2Links(scenario, 80 / 3.6);
 
 		// Define the MATSim Controler
 		// Based on the prepared configuration this part creates a controller that runs
@@ -226,9 +228,9 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 			rebalancingParams.setInterval(300);
 			rebalancingParams.setCellSize(1000);
-			rebalancingParams.setTargetAlpha(0.8);
+			rebalancingParams.setTargetAlpha(0.7);
 			rebalancingParams.setTargetBeta(0.8);
-			rebalancingParams.setMaxTimeBeforeIdle(300);
+			rebalancingParams.setMaxTimeBeforeIdle(500);
 			rebalancingParams.setMinServiceTime(3600);
 			drt.addParameterSet(rebalancingParams);
 
@@ -249,7 +251,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 				// Default alpha is 0.05. Which means i.e. 0.3 is not smooth in comparison to
 				// 0.05
 				DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.15);
-				DvrpConfigGroup.get(config).setTravelTimeEstimationBeta(600);
+				DvrpConfigGroup.get(config).setTravelTimeEstimationBeta(900);
 				// bind(RelocationWriter.class).asEagerSingleton();
 				// addControlerListenerBinding().to(RelocationWriter.class);
 
