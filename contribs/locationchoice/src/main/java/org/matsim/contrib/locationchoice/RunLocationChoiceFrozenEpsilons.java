@@ -25,10 +25,11 @@ package org.matsim.contrib.locationchoice;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.locationchoice.bestresponse.BestReplyLocationChoicePlanStrategy;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
+import org.matsim.contrib.locationchoice.bestresponse.MaxDCScoreWrapper;
+import org.matsim.contrib.locationchoice.bestresponse.ReadOrComputeMaxDCScore;
+import org.matsim.contrib.locationchoice.bestresponse.DCScoringFunctionFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -86,7 +87,7 @@ public class RunLocationChoiceFrozenEpsilons {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding(MY_LOCATION_CHOICE).to(BestReplyLocationChoicePlanStrategy.class);
+				addPlanStrategyBinding(MY_LOCATION_CHOICE).to( BestReplyLocationChoicePlanStrategy.class );
 			}
 		});
 

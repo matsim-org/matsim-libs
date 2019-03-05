@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.bestresponse.preprocess;
+package org.matsim.contrib.locationchoice.bestresponse;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -32,7 +32,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-public class ReadOrCreateKVals {
+ class ReadOrCreateKVals {
 	
 	private static final Logger log = Logger.getLogger(ReadOrCreateKVals.class);
 	

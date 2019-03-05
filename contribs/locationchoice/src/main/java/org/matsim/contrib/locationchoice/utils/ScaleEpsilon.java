@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LCPlanElement.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,16 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.population;
+package org.matsim.contrib.locationchoice.utils;
 
-import org.matsim.api.core.v01.population.PlanElement;
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 
-/**
- * @author cdobler
- */
-public interface LCPlanElement extends PlanElement {
+import java.util.Set;
 
-	public int getArrayIndex();
+ public class ScaleEpsilon {
 	
-	public int getPlanElementIndex();
+	private TObjectDoubleMap<String> epsilonFactors = new TObjectDoubleHashMap<>();
+	private boolean useSimpleTypes = false; // demand v1: e.g., s0.5, ... s24.0 = s
+	
+	public double getEpsilonFactor(String actType) {
+		if (this.useSimpleTypes) actType = actType.substring(0, 1);
+		return this.epsilonFactors.get(actType);
+	}
+	
+	public void setEpsilonFactor(String actType, double factor) {
+		this.epsilonFactors.put(actType, factor);
+	}
+	
+	public void setUseSimpleTypes(boolean useSimpleTypes) {
+		this.useSimpleTypes = useSimpleTypes;
+	}
+	
+	public boolean isFlexibleType(String actType) {
+		if (this.useSimpleTypes) actType = actType.substring(0, 1);
+		return this.epsilonFactors.containsKey(actType);
+	}
+	
+	public int getNumberOfFlexibleTypes() {
+		return this.epsilonFactors.size();
+	}
+	
+	public Set<String> getFlexibleTypes() {
+		return this.epsilonFactors.keySet();
+	}
 }

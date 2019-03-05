@@ -35,7 +35,7 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
  * probability that facilityValue is k is expected 0.1 (or 10%)
  * 
  */
-public class DestinationSampler {
+class DestinationSampler {
 	
 	private double[] facilitiesKValues;
 	private double[] personsKValues;

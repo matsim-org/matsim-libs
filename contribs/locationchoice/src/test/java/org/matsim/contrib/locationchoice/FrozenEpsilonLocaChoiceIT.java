@@ -11,11 +11,12 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.locationchoice.bestresponse.BestReplyLocationChoicePlanStrategy;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.DCActivityWOFacilitiesScoringFunction;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
+import org.matsim.contrib.locationchoice.bestresponse.MaxDCScoreWrapper;
+import org.matsim.contrib.locationchoice.bestresponse.ReadOrComputeMaxDCScore;
+import org.matsim.contrib.locationchoice.bestresponse.DCActivityWOFacilitiesScoringFunction;
+import org.matsim.contrib.locationchoice.bestresponse.DCScoringFunctionFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -184,7 +185,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("MyLocationChoice").to(BestReplyLocationChoicePlanStrategy.class);
+				addPlanStrategyBinding("MyLocationChoice").to( BestReplyLocationChoicePlanStrategy.class );
 			}
 		});
 

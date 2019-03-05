@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LCActivity.java
+ * LCLeg.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,107 +18,77 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.population;
+package org.matsim.contrib.locationchoice.bestresponse;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.facilities.ActivityFacility;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author cdobler
  */
-public class LCActivity implements Activity, LCPlanElement {
+class LCLeg implements Leg, LCPlanElement {
 
 	private final LCPlan plan;
 	private final int arrayIndex;
 	private final int planElementIndex;
 	
-	public LCActivity(final LCPlan plan, final int arrayIndex, final int planElementIndex) {
+	public LCLeg(final LCPlan plan, final int arrayIndex, final int planElementIndex) {
 		this.plan = plan;
 		this.arrayIndex = arrayIndex;
 		this.planElementIndex = planElementIndex;
 	}
 	
 	@Override
-	public final double getEndTime() {
-		return this.plan.endTimes[this.arrayIndex];
+	public final String getMode() {
+		return this.plan.modes[this.arrayIndex];
 	}
 
 	@Override
-	public final void setEndTime(double seconds) {
-		this.plan.endTimes[this.arrayIndex] = seconds;
+	public final void setMode(String mode) {
+		this.plan.modes[this.arrayIndex] = mode;
 	}
 
 	@Override
-	public final String getType() {
-		return this.plan.types[this.arrayIndex];
+	public final Route getRoute() {
+		return this.plan.routes[this.arrayIndex];
 	}
 
 	@Override
-	public final void setType(String type) {
-		this.plan.types[this.arrayIndex] = type;
+	public final void setRoute(Route route) {
+		this.plan.routes[this.arrayIndex] = route;
 	}
 
 	@Override
-	public final Coord getCoord() {
-		return this.plan.coords[this.arrayIndex];
-	}
-
-	public final void setCoord(Coord coord) {
-		this.plan.coords[this.arrayIndex] = coord;
-	}
-	
-	@Override
-	public final double getStartTime() {
-		return this.plan.startTimes[this.arrayIndex];
+	public final double getDepartureTime() {
+		return this.plan.depTimes[this.arrayIndex];
 	}
 
 	@Override
-	public final void setStartTime(double seconds) {
-		this.plan.startTimes[this.arrayIndex] = seconds;
+	public final void setDepartureTime(double seconds) {
+		this.plan.depTimes[this.arrayIndex] = seconds;
 	}
 
 	@Override
-	public final double getMaximumDuration() {
-		return this.plan.durations[this.arrayIndex];
+	public final double getTravelTime() {
+		return this.plan.travTimes[this.arrayIndex];
 	}
 
 	@Override
-	public final void setMaximumDuration(double seconds) {
-		this.plan.durations[this.arrayIndex] = seconds;
-	}
-
-	@Override
-	public final Id<Link> getLinkId() {
-		return this.plan.linkIds[this.arrayIndex];
-	}
-
-	public final void setLinkId(Id<Link> linkId) {
-		this.plan.linkIds[this.arrayIndex] = linkId;
-	}
-	
-	@Override
-	public final Id<ActivityFacility> getFacilityId() {
-		return this.plan.facilityIds[this.arrayIndex];
-	}
-	
-	public final void setFacilityId(Id<ActivityFacility> facilityId) {
-		this.plan.facilityIds[this.arrayIndex] = facilityId;
+	public final void setTravelTime(double seconds) {
+		this.plan.travTimes[this.arrayIndex] = seconds;
 	}
 
 	public final double getArrivalTime() {
 		return this.plan.arrTimes[this.arrayIndex];
 	}
-
+	
 	public final void setArrivalTime(final double arrTime) {
 		this.plan.arrTimes[this.arrayIndex] = arrTime;
 	}
-	
+
 	@Override
-	public final int getArrayIndex() {
+	public int getArrayIndex() {
 		return this.arrayIndex;
 	}
 	

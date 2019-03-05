@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -204,8 +203,8 @@ class PlanTimesAdapter {
 
 	private List<? extends PlanElement> estimateTravelTime( Plan plan , Activity act ) {
 		// Ouch... should be passed as parameter!
-		final Leg previousLeg = PlanUtils.getPreviousLeg( plan, act );
-		final Activity previousActivity = PlanUtils.getPreviousActivity( plan, previousLeg );
+		final Leg previousLeg = LCPlanUtils.getPreviousLeg( plan, act );
+		final Activity previousActivity = LCPlanUtils.getPreviousActivity( plan, previousLeg );
 		final String mode = previousLeg.getMode();
 
 		switch ( this.approximationLevel ) {

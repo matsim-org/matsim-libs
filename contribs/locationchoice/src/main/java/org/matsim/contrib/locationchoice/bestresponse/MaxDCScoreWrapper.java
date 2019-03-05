@@ -1,4 +1,4 @@
-package org.matsim.contrib.locationchoice.bestresponse.preprocess;
+package org.matsim.contrib.locationchoice.bestresponse;
 
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.api.internal.MatsimToplevelContainer;

@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.router.PlanRouterAdapter;
-import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
@@ -43,7 +42,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
-public class RecursiveLocationMutator extends AbstractLocationMutator{
+class RecursiveLocationMutator extends AbstractLocationMutator{
 
 	//	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSet.class);
 	private int unsuccessfullLC = 0;
@@ -74,7 +73,7 @@ public class RecursiveLocationMutator extends AbstractLocationMutator{
 	public void run(final Plan plan){
 		List<SubChain> subChains = this.calcActChains(plan);
 		this.handleSubChains(plan, subChains);
-		PlanUtils.resetRoutes(plan);
+		PopulationUtils.resetRoutes(plan );
 	}
 
 	public final int getNumberOfUnsuccessfull() {

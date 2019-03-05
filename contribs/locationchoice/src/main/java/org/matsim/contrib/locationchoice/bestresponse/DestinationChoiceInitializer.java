@@ -22,8 +22,6 @@ package org.matsim.contrib.locationchoice.bestresponse;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.analysis.DistanceStats;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;

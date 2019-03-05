@@ -36,8 +36,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
-import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -45,7 +45,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
-public class SingleActLocationMutator extends AbstractLocationMutator{
+class SingleActLocationMutator extends AbstractLocationMutator{
 
 	protected int unsuccessfullLC = 0;
 	private final ActivitiesHandler defineFlexibleActivities;
@@ -104,7 +104,7 @@ public class SingleActLocationMutator extends AbstractLocationMutator{
 			this.unsuccessfullLC++;
 			return;
 		}
-		PlanUtils.resetRoutes(plan);
+		PopulationUtils.resetRoutes(plan );
 	}
 
 	private List<Activity> getFlexibleActivities(final Plan plan) {

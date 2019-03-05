@@ -17,12 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice;
+package org.matsim.contrib.locationchoice.timegeography;
 
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.locationchoice.Initializer;
 import org.matsim.contrib.locationchoice.timegeography.RandomLocationMutator;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.testcases.MatsimTestCase;

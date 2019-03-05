@@ -17,14 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.bestresponse.scoring;
+package org.matsim.contrib.locationchoice.bestresponse;
 
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
 import org.matsim.core.scoring.SumScoringFunction;
 
 public class DCActivityWOFacilitiesScoringFunction implements SumScoringFunction.ActivityScoring {

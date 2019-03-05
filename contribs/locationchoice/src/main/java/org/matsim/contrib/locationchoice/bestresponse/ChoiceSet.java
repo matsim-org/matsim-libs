@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
-import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.ImaginaryNode;
 import org.matsim.core.router.InitialNode;
@@ -253,8 +252,8 @@ class ChoiceSet {
 			// ---
 			
 //			Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(act));
-			Leg previousLeg = PlanUtils.getPreviousLeg(plan, act);
-			Activity previousActivity = PlanUtils.getPreviousActivity(plan, previousLeg);
+			Leg previousLeg = LCPlanUtils.getPreviousLeg(plan, act );
+			Activity previousActivity = LCPlanUtils.getPreviousActivity(plan, previousLeg );
 			fromNode = this.network.getLinks().get(previousActivity.getLinkId()).getToNode();
 
 			forwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, previousActivity.getEndTime(), plan.getPerson(), null);			
@@ -265,8 +264,8 @@ class ChoiceSet {
 			// ---
 			
 //			Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).getNextLeg(act));
-			Leg nextLeg = PlanUtils.getNextLeg(plan, act);
-			Activity nextActivity = PlanUtils.getPreviousActivity(plan, nextLeg);
+			Leg nextLeg = LCPlanUtils.getNextLeg(plan, act );
+			Activity nextActivity = LCPlanUtils.getPreviousActivity(plan, nextLeg );
 			fromNode = this.network.getLinks().get(nextActivity.getLinkId()).getToNode();
 			
 			/*
@@ -312,7 +311,7 @@ class ChoiceSet {
 		Plan planTmp = null;
 
 		// In case we try to re-use a single copy of the plan: create the copy here and re-use it within the loop.
-		if (this.reUsePlans) planTmp = PlanUtils.createCopy(plan);
+		if (this.reUsePlans) planTmp = LCPlanUtils.createCopy(plan );
 				
 		for (Id<ActivityFacility> destinationId : this.destinations) {
 			// tentatively set
@@ -322,9 +321,9 @@ class ChoiceSet {
 			// are calculated. The resulting travel times are written to the temporary plan. If this is true, it should 
 			// not be necessary to update the activity location in the copied plan? I am not sure about this, therefore 
 			// keep the update in the "if(this.ReUsePlans)" block. cdobler oct'15
-			PlanUtils.setFacilityId(act, destinationId);
-			PlanUtils.setCoord(act, facility.getCoord());
-			PlanUtils.setLinkId(act, this.nearestLinks.get(destinationId));
+			LCPlanUtils.setFacilityId(act, destinationId );
+			LCPlanUtils.setCoord(act, facility.getCoord() );
+			LCPlanUtils.setLinkId(act, this.nearestLinks.get(destinationId ) );
 			
 //			PlanImpl planTmp = new PlanImpl();
 //			planTmp.copyFrom(plan);
@@ -332,12 +331,12 @@ class ChoiceSet {
 			if (this.reUsePlans) {
 				// we have to update the copied plan
 				Activity actTmp = (Activity) planTmp.getPlanElements().get(actlegIndex);
-				PlanUtils.setFacilityId(actTmp, destinationId);
-				PlanUtils.setCoord(actTmp, facility.getCoord());
-				PlanUtils.setLinkId(actTmp, this.nearestLinks.get(destinationId));
+				LCPlanUtils.setFacilityId(actTmp, destinationId );
+				LCPlanUtils.setCoord(actTmp, facility.getCoord() );
+				LCPlanUtils.setLinkId(actTmp, this.nearestLinks.get(destinationId ) );
 			}
 			// If we don't re-use a single copy of the plan, create a new one.
-			else planTmp = PlanUtils.createCopy(plan);
+			else planTmp = LCPlanUtils.createCopy(plan );
 			
 			final double score =
 					this.adaptAndScoreTimes(

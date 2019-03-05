@@ -48,7 +48,7 @@
 	 <parameterset type="strategysettings" >
 		 <param name="disableAfterIteration" value="-1" />
 		 <param name="executionPath" value="null" />
-		 <param name="strategyName" value="org.matsim.contrib.locationchoice.BestReplyLocationChoicePlanStrategy" />
+		 <param name="strategyName" value="org.matsim.contrib.locationchoice.bestresponse.BestReplyLocationChoicePlanStrategy" />
 		 <param name="subpopulation" value="null" />
 		 <param name="weight" value="0.1" />
 	 </parameterset>

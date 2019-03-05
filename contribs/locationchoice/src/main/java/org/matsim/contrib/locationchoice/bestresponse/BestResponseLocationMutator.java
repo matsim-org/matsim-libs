@@ -38,11 +38,9 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.InternalPlanDataStructure;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
-import org.matsim.contrib.locationchoice.population.LCPlan;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
-import org.matsim.contrib.locationchoice.utils.PlanUtils;
+import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
@@ -53,10 +51,9 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public final class BestResponseLocationMutator implements PlanAlgorithm {
+final class BestResponseLocationMutator implements PlanAlgorithm {
 	
 	private final ActivityFacilities facilities;
 	private final ObjectAttributes personsMaxDCScoreUnscaled;
@@ -138,9 +135,9 @@ public final class BestResponseLocationMutator implements PlanAlgorithm {
 
 				// copy the best plan into replanned plan
 				// making a deep copy
-				PlanUtils.copyPlanFieldsToFrom( plan, bestPlan );
+				LCPlanUtils.copyPlanFieldsToFrom( plan, bestPlan );
 
-				PlanUtils.resetRoutes( plan );
+				PopulationUtils.resetRoutes( plan );
 				break;
 			}
 			case lcPlan:{
@@ -156,9 +153,9 @@ public final class BestResponseLocationMutator implements PlanAlgorithm {
 
 				// copy the best plan into replanned plan
 				// making a deep copy
-				PlanUtils.copyPlanFieldsToFrom( plan, bestPlan );
+				LCPlanUtils.copyPlanFieldsToFrom( plan, bestPlan );
 
-				PlanUtils.resetRoutes( plan );
+				PopulationUtils.resetRoutes( plan );
 				break;
 			}
 			default:
@@ -239,7 +236,7 @@ public final class BestResponseLocationMutator implements PlanAlgorithm {
 			if (this.sampler.sample(facilityIndex, personIndex)) { 
 				
 				// only add destination if it can be reached with the chosen mode
-				Leg previousLeg = PlanUtils.getPreviousLeg(plan, actToMove);
+				Leg previousLeg = LCPlanUtils.getPreviousLeg(plan, actToMove );
 				String mode = previousLeg.getMode();	
 				
 				Id<Link> linkId = null;
@@ -267,7 +264,7 @@ public final class BestResponseLocationMutator implements PlanAlgorithm {
 	private void setLocation(Activity act2, Id<ActivityFacility> facilityId) {
 //		ActivityImpl act = (ActivityImpl) act2;
 //		act.setFacilityId(facilityId);
-		PlanUtils.setFacilityId(act2, facilityId);
+		LCPlanUtils.setFacilityId(act2, facilityId );
 		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
 		
 		Id<Link> linkId = null;
@@ -280,8 +277,8 @@ public final class BestResponseLocationMutator implements PlanAlgorithm {
 		}	
 //		act.setLinkId(linkId);
 //		act.setCoord(facility.getCoord());
-		PlanUtils.setLinkId(act2, linkId);
-		PlanUtils.setCoord(act2, facility.getCoord());
+		LCPlanUtils.setLinkId(act2, linkId );
+		LCPlanUtils.setCoord(act2, facility.getCoord() );
 	}
 	
 	private void evaluateAndAdaptPlans(Plan plan, Plan bestPlanSoFar, ChoiceSet cs, ScoringFunctionFactory scoringFunction) {		
@@ -294,7 +291,7 @@ public final class BestResponseLocationMutator implements PlanAlgorithm {
 //			((PlanImpl) bestPlanSoFar).copyFrom(plan);
 			Plan source = plan;
 			Plan destination = bestPlanSoFar;
-			PlanUtils.copyFrom(source, destination);
+			LCPlanUtils.copyFrom(source, destination );
 		}
 	}
 
@@ -307,7 +304,7 @@ public final class BestResponseLocationMutator implements PlanAlgorithm {
 		Plan planTmp = null;
 		if ( this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.planImpl) {
 			planTmp = PopulationUtils.createPlan(plan.getPerson());
-			PlanUtils.copyFrom(plan, planTmp);
+			LCPlanUtils.copyFrom(plan, planTmp );
 		} else if ( this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.lcPlan) {
 			planTmp = new LCPlan(plan);
 		}
@@ -320,7 +317,7 @@ public final class BestResponseLocationMutator implements PlanAlgorithm {
 						this.tripRouter,
 						DestinationChoiceConfigGroup.ApproximationLevel.completeRouting );
 
-		PlanUtils.copyPlanFieldsToFrom(plan, planTmp);	// copy( to, from )
+		LCPlanUtils.copyPlanFieldsToFrom(plan, planTmp );	// copy( to, from )
 		return score;
 	}
 

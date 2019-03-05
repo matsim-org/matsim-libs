@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice;
+package org.matsim.contrib.locationchoice.timegeography;
 
 import java.util.List;
 import java.util.TreeMap;
@@ -25,10 +25,8 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
-import org.matsim.contrib.locationchoice.timegeography.RandomLocationMutator;
-import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
-import org.matsim.contrib.locationchoice.timegeography.SingleActLocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
@@ -44,7 +42,7 @@ import org.matsim.facilities.ActivityFacilityImpl;
 
 import javax.inject.Provider;
 
-public class DestinationChoice extends AbstractMultithreadedModule {
+class DestinationChoice extends AbstractMultithreadedModule {
 
     private static final Logger log = Logger.getLogger(DestinationChoice.class);
 	private final Provider<TripRouter> tripRouterProvider;
@@ -61,7 +59,7 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 	public DestinationChoice(Provider<TripRouter> tripRouterProvider, Scenario scenario) {
 		super(scenario.getConfig().global());
 		this.tripRouterProvider = tripRouterProvider;
-		if ( DestinationChoiceConfigGroup.Algotype.bestResponse.equals(((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).getAlgorithm()) ) {
+		if ( DestinationChoiceConfigGroup.Algotype.bestResponse.equals(((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice" )).getAlgorithm() ) ) {
 			throw new RuntimeException("best response location choice not supported as part of LocationChoice. " +
 					"Use BestReplyLocationChoice instead, but be aware that as of now some Java coding is necessary to do that. kai, feb'13");
 		}

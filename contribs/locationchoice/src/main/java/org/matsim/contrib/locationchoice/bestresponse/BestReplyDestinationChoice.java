@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice;
+package org.matsim.contrib.locationchoice.bestresponse;
 
 import java.util.*;
 
@@ -26,10 +26,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.locationchoice.bestresponse.BestResponseLocationMutator;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext.ActivityFacilityWithIndex;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
 import org.matsim.core.config.ConfigUtils;
@@ -57,7 +55,7 @@ import javax.inject.Provider;
  * Idea of this should be as follows: all persons and all facilities have k values.  frozen epsilon will be generated on the fly from those two values.  together with frozen
  * epsilon, the location choice is indeed best reply.
  */
-public final class BestReplyDestinationChoice extends AbstractMultithreadedModule {
+final class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
 	private static final Logger log = Logger.getLogger(BestReplyDestinationChoice.class);
 	private final Provider<TripRouter> tripRouterProvider;

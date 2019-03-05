@@ -17,25 +17,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.utils;
+package org.matsim.contrib.locationchoice.bestresponse;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.locationchoice.population.LCActivity;
-import org.matsim.contrib.locationchoice.population.LCLeg;
-import org.matsim.contrib.locationchoice.population.LCPlan;
+import org.matsim.contrib.locationchoice.bestresponse.LCActivity;
+import org.matsim.contrib.locationchoice.bestresponse.LCLeg;
+import org.matsim.contrib.locationchoice.bestresponse.LCPlan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
 
-public class PlanUtils {
+ class LCPlanUtils{
 	
 	public static void copyPlanFieldsToFrom(Plan planTarget, Plan planTemplate) {
 		if (planTarget instanceof Plan) {
@@ -223,14 +220,5 @@ public class PlanUtils {
 			((LCActivity) activity).setLinkId(linkId);
 		} else throw new RuntimeException("Unexpected type of activity was found: " + activity.getClass().toString() + ". Aborting!");
 	}
-	
-	public static void resetRoutes(final Plan plan) {
-		// loop over all <leg>s, remove route-information
-		// routing is done after location choice
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				((Leg) pe).setRoute(null);
-			}
-		}
-	}
+
 }

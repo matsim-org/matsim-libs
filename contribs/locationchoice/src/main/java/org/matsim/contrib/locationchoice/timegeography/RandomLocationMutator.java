@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -37,7 +37,7 @@ import org.matsim.facilities.ActivityFacilityImpl;
 /**
  * @author anhorni
  */
-public class RandomLocationMutator extends AbstractLocationMutator{
+class RandomLocationMutator extends AbstractLocationMutator{
 
 	public RandomLocationMutator(final Scenario scenario, Random random) {
 		super(scenario, random);
@@ -57,7 +57,7 @@ public class RandomLocationMutator extends AbstractLocationMutator{
 	@Override
 	public void run(final Plan plan) {
 		this.handlePlanForPreDefinedFlexibleTypes(plan);
-		PlanUtils.resetRoutes(plan);
+		PopulationUtils.resetRoutes(plan );
 	}
 
 

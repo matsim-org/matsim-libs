@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.bestresponse.scoring;
+package org.matsim.contrib.locationchoice.bestresponse;
 
 import java.util.Collection;
 import java.util.Random;
@@ -27,12 +27,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.EpsilonDistributionTypes;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
+import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.core.config.Config;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 
-public class DestinationScoring { 
+ class DestinationScoring {
 	//As the random number generator is re-seeded here anyway, we do not need a rng given from outside!
 	private Random rnd = new Random();
 	private Config config;
