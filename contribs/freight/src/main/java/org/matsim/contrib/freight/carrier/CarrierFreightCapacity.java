@@ -13,7 +13,9 @@ public class CarrierFreightCapacity implements FreightCapacity{
 	
 	private double volumeInCubicMeters;
 	
-	private double weightInKilo;
+	private double weightInTons;
+
+	private int capacityInUnits;
 	
 	public void setCapacity(String dimensionKey, Double value){
 		customDimensions.put(dimensionKey,value);
@@ -33,12 +35,21 @@ public class CarrierFreightCapacity implements FreightCapacity{
 		volumeInCubicMeters = cubicMeters;
 	}
 
-	public void setWeight(double kilos){
-		weightInKilo = kilos;
+	public void setWeight(double tons){
+		weightInTons = tons;
 	}
 	
 	public double getWeight(){
-		return weightInKilo;
+		return weightInTons;
 	}
 
+	@Override
+	public int getUnits() {
+		return capacityInUnits ;
+	}
+
+	@Override
+	public void setUnits(int units) {
+		capacityInUnits = units;
+	}
 }
