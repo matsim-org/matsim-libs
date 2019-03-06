@@ -97,12 +97,14 @@ public class VehicleTypeImpl implements VehicleType {
 
 	@Override
 	public DoorOperationMode getDoorOperationMode() {
-		return this.doorOperationMode;
+//		return this.doorOperationMode;
+		return VehicleUtils.getDoorOperationMode( this ) ;
 	}
 
 	@Override
 	public void setDoorOperationMode(DoorOperationMode mode) {
-		this.doorOperationMode = mode;
+//		this.doorOperationMode = mode;
+		VehicleUtils.setDoorOperationMode( this, mode ) ;
 	}
 
     @Override

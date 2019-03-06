@@ -31,6 +31,9 @@ public class VehicleUtils {
 
 	private static final VehicleType DEFAULT_VEHICLE_TYPE = VehicleUtils.getFactory().createVehicleType(Id.create("defaultVehicleType", VehicleType.class));
 
+	private static final String DOOR_OPERATION_MODE = "doorOperationMode" ;
+	// should remain under the hood --> should remain private
+
 	static {
 		VehicleCapacityImpl capacity = new VehicleCapacityImpl();
 		capacity.setSeats(4);
@@ -49,4 +52,11 @@ public class VehicleUtils {
 		return DEFAULT_VEHICLE_TYPE;
 	}
 
+	public static VehicleType.DoorOperationMode getDoorOperationMode( VehicleType vehicleType ){
+		return (VehicleType.DoorOperationMode) vehicleType.getAttributes().getAttribute( DOOR_OPERATION_MODE );
+	}
+
+	public static void setDoorOperationMode( VehicleType vehicleType, VehicleType.DoorOperationMode mode ){
+		vehicleType.getAttributes().putAttribute( DOOR_OPERATION_MODE, mode ) ;
+	}
 }
