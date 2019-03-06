@@ -19,7 +19,13 @@
 
 package vwExamples.utils;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -32,9 +38,8 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-import vwExamples.utils.modalSplitAnalyzer.PersonValidator;
 
-import java.util.*;
+import vwExamples.utils.modalSplitAnalyzer.PersonValidator;
 
 /**
  * @author saxer

@@ -21,15 +21,16 @@ package playground.vsp.demandde.corineLandcover;
 
 import java.util.Collection;
 import java.util.List;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygonal;
-import com.vividsolutions.jts.shape.random.RandomPointsBuilder;
-import com.vividsolutions.jts.simplify.TopologyPreservingSimplifier;
+
 import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryCollection;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygonal;
+import org.locationtech.jts.shape.random.RandomPointsBuilder;
+import org.locationtech.jts.simplify.TopologyPreservingSimplifier;
 
 /**
  * Created by amit on 10.10.17.

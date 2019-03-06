@@ -18,8 +18,13 @@
 
 package vwExamples.utils.delays;
 
-import analysis.drtOccupancy.DynModeTripsAnalyser;
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -40,7 +45,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import java.util.*;
+import analysis.drtOccupancy.DynModeTripsAnalyser;
 
 public class RunTravelDelayAnalysis {
 
