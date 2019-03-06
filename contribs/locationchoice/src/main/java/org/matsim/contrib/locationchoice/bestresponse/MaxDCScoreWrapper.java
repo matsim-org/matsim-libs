@@ -1,10 +1,8 @@
 package org.matsim.contrib.locationchoice.bestresponse;
 
-import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public class MaxDCScoreWrapper  {
+class MaxDCScoreWrapper  {
 	public static final String ELEMENT_NAME = "maxDcScoreWrapper";
 
 	private ObjectAttributes personsMaxDCScoreUnscaled; 

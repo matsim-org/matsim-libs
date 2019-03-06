@@ -53,7 +53,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-final class BestResponseLocationMutator implements PlanAlgorithm {
+final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	
 	private final ActivityFacilities facilities;
 	private final ObjectAttributes personsMaxDCScoreUnscaled;
@@ -79,7 +79,7 @@ final class BestResponseLocationMutator implements PlanAlgorithm {
 	private final DestinationChoiceConfigGroup dccg;
 	private final Scenario scenario;
 
-	public BestResponseLocationMutator(
+	public BestReplyLocationChoicePlanAlgorithm(
 		  TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quad_trees,
 		  ObjectAttributes personsMaxDCScoreUnscaled, DestinationChoiceContext lcContext,
 		  DestinationSampler sampler, TripRouter tripRouter, MultiNodeDijkstra forwardMultiNodeDijkstra,

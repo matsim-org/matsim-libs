@@ -50,18 +50,18 @@ public class DCActivityWOFacilitiesScoringFunction implements SumScoringFunction
 	@Override
 	public void handleFirstActivity(Activity act) {
 		activityIndex = 0 ;
-		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyDestinationChoice.useScaleEpsilonFromConfig, activityIndex, person.getId());
+		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyLocationChoiceStrategyModule.useScaleEpsilonFromConfig, activityIndex, person.getId() );
 	}
 
 	@Override
 	public void handleActivity(Activity act) {
 		activityIndex++ ;
-		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyDestinationChoice.useScaleEpsilonFromConfig, activityIndex, person.getId());
+		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyLocationChoiceStrategyModule.useScaleEpsilonFromConfig, activityIndex, person.getId() );
 	}
 
 	@Override
 	public void handleLastActivity(Activity act) {
 		activityIndex++ ;
-		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyDestinationChoice.useScaleEpsilonFromConfig, activityIndex, person.getId());
+		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyLocationChoiceStrategyModule.useScaleEpsilonFromConfig, activityIndex, person.getId() );
 	}
 }

@@ -101,6 +101,21 @@ public class DestinationChoiceContext implements MatsimToplevelContainer {
 		this.scenario = scenario;	
 		log.info("dc context created but not yet initialized");
 		this.init(); // actually wanted to leave this away to be able to create but not yet fill the context.
+
+		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
+		scenario.addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME , dcScore);
+		// is ONLY there to make the personsMaxDCScoreUnscaled available, yyyy which would now be much better be done with person.getAttributes().putAttribute(...). kai,
+		// mar'19
+
+		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(this);
+
+		computer.readOrCreateMaxDCScore( this.kValsAreRead() );
+		// the k vals are read or computed in DestinationChoiceContext.  lcContest.kValsAreRead() is set accordingly.  If they were read, the method here attempts to also
+		// read the max dc score values, otherwise it computes them.
+
+		dcScore.setPersonsMaxDCScoreUnscaled( computer.getPersonsMaxEpsUnscaled() );
+
+
 	}
 	
 	public void init() {

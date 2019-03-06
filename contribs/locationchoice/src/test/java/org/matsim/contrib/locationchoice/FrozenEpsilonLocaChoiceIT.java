@@ -12,11 +12,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.bestresponse.BestReplyLocationChoicePlanStrategy;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
-import org.matsim.contrib.locationchoice.bestresponse.MaxDCScoreWrapper;
-import org.matsim.contrib.locationchoice.bestresponse.ReadOrComputeMaxDCScore;
 import org.matsim.contrib.locationchoice.bestresponse.DCActivityWOFacilitiesScoringFunction;
 import org.matsim.contrib.locationchoice.bestresponse.DCScoringFunctionFactory;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -33,13 +31,10 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreateConfig;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopWOnePerson;
 
@@ -81,18 +76,6 @@ public class FrozenEpsilonLocaChoiceIT{
 		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME , lcContext);
 		// makes all kinds of stuff available.  also reads or creates the k values both for the persons and the facilities.
 
-		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
-		scenario.addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME , dcScore);
-		// is ONLY there to make the personsMaxDCScoreUnscaled available, yyyy which would now be much better be done with person.getAttributes().putAttribute(...). kai,
-		// mar'19
-
-		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
-
-		computer.readOrCreateMaxDCScore( lcContext.kValsAreRead() );
-		// the k vals are read or computed in DestinationChoiceContext.  lcContest.kValsAreRead() is set accordingly.  If they were read, the method here attempts to also
-		// read the max dc score values, otherwise it computes them.
-
-		dcScore.setPersonsMaxDCScoreUnscaled( computer.getPersonsMaxEpsUnscaled() );
 
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
@@ -162,15 +145,6 @@ public class FrozenEpsilonLocaChoiceIT{
 
 		final DestinationChoiceContext lcContext = new DestinationChoiceContext(scenario) ;
 		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME, lcContext);
-
-		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
-		computer.readOrCreateMaxDCScore( lcContext.kValsAreRead() );
-		final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
-
-		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
-		scenario.addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME , dcScore);
-		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
-
 
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);

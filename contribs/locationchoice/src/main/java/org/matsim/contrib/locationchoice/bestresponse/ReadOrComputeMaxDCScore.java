@@ -32,7 +32,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-public class ReadOrComputeMaxDCScore {
+class ReadOrComputeMaxDCScore {
 
 	private final static Logger log = Logger.getLogger(ReadOrComputeMaxDCScore.class);
 

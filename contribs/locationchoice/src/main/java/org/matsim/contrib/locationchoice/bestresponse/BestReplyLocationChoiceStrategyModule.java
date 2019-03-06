@@ -55,9 +55,9 @@ import javax.inject.Provider;
  * Idea of this should be as follows: all persons and all facilities have k values.  frozen epsilon will be generated on the fly from those two values.  together with frozen
  * epsilon, the location choice is indeed best reply.
  */
-final class BestReplyDestinationChoice extends AbstractMultithreadedModule {
+final class BestReplyLocationChoiceStrategyModule extends AbstractMultithreadedModule {
 
-	private static final Logger log = Logger.getLogger(BestReplyDestinationChoice.class);
+	private static final Logger log = Logger.getLogger( BestReplyLocationChoiceStrategyModule.class );
 	private final Provider<TripRouter> tripRouterProvider;
 
 	private ObjectAttributes personsMaxEpsUnscaled;
@@ -76,8 +76,8 @@ final class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	private Map<String, TravelTime> travelTimes;
 	private Map<String, TravelDisutilityFactory> travelDisutilities;
 
-	public BestReplyDestinationChoice(Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled,
-						    ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities) {
+	public BestReplyLocationChoiceStrategyModule( Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled,
+								    ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities ) {
 		super(lcContext.getScenario().getConfig().global());
 		this.tripRouterProvider = tripRouterProvider;
 		this.scoringFunctionFactory = scoringFunctionFactory;
@@ -147,7 +147,7 @@ final class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		TripRouter tripRouter = tripRouterProvider.get();
 		int iteration = replanningContext.getIteration();
 
-		return new BestResponseLocationMutator(this.quadTreesOfType, this.personsMaxEpsUnscaled,
+		return new BestReplyLocationChoicePlanAlgorithm(this.quadTreesOfType, this.personsMaxEpsUnscaled,
 			  this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration, this.nearestLinks);
 	}
 }

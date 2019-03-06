@@ -75,7 +75,7 @@ public class DCActivityScoringFunction extends org.matsim.deprecated.scoring.fun
 			if (pe instanceof Activity) {
 				activityIndex++ ;
 				this.score += destinationChoiceScoring.getDestinationScore(  (Activity)pe, 
-						BestReplyDestinationChoice.useScaleEpsilonFromConfig, activityIndex, this.plan.getPerson().getId() );
+						BestReplyLocationChoiceStrategyModule.useScaleEpsilonFromConfig, activityIndex, this.plan.getPerson().getId() );
 			}
 		}
 		// reduce score by penalty from capacity restraints
