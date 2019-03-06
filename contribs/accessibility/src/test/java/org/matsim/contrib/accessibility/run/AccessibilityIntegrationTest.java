@@ -30,6 +30,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.locationtech.jts.geom.Envelope;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -66,8 +67,6 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.testcases.MatsimTestUtils;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * I can't say how similar or different to {@link AccessibilityIntegrationTest} this one here is.  kai, feb'17

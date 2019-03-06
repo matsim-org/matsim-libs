@@ -12,7 +12,7 @@
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-geotiff</artifactId>
-			<version>14.0</version>
+			<version>20.2</version>
 		</dependency>
 	</dependencies>
 </project>
