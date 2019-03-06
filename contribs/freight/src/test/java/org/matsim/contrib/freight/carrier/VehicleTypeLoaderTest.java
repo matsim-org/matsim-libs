@@ -39,6 +39,9 @@ public class VehicleTypeLoaderTest extends MatsimTestCase{
 	@Override
 	public void setUp() throws Exception{
 		super.setUp();
+
+		System.setProperty("matsim.preferLocalDtds","true");
+
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 //		new MatsimVehicleReader(vehicles).readFile(getClassInputDirectory() + "vehicles.xml");
 		MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
