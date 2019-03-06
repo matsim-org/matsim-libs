@@ -190,6 +190,9 @@ public class LocationChoiceIT extends MatsimTestCase {
 		ActivityParams work = new ActivityParams("work");
 		work.setTypicalDuration(12*60*60);
 		config.planCalcScore().addActivityParams(work);
+		ActivityParams shop = new ActivityParams("shop");
+		shop.setTypicalDuration(1.*60*60);
+		config.planCalcScore().addActivityParams(shop);
 
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("MyLocationChoice");

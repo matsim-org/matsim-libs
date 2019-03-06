@@ -1,5 +1,7 @@
 package org.matsim.contrib.locationchoice;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -7,10 +9,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
 import org.matsim.contrib.locationchoice.bestresponse.BestReplyLocationChoicePlanStrategy;
 import org.matsim.contrib.locationchoice.bestresponse.DCActivityWOFacilitiesScoringFunction;
 import org.matsim.contrib.locationchoice.bestresponse.DCScoringFunctionFactory;
@@ -20,6 +22,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -28,17 +31,24 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import static org.junit.Assert.*;
+import static org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype.*;
+import static org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel.completeRouting;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreateConfig;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopWOnePerson;
 
 public class FrozenEpsilonLocaChoiceIT{
+	private static final Logger log = Logger.getLogger( FrozenEpsilonLocaChoiceIT.class ) ;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -54,7 +64,7 @@ public class FrozenEpsilonLocaChoiceIT{
 
 		DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule( config, DestinationChoiceConfigGroup.class );;
 
-		dccg.setAlgorithm( DestinationChoiceConfigGroup.Algotype.bestResponse );
+		dccg.setAlgorithm( bestResponse );
 		// yy I don't think that this is honoured anywhere in the way this is plugged together here.  kai, mar'19
 
 		dccg.setEpsilonScaleFactors("100.0");
@@ -125,11 +135,11 @@ public class FrozenEpsilonLocaChoiceIT{
 
 		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
 
-		dccg.setAlgorithm( DestinationChoiceConfigGroup.Algotype.bestResponse );
+		dccg.setAlgorithm( bestResponse );
 		// yy Don't think has an influence with setup here. kai, mar'19
+		// well, it does not work without this ...
 
 		dccg.setEpsilonScaleFactors("100.0" );
-
 
 		// scenario:
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config );
@@ -175,6 +185,144 @@ public class FrozenEpsilonLocaChoiceIT{
 		//		assertEquals( Id.create(55), newWork.getFacilityId() );
 		System.err.println("shouldn't this change anyways??") ;
 	}
+
+	@Test public void testFacilitiesAlongALine() {
+//		Config config = ConfigUtils.createConfig() ;
+		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "config.xml");
+
+		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
+		dccg.setEpsilonScaleFactors("100.0" );
+		dccg.setAlgorithm( bestResponse );
+		dccg.setFlexibleTypes( "shop" );
+		dccg.setTravelTimeApproximationLevel( completeRouting );
+		dccg.setRandomSeed( 1 );
+		// yy do we need more settings here?
+
+		// ---
+
+		//		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		// (this will not load anything since there are no files defined)
+
+		Scenario scenario = ScenarioUtils.createScenario( config ) ;
+		// don't load anything
+
+		NetworkFactory nf = scenario.getNetwork().getFactory();
+		PopulationFactory pf = scenario.getPopulation().getFactory();
+		ActivityFacilitiesFactory ff = scenario.getActivityFacilities().getFactory();
+
+		Node prevNode;
+		{
+			Node node = nf.createNode( Id.createNodeId( 0 ) , new Coord( 0., 0. ) ) ;
+			scenario.getNetwork().addNode( node );
+			prevNode = node ;
+		}
+		for ( int ii=1 ; ii<100 ; ii++ ) {
+			Node node = nf.createNode( Id.createNodeId( ii ) , new Coord( ii*100, 0.) ) ;
+			scenario.getNetwork().addNode( node );
+			// ---
+			addLinkAndFacility( scenario, nf, ff, prevNode, node );
+			addLinkAndFacility( scenario, nf, ff, node, prevNode );
+			// ---
+			prevNode = node ;
+		}
+		Person person = pf.createPerson( Id.createPersonId( "abc" ) ) ;
+		{
+			scenario.getPopulation().addPerson( person );
+			Plan plan = pf.createPlan() ;
+			person.addPlan( plan ) ;
+			// ---
+			Activity home = pf.createActivityFromCoord( "home", new Coord( 50., 0. ) );
+			home.setEndTime( 7. * 3600. );
+			plan.addActivity( home );
+			{
+				Leg leg = pf.createLeg( "car" );
+				leg.setDepartureTime( 7.*3600. );
+				leg.setTravelTime( 1800. );
+				plan.addLeg( leg );
+			}
+			{
+				Activity shop = pf.createActivityFromCoord( "shop", new Coord( 250., 0. ) );
+				// shop.setMaximumDuration( 3600. ); // does not work for locachoice: time computation is not able to deal with it.  yyyy replace by
+				// more central code. kai, mar'19
+				shop.setEndTime( 8.*3600 );
+				plan.addActivity( shop );
+			}
+			{
+				Leg leg = pf.createLeg( "car" );
+				leg.setDepartureTime( 8.*3600. );
+				leg.setTravelTime( 1800. );
+				plan.addLeg( leg );
+			}
+			{
+				Activity home2 = pf.createActivityFromCoord( "home", new Coord( 50., 0. ) );
+				PopulationUtils.copyFromTo( home, home2 );
+				plan.addActivity( home2 );
+			}
+		}
+
+		final DestinationChoiceContext lcContext = new DestinationChoiceContext(scenario) ;
+		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME, lcContext);
+
+		// CONTROL(L)ER:
+		Controler controler = new Controler(scenario);
+		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+
+		// set scoring function
+		DCScoringFunctionFactory scoringFunctionFactory = new DCScoringFunctionFactory(controler.getScenario(), lcContext);
+		scoringFunctionFactory.setUsingConfigParamsForScoring(true) ;
+		controler.setScoringFunctionFactory(scoringFunctionFactory);
+
+		// bind locachoice strategy (selected in localCreateConfig):
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addPlanStrategyBinding("MyLocationChoice").to( BestReplyLocationChoicePlanStrategy.class );
+			}
+		});
+
+		controler.run();
+
+		assertEquals("number of plans in person.", 2, person.getPlans().size());
+		Plan newPlan = person.getSelectedPlan();
+		Level lvl = Level.INFO ;
+		log.log( lvl, "" );
+		log.log( lvl, " newPlan: " + newPlan ) ;
+		for( PlanElement planElement : newPlan.getPlanElements() ){
+			log.log( lvl, planElement.toString() ) ;
+		}
+		log.log(lvl,"") ;
+		Activity newWork = (Activity) newPlan.getPlanElements().get(2 );
+		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			newWork = (Activity) newPlan.getPlanElements().get(6);
+		}
+		System.err.println( " newWork: " + newWork ) ;
+		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
+		assertNotNull( newWork ) ;
+		assertTrue( !newWork.getFacilityId().equals(Id.create(1, ActivityFacility.class) ) ) ; // should be different from facility number 1 !!
+		assertEquals( Id.create(63, ActivityFacility.class), newWork.getFacilityId() ); // as I have changed the scoring (act is included) I also changed the test here: 27->92
+
+		// This test is technically failing, but it seems to be doing what it should: It selects a facility with a large positive epsilon.  Changing the dccg random seed leads
+		// to different frozen epsilons, and thus to a different selected facility.  I have not yet tested if this is stable under repeated calls.  kai, mar'19
+
+	}
+
+	public static void addLinkAndFacility( Scenario scenario, NetworkFactory nf, ActivityFacilitiesFactory ff, Node prevNode, Node node ){
+		final String str = prevNode.getId() + "-" + node.getId();
+		Link link = nf.createLink( Id.createLinkId( str ), prevNode, node ) ;
+		Set<String> set = new HashSet<>() ;
+		set.add("car" ) ;
+		link.setAllowedModes( set ) ;
+		link.setLength( 100. );
+		link.setCapacity( 3600. );
+		link.setFreespeed( 50./3.6 );
+		scenario.getNetwork().addLink( link );
+		// ---
+		ActivityFacility af = ff.createActivityFacility( Id.create( str, ActivityFacility.class ), link.getCoord(), link.getId() ) ;
+		ActivityOption option = ff.createActivityOption( "shop" ) ;
+		af.addActivityOption( option );
+		scenario.getActivityFacilities().addActivityFacility( af );
+	}
+
 
 	private static void createExampleNetwork( final Scenario scenario, final double scale, final double speed ) {
 		Network network = scenario.getNetwork() ;

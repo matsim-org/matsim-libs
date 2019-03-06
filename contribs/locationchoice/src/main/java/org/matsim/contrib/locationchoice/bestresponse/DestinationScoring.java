@@ -22,6 +22,8 @@ package org.matsim.contrib.locationchoice.bestresponse;
 import java.util.Collection;
 import java.util.Random;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -33,6 +35,8 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 
  class DestinationScoring {
+ 	private static final Logger log = Logger.getLogger( DestinationScoring.class ) ;
+
 	//As the random number generator is re-seeded here anyway, we do not need a rng given from outside!
 	private Random rnd = new Random();
 	private Config config;
@@ -52,6 +56,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 	}
 	
 	public double getDestinationScore(Activity act, double fVar, int activityIndex, Id<Person> personId) {
+		Level lvl = Level.INFO ;
 		double score = 0.0;
 		if (this.scaleEpsilon.isFlexibleType(act.getType())) {
 			/*
@@ -61,7 +66,9 @@ import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 			// but then the test fail because this is equivalent to a different random seed.  So more diligent checking would be needed.
 			
 			if (fVar < 0.0) fVar = this.scaleEpsilon.getEpsilonFactor(act.getType());
-			score += (fVar * this.getEpsilonAlternative(act.getFacilityId(), personId, actIndex));
+			final double epsilon = fVar * this.getEpsilonAlternative( act.getFacilityId(), personId, actIndex );
+			log.log( lvl, "facId=" + act.getFacilityId() + "; epsilon=" + epsilon ) ;
+			score += epsilon;
 			score += this.getAttributesScore(act.getFacilityId(), personId );
 		}
 		return score;

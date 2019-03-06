@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -31,6 +33,7 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -45,12 +48,8 @@ import java.util.List;
 import java.util.Map;
 
 class PlanTimesAdapter {
+	private static final Logger log = Logger.getLogger( PlanTimesAdapter.class ) ;
 
-	;
-
-	// 0: complete routing
-	// 1: local routing
-	// 2: no routing (distance-based approximation)
 	private final DestinationChoiceConfigGroup.ApproximationLevel approximationLevel;
 	private final Network network;
 	private final Config config;
@@ -123,7 +122,10 @@ class PlanTimesAdapter {
 					// scoringFunction.handleActivity( (Activity) pe );
 				}
 				else if ( pe instanceof Leg ){
-					scoringFunction.handleLeg( (Leg) pe );
+					final Leg leg = (Leg) pe;
+					Gbl.assertIf( !Time.isUndefinedTime( leg.getDepartureTime() ) ) ;
+					Gbl.assertIf( !Time.isUndefinedTime( leg.getTravelTime() ) );
+					scoringFunction.handleLeg( leg );
 				}
 				else {
 					throw new RuntimeException( "unknown plan element type? "+pe.getClass().getName() );
@@ -294,6 +296,9 @@ class PlanTimesAdapter {
 				final Activity fromAct,
 				final Activity toAct,
 				final String mode) {
+
+		Level lvl = Level.INFO ;
+
 		final List<? extends PlanElement> trip =
 				this.router.calcRoute(
 						mode,
@@ -301,7 +306,17 @@ class PlanTimesAdapter {
 						new ActivityWrapperFacility( toAct ),
 						fromAct.getEndTime(),
 						person );
+		log.log(lvl,"") ;
+		for( PlanElement planElement : trip ){
+			log.log(lvl, planElement ) ;
+		}
+		log.log(lvl,"") ;
 		fillInLegTravelTimes( fromAct.getEndTime() , trip );
+		log.log(lvl,"") ;
+		for( PlanElement planElement : trip ){
+			log.log(lvl, planElement ) ;
+		}
+		log.log(lvl,"") ;
 		return trip;
 	}
 }

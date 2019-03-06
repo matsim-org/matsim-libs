@@ -42,6 +42,7 @@ import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.MultiNodeDijkstra;
@@ -228,7 +229,10 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, this.getScenario(), this.nearestLinks, this.teleportedModeSpeeds, this.beelineDistanceFactors);
 
 		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
-		Collection<ActivityFacilityWithIndex> list = this.quadTreesOfType.get(convertedType).getDisk(center.getX(), center.getY(), maxRadius);
+		Gbl.assertNotNull(convertedType);
+		final QuadTree<ActivityFacilityWithIndex> quadTree = this.quadTreesOfType.get( convertedType );
+		Gbl.assertNotNull( quadTree );
+		Collection<ActivityFacilityWithIndex> list = quadTree.getDisk(center.getX(), center.getY(), maxRadius );
 		
 		for (ActivityFacilityWithIndex facility : list) {
 //			int facilityIndex = this.lcContext.getFacilityIndex(facility.getId());

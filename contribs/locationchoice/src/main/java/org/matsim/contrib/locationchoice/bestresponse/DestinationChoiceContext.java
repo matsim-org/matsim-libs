@@ -229,7 +229,7 @@ public class DestinationChoiceContext implements MatsimToplevelContainer {
 				this.facilitiesOfType.put(activityType, tuple.getSecond());
 				
 				return tuple;
-			} else return new Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]>(quadTree, facilities);
+			} else return new Tuple<>( quadTree, facilities );
 		} else return getTuple(activityType);
 	}
 	

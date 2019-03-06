@@ -47,6 +47,8 @@ import java.util.Set;
 public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
 	// yyyy URL in above javadoc is broken.  kai, feb'17
 
+	private static final Logger log = Logger.getLogger( CharyparNagelLegScoring.class ) ;
+
 	protected double score;
 
 	/** The parameters used for scoring */
@@ -171,7 +173,14 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 
 	@Override
 	public void handleLeg(Leg leg) {
+		Gbl.assertIf( !Time.isUndefinedTime( leg.getDepartureTime() ) ) ;
+		Gbl.assertIf( !Time.isUndefinedTime( leg.getTravelTime() ) );
+
 		double legScore = calcLegScore(leg.getDepartureTime(), leg.getDepartureTime() + leg.getTravelTime(), leg);
+		if ( Double.isNaN( legScore )) {
+			log.error( "dpTime=" + leg.getDepartureTime() + "; ttime=" + leg.getTravelTime() + "; leg=" + leg ) ;
+			throw new RuntimeException("score is NaN") ;
+		}
 		this.score += legScore;
 	}
 }
