@@ -35,28 +35,28 @@ class VehicleReaderV2 extends MatsimXmlParser{
 
 	@Override
 	public void endTag( final String name, final String content, final Stack<String> context ){
-		if( VehicleSchemaV1Names.DESCRIPTION.equalsIgnoreCase( name ) && (content.trim().length() > 0) ){
+		if( VehicleSchemaV2Names.DESCRIPTION.equalsIgnoreCase( name ) && (content.trim().length() > 0) ){
 			this.currentVehType.setDescription( content.trim() );
-		} else if( VehicleSchemaV1Names.ENGINEINFORMATION.equalsIgnoreCase( name ) ){
+		} else if( VehicleSchemaV2Names.ENGINEINFORMATION.equalsIgnoreCase( name ) ){
 			EngineInformation currentEngineInfo = this.builder.createEngineInformation( this.currentFuelType, this.currentGasConsumption );
 			this.currentVehType.setEngineInformation( currentEngineInfo );
 			this.currentFuelType = null;
 			this.currentGasConsumption = Double.NaN;
-		} else if( VehicleSchemaV1Names.COSTSINFORMATION.equalsIgnoreCase( name ) ){
+		} else if( VehicleSchemaV2Names.COSTSINFORMATION.equalsIgnoreCase( name ) ){
 			CostInformation currentCostInformation = this.builder.createCostInformation(this.fixedCosts, this.costsPerMeter, this.costsPerSecond);
 			this.currentVehType.setCostInformation(currentCostInformation);
 			this.fixedCosts = Double.NaN;
 			this.costsPerMeter = Double.NaN;
 			this.costsPerSecond = Double.NaN;
-		} else if( VehicleSchemaV1Names.FUELTYPE.equalsIgnoreCase( name ) ){
+		} else if( VehicleSchemaV2Names.FUELTYPE.equalsIgnoreCase( name ) ){
 			this.currentFuelType = this.parseFuelType( content.trim() );
-		} else if( VehicleSchemaV1Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){
+		} else if( VehicleSchemaV2Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){
 			this.currentCapacity.setFreightCapacity( this.currentFreightCapacity);
 			this.currentFreightCapacity = null;
-		} else if( VehicleSchemaV1Names.CAPACITY.equalsIgnoreCase( name ) ){
+		} else if( VehicleSchemaV2Names.CAPACITY.equalsIgnoreCase( name ) ){
 			this.currentVehType.setCapacity( this.currentCapacity );
 			this.currentCapacity = null;
-		} else if( VehicleSchemaV1Names.VEHICLETYPE.equalsIgnoreCase( name ) ){
+		} else if( VehicleSchemaV2Names.VEHICLETYPE.equalsIgnoreCase( name ) ){
 			this.vehicles.addVehicleType( this.currentVehType );
 			this.currentVehType = null;
 		} else if (name.equalsIgnoreCase( HouseholdsSchemaV10Names.ATTRIBUTES )) {
@@ -94,69 +94,69 @@ class VehicleReaderV2 extends MatsimXmlParser{
 
 	@Override
 	public void startTag( final String name, final Attributes atts, final Stack<String> context ){
-		if( VehicleSchemaV1Names.VEHICLETYPE.equalsIgnoreCase( name ) ){
-			this.currentVehType = this.builder.createVehicleType( Id.create( atts.getValue( VehicleSchemaV1Names.ID ), VehicleType.class ) );
-		} else if( VehicleSchemaV1Names.LENGTH.equalsIgnoreCase( name ) ){
-			this.currentVehType.setLength( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.METER ) ) );
-		} else if( VehicleSchemaV1Names.WIDTH.equalsIgnoreCase( name ) ){
-			this.currentVehType.setWidth( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.METER ) ) );
-		} else if( VehicleSchemaV1Names.MAXIMUMVELOCITY.equalsIgnoreCase( name ) ){
-			double val = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.METERPERSECOND ) );
+		if( VehicleSchemaV2Names.VEHICLETYPE.equalsIgnoreCase( name ) ){
+			this.currentVehType = this.builder.createVehicleType( Id.create( atts.getValue( VehicleSchemaV2Names.ID ), VehicleType.class ) );
+		} else if( VehicleSchemaV2Names.LENGTH.equalsIgnoreCase( name ) ){
+			this.currentVehType.setLength( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.METER ) ) );
+		} else if( VehicleSchemaV2Names.WIDTH.equalsIgnoreCase( name ) ){
+			this.currentVehType.setWidth( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.METER ) ) );
+		} else if( VehicleSchemaV2Names.MAXIMUMVELOCITY.equalsIgnoreCase( name ) ){
+			double val = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.METERPERSECOND ) );
 			if( val == 1.0 ){
 				log.warn(
 					  "The vehicle type's maximum velocity is set to 1.0 meter per second, is this really intended? vehicletype = " + this.currentVehType.getId().toString() );
 			}
 			this.currentVehType.setMaximumVelocity( val );
-		} else if( VehicleSchemaV1Names.CAPACITY.equalsIgnoreCase( name ) ){
+		} else if( VehicleSchemaV2Names.CAPACITY.equalsIgnoreCase( name ) ){
 			this.currentCapacity = this.builder.createVehicleCapacity();
-		} else if( VehicleSchemaV1Names.SEATS.equalsIgnoreCase( name ) ){
-			this.currentCapacity.setSeats( Integer.valueOf( atts.getValue( VehicleSchemaV1Names.PERSONS ) ) );
-		} else if( VehicleSchemaV1Names.STANDINGROOM.equalsIgnoreCase( name ) ){
-			this.currentCapacity.setStandingRoom( Integer.valueOf( atts.getValue( VehicleSchemaV1Names.PERSONS ) ) );
-		} else if( VehicleSchemaV1Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){
+		} else if( VehicleSchemaV2Names.SEATS.equalsIgnoreCase( name ) ){
+			this.currentCapacity.setSeats( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.PERSONS ) ) );
+		} else if( VehicleSchemaV2Names.STANDINGROOM.equalsIgnoreCase( name ) ){
+			this.currentCapacity.setStandingRoom( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.PERSONS ) ) );
+		} else if( VehicleSchemaV2Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){
 			this.currentFreightCapacity = this.builder.createFreigthCapacity();
-		} else if( VehicleSchemaV1Names.VOLUME.equalsIgnoreCase( name ) ){
-			this.currentFreightCapacity.setVolume( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.CUBICMETERS ) ) );
-		} else if( VehicleSchemaV1Names.WEIGHT.equalsIgnoreCase( name ) ){
-			this.currentFreightCapacity.setWeight( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.TONS) ) );
-		} else if( VehicleSchemaV1Names.UNIT.equalsIgnoreCase( name ) ){
-			this.currentFreightCapacity.setUnits( Integer.parseInt( atts.getValue( VehicleSchemaV1Names.UNITS ) ) );
+		} else if( VehicleSchemaV2Names.VOLUME.equalsIgnoreCase( name ) ){
+			this.currentFreightCapacity.setVolume( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.CUBICMETERS ) ) );
+		} else if( VehicleSchemaV2Names.WEIGHT.equalsIgnoreCase( name ) ){
+			this.currentFreightCapacity.setWeight( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.TONS) ) );
+		} else if( VehicleSchemaV2Names.UNIT.equalsIgnoreCase( name ) ){
+			this.currentFreightCapacity.setUnits( Integer.parseInt( atts.getValue( VehicleSchemaV2Names.UNITS ) ) );
 
-		} else if( VehicleSchemaV1Names.COSTINFORMATION.equalsIgnoreCase( name ) ){
-			this.fixedCosts = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.FIXEDCOSTS ) );
-			this.costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.COSTSPERMETER ) );
-			this.costsPerSecond = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.COSTSPERSECOND ) );
+		} else if( VehicleSchemaV2Names.COSTINFORMATION.equalsIgnoreCase( name ) ){
+			this.fixedCosts = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTS ) );
+			this.costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) );
+			this.costsPerSecond = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERSECOND ) );
 
-//		} else if( VehicleSchemaV1Names.FIXEDCOSTS.equalsIgnoreCase( name ) ){
-//			this.fixedCosts = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.FIXEDCOSTS ) );
-//		} else if( VehicleSchemaV1Names.COSTSPERMETER.equalsIgnoreCase( name ) ){
-//			this.costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.COSTSPERMETER ) );
-//		} else if( VehicleSchemaV1Names.COSTSPERSECOND.equalsIgnoreCase( name ) ){
-//			this.costsPerSecond = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.COSTSPERSECOND ) );
+//		} else if( VehicleSchemaV2Names.FIXEDCOSTS.equalsIgnoreCase( name ) ){
+//			this.fixedCosts = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTS ) );
+//		} else if( VehicleSchemaV2Names.COSTSPERMETER.equalsIgnoreCase( name ) ){
+//			this.costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) );
+//		} else if( VehicleSchemaV2Names.COSTSPERSECOND.equalsIgnoreCase( name ) ){
+//			this.costsPerSecond = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERSECOND ) );
 
-		} else if( VehicleSchemaV1Names.GASCONSUMPTION.equalsIgnoreCase( name ) ){
-			this.currentGasConsumption = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.LITERPERMETER ) );
-		} else if( VehicleSchemaV1Names.VEHICLE.equalsIgnoreCase( name ) ){
-			Id<VehicleType> typeId = Id.create( atts.getValue( VehicleSchemaV1Names.TYPE ), VehicleType.class );
+		} else if( VehicleSchemaV2Names.GASCONSUMPTION.equalsIgnoreCase( name ) ){
+			this.currentGasConsumption = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.LITERPERMETER ) );
+		} else if( VehicleSchemaV2Names.VEHICLE.equalsIgnoreCase( name ) ){
+			Id<VehicleType> typeId = Id.create( atts.getValue( VehicleSchemaV2Names.TYPE ), VehicleType.class );
 			VehicleType type = this.vehicles.getVehicleTypes().get( typeId );
 			if( type == null ){
 				log.error( "VehicleType " + typeId + " does not exist." );
 			}
-			String idString = atts.getValue( VehicleSchemaV1Names.ID );
+			String idString = atts.getValue( VehicleSchemaV2Names.ID );
 			Id<Vehicle> id = Id.create( idString, Vehicle.class );
 			Vehicle v = this.builder.createVehicle( id, type );
 			this.vehicles.addVehicle( v );
-		} else if( VehicleSchemaV1Names.ACCESSTIME.equalsIgnoreCase( name ) ){
-			this.currentVehType.setAccessTime( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.SECONDSPERPERSON ) ) );
-		} else if( VehicleSchemaV1Names.EGRESSTIME.equalsIgnoreCase( name ) ){
-			this.currentVehType.setEgressTime( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.SECONDSPERPERSON ) ) );
-		} else if( VehicleSchemaV1Names.DOOROPERATION.equalsIgnoreCase( name ) ){
-			this.currentVehType.setDoorOperationMode( this.parseDoorOperationMode( atts.getValue( VehicleSchemaV1Names.MODE ) ) );
-		} else if( VehicleSchemaV1Names.PASSENGERCAREQUIVALENTS.equalsIgnoreCase( name ) ){
-			this.currentVehType.setPcuEquivalents( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.PCE ) ) );
+		} else if( VehicleSchemaV2Names.ACCESSTIME.equalsIgnoreCase( name ) ){
+			this.currentVehType.setAccessTime( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.SECONDSPERPERSON ) ) );
+		} else if( VehicleSchemaV2Names.EGRESSTIME.equalsIgnoreCase( name ) ){
+			this.currentVehType.setEgressTime( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.SECONDSPERPERSON ) ) );
+		} else if( VehicleSchemaV2Names.DOOROPERATION.equalsIgnoreCase( name ) ){
+			this.currentVehType.setDoorOperationMode( this.parseDoorOperationMode( atts.getValue( VehicleSchemaV2Names.MODE ) ) );
+		} else if( VehicleSchemaV2Names.PASSENGERCAREQUIVALENTS.equalsIgnoreCase( name ) ){
+			this.currentVehType.setPcuEquivalents( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.PCE ) ) );
 		} else if (name.equalsIgnoreCase(HouseholdsSchemaV10Names.ATTRIBUTES)) {
 //			if (context.peek().equalsIgnoreCase(HouseholdsSchemaV10Names.HOUSEHOLD)) {
-			if (context.peek().equalsIgnoreCase(VehicleSchemaV1Names.VEHICLETYPE)) {
+			if (context.peek().equalsIgnoreCase(VehicleSchemaV2Names.VEHICLETYPE)) {
 				currAttributes = this.currentVehType.getAttributes();
 				attributesReader.startTag( name , atts , context, currAttributes );
 			}
