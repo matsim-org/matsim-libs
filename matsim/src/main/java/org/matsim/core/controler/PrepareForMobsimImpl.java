@@ -35,10 +35,10 @@ import java.util.Map;
 public final class PrepareForMobsimImpl implements PrepareForMobsim {
 	// I think it is ok to have this public final.  Since one may want to use it as a delegate.  kai, may'18
 	// yyyyyy but how should that work with a non-public constructor? kai, jun'18
-	
-	// yyyy There is currently a lot of overlap between PrepareForSimImpl and PrepareForMobsimImpl.
-	// This should be removed.  kai, jun'18
-	
+	// Well, I guess it can be injected as well?!
+	// bind( PrepareForSimImpl.class ) ;
+	// bind( PrepareForSim.class ).to( MyPrepareForSimImpl.class ) ;
+
 	private static Logger log = Logger.getLogger(PrepareForMobsimImpl.class);
 	
 	private final GlobalConfigGroup globalConfigGroup;
