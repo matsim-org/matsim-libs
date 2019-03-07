@@ -22,7 +22,7 @@ package org.matsim.vehicles;
 /**
  * @author dgrether
  */
-public interface VehicleSchemaV1Names {
+public interface VehicleSchemaV2Names {
 
 	public static final String VEHICLEDEFINITIONS = "vehicleDefinitions";
 	public static final String VEHICLETYPE = "vehicleType";
@@ -34,9 +34,18 @@ public interface VehicleSchemaV1Names {
 	public static final String FREIGHTCAPACITY = "freightCapacity";
 	public static final String VOLUME = "volume";
 	public static final String CUBICMETERS = "cubicMeters";
+	public static final String WEIGHT = "weight";
+	public static final String TONS = "tons";
+	public static final String UNIT = "unit";
+	public static final String UNITS = "units";
 	public static final String LENGTH = "length";
 	public static final String METER = "meter";
 	public static final String WIDTH = "width";
+	public static final String COSTINFORMATION = "costInformation";
+	public static final String COSTSINFORMATION = "costsInformation";
+	public static final String FIXEDCOSTS = "fixedCosts";
+	public static final String COSTSPERMETER = "costsPerMeter";
+	public static final String COSTSPERSECOND = "costsPerSecond";
 	public static final String MAXIMUMVELOCITY = "maximumVelocity";
 	public static final String METERPERSECOND = "meterPerSecond";
 	public static final String ENGINEINFORMATION = "engineInformation";
@@ -46,5 +55,12 @@ public interface VehicleSchemaV1Names {
 	public static final String VEHICLE = "vehicle";
 	public static final String ID = "id";
 	public static final String TYPE = "type";
+	public static final String ACCESSTIME = "accessTime";
+	public static final String SECONDSPERPERSON = "secondsPerPerson";
+	public static final String EGRESSTIME = "egressTime";
+	public static final String DOOROPERATION = "doorOperation";
+	public static final String MODE = "mode";
+	public static final String PASSENGERCAREQUIVALENTS = "passengerCarEquivalents";
+	public static final String PCE = "pce";
 	
 }
