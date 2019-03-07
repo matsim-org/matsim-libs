@@ -39,28 +39,16 @@ import com.google.inject.Provider;
  */
 public final class QSimScopeObjectListenerModule<T, L extends QSimScopeObjectListener<T> & ControlerListener>
 		extends AbstractDvrpModeModule {
-	public static <T, L extends QSimScopeObjectListener<T> & ControlerListener> QSimScopeObjectListenerModule createModule(
-			String mode, Class<T> objectClass, Class<L> listenerClass,
-			Function<ModalProviders.InstanceGetter, L> listenerProvider) {
-		return new QSimScopeObjectListenerModule<>(mode, objectClass, listenerClass,
-				ModalProviders.createProvider(mode, listenerProvider));
-	}
-
-	public static <T, L extends QSimScopeObjectListener<T> & ControlerListener> QSimScopeObjectListenerModule createModule(
-			String mode, Class<T> objectClass, Class<L> listenerClass, Provider<L> listenerProvider) {
-		return new QSimScopeObjectListenerModule<>(mode, objectClass, listenerClass, listenerProvider);
-	}
 
 	private final Class<T> objectClass;
 	private final Class<L> listenerClass;
 	private final Provider<L> listenerProvider;
 
-	private QSimScopeObjectListenerModule(String mode, Class<T> objectClass, Class<L> listenerClass,
-			Provider<L> listenerProvider) {
-		super(mode);
-		this.objectClass = objectClass;
-		this.listenerClass = listenerClass;
-		this.listenerProvider = listenerProvider;
+	private QSimScopeObjectListenerModule(Builder<T, L> builder) {
+		super(builder.mode);
+		objectClass = builder.objectClass;
+		listenerClass = builder.listenerClass;
+		listenerProvider = builder.listenerProvider;
 	}
 
 	@Override
@@ -91,6 +79,46 @@ public final class QSimScopeObjectListenerModule<T, L extends QSimScopeObjectLis
 		@Override
 		public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 			objectListener.objectCreated(object);
+		}
+	}
+
+	public static <T, L extends QSimScopeObjectListener<T> & ControlerListener> Builder<T, L> builder(
+			Class<L> listenerClass) {
+		return new Builder<>(listenerClass);
+	}
+
+	public static final class Builder<T, L extends QSimScopeObjectListener<T> & ControlerListener> {
+		private final Class<L> listenerClass;
+		private String mode;
+		private Class<T> objectClass;
+		private Provider<L> listenerProvider;
+
+		private Builder(Class<L> listenerClass) {
+			this.listenerClass = listenerClass;
+		}
+
+		public Builder<T, L> mode(String val) {
+			mode = val;
+			return this;
+		}
+
+		public Builder<T, L> objectClass(Class<T> val) {
+			objectClass = val;
+			return this;
+		}
+
+		public Builder<T, L> listenerCreator(Function<ModalProviders.InstanceGetter, L> val) {
+			listenerProvider = ModalProviders.createProvider(mode, val);
+			return this;
+		}
+
+		public Builder<T, L> listenerProvider(Provider<L> val) {
+			listenerProvider = val;
+			return this;
+		}
+
+		public QSimScopeObjectListenerModule<T, L> build() {
+			return new QSimScopeObjectListenerModule<>(this);
 		}
 	}
 }

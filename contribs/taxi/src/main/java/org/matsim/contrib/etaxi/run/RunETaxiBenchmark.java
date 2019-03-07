@@ -72,9 +72,11 @@ public class RunETaxiBenchmark {
 
 		controler.addOverridingModule(RunETaxiScenario.createEvDvrpIntegrationModule(taxiCfg.getMode()));
 
-		controler.addOverridingModule(
-				QSimScopeObjectListenerModule.createModule(taxiCfg.getMode(), Fleet.class, ETaxiBenchmarkStats.class,
-						getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class))));
+		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(ETaxiBenchmarkStats.class)
+				.mode(taxiCfg.getMode())
+				.objectClass(Fleet.class)
+				.listenerCreator(getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class)))
+				.build());
 
 		return controler;
 	}

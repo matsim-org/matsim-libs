@@ -50,8 +50,11 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 
 		install(new FleetModule(getMode(), taxiCfg.getTaxisFile(), taxiCfg.isChangeStartLinkToLastLinkInSchedule()));
 
-		install(QSimScopeObjectListenerModule.createModule(getMode(), Fleet.class, TaxiStatsDumper.class,
-				getter -> new TaxiStatsDumper(taxiCfg, getter.get(OutputDirectoryHierarchy.class),
-						getter.get(IterationCounter.class))));
+		install(QSimScopeObjectListenerModule.builder(TaxiStatsDumper.class)
+				.mode(getMode())
+				.objectClass(Fleet.class)
+				.listenerCreator(getter -> new TaxiStatsDumper(taxiCfg, getter.get(OutputDirectoryHierarchy.class),
+						getter.get(IterationCounter.class)))
+				.build());
 	}
 }

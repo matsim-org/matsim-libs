@@ -73,9 +73,12 @@ public class FleetModule extends AbstractDvrpModeModule {
 		});
 
 		if (updateVehicleStartLinkToLastLink) {
-			install(QSimScopeObjectListenerModule.createModule(getMode(), Fleet.class,
-					VehicleStartLinkToLastLinkUpdater.class,
-					getter -> new VehicleStartLinkToLastLinkUpdater(getter.getModal(FleetSpecification.class))));
+			install(QSimScopeObjectListenerModule.builder(VehicleStartLinkToLastLinkUpdater.class)
+					.mode(getMode())
+					.objectClass(Fleet.class)
+					.listenerCreator(
+							getter -> new VehicleStartLinkToLastLinkUpdater(getter.getModal(FleetSpecification.class)))
+					.build());
 		}
 	}
 }

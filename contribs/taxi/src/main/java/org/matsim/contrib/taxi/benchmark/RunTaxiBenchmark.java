@@ -74,9 +74,11 @@ public class RunTaxiBenchmark {
 
 		controler.addOverridingModule(new TaxiModule());
 
-		controler.addOverridingModule(
-				QSimScopeObjectListenerModule.createModule(mode, Fleet.class, TaxiBenchmarkStats.class,
-						getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class))));
+		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(TaxiBenchmarkStats.class)
+				.mode(mode)
+				.objectClass(Fleet.class)
+				.listenerCreator(getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class)))
+				.build());
 
 		return controler;
 	}
