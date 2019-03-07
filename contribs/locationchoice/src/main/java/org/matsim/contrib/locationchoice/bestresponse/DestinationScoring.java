@@ -67,7 +67,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 			
 			if (fVar < 0.0) fVar = this.scaleEpsilon.getEpsilonFactor(act.getType());
 			final double epsilon = fVar * this.getEpsilonAlternative( act.getFacilityId(), personId, actIndex );
-			log.log( lvl, "facId=" + act.getFacilityId() + "; epsilon=" + epsilon ) ;
+			log.log( lvl, "perId=" + personId + "; facId=" + act.getFacilityId() + "; epsilon=" + epsilon ) ;
 			score += epsilon;
 			score += this.getAttributesScore(act.getFacilityId(), personId );
 		}

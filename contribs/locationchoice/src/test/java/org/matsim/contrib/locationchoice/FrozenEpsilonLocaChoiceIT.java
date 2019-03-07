@@ -22,6 +22,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -189,6 +191,7 @@ public class FrozenEpsilonLocaChoiceIT{
 	@Test public void testFacilitiesAlongALine() {
 //		Config config = ConfigUtils.createConfig() ;
 		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "config.xml");
+		config.controler().setLastIteration( 2 );
 
 		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
 		dccg.setEpsilonScaleFactors("100.0" );
@@ -225,38 +228,43 @@ public class FrozenEpsilonLocaChoiceIT{
 			// ---
 			prevNode = node ;
 		}
-		Person person = pf.createPerson( Id.createPersonId( "abc" ) ) ;
-		{
-			scenario.getPopulation().addPerson( person );
-			Plan plan = pf.createPlan() ;
-			person.addPlan( plan ) ;
-			// ---
-			Activity home = pf.createActivityFromCoord( "home", new Coord( 50., 0. ) );
-			home.setEndTime( 7. * 3600. );
-			plan.addActivity( home );
+		// ===
+		final Id<ActivityFacility> initialActivityFacilityId = Id.create( "1-2", ActivityFacility.class );
+		for ( int jj=0 ; jj<10 ; jj++ ){
+			Person person = pf.createPerson( Id.createPersonId( jj ) );
 			{
-				Leg leg = pf.createLeg( "car" );
-				leg.setDepartureTime( 7.*3600. );
-				leg.setTravelTime( 1800. );
-				plan.addLeg( leg );
-			}
-			{
-				Activity shop = pf.createActivityFromCoord( "shop", new Coord( 250., 0. ) );
-				// shop.setMaximumDuration( 3600. ); // does not work for locachoice: time computation is not able to deal with it.  yyyy replace by
-				// more central code. kai, mar'19
-				shop.setEndTime( 8.*3600 );
-				plan.addActivity( shop );
-			}
-			{
-				Leg leg = pf.createLeg( "car" );
-				leg.setDepartureTime( 8.*3600. );
-				leg.setTravelTime( 1800. );
-				plan.addLeg( leg );
-			}
-			{
-				Activity home2 = pf.createActivityFromCoord( "home", new Coord( 50., 0. ) );
-				PopulationUtils.copyFromTo( home, home2 );
-				plan.addActivity( home2 );
+				scenario.getPopulation().addPerson( person );
+				Plan plan = pf.createPlan();
+				person.addPlan( plan );
+				// ---
+				Activity home = pf.createActivityFromCoord( "home", new Coord( 50., 0. ) );
+				home.setEndTime( 7. * 3600. );
+				plan.addActivity( home );
+				{
+					Leg leg = pf.createLeg( "car" );
+					leg.setDepartureTime( 7. * 3600. );
+					leg.setTravelTime( 1800. );
+					plan.addLeg( leg );
+				}
+				{
+					//				Activity shop = pf.createActivityFromCoord( "shop", new Coord( 250., 0. ) );
+					Activity shop = pf.createActivityFromActivityFacilityId( "shop", initialActivityFacilityId );
+					// shop.setMaximumDuration( 3600. ); // does not work for locachoice: time computation is not able to deal with it.  yyyy replace by
+					// more central code. kai, mar'19
+					shop.setEndTime( 8. * 3600 );
+					plan.addActivity( shop );
+				}
+				{
+					Leg leg = pf.createLeg( "car" );
+					leg.setDepartureTime( 8. * 3600. );
+					leg.setTravelTime( 1800. );
+					plan.addLeg( leg );
+				}
+				{
+					Activity home2 = pf.createActivityFromCoord( "home", new Coord( 50., 0. ) );
+					PopulationUtils.copyFromTo( home, home2 );
+					plan.addActivity( home2 );
+				}
 			}
 		}
 
@@ -280,29 +288,52 @@ public class FrozenEpsilonLocaChoiceIT{
 			}
 		});
 
+		controler.addOverridingModule( new AbstractModule(){
+			@Override
+			public void install(){
+				this.addControlerListenerBinding().toInstance( new IterationEndsListener(){
+					@Override
+					public void notifyIterationEnds( IterationEndsEvent event ){
+						if ( event.getIteration() <=0 ) {
+							return ;
+						}
+
+						for( Person person : scenario.getPopulation().getPersons().values() ){
+
+							assertEquals( "number of plans in person.", event.getIteration()+1, person.getPlans().size() );
+							Plan newPlan = person.getSelectedPlan();
+							Level lvl = Level.INFO;
+							log.log( lvl, "" );
+							log.log( lvl, " newPlan: " + newPlan );
+							for( PlanElement planElement : newPlan.getPlanElements() ){
+								log.log( lvl, planElement.toString() );
+							}
+							log.log( lvl, "" );
+							Activity newAct = (Activity) newPlan.getPlanElements().get( 2 );
+							if( config.plansCalcRoute().isInsertingAccessEgressWalk() ){
+								newAct = (Activity) newPlan.getPlanElements().get( 6 );
+							}
+							System.err.println( " newAct: " + newAct );
+							System.err.println( " facilityId: " + newAct.getFacilityId() );
+							assertNotNull( newAct );
+
+							assertTrue( !newAct.getFacilityId().equals( initialActivityFacilityId ) );
+							// yy I think that it could technically select the same as before so this is a brittle check. kai, mar'19
+
+							switch ( person.getId().toString() ) {
+								case "0":
+									assertEquals( Id.create( "90-89", ActivityFacility.class ), newAct.getFacilityId() );
+									break ;
+							}
+						}
+					}
+				} );
+			}
+		} ) ;
 		controler.run();
 
-		assertEquals("number of plans in person.", 2, person.getPlans().size());
-		Plan newPlan = person.getSelectedPlan();
-		Level lvl = Level.INFO ;
-		log.log( lvl, "" );
-		log.log( lvl, " newPlan: " + newPlan ) ;
-		for( PlanElement planElement : newPlan.getPlanElements() ){
-			log.log( lvl, planElement.toString() ) ;
-		}
-		log.log(lvl,"") ;
-		Activity newWork = (Activity) newPlan.getPlanElements().get(2 );
-		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
-			newWork = (Activity) newPlan.getPlanElements().get(6);
-		}
-		System.err.println( " newWork: " + newWork ) ;
-		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
-		assertNotNull( newWork ) ;
-		assertTrue( !newWork.getFacilityId().equals(Id.create(1, ActivityFacility.class) ) ) ; // should be different from facility number 1 !!
-		assertEquals( Id.create(63, ActivityFacility.class), newWork.getFacilityId() ); // as I have changed the scoring (act is included) I also changed the test here: 27->92
-
-		// This test is technically failing, but it seems to be doing what it should: It selects a facility with a large positive epsilon.  Changing the dccg random seed leads
-		// to different frozen epsilons, and thus to a different selected facility.  I have not yet tested if this is stable under repeated calls.  kai, mar'19
+		// yyyy todo make test such that far-away activities have strongly lower proba
+		// yyyy todo then make other test with other epsilon to show that average distance depends on this
 
 	}
 
