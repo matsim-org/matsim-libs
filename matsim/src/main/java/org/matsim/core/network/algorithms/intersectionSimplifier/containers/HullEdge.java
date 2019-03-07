@@ -22,7 +22,7 @@ package org.matsim.core.network.algorithms.intersectionSimplifier.containers;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vividsolutions.jts.geom.LineSegment;
+import org.locationtech.jts.geom.LineSegment;
 
 public class HullEdge {
 	/** ID of the edge */

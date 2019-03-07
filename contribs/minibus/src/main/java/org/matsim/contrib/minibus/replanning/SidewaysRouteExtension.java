@@ -19,9 +19,13 @@
 
 package org.matsim.contrib.minibus.replanning;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.genericUtils.TerminusStopFinder;
 import org.matsim.contrib.minibus.operator.Operator;
@@ -30,8 +34,6 @@ import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.util.*;
 
 /**
  * Takes the route transformed into a lineString to calculate a buffer around it. 
