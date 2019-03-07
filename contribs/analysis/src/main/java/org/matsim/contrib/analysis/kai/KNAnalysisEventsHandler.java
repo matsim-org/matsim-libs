@@ -24,7 +24,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
+
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
@@ -32,8 +35,11 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.MainModeIdentifier;
@@ -55,11 +61,8 @@ import org.matsim.vehicles.Vehicle;
  * @author knagel, originally based on
  * @author mrieser
  */
-public class KNAnalysisEventsHandler implements 
-PersonDepartureEventHandler, PersonArrivalEventHandler, 
-PersonMoneyEventHandler, 
-LinkLeaveEventHandler, LinkEnterEventHandler, 
-VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonMoneyEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler,
+VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ShutdownListener{
 
 	private final static Logger log = Logger.getLogger(KNAnalysisEventsHandler.class);
 
@@ -82,6 +85,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	
 //	private final MainModeIdentifier mainModeIdentifier = new TransportPlanningMainModeIdentifier() ;
 	private final MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl() ;
+
 	// using this one here since presumably a fair number of the transit_walk trips in the survey in fact were pt trips.  kai, sep'16
 
 	// statistics types:
@@ -139,6 +143,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		}
 	}
 
+	@Inject
 	/* deliberately package */ KNAnalysisEventsHandler(final Scenario scenario) {
 		// this does not need to be injectable, since it is typically called from KaiAnalysisListener.  kai, may'18
 		this.scenario = scenario ;
@@ -309,20 +314,12 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		}
 	}
 
-	private double calcBeelineDistance(final Activity fromAct, final Activity toAct) {
-		double item;
-		if ( fromAct.getCoord()!=null && toAct.getCoord()!=null ) {
-			item = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord()) ;
-		} else {
-			if ( noCoordCnt < 1 ) {
-				noCoordCnt ++ ;
-				log.warn("either fromAct or to Act has no Coord; using link coordinates as substitutes.\n" + Gbl.ONLYONCE ) ;
-			}
-			Link fromLink = scenario.getNetwork().getLinks().get( fromAct.getLinkId() ) ;
-			Link   toLink = scenario.getNetwork().getLinks().get(   toAct.getLinkId() ) ;
-			item = CoordUtils.calcEuclideanDistance( fromLink.getCoord(), toLink.getCoord() ) ; 
-		}
-		return item;
+	private double calcBeelineDistance(final Activity fromAct, final Activity toAct ) {
+		final Coord fromCoord = PopulationUtils.decideOnCoordForActivity( fromAct, scenario );
+		Gbl.assertNotNull( fromCoord ); ;
+		final Coord toCoord = PopulationUtils.decideOnCoordForActivity( toAct, scenario );
+		Gbl.assertNotNull( toCoord ); ;
+		return CoordUtils.calcEuclideanDistance( fromCoord, toCoord ) ;
 	}
 
 	private String getSubpopName(Person person) {
@@ -408,6 +405,8 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	}
 
 	public void writeStats(final String filenameTmp) {
+		log.info( "writing stats to " + filenameTmp + "...") ;
+
 		final Population pop = this.scenario.getPopulation();
 
 		// score statistics:
@@ -654,5 +653,11 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 			}
 		}
 	}
+
+	@Override
+	public void notifyShutdown( ShutdownEvent event ){
+		this.writeStats( event.getServices().getControlerIO().getOutputPath() + "/_stats_");
+	}
+
 
 }
