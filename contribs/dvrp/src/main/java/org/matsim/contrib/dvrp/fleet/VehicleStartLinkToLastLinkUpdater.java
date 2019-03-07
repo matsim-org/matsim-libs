@@ -33,7 +33,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
  *
  * @author Michal Maciejewski (michalm)
  */
-public class VehicleStartLinkToLastLinkUpdater implements FleetStatsCalculator, IterationEndsListener {
+public class VehicleStartLinkToLastLinkUpdater implements QSimScopeObjectListener<Fleet>, IterationEndsListener {
 	private final FleetSpecification fleetSpecification;
 	private List<DvrpVehicleSpecification> updatedVehSpecifications;
 
@@ -42,7 +42,7 @@ public class VehicleStartLinkToLastLinkUpdater implements FleetStatsCalculator, 
 	}
 
 	@Override
-	public void updateStats(Fleet fleet) {
+	public void objectCreated(Fleet fleet) {
 		updatedVehSpecifications = fleet.getVehicles()
 				.values()
 				.stream()

@@ -2,7 +2,7 @@ package org.matsim.contrib.taxi.benchmark;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.FleetStatsCalculator;
+import org.matsim.contrib.dvrp.fleet.QSimScopeObjectListener;
 import org.matsim.contrib.taxi.util.stats.TaxiStats;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculator;
 import org.matsim.contrib.util.CSVLineBuilder;
@@ -12,7 +12,7 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.io.IOUtils;
 
-public class TaxiBenchmarkStats implements ShutdownListener, FleetStatsCalculator {
+public class TaxiBenchmarkStats implements ShutdownListener, QSimScopeObjectListener<Fleet> {
 	public static final String[] HEADER = { "n", "m", //
 			"PassWaitTime_avg", //
 			"PassWaitTime_95%ile", //
@@ -34,7 +34,7 @@ public class TaxiBenchmarkStats implements ShutdownListener, FleetStatsCalculato
 	}
 
 	@Override
-	public void updateStats(Fleet fleet) {
+	public void objectCreated(Fleet fleet) {
 		TaxiStats singleRunStats = new TaxiStatsCalculator(fleet.getVehicles().values()).getDailyStats();
 
 		passengerWaitTime.addValue(singleRunStats.passengerWaitTime.getMean());

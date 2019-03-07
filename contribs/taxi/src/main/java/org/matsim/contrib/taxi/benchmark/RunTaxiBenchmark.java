@@ -23,7 +23,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
-import org.matsim.contrib.dvrp.fleet.FleetStatsCalculatorModule;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.QSimScopeObjectListenerModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -73,8 +74,9 @@ public class RunTaxiBenchmark {
 
 		controler.addOverridingModule(new TaxiModule());
 
-		controler.addOverridingModule(FleetStatsCalculatorModule.createModule(mode, TaxiBenchmarkStats.class,
-				getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class))));
+		controler.addOverridingModule(
+				QSimScopeObjectListenerModule.createModule(mode, Fleet.class, TaxiBenchmarkStats.class,
+						getter -> new TaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class))));
 
 		return controler;
 	}

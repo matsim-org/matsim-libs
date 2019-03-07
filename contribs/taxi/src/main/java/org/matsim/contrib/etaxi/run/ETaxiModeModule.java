@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.etaxi.run;
 
-import org.matsim.contrib.dvrp.fleet.FleetStatsCalculatorModule;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.QSimScopeObjectListenerModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
@@ -50,7 +51,7 @@ public final class ETaxiModeModule extends AbstractDvrpModeModule {
 
 		install(new EvDvrpFleetModule(getMode(), taxiCfg.getTaxisFile()));
 
-		install(FleetStatsCalculatorModule.createModule(getMode(), TaxiStatsDumper.class,
+		install(QSimScopeObjectListenerModule.createModule(getMode(), Fleet.class, TaxiStatsDumper.class,
 				getter -> new TaxiStatsDumper(taxiCfg, getter.get(OutputDirectoryHierarchy.class),
 						getter.get(IterationCounter.class))));
 	}

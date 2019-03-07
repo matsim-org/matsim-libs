@@ -21,8 +21,8 @@ public class ETaxiBenchmarkStats extends TaxiBenchmarkStats {
 	}
 
 	@Override
-	public void updateStats(Fleet fleet) {
-		super.updateStats(fleet);
+	public void objectCreated(Fleet fleet) {
+		super.objectCreated(fleet);
 		ETaxiStats singleRunEStats = new ETaxiStatsCalculator(fleet.getVehicles().values()).getDailyEStats();
 		queuedTimeRatio.addValue(singleRunEStats.getFleetQueuedTimeRatio());
 	}

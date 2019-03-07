@@ -23,6 +23,6 @@ package org.matsim.contrib.dvrp.fleet;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public interface FleetStatsCalculator {
-	void updateStats(Fleet fleet);
+public interface QSimScopeObjectListener<T> {
+	void objectCreated(T object);
 }

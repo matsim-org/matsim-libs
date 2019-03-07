@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.util.stats;
 import java.util.List;
 
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.FleetStatsCalculator;
+import org.matsim.contrib.dvrp.fleet.QSimScopeObjectListener;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.util.CSVLineBuilder;
 import org.matsim.contrib.util.CompactCSVWriter;
@@ -32,7 +32,7 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.io.IOUtils;
 
-public class TaxiStatsDumper implements ShutdownListener, FleetStatsCalculator {
+public class TaxiStatsDumper implements ShutdownListener, QSimScopeObjectListener<Fleet> {
 	private static final String[] HEADER = { "iter", null, //
 			"PassWaitTime_avg", "PassWaitTime_sd", "PassWaitTime_95%ile", "PassWaitTime_max", null, //
 			"EmptyDriveRatio_fleetAvg", "EmptyDriveRatio_avg", "EmptyDriveRatio_sd", null, //
@@ -56,7 +56,7 @@ public class TaxiStatsDumper implements ShutdownListener, FleetStatsCalculator {
 	}
 
 	@Override
-	public void updateStats(Fleet fleet) {
+	public void objectCreated(Fleet fleet) {
 		TaxiStatsCalculator calculator = new TaxiStatsCalculator(fleet.getVehicles().values());
 
 		appendToMultiDayStats(calculator.getDailyStats(), iterationCounter.getIterationNumber());

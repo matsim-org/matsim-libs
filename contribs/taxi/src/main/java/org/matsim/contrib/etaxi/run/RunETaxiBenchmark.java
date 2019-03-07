@@ -22,7 +22,8 @@ package org.matsim.contrib.etaxi.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
-import org.matsim.contrib.dvrp.fleet.FleetStatsCalculatorModule;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.QSimScopeObjectListenerModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.ev.EvConfigGroup;
@@ -72,7 +73,7 @@ public class RunETaxiBenchmark {
 		controler.addOverridingModule(RunETaxiScenario.createEvDvrpIntegrationModule(taxiCfg.getMode()));
 
 		controler.addOverridingModule(
-				FleetStatsCalculatorModule.createModule(taxiCfg.getMode(), ETaxiBenchmarkStats.class,
+				QSimScopeObjectListenerModule.createModule(taxiCfg.getMode(), Fleet.class, ETaxiBenchmarkStats.class,
 						getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class))));
 
 		return controler;

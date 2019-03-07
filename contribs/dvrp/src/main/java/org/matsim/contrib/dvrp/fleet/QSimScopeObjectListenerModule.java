@@ -32,59 +32,65 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import com.google.inject.Provider;
 
 /**
- * Useful for binding multi-iteration fleet stats calculators to overcome the limitation of the QSim scope of Fleet.
- * Notifies FleetStatsCalculator (also being a controler listener) to update stats at the end of each QSim.
+ * Typical usecase: binding multi-iteration object stats calculators to overcome the limitation of the QSim scope of Fleet.
+ * Notifies objectListener (also being a ControlerListener) to that the object has been created.
  *
  * @author Michal Maciejewski (michalm)
  */
-public final class FleetStatsCalculatorModule<T extends FleetStatsCalculator & ControlerListener>
+public final class QSimScopeObjectListenerModule<T, L extends QSimScopeObjectListener<T> & ControlerListener>
 		extends AbstractDvrpModeModule {
-	public static <T extends FleetStatsCalculator & ControlerListener> FleetStatsCalculatorModule createModule(
-			String mode, Class<T> clazz, Function<ModalProviders.InstanceGetter, T> delegate) {
-		return new FleetStatsCalculatorModule(mode, clazz, ModalProviders.createProvider(mode, delegate));
+	public static <T, L extends QSimScopeObjectListener<T> & ControlerListener> QSimScopeObjectListenerModule createModule(
+			String mode, Class<T> objectClass, Class<L> listenerClass,
+			Function<ModalProviders.InstanceGetter, L> listenerProvider) {
+		return new QSimScopeObjectListenerModule<>(mode, objectClass, listenerClass,
+				ModalProviders.createProvider(mode, listenerProvider));
 	}
 
-	public static <T extends FleetStatsCalculator & ControlerListener> FleetStatsCalculatorModule createModule(
-			String mode, Class<T> clazz, Provider<T> provider) {
-		return new FleetStatsCalculatorModule(mode, clazz, provider);
+	public static <T, L extends QSimScopeObjectListener<T> & ControlerListener> QSimScopeObjectListenerModule createModule(
+			String mode, Class<T> objectClass, Class<L> listenerClass, Provider<L> listenerProvider) {
+		return new QSimScopeObjectListenerModule<>(mode, objectClass, listenerClass, listenerProvider);
 	}
 
-	private final Class<T> clazz;
-	private final Provider<T> provider;
+	private final Class<T> objectClass;
+	private final Class<L> listenerClass;
+	private final Provider<L> listenerProvider;
 
-	private FleetStatsCalculatorModule(String mode, Class<T> clazz, Provider<T> provider) {
+	private QSimScopeObjectListenerModule(String mode, Class<T> objectClass, Class<L> listenerClass,
+			Provider<L> listenerProvider) {
 		super(mode);
-		this.clazz = clazz;
-		this.provider = provider;
+		this.objectClass = objectClass;
+		this.listenerClass = listenerClass;
+		this.listenerProvider = listenerProvider;
 	}
 
 	@Override
 	public void install() {
-		bindModal(clazz).toProvider(provider).asEagerSingleton();
-		addControlerListenerBinding().to(modalKey(clazz));
+		bindModal(listenerClass).toProvider(listenerProvider).asEagerSingleton();
+		addControlerListenerBinding().to(modalKey(listenerClass));
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
 				addModalQSimComponentBinding().toProvider(modalProvider(
-						getter -> new MobsimBeforeCleanupNotifier(getter.getModal(clazz),
-								getter.getModal(Fleet.class))));
+						getter -> new MobsimBeforeCleanupNotifier<>(getter.getModal(listenerClass),
+								getter.getModal(objectClass))));
 			}
 		});
 	}
 
-	private static class MobsimBeforeCleanupNotifier implements MobsimBeforeCleanupListener {
-		private final FleetStatsCalculator fleetStatsCalculator;
-		private final Fleet fleet;
+	//TODO this should be MobsimInitializedListener (MobsimBeforeCleanupListener is sometimes too late)
+	private static class MobsimBeforeCleanupNotifier<T> implements MobsimBeforeCleanupListener {
+		private final QSimScopeObjectListener<T> objectListener;
+		private final T object;
 
-		public MobsimBeforeCleanupNotifier(FleetStatsCalculator fleetStatsCalculator, Fleet fleet) {
-			this.fleetStatsCalculator = fleetStatsCalculator;
-			this.fleet = fleet;
+		public MobsimBeforeCleanupNotifier(QSimScopeObjectListener<T> objectListener, T object) {
+			this.objectListener = objectListener;
+			this.object = object;
 		}
 
 		@Override
 		public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-			fleetStatsCalculator.updateStats(fleet);
+			objectListener.objectCreated(object);
 		}
 	}
 }
