@@ -20,11 +20,12 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.contrib.locationchoice;
+package org.matsim.contrib.locationchoice.zzunused;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
+import org.matsim.contrib.locationchoice.zzunused.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.bestresponse.DCScoringFunctionFactory;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.core.config.Config;
@@ -33,10 +34,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 @Deprecated // (I think)
-public class RunLocationChoiceBestResponse {
+class RunLocationChoiceBestResponse {
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(args[0], new DestinationChoiceConfigGroup());
+		Config config = ConfigUtils.loadConfig(args[0], new DestinationChoiceConfigGroup() );
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		run(scenario);
 	}

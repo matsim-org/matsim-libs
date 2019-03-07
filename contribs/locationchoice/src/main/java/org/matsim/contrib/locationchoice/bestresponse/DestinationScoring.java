@@ -54,6 +54,8 @@ import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
 		this.lcContext = lcContext;
 	}
+
+	private static int cnt = 0 ;
 	
 	public double getDestinationScore(Activity act, double fVar, int activityIndex, Id<Person> personId) {
 		Level lvl = Level.INFO ;
@@ -67,7 +69,10 @@ import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 			
 			if (fVar < 0.0) fVar = this.scaleEpsilon.getEpsilonFactor(act.getType());
 			final double epsilon = fVar * this.getEpsilonAlternative( act.getFacilityId(), personId, actIndex );
-			log.log( lvl, "perId=" + personId + "; facId=" + act.getFacilityId() + "; epsilon=" + epsilon ) ;
+//			if ( cnt < 200 ){
+//				log.log( lvl, "perId=" + personId + "; facId=" + act.getFacilityId() + "; epsilon=" + epsilon ) ;
+//				cnt++ ;
+//			}
 			score += epsilon;
 			score += this.getAttributesScore(act.getFacilityId(), personId );
 		}

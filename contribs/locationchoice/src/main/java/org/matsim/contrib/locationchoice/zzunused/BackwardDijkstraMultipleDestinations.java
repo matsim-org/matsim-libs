@@ -35,7 +35,7 @@ import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
-
+@Deprecated // (I think)
 class BackwardDijkstraMultipleDestinations extends Dijkstra {
 
 	private final static Logger log = Logger.getLogger(BackwardDijkstraMultipleDestinations.class);

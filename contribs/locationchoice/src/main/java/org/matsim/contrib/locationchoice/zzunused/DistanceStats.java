@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.analysis;
+package org.matsim.contrib.locationchoice.zzunused;
 
 import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.population.Activity;
@@ -33,7 +33,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-public class DistanceStats implements IterationEndsListener {	
+@Deprecated // (I think)
+class DistanceStats implements IterationEndsListener {
 
 	private DestinationChoiceConfigGroup dccg;
 	private double analysisBoundary;

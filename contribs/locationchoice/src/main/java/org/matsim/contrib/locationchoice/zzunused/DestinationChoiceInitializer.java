@@ -17,23 +17,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.bestresponse;
+package org.matsim.contrib.locationchoice.zzunused;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.locationchoice.analysis.DistanceStats;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 
 /*
  * Listener for inclusion of bestreply lc, very similar to roadpricing
  * no further coding should be required 
  */
-@Deprecated // (I think)
-public class DestinationChoiceInitializer implements StartupListener {
+@Deprecated
+class DestinationChoiceInitializer implements StartupListener {
 	// I think that this was an attempt to bunde the frozen epsilon material.  But it was not used in most of the examples/test cases, so it was not visible.  I have now
 	// achieved something similar by moving all ini into DestinationChoiceContext.  What I don't have there is the distance stats listeners!
 
@@ -55,10 +54,11 @@ public class DestinationChoiceInitializer implements StartupListener {
   				  		
   		// compute or read maxDCScore but do not add it to the context:
   		// context can then be given to scoring classes both during regular scoring and in pre-processing 
-  		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(dcContext);
-        computer.readOrCreateMaxDCScore( dcContext.kValsAreRead() );
-		ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
-  		
+//		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(dcContext);
+//		computer.readOrCreateMaxDCScore( dcContext.kValsAreRead() );
+//		ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
+		// now all done in DestinationChoiceContext. kai, mar'19
+
   		for (String actType : this.dcContext.getFlexibleTypes()) {
   			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.car));
   			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.pt));
@@ -67,12 +67,16 @@ public class DestinationChoiceInitializer implements StartupListener {
   			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.other));
   			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.ride));
   			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.transit_walk));
-  		}		
-		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
-		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
-		controler.getScenario().addScenarioElement(DestinationChoiceContext.ELEMENT_NAME, dcContext);
-		controler.getScenario().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME, dcScore);
-			
+  		}
+  		// having a distance analysis class is a good idea.  But there is not much of a point to use something that is hidden here.  kai, mar'19
+
+
+//		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
+//		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
+//		controler.getScenario().addScenarioElement(DestinationChoiceContext.ELEMENT_NAME, dcContext);
+//		controler.getScenario().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME, dcScore);
+		// now all done in DestinationChoiceContext. kai, mar'19
+
 		log.info("dc initialized");
 	}	
 }

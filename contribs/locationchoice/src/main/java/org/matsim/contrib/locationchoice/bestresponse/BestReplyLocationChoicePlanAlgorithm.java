@@ -29,11 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.InternalPlanDataStructure;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext.ActivityFacilityWithIndex;
@@ -179,15 +175,17 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 					final Activity actToMove = (Activity) pe;
 					final Activity actPre = (Activity) actslegs.get(actlegIndex - 2);
 
-					final Activity actPost = (Activity) actslegs.get(actlegIndex + 2);					
-					double distanceDirect = CoordUtils.calcEuclideanDistance(actPre.getCoord(), actPost.getCoord());
+					final Activity actPost = (Activity) actslegs.get(actlegIndex + 2);
+					final Coord coordPre = PopulationUtils.decideOnCoordForActivity( actPre, scenario ) ;
+					final Coord coordPost = PopulationUtils.decideOnCoordForActivity( actPost, scenario ) ;
+					double distanceDirect = CoordUtils.calcEuclideanDistance( coordPre, coordPost );
 					double maximumDistance = this.convertEpsilonIntoDistance(plan.getPerson(), 
 							this.actTypeConverter.convertType(actToMove.getType()));
 
 					double maxRadius = (distanceDirect +  maximumDistance) / 2.0;
 
-					double x = (actPre.getCoord().getX() + actPost.getCoord().getX()) / 2.0;
-					double y = (actPre.getCoord().getY() + actPost.getCoord().getY()) / 2.0;
+					double x = (coordPre.getX() + coordPost.getX()) / 2.0;
+					double y = (coordPre.getY() + coordPost.getY()) / 2.0;
 					Coord center = new Coord(x, y);
 
 					ChoiceSet cs = createChoiceSetFromCircle(plan, personIndex, travelTimeApproximationLevel, actToMove, maxRadius, center);
@@ -218,15 +216,11 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		}		
 	}
 
-	private Scenario getScenario() {
-		return this.scenario ;
-	}
-
 	private ChoiceSet createChoiceSetFromCircle(Plan plan, int personIndex,
 			final ApproximationLevel travelTimeApproximationLevel,
 			final Activity actToMove, double maxRadius, Coord center) {
 
-		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, this.getScenario(), this.nearestLinks, this.teleportedModeSpeeds, this.beelineDistanceFactors);
+		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, this.scenario, this.nearestLinks, this.teleportedModeSpeeds, this.beelineDistanceFactors);
 
 		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
 		Gbl.assertNotNull(convertedType);
@@ -338,10 +332,10 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		 * here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
 		 */
 		double travelSpeedCrowFly = this.dccg.getTravelSpeed_car();
-		double betaTime = this.getScenario().getConfig().planCalcScore().getModes().get(TransportMode.car ).getMarginalUtilityOfTraveling();
+		double betaTime = this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car ).getMarginalUtilityOfTraveling();
 //		if ( Boolean.getBoolean(this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice)) ) {
-		if ( this.getScenario().getConfig().vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
-			betaTime -= this.getScenario().getConfig().planCalcScore().getPerforming_utils_hr() ;
+		if ( this.scenario.getConfig().vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
+			betaTime -= this.scenario.getConfig().planCalcScore().getPerforming_utils_hr() ;
 			// needs to be negative (I think) since AH uses this as a cost parameter. kai, jan'13
 		}
 		double maxTravelTime = Double.MAX_VALUE;

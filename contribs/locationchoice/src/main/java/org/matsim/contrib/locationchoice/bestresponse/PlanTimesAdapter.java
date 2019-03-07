@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
@@ -42,6 +41,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.FacilitiesUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -211,11 +211,28 @@ class PlanTimesAdapter {
 
 		switch ( this.approximationLevel ) {
 			case completeRouting:
-				return computeTravelTimeFromCompleteRouting(
-						plan.getPerson(),
-						previousActivity,
-						act,
-						mode);
+
+				Level lvl = Level.INFO ;
+
+				final List<? extends PlanElement> trip =
+						this.router.calcRoute(
+							  mode,
+								new ActivityWrapperFacility( previousActivity ),
+								new ActivityWrapperFacility( act ),
+								previousActivity.getEndTime(),
+							  plan.getPerson() );
+				//		log.log(lvl,"") ;
+				//		for( PlanElement planElement : trip ){
+				//			log.log(lvl, planElement ) ;
+				//		}
+				//		log.log(lvl,"") ;
+				//		fillInLegTravelTimes( fromAct.getEndTime() , trip );
+				//		log.log(lvl,"") ;
+				//		for( PlanElement planElement : trip ){
+				//			log.log(lvl, planElement ) ;
+				//		}
+				//		log.log(lvl,"") ;
+				return trip;
 			case noRouting:
 				// Yes, those two are doing the same. I passed some time to simplify the (rather convoluted) code,
 				// and it boiled down to this. No idea of since how long this is not doing what it is claiming to do...
@@ -291,32 +308,4 @@ class PlanTimesAdapter {
 		return Collections.singletonList( l );
 	}
 
-	private List<? extends PlanElement> computeTravelTimeFromCompleteRouting(
-				final Person person,
-				final Activity fromAct,
-				final Activity toAct,
-				final String mode) {
-
-		Level lvl = Level.INFO ;
-
-		final List<? extends PlanElement> trip =
-				this.router.calcRoute(
-						mode,
-						new ActivityWrapperFacility( fromAct ),
-						new ActivityWrapperFacility( toAct ),
-						fromAct.getEndTime(),
-						person );
-		log.log(lvl,"") ;
-		for( PlanElement planElement : trip ){
-			log.log(lvl, planElement ) ;
-		}
-		log.log(lvl,"") ;
-		fillInLegTravelTimes( fromAct.getEndTime() , trip );
-		log.log(lvl,"") ;
-		for( PlanElement planElement : trip ){
-			log.log(lvl, planElement ) ;
-		}
-		log.log(lvl,"") ;
-		return trip;
-	}
 }

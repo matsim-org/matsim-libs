@@ -32,6 +32,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
+@Deprecated // (I think)
 class ForwardDijkstraMultipleDestinations extends Dijkstra {
 		
 	public ForwardDijkstraMultipleDestinations(Network network, TravelDisutility costFunction, TravelTime timeFunction) {
