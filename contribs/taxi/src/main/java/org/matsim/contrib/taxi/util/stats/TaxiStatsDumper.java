@@ -30,9 +30,11 @@ import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.utils.io.IOUtils;
 
-public class TaxiStatsDumper implements ShutdownListener, QSimScopeObjectListener<Fleet> {
+public class TaxiStatsDumper implements ShutdownListener, MobsimBeforeCleanupListener, QSimScopeObjectListener<Fleet> {
 	private static final String[] HEADER = { "iter", null, //
 			"PassWaitTime_avg", "PassWaitTime_sd", "PassWaitTime_95%ile", "PassWaitTime_max", null, //
 			"EmptyDriveRatio_fleetAvg", "EmptyDriveRatio_avg", "EmptyDriveRatio_sd", null, //
@@ -43,6 +45,8 @@ public class TaxiStatsDumper implements ShutdownListener, QSimScopeObjectListene
 	private final OutputDirectoryHierarchy controlerIO;
 	private final IterationCounter iterationCounter;
 	private final CompactCSVWriter multiDayWriter;
+
+	private Fleet fleet;
 
 	public TaxiStatsDumper(TaxiConfigGroup taxiCfg, OutputDirectoryHierarchy controlerIO,
 			IterationCounter iterationCounter) {
@@ -57,6 +61,11 @@ public class TaxiStatsDumper implements ShutdownListener, QSimScopeObjectListene
 
 	@Override
 	public void objectCreated(Fleet fleet) {
+		this.fleet = fleet;
+	}
+
+	@Override
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 		TaxiStatsCalculator calculator = new TaxiStatsCalculator(fleet.getVehicles().values());
 
 		appendToMultiDayStats(calculator.getDailyStats(), iterationCounter.getIterationNumber());

@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 
 /**
  * 1. Collects information on fleet vehicles on MobsimBeforeCleanupEvent.
@@ -33,9 +35,11 @@ import org.matsim.core.controler.listener.IterationEndsListener;
  *
  * @author Michal Maciejewski (michalm)
  */
-public class VehicleStartLinkToLastLinkUpdater implements QSimScopeObjectListener<Fleet>, IterationEndsListener {
+public class VehicleStartLinkToLastLinkUpdater
+		implements QSimScopeObjectListener<Fleet>, MobsimBeforeCleanupListener, IterationEndsListener {
 	private final FleetSpecification fleetSpecification;
 	private List<DvrpVehicleSpecification> updatedVehSpecifications;
+	private Fleet fleet;
 
 	public VehicleStartLinkToLastLinkUpdater(FleetSpecification fleetSpecification) {
 		this.fleetSpecification = fleetSpecification;
@@ -43,6 +47,11 @@ public class VehicleStartLinkToLastLinkUpdater implements QSimScopeObjectListene
 
 	@Override
 	public void objectCreated(Fleet fleet) {
+		this.fleet = fleet;
+	}
+
+	@Override
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 		updatedVehSpecifications = fleet.getVehicles()
 				.values()
 				.stream()

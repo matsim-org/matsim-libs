@@ -26,8 +26,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
 import com.google.inject.Provider;
 
@@ -60,26 +59,15 @@ public final class QSimScopeObjectListenerModule<T, L extends QSimScopeObjectLis
 			@Override
 			protected void configureQSim() {
 				addModalQSimComponentBinding().toProvider(modalProvider(
-						getter -> new MobsimBeforeCleanupNotifier<>(getter.getModal(listenerClass),
+						getter -> mobsimInitializedListener(getter.getModal(listenerClass),
 								getter.getModal(objectClass))));
 			}
 		});
 	}
 
-	//TODO this should be MobsimInitializedListener (MobsimBeforeCleanupListener is sometimes too late)
-	private static class MobsimBeforeCleanupNotifier<T> implements MobsimBeforeCleanupListener {
-		private final QSimScopeObjectListener<T> objectListener;
-		private final T object;
-
-		public MobsimBeforeCleanupNotifier(QSimScopeObjectListener<T> objectListener, T object) {
-			this.objectListener = objectListener;
-			this.object = object;
-		}
-
-		@Override
-		public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-			objectListener.objectCreated(object);
-		}
+	private static <T> MobsimInitializedListener mobsimInitializedListener(QSimScopeObjectListener<T> objectListener,
+			T object) {
+		return e -> objectListener.objectCreated(object);
 	}
 
 	public static <T, L extends QSimScopeObjectListener<T> & ControlerListener> Builder<T, L> builder(

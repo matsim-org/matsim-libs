@@ -10,9 +10,12 @@ import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.utils.io.IOUtils;
 
-public class TaxiBenchmarkStats implements ShutdownListener, QSimScopeObjectListener<Fleet> {
+public class TaxiBenchmarkStats
+		implements ShutdownListener, MobsimBeforeCleanupListener, QSimScopeObjectListener<Fleet> {
 	public static final String[] HEADER = { "n", "m", //
 			"PassWaitTime_avg", //
 			"PassWaitTime_95%ile", //
@@ -29,12 +32,19 @@ public class TaxiBenchmarkStats implements ShutdownListener, QSimScopeObjectList
 	private final SummaryStatistics emptyDriveRatio = new SummaryStatistics();
 	private final SummaryStatistics stayRatio = new SummaryStatistics();
 
+	private Fleet fleet;
+
 	public TaxiBenchmarkStats(OutputDirectoryHierarchy controlerIO) {
 		this.controlerIO = controlerIO;
 	}
 
 	@Override
 	public void objectCreated(Fleet fleet) {
+		this.fleet = fleet;
+	}
+
+	@Override
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 		TaxiStats singleRunStats = new TaxiStatsCalculator(fleet.getVehicles().values()).getDailyStats();
 
 		passengerWaitTime.addValue(singleRunStats.passengerWaitTime.getMean());
