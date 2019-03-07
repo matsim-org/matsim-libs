@@ -22,9 +22,9 @@ package org.matsim.contrib.taxi.run;
 
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
-import org.matsim.contrib.dvrp.fleet.QSimScopeObjectListenerModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
 import org.matsim.core.controler.IterationCounter;

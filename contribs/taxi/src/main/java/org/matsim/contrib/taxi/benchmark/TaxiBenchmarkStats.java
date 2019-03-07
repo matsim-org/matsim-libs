@@ -2,7 +2,7 @@ package org.matsim.contrib.taxi.benchmark;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.QSimScopeObjectListener;
+import org.matsim.contrib.dvrp.run.QSimScopeObjectListener;
 import org.matsim.contrib.taxi.util.stats.TaxiStats;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculator;
 import org.matsim.contrib.util.CSVLineBuilder;

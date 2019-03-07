@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.util.stats;
 import java.util.List;
 
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.QSimScopeObjectListener;
+import org.matsim.contrib.dvrp.run.QSimScopeObjectListener;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.util.CSVLineBuilder;
 import org.matsim.contrib.util.CompactCSVWriter;

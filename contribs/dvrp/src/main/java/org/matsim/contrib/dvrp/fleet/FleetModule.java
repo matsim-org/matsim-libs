@@ -25,6 +25,7 @@ import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
 import org.matsim.core.config.ConfigGroup;
 
 import com.google.inject.Inject;

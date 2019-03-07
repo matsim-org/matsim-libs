@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.fleet;
+package org.matsim.contrib.dvrp.run;
 
 /**
  * @author Michal Maciejewski (michalm)

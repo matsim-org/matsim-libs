@@ -18,13 +18,10 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.fleet;
+package org.matsim.contrib.dvrp.run;
 
 import java.util.function.Function;
 
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
