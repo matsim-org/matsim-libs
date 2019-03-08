@@ -37,6 +37,7 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
@@ -245,7 +246,7 @@ public class FrozenEpsilonLocaChoiceIT{
 			prevNode = node ;
 		}
 		for ( int ii=1 ; ii<100 ; ii++ ) {
-			Node node = nf.createNode( Id.createNodeId( ii ) , new Coord( ii*100, 0.) ) ;
+			Node node = nf.createNode( Id.createNodeId( ii ) , new Coord( ii*1000, 0.) ) ;
 			scenario.getNetwork().addNode( node );
 			// ---
 			addLinkAndFacility( scenario, nf, ff, prevNode, node );
@@ -374,7 +375,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		Set<String> set = new HashSet<>() ;
 		set.add("car" ) ;
 		link.setAllowedModes( set ) ;
-		link.setLength( 100. );
+		link.setLength( CoordUtils.calcEuclideanDistance( prevNode.getCoord(), node.getCoord() ) );
 		link.setCapacity( 3600. );
 		link.setFreespeed( 50./3.6 );
 		scenario.getNetwork().addLink( link );
