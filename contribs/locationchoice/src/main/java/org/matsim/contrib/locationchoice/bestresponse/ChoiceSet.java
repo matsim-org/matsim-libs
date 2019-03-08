@@ -68,12 +68,12 @@ class ChoiceSet {
 		StringBuilder stb = new StringBuilder() ;
 		stb.append("destinations:") ;
 		for ( Id<ActivityFacility> id : destinations ) {
-			stb.append( " "+id ) ;
+			stb.append( " " ).append( id );
 		}
 		stb.append("\n") ;
 		stb.append("notYetVisited:" ) ;
 		for ( Id<ActivityFacility> id : notYetVisited ) {
-			stb.append( " "+id ) ;
+			stb.append( " " ).append( id );
 		}
 		return stb.toString() ;
 	}
@@ -88,84 +88,43 @@ class ChoiceSet {
 		this.teleportedModeSpeeds = teleportedModeSpeeds;
 		this.beelineDistanceFactors = beelineDistanceFactors;
 
-		//		this.exponent = Double.parseDouble(config.locationchoice().getProbChoiceExponent());
-		//		if ( wrnCnt < 1 ) {
-		//			wrnCnt++ ;
-		//			if ( this.exponent != 1. ) {
-		//				Logger.getLogger(this.getClass()).warn("Exponent is presumably some exponent that is used to re-weight scores. " +
-		//					" Problem is that it does not work with negative scores. " +
-		//					"Negative scores should not happen because then the activity should be dropped, " +
-		//					"but clearly the negativeness can be a consequence of the approximations, " +
-		//					"which means that it needs to be handeled.  " +
-		//					"The way this is done looks like a hack to me.  kai, jan'13" ) ;
-		//			}
-		//		}
 		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		this.numberOfAlternatives = dccg.getProbChoiceSetSize();
 		this.reUsePlans = dccg.getReUseTemporaryPlans();
 	}
 
-	public void addDestination(Id<ActivityFacility> facilityId) {
+	 void addDestination(Id<ActivityFacility> facilityId) {
 		this.destinations.add(facilityId);
 		this.notYetVisited.add(facilityId);
 	}
 
-	public boolean hasUnvisited() {
-		if (this.notYetVisited.size() > 0) return true;
-		else return false;
-	}
-
-	public Id<ActivityFacility> visitNext() {
-		Id<ActivityFacility> id = this.notYetVisited.get(0);
-		this.notYetVisited.remove(0);
-		return id;
-	}
-
-	public void reset() {
-		for (Id<ActivityFacility> id : this.destinations) {
-			this.notYetVisited.add(id);
-		}
-	}
-
-	public int getNumberOfDestinations() {
-		return this.destinations.size();
-	}
-
-	public void shuffle(Random rnd) {
-		// set random seed
-		Collections.shuffle(this.notYetVisited, rnd);
-	}
-
-	public Id<ActivityFacility> getWeightedRandomChoice(int actlegIndex,
+	Id<ActivityFacility> getWeightedRandomChoice(int actlegIndex,
 									    ScoringFunctionFactory scoringFunction, Plan plan, TripRouter tripRouter, double pKVal,
 									    MultiNodeDijkstra forwardMultiNodeDijkstra, BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra,
-									    int interation) {
+									    int iteration) {
 
 		TreeMap<Double, Id<ActivityFacility>> map;
 
-		// if we have no destinations defined so far, we can shorten this
 		if (this.destinations.size() > 0) {
-			map = this.createReducedChoiceSetWithScores(actlegIndex, this.facilities, scoringFunction, plan,
-				  tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra);
+			map = this.createReducedChoiceSetWithPseudoScores(actlegIndex, this.facilities, scoringFunction, plan,
+				  tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra );
 		} else {
+			// if we have no destinations defined so far, we can shorten this
 			// currently handled activity which should be re-located
 			Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
-			Id<ActivityFacility> facilityIdWithLargestScore = act.getFacilityId();
-			map = createEmptyChoiceMap(facilityIdWithLargestScore);
+			map = createEmptyChoiceMap( act.getFacilityId() );
 		}
 
-		/*  the same seed for every agent????? kai, jan'13
-		 *
-		 * corrected, thx.
-		 * Probably this error was not dramatic as the cs is different for every agent anyway.
-		 */
-		Random random = new Random((long) (Long.MAX_VALUE / interation * pKVal));
+		// The following is sampling from the choice set, taking the best alternative with 60% proba, the next with 24% proba, etc.  Follow where it is coming from.  I don't
+		// know why that could be a good approach. kai, mar'19
+
+		Random random = new Random((long) (Long.MAX_VALUE / iteration * pKVal));
 
 		//	a couple of random draws to come to the "chaotic" region:
 		for (int i = 0; i < 10; i++) {
 			random.nextDouble();
 		}
-		double randomScore = random.nextDouble();
+		double randomNumber = random.nextDouble();
 
 		/*
 		 * map is filled by summing up the normalized scores (in descending order!):
@@ -183,44 +142,25 @@ class ChoiceSet {
 		 */
 		Id<ActivityFacility> id = map.get(map.firstKey());
 		for (Entry<Double, Id<ActivityFacility>> entry : map.entrySet()) {
-			if (entry.getKey() > randomScore + 0.000000000000000001) {
+			if (entry.getKey() > randomNumber + 0.000000000000000001) {
 				id = entry.getValue();
 			}
 		}
 
-		//		// ich würde es wohl in etwa wie folgt probieren:
-		//		// assumes that entry.getKey() just has the normal scores, not something modified.
-		//		// what is pKVal doing??
-		//		double sum = 0 ;
-		//		double offset = map.firstKey() ; // oder lastKey; denke aber, dass das eigentlich egal ist.
-		//		int ii = 0 ;
-		//		for ( Map.Entry<Double,Id> entry : map.entrySet() ) {
-		//			ii ++ ;
-		//			if ( ii > this.numberOfAlternatives ) break ;
-		//			sum += entry.getKey()-offset ;
-		//		}
-		//
-		//		double sum2 = 0. ;
-		//		double rnd = MatsimRandom.getRandom().nextDouble() * sum ; // note *sum!!  could also deal with offset here
-		//		for ( Map.Entry<Double,Id> entry : map.entrySet() ) {
-		//			sum2 += entry.getKey() - offset ;
-		//			if ( sum2 > rnd ) {
-		//				return entry.getValue() ;
-		//			}
-		//		}
-		//		throw new RuntimeException("at this point, I see no reason why it should ever get here; may need some fix later ...") ;
-
 		return id;
 	}
 
-	private TreeMap<Double, Id<ActivityFacility>> createReducedChoiceSetWithScores(
+	/**
+	 * The "score", which is behind the "Double" in the TreeMap, is some pseudo score 0.6, 0.84, ..., see {@link ChoiceSet#generateReducedChoiceSet(ArrayList)}
+	 */
+	private TreeMap<Double, Id<ActivityFacility>> createReducedChoiceSetWithPseudoScores(
 		  int actlegIndex,
 		  ActivityFacilities facilities,
 		  ScoringFunctionFactory scoringFunction,
 		  Plan plan,
 		  TripRouter router,
 		  MultiNodeDijkstra forwardMultiNodeDijkstra,
-		  BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra) {
+		  BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra ) {
 
 		// currently handled activity which should be re-located
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
@@ -372,28 +312,10 @@ class ChoiceSet {
 		}
 	}
 	private TreeMap<Double, Id<ActivityFacility>> createEmptyChoiceMap(Id<ActivityFacility> facilityIdWithLargestScore) {
-		TreeMap<Double, Id<ActivityFacility>> mapTmp = new TreeMap<Double, Id<ActivityFacility>>();
+		TreeMap<Double, Id<ActivityFacility>> mapTmp = new TreeMap<>();
 		mapTmp.put(1.1, facilityIdWithLargestScore);
 		return mapTmp;
 	}
-
-	//	private double getTotalScore(ArrayList<ScoredAlternative> list) {
-	//		double totalScore = 0.0;
-	//
-	//		int nrElements = Math.min(list.size(), this.numberOfAlternatives);
-	//
-	//		for (int index = 0; index < nrElements; index++)  {
-	//			ScoredAlternative sa = list.get(index);
-	//			totalScore += sa.getScore() + this.getOffset(list, nrElements);
-	//		}
-	//		return totalScore;
-	//	}
-
-
-	//	private double getOffset(ArrayList<ScoredAlternative> list, int nrElements) {
-	//		double smallestScore = list.get(nrElements - 1).getScore();
-	//		return Math.min(smallestScore, 0.0) * (-1.0); // if smallest score is negative, then add offsets!
-	//	}
 
 	/*
 	 * We can have three cases here:
@@ -422,37 +344,21 @@ class ChoiceSet {
 	 *  anhorni, dec 2013
 	 *
 	 */
-	//	private TreeMap<Double,Id> generateReducedChoiceSet(ArrayList<ScoredAlternative> list) {
-	//		/*
-	//		 * list is given here in descending order -> see compareTo in ScoredAlternative
-	//		 */
-	//		Collections.sort(list);
-	//		double totalScore = this.getTotalScore(list);
-	//
-	//		int nrElements = Math.min(list.size(), this.numberOfAlternatives);
-	//
-	//		TreeMap<Double,Id> mapNormalized = new TreeMap<Double,Id>(java.util.Collections.reverseOrder());
-	//		double sumScore = 0.0;
-	//		for (int index = 0; index < nrElements; index++)  {
-	//			ScoredAlternative sa = list.get(index);
-	//			sumScore += (sa.getScore() + this.getOffset(list, nrElements)) / totalScore;
-	//			mapNormalized.put(sumScore , sa.getAlternativeId());
-	//		}
-	//		return mapNormalized;
-	//	}
-
+	// A standard approach to get around that positive/negative problem would be to use exp(score) instead of score (logit).  Kai
 	/*
 	 * Use approximation to golden ratio (contains sqrt) with specified number of alternatives
 	 * (more than around 5 makes no sense actually)
 	 */
 	private TreeMap<Double, Id<ActivityFacility>> generateReducedChoiceSet(ArrayList<ScoredAlternative> list) {
-		/*
-		 * list is given here in descending order -> see compareTo in ScoredAlternative
-		 */
+
+		// sort the list (ScoredAlternative fulfills Comparable):
 		Collections.sort(list);
+
+		// say that we want about five alternatives (or less if we don't have enough):
 		int nrElements = Math.min(list.size(), this.numberOfAlternatives);
 
-		TreeMap<Double, Id<ActivityFacility>> mapNormalized = new TreeMap<Double, Id<ActivityFacility>>(java.util.Collections.reverseOrder());
+		// take the first 5 alternatives and give them some pseudo-scores 0.6, 0.84, 0.936, 0.9744, ...
+		TreeMap<Double, Id<ActivityFacility>> mapNormalized = new TreeMap<>( java.util.Collections.reverseOrder() );
 		for (int index = 0; index < nrElements; index++)  {
 			double indexNormalized = 1.0 - Math.pow(0.4, (index + 1));
 			ScoredAlternative sa = list.get(index);

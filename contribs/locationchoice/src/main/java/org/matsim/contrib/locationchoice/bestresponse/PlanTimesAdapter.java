@@ -215,27 +215,9 @@ class PlanTimesAdapter {
 
 		switch ( this.approximationLevel ) {
 			case completeRouting:
-
-				Level lvl = Level.INFO ;
-
-				final List<? extends PlanElement> trip =
-						this.router.calcRoute(
-							  mode,
-								new ActivityWrapperFacility( previousActivity ),
-								new ActivityWrapperFacility( act ),
-								previousActivity.getEndTime(),
-							  plan.getPerson() );
-				//		log.log(lvl,"") ;
-				//		for( PlanElement planElement : trip ){
-				//			log.log(lvl, planElement ) ;
-				//		}
-				//		log.log(lvl,"") ;
-				//		fillInLegTravelTimes( fromAct.getEndTime() , trip );
-				//		log.log(lvl,"") ;
-				//		for( PlanElement planElement : trip ){
-				//			log.log(lvl, planElement ) ;
-				//		}
-				//		log.log(lvl,"") ;
+				final List<? extends PlanElement> trip = this.router.calcRoute( mode, FacilitiesUtils.toFacility( previousActivity, scenario.getActivityFacilities() ),
+								FacilitiesUtils.toFacility( act, scenario.getActivityFacilities() ), previousActivity.getEndTime(), plan.getPerson() );
+				fillInLegTravelTimes( previousActivity.getEndTime() , trip );
 				return trip;
 			case noRouting:
 				// Yes, those two are doing the same. I passed some time to simplify the (rather convoluted) code,
@@ -247,10 +229,7 @@ class PlanTimesAdapter {
 				}
 				// fall through to local routing if not car or previous travel time not found
 			case localRouting:
-				return getTravelTimeApproximation(
-						previousActivity,
-						act,
-						mode );
+				return getTravelTimeApproximation( previousActivity, act, mode );
 			default:
 				throw new RuntimeException( "unknown method "+this.approximationLevel );
 		}
@@ -273,10 +252,7 @@ class PlanTimesAdapter {
 		}
 	}
 
-	private List<? extends PlanElement> getTravelTimeApproximation(
-			Activity fromAct,
-			Activity toAct,
-			String mode ) {
+	private List<? extends PlanElement> getTravelTimeApproximation( Activity fromAct, Activity toAct, String mode ) {
 		// TODO: as soon as plansCalcRoute provides defaults for all modes use them
 		// I do not want users having to set dc parameters in other config modules!
 		double speed;

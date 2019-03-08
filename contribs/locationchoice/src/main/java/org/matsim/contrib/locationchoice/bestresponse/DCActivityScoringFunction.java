@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
@@ -152,7 +153,14 @@ public class DCActivityScoringFunction extends org.matsim.deprecated.scoring.fun
 
 			// disutility if too late
 
-			double latestStartTime = (Double)this.prefs.getAttribute(this.plan.getPerson().getId().toString(), "latestStartTime_" + act.getType());	
+		Gbl.assertNotNull(this.prefs);
+		Gbl.assertNotNull( this.plan );
+		Gbl.assertNotNull( this.plan.getPerson() );
+
+		final Double attribute = (Double) this.prefs.getAttribute( this.plan.getPerson().getId().toString(), "latestStartTime_" + act.getType() );
+		Gbl.assertNotNull( attribute );
+
+		double latestStartTime = attribute;
 			if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
 				tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime);
 			}
