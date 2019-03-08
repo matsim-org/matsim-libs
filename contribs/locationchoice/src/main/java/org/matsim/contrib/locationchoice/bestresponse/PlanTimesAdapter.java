@@ -33,13 +33,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.FacilitiesUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -300,8 +300,8 @@ public class PlanTimesAdapter {
 		final List<? extends PlanElement> trip =
 				this.router.calcRoute(
 						mode,
-					  ActivityWrapperFacility.toFacility( fromAct, scenario.getActivityFacilities() ),
-					  ActivityWrapperFacility.toFacility( toAct, scenario.getActivityFacilities() ),
+					  FacilitiesUtils.toFacility( fromAct, scenario.getActivityFacilities() ),
+					  FacilitiesUtils.toFacility( toAct, scenario.getActivityFacilities() ),
 						fromAct.getEndTime(),
 						person );
 		fillInLegTravelTimes( fromAct.getEndTime() , trip );

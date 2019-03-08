@@ -34,7 +34,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.Facility;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -89,8 +89,8 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			final List<? extends PlanElement> newTrip =
 					tripRouter.calcRoute(
 							tripRouter.getMainModeIdentifier().identifyMainMode( oldTrip.getTripElements() ),
-							toFacility( oldTrip.getOriginActivity() ),
-							toFacility( oldTrip.getDestinationActivity() ),
+						  FacilitiesUtils.toFacility( oldTrip.getOriginActivity(), facilities ),
+						  FacilitiesUtils.toFacility( oldTrip.getDestinationActivity(), facilities ),
 							calcEndOfActivity( oldTrip.getOriginActivity() , plan, tripRouter.getConfig() ),
 							plan.getPerson() );
 			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
@@ -140,30 +140,6 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		for (Plan plan : person.getPlans()) {
 			run( plan );
 		}
-	}
-
-	// /////////////////////////////////////////////////////////////////////////
-	// helpers
-	// /////////////////////////////////////////////////////////////////////////
-	private Facility toFacility(final Activity act) {
-//		if (  (act.getLinkId() == null && act.getCoord() == null)  // yyyy this used to be || instead of && --???  kai, jun'16
-//				&& facilities != null
-//				&& !facilities.getFacilities().isEmpty()) {
-//			// use facilities only if the activity does not provide the required fields.
-//			// yyyyyy Seems to me that the Access/EgressRoutingModule only needs either link or coord to start from.  So we only go
-//			// to facilities if neither is provided.  --  This may, however, be at odds of how it is done in the AccessEgressRoutingModule, so we
-//			// need to conceptually sort this out!!  kai, jun'16
-//			return facilities.getFacilities().get( act.getFacilityId() );
-//		}
-
-		// use facility first if available i.e. reversing the logic above Amit July'18
-		if (	facilities != null &&
-				! facilities.getFacilities().isEmpty() &&
-				act.getFacilityId() != null ) {
-			return facilities.getFacilities().get( act.getFacilityId() );
-		}
-
-		return ActivityWrapperFacility.toFacility( act, facilities );
 	}
 
 	public static double calcEndOfActivity(

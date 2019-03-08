@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 /**
@@ -59,7 +60,7 @@ public class TestActivityWrapperFacility {
 	@Test
 	public void testWrapper() {
 		for (Activity activity : activities) {
-			Facility wrapper = ActivityWrapperFacility.toFacility( activity, null );
+			Facility wrapper = FacilitiesUtils.toFacility( activity, null );
 
 			Assert.assertEquals(
 					"wrapped activity returns incorrect coordinate!",

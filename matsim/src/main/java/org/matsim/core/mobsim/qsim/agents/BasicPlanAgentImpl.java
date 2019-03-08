@@ -26,12 +26,9 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.ActivityWrapperFacility;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.router.TransitRouter;
 import org.matsim.vehicles.Vehicle;
 
 public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPerson, VehicleUsingAgent, HasModifiablePlan {
@@ -382,7 +379,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		} else {
 			throw new RuntimeException("unexpected type of PlanElement") ;
 		}
-		return ActivityWrapperFacility.toFacility( activity, scenario.getActivityFacilities() ) ;
+		return FacilitiesUtils.toFacility( activity, scenario.getActivityFacilities() ) ;
 	}
 
 	@Override
@@ -390,7 +387,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		PlanElement pe = this.getCurrentPlanElement() ;
 		if ( pe instanceof Leg ) {
 			Activity activity = this.getNextActivity() ;
-			return ActivityWrapperFacility.toFacility( activity, scenario.getActivityFacilities() ) ;
+			return FacilitiesUtils.toFacility( activity, scenario.getActivityFacilities() ) ;
 
 			// the above assumes alternating acts/legs.  I start having the suspicion that we should revoke our decision to give that up.
 			// If not, one will have to use TripUtils to find the preceeding activity ... but things get more difficult.  Preferably, the

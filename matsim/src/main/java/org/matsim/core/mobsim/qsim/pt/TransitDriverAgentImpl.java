@@ -35,8 +35,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.ActivityWrapperFacility;
-import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.Umlauf;
@@ -298,7 +297,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 		} else {
 			throw new RuntimeException("unexpected type of PlanElement") ;
 		}
-		return  ActivityWrapperFacility.toFacility( activity, this.scenario.getActivityFacilities() );
+		return  FacilitiesUtils.toFacility( activity, this.scenario.getActivityFacilities() );
 
 		// the above assumes alternating acts/legs.  I start having the suspicion that we should revoke our decision to give that up.
 		// If not, one will have to use TripUtils to find the preceeding activity ... but things get more difficult.  Preferably, the
@@ -310,7 +309,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 		PlanElement pe = this.getCurrentPlanElement() ;
 		if ( pe instanceof Leg ) {
 			Activity activity = (Activity)this.getNextPlanElement() ;
-			return  ActivityWrapperFacility.toFacility( activity, this.scenario.getActivityFacilities() );
+			return  FacilitiesUtils.toFacility( activity, this.scenario.getActivityFacilities() );
 		} else if ( pe instanceof Activity ) {
 			return null ;
 		}

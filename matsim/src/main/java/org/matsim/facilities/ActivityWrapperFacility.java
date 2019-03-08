@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.router;
+package org.matsim.facilities;
 
 import java.util.Map;
 
@@ -26,9 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.Facility;
 
 /**
  * When ActivityFacilities are not used, use this class
@@ -36,21 +33,11 @@ import org.matsim.facilities.Facility;
  * in a facility interface (for example to pass to the router)
  * @author thibautd
  */
-public class ActivityWrapperFacility implements Facility, Identifiable<ActivityFacility> {
+ class ActivityWrapperFacility implements Facility, Identifiable<ActivityFacility> {
 	private final Activity wrapped;
 
-	private ActivityWrapperFacility( final Activity toWrap ) {
+	ActivityWrapperFacility( final Activity toWrap ) {
 		this.wrapped = toWrap;
-	}
-
-	public static Facility toFacility( final Activity toWrap, ActivityFacilities activityFacilities ){
-		if ( activityFacilities!=null && toWrap.getFacilityId()!=null ){
-			ActivityFacility fac = activityFacilities.getFacilities().get( toWrap.getFacilityId() );
-			if( fac != null ){
-				return fac;
-			}
-		}
-		return new ActivityWrapperFacility( toWrap );
 	}
 
 	@Override

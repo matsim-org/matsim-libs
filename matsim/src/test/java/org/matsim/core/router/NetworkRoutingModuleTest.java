@@ -45,6 +45,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 public class NetworkRoutingModuleTest {
@@ -66,8 +67,8 @@ public class NetworkRoutingModuleTest {
 		            f.s.getPopulation().getFactory(),
 		            f.s.getNetwork(),
 		            routeAlgo);
-		Facility fromFacility = ActivityWrapperFacility.toFacility( fromAct, f.s.getActivityFacilities() );
-		Facility toFacility = ActivityWrapperFacility.toFacility( toAct, f.s.getActivityFacilities() );
+		Facility fromFacility = FacilitiesUtils.toFacility( fromAct, f.s.getActivityFacilities() );
+		Facility toFacility = FacilitiesUtils.toFacility( toAct, f.s.getActivityFacilities() );
 		List<? extends PlanElement> result = routingModule.calcRoute(fromFacility, toFacility, 7.0*3600, person) ;
 		Assert.assertEquals(1, result.size() );
 		Leg leg = (Leg)result.get(0) ;
@@ -99,8 +100,8 @@ public class NetworkRoutingModuleTest {
 							f.s.getNetwork(),
 							routeAlgo);
 
-			List<? extends PlanElement> results = router.calcRoute( ActivityWrapperFacility.toFacility(fromAct, f.s.getActivityFacilities() ),
-				  ActivityWrapperFacility.toFacility(toAct, f.s.getActivityFacilities() ), 8.*3600, person ) ;
+			List<? extends PlanElement> results = router.calcRoute( FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ),
+				  FacilitiesUtils.toFacility(toAct, f.s.getActivityFacilities() ), 8.*3600, person ) ;
 			Assert.assertEquals( 1, results.size() );
 			Leg leg = (Leg) results.get(0) ;
 			
@@ -127,7 +128,7 @@ public class NetworkRoutingModuleTest {
 							f.s.getNetwork(),
 							routeAlgo);
 
-			List<? extends PlanElement> result = router.calcRoute( ActivityWrapperFacility.toFacility(fromAct, f.s.getActivityFacilities() ), ActivityWrapperFacility.toFacility(toAct,
+			List<? extends PlanElement> result = router.calcRoute( FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ), FacilitiesUtils.toFacility(toAct,
 				  f.s.getActivityFacilities() ), 7.*3600, person ) ;
 			
 			Assert.assertEquals( 1, result.size() ) ; 
