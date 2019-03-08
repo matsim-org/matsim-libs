@@ -20,12 +20,6 @@
 
 package org.matsim.contrib.analysis.kai;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.*;
-import java.util.Map.Entry;
-
-import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -35,7 +29,6 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -57,12 +50,17 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.Vehicle;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
+
 /**
  * @author knagel, originally based on
  * @author mrieser
  */
 public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonMoneyEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler,
-VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ShutdownListener{
+									  VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final static Logger log = Logger.getLogger(KNAnalysisEventsHandler.class);
 
@@ -82,16 +80,16 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ShutdownList
 			// yyyy Hopefully nobody defines a standard activity type with name "people_interaction" or similar ...  kai, sep'16
 		}
 	} ;
-	
-//	private final MainModeIdentifier mainModeIdentifier = new TransportPlanningMainModeIdentifier() ;
+
+	//	private final MainModeIdentifier mainModeIdentifier = new TransportPlanningMainModeIdentifier() ;
 	private final MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl() ;
 
 	// using this one here since presumably a fair number of the transit_walk trips in the survey in fact were pt trips.  kai, sep'16
 
 	// statistics types:
-	enum StatType { 
-		legDurations, legDurationsOtherBins, legBeelineDistances, legBeelineDistancesOtherBins, legDistances, personScores, 
-		personPayments, tripBeelineDistances
+	enum StatType {
+		legDurations, legDurationsOtherBins, legBeelineDistances, legBeelineDistancesOtherBins, legDistances, personScores,
+		personPayments, tripBeelineDistances, tripBeelineDistancesCumulative
 	} ;
 
 	// container that contains the statistics containers:
@@ -143,7 +141,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ShutdownList
 		}
 	}
 
-	@Inject
+
 	/* deliberately package */ KNAnalysisEventsHandler(final Scenario scenario) {
 		// this does not need to be injectable, since it is typically called from KaiAnalysisListener.  kai, may'18
 		this.scenario = scenario ;
@@ -166,49 +164,50 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ShutdownList
 
 			// define the bin boundaries:
 			switch ( type ) {
-			case legBeelineDistances: {
-				double[] dataBoundariesTmp = {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.} ;
-				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
-				this.statsContainer.put( type, databins) ;
-				break; }
-			case tripBeelineDistances: {
-				double[] dataBoundariesTmp = {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.} ;
-				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
-				this.statsContainer.put( type, databins) ;
-				break; }
-			case legBeelineDistancesOtherBins: {
-				double[] dataBoundariesTmp = {0., 2000., 4000., 6000., 8000., 10000.} ;
-				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
-				this.statsContainer.put( type, databins) ;
-				break; }
-			case legDurations: {
-				double[] dataBoundariesTmp = {0., 300., 600., 900., 1200., 1500., 1800., 2100., 2400., 2700., 3000., 3300., 3600., 
-						3900., 4200., 4500., 4800., 5100., 5400., 5700., 6000., 6300., 6600., 6900., 7200.} ;
-				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
-				this.statsContainer.put( type, databins) ;
-				break; }
-			case legDurationsOtherBins: {
-				double[] dataBoundariesTmp = {0., 300., 900., 1800., 2700., 3600.} ;
-				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
-				this.statsContainer.put( type, databins) ;
-				break; }
-			case legDistances: {
-				double[] dataBoundariesTmp = {0., 1000, 3000, 10000, 30000, 10000, 300000, 1000.*1000. } ;
-				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
-				this.statsContainer.put( type, databins) ;
-				break; }
-			case personScores:{
-				double[] dataBoundariesTmp = {Double.NEGATIVE_INFINITY} ; // yy ??
-				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
-				this.statsContainer.put( type, databins) ;
-				break; }
-			case personPayments:{
-				double[] dataBoundariesTmp = {Double.NEGATIVE_INFINITY } ; // yy ??
-				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
-				this.statsContainer.put( type, databins) ;
-				break; }
-			default:
-				throw new RuntimeException("statistics container for type "+type.toString()+" not initialized.") ;
+				case legBeelineDistances: {
+					double[] dataBoundariesTmp = {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.} ;
+					Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+					this.statsContainer.put( type, databins) ;
+					break; }
+				case tripBeelineDistances:
+				case tripBeelineDistancesCumulative: {
+					double[] dataBoundariesTmp = {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000., 200000., 500000.} ;
+					Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+					this.statsContainer.put( type, databins) ;
+					break; }
+				case legBeelineDistancesOtherBins: {
+					double[] dataBoundariesTmp = {0., 2000., 4000., 6000., 8000., 10000.} ;
+					Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+					this.statsContainer.put( type, databins) ;
+					break; }
+				case legDurations: {
+					double[] dataBoundariesTmp = {0., 300., 600., 900., 1200., 1500., 1800., 2100., 2400., 2700., 3000., 3300., 3600.,
+						  3900., 4200., 4500., 4800., 5100., 5400., 5700., 6000., 6300., 6600., 6900., 7200.} ;
+					Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+					this.statsContainer.put( type, databins) ;
+					break; }
+				case legDurationsOtherBins: {
+					double[] dataBoundariesTmp = {0., 300., 900., 1800., 2700., 3600.} ;
+					Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+					this.statsContainer.put( type, databins) ;
+					break; }
+				case legDistances: {
+					double[] dataBoundariesTmp = {0., 1000, 3000, 10000, 30000, 10000, 300000, 1000.*1000. } ;
+					Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+					this.statsContainer.put( type, databins) ;
+					break; }
+				case personScores:{
+					double[] dataBoundariesTmp = {Double.NEGATIVE_INFINITY} ; // yy ??
+					Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+					this.statsContainer.put( type, databins) ;
+					break; }
+				case personPayments:{
+					double[] dataBoundariesTmp = {Double.NEGATIVE_INFINITY } ; // yy ??
+					Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+					this.statsContainer.put( type, databins) ;
+					break; }
+				default:
+					throw new RuntimeException("statistics container for type "+type.toString()+" not initialized.") ;
 			}
 		}
 
@@ -274,37 +273,38 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ShutdownList
 				Double item = null ;
 				// .. generate correct "item" for statType ...
 				switch( statType) {
-				case legDurations:
-				case legDurationsOtherBins:
-					item = travTime ;
-					break;
-				case legBeelineDistances:
-				case legBeelineDistancesOtherBins:
-					item = calcBeelineDistance(fromAct, toAct);
-					break;
-				case legDistances:
-					if ( leg.getRoute() instanceof NetworkRoute ) {
-						item = RouteUtils.calcDistanceExcludingStartEndLink( ((NetworkRoute)leg.getRoute()), this.scenario.getNetwork() ) ;
-					} else if ( leg.getRoute()!=null && !Double.isNaN( leg.getRoute().getDistance() ) )  {
-						item = leg.getRoute().getDistance() ;
-					} else {
-						if ( noDistanceCnt < 10 ) {
-							noDistanceCnt++ ;
-							log.warn("cannot get leg distance for arrival event") ;
-							log.warn( "person: " + person.toString() ) ;
-							log.warn( "leg: " + leg.toString() ) ;
-							if ( noDistanceCnt==10 ) {
-								log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+					case legDurations:
+					case legDurationsOtherBins:
+						item = travTime ;
+						break;
+					case legBeelineDistances:
+					case legBeelineDistancesOtherBins:
+						item = calcBeelineDistance(fromAct, toAct);
+						break;
+					case legDistances:
+						if ( leg.getRoute() instanceof NetworkRoute ) {
+							item = RouteUtils.calcDistanceExcludingStartEndLink( ((NetworkRoute)leg.getRoute()), this.scenario.getNetwork() ) ;
+						} else if ( leg.getRoute()!=null && !Double.isNaN( leg.getRoute().getDistance() ) )  {
+							item = leg.getRoute().getDistance() ;
+						} else {
+							if ( noDistanceCnt < 10 ) {
+								noDistanceCnt++ ;
+								log.warn("cannot get leg distance for arrival event") ;
+								log.warn( "person: " + person.toString() ) ;
+								log.warn( "leg: " + leg.toString() ) ;
+								if ( noDistanceCnt==10 ) {
+									log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+								}
 							}
 						}
-					}
-					break;
-				case personPayments:
-				case personScores:
-				case tripBeelineDistances:
-					break ;
-				default:
-					throw new RuntimeException("`item' for statistics type not defined; statistics type: " + statType ) ;
+						break;
+					case personPayments:
+					case personScores:
+					case tripBeelineDistances:
+					case tripBeelineDistancesCumulative:
+						break;
+					default:
+						throw new RuntimeException("`item' for statistics type not defined; statistics type: " + statType ) ;
 				}
 				if ( item != null ) {
 					addItemToAllRegisteredTypes(legTypes, statType, item);
@@ -401,7 +401,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ShutdownList
 		if ( oldVal!=null ) {
 			newVal += oldVal ;
 		}
-		pAttribs.putAttribute( id.toString(), attributeName, newVal ) ; 
+		pAttribs.putAttribute( id.toString(), attributeName, newVal ) ;
 	}
 
 	public void writeStats(final String filenameTmp) {
@@ -427,7 +427,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ShutdownList
 			{
 				for ( Trip trip : TripStructureUtils.getTrips(selectedPlan, stageActivities ) ) {
 					String mainMode = mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ;
-					Double item = calcBeelineDistance(trip.getOriginActivity(), trip.getDestinationActivity()) ;
+					double item = calcBeelineDistance(trip.getOriginActivity(), trip.getDestinationActivity() ) ;
 
 					// this defines to which categories this person should belong for the statistical averaging:
 					List<String> categories = new ArrayList<>() ;
@@ -436,7 +436,18 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ShutdownList
 					categories.add("zzzzzzz_all") ;  // register for the overall average
 
 					this.addItemToAllRegisteredTypes(categories, StatType.tripBeelineDistances, item);
+					this.addItemToAllRegisteredTypes(categories, StatType.tripBeelineDistancesCumulative, item );
 				}
+			}
+		}
+
+		// consolidate cumulative plot(s)
+		for( Entry<String, double[]> entry : this.statsContainer.get( StatType.tripBeelineDistancesCumulative ).entrySet() ){
+			double sum = 0. ;
+			final double[] array = entry.getValue();
+			for ( int ii = 0 ; ii<array.length ; ii++ ) {
+				sum += array[ii] ;
+				array[ii] = sum ;
 			}
 		}
 
@@ -448,7 +459,6 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ShutdownList
 			String filename = filenameTmp + type.toString() + ".txt" ;
 			try ( BufferedWriter legStatsFile = IOUtils.getBufferedWriter(filename) ) {
 				writeStatsHorizontal(type, legStatsFile );
-				legStatsFile.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -541,7 +551,13 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ShutdownList
 					first = false;
 					out.write(statType.toString());
 					for (int i = 0; i < counts.length; i++) {
-						out.write("\t" + this.statsContainer.get(statType).getDataBoundaries()[i] + "+" ) ;
+						double dataBoundary = Double.MAX_VALUE;
+						try{
+							dataBoundary = this.statsContainer.get( statType ).getDataBoundaries()[i+1];
+						} catch( IndexOutOfBoundsException ee ) {
+							// do nothing; will then use Double.MAX_VALUE
+						}
+						out.write("\t" + dataBoundary ) ;
 					}
 					out.write("\t|\t average \t|\t cnt \t | \t sum\n");
 				}
@@ -566,16 +582,16 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ShutdownList
 			}
 
 			switch( statType ) {
-			case legDurations:
-			case legDurationsOtherBins:
-				out.write("control statistics: average ttime = " + (controlStatisticsSum/controlStatisticsCnt) ) ;
-				out.write("\n");
-				out.write("\n");
-				break;
-			case legBeelineDistances:
-				break;
-			default:
-				break;
+				case legDurations:
+				case legDurationsOtherBins:
+					out.write("control statistics: average ttime = " + (controlStatisticsSum/controlStatisticsCnt) ) ;
+					out.write("\n");
+					out.write("\n");
+					break;
+				case legBeelineDistances:
+					break;
+				default:
+					break;
 			}
 
 		} catch (IOException e) {
@@ -623,7 +639,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ShutdownList
 			final Double sumSoFar = linkTtimesSums.get( linkId );
 			if ( sumSoFar == null ) {
 				linkTtimesSums.put( linkId, event.getTime() - enterTime ) ;
-				linkCnts.put( linkId, 1. ) ; 
+				linkCnts.put( linkId, 1. ) ;
 			} else {
 				linkTtimesSums.put( linkId, event.getTime() - enterTime + sumSoFar ) ;
 				linkCnts.put( linkId, 1. + linkCnts.get(linkId) ) ;
@@ -648,16 +664,10 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ShutdownList
 				wrnCnt++ ;
 				//				throw new RuntimeException("vehicle arrival for vehicle that never entered link.  teleportation?") ;
 				Logger.getLogger(this.getClass()).warn("vehicle arrival for vehicle that never entered link.  I think this can happen with departures "
-						+ "that have empty routes, i.e. go to a location on the same link. kai, may'14");
+											     + "that have empty routes, i.e. go to a location on the same link. kai, may'14");
 				Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
 			}
 		}
 	}
-
-	@Override
-	public void notifyShutdown( ShutdownEvent event ){
-		this.writeStats( event.getServices().getControlerIO().getOutputPath() + "/_stats_");
-	}
-
 
 }

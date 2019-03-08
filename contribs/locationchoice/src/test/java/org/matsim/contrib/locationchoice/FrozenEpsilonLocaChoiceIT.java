@@ -1,8 +1,9 @@
 package org.matsim.contrib.locationchoice;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -13,8 +14,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.analysis.kai.KNAnalysisEventsHandler;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
+import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.contrib.locationchoice.bestresponse.BestReplyLocationChoicePlanStrategy;
 import org.matsim.contrib.locationchoice.bestresponse.DCActivityWOFacilitiesScoringFunction;
 import org.matsim.contrib.locationchoice.bestresponse.DCScoringFunctionFactory;
@@ -27,8 +27,13 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -38,13 +43,11 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.facilities.ActivityFacilitiesFactory;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityOption;
-import org.matsim.facilities.ActivityOptionImpl;
+import org.matsim.facilities.*;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -195,7 +198,7 @@ public class FrozenEpsilonLocaChoiceIT{
 
 	@Test public void testFacilitiesAlongALine() {
 		Config config = ConfigUtils.createConfig() ;
-//		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "config.xml");
+		//		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "config.xml");
 		config.controler().setLastIteration( 2 );
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		{
@@ -216,12 +219,12 @@ public class FrozenEpsilonLocaChoiceIT{
 		}
 
 		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
-		dccg.setEpsilonScaleFactors("30.0" );
+		dccg.setEpsilonScaleFactors("50.0" );
 		dccg.setAlgorithm( bestResponse );
 		dccg.setFlexibleTypes( "shop" );
 		dccg.setTravelTimeApproximationLevel( completeRouting );
-		dccg.setRandomSeed( 1 );
-		// yy do we need more settings here?
+		dccg.setRandomSeed( 2 );
+		dccg.setDestinationSamplePercent( 5. );
 
 		// ---
 
@@ -245,8 +248,8 @@ public class FrozenEpsilonLocaChoiceIT{
 			scenario.getNetwork().addNode( node );
 			prevNode = node ;
 		}
-		for ( int ii=1 ; ii<100 ; ii++ ) {
-			Node node = nf.createNode( Id.createNodeId( ii ) , new Coord( ii*1000, 0.) ) ;
+		for ( int ii=1 ; ii<1000 ; ii++ ) {
+			Node node = nf.createNode( Id.createNodeId( ii ) , new Coord( ii*100, 0.) ) ;
 			scenario.getNetwork().addNode( node );
 			// ---
 			addLinkAndFacility( scenario, nf, ff, prevNode, node );
@@ -257,7 +260,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		// ===
 		final Id<ActivityFacility> homeFacilityId = Id.create( "0-1", ActivityFacility.class ) ;
 		final Id<ActivityFacility> initialShopFacilityId = Id.create( "1-2", ActivityFacility.class );
-		for ( int jj=0 ; jj<100 ; jj++ ){
+		for ( int jj=0 ; jj<1000 ; jj++ ){
 			Person person = pf.createPerson( Id.createPersonId( jj ) );
 			{
 				scenario.getPopulation().addPerson( person );
@@ -312,56 +315,81 @@ public class FrozenEpsilonLocaChoiceIT{
 			@Override
 			public void install() {
 				addPlanStrategyBinding("MyLocationChoice").to( BestReplyLocationChoicePlanStrategy.class );
-				addEventHandlerBinding().to( KNAnalysisEventsHandler.class ).in( Singleton.class );
-				addControlerListenerBinding().to( KNAnalysisEventsHandler.class ).in( Singleton.class ) ;
+				addControlerListenerBinding().to( KaiAnalysisListener.class ).in( Singleton.class ) ;
 			}
 		});
 
 		controler.addOverridingModule( new AbstractModule(){
 			@Override
 			public void install(){
-				this.addControlerListenerBinding().toInstance( new IterationEndsListener(){
-					@Override
-					public void notifyIterationEnds( IterationEndsEvent event ){
-						if ( event.getIteration() <=0 ) {
-							return ;
-						}
-
-						for( Person person : scenario.getPopulation().getPersons().values() ){
-
-							assertEquals( "number of plans in person.", event.getIteration()+1, person.getPlans().size() );
-							Plan newPlan = person.getSelectedPlan();
-							Level lvl = Level.INFO;
-//							log.log( lvl, "" );
-//							log.log( lvl, " newPlan: " + newPlan );
-//							for( PlanElement planElement : newPlan.getPlanElements() ){
-//								log.log( lvl, planElement.toString() );
+//				this.addControlerListenerBinding().toInstance( new IterationEndsListener(){
+//					@Override public void notifyIterationEnds( IterationEndsEvent event ){
+//						if ( event.getIteration() <=0 ) {
+//							return ;
+//						}
+//
+//						for( Person person : scenario.getPopulation().getPersons().values() ){
+//
+//							assertEquals( "number of plans in person.", event.getIteration()+1, person.getPlans().size() );
+//							Plan newPlan = person.getSelectedPlan();
+//
+//							// yyyy todo make the following NOT (so much) depend on exact positions in plans file
+//
+//							Activity newAct = (Activity) newPlan.getPlanElements().get( 2 );
+//							if( config.plansCalcRoute().isInsertingAccessEgressWalk() ){
+//								newAct = (Activity) newPlan.getPlanElements().get( 6 );
 //							}
-//							log.log( lvl, "" );
-
-							// yyyy todo make the following NOT (so much) depend on exact positions in plans file
-
-							Activity newAct = (Activity) newPlan.getPlanElements().get( 2 );
-							if( config.plansCalcRoute().isInsertingAccessEgressWalk() ){
-								newAct = (Activity) newPlan.getPlanElements().get( 6 );
-							}
-							System.err.println( " newAct: " + newAct );
-							System.err.println( " facilityId: " + newAct.getFacilityId() );
-							assertNotNull( newAct );
-
-//							assertTrue( !newAct.getFacilityId().equals( initialShopFacilityId ) );
-							// yy I think that it could technically select the same as before so this is a brittle check. kai, mar'19
-
-							switch ( person.getId().toString() ) {
-								case "0":
-//									assertEquals( Id.create( "90-89", ActivityFacility.class ), newAct.getFacilityId() );
-									break ;
+//							System.err.println( " newAct: " + newAct );
+//							System.err.println( " facilityId: " + newAct.getFacilityId() );
+//							assertNotNull( newAct );
+//
+//							//							assertTrue( !newAct.getFacilityId().equals( initialShopFacilityId ) );
+//							// yy I think that it could technically select the same as before so this is a brittle check. kai, mar'19
+//
+//							switch ( person.getId().toString() ) {
+//								case "0":
+//									//									assertEquals( Id.create( "90-89", ActivityFacility.class ), newAct.getFacilityId() );
+//									break ;
+//							}
+//						}
+//					}
+//				} );
+				this.addControlerListenerBinding().toInstance( new ShutdownListener(){
+					@Inject Population population ;
+					@Inject ActivityFacilities facilities ;
+					@Inject TripRouter tripRouter ;
+					@Override public void notifyShutdown( ShutdownEvent event ){
+						double[] cnt = new double[1000] ;
+						for( Person person : population.getPersons().values() ){
+							List<Trip> trips = TripStructureUtils.getTrips( person.getSelectedPlan(), tripRouter.getStageActivityTypes() );
+							for( Trip trip : trips ){
+								Facility facFrom = FacilitiesUtils.toFacility( trip.getOriginActivity(), facilities );
+								Facility facTo = FacilitiesUtils.toFacility( trip.getDestinationActivity(), facilities );
+								double tripBeelineDistance = CoordUtils.calcEuclideanDistance( facFrom.getCoord(), facTo.getCoord() );
+								int bin = (int) (tripBeelineDistance / 1000.);
+								cnt[bin] ++ ;
 							}
 						}
+						for ( int ii=0 ; ii<cnt.length ; ii++ ){
+							if( cnt[ii] > 0 ){
+								log.info( "bin=" + ii + "; cnt=" + cnt[ii] );
+							}
+						}
+						check( 1440, cnt[0] );
+						check( 22, cnt[1] ) ;
+						check( 16, cnt[2] ) ;
+						check( 20, cnt[3] ) ;
+						check( 12, cnt[4] ) ;
 					}
+
+					void check( double val, double actual ){
+						Assert.assertEquals( val, actual, Math.max( 5, Math.sqrt( val ) ) );
+					}
+
 				} );
 			}
 		} ) ;
+
 		controler.run();
 
 		// yyyy todo make test such that far-away activities have strongly lower proba
