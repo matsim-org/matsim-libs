@@ -1050,10 +1050,12 @@ public final class PopulationUtils {
 		}
 	}
 	public static double decideOnTravelTimeForLeg( Leg leg ) {
-		if ( leg.getRoute()!=null ) {
+		if ( leg.getRoute()!=null && !Time.isUndefinedTime( leg.getRoute().getTravelTime() )) {
 			return leg.getRoute().getTravelTime() ;
-		} else {
+		} else if ( !Time.isUndefinedTime( leg.getTravelTime() ) ){
 			return leg.getTravelTime() ;
+		} else {
+			return 0. ;
 		}
 	}
 	public static void sampleDown( Population pop, double sample ) {
