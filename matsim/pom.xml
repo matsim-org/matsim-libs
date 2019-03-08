@@ -152,6 +152,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<source>8</source><!--can be skipped from maven-javadoc-plugin 3.1.0-->
 					<quiet>true</quiet>
 					<header>MATSim API</header>
 					<excludePackageNames>org.matsim.jaxb:org.matsim.jaxb.*</excludePackageNames>
@@ -454,6 +455,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<geotools.version>14.0</geotools.version>
+		<geotools.version>20.2</geotools.version>
     </properties>
 </project>

@@ -39,15 +39,17 @@ mergeMethod: merge
 
 # Blocking labels are the labels that can be attached to a pull request to make sure the pull request
 # is not being automatically merged.
-blockingLabels:
-- blocked
+# blockingLabels:
+# - blocked
 
 # Whenever required labels are configured, pull requests will only be automatically merged whenever
 # all of these labels are attached to a pull request.
-# requiredLabels:
-# - merge
+requiredLabels:
+- automerge
 
 # Automatic merges will be blocked if there is a match between the regular expression and title
 blockingTitleRegex: '\bwip\b'
 
 reportStatus: true
+
+

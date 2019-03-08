@@ -1,9 +1,10 @@
 package org.matsim.contrib.analysis.spatial;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import org.junit.Test;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
 
-import static junit.framework.TestCase.*;
+import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
 
 public class SpatialInterpolationTest {
 

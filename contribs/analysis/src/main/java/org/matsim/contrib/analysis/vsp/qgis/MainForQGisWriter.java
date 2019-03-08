@@ -1,6 +1,6 @@
 package org.matsim.contrib.analysis.vsp.qgis;
 
-import com.vividsolutions.jts.geom.Envelope;
+import org.locationtech.jts.geom.Envelope;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityXmlRenderer;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
