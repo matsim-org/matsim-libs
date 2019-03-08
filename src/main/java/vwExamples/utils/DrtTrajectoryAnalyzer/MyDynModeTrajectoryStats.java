@@ -60,6 +60,7 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
+import org.matsim.contrib.dvrp.run.QSimScopeObjectListener;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.data.ElectricFleet;
@@ -67,18 +68,18 @@ import org.matsim.contrib.ev.data.ElectricVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
-
 /**
  * @author saxer
  */
 public class MyDynModeTrajectoryStats
 		implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
-		LinkLeaveEventHandler,  ActivityEndEventHandler, DrtRequestSubmittedEventHandler,
-		PassengerRequestRejectedEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ActivityStartEventHandler {
+		LinkLeaveEventHandler, ActivityEndEventHandler, DrtRequestSubmittedEventHandler,
+		PassengerRequestRejectedEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
+		ActivityStartEventHandler, QSimScopeObjectListener<Fleet> {
 
 	private final Map<Id<Person>, Double> departureTimes = new HashMap<>();
 	public final Map<Id<Vehicle>, List<String>> vehicleTrajectoryMap = new HashMap<>();
-	private final  Set<Id<Vehicle>> activeVehicle = new HashSet<>();
+	private final Set<Id<Vehicle>> activeVehicle = new HashSet<>();
 	private final Map<Id<Person>, Id<Link>> departureLinks = new HashMap<>();
 	private final List<DynModeTrip> drtTrips = new ArrayList<>();
 	private final Map<Id<Vehicle>, Map<Id<Person>, MutableDouble>> inVehicleDistance = new HashMap<>();
@@ -107,7 +108,7 @@ public class MyDynModeTrajectoryStats
 
 	}
 
-	public void setFleetOnMobsimStart(Fleet fleet) {
+	public void objectCreated(Fleet fleet) {
 		this.fleet = fleet;
 	}
 
@@ -131,7 +132,6 @@ public class MyDynModeTrajectoryStats
 
 	private final Map<Id<Vehicle>, VehDrive> vehDrives = new HashMap<>();
 
-
 	@Override
 	public void reset(int iteration) {
 		drtTrips.clear();
@@ -154,9 +154,7 @@ public class MyDynModeTrajectoryStats
 			this.vehicleDistances.put(vid, new double[3 + maxcap]);
 		}
 
-
-		if (event.getActType().equals("ChargingActivity"))
-		{
+		if (event.getActType().equals("ChargingActivity")) {
 			Id<Vehicle> vid = Id.createVehicleId(event.getPersonId().toString());
 
 			double acutalTime = event.getTime();
@@ -167,18 +165,34 @@ public class MyDynModeTrajectoryStats
 			double x = network.getLinks().get(event.getLinkId()).getCoord().getX();
 			double y = network.getLinks().get(event.getLinkId()).getCoord().getY();
 
-			double tt = Double.NaN;;
+			double tt = Double.NaN;
+			;
 			double v_meterPerSec = Double.NaN;
 			Id<ElectricVehicle> evId = Id.create(vid, ElectricVehicle.class);
 			double currentSoc = EvUnits.J_to_kWh(electricFleet.getElectricVehicles().get(evId).getBattery().getSoc());
-			String line = (vehicleID + sep + acutalTime + sep + occupancy + sep + dist + sep + actualTaskType + sep + x
-					+ sep + y + sep + tt + sep + v_meterPerSec + sep + currentSoc);
+			String line = (vehicleID
+					+ sep
+					+ acutalTime
+					+ sep
+					+ occupancy
+					+ sep
+					+ dist
+					+ sep
+					+ actualTaskType
+					+ sep
+					+ x
+					+ sep
+					+ y
+					+ sep
+					+ tt
+					+ sep
+					+ v_meterPerSec
+					+ sep
+					+ currentSoc);
 
-			if (vehicleTrajectoryMap.containsKey(vid))
-			{
+			if (vehicleTrajectoryMap.containsKey(vid)) {
 				vehicleTrajectoryMap.get(vid).add(line);
-			}
-			else {
+			} else {
 				//Add the first line to the list and initialize the list
 				vehicleTrajectoryMap.put(vid, new ArrayList<>());
 			}
@@ -187,14 +201,10 @@ public class MyDynModeTrajectoryStats
 
 	}
 
-
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 
-
-
-		if (event.getActType().equals("ChargingActivity"))
-		{
+		if (event.getActType().equals("ChargingActivity")) {
 			Id<Vehicle> vid = Id.createVehicleId(event.getPersonId().toString());
 
 			double acutalTime = event.getTime();
@@ -204,30 +214,42 @@ public class MyDynModeTrajectoryStats
 			String actualTaskType = "CHARGE_START";
 			double x = network.getLinks().get(event.getLinkId()).getCoord().getX();
 			double y = network.getLinks().get(event.getLinkId()).getCoord().getY();
-			
-			double tt = Double.NaN;;
+
+			double tt = Double.NaN;
+			;
 			double v_meterPerSec = Double.NaN;
 			Id<ElectricVehicle> evId = Id.create(vid, ElectricVehicle.class);
 			double currentSoc = EvUnits.J_to_kWh(electricFleet.getElectricVehicles().get(evId).getBattery().getSoc());
-			String line = (vehicleID + sep + acutalTime + sep + occupancy + sep + dist + sep + actualTaskType + sep + x + sep + y + sep + tt + sep + v_meterPerSec + sep + currentSoc);
+			String line = (vehicleID
+					+ sep
+					+ acutalTime
+					+ sep
+					+ occupancy
+					+ sep
+					+ dist
+					+ sep
+					+ actualTaskType
+					+ sep
+					+ x
+					+ sep
+					+ y
+					+ sep
+					+ tt
+					+ sep
+					+ v_meterPerSec
+					+ sep
+					+ currentSoc);
 
-			if (vehicleTrajectoryMap.containsKey(vid))
-			{
+			if (vehicleTrajectoryMap.containsKey(vid)) {
 				vehicleTrajectoryMap.get(vid).add(line);
-			}
-			else {
+			} else {
 				//Add the first line to the list and initialize the list
 				vehicleTrajectoryMap.put(vid, new ArrayList<>());
 			}
 
 		}
 
-
-
 	}
-
-
-
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
@@ -235,8 +257,8 @@ public class MyDynModeTrajectoryStats
 		if (fleetSpecification.getVehicleSpecifications().containsKey(vehicleId)) {// handle all drt
 			activeVehicle.add(vehicleId);
 
-
-			vehDrives.put(vehicleId, new VehDrive(vehicleId, fleetSpecification.getVehicleSpecifications().get(vehicleId)));
+			vehDrives.put(vehicleId,
+					new VehDrive(vehicleId, fleetSpecification.getVehicleSpecifications().get(vehicleId)));
 
 			double acutalTime = event.getTime();
 			String vehicleID = event.getVehicleId().toString();
@@ -245,21 +267,39 @@ public class MyDynModeTrajectoryStats
 			double x = network.getLinks().get(event.getLinkId()).getCoord().getX();
 			double y = network.getLinks().get(event.getLinkId()).getCoord().getY();
 
-			double tt =  Double.NaN;
-			DrtTask actualTask = (DrtTask) fleet.getVehicles().get(Id.create(vehicleID, DvrpVehicle.class)).getSchedule().getCurrentTask();
+			double tt = Double.NaN;
+			DrtTask actualTask = (DrtTask)fleet.getVehicles()
+					.get(Id.create(vehicleID, DvrpVehicle.class))
+					.getSchedule()
+					.getCurrentTask();
 			String actualTaskType = actualTask.getDrtTaskType().toString();
 
 			double v_meterPerSec = Double.NaN;
 			Id<ElectricVehicle> evId = Id.create(event.getVehicleId(), ElectricVehicle.class);
 			double currentSoc = EvUnits.J_to_kWh(electricFleet.getElectricVehicles().get(evId).getBattery().getSoc());
-			String line = (vehicleID + sep + acutalTime + sep + occupancy + sep + dist + sep + actualTaskType + sep + x + sep + y + sep + tt + sep + v_meterPerSec + sep + currentSoc);
+			String line = (vehicleID
+					+ sep
+					+ acutalTime
+					+ sep
+					+ occupancy
+					+ sep
+					+ dist
+					+ sep
+					+ actualTaskType
+					+ sep
+					+ x
+					+ sep
+					+ y
+					+ sep
+					+ tt
+					+ sep
+					+ v_meterPerSec
+					+ sep
+					+ currentSoc);
 
-
-			if (vehicleTrajectoryMap.containsKey(event.getVehicleId()))
-			{
+			if (vehicleTrajectoryMap.containsKey(event.getVehicleId())) {
 				vehicleTrajectoryMap.get(event.getVehicleId()).add(line);
-			}
-			else {
+			} else {
 				//Add the first line to the list and initialize the list
 				vehicleTrajectoryMap.put(event.getVehicleId(), new ArrayList<>());
 			}
@@ -273,7 +313,8 @@ public class MyDynModeTrajectoryStats
 		if (fleetSpecification.getVehicleSpecifications().containsKey(vehicleId)) {// handle all drt
 			activeVehicle.add(vehicleId);
 
-			vehDrives.remove(vehicleId, new VehDrive(vehicleId, fleetSpecification.getVehicleSpecifications().get(vehicleId)));
+			vehDrives.remove(vehicleId,
+					new VehDrive(vehicleId, fleetSpecification.getVehicleSpecifications().get(vehicleId)));
 
 			double acutalTime = event.getTime();
 			String vehicleID = event.getVehicleId().toString();
@@ -283,30 +324,47 @@ public class MyDynModeTrajectoryStats
 			double x = network.getLinks().get(event.getLinkId()).getCoord().getX();
 			double y = network.getLinks().get(event.getLinkId()).getCoord().getY();
 
-			double tt =  Double.NaN;
+			double tt = Double.NaN;
 
 			double v_meterPerSec = Double.NaN;
 
-			DrtTask actualTask = (DrtTask) fleet.getVehicles().get(Id.create(vehicleID, DvrpVehicle.class)).getSchedule().getCurrentTask();
+			DrtTask actualTask = (DrtTask)fleet.getVehicles()
+					.get(Id.create(vehicleID, DvrpVehicle.class))
+					.getSchedule()
+					.getCurrentTask();
 			String actualTaskType = actualTask.getDrtTaskType().toString();
 
 			Id<ElectricVehicle> evId = Id.create(event.getVehicleId(), ElectricVehicle.class);
 			double currentSoc = EvUnits.J_to_kWh(electricFleet.getElectricVehicles().get(evId).getBattery().getSoc());
-			String line = (vehicleID + sep + acutalTime + sep + occupancy + sep + dist + sep + actualTaskType + sep + x + sep + y + sep + tt + sep + v_meterPerSec + sep + currentSoc);
+			String line = (vehicleID
+					+ sep
+					+ acutalTime
+					+ sep
+					+ occupancy
+					+ sep
+					+ dist
+					+ sep
+					+ actualTaskType
+					+ sep
+					+ x
+					+ sep
+					+ y
+					+ sep
+					+ tt
+					+ sep
+					+ v_meterPerSec
+					+ sep
+					+ currentSoc);
 
-
-			if (vehicleTrajectoryMap.containsKey(event.getVehicleId()))
-			{
+			if (vehicleTrajectoryMap.containsKey(event.getVehicleId())) {
 				vehicleTrajectoryMap.get(event.getVehicleId()).add(line);
-			}
-			else {
+			} else {
 				//Add the first line to the list and initialize the list
 				vehicleTrajectoryMap.put(event.getVehicleId(), new ArrayList<>());
 			}
 		}
 
 	}
-
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
@@ -328,38 +386,54 @@ public class MyDynModeTrajectoryStats
 			double y = network.getLinks().get(event.getLinkId()).getCoord().getY();
 
 			//Assign first time stamp after having traversed the first link
-			VehDrive vehDrive =  vehDrives.get(event.getVehicleId());
-			double tt =  Double.NaN;
+			VehDrive vehDrive = vehDrives.get(event.getVehicleId());
+			double tt = Double.NaN;
 
-			if (!vehDrive.isOnFirstLink())
-			{
+			if (!vehDrive.isOnFirstLink()) {
 				tt = event.getTime() - vehDrive.movedOverNodeTime;
 
 			}
 
-			if (vehDrive.isOnFirstLink())
-			{
+			if (vehDrive.isOnFirstLink()) {
 				double defaultSpeedOnFirstEdge = 7.0; //meter per second
-				tt = network.getLinks().get(event.getLinkId()).getLength()/defaultSpeedOnFirstEdge;
+				tt = network.getLinks().get(event.getLinkId()).getLength() / defaultSpeedOnFirstEdge;
 
 			}
 
 			vehDrive.movedOverNodeTime = event.getTime();
 			double v_meterPerSec = distance / tt;
 
-			DrtTask actualTask = (DrtTask) fleet.getVehicles().get(Id.create(vehicleID, DvrpVehicle.class)).getSchedule().getCurrentTask();
+			DrtTask actualTask = (DrtTask)fleet.getVehicles()
+					.get(Id.create(vehicleID, DvrpVehicle.class))
+					.getSchedule()
+					.getCurrentTask();
 			String actualTaskType = actualTask.getDrtTaskType().toString();
 
 			Id<ElectricVehicle> evId = Id.create(event.getVehicleId(), ElectricVehicle.class);
 			double currentSoc = EvUnits.J_to_kWh(electricFleet.getElectricVehicles().get(evId).getBattery().getSoc());
-			String line = (vehicleID + sep + acutalTime + sep + occupancy + sep + dist + sep + actualTaskType + sep + x + sep + y + sep + tt + sep + v_meterPerSec + sep + currentSoc);
+			String line = (vehicleID
+					+ sep
+					+ acutalTime
+					+ sep
+					+ occupancy
+					+ sep
+					+ dist
+					+ sep
+					+ actualTaskType
+					+ sep
+					+ x
+					+ sep
+					+ y
+					+ sep
+					+ tt
+					+ sep
+					+ v_meterPerSec
+					+ sep
+					+ currentSoc);
 
-
-			if (vehicleTrajectoryMap.containsKey(event.getVehicleId()))
-			{
+			if (vehicleTrajectoryMap.containsKey(event.getVehicleId())) {
 				vehicleTrajectoryMap.get(event.getVehicleId()).add(line);
-			}
-			else {
+			} else {
 				//Add the first line to the list and initialize the list
 				vehicleTrajectoryMap.put(event.getVehicleId(), new ArrayList<>());
 			}
