@@ -110,8 +110,8 @@ public class PseudoTransitRoutingModuleTest {
 			
 			TripRouter tripRouter = injector.getInstance(TripRouter.class) ;
 			
-			Facility fromFacility = new ActivityWrapperFacility(fromAct) ;
-			Facility toFacility = new ActivityWrapperFacility(toAct) ;
+			Facility fromFacility = ActivityWrapperFacility.toFacility(fromAct, f.s.getActivityFacilities() ) ;
+			Facility toFacility = ActivityWrapperFacility.toFacility(toAct, f.s.getActivityFacilities() );
 			
 			List<? extends PlanElement> result = tripRouter.calcRoute("mode", fromFacility, toFacility, 7.0*3600., person) ;
 			Gbl.assertIf( result.size()==1);

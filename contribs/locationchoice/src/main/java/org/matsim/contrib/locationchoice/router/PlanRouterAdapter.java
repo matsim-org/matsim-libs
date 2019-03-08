@@ -56,8 +56,8 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 			final double depTime) {
 		List<? extends PlanElement> trip = tripRouter.calcRoute(
 					leg.getMode(),
-					new ActivityWrapperFacility( fromAct ),
-					new ActivityWrapperFacility( toAct ),
+			  ActivityWrapperFacility.toFacility( fromAct, null ),
+			  ActivityWrapperFacility.toFacility( toAct, null ),
 					depTime,
 					person);
 	

@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
 
@@ -38,8 +39,18 @@ import org.matsim.facilities.Facility;
 public class ActivityWrapperFacility implements Facility, Identifiable<ActivityFacility> {
 	private final Activity wrapped;
 
-	public ActivityWrapperFacility( final Activity toWrap ) {
+	private ActivityWrapperFacility( final Activity toWrap ) {
 		this.wrapped = toWrap;
+	}
+
+	public static Facility toFacility( final Activity toWrap, ActivityFacilities activityFacilities ){
+		if ( activityFacilities!=null && toWrap.getFacilityId()!=null ){
+			ActivityFacility fac = activityFacilities.getFacilities().get( toWrap.getFacilityId() );
+			if( fac != null ){
+				return fac;
+			}
+		}
+		return new ActivityWrapperFacility( toWrap );
 	}
 
 	@Override

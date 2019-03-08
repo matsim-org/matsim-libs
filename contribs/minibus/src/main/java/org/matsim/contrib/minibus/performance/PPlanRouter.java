@@ -123,7 +123,7 @@ final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			// use facilities only if the activity does not provides the required fields.
 			return facilities.getFacilities().get( act.getFacilityId() );
 		}
-		return new ActivityWrapperFacility( act );
+		return ActivityWrapperFacility.toFacility( act, facilities );
 	}
 
 	private static double calcEndOfActivity(

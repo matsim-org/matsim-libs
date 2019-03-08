@@ -59,6 +59,7 @@ public class PlanTimesAdapter {
 	private final Map<String, Double> beelineDistanceFactors;
 	private final DestinationChoiceConfigGroup dccg;
 	private final TripRouter router;
+	private final Scenario scenario;
 
 	/* package */ PlanTimesAdapter(
 			final DestinationChoiceConfigGroup.ApproximationLevel approximationLevel,
@@ -73,6 +74,7 @@ public class PlanTimesAdapter {
 		this.teleportedModeSpeeds = teleportedModeSpeeds;
 		this.beelineDistanceFactors = beelineDistanceFactors;
 		this.dccg = (DestinationChoiceConfigGroup) this.config.getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		this.scenario = scenario ;
 	}
 
 	/*
@@ -298,8 +300,8 @@ public class PlanTimesAdapter {
 		final List<? extends PlanElement> trip =
 				this.router.calcRoute(
 						mode,
-						new ActivityWrapperFacility( fromAct ),
-						new ActivityWrapperFacility( toAct ),
+					  ActivityWrapperFacility.toFacility( fromAct, scenario.getActivityFacilities() ),
+					  ActivityWrapperFacility.toFacility( toAct, scenario.getActivityFacilities() ),
 						fromAct.getEndTime(),
 						person );
 		fillInLegTravelTimes( fromAct.getEndTime() , trip );

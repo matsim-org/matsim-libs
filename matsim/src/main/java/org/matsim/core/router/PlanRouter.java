@@ -163,7 +163,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			return facilities.getFacilities().get( act.getFacilityId() );
 		}
 
-		return new ActivityWrapperFacility( act );
+		return ActivityWrapperFacility.toFacility( act, facilities );
 	}
 
 	public static double calcEndOfActivity(

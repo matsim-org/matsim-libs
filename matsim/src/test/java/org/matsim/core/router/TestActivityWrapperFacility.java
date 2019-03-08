@@ -59,7 +59,7 @@ public class TestActivityWrapperFacility {
 	@Test
 	public void testWrapper() {
 		for (Activity activity : activities) {
-			Facility wrapper = new ActivityWrapperFacility( activity );
+			Facility wrapper = ActivityWrapperFacility.toFacility( activity, null );
 
 			Assert.assertEquals(
 					"wrapped activity returns incorrect coordinate!",

@@ -39,6 +39,8 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TeleportationRoutingModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import java.util.List;
@@ -51,6 +53,7 @@ public class StopBasedDrtRoutingModuleTest {
 	@Test
 	public void test() {
 		Scenario scenario = createTestScenario();
+		ActivityFacilities facilities = scenario.getActivityFacilities();;
 		final Double networkTravelSpeed = 0.83333;
 		final Double beelineFactor = 1.3;
 		TeleportationRoutingModule walkRouter = new TeleportationRoutingModule(TransportMode.walk,
@@ -66,10 +69,10 @@ public class StopBasedDrtRoutingModuleTest {
 
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
 		Activity h = (Activity)p1.getSelectedPlan().getPlanElements().get(0);
-		ActivityWrapperFacility hf = new ActivityWrapperFacility(h);
+		Facility hf = ActivityWrapperFacility.toFacility(h, facilities );
 
 		Activity w = (Activity)p1.getSelectedPlan().getPlanElements().get(2);
-		ActivityWrapperFacility wf = new ActivityWrapperFacility(w);
+		Facility wf = ActivityWrapperFacility.toFacility(w, facilities );
 
 		List<? extends PlanElement> routedList = stopBasedDRTRoutingModule.calcRoute(hf, wf, 8 * 3600, p1);
 
@@ -77,19 +80,19 @@ public class StopBasedDrtRoutingModuleTest {
 
 		Person p2 = scenario.getPopulation().getPersons().get(Id.createPersonId(2));
 		Activity h2 = (Activity)p2.getSelectedPlan().getPlanElements().get(0);
-		ActivityWrapperFacility hf2 = new ActivityWrapperFacility(h2);
+		Facility hf2 = ActivityWrapperFacility.toFacility(h2, facilities );
 
 		Activity w2 = (Activity)p2.getSelectedPlan().getPlanElements().get(2);
-		ActivityWrapperFacility wf2 = new ActivityWrapperFacility(w2);
+		Facility wf2 = ActivityWrapperFacility.toFacility(w2, facilities );
 
 		List<? extends PlanElement> routedList2 = stopBasedDRTRoutingModule.calcRoute(hf2, wf2, 8 * 3600, p2);
 
 		Person p3 = scenario.getPopulation().getPersons().get(Id.createPersonId(3));
 		Activity h3 = (Activity) p3.getSelectedPlan().getPlanElements().get(0);
-		ActivityWrapperFacility hf3 = new ActivityWrapperFacility(h3);
+		Facility hf3 = ActivityWrapperFacility.toFacility(h3, facilities );
 
 		Activity w3 = (Activity) p3.getSelectedPlan().getPlanElements().get(2);
-		ActivityWrapperFacility wf3 = new ActivityWrapperFacility(w3);
+		Facility wf3 = ActivityWrapperFacility.toFacility(w3, facilities );
 
 		List<? extends PlanElement> routedList3 = stopBasedDRTRoutingModule.calcRoute(hf3, wf3, 8 * 3600, p3);
 

@@ -142,12 +142,12 @@ public final class EditTrips {
 	private List<? extends PlanElement> newTripToNewActivity(Activity newAct, String mainMode, double now, 
 			MobsimAgent agent, Person person, Scenario scenario) {
 		log.debug("entering newTripToNewActivity") ;
+
 		Link currentLink = scenario.getNetwork().getLinks().get( agent.getCurrentLinkId() ) ;
 		Facility fromFacility = new LinkWrapperFacility( currentLink ) ;
-		Facility toFacility = scenario.getActivityFacilities().getFacilities().get( newAct.getFacilityId() ) ;
-		if ( toFacility == null ) {
-			toFacility = new ActivityWrapperFacility( newAct ) ;
-		}
+
+		Facility toFacility =  ActivityWrapperFacility.toFacility( newAct, scenario.getActivityFacilities() );
+
 		List<? extends PlanElement> newTrip = tripRouter.calcRoute(mainMode, fromFacility, toFacility, now, person) ;
 		return newTrip;
 	}
@@ -189,7 +189,7 @@ public final class EditTrips {
 		return replanFutureTrip( trip, plan, mainMode, departureTime ) ;
 	}
 	public final boolean replanFutureTrip(Trip trip, Plan plan, String routingMode, double departureTime) {
-		return replanFutureTrip(trip, plan, routingMode, departureTime, tripRouter);
+		return replanFutureTrip(trip, plan, routingMode, departureTime, tripRouter, scenario );
 	}
 
 	// utility methods (plans splicing):
@@ -233,11 +233,12 @@ public final class EditTrips {
 	 * by a new one. This is e.g. necessary when replacing a pt trip which might consists of multiple legs
 	 * and pt_interaction activities.  
 	 */
-	public static boolean replanFutureTrip(Trip trip, Plan plan, String routingMode, double departureTime, TripRouter tripRouter) {
+	@Deprecated // prefer the non-static methods
+	public static boolean replanFutureTrip( Trip trip, Plan plan, String routingMode, double departureTime, TripRouter tripRouter, Scenario scenario ) {
 		Person person = plan.getPerson();
 
-		Facility fromFacility = new ActivityWrapperFacility( trip.getOriginActivity() ) ;
-		Facility toFacility = new ActivityWrapperFacility( trip.getDestinationActivity() ) ;
+		Facility fromFacility = ActivityWrapperFacility.toFacility( trip.getOriginActivity(), scenario.getActivityFacilities() );
+		Facility toFacility = ActivityWrapperFacility.toFacility( trip.getDestinationActivity(), scenario.getActivityFacilities() );
 
 		final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, person);
 		
@@ -256,11 +257,12 @@ public final class EditTrips {
 	 * @param plan
 	 * @param mainMode
 	 * @param departureTime
-	 * @param network
 	 * @param tripRouter
+	 * @param scenario
 	 */
-	public static boolean relocateFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, Network network, TripRouter tripRouter) {
-		return replanFutureTrip(trip, plan, mainMode, departureTime, tripRouter );
+	@Deprecated // prefer the non-static methods
+	public static boolean relocateFutureTrip( Trip trip, Plan plan, String mainMode, double departureTime, TripRouter tripRouter, Scenario scenario ) {
+		return replanFutureTrip(trip, plan, mainMode, departureTime, tripRouter, scenario );
 	}
 	public StageActivityTypes getStageActivities() {
 		return tripRouter.getStageActivityTypes() ;

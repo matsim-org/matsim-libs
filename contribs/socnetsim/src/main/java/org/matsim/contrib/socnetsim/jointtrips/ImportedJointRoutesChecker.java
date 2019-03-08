@@ -68,8 +68,8 @@ public class ImportedJointRoutesChecker implements PlanAlgorithm, PersonAlgorith
 				List<? extends PlanElement> trip =
 					router.calcRoute(
 							l.getMode(),
-							new ActivityWrapperFacility( origin ),
-							new ActivityWrapperFacility( dest ),
+						  ActivityWrapperFacility.toFacility( origin, null ),
+						  ActivityWrapperFacility.toFacility( dest, null ),
 							now,
 							plan.getPerson());
 
