@@ -25,6 +25,7 @@ import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
 import org.matsim.core.config.ConfigGroup;
 
 import com.google.inject.Inject;
@@ -73,8 +74,12 @@ public class FleetModule extends AbstractDvrpModeModule {
 		});
 
 		if (updateVehicleStartLinkToLastLink) {
-			install(FleetStatsCalculatorModule.createModule(getMode(), VehicleStartLinkToLastLinkUpdater.class,
-					getter -> new VehicleStartLinkToLastLinkUpdater(getter.getModal(FleetSpecification.class))));
+			install(QSimScopeObjectListenerModule.builder(VehicleStartLinkToLastLinkUpdater.class)
+					.mode(getMode())
+					.objectClass(Fleet.class)
+					.listenerCreator(
+							getter -> new VehicleStartLinkToLastLinkUpdater(getter.getModal(FleetSpecification.class)))
+					.build());
 		}
 	}
 }
