@@ -41,9 +41,6 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	// bind( PrepareForSimImpl.class ) ;
 	// bind( PrepareForSim.class ).to( MyPrepareForSimImpl.class ) ;
 	
-	// yyyy There is currently a lot of overlap between PrepareForSimImpl and PrepareForMobsimImpl.
-	// This should be removed.  kai, jun'18
-
 	private static Logger log = Logger.getLogger(PrepareForSim.class);
 
 	private final GlobalConfigGroup globalConfigGroup;
@@ -105,12 +102,13 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				break;
 			case onePerActivityLinkInPlansFile:
 			case onePerActivityLocationInPlansFile:
-				FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(activityFacilities, facilitiesConfigGroup);
+//				FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(activityFacilities, facilitiesConfigGroup);
+				FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(scenario);
 
-				facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing(true, network);
+//				facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing(true, network);
 				// (yy not sure if the false setting makes sense at all. kai, jul'18)
 
-				facilitiesFromPopulation.assignOpeningTimes(facilitiesConfigGroup.isAssigningOpeningTime(), scenario.getConfig().planCalcScore());
+//				facilitiesFromPopulation.assignOpeningTimes(facilitiesConfigGroup.isAssigningOpeningTime(), scenario.getConfig().planCalcScore());
 				facilitiesFromPopulation.run(population);
 				// Note that location choice, when switched on, should now either use the facilities generated here,
 				// or come with explicit pre-existing facilities.  kai, jul'18
