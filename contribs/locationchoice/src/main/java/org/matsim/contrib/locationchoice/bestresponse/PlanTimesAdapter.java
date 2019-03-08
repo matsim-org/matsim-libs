@@ -77,6 +77,9 @@ public class PlanTimesAdapter {
 		this.scenario = scenario ;
 	}
 
+	/**
+	 * yyyyyy This should now be re-written using {@link TripRouter#calcEndOfPlanElement(double, PlanElement, Config)} or the methods therein. kai, mar'19
+	 */
 	/*
 	 * Why do we have plan and planTmp?!
 	 * Probably to avoid something like concurrent modification problems?
