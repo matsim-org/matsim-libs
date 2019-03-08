@@ -8,6 +8,7 @@ import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
 import org.matsim.contrib.util.CSVLineBuilder;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 
 import com.google.common.collect.ObjectArrays;
 
@@ -16,13 +17,21 @@ public class ETaxiBenchmarkStats extends TaxiBenchmarkStats {
 
 	private final SummaryStatistics queuedTimeRatio = new SummaryStatistics();
 
+	private Fleet fleet;
+
 	public ETaxiBenchmarkStats(OutputDirectoryHierarchy controlerIO) {
 		super(controlerIO);
 	}
 
 	@Override
-	public void updateStats(Fleet fleet) {
-		super.updateStats(fleet);
+	public void objectCreated(Fleet fleet) {
+		super.objectCreated(fleet);
+		this.fleet = fleet;
+	}
+
+	@Override
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
+		super.notifyMobsimBeforeCleanup(e);
 		ETaxiStats singleRunEStats = new ETaxiStatsCalculator(fleet.getVehicles().values()).getDailyEStats();
 		queuedTimeRatio.addValue(singleRunEStats.getFleetQueuedTimeRatio());
 	}
