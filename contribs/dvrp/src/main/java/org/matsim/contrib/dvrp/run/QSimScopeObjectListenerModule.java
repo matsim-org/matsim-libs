@@ -24,16 +24,20 @@ import java.util.function.Function;
 
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
 import com.google.inject.Provider;
 
 /**
  * Typical usecase: binding multi-iteration object stats calculators to overcome the limitation of the QSim scope of Fleet.
- * Notifies objectListener (also being a ControlerListener) to that the object has been created.
+ * Notifies objectListener to that the object has been created.
+ * <p>
+ * If objectListener is also ControllerListener and/or MobsimListener, which is quite typical,
+ * addControlerListenerBinding() and/or addModalComponent() will be called, respectively.
  *
  * @author Michal Maciejewski (michalm)
  */
-public final class QSimScopeObjectListenerModule<T, L extends QSimScopeObjectListener<T> & ControlerListener>
+public final class QSimScopeObjectListenerModule<T, L extends QSimScopeObjectListener<T>>
 		extends AbstractDvrpModeModule {
 
 	private final Class<T> objectClass;
@@ -50,11 +54,17 @@ public final class QSimScopeObjectListenerModule<T, L extends QSimScopeObjectLis
 	@Override
 	public void install() {
 		bindModal(listenerClass).toProvider(listenerProvider).asEagerSingleton();
-		addControlerListenerBinding().to(modalKey(listenerClass));
+		if (ControlerListener.class.isAssignableFrom(listenerClass)) {
+			addControlerListenerBinding().to(modalKey((Class<? extends ControlerListener>)listenerClass));
+		}
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
+				if (MobsimListener.class.isAssignableFrom(listenerClass)) {
+					addModalQSimComponentBinding().to(modalKey((Class<? extends MobsimListener>)listenerClass));
+				}
+
 				addModalQSimComponentBinding().toProvider(modalProvider(
 						getter -> mobsimInitializedListener(getter.getModal(listenerClass),
 								getter.getModal(objectClass))));
@@ -67,12 +77,11 @@ public final class QSimScopeObjectListenerModule<T, L extends QSimScopeObjectLis
 		return e -> objectListener.objectCreated(object);
 	}
 
-	public static <T, L extends QSimScopeObjectListener<T> & ControlerListener> Builder<T, L> builder(
-			Class<L> listenerClass) {
+	public static <T, L extends QSimScopeObjectListener<T>> Builder<T, L> builder(Class<L> listenerClass) {
 		return new Builder<>(listenerClass);
 	}
 
-	public static final class Builder<T, L extends QSimScopeObjectListener<T> & ControlerListener> {
+	public static final class Builder<T, L extends QSimScopeObjectListener<T>> {
 		private final Class<L> listenerClass;
 		private String mode;
 		private Class<T> objectClass;
@@ -102,7 +111,7 @@ public final class QSimScopeObjectListenerModule<T, L extends QSimScopeObjectLis
 			return this;
 		}
 
-		public QSimScopeObjectListenerModule<T, L> build() {
+		public AbstractDvrpModeModule build() {
 			return new QSimScopeObjectListenerModule<>(this);
 		}
 	}
