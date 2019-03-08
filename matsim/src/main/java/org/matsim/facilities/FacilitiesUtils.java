@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
@@ -104,5 +105,23 @@ public class FacilitiesUtils {
 			Gbl.assertNotNull(accessActLink);
 		}
 		return accessActLink;
+	}
+
+	public static Facility toFacility( final Activity toWrap, ActivityFacilities activityFacilities ){
+		if ( activityFacilities!=null && toWrap.getFacilityId()!=null ){
+			ActivityFacility fac = activityFacilities.getFacilities().get( toWrap.getFacilityId() );
+			if( fac != null ){
+				return fac;
+			}
+		}
+		return new ActivityWrapperFacility( toWrap );
+	}
+
+	/**
+	 * Preferably use {@link FacilitiesUtils#toFacility(Activity, ActivityFacilities)}.  The method here is left in place if one wants to construct a wrapper decidedly without
+	 * automagic.  It deliberately returns the interface.
+	 */
+	public static Facility wrapActivity ( final Activity toWrap ) {
+		return new ActivityWrapperFacility( toWrap ) ;
 	}
 }

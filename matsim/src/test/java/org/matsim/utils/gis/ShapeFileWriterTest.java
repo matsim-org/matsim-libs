@@ -5,16 +5,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Assert;
-
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Polygon;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
@@ -23,13 +28,6 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.testcases.MatsimTestUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
 
 public class ShapeFileWriterTest {
 	

@@ -412,9 +412,17 @@ public final class PopulationUtils {
 	}
 
 	/**
+	 * @deprecated Use {@link #decideOnActivityEndTime(Activity, double, Config)}
+	 */
+	@Deprecated // was renamed
+	public static double getActivityEndTime( Activity act, double now, Config config ) {
+		return decideOnActivityEndTime( act, now, config ) ;
+	}
+
+	/**
 	 * Computes the (expected or planned) activity end time, depending on the configured time interpretation.
 	 */
-	public static double getActivityEndTime( Activity act, double now, Config config ) {
+	public static double decideOnActivityEndTime( Activity act, double now, Config config ) {
 		switch ( config.plans().getActivityDurationInterpretation() ) {
 		case endTimeOnly:
 			return act.getEndTime() ;

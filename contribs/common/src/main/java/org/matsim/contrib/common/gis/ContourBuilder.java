@@ -13,12 +13,24 @@
 
 package org.matsim.contrib.common.gis;
 
-import com.vividsolutions.jts.algorithm.CGAlgorithms;
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.triangulate.quadedge.QuadEdge;
-import com.vividsolutions.jts.triangulate.quadedge.QuadEdgeSubdivision;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
 
-import java.util.*;
+import org.locationtech.jts.algorithm.CGAlgorithms;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.triangulate.quadedge.QuadEdge;
+import org.locationtech.jts.triangulate.quadedge.QuadEdgeSubdivision;
 
 /**
  *

@@ -34,7 +34,6 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -57,6 +56,7 @@ class PlanTimesAdapter {
 	private final Map<String, Double> beelineDistanceFactors;
 	private final DestinationChoiceConfigGroup dccg;
 	private final TripRouter router;
+	private final Scenario scenario;
 
 	/* package */ PlanTimesAdapter(
 			final DestinationChoiceConfigGroup.ApproximationLevel approximationLevel,
@@ -71,8 +71,12 @@ class PlanTimesAdapter {
 		this.teleportedModeSpeeds = teleportedModeSpeeds;
 		this.beelineDistanceFactors = beelineDistanceFactors;
 		this.dccg = (DestinationChoiceConfigGroup) this.config.getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		this.scenario = scenario ;
 	}
 
+	/**
+	 * yyyyyy This should now be re-written using {@link TripRouter#calcEndOfPlanElement(double, PlanElement, Config)} or the methods therein. kai, mar'19
+	 */
 	/*
 	 * Why do we have plan and planTmp?!
 	 * Probably to avoid something like concurrent modification problems?

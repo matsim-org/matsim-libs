@@ -1,9 +1,12 @@
 package org.matsim.contrib.noise.utils;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateFilter;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -11,6 +14,10 @@ import org.geotools.geojson.GeoJSONUtil;
 import org.geotools.geojson.feature.FeatureJSON;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateFilter;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Polygon;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.noise.data.FeatureNoiseBarrierImpl;
 import org.matsim.contrib.noise.data.NoiseBarrier;
@@ -19,13 +26,6 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * @author nkuehnel

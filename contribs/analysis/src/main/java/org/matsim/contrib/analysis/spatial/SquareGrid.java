@@ -1,8 +1,8 @@
 package org.matsim.contrib.analysis.spatial;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 import java.util.function.Supplier;
+
+import org.locationtech.jts.geom.Geometry;
 
 /**
  * Square grid which holds values

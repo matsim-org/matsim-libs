@@ -1,18 +1,22 @@
 package org.matsim.contrib.noise.data;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.index.quadtree.Quadtree;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
+
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.index.quadtree.Quadtree;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.handler.NoiseEquations;
 import org.matsim.core.utils.geometry.GeometryUtils;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * Separate from {@link NoiseContext} for better testability.

@@ -19,15 +19,20 @@
 
 package org.matsim.contrib.zone.util;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.geotools.geometry.jts.GeometryCollector;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.TopologyException;
+import org.locationtech.jts.geom.util.PolygonExtracter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.zone.Zone;
 import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
 public class SubzoneUtils {
 	public static Map<Id<Zone>, List<Polygon>> extractSubzonePolygons(Map<Id<Zone>, Zone> zones,
