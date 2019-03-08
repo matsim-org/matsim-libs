@@ -46,6 +46,7 @@ class RunLocationChoiceBestResponse {
 
 
 		DestinationChoiceContext dcContext = new DestinationChoiceContext(scenario);
+		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME , dcContext);
 
 		DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(scenario, dcContext);
 		DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule( dcContext.getScenario().getConfig(), DestinationChoiceConfigGroup.class);
