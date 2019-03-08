@@ -29,10 +29,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
+import org.matsim.facilities.FacilitiesUtils;
 
 /**
  * Checks driver routes, in case only passengers were provided in the plan file
@@ -68,8 +68,8 @@ public class ImportedJointRoutesChecker implements PlanAlgorithm, PersonAlgorith
 				List<? extends PlanElement> trip =
 					router.calcRoute(
 							l.getMode(),
-							new ActivityWrapperFacility( origin ),
-							new ActivityWrapperFacility( dest ),
+						  FacilitiesUtils.toFacility( origin, null ),
+						  FacilitiesUtils.toFacility( dest, null ),
 							now,
 							plan.getPerson());
 

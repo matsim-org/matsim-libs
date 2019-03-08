@@ -68,9 +68,9 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 				"Defines how routes are stored in memory. Currently supported: " +
 				NetworkRouteType.LinkNetworkRoute + ", " +
 				NetworkRouteType.CompressedNetworkRoute + ".");
-		comments.put(
-				INPUT_PERSON_ATTRIBUTES_FILE,
-				"Path to a file containing person attributes (required file format: ObjectAttributes).");
+//		comments.put(
+//				INPUT_PERSON_ATTRIBUTES_FILE,
+//				"Path to a file containing person attributes (required file format: ObjectAttributes).");
 		comments.put(
 				SUBPOPULATION_ATTRIBUTE,
 				"Name of the (Object)Attribute defining the subpopulation to which pertains a Person"+
@@ -109,15 +109,18 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringGetter( INPUT_PERSON_ATTRIBUTES_FILE )
+	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
 	public String getInputPersonAttributeFile() {
 		return this.inputPersonAttributeFile;
 	}
 
 	@StringSetter( INPUT_PERSON_ATTRIBUTES_FILE )
+	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
 	public void setInputPersonAttributeFile(final String inputPersonAttributeFile) {
 		this.inputPersonAttributeFile = inputPersonAttributeFile;
 	}
 
+	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
 	public URL getInputPersonAttributeFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.inputPersonAttributeFile);
 	}

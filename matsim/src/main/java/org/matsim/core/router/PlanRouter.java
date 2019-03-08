@@ -28,14 +28,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.Facility;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -90,8 +89,8 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			final List<? extends PlanElement> newTrip =
 					tripRouter.calcRoute(
 							tripRouter.getMainModeIdentifier().identifyMainMode( oldTrip.getTripElements() ),
-							toFacility( oldTrip.getOriginActivity() ),
-							toFacility( oldTrip.getDestinationActivity() ),
+						  FacilitiesUtils.toFacility( oldTrip.getOriginActivity(), facilities ),
+						  FacilitiesUtils.toFacility( oldTrip.getDestinationActivity(), facilities ),
 							calcEndOfActivity( oldTrip.getOriginActivity() , plan, tripRouter.getConfig() ),
 							plan.getPerson() );
 			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
@@ -143,30 +142,6 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		}
 	}
 
-	// /////////////////////////////////////////////////////////////////////////
-	// helpers
-	// /////////////////////////////////////////////////////////////////////////
-	private Facility toFacility(final Activity act) {
-//		if (  (act.getLinkId() == null && act.getCoord() == null)  // yyyy this used to be || instead of && --???  kai, jun'16
-//				&& facilities != null
-//				&& !facilities.getFacilities().isEmpty()) {
-//			// use facilities only if the activity does not provide the required fields.
-//			// yyyyyy Seems to me that the Access/EgressRoutingModule only needs either link or coord to start from.  So we only go
-//			// to facilities if neither is provided.  --  This may, however, be at odds of how it is done in the AccessEgressRoutingModule, so we
-//			// need to conceptually sort this out!!  kai, jun'16
-//			return facilities.getFacilities().get( act.getFacilityId() );
-//		}
-
-		// use facility first if available i.e. reversing the logic above Amit July'18
-		if (	facilities != null &&
-				! facilities.getFacilities().isEmpty() &&
-				act.getFacilityId() != null ) {
-			return facilities.getFacilities().get( act.getFacilityId() );
-		}
-
-		return new ActivityWrapperFacility( act );
-	}
-
 	public static double calcEndOfActivity(
 			final Activity activity,
 			final Plan plan,
@@ -182,44 +157,12 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		double now = 0;
 
 		for (PlanElement pe : plan.getPlanElements()) {
-			now = updateNow( now , pe, config );
+			now = TripRouter.calcEndOfPlanElement( now, pe, config );
 			if (pe == activity) return now;
 		}
 
 		throw new RuntimeException( "activity "+activity+" not found in "+plan.getPlanElements() );
 	}
 
-	private static double updateNow(
-			final double now,
-			final PlanElement pe,
-			final Config config ) {
-		// yyyy see similar method in TripRouter. kai, oct'17
-		if (pe instanceof Activity) {
-			// yyyyyy this should use PopulationUtils.getActivityEndTime(...) to be consistent with other code.  kai, oct'17
-			Activity act = (Activity) pe;
-			return PopulationUtils.getActivityEndTime(act, now, config ) ;
-			
-//			double endTime = act.getEndTime();
-//			double startTime = act.getStartTime();
-//			double dur = (act instanceof Activity ? act.getMaximumDuration() : Time.UNDEFINED_TIME);
-//			if (endTime != Time.UNDEFINED_TIME) {
-//				// use fromAct.endTime as time for routing
-//				return endTime;
-//			}
-//			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
-//				// use fromAct.startTime + fromAct.duration as time for routing
-//				return startTime + dur;
-//			}
-//			else if (dur != Time.UNDEFINED_TIME) {
-//				// use last used time + fromAct.duration as time for routing
-//				return now + dur;
-//			}
-//			else {
-//				throw new RuntimeException("activity has neither end-time nor duration." + act);
-//			}
-		}
-		double tt = ((Leg) pe).getTravelTime();
-		return now + (Time.isUndefinedTime(tt) ? 0 : tt);
-	}	
 }
 

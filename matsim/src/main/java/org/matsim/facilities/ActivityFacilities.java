@@ -45,6 +45,7 @@ public interface ActivityFacilities extends MatsimToplevelContainer, Attributabl
 
 	public void addActivityFacility(ActivityFacility facility);
 
+	@Deprecated // I think that this should be phased out; use Attributable inside ActivityFacility.  kai, mar'19
 	public ObjectAttributes getFacilityAttributes();
 
 	/* not sure if this method should be in the interface, but too many users seem to use and like it,
