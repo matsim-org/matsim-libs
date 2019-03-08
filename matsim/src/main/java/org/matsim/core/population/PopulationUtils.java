@@ -402,7 +402,7 @@ public final class PopulationUtils {
 	}
 
 	/**
-	 * @deprecated Use {@link #decideOnActivityEndTime(Activity, double, Config)} instead.
+	 * @deprecated Use {@link #decideOnActivityEndTime(Activity, double, Config)}
 	 */
 	@Deprecated // was renamed
 	public static double getActivityEndTime( Activity act, double now, Config config ) {
@@ -1050,12 +1050,10 @@ public final class PopulationUtils {
 		}
 	}
 	public static double decideOnTravelTimeForLeg( Leg leg ) {
-		if ( leg.getRoute()!=null && !Time.isUndefinedTime( leg.getRoute().getTravelTime() )) {
+		if ( leg.getRoute()!=null ) {
 			return leg.getRoute().getTravelTime() ;
-		} else if ( !Time.isUndefinedTime( leg.getTravelTime() ) ){
-			return leg.getTravelTime() ;
 		} else {
-			return 0. ;
+			return leg.getTravelTime() ;
 		}
 	}
 	public static void sampleDown( Population pop, double sample ) {

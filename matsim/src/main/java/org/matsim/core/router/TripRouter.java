@@ -277,7 +277,11 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 			// replace above by already existing centralized method.  Which, however, does less hedging, and prioritizes route ttime over leg ttime.  Let's run the tests ...
 
-			return now + PopulationUtils.decideOnTravelTimeForLeg( (Leg) pe ) ;
+			double ttime = PopulationUtils.decideOnTravelTimeForLeg( (Leg) pe );
+			if ( Time.isUndefinedTime( ttime ) ) {
+				ttime = 0. ;
+			}
+			return now + ttime;
 		}
 	}
 
