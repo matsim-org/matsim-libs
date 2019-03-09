@@ -70,6 +70,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		//	CONFIG:
 		final Config config = localCreateConfig( this.utils.getPackageInputDirectory() + "config.xml");
 
+		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
 		DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule( config, DestinationChoiceConfigGroup.class );;
@@ -142,6 +143,8 @@ public class FrozenEpsilonLocaChoiceIT{
 	public void testLocationChoiceFeb2013NegativeScores() {
 		// config:
 		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "config.xml");
+
+		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 
 		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
 
@@ -219,6 +222,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		}
 
 		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
+//		dccg.setEpsilonScaleFactors("20.0" );
 		dccg.setEpsilonScaleFactors("50.0" );
 		dccg.setAlgorithm( bestResponse );
 		dccg.setFlexibleTypes( "shop" );
@@ -277,7 +281,6 @@ public class FrozenEpsilonLocaChoiceIT{
 					plan.addLeg( leg );
 				}
 				{
-					//				Activity shop = pf.createActivityFromCoord( "shop", new Coord( 250., 0. ) );
 					Activity shop = pf.createActivityFromActivityFacilityId( "shop", initialShopFacilityId );
 					// shop.setMaximumDuration( 3600. ); // does not work for locachoice: time computation is not able to deal with it.  yyyy replace by
 					// more central code. kai, mar'19

@@ -33,8 +33,9 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
 
  class LCPlanUtils{
+ 	// yy It looks like PopulationUtils now does similar things or even the same--???
 	
-	public static void copyPlanFieldsToFrom(Plan planTarget, Plan planTemplate) {
+	public static void copyPlanFieldsFromTo( Plan planTemplate, Plan planTarget ) {
 		if (planTarget instanceof Plan) {
 			if (planTemplate instanceof Plan) {
 				copyPlanFieldsToFrom1((Plan) planTarget, (Plan) planTemplate);
@@ -134,7 +135,7 @@ import org.matsim.facilities.ActivityFacility;
 		}
 	}
 		
-	public static void copyFrom(Plan srcPlan, Plan destPlan) {
+	public static void copyFromTo( Plan srcPlan, Plan destPlan ) {
 		if (destPlan instanceof Plan) {
 			PopulationUtils.copyFromTo(srcPlan, destPlan);
 		} else if (destPlan instanceof LCPlan) {

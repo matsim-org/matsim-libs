@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -27,6 +28,9 @@ public class BestReplyIT {
   
         // override or add some material:
 		ConfigUtils.loadConfig(config, utils.getPackageInputDirectory() + "/config.xml");
+
+		config.controler().setOutputDirectory( utils.getOutputDirectory() );
+		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		
 		
         Scenario scenario = ScenarioUtils.loadScenario(config);

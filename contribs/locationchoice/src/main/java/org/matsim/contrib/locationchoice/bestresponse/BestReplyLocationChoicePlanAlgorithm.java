@@ -82,8 +82,6 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		  DestinationSampler sampler, TripRouter tripRouter, MultiNodeDijkstra forwardMultiNodeDijkstra,
 		  BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, ScoringFunctionFactory scoringFunctionFactory,
 		  int iteration, Map<Id<ActivityFacility>, Id<Link>> nearestLinks ) {
-		// TODO: first null argument should be quad_trees...
-//		super(lcContext.getScenario(), tripRouter, null, facilities_of_type, null);
 		this.facilities = lcContext.getScenario().getActivityFacilities();
 		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
@@ -132,7 +130,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 
 				// copy the best plan into replanned plan
 				// making a deep copy
-				LCPlanUtils.copyPlanFieldsToFrom( plan, bestPlan );
+				LCPlanUtils.copyPlanFieldsFromTo( bestPlan, plan );
 
 				PopulationUtils.resetRoutes( plan );
 				break;
@@ -150,7 +148,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 
 				// copy the best plan into replanned plan
 				// making a deep copy
-				LCPlanUtils.copyPlanFieldsToFrom( plan, bestPlan );
+				LCPlanUtils.copyPlanFieldsFromTo( bestPlan, plan );
 
 				PopulationUtils.resetRoutes( plan );
 				break;
@@ -168,7 +166,6 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 			actlegIndex++;
 			if (pe instanceof Activity) {
 				String actType = ((Activity) plan.getPlanElements().get(actlegIndex)).getType();
-//				System.err.println("looking at act of type: " + actType ) ;
 				if (actlegIndex > 0 && this.scaleEpsilon.isFlexibleType(actType)) {
 
 					List<? extends PlanElement> actslegs = plan.getPlanElements();
@@ -190,27 +187,21 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 
 					ChoiceSet cs = createChoiceSetFromCircle(plan, personIndex, travelTimeApproximationLevel, actToMove, maxRadius, center);
 					
-//					System.err.println("ChoiceSet cs:\n" + cs.toString() ) ;
-
-					// **************************************************
-					// maybe repeat this a couple of times
-					// yy why? kai, feb'13
-
 					final Id<ActivityFacility> choice = cs.getWeightedRandomChoice(
 							actlegIndex, this.scoringFunctionFactory, plan, this.tripRouter, this.lcContext.getPersonsKValuesArray()[personIndex],
 							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
 
 					this.setLocation(actToMove, choice);
-					
-//					printTentativePlanToConsole(plan);
 
 					// the change was done to "plan".  Now check if we want to copy this to bestPlan:
-					this.evaluateAndAdaptPlans(plan, bestPlan, cs, this.scoringFunctionFactory);
+					double score = this.computeScoreAndAdaptPlan( plan, cs, this.scoringFunctionFactory );
+					if (score > bestPlan.getScore() + 0.0000000000001) {
+						LCPlanUtils.copyFromTo( plan, bestPlan );
+					}
+					// yyyy Is it really necessary to do this evaulation step?  We just need a suggestion, and the forward/backward Dijkstra should be good enough to
+					// evaluate that. kai, mar'19
 
-					// yyyy if I understand this correctly, this means that, if the location change is accepted, all subsequent locachoice 
-					// optimization attempts will be run with that new location.  kai, jan'13
-					
-					// **************************************************
+
 				}
 			}
 		}		
@@ -260,8 +251,6 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	}
 
 	private void setLocation(Activity act2, Id<ActivityFacility> facilityId) {
-//		ActivityImpl act = (ActivityImpl) act2;
-//		act.setFacilityId(facilityId);
 		LCPlanUtils.setFacilityId(act2, facilityId );
 		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
 		
@@ -273,26 +262,11 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		else {
 			linkId = this.nearestLinks.get(facilityId);
 		}	
-//		act.setLinkId(linkId);
-//		act.setCoord(facility.getCoord());
 		LCPlanUtils.setLinkId(act2, linkId );
 		LCPlanUtils.setCoord(act2, facility.getCoord() );
 	}
-	
-	private void evaluateAndAdaptPlans(Plan plan, Plan bestPlanSoFar, ChoiceSet cs, ScoringFunctionFactory scoringFunction) {		
-		double score = this.computeScoreAndAdaptPlan(plan, cs, scoringFunction);	
-//		System.err.println("expected score of new plan is: " + score ) ;
-//		System.err.println("existing score of old plan is: " + bestPlanSoFar.getScore() ) ;
-		if (score > bestPlanSoFar.getScore() + 0.0000000000001) {
-//			plan.setScore(score);
-//			bestPlanSoFar.getPlanElements().clear();
-//			((PlanImpl) bestPlanSoFar).copyFrom(plan);
-			Plan source = plan;
-			Plan destination = bestPlanSoFar;
-			LCPlanUtils.copyFrom(source, destination );
-		}
-	}
 
+	@Deprecated // try without
 	private double computeScoreAndAdaptPlan(Plan plan, ChoiceSet cs, ScoringFunctionFactory scoringFunction) {
 		// yyyy why is all this plans copying necessary?  kai, jan'13
 		// looked into it but could not find a reason. Removed it and tests are still fine. cdobler, oct'15
@@ -302,7 +276,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		Plan planTmp = null;
 		if ( this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.planImpl) {
 			planTmp = PopulationUtils.createPlan(plan.getPerson());
-			LCPlanUtils.copyFrom(plan, planTmp );
+			LCPlanUtils.copyFromTo(plan, planTmp );
 		} else if ( this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.lcPlan) {
 			planTmp = new LCPlan(plan);
 		}
@@ -315,7 +289,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 						this.tripRouter,
 						DestinationChoiceConfigGroup.ApproximationLevel.completeRouting );
 
-		LCPlanUtils.copyPlanFieldsToFrom(plan, planTmp );	// copy( to, from )
+		LCPlanUtils.copyPlanFieldsFromTo( planTmp, plan );
 		return score;
 	}
 
