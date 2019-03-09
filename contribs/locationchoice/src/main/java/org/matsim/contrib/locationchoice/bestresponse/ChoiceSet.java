@@ -20,7 +20,6 @@
 package org.matsim.contrib.locationchoice.bestresponse;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,12 +29,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 class ChoiceSet {
 
@@ -117,6 +114,7 @@ class ChoiceSet {
 
 		// The following is sampling from the choice set, taking the best alternative with 60% proba, the next with 24% proba, etc.  Follow where it is coming from.  I don't
 		// know why that could be a good approach. kai, mar'19
+		// ignored now.  kai, mar'19
 
 //		/*
 //		 * list is filled by summing up the normalized scores (in descending order!):
@@ -154,7 +152,7 @@ class ChoiceSet {
 		  TripRouter router ) {
 
 		// currently handled activity which should be re-located
-		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
+		Activity activityToRelocate = (Activity) plan.getPlanElements().get(actlegIndex);
 
 		// We need to calculate the multi node dijkstra stuff only in case localRouting is used.
 //		if (this.approximationLevel == DestinationChoiceConfigGroup.ApproximationLevel.localRouting ) {
@@ -182,8 +180,8 @@ class ChoiceSet {
 //
 //			// ---
 //
-//			//			Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(act));
-//			Leg previousLeg = LCPlanUtils.getPreviousLeg(plan, act );
+//			//			Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(activityToRelocate));
+//			Leg previousLeg = LCPlanUtils.getPreviousLeg(plan, activityToRelocate );
 //			Activity previousActivity = LCPlanUtils.getPreviousActivity(plan, previousLeg );
 //			fromNode = this.network.getLinks().get(previousActivity.getLinkId()).getToNode();
 //
@@ -194,8 +192,8 @@ class ChoiceSet {
 //
 //			// ---
 //
-//			//			Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).getNextLeg(act));
-//			Leg nextLeg = LCPlanUtils.getNextLeg(plan, act );
+//			//			Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).getNextLeg(activityToRelocate));
+//			Leg nextLeg = LCPlanUtils.getNextLeg(plan, activityToRelocate );
 //			Activity nextActivity = LCPlanUtils.getPreviousActivity(plan, nextLeg );
 //			fromNode = this.network.getLinks().get(nextActivity.getLinkId()).getToNode();
 //
@@ -205,14 +203,14 @@ class ChoiceSet {
 //			 * BUT: if we use that activities end time, we could also use another ForwardMultiNodeDijsktra...
 //			 * Switched to nextActivity.startTime() since this time is also available in PlanTimesAdapter.computeTravelTimeFromLocalRouting()
 //			 * where the path's created by the Dijkstra are used. So far (I think), the estimated start times
-//			 * where used there (leastCostPathCalculatorBackward.setEstimatedStartTime(act.getEndTime())).
+//			 * where used there (leastCostPathCalculatorBackward.setEstimatedStartTime(activityToRelocate.getEndTime())).
 //			 *
 //			 * cdobler oct'13
 //			 */
-//			backwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, act.getEndTime(), plan.getPerson(), null);
+//			backwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, activityToRelocate.getEndTime(), plan.getPerson(), null);
 //
 //			//		BackwardDijkstraMultipleDestinations leastCostPathCalculatorBackward = new BackwardDijkstraMultipleDestinations(network, travelCost, travelTime);
-//			//		leastCostPathCalculatorBackward.setEstimatedStartTime(act.getEndTime());
+//			//		leastCostPathCalculatorBackward.setEstimatedStartTime(activityToRelocate.getEndTime());
 //			//		// the backwards Dijkstra will expand from the _next_ activity location backwards to all locations in the system.  This is the time
 //			//		// at which this is anchored.  (Clearly too early, but probably not that bad as an approximation.)
 //			//
@@ -231,7 +229,7 @@ class ChoiceSet {
 		// comment should be removed.
 		ArrayList<ScoredAlternative> list = new ArrayList<ScoredAlternative>();
 		double largestValue = Double.NEGATIVE_INFINITY;
-		Id<ActivityFacility> facilityIdWithLargestScore = act.getFacilityId();
+		Id<ActivityFacility> facilityIdWithLargestScore = activityToRelocate.getFacilityId();
 
 		/*
 		 * TODO:
@@ -252,9 +250,9 @@ class ChoiceSet {
 			// are calculated. The resulting travel times are written to the temporary plan. If this is true, it should 
 			// not be necessary to update the activity location in the copied plan? I am not sure about this, therefore 
 			// keep the update in the "if(this.ReUsePlans)" block. cdobler oct'15
-			LCPlanUtils.setFacilityId(act, destinationId );
-			LCPlanUtils.setCoord(act, facility.getCoord() );
-			LCPlanUtils.setLinkId(act, this.nearestLinks.get(destinationId ) );
+			LCPlanUtils.setFacilityId(activityToRelocate, destinationId );
+			LCPlanUtils.setCoord(activityToRelocate, facility.getCoord() );
+			LCPlanUtils.setLinkId(activityToRelocate, this.nearestLinks.get(destinationId ) );
 
 			//			PlanImpl planTmp = new PlanImpl();
 			//			planTmp.copyFrom(plan);
@@ -269,13 +267,16 @@ class ChoiceSet {
 			// If we don't re-use a single copy of the plan, create a new one.
 			else planTmp = LCPlanUtils.createCopy(plan );
 
-			final double score =
-				  this.adaptAndScoreTimes(
-					    plan,
-					    planTmp,
-					    scoringFunction,
-					    router,
-					    this.approximationLevel);
+			PlanTimesAdapter adapter = new PlanTimesAdapter( this.approximationLevel,
+				  router, this.scenario, this.teleportedModeSpeeds, this.beelineDistanceFactors);
+
+			//  Try:
+			// * remove plan as argument
+			// * duplicate following method, and rename into "adaptTimes" and "scorePlan".
+			// * try, under testing, to thin out each method, to those two separate functionalities
+			// * then try to replace by more central language constructs.
+
+			final double score = adapter.adaptTimesAndScorePlan( plan, planTmp, scoringFunction );
 
 			if (score > largestValue) {
 				largestValue = score;
@@ -283,9 +284,10 @@ class ChoiceSet {
 			}
 			list.add(new ScoredAlternative(score, destinationId));
 		}
+
 		Collections.sort( list );
 		if ( !list.isEmpty() ) {
-			return list.subList( 0,5 ) ;
+			return list.subList( 0,Math.min( list.size(), 5) ) ;
 		}
 		else  {
 			/* how is this supposed to happen at all?  kai, jan'13
@@ -368,13 +370,4 @@ class ChoiceSet {
 //		return mapNormalized;
 //	}
 
-	double adaptAndScoreTimes( Plan plan,
-					   Plan planTmp,
-					   ScoringFunctionFactory scoringFunction,
-					   TripRouter router,
-					   ApproximationLevel approximationLevelTmp ) {
-		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp,
-			  router, this.scenario, this.teleportedModeSpeeds, this.beelineDistanceFactors);
-		return adapter.adaptTimesAndScorePlan(plan, planTmp, scoringFunction);
-	}
 }

@@ -136,7 +136,8 @@ public class FrozenEpsilonLocaChoiceIT{
 		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
 		assertNotNull( newWork ) ;
 		assertTrue( !newWork.getFacilityId().equals(Id.create(1, ActivityFacility.class) ) ) ; // should be different from facility number 1 !!
-		assertEquals( Id.create(63, ActivityFacility.class), newWork.getFacilityId() ); // as I have changed the scoring (act is included) I also changed the test here: 27->92
+//		assertEquals( Id.create(63, ActivityFacility.class), newWork.getFacilityId() ); // as I have changed the scoring (act is included) I also changed the test here: 27->92
+		assertEquals( Id.create(64, ActivityFacility.class), newWork.getFacilityId() ); // as I have changed the scoring (act is included) I also changed the test here: 27->92
 	}
 
 	@Test

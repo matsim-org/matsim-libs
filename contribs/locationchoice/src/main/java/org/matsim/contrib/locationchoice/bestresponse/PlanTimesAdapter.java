@@ -97,6 +97,8 @@ class PlanTimesAdapter {
 			final Plan plan,
 			final Plan planTmp,
 			final ScoringFunctionFactory scoringFunctionFactory ) {
+		// We need a copy of the plan since for scoring other fields need to be filled out than in the original plan (e.g. activityEndTime).  On the other hand, it is not
+		// clear why the original plan needs to be passed to here.  What _is_ necessary is the person in that plan (because the copy does not have it).
 
 		// yyyy Note: getPrevious/NextLeg/Activity all relies on alternating activities and leg, which was given up as a requirement
 		// a long time ago (which is why it is not in the interface).  kai, jan'13
