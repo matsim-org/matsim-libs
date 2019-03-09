@@ -271,12 +271,12 @@ class ChoiceSet {
 				  router, this.scenario, this.teleportedModeSpeeds, this.beelineDistanceFactors);
 
 			//  Try:
-			// * remove plan as argument
+			// * remove plan as argument ... DONE
 			// * duplicate following method, and rename into "adaptTimes" and "scorePlan".
 			// * try, under testing, to thin out each method, to those two separate functionalities
 			// * then try to replace by more central language constructs.
 
-			final double score = adapter.adaptTimesAndScorePlan( plan, planTmp, scoringFunction );
+			final double score = adapter.adaptTimesAndScorePlan( planTmp, scoringFunction, plan.getPerson() );
 
 			if (score > largestValue) {
 				largestValue = score;

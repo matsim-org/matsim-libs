@@ -24,10 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -94,21 +91,20 @@ class PlanTimesAdapter {
 	 * 
 	 */
 	/* package */ double adaptTimesAndScorePlan(
-			final Plan plan,
-			final Plan planTmp,
-			final ScoringFunctionFactory scoringFunctionFactory ) {
+		  final Plan planTmp,
+		  final ScoringFunctionFactory scoringFunctionFactory, Person person ) {
 		// We need a copy of the plan since for scoring other fields need to be filled out than in the original plan (e.g. activityEndTime).  On the other hand, it is not
 		// clear why the original plan needs to be passed to here.  What _is_ necessary is the person in that plan (because the copy does not have it).
 
 		// yyyy Note: getPrevious/NextLeg/Activity all relies on alternating activities and leg, which was given up as a requirement
 		// a long time ago (which is why it is not in the interface).  kai, jan'13
 
-		final ScoringFunction scoringFunction = scoringFunctionFactory.createNewScoringFunction(plan.getPerson());
+		final ScoringFunction scoringFunction = scoringFunctionFactory.createNewScoringFunction( person);
 
 		// iterate through plan and adapt travel and activity times
 		boolean isFirstActivity = true;
-		for ( Activity act : TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE ) ) {
-			final int planElementIndex = plan.getPlanElements().indexOf( act );
+		for ( Activity act : TripStructureUtils.getActivities( planTmp , EmptyStageActivityTypes.INSTANCE ) ) {
+			final int planElementIndex = planTmp.getPlanElements().indexOf( act );
 			if ( isFirstActivity ) {
 				isFirstActivity = false;
 				final Activity actTmp = (Activity) planTmp.getPlanElements().get(planElementIndex);
@@ -120,7 +116,7 @@ class PlanTimesAdapter {
 				continue;
 			}
 
-			final List<? extends PlanElement> trip = estimateTravelTime( plan, act );
+			final List<? extends PlanElement> trip = estimateTravelTime( planTmp, act );
 
 			for ( PlanElement pe : trip ) {
 				if ( pe instanceof Activity ) {
