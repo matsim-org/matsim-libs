@@ -194,10 +194,10 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 					this.setLocation(actToMove, choice);
 
 					// the change was done to "plan".  Now check if we want to copy this to bestPlan:
-					double score = this.computeScoreAndAdaptPlan( plan, cs, this.scoringFunctionFactory );
-					if (score > bestPlan.getScore() + 0.0000000000001) {
+//					double score = this.computeScoreAndAdaptPlan( plan, cs, this.scoringFunctionFactory );
+//					if (score > bestPlan.getScore() + 0.0000000000001) {
 						LCPlanUtils.copyFromTo( plan, bestPlan );
-					}
+//					}
 					// yyyy Is it really necessary to do this evaulation step?  We just need a suggestion, and the forward/backward Dijkstra should be good enough to
 					// evaluate that. kai, mar'19
 
@@ -266,32 +266,32 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		LCPlanUtils.setCoord(act2, facility.getCoord() );
 	}
 
-	@Deprecated // try without
-	private double computeScoreAndAdaptPlan(Plan plan, ChoiceSet cs, ScoringFunctionFactory scoringFunction) {
-		// yyyy why is all this plans copying necessary?  kai, jan'13
-		// looked into it but could not find a reason. Removed it and tests are still fine. cdobler, oct'15
-
-//		Plan planTmp = plan;
-
-		Plan planTmp = null;
-		if ( this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.planImpl) {
-			planTmp = PopulationUtils.createPlan(plan.getPerson());
-			LCPlanUtils.copyFromTo(plan, planTmp );
-		} else if ( this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.lcPlan) {
-			planTmp = new LCPlan(plan);
-		}
-
-		final double score =
-				cs.adaptAndScoreTimes(
-						plan,
-						planTmp,
-						scoringFunction,
-						this.tripRouter,
-						DestinationChoiceConfigGroup.ApproximationLevel.completeRouting );
-
-		LCPlanUtils.copyPlanFieldsFromTo( planTmp, plan );
-		return score;
-	}
+//	@Deprecated // try without
+//	private double computeScoreAndAdaptPlan(Plan plan, ChoiceSet cs, ScoringFunctionFactory scoringFunction) {
+//		// yyyy why is all this plans copying necessary?  kai, jan'13
+//		// looked into it but could not find a reason. Removed it and tests are still fine. cdobler, oct'15
+//
+////		Plan planTmp = plan;
+//
+//		Plan planTmp = null;
+//		if ( this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.planImpl) {
+//			planTmp = PopulationUtils.createPlan(plan.getPerson());
+//			LCPlanUtils.copyFromTo(plan, planTmp );
+//		} else if ( this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.lcPlan) {
+//			planTmp = new LCPlan(plan);
+//		}
+//
+//		final double score =
+//				cs.adaptAndScoreTimes(
+//						plan,
+//						planTmp,
+//						scoringFunction,
+//						this.tripRouter,
+//						DestinationChoiceConfigGroup.ApproximationLevel.completeRouting );
+//
+//		LCPlanUtils.copyPlanFieldsFromTo( planTmp, plan );
+//		return score;
+//	}
 
 	/**
 	 * Conversion of the "frozen" logit model epsilon into a distance.

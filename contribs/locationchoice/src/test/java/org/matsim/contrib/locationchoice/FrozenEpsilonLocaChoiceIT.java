@@ -222,8 +222,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		}
 
 		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
-//		dccg.setEpsilonScaleFactors("20.0" );
-		dccg.setEpsilonScaleFactors("50.0" );
+		dccg.setEpsilonScaleFactors("10.0" );
 		dccg.setAlgorithm( bestResponse );
 		dccg.setFlexibleTypes( "shop" );
 		dccg.setTravelTimeApproximationLevel( completeRouting );
@@ -284,12 +283,12 @@ public class FrozenEpsilonLocaChoiceIT{
 					Activity shop = pf.createActivityFromActivityFacilityId( "shop", initialShopFacilityId );
 					// shop.setMaximumDuration( 3600. ); // does not work for locachoice: time computation is not able to deal with it.  yyyy replace by
 					// more central code. kai, mar'19
-					shop.setEndTime( 8. * 3600 );
+					shop.setEndTime( 10. * 3600 );
 					plan.addActivity( shop );
 				}
 				{
 					Leg leg = pf.createLeg( "car" );
-					leg.setDepartureTime( 8. * 3600. );
+					leg.setDepartureTime( 10. * 3600. );
 					leg.setTravelTime( 1800. );
 					plan.addLeg( leg );
 				}
@@ -361,6 +360,12 @@ public class FrozenEpsilonLocaChoiceIT{
 					@Inject Population population ;
 					@Inject ActivityFacilities facilities ;
 					@Inject TripRouter tripRouter ;
+					int binFromVal( double val ) {
+						if ( val < 1. ) {
+							return 0 ;
+						}
+						return (int) ( Math.log(val)/Math.log(2) ) ;
+					}
 					@Override public void notifyShutdown( ShutdownEvent event ){
 						double[] cnt = new double[1000] ;
 						for( Person person : population.getPersons().values() ){
@@ -369,7 +374,7 @@ public class FrozenEpsilonLocaChoiceIT{
 								Facility facFrom = FacilitiesUtils.toFacility( trip.getOriginActivity(), facilities );
 								Facility facTo = FacilitiesUtils.toFacility( trip.getDestinationActivity(), facilities );
 								double tripBeelineDistance = CoordUtils.calcEuclideanDistance( facFrom.getCoord(), facTo.getCoord() );
-								int bin = (int) (tripBeelineDistance / 1000.);
+								int bin = binFromVal( tripBeelineDistance ) ;
 								cnt[bin] ++ ;
 							}
 						}
@@ -378,11 +383,20 @@ public class FrozenEpsilonLocaChoiceIT{
 								log.info( "bin=" + ii + "; cnt=" + cnt[ii] );
 							}
 						}
-						check( 1440, cnt[0] );
-						check( 22, cnt[1] ) ;
-						check( 16, cnt[2] ) ;
-						check( 20, cnt[3] ) ;
-						check( 12, cnt[4] ) ;
+						check( 16, cnt[0] );
+						check( 12, cnt[6] ) ;
+						check( 30, cnt[7] ) ;
+						check( 38, cnt[8] ) ;
+						check( 88, cnt[9] ) ;
+						check( 122, cnt[10] ) ;
+						check( 266, cnt[11] ) ;
+						check( 434, cnt[12] ) ;
+						check( 476, cnt[13] ) ;
+						check( 404, cnt[14] ) ;
+						check( 114, cnt[15] ) ;
+
+						// The bins are logarithmic, so I would have expected the counts to be approximately constant.  That clearly is not the case.  I don't know why.
+
 					}
 
 					void check( double val, double actual ){

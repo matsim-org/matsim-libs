@@ -171,7 +171,8 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 					break; }
 				case tripBeelineDistances:
 				case tripBeelineDistancesCumulative: {
-					double[] dataBoundariesTmp = {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 30000., 50000., 70000., 100000., 200000., 500000.} ;
+					// making them exactly logarithmic so that exp(-x) becomes constant
+					double[] dataBoundariesTmp = {0., 100., 200., 400., 800., 1600., 3200., 6400., 12800., 25600., 51200., 102400., 204800.,409600.,819200.} ;
 					Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
 					this.statsContainer.put( type, databins) ;
 					break; }
