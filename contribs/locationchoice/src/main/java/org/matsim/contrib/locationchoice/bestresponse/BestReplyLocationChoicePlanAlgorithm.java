@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.InternalPlanDataStructure;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
@@ -58,8 +57,6 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private final ActTypeConverter actTypeConverter;
 	private final DestinationSampler sampler;
 	private final DestinationChoiceContext lcContext;
-	private final MultiNodeDijkstra forwardMultiNodeDijkstra;
-	private final BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final int iteration;
 	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
@@ -79,8 +76,8 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	public BestReplyLocationChoicePlanAlgorithm(
 		  TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quad_trees,
 		  ObjectAttributes personsMaxDCScoreUnscaled, DestinationChoiceContext lcContext,
-		  DestinationSampler sampler, TripRouter tripRouter, MultiNodeDijkstra forwardMultiNodeDijkstra,
-		  BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, ScoringFunctionFactory scoringFunctionFactory,
+		  DestinationSampler sampler, TripRouter tripRouter,
+		  ScoringFunctionFactory scoringFunctionFactory,
 		  int iteration, Map<Id<ActivityFacility>, Id<Link>> nearestLinks ) {
 		this.facilities = lcContext.getScenario().getActivityFacilities();
 		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
@@ -88,8 +85,6 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		this.actTypeConverter = lcContext.getConverter();
 		this.sampler = sampler;
 		this.lcContext = lcContext;
-		this.forwardMultiNodeDijkstra = forwardMultiNodeDijkstra;
-		this.backwardMultiNodeDijkstra = backwardMultiNodeDijkstra;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.iteration = iteration;
 		this.nearestLinks = nearestLinks;
@@ -126,7 +121,10 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 
 				// this will probably generate an improved bestPlan (?):
 				int personIndex = this.lcContext.getPersonIndex( person.getId() );
+
+				// ### The following is where the work is done:
 				this.handleActivities( plan, bestPlan, personIndex );
+				// ###
 
 				// copy the best plan into replanned plan
 				// making a deep copy
@@ -189,9 +187,9 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 					
 					final Id<ActivityFacility> choice = cs.getWeightedRandomChoice(
 							actlegIndex, this.scoringFunctionFactory, plan, this.tripRouter, this.lcContext.getPersonsKValuesArray()[personIndex],
-							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
+						  this.iteration);
 
-					this.setLocation(actToMove, choice);
+					this.setLocationOfActivityToChoice(actToMove, choice );
 
 					// the change was done to "plan".  Now check if we want to copy this to bestPlan:
 //					double score = this.computeScoreAndAdaptPlan( plan, cs, this.scoringFunctionFactory );
@@ -199,7 +197,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 						LCPlanUtils.copyFromTo( plan, bestPlan );
 //					}
 					// yyyy Is it really necessary to do this evaulation step?  We just need a suggestion, and the forward/backward Dijkstra should be good enough to
-					// evaluate that. kai, mar'19
+					// evaluate that. Or, for that matter, the matsim iteration loop. kai, mar'19
 
 
 				}
@@ -250,7 +248,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		return cs;
 	}
 
-	private void setLocation(Activity act2, Id<ActivityFacility> facilityId) {
+	private void setLocationOfActivityToChoice( Activity act2, Id<ActivityFacility> facilityId ) {
 		LCPlanUtils.setFacilityId(act2, facilityId );
 		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
 		

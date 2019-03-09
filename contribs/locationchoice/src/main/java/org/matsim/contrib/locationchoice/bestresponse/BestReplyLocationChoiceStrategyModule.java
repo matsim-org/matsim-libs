@@ -67,22 +67,16 @@ final class BestReplyLocationChoiceStrategyModule extends AbstractMultithreadedM
 	private final Scenario scenario;
 	private DestinationChoiceContext lcContext;
 	private HashSet<String> flexibleTypes;
-	private final LeastCostPathCalculatorFactory forwardMultiNodeDijsktaFactory;
-	private final LeastCostPathCalculatorFactory backwardMultiNodeDijsktaFactory;
 	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
 
 	public static double useScaleEpsilonFromConfig = -99.0;
 	private ScoringFunctionFactory scoringFunctionFactory;
-	private Map<String, TravelTime> travelTimes;
-	private Map<String, TravelDisutilityFactory> travelDisutilities;
 
 	public BestReplyLocationChoiceStrategyModule( Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled,
-								    ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities ) {
+								    ScoringFunctionFactory scoringFunctionFactory ) {
 		super(lcContext.getScenario().getConfig().global());
 		this.tripRouterProvider = tripRouterProvider;
 		this.scoringFunctionFactory = scoringFunctionFactory;
-		this.travelTimes = travelTimes;
-		this.travelDisutilities = travelDisutilities;
 
 		DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule( lcContext.getScenario().getConfig(), DestinationChoiceConfigGroup.class );
 		if (!DestinationChoiceConfigGroup.Algotype.bestResponse.equals( dccg.getAlgorithm() )) {
@@ -91,8 +85,6 @@ final class BestReplyLocationChoiceStrategyModule extends AbstractMultithreadedM
 		this.lcContext = lcContext;
 		this.scenario = lcContext.getScenario();
 		this.personsMaxEpsUnscaled = personsMaxDCScoreUnscaled;
-		this.forwardMultiNodeDijsktaFactory = new FastMultiNodeDijkstraFactory(true);
-		this.backwardMultiNodeDijsktaFactory = new BackwardFastMultiNodeDijkstraFactory(true);
 
 		// create cache which is used in ChoiceSet
 		// instead of just the nearest link we probably should check whether the facility is attached to a link? cdobler, oct'14
@@ -135,12 +127,6 @@ final class BestReplyLocationChoiceStrategyModule extends AbstractMultithreadedM
 
 		ReplanningContext replanningContext = this.getReplanningContext();
 
-		MultiNodeDijkstra forwardMultiNodeDijkstra = (MultiNodeDijkstra) this.forwardMultiNodeDijsktaFactory.createPathCalculator(this.scenario.getNetwork(),
-			  travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car)), travelTimes.get(TransportMode.car));
-
-		BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra = (BackwardFastMultiNodeDijkstra) this.backwardMultiNodeDijsktaFactory.createPathCalculator(
-			  this.scenario.getNetwork(), travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car)), travelTimes.get(TransportMode.car));
-
 		// this one corresponds to the "frozen epsilon" paper(s)
 		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
 
@@ -148,6 +134,6 @@ final class BestReplyLocationChoiceStrategyModule extends AbstractMultithreadedM
 		int iteration = replanningContext.getIteration();
 
 		return new BestReplyLocationChoicePlanAlgorithm(this.quadTreesOfType, this.personsMaxEpsUnscaled,
-			  this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration, this.nearestLinks);
+			  this.lcContext, this.sampler, tripRouter, scoringFunctionFactory, iteration, this.nearestLinks);
 	}
 }

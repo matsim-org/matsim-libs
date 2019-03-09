@@ -31,7 +31,9 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	public enum Algotype { random, bestResponse, localSearchRecursive, localSearchSingleAct };
 	public enum EpsilonDistributionTypes { gumbel, gaussian };
 	public enum InternalPlanDataStructure { planImpl, lcPlan };
-	public enum ApproximationLevel {completeRouting, localRouting, noRouting}
+//	public enum ApproximationLevel {completeRouting, localRouting, noRouting}
+	public enum ApproximationLevel {completeRouting, noRouting}
+	// I don't understand how the localRouting execution path is supposed to work.  It is also not covered by a test.  --> commenting it out.  kai, mar'19
 
 	public static final String GROUP_NAME = "locationchoice";
 	
@@ -103,7 +105,7 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	private String flexible_types = "null";	// TODO !!
 	
 	private Algotype algorithm = Algotype.bestResponse;
-	private ApproximationLevel tt_approximationLevel = ApproximationLevel.localRouting;
+	private ApproximationLevel tt_approximationLevel = ApproximationLevel.completeRouting ;
 	private double maxDistanceDCScore = -1.0;
 	private String planSelector = "SelectExpBeta";
 	
@@ -358,9 +360,9 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 				case "0":
 					this.setTravelTimeApproximationLevel( ApproximationLevel.completeRouting );
 					break;
-				case "1":
-					this.setTravelTimeApproximationLevel( ApproximationLevel.localRouting );
-					break;
+//				case "1":
+//					this.setTravelTimeApproximationLevel( ApproximationLevel.localRouting );
+//					break;
 				case "2":
 					this.setTravelTimeApproximationLevel( ApproximationLevel.noRouting );
 					break;

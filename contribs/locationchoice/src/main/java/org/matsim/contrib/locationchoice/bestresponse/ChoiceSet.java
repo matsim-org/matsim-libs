@@ -32,17 +32,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
-import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.ImaginaryNode;
-import org.matsim.core.router.InitialNode;
-import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.facilities.ActivityFacilities;
@@ -98,16 +91,15 @@ class ChoiceSet {
 		this.notYetVisited.add(facilityId);
 	}
 
-	Id<ActivityFacility> getWeightedRandomChoice(int actlegIndex,
-									    ScoringFunctionFactory scoringFunction, Plan plan, TripRouter tripRouter, double pKVal,
-									    MultiNodeDijkstra forwardMultiNodeDijkstra, BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra,
-									    int iteration) {
+	Id<ActivityFacility> getWeightedRandomChoice( int actlegIndex,
+								    ScoringFunctionFactory scoringFunction, Plan plan, TripRouter tripRouter, double pKVal,
+								    int iteration ) {
 
 		TreeMap<Double, Id<ActivityFacility>> map;
 
 		if (this.destinations.size() > 0) {
 			map = this.createReducedChoiceSetWithPseudoScores(actlegIndex, this.facilities, scoringFunction, plan,
-				  tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra );
+				  tripRouter );
 		} else {
 			// if we have no destinations defined so far, we can shorten this
 			// currently handled activity which should be re-located
@@ -158,79 +150,77 @@ class ChoiceSet {
 		  ActivityFacilities facilities,
 		  ScoringFunctionFactory scoringFunction,
 		  Plan plan,
-		  TripRouter router,
-		  MultiNodeDijkstra forwardMultiNodeDijkstra,
-		  BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra ) {
+		  TripRouter router ) {
 
 		// currently handled activity which should be re-located
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
 
 		// We need to calculate the multi node dijkstra stuff only in case localRouting is used.
-		if (this.approximationLevel == DestinationChoiceConfigGroup.ApproximationLevel.localRouting ) {
-			Node fromNode;
-			/*
-			 * Assuming that both, forward and backward Dijkstra, route to the end nodes of links where
-			 * potential activities are located. Is this correct??
-			 * Otherwise, an ImaginaryNode for each routing direction has to be created.
-			 * cdobler, oct'13
-			 */
-			List<InitialNode> destinationNodes = new ArrayList<InitialNode>();
-			for (Id<ActivityFacility> destinationId : this.destinations) {
-				ActivityFacility destinationFacility = this.scenario.getActivityFacilities().getFacilities().get(destinationId);
-				Id<Link> linkId = destinationFacility.getLinkId();
-				Link destinationLink;
-				if (linkId != null) {
-					destinationLink = this.network.getLinks().get(linkId);
-				} else destinationLink = NetworkUtils.getNearestLink(((Network) this.network), destinationFacility.getCoord());
-
-				Node toNode = destinationLink.getToNode();
-				InitialNode initialToNode = new InitialNode(toNode, 0.0, 0.0);
-				destinationNodes.add(initialToNode);
-			}
-			ImaginaryNode destinationNode = forwardMultiNodeDijkstra.createImaginaryNode(destinationNodes);
-
-			// ---
-
-			//			Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(act));
-			Leg previousLeg = LCPlanUtils.getPreviousLeg(plan, act );
-			Activity previousActivity = LCPlanUtils.getPreviousActivity(plan, previousLeg );
-			fromNode = this.network.getLinks().get(previousActivity.getLinkId()).getToNode();
-
-			forwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, previousActivity.getEndTime(), plan.getPerson(), null);
-
-			//		ForwardDijkstraMultipleDestinations leastCostPathCalculatorForward = new ForwardDijkstraMultipleDestinations(network, travelCost, travelTime);
-			//		leastCostPathCalculatorForward.calcLeastCostTree(fromNode, previousActivity.getEndTime());
-
-			// ---
-
-			//			Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).getNextLeg(act));
-			Leg nextLeg = LCPlanUtils.getNextLeg(plan, act );
-			Activity nextActivity = LCPlanUtils.getPreviousActivity(plan, nextLeg );
-			fromNode = this.network.getLinks().get(nextActivity.getLinkId()).getToNode();
-
-			/*
-			 * The original code below uses the relocated activities end time as start time. Does this make sense?
-			 * Probably yes, since the trip to the next destination is short??
-			 * BUT: if we use that activities end time, we could also use another ForwardMultiNodeDijsktra...
-			 * Switched to nextActivity.startTime() since this time is also available in PlanTimesAdapter.computeTravelTimeFromLocalRouting()
-			 * where the path's created by the Dijkstra are used. So far (I think), the estimated start times
-			 * where used there (leastCostPathCalculatorBackward.setEstimatedStartTime(act.getEndTime())).
-			 *
-			 * cdobler oct'13
-			 */
-			backwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, act.getEndTime(), plan.getPerson(), null);
-
-			//		BackwardDijkstraMultipleDestinations leastCostPathCalculatorBackward = new BackwardDijkstraMultipleDestinations(network, travelCost, travelTime);
-			//		leastCostPathCalculatorBackward.setEstimatedStartTime(act.getEndTime());
-			//		// the backwards Dijkstra will expand from the _next_ activity location backwards to all locations in the system.  This is the time
-			//		// at which this is anchored.  (Clearly too early, but probably not that bad as an approximation.)
-			//
-			//		leastCostPathCalculatorBackward.calcLeastCostTree(fromNode, -1.0);
-			//		// "-1.0" is ignored.  It is not clear to me why we first set the (approximated) start time separately, and then ignore the startTime.
-			//		// (The Dijkstra algo does not care if the start time is approximated or exact.)  kai, jan'13
-
-			// ---	
-		}
+//		if (this.approximationLevel == DestinationChoiceConfigGroup.ApproximationLevel.localRouting ) {
+//			Node fromNode;
+//			/*
+//			 * Assuming that both, forward and backward Dijkstra, route to the end nodes of links where
+//			 * potential activities are located. Is this correct??
+//			 * Otherwise, an ImaginaryNode for each routing direction has to be created.
+//			 * cdobler, oct'13
+//			 */
+//			List<InitialNode> destinationNodes = new ArrayList<InitialNode>();
+//			for (Id<ActivityFacility> destinationId : this.destinations) {
+//				ActivityFacility destinationFacility = this.scenario.getActivityFacilities().getFacilities().get(destinationId);
+//				Id<Link> linkId = destinationFacility.getLinkId();
+//				Link destinationLink;
+//				if (linkId != null) {
+//					destinationLink = this.network.getLinks().get(linkId);
+//				} else destinationLink = NetworkUtils.getNearestLink(((Network) this.network), destinationFacility.getCoord());
+//
+//				Node toNode = destinationLink.getToNode();
+//				InitialNode initialToNode = new InitialNode(toNode, 0.0, 0.0);
+//				destinationNodes.add(initialToNode);
+//			}
+//			ImaginaryNode destinationNode = forwardMultiNodeDijkstra.createImaginaryNode(destinationNodes);
+//
+//			// ---
+//
+//			//			Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(act));
+//			Leg previousLeg = LCPlanUtils.getPreviousLeg(plan, act );
+//			Activity previousActivity = LCPlanUtils.getPreviousActivity(plan, previousLeg );
+//			fromNode = this.network.getLinks().get(previousActivity.getLinkId()).getToNode();
+//
+//			forwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, previousActivity.getEndTime(), plan.getPerson(), null);
+//
+//			//		ForwardDijkstraMultipleDestinations leastCostPathCalculatorForward = new ForwardDijkstraMultipleDestinations(network, travelCost, travelTime);
+//			//		leastCostPathCalculatorForward.calcLeastCostTree(fromNode, previousActivity.getEndTime());
+//
+//			// ---
+//
+//			//			Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).getNextLeg(act));
+//			Leg nextLeg = LCPlanUtils.getNextLeg(plan, act );
+//			Activity nextActivity = LCPlanUtils.getPreviousActivity(plan, nextLeg );
+//			fromNode = this.network.getLinks().get(nextActivity.getLinkId()).getToNode();
+//
+//			/*
+//			 * The original code below uses the relocated activities end time as start time. Does this make sense?
+//			 * Probably yes, since the trip to the next destination is short??
+//			 * BUT: if we use that activities end time, we could also use another ForwardMultiNodeDijsktra...
+//			 * Switched to nextActivity.startTime() since this time is also available in PlanTimesAdapter.computeTravelTimeFromLocalRouting()
+//			 * where the path's created by the Dijkstra are used. So far (I think), the estimated start times
+//			 * where used there (leastCostPathCalculatorBackward.setEstimatedStartTime(act.getEndTime())).
+//			 *
+//			 * cdobler oct'13
+//			 */
+//			backwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, act.getEndTime(), plan.getPerson(), null);
+//
+//			//		BackwardDijkstraMultipleDestinations leastCostPathCalculatorBackward = new BackwardDijkstraMultipleDestinations(network, travelCost, travelTime);
+//			//		leastCostPathCalculatorBackward.setEstimatedStartTime(act.getEndTime());
+//			//		// the backwards Dijkstra will expand from the _next_ activity location backwards to all locations in the system.  This is the time
+//			//		// at which this is anchored.  (Clearly too early, but probably not that bad as an approximation.)
+//			//
+//			//		leastCostPathCalculatorBackward.calcLeastCostTree(fromNode, -1.0);
+//			//		// "-1.0" is ignored.  It is not clear to me why we first set the (approximated) start time separately, and then ignore the startTime.
+//			//		// (The Dijkstra algo does not care if the start time is approximated or exact.)  kai, jan'13
+//
+//			// ---
+//		}
 
 		// Handling duplicates. This was may the source for (small) random fluctuations
 		// yyyy which duplicates?  and how are they handled?  kai, jan'13

@@ -228,8 +228,8 @@ class PlanTimesAdapter {
 					return Collections.singletonList( previousLeg );
 				}
 				// fall through to local routing if not car or previous travel time not found
-			case localRouting:
-				return getTravelTimeApproximation( previousActivity, act, mode );
+//			case localRouting:
+//				return getTravelTimeApproximation( previousActivity, act, mode );
 			default:
 				throw new RuntimeException( "unknown method "+this.approximationLevel );
 		}
