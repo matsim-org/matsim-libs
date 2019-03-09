@@ -34,7 +34,6 @@
 				<vehicles description="representativeVehicles">
 					<vehicle id="lightVehicle" depotLinkId="1" typeId="light" earliestStart="21900" latestEnd="23:59:59"/>
 					<vehicle id="mediumVehicle" depotLinkId="1" typeId="medium" earliestStart="21900" latestEnd="23:59:59"/>
-					<vehicle id="heavyVehicle" depotLinkId="2" typeId="heavy" earliestStart="21900" latestEnd="23:59:59"/>
 				</vehicles>
 				
 			</capabilities>
