@@ -22,8 +22,11 @@ package org.matsim.contrib.freight.carrier;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.MatsimVehicleReader;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
+
+import javax.measure.unit.SystemOfUnits;
 
 /**
  *  Test for using the usual vehicles / vehicle types (v2) format.
@@ -42,10 +45,11 @@ public class VehicleTypeLoaderTest extends MatsimTestCase{
 
 		System.setProperty("matsim.preferLocalDtds","true");
 
-		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+		vehicles = VehicleUtils.createVehiclesContainer();
 //		new MatsimVehicleReader(vehicles).readFile(getClassInputDirectory() + "vehicles.xml");
 		MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
 		reader.readFile(this.getClassInputDirectory() + "vehicles.xml");
+
 		carriers = new Carriers();
 		new CarrierPlanXmlReaderV2(carriers).readFile(this.getClassInputDirectory() + "carrierPlansEquils.xml");
 	}
