@@ -385,13 +385,13 @@ public class FrozenEpsilonLocaChoiceIT{
 						}
 						check( 16, cnt[0] );
 						check( 12, cnt[6] ) ;
-						check( 30, cnt[7] ) ;
-						check( 38, cnt[8] ) ;
+						check( 26, cnt[7] ) ;
+						check( 44, cnt[8] ) ;
 						check( 88, cnt[9] ) ;
-						check( 122, cnt[10] ) ;
-						check( 266, cnt[11] ) ;
+						check( 128, cnt[10] ) ;
+						check( 242, cnt[11] ) ;
 						check( 434, cnt[12] ) ;
-						check( 476, cnt[13] ) ;
+						check( 488, cnt[13] ) ;
 						check( 404, cnt[14] ) ;
 						check( 114, cnt[15] ) ;
 
@@ -400,7 +400,7 @@ public class FrozenEpsilonLocaChoiceIT{
 					}
 
 					void check( double val, double actual ){
-						Assert.assertEquals( val, actual, Math.max( 5, Math.sqrt( val ) ) );
+						Assert.assertEquals( val, actual, Math.max( 10, Math.sqrt( val ) ) );
 					}
 
 				} );

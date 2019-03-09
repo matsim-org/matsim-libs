@@ -19,14 +19,8 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Random;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,10 +30,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 class ChoiceSet {
 
@@ -95,20 +91,19 @@ class ChoiceSet {
 								    ScoringFunctionFactory scoringFunction, Plan plan, TripRouter tripRouter, double pKVal,
 								    int iteration ) {
 
-		TreeMap<Double, Id<ActivityFacility>> map;
+		List<ScoredAlternative> list;
 
 		if (this.destinations.size() > 0) {
-			map = this.createReducedChoiceSetWithPseudoScores(actlegIndex, this.facilities, scoringFunction, plan,
+			list = this.createReducedChoiceSetWithPseudoScores(actlegIndex, this.facilities, scoringFunction, plan,
 				  tripRouter );
 		} else {
 			// if we have no destinations defined so far, we can shorten this
 			// currently handled activity which should be re-located
 			Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
-			map = createEmptyChoiceMap( act.getFacilityId() );
+//			list = createEmptyChoiceMap( act.getFacilityId() );
+			list = Collections.singletonList( new ScoredAlternative( 0., act.getFacilityId() ) ) ;
+			// (the "0" is a dummy entry!)
 		}
-
-		// The following is sampling from the choice set, taking the best alternative with 60% proba, the next with 24% proba, etc.  Follow where it is coming from.  I don't
-		// know why that could be a good approach. kai, mar'19
 
 		Random random = new Random((long) (Long.MAX_VALUE / iteration * pKVal));
 
@@ -116,36 +111,42 @@ class ChoiceSet {
 		for (int i = 0; i < 10; i++) {
 			random.nextDouble();
 		}
-		double randomNumber = random.nextDouble();
+		int randomIndex = random.nextInt( list.size() ) ;
 
-		/*
-		 * map is filled by summing up the normalized scores (in descending order!):
-		 * Thus small original scores have a large normalized sum score. This is required as we put elements with decreasing
-		 * original score into the choice set as long as there is space left (number of alternatives).
-		 *
-		 * The map is thus here traversed (or sorted) in reverse order (descending), such that small normalized scores
-		 * (== alternatives having large original scores) are visited first.
-		 *  TODO: Check if this really makes a difference ... (I think not!)... -> maybe do natural order and add "break"
-		 *
-		 * The last entry, that is still larger (descending order) than the random number is returned as id.
-		 * Essentially this is Monte Carlo sampling.
-		 *
-		 * NOTE: Scores are not only normalized, but also accumulated!!!
-		 */
-		Id<ActivityFacility> id = map.get(map.firstKey());
-		for (Entry<Double, Id<ActivityFacility>> entry : map.entrySet()) {
-			if (entry.getKey() > randomNumber + 0.000000000000000001) {
-				id = entry.getValue();
-			}
-		}
+		return list.get( randomIndex ).getAlternativeId() ;
 
-		return id;
+		// The following is sampling from the choice set, taking the best alternative with 60% proba, the next with 24% proba, etc.  Follow where it is coming from.  I don't
+		// know why that could be a good approach. kai, mar'19
+
+//		/*
+//		 * list is filled by summing up the normalized scores (in descending order!):
+//		 * Thus small original scores have a large normalized sum score. This is required as we put elements with decreasing
+//		 * original score into the choice set as long as there is space left (number of alternatives).
+//		 *
+//		 * The list is thus here traversed (or sorted) in reverse order (descending), such that small normalized scores
+//		 * (== alternatives having large original scores) are visited first.
+//		 *  TODO: Check if this really makes a difference ... (I think not!)... -> maybe do natural order and add "break"
+//		 *
+//		 * The last entry, that is still larger (descending order) than the random number is returned as id.
+//		 * Essentially this is Monte Carlo sampling.
+//		 *
+//		 * NOTE: Scores are not only normalized, but also accumulated!!!
+//		 */
+//		Id<ActivityFacility> id = list.get(list.firstKey());
+//		for (Entry<Double, Id<ActivityFacility>> entry : list.entrySet()) {
+//			if (entry.getKey() > randomNumber + 0.000000000000000001) {
+//				id = entry.getValue();
+//			}
+//		}
+//
+//		return id;
 	}
 
 	/**
-	 * The "score", which is behind the "Double" in the TreeMap, is some pseudo score 0.6, 0.84, ..., see {@link ChoiceSet#generateReducedChoiceSet(ArrayList)}
+	 * The "score", which is behind the "Double" in the TreeMap, is some pseudo score 0.6, 0.84, ..., see {ChoiceSet#generateReducedChoiceSet(ArrayList)}.
+	 * Well, no, not any more, just setting all of them to 0.2.
 	 */
-	private TreeMap<Double, Id<ActivityFacility>> createReducedChoiceSetWithPseudoScores(
+	private List<ScoredAlternative> createReducedChoiceSetWithPseudoScores(
 		  int actlegIndex,
 		  ActivityFacilities facilities,
 		  ScoringFunctionFactory scoringFunction,
@@ -282,9 +283,9 @@ class ChoiceSet {
 			}
 			list.add(new ScoredAlternative(score, destinationId));
 		}
-		TreeMap<Double, Id<ActivityFacility>> mapCorrected = this.generateReducedChoiceSet(list);
-		if (mapCorrected.size() > 0) {
-			return mapCorrected;
+		Collections.sort( list );
+		if ( !list.isEmpty() ) {
+			return list.subList( 0,5 ) ;
 		}
 		else  {
 			/* how is this supposed to happen at all?  kai, jan'13
@@ -298,14 +299,15 @@ class ChoiceSet {
 			//			TreeMap<Double,Id> mapTmp = new TreeMap<Double,Id>();
 			//			mapTmp.put(1.1, facilityIdWithLargestScore);
 			//			return mapTmp;
-			return createEmptyChoiceMap(facilityIdWithLargestScore);
+//			return createEmptyChoiceMap(facilityIdWithLargestScore);
+			return Collections.singletonList( new ScoredAlternative( largestValue, facilityIdWithLargestScore ) )  ;
 		}
 	}
-	private TreeMap<Double, Id<ActivityFacility>> createEmptyChoiceMap(Id<ActivityFacility> facilityIdWithLargestScore) {
-		TreeMap<Double, Id<ActivityFacility>> mapTmp = new TreeMap<>();
-		mapTmp.put(1.1, facilityIdWithLargestScore);
-		return mapTmp;
-	}
+//	private TreeMap<Double, Id<ActivityFacility>> createEmptyChoiceMap(Id<ActivityFacility> facilityIdWithLargestScore) {
+//		TreeMap<Double, Id<ActivityFacility>> mapTmp = new TreeMap<>();
+//		mapTmp.put(1.1, facilityIdWithLargestScore);
+//		return mapTmp;
+//	}
 
 	/*
 	 * We can have three cases here:
@@ -339,23 +341,32 @@ class ChoiceSet {
 	 * Use approximation to golden ratio (contains sqrt) with specified number of alternatives
 	 * (more than around 5 makes no sense actually)
 	 */
-	private TreeMap<Double, Id<ActivityFacility>> generateReducedChoiceSet(ArrayList<ScoredAlternative> list) {
-
-		// sort the list (ScoredAlternative fulfills Comparable):
-		Collections.sort(list);
-
-		// say that we want about five alternatives (or less if we don't have enough):
-		int nrElements = Math.min(list.size(), this.numberOfAlternatives);
-
-		// take the first 5 alternatives and give them some pseudo-scores 0.6, 0.84, 0.936, 0.9744, ...
-		TreeMap<Double, Id<ActivityFacility>> mapNormalized = new TreeMap<>( java.util.Collections.reverseOrder() );
-		for (int index = 0; index < nrElements; index++)  {
-			double indexNormalized = 1.0 - Math.pow(0.4, (index + 1));
-			ScoredAlternative sa = list.get(index);
-			mapNormalized.put(indexNormalized, sa.getAlternativeId());
-		}
-		return mapNormalized;
-	}
+//	private TreeMap<Double, Id<ActivityFacility>> generateReducedChoiceSet(ArrayList<ScoredAlternative> list) {
+//		// This is an attempt generate diversity, without falling back into the trap that locations just slide closer and closer to the home location.  I guess that the
+//		// author did not want a sharp transition between the 1st five and the 6th, and thus introduced gradually declining probabilities.
+//
+//		// However, in the sense of matsim this does not make a difference: The iterations are not converged before all of them have been tried out.  In consequence,
+//		// providing some with lower proba may(!) help being faster in the transients, but it will slow down final convergence.
+//
+//		// However, reaching final convergence may not be the true goal of matsim; at least, all the diversity generating stuff elsewhere also has the consequence that it will
+//		// keep generating alternatives.
+//
+//		// sort the list (ScoredAlternative fulfills Comparable):
+//		Collections.sort(list);
+//
+//		// say that we want about five alternatives (or less if we don't have enough):
+//		int nrElements = Math.min(list.size(), this.numberOfAlternatives);
+//
+//		// take the first 5 alternatives and give them some pseudo-scores 0.6, 0.84, 0.936, 0.9744, ...
+//		TreeMap<Double, Id<ActivityFacility>> mapNormalized = new TreeMap<>( java.util.Collections.reverseOrder() );
+//		for (int index = 0; index < nrElements; index++)  {
+////			double indexNormalized = 1.0 - Math.pow(0.4, (index + 1));
+//			double indexNormalized = 0.2 ;
+//			ScoredAlternative sa = list.get(index);
+//			mapNormalized.put(indexNormalized, sa.getAlternativeId());
+//		}
+//		return mapNormalized;
+//	}
 
 	double adaptAndScoreTimes( Plan plan,
 					   Plan planTmp,
