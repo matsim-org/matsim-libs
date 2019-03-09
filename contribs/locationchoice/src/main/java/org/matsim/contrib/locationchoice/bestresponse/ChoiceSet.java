@@ -36,11 +36,9 @@ import org.matsim.facilities.ActivityFacility;
 
 class ChoiceSet {
 
-	private int numberOfAlternatives;
 	private ApproximationLevel approximationLevel;
-	private List<Id<ActivityFacility>> destinations = new LinkedList<Id<ActivityFacility>>();
-	private List<Id<ActivityFacility>> notYetVisited = new LinkedList<Id<ActivityFacility>>();
-	private final Network network;
+	private List<Id<ActivityFacility>> destinations = new LinkedList<>();
+	private List<Id<ActivityFacility>> notYetVisited = new LinkedList<>();
 	private final ActivityFacilities facilities;
 	private final Scenario scenario;
 	private final Map<String, Double> teleportedModeSpeeds;
@@ -67,7 +65,6 @@ class ChoiceSet {
 	ChoiceSet(ApproximationLevel approximationLevel, Scenario scenario, Map<Id<ActivityFacility>, Id<Link>> nearestLinks,
 		    Map<String, Double> teleportedModeSpeeds, Map<String, Double> beelineDistanceFactors) {
 		this.approximationLevel = approximationLevel;
-		this.network = scenario.getNetwork();
 		this.facilities = scenario.getActivityFacilities();
 		this.scenario = scenario;
 		this.nearestLinks = nearestLinks;
@@ -75,7 +72,6 @@ class ChoiceSet {
 		this.beelineDistanceFactors = beelineDistanceFactors;
 
 		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
-		this.numberOfAlternatives = dccg.getProbChoiceSetSize();
 		this.reUsePlans = dccg.getReUseTemporaryPlans();
 	}
 
@@ -221,12 +217,6 @@ class ChoiceSet {
 //			// ---
 //		}
 
-		// Handling duplicates. This was may the source for (small) random fluctuations
-		// yyyy which duplicates?  and how are they handled?  kai, jan'13
-		//
-		// that was not the problem of the fluctuations. alternatives with the same score are deterministically 
-		// handled now by including the id for compareTo evaluation.
-		// comment should be removed.
 		ArrayList<ScoredAlternative> list = new ArrayList<ScoredAlternative>();
 		double largestValue = Double.NEGATIVE_INFINITY;
 		Id<ActivityFacility> facilityIdWithLargestScore = activityToRelocate.getFacilityId();
@@ -276,7 +266,7 @@ class ChoiceSet {
 			// * try, under testing, to thin out each method, to those two separate functionalities
 			// * then try to replace by more central language constructs.
 
-			final double score = adapter.adaptTimesAndScorePlan( planTmp, scoringFunction, plan.getPerson() );
+			final double score = adapter.scorePlan( planTmp, scoringFunction, plan.getPerson() );
 
 			if (score > largestValue) {
 				largestValue = score;

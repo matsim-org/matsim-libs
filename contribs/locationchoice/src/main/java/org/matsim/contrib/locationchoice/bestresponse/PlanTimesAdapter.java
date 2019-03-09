@@ -43,6 +43,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.matsim.core.router.TripStructureUtils.*;
+
 class PlanTimesAdapter {
 	private static final Logger log = Logger.getLogger( PlanTimesAdapter.class ) ;
 
@@ -90,20 +92,32 @@ class PlanTimesAdapter {
 	 * 	- noRouting: same as localRouting but with estimated travel times for the calculated routes
 	 * 
 	 */
-	/* package */ double adaptTimesAndScorePlan(
+	/* package */ double scorePlan (
 		  final Plan planTmp,
 		  final ScoringFunctionFactory scoringFunctionFactory, Person person ) {
-		// We need a copy of the plan since for scoring other fields need to be filled out than in the original plan (e.g. activityEndTime).  On the other hand, it is not
-		// clear why the original plan needs to be passed to here.  What _is_ necessary is the person in that plan (because the copy does not have it).
+		// We need a copy of the plan since for scoring other fields need to be filled out than in the original plan (e.g. activityEndTime).  The plan is afterwards thrown
+		// away (which implies that we should make the defensive copy rather inside this method).
 
-		// yyyy Note: getPrevious/NextLeg/Activity all relies on alternating activities and leg, which was given up as a requirement
-		// a long time ago (which is why it is not in the interface).  kai, jan'13
+		// prev/next activity is ok
 
 		final ScoringFunction scoringFunction = scoringFunctionFactory.createNewScoringFunction( person);
 
+		boolean first = true ;
+		for( Trip trip : getTrips( planTmp, router.getStageActivityTypes() ) ){
+			if ( first ) {
+				scoringFunction.handleActivity( trip.getOriginActivity() );
+				first = false ;
+			}
+			for( Leg leg : trip.getLegsOnly() ){
+				scoringFunction.handleLeg( leg );
+			}
+			// note: one could insist on scoring all plan elements of the trip but be careful since the origin and destination activities will be included.
+			scoringFunction.handleTrip( trip );
+		}
+
 		// iterate through plan and adapt travel and activity times
 		boolean isFirstActivity = true;
-		for ( Activity act : TripStructureUtils.getActivities( planTmp , EmptyStageActivityTypes.INSTANCE ) ) {
+		for ( Activity act : getActivities( planTmp , EmptyStageActivityTypes.INSTANCE ) ) {
 			final int planElementIndex = planTmp.getPlanElements().indexOf( act );
 			if ( isFirstActivity ) {
 				isFirstActivity = false;
@@ -227,7 +241,7 @@ class PlanTimesAdapter {
 				}
 				// fall through to local routing if not car or previous travel time not found
 //			case localRouting:
-//				return getTravelTimeApproximation( previousActivity, act, mode );
+				return getTravelTimeApproximation( previousActivity, act, mode );
 			default:
 				throw new RuntimeException( "unknown method "+this.approximationLevel );
 		}
