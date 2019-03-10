@@ -51,8 +51,7 @@ final class BookingEngine implements MobsimEngine {
 	private final TripRouter tripRouter;
 
 	@Inject
-	BookingEngine(TripRouter tripRouter, Scenario scenario,
-			Map<String, TripInfo.Provider> tripInfoProviders) {
+	BookingEngine(TripRouter tripRouter, Scenario scenario, Map<String, TripInfo.Provider> tripInfoProviders) {
 		this.tripRouter = tripRouter;
 		this.editTrips = new EditTrips(tripRouter, scenario);
 		this.tripInfoProviders = tripInfoProviders;
@@ -89,6 +88,50 @@ final class BookingEngine implements MobsimEngine {
 		tripInfoRequestMap.put(agent, tripInfoRequest);
 	}
 
+	private void processTripInfoRequests() {
+		for (Map.Entry<MobsimAgent, TripInfoRequest> entry : tripInfoRequestMap.entrySet()) {
+			Map<TripInfo, TripInfo.Provider> allTripInfos = new LinkedHashMap<>();
+			for (TripInfo.Provider provider : tripInfoProviders.values()) {
+				List<TripInfo> tripInfos = provider.getTripInfos(entry.getValue());
+				for (TripInfo tripInfo : tripInfos) {
+					allTripInfos.put(tripInfo, provider);
+				}
+			}
+
+			// TODO add info for mode that is in agent plan, if not returned by trip info provider
+
+			decide(entry.getKey(), allTripInfos);
+		}
+
+		tripInfoRequestMap.clear();
+	}
+
+	private void decide(MobsimAgent agent, Map<TripInfo, TripInfo.Provider> allTripInfos) {
+
+		// to get started, we assume that we are only getting one drt option back.
+		// TODO: make complete
+		TripInfo tripInfo = allTripInfos.keySet().iterator().next();
+
+		if (tripInfo instanceof RequiresBooking) {
+			((RequiresBooking)tripInfo).bookTrip(); //or: tripinfoProvider.bookTrip((RequiresBooking)tripInfo);
+			//to reduce number of possibilities, I would simply assume that notification always comes later
+			//
+			// --> yes, with DRT it will always come in the next time step, I adapted code accordingly (michal)
+
+			//but what to do if trip gets rejected?
+			//
+			// --> maybe ActivityEngineWithWakeup should only wake up agents given some conditions and then delegate
+			// handling of agents to bookingNotificationEngine (or other handlers - depending on the wake-up condition)
+			// Then bookingNotificationEngine should handle the whole process, including re-looping through providers in case a rejection comes
+			// (michal)
+
+			// wait for notification:
+			((Activity)WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.MAX_VALUE);
+			editPlans.rescheduleActivityEnd(agent);
+		} else {
+			notifyChangedTripInformation(agent, tripInfo);//no booking here-> just plan trip
+		}
+	}
 
 	private void processTripInfos() {
 		for (Map.Entry<MobsimAgent, TripInfo> entry : tripInfoMap.entrySet()) {
@@ -169,50 +212,5 @@ final class BookingEngine implements MobsimEngine {
 		// ----
 
 		Gbl.assertIf(!walkTripsIter.hasNext());
-	}
-
-	private void processTripInfoRequests() {
-		for (Map.Entry<MobsimAgent, TripInfoRequest> entry : tripInfoRequestMap.entrySet()) {
-			Map<TripInfo, TripInfo.Provider> allTripInfos = new LinkedHashMap<>();
-			for (TripInfo.Provider provider : tripInfoProviders.values()) {
-				List<TripInfo> tripInfos = provider.getTripInfos(entry.getValue());
-				for (TripInfo tripInfo : tripInfos) {
-					allTripInfos.put(tripInfo, provider);
-				}
-			}
-
-			// TODO add info for mode that is in agent plan, if not returned by trip info provider
-
-			decide(entry.getKey(), allTripInfos);
-		}
-
-		tripInfoRequestMap.clear();
-	}
-
-	private void decide(MobsimAgent agent, Map<TripInfo, TripInfo.Provider> allTripInfos) {
-
-		// to get started, we assume that we are only getting one drt option back.
-		// TODO: make complete
-		TripInfo tripInfo = allTripInfos.keySet().iterator().next();
-
-		if (tripInfo instanceof RequiresBooking) {
-			((RequiresBooking)tripInfo).bookTrip(); //or: tripinfoProvider.bookTrip((RequiresBooking)tripInfo);
-			//to reduce number of possibilities, I would simply assume that notification always comes later
-			//
-			// --> yes, with DRT it will always come in the next time step, I adapted code accordingly (michal)
-
-			//but what to do if trip gets rejected?
-			//
-			// --> maybe ActivityEngineWithWakeup should only wake up agents given some conditions and then delegate
-			// handling of agents to bookingNotificationEngine (or other handlers - depending on the wake-up condition)
-			// Then bookingNotificationEngine should handle the whole process, including re-looping through providers in case a rejection comes
-			// (michal)
-
-			// wait for notification:
-			((Activity)WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.MAX_VALUE);
-			editPlans.rescheduleActivityEnd(agent);
-		} else {
-			notifyChangedTripInformation(agent, tripInfo);//no booking here-> just plan trip
-		}
 	}
 }
