@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Scenario;
@@ -38,7 +39,7 @@ final class BookingEngine implements MobsimEngine {
 
 	private final Map<String, TripInfo.Provider> tripInfoProviders;
 
-	private Map<MobsimAgent, TripInfo> tripInfoMap = new ConcurrentHashMap<>();
+	private Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new ConcurrentHashMap<>();
 	// yyyy not sure about possible race conditions here! kai, feb'19
 
 	private Map<MobsimAgent, TripInfoRequest> tripInfoRequestMap = new ConcurrentHashMap<>();
@@ -71,17 +72,18 @@ final class BookingEngine implements MobsimEngine {
 
 	@Override
 	public void doSimStep(double time) {
-		//first process requests then infos --> trips without booking required can be processed in 1 time step
+		//first process requests  and then infos --> trips without booking required can be processed in 1 time step
+		//booking confirmation always comes later (e.g. next time step)
 		processTripInfoRequests();
-		processTripInfos();
+		processTripInfoUpdates();
 	}
 
-	public synchronized final void notifyChangedTripInformation(MobsimAgent agent, TripInfo tripinfo) {
+	public synchronized final void notifyChangedTripInformation(MobsimAgent agent, Optional<TripInfo> tripInfoUpdate) {
 		// (we are in the mobsim, so we don't need to play around with IDs)
-		tripInfoMap.put(agent, tripinfo);
+		tripInfoUpdatesMap.put(agent, tripInfoUpdate);
 	}
 
-	public synchronized final void notifyTripInfoRequestArrived(MobsimAgent agent, TripInfoRequest tripInfoRequest) {
+	public synchronized final void notifyTripInfoRequestSent(MobsimAgent agent, TripInfoRequest tripInfoRequest) {
 		tripInfoRequestMap.put(agent, tripInfoRequest);
 	}
 
@@ -115,38 +117,31 @@ final class BookingEngine implements MobsimEngine {
 			//
 			// --> yes, with DRT it will always come in the next time step, I adapted code accordingly (michal)
 
-			//but what to do if trip gets rejected?
-			//
-			// --> maybe ActivityEngineWithWakeup should only wake up agents given some conditions and then delegate
-			// handling of agents to bookingNotificationEngine (or other handlers - depending on the wake-up condition)
-			// Then bookingNotificationEngine should handle the whole process, including re-looping through providers in case a rejection comes
-			// (michal)
-
 			// wait for notification:
 			((Activity)WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.MAX_VALUE);
 			editPlans.rescheduleActivityEnd(agent);
 		} else {
-			notifyChangedTripInformation(agent, tripInfo);//no booking here-> just plan trip
+			notifyChangedTripInformation(agent, Optional.of(tripInfo));//no booking here
 		}
 	}
 
-	private void processTripInfos() {
-		for (Map.Entry<MobsimAgent, TripInfo> entry : tripInfoMap.entrySet()) {
+	private void processTripInfoUpdates() {
+		for (Map.Entry<MobsimAgent, Optional<TripInfo>> entry : tripInfoUpdatesMap.entrySet()) {
 			MobsimAgent agent = entry.getKey();
-			TripInfo tripInfo = entry.getValue();
+			Optional<TripInfo> tripInfo = entry.getValue();
 
-			boolean bookingRejected = false;// get it from TripInfo ???
-			if (bookingRejected) {
-				TripInfoRequest request = null;///get it from TripInfo ???
+			if (tripInfo.isPresent()) {
+				updateAgentPlan(agent, tripInfo.get());
+			} else {
+				TripInfoRequest request = null;
+				//TODO get it from where ??? from TripInfo???
 				//TODO agent should adapt trip info request given that the previous one got rejected??
 				//TODO or it should skip the rejected option during "accept()"
-				notifyTripInfoRequestArrived(agent, request);//start over again in the next time step
-			} else {
-				updateAgentPlan(agent, tripInfo);
+				notifyTripInfoRequestSent(agent, request);//start over again in the next time step
 			}
 		}
 
-		tripInfoMap.clear();
+		tripInfoUpdatesMap.clear();
 	}
 
 	private void updateAgentPlan(MobsimAgent agent, TripInfo tripInfo) {

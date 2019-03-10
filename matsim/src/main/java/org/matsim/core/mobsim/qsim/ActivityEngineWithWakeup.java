@@ -154,7 +154,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 
 		//first simulate ActivityEngineWithWakeup and then BookingEngine --> decision process
 		//in the same time step
-		bookingEngine.notifyTripInfoRequestArrived(entry.agent, request);
+		bookingEngine.notifyTripInfoRequestSent(entry.agent, request);
 	}
 
 	/**
