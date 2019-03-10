@@ -55,7 +55,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	private static final Logger log = Logger.getLogger(ActivityEngine.class);
 
 	private final ActivityFacilities facilities;
-	private final BookingNotificationEngine bookingNotificationEngine;
+	private final BookingEngine bookingEngine;
 
 	private ActivityEngine delegate;
 
@@ -68,11 +68,10 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	});
 
 	@Inject
-	ActivityEngineWithWakeup(EventsManager eventsManager, Scenario scenario,
-			BookingNotificationEngine bookingNotificationEngine) {
+	ActivityEngineWithWakeup(EventsManager eventsManager, Scenario scenario, BookingEngine bookingEngine) {
 		this.delegate = new ActivityEngine(eventsManager);
 		this.facilities = scenario.getActivityFacilities();
-		this.bookingNotificationEngine = bookingNotificationEngine;
+		this.bookingEngine = bookingEngine;
 	}
 
 	@Override
@@ -153,9 +152,9 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 				.setTime(drtTrip.getOriginActivity().getEndTime())
 				.createRequest();
 
-		//first simulate ActivityEngineWithWakeup and then BookingNotificationEngine --> decision process
+		//first simulate ActivityEngineWithWakeup and then BookingEngine --> decision process
 		//in the same time step
-		bookingNotificationEngine.notifyTripInfoRequestArrived(entry.agent, request);
+		bookingEngine.notifyTripInfoRequestArrived(entry.agent, request);
 	}
 
 	/**

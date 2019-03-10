@@ -30,7 +30,7 @@ import org.matsim.withinday.utils.EditTrips;
 
 import com.google.inject.Inject;
 
-final class BookingNotificationEngine implements MobsimEngine {
+final class BookingEngine implements MobsimEngine {
 
 	// Could implement this as a generalized version of the bdi-abm implementation: can send notifications to agent, and agent can react.  Similar to the drive-to action.
 	// Notifications and corresponding handlers could then be registered. On the other hand, it is easy to add an engine such as this one; how much does it help to have another
@@ -51,7 +51,7 @@ final class BookingNotificationEngine implements MobsimEngine {
 	private final TripRouter tripRouter;
 
 	@Inject
-	BookingNotificationEngine(TripRouter tripRouter, Scenario scenario,
+	BookingEngine(TripRouter tripRouter, Scenario scenario,
 			Map<String, TripInfo.Provider> tripInfoProviders) {
 		this.tripRouter = tripRouter;
 		this.editTrips = new EditTrips(tripRouter, scenario);
