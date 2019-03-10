@@ -32,6 +32,7 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -42,6 +43,7 @@ import org.matsim.facilities.FacilitiesUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.matsim.core.router.TripStructureUtils.*;
 
@@ -105,106 +107,114 @@ class PlanTimesAdapter {
 
 		final ScoringFunction scoringFunction = scoringFunctionFactory.createNewScoringFunction( person);
 
-		boolean first = true ;
-		for( Trip trip : getTrips( planTmp, router.getStageActivityTypes() ) ){
-			if ( first ) {
-				scoringFunction.handleActivity( trip.getOriginActivity() );
-				first = false ;
-			}
-			for( Leg leg : trip.getLegsOnly() ){
+		// yy The honest way of doing the following would be using the psim. kai, mar'19
+		Activity prevAct = null ;
+		for( PlanElement pe : planTmp.getPlanElements() ){
+			if ( pe instanceof Activity ) {
+				prevAct = (Activity) pe;
+				scoringFunction.handleActivity( prevAct );
+			} else if ( pe instanceof Leg ) {
+				final Leg leg = (Leg) pe;
+				// the scoring needs dpTime and tTime filled out, even if qsim input does not require that:
+				leg.setDepartureTime( PlanRouter.calcEndOfActivity( Objects.requireNonNull( prevAct ), planTmp, config ) );
+				double travelTime = PopulationUtils.decideOnTravelTimeForLeg( leg );
+				if ( Time.isUndefinedTime( travelTime ) ) {
+					travelTime = 0. ;
+				}
+				leg.setTravelTime( travelTime );
 				scoringFunction.handleLeg( leg );
+			} else {
+				throw new RuntimeException( "Unsupported PlanElement type" ) ;
 			}
-			// note: one could insist on scoring all plan elements of the trip but be careful since the origin and destination activities will be included.
+		}
+		// the following is hedging against the newer tripscoring; not clear if this will work out-of-sequence.
+		for( Trip trip : getTrips( planTmp, router.getStageActivityTypes() ) ){
 			scoringFunction.handleTrip( trip );
 		}
 
-		// iterate through plan and adapt travel and activity times
-		boolean isFirstActivity = true;
-		for ( Activity act : getActivities( planTmp , EmptyStageActivityTypes.INSTANCE ) ) {
-			final int planElementIndex = planTmp.getPlanElements().indexOf( act );
-			if ( isFirstActivity ) {
-				isFirstActivity = false;
-				final Activity actTmp = (Activity) planTmp.getPlanElements().get(planElementIndex);
-				// this used to assume the activity starts at 00:00:00, but this
-				// is not what happens in the iterations: the first activity
-				// has no start time, the last has no end time.
-				actTmp.setStartTime( Time.UNDEFINED_TIME );
-				scoringFunction.handleActivity( actTmp );
-				continue;
-			}
-
-			final List<? extends PlanElement> trip = estimateTravelTime( planTmp, act );
-
-			for ( PlanElement pe : trip ) {
-				if ( pe instanceof Activity ) {
-					// ignore this for the time being (otherwise, need to check times and re-create start and end time
-					// scoringFunction.handleActivity( (Activity) pe );
-				}
-				else if ( pe instanceof Leg ){
-					final Leg leg = (Leg) pe;
-					Gbl.assertIf( !Time.isUndefinedTime( leg.getDepartureTime() ) ) ;
-					Gbl.assertIf( !Time.isUndefinedTime( leg.getTravelTime() ) );
-					scoringFunction.handleLeg( leg );
-				}
-				else {
-					throw new RuntimeException( "unknown plan element type? "+pe.getClass().getName() );
-				}
-			}
-
-			double actDur = act.getMaximumDuration();
-
-			final Activity prevActTmp = (Activity) planTmp.getPlanElements().get(planElementIndex - 2);
-			double departureTime = 
-				prevActTmp.getEndTime() != Time.UNDEFINED_TIME ?
-					prevActTmp.getEndTime() :
-					prevActTmp.getStartTime() + prevActTmp.getMaximumDuration();
-
-			if ( departureTime == Time.UNDEFINED_TIME ) {
-				throw new RuntimeException( "could not infer departure time after activity "+prevActTmp );
-			}
-
-			final double arrivalTime = departureTime + getTravelTime( trip );
-
-			if ( arrivalTime == Time.UNDEFINED_TIME ) {
-				throw new RuntimeException( "could not infer arrival time after trip "+trip );
-			}
-
-			// yyyy I think this is really more complicated than it should be since it could/should just copy the time structure of the 
-			// original plan and not think so much.  kai, jan'13
-
-			// set new activity end time
-			// yy Isn't this the same as "act"?  (The code originally was a bit different, but in the original code it was also not using the
-			// iterated element.)  kai, jan'13
-			// No, it is not: this one comes from planTmp, not plan... Not sure why this duplication is there, though. td may '14
-			final Activity actTmp = (Activity) planTmp.getPlanElements().get(planElementIndex);
-
-			actTmp.setStartTime(arrivalTime);
-
-			final PlansConfigGroup.ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
-			switch ( actDurInterpr ) {
-			case tryEndTimeThenDuration:
-				if ( act.getEndTime() == Time.UNDEFINED_TIME && act.getMaximumDuration() != Time.UNDEFINED_TIME) {
-					// duration based definition: requires some care
-					actTmp.setMaximumDuration( act.getMaximumDuration() ) ;
-
-					// scoring function works with start and end time, not duration,
-					// but we do not want to put an end time in the plan.
-					assert actTmp.getEndTime() == Time.UNDEFINED_TIME : actTmp;
-					actTmp.setEndTime( arrivalTime + actDur ) ;
-					scoringFunction.handleActivity( actTmp );
-					actTmp.setEndTime( Time.UNDEFINED_TIME );
-				}
-				else {
-					actTmp.setEndTime( act.getEndTime() ) ;
-					scoringFunction.handleActivity( actTmp );
-				}
-				break;
-			default:
-				throw new RuntimeException("activity duration interpretation of " 
-						+ config.plans().getActivityDurationInterpretation().toString() + " is not supported for locationchoice; aborting ... " +
-								"Use " + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration.toString() + "instead.") ;
-			}
-		}
+//		if ( false ){
+//			// iterate through plan and adapt travel and activity times
+//			boolean isFirstActivity = true;
+//			for ( Activity act : getActivities( planTmp , EmptyStageActivityTypes.INSTANCE ) ) {
+//				final int planElementIndex = planTmp.getPlanElements().indexOf( act );
+//				if ( isFirstActivity ) {
+//					isFirstActivity = false;
+//					final Activity actTmp = (Activity) planTmp.getPlanElements().get(planElementIndex);
+//					// this used to assume the activity starts at 00:00:00, but this
+//					// is not what happens in the iterations: the first activity
+//					// has no start time, the last has no end time.
+//					actTmp.setStartTime( Time.UNDEFINED_TIME );
+//					scoringFunction.handleActivity( actTmp );
+//					continue;
+//				}
+//
+//				final List<? extends PlanElement> trip = estimateTravelTime( planTmp, act );
+//
+//				for ( PlanElement pe : trip ) {
+//					if ( pe instanceof Activity ) {
+//						// ignore this for the time being (otherwise, need to check times and re-create start and end time
+//						// scoringFunction.handleActivity( (Activity) pe );
+//					}
+//					else if ( pe instanceof Leg ){
+//						final Leg leg = (Leg) pe;
+//						Gbl.assertIf( !Time.isUndefinedTime( leg.getDepartureTime() ) ) ;
+//						Gbl.assertIf( !Time.isUndefinedTime( leg.getTravelTime() ) );
+//						scoringFunction.handleLeg( leg );
+//					}
+//					else {
+//						throw new RuntimeException( "unknown plan element type? "+pe.getClass().getName() );
+//					}
+//				}
+//
+//				double actDur = act.getMaximumDuration();
+//
+//				final Activity prevActTmp = (Activity) planTmp.getPlanElements().get(planElementIndex - 2);
+//				double departureTime =
+//					  prevActTmp.getEndTime() != Time.UNDEFINED_TIME ?
+//						    prevActTmp.getEndTime() :
+//						    prevActTmp.getStartTime() + prevActTmp.getMaximumDuration();
+//
+//				if ( departureTime == Time.UNDEFINED_TIME ) {
+//					throw new RuntimeException( "could not infer departure time after activity "+prevActTmp );
+//				}
+//
+//				final double arrivalTime = departureTime + getTravelTime( trip );
+//
+//				if ( arrivalTime == Time.UNDEFINED_TIME ) {
+//					throw new RuntimeException( "could not infer arrival time after trip "+trip );
+//				}
+//
+//				// set new activity end time
+//				final Activity actTmp = (Activity) planTmp.getPlanElements().get(planElementIndex);
+//
+//				actTmp.setStartTime(arrivalTime);
+//
+//				final PlansConfigGroup.ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
+//				switch ( actDurInterpr ) {
+//					case tryEndTimeThenDuration:
+//						if ( act.getEndTime() == Time.UNDEFINED_TIME && act.getMaximumDuration() != Time.UNDEFINED_TIME) {
+//							// duration based definition: requires some care
+//							actTmp.setMaximumDuration( act.getMaximumDuration() ) ;
+//
+//							// scoring function works with start and end time, not duration,
+//							// but we do not want to put an end time in the plan.
+//							assert actTmp.getEndTime() == Time.UNDEFINED_TIME : actTmp;
+//							actTmp.setEndTime( arrivalTime + actDur ) ;
+//							scoringFunction.handleActivity( actTmp );
+//							actTmp.setEndTime( Time.UNDEFINED_TIME );
+//						}
+//						else {
+//							actTmp.setEndTime( act.getEndTime() ) ;
+//							scoringFunction.handleActivity( actTmp );
+//						}
+//						break;
+//					default:
+//						throw new RuntimeException("activity duration interpretation of "
+//											     + config.plans().getActivityDurationInterpretation().toString() + " is not supported for locationchoice; aborting ... " +
+//											     "Use " + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration.toString() + "instead.") ;
+//				}
+//			}
+//		}
 
 		scoringFunction.finish();
 		return scoringFunction.getScore();
@@ -222,85 +232,5 @@ class PlanTimesAdapter {
 		return tt;
 	}
 
-	private List<? extends PlanElement> estimateTravelTime( Plan plan , Activity act ) {
-		// Ouch... should be passed as parameter!
-		final Leg previousLeg = LCPlanUtils.getPreviousLeg( plan, act );
-		final Activity previousActivity = LCPlanUtils.getPreviousActivity( plan, previousLeg );
-		final String mode = previousLeg.getMode();
-
-		switch ( this.approximationLevel ) {
-			case completeRouting:
-				final List<? extends PlanElement> trip = this.router.calcRoute( mode, FacilitiesUtils.toFacility( previousActivity, scenario.getActivityFacilities() ),
-								FacilitiesUtils.toFacility( act, scenario.getActivityFacilities() ), previousActivity.getEndTime(), plan.getPerson() );
-				fillInLegTravelTimes( previousActivity.getEndTime() , trip );
-				return trip;
-			case noRouting:
-				// Yes, those two are doing the same. I passed some time to simplify the (rather convoluted) code,
-				// and it boiled down to this. No idea of since how long this is not doing what it is claiming to do...
-				// The only difference is that "noRouting" was getting travel times from the route for car if it exists
-				// td dec 15
-				if ( mode.equals( TransportMode.car ) && previousLeg.getTravelTime() != Time.UNDEFINED_TIME ) {
-					return Collections.singletonList( previousLeg );
-				}
-				// fall through to local routing if not car or previous travel time not found
-//			case localRouting:
-				return getTravelTimeApproximation( previousActivity, act, mode );
-			default:
-				throw new RuntimeException( "unknown method "+this.approximationLevel );
-		}
-	}
-
-	private static void fillInLegTravelTimes(
-			final double departureTime,
-			final List<? extends PlanElement> trip ) {
-		double time = departureTime;
-		for ( PlanElement pe : trip ) {
-			if ( !(pe instanceof Leg) ) continue;
-			final Leg leg = (Leg) pe;
-			if ( leg.getDepartureTime() == Time.UNDEFINED_TIME ) {
-				leg.setDepartureTime( time );
-			}
-			if ( leg.getTravelTime() == Time.UNDEFINED_TIME ) {
-				leg.setTravelTime( leg.getRoute().getTravelTime() );
-			}
-			time += leg.getTravelTime();
-		}
-	}
-
-	private List<? extends PlanElement> getTravelTimeApproximation( Activity fromAct, Activity toAct, String mode ) {
-		// TODO: as soon as plansCalcRoute provides defaults for all modes use them
-		// I do not want users having to set dc parameters in other config modules!
-		double speed;
-
-		// Those two parameters could probably be defined with more flexibility...
-		if ( mode.equals( TransportMode.pt )) {
-			speed = this.dccg.getTravelSpeed_pt();
-		}
-		else if ( mode.equals( TransportMode.car ) ) {
-			speed = this.dccg.getTravelSpeed_car();
-		}
-		else if ( mode.equals( TransportMode.bike )) {
-			speed = this.teleportedModeSpeeds.get( TransportMode.bike );
-		}
-		else if ( mode.equals( TransportMode.walk ) || mode.equals( TransportMode.transit_walk )) {
-			speed = this.teleportedModeSpeeds.get(TransportMode.walk);
-		}
-		else {
-			speed = this.teleportedModeSpeeds.get(PlansCalcRouteConfigGroup.UNDEFINED);
-		}
-
-		// This is the only place where this class is used: delete it? td dec 15
-		final PathCostsGeneric pathCosts = new PathCostsGeneric( network );
-		pathCosts.createRoute(
-				this.network.getLinks().get( fromAct.getLinkId() ),
-				this.network.getLinks().get( toAct.getLinkId() ),
-				this.beelineDistanceFactors.get( PlansCalcRouteConfigGroup.UNDEFINED ),
-				speed );
-		final Leg l = PopulationUtils.createLeg(mode);
-		l.setRoute( pathCosts.getRoute() );
-		l.setTravelTime( pathCosts.getRoute().getTravelTime() );
-		l.setDepartureTime( fromAct.getEndTime() );
-		return Collections.singletonList( l );
-	}
 
 }

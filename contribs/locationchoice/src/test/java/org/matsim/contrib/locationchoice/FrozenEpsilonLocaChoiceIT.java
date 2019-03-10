@@ -368,6 +368,9 @@ public class FrozenEpsilonLocaChoiceIT{
 						return (int) ( Math.log(val)/Math.log(2) ) ;
 					}
 					@Override public void notifyShutdown( ShutdownEvent event ){
+						if ( event.isUnexpected() ) {
+							return ;
+						}
 						double[] cnt = new double[1000] ;
 						for( Person person : population.getPersons().values() ){
 							List<Trip> trips = TripStructureUtils.getTrips( person.getSelectedPlan(), tripRouter.getStageActivityTypes() );
