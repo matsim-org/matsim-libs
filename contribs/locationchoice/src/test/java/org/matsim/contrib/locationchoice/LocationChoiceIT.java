@@ -90,7 +90,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 		ActivityFacility facility3 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(3, ActivityFacility.class), new Coord((double) 0, (double) 300));
 		facility3.addActivityOption(new ActivityOptionImpl("work"));
 
-		Person person = localCreatePopWOnePerson(scenario, link, facility1, 17.*60.*60.);
+		Person person = localCreatePopWOnePerson(scenario, facility1, 17.*60.*60. );
 
 		Controler controler = new Controler(scenario);
 
@@ -136,14 +136,14 @@ public class LocationChoiceIT extends MatsimTestCase {
 	 * setup population with one person
 	 * @param workActEndTime TODO
 	 */
-	static Person localCreatePopWOnePerson( Scenario scenario, Link link, ActivityFacility facility1, double workActEndTime ) {
+	static Person localCreatePopWOnePerson( Scenario scenario, ActivityFacility facility1, double workActEndTime ) {
 
 		Population population = scenario.getPopulation();
 
 		Person person = population.getFactory().createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 
-		Plan plan = (Plan) population.getFactory().createPlan() ;
+		Plan plan = population.getFactory().createPlan();
 		person.addPlan(plan) ;
 
 		{
@@ -159,7 +159,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 			((Activity)act).setFacilityId(facility1.getId());
 			plan.addActivity(act) ;
 		}
-		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		plan.addLeg(population.getFactory().createLeg(TransportMode.car)) ;
 		{
 			//		act = plan.createAndAddActivity("home", new CoordImpl(0, 0));
 			//		act.setLinkId(link.getId());
@@ -180,9 +180,9 @@ public class LocationChoiceIT extends MatsimTestCase {
 		config.controler().setMobsim("qsim");
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue) ;
 
-		final DestinationChoiceConfigGroup destinationChoiceConfigGroup = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
-		destinationChoiceConfigGroup.setAlgorithm(Algotype.random );
-		destinationChoiceConfigGroup.setFlexibleTypes("work" );
+		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
+		dccg.setAlgorithm(Algotype.random );
+		dccg.setFlexibleTypes("work" );
 
 		ActivityParams home = new ActivityParams("home");
 		home.setTypicalDuration(12*60*60);

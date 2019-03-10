@@ -37,7 +37,6 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Approximat
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -96,7 +95,7 @@ class ChoiceSet {
 		this.network = scenario.getNetwork() ;
 	}
 
-	 void addDestination(Id<ActivityFacility> facilityId) {
+	void addDestination(Id<ActivityFacility> facilityId) {
 		this.destinations.add(facilityId);
 		this.notYetVisited.add(facilityId);
 	}
@@ -118,7 +117,7 @@ class ChoiceSet {
 			// if we have no destinations defined so far, we can shorten this
 			// currently handled activity which should be re-located
 			Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
-//			list = createEmptyChoiceMap( act.getFacilityId() );
+			//			list = createEmptyChoiceMap( act.getFacilityId() );
 			list = Collections.singletonList( new ScoredAlternative( 0., act.getFacilityId() ) ) ;
 			// (the "0" is a dummy entry!)
 		}
@@ -133,32 +132,6 @@ class ChoiceSet {
 
 		return list.get( randomIndex ).getAlternativeId() ;
 
-		// The following is sampling from the choice set, taking the best alternative with 60% proba, the next with 24% proba, etc.  Follow where it is coming from.  I don't
-		// know why that could be a good approach. kai, mar'19
-		// ignored now.  kai, mar'19
-
-//		/*
-//		 * list is filled by summing up the normalized scores (in descending order!):
-//		 * Thus small original scores have a large normalized sum score. This is required as we put elements with decreasing
-//		 * original score into the choice set as long as there is space left (number of alternatives).
-//		 *
-//		 * The list is thus here traversed (or sorted) in reverse order (descending), such that small normalized scores
-//		 * (== alternatives having large original scores) are visited first.
-//		 *  TODO: Check if this really makes a difference ... (I think not!)... -> maybe do natural order and add "break"
-//		 *
-//		 * The last entry, that is still larger (descending order) than the random number is returned as id.
-//		 * Essentially this is Monte Carlo sampling.
-//		 *
-//		 * NOTE: Scores are not only normalized, but also accumulated!!!
-//		 */
-//		Id<ActivityFacility> id = list.get(list.firstKey());
-//		for (Entry<Double, Id<ActivityFacility>> entry : list.entrySet()) {
-//			if (entry.getKey() > randomNumber + 0.000000000000000001) {
-//				id = entry.getValue();
-//			}
-//		}
-//
-//		return id;
 	}
 
 	/**
@@ -178,74 +151,74 @@ class ChoiceSet {
 		List<InitialNode> destinationNodes = new ArrayList<>();
 
 		// We need to calculate the multi node dijkstra stuff only in case localRouting is used.
-//		if (this.approximationLevel == DestinationChoiceConfigGroup.ApproximationLevel.localRouting )
-		 {
+		if (this.approximationLevel == DestinationChoiceConfigGroup.ApproximationLevel.localRouting )
+		{
 			// we want to investigate multiple destinations for a given activity.  Thus, we need
 			// (1) the Dijkstra tree from the activity before to all these destinations
 			// (2) the (backwards) Dijkstra tree from all these destinations to the activity following the given activity.
 			// The two trees will then be passed into the (preliminary) scoring of these destinations, where they will be evaluated for the
 			// destination under consideration.
 
-			// (1) forward tree
-			// () collect all possible destinations and copy them into an "imaginary" node.
-//			log.info("") ;
-			for (Id<ActivityFacility> destinationId : this.destinations) {
-				ActivityFacility destinationFacility = this.scenario.getActivityFacilities().getFacilities().get(destinationId);
-				Link destinationLink = FacilitiesUtils.decideOnLink( destinationFacility, network );;
-//				Id<Link> linkId = destinationFacility.getLinkId();
-//				Link destinationLink;
-//				if (linkId != null) {
-//					destinationLink = this.network.getLinks().get(linkId);
-//				} else {
-//					destinationLink = NetworkUtils.getNearestLink( this.network, destinationFacility.getCoord() );
-//				}
+			// (0) collect all possible destinations and copy them into an "imaginary" node.
+			for( Id<ActivityFacility> destinationId : this.destinations ){
+				ActivityFacility destinationFacility = this.scenario.getActivityFacilities().getFacilities().get( destinationId );
+				Link destinationLink = FacilitiesUtils.decideOnLink( destinationFacility, network );
+				;
+				//				Id<Link> linkId = destinationFacility.getLinkId();
+				//				Link destinationLink;
+				//				if (linkId != null) {
+				//					destinationLink = this.network.getLinks().get(linkId);
+				//				} else {
+				//					destinationLink = NetworkUtils.getNearestLink( this.network, destinationFacility.getCoord() );
+				//				}
 
 				Node toNode = Objects.requireNonNull( destinationLink ).getToNode();
 
-//				log.info( "destinationToNode=" + toNode.getId() ) ;
+				//				log.info( "destinationToNode=" + toNode.getId() ) ;
 
-				InitialNode initialToNode = new InitialNode(toNode, 0.0, 0.0);
-				destinationNodes.add(initialToNode);
+				InitialNode initialToNode = new InitialNode( toNode, 0.0, 0.0 );
+				destinationNodes.add( initialToNode );
 			}
-			ImaginaryNode destinationNode = MultiNodeDijkstra.createImaginaryNode(destinationNodes );
-//			log.info("") ;
+			ImaginaryNode destinationNode = MultiNodeDijkstra.createImaginaryNode( destinationNodes );
 
-			// ---
+			// (1) forward tree
+			{
 
-			//			Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(activityToRelocate));
-			Leg previousLeg = LCPlanUtils.getPreviousLeg(plan, activityToRelocate );
-			Activity previousActivity = LCPlanUtils.getPreviousActivity(plan, previousLeg );
-			 Node fromNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario ) ).getToNode();
+				//			Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(activityToRelocate));
+				Leg previousLeg = LCPlanUtils.getPreviousLeg( plan, activityToRelocate );
+				Activity previousActivity = LCPlanUtils.getPreviousActivity( plan, previousLeg );
+				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario ) ).getToNode();
 
-			forwardMultiNodeDijkstra.setSearchAllEndNodes( true );
-			forwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, previousActivity.getEndTime(), plan.getPerson(), null);
+				forwardMultiNodeDijkstra.setSearchAllEndNodes( true );
+				forwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, previousActivity.getEndTime(), plan.getPerson(), null );
+			}
 
-			// ---
+			// (2) backward tree
+			{
+				//			Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).getNextLeg(activityToRelocate));
+				Leg nextLeg = LCPlanUtils.getNextLeg( plan, activityToRelocate );
+				Activity nextActivity = LCPlanUtils.getNextActivity( plan, nextLeg );
+				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( nextActivity, scenario ) ).getToNode();
 
-			//			Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).getNextLeg(activityToRelocate));
-			Leg nextLeg = LCPlanUtils.getNextLeg(plan, activityToRelocate );
-			Activity nextActivity = LCPlanUtils.getPreviousActivity(plan, nextLeg );
-			fromNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( nextActivity, scenario)).getToNode();
+				/*
+				 * The original code below uses the relocated activities end time as start time. Does this make sense?
+				 * Probably yes, since the trip to the next destination is short??
+				 * BUT: if we use that activities end time, we could also use another ForwardMultiNodeDijsktra...
+				 * Switched to nextActivity.startTime() since this time is also available in PlanTimesAdapter.computeTravelTimeFromLocalRouting()
+				 * where the path's created by the Dijkstra are used. So far (I think), the estimated start times
+				 * were used there (leastCostPathCalculatorBackward.setEstimatedStartTime(activityToRelocate.getEndTime())).
+				 *
+				 * cdobler oct'13
+				 */
+				// yy but the code that follows now is not doing what the comment above says, or does it?  kai, mar'19
+				backwardMultiNodeDijkstra.setSearchAllEndNodes( true );
+				backwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, activityToRelocate.getEndTime(), plan.getPerson(), null );
 
-			/*
-			 * The original code below uses the relocated activities end time as start time. Does this make sense?
-			 * Probably yes, since the trip to the next destination is short??
-			 * BUT: if we use that activities end time, we could also use another ForwardMultiNodeDijsktra...
-			 * Switched to nextActivity.startTime() since this time is also available in PlanTimesAdapter.computeTravelTimeFromLocalRouting()
-			 * where the path's created by the Dijkstra are used. So far (I think), the estimated start times
-			 * were used there (leastCostPathCalculatorBackward.setEstimatedStartTime(activityToRelocate.getEndTime())).
-			 *
-			 * cdobler oct'13
-			 */
-			// yy but the code that follows now is not doing what the comment above says, or does it?  kai, mar'19
-			backwardMultiNodeDijkstra.setSearchAllEndNodes( true );
-			backwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, activityToRelocate.getEndTime(), plan.getPerson(), null);
-
-			//		BackwardDijkstraMultipleDestinations leastCostPathCalculatorBackward = new BackwardDijkstraMultipleDestinations(network, travelCost, travelTime);
-			//		leastCostPathCalculatorBackward.setEstimatedStartTime(activityToRelocate.getEndTime());
-			//		// the backwards Dijkstra will expand from the _next_ activity location backwards to all locations in the system.  This is the time
-			//		// at which this is anchored.  (Clearly too early, but probably not that bad as an approximation.)
-
+				//		BackwardDijkstraMultipleDestinations leastCostPathCalculatorBackward = new BackwardDijkstraMultipleDestinations(network, travelCost, travelTime);
+				//		leastCostPathCalculatorBackward.setEstimatedStartTime(activityToRelocate.getEndTime());
+				//		// the backwards Dijkstra will expand from the _next_ activity location backwards to all locations in the system.  This is the time
+				//		// at which this is anchored.  (Clearly too early, but probably not that bad as an approximation.)
+			}
 			// ---
 		}
 
@@ -257,6 +230,7 @@ class ChoiceSet {
 		 * TODO:
 		 * Can this be merged with the for loop above? So far, facilities are looked up twice.
 		 * cdobler, oct'13
+		 * I cannot say what this comment refers to.  Maybe this has been done in the meantime? kai, mar'19
 		 */
 
 		Plan planTmp = null;
@@ -289,69 +263,53 @@ class ChoiceSet {
 			// If we don't re-use a single copy of the plan, create a new one.
 			else planTmp = LCPlanUtils.createCopy(plan );
 
-			// yyyyyy I am possibly using the wrong nodes in the following; look up how the multi-node things are set up above.
+			switch ( dccg.getTravelTimeApproximationLevel() ){
+				case completeRouting:
+				case noRouting:
+					throw new RuntimeException( "currently not implemented" );
+				case localRouting:{
+					Node movedActNode;
+					{
+						Id<Link> movedActLinkId = PopulationUtils.decideOnLinkIdForActivity( activityToRelocate, scenario );
+						Link movedActLink = scenario.getNetwork().getLinks().get( movedActLinkId );
+						movedActNode = movedActLink.getToNode();
+					}
+					{
+						Node prevActNode;
+						double startTime;
+						final Leg previousLeg = LCPlanUtils.getPreviousLeg( plan, activityToRelocate );
+						{
+							final Activity prevAct = LCPlanUtils.getPreviousActivity( plan, previousLeg );
+							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( prevAct, scenario );
+							Link link = scenario.getNetwork().getLinks().get( linkId );
+							prevActNode = link.getToNode();
 
-			{
-				Node fromNode;
-				double startTime;
-				final Leg previousLeg = LCPlanUtils.getPreviousLeg( plan, activityToRelocate );
-				{
-					final Activity prevAct = LCPlanUtils.getPreviousActivity( plan, previousLeg );
-					Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( prevAct, scenario );
-					Link link = scenario.getNetwork().getLinks().get( linkId );
-					fromNode = link.getToNode();
+							startTime = PlanRouter.calcEndOfActivity( prevAct, plan, scenario.getConfig() );
+						}
 
-					startTime = PlanRouter.calcEndOfActivity( prevAct, plan, scenario.getConfig() );
-				}
+						LeastCostPathCalculator.Path result = this.forwardMultiNodeDijkstra.constructPath( prevActNode, movedActNode, startTime );
+						previousLeg.setTravelTime( result.travelTime );
+					}
+					{
+						Node nextActNode;
+						final Leg nextLeg = LCPlanUtils.getNextLeg( plan, activityToRelocate );
+						{
+							final Activity nextAct = LCPlanUtils.getNextActivity( plan, nextLeg );
+							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( nextAct, scenario );
+							Link link = scenario.getNetwork().getLinks().get( linkId );
+							nextActNode = link.getToNode();
+						}
+						double startTime = PlanRouter.calcEndOfActivity( activityToRelocate, plan, scenario.getConfig() );
 
-				Node toNode;
-				{
-					Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( activityToRelocate, scenario );
-					Link link = scenario.getNetwork().getLinks().get( linkId );
-					toNode = link.getToNode();
-				}
-
-//				log.info("") ;
-//				log.info("destinationToNode to find=" + toNode.getId() ) ;
-//				log.info("") ;
-
-				boolean isThere = false ;
-				for( InitialNode initialNode : destinationNodes ){
-					if ( initialNode.node.getId().equals( toNode.getId() ) )  {
-						isThere = true ;
-						break ;
+						LeastCostPathCalculator.Path result = this.backwardMultiNodeDijkstra.constructPath( movedActNode, nextActNode, startTime );
+						nextLeg.setTravelTime( result.travelTime );
 					}
 				}
-				Gbl.assertIf( isThere );
-				LeastCostPathCalculator.Path result = this.forwardMultiNodeDijkstra.constructPath( fromNode, toNode, startTime );
-				log.info("travelTime=" + result.travelTime ) ;
-				previousLeg.setTravelTime( result.travelTime );
+				break ;
+				default:
+					throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
 			}
-			{
-				Node fromNode;
-				{
-					Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( activityToRelocate, scenario );
-					Link link = scenario.getNetwork().getLinks().get( linkId );
-					fromNode = link.getToNode();
-				}
-				Node toNode;
-				final Leg nextLeg = LCPlanUtils.getNextLeg( plan, activityToRelocate ) ;
-				{
-					final Activity nextAct = LCPlanUtils.getNextActivity( plan, nextLeg ) ;
-					Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( nextAct, scenario ) ;
-					Link link = scenario.getNetwork().getLinks().get( linkId ) ;
-					toNode = link.getToNode() ;
-				}
-				double startTime = PlanRouter.calcEndOfActivity( activityToRelocate, plan, scenario.getConfig() );
-
-				//				LeastCostPathCalculator.Path result = this.backwardMultiNodeDijkstra.constructPath( fromNode, toNode, startTime );
-				// yyyyyy as a fix:
-				LeastCostPathCalculator.Path result = this.forwardMultiNodeDijkstra.constructPath( toNode, fromNode, startTime );
-				nextLeg.setTravelTime( result.travelTime );
-			}
-			PlanTimesAdapter adapter = new PlanTimesAdapter( this.approximationLevel,
-				  router, this.scenario, this.teleportedModeSpeeds, this.beelineDistanceFactors);
-
+			PlanTimesAdapter adapter = new PlanTimesAdapter( router.getStageActivityTypes(), this.scenario );
 			final double score = adapter.scorePlan( planTmp, scoringFunction, plan.getPerson() );
 
 			if (score > largestValue) {
@@ -377,74 +335,10 @@ class ChoiceSet {
 			//			TreeMap<Double,Id> mapTmp = new TreeMap<Double,Id>();
 			//			mapTmp.put(1.1, facilityIdWithLargestScore);
 			//			return mapTmp;
-//			return createEmptyChoiceMap(facilityIdWithLargestScore);
+			//			return createEmptyChoiceMap(facilityIdWithLargestScore);
 			return Collections.singletonList( new ScoredAlternative( largestValue, facilityIdWithLargestScore ) )  ;
 		}
 	}
-//	private TreeMap<Double, Id<ActivityFacility>> createEmptyChoiceMap(Id<ActivityFacility> facilityIdWithLargestScore) {
-//		TreeMap<Double, Id<ActivityFacility>> mapTmp = new TreeMap<>();
-//		mapTmp.put(1.1, facilityIdWithLargestScore);
-//		return mapTmp;
-//	}
-
-	/*
-	 * We can have three cases here:
-	 * 1. All scores positive
-	 * 2. All scores negative
-	 * 3. Mixed scores, negative and positive ones
-	 *
-	 * 1: This case is easy, just scale by total score and sum up for the ids, and then do the weighted random draw.
-	 *
-	 * 2: Adding an offset (minimal negative score) seems not the best idea in this case.
-	 *  The preference order is maintained (to be proofed) but the ratios change a lot (to be proofed).
-	 *  Is it better to apply -1/score? Are the ratios more reasonable?
-	 *  I have a clear intuition for uniform distributions here,
-	 *  i.e., that an option with score=4.0 should be chosen around 4 times more often than an option with score=1.0.
-	 *  I can think of an array of length 5 with 4 elements of option 1 and 1 element of option 2.
-	 *  But I am missing that intuition for negative scores and mixed scores. What about scores 1.0 and -3.0?
-	 *
-	 * 3: This is the most difficult case. We could do -1/score for negative scores but then we have a problem if the user comes up
-	 * 	with all positive scores between 0.0 and 1.0.
-	 *
-	 *  A very efficient but also very simple solution would be to fix the number of alternatives and assign fixed probabilities.
-	 *  Anyway, the question is, if the differences (ratios) between the k best alternatives have a significant meaning. If not, we
-	 *  can get rid of this fancy overly complex Schnick-Snack.
-	 *  Should not be too much of a problem to test, say max. 10 fixed alternatives with fixed probabilities, for example.
-	 *
-	 *  anhorni, dec 2013
-	 *
-	 */
-	// A standard approach to get around that positive/negative problem would be to use exp(score) instead of score (logit).  Kai
-	/*
-	 * Use approximation to golden ratio (contains sqrt) with specified number of alternatives
-	 * (more than around 5 makes no sense actually)
-	 */
-//	private TreeMap<Double, Id<ActivityFacility>> generateReducedChoiceSet(ArrayList<ScoredAlternative> list) {
-//		// This is an attempt generate diversity, without falling back into the trap that locations just slide closer and closer to the home location.  I guess that the
-//		// author did not want a sharp transition between the 1st five and the 6th, and thus introduced gradually declining probabilities.
-//
-//		// However, in the sense of matsim this does not make a difference: The iterations are not converged before all of them have been tried out.  In consequence,
-//		// providing some with lower proba may(!) help being faster in the transients, but it will slow down final convergence.
-//
-//		// However, reaching final convergence may not be the true goal of matsim; at least, all the diversity generating stuff elsewhere also has the consequence that it will
-//		// keep generating alternatives.
-//
-//		// sort the list (ScoredAlternative fulfills Comparable):
-//		Collections.sort(list);
-//
-//		// say that we want about five alternatives (or less if we don't have enough):
-//		int nrElements = Math.min(list.size(), this.numberOfAlternatives);
-//
-//		// take the first 5 alternatives and give them some pseudo-scores 0.6, 0.84, 0.936, 0.9744, ...
-//		TreeMap<Double, Id<ActivityFacility>> mapNormalized = new TreeMap<>( java.util.Collections.reverseOrder() );
-//		for (int index = 0; index < nrElements; index++)  {
-////			double indexNormalized = 1.0 - Math.pow(0.4, (index + 1));
-//			double indexNormalized = 0.2 ;
-//			ScoredAlternative sa = list.get(index);
-//			mapNormalized.put(indexNormalized, sa.getAlternativeId());
-//		}
-//		return mapNormalized;
-//	}
 
 	private List<? extends PlanElement> estimateTravelTime( Plan plan , Activity act ) {
 		// Ouch... should be passed as parameter!

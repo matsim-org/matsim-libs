@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.bestresponse.BestReplyLocationChoicePlanStrategy;
 import org.matsim.contrib.locationchoice.bestresponse.DCActivityWOFacilitiesScoringFunction;
 import org.matsim.contrib.locationchoice.bestresponse.DCScoringFunctionFactory;
@@ -26,9 +27,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
@@ -53,7 +52,6 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype.*;
-import static org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel.completeRouting;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreateConfig;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopWOnePerson;
 
@@ -80,6 +78,8 @@ public class FrozenEpsilonLocaChoiceIT{
 
 		dccg.setEpsilonScaleFactors("100.0");
 		dccg.setRandomSeed(4711);
+		dccg.setTravelTimeApproximationLevel( ApproximationLevel.localRouting );
+
 
 		// SCENARIO:
 		final Scenario scenario = ScenarioUtils.createScenario(config );
@@ -90,7 +90,7 @@ public class FrozenEpsilonLocaChoiceIT{
 
 		Link ll1 = scenario.getNetwork().getLinks().get( Id.create(1, Link.class ) ) ;
 		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(Id.create(1, ActivityFacility.class ) );
-		Person person = localCreatePopWOnePerson(scenario, ll1, ff1, 8.*60*60+5*60 );
+		Person person = localCreatePopWOnePerson(scenario, ff1, 8.*60*60+5*60 );
 
 		// joint context (based on scenario):
 		final DestinationChoiceContext lcContext = new DestinationChoiceContext(scenario) ;
@@ -154,6 +154,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		// well, it does not work without this ...
 
 		dccg.setEpsilonScaleFactors("100.0" );
+		dccg.setTravelTimeApproximationLevel( ApproximationLevel.localRouting );
 
 		// scenario:
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config );
@@ -165,7 +166,7 @@ public class FrozenEpsilonLocaChoiceIT{
 
 		Link ll1 = scenario.getNetwork().getLinks().get(Id.create(1, Link.class)) ;
 		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(Id.create(1, ActivityFacility.class)) ;
-		Person person = localCreatePopWOnePerson(scenario, ll1, ff1, 8.*60*60+5*60);
+		Person person = localCreatePopWOnePerson(scenario, ff1, 8.*60*60+5*60 );
 
 		final DestinationChoiceContext lcContext = new DestinationChoiceContext(scenario) ;
 		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME, lcContext);
@@ -226,7 +227,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		dccg.setEpsilonScaleFactors("10.0" );
 		dccg.setAlgorithm( bestResponse );
 		dccg.setFlexibleTypes( "shop" );
-		dccg.setTravelTimeApproximationLevel( completeRouting );
+		dccg.setTravelTimeApproximationLevel( ApproximationLevel.localRouting );
 		dccg.setRandomSeed( 2 );
 		dccg.setDestinationSamplePercent( 5. );
 
@@ -325,38 +326,6 @@ public class FrozenEpsilonLocaChoiceIT{
 		controler.addOverridingModule( new AbstractModule(){
 			@Override
 			public void install(){
-//				this.addControlerListenerBinding().toInstance( new IterationEndsListener(){
-//					@Override public void notifyIterationEnds( IterationEndsEvent event ){
-//						if ( event.getIteration() <=0 ) {
-//							return ;
-//						}
-//
-//						for( Person person : scenario.getPopulation().getPersons().values() ){
-//
-//							assertEquals( "number of plans in person.", event.getIteration()+1, person.getPlans().size() );
-//							Plan newPlan = person.getSelectedPlan();
-//
-//							// yyyy todo make the following NOT (so much) depend on exact positions in plans file
-//
-//							Activity newAct = (Activity) newPlan.getPlanElements().get( 2 );
-//							if( config.plansCalcRoute().isInsertingAccessEgressWalk() ){
-//								newAct = (Activity) newPlan.getPlanElements().get( 6 );
-//							}
-//							System.err.println( " newAct: " + newAct );
-//							System.err.println( " facilityId: " + newAct.getFacilityId() );
-//							assertNotNull( newAct );
-//
-//							//							assertTrue( !newAct.getFacilityId().equals( initialShopFacilityId ) );
-//							// yy I think that it could technically select the same as before so this is a brittle check. kai, mar'19
-//
-//							switch ( person.getId().toString() ) {
-//								case "0":
-//									//									assertEquals( Id.create( "90-89", ActivityFacility.class ), newAct.getFacilityId() );
-//									break ;
-//							}
-//						}
-//					}
-//				} );
 				this.addControlerListenerBinding().toInstance( new ShutdownListener(){
 					@Inject Population population ;
 					@Inject ActivityFacilities facilities ;
@@ -387,17 +356,17 @@ public class FrozenEpsilonLocaChoiceIT{
 								log.info( "bin=" + ii + "; cnt=" + cnt[ii] );
 							}
 						}
-						check( 16, cnt[0] );
-						check( 12, cnt[6] ) ;
-						check( 26, cnt[7] ) ;
-						check( 44, cnt[8] ) ;
-						check( 88, cnt[9] ) ;
-						check( 128, cnt[10] ) ;
-						check( 242, cnt[11] ) ;
-						check( 434, cnt[12] ) ;
-						check( 488, cnt[13] ) ;
-						check( 404, cnt[14] ) ;
-						check( 114, cnt[15] ) ;
+						check( 2, cnt[0] );
+						check( 24, cnt[8] ) ;
+						check( 52, cnt[9] ) ;
+						check( 68, cnt[10] ) ;
+						check( 130, cnt[11] ) ;
+						check( 304, cnt[12] ) ;
+						check( 326, cnt[13] ) ;
+						check( 654, cnt[14] ) ;
+						check( 416, cnt[15] ) ;
+						check( 24, cnt[16] ) ;
+						check( 0, cnt[17] ) ;
 
 						// The bins are logarithmic, so I would have expected the counts to be approximately constant.  That clearly is not the case.  I don't know why.
 

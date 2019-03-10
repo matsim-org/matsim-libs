@@ -19,218 +19,85 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.FacilitiesUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-import static org.matsim.core.router.TripStructureUtils.*;
+import static org.matsim.core.router.TripStructureUtils.Trip;
+import static org.matsim.core.router.TripStructureUtils.getTrips;
 
 class PlanTimesAdapter {
 	private static final Logger log = Logger.getLogger( PlanTimesAdapter.class ) ;
 
-	private final DestinationChoiceConfigGroup.ApproximationLevel approximationLevel;
-	private final Network network;
 	private final Config config;
-	private final Map<String, Double> teleportedModeSpeeds;
-	private final Map<String, Double> beelineDistanceFactors;
-	private final DestinationChoiceConfigGroup dccg;
-	private final TripRouter router;
-	private final Scenario scenario;
+	private final StageActivityTypes stageActivityTypes;
 
 	/* package */ PlanTimesAdapter(
-			final DestinationChoiceConfigGroup.ApproximationLevel approximationLevel,
-			final TripRouter router,
-			final Scenario scenario,
-			final Map<String, Double> teleportedModeSpeeds,
-			final Map<String, Double> beelineDistanceFactors) {
-		this.approximationLevel = approximationLevel;
-		this.network = scenario.getNetwork();
-		this.router = router;
+		  final StageActivityTypes stageActivityTypes,
+		  final Scenario scenario ) {
+		this.stageActivityTypes = stageActivityTypes;
 		this.config = scenario.getConfig();
-		this.teleportedModeSpeeds = teleportedModeSpeeds;
-		this.beelineDistanceFactors = beelineDistanceFactors;
-		this.dccg = (DestinationChoiceConfigGroup) this.config.getModule(DestinationChoiceConfigGroup.GROUP_NAME);
-		this.scenario = scenario ;
 	}
 
-	/**
-	 * yyyyyy This should now be re-written using {@link TripRouter#calcEndOfPlanElement(double, PlanElement, Config)} or the methods therein. kai, mar'19
-	 */
-	/*
-	 * Why do we have plan and planTmp?!
-	 * Probably to avoid something like concurrent modification problems?
-	 * 
-	 * - TODO: check whether values from planTmp are used before they are overwritten. If not, we could re-use a single plan over and over again as long as the plan structure is
-	 * not changed!
-	 * 
-	 * - Iterate over plan: skip all legs. They are scored when their subsequent activity is handled.
-	 * 
-	 * - Adapt activities and legs in planTmp: times and routes
-	 * 
-	 * ApproximationLevel:
-	 * 	- completeRouting: calculate route for EACH leg
-	 * 	- localRouting: calculate new routes from and to the adapted activity, take other route information from existing leg
-	 * 	- noRouting: same as localRouting but with estimated travel times for the calculated routes
-	 * 
-	 */
 	/* package */ double scorePlan (
 		  final Plan planTmp,
 		  final ScoringFunctionFactory scoringFunctionFactory, Person person ) {
 		// We need a copy of the plan since for scoring other fields need to be filled out than in the original plan (e.g. activityEndTime).  The plan is afterwards thrown
 		// away (which implies that we should make the defensive copy rather inside this method).
 
-		// prev/next activity is ok
-
-
-
 		final ScoringFunction scoringFunction = scoringFunctionFactory.createNewScoringFunction( person);
 
 		// yy The honest way of doing the following would be using the psim. kai, mar'19
-		Activity prevAct = null ;
+		boolean firstAct = true ;
+		Activity rememberedActivity = null ;
+		double now = Time.getUndefinedTime() ;
 		for( PlanElement pe : planTmp.getPlanElements() ){
 			if ( pe instanceof Activity ) {
-				prevAct = (Activity) pe;
-				scoringFunction.handleActivity( prevAct );
+				rememberedActivity = (Activity) pe;
 			} else if ( pe instanceof Leg ) {
+				// the scoring needs, for "middle" acts, actStart/EndTime filled out, even if the mobsim does not need that:
+				if ( firstAct ) {
+					firstAct=false ;
+				} else {
+					rememberedActivity.setStartTime( now );
+				}
+				now = PlanRouter.calcEndOfActivity( Objects.requireNonNull( rememberedActivity ), planTmp, config ) ;
+				rememberedActivity.setEndTime( now );
+				scoringFunction.handleActivity( rememberedActivity );
+				// ---
 				final Leg leg = (Leg) pe;
 				// the scoring needs dpTime and tTime filled out, even if qsim input does not require that:
-				leg.setDepartureTime( PlanRouter.calcEndOfActivity( Objects.requireNonNull( prevAct ), planTmp, config ) );
-				double travelTime = PopulationUtils.decideOnTravelTimeForLeg( leg );
+				leg.setDepartureTime( now ) ;
+				double travelTime = PopulationUtils.decideOnTravelTimeForLeg( leg ) ;
 				if ( Time.isUndefinedTime( travelTime ) ) {
 					travelTime = 0. ;
 				}
 				leg.setTravelTime( travelTime );
 				scoringFunction.handleLeg( leg );
+				now += travelTime ;
 			} else {
 				throw new RuntimeException( "Unsupported PlanElement type" ) ;
 			}
 		}
+		Activity lastAct = (Activity) planTmp.getPlanElements().get( planTmp.getPlanElements().size()-1 );
+		lastAct.setStartTime( now );
+		scoringFunction.handleActivity( lastAct );
 		// the following is hedging against the newer tripscoring; not clear if this will work out-of-sequence.
-		for( Trip trip : getTrips( planTmp, router.getStageActivityTypes() ) ){
+		for( Trip trip : getTrips( planTmp, stageActivityTypes ) ){
 			scoringFunction.handleTrip( trip );
 		}
-
-//		if ( false ){
-//			// iterate through plan and adapt travel and activity times
-//			boolean isFirstActivity = true;
-//			for ( Activity act : getActivities( planTmp , EmptyStageActivityTypes.INSTANCE ) ) {
-//				final int planElementIndex = planTmp.getPlanElements().indexOf( act );
-//				if ( isFirstActivity ) {
-//					isFirstActivity = false;
-//					final Activity actTmp = (Activity) planTmp.getPlanElements().get(planElementIndex);
-//					// this used to assume the activity starts at 00:00:00, but this
-//					// is not what happens in the iterations: the first activity
-//					// has no start time, the last has no end time.
-//					actTmp.setStartTime( Time.UNDEFINED_TIME );
-//					scoringFunction.handleActivity( actTmp );
-//					continue;
-//				}
-//
-//				final List<? extends PlanElement> trip = estimateTravelTime( planTmp, act );
-//
-//				for ( PlanElement pe : trip ) {
-//					if ( pe instanceof Activity ) {
-//						// ignore this for the time being (otherwise, need to check times and re-create start and end time
-//						// scoringFunction.handleActivity( (Activity) pe );
-//					}
-//					else if ( pe instanceof Leg ){
-//						final Leg leg = (Leg) pe;
-//						Gbl.assertIf( !Time.isUndefinedTime( leg.getDepartureTime() ) ) ;
-//						Gbl.assertIf( !Time.isUndefinedTime( leg.getTravelTime() ) );
-//						scoringFunction.handleLeg( leg );
-//					}
-//					else {
-//						throw new RuntimeException( "unknown plan element type? "+pe.getClass().getName() );
-//					}
-//				}
-//
-//				double actDur = act.getMaximumDuration();
-//
-//				final Activity prevActTmp = (Activity) planTmp.getPlanElements().get(planElementIndex - 2);
-//				double departureTime =
-//					  prevActTmp.getEndTime() != Time.UNDEFINED_TIME ?
-//						    prevActTmp.getEndTime() :
-//						    prevActTmp.getStartTime() + prevActTmp.getMaximumDuration();
-//
-//				if ( departureTime == Time.UNDEFINED_TIME ) {
-//					throw new RuntimeException( "could not infer departure time after activity "+prevActTmp );
-//				}
-//
-//				final double arrivalTime = departureTime + getTravelTime( trip );
-//
-//				if ( arrivalTime == Time.UNDEFINED_TIME ) {
-//					throw new RuntimeException( "could not infer arrival time after trip "+trip );
-//				}
-//
-//				// set new activity end time
-//				final Activity actTmp = (Activity) planTmp.getPlanElements().get(planElementIndex);
-//
-//				actTmp.setStartTime(arrivalTime);
-//
-//				final PlansConfigGroup.ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
-//				switch ( actDurInterpr ) {
-//					case tryEndTimeThenDuration:
-//						if ( act.getEndTime() == Time.UNDEFINED_TIME && act.getMaximumDuration() != Time.UNDEFINED_TIME) {
-//							// duration based definition: requires some care
-//							actTmp.setMaximumDuration( act.getMaximumDuration() ) ;
-//
-//							// scoring function works with start and end time, not duration,
-//							// but we do not want to put an end time in the plan.
-//							assert actTmp.getEndTime() == Time.UNDEFINED_TIME : actTmp;
-//							actTmp.setEndTime( arrivalTime + actDur ) ;
-//							scoringFunction.handleActivity( actTmp );
-//							actTmp.setEndTime( Time.UNDEFINED_TIME );
-//						}
-//						else {
-//							actTmp.setEndTime( act.getEndTime() ) ;
-//							scoringFunction.handleActivity( actTmp );
-//						}
-//						break;
-//					default:
-//						throw new RuntimeException("activity duration interpretation of "
-//											     + config.plans().getActivityDurationInterpretation().toString() + " is not supported for locationchoice; aborting ... " +
-//											     "Use " + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration.toString() + "instead.") ;
-//				}
-//			}
-//		}
 
 		scoringFunction.finish();
 		return scoringFunction.getScore();
 	}
-
-	private double getTravelTime( List<? extends PlanElement> trip ) {
-		double tt = 0;
-		for ( PlanElement pe : trip ) {
-			if ( pe instanceof Leg ) {
-				final double curr = ((Leg) pe).getTravelTime();
-				if ( curr == Time.UNDEFINED_TIME ) throw new RuntimeException( "undefined travel time in "+pe );
-				tt += curr;
-			}
-		}
-		return tt;
-	}
-
 
 }

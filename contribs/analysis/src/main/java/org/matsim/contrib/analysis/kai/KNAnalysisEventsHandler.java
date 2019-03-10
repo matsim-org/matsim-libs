@@ -89,7 +89,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 	// statistics types:
 	enum StatType {
 		legDurations, legDurationsOtherBins, legBeelineDistances, legBeelineDistancesOtherBins, legDistances, personScores,
-		personPayments, tripBeelineDistances, tripBeelineDistancesCumulative
+		personPayments, tripBeelineDistances, tripBeelineDistancesCumulative, tripBeelineDistancesOtherBins
 	} ;
 
 	// container that contains the statistics containers:
@@ -173,6 +173,12 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 				case tripBeelineDistancesCumulative: {
 					// making them exactly logarithmic so that exp(-x) becomes constant
 					double[] dataBoundariesTmp = {0., 100., 200., 400., 800., 1600., 3200., 6400., 12800., 25600., 51200., 102400., 204800.,409600.,819200.} ;
+					Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+					this.statsContainer.put( type, databins) ;
+					break; }
+				case tripBeelineDistancesOtherBins: {
+					// making them exactly logarithmic so that exp(-x) becomes constant
+					double[] dataBoundariesTmp = {0., 10000., 20000., 30000., 40000., 50000., 60000., 70000., 80000., 90000., 100000. } ;
 					Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
 					this.statsContainer.put( type, databins) ;
 					break; }
@@ -303,6 +309,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 					case personScores:
 					case tripBeelineDistances:
 					case tripBeelineDistancesCumulative:
+					case tripBeelineDistancesOtherBins:
 						break;
 					default:
 						throw new RuntimeException("`item' for statistics type not defined; statistics type: " + statType ) ;
@@ -438,6 +445,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 
 					this.addItemToAllRegisteredTypes(categories, StatType.tripBeelineDistances, item);
 					this.addItemToAllRegisteredTypes(categories, StatType.tripBeelineDistancesCumulative, item );
+					this.addItemToAllRegisteredTypes(categories, StatType.tripBeelineDistancesOtherBins, item );
 				}
 			}
 		}
