@@ -66,14 +66,10 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 
 	static StageActivityTypes drtStageActivities = new StageActivityTypesImpl( createStageActivityType( TransportMode.drt ) , createStageActivityType( TransportMode.walk ) ) ;
 
-	private final Queue<AgentAndLegEntry> wakeUpList = new PriorityBlockingQueue<>( 500, ( o1, o2 ) -> {
-		int cmp = Double.compare( o1.time, o2.time ) ;
-		if ( cmp==0 ) {
-			return cmp ;
-		} else {
-			return o1.agent.getId().compareTo( o2.agent.getId() ) ;
-		}
-	} );
+	private final Queue<AgentAndLegEntry> wakeUpList = new PriorityBlockingQueue<>(500, (o1, o2) -> {
+		int cmp = Double.compare(o1.time, o2.time);
+		return cmp != 0 ? cmp : o1.agent.getId().compareTo(o2.agent.getId());
+	});
 
 	@Inject
 	ActivityEngineWithWakeup(EventsManager eventsManager, Map<String, TripInfo.Provider> tripInfoProviders,
