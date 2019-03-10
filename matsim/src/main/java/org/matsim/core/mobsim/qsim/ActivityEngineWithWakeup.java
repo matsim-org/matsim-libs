@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
@@ -51,14 +52,15 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
-	private static final Logger log = Logger.getLogger( ActivityEngine.class ) ;
+	private static final Logger log = Logger.getLogger(ActivityEngine.class);
 
 	private final ActivityFacilities facilities;
 	private final BookingNotificationEngine bookingNotificationEngine;
 
-	private ActivityEngine delegate ;
+	private ActivityEngine delegate;
 
-	static StageActivityTypes drtStageActivities = new StageActivityTypesImpl( createStageActivityType( TransportMode.drt ) , createStageActivityType( TransportMode.walk ) ) ;
+	static StageActivityTypes drtStageActivities = new StageActivityTypesImpl(
+			createStageActivityType(TransportMode.drt), createStageActivityType(TransportMode.walk));
 
 	private final Queue<AgentAndLegEntry> wakeUpList = new PriorityBlockingQueue<>(500, (o1, o2) -> {
 		int cmp = Double.compare(o1.time, o2.time);
@@ -66,8 +68,8 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	});
 
 	@Inject
-	ActivityEngineWithWakeup(EventsManager eventsManager,
-			Scenario scenario, BookingNotificationEngine bookingNotificationEngine) {
+	ActivityEngineWithWakeup(EventsManager eventsManager, Scenario scenario,
+			BookingNotificationEngine bookingNotificationEngine) {
 		this.delegate = new ActivityEngine(eventsManager);
 		this.facilities = scenario.getActivityFacilities();
 		this.bookingNotificationEngine = bookingNotificationEngine;
@@ -80,81 +82,80 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 
 	@Override
 	public void doSimStep(double time) {
-		while ( !wakeUpList.isEmpty() ) {
-			if ( wakeUpList.peek().time <= time ) {
+		while (!wakeUpList.isEmpty()) {
+			if (wakeUpList.peek().time <= time) {
 				final AgentAndLegEntry entry = wakeUpList.poll();
-				Plan plan = WithinDayAgentUtils.getModifiablePlan( entry.agent );
-
-				// search for drt trip corresponding to drt leg.  Trick is using our own stage activities.
-				Trip drtTrip = TripStructureUtils.findTripAtPlanElement( entry.leg, plan, this.drtStageActivities ) ;
-				Gbl.assertNotNull( drtTrip );
-
-				Facility fromFacility = FacilitiesUtils.toFacility( drtTrip.getOriginActivity(), facilities ) ;
-				Facility toFacility = FacilitiesUtils.toFacility( drtTrip.getDestinationActivity(), facilities ) ;
-
-				final TripInfoRequest request = new TripInfoRequest.Builder().setFromFacility(fromFacility)
-						.setToFacility(toFacility)
-						.setTime(drtTrip.getOriginActivity().getEndTime())
-						.createRequest();
-
-				//first simulate ActivityEngineWithWakeup and then BookingNotificationEngine --> decision process
-				//in the same time step
-				bookingNotificationEngine.addTripInfoRequest(entry.agent, request);
+				entry.executeOnWakeUp.accept(entry);
 			}
 		}
-		delegate.doSimStep( time );
+		delegate.doSimStep(time);
 	}
-
 
 	@Override
 	public void afterSim() {
-		delegate.afterSim( );
+		delegate.afterSim();
 	}
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
-		delegate.setInternalInterface( internalInterface );
+		delegate.setInternalInterface(internalInterface);
 	}
 
-
 	/**
-	 *
 	 * This method is called by QSim to pass in agents which then "live" in the activity layer until they are handed out again
 	 * through the internalInterface.
-	 *
+	 * <p>
 	 * It is called not before onPrepareSim() and not after afterSim(), but it may be called before, after, or from doSimStep(),
 	 * and even from itself (i.e. it must be reentrant), since internalInterface.arrangeNextAgentState() may trigger
 	 * the next Activity.
-	 *
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
 
-		// propose a generic way of adding agents to wakeUpList... this code is DRT specific, michal
-		for( Leg drtLeg : findLegsWithModeInFuture( agent, TransportMode.drt ) ){
-			double prebookingOffset_s = (double) drtLeg.getAttributes().getAttribute( "prebookingOffset_s" );
+		for (Leg drtLeg : findLegsWithModeInFuture(agent, TransportMode.drt)) {
+			double prebookingOffset_s = (double)drtLeg.getAttributes().getAttribute("prebookingOffset_s");
 			final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
-			if ( prebookingTime < agent.getActivityEndTime() ) {
+			if (prebookingTime < agent.getActivityEndTime()) {
 				// yyyy and here one sees that having this in the activity engine is not very practical
-				this.wakeUpList.add( new AgentAndLegEntry( agent, prebookingTime , drtLeg ) ) ;
+				this.wakeUpList.add(new AgentAndLegEntry(agent, prebookingTime, drtLeg, this::wakeUpAgent));
 			}
 		}
 
-		return delegate.handleActivity( agent ) ;
+		return delegate.handleActivity(agent);
 	}
 
-	static List<Leg> findLegsWithModeInFuture( MobsimAgent agent, String mode ) {
-		List<Leg> retVal = new ArrayList<>() ;
-		Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ;
-		for( int ii = WithinDayAgentUtils.getCurrentPlanElementIndex( agent ) ; ii < plan.getPlanElements().size() ; ii++ ){
-			PlanElement pe = plan.getPlanElements().get( ii );;
-			if ( pe instanceof Leg ) {
-				if ( Objects.equals( mode, ((Leg) pe).getMode() ) ) {
-					retVal.add( (Leg) pe ) ;
+	static List<Leg> findLegsWithModeInFuture(MobsimAgent agent, String mode) {
+		List<Leg> retVal = new ArrayList<>();
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
+		for (int ii = WithinDayAgentUtils.getCurrentPlanElementIndex(agent); ii < plan.getPlanElements().size(); ii++) {
+			PlanElement pe = plan.getPlanElements().get(ii);
+			if (pe instanceof Leg) {
+				if (Objects.equals(mode, ((Leg)pe).getMode())) {
+					retVal.add((Leg)pe);
 				}
 			}
 		}
-		return retVal ;
+		return retVal;
+	}
+
+	private void wakeUpAgent(AgentAndLegEntry entry) {
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(entry.agent);
+
+		// search for drt trip corresponding to drt leg.  Trick is using our own stage activities.
+		Trip drtTrip = TripStructureUtils.findTripAtPlanElement(entry.leg, plan, this.drtStageActivities);
+		Gbl.assertNotNull(drtTrip);
+
+		Facility fromFacility = FacilitiesUtils.toFacility(drtTrip.getOriginActivity(), facilities);
+		Facility toFacility = FacilitiesUtils.toFacility(drtTrip.getDestinationActivity(), facilities);
+
+		final TripInfoRequest request = new TripInfoRequest.Builder().setFromFacility(fromFacility)
+				.setToFacility(toFacility)
+				.setTime(drtTrip.getOriginActivity().getEndTime())
+				.createRequest();
+
+		//first simulate ActivityEngineWithWakeup and then BookingNotificationEngine --> decision process
+		//in the same time step
+		bookingNotificationEngine.addTripInfoRequest(entry.agent, request);
 	}
 
 	/**
@@ -167,7 +168,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	 */
 	@Override
 	public void rescheduleActivityEnd(final MobsimAgent agent) {
-		delegate.rescheduleActivityEnd( agent );
+		delegate.rescheduleActivityEnd(agent);
 	}
 
 	/**
@@ -180,15 +181,17 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	 * cdobler, apr'12
 	 */
 	static class AgentAndLegEntry {
-		public AgentAndLegEntry(MobsimAgent agent, double time, Leg leg ) {
+		public AgentAndLegEntry(MobsimAgent agent, double time, Leg leg, Consumer<AgentAndLegEntry> executeOnWakeUp) {
 			this.agent = agent;
 			this.time = time;
-			this.leg = leg ;
+			this.leg = leg;
+			this.executeOnWakeUp = executeOnWakeUp;
 		}
+
 		final MobsimAgent agent;
 		final double time;
-		final Leg leg ;
+		final Leg leg;
+		final Consumer<AgentAndLegEntry> executeOnWakeUp;
 	}
-
 
 }
