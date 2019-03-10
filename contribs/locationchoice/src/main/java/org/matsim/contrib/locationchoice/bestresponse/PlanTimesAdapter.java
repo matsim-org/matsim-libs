@@ -80,7 +80,8 @@ class PlanTimesAdapter {
 	 * Why do we have plan and planTmp?!
 	 * Probably to avoid something like concurrent modification problems?
 	 * 
-	 * - TODO: check whether values from planTmp are used before they are overwritten. If not, we could re-use a single plan over and over again as long as the plan structure is not changed! 
+	 * - TODO: check whether values from planTmp are used before they are overwritten. If not, we could re-use a single plan over and over again as long as the plan structure is
+	 * not changed!
 	 * 
 	 * - Iterate over plan: skip all legs. They are scored when their subsequent activity is handled.
 	 * 
@@ -99,6 +100,8 @@ class PlanTimesAdapter {
 		// away (which implies that we should make the defensive copy rather inside this method).
 
 		// prev/next activity is ok
+
+
 
 		final ScoringFunction scoringFunction = scoringFunctionFactory.createNewScoringFunction( person);
 
