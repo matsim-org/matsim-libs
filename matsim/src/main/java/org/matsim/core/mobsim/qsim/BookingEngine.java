@@ -36,8 +36,6 @@ final class BookingEngine implements MobsimEngine {
 	// Notifications and corresponding handlers could then be registered. On the other hand, it is easy to add an engine such as this one; how much does it help to have another
 	// layer of infrastructure?  Am currently leaning towards the second argument.  kai, mar'19
 
-	private InternalInterface internalInterface;
-
 	private final Map<String, TripInfo.Provider> tripInfoProviders;
 
 	private Map<MobsimAgent, TripInfo> tripInfoMap = new ConcurrentHashMap<>();
@@ -45,7 +43,7 @@ final class BookingEngine implements MobsimEngine {
 
 	private Map<MobsimAgent, TripInfoRequest> tripInfoRequestMap = new ConcurrentHashMap<>();
 
-	private EditTrips editTrips = null;
+	private final EditTrips editTrips;
 	private EditPlans editPlans = null;
 
 	private final TripRouter tripRouter;
@@ -68,7 +66,6 @@ final class BookingEngine implements MobsimEngine {
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
-		this.internalInterface = internalInterface;
 		this.editPlans = new EditPlans(internalInterface.getMobsim(), tripRouter, editTrips);
 	}
 
