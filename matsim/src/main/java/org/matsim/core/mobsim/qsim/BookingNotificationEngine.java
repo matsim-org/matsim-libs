@@ -80,73 +80,91 @@ final class BookingNotificationEngine implements MobsimEngine {
 		processTripInfos();
 	}
 
+	public synchronized final void notifyChangedTripInformation(MobsimAgent agent, TripInfo tripinfo) {
+		// (we are in the mobsim, so we don't need to play around with IDs)
+		tripInfoMap.put(agent, tripinfo);
+	}
+
+	public synchronized final void notifyTripInfoRequestArrived(MobsimAgent agent, TripInfoRequest tripInfoRequest) {
+		tripInfoRequestMap.put(agent, tripInfoRequest);
+	}
+
+
 	private void processTripInfos() {
 		for (Map.Entry<MobsimAgent, TripInfo> entry : tripInfoMap.entrySet()) {
 			MobsimAgent agent = entry.getKey();
 			TripInfo tripInfo = entry.getValue();
 
-			Gbl.assertIf(WithinDayAgentUtils.getCurrentPlanElement(agent) instanceof Activity);
-
-			Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
-
-			Trip theTrip = null;
-			for (Trip drtTrip : TripStructureUtils.getTrips(plan, ActivityEngineWithWakeup.drtStageActivities)) {
-				// recall that we have set the activity end time of the current activity to infinity, so we cannot use that any more.  :-( ?!
-				// could instead use some kind of ID.  Not sure if that would really be better.
-				if (CoordUtils.calcEuclideanDistance(drtTrip.getOriginActivity().getCoord(),
-						tripInfo.getPickupLocation().getCoord()) > 1000.) {
-					continue;
-				}
-				if (CoordUtils.calcEuclideanDistance(drtTrip.getDestinationActivity().getCoord(),
-						tripInfo.getDropoffLocation().getCoord()) > 1000.) {
-					continue;
-				}
-				theTrip = drtTrip;
-				break;
+			boolean bookingRejected = false;// get it from TripInfo ???
+			if (bookingRejected) {
+				TripInfoRequest request = null;///get it from TripInfo ???
+				notifyTripInfoRequestArrived(agent, request);//start over again in the next time step
+			} else {
+				updateAgentPlan(agent, tripInfo);
 			}
-			Gbl.assertNotNull(theTrip);
-			Iterator<Trip> walkTripsIter = TripStructureUtils.getTrips(theTrip.getTripElements(),
-					new StageActivityTypesImpl(TransportMode.walk)).iterator();
-
-			// ---
-
-			Gbl.assertIf(walkTripsIter.hasNext());
-			Trip accessWalkTrip = walkTripsIter.next();
-			accessWalkTrip.getDestinationActivity().setCoord(tripInfo.getPickupLocation().getCoord());
-			accessWalkTrip.getDestinationActivity().setLinkId(tripInfo.getPickupLocation().getLinkId());
-			accessWalkTrip.getDestinationActivity().setFacilityId(null);
-
-			List<? extends PlanElement> pe = editTrips.replanFutureTrip(accessWalkTrip, plan, TransportMode.walk);
-			List<Leg> legs = TripStructureUtils.getLegs(pe);
-			double ttime = 0.;
-			for (Leg leg : legs) {
-				if (leg.getRoute() != null) {
-					ttime += leg.getTravelTime();
-				} else {
-					ttime += leg.getTravelTime();
-				}
-			}
-			double buffer = 300.;
-			editPlans.rescheduleCurrentActivityEndtime(agent, tripInfo.getExpectedBoardingTime() - ttime - buffer);
-
-			// ---
-
-			Gbl.assertIf(walkTripsIter.hasNext());
-			Trip egressWalkTrip = walkTripsIter.next();
-			final Activity egressWalkOriginActivity = egressWalkTrip.getOriginActivity();
-			egressWalkOriginActivity.setCoord(tripInfo.getDropoffLocation().getCoord());
-			egressWalkOriginActivity.setLinkId(tripInfo.getDropoffLocation().getLinkId());
-			egressWalkOriginActivity.setFacilityId(null);
-
-			editTrips.replanFutureTrip(egressWalkTrip, plan, TransportMode.walk);
-			// yy maybe better do this at dropoff?
-
-			// ----
-
-			Gbl.assertIf(!walkTripsIter.hasNext());
-
 		}
+	}
 
+	private void updateAgentPlan(MobsimAgent agent, TripInfo tripInfo) {
+		Gbl.assertIf(WithinDayAgentUtils.getCurrentPlanElement(agent) instanceof Activity);
+
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
+
+		Trip theTrip = null;
+		for (Trip drtTrip : TripStructureUtils.getTrips(plan, ActivityEngineWithWakeup.drtStageActivities)) {
+			// recall that we have set the activity end time of the current activity to infinity, so we cannot use that any more.  :-( ?!
+			// could instead use some kind of ID.  Not sure if that would really be better.
+			if (CoordUtils.calcEuclideanDistance(drtTrip.getOriginActivity().getCoord(),
+					tripInfo.getPickupLocation().getCoord()) > 1000.) {
+				continue;
+			}
+			if (CoordUtils.calcEuclideanDistance(drtTrip.getDestinationActivity().getCoord(),
+					tripInfo.getDropoffLocation().getCoord()) > 1000.) {
+				continue;
+			}
+			theTrip = drtTrip;
+			break;
+		}
+		Gbl.assertNotNull(theTrip);
+		Iterator<Trip> walkTripsIter = TripStructureUtils.getTrips(theTrip.getTripElements(),
+				new StageActivityTypesImpl(TransportMode.walk)).iterator();
+
+		// ---
+
+		Gbl.assertIf(walkTripsIter.hasNext());
+		Trip accessWalkTrip = walkTripsIter.next();
+		accessWalkTrip.getDestinationActivity().setCoord(tripInfo.getPickupLocation().getCoord());
+		accessWalkTrip.getDestinationActivity().setLinkId(tripInfo.getPickupLocation().getLinkId());
+		accessWalkTrip.getDestinationActivity().setFacilityId(null);
+
+		List<? extends PlanElement> pe = editTrips.replanFutureTrip(accessWalkTrip, plan, TransportMode.walk);
+		List<Leg> legs = TripStructureUtils.getLegs(pe);
+		double ttime = 0.;
+		for (Leg leg : legs) {
+			if (leg.getRoute() != null) {
+				ttime += leg.getTravelTime();
+			} else {
+				ttime += leg.getTravelTime();
+			}
+		}
+		double buffer = 300.;
+		editPlans.rescheduleCurrentActivityEndtime(agent, tripInfo.getExpectedBoardingTime() - ttime - buffer);
+
+		// ---
+
+		Gbl.assertIf(walkTripsIter.hasNext());
+		Trip egressWalkTrip = walkTripsIter.next();
+		final Activity egressWalkOriginActivity = egressWalkTrip.getOriginActivity();
+		egressWalkOriginActivity.setCoord(tripInfo.getDropoffLocation().getCoord());
+		egressWalkOriginActivity.setLinkId(tripInfo.getDropoffLocation().getLinkId());
+		egressWalkOriginActivity.setFacilityId(null);
+
+		editTrips.replanFutureTrip(egressWalkTrip, plan, TransportMode.walk);
+		// yy maybe better do this at dropoff?
+
+		// ----
+
+		Gbl.assertIf(!walkTripsIter.hasNext());
 	}
 
 	private void processTripInfoRequests() {
@@ -188,16 +206,7 @@ final class BookingNotificationEngine implements MobsimEngine {
 			((Activity)WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.MAX_VALUE);
 			editPlans.rescheduleActivityEnd(agent);
 		} else {
-			notifyChangedTripInformation(agent, tripInfo);//no booking here-> TripPlanning
+			notifyChangedTripInformation(agent, tripInfo);//no booking here-> just plan trip
 		}
-	}
-
-	public synchronized final void notifyChangedTripInformation(MobsimAgent agent, TripInfo tripinfo) {
-		// (we are in the mobsim, so we don't need to play around with IDs)
-		tripInfoMap.put(agent, tripinfo);
-	}
-
-	public synchronized final void addTripInfoRequest(MobsimAgent agent, TripInfoRequest tripInfoRequest) {
-		tripInfoRequestMap.put(agent, tripInfoRequest);
 	}
 }
