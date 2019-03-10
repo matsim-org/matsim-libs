@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.bestresponse.BestReplyLocationChoicePlanStrategy;
 import org.matsim.contrib.locationchoice.bestresponse.DCActivityWOFacilitiesScoringFunction;
 import org.matsim.contrib.locationchoice.bestresponse.DCScoringFunctionFactory;
@@ -54,6 +53,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype.*;
+import static org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel.completeRouting;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreateConfig;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopWOnePerson;
 
@@ -226,7 +226,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		dccg.setEpsilonScaleFactors("10.0" );
 		dccg.setAlgorithm( bestResponse );
 		dccg.setFlexibleTypes( "shop" );
-		dccg.setTravelTimeApproximationLevel( ApproximationLevel.completeRouting );
+		dccg.setTravelTimeApproximationLevel( completeRouting );
 		dccg.setRandomSeed( 2 );
 		dccg.setDestinationSamplePercent( 5. );
 

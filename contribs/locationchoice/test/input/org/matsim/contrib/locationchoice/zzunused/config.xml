@@ -31,7 +31,7 @@
 		<param name="fkValuesFile" value="test/input/org/matsim/contrib/locationchoice/bestresponse/facilitiesKValues.xml"/>
 		<param name="maxDCScoreFile" value="test/input/org/matsim/contrib/locationchoice/bestresponse/personsMaxEpsUnscaled.xml"/>
 		
-		<!--<param name="tt_approximationLevel" value="1" />-->
+		<param name="tt_approximationLevel" value="1" />
 	</module>
 	 
   <!-- ====================================================================== -->
