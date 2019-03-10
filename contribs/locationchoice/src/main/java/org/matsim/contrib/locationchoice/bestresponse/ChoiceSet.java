@@ -322,104 +322,10 @@ class ChoiceSet {
 		Collections.sort( list );
 		if ( !list.isEmpty() ) {
 			return list.subList( 0,Math.min( list.size(), 5) ) ;
-		}
-		else  {
-			/* how is this supposed to happen at all?  kai, jan'13
-			 *
-			 * If the choice set is empty (for example due to sampling) use the current activity location.
-			 * TODO: add a mechanism to at least keep, a minimal number of alternatives (minimally the chosen
-			 * location of the previous iteration. Then this "if" can go.
-			 *
-			 * yyyyyy If facilityIdWithLargestScore is defined, it is also in list and thus in mapCorrected.  No?  kai, feb'13
-			 */
-			//			TreeMap<Double,Id> mapTmp = new TreeMap<Double,Id>();
-			//			mapTmp.put(1.1, facilityIdWithLargestScore);
-			//			return mapTmp;
-			//			return createEmptyChoiceMap(facilityIdWithLargestScore);
+		} else  {
+			// I don't think that this can happen.  But it was in the code before, and better safe than sorry.  kai, mar'19
 			return Collections.singletonList( new ScoredAlternative( largestValue, facilityIdWithLargestScore ) )  ;
 		}
 	}
-
-	private List<? extends PlanElement> estimateTravelTime( Plan plan , Activity act ) {
-		// Ouch... should be passed as parameter!
-		final Leg previousLeg = LCPlanUtils.getPreviousLeg( plan, act );
-		final Activity previousActivity = LCPlanUtils.getPreviousActivity( plan, previousLeg );
-		final String mode = previousLeg.getMode();
-
-		switch ( this.approximationLevel ) {
-			case completeRouting:
-				final List<? extends PlanElement> trip = this.tripRouter.calcRoute( mode, FacilitiesUtils.toFacility( previousActivity, scenario.getActivityFacilities() ),
-					  FacilitiesUtils.toFacility( act, scenario.getActivityFacilities() ), previousActivity.getEndTime(), plan.getPerson() );
-				fillInLegTravelTimes( previousActivity.getEndTime() , trip );
-				return trip;
-			case noRouting:
-				// Yes, those two are doing the same. I passed some time to simplify the (rather convoluted) code,
-				// and it boiled down to this. No idea of since how long this is not doing what it is claiming to do...
-				// The only difference is that "noRouting" was getting travel times from the route for car if it exists
-				// td dec 15
-				if ( mode.equals( TransportMode.car ) && previousLeg.getTravelTime() != Time.UNDEFINED_TIME ) {
-					return Collections.singletonList( previousLeg );
-				}
-				// fall through to local routing if not car or previous travel time not found
-			case localRouting:
-				return getTravelTimeApproximation( previousActivity, act, mode );
-			default:
-				throw new RuntimeException( "unknown method "+this.approximationLevel );
-		}
-	}
-
-	private static void fillInLegTravelTimes(
-		  final double departureTime,
-		  final List<? extends PlanElement> trip ) {
-		double time = departureTime;
-		for ( PlanElement pe : trip ) {
-			if ( !(pe instanceof Leg) ) continue;
-			final Leg leg = (Leg) pe;
-			if ( leg.getDepartureTime() == Time.UNDEFINED_TIME ) {
-				leg.setDepartureTime( time );
-			}
-			if ( leg.getTravelTime() == Time.UNDEFINED_TIME ) {
-				leg.setTravelTime( leg.getRoute().getTravelTime() );
-			}
-			time += leg.getTravelTime();
-		}
-	}
-
-	private List<? extends PlanElement> getTravelTimeApproximation( Activity fromAct, Activity toAct, String mode ) {
-		// TODO: as soon as plansCalcRoute provides defaults for all modes use them
-		// I do not want users having to set dc parameters in other config modules!
-		double speed;
-
-		// Those two parameters could probably be defined with more flexibility...
-		if ( mode.equals( TransportMode.pt )) {
-			speed = this.dccg.getTravelSpeed_pt();
-		}
-		else if ( mode.equals( TransportMode.car ) ) {
-			speed = this.dccg.getTravelSpeed_car();
-		}
-		else if ( mode.equals( TransportMode.bike )) {
-			speed = this.teleportedModeSpeeds.get( TransportMode.bike );
-		}
-		else if ( mode.equals( TransportMode.walk ) || mode.equals( TransportMode.transit_walk )) {
-			speed = this.teleportedModeSpeeds.get(TransportMode.walk);
-		}
-		else {
-			speed = this.teleportedModeSpeeds.get( PlansCalcRouteConfigGroup.UNDEFINED );
-		}
-
-		// This is the only place where this class is used: delete it? td dec 15
-		final PathCostsGeneric pathCosts = new PathCostsGeneric( network );
-		pathCosts.createRoute(
-			  this.network.getLinks().get( fromAct.getLinkId() ),
-			  this.network.getLinks().get( toAct.getLinkId() ),
-			  this.beelineDistanceFactors.get( PlansCalcRouteConfigGroup.UNDEFINED ),
-			  speed );
-		final Leg l = PopulationUtils.createLeg(mode );
-		l.setRoute( pathCosts.getRoute() );
-		l.setTravelTime( pathCosts.getRoute().getTravelTime() );
-		l.setDepartureTime( fromAct.getEndTime() );
-		return Collections.singletonList( l );
-	}
-
 
 }
