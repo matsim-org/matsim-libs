@@ -1,6 +1,12 @@
 package org.matsim.core.mobsim.qsim;
 
-import com.google.inject.Inject;
+import static org.matsim.core.router.TripStructureUtils.Trip;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -12,22 +18,14 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.GeometryUtils;
-import org.matsim.facilities.Facility;
 import org.matsim.withinday.utils.EditPlans;
 import org.matsim.withinday.utils.EditTrips;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.matsim.core.router.TripStructureUtils.*;
+import com.google.inject.Inject;
 
 final class BookingNotificationEngine implements MobsimEngine {
 
@@ -69,7 +67,7 @@ final class BookingNotificationEngine implements MobsimEngine {
 	@Override
 	public void doSimStep( double time ){
 		for( Map.Entry<MobsimAgent, TripInfo> entry : map.entrySet() ){
-			MobsimAgent agent = entry.getKey();;
+			MobsimAgent agent = entry.getKey();
 			TripInfo tripInfo = entry.getValue();
 
 			Gbl.assertIf( WithinDayAgentUtils.getCurrentPlanElement( agent ) instanceof  Activity );

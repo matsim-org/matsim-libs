@@ -20,8 +20,8 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,12 +43,14 @@ import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.*;
-import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.Facility;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.RequiresBooking;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
+import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.Facility;
 
 public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo.Provider{
 	private static final Logger LOGGER = Logger.getLogger(PassengerEngine.class);
@@ -266,7 +268,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		internalInterface.arrangeNextAgentState(passenger);
 	}
 
-	private class DrtTripInfo implements TripInfo, CanBeAccepted {
+	private class DrtTripInfo implements TripInfo, RequiresBooking {
 		private final Link pickupLink;
 		private final PassengerRequest request;
 		private final Link dropoffLink;
@@ -327,13 +329,12 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 			return TransportMode.drt ;
 		}
 
-		@Override public TripInfo accept(){
+		@Override
+		public void bookTrip() {
 			// this is the handle by which the passenger can accept.  This would, we think, easiest go to a container that keeps track of unconfirmed
 			// offers.  We cannot say if advanceRequestStorage is the correct container for this, probably not and you will need yet another one.
 
 			pendingRequests.add( this) ;
-
-			return this ;
 		}
 		@Override public double getLatestDecisionTime(){
 			// we currently allow only one time step to make the decision:

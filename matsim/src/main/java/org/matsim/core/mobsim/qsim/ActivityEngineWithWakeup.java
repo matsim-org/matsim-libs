@@ -19,31 +19,46 @@
 
 package org.matsim.core.mobsim.qsim;
 
+import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
+import static org.matsim.core.router.TripStructureUtils.Trip;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.mobsim.qsim.interfaces.*;
-import org.matsim.core.router.*;
+import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.RequiresBooking;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
-import javax.inject.Inject;
-import java.util.*;
-import java.util.concurrent.PriorityBlockingQueue;
-
-import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
-import static org.matsim.core.router.TripStructureUtils.*;
-
 public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	private static final Logger log = Logger.getLogger( ActivityEngine.class ) ;
 
-	private final Map<String, DepartureHandler> departureHandlers;
+	private final Map<String, TripInfo.Provider> tripInfoProviders;
 	private final ActivityFacilities facilities;
 	private final BookingNotificationEngine bookingNotificationEngine;
 
@@ -61,10 +76,10 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	} );
 
 	@Inject
-	ActivityEngineWithWakeup( EventsManager eventsManager, Map<String, DepartureHandler> departureHandlers, Scenario scenario,
-					  BookingNotificationEngine bookingNotificationEngine ) {
-		this.delegate = new ActivityEngine( eventsManager ) ;
-		this.departureHandlers = departureHandlers;
+	ActivityEngineWithWakeup(EventsManager eventsManager, Map<String, TripInfo.Provider> tripInfoProviders,
+			Scenario scenario, BookingNotificationEngine bookingNotificationEngine) {
+		this.delegate = new ActivityEngine(eventsManager);
+		this.tripInfoProviders = tripInfoProviders;
 		this.facilities = scenario.getActivityFacilities();
 		this.bookingNotificationEngine = bookingNotificationEngine;
 	}
@@ -88,16 +103,15 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 				Facility fromFacility = FacilitiesUtils.toFacility( drtTrip.getOriginActivity(), facilities ) ;
 				Facility toFacility = FacilitiesUtils.toFacility( drtTrip.getDestinationActivity(), facilities ) ;
 
-				Map<TripInfo,TripInfo.Provider> allTripInfos  = new LinkedHashMap<>() ;
-
-				for ( DepartureHandler handler : departureHandlers.values() ) {
-					if ( handler instanceof TripInfo.Provider ){
-						final TripInfoRequest request = new TripInfoRequest.Builder().setFromFacility( fromFacility ).setToFacility( toFacility ).setTime(
-							  drtTrip.getOriginActivity().getEndTime() ).createRequest();
-						List<TripInfo> tripInfos = ((TripInfo.Provider) handler).getTripInfos( request ) ;
-						for( TripInfo tripInfo : tripInfos ){
-							allTripInfos.put( tripInfo, (TripInfo.Provider) handler ) ;
-						}
+				final TripInfoRequest request = new TripInfoRequest.Builder().setFromFacility(fromFacility)
+						.setToFacility(toFacility)
+						.setTime(drtTrip.getOriginActivity().getEndTime())
+						.createRequest();
+				Map<TripInfo, TripInfo.Provider> allTripInfos = new LinkedHashMap<>();
+				for (TripInfo.Provider provider : tripInfoProviders.values()) {
+					List<TripInfo> tripInfos = provider.getTripInfos(request);
+					for (TripInfo tripInfo : tripInfos) {
+						allTripInfos.put(tripInfo, provider);
 					}
 				}
 
@@ -115,20 +129,24 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 		// TODO: make complete
 		TripInfo tripInfo = allTripInfos.keySet().iterator().next() ;
 
-		TripInfo confirmation = null ;
-		if ( tripInfo instanceof CanBeAccepted ) {
-			confirmation = ((CanBeAccepted)tripInfo).accept() ;
-		}
-		if( confirmation==null ) {
-			confirmation = tripInfo ;
-		}
+		if (tripInfo instanceof RequiresBooking) {
+			((RequiresBooking)tripInfo).bookTrip(); //or: tripinfoProvider.bookTrip((RequiresBooking)tripInfo);
+			//to reduce number of possibilities, I would simply assume that notification always comes later
+			//
+			// --> yes, with DRT it will always come in the next time step, I adapted code accordingly (michal)
 
-		if ( confirmation.getPickupLocation()!=null ) {
-			bookingNotificationEngine.notifyChangedTripInformation( agent, confirmation );
-		} else{
+			//but what to do if trip gets rejected?
+			//
+			// --> maybe ActivityEngineWithWakeup should only wake up agents given some conditions and then delegate
+			// handling of agents to bookingNotificationEngine (or other handlers - depending on the wake-up condition)
+			// Then bookingNotificationEngine should handle the whole process, including re-looping through providers in case a rejection comes
+			// (michal)
+
 			// wait for notification:
-			((Activity)WithinDayAgentUtils.getCurrentPlanElement( agent )).setEndTime( Double.MAX_VALUE );
-			delegate.rescheduleActivityEnd( agent );
+			((Activity)WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.MAX_VALUE);
+			delegate.rescheduleActivityEnd(agent);
+		} else {
+			bookingNotificationEngine.notifyChangedTripInformation(agent, tripInfo);
 		}
 	}
 
@@ -142,16 +160,16 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 		delegate.setInternalInterface( internalInterface );
 	}
 
-	
+
 	/**
-	 * 
+	 *
 	 * This method is called by QSim to pass in agents which then "live" in the activity layer until they are handed out again
 	 * through the internalInterface.
-	 * 
+	 *
 	 * It is called not before onPrepareSim() and not after afterSim(), but it may be called before, after, or from doSimStep(),
 	 * and even from itself (i.e. it must be reentrant), since internalInterface.arrangeNextAgentState() may trigger
 	 * the next Activity.
-	 * 
+	 *
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
