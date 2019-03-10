@@ -23,9 +23,7 @@ import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStage
 import static org.matsim.core.router.TripStructureUtils.Trip;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -35,7 +33,6 @@ import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -45,8 +42,6 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.RequiresBooking;
-import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -58,7 +53,6 @@ import org.matsim.facilities.Facility;
 public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	private static final Logger log = Logger.getLogger( ActivityEngine.class ) ;
 
-	private final Map<String, TripInfo.Provider> tripInfoProviders;
 	private final ActivityFacilities facilities;
 	private final BookingNotificationEngine bookingNotificationEngine;
 
@@ -72,10 +66,9 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	});
 
 	@Inject
-	ActivityEngineWithWakeup(EventsManager eventsManager, Map<String, TripInfo.Provider> tripInfoProviders,
+	ActivityEngineWithWakeup(EventsManager eventsManager,
 			Scenario scenario, BookingNotificationEngine bookingNotificationEngine) {
 		this.delegate = new ActivityEngine(eventsManager);
-		this.tripInfoProviders = tripInfoProviders;
 		this.facilities = scenario.getActivityFacilities();
 		this.bookingNotificationEngine = bookingNotificationEngine;
 	}
@@ -103,48 +96,15 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 						.setToFacility(toFacility)
 						.setTime(drtTrip.getOriginActivity().getEndTime())
 						.createRequest();
-				Map<TripInfo, TripInfo.Provider> allTripInfos = new LinkedHashMap<>();
-				for (TripInfo.Provider provider : tripInfoProviders.values()) {
-					List<TripInfo> tripInfos = provider.getTripInfos(request);
-					for (TripInfo tripInfo : tripInfos) {
-						allTripInfos.put(tripInfo, provider);
-					}
-				}
 
-				// TODO add info for mode that is in agent plan, if not returned by trip info provider
-
-				decide( entry.agent, allTripInfos ) ;
+				//first simulate ActivityEngineWithWakeup and then BookingNotificationEngine --> decision process
+				//in the same time step
+				bookingNotificationEngine.addTripInfoRequest(entry.agent, request);
 			}
 		}
 		delegate.doSimStep( time );
 	}
 
-	private void decide( MobsimAgent agent, Map<TripInfo, TripInfo.Provider> allTripInfos ){
-
-		// to get started, we assume that we are only getting one drt option back.
-		// TODO: make complete
-		TripInfo tripInfo = allTripInfos.keySet().iterator().next() ;
-
-		if (tripInfo instanceof RequiresBooking) {
-			((RequiresBooking)tripInfo).bookTrip(); //or: tripinfoProvider.bookTrip((RequiresBooking)tripInfo);
-			//to reduce number of possibilities, I would simply assume that notification always comes later
-			//
-			// --> yes, with DRT it will always come in the next time step, I adapted code accordingly (michal)
-
-			//but what to do if trip gets rejected?
-			//
-			// --> maybe ActivityEngineWithWakeup should only wake up agents given some conditions and then delegate
-			// handling of agents to bookingNotificationEngine (or other handlers - depending on the wake-up condition)
-			// Then bookingNotificationEngine should handle the whole process, including re-looping through providers in case a rejection comes
-			// (michal)
-
-			// wait for notification:
-			((Activity)WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.MAX_VALUE);
-			delegate.rescheduleActivityEnd(agent);
-		} else {
-			bookingNotificationEngine.notifyChangedTripInformation(agent, tripInfo);
-		}
-	}
 
 	@Override
 	public void afterSim() {
@@ -170,6 +130,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
 
+		// propose a generic way of adding agents to wakeUpList... this code is DRT specific, michal
 		for( Leg drtLeg : findLegsWithModeInFuture( agent, TransportMode.drt ) ){
 			double prebookingOffset_s = (double) drtLeg.getAttributes().getAttribute( "prebookingOffset_s" );
 			final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
