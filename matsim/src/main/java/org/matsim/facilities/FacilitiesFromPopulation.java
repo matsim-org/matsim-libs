@@ -26,6 +26,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -62,14 +63,19 @@ public final class FacilitiesFromPopulation {
 	private boolean addEmptyActivityOptions = false;
 
 	public FacilitiesFromPopulation(final ActivityFacilities facilities) {
+		// minimalistic constructor, to configure via external setters
 		this.facilities = facilities;
 	}
 
-	public FacilitiesFromPopulation(final ActivityFacilities facilities, final FacilitiesConfigGroup facilityConfigGroup) {
-		this(facilities);
+	public FacilitiesFromPopulation( Scenario scenario ) {
+		// "fat" constructor, to configure via config etc.
+		this(scenario.getActivityFacilities());
+		FacilitiesConfigGroup facilityConfigGroup = scenario.getConfig().facilities();;
 		this.idPrefix = facilityConfigGroup.getIdPrefix();
-		this.removeLinksAndCoordinates = facilityConfigGroup.isRemovingLinksAndCoordinates();
-		this.addEmptyActivityOptions = facilityConfigGroup.isAddEmptyActivityOption();
+//		this.removeLinksAndCoordinates = facilityConfigGroup.isRemovingLinksAndCoordinates();
+		this.removeLinksAndCoordinates = false ;
+//		this.addEmptyActivityOptions = facilityConfigGroup.isAddEmptyActivityOption();
+		this.addEmptyActivityOptions = true ;
 		if ( facilityConfigGroup.getFacilitiesSource()== FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile ) {
 			oneFacilityPerLink = true;
 		} else if ( facilityConfigGroup.getFacilitiesSource()== FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile ) {
@@ -77,6 +83,8 @@ public final class FacilitiesFromPopulation {
 		} else {
 			throw new RuntimeException( Gbl.INVALID );
 		}
+		this.network = scenario.getNetwork() ;
+		this.planCalcScoreConfigGroup = scenario.getConfig().planCalcScore() ;
 	}
 
 	/**
@@ -150,9 +158,14 @@ public final class FacilitiesFromPopulation {
 						Id<Link> linkId = a.getLinkId();
 						ActivityFacility facility = null;
 
+						Gbl.assertNotNull( network ) ;
+
 						if (linkId == null && this.network != null) {
 							linkId = NetworkUtils.getNearestLinkExactly(this.network, c).getId();
+							// yyyy we have been using the non-exact version in other parts of the project. kai, mar'19
 						}
+
+						Gbl.assertNotNull( linkId );
 
 						if (this.oneFacilityPerLink && linkId != null) {
 							facility = facilitiesPerLinkId.get(linkId);
@@ -169,7 +182,8 @@ public final class FacilitiesFromPopulation {
 
 							facility = facilitiesPerCoordinate.get(c);
 							if (facility == null) {
-								facility = factory.createActivityFacility(Id.create(this.idPrefix + idxCounter++, ActivityFacility.class), c, linkId);
+								facility = factory.createActivityFacility(Id.create(this.idPrefix + idxCounter++, ActivityFacility.class), c,
+									  linkId);
 								this.facilities.addActivityFacility(facility);
 								facilitiesPerCoordinate.put(c, facility);
 							}

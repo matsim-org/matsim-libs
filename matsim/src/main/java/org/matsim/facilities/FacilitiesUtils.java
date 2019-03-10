@@ -30,8 +30,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.ActivityWrapperFacility;
-import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 
 /**
  * Contains several helper methods for working with {@link ActivityFacility facilities}.
@@ -108,10 +106,21 @@ public class FacilitiesUtils {
 		return accessActLink;
 	}
 
-	public static Facility toFacility( final Activity act, ActivityFacilities facilities ) {
-		if (	facilities != null && ! facilities.getFacilities().isEmpty() && act.getFacilityId() != null ) {
-			return facilities.getFacilities().get( act.getFacilityId() );
+	public static Facility toFacility( final Activity toWrap, ActivityFacilities activityFacilities ){
+		if ( activityFacilities!=null && toWrap.getFacilityId()!=null ){
+			ActivityFacility fac = activityFacilities.getFacilities().get( toWrap.getFacilityId() );
+			if( fac != null ){
+				return fac;
+			}
 		}
-		return new ActivityWrapperFacility( act );
+		return new ActivityWrapperFacility( toWrap );
+	}
+
+	/**
+	 * Preferably use {@link FacilitiesUtils#toFacility(Activity, ActivityFacilities)}.  The method here is left in place if one wants to construct a wrapper decidedly without
+	 * automagic.  It deliberately returns the interface.
+	 */
+	public static Facility wrapActivity ( final Activity toWrap ) {
+		return new ActivityWrapperFacility( toWrap ) ;
 	}
 }
