@@ -98,11 +98,15 @@ final class BookingEngine implements MobsimEngine {
 			boolean bookingRejected = false;// get it from TripInfo ???
 			if (bookingRejected) {
 				TripInfoRequest request = null;///get it from TripInfo ???
+				//TODO agent should adapt trip info request given that the previous one got rejected??
+				//TODO or it should skip the rejected option during "accept()"
 				notifyTripInfoRequestArrived(agent, request);//start over again in the next time step
 			} else {
 				updateAgentPlan(agent, tripInfo);
 			}
 		}
+
+		tripInfoMap.clear();
 	}
 
 	private void updateAgentPlan(MobsimAgent agent, TripInfo tripInfo) {
@@ -181,6 +185,8 @@ final class BookingEngine implements MobsimEngine {
 
 			decide(entry.getKey(), allTripInfos);
 		}
+
+		tripInfoRequestMap.clear();
 	}
 
 	private void decide(MobsimAgent agent, Map<TripInfo, TripInfo.Provider> allTripInfos) {
