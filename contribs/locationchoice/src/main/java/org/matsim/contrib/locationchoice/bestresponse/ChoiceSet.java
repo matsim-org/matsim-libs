@@ -214,6 +214,11 @@ class ChoiceSet {
 		// In case we try to re-use a single copy of the plan: create the copy here and re-use it within the loop.
 		if (this.reUsePlans) planTmp = LCPlanUtils.createCopy(plan );
 
+		// yyyy I think that in the following one should re-use a single plan by default. However, the "activityToRelocate" by force refers to the old plan, and so
+		// one needs to be careful with the implementation.  Either make sure that we also have an activityToRelocateTmp.  Or do as what I think is currently done: Do the
+		// computations with the old plan, and only insert travel times etc. into planTmp.  I cannot say how critical this is in terms of performance; the current approach
+		// will (I think) create and later garbage-collect a lot of objects.  kai, mar'19
+
 		for (Id<ActivityFacility> destinationId : this.destinations) {
 			// tentatively set
 			ActivityFacility facility = facilities.getFacilities().get(destinationId);
