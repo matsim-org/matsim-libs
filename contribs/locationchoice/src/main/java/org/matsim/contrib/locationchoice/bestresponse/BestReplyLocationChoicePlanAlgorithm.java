@@ -65,12 +65,6 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
 	private final Map<String, Double> teleportedModeSpeeds;
 	private final Map<String, Double> beelineDistanceFactors;
-	
-	/*
-	 * This is not nice! We hide the object of the super-super class since
-	 * it expects a QuadTreeRing<ActivityFacility>. Find a better solution for this...
-	 * cdobler, oct'13.
-	 */
 	private TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType;
 	private final TripRouter tripRouter;
 	private final DestinationChoiceConfigGroup dccg;
@@ -159,7 +153,6 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	}
 
 	private void handleActivities(final Plan plan, final Plan bestPlan, final int personIndex) {
-		ApproximationLevel travelTimeApproximationLevel = this.dccg.getTravelTimeApproximationLevel();
 
 		int actlegIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -185,22 +178,17 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 					double y = (coordPre.getY() + coordPost.getY()) / 2.0;
 					Coord center = new Coord(x, y);
 
-					ChoiceSet cs = createChoiceSetFromCircle(plan, personIndex, travelTimeApproximationLevel, actToMove, maxRadius, center);
-					
+					ChoiceSet cs = createChoiceSetFromCircle(plan, personIndex, this.dccg.getTravelTimeApproximationLevel(), actToMove, maxRadius, center );
+
+					// === this is where the work is done:
 					final Id<ActivityFacility> choice = cs.getWeightedRandomChoice(
 							actlegIndex, this.scoringFunctionFactory, plan, this.tripRouter, this.lcContext.getPersonsKValuesArray()[personIndex],
 							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
+					// ===
 
 					this.setLocation(actToMove, choice);
 
-					// the change was done to "plan".  Now check if we want to copy this to bestPlan:
-//					double score = this.computeScoreAndAdaptPlan( plan, cs, this.scoringFunctionFactory );
-//					if (score > bestPlan.getScore() + 0.0000000000001) {
-						LCPlanUtils.copyFromTo( plan, bestPlan );
-//					}
-					// yyyy Is it really necessary to do this evaulation step?  We just need a suggestion, and the forward/backward Dijkstra should be good enough to
-					// evaluate that. kai, mar'19
-
+					LCPlanUtils.copyFromTo( plan, bestPlan );
 
 				}
 			}
@@ -211,7 +199,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 			final ApproximationLevel travelTimeApproximationLevel,
 			final Activity actToMove, double maxRadius, Coord center) {
 
-		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, this.scenario, this.nearestLinks, this.teleportedModeSpeeds, this.beelineDistanceFactors);
+		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, scenario, nearestLinks, teleportedModeSpeeds, beelineDistanceFactors);
 
 		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
 		Gbl.assertNotNull(convertedType);

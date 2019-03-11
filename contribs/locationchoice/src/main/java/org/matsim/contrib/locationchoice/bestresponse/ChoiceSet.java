@@ -111,8 +111,9 @@ class ChoiceSet {
 		List<ScoredAlternative> list;
 
 		if (this.destinations.size() > 0) {
-			list = this.createReducedChoiceSetWithPseudoScores(actlegIndex, this.facilities, scoringFunction, plan,
-				  tripRouter );
+			// === this is where the work is done:
+			list = this.createReducedChoiceSetWithPseudoScores(actlegIndex, this.facilities, scoringFunction, plan, tripRouter );
+			// ===
 		} else {
 			// if we have no destinations defined so far, we can shorten this
 			// currently handled activity which should be re-located
@@ -164,17 +165,7 @@ class ChoiceSet {
 				ActivityFacility destinationFacility = this.scenario.getActivityFacilities().getFacilities().get( destinationId );
 				Link destinationLink = FacilitiesUtils.decideOnLink( destinationFacility, network );
 				;
-				//				Id<Link> linkId = destinationFacility.getLinkId();
-				//				Link destinationLink;
-				//				if (linkId != null) {
-				//					destinationLink = this.network.getLinks().get(linkId);
-				//				} else {
-				//					destinationLink = NetworkUtils.getNearestLink( this.network, destinationFacility.getCoord() );
-				//				}
-
 				Node toNode = Objects.requireNonNull( destinationLink ).getToNode();
-
-				//				log.info( "destinationToNode=" + toNode.getId() ) ;
 
 				InitialNode initialToNode = new InitialNode( toNode, 0.0, 0.0 );
 				destinationNodes.add( initialToNode );
@@ -183,8 +174,6 @@ class ChoiceSet {
 
 			// (1) forward tree
 			{
-
-				//			Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(activityToRelocate));
 				Leg previousLeg = LCPlanUtils.getPreviousLeg( plan, activityToRelocate );
 				Activity previousActivity = LCPlanUtils.getPreviousActivity( plan, previousLeg );
 				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario ) ).getToNode();
@@ -195,7 +184,6 @@ class ChoiceSet {
 
 			// (2) backward tree
 			{
-				//			Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).getNextLeg(activityToRelocate));
 				Leg nextLeg = LCPlanUtils.getNextLeg( plan, activityToRelocate );
 				Activity nextActivity = LCPlanUtils.getNextActivity( plan, nextLeg );
 				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( nextActivity, scenario ) ).getToNode();
@@ -213,11 +201,6 @@ class ChoiceSet {
 				// yy but the code that follows now is not doing what the comment above says, or does it?  kai, mar'19
 				backwardMultiNodeDijkstra.setSearchAllEndNodes( true );
 				backwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, activityToRelocate.getEndTime(), plan.getPerson(), null );
-
-				//		BackwardDijkstraMultipleDestinations leastCostPathCalculatorBackward = new BackwardDijkstraMultipleDestinations(network, travelCost, travelTime);
-				//		leastCostPathCalculatorBackward.setEstimatedStartTime(activityToRelocate.getEndTime());
-				//		// the backwards Dijkstra will expand from the _next_ activity location backwards to all locations in the system.  This is the time
-				//		// at which this is anchored.  (Clearly too early, but probably not that bad as an approximation.)
 			}
 			// ---
 		}
@@ -225,13 +208,6 @@ class ChoiceSet {
 		ArrayList<ScoredAlternative> list = new ArrayList<ScoredAlternative>();
 		double largestValue = Double.NEGATIVE_INFINITY;
 		Id<ActivityFacility> facilityIdWithLargestScore = activityToRelocate.getFacilityId();
-
-		/*
-		 * TODO:
-		 * Can this be merged with the for loop above? So far, facilities are looked up twice.
-		 * cdobler, oct'13
-		 * I cannot say what this comment refers to.  Maybe this has been done in the meantime? kai, mar'19
-		 */
 
 		Plan planTmp = null;
 

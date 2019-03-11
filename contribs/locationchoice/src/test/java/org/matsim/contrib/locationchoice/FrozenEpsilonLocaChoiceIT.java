@@ -29,7 +29,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -201,10 +204,21 @@ public class FrozenEpsilonLocaChoiceIT{
 		System.err.println("shouldn't this change anyways??") ;
 	}
 
+	enum RunType { shortRun, longRun }
+	private RunType runType = RunType.longRun ;
+
 	@Test public void testFacilitiesAlongALine() {
 		Config config = ConfigUtils.createConfig() ;
-		//		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "config.xml");
-		config.controler().setLastIteration( 2 );
+		switch( runType ) {
+			case shortRun:
+				config.controler().setLastIteration( 2 );
+				break;
+			case longRun:
+				config.controler().setLastIteration( 1000 );
+				break;
+			default:
+				throw new RuntimeException( Gbl.NOT_IMPLEMENTED) ;
+		}
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		{
 			PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams( "home" ) ;
@@ -220,11 +234,37 @@ public class FrozenEpsilonLocaChoiceIT{
 			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings( ) ;
 			stratSets.setStrategyName( "MyLocationChoice" );
 			stratSets.setWeight( 1.0 );
+			stratSets.setDisableAfter( 10 );
 			config.strategy().addStrategySettings( stratSets );
+		}
+		switch ( runType ){
+			case shortRun:
+				break;
+			case longRun:{
+				StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+				stratSets.setStrategyName( "MyLocationChoice" );
+				stratSets.setWeight( 0.1 );
+				config.strategy().addStrategySettings( stratSets );
+			}
+			{
+				StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+				stratSets.setStrategyName( DefaultSelector.ChangeExpBeta );
+				stratSets.setWeight( 1.0 );
+				config.strategy().addStrategySettings( stratSets );
+			}
+			config.strategy().setFractionOfIterationsToDisableInnovation( 0.8 );
+			config.planCalcScore().setFractionOfIterationsToStartScoreMSA( 0.8 );
 		}
 
 		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
-		dccg.setEpsilonScaleFactors("10.0" );
+		switch( runType ) {
+			case shortRun:
+				dccg.setEpsilonScaleFactors("10.0" );
+				break;
+			case longRun:
+				dccg.setEpsilonScaleFactors("10.0" );
+				break;
+		}
 		dccg.setAlgorithm( bestResponse );
 		dccg.setFlexibleTypes( "shop" );
 		dccg.setTravelTimeApproximationLevel( ApproximationLevel.localRouting );
