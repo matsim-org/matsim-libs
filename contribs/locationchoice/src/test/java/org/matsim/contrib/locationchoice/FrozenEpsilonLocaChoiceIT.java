@@ -205,9 +205,9 @@ public class FrozenEpsilonLocaChoiceIT{
 	}
 
 	enum RunType { shortRun, longRun }
-	private RunType runType = RunType.longRun ;
 
 	@Test public void testFacilitiesAlongALine() {
+		RunType runType = RunType.shortRun ;
 		Config config = ConfigUtils.createConfig() ;
 		switch( runType ) {
 			case shortRun:
@@ -371,12 +371,19 @@ public class FrozenEpsilonLocaChoiceIT{
 					@Inject ActivityFacilities facilities ;
 					@Inject TripRouter tripRouter ;
 					int binFromVal( double val ) {
-						if ( val < 1. ) {
-							return 0 ;
-						}
-						return (int) ( Math.log(val)/Math.log(2) ) ;
+						return (int) (val/10000.) ;
+//						if ( val < 1. ) {
+//							return 0 ;
+//						}
+//						return (int) ( Math.log(val)/Math.log(2) ) ;
 					}
 					@Override public void notifyShutdown( ShutdownEvent event ){
+						switch( runType ) {
+							case longRun:
+								return;
+							case shortRun:
+								break;
+						}
 						if ( event.isUnexpected() ) {
 							return ;
 						}
@@ -396,19 +403,17 @@ public class FrozenEpsilonLocaChoiceIT{
 								log.info( "bin=" + ii + "; cnt=" + cnt[ii] );
 							}
 						}
-						check( 2, cnt[0] );
-						check( 24, cnt[8] ) ;
-						check( 52, cnt[9] ) ;
-						check( 68, cnt[10] ) ;
-						check( 130, cnt[11] ) ;
-						check( 304, cnt[12] ) ;
-						check( 326, cnt[13] ) ;
-						check( 654, cnt[14] ) ;
-						check( 416, cnt[15] ) ;
-						check( 24, cnt[16] ) ;
-						check( 0, cnt[17] ) ;
-
-						// The bins are logarithmic, so I would have expected the counts to be approximately constant.  That clearly is not the case.  I don't know why.
+						// Note that the following "check" method is deliberately a bit imprecise (see implementation), since we are only interested in the
+						// (approximate) distribution.  kai, mar'19
+						check( 684, cnt[0] );
+						check( 380, cnt[1] ) ;
+						check( 408, cnt[2] ) ;
+						check( 304, cnt[3] ) ;
+						check( 122, cnt[4] ) ;
+						check( 66, cnt[5] ) ;
+						check( 16, cnt[6] ) ;
+						check( 18, cnt[7] ) ;
+						check( 8, cnt[8] ) ;
 
 					}
 

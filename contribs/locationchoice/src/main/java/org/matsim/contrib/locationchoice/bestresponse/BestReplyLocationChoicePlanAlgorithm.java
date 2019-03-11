@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.InternalPlanDataStructure;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
@@ -112,15 +111,17 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 			case planImpl:{
 				// why is all this plans copying necessary?  Could you please explain the design a bit?  Thanks.  kai, jan'13
 				// (this may be done by now. kai, jan'13)
+				// No, I don't think it is done.  The plan here is already a copy (matsim strategy manager logic).  We will need another copy later for the
+				// preliminary scoring, but not yet here ...  kai, mar'19
 
 				Plan bestPlan = PopulationUtils.createPlan( person );
 
 				// bestPlan is initialized as a copy from the old/input plan:
 				PopulationUtils.copyFromTo( plan, bestPlan );
 
-				// this will probably generate an improved bestPlan (?):
-				int personIndex = this.lcContext.getPersonIndex( person.getId() );
-				this.handleActivities( plan, bestPlan, personIndex );
+				// ### this is where the work is done:
+				this.handleActivities( plan, bestPlan, this.lcContext.getPersonIndex( person.getId() ) );
+				// ###
 
 				// copy the best plan into replanned plan
 				// making a deep copy
@@ -184,9 +185,10 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 					final Id<ActivityFacility> choice = cs.getWeightedRandomChoice(
 							actlegIndex, this.scoringFunctionFactory, plan, this.tripRouter, this.lcContext.getPersonsKValuesArray()[personIndex],
 							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
+					// yy This looks like method envy, i.e. the method should rather be in this class here.  kai, mar'19
 					// ===
 
-					this.setLocation(actToMove, choice);
+					this.setLocationOfActivityToFacilityId(actToMove, choice );
 
 					LCPlanUtils.copyFromTo( plan, bestPlan );
 
@@ -238,7 +240,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		return cs;
 	}
 
-	private void setLocation(Activity act2, Id<ActivityFacility> facilityId) {
+	private void setLocationOfActivityToFacilityId( Activity act2, Id<ActivityFacility> facilityId ) {
 		LCPlanUtils.setFacilityId(act2, facilityId );
 		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
 		
