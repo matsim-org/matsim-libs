@@ -100,60 +100,21 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 
 	@Override
 	public final void run(final Plan plan) {
-		// if person is not in the analysis population
-		// TODO: replace this now by subpopulation!
 		final Person person = plan.getPerson();
 
 		Long idExclusion = this.dccg.getIdExclusion();
 		if (idExclusion != null && Long.parseLong(person.getId().toString()) > idExclusion) return;
+		// if person is not in the analysis population
+		// TODO: replace this now by subpopulation!
+		// Isn't this done by the strategy manager logic?  kai, mar'19
 
-		switch( this.dccg.getInternalPlanDataStructure() ){
-			case planImpl:{
-				// why is all this plans copying necessary?  Could you please explain the design a bit?  Thanks.  kai, jan'13
-				// (this may be done by now. kai, jan'13)
-				// No, I don't think it is done.  The plan here is already a copy (matsim strategy manager logic).  We will need another copy later for the
-				// preliminary scoring, but not yet here ...  kai, mar'19
+		// ### this is where the work is done:
+		this.handleActivities( plan, this.lcContext.getPersonIndex( person.getId() ) );
+		// ###
 
-				Plan bestPlan = PopulationUtils.createPlan( person );
-
-				// bestPlan is initialized as a copy from the old/input plan:
-				PopulationUtils.copyFromTo( plan, bestPlan );
-
-				// ### this is where the work is done:
-				this.handleActivities( plan, bestPlan, this.lcContext.getPersonIndex( person.getId() ) );
-				// ###
-
-				// copy the best plan into replanned plan
-				// making a deep copy
-				LCPlanUtils.copyPlanFieldsFromTo( bestPlan, plan );
-
-				PopulationUtils.resetRoutes( plan );
-				break;
-			}
-			case lcPlan:{
-
-				// create a memory efficient version of the plan that can be copied easily
-				LCPlan lcPlan = new LCPlan( plan );
-
-				LCPlan bestPlan = LCPlan.createCopy( lcPlan );
-
-				// this will probably generate an improved bestPlan (?):
-				int personIndex = this.lcContext.getPersonIndex( person.getId() );
-				this.handleActivities( lcPlan, bestPlan, personIndex );
-
-				// copy the best plan into replanned plan
-				// making a deep copy
-				LCPlanUtils.copyPlanFieldsFromTo( bestPlan, plan );
-
-				PopulationUtils.resetRoutes( plan );
-				break;
-			}
-			default:
-				throw new RuntimeException( "Unknown InternalPlanDataStructure was found: " + this.dccg.getInternalPlanDataStructure().toString() + ". Aborting!" );
-		}
 	}
 
-	private void handleActivities(final Plan plan, final Plan bestPlan, final int personIndex) {
+	private void handleActivities( final Plan plan, final int personIndex ) {
 
 		int actlegIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -189,8 +150,6 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 					// ===
 
 					this.setLocationOfActivityToFacilityId(actToMove, choice );
-
-					LCPlanUtils.copyFromTo( plan, bestPlan );
 
 				}
 			}

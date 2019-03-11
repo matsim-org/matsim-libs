@@ -270,6 +270,8 @@ public class FrozenEpsilonLocaChoiceIT{
 		dccg.setTravelTimeApproximationLevel( ApproximationLevel.localRouting );
 		dccg.setRandomSeed( 2 );
 		dccg.setDestinationSamplePercent( 5. );
+//		dccg.setInternalPlanDataStructure( DestinationChoiceConfigGroup.InternalPlanDataStructure.lcPlan );
+		// using LCPlans does not, or no longer, work (throws a null pointer exception).  kai, mar'19
 
 		// ---
 
