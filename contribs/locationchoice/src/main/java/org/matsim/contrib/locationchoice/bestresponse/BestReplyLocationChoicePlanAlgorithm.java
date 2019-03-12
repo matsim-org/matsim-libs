@@ -160,7 +160,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 			final ApproximationLevel travelTimeApproximationLevel,
 			final Activity actToMove, double maxRadius, Coord center) {
 
-		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, scenario, nearestLinks, teleportedModeSpeeds, beelineDistanceFactors);
+		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, scenario );
 
 		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
 		Gbl.assertNotNull(convertedType);

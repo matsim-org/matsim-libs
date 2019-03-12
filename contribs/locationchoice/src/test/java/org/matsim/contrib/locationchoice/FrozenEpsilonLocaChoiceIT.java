@@ -204,7 +204,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		System.err.println("shouldn't this change anyways??") ;
 	}
 
-	enum RunType { shortRun, longRun }
+	enum RunType { shortRun, medRun, longRun }
 
 	@Test public void testFacilitiesAlongALine() {
 		RunType runType = RunType.shortRun ;
@@ -212,6 +212,9 @@ public class FrozenEpsilonLocaChoiceIT{
 		switch( runType ) {
 			case shortRun:
 				config.controler().setLastIteration( 2 );
+				break;
+			case medRun:
+				config.controler().setLastIteration( 100 );
 				break;
 			case longRun:
 				config.controler().setLastIteration( 1000 );
@@ -240,6 +243,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		switch ( runType ){
 			case shortRun:
 				break;
+			case medRun:
 			case longRun:{
 				StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
 				stratSets.setStrategyName( "MyLocationChoice" );
@@ -254,6 +258,9 @@ public class FrozenEpsilonLocaChoiceIT{
 			}
 			config.strategy().setFractionOfIterationsToDisableInnovation( 0.8 );
 			config.planCalcScore().setFractionOfIterationsToStartScoreMSA( 0.8 );
+			break ;
+			default:
+				throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
 		}
 
 		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
@@ -262,8 +269,11 @@ public class FrozenEpsilonLocaChoiceIT{
 				dccg.setEpsilonScaleFactors("10.0" );
 				break;
 			case longRun:
+			case medRun:
 				dccg.setEpsilonScaleFactors("10.0" );
 				break;
+			default:
+				throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
 		}
 		dccg.setAlgorithm( bestResponse );
 		dccg.setFlexibleTypes( "shop" );
@@ -382,9 +392,12 @@ public class FrozenEpsilonLocaChoiceIT{
 					@Override public void notifyShutdown( ShutdownEvent event ){
 						switch( runType ) {
 							case longRun:
+							case medRun:
 								return;
 							case shortRun:
 								break;
+							default:
+								throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
 						}
 						if ( event.isUnexpected() ) {
 							return ;
@@ -420,7 +433,7 @@ public class FrozenEpsilonLocaChoiceIT{
 					}
 
 					void check( double val, double actual ){
-						Assert.assertEquals( val, actual, Math.max( 10, Math.sqrt( val ) ) );
+						Assert.assertEquals( val, actual, 2.*Math.max( 5, Math.sqrt( val ) ) );
 					}
 
 				} );

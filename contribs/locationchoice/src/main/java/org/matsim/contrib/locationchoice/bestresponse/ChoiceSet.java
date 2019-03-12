@@ -56,14 +56,9 @@ class ChoiceSet {
 	private List<Id<ActivityFacility>> notYetVisited = new LinkedList<>();
 	private final ActivityFacilities facilities;
 	private final Scenario scenario;
-	private final Map<String, Double> teleportedModeSpeeds;
-	private final Map<String, Double> beelineDistanceFactors;
-	private final boolean reUsePlans;
 
-	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
 	private MultiNodeDijkstra forwardMultiNodeDijkstra;
 	private BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
-	private TripRouter tripRouter;
 
 	@Override
 	public String toString() {
@@ -80,17 +75,12 @@ class ChoiceSet {
 		return stb.toString() ;
 	}
 
-	ChoiceSet(ApproximationLevel approximationLevel, Scenario scenario, Map<Id<ActivityFacility>, Id<Link>> nearestLinks,
-		    Map<String, Double> teleportedModeSpeeds, Map<String, Double> beelineDistanceFactors) {
+	ChoiceSet( ApproximationLevel approximationLevel, Scenario scenario ) {
 		this.approximationLevel = approximationLevel;
 		this.facilities = scenario.getActivityFacilities();
 		this.scenario = scenario;
-		this.nearestLinks = nearestLinks;
-		this.teleportedModeSpeeds = teleportedModeSpeeds;
-		this.beelineDistanceFactors = beelineDistanceFactors;
 
 		this.dccg = (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
-		this.reUsePlans = dccg.getReUseTemporaryPlans();
 
 		this.network = scenario.getNetwork() ;
 	}
@@ -106,13 +96,14 @@ class ChoiceSet {
 								    BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, int iteration ) {
 		this.forwardMultiNodeDijkstra = forwardMultiNodeDijkstra;
 		this.backwardMultiNodeDijkstra = backwardMultiNodeDijkstra;
-		this.tripRouter = tripRouter ;
 
 		List<ScoredAlternative> list;
 
 		if (this.destinations.size() > 0) {
+			Plan planTmp = PopulationUtils.createPlan( plan.getPerson() ) ;
+			PopulationUtils.copyFromTo( plan, planTmp );
 			// === this is where the work is done:
-			list = this.createReducedChoiceSetWithPseudoScores(actlegIndex, this.facilities, scoringFunction, plan, tripRouter );
+			list = this.createReducedChoiceSetWithPseudoScores(actlegIndex, this.facilities, scoringFunction, planTmp, tripRouter );
 			// ===
 		} else {
 			// if we have no destinations defined so far, we can shorten this
@@ -143,13 +134,11 @@ class ChoiceSet {
 		  int actlegIndex,
 		  ActivityFacilities facilities,
 		  ScoringFunctionFactory scoringFunction,
-		  Plan plan,
+		  Plan planTmp,
 		  TripRouter router ) {
 
 		// currently handled activity which should be re-located
-		Activity activityToRelocate = (Activity) plan.getPlanElements().get(actlegIndex);
-
-		List<InitialNode> destinationNodes = new ArrayList<>();
+		Activity activityToRelocate = (Activity) planTmp.getPlanElements().get(actlegIndex);
 
 		// We need to calculate the multi node dijkstra stuff only in case localRouting is used.
 		if (this.approximationLevel == DestinationChoiceConfigGroup.ApproximationLevel.localRouting )
@@ -161,6 +150,7 @@ class ChoiceSet {
 			// destination under consideration.
 
 			// (0) collect all possible destinations and copy them into an "imaginary" node.
+			List<InitialNode> destinationNodes = new ArrayList<>();
 			for( Id<ActivityFacility> destinationId : this.destinations ){
 				ActivityFacility destinationFacility = this.scenario.getActivityFacilities().getFacilities().get( destinationId );
 				Link destinationLink = FacilitiesUtils.decideOnLink( destinationFacility, network );
@@ -174,33 +164,23 @@ class ChoiceSet {
 
 			// (1) forward tree
 			{
-				Leg previousLeg = LCPlanUtils.getPreviousLeg( plan, activityToRelocate );
-				Activity previousActivity = LCPlanUtils.getPreviousActivity( plan, previousLeg );
+				Leg previousLeg = LCPlanUtils.getPreviousLeg( planTmp, activityToRelocate );
+				Activity previousActivity = LCPlanUtils.getPreviousActivity( planTmp, previousLeg );
 				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario ) ).getToNode();
 
 				forwardMultiNodeDijkstra.setSearchAllEndNodes( true );
-				forwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, previousActivity.getEndTime(), plan.getPerson(), null );
+				forwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, previousActivity.getEndTime(), planTmp.getPerson(), null );
 			}
 
 			// (2) backward tree
 			{
-				Leg nextLeg = LCPlanUtils.getNextLeg( plan, activityToRelocate );
-				Activity nextActivity = LCPlanUtils.getNextActivity( plan, nextLeg );
+				Leg nextLeg = LCPlanUtils.getNextLeg( planTmp, activityToRelocate );
+				Activity nextActivity = LCPlanUtils.getNextActivity( planTmp, nextLeg );
 				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( nextActivity, scenario ) ).getToNode();
 
-				/*
-				 * The original code below uses the relocated activities end time as start time. Does this make sense?
-				 * Probably yes, since the trip to the next destination is short??
-				 * BUT: if we use that activities end time, we could also use another ForwardMultiNodeDijsktra...
-				 * Switched to nextActivity.startTime() since this time is also available in PlanTimesAdapter.computeTravelTimeFromLocalRouting()
-				 * where the path's created by the Dijkstra are used. So far (I think), the estimated start times
-				 * were used there (leastCostPathCalculatorBackward.setEstimatedStartTime(activityToRelocate.getEndTime())).
-				 *
-				 * cdobler oct'13
-				 */
-				// yy but the code that follows now is not doing what the comment above says, or does it?  kai, mar'19
 				backwardMultiNodeDijkstra.setSearchAllEndNodes( true );
-				backwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, activityToRelocate.getEndTime(), plan.getPerson(), null );
+				backwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, activityToRelocate.getEndTime(), planTmp.getPerson(), null );
+				// yy it is not clear to me how the dp time is interpreted for the backwards Dijkstra.  kai, mar'19
 			}
 			// ---
 		}
@@ -209,40 +189,14 @@ class ChoiceSet {
 		double largestValue = Double.NEGATIVE_INFINITY;
 		Id<ActivityFacility> facilityIdWithLargestScore = activityToRelocate.getFacilityId();
 
-		Plan planTmp = null;
-
-		// In case we try to re-use a single copy of the plan: create the copy here and re-use it within the loop.
-		if (this.reUsePlans) planTmp = LCPlanUtils.createCopy(plan );
-
-		// yyyy I think that in the following one should re-use a single plan by default. However, the "activityToRelocate" by force refers to the old plan, and so
-		// one needs to be careful with the implementation.  Either make sure that we also have an activityToRelocateTmp.  Or do as what I think is currently done: Do the
-		// computations with the old plan, and only insert travel times etc. into planTmp.  I cannot say how critical this is in terms of performance; the current approach
-		// will (I think) create and later garbage-collect a lot of objects.  kai, mar'19
-
 		for (Id<ActivityFacility> destinationId : this.destinations) {
-			// tentatively set
-			ActivityFacility facility = facilities.getFacilities().get(destinationId);
 
-			// As far as I can see, activity location is updated in the plan. Then the routes from and to that activity 
-			// are calculated. The resulting travel times are written to the temporary plan. If this is true, it should 
-			// not be necessary to update the activity location in the copied plan? I am not sure about this, therefore 
-			// keep the update in the "if(this.ReUsePlans)" block. cdobler oct'15
+			// yy I don't think that the LCPlan stuff is needed; I don't think that it is doing anything in the current implementation. kai, mar'19
+
 			LCPlanUtils.setFacilityId(activityToRelocate, destinationId );
-			LCPlanUtils.setCoord(activityToRelocate, facility.getCoord() );
-			LCPlanUtils.setLinkId(activityToRelocate, this.nearestLinks.get(destinationId ) );
-
-			//			PlanImpl planTmp = new PlanImpl();
-			//			planTmp.copyFrom(plan);
-
-			if (this.reUsePlans) {
-				// we have to update the copied plan
-				Activity actTmp = (Activity) planTmp.getPlanElements().get(actlegIndex);
-				LCPlanUtils.setFacilityId(actTmp, destinationId );
-				LCPlanUtils.setCoord(actTmp, facility.getCoord() );
-				LCPlanUtils.setLinkId(actTmp, this.nearestLinks.get(destinationId ) );
-			}
-			// If we don't re-use a single copy of the plan, create a new one.
-			else planTmp = LCPlanUtils.createCopy(plan );
+			final ActivityFacility activityFacility = facilities.getFacilities().get( destinationId );
+			LCPlanUtils.setCoord(activityToRelocate, activityFacility.getCoord() );
+			LCPlanUtils.setLinkId(activityToRelocate, FacilitiesUtils.decideOnLink( activityFacility, network ).getId() ) ;
 
 			switch ( dccg.getTravelTimeApproximationLevel() ){
 				case completeRouting:
@@ -258,14 +212,14 @@ class ChoiceSet {
 					{
 						Node prevActNode;
 						double startTime;
-						final Leg previousLeg = LCPlanUtils.getPreviousLeg( plan, activityToRelocate );
+						final Leg previousLeg = LCPlanUtils.getPreviousLeg( planTmp, activityToRelocate );
 						{
-							final Activity prevAct = LCPlanUtils.getPreviousActivity( plan, previousLeg );
+							final Activity prevAct = LCPlanUtils.getPreviousActivity( planTmp, previousLeg );
 							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( prevAct, scenario );
 							Link link = scenario.getNetwork().getLinks().get( linkId );
 							prevActNode = link.getToNode();
 
-							startTime = PlanRouter.calcEndOfActivity( prevAct, plan, scenario.getConfig() );
+							startTime = PlanRouter.calcEndOfActivity( prevAct, planTmp, scenario.getConfig() );
 						}
 
 						LeastCostPathCalculator.Path result = this.forwardMultiNodeDijkstra.constructPath( prevActNode, movedActNode, startTime );
@@ -273,14 +227,14 @@ class ChoiceSet {
 					}
 					{
 						Node nextActNode;
-						final Leg nextLeg = LCPlanUtils.getNextLeg( plan, activityToRelocate );
+						final Leg nextLeg = LCPlanUtils.getNextLeg( planTmp, activityToRelocate );
 						{
-							final Activity nextAct = LCPlanUtils.getNextActivity( plan, nextLeg );
+							final Activity nextAct = LCPlanUtils.getNextActivity( planTmp, nextLeg );
 							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( nextAct, scenario );
 							Link link = scenario.getNetwork().getLinks().get( linkId );
 							nextActNode = link.getToNode();
 						}
-						double startTime = PlanRouter.calcEndOfActivity( activityToRelocate, plan, scenario.getConfig() );
+						double startTime = PlanRouter.calcEndOfActivity( activityToRelocate, planTmp, scenario.getConfig() );
 
 						LeastCostPathCalculator.Path result = this.backwardMultiNodeDijkstra.constructPath( movedActNode, nextActNode, startTime );
 						nextLeg.setTravelTime( result.travelTime );
@@ -291,7 +245,7 @@ class ChoiceSet {
 					throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
 			}
 			PlanTimesAdapter adapter = new PlanTimesAdapter( router.getStageActivityTypes(), this.scenario );
-			final double score = adapter.scorePlan( planTmp, scoringFunction, plan.getPerson() );
+			final double score = adapter.scorePlan( planTmp, scoringFunction, planTmp.getPerson() );
 
 			if (score > largestValue) {
 				largestValue = score;
