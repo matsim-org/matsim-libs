@@ -43,6 +43,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	private static final Logger log = Logger.getLogger( ActivityEngine.class ) ;
 
 	private EventsManager eventsManager;
+
 	@Inject
 	public ActivityEngine(EventsManager eventsManager) {
 		this.eventsManager = eventsManager;

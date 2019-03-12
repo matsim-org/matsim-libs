@@ -36,8 +36,8 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author michalm
  */
 public final class RunOneTaxiExample {
-	private static final String CONFIG_FILE = "./src/main/resources/one_taxi/one_taxi_config.xml";
-	private static final String TAXIS_FILE = "one_taxi_vehicles.xml";
+	static final String CONFIG_FILE = "./src/main/resources/one_taxi/one_taxi_config.xml";
+	static final String TAXIS_FILE = "one_taxi_vehicles.xml";
 
 	public static void run(boolean otfvis, int lastIteration) {
 		// load config

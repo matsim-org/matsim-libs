@@ -1,4 +1,4 @@
-package org.matsim.core.mobsim.qsim;
+package org.matsim.contrib.dvrp.passenger;
 
 import static org.matsim.core.router.TripStructureUtils.Trip;
 
@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.RequiresBooking;
@@ -31,7 +32,7 @@ import org.matsim.withinday.utils.EditTrips;
 
 import com.google.inject.Inject;
 
-final class BookingEngine implements MobsimEngine {
+public final class BookingEngine implements MobsimEngine {
 
 	// Could implement this as a generalized version of the bdi-abm implementation: can send notifications to agent, and agent can react.  Similar to the drive-to action.
 	// Notifications and corresponding handlers could then be registered. On the other hand, it is easy to add an engine such as this one; how much does it help to have another
@@ -66,7 +67,7 @@ final class BookingEngine implements MobsimEngine {
 	}
 
 	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {
+	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.editPlans = new EditPlans(internalInterface.getMobsim(), tripRouter, editTrips);
 	}
 
@@ -150,7 +151,7 @@ final class BookingEngine implements MobsimEngine {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
 		Trip theTrip = null;
-		for (Trip drtTrip : TripStructureUtils.getTrips(plan, ActivityEngineWithWakeup.drtStageActivities)) {
+		for (Trip drtTrip : TripStructureUtils.getTrips(plan, ActivityEngineWithWakeup.drtStageActivities )) {
 			// recall that we have set the activity end time of the current activity to infinity, so we cannot use that any more.  :-( ?!
 			// could instead use some kind of ID.  Not sure if that would really be better.
 			if (CoordUtils.calcEuclideanDistance(drtTrip.getOriginActivity().getCoord(),

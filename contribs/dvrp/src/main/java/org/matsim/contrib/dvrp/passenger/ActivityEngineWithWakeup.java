@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim;
+package org.matsim.contrib.dvrp.passenger;
 
 import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
 import static org.matsim.core.router.TripStructureUtils.Trip;
@@ -40,6 +40,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -52,7 +54,7 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
-	private static final Logger log = Logger.getLogger(ActivityEngine.class);
+	private static final Logger log = Logger.getLogger( ActivityEngine.class );
 
 	private final ActivityFacilities facilities;
 	private final BookingEngine bookingEngine;
@@ -96,7 +98,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	}
 
 	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {
+	public void setInternalInterface( InternalInterface internalInterface ) {
 		delegate.setInternalInterface(internalInterface);
 	}
 
@@ -119,11 +121,19 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 				this.wakeUpList.add(new AgentAndLegEntry(agent, prebookingTime, drtLeg, this::wakeUpAgent));
 			}
 		}
+		for (Leg drtLeg : findLegsWithModeInFuture(agent, TransportMode.taxi )) {
+			double prebookingOffset_s = (double)drtLeg.getAttributes().getAttribute("prebookingOffset_s");
+			final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
+			if (prebookingTime < agent.getActivityEndTime()) {
+				// yyyy and here one sees that having this in the activity engine is not very practical
+				this.wakeUpList.add(new AgentAndLegEntry(agent, prebookingTime, drtLeg, this::wakeUpAgent));
+			}
+		}
 
 		return delegate.handleActivity(agent);
 	}
 
-	static List<Leg> findLegsWithModeInFuture(MobsimAgent agent, String mode) {
+	private static List<Leg> findLegsWithModeInFuture( MobsimAgent agent, String mode ) {
 		List<Leg> retVal = new ArrayList<>();
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 		for (int ii = WithinDayAgentUtils.getCurrentPlanElementIndex(agent); ii < plan.getPlanElements().size(); ii++) {
