@@ -25,12 +25,11 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
+import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
 import org.matsim.contrib.ev.data.ElectricFleet;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
 /**
  * @author saxer
@@ -50,15 +49,8 @@ public class MyDrtTrajectoryAnalysisModule extends AbstractDvrpModeModule {
 						drtCfg, getter.getModal(FleetSpecification.class), getter.get(ElectricFleet.class))))
 				.asEagerSingleton();
 
-		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
-			@Override
-			protected void configureQSim() {
-				//this is a mobsim listener that gets notified whenever a new mobsim starts in order to set Fleet inside MyDynModeTrajectoryStats
-				addModalQSimComponentBinding().toProvider(modalProvider(getter -> (MobsimInitializedListener)(e -> {
-					getter.getModal(MyDynModeTrajectoryStats.class).setFleetOnMobsimStart(getter.getModal(Fleet.class));
-				})));
-			}
-		});
+		installQSimModule(QSimScopeObjectListenerModule.createSimplifiedModule(getMode(), Fleet.class,
+				MyDynModeTrajectoryStats.class));
 
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new DrtTrajectryControlerListener(getter.get(Config.class), drtCfg,

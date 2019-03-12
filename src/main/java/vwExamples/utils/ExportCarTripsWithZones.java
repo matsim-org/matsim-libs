@@ -22,7 +22,16 @@
  */
 package vwExamples.utils;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.CarTrip;
@@ -38,10 +47,6 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.*;
 
 /**
  * @author axer

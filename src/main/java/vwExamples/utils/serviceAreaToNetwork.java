@@ -1,22 +1,22 @@
 package vwExamples.utils;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineSegment;
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineSegment;
+import org.locationtech.jts.geom.LinearRing;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.contrib.networkEditor.utils.GeometryTools;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-
-import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 
 public class serviceAreaToNetwork {
 
@@ -61,35 +61,33 @@ public class serviceAreaToNetwork {
     private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
 
     //Main function creates the class and runs it!
-    public static void main(String[] args) {
-        new serviceAreaToNetwork().run();
-    }
+	public static void main(String[] args) {
+		new serviceAreaToNetwork().run();
+	}
 
+	private void run() {
+		topLeft = ct.transform(new Coord(westernLimit, northernLimit));
+		bottomRight = ct.transform(new Coord(easternLimit, southernLimit));
+		new MatsimNetworkReader(network).readFile(inputNetworkFile.toString());
 
-    private void run() {
-        topLeft = ct.transform(new Coord(westernLimit, northernLimit));
-        bottomRight = ct.transform(new Coord(easternLimit, southernLimit));
-        new MatsimNetworkReader(network).readFile(inputNetworkFile.toString());
+		Coordinate p1 = MGC.coord2Coordinate(topLeft);
+		Coordinate p2 = MGC.coord2Coordinate(bottomRight);
 
-        Coordinate p1 = MGC.coord2Coordinate(topLeft);
-        Coordinate p2 = MGC.coord2Coordinate(bottomRight);
+		int i = 0;
+		for (Link l : network.getLinks().values()) {
 
-        int i = 0;
-        for (Link l : network.getLinks().values()) {
+			if (isServiceAreaLink(l, p1, p2)) {
+				Set<String> modes = new HashSet<>();
+				modes.addAll(l.getAllowedModes());
+				modes.add(drtTag);
+				l.setAllowedModes(modes);
+				i++;
+			}
+		}
+		System.out.println("Touched " + i + " Links within total network");
+		new NetworkWriter(network).write(outputNetworkFile);
 
-
-            if (isServiceAreaLink(l, p1, p2)) {
-                Set<String> modes = new HashSet<>();
-                modes.addAll(l.getAllowedModes());
-                modes.add(drtTag);
-                l.setAllowedModes(modes);
-                i++;
-            }
-        }
-        System.out.println("Touched " + i + " Links within total network");
-        new NetworkWriter(network).write(outputNetworkFile);
-
-    }
+	}
 
 
 //	private boolean somePartOfLinkIsInBox(Link l) {
@@ -105,28 +103,47 @@ public class serviceAreaToNetwork {
 //		else return false;
 //	}
 
-    private boolean isServiceAreaLink(Link l, Coordinate p1, Coordinate p2) {
-        Coordinate start = new Coordinate(l.getFromNode().getCoord().getX(), l.getFromNode().getCoord().getY());
-        Coordinate end = new Coordinate(l.getToNode().getCoord().getX(), l.getToNode().getCoord().getY());
-        LineSegment lineSegment = new LineSegment(start, end);
+	private boolean isServiceAreaLink(Link l, Coordinate p1, Coordinate p2) {
+		Coordinate start = new Coordinate(l.getFromNode().getCoord().getX(), l.getFromNode().getCoord().getY());
+		Coordinate end = new Coordinate(l.getToNode().getCoord().getX(), l.getToNode().getCoord().getY());
+		LineSegment lineSegment = new LineSegment(start, end);
 
-        GeometryFactory f = new GeometryFactory();
+		GeometryFactory f = new GeometryFactory();
 
-        //1. Link needs to be in geographical area
+		//1. Link needs to be in geographical area
 
+		if (getRectangle(p1, p2).getEnvelope().intersects(lineSegment.toGeometry(f))) {
+			//2. Link needs to be already available for car
+			if (l.getAllowedModes().contains("car")) {
+				return true;
 
-        if (GeometryTools.getRectangle(p1, p2).getEnvelope().intersects(lineSegment.toGeometry(f))) {
-            //2. Link needs to be already available for car
-            if (l.getAllowedModes().contains("car")) {
-                return true;
+			} else
+				return false;
 
-            } else return false;
+		} else
+			return false;
 
-        } else return false;
+	}
 
-
-    }
-
+	static public LinearRing getRectangle(Coordinate p1, Coordinate p2) {
+		if (p1.x > p2.x) {
+			Coordinate aux = p1;
+			p1 = p2;
+			p2 = aux;
+		}
+		if (p1.y < p2.y) {
+			double aux = p2.y;
+			p2.y = p1.y;
+			p1.y = aux;
+		}
+		Coordinate rectangle[] = new Coordinate[5];
+		rectangle[0] = p1;
+		rectangle[1] = new Coordinate(p2.x, p1.y);
+		rectangle[2] = p2;
+		rectangle[3] = new Coordinate(p1.x, p2.y);
+		rectangle[4] = p1;
+		return new GeometryFactory().createLinearRing(rectangle);
+	}
 
 }
 
