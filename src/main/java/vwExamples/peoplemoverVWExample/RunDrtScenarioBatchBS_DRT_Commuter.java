@@ -59,17 +59,10 @@ import java.util.Map;
  * @author axer
  */
 
-public class RunDrtScenarioBatchBS_eDRT_Commuter {
+public class RunDrtScenarioBatchBS_DRT_Commuter {
 
-	// Class to create the controller
-	// public static Controler createControlerWithSingleModeDrt(Config config,
-	// boolean otfvis) {
-	// config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-	// config.checkConsistency();
-	// return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
-	// }
 	
-	// Class to create the controller
+//	// Class to create the controller
 		public static Controler createControler(Config config, boolean otfvis) {
 			config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
 			config.checkConsistency();
@@ -94,7 +87,7 @@ public class RunDrtScenarioBatchBS_eDRT_Commuter {
 	public static void run(int vehiclePerDepot, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "vw219_netnet" + vehiclePerDepot + "_veh_idx" + iterationIdx;
+		String runId = "20pct_carToDrt_batteryCharge_0C_optDepot" + vehiclePerDepot + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\";
@@ -109,7 +102,7 @@ public class RunDrtScenarioBatchBS_eDRT_Commuter {
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
-		config.plans().setInputFile(inbase + "\\plans\\vw219_selected.xml.gz");
+		config.plans().setInputFile(inbase + "\\plans\\vw219.20pct_commuter_DRT_selected.xml.gz");
 		config.controler().setLastIteration(2); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
@@ -161,6 +154,7 @@ public class RunDrtScenarioBatchBS_eDRT_Commuter {
 
 		 config.qsim().setFlowCapFactor(0.85);
 		 config.qsim().setStorageCapFactor(1.00);
+		 
 
 		config.controler().setOutputDirectory(inbase + "\\output\\" + runId); // Define dynamically the the
 		// output path
@@ -173,10 +167,15 @@ public class RunDrtScenarioBatchBS_eDRT_Commuter {
 		// Define infrastructure for eDRT (vehicles, depots and chargers)
 		CreateEDRTVehiclesAndChargers vehiclesAndChargers = new CreateEDRTVehiclesAndChargers();
 		Map<Id<Link>, Integer> depotsAndVehicles = new HashMap<>();
-		depotsAndVehicles.put(Id.createLinkId(40158), vehiclePerDepot); // BS HBF
-		depotsAndVehicles.put(Id.createLinkId(8097), vehiclePerDepot); // Zentrum SO
-		depotsAndVehicles.put(Id.createLinkId(13417), vehiclePerDepot); // Zentrum N
-		depotsAndVehicles.put(Id.createLinkId(14915), vehiclePerDepot); // Flugplatz
+//		depotsAndVehicles.put(Id.createLinkId(40158), vehiclePerDepot); // BS HBF
+//		depotsAndVehicles.put(Id.createLinkId(8097), vehiclePerDepot); // Zentrum SO
+//		depotsAndVehicles.put(Id.createLinkId(13417), vehiclePerDepot); // Zentrum N
+//		depotsAndVehicles.put(Id.createLinkId(14915), vehiclePerDepot); // Flugplatz
+		
+		depotsAndVehicles.put(Id.createLinkId(22501), vehiclePerDepot); // BS HBF
+		depotsAndVehicles.put(Id.createLinkId(24072), vehiclePerDepot); // Zentrum SO
+		depotsAndVehicles.put(Id.createLinkId(61664), vehiclePerDepot); // Zentrum N
+		depotsAndVehicles.put(Id.createLinkId(45627), vehiclePerDepot); // Flugplatz
 
 		vehiclesAndChargers.CHARGER_FILE = inbase + "\\chargers\\chargers.xml.gz";
 		vehiclesAndChargers.NETWORKFILE = inbase + "\\network\\drtServiceAreaNetwork.xml.gz";

@@ -24,8 +24,6 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
 import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
-import electric.edrt.run.RunVWEDrtScenario;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,20 +33,13 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
-import org.matsim.contrib.edrt.run.EDrtControlerCreator;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.charging.FastThenSlowCharging;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
@@ -72,7 +63,9 @@ import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author axer
@@ -85,9 +78,9 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static final double CHARGING_SPEED_FACTOR = 1.0;
 	public static final double BATTERYREPLACETIME = 180.0;
 
-	static boolean BatteryReplace = false;
+	static boolean BatteryReplace = true;
 	
-	static int[] fleetRange = {100,150,200,250,300};
+	static int[] fleetRange = {25,50,100,150};
 //	static int[] fleetRange = {100};
 
 	public static void main(String[] args) throws IOException {
@@ -107,7 +100,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static void run(int vehiclePerDepot, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "H_1xRate_batteryRecharge_0C_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
+		String runId = "H_1xRate_batteryReplace_0C_45kWh_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\K-GERAK\\";
@@ -119,14 +112,20 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup) config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);
 		tcg.setTempFile(inbase + "\\input\\temp\\temperatures_0.csv");
+		config.travelTimeCalculator().setTraveltimeBinSize(900);
+		Set<String> modes = new HashSet<String>();
+		modes.add("car");
+		modes.add("drt");
+		config.travelTimeCalculator().setAnalyzedModes(modes);
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
 		config.plans().setInputFile(inbase + "\\input\\plans\\vw235_drt_plan_1x_selected.xml.gz");
-		config.controler().setLastIteration(4); // Number of simulation iterations
-		config.controler().setWriteEventsInterval(4); // Write Events file every x-Iterations
-		config.controler().setWritePlansInterval(4); // Write Plan file every x-Iterations
+		config.controler().setLastIteration(2); // Number of simulation iterations
+		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
+		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
 		config.qsim().setStartTime(0);
+		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 
 		String networkFilePath = inbase + "\\input\\network\\network.xml.gz";
 		String shapeFilePath = inbase + "\\input\\shp\\Hannover_Stadtteile.shp";
@@ -179,9 +178,9 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		vehiclesAndChargers.E_VEHICLE_FILE = inbase + "\\input\\fleets\\eFleet.xml.gz";
 		vehiclesAndChargers.drtTag = drtTag;
 		vehiclesAndChargers.SEATS = 6;
-		vehiclesAndChargers.MAX_START_CAPACITY_KWH = 78;
-		vehiclesAndChargers.MIN_START_CAPACITY_KWH = 78;
-		vehiclesAndChargers.BATTERY_CAPACITY_KWH = 78;
+		vehiclesAndChargers.MAX_START_CAPACITY_KWH = 45;
+		vehiclesAndChargers.MIN_START_CAPACITY_KWH = 45;
+		vehiclesAndChargers.BATTERY_CAPACITY_KWH = 45;
 		vehiclesAndChargers.CHARGINGPOWER_KW = (int) (100);
 		vehiclesAndChargers.FRACTION_OF_CHARGERS_PER_DEPOT = 1.0;
 		vehiclesAndChargers.run(depotsAndVehicles);
@@ -232,8 +231,8 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 			rebalancingParams.setInterval(300);
 			rebalancingParams.setCellSize(1000);
-			rebalancingParams.setTargetAlpha(0.7);
-			rebalancingParams.setTargetBeta(0.8);
+			rebalancingParams.setTargetAlpha(0.3);
+			rebalancingParams.setTargetBeta(0.3);
 			rebalancingParams.setMaxTimeBeforeIdle(500);
 			rebalancingParams.setMinServiceTime(3600);
 			drt.addParameterSet(rebalancingParams);
@@ -254,8 +253,10 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 				// Remark: Small alpha leads to more smoothing and longer lags in reaction.
 				// Default alpha is 0.05. Which means i.e. 0.3 is not smooth in comparison to
 				// 0.05
-				DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.15);
+				DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.05);
 				DvrpConfigGroup.get(config).setTravelTimeEstimationBeta(900);
+//				DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.05);
+//				DvrpConfigGroup.get(config).setTravelTimeEstimationBeta(3600*24);
 				// bind(RelocationWriter.class).asEagerSingleton();
 				// addControlerListenerBinding().to(RelocationWriter.class);
 
