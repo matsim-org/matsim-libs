@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.bestresponse;
+package org.matsim.contrib.locationchoice.zzunused;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;

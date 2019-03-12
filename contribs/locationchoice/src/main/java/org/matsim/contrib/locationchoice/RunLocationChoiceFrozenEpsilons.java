@@ -23,9 +23,9 @@
 package org.matsim.contrib.locationchoice;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.locationchoice.bestresponse.BestReplyLocationChoicePlanStrategy;
-import org.matsim.contrib.locationchoice.bestresponse.DCScoringFunctionFactory;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
+import org.matsim.contrib.locationchoice.frozenepsilons.BestReplyLocationChoicePlanStrategy;
+import org.matsim.contrib.locationchoice.frozenepsilons.DCScoringFunctionFactory;
+import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;

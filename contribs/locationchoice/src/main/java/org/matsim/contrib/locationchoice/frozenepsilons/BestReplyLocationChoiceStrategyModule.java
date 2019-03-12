@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.bestresponse;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import java.util.*;
 
@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext.ActivityFacilityWithIndex;
+import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
 import org.matsim.core.config.ConfigUtils;

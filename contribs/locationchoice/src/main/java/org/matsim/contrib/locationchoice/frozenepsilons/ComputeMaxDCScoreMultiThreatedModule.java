@@ -17,13 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.bestresponse;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext.ActivityFacilityWithIndex;
+import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext.ActivityFacilityWithIndex;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.facilities.ActivityFacility;

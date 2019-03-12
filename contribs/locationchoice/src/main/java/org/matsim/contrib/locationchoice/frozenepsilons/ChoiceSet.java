@@ -17,31 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.bestresponse;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
@@ -164,8 +160,8 @@ class ChoiceSet {
 
 			// (1) forward tree
 			{
-				Leg previousLeg = LCPlanUtils.getPreviousLeg( planTmp, activityToRelocate );
-				Activity previousActivity = LCPlanUtils.getPreviousActivity( planTmp, previousLeg );
+				Leg previousLeg = PopulationUtils.getPreviousLeg( planTmp, activityToRelocate );
+				Activity previousActivity = PopulationUtils.getPreviousActivity( planTmp, previousLeg );
 				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario ) ).getToNode();
 
 				forwardMultiNodeDijkstra.setSearchAllEndNodes( true );
@@ -174,8 +170,8 @@ class ChoiceSet {
 
 			// (2) backward tree
 			{
-				Leg nextLeg = LCPlanUtils.getNextLeg( planTmp, activityToRelocate );
-				Activity nextActivity = LCPlanUtils.getNextActivity( planTmp, nextLeg );
+				Leg nextLeg = PopulationUtils.getNextLeg( planTmp, activityToRelocate );
+				Activity nextActivity = PopulationUtils.getNextActivity( planTmp, nextLeg );
 				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( nextActivity, scenario ) ).getToNode();
 
 				backwardMultiNodeDijkstra.setSearchAllEndNodes( true );
@@ -191,12 +187,10 @@ class ChoiceSet {
 
 		for (Id<ActivityFacility> destinationId : this.destinations) {
 
-			// yy I don't think that the LCPlan stuff is needed; I don't think that it is doing anything in the current implementation. kai, mar'19
-
-			LCPlanUtils.setFacilityId(activityToRelocate, destinationId );
+			activityToRelocate.setFacilityId( destinationId );
 			final ActivityFacility activityFacility = facilities.getFacilities().get( destinationId );
-			LCPlanUtils.setCoord(activityToRelocate, activityFacility.getCoord() );
-			LCPlanUtils.setLinkId(activityToRelocate, FacilitiesUtils.decideOnLink( activityFacility, network ).getId() ) ;
+			activityToRelocate.setCoord( activityFacility.getCoord() );
+			activityToRelocate.setLinkId( FacilitiesUtils.decideOnLink( activityFacility, network ).getId() );
 
 			switch ( dccg.getTravelTimeApproximationLevel() ){
 				case completeRouting:
@@ -212,32 +206,32 @@ class ChoiceSet {
 					{
 						Node prevActNode;
 						double startTime;
-						final Leg previousLeg = LCPlanUtils.getPreviousLeg( planTmp, activityToRelocate );
+						Leg previousLeg = PopulationUtils.getPreviousLeg( planTmp, activityToRelocate );
 						{
-							final Activity prevAct = LCPlanUtils.getPreviousActivity( planTmp, previousLeg );
-							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( prevAct, scenario );
+							Activity previousActivity = PopulationUtils.getPreviousActivity( planTmp, previousLeg );
+							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario );
 							Link link = scenario.getNetwork().getLinks().get( linkId );
 							prevActNode = link.getToNode();
 
-							startTime = PlanRouter.calcEndOfActivity( prevAct, planTmp, scenario.getConfig() );
+							startTime = PlanRouter.calcEndOfActivity( previousActivity, planTmp, scenario.getConfig() );
 						}
 
 						LeastCostPathCalculator.Path result = this.forwardMultiNodeDijkstra.constructPath( prevActNode, movedActNode, startTime );
-						previousLeg.setTravelTime( result.travelTime );
+						Objects.requireNonNull( previousLeg ).setTravelTime( result.travelTime );
 					}
 					{
 						Node nextActNode;
-						final Leg nextLeg = LCPlanUtils.getNextLeg( planTmp, activityToRelocate );
+						Leg leg = PopulationUtils.getNextLeg( planTmp, activityToRelocate );
 						{
-							final Activity nextAct = LCPlanUtils.getNextActivity( planTmp, nextLeg );
-							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( nextAct, scenario );
+							Activity nextAct = PopulationUtils.getNextActivity( planTmp, leg );
+							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( Objects.requireNonNull( nextAct ), scenario );
 							Link link = scenario.getNetwork().getLinks().get( linkId );
 							nextActNode = link.getToNode();
 						}
 						double startTime = PlanRouter.calcEndOfActivity( activityToRelocate, planTmp, scenario.getConfig() );
 
 						LeastCostPathCalculator.Path result = this.backwardMultiNodeDijkstra.constructPath( movedActNode, nextActNode, startTime );
-						nextLeg.setTravelTime( result.travelTime );
+						Objects.requireNonNull( leg ).setTravelTime( result.travelTime );
 					}
 				}
 				break ;

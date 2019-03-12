@@ -20,7 +20,7 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.contrib.locationchoice.bestresponse;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import org.junit.Before;
 import org.junit.Rule;

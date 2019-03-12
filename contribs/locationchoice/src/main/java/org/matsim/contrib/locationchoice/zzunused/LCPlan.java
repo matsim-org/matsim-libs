@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.bestresponse;
+package org.matsim.contrib.locationchoice.zzunused;
 
 import java.util.ArrayList;
 import java.util.List;

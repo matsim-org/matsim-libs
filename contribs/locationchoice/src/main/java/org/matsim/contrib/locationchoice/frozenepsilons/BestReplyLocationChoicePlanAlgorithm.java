@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.bestresponse;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import java.util.Collection;
 import java.util.List;
@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext.ActivityFacilityWithIndex;
+import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
@@ -47,6 +47,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
@@ -174,8 +175,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 			if (this.sampler.sample(facilityIndex, personIndex)) { 
 				
 				// only add destination if it can be reached with the chosen mode
-				Leg previousLeg = LCPlanUtils.getPreviousLeg(plan, actToMove );
-				String mode = previousLeg.getMode();	
+				String mode = PopulationUtils.getPreviousLeg( plan, actToMove ).getMode();
 				
 				Id<Link> linkId = null;
 				// try to get linkId from facility, else get it from act. other options not allowed!
@@ -200,47 +200,11 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	}
 
 	private void setLocationOfActivityToFacilityId( Activity act2, Id<ActivityFacility> facilityId ) {
-		LCPlanUtils.setFacilityId(act2, facilityId );
+		act2.setFacilityId( facilityId );
 		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
-		
-		Id<Link> linkId = null;
-		// try to get linkId from facility, else get it from coords. other options not allowed!
-		if (facility.getLinkId() != null) {
-			linkId = facility.getLinkId();
-		}
-		else {
-			linkId = this.nearestLinks.get(facilityId);
-		}	
-		LCPlanUtils.setLinkId(act2, linkId );
-		LCPlanUtils.setCoord(act2, facility.getCoord() );
+		act2.setLinkId( FacilitiesUtils.decideOnLink( facility, scenario.getNetwork() ).getId() );
+		act2.setCoord( facility.getCoord() );
 	}
-
-//	@Deprecated // try without
-//	private double computeScoreAndAdaptPlan(Plan plan, ChoiceSet cs, ScoringFunctionFactory scoringFunction) {
-//		// yyyy why is all this plans copying necessary?  kai, jan'13
-//		// looked into it but could not find a reason. Removed it and tests are still fine. cdobler, oct'15
-//
-////		Plan planTmp = plan;
-//
-//		Plan planTmp = null;
-//		if ( this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.planImpl) {
-//			planTmp = PopulationUtils.createPlan(plan.getPerson());
-//			LCPlanUtils.copyFromTo(plan, planTmp );
-//		} else if ( this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.lcPlan) {
-//			planTmp = new LCPlan(plan);
-//		}
-//
-//		final double score =
-//				cs.adaptAndScoreTimes(
-//						plan,
-//						planTmp,
-//						scoringFunction,
-//						this.tripRouter,
-//						DestinationChoiceConfigGroup.ApproximationLevel.completeRouting );
-//
-//		LCPlanUtils.copyPlanFieldsFromTo( planTmp, plan );
-//		return score;
-//	}
 
 	/**
 	 * Conversion of the "frozen" logit model epsilon into a distance.

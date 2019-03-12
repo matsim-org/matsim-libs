@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.bestresponse;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;

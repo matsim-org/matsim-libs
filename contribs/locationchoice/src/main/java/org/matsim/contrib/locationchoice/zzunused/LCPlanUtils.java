@@ -17,18 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.bestresponse;
+package org.matsim.contrib.locationchoice.zzunused;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.locationchoice.bestresponse.LCActivity;
-import org.matsim.contrib.locationchoice.bestresponse.LCLeg;
-import org.matsim.contrib.locationchoice.bestresponse.LCPlan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -205,21 +200,5 @@ import org.matsim.facilities.ActivityFacility;
 			((LCActivity) activity).setFacilityId(facilityId);
 		} else throw new RuntimeException("Unexpected type of activity was found: " + activity.getClass().toString() + ". Aborting!");
 	}
-	
-	public static void setCoord(Activity activity, Coord coord) {
-		if (activity instanceof Activity) {
-			((Activity) activity).setCoord(coord);
-		} else if (activity instanceof LCActivity) {
-			((LCActivity) activity).setCoord(coord);
-		} else throw new RuntimeException("Unexpected type of activity was found: " + activity.getClass().toString() + ". Aborting!");
-	}
-	
-	public static void setLinkId(Activity activity, Id<Link> linkId) {
-		if (activity instanceof Activity) {
-			((Activity) activity).setLinkId(linkId);
-		} else if (activity instanceof LCActivity) {
-			((LCActivity) activity).setLinkId(linkId);
-		} else throw new RuntimeException("Unexpected type of activity was found: " + activity.getClass().toString() + ". Aborting!");
-	}
 
-}
+ }

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.bestresponse;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext.ActivityFacilityWithIndex;
+import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext.ActivityFacilityWithIndex;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;

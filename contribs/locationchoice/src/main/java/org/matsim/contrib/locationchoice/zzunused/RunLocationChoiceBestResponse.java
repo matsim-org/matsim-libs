@@ -24,9 +24,8 @@ package org.matsim.contrib.locationchoice.zzunused;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
-import org.matsim.contrib.locationchoice.zzunused.DestinationChoiceInitializer;
-import org.matsim.contrib.locationchoice.bestresponse.DCScoringFunctionFactory;
+import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext;
+import org.matsim.contrib.locationchoice.frozenepsilons.DCScoringFunctionFactory;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
