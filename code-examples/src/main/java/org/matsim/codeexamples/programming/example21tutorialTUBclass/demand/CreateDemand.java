@@ -22,6 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,12 +48,6 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
 
 /**
  * @author jbischoff
@@ -90,7 +89,7 @@ public class CreateDemand {
 		double carcommuters = 0.55 * commuters;
 		//Watch out, counties come with some extra zeros in the end in the shape file
 		System.out.println(this.shapeMap.keySet());
-		Geometry home = this.shapeMap.get("12052000");
+		Geometry home = this.shapeMap.get("12052000" );
 		Geometry work = this.shapeMap.get("12052000");
 		for (int i = 0; i<=commuters;i++){
 			String mode = "car";
@@ -172,7 +171,7 @@ public class CreateDemand {
 					geometry = wktReader.read((ft.getAttribute("the_geom")).toString());
 					shapeMap.put(ft.getAttribute(attrString).toString(),geometry);
 
-				} catch (ParseException e) {
+				} catch ( ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}

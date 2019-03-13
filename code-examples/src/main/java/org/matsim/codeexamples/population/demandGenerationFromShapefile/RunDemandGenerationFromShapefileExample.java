@@ -22,12 +22,14 @@ package org.matsim.codeexamples.population.demandGenerationFromShapefile;
 import java.io.IOException;
 import java.util.Random;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.shape.random.RandomPointsBuilder;
 import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.shape.random.RandomPointsBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,9 +46,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * This class generates a simple artificial MATSim demand for
@@ -123,7 +122,7 @@ public class RunDemandGenerationFromShapefileExample {
 			plan.addLeg(leg); // there needs to be a log between two activities
 
 			//work activity on a random link within one of the commercial areas
-			Point p = getRandomPointInFeature(rnd, commercial);
+			Point p = getRandomPointInFeature(rnd, commercial );
 			Activity work = pb.createActivityFromCoord("w", new Coord(p.getX(), p.getY()));
 			double startTime = 8*3600;
 			work.setStartTime(startTime);
@@ -163,23 +162,24 @@ public class RunDemandGenerationFromShapefileExample {
 	}
 
 	private static Point getRandomPointInFeature(Random rnd, SimpleFeature ft) {
-//		Point p = null;
-//		double x, y;
-//		do {
-//			x = ft.getBounds().getMinX() + rnd.nextDouble() * (ft.getBounds().getMaxX() - ft.getBounds().getMinX());
-//			y = ft.getBounds().getMinY() + rnd.nextDouble() * (ft.getBounds().getMaxY() - ft.getBounds().getMinY());
-//			p = MGC.xy2Point(x, y);
-////		} while (((Geometry) ft.getDefaultGeometry()).contains(p));
-//		} while ( ! ((Geometry) ft.getDefaultGeometry()).contains(p));
-//		// the above has been wrong when we found this, presumably for many years
-//        return p;
+		Point p = null;
+		double x, y;
+		do {
+			x = ft.getBounds().getMinX() + rnd.nextDouble() * (ft.getBounds().getMaxX() - ft.getBounds().getMinX());
+			y = ft.getBounds().getMinY() + rnd.nextDouble() * (ft.getBounds().getMaxY() - ft.getBounds().getMinY());
+			p = MGC.xy2Point(x, y);
+			//		} while (((Geometry) ft.getDefaultGeometry()).contains(p));
+		} while ( ! ((Geometry) ft.getDefaultGeometry()).contains(p));
+		// the above has been wrong when we found this, presumably for many years
+		return p;
 
-        // alternative and about 10 times faster way to generate random point inside a geometry. Amit Dec'17
-        RandomPointsBuilder randomPointsBuilder = new RandomPointsBuilder(new GeometryFactory());
-        randomPointsBuilder.setNumPoints(1);
-        randomPointsBuilder.setExtent( (Geometry)ft.getDefaultGeometry());
-        Coordinate coordinate = randomPointsBuilder.getGeometry().getCoordinates()[0];
-        return MGC.coordinate2Point(coordinate);
+		// alternative and about 10 times faster way to generate random point inside a geometry. Amit Dec'17
+		// unfortunately, does not allow to set a random seed, and is thus not repeatable.  kai, mar'19
+		//        RandomPointsBuilder randomPointsBuilder = new RandomPointsBuilder(new GeometryFactory());
+		//        randomPointsBuilder.setNumPoints(1);
+		//        randomPointsBuilder.setExtent( (Geometry)ft.getDefaultGeometry() );
+		//        Coordinate coordinate = randomPointsBuilder.getGeometry().getCoordinates()[0];
+		//        return MGC.coordinate2Point(coordinate);
 	}
 
 
