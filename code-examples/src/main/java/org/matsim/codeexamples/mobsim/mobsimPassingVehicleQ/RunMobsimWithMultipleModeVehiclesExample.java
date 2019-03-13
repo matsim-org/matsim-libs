@@ -3,6 +3,8 @@ package org.matsim.codeexamples.mobsim.mobsimPassingVehicleQ;
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -20,6 +22,8 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -39,7 +43,8 @@ class RunMobsimWithMultipleModeVehiclesExample {
 	public static void main ( String[] args ) {
 
 		// prepare the config:
-		Config config = ConfigUtils.loadConfig( args[0] ) ;
+		Config config = ConfigUtils.loadConfig( IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );;
+
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		config.plans().setRemovingUnneccessaryPlanAttributes(true) ;
@@ -69,65 +74,70 @@ class RunMobsimWithMultipleModeVehiclesExample {
 
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindMobsim().toProvider(MultipleModeVehiclesQSimFactory.class);
-			}
-		});
+//		controler.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				bindMobsim().toProvider(MultipleModeVehiclesQSimFactory.class);
+//			}
+//		});
+		// I don't think that this is still needed.  kai, feb'19
+
+		controler.addOverridingModule( new OTFVisLiveModule() ) ;
 
 		// run everything:
 		controler.run();
 
 	}
 
-	/**
-	 * Look into {@link org.matsim.core.mobsim.qsim.QSimUtils} for the default matsim qsim factory.  This is copy and paste (and somewhat reduced).
-	 * 
-	 * @author nagel
-	 *
-	 */
-	static class MultipleModeVehiclesQSimFactory implements Provider<Mobsim> {
+//	/**
+//	 * Look into {@link org.matsim.core.mobsim.qsim.QSimUtils} for the default matsim qsim factory.  This is copy and paste (and somewhat reduced).
+//	 *
+//	 * @author nagel
+//	 *
+//	 */
+//	static class MultipleModeVehiclesQSimFactory implements Provider<Mobsim> {
+//
+//		@Inject Scenario scenario;
+//		@Inject EventsManager eventsManager;
+//
+//		@Override
+//		public Mobsim get() {
+//
+//			QSimConfigGroup conf = scenario.getConfig().qsim();
+//			if (conf == null) {
+//				throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
+//			}
+//
+//
+//
+//			return new QSimBuilder(scenario.getConfig()) //
+//					.useDefaults() //
+//					.build(scenario, eventsManager);
+//
+//			/*// construct the QSim:
+//			QSim qSim = new QSim(scenario, eventsManager);
+//
+//			// add the activity engine:
+//			ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
+//			qSim.addMobsimEngine(activityEngine);
+//			qSim.addActivityHandler(activityEngine);
+//
+//			// add the netsim engine:
+//			QNetsimEngine netsimEngine = new QNetsimEngine(qSim) ;
+//			qSim.addMobsimEngine(netsimEngine);
+//			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+//
+//			TeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager);
+//			qSim.addMobsimEngine(teleportationEngine);
+//
+//			AgentFactory agentFactory = new DefaultAgentFactory(qSim);
+//
+//			PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
+//			qSim.addAgentSource(agentSource);
+//
+//			return qSim ;*/
+//		}
+//	}
 
-		@Inject Scenario scenario;
-		@Inject EventsManager eventsManager;
 
-		@Override
-		public Mobsim get() {
-
-			QSimConfigGroup conf = scenario.getConfig().qsim();
-			if (conf == null) {
-				throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
-			}
-			
-			
-			
-			return new QSimBuilder(scenario.getConfig()) //
-					.useDefaults() //
-					.build(scenario, eventsManager);
-
-			/*// construct the QSim:
-			QSim qSim = new QSim(scenario, eventsManager);
-
-			// add the activity engine:
-			ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
-			qSim.addMobsimEngine(activityEngine);
-			qSim.addActivityHandler(activityEngine);
-
-			// add the netsim engine:
-			QNetsimEngine netsimEngine = new QNetsimEngine(qSim) ;
-			qSim.addMobsimEngine(netsimEngine);
-			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-
-			TeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager);
-			qSim.addMobsimEngine(teleportationEngine);
-
-			AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-
-			PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-			qSim.addAgentSource(agentSource);
-
-			return qSim ;*/
-		}
-	}
 }

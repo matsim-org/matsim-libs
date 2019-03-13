@@ -34,6 +34,7 @@ import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -69,7 +70,7 @@ public class RunFreightExample {
 
 		//Building the Carriers, running jsprit for solving the VRP:
 		final Carriers carriers = jspritRun( config, scenario.getNetwork() );
-		scenario.addScenarioElement( Freight.CARRIERS, carriers );
+		scenario.addScenarioElement( FreightUtils.CARRIERS, carriers );
 
 		//final MATSim configurations and start of the MATSim-Run:
 		final Controler controler = new Controler( scenario ) ;

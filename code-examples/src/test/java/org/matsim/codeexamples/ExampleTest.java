@@ -3,17 +3,13 @@ package org.matsim.codeexamples;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 import java.net.URL;
 
@@ -96,7 +92,7 @@ public class ExampleTest {
 
 	@Test
 	public void testRunAbcExample() {
-		RunAbcExample abc = new RunAbcExample() ;
+		RunAbcSimpleExample abc = new RunAbcSimpleExample() ;
 		Config config = abc.prepareConfig() ;
 		config.controler().setOverwriteFileSetting( deleteDirectoryIfExists );
 		config.controler().setLastIteration( 2 );
