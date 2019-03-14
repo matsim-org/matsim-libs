@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.passenger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,6 +59,8 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 	private final String mode;
 	private final EventsManager eventsManager;
 	private final MobsimTimer mobsimTimer;
+	private final BookingEngine bookingEngine;
+
 	private final PassengerRequestCreator requestCreator;
 	private final VrpOptimizer optimizer;
 	private final Network network;
@@ -70,11 +73,12 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 	private final Map<Id<Request>, MobsimPassengerAgent> passengersByRequestId = new HashMap<>();
 
 	public PassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
-			PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
-			PassengerRequestValidator requestValidator) {
+			BookingEngine bookingEngine, PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
+			Network network, PassengerRequestValidator requestValidator) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;
+		this.bookingEngine = bookingEngine;
 		this.requestCreator = requestCreator;
 		this.optimizer = optimizer;
 		this.network = network;
@@ -121,20 +125,42 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		return ImmutableList.of(new DvrpTripInfo(mode, pickupLink, dropoffLink, tripInfoRequest.getTime(), now));
 	}
 
+	/**
+	 * @param passenger will be changed to passengerId
+	 * @param tripInfo
+	 * @return true if request has not been rejected during booking (still can be rejected later)
+	 */
 	public void bookTrip(MobsimPassengerAgent passenger, TripInfoWithRequiredBooking tripInfo) {
 		// this is the handle by which the passenger can accept.  This would, we think, easiest go to a container that keeps track of unconfirmed
 		// offers.  We cannot say if advanceRequestStorage is the correct container for this, probably not and you will need yet another one.
-		//FIXME inform VrpOptimizer
-
 		double now = mobsimTimer.getTimeOfDay();
 		if (tripInfo.getExpectedBoardingTime() <= now) {
-			throw new IllegalStateException("This is not a call ahead");
+			throw new IllegalStateException("This is not an advance request");
 		}
 
+		//TODO have not decided yet how VrpOptimizer determines if request is prebooked, maybe boardingTime > now??
+		//TODO probably all request rejections should be always reported back to the passenger engine, and then
+		// the engine decides what to do (e.g. notify the booking engine)
 		PassengerRequest request = createValidateAndSubmitRequest(passenger, tripInfo.getPickupLocation().getLinkId(),
 				tripInfo.getDropoffLocation().getLinkId(), tripInfo.getExpectedBoardingTime(), now);
-		if (!request.isRejected()) {
+		if (request.isRejected()) {
+			bookingEngine.notifyChangedTripInformation(passengersByRequestId.get(request.getId()), Optional.empty());
+		} else {
 			advanceRequestStorage.storeAdvanceRequest(request);
+		}
+	}
+
+	/**
+	 * this is how VrpOptimizer notifies about rejection of prebooked trips... just a very prototype version...
+	 *
+	 * @param request
+	 * @param tripInfoUpdate
+	 */
+	public void notifyRequestUpdate(PassengerRequest request, Optional<TripInfo> tripInfoUpdate) {
+		//right now TripInfo is not calculated and sent by the optimizer --> null
+		//so now we can (and have to!) notify only about rejections
+		if (request.isRejected()) {
+			bookingEngine.notifyChangedTripInformation(passengersByRequestId.get(request.getId()), Optional.empty());
 		}
 	}
 

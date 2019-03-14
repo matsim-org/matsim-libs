@@ -27,12 +27,15 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 			private MobsimTimer mobsimTimer;
 
 			@Inject
+			private BookingEngine bookingEngine;
+
+			@Inject
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
 			private Network network;
 
 			@Override
 			public PassengerEngine get() {
-				return new PassengerEngine(getMode(), eventsManager, mobsimTimer,
+				return new PassengerEngine(getMode(), eventsManager, mobsimTimer, bookingEngine,
 						getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class), network,
 						getModalInstance(PassengerRequestValidator.class));
 			}
