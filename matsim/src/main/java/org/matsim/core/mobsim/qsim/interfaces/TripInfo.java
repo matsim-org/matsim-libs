@@ -1,10 +1,9 @@
 package org.matsim.core.mobsim.qsim.interfaces;
 
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.Facility;
-
 import java.util.List;
 import java.util.Map;
+
+import org.matsim.facilities.Facility;
 
 public interface TripInfo{
 	Facility getPickupLocation() ;
@@ -23,5 +22,4 @@ public interface TripInfo{
 	interface Provider{
 		List<TripInfo> getTripInfos( TripInfoRequest request ) ;
 	}
-
 }

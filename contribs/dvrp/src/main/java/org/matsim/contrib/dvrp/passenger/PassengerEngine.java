@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -42,21 +39,23 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.RequiresBooking;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
 import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.Facility;
 
-public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo.Provider{
+import com.google.common.collect.ImmutableList;
+
+public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo.Provider {
 	private static final Logger LOGGER = Logger.getLogger(PassengerEngine.class);
 
 	private final String mode;
 	private final EventsManager eventsManager;
+	private final MobsimTimer mobsimTimer;
 	private final PassengerRequestCreator requestCreator;
 	private final VrpOptimizer optimizer;
 	private final Network network;
@@ -68,12 +67,12 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 	private final AwaitingPickupStorage awaitingPickupStorage;
 	private final Map<Id<org.matsim.contrib.dvrp.optimizer.Request>, MobsimPassengerAgent> passengersByRequestId = new HashMap<>();
 
-	private final List<TripInfo> pendingRequests = new ArrayList<>() ;
-
-	public PassengerEngine(String mode, EventsManager eventsManager, PassengerRequestCreator requestCreator,
-			VrpOptimizer optimizer, Network network, PassengerRequestValidator requestValidator) {
+	public PassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
+			PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
+			PassengerRequestValidator requestValidator) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
+		this.mobsimTimer = mobsimTimer;
 		this.requestCreator = requestCreator;
 		this.optimizer = optimizer;
 		this.network = network;
@@ -105,33 +104,26 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 	}
 
 	@Override
-	public final List<TripInfo> getTripInfos( TripInfoRequest requestImpl ) {
+	public final List<TripInfo> getTripInfos(TripInfoRequest tripInfoRequest) {
 		// idea is to be able to return multiple trip options, cf. public transit router.  In the case here, we will need only one.  I.e. goals of this method are:
 		// (1) fill out TripInfo
 		// (2) keep handle so that passenger can accept, or not-confirmed request is eventually deleted again.  Also see doSimStet(...) ;
 
-		Gbl.assertIf( requestImpl.getTimeInterpretation() == TripInfo.TimeInterpretation.departure );
-		Link pickupLink = FacilitiesUtils.decideOnLink( requestImpl.getFromFacility(), network );
-		Link dropoffLink = FacilitiesUtils.decideOnLink( requestImpl.getToFacility(), network ) ;
-		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
+		Gbl.assertIf(tripInfoRequest.getTimeInterpretation() == TripInfo.TimeInterpretation.departure);
+		Link pickupLink = FacilitiesUtils.decideOnLink(tripInfoRequest.getFromFacility(), network);
+		Link dropoffLink = FacilitiesUtils.decideOnLink(tripInfoRequest.getToFacility(), network);
+		double now = this.mobsimTimer.getTimeOfDay();
 
-		MobsimPassengerAgent passenger = null ;
-		PassengerRequest request = createValidateAndSubmitRequest(passenger, pickupLink.getId(), dropoffLink.getId(), requestImpl.getTime(), now );
-		// yyyy we think that it is possible to remove parameter MobsimPassengerAgent from this method. kai/gregor, jan'19
-
-		// generating the TripInfo object that will be returned to the potential passenger:
-		TripInfo info = new DrtTripInfo( null, request, null, requestImpl.getTime() );
-		// wrap into list and return:
-		List list = new ArrayList<>() ;
-		list.add(info) ;
-		return list ;
+		//FIXME we need to send the request to VrpOptimizer and actually get tripInfos from there
+		// for the time being: generating the TripInfo object that will be returned to the potential passenger:
+		return ImmutableList.of(new DvrpTripInfo(mode, pickupLink, dropoffLink, tripInfoRequest.getTime(), now));
 	}
 
 	/**
 	 * This is to register an advance booking. The method is called when, in reality, the request is made.
 	 */
-	void prebookTrip( double now, MobsimPassengerAgent passenger, Id<Link> fromLinkId, Id<Link> toLinkId,
-				double departureTime ) {
+	void prebookTrip(double now, MobsimPassengerAgent passenger, Id<Link> fromLinkId, Id<Link> toLinkId,
+			double departureTime) {
 		// suggestion to make this private: only possible through the getTripInfos channel.  Could be called from "accept" method in there. kai, feb'18
 		// no, currently also in PrebookingEngine. kai, mar'19
 
@@ -149,7 +141,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> fromLinkId) {
-		if (!agent.getMode().equals(mode )) {
+		if (!agent.getMode().equals(mode)) {
 			return false;
 		}
 
@@ -201,7 +193,8 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		Map<Id<Link>, ? extends Link> links = network.getLinks();
 		Link fromLink = links.get(fromLinkId);
 		Link toLink = links.get(toLinkId);
-		Id<org.matsim.contrib.dvrp.optimizer.Request> id = Id.create(mode + "_" + nextId++, org.matsim.contrib.dvrp.optimizer.Request.class );
+		Id<org.matsim.contrib.dvrp.optimizer.Request> id = Id.create(mode + "_" + nextId++,
+				org.matsim.contrib.dvrp.optimizer.Request.class);
 
 		PassengerRequest request = requestCreator.createRequest(id, passenger, fromLink, toLink, departureTime, now);
 		return request;
@@ -266,79 +259,5 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());
 		passenger.endLegAndComputeNextState(now);
 		internalInterface.arrangeNextAgentState(passenger);
-	}
-
-	private class DrtTripInfo implements TripInfo, RequiresBooking {
-		private final Link pickupLink;
-		private final PassengerRequest request;
-		private final Link dropoffLink;
-		private final double now;
-
-		public DrtTripInfo( Link pickupLink, PassengerRequest request, Link dropoffLink, double now ){
-			this.pickupLink = pickupLink;
-			this.request = request;
-			this.dropoffLink = dropoffLink;
-			this.now = now;
-		}
-
-		@Override public Facility getPickupLocation(){
-			return new Facility(){
-				@Override public Id<Link> getLinkId(){
-					return pickupLink.getId() ;
-				}
-				@Override public Coord getCoord(){
-					throw new RuntimeException( "not implemented" );
-				}
-				@Override public Map<String, Object> getCustomAttributes(){
-					throw new RuntimeException( "not implemented" );
-				}
-			} ;
-		}
-
-		@Override public double getExpectedBoardingTime(){
-			return request.getEarliestStartTime() ;
-		}
-
-		@Override public Facility getDropoffLocation(){
-			return new Facility(){
-				@Override public Map<String, Object> getCustomAttributes(){
-					throw new RuntimeException( "not implemented" );
-				}
-				@Override public Coord getCoord(){
-					throw new RuntimeException( "not implemented" );
-				}
-				@Override public Id<Link> getLinkId(){
-					return dropoffLink.getId() ;
-				}
-			};
-		}
-
-		@Override public double getExpectedTravelTime(){
-			throw new RuntimeException( "not implemented" );
-		}
-
-		@Override public double getMonetaryPrice(){
-			throw new RuntimeException( "not implemented" );
-		}
-
-		@Override public Map<String, String> getAdditionalAttributes(){
-			return null ;
-		}
-
-		@Override public String getMode(){
-			return TransportMode.drt ;
-		}
-
-		@Override
-		public void bookTrip() {
-			// this is the handle by which the passenger can accept.  This would, we think, easiest go to a container that keeps track of unconfirmed
-			// offers.  We cannot say if advanceRequestStorage is the correct container for this, probably not and you will need yet another one.
-
-			pendingRequests.add( this) ;
-		}
-		@Override public double getLatestDecisionTime(){
-			// we currently allow only one time step to make the decision:
-			return now +1 ;
-		}
 	}
 }
