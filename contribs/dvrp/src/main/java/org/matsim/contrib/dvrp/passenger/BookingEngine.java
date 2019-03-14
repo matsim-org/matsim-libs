@@ -51,10 +51,14 @@ public final class BookingEngine implements MobsimEngine {
 	private final TripRouter tripRouter;
 
 	@Inject
-	BookingEngine(TripRouter tripRouter, Scenario scenario, Map<String, TripInfo.Provider> tripInfoProviders) {
+//	BookingEngine(TripRouter tripRouter, Scenario scenario, Map<String, TripInfo.Provider> tripInfoProviders) {
+		BookingEngine(TripRouter tripRouter, Scenario scenario, PassengerEngine pEngine) {
 		this.tripRouter = tripRouter;
 		this.editTrips = new EditTrips(tripRouter, scenario);
-		this.tripInfoProviders = tripInfoProviders;
+//		this.tripInfoProviders = tripInfoProviders;
+			this.tripInfoProviders = new LinkedHashMap<>(  ) ;
+			//			this.tripInfoProviders.put( TransportMode.drt, pEngine ) ;
+			//			this.tripInfoProviders.put( TransportMode.taxi, pEngine ) ;
 	}
 
 	@Override
@@ -63,12 +67,14 @@ public final class BookingEngine implements MobsimEngine {
 
 	@Override
 	public void afterSim() {
-		throw new RuntimeException("not implemented");
 	}
 
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.editPlans = new EditPlans(internalInterface.getMobsim(), tripRouter, editTrips);
+//		PassengerEngine pEngine = internalInterface.getMobsim().getChildInjector().getInstance( PassengerEngine.class );
+//		this.tripInfoProviders.put( TransportMode.drt, pEngine ) ;
+//		this.tripInfoProviders.put( TransportMode.taxi, pEngine ) ;
 	}
 
 	@Override

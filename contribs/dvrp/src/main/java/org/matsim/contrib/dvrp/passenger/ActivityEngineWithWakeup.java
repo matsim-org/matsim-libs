@@ -40,8 +40,10 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.PlanBasedDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -113,23 +115,36 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
 
-		for (Leg drtLeg : findLegsWithModeInFuture(agent, TransportMode.drt)) {
-			double prebookingOffset_s = (double)drtLeg.getAttributes().getAttribute("prebookingOffset_s");
-			final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
-			if (prebookingTime < agent.getActivityEndTime()) {
-				// yyyy and here one sees that having this in the activity engine is not very practical
-				this.wakeUpList.add(new AgentAndLegEntry(agent, prebookingTime, drtLeg, this::wakeUpAgent));
-			}
-		}
-		for (Leg drtLeg : findLegsWithModeInFuture(agent, TransportMode.taxi )) {
-			double prebookingOffset_s = (double)drtLeg.getAttributes().getAttribute("prebookingOffset_s");
-			final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
-			if (prebookingTime < agent.getActivityEndTime()) {
-				// yyyy and here one sees that having this in the activity engine is not very practical
-				this.wakeUpList.add(new AgentAndLegEntry(agent, prebookingTime, drtLeg, this::wakeUpAgent));
-			}
-		}
+		if ( agent instanceof PlanAgent ){
+			// (we don't want to treat DvrpAgents, CarrierAgents, TransitVehicleDrivers etc. here)
 
+			for( Leg drtLeg : findLegsWithModeInFuture( agent, TransportMode.drt ) ){
+				Double prebookingOffset_s = (Double) drtLeg.getAttributes().getAttribute( "prebookingOffset_s" );
+				if( prebookingOffset_s == null ){
+					log.warn( "not prebooking" );
+					continue;
+				}
+				final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
+				if( prebookingTime < agent.getActivityEndTime() ){
+					// yyyy and here one sees that having this in the activity engine is not very practical
+					log.info( "adding agent to wakeup list" );
+					this.wakeUpList.add( new AgentAndLegEntry( agent, prebookingTime, drtLeg, this::wakeUpAgent ) );
+				}
+			}
+			for( Leg drtLeg : findLegsWithModeInFuture( agent, TransportMode.taxi ) ){
+				Double prebookingOffset_s = (Double) drtLeg.getAttributes().getAttribute( "prebookingOffset_s" );
+				if( prebookingOffset_s == null ){
+					log.warn( "not prebooking" );
+					continue;
+				}
+				final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
+				if( prebookingTime < agent.getActivityEndTime() ){
+					// yyyy and here one sees that having this in the activity engine is not very practical
+					log.info( "adding agent to wakeup list" );
+					this.wakeUpList.add( new AgentAndLegEntry( agent, prebookingTime, drtLeg, this::wakeUpAgent ) );
+				}
+			}
+		}
 		return delegate.handleActivity(agent);
 	}
 
@@ -191,6 +206,9 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	 */
 	static class AgentAndLegEntry {
 		public AgentAndLegEntry(MobsimAgent agent, double time, Leg leg, Consumer<AgentAndLegEntry> executeOnWakeUp) {
+			// yyyy be careful that the executeOnWakeUp does not become overkill here; if we want something more general, rather
+			// move on a completely general MessageQueue.  kai, mar'19
+
 			this.agent = agent;
 			this.time = time;
 			this.leg = leg;

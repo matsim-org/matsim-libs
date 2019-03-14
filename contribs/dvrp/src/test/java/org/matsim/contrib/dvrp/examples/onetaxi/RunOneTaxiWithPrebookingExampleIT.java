@@ -19,39 +19,43 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
-import com.google.inject.Provider;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.passenger.ActivityEngineWithWakeup;
 import org.matsim.contrib.dvrp.passenger.BookingEngine;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponent;
-import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import javax.inject.Singleton;
 
 public class RunOneTaxiWithPrebookingExampleIT{
+	private static final Logger log = Logger.getLogger(RunOneTaxiWithPrebookingExampleIT.class);
+
 	@Test
 	public void testRun() {
 		// load config
 		Config config = ConfigUtils.loadConfig( RunOneTaxiExample.CONFIG_FILE, new DvrpConfigGroup(), new OTFVisConfigGroup() );
 		config.controler().setLastIteration( 0 );
+
+		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
+
+		QSimComponentsConfigGroup componentsConfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
+		for( String component : componentsConfig.getActiveComponents() ){
+			log.info( "mobsimComponent=" + component ) ;
+		}
+
 		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker() );
 		config.checkConsistency();
 
@@ -62,21 +66,38 @@ public class RunOneTaxiWithPrebookingExampleIT{
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule() );
 		controler.addOverridingModule(new OneTaxiModule( RunOneTaxiExample.TAXIS_FILE) );
-		controler.configureQSimComponents( DvrpQSimComponents.activateModes( TransportMode.taxi ) );
+		controler.configureQSimComponents( components -> {
+			log.info("=== before ...") ;
+			for( Object component : components.getActiveComponents() ){
+				log.info( component.toString() ) ;
+			}
+			components.removeNamedComponent( ActivityEngineModule.COMPONENT_NAME );
+//			components.addNamedComponent( DynActivityEngineModule.COMPONENT_NAME );
+			components.addNamedComponent( "abc" );
+			components.addNamedComponent( "BookingEngine" );
+			for( String m : new String[]{TransportMode.taxi} ){
+				components.addComponent( DvrpModes.mode( m ) );
+				// note that this is not an "addNAMEDComponent"!
+			}
+			log.info("=== after ...") ;
+			for( Object component : components.getActiveComponents() ){
+				log.info( component.toString() ) ;
+			}
+		} );
 		controler.addOverridingQSimModule( new AbstractQSimModule(){
 			@Override protected void configureQSim(){
 				this.bind( ActivityEngineWithWakeup.class ).in( Singleton.class ) ;
-				this.addQSimComponentBinding( ActivityEngineModule.COMPONENT_NAME ).to( ActivityEngineWithWakeup.class ) ;
+				this.addQSimComponentBinding( "abc" ).to( ActivityEngineWithWakeup.class ) ;
 
-				this.bind( BookingEngine.class ) ;
+				this.bind( BookingEngine.class ).in( Singleton.class ) ;
 				this.addQSimComponentBinding( "BookingEngine" ).to( BookingEngine.class ) ;
 
-				MapBinder<String, TripInfo.Provider> mapBinder = MapBinder.newMapBinder( this.binder(), String.class, TripInfo.Provider.class );
-				mapBinder.addBinding("abc" ).toProvider( new Provider<TripInfo.Provider>() {
-					@Override public TripInfo.Provider get(){
-						return new PassengerEngine( mode, eventsManager, requestCreator, optimizer, network, requestValidator ) ;
-					}
-				} );
+//				MapBinder<String, TripInfo.Provider> mapBinder = MapBinder.newMapBinder( this.binder(), String.class, TripInfo.Provider.class );
+//				mapBinder.addBinding("abc" ).toProvider( new Provider<TripInfo.Provider>() {
+//					@Override public TripInfo.Provider get(){
+//						return new PassengerEngine( mode, eventsManager, requestCreator, optimizer, network, requestValidator ) ;
+//					}
+//				} );
 
 //				this.binder().bind( TripInfo.Provider.class ).annotatedWith( Names.named( TransportMode.taxi ) ).to( PassengerEngine.class ) ;
 				// does not work since PassengerEngine does not have a constructor annotated with @Inject.  kai, mar'19
@@ -85,7 +106,7 @@ public class RunOneTaxiWithPrebookingExampleIT{
 		} ) ;
 
 		if ( true ) {
-			controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
+//			controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
 		}
 
 		// run simulation
