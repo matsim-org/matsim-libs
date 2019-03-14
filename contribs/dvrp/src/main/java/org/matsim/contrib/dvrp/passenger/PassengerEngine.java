@@ -146,7 +146,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		if (request.isRejected()) {
 			bookingEngine.notifyChangedTripInformation(passengersByRequestId.get(request.getId()), Optional.empty());
 		} else {
-			advanceRequestStorage.storeAdvanceRequest(request);
+			advanceRequestStorage.storeRequest(request);
 		}
 	}
 
@@ -160,6 +160,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		//right now TripInfo is not calculated and sent by the optimizer --> null
 		//so now we can (and have to!) notify only about rejections
 		if (request.isRejected()) {
+			advanceRequestStorage.removeRequest(request);
 			bookingEngine.notifyChangedTripInformation(passengersByRequestId.get(request.getId()), Optional.empty());
 		}
 	}
@@ -175,17 +176,23 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		double departureTime = now;
 		internalInterface.registerAdditionalAgentOnLink(passenger);
 
-		PassengerRequest prebookedRequest = advanceRequestStorage.retrieveAdvanceRequest(passenger, fromLinkId,
-				toLinkId, now);
-		if (prebookedRequest == null) {// this is an immediate request
+		List<PassengerRequest> prebookedRequests = advanceRequestStorage.retrieveRequests(passenger, fromLinkId,
+				toLinkId);
+
+		if (prebookedRequests.isEmpty()) {// this is an immediate request
 			//TODO what if it was already rejected while prebooking??
 			createValidateAndSubmitRequest(passenger, fromLinkId, toLinkId, departureTime, now);
-		} else {
+		} else if (prebookedRequests.size() == 1) {
+			PassengerRequest prebookedRequest = prebookedRequests.get(0);
 			passengersByRequestId.put(prebookedRequest.getId(), passenger);
 			PassengerPickupActivity awaitingPickup = awaitingPickupStorage.retrieveAwaitingPickup(prebookedRequest);
 			if (awaitingPickup != null) {
 				awaitingPickup.notifyPassengerIsReadyForDeparture(passenger, now);
 			}
+		} else {
+			//FIXME
+			throw new UnsupportedOperationException(
+					"The agent has submitted more then 1 request the same from-to links");
 		}
 
 		// always mark the departure as handled, even if rejected, in order to get more consistency with rejections
