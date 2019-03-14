@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
@@ -66,7 +67,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 
 	private final AdvanceRequestStorage advanceRequestStorage;
 	private final AwaitingPickupStorage awaitingPickupStorage;
-	private final Map<Id<org.matsim.contrib.dvrp.optimizer.Request>, MobsimPassengerAgent> passengersByRequestId = new HashMap<>();
+	private final Map<Id<Request>, MobsimPassengerAgent> passengersByRequestId = new HashMap<>();
 
 	public PassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
@@ -120,30 +121,21 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		return ImmutableList.of(new DvrpTripInfo(mode, pickupLink, dropoffLink, tripInfoRequest.getTime(), now));
 	}
 
-	public void bookTrip(TripInfoWithRequiredBooking tripInfo) {
+	public void bookTrip(MobsimPassengerAgent passenger, TripInfoWithRequiredBooking tripInfo) {
 		// this is the handle by which the passenger can accept.  This would, we think, easiest go to a container that keeps track of unconfirmed
 		// offers.  We cannot say if advanceRequestStorage is the correct container for this, probably not and you will need yet another one.
 		//FIXME inform VrpOptimizer
-	}
 
-	/**
-	 * This is to register an advance booking. The method is called when, in reality, the request is made.
-	 */
-	void prebookTrip(double now, MobsimPassengerAgent passenger, Id<Link> fromLinkId, Id<Link> toLinkId,
-			double departureTime) {
-		// suggestion to make this private: only possible through the getTripInfos channel.  Could be called from "accept" method in there. kai, feb'18
-		// no, currently also in PrebookingEngine. kai, mar'19
-
-		if (departureTime <= now) {
+		double now = mobsimTimer.getTimeOfDay();
+		if (tripInfo.getExpectedBoardingTime() <= now) {
 			throw new IllegalStateException("This is not a call ahead");
 		}
 
-		PassengerRequest request = createValidateAndSubmitRequest(passenger, fromLinkId, toLinkId, departureTime, now);
+		PassengerRequest request = createValidateAndSubmitRequest(passenger, tripInfo.getPickupLocation().getLinkId(),
+				tripInfo.getDropoffLocation().getLinkId(), tripInfo.getExpectedBoardingTime(), now);
 		if (!request.isRejected()) {
 			advanceRequestStorage.storeAdvanceRequest(request);
 		}
-
-		request.isRejected();
 	}
 
 	@Override

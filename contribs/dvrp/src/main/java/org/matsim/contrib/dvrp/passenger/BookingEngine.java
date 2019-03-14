@@ -19,6 +19,7 @@ import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -120,7 +121,8 @@ public final class BookingEngine implements MobsimEngine {
 		TripInfo tripInfo = allTripInfos.keySet().iterator().next();
 
 		if (tripInfo instanceof TripInfoWithRequiredBooking) {
-			passengerEngines.get(DvrpModes.mode(tripInfo.getMode())).bookTrip((TripInfoWithRequiredBooking)tripInfo);
+			passengerEngines.get(DvrpModes.mode(tripInfo.getMode()))
+					.bookTrip((MobsimPassengerAgent)agent, (TripInfoWithRequiredBooking)tripInfo);
 			//to reduce number of possibilities, I would simply assume that notification always comes later
 			//
 			// --> yes, with DRT it will always come in the next time step, I adapted code accordingly (michal)
