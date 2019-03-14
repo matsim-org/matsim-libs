@@ -15,14 +15,16 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.dvrp.run.DvrpMode;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.RequiresBooking;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -39,6 +41,7 @@ public final class BookingEngine implements MobsimEngine {
 	// layer of infrastructure?  Am currently leaning towards the second argument.  kai, mar'19
 
 	private final Map<String, TripInfo.Provider> tripInfoProviders;
+	private final Map<DvrpMode, PassengerEngine> passengerEngines;
 
 	private Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new ConcurrentHashMap<>();
 	// yyyy not sure about possible race conditions here! kai, feb'19
@@ -51,14 +54,12 @@ public final class BookingEngine implements MobsimEngine {
 	private final TripRouter tripRouter;
 
 	@Inject
-//	BookingEngine(TripRouter tripRouter, Scenario scenario, Map<String, TripInfo.Provider> tripInfoProviders) {
-		BookingEngine(TripRouter tripRouter, Scenario scenario, PassengerEngine pEngine) {
+	BookingEngine(TripRouter tripRouter, Scenario scenario, Map<String, TripInfo.Provider> tripInfoProviders,
+			Map<DvrpMode, PassengerEngine> passengerEngines) {
 		this.tripRouter = tripRouter;
 		this.editTrips = new EditTrips(tripRouter, scenario);
-//		this.tripInfoProviders = tripInfoProviders;
-			this.tripInfoProviders = new LinkedHashMap<>(  ) ;
-			//			this.tripInfoProviders.put( TransportMode.drt, pEngine ) ;
-			//			this.tripInfoProviders.put( TransportMode.taxi, pEngine ) ;
+		this.tripInfoProviders = tripInfoProviders;
+		this.passengerEngines = passengerEngines;
 	}
 
 	@Override
@@ -70,11 +71,11 @@ public final class BookingEngine implements MobsimEngine {
 	}
 
 	@Override
-	public void setInternalInterface( InternalInterface internalInterface ) {
+	public void setInternalInterface(InternalInterface internalInterface) {
 		this.editPlans = new EditPlans(internalInterface.getMobsim(), tripRouter, editTrips);
-//		PassengerEngine pEngine = internalInterface.getMobsim().getChildInjector().getInstance( PassengerEngine.class );
-//		this.tripInfoProviders.put( TransportMode.drt, pEngine ) ;
-//		this.tripInfoProviders.put( TransportMode.taxi, pEngine ) ;
+		//		PassengerEngine pEngine = internalInterface.getMobsim().getChildInjector().getInstance( PassengerEngine.class );
+		//		this.tripInfoProviders.put( TransportMode.drt, pEngine ) ;
+		//		this.tripInfoProviders.put( TransportMode.taxi, pEngine ) ;
 	}
 
 	@Override
@@ -118,8 +119,8 @@ public final class BookingEngine implements MobsimEngine {
 		// TODO: make complete
 		TripInfo tripInfo = allTripInfos.keySet().iterator().next();
 
-		if (tripInfo instanceof RequiresBooking) {
-			((RequiresBooking)tripInfo).bookTrip(); //or: tripinfoProvider.bookTrip((RequiresBooking)tripInfo);
+		if (tripInfo instanceof TripInfoWithRequiredBooking) {
+			passengerEngines.get(DvrpModes.mode(tripInfo.getMode())).bookTrip((TripInfoWithRequiredBooking)tripInfo);
 			//to reduce number of possibilities, I would simply assume that notification always comes later
 			//
 			// --> yes, with DRT it will always come in the next time step, I adapted code accordingly (michal)
@@ -157,7 +158,7 @@ public final class BookingEngine implements MobsimEngine {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
 		Trip theTrip = null;
-		for (Trip drtTrip : TripStructureUtils.getTrips(plan, ActivityEngineWithWakeup.drtStageActivities )) {
+		for (Trip drtTrip : TripStructureUtils.getTrips(plan, ActivityEngineWithWakeup.drtStageActivities)) {
 			// recall that we have set the activity end time of the current activity to infinity, so we cannot use that any more.  :-( ?!
 			// could instead use some kind of ID.  Not sure if that would really be better.
 			if (CoordUtils.calcEuclideanDistance(drtTrip.getOriginActivity().getCoord(),

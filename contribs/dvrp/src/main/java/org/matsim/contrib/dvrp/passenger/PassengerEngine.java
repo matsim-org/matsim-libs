@@ -46,6 +46,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
 import org.matsim.facilities.FacilitiesUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -117,6 +118,12 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		//FIXME we need to send the request to VrpOptimizer and actually get tripInfos from there
 		// for the time being: generating the TripInfo object that will be returned to the potential passenger:
 		return ImmutableList.of(new DvrpTripInfo(mode, pickupLink, dropoffLink, tripInfoRequest.getTime(), now));
+	}
+
+	public void bookTrip(TripInfoWithRequiredBooking tripInfo) {
+		// this is the handle by which the passenger can accept.  This would, we think, easiest go to a container that keeps track of unconfirmed
+		// offers.  We cannot say if advanceRequestStorage is the correct container for this, probably not and you will need yet another one.
+		//FIXME inform VrpOptimizer
 	}
 
 	/**

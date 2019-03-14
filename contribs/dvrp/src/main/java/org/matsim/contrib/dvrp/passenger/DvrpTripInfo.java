@@ -25,14 +25,13 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.qsim.interfaces.RequiresBooking;
-import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
 import org.matsim.facilities.Facility;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-class DvrpTripInfo implements TripInfo, RequiresBooking {
+class DvrpTripInfo implements TripInfoWithRequiredBooking {
 	private final String mode;
 	private final Link pickupLink;
 	private final Link dropoffLink;
@@ -80,13 +79,6 @@ class DvrpTripInfo implements TripInfo, RequiresBooking {
 	@Override
 	public String getMode() {
 		return mode;
-	}
-
-	@Override
-	public void bookTrip() {
-		// this is the handle by which the passenger can accept.  This would, we think, easiest go to a container that keeps track of unconfirmed
-		// offers.  We cannot say if advanceRequestStorage is the correct container for this, probably not and you will need yet another one.
-		//FIXME inform VrpOptimizer
 	}
 
 	@Override
