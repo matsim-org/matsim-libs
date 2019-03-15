@@ -28,6 +28,8 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestAcceptedEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
@@ -40,6 +42,7 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -53,6 +56,7 @@ import com.google.inject.name.Named;
  * @author michalm
  */
 final class OneTaxiOptimizer implements VrpOptimizer {
+	private final EventsManager eventsManager;
 	private final MobsimTimer timer;
 
 	private final TravelTime travelTime;
@@ -64,8 +68,10 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 	private static final double DROPOFF_DURATION = 60;
 
 	@Inject
-	public OneTaxiOptimizer(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			@DvrpMode(TransportMode.taxi) Fleet fleet, MobsimTimer timer) {
+	public OneTaxiOptimizer(EventsManager eventsManager,
+			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, @DvrpMode(TransportMode.taxi) Fleet fleet,
+			MobsimTimer timer) {
+		this.eventsManager = eventsManager;
 		this.timer = timer;
 		travelTime = new FreeSpeedTravelTime();
 		router = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime),
@@ -79,6 +85,9 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 
 	@Override
 	public void requestSubmitted(Request request) {
+		eventsManager.processEvent(
+				new PassengerRequestAcceptedEvent(timer.getTimeOfDay(), TransportMode.taxi, request.getId()));
+
 		Schedule schedule = vehicle.getSchedule();
 		StayTask lastTask = (StayTask)Schedules.getLastTask(schedule);// only WaitTask possible here
 		double currentTime = timer.getTimeOfDay();
@@ -123,6 +132,10 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 		// just wait (and be ready) till the end of the vehicle's time window (T1)
 		double tEnd = Math.max(t4, vehicle.getServiceEndTime());
 		schedule.addTask(new StayTaskImpl(t4, tEnd, toLink, "wait"));
+
+		eventsManager.processEvent(
+				new PassengerRequestScheduledEvent(timer.getTimeOfDay(), TransportMode.taxi, request.getId(),
+						vehicle.getId(), t1, t4));
 	}
 
 	@Override
