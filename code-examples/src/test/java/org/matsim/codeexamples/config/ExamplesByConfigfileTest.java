@@ -21,12 +21,17 @@ package org.matsim.codeexamples.config;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author nagel
@@ -34,6 +39,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
  */
 @RunWith(Parameterized.class)
 public class ExamplesByConfigfileTest {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
 	private String configFile;
 
@@ -77,15 +83,13 @@ public class ExamplesByConfigfileTest {
 	@SuppressWarnings("static-method")
 	@Test
 	public final void testMain() {
-		try {
-			IOUtils.deleteDirectoryRecursively(new File("./output/example").toPath());
-		} catch ( UncheckedIOException ee ) {
-			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
-			// and did not remove the directory afterwards.)
-		}
-		RunFromConfigfileExample.main(new String[]{configFile});
-		IOUtils.deleteDirectoryRecursively(new File("./output/example").toPath());
-		// (here, the directory should be there)
+		RunFromConfigfileExample matsim = new RunFromConfigfileExample( new String [] { configFile } ) ;
+
+		Config config = matsim.prepareConfig() ;
+		config.controler().setOutputDirectory( utils.getOutputDirectory() );
+		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+
+		matsim.run() ;
 	}
 
 }

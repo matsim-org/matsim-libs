@@ -18,17 +18,19 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.extensions.roadpricing;
 
-import java.io.File;
+import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.roadpricing.RunRoadPricingExample;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author vsp-gleich
  *
  */
 public class RoadPricingByConfigfileTest {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
 	/**
 	 * Test method for {@link RunRoadPricingExample#main(java.lang.String[])}.
@@ -36,15 +38,16 @@ public class RoadPricingByConfigfileTest {
 	@SuppressWarnings("static-method")
 	@Test
 	public final void testMain() {
-		try {
-			IOUtils.deleteDirectoryRecursively(new File("./output/example").toPath());
-		} catch ( UncheckedIOException ee ) {
-			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
-			// and did not remove the directory afterwards.)
-		}
-		RunRoadPricingExample.main(new String[]{"scenarios/equil-extended/config-with-roadpricing.xml"});
-		IOUtils.deleteDirectoryRecursively(new File("./output/example").toPath());
-		// (here, the directory should be there)
+		RunRoadPricingExample matsim = new RunRoadPricingExample( new String[]{"scenarios/equil-extended/config-with-roadpricing.xml"} );
+
+		Config config = matsim.prepareConfig();
+
+		config.controler().setOutputDirectory( utils.getOutputDirectory() );
+		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+
+		config.controler().setLastIteration( 5 );
+
+		matsim.run();
 	}
 
 }

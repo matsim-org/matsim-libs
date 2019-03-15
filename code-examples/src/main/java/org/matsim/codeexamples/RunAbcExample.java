@@ -15,50 +15,55 @@ import java.util.Collection;
 
 public final class RunAbcExample{
 
-    private Config config = null ;
-    private Scenario scenario = null ;
+	private final String[] args;
+	private Config config = null ;
+	private Scenario scenario = null ;
 
-    public static void main ( String [] args ) {
-        new RunAbcExample().run() ;
-    }
+	public static void main ( String [] args ) {
+		new RunAbcExample( args ).run() ;
+	}
 
-    public final Config prepareConfig() {
-        URL url = ExamplesUtils.getTestScenarioURL( "equil" ) ;
-        URL configUrl = IOUtils.newUrl( url, "config.xml" );;
-        config = ConfigUtils.loadConfig( configUrl ) ;
-        return config ;
-    }
+	public RunAbcExample( String [] args ) {
+		this.args = args ;
+	}
 
-    public final Scenario prepareScenario() {
-        if ( config==null ) {
-            prepareConfig() ;
-        }
-        scenario = ScenarioUtils.loadScenario( config ) ;
-        return scenario ;
-    }
+	public final Config prepareConfig() {
+		URL url = ExamplesUtils.getTestScenarioURL( "equil" ) ;
+		URL configUrl = IOUtils.newUrl( url, "config.xml" );;
+		config = ConfigUtils.loadConfig( configUrl ) ;
+		return config ;
+	}
 
-    public final void prepareAndRunControler( Collection<AbstractModule> controlerOverrides, Collection<AbstractQSimModule> qsimOverrides ) {
-        if ( scenario==null ) {
-            prepareScenario() ;
-        }
+	public final Scenario prepareScenario() {
+		if ( config==null ) {
+			prepareConfig() ;
+		}
+		scenario = ScenarioUtils.loadScenario( config ) ;
+		return scenario ;
+	}
 
-        Controler controler = new Controler( scenario );;
+	public final void prepareAndRunControler( Collection<AbstractModule> controlerOverrides, Collection<AbstractQSimModule> qsimOverrides ) {
+		if ( scenario==null ) {
+			prepareScenario() ;
+		}
 
-        if ( controlerOverrides!=null ) {
-            for( AbstractModule controlerOverride : controlerOverrides ){
-                controler.addOverridingModule( controlerOverride ) ;
-            }
-        }
-        if ( qsimOverrides!=null ) {
-            for( AbstractQSimModule qsimOverride : qsimOverrides ){
-                controler.addOverridingQSimModule( qsimOverride ) ;
-            }
-        }
+		Controler controler = new Controler( scenario );;
 
-    }
+		if ( controlerOverrides!=null ) {
+			for( AbstractModule controlerOverride : controlerOverrides ){
+				controler.addOverridingModule( controlerOverride ) ;
+			}
+		}
+		if ( qsimOverrides!=null ) {
+			for( AbstractQSimModule qsimOverride : qsimOverrides ){
+				controler.addOverridingQSimModule( qsimOverride ) ;
+			}
+		}
 
-    void run() {
-        prepareAndRunControler( null, null );
-    }
+	}
+
+	void run() {
+		prepareAndRunControler( null, null );
+	}
 
 }

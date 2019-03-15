@@ -23,6 +23,7 @@ package org.matsim.codeexamples.config;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -33,9 +34,31 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author nagel
  *
  */
-public class RunFromConfigfileExample {
+public final class RunFromConfigfileExample {
 
-	public static void main(final String[] args) {
+	private final String[] args;
+	private Config config;
+
+	public static void main( final String[] args ) {
+		new RunFromConfigfileExample( args ).run() ;
+	}
+
+	public RunFromConfigfileExample( String [] args ) {
+		this.args = args ;
+	}
+
+	public void run( ){
+		if ( config==null ) {
+			prepareConfig() ;
+		}
+
+		Scenario scenario = ScenarioUtils.loadScenario(config );
+
+		Controler controler = new Controler(scenario);
+		controler.run();
+	}
+
+	public Config prepareConfig(){
 		String configFile ;
 		if ( args!=null && args.length>=1 ) {
 			configFile = args[0] ;
@@ -43,12 +66,8 @@ public class RunFromConfigfileExample {
 			configFile = "scenarios/equil/config.xml";
 		}
 
-		Config config = ConfigUtils.loadConfig(configFile);
-		
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		Controler controler = new Controler(scenario);
-		controler.run();
+		config = ConfigUtils.loadConfig( configFile );
+		return config;
 	}
 
 }

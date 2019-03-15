@@ -3,6 +3,7 @@ package org.matsim.codeexamples.mobsim.mobsimPassingVehicleQ;
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.codeexamples.config.RunFromConfigfileExample;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -38,21 +39,34 @@ import javax.inject.Inject;
  * @author nagel
  *
  */
-class RunMobsimWithMultipleModeVehiclesExample {
+final class RunMobsimWithMultipleModeVehiclesExample {
 
-	public static void main ( String[] args ) {
+	private final String[] args;
+	private Config config;
 
-		// prepare the config:
-		Config config = ConfigUtils.loadConfig( IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );;
+	public static void main( String[] args ) {
+		new RunMobsimWithMultipleModeVehiclesExample( args ).run();
 
-		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
+	}
+
+	RunMobsimWithMultipleModeVehiclesExample( String [] args ) {
+		this.args = args ;
+	}
+
+	Config prepareConfig() {
+		config = ConfigUtils.loadConfig( IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
+		config.qsim().setLinkDynamics( QSimConfigGroup.LinkDynamics.PassingQ );
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		config.plans().setRemovingUnneccessaryPlanAttributes(true) ;
+		return config ;
+	}
+
+	void run(){
 
 		// prepare the scenario
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
+		VehicleType car = VehicleUtils.getFactory().createVehicleType( Id.create("car", VehicleType.class ) );
 		car.setMaximumVelocity(60.0/3.6);
 		car.setPcuEquivalents(1.0);
 		scenario.getVehicles().addVehicleType(car);
@@ -74,22 +88,21 @@ class RunMobsimWithMultipleModeVehiclesExample {
 
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
-//		controler.addOverridingModule(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				bindMobsim().toProvider(MultipleModeVehiclesQSimFactory.class);
-//			}
-//		});
+		//		controler.addOverridingModule(new AbstractModule() {
+		//			@Override
+		//			public void install() {
+		//				bindMobsim().toProvider(MultipleModeVehiclesQSimFactory.class);
+		//			}
+		//		});
 		// I don't think that this is still needed.  kai, feb'19
 
-		controler.addOverridingModule( new OTFVisLiveModule() ) ;
+//		controler.addOverridingModule( new OTFVisLiveModule() ) ;
 
 		// run everything:
 		controler.run();
-
 	}
 
-//	/**
+	//	/**
 //	 * Look into {@link org.matsim.core.mobsim.qsim.QSimUtils} for the default matsim qsim factory.  This is copy and paste (and somewhat reduced).
 //	 *
 //	 * @author nagel
