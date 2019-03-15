@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
  * <h1>General usage</h1>
  * 
  * <p>
- * The command line interpreter is set up using the {@link CommandLine$Builder}:
+ * The command line interpreter is set up using the {@link CommandLine.Builder}:
  * </p>
  * 
  * <pre>
@@ -221,7 +221,7 @@ public class CommandLine {
 		 * <li>An unnamed (positional) command line argument is passed, although it is
 		 * forbidden (see {{@link #allowPositionalArguments(boolean)})</li>
 		 * <li>A named command line argument is passed, but it is not allowed (see
-		 * {@link #allowOptions(Collec</li>tion)}. This can be disabled via
+		 * {@link #allowOptions(Collection)}. This can be disabled via
 		 * {@link #allowAnyOption}.</li>
 		 * <li>A named command line argument with a prefix is passed, but the prefix is
 		 * not allowed (see {@link #allowPrefixes(Collection)}. This can be disabled via
