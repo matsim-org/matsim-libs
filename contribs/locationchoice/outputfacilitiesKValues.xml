@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE objectAttributes SYSTEM "http://matsim.org/files/dtd/objectattributes_v1.dtd">
+
+<objectAttributes>
+	<object id="1">
+		<attribute name="k" class="java.lang.Double">0.37826724956265656</attribute>
+	</object>
+	<object id="2">
+		<attribute name="k" class="java.lang.Double">0.7518701267531792</attribute>
+	</object>
+	<object id="3">
+		<attribute name="k" class="java.lang.Double">0.0389397823455806</attribute>
+	</object>
+	<object id="4">
+		<attribute name="k" class="java.lang.Double">0.9002896238597091</attribute>
+	</object>
+	<object id="5">
+		<attribute name="k" class="java.lang.Double">0.4421580306399111</attribute>
+	</object>
+	<object id="6">
+		<attribute name="k" class="java.lang.Double">0.23174168479516355</attribute>
+	</object>
+	<object id="7">
+		<attribute name="k" class="java.lang.Double">0.6063868842494532</attribute>
+	</object>
+	<object id="8">
+		<attribute name="k" class="java.lang.Double">0.2291925981475602</attribute>
+	</object>
+	<object id="9">
+		<attribute name="k" class="java.lang.Double">0.1165787987742436</attribute>
+	</object>
+	<object id="10">
+		<attribute name="k" class="java.lang.Double">0.5932854623714934</attribute>
+	</object>
+	<object id="11">
+		<attribute name="k" class="java.lang.Double">0.3148102743617862</attribute>
+	</object>
+	<object id="12">
+		<attribute name="k" class="java.lang.Double">0.5208305355197167</attribute>
+	</object>
+	<object id="13">
+		<attribute name="k" class="java.lang.Double">0.8811744124699776</attribute>
+	</object>
+	<object id="14">
+		<attribute name="k" class="java.lang.Double">0.2346099512777564</attribute>
+	</object>
+	<object id="15">
+		<attribute name="k" class="java.lang.Double">0.1365022931589086</attribute>
+	</object>
+	<object id="16">
+		<attribute name="k" class="java.lang.Double">0.9059318811932812</attribute>
+	</object>
+	<object id="17">
+		<attribute name="k" class="java.lang.Double">0.4909429556077247</attribute>
+	</object>
+	<object id="18">
+		<attribute name="k" class="java.lang.Double">0.5087879208850544</attribute>
+	</object>
+	<object id="19">
+		<attribute name="k" class="java.lang.Double">0.5840019840600376</attribute>
+	</object>
+	<object id="20">
+		<attribute name="k" class="java.lang.Double">0.13008243984991508</attribute>
+	</object>
+	<object id="21">
+		<attribute name="k" class="java.lang.Double">0.3250184764383309</attribute>
+	</object>
+	<object id="22">
+		<attribute name="k" class="java.lang.Double">0.16722086508541623</attribute>
+	</object>
+	<object id="23">
+		<attribute name="k" class="java.lang.Double">0.7140696710119</attribute>
+	</object>
+	<object id="24">
+		<attribute name="k" class="java.lang.Double">0.08349893033973022</attribute>
+	</object>
+	<object id="25">
+		<attribute name="k" class="java.lang.Double">0.6708754520143885</attribute>
+	</object>
+	<object id="26">
+		<attribute name="k" class="java.lang.Double">0.7024834816784867</attribute>
+	</object>
+	<object id="27">
+		<attribute name="k" class="java.lang.Double">0.2455045037119301</attribute>
+	</object>
+	<object id="28">
+		<attribute name="k" class="java.lang.Double">0.72230226708517</attribute>
+	</object>
+	<object id="29">
+		<attribute name="k" class="java.lang.Double">0.35475262635896043</attribute>
+	</object>
+	<object id="30">
+		<attribute name="k" class="java.lang.Double">0.3649703886481982</attribute>
+	</object>
+	<object id="31">
+		<attribute name="k" class="java.lang.Double">0.3602935041848172</attribute>
+	</object>
+	<object id="32">
+		<attribute name="k" class="java.lang.Double">0.06821026829592824</attribute>
+	</object>
+	<object id="33">
+		<attribute name="k" class="java.lang.Double">0.3605381509310609</attribute>
+	</object>
+	<object id="34">
+		<attribute name="k" class="java.lang.Double">0.42942562910467497</attribute>
+	</object>
+	<object id="35">
+		<attribute name="k" class="java.lang.Double">0.44215093288563934</attribute>
+	</object>
+	<object id="36">
+		<attribute name="k" class="java.lang.Double">0.35345316649087355</attribute>
+	</object>
+	<object id="37">
+		<attribute name="k" class="java.lang.Double">0.46705399501000866</attribute>
+	</object>
+	<object id="38">
+		<attribute name="k" class="java.lang.Double">0.4954429592132771</attribute>
+	</object>
+	<object id="39">
+		<attribute name="k" class="java.lang.Double">0.3473271295810014</attribute>
+	</object>
+	<object id="40">
+		<attribute name="k" class="java.lang.Double">0.6638476129425598</attribute>
+	</object>
+	<object id="41">
+		<attribute name="k" class="java.lang.Double">0.4776227390793377</attribute>
+	</object>
+	<object id="42">
+		<attribute name="k" class="java.lang.Double">0.2202829264144287</attribute>
+	</object>
+	<object id="43">
+		<attribute name="k" class="java.lang.Double">0.7996363143528632</attribute>
+	</object>
+	<object id="44">
+		<attribute name="k" class="java.lang.Double">0.625347642455898</attribute>
+	</object>
+	<object id="45">
+		<attribute name="k" class="java.lang.Double">0.31599486120356135</attribute>
+	</object>
+	<object id="46">
+		<attribute name="k" class="java.lang.Double">0.9028604792884998</attribute>
+	</object>
+</objectAttributes>
