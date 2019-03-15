@@ -680,6 +680,8 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	public void setRandomSeed(long randomSeed) {
 		this.randomSeed = randomSeed;
 	}
+	// --------------------------------------------
+	// --------------------------------------------
 	public EpsilonDistributionTypes getEpsilonDistribution() {
 		return this.epsilonDistribution;
 	}
@@ -695,7 +697,8 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	public void setEpsilonDistribution(EpsilonDistributionTypes epsilonDistribution) {
 		this.epsilonDistribution = epsilonDistribution;
 	}
-	
+	// --------------------------------------------
+	// --------------------------------------------
 	public String getEpsilonScaleFactors() {
 		return this.epsilonScaleFactors;
 	}
@@ -744,12 +747,18 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	public void setAnalysisBinSize(double analysisBinSize) {
 		this.analysisBinSize = analysisBinSize;
 	}
+	// --------------------------------------------
+	// --------------------------------------------
+	@Deprecated // should be id, not long.  Should be a list --> better don't use
 	public Long getIdExclusion() {
 		return this.idExclusion;
 	}
+	@Deprecated // should be id, not long.  Should be a list --> better don't use
 	public void setIdExclusion(Long idExclusion) {
 		this.idExclusion = idExclusion;
 	}
+	// --------------------------------------------
+	// --------------------------------------------
 	public double getDestinationSamplePercent() {
 		return this.destinationSamplePercent;
 	}
