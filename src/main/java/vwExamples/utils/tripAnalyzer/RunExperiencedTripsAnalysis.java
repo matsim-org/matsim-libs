@@ -23,14 +23,17 @@
 
 package vwExamples.utils.tripAnalyzer;
 
-import com.vividsolutions.jts.geom.Geometry;
-import org.matsim.api.core.v01.Coord;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -42,33 +45,33 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import java.util.*;
-
 
 public class RunExperiencedTripsAnalysis {
 
     static Set<Id<Person>> relevantAgents = new HashSet<>();
     static Map<String, Geometry> zoneMap = new HashMap<>();
     static Set<String> zones = new HashSet<>();
-    static String shapeFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Cemdap\\add_data\\shp\\Real_Region_Hannover.shp";
+    static String shapeFile = "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\shp\\parking-bs.shp";
     static String shapeFeature = "NO";
 
     public static void main(String[] args) {
 
-        String runDirectory = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw235_nocad.1.0\\";
-        String runId = "vw235_nocad.1.0.";
+        String runDirectory = "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\output\\vw219_netnet150_veh_idx0\\";
+        String runId = "vw219_netnet150_veh_idx0.";
         String runPrefix = runDirectory + "/" + runId;
 
         boolean useTransitSchedule = true;
 
         Set<String> monitoredModes = new HashSet<>();
         monitoredModes.add("pt");
-        monitoredModes.add("ptSlow");
         monitoredModes.add("transit_walk");
         monitoredModes.add("drt");
         monitoredModes.add("drt_walk");
+        monitoredModes.add("access_walk");
+        monitoredModes.add("egress_walk");
         monitoredModes.add("car");
         monitoredModes.add("walk");
+        monitoredModes.add("bike");
 
         readShape(shapeFile, shapeFeature);
 
@@ -86,22 +89,23 @@ public class RunExperiencedTripsAnalysis {
                 relevantAgents.add(person.getId());
 
 
-                for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-                    if (pe instanceof Activity) {
-                        if (((Activity) pe).getType().contains("home")) {
-
-                            Activity activity = ((Activity) pe);
-                            Coord coord = activity.getCoord();
-                            if (vwExamples.utils.modalSplitAnalyzer.modalSplitEvaluator.isWithinZone(coord, zoneMap)) {
-                                relevantAgents.add(person.getId());
-                                //System.out.println(person.getId().toString());
-                                break;
-
-                            }
-
-                        }
-                    }
-                }
+            	//Take only specific agents
+//				for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+//					if (pe instanceof Activity) {
+//						if (((Activity) pe).getType().contains("home")) {
+//
+//							Activity activity = ((Activity) pe);
+//							Coord coord = activity.getCoord();
+//							if (vwExamples.utils.modalSplitAnalyzer.modalSplitEvaluator.isWithinZone(coord, zoneMap)) {
+//								relevantAgents.add(person.getId());
+//								// System.out.println(person.getId().toString());
+//								break;
+//
+//							}
+//
+//						}
+//					}
+//				}
 
             }
 

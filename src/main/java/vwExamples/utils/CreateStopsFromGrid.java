@@ -22,8 +22,11 @@
  */
 package vwExamples.utils;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.File;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -39,9 +42,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.io.File;
-import java.util.Map;
 
 
 public class CreateStopsFromGrid {
