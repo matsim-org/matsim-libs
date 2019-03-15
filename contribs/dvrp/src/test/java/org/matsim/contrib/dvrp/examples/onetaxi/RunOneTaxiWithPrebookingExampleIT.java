@@ -23,10 +23,12 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.passenger.ActivityEngineWithWakeup;
 import org.matsim.contrib.dvrp.passenger.BookingEngine;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -62,6 +64,10 @@ public class RunOneTaxiWithPrebookingExampleIT{
 		// load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config );
 
+		for( Person person : scenario.getPopulation().getPersons().values() ){
+			
+		}
+
 		// setup controler
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule() );
@@ -72,8 +78,8 @@ public class RunOneTaxiWithPrebookingExampleIT{
 				log.info( component.toString() ) ;
 			}
 			components.removeNamedComponent( ActivityEngineModule.COMPONENT_NAME );
-//			components.addNamedComponent( DynActivityEngineModule.COMPONENT_NAME );
-			components.addNamedComponent( "abc" );
+			components.addNamedComponent( DynActivityEngineModule.COMPONENT_NAME );
+//			components.addNamedComponent( "abc" );
 			components.addNamedComponent( "BookingEngine" );
 			for( String m : new String[]{TransportMode.taxi} ){
 				components.addComponent( DvrpModes.mode( m ) );
@@ -87,7 +93,7 @@ public class RunOneTaxiWithPrebookingExampleIT{
 		controler.addOverridingQSimModule( new AbstractQSimModule(){
 			@Override protected void configureQSim(){
 				this.bind( ActivityEngineWithWakeup.class ).in( Singleton.class ) ;
-				this.addQSimComponentBinding( "abc" ).to( ActivityEngineWithWakeup.class ) ;
+//				this.addQSimComponentBinding( "abc" ).to( ActivityEngineWithWakeup.class ) ;
 
 				this.bind( BookingEngine.class ).in( Singleton.class ) ;
 				this.addQSimComponentBinding( "BookingEngine" ).to( BookingEngine.class ) ;
@@ -106,7 +112,7 @@ public class RunOneTaxiWithPrebookingExampleIT{
 		} ) ;
 
 		if ( true ) {
-//			controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
+			controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
 		}
 
 		// run simulation

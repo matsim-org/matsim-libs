@@ -2,11 +2,7 @@ package org.matsim.contrib.dvrp.passenger;
 
 import static org.matsim.core.router.TripStructureUtils.Trip;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Scenario;
@@ -22,10 +18,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
-import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
-import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -41,8 +34,7 @@ public final class BookingEngine implements MobsimEngine {
 	// Notifications and corresponding handlers could then be registered. On the other hand, it is easy to add an engine such as this one; how much does it help to have another
 	// layer of infrastructure?  Am currently leaning towards the second argument.  kai, mar'19
 
-	private final Map<String, TripInfo.Provider> tripInfoProviders;
-	private final Map<DvrpMode, PassengerEngine> passengerEngines;
+	private final List<TripInfo.Provider> tripInfoProviders;
 
 	private Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new ConcurrentHashMap<>();
 	// yyyy not sure about possible race conditions here! kai, feb'19
@@ -55,12 +47,14 @@ public final class BookingEngine implements MobsimEngine {
 	private final TripRouter tripRouter;
 
 	@Inject
-	BookingEngine(TripRouter tripRouter, Scenario scenario, Map<String, TripInfo.Provider> tripInfoProviders,
-			Map<DvrpMode, PassengerEngine> passengerEngines) {
+//	BookingEngine(TripRouter tripRouter, Scenario scenario, Map<String, TripInfo.Provider> tripInfoProviders) {
+		BookingEngine(TripRouter tripRouter, Scenario scenario ) {
 		this.tripRouter = tripRouter;
 		this.editTrips = new EditTrips(tripRouter, scenario);
-		this.tripInfoProviders = tripInfoProviders;
-		this.passengerEngines = passengerEngines;
+//		this.tripInfoProviders = tripInfoProviders;
+			this.tripInfoProviders = new ArrayList<>(  ) ;
+			//			this.tripInfoProviders.put( TransportMode.drt, pEngine ) ;
+			//			this.tripInfoProviders.put( TransportMode.taxi, pEngine ) ;
 	}
 
 	@Override
@@ -74,9 +68,14 @@ public final class BookingEngine implements MobsimEngine {
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.editPlans = new EditPlans(internalInterface.getMobsim(), tripRouter, editTrips);
-		//		PassengerEngine pEngine = internalInterface.getMobsim().getChildInjector().getInstance( PassengerEngine.class );
-		//		this.tripInfoProviders.put( TransportMode.drt, pEngine ) ;
-		//		this.tripInfoProviders.put( TransportMode.taxi, pEngine ) ;
+//		PassengerEngine pEngine = internalInterface.getMobsim().getChildInjector().getInstance( PassengerEngine.class );
+//		this.tripInfoProviders.put( TransportMode.drt, pEngine ) ;
+//		this.tripInfoProviders.put( TransportMode.taxi, pEngine ) ;
+		for( DepartureHandler departureHandler : internalInterface.getDepartureHandlers() ){
+			if ( departureHandler instanceof TripInfo.Provider ) {
+				this.tripInfoProviders.add ( (TripInfo.Provider) departureHandler ) ;
+			}
+		}
 	}
 
 	@Override
@@ -99,7 +98,7 @@ public final class BookingEngine implements MobsimEngine {
 	private void processTripInfoRequests() {
 		for (Map.Entry<MobsimAgent, TripInfoRequest> entry : tripInfoRequestMap.entrySet()) {
 			Map<TripInfo, TripInfo.Provider> allTripInfos = new LinkedHashMap<>();
-			for (TripInfo.Provider provider : tripInfoProviders.values()) {
+			for (TripInfo.Provider provider : tripInfoProviders ) {
 				List<TripInfo> tripInfos = provider.getTripInfos(entry.getValue());
 				for (TripInfo tripInfo : tripInfos) {
 					allTripInfos.put(tripInfo, provider);

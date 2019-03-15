@@ -164,6 +164,11 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			return null;
 		}
 
+		@Override
+		public synchronized List<DepartureHandler> getDepartureHandlers() {
+			return departureHandlers ;
+		}
+
 //		@Override
 //		@Deprecated // use same method from QSim directly and try to get rid of the handle to internal interface. kai, mar'15
 //		public void rescheduleActivityEnd(MobsimAgent agent) {
