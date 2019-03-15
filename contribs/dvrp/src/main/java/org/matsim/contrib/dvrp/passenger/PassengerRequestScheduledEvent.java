@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,22 +15,23 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.drt.passenger.events;
+package org.matsim.contrib.dvrp.passenger;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.optimizer.Request;
 
 /**
  * @author michalm
  */
-public class DrtRequestScheduledEvent extends Event {
-	public static final String EVENT_TYPE = "DrtRequest scheduled";
+public class PassengerRequestScheduledEvent extends Event {
+	public static final String EVENT_TYPE = "PassengersRequest scheduled";
 
 	public static final String ATTRIBUTE_MODE = "mode";
 	public static final String ATTRIBUTE_REQUEST = "request";
@@ -44,7 +45,7 @@ public class DrtRequestScheduledEvent extends Event {
 	private final double pickupTime;
 	private final double dropoffTime;
 
-	public DrtRequestScheduledEvent(double time, String mode, Id<Request> requestId, Id<DvrpVehicle> vehicleId,
+	public PassengerRequestScheduledEvent(double time, String mode, Id<Request> requestId, Id<DvrpVehicle> vehicleId,
 			double pickupTime, double dropoffTime) {
 		super(time);
 		this.mode = mode;

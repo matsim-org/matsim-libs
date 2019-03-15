@@ -29,11 +29,11 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
@@ -111,7 +111,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				insertionScheduler.scheduleRequest(bestInsertion.vehicleEntry, req, bestInsertion.insertion);
 				vData.updateEntry(bestInsertion.vehicleEntry.vehicle);
 				eventsManager.processEvent(
-						new DrtRequestScheduledEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
+						new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
 								bestInsertion.vehicleEntry.vehicle.getId(), req.getPickupTask().getEndTime(),
 								req.getDropoffTask().getBeginTime()));
 			}

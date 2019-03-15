@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,18 +15,19 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
 /**
- * 
+ *
  */
-package org.matsim.contrib.drt.passenger.events;
+package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.core.events.handler.EventHandler;
 
 /**
  * @author jbischoff
  */
-public interface DrtRequestSubmittedEventHandler extends EventHandler {
-	void handleEvent(final DrtRequestSubmittedEvent event);
+public interface PassengerRequestScheduledEventHandler extends EventHandler {
+	void handleEvent(final PassengerRequestScheduledEvent event);
 }
