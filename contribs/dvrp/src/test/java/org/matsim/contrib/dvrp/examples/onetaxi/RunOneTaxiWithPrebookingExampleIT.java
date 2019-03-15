@@ -20,10 +20,11 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.apache.log4j.Logger;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.passenger.ActivityEngineWithWakeup;
 import org.matsim.contrib.dvrp.passenger.BookingEngine;
 import org.matsim.contrib.dvrp.run.*;
@@ -37,19 +38,27 @@ import org.matsim.core.mobsim.qsim.ActivityEngineModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import javax.inject.Singleton;
+import java.util.List;
 
 public class RunOneTaxiWithPrebookingExampleIT{
 	private static final Logger log = Logger.getLogger(RunOneTaxiWithPrebookingExampleIT.class);
+
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
 	public void testRun() {
 		// load config
 		Config config = ConfigUtils.loadConfig( RunOneTaxiExample.CONFIG_FILE, new DvrpConfigGroup(), new OTFVisConfigGroup() );
 		config.controler().setLastIteration( 0 );
+
+		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 
 		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
 
@@ -65,8 +74,19 @@ public class RunOneTaxiWithPrebookingExampleIT{
 		Scenario scenario = ScenarioUtils.loadScenario(config );
 
 		for( Person person : scenario.getPopulation().getPersons().values() ){
-			
+			Plan plan = person.getSelectedPlan() ;
+			plan.getAttributes().putAttribute( ActivityEngineWithWakeup.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900. ) ;
+//			for( PlanElement pe : plan.getPlanElements() ){
+//				if ( pe instanceof Leg ) {
+//					if ( ((Leg) pe).getMode().equals( TransportMode.drt ) || ((Leg) pe).getMode().equals( TransportMode.taxi ) ) {
+//						log.warn("adding attribute ...") ;
+//						pe.getAttributes().putAttribute( ActivityEngineWithWakeup.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900. ) ;
+//					}
+//				}
+//			}
 		}
+
+		PopulationUtils.writePopulation( scenario.getPopulation(), utils.getOutputDirectory() + "/../pop.xml" );
 
 		// setup controler
 		Controler controler = new Controler(scenario);
@@ -112,7 +132,7 @@ public class RunOneTaxiWithPrebookingExampleIT{
 		} ) ;
 
 		if ( true ) {
-			controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
+//			controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
 		}
 
 		// run simulation

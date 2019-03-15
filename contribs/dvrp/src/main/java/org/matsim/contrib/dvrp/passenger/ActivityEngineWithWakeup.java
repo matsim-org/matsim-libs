@@ -62,8 +62,11 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 
 	private ActivityEngine delegate;
 
-	static StageActivityTypes drtStageActivities = new StageActivityTypesImpl(
+	public static final StageActivityTypes drtStageActivities = new StageActivityTypesImpl(
 			createStageActivityType(TransportMode.drt), createStageActivityType(TransportMode.walk));
+
+	public static final String PREBOOKING_OFFSET_ATTRIBUTE_NAME = "prebookingOffset_s";
+
 
 	private final Queue<AgentAndLegEntry> wakeUpList = new PriorityBlockingQueue<>(500, (o1, o2) -> {
 		int cmp = Double.compare(o1.time, o2.time);
@@ -117,8 +120,10 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 		if (agent instanceof PlanAgent) {
 			// (we don't want to treat DvrpAgents, CarrierAgents, TransitVehicleDrivers etc. here)
 
-			for (Leg drtLeg : findLegsWithModeInFuture(agent, TransportMode.drt)) {
-				Double prebookingOffset_s = (Double)drtLeg.getAttributes().getAttribute("prebookingOffset_s");
+			Double prebookingOffset_s = (Double)((PlanAgent) agent).getCurrentPlan().getAttributes().getAttribute( PREBOOKING_OFFSET_ATTRIBUTE_NAME );
+
+			for (Leg drtLeg : findLegsWithModeInFuture(agent, TransportMode.drt )) {
+				//				Double prebookingOffset_s = (Double)drtLeg.getAttributes().getAttribute( PREBOOKING_OFFSET_ATTRIBUTE_NAME );
 				if (prebookingOffset_s == null) {
 					log.warn("not prebooking");
 					continue;
@@ -131,7 +136,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 				}
 			}
 			for (Leg drtLeg : findLegsWithModeInFuture(agent, TransportMode.taxi)) {
-				Double prebookingOffset_s = (Double)drtLeg.getAttributes().getAttribute("prebookingOffset_s");
+//				Double prebookingOffset_s = (Double)drtLeg.getAttributes().getAttribute( PREBOOKING_OFFSET_ATTRIBUTE_NAME );
 				if (prebookingOffset_s == null) {
 					log.warn("not prebooking");
 					continue;
@@ -147,7 +152,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 		return delegate.handleActivity(agent);
 	}
 
-	private static List<Leg> findLegsWithModeInFuture(MobsimAgent agent, String mode) {
+	public static List<Leg> findLegsWithModeInFuture(MobsimAgent agent, String mode) {
 		List<Leg> retVal = new ArrayList<>();
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 		for (int ii = WithinDayAgentUtils.getCurrentPlanElementIndex(agent); ii < plan.getPlanElements().size(); ii++) {

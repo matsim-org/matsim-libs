@@ -34,7 +34,7 @@ public final class BookingEngine implements MobsimEngine {
 	// Notifications and corresponding handlers could then be registered. On the other hand, it is easy to add an engine such as this one; how much does it help to have another
 	// layer of infrastructure?  Am currently leaning towards the second argument.  kai, mar'19
 
-	private final List<TripInfo.Provider> tripInfoProviders;
+	private final Map<String, TripInfo.Provider> tripInfoProviders;
 
 	private Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new ConcurrentHashMap<>();
 	// yyyy not sure about possible race conditions here! kai, feb'19
@@ -47,14 +47,10 @@ public final class BookingEngine implements MobsimEngine {
 	private final TripRouter tripRouter;
 
 	@Inject
-//	BookingEngine(TripRouter tripRouter, Scenario scenario, Map<String, TripInfo.Provider> tripInfoProviders) {
-		BookingEngine(TripRouter tripRouter, Scenario scenario ) {
+	BookingEngine(TripRouter tripRouter, Scenario scenario ) {
 		this.tripRouter = tripRouter;
 		this.editTrips = new EditTrips(tripRouter, scenario);
-//		this.tripInfoProviders = tripInfoProviders;
-			this.tripInfoProviders = new ArrayList<>(  ) ;
-			//			this.tripInfoProviders.put( TransportMode.drt, pEngine ) ;
-			//			this.tripInfoProviders.put( TransportMode.taxi, pEngine ) ;
+		this.tripInfoProviders = new LinkedHashMap<>(  ) ;
 	}
 
 	@Override
@@ -68,12 +64,10 @@ public final class BookingEngine implements MobsimEngine {
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.editPlans = new EditPlans(internalInterface.getMobsim(), tripRouter, editTrips);
-//		PassengerEngine pEngine = internalInterface.getMobsim().getChildInjector().getInstance( PassengerEngine.class );
-//		this.tripInfoProviders.put( TransportMode.drt, pEngine ) ;
-//		this.tripInfoProviders.put( TransportMode.taxi, pEngine ) ;
 		for( DepartureHandler departureHandler : internalInterface.getDepartureHandlers() ){
 			if ( departureHandler instanceof TripInfo.Provider ) {
-				this.tripInfoProviders.add ( (TripInfo.Provider) departureHandler ) ;
+				String mode = ((TripInfo.Provider) departureHandler).getMode() ;
+				this.tripInfoProviders.put( mode, (TripInfo.Provider) departureHandler ) ;
 			}
 		}
 	}
@@ -98,7 +92,7 @@ public final class BookingEngine implements MobsimEngine {
 	private void processTripInfoRequests() {
 		for (Map.Entry<MobsimAgent, TripInfoRequest> entry : tripInfoRequestMap.entrySet()) {
 			Map<TripInfo, TripInfo.Provider> allTripInfos = new LinkedHashMap<>();
-			for (TripInfo.Provider provider : tripInfoProviders ) {
+			for (TripInfo.Provider provider : tripInfoProviders.values() ) {
 				List<TripInfo> tripInfos = provider.getTripInfos(entry.getValue());
 				for (TripInfo tripInfo : tripInfos) {
 					allTripInfos.put(tripInfo, provider);
@@ -120,8 +114,10 @@ public final class BookingEngine implements MobsimEngine {
 		TripInfo tripInfo = allTripInfos.keySet().iterator().next();
 
 		if (tripInfo instanceof TripInfoWithRequiredBooking) {
-			passengerEngines.get(DvrpModes.mode(tripInfo.getMode()))
-					.bookTrip((MobsimPassengerAgent)agent, (TripInfoWithRequiredBooking)tripInfo);
+			tripInfoProviders.get(DvrpModes.mode(tripInfo.getMode()))
+					    .bookTrip((MobsimPassengerAgent)agent, (TripInfoWithRequiredBooking)tripInfo);
+			// yyyy can't we really not use the tripInfo handle directly as I had it before?  kai, mar'15
+
 			//to reduce number of possibilities, I would simply assume that notification always comes later
 			//
 			// --> yes, with DRT it will always come in the next time step, I adapted code accordingly (michal)
@@ -163,11 +159,11 @@ public final class BookingEngine implements MobsimEngine {
 			// recall that we have set the activity end time of the current activity to infinity, so we cannot use that any more.  :-( ?!
 			// could instead use some kind of ID.  Not sure if that would really be better.
 			if (CoordUtils.calcEuclideanDistance(drtTrip.getOriginActivity().getCoord(),
-					tripInfo.getPickupLocation().getCoord()) > 1000.) {
+				  tripInfo.getPickupLocation().getCoord()) > 1000.) {
 				continue;
 			}
 			if (CoordUtils.calcEuclideanDistance(drtTrip.getDestinationActivity().getCoord(),
-					tripInfo.getDropoffLocation().getCoord()) > 1000.) {
+				  tripInfo.getDropoffLocation().getCoord()) > 1000.) {
 				continue;
 			}
 			theTrip = drtTrip;
@@ -175,7 +171,7 @@ public final class BookingEngine implements MobsimEngine {
 		}
 		Gbl.assertNotNull(theTrip);
 		Iterator<Trip> walkTripsIter = TripStructureUtils.getTrips(theTrip.getTripElements(),
-				new StageActivityTypesImpl(TransportMode.walk)).iterator();
+			  new StageActivityTypesImpl(TransportMode.walk)).iterator();
 
 		// ---
 
