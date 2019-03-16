@@ -29,6 +29,10 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
+/**
+ * Calculates full Dijkstra (to all nodes in the network).
+ * To calculate shortest-path to a subset of nodes, consider {@link org.matsim.core.router.MultiNodeDijkstra}
+ */
 public class DijkstraTree extends Dijkstra {
 	private Node fromNode;
 	private double startTime;
@@ -50,8 +54,7 @@ public class DijkstraTree extends Dijkstra {
 		}
 	}
 
-	private void initFromNode(final Node fromNode, final Node toNode, final double startTime,
-			final PseudoRemovePriorityQueue<Node> pendingNodes) {
+	private void initFromNode(final Node fromNode, final Node toNode, final double startTime, final PseudoRemovePriorityQueue<Node> pendingNodes) {
 		DijkstraNodeData data = getData(fromNode);
 		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
 	}
