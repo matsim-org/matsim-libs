@@ -132,7 +132,7 @@ public class RunOneTaxiWithPrebookingExampleIT{
 		} ) ;
 
 		if ( true ) {
-//			controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
+			controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
 		}
 
 		// run simulation

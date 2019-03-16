@@ -5,12 +5,10 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.gbl.Gbl;
@@ -23,18 +21,21 @@ import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.withinday.utils.EditPlans;
 import org.matsim.withinday.utils.EditTrips;
 
 import com.google.inject.Inject;
 
 public final class BookingEngine implements MobsimEngine {
-
 	// Could implement this as a generalized version of the bdi-abm implementation: can send notifications to agent, and agent can react.  Similar to the drive-to action.
 	// Notifications and corresponding handlers could then be registered. On the other hand, it is easy to add an engine such as this one; how much does it help to have another
 	// layer of infrastructure?  Am currently leaning towards the second argument.  kai, mar'19
 
+	private static final Logger log = Logger.getLogger( BookingEngine.class ) ;
+
 	private final Map<String, TripInfo.Provider> tripInfoProviders;
+	private final Population population;
 
 	private Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new ConcurrentHashMap<>();
 	// yyyy not sure about possible race conditions here! kai, feb'19
@@ -51,6 +52,7 @@ public final class BookingEngine implements MobsimEngine {
 		this.tripRouter = tripRouter;
 		this.editTrips = new EditTrips(tripRouter, scenario);
 		this.tripInfoProviders = new LinkedHashMap<>(  ) ;
+		this.population = scenario.getPopulation() ;
 	}
 
 	@Override
@@ -86,11 +88,13 @@ public final class BookingEngine implements MobsimEngine {
 	}
 
 	public synchronized final void notifyTripInfoRequestSent(MobsimAgent agent, TripInfoRequest tripInfoRequest) {
+		log.warn("entering notifyTripInfoRequestSent with agentId=" + agent.getId() ) ;
 		tripInfoRequestMap.put(agent, tripInfoRequest);
 	}
 
 	private void processTripInfoRequests() {
 		for (Map.Entry<MobsimAgent, TripInfoRequest> entry : tripInfoRequestMap.entrySet()) {
+			log.warn("processing tripInfoRequests for agentId=" + entry.getKey().getId() );
 			Map<TripInfo, TripInfo.Provider> allTripInfos = new LinkedHashMap<>();
 			for (TripInfo.Provider provider : tripInfoProviders.values() ) {
 				List<TripInfo> tripInfos = provider.getTripInfos(entry.getValue());
@@ -108,13 +112,25 @@ public final class BookingEngine implements MobsimEngine {
 	}
 
 	private void decide(MobsimAgent agent, Map<TripInfo, TripInfo.Provider> allTripInfos) {
+		log.warn( "entering decide for agentId=" + agent.getId() ) ;
+
+		this.population.getPersons().get( agent.getId() ).getAttributes().putAttribute( AgentSnapshotInfo.marker, true ) ;
+
+		if ( allTripInfos.isEmpty() ) {
+			return ;
+		}
+
+		log.warn("020") ;
 
 		// to get started, we assume that we are only getting one drt option back.
 		// TODO: make complete
 		TripInfo tripInfo = allTripInfos.keySet().iterator().next();
 
 		if (tripInfo instanceof TripInfoWithRequiredBooking) {
-			tripInfoProviders.get(DvrpModes.mode(tripInfo.getMode()))
+			log.warn("030") ;
+
+//			tripInfoProviders.get(DvrpModes.mode(tripInfo.getMode()))
+			tripInfoProviders.get(tripInfo.getMode())
 					    .bookTrip((MobsimPassengerAgent)agent, (TripInfoWithRequiredBooking)tripInfo);
 			// yyyy can't we really not use the tripInfo handle directly as I had it before?  kai, mar'15
 
@@ -125,9 +141,19 @@ public final class BookingEngine implements MobsimEngine {
 			// wait for notification:
 			((Activity)WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.MAX_VALUE);
 			editPlans.rescheduleActivityEnd(agent);
+
+			final Person person = this.population.getPersons().get( agent.getId() );
+			if ( person != null ) {
+				if ( person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ){
+					log.warn( "040" );
+				}
+			}
+
 		} else {
 			notifyChangedTripInformation(agent, Optional.of(tripInfo));//no booking here
 		}
+
+
 	}
 
 	private void processTripInfoUpdates() {

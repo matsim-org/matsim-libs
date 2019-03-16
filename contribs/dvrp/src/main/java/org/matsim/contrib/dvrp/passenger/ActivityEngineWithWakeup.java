@@ -87,11 +87,9 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 
 	@Override
 	public void doSimStep(double time) {
-		while (!wakeUpList.isEmpty()) {
-			if (wakeUpList.peek().time <= time) {
-				final AgentAndLegEntry entry = wakeUpList.poll();
-				entry.executeOnWakeUp.accept(entry.agent, entry.leg);
-			}
+		while( !wakeUpList.isEmpty() && wakeUpList.peek().time <= time ) {
+			final AgentAndLegEntry entry = wakeUpList.poll();
+			entry.executeOnWakeUp.accept(entry.agent, entry.leg);
 		}
 		delegate.doSimStep(time);
 	}
@@ -167,6 +165,8 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	}
 
 	private void wakeUpAgent(MobsimAgent agent, Leg leg) {
+		log.warn("entering wakeUpAgent with agentId=" + agent.getId() ) ;
+
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
 		// search for drt trip corresponding to drt leg.  Trick is using our own stage activities.
