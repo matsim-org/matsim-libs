@@ -19,13 +19,17 @@
 
 package org.matsim.contrib.dvrp.router;
 
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.DijkstraNodeData;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
-public class DijkstraTree extends DijkstraWithThinPath {
+public class DijkstraTree extends Dijkstra {
 	private Node fromNode;
 	private double startTime;
 
