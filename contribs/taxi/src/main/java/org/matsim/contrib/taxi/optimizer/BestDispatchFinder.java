@@ -111,7 +111,7 @@ public class BestDispatchFinder {
 		// the calculated path contains real nodes (no imaginary/initial nodes),
 		// the time and cost are of real travel (between the first and last real node)
 		// (no initial times/costs for imaginary<->initial are included)
-		Node fromNode = path.nodes.get(0);
+		Node fromNode = path.getFromNode();
 		DvrpVehicle bestVehicle = nodeToVehicle.get(fromNode.getId());
 		LinkTimePair bestDeparture = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(bestVehicle);
 
@@ -161,7 +161,7 @@ public class BestDispatchFinder {
 		// the calculated path contains real nodes (no imaginary/initial nodes),
 		// the time and cost are of real travel (between the first and last real node)
 		// (no initial times/costs for imaginary<->initial are included)
-		Node toNode = path.nodes.get(path.nodes.size() - 1);
+		Node toNode = path.getToNode();
 		D bestDestination = nodeToDestination.get(toNode.getId());
 		VrpPathWithTravelData vrpPath = VrpPaths.createPath(departure.link, destinationToLink.apply(bestDestination),
 				departure.time, path, travelTime);
