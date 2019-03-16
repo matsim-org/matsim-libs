@@ -11,10 +11,10 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-final class TravelDisutilities {
+public final class TravelDisutilities {
 	
 	public static TravelDisutility createBaseDisutility(final CarrierVehicleTypes vehicleTypes, final TravelTime travelTime){
-		
+
 		return new TravelDisutility() {
 
 			@Override
@@ -22,7 +22,7 @@ final class TravelDisutilities {
 				CarrierVehicleType type = vehicleTypes.getVehicleTypes().get(vehicle.getType().getId());
 				if(type == null) throw new IllegalStateException("vehicle "+vehicle.getId()+" has no type");
 				double tt = travelTime.getLinkTravelTime(link, time, person, vehicle);
-				return type.getVehicleCostInformation().perDistanceUnit*link.getLength() + type.getVehicleCostInformation().perTimeUnit*tt;
+				return type.getVehicleCostInformation().getPerDistanceUnit()*link.getLength() + type.getVehicleCostInformation().getPerTimeUnit()*tt;
 			}
 
 			@Override
@@ -30,7 +30,7 @@ final class TravelDisutilities {
 				double minDisutility = Double.MAX_VALUE;
 				double free_tt = link.getLength()/link.getFreespeed();
 				for(CarrierVehicleType type : vehicleTypes.getVehicleTypes().values()){
-					double disu = type.getVehicleCostInformation().perDistanceUnit*link.getLength() + type.getVehicleCostInformation().perTimeUnit*free_tt;
+					double disu = type.getVehicleCostInformation().getPerDistanceUnit()*link.getLength() + type.getVehicleCostInformation().getPerTimeUnit()*free_tt;
 					if(disu < minDisutility) minDisutility=disu;
 				}
 				return minDisutility;

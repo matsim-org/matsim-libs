@@ -20,21 +20,27 @@ package org.matsim.contrib.taxi.schedule.reconstruct;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
 /**
  * @author michalm
  */
 class TaxiRequestWithModifiableToLink extends TaxiRequest {
-	public TaxiRequestWithModifiableToLink(Id<Request> id, Link fromLink, double time) {
-		super(id, null, fromLink, null, time, time);
+	public TaxiRequestWithModifiableToLink(Id<Request> id, Id<Person> passengerId, String mode, Link fromLink,
+			double time) {
+		super(id, passengerId, mode, fromLink, null, time, time);
 	}
 
-	Link toLink;
+	private Link toLink;
 
 	@Override
 	public Link getToLink() {
 		return toLink;
+	}
+
+	void setToLink(Link toLink) {
+		this.toLink = toLink;
 	}
 }

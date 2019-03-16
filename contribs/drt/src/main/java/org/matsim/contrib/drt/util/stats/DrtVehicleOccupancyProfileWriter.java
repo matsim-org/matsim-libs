@@ -23,7 +23,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
@@ -74,9 +74,11 @@ public class DrtVehicleOccupancyProfileWriter implements MobsimBeforeCleanupList
 			}
 		}
 
-		DefaultTableXYDataset createXYDataset = createXYDataset(calculator);
-		generateImage(createXYDataset, TimeProfileCharts.ChartType.Line);
-		generateImage(createXYDataset, TimeProfileCharts.ChartType.StackedArea);
+		if (this.matsimServices.getConfig().controler().isCreateGraphs()) {
+			DefaultTableXYDataset createXYDataset = createXYDataset(calculator);
+			generateImage(createXYDataset, TimeProfileCharts.ChartType.Line);
+			generateImage(createXYDataset, TimeProfileCharts.ChartType.StackedArea);
+		}
 	}
 
 	private String[] getOccupancyValues(double[][] vehicleOccupancyProfiles, int idx) {

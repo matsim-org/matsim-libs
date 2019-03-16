@@ -39,7 +39,7 @@ public abstract class AbstractRoute implements Route, Cloneable {
 
 	private double dist = Double.NaN;
 
-	private double travTime = Time.UNDEFINED_TIME;
+	private double travTime = Time.getUndefinedTime();
 
 	private Id<Link> startLinkId = null;
 	private Id<Link> endLinkId = null;

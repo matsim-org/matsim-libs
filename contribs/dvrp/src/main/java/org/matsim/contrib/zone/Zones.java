@@ -19,19 +19,24 @@
 
 package org.matsim.contrib.zone;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.util.PolygonExtracter;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.zone.io.*;
+import org.matsim.contrib.zone.io.ZoneShpReader;
+import org.matsim.contrib.zone.io.ZoneShpWriter;
+import org.matsim.contrib.zone.io.ZoneXmlReader;
+import org.matsim.contrib.zone.io.ZoneXmlWriter;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.*;
-
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.util.PolygonExtracter;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 public class Zones {
 	public static Map<Id<Zone>, Zone> readZones(String zonesXmlFile, String zonesShpFile) {

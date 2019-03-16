@@ -68,8 +68,8 @@ public final class DrtControlerCreator {
 	 * @param otfvis
 	 * @return
 	 */
-	public static Controler createControler(Config config, boolean otfvis) {
-		return createControler(config, otfvis, cfg -> {
+	public static Controler createControlerWithSingleModeDrt(Config config, boolean otfvis) {
+		return createControlerWithSingleModeDrt(config, otfvis, cfg -> {
 			Scenario scenario = createScenarioWithDrtRouteFactory(cfg);
 			ScenarioUtils.loadScenario(scenario);
 			return scenario;
@@ -84,8 +84,10 @@ public final class DrtControlerCreator {
 	 * @param scenarioLoader
 	 * @return
 	 */
-	public static Controler createControler(Config config, boolean otfvis, Function<Config, Scenario> scenarioLoader) {
-		DrtConfigs.adjustDrtConfig(DrtConfigGroup.get(config), config.planCalcScore());
+	public static Controler createControlerWithSingleModeDrt(Config config, boolean otfvis,
+			Function<Config, Scenario> scenarioLoader) {
+		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
+		DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
 
 		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
 		config.checkConsistency();
@@ -95,13 +97,11 @@ public final class DrtControlerCreator {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DvrpModule());
-		controler.configureQSimComponents(
-				DvrpQSimComponents.activateModes(DrtConfigGroup.get(controler.getConfig()).getMode()));
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(drtCfg.getMode()));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
 		return controler;
 	}
-
 }

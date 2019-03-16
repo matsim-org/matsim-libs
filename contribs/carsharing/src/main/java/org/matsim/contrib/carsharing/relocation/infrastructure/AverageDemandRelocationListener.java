@@ -12,11 +12,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.MultiPolygon;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.carsharing.relocation.demand.CarsharingVehicleRelocationContainer;
 import org.matsim.contrib.carsharing.relocation.events.DispatchRelocationsEvent;
 import org.matsim.contrib.carsharing.relocation.events.handlers.DispatchRelocationsEventHandler;
@@ -28,10 +28,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
@@ -40,7 +38,6 @@ import org.matsim.matrices.Matrix;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class AverageDemandRelocationListener implements IterationStartsListener, DispatchRelocationsEventHandler {
 

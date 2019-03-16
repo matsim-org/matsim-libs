@@ -20,10 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -65,6 +61,10 @@ import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -483,14 +483,14 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
 		double departureOffset1 = 60;
 		double departureOffset2 = 160;
-		double departureOffset3 = Time.UNDEFINED_TIME;
+		double departureOffset3 = Time.getUndefinedTime();
 		TransitRouteStop routeStop1 = builder.createTransitRouteStop(stop1, departureOffset1 - 10.0, departureOffset1);
 		routeStop1.setAwaitDepartureTime(true);
 		stops.add(routeStop1);
 		TransitRouteStop routeStop2 = builder.createTransitRouteStop(stop2, departureOffset2 - 10.0, departureOffset2);
 		routeStop2.setAwaitDepartureTime(false);
 		stops.add(routeStop2);
-		TransitRouteStop routeStop3 = builder.createTransitRouteStop(stop3, Time.UNDEFINED_TIME, departureOffset3);
+		TransitRouteStop routeStop3 = builder.createTransitRouteStop(stop3, Time.getUndefinedTime(), departureOffset3);
 		routeStop3.setAwaitDepartureTime(true);
 		stops.add(routeStop3);
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);

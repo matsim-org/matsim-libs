@@ -29,6 +29,8 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -38,8 +40,6 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author jbischoff

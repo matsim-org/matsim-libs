@@ -28,5 +28,7 @@ import org.matsim.core.events.handler.EventHandler;
  */
 
 public interface ColdEmissionEventHandler extends EventHandler {
-	public void handleEvent (ColdEmissionEvent event);
+	// leave this public so that external code can generate "standard" emission events. MATSIM-893
+
+	void handleEvent( ColdEmissionEvent event );
 }

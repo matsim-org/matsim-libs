@@ -36,7 +36,7 @@ public class DefaultTaxiOptimizerParams {
 	public DefaultTaxiOptimizerParams(Configuration optimizerConfig, boolean doUnscheduleAwaitingRequests,
 			boolean doUpdateTimelines) {
 		this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;
-		this.doUpdateTimelines = doUnscheduleAwaitingRequests;
+		this.doUpdateTimelines = doUpdateTimelines;
 
 		reoptimizationTimeStep = optimizerConfig.getInt(REOPTIMIZATION_TIME_STEP, 1);
 	}

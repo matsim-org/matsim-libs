@@ -22,11 +22,13 @@ package org.matsim.contrib.taxi.util.stats;
 import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
+import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.util.LongEnumAdder;
 
@@ -36,7 +38,7 @@ public class TaxiStatsCalculator {
 	private final TaxiStats dailyStats = new TaxiStats(TaxiStatsCalculators.DAILY_STATS_ID);
 	private final List<TaxiStats> taxiStats;
 
-	public TaxiStatsCalculator(Iterable<? extends Vehicle> vehicles) {
+	public TaxiStatsCalculator(Iterable<? extends DvrpVehicle> vehicles) {
 		hours = TaxiStatsCalculators.calcHourCount(vehicles);
 		hourlyStats = new TaxiStats[hours];
 		for (int h = 0; h < hours; h++) {
@@ -45,7 +47,7 @@ public class TaxiStatsCalculator {
 
 		taxiStats = TaxiStatsCalculators.createStatsList(hourlyStats, dailyStats);
 
-		for (Vehicle v : vehicles) {
+		for (DvrpVehicle v : vehicles) {
 			updateStatsForVehicle(v);
 		}
 	}
@@ -58,7 +60,7 @@ public class TaxiStatsCalculator {
 		return dailyStats;
 	}
 
-	private void updateStatsForVehicle(Vehicle vehicle) {
+	private void updateStatsForVehicle(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
 			return;// do not evaluate - the vehicle is unused

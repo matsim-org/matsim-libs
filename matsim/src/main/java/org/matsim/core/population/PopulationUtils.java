@@ -402,32 +402,38 @@ public final class PopulationUtils {
 	}
 
 	/**
+	 * @deprecated Use {@link #decideOnActivityEndTime(Activity, double, Config)}
+	 */
+	@Deprecated // was renamed
+	public static double getActivityEndTime( Activity act, double now, Config config ) {
+		return decideOnActivityEndTime( act, now, config ) ;
+	}
+
+	/**
 	 * Computes the (expected or planned) activity end time, depending on the configured time interpretation.
 	 */
-	public static double getActivityEndTime( Activity act, double now, Config config ) {
+	public static double decideOnActivityEndTime( Activity act, double now, Config config ) {
 		switch ( config.plans().getActivityDurationInterpretation() ) {
 		case endTimeOnly:
 			return act.getEndTime() ;
 		case tryEndTimeThenDuration:
-			if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
+			if ( !Time.isUndefinedTime(act.getEndTime()) ) {
 				return act.getEndTime() ;
-			} else if ( act.getMaximumDuration() != Time.UNDEFINED_TIME ) {
+			} else if ( !Time.isUndefinedTime(act.getMaximumDuration()) ) {
 				return now + act.getMaximumDuration() ;
 			} else {
-				return Time.UNDEFINED_TIME ;
+				return Time.getUndefinedTime();
 			}
 		case minOfDurationAndEndTime:
 			return Math.min( now + act.getMaximumDuration() , act.getEndTime() ) ;
 		default:
 			break ;
 		}
-		return Time.UNDEFINED_TIME ;
+		return Time.getUndefinedTime();
 	}
 
 	private static int missingFacilityCnt = 0 ;
-	/**
-	 * @param config
-	 */
+
 	@Deprecated // use decideOnLinkIdForActivity.  kai, sep'18
 	public static Id<Link> computeLinkIdFromActivity( Activity act, ActivityFacilities facs, Config config ) {
 		// the following might eventually become configurable by config. kai, feb'16
@@ -616,17 +622,8 @@ public final class PopulationUtils {
 	 */
 	public static boolean equalPopulation(final Population s1, final Population s2) {
 		try {
-			@SuppressWarnings("resource")
-			InputStream inputStream1 = null;
-			@SuppressWarnings("resource")
-			InputStream inputStream2 = null;
-			try {
-				inputStream1 = openPopulationInputStream(s1);
-				inputStream2 = openPopulationInputStream(s2);
-				return IOUtils.isEqual(inputStream1, inputStream2);
-			} finally {
-				if (inputStream1 != null) inputStream1.close();
-				if (inputStream2 != null) inputStream2.close();
+			try( InputStream inputStream1 = openPopulationInputStream( s1 ) ; InputStream inputStream2 = openPopulationInputStream( s2 ) ){
+				return IOUtils.isEqual( inputStream1, inputStream2 );
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -941,8 +938,8 @@ public final class PopulationUtils {
 			if (index != plan.getPlanElements().size()-2) {
 				// not the last leg
 				Leg next_leg = (Leg)plan.getPlanElements().get(index+2);
-				next_leg.setDepartureTime(Time.UNDEFINED_TIME);
-				next_leg.setTravelTime(Time.UNDEFINED_TIME);
+				next_leg.setDepartureTime(Time.getUndefinedTime());
+				next_leg.setTravelTime(Time.getUndefinedTime());
 				next_leg.setRoute(null);
 			}
 			plan.getPlanElements().remove(index+1); // following act
@@ -971,8 +968,8 @@ public final class PopulationUtils {
 			else {
 				// remove an in-between act
 				Leg prev_leg = (Leg)plan.getPlanElements().get(index-1); // prev leg;
-				prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
-				prev_leg.setTravelTime(Time.UNDEFINED_TIME);
+				prev_leg.setDepartureTime(Time.getUndefinedTime());
+				prev_leg.setTravelTime(Time.getUndefinedTime());
 				prev_leg.setRoute(null);
 
 				plan.getPlanElements().remove(index+1); // following leg

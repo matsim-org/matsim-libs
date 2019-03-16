@@ -26,13 +26,13 @@ import java.util.concurrent.ForkJoinPool;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -70,7 +70,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		forkJoinPool = new ForkJoinPool(drtCfg.getNumberOfThreads());
 		insertionProblem = new ParallelMultiVehicleInsertionProblem(pathDataProvider, drtCfg, mobsimTimer, forkJoinPool,
 				penaltyCalculator);
-		insertionScheduler.initSchedules(drtCfg.isChangeStartLinkToLastLinkInSchedule());
+		insertionScheduler.initSchedules();
 	}
 
 	@Override
@@ -96,11 +96,15 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				eventsManager.processEvent(
 						new PassengerRequestRejectedEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
 								NO_INSERTION_FOUND_CAUSE));
-				eventsManager.processEvent(new PersonStuckEvent(mobsimTimer.getTimeOfDay(), req.getPassenger().getId(),
-						req.getFromLink().getId(), req.getPassenger().getMode()));
+				eventsManager.processEvent(new PersonStuckEvent(mobsimTimer.getTimeOfDay(), req.getPassengerId(),
+						req.getFromLink().getId(), req.getMode()));
 				if (drtCfg.isPrintDetailedWarnings()) {
-					log.warn("No insertion found for drt request " + req + " from passenger id=" + req.getPassenger()
-							.getId() + " fromLinkId=" + req.getFromLink().getId());
+					log.warn("No insertion found for drt request "
+							+ req
+							+ " from passenger id="
+							+ req.getPassengerId()
+							+ " fromLinkId="
+							+ req.getFromLink().getId());
 				}
 			} else {
 				BestInsertion bestInsertion = best.get();

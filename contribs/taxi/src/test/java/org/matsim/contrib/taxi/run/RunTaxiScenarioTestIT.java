@@ -26,11 +26,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -77,12 +76,13 @@ public class RunTaxiScenarioTestIT {
 		config.qsim().setEndTime(36. * 3600);
 		Controler controler = TaxiControlerCreator.createControler(config, false);
 
-		controler.addOverridingModule(new AbstractModule() {
+		controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(taxiCfg.getMode()) {
 			@Override
-			public void install() {
-				bind(DvrpModes.key(PassengerRequestValidator.class, taxiCfg.getMode()))
-						.toInstance(req -> req.getPassenger().getId().toString().equals("0000009") ?
-								Collections.singleton("REJECT_0000009") : Collections.emptySet());
+			protected void configureQSim() {
+				bindModal(PassengerRequestValidator.class).toInstance(
+						req -> req.getPassengerId().toString().equals("0000009") ?
+								Collections.singleton("REJECT_0000009") :
+								Collections.emptySet());
 			}
 		});
 

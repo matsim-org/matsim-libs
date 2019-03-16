@@ -20,8 +20,8 @@ package org.matsim.contrib.drt.util.stats;
 import org.apache.commons.math3.stat.descriptive.rank.Max;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 
@@ -43,7 +43,7 @@ public class DrtVehicleOccupancyProfileCalculator {
 
 		Max maxCapacity = new Max();
 		Max maxTime = new Max();
-		for (Vehicle v : fleet.getVehicles().values()) {
+		for (DvrpVehicle v : fleet.getVehicles().values()) {
 			maxCapacity.increment(v.getCapacity());
 			maxTime.increment(v.getSchedule().getEndTime());
 		}
@@ -60,7 +60,7 @@ public class DrtVehicleOccupancyProfileCalculator {
 	}
 
 	public void calculate() {
-		for (Vehicle v : fleet.getVehicles().values()) {
+		for (DvrpVehicle v : fleet.getVehicles().values()) {
 			updateProfiles(v);
 		}
 		for (int t = 0; t < timeDiscretizer.getIntervalCount(); t++) {
@@ -88,7 +88,7 @@ public class DrtVehicleOccupancyProfileCalculator {
 		return timeDiscretizer;
 	}
 
-	private void updateProfiles(Vehicle vehicle) {
+	private void updateProfiles(DvrpVehicle vehicle) {
 		int occupancy = 0;
 		for (Task t : vehicle.getSchedule().getTasks()) {
 			DrtTask drtTask = (DrtTask)t;

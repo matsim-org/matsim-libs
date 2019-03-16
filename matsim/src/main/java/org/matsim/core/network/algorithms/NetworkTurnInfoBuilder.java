@@ -19,16 +19,23 @@
  * *********************************************************************** */
 package org.matsim.core.network.algorithms;
 
-import java.util.*;
-
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
+import com.google.inject.Inject;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.Lanes;
 import org.matsim.lanes.LanesToLinkAssignment;
 
-import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Creates TurnInfo objects for a Network instance.
@@ -38,7 +45,7 @@ import com.google.inject.Inject;
  */
 public final class NetworkTurnInfoBuilder implements NetworkTurnInfoBuilderI {
 
-    protected final Scenario scenario;
+    private final Scenario scenario;
 
     @Inject
     public NetworkTurnInfoBuilder(Scenario scenario)
@@ -46,12 +53,8 @@ public final class NetworkTurnInfoBuilder implements NetworkTurnInfoBuilderI {
         this.scenario = scenario;
     }
     
-    
-    /* (non-Javadoc)
- * @see org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI#createAllowedTurnInfos()
- */
-@Override
-public Map<Id<Link>, List<TurnInfo>> createAllowedTurnInfos(){
+    @Override
+    public Map<Id<Link>, List<TurnInfo>> createAllowedTurnInfos(){
         Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = new HashMap<>();
     
         createAndAddTurnInfo(TransportMode.car, allowedInLinkTurnInfoMap);

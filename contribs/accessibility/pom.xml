@@ -70,7 +70,7 @@
 		<dependency>
   		  <groupId>org.geotools.jdbc</groupId>
   		  <artifactId>gt-jdbc-postgis</artifactId>
-  		  <version>13.0</version>
+			<version>20.2</version>
  		 </dependency>
   </dependencies>
 </project>

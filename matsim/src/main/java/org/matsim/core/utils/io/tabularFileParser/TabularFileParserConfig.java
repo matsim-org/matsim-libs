@@ -20,6 +20,7 @@
 
 package org.matsim.core.utils.io.tabularFileParser;
 
+import java.net.URL;
 import java.nio.charset.Charset;
 
 /**
@@ -39,6 +40,8 @@ public class TabularFileParserConfig {
     // -------------------- INSTANCE VARIABLES --------------------
 
     private String file = null;
+
+    private URL url = null;
 
     private String startRegex = null;
 
@@ -68,6 +71,16 @@ public class TabularFileParserConfig {
      */
     public void setFileName(String file) {
         this.file = file;
+    }
+
+    /**
+     * Sets the url to be parsed.
+     *
+     * @param url
+     *            the url to be parsed
+     */
+    public void setUrl(URL url) {
+        this.url = url;
     }
     
     /**
@@ -205,6 +218,10 @@ public class TabularFileParserConfig {
 
     public String getFile() {
         return file;
+    }
+
+    public URL getUrl() {
+        return this.url;
     }
 
     public String getStartRegex() {

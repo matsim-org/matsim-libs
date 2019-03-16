@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.util.distance.DistanceUtils;
@@ -35,7 +35,7 @@ import org.matsim.contrib.util.distance.DistanceUtils;
  * @author michalm
  */
 public class Depots {
-	public static boolean isSwitchingFromStopToStay(Vehicle vehicle) {
+	public static boolean isSwitchingFromStopToStay(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 
 		// only active vehicles
@@ -55,7 +55,7 @@ public class Depots {
 				&& ((DrtTask)schedule.getTasks().get(previousTaskIdx)).getDrtTaskType() == DrtTaskType.STOP);
 	}
 
-	public static Link findStraightLineNearestDepot(Vehicle vehicle, Set<Link> links) {
+	public static Link findStraightLineNearestDepot(DvrpVehicle vehicle, Set<Link> links) {
 		Link currentLink = ((DrtStayTask)vehicle.getSchedule().getCurrentTask()).getLink();
 		return links.contains(currentLink)//
 				? null // already at a depot

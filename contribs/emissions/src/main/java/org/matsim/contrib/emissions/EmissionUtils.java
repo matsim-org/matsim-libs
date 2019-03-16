@@ -52,13 +52,13 @@ public final class EmissionUtils {
 	}
 
 	private static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
-	static void setHbefaRoadType( Link link, String type ){
+	public static void setHbefaRoadType( Link link, String type ){
 		if (type!=null){
 			link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);
 		}
 	}
 
-	static String getHbefaRoadType( Link link ) {
+	public static String getHbefaRoadType( Link link ) {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
 
@@ -79,6 +79,11 @@ public final class EmissionUtils {
 	public static <T> Map<Id<T>, Map<String, Double>> sumUpEmissionsPerId(
 			Map<Id<T>, Map<String, Double>> warmEmissions,
 			Map<Id<T>, Map<String, Double>> coldEmissions) {
+
+		if (warmEmissions == null)
+			return coldEmissions;
+		if (coldEmissions == null)
+			return warmEmissions;
 
 		Map<Id<T>, Map<String, Double>> totalEmissions = warmEmissions.entrySet().stream().map(entry -> {
 			Id<T> id = entry.getKey();

@@ -22,20 +22,18 @@ package org.matsim.contrib.drt.scheduler;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithPathData;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.Vehicles;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -72,12 +70,8 @@ public class RequestInsertionScheduler {
 		this.taskFactory = taskFactory;
 	}
 
-	public void initSchedules(boolean changeStartLinkToLastLinkInSchedule) {
-		((FleetImpl)fleet).resetSchedules();
-		for (Vehicle veh : fleet.getVehicles().values()) {
-			if (changeStartLinkToLastLinkInSchedule) {
-				Vehicles.changeStartLinkToLastLinkInSchedule(veh);
-			}
+	public void initSchedules() {
+		for (DvrpVehicle veh : fleet.getVehicles().values()) {
 			veh.getSchedule()
 					.addTask(taskFactory.createStayTask(veh, veh.getServiceBeginTime(), veh.getServiceEndTime(),
 							veh.getStartLink()));

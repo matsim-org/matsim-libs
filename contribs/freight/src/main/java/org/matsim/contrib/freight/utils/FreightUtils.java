@@ -22,6 +22,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
@@ -41,7 +42,12 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
  */
 public class FreightUtils {
 
-	private static final Logger log = Logger.getLogger(FreightUtils.class);
+	/**
+	 * From the outside, rather use {@link FreightUtils#getCarriers(Scenario)} .  This string constant will eventually become private.
+	 */
+	@Deprecated
+	public static final String CARRIERS = "carriers" ;
+	private static final Logger log = Logger.getLogger(FreightUtils.class );
 
 	/**
 	 * Creates a new {@link Carriers} container only with {@link CarrierShipment}s for creating a new VRP.
@@ -71,6 +77,15 @@ public class FreightUtils {
 			carriersWithShipments.addCarrier(carrierWS);
 		}
 		return carriersWithShipments;
+	}
+
+	public static Carriers getCarriers( Scenario scenario ){
+		Carriers carriers = (Carriers) scenario.getScenarioElement( CARRIERS );
+		if ( carriers==null ) {
+			carriers = new Carriers(  ) ;
+			scenario.addScenarioElement( CARRIERS, carriers );
+		}
+		return carriers;
 	}
 
 	/**

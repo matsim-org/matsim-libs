@@ -207,6 +207,12 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 		write(filename);
 	}
 
+	public final void writeV6(final OutputStream stream) {
+		this.handler = new PopulationWriterHandlerImplV6(coordinateTransformation);
+		((PopulationWriterHandlerImplV6) handler).putAttributeConverters( converters );
+		write(stream);
+	}
+
 	public final void setWriterHandler(final PopulationWriterHandler handler) {
 		this.handler = handler;
 	}

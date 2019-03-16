@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * This is just an example how to implement RebalancingStrategy, not a real rebalancing strategy.
@@ -32,7 +32,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
  */
 public class SendToStartLinkStrategy implements RebalancingStrategy {
 	@Override
-	public List<Relocation> calcRelocations(Stream<? extends Vehicle> rebalancableVehicles, double time) {
+	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
 		return rebalancableVehicles.map(v -> new Relocation(v, v.getStartLink())).collect(Collectors.toList());
 	}
 }

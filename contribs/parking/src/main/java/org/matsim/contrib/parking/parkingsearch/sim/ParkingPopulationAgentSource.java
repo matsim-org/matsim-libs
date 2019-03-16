@@ -19,14 +19,6 @@
 
 package org.matsim.contrib.parking.parkingsearch.sim;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -52,6 +44,14 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
+
+import javax.inject.Inject;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 
 public final class ParkingPopulationAgentSource implements AgentSource {
@@ -73,7 +73,7 @@ public final class ParkingPopulationAgentSource implements AgentSource {
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
 		this.modeVehicleTypes = new HashMap<>();
-		this.mainModes = new HashSet<String>( qsim.getScenario().getConfig().qsim().getMainModes());
+		this.mainModes = new HashSet<>(qsim.getScenario().getConfig().qsim().getMainModes());
 		switch ( qsimConfig.getVehiclesSource() ) {
 		case defaultVehicle:
 			for (String mode : mainModes) {
@@ -111,8 +111,12 @@ public final class ParkingPopulationAgentSource implements AgentSource {
 	}
 
 	private void insertVehicles(Person p) {
+		Vehicles vehicles = this.qsim.getScenario().getVehicles();
+		VehiclesFactory vehiclesFactory = vehicles.getFactory();
 		Plan plan = p.getSelectedPlan();
 		Set<String> seenModes = new HashSet<>();
+		boolean usePersonIdForMissingVehicleId = qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId();
+		QSimConfigGroup.VehiclesSource vehiclesSource = qsim.getScenario().getConfig().qsim().getVehiclesSource();
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Leg) {
 				Leg leg = (Leg) planElement;
@@ -125,20 +129,20 @@ public final class ParkingPopulationAgentSource implements AgentSource {
 							vehicleId = ((NetworkRoute) route).getVehicleId(); // may be null!
 						}
 						if (vehicleId == null) {
-							if (qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
+							if (usePersonIdForMissingVehicleId) {
 								vehicleId = Id.create(p.getId(), Vehicle.class);
 							} else {
 								throw new IllegalStateException("Found a network route without a vehicle id.");
 							}
 						}
 						Vehicle vehicle = null ;
-						switch ( qsim.getScenario().getConfig().qsim().getVehiclesSource() ) {
+						switch ( vehiclesSource ) {
 						case defaultVehicle:
 						case modeVehicleTypesFromVehiclesData:
-							vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
+							vehicle = vehiclesFactory.createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
 							break;
 						case fromVehiclesData:
-							vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
+							vehicle = vehicles.getVehicles().get(vehicleId);
 							if (vehicle == null) {
 								throw new IllegalStateException("Expecting a vehicle id which is missing in the vehicles database: " + vehicleId);
 							}

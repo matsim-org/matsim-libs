@@ -20,10 +20,6 @@
 
 package org.matsim.contrib.locationchoice;
 
-import java.util.Random;
-
-import javax.inject.Provider;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -77,6 +73,9 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
+import javax.inject.Provider;
+import java.util.Random;
+
 public class LocationChoiceIT extends MatsimTestCase {
 
 	public void testLocationChoiceJan2013() {
@@ -116,7 +115,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 			public ScoringFunction createNewScoringFunction(Person person) {
 				SumScoringFunction sum = new SumScoringFunction() ;
 				sum.addScoringFunction(new CharyparNagelActivityScoring(lcContext.getParams()));
-				sum.addScoringFunction(new CharyparNagelLegScoring(lcContext.getParams(), scenario.getNetwork() ) ) ;
+				sum.addScoringFunction(new CharyparNagelLegScoring(lcContext.getParams(), scenario.getNetwork(), config.transit().getTransitModes() ) ) ;
 				sum.addScoringFunction( new CharyparNagelAgentStuckScoring(lcContext.getParams() ) );
 				sum.addScoringFunction( new DCActivityWOFacilitiesScoringFunction(person, lcContext) ) ;
 				return sum ;

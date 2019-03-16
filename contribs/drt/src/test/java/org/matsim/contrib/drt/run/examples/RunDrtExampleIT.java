@@ -28,16 +28,14 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.testcases.MatsimTestUtils;
@@ -47,14 +45,14 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author jbischoff
  */
 public class RunDrtExampleIT {
-	
+
 	private class PersonIdValidator implements PassengerRequestValidator {
 		private boolean validateRequestWasCalled = false;
-		
+
 		@Override
 		public Set<String> validateRequest(PassengerRequest request) {
 			validateRequestWasCalled = true;
-			return request.getPassenger().getId().toString().equalsIgnoreCase("12052000_12052000_100") ?
+			return request.getPassengerId().toString().equalsIgnoreCase("12052000_12052000_100") ?
 					Collections.singleton("REJECT_12052000_12052000_100") :
 					Collections.emptySet();
 		}
@@ -89,19 +87,20 @@ public class RunDrtExampleIT {
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		Controler controler = DrtControlerCreator.createControler(config, false);
+		Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config, false);
 
 		PersonIdValidator personIdValidator = new PersonIdValidator();
 
-		controler.addOverridingModule(new AbstractModule() {
+		controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(DrtConfigGroup.get(config).getMode()) {
 			@Override
-			public void install() {
-				this.bind(PassengerRequestValidator.class).annotatedWith(DvrpModes.mode(TransportMode.drt)).toInstance(personIdValidator);
+			protected void configureQSim() {
+				bindModal(PassengerRequestValidator.class).toInstance(personIdValidator);
 			}
 		});
 		controler.run();
-		
-		Assert.assertEquals("passenger request validator was not called", true, personIdValidator.isValidateRequestWasCalled());
+
+		Assert.assertEquals("passenger request validator was not called", true,
+				personIdValidator.isValidateRequestWasCalled());
 	}
 
 	@Test

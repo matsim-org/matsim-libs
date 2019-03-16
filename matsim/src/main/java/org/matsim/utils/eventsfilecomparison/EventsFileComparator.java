@@ -150,9 +150,9 @@ public final class EventsFileComparator {
 			for (Entry<String, Counter> e : map1.entrySet()) {
 				Counter c = map2.get(e.getKey());
 				if (c == null) {
-					log.warn("Missing event:" ) ;
+					log.warn("The event:" ) ;
 					log.warn( e.getKey() );
-					log.warn("in events file:" + worker2.getEventsFile());
+					log.warn("is missing in events file:" + worker2.getEventsFile());
 					setExitCode(Result.MISSING_EVENT);
 					return;
 				}
@@ -168,7 +168,9 @@ public final class EventsFileComparator {
 			for (Entry<String, Counter> e : map2.entrySet()) {
 				Counter c = map1.get(e.getKey());
 				if (c == null) {
-					log.warn("Missing event:" + e.getKey() + "\nin events file:" + worker1.getEventsFile());
+					log.warn("The event:");
+					log.warn(e.getKey());
+					log.warn("is missing in events file:" + worker1.getEventsFile());
 					setExitCode(Result.MISSING_EVENT);
 					return;
 				}

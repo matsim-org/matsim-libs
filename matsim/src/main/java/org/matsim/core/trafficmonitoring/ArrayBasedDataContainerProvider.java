@@ -20,13 +20,12 @@
 
 package org.matsim.core.trafficmonitoring;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.priorityqueue.HasIndex;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator.DataContainer;
+
+import java.util.Map;
 
 /**
  *  Uses an array to store DataContainer object for the TravelTimeCalculator.
@@ -39,14 +38,14 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator.DataContainer;
  *  
  * @author cdobler
  */
-public class ArrayBasedDataContainerProvider implements DataContainerProvider {
+class ArrayBasedDataContainerProvider implements DataContainerProvider {
 
-	private final DataContainer[] arrayLinkData;
+	private final TravelTimeData[] arrayLinkData;
 	private final DataContainerProvider delegate;
 	
-	public ArrayBasedDataContainerProvider(Map<Id<Link>, DataContainer> linkData, TravelTimeDataFactory ttDataFactory,
+	public ArrayBasedDataContainerProvider(Map<Id<Link>, TravelTimeData> linkData, TravelTimeDataFactory ttDataFactory,
 			Network network) {
-		this.arrayLinkData = new DataContainer[network.getLinks().size()];
+		this.arrayLinkData = new TravelTimeData[network.getLinks().size()];
 		this.delegate = new MapBasedDataContainerProvider(linkData, ttDataFactory);
 	}
 	
@@ -55,7 +54,7 @@ public class ArrayBasedDataContainerProvider implements DataContainerProvider {
 	 * There, only link ids are available. We cannot optimize this. 
 	 */
 	@Override
-	public DataContainer getTravelTimeData(final Id<Link> linkId, final boolean createIfMissing) {
+	public TravelTimeData getTravelTimeData(final Id<Link> linkId, final boolean createIfMissing) {
 		return this.delegate.getTravelTimeData(linkId, createIfMissing);
 	}
 	
@@ -66,10 +65,10 @@ public class ArrayBasedDataContainerProvider implements DataContainerProvider {
 	 *  Probably pre-initialize all DataContainers to avoid the null-check?
 	 */
 	@Override
-	public DataContainer getTravelTimeData(Link link, boolean createIfMissing) {
+	public TravelTimeData getTravelTimeData(Link link, boolean createIfMissing) {
 		if (link instanceof HasIndex) {
 			int index = ((HasIndex) link).getArrayIndex();
-			DataContainer data = this.arrayLinkData[index];
+			TravelTimeData data = this.arrayLinkData[index];
 			if (data == null) {
 				data = this.delegate.getTravelTimeData(link, createIfMissing);
 				this.arrayLinkData[index] = data;

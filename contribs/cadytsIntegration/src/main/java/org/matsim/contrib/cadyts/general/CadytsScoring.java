@@ -52,6 +52,9 @@ public class CadytsScoring<T> implements SumScoringFunction.BasicScoring {
 		cadyts.demand.Plan<T> currentPlanSteps = this.plansTranslator.getCadytsPlan(plan);
 		double currentPlanCadytsCorrection = this.matsimCalibrator.calcLinearPlanEffect(currentPlanSteps) / this.beta;
 		this.score = weightOfCadytsCorrection * currentPlanCadytsCorrection;
+		if ( currentPlanCadytsCorrection!= 0. ){
+			log.warn( "weight=" + weightOfCadytsCorrection + "; corr=" + currentPlanCadytsCorrection );
+		}
 	}
 
 	@Override

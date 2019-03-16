@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -256,42 +255,33 @@ public final class TripRouter implements MatsimExtensionPoint {
 	public static double calcEndOfPlanElement(
 			final double now,
 			final PlanElement pe, Config config) {
-		// yyyy see similar method in PlanRouter. kai, oct'17
-		
-		if (now == Time.UNDEFINED_TIME) {
+
+		if (Time.isUndefinedTime(now)) {
 			throw new RuntimeException("got undefined now to update with plan element" + pe);
 		}
 
 		if (pe instanceof Activity) {
 			Activity act = (Activity) pe;
-			return PopulationUtils.getActivityEndTime(act, now, config) ;
-			
-//			double endTime = act.getEndTime();
-//			double startTime = act.getStartTime();
-//			double dur = act.getMaximumDuration();
-//			if (endTime != Time.UNDEFINED_TIME) {
-//				// use fromAct.endTime as time for routing
-//				return endTime;
-//			}
-//			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
-//				// use fromAct.startTime + fromAct.duration as time for routing
-//				return startTime + dur;
-//			}
-//			else if (dur != Time.UNDEFINED_TIME) {
-//				// use last used time + fromAct.duration as time for routing
-//				return now + dur;
-//			}
-//			else {
-//				return Time.UNDEFINED_TIME;
-//			}
+			return PopulationUtils.decideOnActivityEndTime(act, now, config ) ;
 		}
 		else {
-			Route route = ((Leg) pe).getRoute();
+//			// take travel time from route if possible
+//			Route route = ((Leg) pe).getRoute();
+//			double travelTime = route != null ? route.getTravelTime() : Time.getUndefinedTime();
+//
+//			// travel time from leg will override this
+//			travelTime = Time.isUndefinedTime(travelTime) ? ((Leg) pe).getTravelTime() : travelTime;
+//
+//			// if still undefined, assume zero:
+//			return now + (Time.isUndefinedTime(travelTime) ? 0 : travelTime);
 
-			double travelTime = route != null ? route.getTravelTime() : Time.UNDEFINED_TIME;
-			travelTime = travelTime == Time.UNDEFINED_TIME ? ((Leg) pe).getTravelTime() : travelTime;
+			// replace above by already existing centralized method.  Which, however, does less hedging, and prioritizes route ttime over leg ttime.  Let's run the tests ...
 
-			return now + (travelTime != Time.UNDEFINED_TIME ? travelTime : 0);
+			double ttime = PopulationUtils.decideOnTravelTimeForLeg( (Leg) pe );
+			if ( Time.isUndefinedTime( ttime ) ) {
+				ttime = 0. ;
+			}
+			return now + ttime;
 		}
 	}
 
