@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.contrib.dvrp.optimizer.Request;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -34,18 +34,18 @@ import com.google.common.collect.Multimap;
 class AdvanceRequestStorage {
 	private final Multimap<Id<Person>, PassengerRequest> advanceRequests = ArrayListMultimap.create();
 
-	public void storeRequest(PassengerRequest request) {
+	void storeRequest(PassengerRequest request) {
 		advanceRequests.put(request.getPassengerId(), request);
 	}
 
-	public void removeRequest(PassengerRequest request) {
-		advanceRequests.remove(request.getPassengerId(), request);
+	//XXX it should be enough to provide only requestId (consider replacing Multimap with Table)
+	boolean removeRequest(Id<Person> passengerId, Id<Request> requestId) {
+		return advanceRequests.get(passengerId).removeIf(req -> req.getId().equals(requestId));
 	}
 
-	public List<PassengerRequest> retrieveRequests(MobsimPassengerAgent passenger, Id<Link> fromLinkId,
-			Id<Link> toLinkId) {
-		Collection<PassengerRequest> allRequests = advanceRequests.get(passenger.getId());
-		List<PassengerRequest> filteredRequests = advanceRequests.get(passenger.getId())
+	List<PassengerRequest> retrieveRequests(Id<Person> passengerId, Id<Link> fromLinkId, Id<Link> toLinkId) {
+		Collection<PassengerRequest> allRequests = advanceRequests.get(passengerId);
+		List<PassengerRequest> filteredRequests = advanceRequests.get(passengerId)
 				.stream()
 				.filter(r -> r.getFromLink().getId().equals(fromLinkId) && r.getToLink().getId().equals(toLinkId))
 				.collect(Collectors.toList());
