@@ -33,6 +33,7 @@ import org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizerParams;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -47,6 +48,7 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 		E_RULE_BASED, E_ASSIGNMENT;
 	}
 
+	private final EventsManager eventsManager;
 	private final TaxiConfigGroup taxiCfg;
 	private final Network network;
 	private final Fleet fleet;
@@ -56,10 +58,11 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final ETaxiScheduler eScheduler;
 	private final ChargingInfrastructure chargingInfrastructure;
 
-	public ETaxiOptimizerProvider(TaxiConfigGroup taxiCfg, Fleet fleet,
+	public ETaxiOptimizerProvider(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
 			ETaxiScheduler eScheduler, ChargingInfrastructure chargingInfrastructure) {
+		this.eventsManager = eventsManager;
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
 		this.network = network;
@@ -77,12 +80,14 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
 		switch (type) {
 			case E_RULE_BASED:
-				return RuleBasedETaxiOptimizer.create(taxiCfg, fleet, eScheduler, network, timer, travelTime,
-						travelDisutility, new RuleBasedETaxiOptimizerParams(optimizerConfig), chargingInfrastructure);
+				return RuleBasedETaxiOptimizer.create(eventsManager, taxiCfg, fleet, eScheduler, network, timer,
+						travelTime, travelDisutility, new RuleBasedETaxiOptimizerParams(optimizerConfig),
+						chargingInfrastructure);
 
 			case E_ASSIGNMENT:
-				return AssignmentETaxiOptimizer.create(taxiCfg, fleet, network, timer, travelTime, travelDisutility,
-						eScheduler, chargingInfrastructure, new AssignmentETaxiOptimizerParams(optimizerConfig));
+				return AssignmentETaxiOptimizer.create(eventsManager, taxiCfg, fleet, network, timer, travelTime,
+						travelDisutility, eScheduler, chargingInfrastructure,
+						new AssignmentETaxiOptimizerParams(optimizerConfig));
 
 			default:
 				throw new RuntimeException();

@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 
 public class ActivitiesHandler {
 	private HashSet<String> flexibleTypes = new HashSet<String>();
