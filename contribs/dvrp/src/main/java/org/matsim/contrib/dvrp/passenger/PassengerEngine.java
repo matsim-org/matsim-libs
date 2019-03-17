@@ -23,7 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -68,13 +70,16 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 
 	private InternalInterface internalInterface;
 
-	private final AdvanceRequestStorage advanceRequestStorage;
-	private final AwaitingPickupStorage awaitingPickupStorage;
-	private final Map<Id<Request>, MobsimPassengerAgent> passengersByRequestId = new HashMap<>();
+	private final AdvanceRequestStorage advanceRequestStorage = new AdvanceRequestStorage();
+	private final AwaitingPickupStorage awaitingPickupStorage = new AwaitingPickupStorage();
+
+	//keeps all received requests until rejection or dropoff
+	private final Map<Id<Request>, RequestEntry> requests = new HashMap<>();
 
 	public PassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			BookingEngine bookingEngine, PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
-			Network network, PassengerRequestValidator requestValidator) {
+			Network network, PassengerRequestValidator requestValidator,
+			PassengerRequestEventToPassengerEngineForwarder passengerRequestEventForwarder) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;
@@ -83,9 +88,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		this.optimizer = optimizer;
 		this.network = network;
 		this.requestValidator = requestValidator;
-
-		advanceRequestStorage = new AdvanceRequestStorage();
-		awaitingPickupStorage = new AwaitingPickupStorage();
+		passengerRequestEventForwarder.registerPassengerEngineEventsHandler(this);
 	}
 
 	@Override
@@ -103,6 +106,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 
 	@Override
 	public void doSimStep(double time) {
+		processPassengerRequestEvents();
 	}
 
 	@Override
@@ -120,8 +124,8 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		Link dropoffLink = FacilitiesUtils.decideOnLink(tripInfoRequest.getToFacility(), network);
 		double now = this.mobsimTimer.getTimeOfDay();
 
-		//FIXME we need to send the request to VrpOptimizer and actually get tripInfos from there
-		// for the time being: generating the TripInfo object that will be returned to the potential passenger:
+		//FIXME we need to send TripInfoRequest to VrpOptimizer and actually get TripInfos from there
+		// for the time being: generating TripInfo object that will be returned to the potential passenger:
 		return ImmutableList.of(new DvrpTripInfo(mode, pickupLink, dropoffLink, tripInfoRequest.getTime(), now));
 	}
 
@@ -139,30 +143,9 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		}
 
 		//TODO have not decided yet how VrpOptimizer determines if request is prebooked, maybe boardingTime > now??
-		//TODO probably all request rejections should be always reported back to the passenger engine, and then
-		// the engine decides what to do (e.g. notify the booking engine)
 		PassengerRequest request = createValidateAndSubmitRequest(passenger, tripInfo.getPickupLocation().getLinkId(),
 				tripInfo.getDropoffLocation().getLinkId(), tripInfo.getExpectedBoardingTime(), now);
-		if (request.isRejected()) {
-			bookingEngine.notifyChangedTripInformation(passengersByRequestId.get(request.getId()), Optional.empty());
-		} else {
-			advanceRequestStorage.storeRequest(request);
-		}
-	}
-
-	/**
-	 * this is how VrpOptimizer notifies about rejection of prebooked trips... just a very prototype version...
-	 *
-	 * @param request
-	 * @param tripInfoUpdate
-	 */
-	public void notifyRequestUpdate(PassengerRequest request, Optional<TripInfo> tripInfoUpdate) {
-		//right now TripInfo is not calculated and sent by the optimizer --> null
-		//so now we can (and have to!) notify only about rejections
-		if (request.isRejected()) {
-			advanceRequestStorage.removeRequest(request);
-			bookingEngine.notifyChangedTripInformation(passengersByRequestId.get(request.getId()), Optional.empty());
-		}
+		advanceRequestStorage.storeRequest(request);
 	}
 
 	@Override
@@ -176,7 +159,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		double departureTime = now;
 		internalInterface.registerAdditionalAgentOnLink(passenger);
 
-		List<PassengerRequest> prebookedRequests = advanceRequestStorage.retrieveRequests(passenger, fromLinkId,
+		List<PassengerRequest> prebookedRequests = advanceRequestStorage.retrieveRequests(passenger.getId(), fromLinkId,
 				toLinkId);
 
 		if (prebookedRequests.isEmpty()) {// this is an immediate request
@@ -184,8 +167,8 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 			createValidateAndSubmitRequest(passenger, fromLinkId, toLinkId, departureTime, now);
 		} else if (prebookedRequests.size() == 1) {
 			PassengerRequest prebookedRequest = prebookedRequests.get(0);
-			passengersByRequestId.put(prebookedRequest.getId(), passenger);
-			PassengerPickupActivity awaitingPickup = awaitingPickupStorage.retrieveAwaitingPickup(prebookedRequest);
+			PassengerPickupActivity awaitingPickup = awaitingPickupStorage.retrieveAwaitingPickup(
+					prebookedRequest.getId());
 			if (awaitingPickup != null) {
 				awaitingPickup.notifyPassengerIsReadyForDeparture(passenger, now);
 			}
@@ -195,11 +178,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 					"The agent has submitted more then 1 request the same from-to links");
 		}
 
-		// always mark the departure as handled, even if rejected, in order to get more consistency with rejections
-		// that are decided later (for instance, during optimisation which is usually called in the next sim step)
-		// michalm, sep'18
-		// See: github.com/matsim-org/matsim/pull/362 for some more discussion
-		return true;//!request.isRejected();
+		return true;
 	}
 
 	// ================ REQUESTS HANDLING
@@ -208,9 +187,8 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 			Id<Link> toLinkId, double departureTime, double now) {
 		// yyyy remove parameter MobsimPassengerAgent. kai/gregor, jan'19
 		PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime, now);
-		rejectInvalidRequest(request);
-		if (!request.isRejected()) {
-			passengersByRequestId.put(request.getId(), passenger);
+		requests.put(request.getId(), new RequestEntry(request, passenger, now < departureTime));
+		if (validateRequest(request)) {
 			optimizer.requestSubmitted(request);//optimizer can also reject request if cannot handle it
 		}
 		return request;
@@ -225,16 +203,12 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		Map<Id<Link>, ? extends Link> links = network.getLinks();
 		Link fromLink = links.get(fromLinkId);
 		Link toLink = links.get(toLinkId);
-		Id<org.matsim.contrib.dvrp.optimizer.Request> id = Id.create(mode + "_" + nextId++,
-				org.matsim.contrib.dvrp.optimizer.Request.class);
-
-		PassengerRequest request = requestCreator.createRequest(id, passenger, fromLink, toLink, departureTime, now);
-		return request;
+		Id<Request> id = Id.create(mode + "_" + nextId++, Request.class);
+		return requestCreator.createRequest(id, passenger, fromLink, toLink, departureTime, now);
 	}
 
-	private void rejectInvalidRequest(PassengerRequest request) {
+	private boolean validateRequest(PassengerRequest request) {
 		Set<String> violations = requestValidator.validateRequest(request);
-
 		if (!violations.isEmpty()) {
 			String causes = violations.stream().collect(Collectors.joining(", "));
 			LOGGER.warn("Request: "
@@ -243,12 +217,10 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 					+ mode
 					+ " will not be served. The agent will get stuck. Causes: "
 					+ causes);
-			request.setRejected(true);
 			eventsManager.processEvent(
 					new PassengerRequestRejectedEvent(request.getSubmissionTime(), mode, request.getId(), causes));
-			eventsManager.processEvent(new PersonStuckEvent(request.getSubmissionTime(), request.getPassengerId(),
-					request.getFromLink().getId(), request.getMode()));
 		}
+		return violations.isEmpty();
 	}
 
 	// ================ PICKUP / DROPOFF
@@ -256,18 +228,19 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 	public boolean pickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			PassengerRequest request, double now) {
 		Id<Link> linkId = driver.getCurrentLinkId();
-		MobsimPassengerAgent passenger = passengersByRequestId.get(request.getId());
+		RequestEntry requestEntry = requests.get(request.getId());
+		MobsimPassengerAgent passenger = requestEntry.passenger;
 
 		if (passenger.getCurrentLinkId() != linkId || passenger.getState() != State.LEG || !passenger.getMode()
 				.equals(mode)) {
-			awaitingPickupStorage.storeAwaitingPickup(request, pickupActivity);
+			awaitingPickupStorage.storeAwaitingPickup(request.getId(), pickupActivity);
 			return false;// wait for the passenger
 		}
 
 		if (internalInterface.unregisterAdditionalAgentOnLink(passenger.getId(), driver.getCurrentLinkId()) == null) {
 			// the passenger has already been picked up and is on another taxi trip
 			// seems there have been at least 2 requests made by this passenger for this location
-			awaitingPickupStorage.storeAwaitingPickup(request, pickupActivity);
+			awaitingPickupStorage.storeAwaitingPickup(request.getId(), pickupActivity);
 			return false;// wait for the passenger (optimistically, he/she should appear soon)
 		}
 
@@ -276,12 +249,11 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		passenger.setVehicle(mobVehicle);
 
 		eventsManager.processEvent(new PersonEntersVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
-
 		return true;
 	}
 
 	public void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now) {
-		MobsimPassengerAgent passenger = passengersByRequestId.remove(request.getId());
+		MobsimPassengerAgent passenger = requests.remove(request.getId()).passenger;
 		MobsimVehicle mobVehicle = driver.getVehicle();
 		mobVehicle.removePassenger(passenger);
 		passenger.setVehicle(null);
@@ -291,5 +263,63 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 		passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());
 		passenger.endLegAndComputeNextState(now);
 		internalInterface.arrangeNextAgentState(passenger);
+	}
+
+	// ================ REJECTED/SCHEDULED EVENTS
+
+	private final Queue<PassengerRequestRejectedEvent> rejectedEvents = new ConcurrentLinkedQueue<>();
+	private final Queue<PassengerRequestScheduledEvent> scheduledEvents = new ConcurrentLinkedQueue<>();
+
+	void notifyPassengerRequestRejectedEvent(PassengerRequestRejectedEvent event) {
+		rejectedEvents.add(event);
+	}
+
+	void notifyPassengerRequestRejectedEvent(PassengerRequestScheduledEvent event) {
+		scheduledEvents.add(event);
+	}
+
+	private void processPassengerRequestEvents() {
+		while (!rejectedEvents.isEmpty()) {
+			processRequestRejectedEvents(rejectedEvents.poll());
+		}
+		while (!scheduledEvents.isEmpty()) {
+			processRequestScheduledEvents(scheduledEvents.poll());
+		}
+	}
+
+	private void processRequestRejectedEvents(PassengerRequestRejectedEvent event) {
+		RequestEntry requestEntry = requests.remove(event.getRequestId());
+		if (requestEntry.prebooked) {
+			advanceRequestStorage.removeRequest(requestEntry.passenger.getId(), event.getRequestId());
+			//let agent/BookingEngine decide what to do next
+			bookingEngine.notifyChangedTripInformation(requestEntry.passenger, Optional.empty());
+		} else {
+			//not much else can be done for immediate requests
+			PassengerRequest request = requestEntry.request;
+			eventsManager.processEvent(new PersonStuckEvent(request.getSubmissionTime(), request.getPassengerId(),
+					request.getFromLink().getId(), request.getMode()));
+		}
+	}
+
+	private void processRequestScheduledEvents(PassengerRequestScheduledEvent event) {
+		RequestEntry requestEntry = requests.get(event.getRequestId());
+		if (requestEntry.prebooked) {
+			PassengerRequest request = requestEntry.request;
+			bookingEngine.notifyChangedTripInformation(requestEntry.passenger, Optional.of(
+					new DvrpTripInfo(mode, request.getFromLink(), request.getToLink(), event.getPickupTime(),
+							event.getTime())));
+		}
+	}
+
+	private static class RequestEntry {
+		private final PassengerRequest request;
+		private final MobsimPassengerAgent passenger;
+		private final boolean prebooked; // != immediate request
+
+		private RequestEntry(PassengerRequest request, MobsimPassengerAgent passenger, boolean prebooked) {
+			this.request = request;
+			this.passenger = passenger;
+			this.prebooked = prebooked;
+		}
 	}
 }

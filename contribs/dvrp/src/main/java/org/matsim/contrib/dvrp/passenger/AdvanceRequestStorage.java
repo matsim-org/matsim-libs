@@ -38,7 +38,7 @@ class AdvanceRequestStorage {
 		advanceRequests.put(request.getPassengerId(), request);
 	}
 
-	//XXX it should be enough to provide only requestId (consider replacing Multimap with Table)
+	//XXX it should be enough to provide only requestId
 	boolean removeRequest(Id<Person> passengerId, Id<Request> requestId) {
 		return advanceRequests.get(passengerId).removeIf(req -> req.getId().equals(requestId));
 	}
