@@ -150,6 +150,16 @@ public final class PopulationUtils {
 		return new UnmodifiableLeg( leg ) ;
 	}
 
+	public static void resetRoutes( final Plan plan ) {
+		// loop over all <leg>s, remove route-information
+		// routing is done after location choice
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				((Leg) pe).setRoute(null);
+			}
+		}
+	}
+
 	static class UnmodifiableLeg implements Leg {
 		private final Leg delegate ;
 		public UnmodifiableLeg( Leg leg ) {
@@ -402,9 +412,17 @@ public final class PopulationUtils {
 	}
 
 	/**
+	 * @deprecated Use {@link #decideOnActivityEndTime(Activity, double, Config)}
+	 */
+	@Deprecated // was renamed
+	public static double getActivityEndTime( Activity act, double now, Config config ) {
+		return decideOnActivityEndTime( act, now, config ) ;
+	}
+
+	/**
 	 * Computes the (expected or planned) activity end time, depending on the configured time interpretation.
 	 */
-	public static double getActivityEndTime( Activity act, double now, Config config ) {
+	public static double decideOnActivityEndTime( Activity act, double now, Config config ) {
 		switch ( config.plans().getActivityDurationInterpretation() ) {
 		case endTimeOnly:
 			return act.getEndTime() ;

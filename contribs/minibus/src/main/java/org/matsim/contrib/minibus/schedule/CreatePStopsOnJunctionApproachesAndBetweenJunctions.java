@@ -19,9 +19,24 @@
 
 package org.matsim.contrib.minibus.schedule;
 
-import com.vividsolutions.jts.geom.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -44,11 +59,6 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.feature.simple.SimpleFeature;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 
 /**
  * Create one TransitStopFacility for each car mode link of the network

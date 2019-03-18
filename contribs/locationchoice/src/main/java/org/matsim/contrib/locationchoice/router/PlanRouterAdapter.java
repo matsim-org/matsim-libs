@@ -25,7 +25,6 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.RouteFactories;
-import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -33,6 +32,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.FacilitiesUtils;
 
 import java.util.List;
 
@@ -56,8 +56,8 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 			final double depTime) {
 		List<? extends PlanElement> trip = tripRouter.calcRoute(
 					leg.getMode(),
-					new ActivityWrapperFacility( fromAct ),
-					new ActivityWrapperFacility( toAct ),
+			  FacilitiesUtils.toFacility( fromAct, null ),
+			  FacilitiesUtils.toFacility( toAct, null ),
 					depTime,
 					person);
 	

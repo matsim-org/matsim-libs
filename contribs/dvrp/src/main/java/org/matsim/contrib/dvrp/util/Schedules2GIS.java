@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.locationtech.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -35,8 +36,6 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.Coordinate;
 
 public class Schedules2GIS {
 	private final Iterable<? extends DvrpVehicle> vehicles;

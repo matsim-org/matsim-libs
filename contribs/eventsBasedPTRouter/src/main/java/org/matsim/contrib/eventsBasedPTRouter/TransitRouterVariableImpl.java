@@ -20,7 +20,15 @@
 
 package org.matsim.contrib.eventsBasedPTRouter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -113,7 +121,8 @@ public class TransitRouterVariableImpl implements TransitRouter {
 		}
 
 		double directWalkCost = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), toFacility.getCoord()) / this.config.getBeelineWalkSpeed() * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
-		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
+			double pathCost = p.travelCost + wrappedFromNodes.get(p.getFromNode()).initialCost + wrappedToNodes.get(
+					p.getToNode()).initialCost;
 		if (directWalkCost < pathCost) {
 			List<Leg> legs = new ArrayList<Leg>();
 			Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
@@ -142,11 +151,13 @@ public class TransitRouterVariableImpl implements TransitRouter {
 		}
 		double directWalkTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
 		double directWalkCost = directWalkTime * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
-		double pathCost = path.travelCost + wrappedFromNodes.get(path.nodes.get(0)).initialCost + wrappedToNodes.get(path.nodes.get(path.nodes.size() - 1)).initialCost;
+		double pathCost = path.travelCost + wrappedFromNodes.get(path.getFromNode()).initialCost + wrappedToNodes.get(
+				path.getToNode()).initialCost;
 		if (directWalkCost < pathCost) {
 			return new Path(new ArrayList<Node>(), new ArrayList<Link>(), directWalkTime, directWalkCost);
 		}
-		double pathTime = path.travelTime + wrappedFromNodes.get(path.nodes.get(0)).initialTime + wrappedToNodes.get(path.nodes.get(path.nodes.size() - 1)).initialTime - 2*departureTime;
+		double pathTime = path.travelTime + wrappedFromNodes.get(path.getFromNode()).initialTime + wrappedToNodes.get(
+				path.getToNode()).initialTime - 2 * departureTime;
 		return new Path(path.nodes, path.links, pathTime, pathCost);
 	}
 	

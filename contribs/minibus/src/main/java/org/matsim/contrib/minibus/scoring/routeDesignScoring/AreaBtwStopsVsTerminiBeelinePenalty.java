@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Polygon;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams.LogRouteDesignScore;
@@ -33,8 +34,6 @@ import org.matsim.core.utils.geometry.GeometryUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Calculate penalty score for the area between all TransitStopFacilities (of

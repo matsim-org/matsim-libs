@@ -27,11 +27,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.utils.io.IOUtils;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * The spatial grid saves the data values of a study area in a matrix.
