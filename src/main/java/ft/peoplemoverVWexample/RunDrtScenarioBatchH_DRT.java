@@ -53,6 +53,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 
 import javax.inject.Inject;
@@ -64,7 +65,7 @@ import java.util.Map;
 
 /** * @author axer */
 
-public class RunDrtScenarioBatchH_eDRT {
+public class RunDrtScenarioBatchH_DRT {
 
 	// Class to create the controller
 	// public static Controler createControler(Config config, boolean otfvis) {
@@ -81,13 +82,13 @@ public class RunDrtScenarioBatchH_eDRT {
 		boolean enableCadyts = false;
 
 		// Enable or Disable rebalancing
-		String runId = "Moia_2";
+		String runId = "Moia_4";
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Thiel\\Programme\\MatSim\\03_HannoverDRT\\input\\";
 		String outbase = "D:\\Thiel\\Programme\\MatSim\\03_HannoverDRT\\output\\";
 
-		final Config config = ConfigUtils.loadConfig(inbase + "config_H_DRT_1.0_0.25DRT.xml", new DrtConfigGroup(),
+		final Config config = ConfigUtils.loadConfig(inbase + "config_H_DRT_0.1_0.25DRT.xml", new DrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(), new TemperatureChangeConfigGroup(),
 				new CadytsConfigGroup());
 
@@ -97,12 +98,15 @@ public class RunDrtScenarioBatchH_eDRT {
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
-		config.plans().setInputFile(inbase + "\\plans\\Moia_2.20.plans.xml.gz");
+		config.plans().setInputFile(inbase + "\\plans\\vw234_nocad.0.1.output_plans.xml.gz");
 		config.controler().setLastIteration(140); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(20); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(20); // Write Plan file every x-Iterations
 		config.qsim().setStartTime(0);
-
+		config.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra);
+		
+		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+		
 		String networkFilePath = inbase + "network\\network.xml.gz";
 		String shapeFilePath = inbase + "\\shp\\Hannover_Service_Area.shp";
 		String shapeFeature = "NO"; // shapeFeature is used to read the shapeFilePath. All zones in shapeFile are
@@ -131,9 +135,9 @@ public class RunDrtScenarioBatchH_eDRT {
 
 		drt.setPrintDetailedWarnings(false);
 		// Parameters to setup the DRT service
-		drt.setMaxTravelTimeBeta(300.0);
+		drt.setMaxTravelTimeBeta(500.0);
 		drt.setMaxTravelTimeAlpha(1.3);
-		drt.setMaxWaitTime(300.0);
+		drt.setMaxWaitTime(500.0);
 		drt.setStopDuration(30.0);
 
 		// Create the virtual stops for the drt service
@@ -211,9 +215,9 @@ public class RunDrtScenarioBatchH_eDRT {
 
 		// Define the MATSim Controler
 		// Based on the prepared configuration this part creates a controller that runs
-		//Controler controler = createControler(config, false);
+		Controler controler = createControler(config, false);
 
-		Controler controler = RunVWEDrtScenario.createControler(config);
+		//Controler controler = RunVWEDrtScenario.createControler(config);
 
 		if (enableCadyts)
 		{
@@ -234,8 +238,8 @@ public class RunDrtScenarioBatchH_eDRT {
 
 			rebalancingParams.setInterval(300);
 			rebalancingParams.setCellSize(1000);
-			rebalancingParams.setTargetAlpha(0.8);
-			rebalancingParams.setTargetBeta(0.8);
+			rebalancingParams.setTargetAlpha(0.3);
+			rebalancingParams.setTargetBeta(0.3);
 			rebalancingParams.setMaxTimeBeforeIdle(300);
 			rebalancingParams.setMinServiceTime(3600);
 			drt.addParameterSet(rebalancingParams);

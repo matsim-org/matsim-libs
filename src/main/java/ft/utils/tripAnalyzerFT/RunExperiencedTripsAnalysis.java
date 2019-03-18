@@ -21,7 +21,7 @@
 //This script has been adapted in order to write only trips of agents that are living within the defined shape.
 //Only export trips within defined shape
 
-package vwExamples.utils.tripAnalyzer;
+package ft.utils.tripAnalyzerFT;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,6 +47,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.opengis.feature.simple.SimpleFeature;
+
+import ft.utils.modalSplitEvaluator;
 
 
 public class RunExperiencedTripsAnalysis {
@@ -89,7 +91,9 @@ public class RunExperiencedTripsAnalysis {
         spr.addAlgorithm(new PersonAlgorithm() {
             @Override
             public void run(Person person) {
-                relevantAgents.add(person.getId());
+
+            	//Take all agents
+//                relevantAgents.add(person.getId());
 
 
             	//Take only specific agents
@@ -99,7 +103,7 @@ public class RunExperiencedTripsAnalysis {
 
 							Activity activity = ((Activity) pe);
 							Coord coord = activity.getCoord();
-							if (vwExamples.utils.modalSplitAnalyzer.modalSplitEvaluator.isWithinZone(coord, zoneMap)) {
+							if (modalSplitEvaluator.isWithinZone(coord, zoneMap)) {
 								relevantAgents.add(person.getId());
 								// System.out.println(person.getId().toString());
 								break;

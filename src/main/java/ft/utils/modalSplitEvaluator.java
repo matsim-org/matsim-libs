@@ -78,11 +78,11 @@ public class modalSplitEvaluator {
 	private Map<String, PersonValidator> groups = new HashMap<>();
 	Set<String> zones = new HashSet<>();
 	static Map<String, Geometry> zoneMap = new HashMap<>();
-	String shapeFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Cemdap\\add_data\\shp\\Real_Region_Hannover.shp";
+	String shapeFile = "D:\\Thiel\\Programme\\MatSim\\03_HannoverDRT\\Input\\shp\\Hannover_Service_Area.shp";
 	String shapeFeature = "NO";
 	StageActivityTypes stageActs;
-	static String inFileName = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw235_nocad.1.0\\vw235_nocad.1.0.output_plans.xml.gz";
-	static String OutFileName = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw235_nocad.1.0\\output.xml.gz";
+	static String inFileName = "D:\\Thiel\\Programme\\MatSim\\03_HannoverDRT\\Output\\Moia_4\\Moia_4.output_plans.xml.gz";
+	static String OutFileName = "D:\\Thiel\\\\Programme\\MatSim\\03_HannoverDRT\\Output\\Moia_4\\output.xml.gz";
 
 	static List<String> primaryActivies = new ArrayList<>();
 	static List<String> primaryLegModes = new ArrayList<>();
