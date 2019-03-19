@@ -20,17 +20,19 @@
 
 package org.matsim.contrib.ev.data;
 
-import javax.inject.Inject;
-
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.data.file.ElectricFleetProvider;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -61,12 +63,22 @@ public class ElectricFleetModule extends AbstractModule {
 		private EventsManager eventsManager;
 		@Inject
 		private DriveEnergyConsumption.Factory driveConsumptionFactory;
+
 		@Inject
+		@Nullable
 		private AuxEnergyConsumption.Factory auxConsumptionFactory;
+		@Inject
+		private Config config;
 
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
-			evFleet.resetBatteriesAndConsumptions(driveConsumptionFactory, auxConsumptionFactory);
+			EvConfigGroup evConfigGroup = EvConfigGroup.get(config);
+			if (evConfigGroup.getAuxDischargingSimulation() == EvConfigGroup.AuxDischargingSimulation.none) {
+				evFleet.resetBatteriesAndConsumptions(driveConsumptionFactory, null);
+			} else {
+				evFleet.resetBatteriesAndConsumptions(driveConsumptionFactory, auxConsumptionFactory);
+
+			}
 			chargingInfrastructure.initChargingLogics(logicFactory, eventsManager);
 		}
 	}

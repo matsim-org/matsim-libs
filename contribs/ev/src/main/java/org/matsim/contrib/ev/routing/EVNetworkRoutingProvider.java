@@ -18,6 +18,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.HashSet;
@@ -58,6 +59,7 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
     @Inject
     private DriveEnergyConsumption.Factory driveConsumptionFactory;
     @Inject
+    @Nullable
     private AuxEnergyConsumption.Factory auxConsumptionFactory;
     /**
      * This is the older (and still more standard) constructor, where the routingMode and the resulting mode were the
