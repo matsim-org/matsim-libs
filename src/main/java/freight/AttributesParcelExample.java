@@ -28,7 +28,9 @@ import org.matsim.core.population.io.PopulationReader;
 
 import static org.matsim.core.config.ConfigUtils.createConfig;
 import static org.matsim.core.scenario.ScenarioUtils.createScenario;
-
+/**
+ * @author thiel
+ */
 public class AttributesParcelExample {
 
 	public static void main(String[] args) {
