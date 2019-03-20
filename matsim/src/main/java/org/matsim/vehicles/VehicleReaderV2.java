@@ -3,7 +3,6 @@ package org.matsim.vehicles;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.households.HouseholdsSchemaV10Names;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.Attributes;
 
@@ -124,12 +123,12 @@ class VehicleReaderV2 extends MatsimXmlParser{
 			this.currentFreightCapacity.setUnits( Integer.parseInt( atts.getValue( VehicleSchemaV2Names.UNITS ) ) );
 
 		} else if( VehicleSchemaV2Names.COSTINFORMATION.equalsIgnoreCase( name ) ){
-			this.fixedCostsPerDay = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTS ) );
+			this.fixedCostsPerDay = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTSPERDAY) );
 			this.costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) );
 			this.costsPerSecond = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERSECOND ) );
 
-//		} else if( VehicleSchemaV2Names.FIXEDCOSTS.equalsIgnoreCase( name ) ){
-//			this.fixedCostsPerDay = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTS ) );
+//		} else if( VehicleSchemaV2Names.FIXEDCOSTSPERDAY.equalsIgnoreCase( name ) ){
+//			this.fixedCostsPerDay = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTSPERDAY ) );
 //		} else if( VehicleSchemaV2Names.COSTSPERMETER.equalsIgnoreCase( name ) ){
 //			this.costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) );
 //		} else if( VehicleSchemaV2Names.COSTSPERSECOND.equalsIgnoreCase( name ) ){
