@@ -25,14 +25,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * Converter factory for various conversion from Geotools to MATSim and vice versa.

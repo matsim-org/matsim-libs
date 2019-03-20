@@ -13,6 +13,7 @@
 			<param name="maxTravelTimeBeta" value="600"/>
 			<param name="requestRejection" value="false"/>
 			<param name="vehiclesFile" value="one_shared_taxi_vehicles_A.xml"/>
+			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
 		</parameterset>
 
 		<parameterset type="drt">
@@ -23,6 +24,7 @@
 			<param name="maxTravelTimeBeta" value="600"/>
 			<param name="requestRejection" value="false"/>
 			<param name="vehiclesFile" value="one_shared_taxi_vehicles_B.xml"/>
+			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
 		</parameterset>
 
 		<parameterset type="drt">
@@ -33,6 +35,7 @@
 			<param name="maxTravelTimeBeta" value="600"/>
 			<param name="requestRejection" value="false"/>
 			<param name="vehiclesFile" value="one_shared_taxi_vehicles_C.xml"/>
+			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
 		</parameterset>
 	</module>
 

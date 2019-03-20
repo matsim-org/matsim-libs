@@ -81,10 +81,12 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private static final String BUS_ID_IDENTIFIER = "busIdIdentifier";
 	private static final String NOISE_TOLL_FACTOR = "noiseTollFactor";
 	private static final String NOISE_ALLOCATION_APPROACH = "noiseAllocationApproach";
-	public static final String RECEIVER_POINT_GAP_CMT = "horizontal and vertical distance between receiver points in x-/y-coordinate units";
-	public static final String WRITE_OUTPUT_ITERATION_CMT = "Specifies how often the noise-specific output is written out.";
-	
-	public NoiseConfigGroup() {
+	private static final String RECEIVER_POINT_GAP_CMT = "horizontal and vertical distance between receiver points in x-/y-coordinate units";
+	private static final String WRITE_OUTPUT_ITERATION_CMT = "Specifies how often the noise-specific output is written out.";
+	private static final String CONSIDER_NOISE_BARRIERS = "considerNoiseBarriers";
+	private static final String NOISE_BARRIERS_GEOJSON_FILE = "noiseBarriersGeojsonPath";
+
+    public NoiseConfigGroup() {
 		super(GROUP_NAME);
 	}
 	
@@ -127,8 +129,12 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 	
 	private double noiseTollFactor = 1.0;
-	
-	// ########################################################################################################
+
+	private boolean considerNoiseBarriers = false;
+    private String noiseBarriersFilePath = null;
+
+
+    // ########################################################################################################
 	
 	@Override
 	public Map<String, String> getComments() {
@@ -176,6 +182,9 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 		comments.put(BUS_ID_IDENTIFIER, "Specifies the public transit vehicle ID identifiers. Buses are treated as HGV, other public transit vehicles are neglected." ) ;
 
 		comments.put(NOISE_TOLL_FACTOR, "To be used for sensitivity analysis. Default: 1.0 (= the parameter has no effect)" ) ;
+
+		comments.put(CONSIDER_NOISE_BARRIERS, "Set to 'true' if noise barriers / building shielding should be considered. Otherwise set to 'false'.");
+        comments.put(NOISE_BARRIERS_GEOJSON_FILE, "Path to the geojson file for noise barriers.");
 
 		return comments;
 	}
@@ -318,6 +327,13 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 					+ " 20 km/h or 10 km/h may still result in an 'okay' estimate of the traffic noise. However, 1 km/h or lower speeds will definitly make no sense."
 					+ " It is therefore recommended not to use speeds outside of the range of valid parameters!");
 		}
+
+		if(this.considerNoiseBarriers) {
+		    if(this.noiseBarriersFilePath == null || "".equals(this.noiseBarriersFilePath)) {
+		        log.warn("Cannot consider noise barriers without a specified file path to the geojson file of barriers / buildings.");
+		        this.considerNoiseBarriers = false;
+            }
+        }
 	}
 
 	// ########################################################################################################
@@ -725,5 +741,25 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	public URL getTunnelLinkIDsFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.getTunnelLinkIdFile());
 	}
+
+	@StringGetter(CONSIDER_NOISE_BARRIERS)
+	public boolean isConsiderNoiseBarriers() {
+		return this.considerNoiseBarriers;
+	}
+
+	@StringSetter(CONSIDER_NOISE_BARRIERS)
+	public void setConsiderNoiseBarriers(boolean considerNoiseBarriers) {
+		this.considerNoiseBarriers = considerNoiseBarriers;
+	}
+
+    @StringGetter(NOISE_BARRIERS_GEOJSON_FILE)
+    public String getNoiseBarriersFilePath() {
+        return this.noiseBarriersFilePath;
+    }
+
+    @StringSetter(NOISE_BARRIERS_GEOJSON_FILE)
+    public void setConsiderNoiseBarriers(String noiseBarriersFilePath) {
+        this.noiseBarriersFilePath = noiseBarriersFilePath;
+    }
 	
 }

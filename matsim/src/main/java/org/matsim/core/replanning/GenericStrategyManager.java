@@ -209,7 +209,7 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 			GenericPlanStrategy<PL, AG> strategy = this.chooseStrategy(person, subpopName);
 
 			if (strategy==null) {
-				throw new RuntimeException("No strategy found! Have you defined at least one replanning strategy per subpopulation?");
+				throw new RuntimeException("No strategy found! Have you defined at least one replanning strategy per subpopulation? Current subpopulation = " + subpopName);
 			}
 			
 			// ... and run the strategy:

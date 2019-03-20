@@ -18,10 +18,17 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility.utils;
 
-import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Envelope;
 import org.matsim.contrib.accessibility.Labels;
-import org.matsim.contrib.analysis.vsp.qgis.*;
+import org.matsim.contrib.analysis.vsp.qgis.GraduatedSymbolRenderer;
+import org.matsim.contrib.analysis.vsp.qgis.PolygonLayerRenderer;
+import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
+import org.matsim.contrib.analysis.vsp.qgis.QGisMapnikFileCreator;
+import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
+import org.matsim.contrib.analysis.vsp.qgis.RasterLayer;
+import org.matsim.contrib.analysis.vsp.qgis.RendererFactory;
+import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityXmlRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.utils.ColorRangeUtils;
 import org.matsim.core.utils.misc.ExeRunner;

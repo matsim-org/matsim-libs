@@ -19,25 +19,6 @@
 
 package org.matsim.core.network.algorithms.intersectionSimplifier.containers;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineSegment;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.operation.linemerge.LineMerger;
-import com.vividsolutions.jts.triangulate.DelaunayTriangulationBuilder;
-import com.vividsolutions.jts.triangulate.quadedge.QuadEdge;
-import com.vividsolutions.jts.triangulate.quadedge.QuadEdgeSubdivision;
-import com.vividsolutions.jts.triangulate.quadedge.QuadEdgeTriangle;
-import com.vividsolutions.jts.triangulate.quadedge.Vertex;
-import com.vividsolutions.jts.util.UniqueCoordinateArrayFilter;
-import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.IOUtils;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -48,6 +29,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryCollection;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineSegment;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.operation.linemerge.LineMerger;
+import org.locationtech.jts.triangulate.DelaunayTriangulationBuilder;
+import org.locationtech.jts.triangulate.quadedge.QuadEdge;
+import org.locationtech.jts.triangulate.quadedge.QuadEdgeSubdivision;
+import org.locationtech.jts.triangulate.quadedge.QuadEdgeTriangle;
+import org.locationtech.jts.triangulate.quadedge.Vertex;
+import org.locationtech.jts.util.UniqueCoordinateArrayFilter;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Class to generate the concave hull from a set of given points. The algorithm 

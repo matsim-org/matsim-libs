@@ -39,7 +39,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
@@ -51,10 +51,10 @@ import org.matsim.contrib.util.chart.CoordDataset.CoordSource;
  * @author michalm
  */
 public class RouteCharts {
-	public static JFreeChart chartRoutes(Collection<? extends Vehicle> vehicles) {
+	public static JFreeChart chartRoutes(Collection<? extends DvrpVehicle> vehicles) {
 		CoordDataset lData = new CoordDataset();
 		int i = 0;
-		for (Vehicle v : vehicles) {
+		for (DvrpVehicle v : vehicles) {
 			Schedule schedule = v.getSchedule();
 			lData.addSeries(Integer.toString(i++), ScheduleCoordSources.createCoordSource(schedule));
 		}
@@ -90,7 +90,7 @@ public class RouteCharts {
 		return chart;
 	}
 
-	public static JFreeChart chartRoutesByStatus(List<? extends Vehicle> vehicles) {
+	public static JFreeChart chartRoutesByStatus(List<? extends DvrpVehicle> vehicles) {
 		CoordDataset nData = new CoordDataset();
 
 		for (int i = 0; i < vehicles.size(); i++) {

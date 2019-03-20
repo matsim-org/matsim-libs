@@ -19,9 +19,6 @@
 
 package org.matsim.contrib.accessibility.utils;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
@@ -32,6 +29,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author dziemke
@@ -143,7 +143,7 @@ public class AccessibilityOsmNetworkReader {
 		if (osmFileName != null && osmInputStream == null) {
 			osmNetworkReader.parse(osmFileName);
 		} else if (osmFileName == null && osmInputStream != null) {
-			osmNetworkReader.parse(osmInputStream); 
+			osmNetworkReader.parse(() -> osmInputStream);
 		} else {
 			throw new IllegalArgumentException("Either the input stream OR the input file should be defined, but not both.");
 		}

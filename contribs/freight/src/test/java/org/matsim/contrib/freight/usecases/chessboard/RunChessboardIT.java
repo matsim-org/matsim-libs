@@ -16,11 +16,14 @@ public class RunChessboardIT {
     public void runChessboard() {
         try{
             RunChessboard abc = new RunChessboard();
+            // ---
             Config config = abc.prepareConfig();
             config.controler().setLastIteration( 1 );
             config.controler().setOutputDirectory( utils.getOutputDirectory() );
+            // ---
             abc.run();
         } catch (Exception ee ) {
+            ee.printStackTrace();
             Assert.fail("something went wrong");
         }
     }

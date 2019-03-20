@@ -23,6 +23,7 @@ package org.matsim.core.scoring.functions;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -42,16 +43,18 @@ import javax.inject.Inject;
  */
 public final class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 
-	protected Network network;
+	private final Config config;
+	private Network network;
 
 	private final ScoringParametersForPerson params;
 
 	public CharyparNagelScoringFunctionFactory( final Scenario sc ) {
-		this( new SubpopulationScoringParameters( sc ) , sc.getNetwork() );
+		this( sc.getConfig(), new SubpopulationScoringParameters( sc ) , sc.getNetwork() );
 	}
 
 	@Inject
-	CharyparNagelScoringFunctionFactory(final ScoringParametersForPerson params, Network network) {
+	CharyparNagelScoringFunctionFactory(Config config, ScoringParametersForPerson params, Network network) {
+		this.config = config;
 		this.params = params;
 		this.network = network;
 	}
@@ -81,7 +84,7 @@ public final class CharyparNagelScoringFunctionFactory implements ScoringFunctio
 
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
 		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring( parameters ));
-		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring( parameters , this.network));
+		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring( parameters , this.network, config.transit().getTransitModes() ));
 		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring( parameters ));
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring( parameters ));
 		return sumScoringFunction;

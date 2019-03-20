@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;

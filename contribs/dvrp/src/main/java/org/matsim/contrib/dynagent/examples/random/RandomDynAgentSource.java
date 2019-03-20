@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.dynagent.examples.random;
 
-import javax.inject.Inject;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -34,6 +32,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
+
+import javax.inject.Inject;
 
 public class RandomDynAgentSource implements AgentSource {
 	private static final int AGENT_COUNT = 100;
@@ -49,7 +49,7 @@ public class RandomDynAgentSource implements AgentSource {
 	public void insertAgentsIntoMobsim() {
 		Scenario scenario = qSim.getScenario();
 		Network network = scenario.getNetwork();
-		VehiclesFactory qSimVehicleFactory = VehicleUtils.getFactory();
+		VehiclesFactory qSimVehicleFactory = scenario.getVehicles().getFactory();
 
 		for (int i = 0; i < AGENT_COUNT; i++) {
 			RandomDynAgentLogic agentLogic = new RandomDynAgentLogic(network);

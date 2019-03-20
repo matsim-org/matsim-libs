@@ -25,10 +25,9 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Envelope;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.facilities.ActivityFacilities;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * @author thomas, nagel, dziemke

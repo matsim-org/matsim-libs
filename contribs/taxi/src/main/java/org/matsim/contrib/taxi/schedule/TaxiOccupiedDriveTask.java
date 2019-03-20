@@ -21,7 +21,7 @@ package org.matsim.contrib.taxi.schedule;
 
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
 public class TaxiOccupiedDriveTask extends DriveTaskImpl implements TaxiTask {
 	public TaxiOccupiedDriveTask(VrpPathWithTravelData path, TaxiRequest request) {

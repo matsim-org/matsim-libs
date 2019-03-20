@@ -1,21 +1,10 @@
 package org.matsim.contrib.freight.usecases.chessboard;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Map;
-
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.Freight;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.controler.CarrierModule;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
@@ -25,6 +14,7 @@ import org.matsim.contrib.freight.usecases.analysis.LegHistogram;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversActivityScoring;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversLegScoring;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.VehicleEmploymentScoring;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -32,6 +22,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
@@ -40,53 +31,71 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
 import javax.inject.Inject;
+import java.io.File;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Map;
 
 public final class RunChessboard {
 
-    Config config ;
+    private Config config ;
+    private Scenario scenario ;
 
     public static void main(String[] args){
         new RunChessboard().run();
     }
 
     public void run() {
-        if ( config==null ) {
-            prepareConfig() ;
+        run(null,null) ;
+    }
+
+    public void run( Collection<AbstractModule> controlerModules, Collection<AbstractQSimModule> qsimModules ) {
+        if ( scenario==null ) {
+            prepareScenario() ;
         }
 
-        Controler controler = new Controler(config);
-
+        // yyyy from here ...
         final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 
-        final Carriers carriers = new Carriers();
-        final URL carrierPlansURL = IOUtils.newUrl(url, "carrierPlans.xml");
-        new CarrierPlanXmlReaderV2(carriers).readURL(carrierPlansURL);
+        final Carriers carriers = FreightUtils.getCarriers( scenario ) ;
+        new CarrierPlanXmlReaderV2(carriers).readURL( IOUtils.newUrl(url, "carrierPlans.xml" ) );
 
         final CarrierVehicleTypes types = new CarrierVehicleTypes();
-
-        final URL vehTypesURL = IOUtils.newUrl(url, "vehicleTypes.xml");
-        new CarrierVehicleTypeReader(types).readURL(vehTypesURL);
+        new CarrierVehicleTypeReader(types).readURL( IOUtils.newUrl(url, "vehicleTypes.xml" ) );
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
+        // ... to here should really be done in prepareScenario.  kai, feb'19
 
-        final CarrierPlanStrategyManagerFactory strategyManagerFactory = new MyCarrierPlanStrategyManagerFactory(types);
-        final CarrierScoringFunctionFactory scoringFunctionFactory = new MyCarrierScoringFunctionFactory();
+        Controler controler = new Controler(scenario);
+
+        if ( controlerModules!=null ){
+            for( AbstractModule abstractModule : controlerModules ){
+                controler.addOverridingModule( abstractModule ) ;
+            }
+        }
+        if ( qsimModules!=null ) {
+            for( AbstractQSimModule qsimModule : qsimModules ){
+                controler.addOverridingQSimModule( qsimModule ) ;
+            }
+        }
+
 
         Freight.configure( controler );
 
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-//                CarrierModule carrierModule = new CarrierModule(carriers);
-//                carrierModule.setPhysicallyEnforceTimeWindowBeginnings(true);
-//                install(carrierModule);
-                bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);
-                bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
+                //                CarrierModule carrierModule = new CarrierModule(carriers);
+                //                carrierModule.setPhysicallyEnforceTimeWindowBeginnings(true);
+                //                install(carrierModule);
+                bind(CarrierPlanStrategyManagerFactory.class).toInstance( new MyCarrierPlanStrategyManagerFactory(types) );
+                bind(CarrierScoringFunctionFactory.class).toInstance( new MyCarrierScoringFunctionFactory() );
             }
         });
         controler.addOverridingModule(new AbstractModule() {
@@ -130,7 +139,15 @@ public final class RunChessboard {
 
     }
 
-    public Config prepareConfig(){
+    public final Scenario prepareScenario() {
+        if ( config==null ) {
+            prepareConfig() ;
+        }
+        scenario = ScenarioUtils.loadScenario( config ) ;
+        return scenario ;
+    }
+
+    public final Config prepareConfig(){
         final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
         final URL configURL = IOUtils.newUrl(url, "config.xml");
         config = ConfigUtils.loadConfig(configURL  );

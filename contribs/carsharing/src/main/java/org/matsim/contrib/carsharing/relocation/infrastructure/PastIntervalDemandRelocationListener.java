@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.MultiPolygon;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -38,7 +39,6 @@ import org.matsim.matrices.Matrix;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class PastIntervalDemandRelocationListener implements IterationStartsListener, DispatchRelocationsEventHandler {
 

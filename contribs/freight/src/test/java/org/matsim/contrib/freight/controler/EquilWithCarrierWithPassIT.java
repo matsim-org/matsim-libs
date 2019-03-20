@@ -34,6 +34,7 @@ import org.matsim.contrib.freight.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -80,7 +81,7 @@ public class EquilWithCarrierWithPassIT {
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 		Carriers carriers = new Carriers();
 		new CarrierPlanXmlReaderV2(carriers).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
-		scenario.addScenarioElement( Freight.CARRIERS, carriers );
+		scenario.addScenarioElement( FreightUtils.CARRIERS, carriers );
 
 		controler = new Controler(scenario);
 		controler.getConfig().controler().setWriteEventsInterval(1);

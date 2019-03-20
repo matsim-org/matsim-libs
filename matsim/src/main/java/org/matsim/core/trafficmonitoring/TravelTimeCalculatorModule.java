@@ -56,8 +56,9 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 						+ "but I cannot say if it would be picked up correctly by downstream modules.  kai, nov'16") ;
 			}			
 			// go through all modes:
-			for (final String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
-				
+			//			for (final String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModesAsString() )) {
+			for (final String mode : getConfig().plansCalcRoute().getNetworkModes() ) {
+
 				// generate and bind the observer:
 				bind(TravelTimeCalculator.class).annotatedWith(Names.named(mode)).toProvider(new SingleModeTravelTimeCalculatorProvider(mode)).in(Singleton.class);
 
@@ -68,6 +69,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 						return injector.getInstance(Key.get(TravelTimeCalculator.class, Names.named(mode))).getLinkTravelTimes();
 					}
 				});
+
 			}
 		} else {
 			// (all analyzed modes are measured together, and the same result is returned to each mode)
@@ -77,7 +79,8 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 			
 			// bind the TravelTime objects.  In this case, this just passes on the same information from TravelTimeCalculator to each individual mode:
 			if (getConfig().travelTimeCalculator().isCalculateLinkTravelTimes()) {
-				for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
+//				for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModesAsString() )) {
+				for ( String mode : getConfig().plansCalcRoute().getNetworkModes() ) {
 					addTravelTimeBinding(mode).toProvider(ObservedLinkTravelTimes.class);
 				}
 			}
@@ -85,6 +88,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 				bind(LinkToLinkTravelTime.class).toProvider(ObservedLinkToLinkTravelTimes.class);
 			}
 		}
+
 	}
 
 	private static class SingleModeTravelTimeCalculatorProvider implements Provider<TravelTimeCalculator> {
@@ -101,11 +105,45 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
 		@Override
 		public TravelTimeCalculator get() {
-			TravelTimeCalculator calculator = new TravelTimeCalculator(network, config.getTraveltimeBinSize(), config.getMaxTime(), 
-					config.isCalculateLinkTravelTimes(), config.isCalculateLinkToLinkTravelTimes(), true, CollectionUtils.stringToSet(mode));
-			eventsManager.addHandler(calculator);
-			return TravelTimeCalculator.configure(calculator, config, network);
+//			TravelTimeCalculator calculator = new TravelTimeCalculator(network, config.getTraveltimeBinSize(), config.getMaxTime(),
+//					config.isCalculateLinkTravelTimes(), config.isCalculateLinkToLinkTravelTimes(), true, CollectionUtils.stringToSet(mode));
+//			eventsManager.addHandler(calculator);
+//			return TravelTimeCalculator.configure(calculator, config, network);
+			TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder( network );
+			builder.setTimeslice( config.getTraveltimeBinSize() );
+			builder.setMaxTime( config.getMaxTime() );
+			builder.setCalculateLinkTravelTimes( config.isCalculateLinkTravelTimes() );
+			builder.setCalculateLinkToLinkTravelTimes( config.isCalculateLinkToLinkTravelTimes() );
+			builder.setFilterModes( true ); // no point asking the config since we are in "separateModes" anyways.
+			builder.setAnalyzedModes( CollectionUtils.stringToSet( mode ) );
+			builder.configure( config );
+			TravelTimeCalculator calculator = builder.build();
+			eventsManager.addHandler( calculator );
+			return calculator ;
 		}
 	}
 
+	private static class ObservedLinkTravelTimes implements Provider<TravelTime> {
+
+		@Inject
+		TravelTimeCalculator travelTimeCalculator;
+
+		@Override
+		public TravelTime get() {
+			return travelTimeCalculator.getLinkTravelTimes();
+		}
+
+	}
+
+	private static class ObservedLinkToLinkTravelTimes implements Provider<LinkToLinkTravelTime> {
+
+		@Inject
+		TravelTimeCalculator travelTimeCalculator;
+
+		@Override
+		public LinkToLinkTravelTime get() {
+			return travelTimeCalculator.getLinkToLinkTravelTimes();
+		}
+
+	}
 }

@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
@@ -22,6 +23,9 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -33,7 +37,7 @@ public class TravelTimeCalculatorModuleTest {
 	@Test
 	public void testOneTravelTimeCalculatorForAll() {
 		Config config = ConfigUtils.createConfig();
-		config.travelTimeCalculator().setAnalyzedModes("car,bike");
+		config.travelTimeCalculator().setSeparateModes(false);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Node node0 = scenario.getNetwork().getFactory().createNode(Id.createNodeId(0), new Coord(0, 0));
 		Node node1 = scenario.getNetwork().getFactory().createNode(Id.createNodeId(1), new Coord(1, 0));
@@ -55,14 +59,18 @@ public class TravelTimeCalculatorModuleTest {
 		events.processEvent(new LinkLeaveEvent(8.0, Id.createVehicleId(1), linkId));
 		events.processEvent(new VehicleLeavesTrafficEvent(8.0, Id.createPersonId(1), linkId, Id.createVehicleId(1), "bike", 0.0));
 
-		assertThat(testee.getLinkTravelTime(link, 0.0), is(5.0));
+		assertThat(testee.getLinkTravelTimes().getLinkTravelTime(link, 0.0,null,null), is(5.0));
 	}
 
 
 	@Test
 	public void testOneTravelTimeCalculatorPerMode() {
 		Config config = ConfigUtils.createConfig();
-		config.travelTimeCalculator().setAnalyzedModes("car,bike");
+
+//		config.travelTimeCalculator().setAnalyzedModesAsString("car,bike" );
+		config.plansCalcRoute().setNetworkModes( new LinkedHashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ) ) );
+		// (this is now newly taken from the router network modes. kai, feb'19)
+
 		config.travelTimeCalculator().setSeparateModes(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Node node0 = scenario.getNetwork().getFactory().createNode(Id.createNodeId(0), new Coord(0, 0));
@@ -86,8 +94,8 @@ public class TravelTimeCalculatorModuleTest {
 		events.processEvent(new LinkLeaveEvent(8.0, Id.createVehicleId(1), linkId));
 		events.processEvent(new VehicleLeavesTrafficEvent(8.0, Id.createPersonId(1), linkId, Id.createVehicleId(1), "bike", 0.0));
 
-		assertThat(car.getLinkTravelTime(link, 0.0), is(2.0));
-		assertThat(bike.getLinkTravelTime(link, 0.0), is(8.0));
+		assertThat(car.getLinkTravelTimes().getLinkTravelTime(link, 0.0, null, null ), is(2.0));
+		assertThat(bike.getLinkTravelTimes().getLinkTravelTime(link, 0.0, null, null ), is(8.0));
 	}
 
 }

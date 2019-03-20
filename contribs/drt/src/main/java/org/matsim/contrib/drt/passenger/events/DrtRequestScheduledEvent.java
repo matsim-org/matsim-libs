@@ -23,8 +23,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * @author michalm
@@ -40,11 +40,11 @@ public class DrtRequestScheduledEvent extends Event {
 
 	private final String mode;
 	private final Id<Request> requestId;
-	private final Id<Vehicle> vehicleId;
+	private final Id<DvrpVehicle> vehicleId;
 	private final double pickupTime;
 	private final double dropoffTime;
 
-	public DrtRequestScheduledEvent(double time, String mode, Id<Request> requestId, Id<Vehicle> vehicleId,
+	public DrtRequestScheduledEvent(double time, String mode, Id<Request> requestId, Id<DvrpVehicle> vehicleId,
 			double pickupTime, double dropoffTime) {
 		super(time);
 		this.mode = mode;
@@ -73,7 +73,7 @@ public class DrtRequestScheduledEvent extends Event {
 	/**
 	 * the vehicle scheduled to the request
 	 */
-	public Id<Vehicle> getVehicleId() {
+	public Id<DvrpVehicle> getVehicleId() {
 		return vehicleId;
 	}
 

@@ -94,7 +94,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 			Node endNode = toLink.getFromNode(); // the target is the start of the link
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, departureTime, person, null);
 			if (path == null)
-				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + " by mode " + this.mode + ".");
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime(path.travelTime);

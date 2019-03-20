@@ -56,10 +56,7 @@ import org.matsim.run.CreateFullConfig;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Stores all configuration settings specified in a configuration file and
@@ -534,6 +531,12 @@ public final class Config implements MatsimExtensionPoint {
 		} else {
 			log.info( "ConfigConsistencyChecker with runtime type=" + checker.getClass() + " was already added; not adding it a second time" ) ;
 		}
+	}
+
+	public void removeConfigConsistencyChecker( final Class clazz ) {
+		// I am not saying that I like this.  But I would like to be able to check config consistency before the iterator is created, but by then we still have
+		// unmaterialized config groups, and so I need to remove that checker at that point.  Maybe we can sort this in some different way ...
+		consistencyCheckers.removeIf( ch -> ch.getClass().equals( clazz ) );
 	}
 
 	public final boolean isLocked() {

@@ -39,6 +39,7 @@ public class DvrpBenchmarkModule extends AbstractModule {
 	public void install() {
 		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
 				.toInstance(VehicleUtils.getDefaultVehicleType());
+
 		install(new DvrpBenchmarkTravelTimeModule());// fixed travel times
 
 		bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))

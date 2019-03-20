@@ -18,11 +18,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,7 +54,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehiclesFactory;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A test to check the functionality of the VehicleSource.
@@ -200,12 +200,13 @@ public class VehicleSourceTest {
 	private void createPlans(){
 
 		Population population = scenario.getPopulation();
+		VehiclesFactory vehiclesFactory = scenario.getVehicles().getFactory();
 
-		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create(transportModes[0], VehicleType.class));
+		VehicleType bike = vehiclesFactory.createVehicleType(Id.create(transportModes[0], VehicleType.class));
 		bike.setMaximumVelocity(5);
 		bike.setPcuEquivalents(0.25);
 
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(transportModes[1], VehicleType.class));
+		VehicleType car = vehiclesFactory.createVehicleType(Id.create(transportModes[1], VehicleType.class));
 		car.setMaximumVelocity(20);
 		car.setPcuEquivalents(1.0);
 
@@ -249,7 +250,7 @@ public class VehicleSourceTest {
 					}
 
 					Id<Vehicle> vId = Id.create(p.getId(),Vehicle.class);
-					Vehicle v = VehicleUtils.getFactory().createVehicle(vId, vehTypes[i]);
+					Vehicle v = vehiclesFactory.createVehicle(vId, vehTypes[i]);
 					scenario.getVehicles().addVehicle(v);
 
 					break;

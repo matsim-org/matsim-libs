@@ -111,13 +111,13 @@ public final class NetworkWriteAsTable implements NetworkRunnable {
 				out_l.write(tc.getX() + "\t" + tc.getY() + "\t" + l.getLength() + "\t");
 				out_l.write(l.getFreespeed()+"\t"
 						+(l.getCapacity()/capperiod)+"\t"
-						+ NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, l)+"\t"
+						+ NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), l)+"\t"
 						+l.getAllowedModes().toString()+"\n");
 				out_l.flush();
 
 				out_et.write(l.getId() + "\t" + l.getFromNode().getId() + "\t" + l.getToNode().getId() + "\t");
 				out_et.write(Math.round(l.getLength()) + "\t" + Math.round(l.getFreespeed()*3.6) + "\t");
-				out_et.write(Math.round(l.getCapacity()/capperiod) + "\t" + NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, l) + "\t");
+				out_et.write(Math.round(l.getCapacity()/capperiod) + "\t" + NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), l) + "\t");
 				out_et.write(NetworkUtils.getOrigId( ((Link) l) ) + "\t" + NetworkUtils.getType(((Link) l)) + "\t"+l.getAllowedModes().toString()+"\n");
 				out_et.write(fc.getX() + "\t" + fc.getY() + "\n");
 				out_et.write(tc.getX() + "\t" + tc.getY() + "\n");

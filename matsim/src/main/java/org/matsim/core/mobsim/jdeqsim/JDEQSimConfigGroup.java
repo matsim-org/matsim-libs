@@ -93,7 +93,7 @@ public class JDEQSimConfigGroup extends ReflectiveConfigGroup {
 			return Time.writeTime(simulationEndTime);
 		}
 		else {
-			return Time.writeTime(Time.UNDEFINED_TIME);
+			return Time.writeTime(Time.getUndefinedTime());
 		}
 	}
 

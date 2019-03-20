@@ -24,13 +24,12 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
@@ -77,7 +76,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 			// TODO update timeline only if the algo really wants to reschedule in this time step,
 			// perhaps by checking if there are any unplanned requests??
 			if (params.doUpdateTimelines) {
-				for (Vehicle v : fleet.getVehicles().values()) {
+				for (DvrpVehicle v : fleet.getVehicles().values()) {
 					scheduler.updateTimeline(v);
 				}
 			}
@@ -117,7 +116,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	}
 
 	@Override
-	public void nextTask(Vehicle vehicle) {
+	public void nextTask(DvrpVehicle vehicle) {
 		scheduler.updateBeforeNextTask(vehicle);
 
 		Task newCurrentTask = vehicle.getSchedule().nextTask();
@@ -129,15 +128,6 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 
 	protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask) {
 		return !destinationKnown && newCurrentTask.getTaxiTaskType() == TaxiTaskType.OCCUPIED_DRIVE;
-	}
-
-	@Override
-	public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
-		// TODO do we really need this??? timeline is updated always before reoptimisation
-		scheduler.updateTimeline(vehicle);// TODO comment this out...
-
-		// TODO we may here possibly decide whether or not to reoptimize
-		// if (delays/speedups encountered) {requiresReoptimization = true;}
 	}
 
 	protected void setRequiresReoptimization(boolean requiresReoptimization) {

@@ -14,6 +14,6 @@
 <!ATTLIST charger
 	id       CDATA   #REQUIRED
 	link     CDATA   #REQUIRED
-	power    CDATA   #IMPLIED
-		capacity CDATA   #IMPLIED
-		type     CDATA     #IMPLIED >
+		power    CDATA   #REQUIRED
+		capacity CDATA   #REQUIRED
+		type     CDATA   #IMPLIED >

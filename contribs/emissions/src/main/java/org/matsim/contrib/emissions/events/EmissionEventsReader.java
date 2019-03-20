@@ -47,6 +47,8 @@ import static org.matsim.core.events.EventsReaderXMLv1.*;
  *
  */
 public final class EmissionEventsReader implements MatsimReader {
+	// leave this public so that external code can generate "standard" emission events. MATSIM-893
+
 
 	private MatsimEventsReader delegate ;
 

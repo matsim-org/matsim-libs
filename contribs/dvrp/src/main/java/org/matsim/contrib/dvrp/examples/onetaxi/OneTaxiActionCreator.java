@@ -20,20 +20,19 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.IdleDynActivity;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import com.google.inject.Inject;
@@ -55,7 +54,7 @@ final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	}
 
 	@Override
-	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
+	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
 		Task task = vehicle.getSchedule().getCurrentTask();
 		if (task instanceof DriveTask) {
 			return VrpLegFactory.createWithOfflineTracker(mobsimMode, vehicle, timer);
@@ -64,13 +63,13 @@ final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 
 			if (serveTask.isPickup()) {
 				return new SinglePassengerPickupActivity(passengerEngine, dynAgent, serveTask, serveTask.getRequest(),
-						OneTaxiOptimizer.PICKUP_DURATION, "OneTaxiPickup");
+						"OneTaxiPickup");
 			} else {
 				return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, serveTask, serveTask.getRequest(),
 						"OneTaxiDropoff");
 			}
 		} else { // WAIT
-			return new VrpActivity("OneTaxiStay", (StayTask)task);
+			return new IdleDynActivity("OneTaxiStay", task::getEndTime);
 		}
 	}
 }

@@ -41,7 +41,6 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.core.population.algorithms.PlanMutateTimeAllocationSimplified;
 import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
-import org.matsim.core.replanning.strategies.TimeAllocationMutatorModule;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -177,7 +176,7 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 			if (diff > maxDiff1) maxDiff1 = diff;
 			if (diff < minDiff1) minDiff1 = diff;
 			act1Dur = act1.getMaximumDuration();
-			if (act1Dur != Time.UNDEFINED_TIME) {
+			if (!Time.isUndefinedTime(act1Dur)) {
 				assertTrue("activity duration cannot be smaller than 0, is " + act1Dur, act1Dur >= 0.0);
 			}
 			// test duration of act2
@@ -185,7 +184,7 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 			if (diff > maxDiff2) maxDiff2 = diff;
 			if (diff < minDiff2) minDiff2 = diff;
 			act2Dur = act2.getMaximumDuration();
-			if (act2Dur != Time.UNDEFINED_TIME) {
+			if (!Time.isUndefinedTime(act2Dur)) {
 				assertTrue("activity duration cannot be smaller than 0, is " + act2Dur, act2Dur >= 0.0);
 			}
 		}
@@ -262,7 +261,7 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 			if (diff > maxDiff1) maxDiff1 = diff;
 			if (diff < minDiff1) minDiff1 = diff;
 			act1End = act1.getEndTime();
-			if (act1End != Time.UNDEFINED_TIME) {
+			if (!Time.isUndefinedTime(act1End)) {
 				assertTrue("activity end time cannot be smaller than 0, is " + act1End, act1End >= 0.0);
 			}
 			// test end time of act2
@@ -270,7 +269,7 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 			if (diff > maxDiff2) maxDiff2 = diff;
 			if (diff < minDiff2) minDiff2 = diff;
 			act2Dur = act2.getMaximumDuration();
-			if (act2Dur != Time.UNDEFINED_TIME) {
+			if (!Time.isUndefinedTime(act2Dur)) {
 				assertTrue("activity duration cannot be smaller than 0, is " + act2Dur, act2Dur >= 0.0);
 			}
 		}

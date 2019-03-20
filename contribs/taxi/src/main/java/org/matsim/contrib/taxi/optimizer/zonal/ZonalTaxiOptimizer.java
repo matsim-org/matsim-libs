@@ -20,7 +20,7 @@
 package org.matsim.contrib.taxi.optimizer.zonal;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.taxi.optimizer.rules.IdleTaxiZonalRegistry;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.rules.UnplannedRequestZonalRegistry;

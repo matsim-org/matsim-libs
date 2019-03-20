@@ -44,7 +44,8 @@ public interface Population extends MatsimToplevelContainer, Attributable {
 	public void addPerson(final Person p);
 	
 	public Person removePerson( final Id<Person> personId ) ;
-	
+
+	@Deprecated // I think that this should be phased out; use Attributable inside ActivityFacility.  kai, mar'19
 	public ObjectAttributes getPersonAttributes();
 
 }
