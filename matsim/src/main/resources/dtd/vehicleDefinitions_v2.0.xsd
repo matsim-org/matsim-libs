@@ -17,7 +17,6 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-
   <xs:complexType name="vehicleTypeType">
     <xs:complexContent>
       <xs:extension base="matsimObjectType">
@@ -48,24 +47,29 @@
           </xs:element>
           <xs:element name="engineInformation" type="engineInformationType" minOccurs="0" maxOccurs="1" />
           <xs:element name="costsInformation" type="costInformationType" minOccurs="0" maxOccurs="1" />
-          <xs:element name="accessTime" minOccurs="0" maxOccurs="1">
-            <xs:complexType>
-              <xs:attribute name="secondsPerPerson" type="xs:decimal" default="1.0"></xs:attribute>
-            </xs:complexType>
-          </xs:element>
-          <xs:element name="egressTime" minOccurs="0" maxOccurs="1">
-            <xs:complexType>
-              <xs:attribute name="secondsPerPerson" type="xs:decimal" default="1.0"></xs:attribute>
-            </xs:complexType>
-          </xs:element>
-          <xs:element name="doorOperation" minOccurs="0" maxOccurs="1">
-            <xs:complexType>
-              <xs:attribute name="mode" type="doorOperationModeType" default="serial"/>
-            </xs:complexType>
-          </xs:element>
+          <!--<xs:element name="accessTime" minOccurs="0" maxOccurs="1">-->
+            <!--<xs:complexType>-->
+              <!--<xs:attribute name="secondsPerPerson" type="xs:decimal" default="1.0"></xs:attribute>-->
+            <!--</xs:complexType>-->
+          <!--</xs:element>-->
+          <!--<xs:element name="egressTime" minOccurs="0" maxOccurs="1">-->
+            <!--<xs:complexType>-->
+              <!--<xs:attribute name="secondsPerPerson" type="xs:decimal" default="1.0"></xs:attribute>-->
+            <!--</xs:complexType>-->
+          <!--</xs:element>-->
+          <!--<xs:element name="doorOperation" minOccurs="0" maxOccurs="1">-->
+            <!--<xs:complexType>-->
+              <!--<xs:attribute name="mode" type="doorOperationModeType" default="serial"/>-->
+            <!--</xs:complexType>-->
+          <!--</xs:element>-->
           <xs:element name="passengerCarEquivalents" minOccurs="0" maxOccurs="1">
             <xs:complexType>
               <xs:attribute name="pce" type="xs:decimal" default="1.0"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="flowEfficiencyFactor" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:attribute name="fef" type="xs:decimal" default="1.0"/>
             </xs:complexType>
           </xs:element>
         </xs:sequence>
@@ -99,11 +103,11 @@
                 <xs:attribute name="tons" type="xs:double"/>
               </xs:complexType>
             </xs:element>
-            <xs:element name="unit" minOccurs="0" maxOccurs="1">
-              <xs:complexType>
-                <xs:attribute name="units" type="xs:nonNegativeInteger"/>
-              </xs:complexType>
-            </xs:element>
+            <!--<xs:element name="unit" minOccurs="0" maxOccurs="1">-->
+              <!--<xs:complexType>-->
+                <!--<xs:attribute name="units" type="xs:nonNegativeInteger"/>-->
+              <!--</xs:complexType>-->
+            <!--</xs:element>-->
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -114,12 +118,12 @@
     <xs:sequence>
       <xs:element name="fuelType" type="fuelTypeType" minOccurs="1" maxOccurs="1">
       </xs:element>
-      <xs:element name="gasConsumption" minOccurs="1" maxOccurs="1">
-        <xs:complexType>
-          <xs:attribute name="literPerMeter" type="xs:decimal">
-          </xs:attribute>
-        </xs:complexType>
-      </xs:element>
+      <!--<xs:element name="gasConsumption" minOccurs="1" maxOccurs="1">-->
+        <!--<xs:complexType>-->
+          <!--<xs:attribute name="literPerMeter" type="xs:decimal">-->
+          <!--</xs:attribute>-->
+        <!--</xs:complexType>-->
+      <!--</xs:element>-->
     </xs:sequence>
   </xs:complexType>
 
@@ -127,7 +131,7 @@
     <xs:sequence>
       <xs:element name="costInformation" minOccurs="1" maxOccurs="1">
         <xs:complexType>
-          <xs:attribute name="fixedCosts" type="xs:decimal">
+          <xs:attribute name="fixedCostsPerDay" type="xs:decimal">
           </xs:attribute>
           <xs:attribute name="costsPerMeter" type="xs:decimal">
           </xs:attribute>
