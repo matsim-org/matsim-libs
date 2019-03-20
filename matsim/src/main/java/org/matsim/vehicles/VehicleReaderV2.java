@@ -19,13 +19,15 @@ class VehicleReaderV2 extends MatsimXmlParser{
 	private FreightCapacity currentFreightCapacity = null;
 	private EngineInformation.FuelType currentFuelType = null;
 	private double currentGasConsumption = Double.NaN;
-	private double fixedCosts = Double.NaN;
+	private double fixedCostsPerDay = Double.NaN;
 	private double costsPerMeter = Double.NaN;
 	private double costsPerSecond = Double.NaN;
 
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
 		  new org.matsim.utils.objectattributes.attributable.Attributes();
+
+//	TODO: flowEfficiencyFactor fef (NEU)
 
 	public VehicleReaderV2( final Vehicles vehicles ){
 		log.info("Using " + this.getClass().getName());
@@ -43,9 +45,9 @@ class VehicleReaderV2 extends MatsimXmlParser{
 			this.currentFuelType = null;
 			this.currentGasConsumption = Double.NaN;
 		} else if( VehicleSchemaV2Names.COSTSINFORMATION.equalsIgnoreCase( name ) ){
-			CostInformation currentCostInformation = this.builder.createCostInformation(this.fixedCosts, this.costsPerMeter, this.costsPerSecond);
+			CostInformation currentCostInformation = this.builder.createCostInformation(this.fixedCostsPerDay, this.costsPerMeter, this.costsPerSecond);
 			this.currentVehType.setCostInformation(currentCostInformation);
-			this.fixedCosts = Double.NaN;
+			this.fixedCostsPerDay = Double.NaN;
 			this.costsPerMeter = Double.NaN;
 			this.costsPerSecond = Double.NaN;
 		} else if( VehicleSchemaV2Names.FUELTYPE.equalsIgnoreCase( name ) ){
@@ -59,10 +61,9 @@ class VehicleReaderV2 extends MatsimXmlParser{
 		} else if( VehicleSchemaV2Names.VEHICLETYPE.equalsIgnoreCase( name ) ){
 			this.vehicles.addVehicleType( this.currentVehType );
 			this.currentVehType = null;
-		} else if (name.equalsIgnoreCase( HouseholdsSchemaV10Names.ATTRIBUTES )) {
+		} else if (name.equalsIgnoreCase( VehicleSchemaV2Names.ATTRIBUTES )) {
 			this.currAttributes = null;
-		}
-		else if (name.equalsIgnoreCase(HouseholdsSchemaV10Names.ATTRIBUTE)) {
+		} else if (name.equalsIgnoreCase(VehicleSchemaV2Names.ATTRIBUTE)) {
 			this.attributesReader.endTag( name , content , context );
 		}
 
@@ -123,12 +124,12 @@ class VehicleReaderV2 extends MatsimXmlParser{
 			this.currentFreightCapacity.setUnits( Integer.parseInt( atts.getValue( VehicleSchemaV2Names.UNITS ) ) );
 
 		} else if( VehicleSchemaV2Names.COSTINFORMATION.equalsIgnoreCase( name ) ){
-			this.fixedCosts = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTS ) );
+			this.fixedCostsPerDay = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTS ) );
 			this.costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) );
 			this.costsPerSecond = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERSECOND ) );
 
 //		} else if( VehicleSchemaV2Names.FIXEDCOSTS.equalsIgnoreCase( name ) ){
-//			this.fixedCosts = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTS ) );
+//			this.fixedCostsPerDay = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTS ) );
 //		} else if( VehicleSchemaV2Names.COSTSPERMETER.equalsIgnoreCase( name ) ){
 //			this.costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) );
 //		} else if( VehicleSchemaV2Names.COSTSPERSECOND.equalsIgnoreCase( name ) ){
@@ -154,14 +155,13 @@ class VehicleReaderV2 extends MatsimXmlParser{
 			this.currentVehType.setDoorOperationMode( this.parseDoorOperationMode( atts.getValue( VehicleSchemaV2Names.MODE ) ) );
 		} else if( VehicleSchemaV2Names.PASSENGERCAREQUIVALENTS.equalsIgnoreCase( name ) ){
 			this.currentVehType.setPcuEquivalents( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.PCE ) ) );
-		} else if (name.equalsIgnoreCase(HouseholdsSchemaV10Names.ATTRIBUTES)) {
-//			if (context.peek().equalsIgnoreCase(HouseholdsSchemaV10Names.HOUSEHOLD)) {
+		} else if (name.equalsIgnoreCase(VehicleSchemaV2Names.ATTRIBUTES)) {
 			if (context.peek().equalsIgnoreCase(VehicleSchemaV2Names.VEHICLETYPE)) {
 				currAttributes = this.currentVehType.getAttributes();
 				attributesReader.startTag( name , atts , context, currAttributes );
 			}
 		}
-		else if (name.equalsIgnoreCase(HouseholdsSchemaV10Names.ATTRIBUTE)) {
+		else if (name.equalsIgnoreCase(VehicleSchemaV2Names.ATTRIBUTE)) {
 			attributesReader.startTag( name , atts , context, currAttributes );
 		}
 
