@@ -31,8 +31,12 @@ public class VehicleUtils {
 
 	private static final VehicleType DEFAULT_VEHICLE_TYPE = VehicleUtils.getFactory().createVehicleType(Id.create("defaultVehicleType", VehicleType.class));
 
-	private static final String DOOR_OPERATION_MODE = "doorOperationMode" ;
 	// should remain under the hood --> should remain private
+	private static final String DOOR_OPERATION_MODE = "doorOperationMode" ;
+	private static final String EGRESSTIME = "egressTime";
+	private static final String ACCESSTIME = "accessTime";
+	private static final String GASCONSUMPTION = "gasConsumption";
+	private static final String FREIGHT_CAPACITY_UNITS = "freightCapacityInUnits";
 
 	static {
 		VehicleCapacityImpl capacity = new VehicleCapacityImpl();
@@ -59,4 +63,29 @@ public class VehicleUtils {
 	public static void setDoorOperationMode( VehicleType vehicleType, VehicleType.DoorOperationMode mode ){
 		vehicleType.getAttributes().putAttribute( DOOR_OPERATION_MODE, mode ) ;
 	}
+
+	public static double getEgressTime(VehicleType vehicleType) {
+		return (Double) vehicleType.getAttributes().getAttribute(EGRESSTIME);
+	}
+
+	public static void setEgressTime(VehicleType vehicleType, double egressTime) {
+		vehicleType.getAttributes().putAttribute(EGRESSTIME, egressTime);
+	}
+
+	public static double getAccessTime(VehicleType vehicleType) {
+		return (Double) vehicleType.getAttributes().getAttribute(ACCESSTIME);
+	}
+
+	public static void setAccessTime(VehicleType vehicleType, double accessTime) {
+		vehicleType.getAttributes().putAttribute(ACCESSTIME, accessTime);
+	}
+
+
+	//TODO: acessTime: einbinden
+
+	//TODO: egressTime: einbinden
+
+	//TODO: gasConsumption -> literPerMeter: getter/setter, einbinden
+
+	//TODO: FreightCapacity -> units: getter/setter, einbinden
 }

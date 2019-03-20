@@ -77,22 +77,26 @@ public class VehicleTypeImpl implements VehicleType {
 
 	@Override
 	public double getAccessTime() {
-		return this.accessTime;
+//		return this.accessTime;
+		return VehicleUtils.getAccessTime(this);
 	}
 
 	@Override
 	public double getEgressTime() {
-		return this.egressTime;
+//		return this.egressTime;
+		return VehicleUtils.getEgressTime(this);
 	}
 
 	@Override
 	public void setAccessTime(double seconds) {
-		this.accessTime = seconds;
+//		this.accessTime = seconds;
+		VehicleUtils.setAccessTime(this, seconds);
 	}
 
 	@Override
 	public void setEgressTime(double seconds) {
-		this.egressTime = seconds;
+//		this.egressTime = seconds;
+		VehicleUtils.setEgressTime(this, seconds);
 	}
 
 	@Override
