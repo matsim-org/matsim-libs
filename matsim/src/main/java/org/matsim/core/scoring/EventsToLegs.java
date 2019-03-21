@@ -85,6 +85,8 @@ import com.google.inject.Inject;
 public final class EventsToLegs implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, 
 TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
+	private static final Logger logger = Logger.getLogger(EventsToLegs.class);
+
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	private class PendingTransitTravel {
@@ -199,8 +201,17 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> driverOfVehicle = delegate.getDriverOfVehicle(event.getVehicleId());
-		List<Id<Link>> route = experiencedRoutes.get(driverOfVehicle);
+		final Id<Person> driverOfVehicle = delegate.getDriverOfVehicle(event.getVehicleId());
+		if (null == driverOfVehicle) {
+			logger.warn(String.format("Could not find the driver for the vehicle '%s'. Event: '%s'", event.getVehicleId(), event));
+			return;
+		}
+
+		final List<Id<Link>> route = experiencedRoutes.get(driverOfVehicle);
+		if (null == route) {
+			logger.warn(String.format("Could not find experienced routes for the vehicle '%s' with driver '%s'. Event: '%s'", event.getVehicleId(), driverOfVehicle, event));
+			return;
+		}
 		route.add(event.getLinkId());
 	}
 
