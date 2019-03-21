@@ -61,6 +61,18 @@ public class EventsToLegsTest {
 	}
 
 	@Test
+	public void shouldLogWarning() {
+		Scenario scenario = createTriangularNetwork();
+		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
+		Id<Vehicle> vehId = Id.create("veh1", Vehicle.class);
+		eventsToLegs.handleEvent(new LinkEnterEvent(11.0, vehId, Id.createLinkId("l2")));
+
+		Id<Person> agentId = Id.create("1", Person.class);
+		eventsToLegs.handleEvent(new VehicleEntersTrafficEvent(10.0, agentId, Id.createLinkId("l1"), vehId, "car", 1.0));
+		eventsToLegs.handleEvent(new LinkEnterEvent(11.0, vehId, Id.createLinkId("l2")));
+	}
+
+	@Test
 	public void testCreatesLegWithRoute() {
 		Scenario scenario = createTriangularNetwork();
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
