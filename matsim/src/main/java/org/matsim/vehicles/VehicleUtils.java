@@ -80,12 +80,28 @@ public class VehicleUtils {
 		vehicleType.getAttributes().putAttribute(ACCESSTIME, accessTime);
 	}
 
+	public static double getGasConsumption(VehicleType vehicleType) {
+		return (Double) vehicleType.getAttributes().getAttribute(GASCONSUMPTION);
+	}
+
+	public static void setGasConsumption(VehicleType vehicleType, double literPerMeter) {
+		vehicleType.getAttributes().putAttribute(GASCONSUMPTION, literPerMeter);
+	}
+
+	public static double getFreightCapacityUnits (VehicleType vehicleType) {
+		return (Double) vehicleType.getAttributes().getAttribute(FREIGHT_CAPACITY_UNITS);
+	}
+
+	public static void setFreightCapacityUnits(VehicleType vehicleType, double units) {
+		vehicleType.getAttributes().putAttribute(FREIGHT_CAPACITY_UNITS, units);
+	}
+
 
 	//TODO: acessTime: einbinden
 
 	//TODO: egressTime: einbinden
 
-	//TODO: gasConsumption -> literPerMeter: getter/setter, einbinden
+	//TODO: gasConsumption -> literPerMeter: , einbinden
 
-	//TODO: FreightCapacity -> units: getter/setter, einbinden
+	//TODO: FreightCapacity -> units: einbinden
 }

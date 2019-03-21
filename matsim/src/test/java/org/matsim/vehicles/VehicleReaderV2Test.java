@@ -37,6 +37,7 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 	private final Id<Vehicle> id42_23 = Id.create(" 42  23", Vehicle.class); //indeed this should be double blank in the middle but due to collapse this is only one blank
 
 	// todo: test for minimal vehicle (was kann man alles weglassen)?
+	// TODO: FEF, Einlesen und setztn neuer Attributes: DoorOperationm, accessTime,egressTime, doorOperationMode, LitersPerMeter, FreightCapaUnits.
 
 	public void testBasicParser_v2() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();

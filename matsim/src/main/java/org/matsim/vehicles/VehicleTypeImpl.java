@@ -59,7 +59,6 @@ public class VehicleTypeImpl implements VehicleType {
 	}
 
 
-
 	@Override
 	public String getDescription() {
 		return description;
