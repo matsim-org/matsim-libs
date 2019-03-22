@@ -20,6 +20,7 @@
 package org.matsim.contrib.dvrp.run;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestEventToPassengerEngineForwarder;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
@@ -64,5 +65,8 @@ public final class DvrpModule extends AbstractModule {
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 			}
 		});
+
+		bind(PassengerRequestEventToPassengerEngineForwarder.class).asEagerSingleton();
+		addEventHandlerBinding().to(PassengerRequestEventToPassengerEngineForwarder.class);
 	}
 }
