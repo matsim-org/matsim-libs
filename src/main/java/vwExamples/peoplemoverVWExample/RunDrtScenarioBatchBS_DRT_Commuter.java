@@ -37,6 +37,7 @@ import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
@@ -130,9 +131,15 @@ public class RunDrtScenarioBatchBS_DRT_Commuter {
 //				inbase + "\\network\\drtServiceAreaNetwork_withPark.xml.gz");
 
 		config.network().setInputFile(inbase + "\\network\\drtServiceAreaNetwork.xml.gz");
+		
+		config.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra);
 
 		// This part allows to change dynamically DRT config parameters
 		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		
+//		DvrpConfigGroup dvrp = (DvrpConfigGroup) config.getModules().get(DvrpConfigGroup.GROUP_NAME);
+//		dvrp.setTravelTimeEstimationAlpha(.15);
+//		dvrp.setTravelTimeEstimationBeta(600);
 
 		drt.setPrintDetailedWarnings(false);
 		// Parameters to setup the DRT service
@@ -222,7 +229,7 @@ public class RunDrtScenarioBatchBS_DRT_Commuter {
 		// Based on the prepared configuration this part creates a controller that runs
 		// Controler controler = createControlerWithSingleModeDrt(config, otfvis);
 
-		//Controler controler = electric.edrt.run.RunEDrtScenario.createControler(config);
+//		Controler controler = electric.edrt.run.RunEDrtScenario.createControler(config);
 		Controler controler = createControler(config, false);
 
 		if (rebalancing == true) {

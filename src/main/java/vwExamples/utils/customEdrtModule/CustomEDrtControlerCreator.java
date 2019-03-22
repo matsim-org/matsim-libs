@@ -29,6 +29,7 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import vwExamples.utils.customEdrtModule.CustomEDrtModule;
 
 /**
  * @author axer

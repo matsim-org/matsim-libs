@@ -50,12 +50,12 @@ public class RunExperiencedTripsAnalysisBatch {
 	static Set<Id<Person>> relevantAgents = new HashSet<>();
 	static Map<String, Geometry> zoneMap = new HashMap<>();
 	static Set<String> zones = new HashSet<>();
-	static String shapeFile = "D:\\\\Matsim\\\\Axer\\\\BSWOB2.0_Scenarios\\\\shp\\\\parking-bs.shp";
+	static String shapeFile = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Real_Region_Hannover.shp";
 	static String shapeFeature = "NO";
 
 	public static void main(String[] args) {
 
-		run("D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\output\\");
+		run("D:\\Matsim\\Axer\\Hannover\\ZIM\\output\\");
 	}
 
 	public static void run(String runDir) {
@@ -91,6 +91,7 @@ public class RunExperiencedTripsAnalysisBatch {
 		monitoredModes.add("car");
 		monitoredModes.add("walk");
 		monitoredModes.add("bike");
+		monitoredModes.add("ride");
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(runPrefix + "output_network.xml.gz");
@@ -141,11 +142,11 @@ public class RunExperiencedTripsAnalysisBatch {
 		ExperiencedTripsWriter tripsWriter = new ExperiencedTripsWriter(runPrefix + "experiencedTrips.csv",
 				eventHandler.getPerson2ExperiencedTrips(), monitoredModes, scenario.getNetwork(), relevantAgents,
 				zoneMap);
-		tripsWriter.writeExperiencedTrips();
+		tripsWriter.writeExperiencedTripsIntersectZoneMap();
 		ExperiencedTripsWriter legsWriter = new ExperiencedTripsWriter(runPrefix + "experiencedLegs.csv",
 				eventHandler.getPerson2ExperiencedTrips(), monitoredModes, scenario.getNetwork(), relevantAgents,
 				zoneMap);
-		legsWriter.writeExperiencedLegs();
+		legsWriter.writeExperiencedLegsIntersectZoneMap();
 
 	}
 

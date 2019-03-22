@@ -71,7 +71,7 @@ import java.util.Set;
  * @author axer
  */
 
-public class RunDrtScenarioBatchH_eDRT_KGERAK {
+public class RunDrtScenarioBatchH_MOIA {
 
 	public static final double MAX_RELATIVE_SOC = 0.8;// charge up to 80% SOC
 	public static final double MIN_RELATIVE_SOC = 0.1;// send to chargers vehicles below 20% SOC
@@ -100,10 +100,10 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static void run(int vehiclePerDepot, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "H_1xRate_batteryReplace_0C_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
+		String runId = "MOIA_1_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
-		String inbase = "D:\\Matsim\\Axer\\Hannover\\K-GERAK\\";
+		String inbase = "D:\\Matsim\\Axer\\Hannover\\MOIA\\";
 
 		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\hannover_edrt.xml", new DrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
@@ -122,7 +122,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
-		config.plans().setInputFile(inbase + "\\input\\plans\\vw235_drt_plan_1x_selected.xml.gz");
+		config.plans().setInputFile(inbase + "\\input\\plans\\plans.xml.gz");
 		config.controler().setLastIteration(2); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
@@ -144,10 +144,10 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 		drt.setPrintDetailedWarnings(false);
 		// Parameters to setup the DRT service
-		drt.setMaxTravelTimeBeta(500.0);
-		drt.setMaxTravelTimeAlpha(1.3);
-		drt.setMaxWaitTime(500.0);
-		drt.setStopDuration(30.0);
+		drt.setMaxTravelTimeBeta(600.0);
+		drt.setMaxTravelTimeAlpha(1.4);
+		drt.setMaxWaitTime(900.0);
+		drt.setStopDuration(105.0);
 		drt.setRequestRejection(true);
 
 		// Create the virtual stops for the drt service
@@ -356,7 +356,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
 		return new EvDvrpIntegrationModule(drtCfg.getMode()).
 				setAuxDischargingFactory(new VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory()).
-				setDriveDischargingFactory(f -> new VwDrtDriveEnergyConsumption()).setTurnedOnPredicate(RunDrtScenarioBatchH_eDRT_KGERAK::isTurnedOn);
+				setDriveDischargingFactory(f -> new VwDrtDriveEnergyConsumption()).setTurnedOnPredicate(RunDrtScenarioBatchH_MOIA::isTurnedOn);
 	}
 
     private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
