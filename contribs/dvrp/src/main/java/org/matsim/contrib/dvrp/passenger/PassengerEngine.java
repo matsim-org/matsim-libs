@@ -222,7 +222,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 					+ " will not be served. The agent will get stuck. Causes: "
 					+ causes);
 			eventsManager.processEvent(
-					new PassengerRequestRejectedEvent(request.getSubmissionTime(), mode, request.getId(), causes));
+					new PassengerRequestRejectedEvent(mobsimTimer.getTimeOfDay(), mode, request.getId(), causes));
 		}
 		return violations.isEmpty();
 	}
@@ -300,7 +300,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		} else {
 			//not much else can be done for immediate requests
 			PassengerRequest request = requestEntry.request;
-			eventsManager.processEvent(new PersonStuckEvent(request.getSubmissionTime(), request.getPassengerId(),
+			eventsManager.processEvent(new PersonStuckEvent(mobsimTimer.getTimeOfDay(), request.getPassengerId(),
 					request.getFromLink().getId(), request.getMode()));
 		}
 	}
