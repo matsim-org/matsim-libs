@@ -18,10 +18,8 @@
 
 package org.matsim.contrib.dvrp.benchmark;
 
-import javax.inject.Singleton;
-
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestEventToPassengerEngineForwarder;
+import org.matsim.contrib.dvrp.passenger.PassengerModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
@@ -57,7 +55,6 @@ public class DvrpBenchmarkModule extends AbstractModule {
 			}
 		});
 
-		bind(PassengerRequestEventToPassengerEngineForwarder.class).in(Singleton.class);
-		addEventHandlerBinding().to(PassengerRequestEventToPassengerEngineForwarder.class);
+		install(new PassengerModule());
 	}
 }
