@@ -19,12 +19,14 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule {
 		configureQSim();
 	}
 
-	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding(Annotation annotation) {
+	@Deprecated // for experts only
+	protected final LinkedBindingBuilder<QSimComponent> addQSimComponentBinding(Annotation annotation) {
 		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class, annotation);
 		multibinder.permitDuplicates();
 		return multibinder.addBinding();
 	}
 
+	@Deprecated // for experts only
 	protected LinkedBindingBuilder<QSimComponent> addQSimComponentBinding(Class<? extends Annotation> annotationClass) {
 		Multibinder<QSimComponent> multibinder = Multibinder.newSetBinder(binder(), QSimComponent.class, annotationClass);
 		multibinder.permitDuplicates();

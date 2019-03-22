@@ -55,7 +55,7 @@ import org.matsim.facilities.FacilitiesUtils;
 
 import com.google.common.collect.ImmutableList;
 
-public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo.Provider {
+public final class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo.Provider {
 	private static final Logger LOGGER = Logger.getLogger(PassengerEngine.class);
 
 	private final String mode;
@@ -76,10 +76,14 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo
 	//keeps all received requests until rejection or dropoff
 	private final Map<Id<Request>, RequestEntry> requests = new HashMap<>();
 
-	public PassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
+	PassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			BookingEngine bookingEngine, PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
 			Network network, PassengerRequestValidator requestValidator,
 			PassengerRequestEventToPassengerEngineForwarder passengerRequestEventForwarder) {
+		// yyyyyy I think it is ok to say that the only thing that uses injection is PassengerEngineQSimModule.  However, my very strong intuition is that everything that
+		// is used from there needs to have little or no public footprint.  Otherwise, one is quickly back in a world where one cannot change dependencies without breaking
+		// other users' code. kai, mar'19
+
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;

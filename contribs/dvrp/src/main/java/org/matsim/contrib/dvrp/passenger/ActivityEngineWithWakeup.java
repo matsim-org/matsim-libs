@@ -19,25 +19,27 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
+import static org.matsim.api.core.v01.events.PersonArrivalEvent.ATTRIBUTE_PERSON;
 import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
 import static org.matsim.core.router.TripStructureUtils.Trip;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.function.BiConsumer;
 
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -59,6 +61,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 
 	private final ActivityFacilities facilities;
 	private final BookingEngine bookingEngine;
+	private final EventsManager eventsManager;
 
 	private ActivityEngine delegate;
 
@@ -78,6 +81,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 		this.delegate = new ActivityEngine(eventsManager);
 		this.facilities = scenario.getActivityFacilities();
 		this.bookingEngine = bookingEngine;
+		this.eventsManager = eventsManager ;
 	}
 
 	@Override
@@ -86,12 +90,13 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	}
 
 	@Override
-	public void doSimStep(double time) {
-		while( !wakeUpList.isEmpty() && wakeUpList.peek().time <= time ) {
+	public void doSimStep(double now) {
+		while( !wakeUpList.isEmpty() && wakeUpList.peek().time <= now ) {
 			final AgentAndLegEntry entry = wakeUpList.poll();
+			this.eventsManager.processEvent( new AgentWakeupEvent( now, entry.agent.getId() ) );
 			entry.executeOnWakeUp.accept(entry.agent, entry.leg);
 		}
-		delegate.doSimStep(time);
+		delegate.doSimStep(now);
 	}
 
 	@Override
@@ -165,7 +170,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	}
 
 	private void wakeUpAgent(MobsimAgent agent, Leg leg) {
-		log.warn("entering wakeUpAgent with agentId=" + agent.getId() ) ;
+//		log.warn("entering wakeUpAgent with agentId=" + agent.getId() ) ;
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
@@ -208,10 +213,10 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	 * in the mean time, it might be inserted at the wrong position.
 	 * cdobler, apr'12
 	 */
-	static class AgentAndLegEntry {
+	private static class AgentAndLegEntry {
 		public AgentAndLegEntry(MobsimAgent agent, double time, Leg leg, BiConsumer<MobsimAgent, Leg> executeOnWakeUp) {
-			// yyyy be careful that the executeOnWakeUp does not become overkill here; if we want something more general, rather
-			// move on a completely general MessageQueue.  kai, mar'19
+			// yyyy Let us be careful that the executeOnWakeUp does not become overkill here; if we want something more
+			// general, rather move on a completely general MessageQueue.  kai, mar'19
 
 			this.agent = agent;
 			this.time = time;
@@ -225,4 +230,30 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 		final BiConsumer<MobsimAgent, Leg> executeOnWakeUp;
 	}
 
+	public final static class AgentWakeupEvent extends Event implements HasPersonId {
+		private final Id<Person> personId;
+
+		public AgentWakeupEvent( double now, Id<Person> personId ){
+			super(now) ;
+			this.personId = personId;
+		}
+
+		@Override
+		public String getEventType(){
+			return "agentWakeup" ;
+		}
+
+		@Override
+		public Id<Person> getPersonId(){
+			return personId ;
+		}
+
+		@Override
+		public Map<String, String> getAttributes() {
+			Map<String, String> attr = super.getAttributes();
+			attr.put(ATTRIBUTE_PERSON, this.personId.toString());
+			return attr;
+		}
+
+	}
 }
