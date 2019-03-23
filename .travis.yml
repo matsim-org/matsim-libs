@@ -40,7 +40,7 @@ stages:
 
 # this is the script run in the "test" stage:
 # 'failsafe:verify' triggers travis failures for errors/failures of integration tests. 
-script: mvn install --also-make --projects ${MODULE} -DskipTests -Dmaven.javadoc.skip && cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn failsafe:integration-test failsafe:verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dmaven.javadoc.skip -Dsource.skip -Dassembly.skipAssembly=true
+script: mvn install --also-make --projects ${MODULE} -DskipTests -Dmaven.javadoc.skip && cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn surefire:test failsafe:integration-test failsafe:verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dmaven.javadoc.skip -Dsource.skip -Dassembly.skipAssembly=true
 
 # I just added -DskipTests here since I think that we only want to run
 # the IT tests.  kai, sep'18 
