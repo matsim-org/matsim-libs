@@ -21,6 +21,7 @@ package org.matsim.contrib.dvrp.passenger;
 
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import javax.inject.Inject;
@@ -38,7 +39,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	private final EventsManager eventsManager;
-	private final WakeupGenerator wakeupGenerator;
+	private final Set<WakeupGenerator> wakeupGenerators;
 	private ActivityEngine delegate;
 
 	private final Queue<AgentEntry> wakeUpList = new PriorityBlockingQueue<>(500, (o1, o2) -> {
@@ -47,10 +48,10 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	});
 
 	@Inject
-	ActivityEngineWithWakeup(EventsManager eventsManager, WakeupGenerator wakeupGenerator) {
+	ActivityEngineWithWakeup(EventsManager eventsManager, Set<WakeupGenerator> wakeupGenerators) {
 		this.delegate = new ActivityEngine(eventsManager);
 		this.eventsManager = eventsManager;
-		this.wakeupGenerator = wakeupGenerator;
+		this.wakeupGenerators = wakeupGenerators;
 	}
 
 	@Override
@@ -88,8 +89,10 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
-		wakeupGenerator.generateWakeups(agent)
-				.forEach(wakeup -> wakeUpList.add(new AgentEntry(agent, wakeup.getLeft(), wakeup.getRight())));
+		for (WakeupGenerator generator : wakeupGenerators) {
+			generator.generateWakeups(agent)
+					.forEach(wakeup -> wakeUpList.add(new AgentEntry(agent, wakeup.getLeft(), wakeup.getRight())));
+		}
 
 		return delegate.handleActivity(agent);
 	}

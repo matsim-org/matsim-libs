@@ -19,10 +19,7 @@
 
 package org.matsim.contrib.dynagent.examples.random;
 
-import java.util.Collections;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.passenger.WakeupGenerator;
 import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -32,7 +29,6 @@ import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
@@ -62,12 +58,6 @@ public class RunRandomDynAgentExample {
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingQSimModule(new DynQSimModule(RandomDynAgentSource.class));
-		controler.addOverridingQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				bind(WakeupGenerator.class).toInstance(agent -> Collections.emptyList());
-			}
-		});
 		controler.configureQSimComponents(DynQSimModule::configureComponents);
 
 		if (otfvis) {
