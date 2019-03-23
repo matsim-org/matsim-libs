@@ -32,6 +32,8 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
  * @author michalm
  */
 public final class PassengerModule extends AbstractModule {
+	public final static String BOOKING_ENGINE_COMPONENT_NAME = "BookingEngine";
+
 	@Override
 	public void install() {
 		bind(PassengerRequestEventToPassengerEngineForwarder.class).asEagerSingleton();
@@ -40,8 +42,8 @@ public final class PassengerModule extends AbstractModule {
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bind(ActivityEngineWithWakeup.class).asEagerSingleton();
 				bind(BookingEngine.class).asEagerSingleton();
+				addQSimComponentBinding(BOOKING_ENGINE_COMPONENT_NAME).to(BookingEngine.class);
 			}
 		});
 	}
