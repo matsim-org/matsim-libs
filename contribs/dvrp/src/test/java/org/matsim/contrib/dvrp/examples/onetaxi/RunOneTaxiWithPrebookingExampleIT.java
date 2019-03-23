@@ -19,6 +19,9 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -26,34 +29,25 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.dvrp.passenger.ActivityEngineWithWakeup;
-import org.matsim.contrib.dvrp.passenger.BookingEngine;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestEventToPassengerEngineForwarder;
+import org.matsim.contrib.dvrp.passenger.DrtTaxiPrebookingWakeupGenerator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
-import org.matsim.contrib.dvrp.run.*;
-import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.ActivityEngineModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-
-import javax.inject.Singleton;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class RunOneTaxiWithPrebookingExampleIT{
 	private static final Logger log = Logger.getLogger(RunOneTaxiWithPrebookingExampleIT.class);
@@ -83,7 +77,7 @@ public class RunOneTaxiWithPrebookingExampleIT{
 
 		for( Person person : scenario.getPopulation().getPersons().values() ){
 			Plan plan = person.getSelectedPlan() ;
-			plan.getAttributes().putAttribute( ActivityEngineWithWakeup.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900. ) ;
+			plan.getAttributes().putAttribute(DrtTaxiPrebookingWakeupGenerator.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900.);
 //			for( PlanElement pe : plan.getPlanElements() ){
 //				if ( pe instanceof Leg ) {
 //					if ( ((Leg) pe).getMode().equals( TransportMode.drt ) || ((Leg) pe).getMode().equals( TransportMode.taxi ) ) {
@@ -103,42 +97,22 @@ public class RunOneTaxiWithPrebookingExampleIT{
 		controler.addOverridingModule(new OneTaxiModule( RunOneTaxiExample.TAXIS_FILE) );
 		// yyyy I find it unexpected to have an example as "module".  kai, mar'19
 
-		controler.addOverridingModule( new AbstractModule(){
-			@Override
-			public void install(){
-				this.bind( PassengerRequestEventToPassengerEngineForwarder.class ).in( Singleton.class ) ;
-				this.addEventHandlerBinding().to( PassengerRequestEventToPassengerEngineForwarder.class ) ;
-				// yyyyyy this should presumably not be in user code. kai, mar'19
-			}
-		} ) ;
-		controler.configureQSimComponents( components -> {
-			log.info("=== before ...") ;
-			for( Object component : components.getActiveComponents() ){
-				log.info( component.toString() ) ;
-			}
-			components.removeNamedComponent( ActivityEngineModule.COMPONENT_NAME );
-			components.addNamedComponent( DynActivityEngineModule.COMPONENT_NAME );
-			components.addNamedComponent( "abc" );
-			components.addNamedComponent( "BookingEngine" );
-			for( String m : new String[]{TransportMode.taxi} ){
-				components.addComponent( DvrpModes.mode( m ) );
-				// note that this is not an "addNAMEDComponent"!
-			}
-			log.info("=== after ...") ;
-			for( Object component : components.getActiveComponents() ){
-				log.info( component.toString() ) ;
-			}
-		} );
-		controler.addOverridingQSimModule( new AbstractQSimModule(){
-			@Override protected void configureQSim(){
-				this.bind( ActivityEngineWithWakeup.class ).in( Singleton.class ) ;
-				this.addQSimComponentBinding( "abc" ).to( ActivityEngineWithWakeup.class ) ;
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.taxi));
 
-				this.bind( BookingEngine.class ).in( Singleton.class ) ;
-				this.addQSimComponentBinding( "BookingEngine" ).to( BookingEngine.class ) ;
+		//		controler.addOverridingQSimModule( new AbstractQSimModule(){
+		//			@Override protected void configureQSim(){
+//				MapBinder<String, TripInfo.Provider> mapBinder = MapBinder.newMapBinder( this.binder(), String.class, TripInfo.Provider.class );
+//				mapBinder.addBinding("abc" ).toProvider( new Provider<TripInfo.Provider>() {
+//					@Override public TripInfo.Provider get(){
+//						return new PassengerEngine( mode, eventsManager, requestCreator, optimizer, network, requestValidator ) ;
+//					}
+//				} );
 
-			}
-		} ) ;
+//				this.binder().bind( TripInfo.Provider.class ).annotatedWith( Names.named( TransportMode.taxi ) ).to( PassengerEngine.class ) ;
+				// does not work since PassengerEngine does not have a constructor annotated with @Inject.  kai, mar'19
+				// In general I am not sure if this is the right syntax, or if one should rather use a Multibinder or a MultiSet.  kai, mar'19
+		//			}
+		//		} ) ;
 
 		if ( true ) {
 //			controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
