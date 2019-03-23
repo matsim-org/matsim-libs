@@ -23,10 +23,9 @@ package org.matsim.contrib.dvrp.passenger;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
-import com.google.inject.multibindings.Multibinder;
-
 /**
- * This module initialises generic (i.e. not taxi or drt-specific) AND global (not mode-specific) dvrp objects.
+ * This module initialises generic (i.e. not taxi or drt-specific) AND global (not mode-specific) dvrp objects relating
+ * to serving passengers (e.g. booking engine).
  * <p>
  * Some of the initialised objects will become modal at some point in the future. E.g. VehicleType or TravelTime
  * are likely to be provided separately per each mode in the future.
@@ -46,10 +45,6 @@ public final class PassengerModule extends AbstractModule {
 			protected void configureQSim() {
 				bind(BookingEngine.class).asEagerSingleton();
 				addQSimComponentBinding(BOOKING_ENGINE_COMPONENT_NAME).to(BookingEngine.class);
-				Multibinder.newSetBinder(this.binder(), WakeupGenerator.class)
-						.addBinding()
-						.to(DrtTaxiPrebookingWakeupGenerator.class)
-						.asEagerSingleton();
 			}
 		});
 	}
