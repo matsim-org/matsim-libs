@@ -1,26 +1,26 @@
 package org.matsim.contrib.dvrp.passenger;
 
-import static org.matsim.core.router.TripStructureUtils.Trip;
-
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dvrp.run.DvrpMode;
-import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.mobsim.qsim.interfaces.*;
-import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.withinday.utils.EditPlans;
 import org.matsim.withinday.utils.EditTrips;
@@ -32,9 +32,10 @@ public final class BookingEngine implements MobsimEngine {
 	// Notifications and corresponding handlers could then be registered. On the other hand, it is easy to add an engine such as this one; how much does it help to have another
 	// layer of infrastructure?  Am currently leaning towards the second argument.  kai, mar'19
 
-	private static final Logger log = Logger.getLogger( BookingEngine.class ) ;
+	private static final Logger log = Logger.getLogger(BookingEngine.class);
 
-	private final Map<String, TripInfo.Provider> tripInfoProviders;
+	private final Map<String, TripInfo.Provider> tripInfoProviders = new LinkedHashMap<>();
+	private final Map<String, AgentPlanUpdater> agentPlanUpdaters = new LinkedHashMap<>();
 	private final Population population;
 
 	private Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new ConcurrentHashMap<>();
@@ -48,15 +49,17 @@ public final class BookingEngine implements MobsimEngine {
 	private final TripRouter tripRouter;
 
 	@Inject
-	BookingEngine(TripRouter tripRouter, Scenario scenario ) {
+	BookingEngine(TripRouter tripRouter, Scenario scenario) {
 		this.tripRouter = tripRouter;
 		this.editTrips = new EditTrips(tripRouter, scenario);
-		this.tripInfoProviders = new LinkedHashMap<>(  ) ;
-		this.population = scenario.getPopulation() ;
+		this.population = scenario.getPopulation();
 	}
 
 	@Override
 	public void onPrepareSim() {
+		//FIXME create AgentPlanUpdaters with guice
+		new DrtAgentPlanUpdater(this);
+		agentPlanUpdaters.values().forEach(updater -> updater.init(editTrips, editPlans));
 	}
 
 	@Override
@@ -66,12 +69,17 @@ public final class BookingEngine implements MobsimEngine {
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.editPlans = new EditPlans(internalInterface.getMobsim(), tripRouter, editTrips);
-		for( DepartureHandler departureHandler : internalInterface.getDepartureHandlers() ){
-			if ( departureHandler instanceof TripInfo.Provider ) {
-				String mode = ((TripInfo.Provider) departureHandler).getMode() ;
-				this.tripInfoProviders.put( mode, (TripInfo.Provider) departureHandler ) ;
+		for (DepartureHandler departureHandler : internalInterface.getDepartureHandlers()) {
+			if (departureHandler instanceof TripInfo.Provider) {
+				String mode = ((TripInfo.Provider)departureHandler).getMode();
+				this.tripInfoProviders.put(mode, (TripInfo.Provider)departureHandler);
 			}
 		}
+	}
+
+	public void registerAgentPlanUpdater(String mode, AgentPlanUpdater agentPlanUpdater) {
+		agentPlanUpdaters.put(mode, agentPlanUpdater);
+		agentPlanUpdater.init(editTrips, editPlans);
 	}
 
 	@Override
@@ -88,15 +96,15 @@ public final class BookingEngine implements MobsimEngine {
 	}
 
 	public synchronized final void notifyTripInfoRequestSent(MobsimAgent agent, TripInfoRequest tripInfoRequest) {
-		log.warn("entering notifyTripInfoRequestSent with agentId=" + agent.getId() ) ;
+		log.warn("entering notifyTripInfoRequestSent with agentId=" + agent.getId());
 		tripInfoRequestMap.put(agent, tripInfoRequest);
 	}
 
 	private void processTripInfoRequests() {
 		for (Map.Entry<MobsimAgent, TripInfoRequest> entry : tripInfoRequestMap.entrySet()) {
-			log.warn("processing tripInfoRequests for agentId=" + entry.getKey().getId() );
+			log.warn("processing tripInfoRequests for agentId=" + entry.getKey().getId());
 			Map<TripInfo, TripInfo.Provider> allTripInfos = new LinkedHashMap<>();
-			for (TripInfo.Provider provider : tripInfoProviders.values() ) {
+			for (TripInfo.Provider provider : tripInfoProviders.values()) {
 				List<TripInfo> tripInfos = provider.getTripInfos(entry.getValue());
 				for (TripInfo tripInfo : tripInfos) {
 					allTripInfos.put(tripInfo, provider);
@@ -112,26 +120,25 @@ public final class BookingEngine implements MobsimEngine {
 	}
 
 	private void decide(MobsimAgent agent, Map<TripInfo, TripInfo.Provider> allTripInfos) {
-		log.warn( "entering decide for agentId=" + agent.getId() ) ;
+		log.warn("entering decide for agentId=" + agent.getId());
 
-		this.population.getPersons().get( agent.getId() ).getAttributes().putAttribute( AgentSnapshotInfo.marker, true ) ;
+		this.population.getPersons().get(agent.getId()).getAttributes().putAttribute(AgentSnapshotInfo.marker, true);
 
-		if ( allTripInfos.isEmpty() ) {
-			return ;
+		if (allTripInfos.isEmpty()) {
+			return;
 		}
 
-		log.warn("020") ;
+		log.warn("020");
 
 		// to get started, we assume that we are only getting one drt option back.
 		// TODO: make complete
 		TripInfo tripInfo = allTripInfos.keySet().iterator().next();
 
 		if (tripInfo instanceof TripInfoWithRequiredBooking) {
-			log.warn("030") ;
+			log.warn("030");
 
-//			tripInfoProviders.get(DvrpModes.mode(tripInfo.getMode()))
 			tripInfoProviders.get(tripInfo.getMode())
-					    .bookTrip((MobsimPassengerAgent)agent, (TripInfoWithRequiredBooking)tripInfo);
+					.bookTrip((MobsimPassengerAgent)agent, (TripInfoWithRequiredBooking)tripInfo);
 			// yyyy can't we really not use the tripInfo handle directly as I had it before?  kai, mar'15
 
 			//to reduce number of possibilities, I would simply assume that notification always comes later
@@ -142,18 +149,16 @@ public final class BookingEngine implements MobsimEngine {
 			((Activity)WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.MAX_VALUE);
 			editPlans.rescheduleActivityEnd(agent);
 
-			final Person person = this.population.getPersons().get( agent.getId() );
-			if ( person != null ) {
-				if ( person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ){
-					log.warn( "040" );
+			final Person person = this.population.getPersons().get(agent.getId());
+			if (person != null) {
+				if (person.getAttributes().getAttribute(AgentSnapshotInfo.marker) != null) {
+					log.warn("040");
 				}
 			}
 
 		} else {
 			notifyChangedTripInformation(agent, Optional.of(tripInfo));//no booking here
 		}
-
-
 	}
 
 	private void processTripInfoUpdates() {
@@ -162,7 +167,8 @@ public final class BookingEngine implements MobsimEngine {
 			Optional<TripInfo> tripInfo = entry.getValue();
 
 			if (tripInfo.isPresent()) {
-				updateAgentPlan(agent, tripInfo.get());
+				TripInfo actualTripInfo = tripInfo.get();
+				agentPlanUpdaters.get(actualTripInfo.getMode()).updateAgentPlan(agent, actualTripInfo);
 			} else {
 				TripInfoRequest request = null;
 				//TODO get it from where ??? from TripInfo???
@@ -175,65 +181,9 @@ public final class BookingEngine implements MobsimEngine {
 		tripInfoUpdatesMap.clear();
 	}
 
-	private void updateAgentPlan(MobsimAgent agent, TripInfo tripInfo) {
-		Gbl.assertIf(WithinDayAgentUtils.getCurrentPlanElement(agent) instanceof Activity);
+	public interface AgentPlanUpdater {
+		void init(EditTrips editTrips, EditPlans editPlans);
 
-		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
-
-		Trip theTrip = null;
-		for (Trip drtTrip : TripStructureUtils.getTrips(plan, ActivityEngineWithWakeup.drtStageActivities)) {
-			// recall that we have set the activity end time of the current activity to infinity, so we cannot use that any more.  :-( ?!
-			// could instead use some kind of ID.  Not sure if that would really be better.
-			if (CoordUtils.calcEuclideanDistance(drtTrip.getOriginActivity().getCoord(),
-				  tripInfo.getPickupLocation().getCoord()) > 1000.) {
-				continue;
-			}
-			if (CoordUtils.calcEuclideanDistance(drtTrip.getDestinationActivity().getCoord(),
-				  tripInfo.getDropoffLocation().getCoord()) > 1000.) {
-				continue;
-			}
-			theTrip = drtTrip;
-			break;
-		}
-		Gbl.assertNotNull(theTrip);
-		Iterator<Trip> walkTripsIter = TripStructureUtils.getTrips(theTrip.getTripElements(),
-			  new StageActivityTypesImpl(TransportMode.walk)).iterator();
-
-		// ---
-
-		Gbl.assertIf(walkTripsIter.hasNext());
-		Trip accessWalkTrip = walkTripsIter.next();
-		accessWalkTrip.getDestinationActivity().setCoord(tripInfo.getPickupLocation().getCoord());
-		accessWalkTrip.getDestinationActivity().setLinkId(tripInfo.getPickupLocation().getLinkId());
-		accessWalkTrip.getDestinationActivity().setFacilityId(null);
-
-		List<? extends PlanElement> pe = editTrips.replanFutureTrip(accessWalkTrip, plan, TransportMode.walk);
-		List<Leg> legs = TripStructureUtils.getLegs(pe);
-		double ttime = 0.;
-		for (Leg leg : legs) {
-			if (leg.getRoute() != null) {
-				ttime += leg.getTravelTime();
-			} else {
-				ttime += leg.getTravelTime();
-			}
-		}
-		double buffer = 300.;
-		editPlans.rescheduleCurrentActivityEndtime(agent, tripInfo.getExpectedBoardingTime() - ttime - buffer);
-
-		// ---
-
-		Gbl.assertIf(walkTripsIter.hasNext());
-		Trip egressWalkTrip = walkTripsIter.next();
-		final Activity egressWalkOriginActivity = egressWalkTrip.getOriginActivity();
-		egressWalkOriginActivity.setCoord(tripInfo.getDropoffLocation().getCoord());
-		egressWalkOriginActivity.setLinkId(tripInfo.getDropoffLocation().getLinkId());
-		egressWalkOriginActivity.setFacilityId(null);
-
-		editTrips.replanFutureTrip(egressWalkTrip, plan, TransportMode.walk);
-		// yy maybe better do this at dropoff?
-
-		// ----
-
-		Gbl.assertIf(!walkTripsIter.hasNext());
+		void updateAgentPlan(MobsimAgent agent, TripInfo tripInfo);
 	}
 }

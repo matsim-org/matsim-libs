@@ -1,5 +1,6 @@
 package org.matsim.contrib.dynagent.run;
 
+import org.matsim.contrib.dvrp.passenger.ActivityEngineWithWakeup;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
@@ -10,6 +11,7 @@ public class DynActivityEngineModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind(DynActivityEngine.class).asEagerSingleton();
+		bind(ActivityEngineWithWakeup.class).asEagerSingleton();
 		addNamedComponent(DynActivityEngine.class, COMPONENT_NAME);
 	}
 

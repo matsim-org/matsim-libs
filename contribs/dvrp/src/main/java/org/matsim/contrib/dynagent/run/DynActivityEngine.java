@@ -38,10 +38,6 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-/**
- * DynActivityEngine and ActivityEngine could be decoupled (if we can ensure DynActivityEngine's handleActivity() is
- * called before that of ActivityEngine)
- */
 public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 	private InternalInterface internalInterface;
 	private final ActivityEngineWithWakeup activityEngine;

@@ -20,58 +20,31 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import static org.matsim.api.core.v01.events.PersonArrivalEvent.ATTRIBUTE_PERSON;
-import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
-import static org.matsim.core.router.TripStructureUtils.Trip;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.function.BiConsumer;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.Facility;
 
 public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
-	private static final Logger log = Logger.getLogger(ActivityEngine.class);
-
-	private final ActivityFacilities facilities;
-	private final BookingEngine bookingEngine;
 	private final EventsManager eventsManager;
-
+	private final WakeupGenerator wakeupGenerator;
 	private ActivityEngine delegate;
 
-	public static final StageActivityTypes drtStageActivities = new StageActivityTypesImpl(
-			createStageActivityType(TransportMode.drt), createStageActivityType(TransportMode.walk));
-
-	public static final String PREBOOKING_OFFSET_ATTRIBUTE_NAME = "prebookingOffset_s";
-
-
-	private final Queue<AgentAndLegEntry> wakeUpList = new PriorityBlockingQueue<>(500, (o1, o2) -> {
+	private final Queue<AgentEntry> wakeUpList = new PriorityBlockingQueue<>(500, (o1, o2) -> {
 		int cmp = Double.compare(o1.time, o2.time);
 		return cmp != 0 ? cmp : o1.agent.getId().compareTo(o2.agent.getId());
 	});
@@ -79,9 +52,10 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	@Inject
 	ActivityEngineWithWakeup(EventsManager eventsManager, Scenario scenario, BookingEngine bookingEngine) {
 		this.delegate = new ActivityEngine(eventsManager);
-		this.facilities = scenario.getActivityFacilities();
-		this.bookingEngine = bookingEngine;
-		this.eventsManager = eventsManager ;
+		this.eventsManager = eventsManager;
+
+		//FIXME inject wakeup generator
+		this.wakeupGenerator = new DrtTaxiPrebookingWakeupGenerator(scenario, bookingEngine);
 	}
 
 	@Override
@@ -91,10 +65,10 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 
 	@Override
 	public void doSimStep(double now) {
-		while( !wakeUpList.isEmpty() && wakeUpList.peek().time <= now ) {
-			final AgentAndLegEntry entry = wakeUpList.poll();
-			this.eventsManager.processEvent( new AgentWakeupEvent( now, entry.agent.getId() ) );
-			entry.executeOnWakeUp.accept(entry.agent, entry.leg);
+		while (!wakeUpList.isEmpty() && wakeUpList.peek().time <= now) {
+			final AgentEntry entry = wakeUpList.poll();
+			this.eventsManager.processEvent(new AgentWakeupEvent(now, entry.agent.getId()));
+			entry.agentWakeup.wakeUp(entry.agent, now);
 		}
 		delegate.doSimStep(now);
 	}
@@ -119,76 +93,14 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
+		wakeupGenerator.generateWakeups(agent)
+				.forEach(wakeup -> wakeUpList.add(new AgentEntry(agent, wakeup.getLeft(), wakeup.getRight())));
 
-		if (agent instanceof PlanAgent) {
-			// (we don't want to treat DvrpAgents, CarrierAgents, TransitVehicleDrivers etc. here)
-
-			Double prebookingOffset_s = (Double)((PlanAgent) agent).getCurrentPlan().getAttributes().getAttribute( PREBOOKING_OFFSET_ATTRIBUTE_NAME );
-
-			for (Leg drtLeg : findLegsWithModeInFuture(agent, TransportMode.drt )) {
-				//				Double prebookingOffset_s = (Double)drtLeg.getAttributes().getAttribute( PREBOOKING_OFFSET_ATTRIBUTE_NAME );
-				if (prebookingOffset_s == null) {
-					log.warn("not prebooking");
-					continue;
-				}
-				final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
-				if (prebookingTime < agent.getActivityEndTime()) {
-					// yyyy and here one sees that having this in the activity engine is not very practical
-					log.info("adding agent to wakeup list");
-					this.wakeUpList.add(new AgentAndLegEntry(agent, prebookingTime, drtLeg, this::wakeUpAgent));
-				}
-			}
-			for (Leg drtLeg : findLegsWithModeInFuture(agent, TransportMode.taxi)) {
-//				Double prebookingOffset_s = (Double)drtLeg.getAttributes().getAttribute( PREBOOKING_OFFSET_ATTRIBUTE_NAME );
-				if (prebookingOffset_s == null) {
-					log.warn("not prebooking");
-					continue;
-				}
-				final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
-				if (prebookingTime < agent.getActivityEndTime()) {
-					// yyyy and here one sees that having this in the activity engine is not very practical
-					log.info("adding agent to wakeup list");
-					this.wakeUpList.add(new AgentAndLegEntry(agent, prebookingTime, drtLeg, this::wakeUpAgent));
-				}
-			}
-		}
 		return delegate.handleActivity(agent);
 	}
 
-	public static List<Leg> findLegsWithModeInFuture(MobsimAgent agent, String mode) {
-		List<Leg> retVal = new ArrayList<>();
-		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
-		for (int ii = WithinDayAgentUtils.getCurrentPlanElementIndex(agent); ii < plan.getPlanElements().size(); ii++) {
-			PlanElement pe = plan.getPlanElements().get(ii);
-			if (pe instanceof Leg) {
-				if (Objects.equals(mode, ((Leg)pe).getMode())) {
-					retVal.add((Leg)pe);
-				}
-			}
-		}
-		return retVal;
-	}
-
-	private void wakeUpAgent(MobsimAgent agent, Leg leg) {
-//		log.warn("entering wakeUpAgent with agentId=" + agent.getId() ) ;
-
-		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
-
-		// search for drt trip corresponding to drt leg.  Trick is using our own stage activities.
-		Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan, this.drtStageActivities);
-		Gbl.assertNotNull(drtTrip);
-
-		Facility fromFacility = FacilitiesUtils.toFacility(drtTrip.getOriginActivity(), facilities);
-		Facility toFacility = FacilitiesUtils.toFacility(drtTrip.getDestinationActivity(), facilities);
-
-		final TripInfoRequest request = new TripInfoRequest.Builder().setFromFacility(fromFacility)
-				.setToFacility(toFacility)
-				.setTime(drtTrip.getOriginActivity().getEndTime())
-				.createRequest();
-
-		//first simulate ActivityEngineWithWakeup and then BookingEngine --> decision process
-		//in the same time step
-		bookingEngine.notifyTripInfoRequestSent(agent, request);
+	public interface AgentWakeup {
+		void wakeUp(MobsimAgent agent, double now);
 	}
 
 	/**
@@ -213,39 +125,37 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	 * in the mean time, it might be inserted at the wrong position.
 	 * cdobler, apr'12
 	 */
-	private static class AgentAndLegEntry {
-		public AgentAndLegEntry(MobsimAgent agent, double time, Leg leg, BiConsumer<MobsimAgent, Leg> executeOnWakeUp) {
+	private static class AgentEntry {
+		public AgentEntry(MobsimAgent agent, double time, AgentWakeup agentWakeup) {
 			// yyyy Let us be careful that the executeOnWakeUp does not become overkill here; if we want something more
 			// general, rather move on a completely general MessageQueue.  kai, mar'19
 
 			this.agent = agent;
 			this.time = time;
-			this.leg = leg;
-			this.executeOnWakeUp = executeOnWakeUp;
+			this.agentWakeup = agentWakeup;
 		}
 
 		final MobsimAgent agent;
 		final double time;
-		final Leg leg;
-		final BiConsumer<MobsimAgent, Leg> executeOnWakeUp;
+		final AgentWakeup agentWakeup;
 	}
 
 	public final static class AgentWakeupEvent extends Event implements HasPersonId {
 		private final Id<Person> personId;
 
-		public AgentWakeupEvent( double now, Id<Person> personId ){
-			super(now) ;
+		public AgentWakeupEvent(double now, Id<Person> personId) {
+			super(now);
 			this.personId = personId;
 		}
 
 		@Override
-		public String getEventType(){
-			return "agentWakeup" ;
+		public String getEventType() {
+			return "agentWakeup";
 		}
 
 		@Override
-		public Id<Person> getPersonId(){
-			return personId ;
+		public Id<Person> getPersonId() {
+			return personId;
 		}
 
 		@Override
@@ -254,6 +164,5 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 			attr.put(ATTRIBUTE_PERSON, this.personId.toString());
 			return attr;
 		}
-
 	}
 }
