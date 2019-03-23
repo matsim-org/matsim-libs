@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
@@ -57,12 +58,13 @@ public class OneTaxiModule extends AbstractDvrpModeModule {
 				install(new PassengerEngineQSimModule(getMode()));
 
 				// optimizer that dispatches taxis
-				bindModal(VrpOptimizer.class).to(OneTaxiOptimizer.class).asEagerSingleton();
+				bindModal(VrpOptimizer.class).to(OneTaxiOptimizer.class).in( Singleton.class ) ;
+
 				// converts departures of the "taxi" mode into taxi requests
-				bindModal(PassengerRequestCreator.class).to(OneTaxiRequest.OneTaxiRequestCreator.class)
-						.asEagerSingleton();
+				bindModal(PassengerRequestCreator.class).to(OneTaxiRequest.OneTaxiRequestCreator.class).in( Singleton.class ) ;
+
 				// converts scheduled tasks into simulated actions (legs and activities)
-				bindModal(VrpAgentLogic.DynActionCreator.class).to(OneTaxiActionCreator.class).asEagerSingleton();
+				bindModal(VrpAgentLogic.DynActionCreator.class).to(OneTaxiActionCreator.class).in( Singleton.class ) ;
 			}
 		});
 	}

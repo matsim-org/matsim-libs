@@ -112,7 +112,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				eventsManager.processEvent(
 						new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
 								bestInsertion.vehicleEntry.vehicle.getId(), req.getPickupTask().getEndTime(),
-								req.getDropoffTask().getBeginTime()));
+								req.getDropoffTask().getBeginTime(), req.getPassengerId() ) );
 			}
 			reqIter.remove();
 		}

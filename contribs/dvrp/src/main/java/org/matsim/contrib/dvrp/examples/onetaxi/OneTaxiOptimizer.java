@@ -135,7 +135,7 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 
 		eventsManager.processEvent(
 				new PassengerRequestScheduledEvent(timer.getTimeOfDay(), TransportMode.taxi, request.getId(),
-						vehicle.getId(), t1, t4));
+						vehicle.getId(), t1, t4, req.getPassengerId() ) );
 	}
 
 	@Override

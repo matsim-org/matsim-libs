@@ -30,5 +30,7 @@ import org.matsim.api.core.v01.population.Person;
  *
  */
 public interface HasPersonId {
+	String ATTRIBUTE_PERSON = "person";
+
 	Id<Person> getPersonId() ;
 }

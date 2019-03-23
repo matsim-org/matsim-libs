@@ -99,8 +99,10 @@ public class RunOneTaxiWithPrebookingExampleIT{
 		// setup controler
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule() );
+
 		controler.addOverridingModule(new OneTaxiModule( RunOneTaxiExample.TAXIS_FILE) );
 		// yyyy I find it unexpected to have an example as "module".  kai, mar'19
+
 		controler.addOverridingModule( new AbstractModule(){
 			@Override
 			public void install(){
@@ -135,16 +137,6 @@ public class RunOneTaxiWithPrebookingExampleIT{
 				this.bind( BookingEngine.class ).in( Singleton.class ) ;
 				this.addQSimComponentBinding( "BookingEngine" ).to( BookingEngine.class ) ;
 
-//				MapBinder<String, TripInfo.Provider> mapBinder = MapBinder.newMapBinder( this.binder(), String.class, TripInfo.Provider.class );
-//				mapBinder.addBinding("abc" ).toProvider( new Provider<TripInfo.Provider>() {
-//					@Override public TripInfo.Provider get(){
-//						return new PassengerEngine( mode, eventsManager, requestCreator, optimizer, network, requestValidator ) ;
-//					}
-//				} );
-
-//				this.binder().bind( TripInfo.Provider.class ).annotatedWith( Names.named( TransportMode.taxi ) ).to( PassengerEngine.class ) ;
-				// does not work since PassengerEngine does not have a constructor annotated with @Inject.  kai, mar'19
-				// In general I am not sure if this is the right syntax, or if one should rather use a Multibinder or a MultiSet.  kai, mar'19
 			}
 		} ) ;
 
@@ -161,7 +153,7 @@ public class RunOneTaxiWithPrebookingExampleIT{
 					@Override public synchronized void handleEvent( Event event ){
 						if (event instanceof ActivityEngineWithWakeup.AgentWakeupEvent ) {
 							final ActivityEngineWithWakeup.AgentWakeupEvent ev = (ActivityEngineWithWakeup.AgentWakeupEvent) event;
-							log.warn("cnt=" + cnt + "; event=" + event) ;
+//							log.warn("cnt=" + cnt + "; event=" + event) ;
 							switch(cnt) {
 								case 0 :
 								case 1 :
@@ -199,7 +191,51 @@ public class RunOneTaxiWithPrebookingExampleIT{
 							cnt++ ;
 						} else if ( event instanceof PassengerRequestScheduledEvent ) {
 							PassengerRequestScheduledEvent ev = (PassengerRequestScheduledEvent) event;
-							log.warn("cnt2=" + cnt2 + "; event=" + event) ;
+//							log.warn("cnt2=" + cnt2 + "; event=" + event) ;
+							Assert.assertEquals( "taxi_one", ev.getVehicleId().toString() );
+							switch(cnt2){
+								case 0:
+									Assert.assertEquals( 0., event.getTime(), Double.MIN_VALUE );
+									Assert.assertEquals( "taxi_0", ev.getRequestId().toString() );
+									break ;
+								case 1:
+									Assert.assertEquals( 300., event.getTime(), Double.MIN_VALUE );
+									// why one such request scheduling every 5min?  The demand is like that: dp times are spaced by 5 min.
+									Assert.assertEquals( "taxi_1", ev.getRequestId().toString() );
+									break ;
+								case 2:
+									Assert.assertEquals( 600., event.getTime(), Double.MIN_VALUE );
+									Assert.assertEquals( "taxi_2", ev.getRequestId().toString() );
+									break ;
+								case 3:
+									Assert.assertEquals( 900., event.getTime(), Double.MIN_VALUE );
+									Assert.assertEquals( "taxi_3", ev.getRequestId().toString() );
+									break ;
+								case 4:
+									Assert.assertEquals( 1200., event.getTime(), Double.MIN_VALUE );
+									Assert.assertEquals( "taxi_4", ev.getRequestId().toString() );
+									break ;
+								case 5:
+									Assert.assertEquals( 1500., event.getTime(), Double.MIN_VALUE );
+									Assert.assertEquals( "taxi_5", ev.getRequestId().toString() );
+									break ;
+								case 6:
+									Assert.assertEquals( 1800., event.getTime(), Double.MIN_VALUE );
+									Assert.assertEquals( "taxi_6", ev.getRequestId().toString() );
+									break ;
+								case 7:
+									Assert.assertEquals( 2100., event.getTime(), Double.MIN_VALUE );
+									Assert.assertEquals( "taxi_7", ev.getRequestId().toString() );
+									break ;
+								case 8:
+									Assert.assertEquals( 2400., event.getTime(), Double.MIN_VALUE );
+									Assert.assertEquals( "taxi_8", ev.getRequestId().toString() );
+									break ;
+								case 9:
+									Assert.assertEquals( 2700., event.getTime(), Double.MIN_VALUE );
+									Assert.assertEquals( "taxi_9", ev.getRequestId().toString() );
+									break ;
+							}
 							cnt2++ ;
 						}
 					}
