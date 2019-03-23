@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import static org.matsim.api.core.v01.events.PersonArrivalEvent.ATTRIBUTE_PERSON;
-
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -28,7 +26,6 @@ import java.util.concurrent.PriorityBlockingQueue;
 import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -50,12 +47,10 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	});
 
 	@Inject
-	ActivityEngineWithWakeup(EventsManager eventsManager, Scenario scenario, BookingEngine bookingEngine) {
+	ActivityEngineWithWakeup(EventsManager eventsManager, WakeupGenerator wakeupGenerator) {
 		this.delegate = new ActivityEngine(eventsManager);
 		this.eventsManager = eventsManager;
-
-		//FIXME inject wakeup generator
-		this.wakeupGenerator = new DrtTaxiPrebookingWakeupGenerator(scenario, bookingEngine);
+		this.wakeupGenerator = wakeupGenerator;
 	}
 
 	@Override

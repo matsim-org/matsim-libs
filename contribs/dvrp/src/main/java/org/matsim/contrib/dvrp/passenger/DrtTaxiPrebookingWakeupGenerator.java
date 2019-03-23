@@ -47,6 +47,8 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
+import com.google.inject.Inject;
+
 /**
  * @author Michal Maciejewski (michalm)
  */
@@ -61,6 +63,7 @@ public class DrtTaxiPrebookingWakeupGenerator implements WakeupGenerator {
 	private final ActivityFacilities facilities;
 	private final BookingEngine bookingEngine;
 
+	@Inject
 	public DrtTaxiPrebookingWakeupGenerator(Scenario scenario, BookingEngine bookingEngine) {
 		this.facilities = scenario.getActivityFacilities();
 		this.bookingEngine = bookingEngine;

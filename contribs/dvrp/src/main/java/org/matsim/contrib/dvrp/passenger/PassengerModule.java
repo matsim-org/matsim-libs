@@ -44,6 +44,7 @@ public final class PassengerModule extends AbstractModule {
 			protected void configureQSim() {
 				bind(BookingEngine.class).asEagerSingleton();
 				addQSimComponentBinding(BOOKING_ENGINE_COMPONENT_NAME).to(BookingEngine.class);
+				bind(WakeupGenerator.class).to(DrtTaxiPrebookingWakeupGenerator.class).asEagerSingleton();
 			}
 		});
 	}
