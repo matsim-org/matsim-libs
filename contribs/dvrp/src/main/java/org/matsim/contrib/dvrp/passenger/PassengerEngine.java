@@ -274,11 +274,11 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 	private final Queue<PassengerRequestRejectedEvent> rejectedEvents = new ConcurrentLinkedQueue<>();
 	private final Queue<PassengerRequestScheduledEvent> scheduledEvents = new ConcurrentLinkedQueue<>();
 
-	void notifyPassengerRequestRejectedEvent(PassengerRequestRejectedEvent event) {
+	void notifyPassengerRequestEvent( PassengerRequestRejectedEvent event ) {
 		rejectedEvents.add(event);
 	}
 
-	void notifyPassengerRequestRejectedEvent(PassengerRequestScheduledEvent event) {
+	void notifyPassengerRequestEvent( PassengerRequestScheduledEvent event ) {
 		scheduledEvents.add(event);
 	}
 
