@@ -53,6 +53,10 @@ import com.google.inject.Inject;
  * @author Michal Maciejewski (michalm)
  */
 public class DrtTaxiPrebookingWakeupGenerator implements WakeupGenerator {
+	// yyyyyy I would very much rather have this as passenger agent behavior, not as drt behavior.  Maybe the drt forces me to prebook until xyz before pickup, but it is the
+	// decision of the passenger when he/she actually executes the prebooking.  Maybe there are also different prices associated with different prebooking times, then this
+	// becomes even clearer.  kai, mar'19
+
 	private static final Logger log = Logger.getLogger(DrtTaxiPrebookingWakeupGenerator.class);
 
 	public static final String PREBOOKING_OFFSET_ATTRIBUTE_NAME = "prebookingOffset_s";

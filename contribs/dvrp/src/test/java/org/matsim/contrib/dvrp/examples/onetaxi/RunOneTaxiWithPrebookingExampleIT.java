@@ -111,25 +111,12 @@ public class RunOneTaxiWithPrebookingExampleIT {
 						.addBinding()
 						.to(DrtTaxiPrebookingWakeupGenerator.class)
 						.asEagerSingleton();
+				// yyyy in the somewhat longer run, would rather not have this in user code.  kai, mar'19
 			}
 		});
 
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.taxi));
-
-		//		controler.addOverridingQSimModule( new AbstractQSimModule(){
-		//			@Override protected void configureQSim(){
-		//				MapBinder<String, TripInfo.Provider> mapBinder = MapBinder.newMapBinder( this.binder(), String.class, TripInfo.Provider.class );
-		//				mapBinder.addBinding("abc" ).toProvider( new Provider<TripInfo.Provider>() {
-		//					@Override public TripInfo.Provider get(){
-		//						return new PassengerEngine( mode, eventsManager, requestCreator, optimizer, network, requestValidator ) ;
-		//					}
-		//				} );
-
-		//				this.binder().bind( TripInfo.Provider.class ).annotatedWith( Names.named( TransportMode.taxi ) ).to( PassengerEngine.class ) ;
-		// does not work since PassengerEngine does not have a constructor annotated with @Inject.  kai, mar'19
-		// In general I am not sure if this is the right syntax, or if one should rather use a Multibinder or a MultiSet.  kai, mar'19
-		//			}
-		//		} ) ;
+		// yyyy in the somewhat longer run, would rather not have this in user code.  kai, mar'19
 
 		if (true) {
 			//			controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
