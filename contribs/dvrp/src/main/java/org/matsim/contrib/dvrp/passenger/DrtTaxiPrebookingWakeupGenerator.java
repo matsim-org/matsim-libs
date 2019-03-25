@@ -49,9 +49,6 @@ import org.matsim.facilities.Facility;
 
 import com.google.inject.Inject;
 
-/**
- * @author Michal Maciejewski (michalm)
- */
 public class DrtTaxiPrebookingWakeupGenerator implements WakeupGenerator {
 	// yyyyyy I would very much rather have this as passenger agent behavior, not as drt behavior.  Maybe the drt forces me to prebook until xyz before pickup, but it is the
 	// decision of the passenger when he/she actually executes the prebooking.  Maybe there are also different prices associated with different prebooking times, then this

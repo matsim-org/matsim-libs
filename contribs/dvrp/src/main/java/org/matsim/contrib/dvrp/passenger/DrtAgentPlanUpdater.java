@@ -40,9 +40,6 @@ import org.matsim.withinday.utils.EditTrips;
 
 import com.google.inject.Inject;
 
-/**
- * @author Michal Maciejewski (michalm)
- */
 public class DrtAgentPlanUpdater implements BookingEngine.AgentPlanUpdater {
 	private EditTrips editTrips;
 	private EditPlans editPlans;
