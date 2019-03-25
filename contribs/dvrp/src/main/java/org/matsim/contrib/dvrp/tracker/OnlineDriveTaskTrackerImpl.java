@@ -20,7 +20,7 @@
 package org.matsim.contrib.dvrp.tracker;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class OnlineDriveTaskTrackerImpl implements OnlineDriveTaskTracker {
-	private final Vehicle vehicle;
+	private final DvrpVehicle vehicle;
 	private final DriveTask driveTask;
 	private final VrpLeg vrpDynLeg;
 
@@ -45,7 +45,8 @@ public class OnlineDriveTaskTrackerImpl implements OnlineDriveTaskTracker {
 	private double linkEnterTime;
 	private double[] remainingTTs;// excluding the current link
 
-	public OnlineDriveTaskTrackerImpl(Vehicle vehicle, VrpLeg vrpDynLeg, OnlineTrackerListener onlineTrackerListener,
+	public OnlineDriveTaskTrackerImpl(DvrpVehicle vehicle, VrpLeg vrpDynLeg,
+			OnlineTrackerListener onlineTrackerListener,
 			MobsimTimer timer) {
 		this.vehicle = vehicle;
 		this.driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();

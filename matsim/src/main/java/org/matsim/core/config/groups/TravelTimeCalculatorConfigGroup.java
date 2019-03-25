@@ -19,9 +19,18 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.collections.CollectionUtils;
 
 
 /**
@@ -29,6 +38,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  *
  */
 public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup {
+	private static final Logger log = Logger.getLogger( TravelTimeCalculatorConfigGroup.class ) ;
 
 	public static final String GROUPNAME = "travelTimeCalculator";
 
@@ -56,12 +66,13 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	private boolean calculateLinkTravelTimes = true;
 	private boolean calculateLinkToLinkTravelTimes = false;
 
-	private String analyzedModes = TransportMode.car;
+	private Set<String> analyzedModes = new LinkedHashSet<>(  ) ;
 	private boolean filterModes = false;
-	private boolean separateModes = false;
+	private boolean separateModes = true;
 
 	public TravelTimeCalculatorConfigGroup() {
 		super(GROUPNAME);
+		analyzedModes.add( TransportMode.car ) ;
 	}
 
 	@Override
@@ -75,52 +86,46 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 				"supported: average, linearinterpolation");
 		map.put(TRAVEL_TIME_AGGREGATOR, "How to deal with congested time bins that have no link entry events. `optimistic' " +
 				"assumes free speed (too optimistic); 'experimental_LastMile' is experimental and probably too pessimistic.") ;
-		map.put(ANALYZEDMODES, "Transport modes that will be respected by the travel time collector. 'car' is default, which " +
-				"includes also busses from the pt simulation module. Use this parameter in combination with 'filterModes' = true!");
-		map.put(FILTERMODES, "If true, link travel times from legs performed on modes not included in the 'analyzedModes' parameter are ignored.");
-		map.put(SEPARATEMODES, "If true, link travel times are measured and calculated separately for each mode in analyzedModes; other modes are ignored even if " +
-						FILTERMODES + "=false." ) ;
-
-		// === 
-		StringBuilder str = new StringBuilder();
-		for ( TravelTimeCalculatorType type : TravelTimeCalculatorType.values() ) {
-			str.append(type.toString());
-			str.append(' ');
-		}
-		map.put( TRAVEL_TIME_CALCULATOR, "possible values: " + str.toString());
+		map.put(ANALYZEDMODES, "(only for backwards compatibility; only used if " + SEPARATEMODES + "==false && + " + FILTERMODES + "==true)  Transport modes that will be " +
+							 "respected by the travel time collector. 'car' is default which includes also buses from the pt simulation module.");
+		map.put(FILTERMODES, "(only for backwards compatiblity; only used if " + SEPARATEMODES + "==false)  Only modes included in analyzedModes are included." ) ;
+		map.put(SEPARATEMODES, "(only for backwards compatibility) If false, link travel times are measured and aggregated over all vehicles using the link." ) ;
+		map.put( TRAVEL_TIME_CALCULATOR, "possible values: " + Arrays.stream( TravelTimeCalculatorType.values() ).map( type -> type.toString() + ' ' ).collect( Collectors.joining() ) );
 		return map;
 	}
 
+	enum DifferentModesHandling { separateAccordingToAnalyzedModes, jointButRestrictedToAnalyzedModes, jointAndUsingAllModes }
+
+	// ---
 	@StringSetter( TRAVEL_TIME_CALCULATOR )
 	public void setTravelTimeCalculatorType(final String travelTimeCalculator){
+		// leaving this as setter from string for backwards compatibility; enum.name() is not that terrible.  kai, feb'18
 		this.travelTimeCalculator = TravelTimeCalculatorType.valueOf( travelTimeCalculator ) ;
 	}
-
 	@StringGetter( TRAVEL_TIME_CALCULATOR )
 	public TravelTimeCalculatorType getTravelTimeCalculatorType(){
 		return this.travelTimeCalculator;
 	}
-
+	// ---
 	@StringSetter( TRAVEL_TIME_AGGREGATOR )
 	public void setTravelTimeAggregatorType(final String travelTimeAggregator){
 		this.travelTimeAggregator = travelTimeAggregator;
-	}
-
-	@StringSetter( TRAVEL_TIME_GETTER )
-	public void setTravelTimeGetterType(final String travelTimeGetter){
-		this.travelTimeGetter = travelTimeGetter;
 	}
 
 	@StringGetter( TRAVEL_TIME_AGGREGATOR )
 	public String getTravelTimeAggregatorType(){
 		return this.travelTimeAggregator;
 	}
-
+	// ---
+	@StringSetter( TRAVEL_TIME_GETTER )
+	public void setTravelTimeGetterType(final String travelTimeGetter){
+		this.travelTimeGetter = travelTimeGetter;
+	}
 	@StringGetter( TRAVEL_TIME_GETTER )
 	public String getTravelTimeGetterType(){
 		return this.travelTimeGetter;
 	}
-
+	// ---
 	/**
 	 * Sets the size of the time-window over which the travel times are accumulated and averaged.<br>
 	 * Note that smaller values for the binSize increase memory consumption to store the travel times.
@@ -131,13 +136,6 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public final void setTraveltimeBinSize(final int binSize) {
 		this.traveltimeBinSize = binSize;
 	}
-
-
-	@StringSetter( MAX_TIME )
-	public void setMaxTime(int maxTime) {
-		this.maxTime = maxTime;
-	}
-
 	/**
 	 * Returns the size of the time-window used to accumulate and average travel times.
 	 *
@@ -147,12 +145,16 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public final int getTraveltimeBinSize() {
 		return this.traveltimeBinSize;
 	}
-
+	// ---
+	@StringSetter( MAX_TIME )
+	public void setMaxTime(int maxTime) {
+		this.maxTime = maxTime;
+	}
 	@StringGetter( MAX_TIME )
 	public int getMaxTime() {
 		return maxTime;
 	}
-
+	// ---
 	@StringGetter( CALCULATE_LINK_TRAVELTIMES )
 	public boolean isCalculateLinkTravelTimes() {
 		return this.calculateLinkTravelTimes;
@@ -162,7 +164,7 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public void setCalculateLinkTravelTimes(final boolean calculateLinkTravelTimes) {
 		this.calculateLinkTravelTimes = calculateLinkTravelTimes;
 	}
-
+	// ---
 	@StringGetter( CALCULATE_LINKTOLINK_TRAVELTIMES )
 	public boolean isCalculateLinkToLinkTravelTimes() {
 		return this.calculateLinkToLinkTravelTimes;
@@ -172,7 +174,7 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public void setCalculateLinkToLinkTravelTimes( final boolean calculateLinkToLinkTravelTimes) {
 		this.calculateLinkToLinkTravelTimes = calculateLinkToLinkTravelTimes;
 	}
-
+	// ---
 	@StringGetter( FILTERMODES )
 	public boolean isFilterModes() {
 		return this.filterModes;
@@ -182,19 +184,26 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public void setFilterModes(final boolean filterModes) {
 		this.filterModes = filterModes;
 	}
-
+	// ---
 	@StringGetter( ANALYZEDMODES )
-	public String getAnalyzedModes() {
-		return this.analyzedModes;
+	public String getAnalyzedModesAsString() {
+		return CollectionUtils.setToString( this.analyzedModes ) ;
+	}
+	public Set<String> getAnalyzedModes(){
+		return analyzedModes;
 	}
 
 	@StringSetter( ANALYZEDMODES )
-	public void setAnalyzedModes(final String analyzedModes) {
+	public void setAnalyzedModesAsString( final String analyzedModes ) {
+
 //		this.analyzedModes = analyzedModes.toLowerCase(Locale.ROOT);
 		// lower case is confusing here because at other places (qsimConfigGroup, planCalcRoute), it takes mode string as it is. Amit Aug'17
-		this.analyzedModes = analyzedModes;
+		this.analyzedModes = CollectionUtils.stringToSet( analyzedModes ) ;
 	}
-
+	public void setAnalyzedModes( final Set<String> analyzedModes ) {
+		this.analyzedModes = analyzedModes ;
+	}
+	// ---
 	@StringGetter(SEPARATEMODES)
 	public boolean getSeparateModes() {
 		return this.separateModes;

@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.data.DrtRequest;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.Depots;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
@@ -38,9 +38,9 @@ import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.DrtScheduleTimingUpdater;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -87,7 +87,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 		if (requiresReoptimization) {
-			for (Vehicle v : fleet.getVehicles().values()) {
+			for (DvrpVehicle v : fleet.getVehicles().values()) {
 				scheduleTimingUpdater.updateTimings(v);
 			}
 
@@ -102,7 +102,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	private void rebalanceFleet() {
 		// right now we relocate only idle vehicles (vehicles that are being relocated cannot be relocated)
-		Stream<? extends Vehicle> rebalancableVehicles = fleet.getVehicles()
+		Stream<? extends DvrpVehicle> rebalancableVehicles = fleet.getVehicles()
 				.values()
 				.stream()
 				.filter(scheduleInquiry::isIdle);
@@ -127,7 +127,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	}
 
 	@Override
-	public void nextTask(Vehicle vehicle) {
+	public void nextTask(DvrpVehicle vehicle) {
 		scheduleTimingUpdater.updateBeforeNextTask(vehicle);
 
 		vehicle.getSchedule().nextTask();

@@ -21,6 +21,7 @@
 package org.matsim.withinday.replanning.identifiers.tools;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -51,6 +52,7 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 		qSimConfig.setStorageCapFactor(100.0);	// ensure that agents don't have to wait at an intersection
 		config.controler().setMobsim("qsim");
 		config.controler().setLastIteration(0);
+		config.controler().setRoutingAlgorithmType( ControlerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new WithinDayModule());

@@ -1,11 +1,21 @@
 package org.matsim.contrib.emissions.analysis;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import static org.junit.Assert.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -22,16 +32,6 @@ import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import static org.junit.Assert.*;
 
 public class EmissionGridAnalyzerTest {
 
@@ -117,7 +117,7 @@ public class EmissionGridAnalyzerTest {
 
         final Pollutant pollutant = Pollutant.HC;
         final double pollutionPerEvent = 1;
-        Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString());
+        Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString()+ ".xml");
         Network network = createRandomNetwork(100, 1000, 1000);
         writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, 1, 99);
 
@@ -143,7 +143,7 @@ public class EmissionGridAnalyzerTest {
         final Pollutant pollutant = Pollutant.CO;
         final double pollutionPerEvent = 1000;
         final int time = 1;
-        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + "xml");
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
         final Network network = NetworkUtils.createNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
@@ -182,7 +182,7 @@ public class EmissionGridAnalyzerTest {
         final Pollutant pollutant = Pollutant.CO;
         final double pollutionPerEvent = 1000;
         final int time = 1;
-        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + "xml");
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
         final Network network = NetworkUtils.createNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
@@ -221,7 +221,7 @@ public class EmissionGridAnalyzerTest {
         final Pollutant pollutant = Pollutant.CO;
         final double pollutionPerEvent = 1000;
         final int time = 1;
-        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + "xml");
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
         final Network network = NetworkUtils.createNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
@@ -263,7 +263,7 @@ public class EmissionGridAnalyzerTest {
         final Pollutant pollutant = Pollutant.CO;
         final double pollutionPerEvent = 1000;
         final int time = 1;
-        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + "xml");
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
         final Network network = NetworkUtils.createNetwork();
         Node from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(5, 5));
         network.addNode(from);
@@ -304,7 +304,7 @@ public class EmissionGridAnalyzerTest {
 
         final Pollutant pollutant = Pollutant.HC;
         final double pollutionPerEvent = 1;
-        Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString());
+        Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString()+ ".xml");
         Network network = createRandomNetwork(100, 1000, 1000);
         writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, 1, 99);
 
@@ -331,7 +331,7 @@ public class EmissionGridAnalyzerTest {
         final Pollutant pollutant = Pollutant.NO2;
         final double pollutionPerEvent = 1;
         final int time = 1;
-        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString());
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString()+ ".xml");
         final Network network = createRandomNetwork(1, 1000, 1000);
         writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time + 3);
 
@@ -353,8 +353,8 @@ public class EmissionGridAnalyzerTest {
         final Pollutant pollutant = Pollutant.NO2;
         final double pollutionPerEvent = 1;
         final int time = 1;
-        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString());
-        final Path jsonFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString());
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString()+ ".xml");
+        final Path jsonFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString()+ ".json");
         final Network network = createRandomNetwork(1, 1000, 1000);
         writeEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time + 3);
 

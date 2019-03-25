@@ -41,14 +41,14 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
-import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEventHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -56,12 +56,12 @@ import org.matsim.core.utils.io.IOUtils;
 /**
  * @author jbischoff
  */
-public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler, DrtRequestScheduledEventHandler,
+public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler, PassengerRequestScheduledEventHandler,
 		DrtRequestSubmittedEventHandler, PersonEntersVehicleEventHandler {
 
 	private final Map<Id<Request>, DrtRequestSubmittedEvent> submittedRequests = new HashMap<>();
 	private final Map<Id<Request>, Tuple<Double, Double>> waitTimeCompare = new HashMap<>();
-	private final Map<Id<Person>, DrtRequestScheduledEvent> scheduledRequests = new HashMap<>();
+	private final Map<Id<Person>, PassengerRequestScheduledEvent> scheduledRequests = new HashMap<>();
 	private final List<String> rejections = new ArrayList<>();
 	private final Network network;
 	private final DrtConfigGroup drtCfg;
@@ -83,17 +83,17 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (this.scheduledRequests.containsKey(event.getPersonId())) {
-			DrtRequestScheduledEvent scheduled = scheduledRequests.remove(event.getPersonId());
+			PassengerRequestScheduledEvent scheduled = scheduledRequests.remove(event.getPersonId());
 			DrtRequestSubmittedEvent submission = this.submittedRequests.remove(scheduled.getRequestId());
 			double actualWaitTime = event.getTime() - submission.getTime();
 			double estimatedWaitTime = scheduled.getPickupTime() - submission.getTime();
-			waitTimeCompare.put(submission.getRequestId(), new Tuple<>(actualWaitTime, estimatedWaitTime));
+			waitTimeCompare.put(submission.getRequestId(), Tuple.of(actualWaitTime, estimatedWaitTime));
 
 		}
 	}
 
 	@Override
-	public void handleEvent(DrtRequestScheduledEvent event) {
+	public void handleEvent(PassengerRequestScheduledEvent event) {
 		if (!event.getMode().equals(drtCfg.getMode())) {
 			return;
 		}
@@ -151,7 +151,7 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 		return rejections;
 	}
 
-	public void writeAndPlotWaitTimeEstimateComparison(String plotFileName, String textFileName) {
+	public void writeAndPlotWaitTimeEstimateComparison(String plotFileName, String textFileName, boolean createChart) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(textFileName);
 
 		XYSeries times = new XYSeries("waittimes", true, true);
@@ -168,11 +168,13 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 			bw.flush();
 			bw.close();
 
-			final JFreeChart chart2 = DensityScatterPlots.createPlot("Wait times", "Actual wait time [s]",
-					"Initially planned wait time [s]", times, Pair.of(0., drtCfg.getMaxWaitTime()));
-			//			xAxis.setLowerBound(0);
-			//			yAxis.setLowerBound(0);
-			ChartUtilities.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);
+			if (createChart) {
+				final JFreeChart chart2 = DensityScatterPlots.createPlot("Wait times", "Actual wait time [s]",
+						"Initially planned wait time [s]", times, Pair.of(0., drtCfg.getMaxWaitTime()));
+				//			xAxis.setLowerBound(0);
+				//			yAxis.setLowerBound(0);
+				ChartUtilities.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

@@ -22,20 +22,18 @@
 
 package org.matsim.contrib.locationchoice;
 
-import java.util.Collection;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceContext;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
+import org.matsim.contrib.locationchoice.frozenepsilons.BestReplyLocationChoicePlanStrategy;
+import org.matsim.contrib.locationchoice.frozenepsilons.DCScoringFunctionFactory;
+import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import java.util.Collection;
 
 public class RunLocationChoiceFrozenEpsilons {
 	private static final String MY_LOCATION_CHOICE = "MyLocationChoice";
@@ -62,16 +60,7 @@ public class RunLocationChoiceFrozenEpsilons {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		final DestinationChoiceContext lcContext = new DestinationChoiceContext(scenario) ;
-		lcContext.init();
 		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME, lcContext);
-
-		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
-		computer.readOrCreateMaxDCScore(config, lcContext.kValsAreRead());
-
-		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
-		final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
-		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
-		scenario.addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME, dcScore);
 
 		// ---
 
@@ -86,7 +75,7 @@ public class RunLocationChoiceFrozenEpsilons {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding(MY_LOCATION_CHOICE).to(BestReplyLocationChoicePlanStrategy.class);
+				addPlanStrategyBinding(MY_LOCATION_CHOICE).to( BestReplyLocationChoicePlanStrategy.class );
 			}
 		});
 

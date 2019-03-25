@@ -24,7 +24,7 @@ import java.util.Comparator;
 import java.util.Optional;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.data.DrtRequest;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.run.DrtConfigGroup;

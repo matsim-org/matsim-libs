@@ -27,7 +27,7 @@
         descr               CDATA           #IMPLIED
         weight              CDATA           #IMPLIED>
 
-<!ELEMENT receiver 			(attributes?, product*, plan?)>
+<!ELEMENT receiver 			(attributes?, product*, plan*)>
 <!ATTLIST receiver
         id                  CDATA           #REQUIRED
         linkId              CDATA           #IMPLIED>

@@ -19,12 +19,15 @@
 
 package org.matsim.contrib.zone.util;
 
-import org.matsim.contrib.util.random.*;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.matsim.contrib.util.random.RandomUtils;
+import org.matsim.contrib.util.random.UniformRandom;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.google.common.base.Predicate;
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.prep.PreparedGeometry;
 
 public class RandomPointUtils {
 	public static Point getRandomPointInGeometry(final Geometry geometry) {

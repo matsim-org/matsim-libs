@@ -1,12 +1,12 @@
 package org.matsim.contrib.analysis.spatial;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 
 public class GridTest {
 

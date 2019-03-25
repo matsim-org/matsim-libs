@@ -29,8 +29,8 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	private Route route = null;
 
-	private double depTime = Time.UNDEFINED_TIME;
-	private double travTime = Time.UNDEFINED_TIME;
+	private double depTime = Time.getUndefinedTime();
+	private double travTime = Time.getUndefinedTime();
 	private String mode;
 
 	private final Attributes attributes = new Attributes();

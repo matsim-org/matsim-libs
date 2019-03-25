@@ -20,18 +20,14 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.file.FleetProvider;
-import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
-import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
-import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
-import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
-import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
@@ -50,29 +46,15 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 	public void install() {
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
-		bindModal(Fleet.class).toProvider(new FleetProvider(taxiCfg.getTaxisFile())).asEagerSingleton();
-
-		bindModal(SubmittedTaxiRequestsCollector.class).to(SubmittedTaxiRequestsCollector.class).asEagerSingleton();
-		addControlerListenerBinding().to(modalKey(SubmittedTaxiRequestsCollector.class));
-
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new TaxiSimulationConsistencyChecker(getter.getModal(SubmittedTaxiRequestsCollector.class),
-						taxiCfg)));
-
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new TaxiStatsDumper(getter.getModal(Fleet.class), taxiCfg,
-						getter.get(OutputDirectoryHierarchy.class))));
-
 		addRoutingModuleBinding(getMode()).toInstance(new DynRoutingModule(getMode()));
 
-		if (taxiCfg.getTimeProfiles()) {
-			addMobsimListenerBinding().toProvider(modalProvider(
-					getter -> new TaxiStatusTimeProfileCollectorProvider(getter.getModal(Fleet.class),
-							getter.get(MatsimServices.class), getter.getModal(SubmittedTaxiRequestsCollector.class),
-							taxiCfg).get()));
-			// add more time profiles if necessary
-		}
+		install(new FleetModule(getMode(), taxiCfg.getTaxisFile(), taxiCfg.isChangeStartLinkToLastLinkInSchedule()));
 
-		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
+		install(QSimScopeObjectListenerModule.builder(TaxiStatsDumper.class)
+				.mode(getMode())
+				.objectClass(Fleet.class)
+				.listenerCreator(getter -> new TaxiStatsDumper(taxiCfg, getter.get(OutputDirectoryHierarchy.class),
+						getter.get(IterationCounter.class)))
+				.build());
 	}
 }

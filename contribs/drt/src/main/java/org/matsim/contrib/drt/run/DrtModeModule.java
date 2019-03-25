@@ -27,9 +27,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
-import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
@@ -40,10 +37,7 @@ import org.matsim.contrib.drt.routing.DrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.file.FleetProvider;
-import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
+import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -77,21 +71,13 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 	public void install() {
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
-		bindModal(Fleet.class).toProvider(new FleetProvider(drtCfg.getVehiclesFile())).asEagerSingleton();
-
-		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
-		bindModal(DepotFinder.class).toProvider(
-				modalProvider(getter -> new NearestStartLinkAsDepot(getter.getModal(Fleet.class))));
+		install(new FleetModule(getMode(), drtCfg.getVehiclesFile(), drtCfg.isChangeStartLinkToLastLinkInSchedule()));
 
 		if (MinCostFlowRebalancingParams.isRebalancingEnabled(drtCfg.getMinCostFlowRebalancing())) {
 			install(new DrtModeMinCostFlowRebalancingModule(drtCfg));
 		} else {
 			bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
 		}
-
-		bindModal(InsertionCostCalculator.PenaltyCalculator.class).to(drtCfg.isRequestRejection() ?
-				InsertionCostCalculator.RejectSoftConstraintViolations.class :
-				InsertionCostCalculator.DiscourageSoftConstraintViolations.class).asEagerSingleton();
 
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:

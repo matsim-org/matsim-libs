@@ -41,7 +41,7 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
  *
  * @author meisterk
  */
-public class DepartureDelayAverageCalculator implements PersonDepartureEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+class DepartureDelayAverageCalculator implements PersonDepartureEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private Network network;
 	private int timeBinSize;

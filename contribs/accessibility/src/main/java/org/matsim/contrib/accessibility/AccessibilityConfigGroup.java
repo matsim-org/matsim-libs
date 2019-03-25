@@ -30,8 +30,8 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
 
 /**
  * @author thomas, nagel, dziemke
@@ -196,6 +196,16 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	public void setTimeOfDay(Double timeOfDay) {
 		this.timeOfDay = timeOfDay;
 	}
+	
+	@StringGetter(ACCESSIBILITY_DESTINATION_SAMPLING_RATE)
+	public Double getAccessibilityDestinationSamplingRate(){
+		return this.accessibilityDestinationSamplingRate;
+	}
+	@StringSetter(ACCESSIBILITY_DESTINATION_SAMPLING_RATE)
+	public void setAccessibilityDestinationSamplingRate(Double sampleRate){
+		this.accessibilityDestinationSamplingRate = sampleRate;
+	}
+	
     @StringGetter(MEASURE_POINT_GEOMETRY_PROVISION)
     public MeasurePointGeometryProvision getMeasurePointGeometryProvision() {
         return this.measurePointGeometryProvision;
@@ -203,6 +213,14 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     @StringSetter(MEASURE_POINT_GEOMETRY_PROVISION)
     public void setMeasurePointGeometryProvision(MeasurePointGeometryProvision measurePointGeometryProvision) {
         this.measurePointGeometryProvision = measurePointGeometryProvision;
+    }
+    @StringGetter(ACCESSIBILITY_MEASURE_TYPE)
+    public AccessibilityMeasureType getAccessibilityMeasureType() {
+        return this.accessibilityMeasureType;
+    }
+    @StringSetter(ACCESSIBILITY_MEASURE_TYPE)
+    public void setAccessibilityMeasureType(AccessibilityMeasureType accessibilityMeasureType) {
+        this.accessibilityMeasureType = accessibilityMeasureType;
     }
     @StringGetter(USE_OPPORTUNITY_WEIGHTS)
     public boolean isUseOpportunityWeights() {
@@ -251,14 +269,6 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     @StringSetter(BOUNDING_BOX_BOTTOM)
     public void setBoundingBoxBottom(double value) {
         this.boundingBoxBottom = value;
-    }
-    @StringGetter(ACCESSIBILITY_MEASURE_TYPE)
-    public AccessibilityMeasureType getAccessibilityMeasureType() {
-        return this.accessibilityMeasureType;
-    }
-    @StringSetter(ACCESSIBILITY_MEASURE_TYPE)
-    public void setAccessibilityMeasureType(AccessibilityMeasureType accessibilityMeasureType) {
-        this.accessibilityMeasureType = accessibilityMeasureType;
     }
     
     /**

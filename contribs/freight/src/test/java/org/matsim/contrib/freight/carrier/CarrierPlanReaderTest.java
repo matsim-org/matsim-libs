@@ -66,6 +66,7 @@ public class CarrierPlanReaderTest extends MatsimTestCase {
 		assertEquals("15", route.getEndLinkId().toString());
 	}
 	
+	@Test
 	public void testReaderReadsScoreAndSelectedPlanCorrectly() {
 		Carriers carriers = new Carriers();
 		CarrierPlanReader carrierPlanReader = new CarrierPlanReader(carriers);
@@ -76,6 +77,7 @@ public class CarrierPlanReaderTest extends MatsimTestCase {
 		assertEquals(2,carrier.getPlans().size());
 	}
 	
+	@Test
 	public void testReaderReadsUnScoredAndUnselectedPlanCorrectly() {
 		Carriers carriers = new Carriers();
 		CarrierPlanReader carrierPlanReader = new CarrierPlanReader(carriers);

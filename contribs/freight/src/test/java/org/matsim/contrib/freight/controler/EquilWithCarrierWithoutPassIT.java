@@ -113,10 +113,12 @@ public class EquilWithCarrierWithoutPassIT {
 	}
 
 	@Test
-	public void testScoringInSeconds(){
+	public void testScoringInSecondsWoTimeWindowEnforcement(){
 		Carriers carriers = new Carriers();
 		new CarrierPlanXmlReaderV2(carriers).readFile(planFile);
-		controler.addOverridingModule(new CarrierModule(carriers));
+		final CarrierModule carrierModule = new CarrierModule( carriers );
+		carrierModule.setPhysicallyEnforceTimeWindowBeginnings( false );
+		controler.addOverridingModule( carrierModule );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -131,7 +133,32 @@ public class EquilWithCarrierWithoutPassIT {
 		Assert.assertEquals(-240.0, carrier1.getSelectedPlan().getScore(), 2.0);
 
 		Carrier carrier2 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier2", Carrier.class));
-		Assert.assertEquals(0.0, carrier2.getSelectedPlan().getScore().doubleValue(), 0.0);
+		Assert.assertEquals(0.0, carrier2.getSelectedPlan().getScore(), 0.0 );
+
+	}
+
+	@Test
+	public void testScoringInSecondsWTimeWindowEnforcement(){
+		Carriers carriers = new Carriers();
+		new CarrierPlanXmlReaderV2(carriers).readFile(planFile);
+		final CarrierModule carrierModule = new CarrierModule( carriers );
+		carrierModule.setPhysicallyEnforceTimeWindowBeginnings( true );
+		controler.addOverridingModule( carrierModule );
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(CarrierPlanStrategyManagerFactory.class).to(StrategyManagerFactoryForTests.class).asEagerSingleton();
+				bind(CarrierScoringFunctionFactory.class).to(TimeScoringFunctionFactoryForTests.class).asEagerSingleton();
+			}
+		});
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.run();
+
+		Carrier carrier1 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier1", Carrier.class));
+		Assert.assertEquals(-4873.0, carrier1.getSelectedPlan().getScore(), 2.0);
+
+		Carrier carrier2 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier2", Carrier.class));
+		Assert.assertEquals(0.0, carrier2.getSelectedPlan().getScore(), 0.0 );
 
 	}
 

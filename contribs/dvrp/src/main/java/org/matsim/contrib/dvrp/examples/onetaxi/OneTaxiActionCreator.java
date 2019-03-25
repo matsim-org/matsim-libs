@@ -20,7 +20,7 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
@@ -54,7 +54,7 @@ final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	}
 
 	@Override
-	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
+	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
 		Task task = vehicle.getSchedule().getCurrentTask();
 		if (task instanceof DriveTask) {
 			return VrpLegFactory.createWithOfflineTracker(mobsimMode, vehicle, timer);

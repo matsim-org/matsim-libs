@@ -135,7 +135,6 @@ public class GroupCompositionPenalizerTest {
 					}
 				},
 				events );
-		events.addHandler( eventsToScore );
 
 		eventsToScore.beginIteration( 1 );
 		events.initProcessing();

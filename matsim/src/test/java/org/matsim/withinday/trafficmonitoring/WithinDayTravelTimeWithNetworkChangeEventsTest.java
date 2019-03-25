@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -80,6 +81,7 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.controler().setOutputDirectory(outputDirectory);
+		config.controler().setRoutingAlgorithmType( ControlerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
 		config.qsim().setStartTime(6. * 3600.);
 		config.qsim().setEndTime(11 * 3600.);

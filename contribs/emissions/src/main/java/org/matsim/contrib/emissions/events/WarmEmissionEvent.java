@@ -32,8 +32,11 @@ import java.util.Map.Entry;
  * @author benjamin
  *
  */
-public class WarmEmissionEvent extends Event {
-    public final static String EVENT_TYPE = "warmEmissionEvent";
+public final class WarmEmissionEvent extends Event {
+	// leave this public so that external code can generate "standard" emission events. MATSIM-893
+
+
+	public final static String EVENT_TYPE = "warmEmissionEvent";
     public final static String ATTRIBUTE_LINK_ID = "linkId";
     public final static String ATTRIBUTE_VEHICLE_ID = "vehicleId";
     private final Id<Link> linkId;

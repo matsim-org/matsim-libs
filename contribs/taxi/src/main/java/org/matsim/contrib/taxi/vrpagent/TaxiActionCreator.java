@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.taxi.vrpagent;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
@@ -61,7 +61,7 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	}
 
 	@Override
-	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
+	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
 		TaxiTask task = (TaxiTask)vehicle.getSchedule().getCurrentTask();
 		switch (task.getTaxiTaskType()) {
 			case EMPTY_DRIVE:

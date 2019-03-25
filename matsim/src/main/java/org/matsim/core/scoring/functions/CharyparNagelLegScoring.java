@@ -33,6 +33,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,25 +47,33 @@ import java.util.Set;
 public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
 	// yyyy URL in above javadoc is broken.  kai, feb'17
 
+	private static final Logger log = Logger.getLogger( CharyparNagelLegScoring.class ) ;
+
 	protected double score;
 
 	/** The parameters used for scoring */
 	protected final ScoringParameters params;
 	protected Network network;
-	private boolean nextEnterVehicleIsFirstOfTrip = true ;
-	private boolean nextStartPtLegIsFirstOfTrip = true ;
+	private boolean nextEnterVehicleIsFirstOfTrip = true;
+	private boolean nextStartPtLegIsFirstOfTrip = true;
 	private boolean currentLegIsPtLeg = false;
-	private double lastActivityEndTime = Time.UNDEFINED_TIME ;
+	private double lastActivityEndTime = Time.getUndefinedTime();
+	private final Set<String> ptModes;
 	
 	private Set<String> modesAlreadyConsideredForDailyConstants;
 	
-	public CharyparNagelLegScoring(final ScoringParameters params, Network network) {
+	public CharyparNagelLegScoring(final ScoringParameters params, Network network, Set<String> ptModes) {
 		this.params = params;
 		this.network = network;
-		this.nextEnterVehicleIsFirstOfTrip = true ;
-		this.nextStartPtLegIsFirstOfTrip = true ;
-		this.currentLegIsPtLeg = false;
+		this.ptModes = ptModes;
 		modesAlreadyConsideredForDailyConstants = new HashSet<>();
+	}
+
+	/**
+	 * Scoring with pt modes set to 'pt'
+	 */
+	public CharyparNagelLegScoring(final ScoringParameters params, Network network) {
+		this(params, network, new HashSet<>(Collections.singletonList("pt")));
 	}
 
 	@Override
@@ -149,24 +159,28 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		if ( event instanceof PersonDepartureEvent ) {
 			String mode = ((PersonDepartureEvent)event).getLegMode();
 			
-			this.currentLegIsPtLeg = TransportMode.pt.equals( mode  );
+			this.currentLegIsPtLeg = this.ptModes.contains(mode);
 			if ( currentLegIsPtLeg ) {
 				if ( !this.nextStartPtLegIsFirstOfTrip ) {
-					this.score -= params.modeParams.get(TransportMode.pt).constant ;
+					this.score -= params.modeParams.get(mode).constant ;
 					// (yyyy deducting this again, since is it wrongly added above.  should be consolidated; this is so the code
 					// modification is minimally invasive.  kai, dec'12)
 				}
 				this.nextStartPtLegIsFirstOfTrip = false ;
 			}
 		}
-		
 	}
 
 	@Override
 	public void handleLeg(Leg leg) {
+		Gbl.assertIf( !Time.isUndefinedTime( leg.getDepartureTime() ) ) ;
+		Gbl.assertIf( !Time.isUndefinedTime( leg.getTravelTime() ) );
+
 		double legScore = calcLegScore(leg.getDepartureTime(), leg.getDepartureTime() + leg.getTravelTime(), leg);
+		if ( Double.isNaN( legScore )) {
+			log.error( "dpTime=" + leg.getDepartureTime() + "; ttime=" + leg.getTravelTime() + "; leg=" + leg ) ;
+			throw new RuntimeException("score is NaN") ;
+		}
 		this.score += legScore;
 	}
-
-
 }

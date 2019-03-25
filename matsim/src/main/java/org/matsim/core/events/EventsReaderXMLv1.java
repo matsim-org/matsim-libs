@@ -59,7 +59,7 @@ import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-public final class EventsReaderXMLv1 extends MatsimXmlParser {
+public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 
 	public interface CustomEventMapper<T extends Event> /* extends Function<GenericEvent, T> */ {
 		T apply(GenericEvent event);
@@ -74,7 +74,7 @@ public final class EventsReaderXMLv1 extends MatsimXmlParser {
 		this.events = events;
 		this.setValidating(false);// events-files have no DTD, thus they cannot validate
 	}
-
+	@Override
 	public void addCustomEventMapper(String eventType, CustomEventMapper cem) {
 		customEventMappers.put(eventType, cem);
 	}

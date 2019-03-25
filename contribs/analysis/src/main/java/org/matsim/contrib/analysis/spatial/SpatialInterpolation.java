@@ -1,7 +1,7 @@
 package org.matsim.contrib.analysis.spatial;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.commons.math3.special.Erf;
+import org.locationtech.jts.geom.Coordinate;
 
 public abstract class SpatialInterpolation {
 

@@ -29,7 +29,8 @@ import org.matsim.core.utils.misc.StringUtils;
 /**
  * @author mrieser
  */
-public abstract class CollectionUtils {
+public final class CollectionUtils {
+	private CollectionUtils(){} // to not intantiate
 
 	public static final <T> String idSetToString(final Set<Id<T>> values) {
 		boolean isFirst = true;
@@ -70,11 +71,17 @@ public abstract class CollectionUtils {
 		return str.toString();
 	}
 
+	/**
+	 * tokenizes a {@link String} at commas
+	 */
 	public static final String[] stringToArray(final String values) {
 		Set<String> tmp = stringToSet(values);
 		return tmp.toArray(new String[tmp.size()]);
 	}
 
+	/**
+	 * tokenizes a {@link String} at commas
+	 */
 	public static final Set<String> stringToSet(final String values) {
 		if (values == null) {
 			return Collections.emptySet();
