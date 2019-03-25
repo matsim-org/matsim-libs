@@ -197,15 +197,6 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 		this.timeOfDay = timeOfDay;
 	}
 	
-	@StringGetter(ACCESSIBILITY_DESTINATION_SAMPLING_RATE)
-	public Double getAccessibilityDestinationSamplingRate(){
-		return this.accessibilityDestinationSamplingRate;
-	}
-	@StringSetter(ACCESSIBILITY_DESTINATION_SAMPLING_RATE)
-	public void setAccessibilityDestinationSamplingRate(Double sampleRate){
-		this.accessibilityDestinationSamplingRate = sampleRate;
-	}
-	
     @StringGetter(MEASURE_POINT_GEOMETRY_PROVISION)
     public MeasurePointGeometryProvision getMeasurePointGeometryProvision() {
         return this.measurePointGeometryProvision;
