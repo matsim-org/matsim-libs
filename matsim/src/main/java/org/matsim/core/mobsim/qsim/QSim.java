@@ -546,7 +546,9 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		return this.simTimer;
 	}
 
+	@Deprecated // should be package-private; to be used only from QSimProvider.  kai, mar'19
 	public void addMobsimEngine(MobsimEngine mobsimEngine) {
+
 		// yy in all of the instanceof expressions below, the implementation class needs to be replaced
 		// by a meaningful interface.  kai, oct'17
 		
@@ -583,15 +585,24 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		return this.agentCounter;
 	}
 
-	public void addDepartureHandler(DepartureHandler departureHandler) {
+	void addDepartureHandler(DepartureHandler departureHandler) {
+		// (to be used only from QSimProvider. kai, mar'19)
+
 		if (!(departureHandler instanceof TeleportationEngine)) {
 			// We add the teleportation handler manually later
 			this.departureHandlers.add(departureHandler);
 		}
 	}
 
-	public void addActivityHandler(ActivityHandler activityHandler) {
+	@Deprecated
+		// yyyyyy this does not work as it is probably meant.  The _only_ ActivityHandler is added above as a side effect of adding it as a mobsim engine; this
+		// one here is completely ignored.  kai, mar'19
+	void addActivityHandler(ActivityHandler activityHandler) {
+		// (to be used only from QSimProvider. kai, mar'19)
+
 		this.activityHandlers.add(activityHandler);
+
+
 	}
 
 	/**
@@ -626,6 +637,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		return Collections.unmodifiableMap(this.agents);
 	}
 
+	@Deprecated // should be package-private; to be used only from QSimProvider.  kai, mar'19
 	public void addAgentSource(AgentSource agentSource) {
 		this.agentSources.add(agentSource);
 	}
