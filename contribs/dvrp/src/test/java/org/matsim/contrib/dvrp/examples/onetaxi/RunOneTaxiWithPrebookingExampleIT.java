@@ -70,8 +70,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 
 		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
 
-		QSimComponentsConfigGroup componentsConfig = ConfigUtils.addOrGetModule(config,
-				QSimComponentsConfigGroup.class);
+		QSimComponentsConfigGroup componentsConfig = ConfigUtils.addOrGetModule(config, QSimComponentsConfigGroup.class);
 		for (String component : componentsConfig.getActiveComponents()) {
 			log.info("mobsimComponent=" + component);
 		}
@@ -116,7 +115,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		});
 
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.taxi));
-		// yyyy in the somewhat longer run, would rather not have this in user code.  kai, mar'19
+		// yyyy in the somewhat longer run, would rather not have the components configuration in user code.  kai, mar'19
 
 		if (true) {
 			//			controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
