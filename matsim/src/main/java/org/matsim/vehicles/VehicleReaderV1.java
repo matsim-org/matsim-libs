@@ -98,7 +98,8 @@ class VehicleReaderV1 extends MatsimXmlParser{
 		} else if( VehicleSchemaV1Names.VOLUME.equalsIgnoreCase( name ) ){
 			this.currentFreightCap.setVolume( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.CUBICMETERS ) ) );
 		} else if( VehicleSchemaV1Names.GASCONSUMPTION.equalsIgnoreCase( name ) ){
-			this.currentGasConsumption = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.LITERPERMETER ) );
+		    VehicleUtils.setGasConsumption(this.currentVehType, Double.parseDouble( atts.getValue( VehicleSchemaV1Names.LITERPERMETER ) ));
+//			this.currentGasConsumption = Double.parseDouble( atts.getValue( VehicleSchemaV1Names.LITERPERMETER ) );
 		} else if( VehicleSchemaV1Names.VEHICLE.equalsIgnoreCase( name ) ){
 			Id<VehicleType> typeId = Id.create( atts.getValue( VehicleSchemaV1Names.TYPE ), VehicleType.class );
 			VehicleType type = this.vehicles.getVehicleTypes().get( typeId );
@@ -113,9 +114,11 @@ class VehicleReaderV1 extends MatsimXmlParser{
 			VehicleUtils.setAccessTime(this.currentVehType, Double.parseDouble( atts.getValue( VehicleSchemaV1Names.SECONDSPERPERSON ) ));
 //			this.currentVehType.setAccessTime( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.SECONDSPERPERSON ) ) );
 		} else if( VehicleSchemaV1Names.EGRESSTIME.equalsIgnoreCase( name ) ){
-			this.currentVehType.setEgressTime( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.SECONDSPERPERSON ) ) );
+		    VehicleUtils.setEgressTime(this.currentVehType, Double.parseDouble( atts.getValue( VehicleSchemaV1Names.SECONDSPERPERSON ) ));
+//			this.currentVehType.setEgressTime( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.SECONDSPERPERSON ) ) );
 		} else if( VehicleSchemaV1Names.DOOROPERATION.equalsIgnoreCase( name ) ){
-			this.currentVehType.setDoorOperationMode( this.parseDoorOperationMode( atts.getValue( VehicleSchemaV1Names.MODE ) ) );
+		    VehicleUtils.setDoorOperationMode(this.currentVehType, this.parseDoorOperationMode((atts.getValue(VehicleSchemaV1Names.MODE))));
+//			this.currentVehType.setDoorOperationMode( this.parseDoorOperationMode( atts.getValue( VehicleSchemaV1Names.MODE ) ) );
 		} else if( VehicleSchemaV1Names.PASSENGERCAREQUIVALENTS.equalsIgnoreCase( name ) ){
 			this.currentVehType.setPcuEquivalents( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.PCE ) ) );
 		}
