@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.dvrp.passenger.*;
@@ -156,9 +157,9 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		public synchronized void handleEvent( Event event ) {
 			if (event instanceof ActivityEngineWithWakeup.AgentWakeupEvent) {
 				final ActivityEngineWithWakeup.AgentWakeupEvent ev = (ActivityEngineWithWakeup.AgentWakeupEvent)event;
-				log.info("") ;
-				System.out.println("cnt=" + cnt + "; event=" + event) ;
-				log.info("") ;
+//				System.out.println() ;
+				System.out.println(event) ;
+//				System.out.println("") ;
 				switch (cnt) {
 					case 0:
 					case 1:
@@ -197,9 +198,9 @@ public class RunOneTaxiWithPrebookingExampleIT {
 				cnt++;
 			} else if (event instanceof PassengerRequestScheduledEvent ) {
 				PassengerRequestScheduledEvent ev = (PassengerRequestScheduledEvent)event;
-				log.info("") ;
-				System.out.println("cnt2=" + cnt2 + "; event=" + event) ;
-				log.info("") ;
+//				System.out.println("") ;
+				System.out.println( event) ;
+//				System.out.println(""); ;
 				Assert.assertEquals("taxi_one", ev.getVehicleId().toString());
 				switch (cnt2) {
 					case 0:
@@ -245,6 +246,11 @@ public class RunOneTaxiWithPrebookingExampleIT {
 						break;
 				}
 				cnt2++;
+			} else if ( event instanceof PersonDepartureEvent ) {
+				PersonDepartureEvent ev = (PersonDepartureEvent) event;
+				if ( TransportMode.taxi.equals( ev.getLegMode() ) ) {
+					System.out.println( event ) ;
+				}
 			}
 		}
 

@@ -95,13 +95,13 @@ public final class BookingEngine implements MobsimEngine {
 	}
 
 	public synchronized final void notifyTripInfoRequestSent(MobsimAgent agent, TripInfoRequest tripInfoRequest) {
-		log.warn("entering notifyTripInfoRequestSent with agentId=" + agent.getId());
+//		log.info("entering notifyTripInfoRequestSent with agentId=" + agent.getId());
 		tripInfoRequestMap.put(agent, tripInfoRequest);
 	}
 
 	private void processTripInfoRequests() {
 		for (Map.Entry<MobsimAgent, TripInfoRequest> entry : tripInfoRequestMap.entrySet()) {
-			log.warn("processing tripInfoRequests for agentId=" + entry.getKey().getId());
+//			log.info("processing tripInfoRequests for agentId=" + entry.getKey().getId());
 			Map<TripInfo, TripInfo.Provider> allTripInfos = new LinkedHashMap<>();
 			for (TripInfo.Provider provider : tripInfoProviders.values()) {
 				List<TripInfo> tripInfos = provider.getTripInfos(entry.getValue());
@@ -119,7 +119,7 @@ public final class BookingEngine implements MobsimEngine {
 	}
 
 	private void decide(MobsimAgent agent, Map<TripInfo, TripInfo.Provider> allTripInfos) {
-		log.warn("entering decide for agentId=" + agent.getId());
+//		log.info("entering decide for agentId=" + agent.getId());
 
 		this.population.getPersons().get(agent.getId()).getAttributes().putAttribute(AgentSnapshotInfo.marker, true);
 
