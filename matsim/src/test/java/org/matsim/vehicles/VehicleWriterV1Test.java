@@ -19,6 +19,7 @@
 
 package org.matsim.vehicles;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
@@ -32,6 +33,7 @@ import java.util.Map;
  * @author dgrether
  */
 public class VehicleWriterV1Test extends MatsimTestCase {
+	private static final Logger log = Logger.getLogger( VehicleWriterV1Test.class ) ;
 
 	private static final String TESTXML  = "testVehicles_v1.xml";
 
@@ -50,6 +52,7 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
+
 		//write it
 		MatsimVehicleWriter writer = new MatsimVehicleWriter(vehicles);
 		writer.writeFile(outfileName);

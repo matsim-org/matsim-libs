@@ -20,6 +20,7 @@
 
 package org.matsim.vehicles;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
@@ -29,6 +30,7 @@ import org.matsim.core.gbl.Gbl;
  *
  */
 public class VehicleUtils {
+	private static final Logger log = Logger.getLogger( VehicleUtils.class ) ;
 
 	private static final VehicleType DEFAULT_VEHICLE_TYPE = VehicleUtils.getFactory().createVehicleType(Id.create("defaultVehicleType", VehicleType.class));
 
@@ -74,9 +76,12 @@ public class VehicleUtils {
 	}
 
 	public static double getAccessTime(VehicleType vehicleType) {
-		Gbl.assertNotNull(vehicleType);
-		Gbl.assertNotNull(vehicleType.getAttributes());
-		return (Double) vehicleType.getAttributes().getAttribute(ACCESSTIME);
+		final Object attribute = vehicleType.getAttributes().getAttribute( ACCESSTIME );
+		if ( attribute==null ) {
+			return 1.0 ; // this was the default value in V1; could also return Double-null instead.
+		} else {
+			return (double) attribute ;
+		}
 	}
 
 	public static void setAccessTime(VehicleType vehicleType, double accessTime) {
