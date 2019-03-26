@@ -136,6 +136,11 @@ public class CommandLine {
 		 */
 		public Builder(String[] args) {
 			this.arguments = Arrays.asList(args);
+			for( String argument : this.arguments ){
+				if ( argument==null) {
+					throw new RuntimeException( "one of the entries in args is null; this will not work ..." ) ;
+				}
+			}
 		}
 
 		/**
