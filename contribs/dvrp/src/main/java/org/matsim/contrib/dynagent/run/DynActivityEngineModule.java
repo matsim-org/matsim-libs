@@ -1,5 +1,6 @@
 package org.matsim.contrib.dynagent.run;
 
+import com.google.inject.Singleton;
 import org.matsim.contrib.dvrp.passenger.ActivityEngineWithWakeup;
 import org.matsim.contrib.dvrp.passenger.WakeupGenerator;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -13,10 +14,10 @@ public class DynActivityEngineModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bind(DynActivityEngine.class).asEagerSingleton();
-		bind(ActivityEngineWithWakeup.class).asEagerSingleton();
+		bind(DynActivityEngine.class).in( Singleton.class ) ;
+		bind(ActivityEngineWithWakeup.class).in( Singleton.class ) ;
 		Multibinder.newSetBinder(this.binder(), WakeupGenerator.class);
-		addNamedComponent(DynActivityEngine.class, COMPONENT_NAME);
+		addQSimComponentBinding( COMPONENT_NAME ).to( DynActivityEngine.class );
 	}
 
 	public static void configureComponents(QSimComponentsConfig components) {

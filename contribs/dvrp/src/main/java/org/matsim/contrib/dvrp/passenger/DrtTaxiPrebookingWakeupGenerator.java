@@ -83,12 +83,17 @@ public class DrtTaxiPrebookingWakeupGenerator implements WakeupGenerator {
 				.getAttributes()
 				.getAttribute(PREBOOKING_OFFSET_ATTRIBUTE_NAME);
 
+		if ( prebookingOffset_s == null ) {
+			log.warn("not prebooking") ;
+			return wakeups ;
+		}
+
 		for (Leg drtLeg : findLegsWithModeInFuture(agent, TransportMode.drt)) {
 			//				Double prebookingOffset_s = (Double)drtLeg.getAttributes().getAttribute( PREBOOKING_OFFSET_ATTRIBUTE_NAME );
-			if (prebookingOffset_s == null) {
-				log.warn("not prebooking");
-				continue;
-			}
+//			if (prebookingOffset_s == null) {
+//				log.warn("not prebooking");
+//				continue;
+//			}
 			final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
 			if (prebookingTime < agent.getActivityEndTime()) {
 				// yyyy and here one sees that having this in the activity engine is not very practical
@@ -98,10 +103,10 @@ public class DrtTaxiPrebookingWakeupGenerator implements WakeupGenerator {
 		}
 		for (Leg drtLeg : findLegsWithModeInFuture(agent, TransportMode.taxi)) {
 			//				Double prebookingOffset_s = (Double)drtLeg.getAttributes().getAttribute( PREBOOKING_OFFSET_ATTRIBUTE_NAME );
-			if (prebookingOffset_s == null) {
-				log.warn("not prebooking");
-				continue;
-			}
+//			if (prebookingOffset_s == null) {
+//				log.warn("not prebooking");
+//				continue;
+//			}
 			final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
 			if (prebookingTime < agent.getActivityEndTime()) {
 				// yyyy and here one sees that having this in the activity engine is not very practical
