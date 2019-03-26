@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package org.matsim.vehicles;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
@@ -26,25 +30,20 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author dgrether
  * @author jwjoubert
  */
-public class VehicleWriterV1 extends MatsimXmlWriter {
-
-	private static final Logger log = Logger.getLogger(VehicleWriterV1.class);
-
+public class MatsimVehicleWriter extends MatsimXmlWriter {
+  
+	private static final Logger log = Logger.getLogger(MatsimVehicleWriter.class);
+	
 	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 	private Map<Id<VehicleType>, VehicleType> vehicleTypes;
 	private Map<Id<Vehicle>, Vehicle> vehicles;
 
-	@Deprecated
-	public VehicleWriterV1(Vehicles vehicles) {
-		log.warn("VehiclesV1 is deprecated; Please use MatsimVehicleWriter to always write with the currently supported version");
+	
+	public MatsimVehicleWriter(Vehicles vehicles) {
 		this.vehicleTypes = vehicles.getVehicleTypes();
 		this.vehicles = vehicles.getVehicles();
 	}

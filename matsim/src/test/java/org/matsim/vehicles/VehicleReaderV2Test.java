@@ -38,6 +38,7 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 
 	// todo: test for minimal vehicle (was kann man alles weglassen)?
 	// TODO: FEF, Einlesen und setztn neuer Attributes: DoorOperationm, accessTime,egressTime, doorOperationMode, LitersPerMeter, FreightCapaUnits.
+	// TODO: Use VehicleUtils ... 25.3.19
 
 	public void testBasicParser_v2() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();

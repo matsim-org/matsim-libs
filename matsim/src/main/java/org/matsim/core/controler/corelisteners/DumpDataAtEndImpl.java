@@ -38,7 +38,6 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.network.io.NetworkWriter;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -56,7 +55,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.MatsimVehicleWriter;
 import org.matsim.vehicles.Vehicles;
 
 import java.io.File;
@@ -213,7 +212,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpVehicles() {
 		try {
-			new VehicleWriterV1(vehicles).writeFile(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_VEHICLES));
+			new MatsimVehicleWriter(vehicles).writeFile(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_VEHICLES));
 		} catch ( Exception ee ) {
 			log.error("Exception writing vehicles.", ee);
 		}
@@ -222,7 +221,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private void dumpTransitVehicles() {
 		try {
 			if ( transitVehicles != null ) {
-				new VehicleWriterV1(transitVehicles).writeFile(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_TRANSIT_VEHICLES));
+				new MatsimVehicleWriter(transitVehicles).writeFile(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_TRANSIT_VEHICLES));
 			}
 		} catch ( Exception ee ) {
 			log.error("Exception writing transit vehicles.", ee);

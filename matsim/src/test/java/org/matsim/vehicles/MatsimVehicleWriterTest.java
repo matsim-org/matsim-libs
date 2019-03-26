@@ -31,7 +31,7 @@ import org.matsim.vehicles.VehicleType.DoorOperationMode;
 /**
  * @author dgrether
  */
-public class VehicleWriterV1Test extends MatsimTestCase {
+public class MatsimVehicleWriterTest extends MatsimTestCase {
 
 	private static final String TESTXML  = "testVehicles_v1.xml";
 
@@ -51,7 +51,7 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 		MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		//write it
-		VehicleWriterV1 writer = new VehicleWriterV1(vehicles);
+		MatsimVehicleWriter writer = new MatsimVehicleWriter(vehicles);
 		writer.writeFile(outfileName);
 		assertTrue(new File(outfileName).exists()); 
 		//read it again
