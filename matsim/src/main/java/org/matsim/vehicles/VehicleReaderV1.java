@@ -110,7 +110,8 @@ class VehicleReaderV1 extends MatsimXmlParser{
 			Vehicle v = this.builder.createVehicle( id, type );
 			this.vehicles.addVehicle( v );
 		} else if( VehicleSchemaV1Names.ACCESSTIME.equalsIgnoreCase( name ) ){
-			this.currentVehType.setAccessTime( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.SECONDSPERPERSON ) ) );
+			VehicleUtils.setAccessTime(this.currentVehType, Double.parseDouble( atts.getValue( VehicleSchemaV1Names.SECONDSPERPERSON ) ));
+//			this.currentVehType.setAccessTime( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.SECONDSPERPERSON ) ) );
 		} else if( VehicleSchemaV1Names.EGRESSTIME.equalsIgnoreCase( name ) ){
 			this.currentVehType.setEgressTime( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.SECONDSPERPERSON ) ) );
 		} else if( VehicleSchemaV1Names.DOOROPERATION.equalsIgnoreCase( name ) ){
