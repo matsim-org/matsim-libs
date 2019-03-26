@@ -17,14 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.passenger;
-
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.PriorityBlockingQueue;
-
-import javax.inject.Inject;
+package org.matsim.core.mobsim.qsim;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -32,14 +25,19 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
+import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.PriorityBlockingQueue;
+
 public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	private final EventsManager eventsManager;
-	private final Set<WakeupGenerator> wakeupGenerators;
+	private DrtTaxiPrebookingWakeupGenerator wakeupGenerator ;
 	private ActivityEngine delegate;
 
 	private final Queue<AgentEntry> wakeUpList = new PriorityBlockingQueue<>(500, (o1, o2) -> {
@@ -48,10 +46,10 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	});
 
 	@Inject
-	ActivityEngineWithWakeup(EventsManager eventsManager, Set<WakeupGenerator> wakeupGenerators) {
+	ActivityEngineWithWakeup(EventsManager eventsManager, DrtTaxiPrebookingWakeupGenerator wakeupGenerator ) {
 		this.delegate = new ActivityEngine(eventsManager);
 		this.eventsManager = eventsManager;
-		this.wakeupGenerators = wakeupGenerators;
+		this.wakeupGenerator = wakeupGenerator ;
 	}
 
 	@Override
@@ -89,9 +87,9 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
-		for (WakeupGenerator generator : wakeupGenerators) {
-			generator.generateWakeups(agent)
-					.forEach(wakeup -> wakeUpList.add(new AgentEntry(agent, wakeup.getLeft(), wakeup.getRight())));
+		Map<Double, AgentWakeup> result = wakeupGenerator.generateWakeups( agent );
+		for( Map.Entry<Double, AgentWakeup> entry : result.entrySet() ){
+			wakeUpList.add( new AgentEntry( agent, entry.getKey(), entry.getValue() ) ) ;
 		}
 
 		return delegate.handleActivity(agent);

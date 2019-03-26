@@ -11,6 +11,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import com.google.inject.name.Named;
+import org.matsim.core.mobsim.qsim.BookingEngine;
 
 public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 	public PassengerEngineQSimModule(String mode) {

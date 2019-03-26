@@ -18,16 +18,10 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.passenger;
+package org.matsim.core.mobsim.qsim;
 
-import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-
-import org.apache.commons.lang3.tuple.Pair;
+import com.google.inject.Inject;
+import com.sun.tools.javac.util.Pair;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -47,9 +41,11 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
-import com.google.inject.Inject;
+import java.util.*;
 
-public class DrtTaxiPrebookingWakeupGenerator implements WakeupGenerator {
+import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
+
+public class DrtTaxiPrebookingWakeupGenerator {
 	// yyyyyy I would very much rather have this as passenger agent behavior, not as drt behavior.  Maybe the drt forces me to prebook until xyz before pickup, but it is the
 	// decision of the passenger when he/she actually executes the prebooking.  Maybe there are also different prices associated with different prebooking times, then this
 	// becomes even clearer.  kai, mar'19
@@ -70,14 +66,13 @@ public class DrtTaxiPrebookingWakeupGenerator implements WakeupGenerator {
 		this.bookingEngine = bookingEngine;
 	}
 
-	@Override
-	public List<Pair<Double, ActivityEngineWithWakeup.AgentWakeup>> generateWakeups(MobsimAgent agent) {
+	public Map<Double, ActivityEngineWithWakeup.AgentWakeup> generateWakeups( MobsimAgent agent ) {
 		if (!(agent instanceof HasModifiablePlan)) {
 			// (we don't want to treat DvrpAgents, CarrierAgents, TransitVehicleDrivers etc. here)
-			return Collections.emptyList();
+			return Collections.emptyMap();
 		}
 
-		List<Pair<Double, ActivityEngineWithWakeup.AgentWakeup>> wakeups = new ArrayList<>();
+		Map<Double, ActivityEngineWithWakeup.AgentWakeup> wakeups = new TreeMap<>(  ) ;
 
 		Double prebookingOffset_s = (Double)((PlanAgent)agent).getCurrentPlan()
 				.getAttributes()
@@ -95,10 +90,15 @@ public class DrtTaxiPrebookingWakeupGenerator implements WakeupGenerator {
 //				continue;
 //			}
 			final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
-			if (prebookingTime < agent.getActivityEndTime()) {
+			if (prebookingTime < agent.getActivityEndTime()){
 				// yyyy and here one sees that having this in the activity engine is not very practical
-				log.info("adding agent to wakeup list");
-				wakeups.add(Pair.of(prebookingTime, (agent1, now) -> wakeUpAgent(agent1, now, drtLeg)));
+				log.info( "adding agent to wakeup list" );
+				wakeups.put( prebookingTime, new ActivityEngineWithWakeup.AgentWakeup(){
+					@Override
+					public void wakeUp( MobsimAgent agent, double now ){
+						wakeUpAgent( agent, now, drtLeg );
+					}
+				} );
 			}
 		}
 		for (Leg drtLeg : findLegsWithModeInFuture(agent, TransportMode.taxi)) {
@@ -111,7 +111,12 @@ public class DrtTaxiPrebookingWakeupGenerator implements WakeupGenerator {
 			if (prebookingTime < agent.getActivityEndTime()) {
 				// yyyy and here one sees that having this in the activity engine is not very practical
 				log.info("adding agent to wakeup list");
-				wakeups.add(Pair.of(prebookingTime, (agent1, now) -> wakeUpAgent(agent1, now, drtLeg)));
+				wakeups.put( prebookingTime, new ActivityEngineWithWakeup.AgentWakeup(){
+					@Override
+					public void wakeUp( MobsimAgent agent, double now ){
+						wakeUpAgent( agent, now, drtLeg );
+					}
+				} );
 			}
 		}
 		return wakeups;
