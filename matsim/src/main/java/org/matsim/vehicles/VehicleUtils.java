@@ -21,6 +21,7 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.Gbl;
 
 
 /**
@@ -33,9 +34,9 @@ public class VehicleUtils {
 
 	// should remain under the hood --> should remain private
 	private static final String DOOR_OPERATION_MODE = "doorOperationMode" ;
-	private static final String EGRESSTIME = "egressTime";
-	private static final String ACCESSTIME = "accessTime";
-	private static final String GASCONSUMPTION = "gasConsumption";
+	private static final String EGRESSTIME = "egressTimeInSecondsPerPerson";
+	private static final String ACCESSTIME = "accessTimeInSecondsPerPerson";
+	private static final String GASCONSUMPTION = "gasConsumptionLitersPerMeter";
 	private static final String FREIGHT_CAPACITY_UNITS = "freightCapacityInUnits";
 
 	static {
@@ -73,6 +74,8 @@ public class VehicleUtils {
 	}
 
 	public static double getAccessTime(VehicleType vehicleType) {
+		Gbl.assertNotNull(vehicleType);
+		Gbl.assertNotNull(vehicleType.getAttributes());
 		return (Double) vehicleType.getAttributes().getAttribute(ACCESSTIME);
 	}
 

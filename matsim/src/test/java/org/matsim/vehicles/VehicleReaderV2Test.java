@@ -85,6 +85,9 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 //		assertEquals("serial", vehTypeNormalCar.getAttributes().getAttribute("doorOperationMode"));  //TODO: make compatible
 		assertEquals(0.23, (double) vehTypeNormalCar.getAttributes().getAttribute("fuelConsumptionLiterPerMeter"), EPSILON);
 
+		assertEquals(23.23, vehTypeNormalCar.getAccessTime(), EPSILON); //Muss failen, da nur über Attributes eingelesen wird (v2)
+//		assertEquals(0.23, vehTypeNormalCar.getEngineInformation().getGasConsumption(),EPSILON);
+
 
 		VehicleType vehTypeDefaultCar = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
 //		assertNotNull(vehTypeDefaultCar);
@@ -110,8 +113,6 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 
 		assertNotNull(vehicles.get(id42_23));
 		assertEquals(id42_23, vehicles.get(id42_23).getId());
-
-
 	}
 
 }
