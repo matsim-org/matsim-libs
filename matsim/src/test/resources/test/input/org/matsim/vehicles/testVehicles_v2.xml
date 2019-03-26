@@ -8,6 +8,13 @@
   <attributes>
     <attribute name="Attribute1" class="java.lang.String">abc</attribute>
     <attribute name="Attribute2" class="java.lang.Double">1.3</attribute>
+    <attribute name="fuelConsumptionLiterPerMeter" class="java.lang.Double">0.23</attribute>
+    <attribute name="freightCapacityInUnits" class="java.lang.Integer">200</attribute>
+    <attribute name="accessTimeInSeconds" class="java.lang.Double">23.23</attribute>
+    <attribute name="egressTimeInSeconds" class="java.lang.Double">42.42</attribute>
+    <attribute name="doorOperationMode" class="java.lang.String">parallel</attribute>
+
+
   </attributes>
   <description></description>
   <!-- capacity including driver -->
@@ -17,7 +24,6 @@
     <freightCapacity>
       <volume cubicMeters="23.23"/>
       <weight tons="9.5"/>
-      <unit units="200"/>
     </freightCapacity>
   </capacity>
   <length meter="9.5" />
@@ -25,14 +31,10 @@
   <maximumVelocity meterPerSecond="42" />
   <engineInformation>
     <fuelType>diesel</fuelType>
-    <gasConsumption literPerMeter="0.23"/>
   </engineInformation>
   <costsInformation>
-    <costInformation fixedCosts="100.00" costsPerMeter="0.15" costsPerSecond="0.08"/>
+    <costInformation fixedCostsPerDay="100.00" costsPerMeter="0.15" costsPerSecond="0.08"/>
   </costsInformation>
-  <accessTime secondsPerPerson="23.23" />
-  <egressTime secondsPerPerson="42.42" />
-  <doorOperation mode="parallel" />
   <passengerCarEquivalents pce="2.0" />
 </vehicleType>
 

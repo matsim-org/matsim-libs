@@ -43,7 +43,7 @@ public interface VehicleSchemaV2Names {
 	public static final String WIDTH = "width";
 	public static final String COSTINFORMATION = "costInformation";
 	public static final String COSTSINFORMATION = "costsInformation";
-	public static final String FIXEDCOSTSPERDAY = "fixedCosts";
+	public static final String FIXEDCOSTSPERDAY = "fixedCostsPerDay";
 	public static final String COSTSPERMETER = "costsPerMeter";
 	public static final String COSTSPERSECOND = "costsPerSecond";
 	public static final String MAXIMUMVELOCITY = "maximumVelocity";
