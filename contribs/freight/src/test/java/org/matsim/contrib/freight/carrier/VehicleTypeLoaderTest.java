@@ -22,11 +22,8 @@ package org.matsim.contrib.freight.carrier;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.MatsimVehicleReader;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
-
-import javax.measure.unit.SystemOfUnits;
 
 /**
  *  Test for using the usual vehicles / vehicle types (v2) format.
