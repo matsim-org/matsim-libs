@@ -36,7 +36,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
 
 /**
  * This calculates transport-times and transport-costs to cover the distance from one location to another. 
@@ -93,7 +92,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		}
 
 		private VehicleType makeType(String typeId, double maxVelocity) {
-			VehicleTypeImpl vehicleTypeImpl = new VehicleTypeImpl(Id.create(typeId, org.matsim.vehicles.VehicleType.class));
+			VehicleType vehicleTypeImpl = new VehicleType(Id.create(typeId, org.matsim.vehicles.VehicleType.class ));
 			vehicleTypeImpl.setMaximumVelocity(maxVelocity);
 			return vehicleTypeImpl;
 		}

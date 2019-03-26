@@ -20,103 +20,152 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.utils.objectattributes.attributable.Attributable;
-
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author dgrether
  */
-public interface VehicleType extends Attributable{
-	
-	public enum DoorOperationMode {serial, parallel}
+public class VehicleType{
 
-	public void setDescription(String desc);
-
-	public void setLength(double length);
-
-	public void setWidth(double width);
-
-	public void setMaximumVelocity(double meterPerSecond);
-
-	public void setEngineInformation(EngineInformation currentEngineInfo);
-
-	public void setCostInformation(CostInformation costInformation);
-
-	public void setFreightCapacity(FreightCapacity freightCapacity);
-
-	public void setCapacity(VehicleCapacity capacity);
-
-	public double getWidth();
-
-	public double getMaximumVelocity();
-	
-	public double getLength();
-	
-	public EngineInformation getEngineInformation();
-
-	public CostInformation getCostInformation();
-
-	public FreightCapacity getFreightCapacity();
-	
-	public String getDescription();
+	private double width = 1.0;
+	private double maxVelocity = Double.POSITIVE_INFINITY; // default: constrained only by the link speed
+	private double length = 7.5;
+    private double pcuEquivalents = 1.0;
+    private double flowEfficiencyFactor = 1.0;
+	private EngineInformation engineInformation;
+	private CostInformation costInformation;		//TODO: Needs to be created, kmt feb19
+	private FreightCapacity freightCapacity;
+	private String description;
+	private VehicleCapacity capacity;
 	
 	/**
-	 * Comments:<ul>
-	 * <li> What happens with multi-vehicle trains?  I assume they need to be defined as a single vehicle?  kai, jul'11
-	 * </ul>
+	 * default from xml schema
 	 */
-	public VehicleCapacity getCapacity();
-	
-	public Id<VehicleType> getId();
+	private double accessTime = 1.0;
 	
 	/**
-	 * Comments:<ul>
-	 * <li> In my understanding, ``access'' time is the time to reach the public transit system (e.g. by walking).  
-	 * See, e.g., http://en.wikipedia.org/wiki/Public_Transport_Accessibility_Level .  It is thus not the same as
-	 * the time for one person to enter the vehicle.  Or is there an alternative definition somewhere? kai, jul'11
-	 * <li> Even if this is understood as the time per person to enter the vehicle, it needs to be clear that this is, at
-	 * best, the emtpy vehicle entering time, and there may be additional functions computing longer vehicle entering times 
-	 * when the vehicle is full. kai, jul'11
-	 * <li> Finally, the time needs to be understood as capacitated.  I.e. when there are enough doors so that 9 passengers
-	 * can enter the vehicle per second, then this time should be 1/9=0.111. kai, jul'11
-	 * </ul>
+	 * default from xml schema
 	 */
-	@Deprecated
-	public double getAccessTime();
-	
-	/**
-	 * See comments under getter.
-	 */
-	@Deprecated
-	public void setAccessTime(double seconds);
-	
-	/**
-	 * Comments:<ul>
-	 * <li> In my understanding, ``egress'' time is either the time from the vehicle to the final destination
-	 * (e.g. http://www.worldtransitresearch.info/research/1507/ ), or 
-	 * the time that is necessary to evacuate the vehicle.  Both definitions are decidedly not the same as the 
-	 * time for one person to leave the vehicle.  kai, jul'11  
-	 * <li> Also see remarks under getAccessTime() .
-	 * </ul>
-	 */
-	@Deprecated
-	public double getEgressTime();
-	
-	/**
-	 * See comments under getter.
-	 */
-	@Deprecated
-	public void setEgressTime(double seconds);
-	
-	public DoorOperationMode getDoorOperationMode();
-	
-	public void setDoorOperationMode(DoorOperationMode mode);
-	
-	public double getPcuEquivalents();
+	private double egressTime = 1.0;
 
-	public void setPcuEquivalents(double pcuEquivalents);
+	private Id<VehicleType> id;
 
-    public double getFlowEfficiencyFactor();
+	public enum DoorOperationMode { serial, parallel }
+	private DoorOperationMode doorOperationMode = DoorOperationMode.serial;
 
-	public void setFlowEfficiencyFactor(double flowEfficiencyFactor);
+	private final Attributes attributes = new Attributes();
+
+	public VehicleType( Id<VehicleType> typeId ) {
+		this.id = typeId;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public VehicleCapacity getCapacity() {
+		return capacity;
+	}
+
+	public Id<VehicleType> getId() {
+		return id;
+	}
+
+	public double getAccessTime() {
+//		return this.accessTime;
+		return VehicleUtils.getAccessTime(this);
+	}
+
+	public double getEgressTime() {
+//		return this.egressTime;
+		return VehicleUtils.getEgressTime(this);
+	}
+
+	public void setAccessTime(double seconds) {
+//		this.accessTime = seconds;
+		VehicleUtils.setAccessTime(this, seconds);
+	}
+
+	public void setEgressTime(double seconds) {
+//		this.egressTime = seconds;
+		VehicleUtils.setEgressTime(this, seconds);
+	}
+
+	public DoorOperationMode getDoorOperationMode() {
+//		return this.doorOperationMode;
+		return VehicleUtils.getDoorOperationMode( this ) ;
+	}
+
+	public void setDoorOperationMode(DoorOperationMode mode) {
+//		this.doorOperationMode = mode;
+		VehicleUtils.setDoorOperationMode( this, mode ) ;
+	}
+
+    public double getPcuEquivalents() {
+        return pcuEquivalents;
+    }
+
+    public void setPcuEquivalents(double pcuEquivalents) {
+        this.pcuEquivalents = pcuEquivalents;
+    }
+
+    public double getFlowEfficiencyFactor() {
+        return flowEfficiencyFactor;
+    }
+
+    public void setFlowEfficiencyFactor(double flowEfficiencyFactor) {
+        this.flowEfficiencyFactor = flowEfficiencyFactor;
+    }
+
+	public Attributes getAttributes() {
+		return attributes ;
+    }
+
+	public void setCapacity(VehicleCapacity capacity) {
+		this.capacity = capacity;
+	}
+
+	public void setDescription(String desc) {
+		this.description = desc;
+	}
+
+	public void setEngineInformation(EngineInformation engineInformation) {
+		this.engineInformation = engineInformation;
+	}
+
+	public void setFreightCapacity(FreightCapacity freightCapacity) { this.freightCapacity = freightCapacity; }
+
+	public void setCostInformation(CostInformation costInformation) {this.costInformation = costInformation; }
+
+	public void setLength(double length) {
+		this.length = length;
+	}
+
+	public void setMaximumVelocity(double meterPerSecond) {
+		this.maxVelocity = meterPerSecond;
+	}
+
+	public void setWidth(double width) {
+		this.width = width;
+	}
+
+	public double getWidth() {
+		return width;
+	}
+
+	public double getMaximumVelocity() {
+		return maxVelocity;
+	}
+
+	public double getLength() {
+		return length;
+	}
+
+	public EngineInformation getEngineInformation() {
+		return engineInformation;
+	}
+
+	public CostInformation getCostInformation() { return costInformation;	}
+
+	public FreightCapacity getFreightCapacity() { return freightCapacity;	}
 }

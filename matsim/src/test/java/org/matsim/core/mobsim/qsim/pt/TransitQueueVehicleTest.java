@@ -27,7 +27,6 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
 
 /**
  * @author mrieser
@@ -40,8 +39,8 @@ public class TransitQueueVehicleTest extends AbstractTransitVehicleTest {
 	}
 
 	public void testSizeInEquivalents() {
-		VehicleType carType = new VehicleTypeImpl(Id.create("carType", VehicleType.class));
-		VehicleType busType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
+		VehicleType carType = new VehicleType(Id.create("carType", VehicleType.class ));
+		VehicleType busType = new VehicleType(Id.create("busType", VehicleType.class ));
 		busType.setPcuEquivalents(2.5);
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));

@@ -89,7 +89,6 @@ import org.matsim.testcases.utils.LogCounter;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
 
 @RunWith(Parameterized.class)
 public class QSimTest {
@@ -1043,7 +1042,7 @@ public class QSimTest {
 		NetsimLink qlink2 = qnet.getNetsimLink(Id.create(2, Link.class));
 		NetsimLink qlink3 = qnet.getNetsimLink(Id.create(3, Link.class));
 
-		VehicleType defaultVehicleType = new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class));
+		VehicleType defaultVehicleType = new VehicleType(Id.create("defaultVehicleType", VehicleType.class ));
 		QVehicle vehicle1 = new QVehicleImpl(new VehicleImpl(Id.create(1, Vehicle.class), defaultVehicleType));
 		QVehicle vehicle2 = new QVehicleImpl(new VehicleImpl(Id.create(2, Vehicle.class), defaultVehicleType));
 		sim.addParkedVehicle(vehicle1, Id.create(2, Link.class));

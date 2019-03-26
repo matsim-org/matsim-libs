@@ -32,7 +32,6 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
 
 
 /**
@@ -45,7 +44,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 	protected abstract TransitVehicle createTransitVehicle(final Vehicle vehicle);
 
 	public void testInitialization_SeatAndStandCapacity() {
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
+		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		capacity.setStandingRoom(Integer.valueOf(2));
@@ -57,7 +56,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 	}
 
 	public void testInitialization_SeatOnlyCapacity() {
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
+		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(4));
 		vehType.setCapacity(capacity);
@@ -68,7 +67,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 	}
 
 	public void testInitialization_NoCapacity() {
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
+		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
 		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
 		try {
 			createTransitVehicle(vehicle);
@@ -80,7 +79,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 	}
 
 	public void testAddPassenger() {
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
+		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
@@ -102,7 +101,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 	}
 
 	public void testRemovePassenger() {
-		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
+		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);

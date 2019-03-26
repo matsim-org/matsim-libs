@@ -3,7 +3,6 @@ package org.matsim.contrib.freight.carrier;
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
 
 /**
  * The carrier vehicle type.
@@ -204,7 +203,7 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 	private int capacity;
 	
 	private CarrierVehicleType(Builder builder){
-		super(new VehicleTypeImpl(builder.typeId));
+		super(new VehicleType(builder.typeId) );
 		this.vehicleCostInformation = new VehicleCostInformation(builder.fix, builder.perDistanceUnit, builder.perTimeUnit);
 		if(builder.engineInfo != null) super.setEngineInformation(builder.engineInfo);
 		if(builder.description != null) super.setDescription(builder.description);

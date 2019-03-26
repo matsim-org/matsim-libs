@@ -66,7 +66,6 @@ import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
 
 
 /**
@@ -333,14 +332,14 @@ public final class QLinkTest extends MatsimTestCase {
 		dummify((QNetwork) queueNetwork);
 		QLinkImpl qlink = (QLinkImpl) queueNetwork.getNetsimLink(Id.create("1", Link.class));
 
-		QVehicle v1 = new QVehicleImpl(new VehicleImpl(Id.create("1", Vehicle.class), new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class))));
+		QVehicle v1 = new QVehicleImpl(new VehicleImpl(Id.create("1", Vehicle.class), new VehicleType(Id.create("defaultVehicleType", VehicleType.class ))));
 		Person p = createPerson(Id.createPersonId(1), scenario, link1, link2);
 		PersonDriverAgentImpl pa1 = createAndInsertPersonDriverAgentImpl(p, qsim);
 		v1.setDriver(pa1);
 		pa1.setVehicle(v1);
 		pa1.endActivityAndComputeNextState(0);
 
-		QVehicle v2 = new QVehicleImpl(new VehicleImpl(Id.create("2", Vehicle.class), new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class))));
+		QVehicle v2 = new QVehicleImpl(new VehicleImpl(Id.create("2", Vehicle.class), new VehicleType(Id.create("defaultVehicleType", VehicleType.class ))));
 		Person p2 = createPerson( Id.createPersonId(2),scenario,link1, link2) ;
 		PersonDriverAgentImpl pa2 = createAndInsertPersonDriverAgentImpl(p2, qsim);
 		v2.setDriver(pa2);
@@ -428,10 +427,10 @@ public final class QLinkTest extends MatsimTestCase {
 	
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
-		VehicleType defaultVehType = new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class));
-		VehicleType mediumVehType = new VehicleTypeImpl(Id.create("mediumVehicleType", VehicleType.class));
+		VehicleType defaultVehType = new VehicleType(Id.create("defaultVehicleType", VehicleType.class ));
+		VehicleType mediumVehType = new VehicleType(Id.create("mediumVehicleType", VehicleType.class ));
 		mediumVehType.setPcuEquivalents(2.5);
-		VehicleType largeVehType = new VehicleTypeImpl(Id.create("largeVehicleType", VehicleType.class));
+		VehicleType largeVehType = new VehicleType(Id.create("largeVehicleType", VehicleType.class ));
 		largeVehType.setPcuEquivalents(5);
 		
 		double now = 0.0 ;
@@ -630,7 +629,7 @@ public final class QLinkTest extends MatsimTestCase {
             this.qlink1 = (QLinkImpl) this.queueNetwork.getNetsimLink(Id.create("1", Link.class));
             this.qlink2 = (QLinkImpl) this.queueNetwork.getNetsimLink(Id.create("2", Link.class));
             dummify(this.queueNetwork);
-			this.basicVehicle = new VehicleImpl(Id.create("1", Vehicle.class), new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class)));
+			this.basicVehicle = new VehicleImpl(Id.create("1", Vehicle.class), new VehicleType(Id.create("defaultVehicleType", VehicleType.class )));
 		}
 
 	}

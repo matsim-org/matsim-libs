@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
 
 import com.google.inject.name.Names;
 /**
@@ -45,7 +44,7 @@ public class AvIncreasedCapacityModule extends AbstractModule {
 	 *                               A factor below 1 would mean that more capacity is used.
 	 */
 	public AvIncreasedCapacityModule(double flowEfficiencyFactor) {
-		this(flowEfficiencyFactor, new VehicleTypeImpl(Id.create("autonomousVehicleType", VehicleType.class)));
+		this(flowEfficiencyFactor, new VehicleType(Id.create("autonomousVehicleType", VehicleType.class )) );
 	}
 
 	public AvIncreasedCapacityModule(double flowEfficiencyFactor, VehicleType vehicleType) {

@@ -4,12 +4,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.*;
 
-public class ForwardingVehicleType implements VehicleType{
+public class ForwardingVehicleType extends VehicleType{
 
 	private VehicleType vType;
 	
 	public ForwardingVehicleType(VehicleType vType) {
-		super();
+//		super();
+		super( vType.getId() ) ;
 		this.vType = vType;
 	}
 

@@ -86,7 +86,6 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
@@ -561,7 +560,7 @@ public class TransitQueueSimulationTest {
                     		TestHandleStopSimulation.this.route, TestHandleStopSimulation.this.departure, 
                     		transitEngine.getAgentTracker(), transitEngine);
 
-                    VehicleType vehicleType = new VehicleTypeImpl(Id.create("transitVehicleType", VehicleType.class));
+                    VehicleType vehicleType = new VehicleType(Id.create("transitVehicleType", VehicleType.class ));
                     VehicleCapacity capacity = new VehicleCapacityImpl();
                     capacity.setSeats(101);
                     capacity.setStandingRoom(0);

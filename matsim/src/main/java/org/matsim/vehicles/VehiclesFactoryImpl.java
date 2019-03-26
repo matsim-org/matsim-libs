@@ -44,7 +44,7 @@ class VehiclesFactoryImpl implements VehiclesFactory {
 	
 	@Override
 	public VehicleType createVehicleType(Id<VehicleType> typeId) {
-			VehicleType veh = new VehicleTypeImpl(typeId);
+			VehicleType veh = new VehicleType(typeId);
 			return veh;
 	}
 
