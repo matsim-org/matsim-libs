@@ -110,8 +110,6 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	private WithinDayEngine withindayEngine = null;
 
-	private ActivityHandler activityEngine;
-
 	private final Date realWorldStarttime = new Date();
 	private double stopTime = 100 * 3600;
 	private final MobsimListenerManager listenerManager;
@@ -128,6 +126,8 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private long startTime = 0;
 	private long qSimInternalTime = 0;
 	private final Map<MobsimEngine, AtomicLong> mobsimEngineRunTimes;
+	private ActivityEngine activityEngine;
+
 	{
 		if (analyzeRunTimes) this.mobsimEngineRunTimes = new HashMap<>();
 		else this.mobsimEngineRunTimes = null;
@@ -164,11 +164,6 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			return null;
 		}
 
-		@Override
-		public synchronized List<DepartureHandler> getDepartureHandlers() {
-			return departureHandlers ;
-		}
-
 //		@Override
 //		@Deprecated // use same method from QSim directly and try to get rid of the handle to internal interface. kai, mar'15
 //		public void rescheduleActivityEnd(MobsimAgent agent) {
@@ -187,7 +182,9 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	
 	@Override
 	public final void rescheduleActivityEnd(MobsimAgent agent) {
-		this.activityEngine.rescheduleActivityEnd(agent);
+		for( ActivityHandler activityHandler : this.activityHandlers ){
+			activityHandler.rescheduleActivityEnd( agent );
+		}
 	}
 
 	/**
@@ -220,9 +217,12 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	@Override
 	public void run() {
 		try {
-			// Teleportation must be last (default) departure handler, so add it
-			// only before running.
+			// Teleportation must be last (default) departure handler, so add it only before running:
 			this.departureHandlers.add(this.teleportationEngine);
+
+			// ActivityEngine must be last (=default) activity handler, so add it only before running:
+			this.activityHandlers.add( this.activityEngine ) ;
+
 			prepareSim();
 			this.listenerManager.fireQueueSimulationInitializedEvent();
 
@@ -546,9 +546,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		return this.simTimer;
 	}
 
-	@Deprecated // should be package-private; to be used only from QSimProvider.  kai, mar'19
 	public void addMobsimEngine(MobsimEngine mobsimEngine) {
-
 		// yy in all of the instanceof expressions below, the implementation class needs to be replaced
 		// by a meaningful interface.  kai, oct'17
 		
@@ -562,9 +560,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		if ( mobsimEngine instanceof AgentTracker ) {
 			agentTrackers.add((AgentTracker) mobsimEngine);
 		}
-		if (mobsimEngine instanceof ActivityHandler) {
-			this.activityEngine = (ActivityHandler) mobsimEngine;
+		if (mobsimEngine instanceof ActivityEngine) {
+			this.activityEngine = (ActivityEngine) mobsimEngine;
 		}
+
 		if (mobsimEngine instanceof NetsimEngine) {
 			this.netEngine = (NetsimEngine) mobsimEngine;
 		}
@@ -585,24 +584,18 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		return this.agentCounter;
 	}
 
-	void addDepartureHandler(DepartureHandler departureHandler) {
-		// (to be used only from QSimProvider. kai, mar'19)
-
+	public void addDepartureHandler(DepartureHandler departureHandler) {
 		if (!(departureHandler instanceof TeleportationEngine)) {
 			// We add the teleportation handler manually later
 			this.departureHandlers.add(departureHandler);
 		}
 	}
 
-	@Deprecated
-		// yyyyyy this does not work as it is probably meant.  The _only_ ActivityHandler is added above as a side effect of adding it as a mobsim engine; this
-		// one here is completely ignored.  kai, mar'19
-	void addActivityHandler(ActivityHandler activityHandler) {
-		// (to be used only from QSimProvider. kai, mar'19)
-
-		this.activityHandlers.add(activityHandler);
-
-
+	public void addActivityHandler(ActivityHandler activityHandler) {
+		if ( ! ( activityHandler instanceof ActivityEngine ) ){
+			// We add the ActivityEngine manually later
+			this.activityHandlers.add( activityHandler );
+		}
 	}
 
 	/**
@@ -637,7 +630,6 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		return Collections.unmodifiableMap(this.agents);
 	}
 
-	@Deprecated // should be package-private; to be used only from QSimProvider.  kai, mar'19
 	public void addAgentSource(AgentSource agentSource) {
 		this.agentSources.add(agentSource);
 	}

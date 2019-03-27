@@ -30,24 +30,28 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
+import org.matsim.core.mobsim.qsim.DefaultActivityEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
+/**
+ * DynActivityEngine and ActivityEngine could be decoupled (if we can ensure DynActivityEngine's handleActivity() is
+ * called before that of ActivityEngine)
+ */
 public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 	private InternalInterface internalInterface;
-	private final ActivityHandler activityEngine;
+	private final DefaultActivityEngine activityEngine;
 
 	private final List<DynAgent> dynAgents = new LinkedList<>();
 	private final List<DynAgent> newDynAgents = new ArrayList<>();// will to be handled in the next timeStep
 
-	public interface ActivityEngineDelegate4Drt extends ActivityHandler, MobsimEngine {}
-
 	@Inject
-	DynActivityEngine( ActivityHandler activityHandler ) {
-		this.activityEngine = activityHandler ;
+	public DynActivityEngine(EventsManager eventsManager) {
+		this.activityEngine = new DefaultActivityEngine(eventsManager);
 	}
 
 	// See handleActivity for the reason for this.
@@ -81,10 +85,7 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 			// TODO what if not activity?
 		}
 
-		if ( activityEngine instanceof MobsimEngine ){
-			// (there is currently no interface that combines ActivityHandler and MobsimEngine.  Maybe to be changed eventually.  kai, mar'19)
-			((MobsimEngine)activityEngine).doSimStep( time );
-		}
+		activityEngine.doSimStep(time);
 	}
 
 	@Override
@@ -121,18 +122,14 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 
 	@Override
 	public void afterSim() {
-		if ( activityEngine instanceof MobsimEngine ){
-			((MobsimEngine)activityEngine).afterSim();
-		}
+		activityEngine.afterSim();
 		dynAgents.clear();
 	}
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-		if ( activityEngine instanceof MobsimEngine ){
-			((MobsimEngine)activityEngine).setInternalInterface( internalInterface );
-		}
+		activityEngine.setInternalInterface(internalInterface);
 	}
 
 	private void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
@@ -145,9 +142,7 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 
 	@Override
 	public void onPrepareSim() {
-		if ( activityEngine instanceof MobsimEngine ){
-			((MobsimEngine)activityEngine).onPrepareSim();
-		}
+		activityEngine.onPrepareSim();
 	}
 
 	@Override
