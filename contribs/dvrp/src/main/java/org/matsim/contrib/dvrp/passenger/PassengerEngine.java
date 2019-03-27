@@ -44,8 +44,8 @@ import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.PreplanningEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.PreplanningEngine;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -143,13 +143,9 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		// this is the handle by which the passenger can accept.  This would, we think, easiest go to a container that keeps track of unconfirmed
 		// offers.  We cannot say if advanceRequestStorage is the correct container for this, probably not and you will need yet another one.
 		double now = mobsimTimer.getTimeOfDay();
-		if (tripInfo.getExpectedBoardingTime() <= now) {
-			throw new IllegalStateException("This is not an advance request");
-		}
 
-		//TODO have not decided yet how VrpOptimizer determines if request is prebooked, maybe boardingTime > now??
 		PassengerRequest request = createValidateAndSubmitRequest(passenger, tripInfo.getPickupLocation().getLinkId(),
-				tripInfo.getDropoffLocation().getLinkId(), tripInfo.getExpectedBoardingTime(), now);
+				tripInfo.getDropoffLocation().getLinkId(), tripInfo.getExpectedBoardingTime(), now, true);
 		advanceRequestStorage.storeRequest(request);
 	}
 
@@ -169,7 +165,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 
 		if (prebookedRequests.isEmpty()) {// this is an immediate request
 			//TODO what if it was already rejected while prebooking??
-			createValidateAndSubmitRequest(passenger, fromLinkId, toLinkId, departureTime, now);
+			createValidateAndSubmitRequest(passenger, fromLinkId, toLinkId, departureTime, now, false);
 		} else if (prebookedRequests.size() == 1) {
 			PassengerRequest prebookedRequest = prebookedRequests.get(0);
 			PassengerPickupActivity awaitingPickup = awaitingPickupStorage.retrieveAwaitingPickup(
@@ -189,10 +185,10 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 	// ================ REQUESTS HANDLING
 
 	private PassengerRequest createValidateAndSubmitRequest(MobsimPassengerAgent passenger, Id<Link> fromLinkId,
-			Id<Link> toLinkId, double departureTime, double now) {
+			Id<Link> toLinkId, double departureTime, double now, boolean prebooked) {
 		// yyyy remove parameter MobsimPassengerAgent. kai/gregor, jan'19
 		PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime, now);
-		requests.put(request.getId(), new RequestEntry(request, passenger, now < departureTime));
+		requests.put(request.getId(), new RequestEntry(request, passenger, prebooked));
 		if (validateRequest(request)) {
 			optimizer.requestSubmitted(request);//optimizer can also reject request if cannot handle it
 		}
@@ -209,6 +205,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		Link fromLink = links.get(fromLinkId);
 		Link toLink = links.get(toLinkId);
 		Id<Request> id = Id.create(mode + "_" + nextId++, Request.class);
+		//TODO have not decided yet how VrpOptimizer determines if request is prebooked, maybe 'boolean prebooked'??
 		return requestCreator.createRequest(id, passenger, fromLink, toLink, departureTime, now);
 	}
 
