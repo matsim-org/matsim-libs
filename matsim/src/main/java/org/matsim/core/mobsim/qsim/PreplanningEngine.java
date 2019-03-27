@@ -1,9 +1,6 @@
 package org.matsim.core.mobsim.qsim;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -34,13 +31,19 @@ public final class PreplanningEngine implements MobsimEngine {
 	private static final Logger log = Logger.getLogger( PreplanningEngine.class );
 
 	private final Map<String, TripInfo.Provider> tripInfoProviders = new LinkedHashMap<>();
+	// yyyy Is "linked" enough to be deterministic? kai, mar'19
+
 	private final Map<String, AgentPlanUpdater> agentPlanUpdaters = new LinkedHashMap<>();
+	// yyyy Is "linked" enough to be deterministic? kai, mar'19
+
 	private final Population population;
 
-	private Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new ConcurrentHashMap<>();
+	private Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new TreeMap<>( ( o1, o2 ) -> o1.getId().compareTo( o2.getId() ) ) ;
 	// yyyy not sure about possible race conditions here! kai, feb'19
+	// yyyyyy can't have non-sorted maps here because we will get non-deterministic results. kai, mar'19
 
-	private Map<MobsimAgent, TripInfoRequest> tripInfoRequestMap = new ConcurrentHashMap<>();
+	private Map<MobsimAgent, TripInfoRequest> tripInfoRequestMap = new TreeMap<>( ( o1, o2 ) -> o1.getId().compareTo( o2.getId() ) ) ;
+	// yyyyyy can't have non-sorted maps here because we will get non-deterministic results. kai, mar'19
 
 	private final EditTrips editTrips;
 	private EditPlans editPlans = null;
@@ -92,7 +95,9 @@ public final class PreplanningEngine implements MobsimEngine {
 		processTripInfoUpdates();
 	}
 
-	public synchronized final void notifyChangedTripInformation(MobsimAgent agent, Optional<TripInfo> tripInfoUpdate) {
+	public synchronized final void notifyChangedTripInformation( MobsimAgent agent, Optional<TripInfo> tripInfoUpdate ) {
+		// needs to be public because this is what the Drt Passenger Engine uses
+
 		// (we are in the mobsim, so we don't need to play around with IDs)
 		tripInfoUpdatesMap.put(agent, tripInfoUpdate);
 	}
