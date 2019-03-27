@@ -29,4 +29,5 @@ public interface TripInfo{
 
 		void bookTrip( MobsimPassengerAgent agent, TripInfoWithRequiredBooking tripInfo );
 	}
+
 }

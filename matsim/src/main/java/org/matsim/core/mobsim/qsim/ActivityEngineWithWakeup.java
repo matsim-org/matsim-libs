@@ -29,10 +29,7 @@ import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import javax.inject.Inject;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
@@ -87,10 +84,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
-		Map<Double, AgentWakeup> result = wakeupGenerator.generateWakeups( agent );
-		for( Map.Entry<Double, AgentWakeup> entry : result.entrySet() ){
-			wakeUpList.add( new AgentEntry( agent, entry.getKey(), entry.getValue() ) ) ;
-		}
+		wakeUpList.addAll( wakeupGenerator.generateWakeups( agent ) ) ;
 
 		return delegate.handleActivity(agent);
 	}
@@ -121,7 +115,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	 * in the mean time, it might be inserted at the wrong position.
 	 * cdobler, apr'12
 	 */
-	private static class AgentEntry {
+	static class AgentEntry {
 		public AgentEntry(MobsimAgent agent, double time, AgentWakeup agentWakeup) {
 			// yyyy Let us be careful that the executeOnWakeUp does not become overkill here; if we want something more
 			// general, rather move on a completely general MessageQueue.  kai, mar'19

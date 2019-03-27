@@ -30,8 +30,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.BookingEngine;
-import org.matsim.core.mobsim.qsim.DrtTaxiPrebookingWakeupGenerator;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -42,12 +40,12 @@ import org.matsim.withinday.utils.EditTrips;
 
 import com.google.inject.Inject;
 
-public class DrtAgentPlanUpdater implements BookingEngine.AgentPlanUpdater {
+class DrtAgentPlanUpdater implements PreplanningEngine.AgentPlanUpdater {
 	private EditTrips editTrips;
 	private EditPlans editPlans;
 
 	@Inject
-	public DrtAgentPlanUpdater( BookingEngine bookingEngine ) {
+	public DrtAgentPlanUpdater( PreplanningEngine bookingEngine ) {
 		bookingEngine.registerAgentPlanUpdater(TransportMode.drt, this);
 	}
 

@@ -22,7 +22,7 @@ package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.BookingEngine;
+import org.matsim.core.mobsim.qsim.PreplanningEngine;
 
 /**
  * This module initialises generic (i.e. not taxi or drt-specific) AND global (not mode-specific) dvrp objects relating
@@ -47,8 +47,8 @@ public final class PassengerModule extends AbstractModule {
 
 		@Override
 		protected void configureQSim() {
-			bind(BookingEngine.class).asEagerSingleton();
-			addQSimComponentBinding(COMPONENT_NAME).to( BookingEngine.class );
+			bind( PreplanningEngine.class ).asEagerSingleton();
+			addQSimComponentBinding(COMPONENT_NAME).to( PreplanningEngine.class );
 		}
 	}
 }

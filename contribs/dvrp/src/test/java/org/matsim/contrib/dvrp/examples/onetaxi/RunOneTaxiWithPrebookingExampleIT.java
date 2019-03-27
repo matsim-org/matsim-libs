@@ -208,12 +208,12 @@ public class RunOneTaxiWithPrebookingExampleIT {
 						Assert.assertEquals("taxi_0", ev.getRequestId().toString());
 						break;
 					case 1:
-						Assert.assertEquals(300., event.getTime(), Double.MIN_VALUE);
+						Assert.assertEquals(0., event.getTime(), Double.MIN_VALUE);
 						// why one such request scheduling every 5min?  The demand is like that: dp times are spaced by 5 min.
 						Assert.assertEquals("taxi_1", ev.getRequestId().toString());
 						break;
 					case 2:
-						Assert.assertEquals(600., event.getTime(), Double.MIN_VALUE);
+						Assert.assertEquals(0., event.getTime(), Double.MIN_VALUE);
 						Assert.assertEquals("taxi_2", ev.getRequestId().toString());
 						break;
 					case 3:

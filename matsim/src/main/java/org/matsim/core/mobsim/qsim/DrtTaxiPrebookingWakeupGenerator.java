@@ -21,7 +21,6 @@
 package org.matsim.core.mobsim.qsim;
 
 import com.google.inject.Inject;
-import com.sun.tools.javac.util.Pair;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -31,6 +30,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup.AgentEntry;
 import org.matsim.core.mobsim.qsim.agents.HasModifiablePlan;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
@@ -58,21 +58,21 @@ public class DrtTaxiPrebookingWakeupGenerator {
 			createStageActivityType(TransportMode.drt), createStageActivityType(TransportMode.walk));
 
 	private final ActivityFacilities facilities;
-	private final BookingEngine bookingEngine;
+	private final PreplanningEngine preplanningEngine;
 
 	@Inject
-	public DrtTaxiPrebookingWakeupGenerator(Scenario scenario, BookingEngine bookingEngine) {
+	public DrtTaxiPrebookingWakeupGenerator(Scenario scenario, PreplanningEngine preplanningEngine ) {
 		this.facilities = scenario.getActivityFacilities();
-		this.bookingEngine = bookingEngine;
+		this.preplanningEngine = preplanningEngine;
 	}
 
-	public Map<Double, ActivityEngineWithWakeup.AgentWakeup> generateWakeups( MobsimAgent agent ) {
+	public List<AgentEntry> generateWakeups( MobsimAgent agent ) {
 		if (!(agent instanceof HasModifiablePlan)) {
 			// (we don't want to treat DvrpAgents, CarrierAgents, TransitVehicleDrivers etc. here)
-			return Collections.emptyMap();
+			return Collections.emptyList();
 		}
 
-		Map<Double, ActivityEngineWithWakeup.AgentWakeup> wakeups = new TreeMap<>(  ) ;
+		List<AgentEntry> wakeups = new ArrayList<>() ;
 
 		Double prebookingOffset_s = (Double)((PlanAgent)agent).getCurrentPlan()
 				.getAttributes()
@@ -93,12 +93,12 @@ public class DrtTaxiPrebookingWakeupGenerator {
 			if (prebookingTime < agent.getActivityEndTime()){
 				// yyyy and here one sees that having this in the activity engine is not very practical
 				log.info( "adding agent to wakeup list" );
-				wakeups.put( prebookingTime, new ActivityEngineWithWakeup.AgentWakeup(){
+				wakeups.add( new AgentEntry( agent, prebookingTime, new ActivityEngineWithWakeup.AgentWakeup(){
 					@Override
 					public void wakeUp( MobsimAgent agent, double now ){
 						wakeUpAgent( agent, now, drtLeg );
 					}
-				} );
+				} ) ) ;
 			}
 		}
 		for (Leg drtLeg : findLegsWithModeInFuture(agent, TransportMode.taxi)) {
@@ -111,12 +111,12 @@ public class DrtTaxiPrebookingWakeupGenerator {
 			if (prebookingTime < agent.getActivityEndTime()) {
 				// yyyy and here one sees that having this in the activity engine is not very practical
 				log.info("adding agent to wakeup list");
-				wakeups.put( prebookingTime, new ActivityEngineWithWakeup.AgentWakeup(){
+				wakeups.add( new AgentEntry( agent, prebookingTime, new ActivityEngineWithWakeup.AgentWakeup(){
 					@Override
 					public void wakeUp( MobsimAgent agent, double now ){
 						wakeUpAgent( agent, now, drtLeg );
 					}
-				} );
+				} ) ) ;
 			}
 		}
 		return wakeups;
@@ -142,7 +142,7 @@ public class DrtTaxiPrebookingWakeupGenerator {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
 		// search for drt trip corresponding to drt leg.  Trick is using our own stage activities.
-		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan, this.drtStageActivities);
+		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan, drtStageActivities);
 		Gbl.assertNotNull(drtTrip);
 
 		Facility fromFacility = FacilitiesUtils.toFacility(drtTrip.getOriginActivity(), facilities);
@@ -155,6 +155,6 @@ public class DrtTaxiPrebookingWakeupGenerator {
 
 		//first simulate ActivityEngineWithWakeup and then BookingEngine --> decision process
 		//in the same time step
-		bookingEngine.notifyTripInfoRequestSent(agent, request);
+		preplanningEngine.notifyTripInfoNeeded(agent, request );
 	}
 }

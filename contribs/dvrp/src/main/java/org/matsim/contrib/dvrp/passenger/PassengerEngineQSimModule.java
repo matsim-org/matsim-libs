@@ -11,7 +11,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import com.google.inject.name.Named;
-import org.matsim.core.mobsim.qsim.BookingEngine;
+import org.matsim.core.mobsim.qsim.PreplanningEngine;
 
 public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 	public PassengerEngineQSimModule(String mode) {
@@ -28,7 +28,7 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 			private MobsimTimer mobsimTimer;
 
 			@Inject
-			private BookingEngine bookingEngine;
+			private PreplanningEngine bookingEngine;
 
 			@Inject
 			private PassengerRequestEventToPassengerEngineForwarder passengerRequestEventForwarder;

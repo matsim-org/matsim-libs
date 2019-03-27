@@ -2,13 +2,15 @@ package org.matsim.core.mobsim.qsim.interfaces;
 
 import org.matsim.facilities.Facility;
 
+import static org.matsim.core.mobsim.qsim.interfaces.TripInfo.*;
+
 public class TripInfoRequest{
 	private final Facility fromFacility;
 	private final Facility toFacility;
 	private final double time;
-	private final TripInfo.TimeInterpretation timeInterpretation;
+	private final TimeInterpretation timeInterpretation;
 
-	private TripInfoRequest( Facility fromFacility, Facility toFacility, double time, TripInfo.TimeInterpretation timeInterpretation ){
+	private TripInfoRequest( Facility fromFacility, Facility toFacility, double time, TimeInterpretation timeInterpretation ){
 		this.fromFacility = fromFacility;
 		this.toFacility = toFacility;
 		this.time = time;
@@ -27,7 +29,7 @@ public class TripInfoRequest{
 		return time;
 	}
 
-	public TripInfo.TimeInterpretation getTimeInterpretation(){
+	public TimeInterpretation getTimeInterpretation(){
 		return timeInterpretation;
 	}
 
@@ -38,7 +40,7 @@ public class TripInfoRequest{
 		private Facility fromFacility;
 		private Facility toFacility;
 		private double time;
-		private TripInfo.TimeInterpretation timeInterpretation;
+		private TimeInterpretation timeInterpretation = TimeInterpretation.departure ;
 
 		public Builder setFromFacility( Facility fromFacility ){
 			this.fromFacility = fromFacility;
@@ -55,7 +57,7 @@ public class TripInfoRequest{
 			return this;
 		}
 
-		public Builder setTimeInterpretation( TripInfo.TimeInterpretation timeInterpretation ){
+		public Builder setTimeInterpretation( TimeInterpretation timeInterpretation ){
 			this.timeInterpretation = timeInterpretation;
 			return this;
 		}

@@ -44,7 +44,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.BookingEngine;
+import org.matsim.core.mobsim.qsim.PreplanningEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -62,7 +62,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 	private final String mode;
 	private final EventsManager eventsManager;
 	private final MobsimTimer mobsimTimer;
-	private final BookingEngine bookingEngine;
+	private final PreplanningEngine bookingEngine;
 
 	private final PassengerRequestCreator requestCreator;
 	private final VrpOptimizer optimizer;
@@ -77,10 +77,10 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 	//keeps all received requests until rejection or dropoff
 	private final Map<Id<Request>, RequestEntry> requests = new HashMap<>();
 
-	PassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
-			BookingEngine bookingEngine, PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
-			Network network, PassengerRequestValidator requestValidator,
-			PassengerRequestEventToPassengerEngineForwarder passengerRequestEventForwarder) {
+	PassengerEngine( String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
+			     PreplanningEngine bookingEngine, PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
+			     Network network, PassengerRequestValidator requestValidator,
+			     PassengerRequestEventToPassengerEngineForwarder passengerRequestEventForwarder) {
 		// yyyyyy I think it is ok to say that the only thing that uses injection is PassengerEngineQSimModule.  However, my very strong intuition is that everything that
 		// is used from there needs to have little or no public footprint.  Otherwise, one is quickly back in a world where one cannot change dependencies without breaking
 		// other users' code. kai, mar'19
