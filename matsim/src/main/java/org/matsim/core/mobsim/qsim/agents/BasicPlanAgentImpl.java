@@ -168,6 +168,18 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 
 	@Override
 	public final void endActivityAndComputeNextState(final double now) {
+		if ( ! ( this.getCurrentPlanElement() instanceof Activity ) ){
+			log.warn( "something is wrong; agentId=" + this.getId() );
+		}
+		if ( this.getId().toString().equals( "passenger_0" ) ) {
+			log.warn("---") ;
+			log.warn("ending activity; now=" + now );
+			for( PlanElement planElement : this.plan.getPlanElements() ){
+				log.warn( planElement.toString() ) ;
+			}
+			log.warn("currentPlanElementIndex=" + this.currentPlanElementIndex );
+			log.warn("---") ;
+		}
 		Activity act = (Activity) this.getCurrentPlanElement() ;
 		this.getEvents().processEvent( new ActivityEndEvent(now, this.getPerson().getId(), this.currentLinkId, act.getFacilityId(), act.getType()));
 	

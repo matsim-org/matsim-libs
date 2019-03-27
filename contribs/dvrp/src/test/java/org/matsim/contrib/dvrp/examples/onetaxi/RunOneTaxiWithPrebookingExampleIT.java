@@ -83,7 +83,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
-			plan.getAttributes().putAttribute(DrtTaxiPrebookingWakeupGenerator.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900.);
+			plan.getAttributes().putAttribute( ActivityEngineWithWakeup.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900. );
 			//			for( PlanElement pe : plan.getPlanElements() ){
 			//				if ( pe instanceof Leg ) {
 			//					if ( ((Leg) pe).getMode().equals( TransportMode.drt ) || ((Leg) pe).getMode().equals( TransportMode.taxi ) ) {
@@ -122,8 +122,6 @@ public class RunOneTaxiWithPrebookingExampleIT {
 			@Override protected void configureQSim() {
 				// throw all the stuff in that we need:
 
-				this.bind( DrtTaxiPrebookingWakeupGenerator.class ) ;
-
 				this.bind( ActivityHandler.class).to( ActivityEngineWithWakeup.class ) ;
 				// assumes there is only one, which is not consistent with Sebastian's design, but corresponds to the current implementation
 
@@ -158,7 +156,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 			if (event instanceof ActivityEngineWithWakeup.AgentWakeupEvent) {
 				final ActivityEngineWithWakeup.AgentWakeupEvent ev = (ActivityEngineWithWakeup.AgentWakeupEvent)event;
 //				System.out.println() ;
-				System.out.println(event) ;
+				System.err.println(event) ;
 //				System.out.println("") ;
 				switch (cnt) {
 					case 0:
@@ -199,7 +197,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 			} else if (event instanceof PassengerRequestScheduledEvent ) {
 				PassengerRequestScheduledEvent ev = (PassengerRequestScheduledEvent)event;
 //				System.out.println("") ;
-				System.out.println( event) ;
+				System.err.println( event) ;
 //				System.out.println(""); ;
 				Assert.assertEquals("taxi_one", ev.getVehicleId().toString());
 				switch (cnt2) {
@@ -217,7 +215,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 						Assert.assertEquals("taxi_2", ev.getRequestId().toString());
 						break;
 					case 3:
-						Assert.assertEquals(900., event.getTime(), Double.MIN_VALUE);
+						Assert.assertEquals(0., event.getTime(), Double.MIN_VALUE);
 						Assert.assertEquals("taxi_3", ev.getRequestId().toString());
 						break;
 					case 4:
@@ -249,7 +247,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 			} else if ( event instanceof PersonDepartureEvent ) {
 				PersonDepartureEvent ev = (PersonDepartureEvent) event;
 				if ( TransportMode.taxi.equals( ev.getLegMode() ) ) {
-					System.out.println( event ) ;
+					System.err.println( event ) ;
 				}
 			}
 		}

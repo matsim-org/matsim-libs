@@ -69,6 +69,10 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		}
 		final MobsimAgent agent;
 		final double time;
+		@Override
+		public String toString() {
+			return "agentEntry: [ time=" + time + " | id=" + agent.getId() + " ]" ;
+		}
 	}
 
 	private InternalInterface internalInterface;
@@ -90,6 +94,9 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	@Override
 	public void doSimStep(double time) {
 		beforeFirstSimStep = false;
+
+		logwarn( activityEndsList );
+
 		while (activityEndsList.peek() != null) {
 			if (activityEndsList.peek().time <= time) {
 				MobsimAgent agent = activityEndsList.poll().agent;
@@ -100,6 +107,14 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 				return;
 			}
 		}
+	}
+
+	private static void logwarn( Queue<AgentEntry> activityEndsList ){
+		log.warn("===") ;
+		for( AgentEntry agentEntry : activityEndsList ){
+			log.warn(agentEntry.toString()) ;
+		}
+		log.warn("===") ;
 	}
 
 	@Override
@@ -133,6 +148,10 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
+
+		log.warn("100") ;
+		logwarn(activityEndsList) ;
+
 		if (agent.getActivityEndTime() == Double.POSITIVE_INFINITY) {
 			// This is the last planned activity.
 			// So the agent goes to sleep.
@@ -158,6 +177,10 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		// - This is safe (Agents will not miss a second), simply because doSimStep for this time step has not yet happened.
 		// - It also means that e.g. OTFVis will probably display all Agents while they are in their first Activity before you press play.
 		// - On the other hand, agents whose first activity is also their last activity go right to sleep "inside" this engine.
+
+		log.warn("110") ;
+		logwarn(activityEndsList) ;
+
 		return true;
 	}
 
@@ -171,10 +194,13 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	 */
 	@Override
 	public void rescheduleActivityEnd(final MobsimAgent agent) {
+
+		log.warn("40") ;
+		logwarn( this.activityEndsList );
+
 		if ( agent.getState()!=State.ACTIVITY ) {
 			return ;
 		}
-		
 		
 		double newActivityEndTime = agent.getActivityEndTime();
 		AgentEntry oldEntry = removeAgentFromQueue(agent);
@@ -203,6 +229,10 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 			 */
 			activityEndsList.add(new AgentEntry(agent, newActivityEndTime));
 		}
+
+		log.warn("50") ;
+		logwarn( this.activityEndsList );
+
 	}
 
 	private AgentEntry removeAgentFromQueue(MobsimAgent agent) {

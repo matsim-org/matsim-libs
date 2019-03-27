@@ -32,21 +32,26 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 
-public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
+public final class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
+
+	public static final String PREBOOKING_OFFSET_ATTRIBUTE_NAME = "prebookingOffset_s";
+	// moved to here for time being so I can make some other clase package-private. kai, mar'19
+
 	private final EventsManager eventsManager;
-	private DrtTaxiPrebookingWakeupGenerator wakeupGenerator ;
+	private PreplanningEngine preplanningEngine;
 	private ActivityEngine delegate;
 
 	private final Queue<AgentEntry> wakeUpList = new PriorityBlockingQueue<>(500, (o1, o2) -> {
 		int cmp = Double.compare(o1.time, o2.time);
 		return cmp != 0 ? cmp : o1.agent.getId().compareTo(o2.agent.getId());
 	});
+	private InternalInterface internalInterface;
 
 	@Inject
-	ActivityEngineWithWakeup(EventsManager eventsManager, DrtTaxiPrebookingWakeupGenerator wakeupGenerator ) {
+	ActivityEngineWithWakeup( EventsManager eventsManager, PreplanningEngine preplanningEngine ) {
 		this.delegate = new ActivityEngine(eventsManager);
 		this.eventsManager = eventsManager;
-		this.wakeupGenerator = wakeupGenerator ;
+		this.preplanningEngine = preplanningEngine ;
 	}
 
 	@Override
@@ -71,6 +76,7 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
+		this.internalInterface = internalInterface ;
 		delegate.setInternalInterface(internalInterface);
 	}
 
@@ -84,7 +90,8 @@ public class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
-		wakeUpList.addAll( wakeupGenerator.generateWakeups( agent ) ) ;
+		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
+		wakeUpList.addAll( preplanningEngine.generateWakeups( agent, now ) ) ;
 
 		return delegate.handleActivity(agent);
 	}
