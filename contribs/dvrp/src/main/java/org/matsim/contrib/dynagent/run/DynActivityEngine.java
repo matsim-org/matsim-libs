@@ -33,7 +33,7 @@ import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.DefaultActivityEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -44,14 +44,14 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
  */
 public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 	private InternalInterface internalInterface;
-	private final ActivityEngine activityEngine;
+	private final DefaultActivityEngine activityEngine;
 
 	private final List<DynAgent> dynAgents = new LinkedList<>();
 	private final List<DynAgent> newDynAgents = new ArrayList<>();// will to be handled in the next timeStep
 
 	@Inject
 	public DynActivityEngine(EventsManager eventsManager) {
-		this.activityEngine = new ActivityEngine(eventsManager);
+		this.activityEngine = new DefaultActivityEngine(eventsManager);
 	}
 
 	// See handleActivity for the reason for this.

@@ -5,7 +5,7 @@ public class ActivityEngineModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bind(ActivityEngine.class).asEagerSingleton();
-		addNamedComponent(ActivityEngine.class, COMPONENT_NAME);
+		bind( DefaultActivityEngine.class ).asEagerSingleton();
+		addNamedComponent( DefaultActivityEngine.class, COMPONENT_NAME );
 	}
 }
