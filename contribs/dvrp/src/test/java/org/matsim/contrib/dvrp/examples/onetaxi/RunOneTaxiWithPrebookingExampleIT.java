@@ -105,6 +105,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 				// this method, other than the methods in addOverriding..., is _not_ additive.  It always starts afresh, from the default configuration.
 				components.removeNamedComponent( ActivityEngineModule.COMPONENT_NAME );
 				components.addNamedComponent( "abc" );
+				components.addNamedComponent( "def" );
 				components.addNamedComponent( PassengerModule.BookingEngineQSimModule.COMPONENT_NAME );
 				for( String m : new String[]{TransportMode.taxi} ){
 					components.addComponent( DvrpModes.mode( m ) );
@@ -120,13 +121,8 @@ public class RunOneTaxiWithPrebookingExampleIT {
 
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override protected void configureQSim() {
-				// throw all the stuff in that we need:
-
-				this.bind( ActivityHandler.class).to( ActivityEngineWithWakeup.class ) ;
-				// assumes there is only one, which is not consistent with Sebastian's design, but corresponds to the current implementation
-
+				this.addQSimComponentBinding( "def" ).to( ActivityEngineWithWakeup.class ) ;
 				this.addQSimComponentBinding( "abc" ).to( DynActivityEngine.class ) ;
-
 			}
 		});
 

@@ -4,8 +4,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -18,6 +21,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
@@ -50,6 +54,8 @@ public final class PreplanningEngine implements MobsimEngine {
 	// yyyy Is "linked" enough to be deterministic? kai, mar'19
 
 	private final Population population;
+	private final Network network;
+	private final Scenario scenario;
 
 	private Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new TreeMap<>( ( o1, o2 ) -> o1.getId().compareTo( o2.getId() ) ) ;
 	// yyyy not sure about possible race conditions here! kai, feb'19
@@ -70,6 +76,8 @@ public final class PreplanningEngine implements MobsimEngine {
 		this.editTrips = new EditTrips(tripRouter, scenario);
 		this.population = scenario.getPopulation();
 		this.facilities = scenario.getActivityFacilities() ;
+		this.network = scenario.getNetwork() ;
+		this.scenario = scenario ;
 	}
 
 	@Override
@@ -229,10 +237,17 @@ public final class PreplanningEngine implements MobsimEngine {
 					// I think that "==" is ok here, since we really want to know if this is the same object.  kai, mar'19
 
 					if ( originActivity.getEndTime() <= now ){
-						int index = WithinDayAgentUtils.indexOfPlanElement( agent, originActivity );;
-						this.editPlans.rescheduleActivityEndtime( agent, index, now+1 );
+//						int index = WithinDayAgentUtils.indexOfPlanElement( agent, originActivity );;
+//						this.editPlans.rescheduleActivityEndtime( agent, index, now+1 );
+						log.warn("currentEndTimeBefore=" + originActivity.getEndTime() ) ;
+						log.warn("agentEndTimeBefore=" + agent.getActivityEndTime() ) ;
+						originActivity.setEndTime( now+2 );
+						WithinDayAgentUtils.resetCaches( agent );
+						log.warn("currentEndTimeAfter=" + originActivity.getEndTime() ) ;
+						log.warn("agentEndTimeAfter=" + agent.getActivityEndTime() ) ;
+						// (we are still before "handleActivity" so we don't want to reschedule because then it will end
+						// up twice in the wakeup queue)
 					}
-
 					// yyyyyy a possibly terrible quick fix to avoid that agents depart while they are thinking about pre-booking. A
 					// problem is that setting the activity end time to Double.MAX_VALUE means that the agent is forgetting the
 					// originally planned activity end time.  Yes, we could leave it in the leg departure time, but this is really not
@@ -289,16 +304,27 @@ public final class PreplanningEngine implements MobsimEngine {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
 		TripStructureUtils.Trip theTrip = null;
-		for (TripStructureUtils.Trip drtTrip : TripStructureUtils.getTrips(plan,
-			  PreplanningEngine.drtStageActivities )) {
+		Coord pickupCoord = tripInfo.getPickupLocation().getCoord();
+		if ( pickupCoord==null ) {
+			Link link = this.network.getLinks().get( tripInfo.getPickupLocation().getLinkId() ) ;
+			Gbl.assertNotNull( link );
+			pickupCoord = link.getCoord() ;
+		}
+		Coord dropoffCoord = tripInfo.getDropoffLocation().getCoord();
+		if ( dropoffCoord==null ) {
+			Link link = this.network.getLinks().get( tripInfo.getDropoffLocation().getLinkId() ) ;
+			Gbl.assertNotNull( link );
+			dropoffCoord = link.getCoord() ;
+		}
+		for (TripStructureUtils.Trip drtTrip : TripStructureUtils.getTrips(plan, PreplanningEngine.drtStageActivities )) {
 			// recall that we have set the activity end time of the current activity to infinity, so we cannot use that any more.  :-( ?!
 			// could instead use some kind of ID.  Not sure if that would really be better.
-			if ( CoordUtils.calcEuclideanDistance(drtTrip.getOriginActivity().getCoord(),
-				  tripInfo.getPickupLocation().getCoord() ) > 1000.) {
+			Coord coordOrigin = PopulationUtils.decideOnCoordForActivity( drtTrip.getOriginActivity(), scenario ) ;
+			if ( CoordUtils.calcEuclideanDistance( coordOrigin, pickupCoord ) > 1000.) {
 				continue;
 			}
-			if (CoordUtils.calcEuclideanDistance(drtTrip.getDestinationActivity().getCoord(),
-				  tripInfo.getDropoffLocation().getCoord()) > 1000.) {
+			Coord coordDestination = PopulationUtils.decideOnCoordForActivity( drtTrip.getDestinationActivity(), scenario ) ;
+			if (CoordUtils.calcEuclideanDistance( coordDestination, dropoffCoord ) > 1000.) {
 				continue;
 			}
 			theTrip = drtTrip;
@@ -312,7 +338,7 @@ public final class PreplanningEngine implements MobsimEngine {
 
 		Gbl.assertIf(walkTripsIter.hasNext());
 		TripStructureUtils.Trip accessWalkTrip = walkTripsIter.next();
-		accessWalkTrip.getDestinationActivity().setCoord(tripInfo.getPickupLocation().getCoord());
+		accessWalkTrip.getDestinationActivity().setCoord( pickupCoord );
 		accessWalkTrip.getDestinationActivity().setLinkId(tripInfo.getPickupLocation().getLinkId());
 		accessWalkTrip.getDestinationActivity().setFacilityId(null);
 
@@ -334,7 +360,7 @@ public final class PreplanningEngine implements MobsimEngine {
 		Gbl.assertIf(walkTripsIter.hasNext());
 		TripStructureUtils.Trip egressWalkTrip = walkTripsIter.next();
 		final Activity egressWalkOriginActivity = egressWalkTrip.getOriginActivity();
-		egressWalkOriginActivity.setCoord(tripInfo.getDropoffLocation().getCoord());
+		egressWalkOriginActivity.setCoord( dropoffCoord );
 		egressWalkOriginActivity.setLinkId(tripInfo.getDropoffLocation().getLinkId());
 		egressWalkOriginActivity.setFacilityId(null);
 

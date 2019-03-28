@@ -15,7 +15,7 @@ public class DynActivityEngineModule extends AbstractQSimModule {
 	}
 
 	public static void configureComponents(QSimComponentsConfig components) {
-		components.removeNamedComponent(ActivityEngineModule.COMPONENT_NAME);
+//		components.removeNamedComponent(ActivityEngineModule.COMPONENT_NAME);
 		components.addNamedComponent(COMPONENT_NAME);
 	}
 }

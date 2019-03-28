@@ -38,21 +38,15 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-/**
- * DynActivityEngine and ActivityEngine could be decoupled (if we can ensure DynActivityEngine's handleActivity() is
- * called before that of ActivityEngine)
- */
 public class DynActivityEngine implements MobsimEngine, ActivityHandler {
+	// This is now _additive_ to the normal ActivityEngine!
+
 	private InternalInterface internalInterface;
-	private final DefaultActivityEngine activityEngine;
 
 	private final List<DynAgent> dynAgents = new LinkedList<>();
 	private final List<DynAgent> newDynAgents = new ArrayList<>();// will to be handled in the next timeStep
 
-	@Inject
-	public DynActivityEngine(EventsManager eventsManager) {
-		this.activityEngine = new DefaultActivityEngine(eventsManager);
-	}
+	public interface ActivityEngineDelegate4Drt extends ActivityHandler, MobsimEngine {}
 
 	// See handleActivity for the reason for this.
 	private boolean beforeFirstSimStep = true;
@@ -85,13 +79,13 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 			// TODO what if not activity?
 		}
 
-		activityEngine.doSimStep(time);
 	}
 
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
 		if (!(agent instanceof DynAgent)) {
-			return activityEngine.handleActivity(agent);
+			return false ;
+			// (this means "I am not responsible").
 		}
 
 		double endTime = agent.getActivityEndTime();
@@ -122,14 +116,12 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 
 	@Override
 	public void afterSim() {
-		activityEngine.afterSim();
 		dynAgents.clear();
 	}
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-		activityEngine.setInternalInterface(internalInterface);
 	}
 
 	private void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
@@ -142,11 +134,9 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 
 	@Override
 	public void onPrepareSim() {
-		activityEngine.onPrepareSim();
 	}
 
 	@Override
 	public void rescheduleActivityEnd(MobsimAgent agent) {
-		activityEngine.rescheduleActivityEnd(agent);
 	}
 }

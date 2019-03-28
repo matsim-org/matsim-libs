@@ -68,6 +68,9 @@ public class DefaultActivityEngine implements ActivityEngine {
 		}
 		final MobsimAgent agent;
 		final double activityEndTime;
+		public String toString() {
+			return "agentEntry: [ actEndTime=" + activityEndTime + " | agentId=" + agent.getId() + " ]" ;
+		}
 	}
 
 	private InternalInterface internalInterface;
@@ -152,6 +155,13 @@ public class DefaultActivityEngine implements ActivityEngine {
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
+
+//		log.warn("=== before") ;
+//		for( AgentEntry agentEntry : activityEndsList ){
+//			log.warn( agentEntry );
+//		}
+//		log.warn("===") ;
+
 		if (agent.getActivityEndTime() == Double.POSITIVE_INFINITY) {
 			// This is the last planned activity.
 			// So the agent goes to sleep.
@@ -177,6 +187,13 @@ public class DefaultActivityEngine implements ActivityEngine {
 		// - This is safe (Agents will not miss a second), simply because doSimStep for this time step has not yet happened.
 		// - It also means that e.g. OTFVis will probably display all Agents while they are in their first Activity before you press play.
 		// - On the other hand, agents whose first activity is also their last activity go right to sleep "inside" this engine.
+
+		log.warn("=== after") ;
+		for( AgentEntry agentEntry : activityEndsList ){
+			log.warn( agentEntry );
+		}
+		log.warn("===") ;
+
 		return true;
 	}
 

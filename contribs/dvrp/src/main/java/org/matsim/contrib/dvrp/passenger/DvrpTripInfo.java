@@ -96,7 +96,8 @@ class DvrpTripInfo implements TripInfoWithRequiredBooking {
 
 			@Override
 			public Coord getCoord() {
-				throw new RuntimeException("not implemented");
+//				throw new RuntimeException("not implemented");
+				return null ;
 			}
 
 			@Override

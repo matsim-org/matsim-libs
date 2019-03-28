@@ -183,6 +183,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	@Override
 	public final void rescheduleActivityEnd(MobsimAgent agent) {
 		for( ActivityHandler activityHandler : this.activityHandlers ){
+			Gbl.assertNotNull( activityHandler );
 			activityHandler.rescheduleActivityEnd( agent );
 		}
 	}
@@ -597,6 +598,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	public void addActivityHandler(ActivityHandler activityHandler) {
 		if ( ! ( activityHandler instanceof ActivityEngine ) ){
 			// We add the ActivityEngine manually later
+			Gbl.assertNotNull( activityHandler );
 			this.activityHandlers.add( activityHandler );
 		}
 	}

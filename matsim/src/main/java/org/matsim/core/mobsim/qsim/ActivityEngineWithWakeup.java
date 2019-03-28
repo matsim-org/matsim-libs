@@ -32,7 +32,7 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 
-public final class ActivityEngineWithWakeup implements MobsimEngine, ActivityHandler {
+public final class ActivityEngineWithWakeup implements ActivityEngine {
 
 	public static final String PREBOOKING_OFFSET_ATTRIBUTE_NAME = "prebookingOffset_s";
 	// moved to here for time being so I can make some other clase package-private. kai, mar'19
@@ -49,7 +49,7 @@ public final class ActivityEngineWithWakeup implements MobsimEngine, ActivityHan
 
 	@Inject
 	ActivityEngineWithWakeup( EventsManager eventsManager, PreplanningEngine preplanningEngine ) {
-		this.delegate = new ActivityEngine(eventsManager);
+		this.delegate = new DefaultActivityEngine(eventsManager);
 		this.eventsManager = eventsManager;
 		this.preplanningEngine = preplanningEngine ;
 	}
