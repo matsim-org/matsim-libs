@@ -1,5 +1,8 @@
 package org.matsim.core.mobsim.qsim.interfaces;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 import static org.matsim.core.mobsim.qsim.interfaces.TripInfo.*;
@@ -9,10 +12,14 @@ public class TripInfoRequest{
 	private final Facility toFacility;
 	private final double time;
 	private final TimeInterpretation timeInterpretation;
+	private final Activity fromActivity;
+	private final Activity toActivity;
 
-	private TripInfoRequest( Facility fromFacility, Facility toFacility, double time, TimeInterpretation timeInterpretation ){
-		this.fromFacility = fromFacility;
-		this.toFacility = toFacility;
+	private TripInfoRequest( Scenario scenario, Activity fromActivity, Activity toActivity, double time, TimeInterpretation timeInterpretation ){
+		this.fromActivity = fromActivity;
+		this.toActivity = toActivity;
+		this.fromFacility = FacilitiesUtils.toFacility( fromActivity, scenario.getActivityFacilities() ) ;
+		this.toFacility = FacilitiesUtils.toFacility( toActivity, scenario.getActivityFacilities() ) ;
 		this.time = time;
 		this.timeInterpretation = timeInterpretation;
 	}
@@ -33,22 +40,35 @@ public class TripInfoRequest{
 		return timeInterpretation;
 	}
 
+	public Activity getFromActivity(){
+		return fromActivity;
+	}
+
+	public Activity getToActivity(){
+		return toActivity;
+	}
+
 	public static class Builder{
+		private final Scenario scenario;
 		// this is deliberately a builder and not a constructor so that we can add arguments later without having to add constructors with longer and longer
 		// argument lists.  kai, mar'19
 
-		private Facility fromFacility;
-		private Facility toFacility;
+		public Builder( Scenario scenario ) {
+			this.scenario = scenario ;
+		}
+
 		private double time;
 		private TimeInterpretation timeInterpretation = TimeInterpretation.departure ;
+		private Activity fromActivity;
+		private Activity toActivity;
 
-		public Builder setFromFacility( Facility fromFacility ){
-			this.fromFacility = fromFacility;
+		public Builder setFromActivity( Activity fromActivity ){
+			this.fromActivity = fromActivity;
 			return this;
 		}
 
-		public Builder setToFacility( Facility toFacility ){
-			this.toFacility = toFacility;
+		public Builder setToActivity( Activity toActivity ){
+			this.toActivity = toActivity;
 			return this;
 		}
 
@@ -63,7 +83,7 @@ public class TripInfoRequest{
 		}
 
 		public TripInfoRequest createRequest(){
-			return new TripInfoRequest( fromFacility, toFacility, time, timeInterpretation );
+			return new TripInfoRequest( scenario, fromActivity, toActivity, time, timeInterpretation );
 		}
 	}
 }

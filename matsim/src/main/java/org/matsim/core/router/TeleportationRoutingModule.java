@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -29,6 +30,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 
@@ -40,20 +42,20 @@ import org.matsim.facilities.Facility;
 public class TeleportationRoutingModule implements RoutingModule {
 
 	private final String mode;
-	private final PopulationFactory populationFactory;
 
 	private final double beelineDistanceFactor;
 	private final double networkTravelSpeed;
+	private final Scenario scenario;
 
-	 public TeleportationRoutingModule(
+	public TeleportationRoutingModule(
 			final String mode,
-			final PopulationFactory populationFactory,
+			final Scenario scenario,
 			final double networkTravelSpeed,
 			final double beelineDistanceFactor) {
 		this.networkTravelSpeed = networkTravelSpeed;
 		this.beelineDistanceFactor = beelineDistanceFactor;
 		this.mode = mode;
-		this.populationFactory = populationFactory;
+		this.scenario = scenario ;
 	}
 
 	@Override
@@ -62,7 +64,7 @@ public class TeleportationRoutingModule implements RoutingModule {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
-		Leg newLeg = this.populationFactory.createLeg( this.mode );
+		Leg newLeg = this.scenario.getPopulation().getFactory().createLeg( this.mode );
 		newLeg.setDepartureTime( departureTime );
 
 		double travTime = routeLeg(
@@ -91,13 +93,15 @@ public class TeleportationRoutingModule implements RoutingModule {
 
 	/* package */ double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		// make simple assumption about distance and walking speed
-		final Coord fromActCoord = fromAct.getCoord();
+
+
+		final Coord fromActCoord = 	PopulationUtils.decideOnCoordForActivity( fromAct, scenario) ;
 		Gbl.assertNotNull( fromActCoord );
-		final Coord toActCoord = toAct.getCoord();
+		final Coord toActCoord = PopulationUtils.decideOnCoordForActivity( toAct, scenario ) ;
 		Gbl.assertNotNull( toActCoord );
 		double dist = CoordUtils.calcEuclideanDistance( fromActCoord, toActCoord );
 		// create an empty route, but with realistic travel time
-		Route route = this.populationFactory.getRouteFactories().createRoute(Route.class, fromAct.getLinkId(), toAct.getLinkId());
+		Route route = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(Route.class, fromAct.getLinkId(), toAct.getLinkId());
 		double estimatedNetworkDistance = dist * this.beelineDistanceFactor;
 		int travTime = (int) (estimatedNetworkDistance / this.networkTravelSpeed);
 		route.setTravelTime(travTime);

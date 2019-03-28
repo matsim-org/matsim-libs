@@ -115,6 +115,16 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.addActivityParams(params);
 		}
 		{
+			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.drt ) ) ;
+			params.setScoringThisActivityAtAll(false);
+			this.addActivityParams(params);
+		}
+		{
+			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.taxi ) ) ;
+			params.setScoringThisActivityAtAll(false);
+			this.addActivityParams(params);
+		}
+		{
 			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.other ) ) ;
 			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);

@@ -57,7 +57,7 @@ public class StopBasedDrtRoutingModuleTest {
 		final Double networkTravelSpeed = 0.83333;
 		final Double beelineFactor = 1.3;
 		TeleportationRoutingModule walkRouter = new TeleportationRoutingModule(TransportMode.walk,
-				scenario.getPopulation().getFactory(), networkTravelSpeed, beelineFactor);
+				scenario, networkTravelSpeed, beelineFactor);
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(scenario.getConfig());
 		AccessEgressStopFinder stopFinder = new DefaultAccessEgressStopFinder(scenario.getTransitSchedule(), drtCfg,
 				scenario.getConfig().plansCalcRoute(), scenario.getNetwork());

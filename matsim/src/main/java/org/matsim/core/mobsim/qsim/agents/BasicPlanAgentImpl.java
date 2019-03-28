@@ -173,7 +173,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		}
 		if ( this.getId().toString().equals( "passenger_0" ) ) {
 			log.warn("---") ;
-			log.warn("ending activity; now=" + now );
+			log.warn("agentId=" + this.getId() + "; ending activity; now=" + now );
 			for( PlanElement planElement : this.plan.getPlanElements() ){
 				log.warn( planElement.toString() ) ;
 			}

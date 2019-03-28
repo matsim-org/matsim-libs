@@ -17,6 +17,7 @@ public interface TripInfo{
 	Map<String,String> getAdditionalAttributes() ;
 	String getMode() ;
 	double getLatestDecisionTime() ;
+	TripInfoRequest getOriginalRequest() ;
 
 	enum TimeInterpretation { departure, arrival }
 
