@@ -68,7 +68,12 @@ public class VehicleUtils {
 	}
 
 	public static double getEgressTime(VehicleType vehicleType) {
-		return (Double) vehicleType.getAttributes().getAttribute(EGRESSTIME);
+		final Object attribute = vehicleType.getAttributes().getAttribute( EGRESSTIME );
+		if ( attribute==null ) {
+			return 1.0 ; // this was the default value in V1; could also return Double-null instead.
+		} else {
+			return (double) attribute;
+		}
 	}
 
 	public static void setEgressTime(VehicleType vehicleType, double egressTime) {
@@ -89,7 +94,7 @@ public class VehicleUtils {
 	}
 
 	public static double getGasConsumption(VehicleType vehicleType) {
-		return (Double) vehicleType.getAttributes().getAttribute(GASCONSUMPTION);
+		return (double) vehicleType.getAttributes().getAttribute(GASCONSUMPTION);
 	}
 
 	public static void setGasConsumption(VehicleType vehicleType, double literPerMeter) {
@@ -97,7 +102,7 @@ public class VehicleUtils {
 	}
 
 	public static double getFreightCapacityUnits (VehicleType vehicleType) {
-		return (Double) vehicleType.getAttributes().getAttribute(FREIGHT_CAPACITY_UNITS);
+		return (double) vehicleType.getAttributes().getAttribute(FREIGHT_CAPACITY_UNITS);
 	}
 
 	public static void setFreightCapacityUnits(VehicleType vehicleType, double units) {
@@ -105,11 +110,4 @@ public class VehicleUtils {
 	}
 
 
-	//TODO: acessTime: einbinden
-
-	//TODO: egressTime: einbinden
-
-	//TODO: gasConsumption -> literPerMeter: , einbinden
-
-	//TODO: FreightCapacity -> units: einbinden
 }
