@@ -90,6 +90,7 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 		assertEquals(DoorOperationMode.parallel, vehType.getDoorOperationMode());
 		assertEquals(2.0, vehType.getPcuEquivalents());
 
+
 		vehType = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
 		assertNotNull(vehType);
 		assertEquals(7.5, vehType.getLength(), EPSILON);

@@ -37,12 +37,12 @@ public class VehicleType{
 	private FreightCapacity freightCapacity;
 	private String description;
 	private VehicleCapacity capacity;
-	
+
 	/**
 	 * default from xml schema
 	 */
 	private double accessTime = 1.0;
-	
+
 	/**
 	 * default from xml schema
 	 */
@@ -133,9 +133,13 @@ public class VehicleType{
 		this.engineInformation = engineInformation;
 	}
 
-	public void setFreightCapacity(FreightCapacity freightCapacity) { this.freightCapacity = freightCapacity; }
+	public void setFreightCapacity(FreightCapacity freightCapacity) {
+		this.freightCapacity = freightCapacity;
+	}
 
-	public void setCostInformation(CostInformation costInformation) {this.costInformation = costInformation; }
+	public void setCostInformation(CostInformation costInformation) {
+		this.costInformation = costInformation;
+	}
 
 	public void setLength(double length) {
 		this.length = length;
@@ -165,7 +169,11 @@ public class VehicleType{
 		return engineInformation;
 	}
 
-	public CostInformation getCostInformation() { return costInformation;	}
+	public CostInformation getCostInformation() {
+		return costInformation;
+	}
 
-	public FreightCapacity getFreightCapacity() { return freightCapacity;	}
+	public FreightCapacity getFreightCapacity() {
+		return freightCapacity;
+	}
 }
