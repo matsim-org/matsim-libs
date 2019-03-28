@@ -20,6 +20,7 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import com.google.inject.Singleton;
@@ -27,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
@@ -37,6 +39,7 @@ import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dynagent.run.DynActivityEngine;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -95,6 +98,14 @@ public class RunOneTaxiWithPrebookingExampleIT {
 			//			}
 		}
 
+//		Iterator<? extends Person> it = scenario.getPopulation().getPersons().values().iterator();
+//		while ( it.hasNext() ) {
+//			Person result = it.next();
+//			if ( ! result.getId().toString().equals( "passenger_0" ) ) {
+//				it.remove();
+//			}
+//		}
+
 		PopulationUtils.writePopulation(scenario.getPopulation(), utils.getOutputDirectory() + "/../pop.xml");
 
 		// setup controler
@@ -127,7 +138,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 			}
 		});
 
-//		controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
+		controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -154,15 +165,15 @@ public class RunOneTaxiWithPrebookingExampleIT {
 				System.err.println(event) ;
 //				System.out.println("") ;
 				switch (cnt) {
-					case 0:
-					case 1:
-					case 2:
-					case 3:
-						Assert.assertEquals(0., event.getTime(), Double.MIN_VALUE );
-						final List<String> personIds = Arrays.asList("passenger_0", "passenger_1",
-								"passenger_2", "passenger_3" );
-						Assert.assertTrue(personIds.contains(ev.getPersonId().toString()));
-						break;
+//					case 0:
+//					case 1:
+//					case 2:
+//					case 3:
+//						Assert.assertEquals(0., event.getTime(), Double.MIN_VALUE );
+//						final List<String> personIds = Arrays.asList("passenger_0", "passenger_1",
+//								"passenger_2", "passenger_3" );
+//						Assert.assertTrue(personIds.contains(ev.getPersonId().toString()));
+//						break;
 //					case 4:
 ////						Assert.assertEquals(300., event.getTime(), Double.MIN_VALUE);
 //						Assert.assertEquals("passenger_4", ev.getPersonId().toString());
@@ -196,23 +207,23 @@ public class RunOneTaxiWithPrebookingExampleIT {
 //				System.out.println(""); ;
 				Assert.assertEquals("taxi_one", ev.getVehicleId().toString());
 				switch (cnt2) {
-					case 0:
-						Assert.assertEquals(0., event.getTime(), Double.MIN_VALUE);
-						Assert.assertEquals("taxi_0", ev.getRequestId().toString());
-						break;
-					case 1:
-						Assert.assertEquals(0., event.getTime(), Double.MIN_VALUE);
-						// why one such request scheduling every 5min?  The demand is like that: dp times are spaced by 5 min.
-						Assert.assertEquals("taxi_1", ev.getRequestId().toString());
-						break;
-					case 2:
-						Assert.assertEquals(0., event.getTime(), Double.MIN_VALUE);
-						Assert.assertEquals("taxi_2", ev.getRequestId().toString());
-						break;
-					case 3:
-						Assert.assertEquals(0., event.getTime(), Double.MIN_VALUE);
-						Assert.assertEquals("taxi_3", ev.getRequestId().toString());
-						break;
+//					case 0:
+//						Assert.assertEquals(0., event.getTime(), Double.MIN_VALUE);
+//						Assert.assertEquals("taxi_0", ev.getRequestId().toString());
+//						break;
+//					case 1:
+//						Assert.assertEquals(0., event.getTime(), Double.MIN_VALUE);
+//						// why one such request scheduling every 5min?  The demand is like that: dp times are spaced by 5 min.
+//						Assert.assertEquals("taxi_1", ev.getRequestId().toString());
+//						break;
+//					case 2:
+//						Assert.assertEquals(0., event.getTime(), Double.MIN_VALUE);
+//						Assert.assertEquals("taxi_2", ev.getRequestId().toString());
+//						break;
+//					case 3:
+//						Assert.assertEquals(0., event.getTime(), Double.MIN_VALUE);
+//						Assert.assertEquals("taxi_3", ev.getRequestId().toString());
+//						break;
 //					case 4:
 //						Assert.assertEquals(1200., event.getTime(), Double.MIN_VALUE);
 //						Assert.assertEquals("taxi_4", ev.getRequestId().toString());
@@ -239,10 +250,9 @@ public class RunOneTaxiWithPrebookingExampleIT {
 //						break;
 				}
 				cnt2++;
-			} else if ( event instanceof PersonDepartureEvent ) {
-				PersonDepartureEvent ev = (PersonDepartureEvent) event;
-				if ( TransportMode.taxi.equals( ev.getLegMode() ) ) {
-					System.err.println( event ) ;
+			} else if ( event instanceof HasPersonId ) {
+				if ( ((HasPersonId) event).getPersonId().toString().equals( "passenger_0" )){
+					System.err.println( event );
 				}
 			}
 		}

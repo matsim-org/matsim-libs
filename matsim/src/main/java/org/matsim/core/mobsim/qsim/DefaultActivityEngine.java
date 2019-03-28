@@ -111,6 +111,9 @@ public class DefaultActivityEngine implements ActivityEngine {
 
 	@Override
 	public void doSimStep(double time) {
+//		for( AgentEntry agentEntry : activityEndsList ){
+//			log.warn(agentEntry.toString()) ;
+//		}
 		beforeFirstSimStep = false;
 		while (activityEndsList.peek() != null) {
 			if (activityEndsList.peek().activityEndTime <= time) {
@@ -156,7 +159,7 @@ public class DefaultActivityEngine implements ActivityEngine {
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
 
-		log.warn("agentId=" + agent.getId() + "; actEndTime=" + agent.getActivityEndTime() ) ;
+		log.warn("entering handleActivity; agentId=" + agent.getId() + "; actEndTime=" + agent.getActivityEndTime() ) ;
 
 		if (agent.getActivityEndTime() == Double.POSITIVE_INFINITY) {
 			// This is the last planned activity.

@@ -216,7 +216,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 			String causes = violations.stream().collect(Collectors.joining(", "));
 			LOGGER.warn("Request: "
 					+ request.getId()
-					+ "of mode: "
+					+ " of mode: "
 					+ mode
 					+ " will not be served. The agent will get stuck. Causes: "
 					+ causes);

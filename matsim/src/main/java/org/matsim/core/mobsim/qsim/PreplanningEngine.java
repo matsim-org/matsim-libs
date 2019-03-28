@@ -284,7 +284,7 @@ public final class PreplanningEngine implements MobsimEngine {
 
 
 	private void updateAgentPlan(MobsimAgent agent, TripInfo tripInfo) {
-		Gbl.assertIf(WithinDayAgentUtils.getCurrentPlanElement(agent) instanceof Activity);
+//		Gbl.assertIf(WithinDayAgentUtils.getCurrentPlanElement(agent) instanceof Activity);
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
@@ -340,7 +340,7 @@ public final class PreplanningEngine implements MobsimEngine {
 			leg.setRoute( route );
 		}
 		{
-			Activity act = pf.createActivityFromLinkId( createStageActivityType( TransportMode.taxi ), tripInfo.getPickupLocation().getLinkId() );
+			Activity act = pf.createActivityFromLinkId( createStageActivityType( TransportMode.taxi ), tripInfo.getDropoffLocation().getLinkId() );
 			act.setMaximumDuration( 0. );
 			result.add( act );
 		}

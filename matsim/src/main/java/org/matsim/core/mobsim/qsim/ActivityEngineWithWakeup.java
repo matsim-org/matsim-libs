@@ -21,10 +21,12 @@ package org.matsim.core.mobsim.qsim;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
@@ -91,7 +93,11 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
 		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
-		wakeUpList.addAll( preplanningEngine.generateWakeups( agent, now ) ) ;
+
+		Activity act = (Activity) WithinDayAgentUtils.getCurrentPlanElement( agent );
+		if ( !act.getType().contains( "interaction" ) ){
+			wakeUpList.addAll( preplanningEngine.generateWakeups( agent, now ) );
+		}
 
 		return delegate.handleActivity(agent);
 	}
