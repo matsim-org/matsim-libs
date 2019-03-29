@@ -58,6 +58,7 @@ public class AmenityReader {
 	private ObjectAttributes amenityAttributes;
 	private final CoordinateTransformation ct;
 	private Map<String, String> osmToMatsimTypeMap;
+	private final boolean skipDesc;
 	
 
 	/**
@@ -69,15 +70,32 @@ public class AmenityReader {
 	 * @param osmToMatsimTypeMap a mapping of OpenStreetMap
 	 * 		  <a href="http://wiki.openstreetmap.org/wiki/Key:amenity">Amenity values</a>
 	 * 		  to MATSim activity types.
+	 * @param skipDesc boolean to prevent writing the name into the facility description
 	 */
 	public AmenityReader(String file, CoordinateTransformation ct, 
-			Map<String, String> osmToMatsimTypeMap) {
+			Map<String, String> osmToMatsimTypeMap, boolean skipDesc) {
 		log.info("Creating amenity reader");
 		
 		this.ct = ct;
 		this.osmToMatsimTypeMap = osmToMatsimTypeMap;
 		this.amenities = FacilitiesUtils.createActivityFacilities("OpenStreetMap amenities");
 		this.amenityAttributes = new ObjectAttributes();
+		this.skipDesc = skipDesc;
+	}
+	
+	/**
+	 * Constructing an amenity reader to parse the OpenStreetMap amenities.
+	 * 
+	 * @param file the path to the *.osm OpenStreetMap file;
+	 * @param ct the (projected) coordinate reference system to which the 
+	 * 		  WGS84 coordinates of OpenStreetMap will be converted to; and
+	 * @param osmToMatsimTypeMap a mapping of OpenStreetMap
+	 * 		  <a href="http://wiki.openstreetmap.org/wiki/Key:amenity">Amenity values</a>
+	 * 		  to MATSim activity types.
+	 */
+	public AmenityReader(String file, CoordinateTransformation ct, 
+			Map<String, String> osmToMatsimTypeMap) {		
+		this(file, ct, osmToMatsimTypeMap, false);
 	}
 	
 	
@@ -96,7 +114,7 @@ public class AmenityReader {
 		if(!f.exists()){
 			throw new FileNotFoundException("Could not find " + file);
 		}
-		AmenitySink mes = new AmenitySink(this.ct, this.osmToMatsimTypeMap);
+		AmenitySink mes = new AmenitySink(this.ct, this.osmToMatsimTypeMap, this.skipDesc);
 		XmlReader xr = new XmlReader(f, false, CompressionMethod.None);
 		xr.setSink(mes);
 		xr.run();		
