@@ -124,7 +124,8 @@ public final class AccessibilityCalculator {
 				for (final AggregationObject aggregatedFacility : aggregatedOpportunities) {
 					// Go through all calculators
 					for (String mode : calculators.keySet()) {
-						final double expVhk = calculators.get(mode).computeContributionOfOpportunity(origin, aggregatedFacility, departureTime);
+//						final double expVhk = calculators.get(mode).computeContributionOfOpportunity(origin, aggregatedFacility, departureTime);
+						final double expVhk = 100.;
 						expSums.put(mode, expSums.get(mode) + expVhk);
 					}
 				}
