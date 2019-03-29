@@ -312,6 +312,7 @@ public final class PreplanningEngine implements MobsimEngine {
 
 		inputTrip.getOriginActivity().setEndTime( tripInfo.getExpectedBoardingTime() - 900 );
 		// yyyy means for time being we always depart 15min before pickup.  kai, mar'19
+		WithinDayAgentUtils.resetCaches( agent );
 
 		log.warn( "agentId=" + agent.getId() + " | newActEndTime=" + inputTrip.getOriginActivity().getEndTime() ) ;
 

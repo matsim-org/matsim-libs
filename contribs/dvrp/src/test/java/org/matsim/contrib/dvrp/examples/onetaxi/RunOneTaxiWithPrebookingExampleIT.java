@@ -98,13 +98,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 			//			}
 		}
 
-//		Iterator<? extends Person> it = scenario.getPopulation().getPersons().values().iterator();
-//		while ( it.hasNext() ) {
-//			Person result = it.next();
-//			if ( ! result.getId().toString().equals( "passenger_0" ) ) {
-//				it.remove();
-//			}
-//		}
+//		scenario.getPopulation().getPersons().values().removeIf( result -> !result.getId().toString().equals( "passenger_0" ) );
 
 		PopulationUtils.writePopulation(scenario.getPopulation(), utils.getOutputDirectory() + "/../pop.xml");
 
@@ -138,7 +132,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 			}
 		});
 
-		controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
+//		controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -251,9 +245,9 @@ public class RunOneTaxiWithPrebookingExampleIT {
 				}
 				cnt2++;
 			} else if ( event instanceof HasPersonId ) {
-				if ( ((HasPersonId) event).getPersonId().toString().equals( "passenger_0" )){
+//				if ( ((HasPersonId) event).getPersonId().toString().equals( "passenger_0" )){
 					System.err.println( event );
-				}
+//				}
 			}
 		}
 
