@@ -28,22 +28,19 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.triangulate.VoronoiDiagramBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
 
 /**
  * @author dziemke
@@ -175,9 +172,7 @@ public class VoronoiGeometryUtils {
 	    SimpleFeatureBuilder fbuilder = new SimpleFeatureBuilder(type);
 
 	    for (Geometry geometry : geometries) {
-	        
-	        Object[] values = new Object[]{geometry};
-	        fbuilder.addAll(values);
+	    	fbuilder.add(geometry);
 	        SimpleFeature feature = fbuilder.buildFeature(null);
 	        features.add(feature);
 	    }

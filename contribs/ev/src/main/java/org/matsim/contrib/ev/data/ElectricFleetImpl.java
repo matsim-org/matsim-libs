@@ -45,7 +45,9 @@ public class ElectricFleetImpl implements ElectricFleet {
 		for (ElectricVehicle ev : eVehicles.values()) {
 			ev.getBattery().resetSoc();
 			ev.setDriveEnergyConsumption(driveConsumptionFactory.create(ev));
-			ev.setAuxEnergyConsumption(auxConsumptionFactory.create(ev));
+			if (auxConsumptionFactory != null) {
+				ev.setAuxEnergyConsumption(auxConsumptionFactory.create(ev));
+			}
 		}
 	}
 }

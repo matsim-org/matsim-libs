@@ -22,7 +22,7 @@ package org.matsim.contrib.ev.stats;/*
  */
 
 import com.google.inject.Inject;
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.charging.ChargingEndEvent;
@@ -46,7 +46,8 @@ public class ChargerPowerCollector implements ChargingEndEventHandler, ChargingS
 
     private final ChargingInfrastructure chargingInfrastructure;
     private final ElectricFleet fleet;
-    private Map<Id<ElectricVehicle>, Pair<Double, Double>> chargeBeginSoc = new HashMap<>();
+    private Map<Id<ElectricVehicle>, ImmutablePair> chargeBeginSoc = new HashMap<>();
+
     private List<ChargingLogEntry> logList = new ArrayList<>();
 
     @Inject
@@ -58,7 +59,7 @@ public class ChargerPowerCollector implements ChargingEndEventHandler, ChargingS
 
     @Override
     public void handleEvent(ChargingEndEvent event) {
-        Pair<Double, Double> chargeStart = chargeBeginSoc.remove(event.getVehicleId());
+        ImmutablePair<Double, Double> chargeStart = chargeBeginSoc.remove(event.getVehicleId());
         if (chargeStart != null) {
             double energy = this.fleet.getElectricVehicles().get(event.getVehicleId()).getBattery().getSoc() - chargeStart.getValue();
             ChargingLogEntry loge = new ChargingLogEntry(chargeStart.getKey(), event.getTime(), chargingInfrastructure.getChargers().get(event.getChargerId()), energy, event.getVehicleId());
@@ -70,7 +71,7 @@ public class ChargerPowerCollector implements ChargingEndEventHandler, ChargingS
     public void handleEvent(ChargingStartEvent event) {
         ElectricVehicle ev = this.fleet.getElectricVehicles().get(event.getVehicleId());
         if (ev != null) {
-            this.chargeBeginSoc.put(event.getVehicleId(), new Pair<>(event.getTime(), ev.getBattery().getSoc()));
+            this.chargeBeginSoc.put(event.getVehicleId(), new ImmutablePair<>(event.getTime(), ev.getBattery().getSoc()));
         } else throw new NullPointerException(event.getVehicleId().toString() + " is not in list");
 
     }

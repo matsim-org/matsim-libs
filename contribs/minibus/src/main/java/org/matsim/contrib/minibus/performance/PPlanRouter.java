@@ -23,12 +23,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 import java.util.List;
@@ -123,7 +123,7 @@ final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			// use facilities only if the activity does not provides the required fields.
 			return facilities.getFacilities().get( act.getFacilityId() );
 		}
-		return new ActivityWrapperFacility( act );
+		return FacilitiesUtils.toFacility( act, facilities );
 	}
 
 	private static double calcEndOfActivity(

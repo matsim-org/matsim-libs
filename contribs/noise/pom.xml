@@ -26,7 +26,7 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojson</artifactId>
-            <version>14.0</version>
+			<version>20.2</version>
         </dependency>
 
     </dependencies>

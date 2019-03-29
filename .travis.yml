@@ -9,7 +9,7 @@
 
 language: java
 
-# jdk: oraclejdk8
+jdk: openjdk11
 # addons:
 #   apt:
 #     packages:
@@ -29,20 +29,33 @@ install: true
 
 # define the order of the stages:
 stages:
-  - package
+  # - package
   - test
+
+# yyyy It would be good to install matsim-main in the package stage
+# (presumably including non-it tests), and then just run all other
+# tests based on the installation.  However, the travis forgets the
+# result of mvn install and starts over; thus is this not very useful.
+# kai, mar'19
 
 # this is the script run in the "test" stage:
 # 'failsafe:verify' triggers travis failures for errors/failures of integration tests. 
-script: mvn install --also-make --projects ${MODULE} -DskipTests -Dmaven.javadoc.skip && cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn failsafe:integration-test failsafe:verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dmaven.javadoc.skip -Dsource.skip -Dassembly.skipAssembly=true -DskipTests
+script: mvn install --also-make --projects ${MODULE} -DskipTests -Dmaven.javadoc.skip && cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn surefire:test failsafe:integration-test failsafe:verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dmaven.javadoc.skip -Dsource.skip -Dassembly.skipAssembly=true
 
-# I just added -DskipTests here since I think that we only want to run the IT tests.  kai, sep'18
+# I just added -DskipTests here since I think that we only want to run
+# the IT tests.  kai, sep'18 
+
+# -DskipTests skips both normal _and_ integration tests :-(. There is
+# now instead -Dskip.surefire.tests, which is resolved in the matsim
+# pom.xml (and hopefully inherited). See
+# https://stackoverflow.com/questions/6612344/prevent-unit-tests-but-allow-integration-tests-in-maven
+# kai, mar'19
 
 # this defines all other stages.
-jobs:
-  include:
-    - stage: package
-      script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end 
+# jobs:
+#   include:
+#     - stage: package
+#       script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -DskipTests
 
 #-Dmaven.javadoc.skip # may need this for the weekly/monthly releases
 #-Dsource.skip # may need this for the weekly/monthly releases

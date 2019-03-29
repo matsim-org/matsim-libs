@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.locationtech.jts.geom.MultiPolygon;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.carsharing.relocation.demand.CarsharingVehicleRelocationContainer;
 import org.matsim.contrib.carsharing.relocation.events.handlers.DemandDistributionHandler;
@@ -25,7 +26,6 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 
 import com.google.inject.Inject;
-import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class KmlWriterListener implements IterationStartsListener, IterationEndsListener {
 	int frequency = 0;

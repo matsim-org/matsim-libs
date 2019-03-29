@@ -7,14 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
 
 public class RelocationZone implements Identifiable<RelocationZone> {
 

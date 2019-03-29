@@ -43,7 +43,7 @@ public class AuxDischargingHandler implements MobsimAfterSimStepListener {
 	public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
 		if ((e.getSimulationTime() + 1) % auxDischargeTimeStep == 0) {
 			for (ElectricVehicle ev : evFleet.getElectricVehicles().values()) {
-				double energy = ev.getAuxEnergyConsumption().calcEnergyConsumption(auxDischargeTimeStep);
+				double energy = ev.getAuxEnergyConsumption().calcEnergyConsumption(auxDischargeTimeStep, e.getSimulationTime() + 1);
 				ev.getBattery().discharge(energy);
 			}
 		}

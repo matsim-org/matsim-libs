@@ -92,6 +92,17 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log( lvl, "did not find xml as one of the events file formats. vsp default is using xml events.");
 		}
 
+		switch ( config.controler().getRoutingAlgorithmType() ) {
+			case Dijkstra:
+			case AStarLandmarks:
+			case FastDijkstra:
+				log.log( lvl, "you are not using FastAStarLandmarks as routing algorithm.  vsp default is to use FastAStarLandmarks.") ;
+				System.out.flush();
+				break;
+			case FastAStarLandmarks:
+				break;
+		}
+
 		// === location choice:
 		
 		boolean usingLocationChoice = false ;
