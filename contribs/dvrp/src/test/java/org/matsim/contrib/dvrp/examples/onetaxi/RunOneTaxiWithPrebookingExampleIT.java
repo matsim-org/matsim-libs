@@ -244,9 +244,9 @@ public class RunOneTaxiWithPrebookingExampleIT {
 				}
 				cnt2++;
 			} else if ( event instanceof HasPersonId ) {
-//				if ( ((HasPersonId) event).getPersonId().toString().equals( "passenger_0" )){
+				if ( ((HasPersonId) event).getPersonId().toString().contains( "passenger" )){
 					System.err.println( event );
-//				}
+				}
 			}
 		}
 

@@ -119,13 +119,13 @@ public final class PreplanningEngine implements MobsimEngine {
 
 	private void processTripInfoRequests() {
 		for (Map.Entry<MobsimAgent, TripInfoRequest> entry : tripInfoRequestMap.entrySet()) {
-			log.warn("processing tripInfoRequests for agentId=" + entry.getKey().getId());
+//			log.warn("processing tripInfoRequests for agentId=" + entry.getKey().getId());
 			Map<TripInfo, TripInfo.Provider> allTripInfos = new LinkedHashMap<>();
 			for (TripInfo.Provider provider : tripInfoProviders.values()) {
-				log.warn("querying provider of " + provider.getMode() + " for tripInfo") ;
+//				log.warn("querying provider of " + provider.getMode() + " for tripInfo") ;
 				List<TripInfo> tripInfos = provider.getTripInfos(entry.getValue());
 				for (TripInfo tripInfo : tripInfos) {
-					log.warn("tripInfo=" + toString( tripInfo ) ) ;
+//					log.warn("tripInfo=" + toString( tripInfo ) ) ;
 					allTripInfos.put(tripInfo, provider);
 				}
 			}
@@ -139,7 +139,7 @@ public final class PreplanningEngine implements MobsimEngine {
 	}
 
 	private void decide(MobsimAgent agent, Map<TripInfo, TripInfo.Provider> allTripInfos) {
-		log.warn("entering decide for agentId=" + agent.getId());
+//		log.warn("entering decide for agentId=" + agent.getId());
 
 		this.population.getPersons().get(agent.getId()).getAttributes().putAttribute(AgentSnapshotInfo.marker, true);
 
@@ -153,7 +153,7 @@ public final class PreplanningEngine implements MobsimEngine {
 
 		if (tripInfo instanceof TripInfoWithRequiredBooking) {
 			tripInfoProviders.get(tripInfo.getMode()).bookTrip((MobsimPassengerAgent)agent, (TripInfoWithRequiredBooking)tripInfo);
-			log.warn("booked trip with tripInfo=" + toString( tripInfo ));
+//			log.warn("booked trip with tripInfo=" + toString( tripInfo ));
 			// yyyy can't we really not use the tripInfo handle directly as I had it before?  We may, e.g., have different providers of the same mode.  kai, mar'19
 
 			//to reduce number of possibilities, I would simply assume that notification always comes later
