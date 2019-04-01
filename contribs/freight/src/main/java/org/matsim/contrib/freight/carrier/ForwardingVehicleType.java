@@ -2,7 +2,9 @@ package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.utils.objectattributes.attributable.Attributes;
-import org.matsim.vehicles.*;
+import org.matsim.vehicles.EngineInformation;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleType;
 
 public class ForwardingVehicleType extends VehicleType{
 
@@ -91,24 +93,4 @@ public class ForwardingVehicleType extends VehicleType{
 	public Attributes getAttributes() {
 		return vType.getAttributes() ;
     }
-
-	@Override
-	public void setCostInformation(CostInformation costInformation) {
-		vType.setCostInformation(costInformation);
-	}
-
-	@Override
-	public void setFreightCapacity(FreightCapacity freightCapacity) {
-		vType.setFreightCapacity(freightCapacity);
-	}
-
-	@Override
-	public FreightCapacity getFreightCapacity() {
-		return vType.getFreightCapacity();
-	}
-
-	@Override
-	public CostInformation getCostInformation() {
-		return vType.getCostInformation();
-	}
 }
