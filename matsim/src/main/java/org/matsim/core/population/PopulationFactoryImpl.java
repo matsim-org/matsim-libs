@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteFactory;
+import org.matsim.facilities.ActivityFacility;
 
 /**
  * @author dgrether, mrieser
@@ -67,6 +68,13 @@ import org.matsim.core.population.routes.RouteFactory;
 	        Activity act = new ActivityImpl(actType) ;
 	        act.setLinkId(linkId);
 	        return act ;
+	}
+
+	@Override
+	public Activity createActivityFromActivityFacilityId( String actType, Id<ActivityFacility> activityFacilityId ){
+		Activity act = new ActivityImpl( actType ) ;
+		act.setFacilityId( activityFacilityId );
+		return act ;
 	}
 
 	@Override

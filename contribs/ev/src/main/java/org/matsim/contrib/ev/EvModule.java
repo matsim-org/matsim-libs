@@ -35,4 +35,5 @@ public class EvModule extends AbstractModule {
 		install(new DischargingModule(evCfg));
 		install(new EvStatsModule(evCfg));
 	}
+
 }
