@@ -24,11 +24,7 @@ package org.matsim.contrib.av.flow;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -82,10 +78,10 @@ public class RunAVExample {
 		controler.addOverridingModule(new OTFVisLiveModule());
 		}
 		controler.run();
-	} 
-	
-	
-	void addPopulation(Scenario scenario){
+	}
+
+
+	static void addPopulation(Scenario scenario) {
 		
 		Population pop = scenario.getPopulation();
 		//192 agents on upper route and lower route

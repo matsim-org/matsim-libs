@@ -80,7 +80,8 @@ public final class SumScoringFunction implements ScoringFunction {
 				activityScoringFunction.handleLastActivity(activity);
 			}
 		} else {
-			throw new RuntimeException("Trying to score an activity without start or end time. Should not happen."); 	
+			throw new RuntimeException("Trying to score an activity without start or end time. Should not happen. Activity="
+			+ activity );
 		}
 	}
 

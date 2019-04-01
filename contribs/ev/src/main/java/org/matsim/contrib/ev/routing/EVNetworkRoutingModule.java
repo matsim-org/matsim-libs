@@ -161,7 +161,7 @@ public final class EVNetworkRoutingModule implements RoutingModule {
                     lastArrivaltime = lastLeg.getDepartureTime() + lastLeg.getTravelTime();
                     stagedRoute.add(lastLeg);
                     Activity chargeAct = PopulationUtils.createActivityFromCoordAndLinkId(stageActivityType, selectedCharger.getCoord(), selectedCharger.getLink().getId());
-                    double estimatedChargingTime = (ev.getBattery().getCapacity() * .8) / selectedCharger.getPower();
+                    double estimatedChargingTime = (ev.getBattery().getCapacity() * 1.25) / selectedCharger.getPower();
                     chargeAct.setMaximumDuration(estimatedChargingTime);
                     lastArrivaltime += chargeAct.getMaximumDuration();
                     stagedRoute.add(chargeAct);
@@ -184,7 +184,10 @@ public final class EVNetworkRoutingModule implements RoutingModule {
 
         for (Link l : links) {
             double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime(), null, null);
-            double consumption = ev.getDriveEnergyConsumption().calcEnergyConsumption(l, travelT) + ev.getAuxEnergyConsumption().calcEnergyConsumption(travelT, basicLeg.getDepartureTime());
+            double consumption = ev.getDriveEnergyConsumption().calcEnergyConsumption(l, travelT);
+            if (ev.getAuxEnergyConsumption() != null) {
+                consumption += ev.getAuxEnergyConsumption().calcEnergyConsumption(travelT, basicLeg.getDepartureTime());
+            }
             consumptions.put(l, consumption);
         }
         return consumptions;

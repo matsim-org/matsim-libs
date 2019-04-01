@@ -150,6 +150,16 @@ public final class PopulationUtils {
 		return new UnmodifiableLeg( leg ) ;
 	}
 
+	public static void resetRoutes( final Plan plan ) {
+		// loop over all <leg>s, remove route-information
+		// routing is done after location choice
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				((Leg) pe).setRoute(null);
+			}
+		}
+	}
+
 	static class UnmodifiableLeg implements Leg {
 		private final Leg delegate ;
 		public UnmodifiableLeg( Leg leg ) {

@@ -148,7 +148,7 @@ public class FastMultiNodeDijkstra extends MultiNodeDijkstra {
 		 * found in the InitialNode.
 		 */
 		if (imaginaryNode != null && path != null && path.nodes.size() > 0) {
-			Node pathFromNode = path.nodes.get(0);
+			Node pathFromNode = path.getFromNode();
 			double initialCost = 0.0;
 			double initialTime = 0.0;
 			
@@ -161,8 +161,8 @@ public class FastMultiNodeDijkstra extends MultiNodeDijkstra {
 					break;
 				}
 			}
-			
-			path = new Path(path.nodes, path.links, path.travelTime - initialTime, path.travelCost - initialCost);			
+
+			return new Path(path.nodes, path.links, path.travelTime - initialTime, path.travelCost - initialCost);
 		}
 		
 		return path;
