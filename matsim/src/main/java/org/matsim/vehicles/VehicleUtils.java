@@ -101,6 +101,20 @@ public class VehicleUtils {
 		vehicleType.getAttributes().putAttribute(GASCONSUMPTION, literPerMeter);
 	}
 
+	public static EngineInformation getEngineInformation(VehicleType vehicleType){
+		EngineInformation engineInformation = vehicleType.getEngineInformation();
+		//if not stored in the "old" format, organize values from the attributes. This will be probably changed in the future, kmt mar'19
+		if (Double.isNaN(engineInformation.getGasConsumption())){
+			engineInformation.setGasConsumption(getGasConsumption(vehicleType));
+		}
+		return engineInformation;
+	}
+
+	public static void setEngineInformation(VehicleType vehicleType, EngineInformation.FuelType fuelType, double literPerMeter){
+		vehicleType.setEngineInformation(new EngineInformationImpl(fuelType));
+		setGasConsumption(vehicleType, literPerMeter);
+	}
+
 	public static double getFreightCapacityUnits (VehicleType vehicleType) {
 		return (double) vehicleType.getAttributes().getAttribute(FREIGHT_CAPACITY_UNITS);
 	}

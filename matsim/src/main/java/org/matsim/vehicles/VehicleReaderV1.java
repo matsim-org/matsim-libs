@@ -16,7 +16,6 @@ class VehicleReaderV1 extends MatsimXmlParser{
 	private VehicleCapacity currentCapacity = null;
 	private FreightCapacity currentFreightCap = null;
 	private EngineInformation.FuelType currentFuelType = null;
-	private double currentGasConsumption = Double.NaN;
 
 	public VehicleReaderV1( final Vehicles vehicles ){
 		log.info("Using " + this.getClass().getName());
@@ -29,10 +28,8 @@ class VehicleReaderV1 extends MatsimXmlParser{
 		if( VehicleSchemaV1Names.DESCRIPTION.equalsIgnoreCase( name ) && (content.trim().length() > 0) ){
 			this.currentVehType.setDescription( content.trim() );
 		} else if( VehicleSchemaV1Names.ENGINEINFORMATION.equalsIgnoreCase( name ) ){
-			EngineInformation currentEngineInfo = this.builder.createEngineInformation( this.currentFuelType, this.currentGasConsumption );
-			this.currentVehType.setEngineInformation( currentEngineInfo );
+			VehicleUtils.setEngineInformation(this.currentVehType, this.currentFuelType, VehicleUtils.getGasConsumption(this.currentVehType));
 			this.currentFuelType = null;
-			this.currentGasConsumption = Double.NaN;
 		} else if( VehicleSchemaV1Names.FUELTYPE.equalsIgnoreCase( name ) ){
 			this.currentFuelType = this.parseFuelType( content.trim() );
 		} else if( VehicleSchemaV1Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){
@@ -45,7 +42,6 @@ class VehicleReaderV1 extends MatsimXmlParser{
 			this.vehicles.addVehicleType( this.currentVehType );
 			this.currentVehType = null;
 		}
-
 	}
 
 	private EngineInformation.FuelType parseFuelType( final String content ){
@@ -98,7 +94,7 @@ class VehicleReaderV1 extends MatsimXmlParser{
 		} else if( VehicleSchemaV1Names.VOLUME.equalsIgnoreCase( name ) ){
 			this.currentFreightCap.setVolume( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.CUBICMETERS ) ) );
 		} else if( VehicleSchemaV1Names.GASCONSUMPTION.equalsIgnoreCase( name ) ){
-		    VehicleUtils.setGasConsumption(this.currentVehType, Double.parseDouble( atts.getValue( VehicleSchemaV1Names.LITERPERMETER ) ));
+			VehicleUtils.setGasConsumption(this.currentVehType, Double.parseDouble( atts.getValue( VehicleSchemaV1Names.LITERPERMETER )) );
 		} else if( VehicleSchemaV1Names.VEHICLE.equalsIgnoreCase( name ) ){
 			Id<VehicleType> typeId = Id.create( atts.getValue( VehicleSchemaV1Names.TYPE ), VehicleType.class );
 			VehicleType type = this.vehicles.getVehicleTypes().get( typeId );
