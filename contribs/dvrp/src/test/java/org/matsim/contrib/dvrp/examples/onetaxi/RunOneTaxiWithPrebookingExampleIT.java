@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.population.Person;
@@ -156,7 +157,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 			if (event instanceof ActivityEngineWithWakeup.AgentWakeupEvent) {
 				final ActivityEngineWithWakeup.AgentWakeupEvent ev = (ActivityEngineWithWakeup.AgentWakeupEvent)event;
 //				System.out.println() ;
-				System.err.println(event) ;
+//				System.err.println(event) ;
 //				System.out.println("") ;
 				switch (cnt) {
 					case 0:
@@ -196,53 +197,88 @@ public class RunOneTaxiWithPrebookingExampleIT {
 				cnt++;
 			} else if (event instanceof PassengerRequestScheduledEvent ) {
 				PassengerRequestScheduledEvent ev = (PassengerRequestScheduledEvent)event;
-//				System.out.println("") ;
-				System.err.println( event) ;
-//				System.out.println(""); ;
+				//				System.out.println("") ;
+//				System.err.println( event) ;
+				//				System.out.println(""); ;
 				Assert.assertEquals("taxi_one", ev.getVehicleId().toString());
-				switch (cnt2) {
-					case 0:
+				switch (ev.getPersonId().toString()) {
+					case "passenger_0":
 						Assert.assertEquals(61.66, ev.getPickupTime(), 0.1 );
 						Assert.assertEquals("taxi_0", ev.getRequestId().toString());
 						break;
-					case 1:
+					case "passenger_1":
 						Assert.assertEquals(567.0, ev.getPickupTime(), 0.1 );
 						Assert.assertEquals("taxi_1", ev.getRequestId().toString());
 						break;
-					case 2:
+					case "passenger_2":
 						Assert.assertEquals(954.33, ev.getPickupTime(), 0.1 );
 						Assert.assertEquals("taxi_2", ev.getRequestId().toString());
 						break;
-					case 3:
+					case "passenger_3":
 						Assert.assertEquals(1401.66, ev.getPickupTime(), 0.1 );
 						Assert.assertEquals("taxi_3", ev.getRequestId().toString());
 						break;
-					case 4:
+					case "passenger_4":
 						Assert.assertEquals(1977.8, ev.getPickupTime(), 0.1);
 						Assert.assertEquals("taxi_4", ev.getRequestId().toString());
 						break;
-					case 5:
+					case "passenger_5":
 						Assert.assertEquals(2503.46, ev.getPickupTime(), 0.1);
 						Assert.assertEquals("taxi_5", ev.getRequestId().toString());
 						break;
-					case 6:
+					case "passenger_6":
 						Assert.assertEquals(2932.46, ev.getPickupTime(), 0.1);
 						Assert.assertEquals("taxi_6", ev.getRequestId().toString());
 						break;
-					case 7:
+					case "passenger_7":
 						Assert.assertEquals(3317.46, ev.getPickupTime(), 0.1);
 						Assert.assertEquals("taxi_7", ev.getRequestId().toString());
 						break;
-					case 8:
+					case "passenger_8":
 						Assert.assertEquals(3944.86, ev.getPickupTime(), 0.1);
 						Assert.assertEquals("taxi_8", ev.getRequestId().toString());
 						break;
-					case 9:
+					case "passenger_9":
 						Assert.assertEquals(4333.53, ev.getPickupTime(), 0.1);
 						Assert.assertEquals("taxi_9", ev.getRequestId().toString());
 						break;
 				}
 				cnt2++;
+			} else if (event instanceof ActivityEndEvent  && ((ActivityEndEvent) event).getActType().equals( "dummy" ) ) {
+				ActivityEndEvent ev = (ActivityEndEvent)event;
+//				System.err.println( event) ;
+				switch (ev.getPersonId().toString()) {
+					case "passenger_0":
+						Assert.assertEquals(2., ev.getTime(), 0.1 );
+						break;
+					case "passenger_1":
+						Assert.assertEquals(2., ev.getTime(), 0.1 );
+						break;
+					case "passenger_2":
+						Assert.assertEquals(55., ev.getTime(), 0.1 );
+						break;
+					case "passenger_3":
+						Assert.assertEquals(502., ev.getTime(), 0.1 );
+						break;
+					case "passenger_4":
+						Assert.assertEquals(1078., ev.getTime(), 0.1);
+						break;
+					case "passenger_5":
+						Assert.assertEquals(1604., ev.getTime(), 0.1);
+						break;
+					case "passenger_6":
+						Assert.assertEquals(2033., ev.getTime(), 0.1);
+						break;
+					case "passenger_7":
+						Assert.assertEquals(2418., ev.getTime(), 0.1);
+						break;
+					case "passenger_8":
+						Assert.assertEquals(3045., ev.getTime(), 0.1);
+						break;
+					case "passenger_9":
+						Assert.assertEquals(3434., ev.getTime(), 0.1);
+						break;
+				}
 			} else if ( event instanceof HasPersonId ) {
 				if ( ((HasPersonId) event).getPersonId().toString().contains( "passenger" )){
 					System.err.println( event );
