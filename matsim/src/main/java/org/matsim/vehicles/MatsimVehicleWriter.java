@@ -31,133 +31,37 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
- * @author dgrether
- * @author jwjoubert
+ * This is the new default Writer for the vehicles file.
+ * It can easy pointed to the current version of VehicleReader (which is now V2)
+ * @author kturner
  */
 public class MatsimVehicleWriter extends MatsimXmlWriter {
   
 	private static final Logger log = Logger.getLogger(MatsimVehicleWriter.class);
-	
-	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
-	private Map<Id<VehicleType>, VehicleType> vehicleTypes;
-	private Map<Id<Vehicle>, Vehicle> vehicles;
 
-	
+	private VehicleWriterV1 delegate;
+
 	public MatsimVehicleWriter(Vehicles vehicles) {
-		this.vehicleTypes = vehicles.getVehicleTypes();
-		this.vehicles = vehicles.getVehicles();
+		delegate = new VehicleWriterV1(vehicles);
 	}
-	
+
+	/**
+	 * Writes the vehicles in the current default format
+	 * (currently vehicleDefinitions_v1.dtd).
+	 */
 	public void writeFile(String filename) throws UncheckedIOException {
 		log.info( Gbl.aboutToWrite( "vehicles", filename) ) ;
-		this.openFile(filename);
-		this.writeXmlHead();
-		this.writeRootElement();
-		this.close();
+		delegate.writeFile(filename);
 	}
 
-	private void writeRootElement() throws UncheckedIOException {
-		atts.clear();
-		atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
-		atts.add(this.createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
-		atts.add(this.createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "vehicleDefinitions_v1.0.xsd"));
-		this.writeStartTag(VehicleSchemaV1Names.VEHICLEDEFINITIONS, atts);
-		this.writeVehicleTypes(this.vehicleTypes);
-		this.writeVehicles(this.vehicles);
-		this.writeEndTag(VehicleSchemaV1Names.VEHICLEDEFINITIONS);
-	}
 
-	private void writeVehicles(Map<Id<Vehicle>, Vehicle> veh) throws UncheckedIOException {
-		for (Vehicle v : veh.values()) {
-			atts.clear();
-			atts.add(this.createTuple(VehicleSchemaV1Names.ID, v.getId().toString()));
-			atts.add(this.createTuple(VehicleSchemaV1Names.TYPE, v.getType().getId().toString()));
-			this.writeStartTag(VehicleSchemaV1Names.VEHICLE, atts, true);
-		}
-	}
+//	public void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {
+//		this.converters.putAll(converters);
+//	}
+//
+//	public final void writeV1(final String filename) {
+//		new FacilitiesWriterV1(coordinateTransformation, facilities).write(filename);
+//	}
 
-	private void writeVehicleTypes(Map<Id<VehicleType>, VehicleType> vts) throws UncheckedIOException {
-		for (VehicleType vt : vts.values()) {
-			atts.clear();
-			atts.add(this.createTuple(VehicleSchemaV1Names.ID, vt.getId().toString()));
-			this.writeStartTag(VehicleSchemaV1Names.VEHICLETYPE, atts);
-			if (vt.getDescription() != null) {
-				this.writeStartTag(VehicleSchemaV1Names.DESCRIPTION, null);
-				this.writeContent(vt.getDescription(), true);
-				this.writeEndTag(VehicleSchemaV1Names.DESCRIPTION);
-			}
-			if (vt.getCapacity() != null) {
-				this.writeCapacity(vt.getCapacity());
-			}
-			if (!Double.isNaN(vt.getLength())){
-				atts.clear();
-				atts.add(this.createTuple(VehicleSchemaV1Names.METER, Double.toString(vt.getLength())));
-				this.writeStartTag(VehicleSchemaV1Names.LENGTH, atts, true);
-			}
-			if (!Double.isNaN(vt.getWidth())){
-				atts.clear();
-				atts.add(this.createTuple(VehicleSchemaV1Names.METER, Double.toString(vt.getWidth())));
-				this.writeStartTag(VehicleSchemaV1Names.WIDTH, atts, true);
-			}
-			if (!Double.isNaN(vt.getMaximumVelocity()) && !Double.isInfinite(vt.getMaximumVelocity())){
-				atts.clear();
-				atts.add(this.createTuple(VehicleSchemaV1Names.METERPERSECOND, Double.toString(vt.getMaximumVelocity())));
-				this.writeStartTag(VehicleSchemaV1Names.MAXIMUMVELOCITY, atts, true);
-			}
-			if (vt.getEngineInformation() != null) {
-				this.writeEngineInformation(vt.getEngineInformation());
-			}
-			atts.clear();
-			atts.add(this.createTuple(VehicleSchemaV1Names.SECONDSPERPERSON, vt.getAccessTime()));
-			this.writeStartTag(VehicleSchemaV1Names.ACCESSTIME, atts, true);
-			atts.clear();
-      atts.add(this.createTuple(VehicleSchemaV1Names.SECONDSPERPERSON, vt.getEgressTime()));
-      this.writeStartTag(VehicleSchemaV1Names.EGRESSTIME, atts, true);
-      atts.clear();
-      atts.add(this.createTuple(VehicleSchemaV1Names.MODE, vt.getDoorOperationMode().toString()));
-      this.writeStartTag(VehicleSchemaV1Names.DOOROPERATION, atts, true);
-      atts.clear();
-      atts.add(this.createTuple(VehicleSchemaV1Names.PCE, vt.getPcuEquivalents()));
-      this.writeStartTag(VehicleSchemaV1Names.PASSENGERCAREQUIVALENTS, atts, true);
-			this.writeEndTag(VehicleSchemaV1Names.VEHICLETYPE);
-		}
-	}
 
-	private void writeEngineInformation(EngineInformation ei) throws UncheckedIOException {
-		this.writeStartTag(VehicleSchemaV1Names.ENGINEINFORMATION, null);
-		this.writeStartTag(VehicleSchemaV1Names.FUELTYPE, null);
-		this.writeContent(ei.getFuelType().toString(), false);
-		this.writeEndTag(VehicleSchemaV1Names.FUELTYPE);
-		atts.clear();
-		atts.add(this.createTuple(VehicleSchemaV1Names.LITERPERMETER, Double.toString(ei.getFuelConsumption())));
-		this.writeStartTag(VehicleSchemaV1Names.GASCONSUMPTION, atts, true);
-		this.writeEndTag(VehicleSchemaV1Names.ENGINEINFORMATION);
-	}
-
-	private void writeCapacity(VehicleCapacity cap) throws UncheckedIOException {
-		this.writeStartTag(VehicleSchemaV1Names.CAPACITY, null);
-		if (cap.getSeats() != null) {
-			atts.clear();
-			atts.add(this.createTuple(VehicleSchemaV1Names.PERSONS, cap.getSeats()));
-			this.writeStartTag(VehicleSchemaV1Names.SEATS, atts, true);
-		}
-		if (cap.getStandingRoom() != null) {
-			atts.clear();
-			atts.add(this.createTuple(VehicleSchemaV1Names.PERSONS, cap.getStandingRoom()));
-			this.writeStartTag(VehicleSchemaV1Names.STANDINGROOM, atts, true);
-		}
-		if (cap.getFreightCapacity() != null) {
-			this.writeFreightCapacity(cap.getFreightCapacity());
-		}
-		this.writeEndTag(VehicleSchemaV1Names.CAPACITY);
-	}
-
-	private void writeFreightCapacity(FreightCapacity fc) throws UncheckedIOException {
-		this.writeStartTag(VehicleSchemaV1Names.FREIGHTCAPACITY, null);
-		atts.clear();
-		atts.add(this.createTuple(VehicleSchemaV1Names.CUBICMETERS, Double.toString(fc.getVolume())));
-		this.writeStartTag(VehicleSchemaV1Names.VOLUME, atts, true);
-		this.writeEndTag(VehicleSchemaV1Names.FREIGHTCAPACITY);
-	}
-	
 }

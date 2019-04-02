@@ -39,7 +39,8 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 	private final Id<Vehicle> id42 = Id.create("42", Vehicle.class);
 	private final Id<Vehicle> id42_23 = Id.create(" 42  23", Vehicle.class); //indeed this should be double blank in the middle but due to collapse this is only one blank
 
-	// todo: test for minimal vehicle (was kann man alles weglassen)?
+	// todo: make it for read V1, write V2
+	// Todo: read V2, write V2
 
 
 	public void testWriter() throws FileNotFoundException, IOException {
@@ -81,7 +82,7 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 		assertEquals(23.23, vehType.getCapacity().getFreightCapacity().getVolume(), EPSILON);
 		assertNotNull(vehType.getEngineInformation());
 		assertEquals(EngineInformation.FuelType.diesel, vehType.getEngineInformation().getFuelType());
-		assertEquals(0.23, vehType.getEngineInformation().getFuelConsumption(), EPSILON);
+		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehType), EPSILON);
 		assertEquals(23.23, vehType.getAccessTime(), EPSILON);
 		assertEquals(42.42, vehType.getEgressTime(), EPSILON);
 		assertEquals(DoorOperationMode.parallel, vehType.getDoorOperationMode());

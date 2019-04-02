@@ -42,6 +42,9 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 	private Map<Id<VehicleType>, VehicleType> vehicleTypes;
 	private Map<Id<Vehicle>, Vehicle> vehicles;
 
+	/**
+	 * @deprecated Please use {@link MatsimVehicleWriter} instead.
+	 */
 	@Deprecated
 	public VehicleWriterV1(Vehicles vehicles) {
 		log.warn("VehiclesV1 is deprecated; Please use MatsimVehicleWriter to always write with the currently supported version");
@@ -106,7 +109,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 				this.writeStartTag(VehicleSchemaV1Names.MAXIMUMVELOCITY, atts, true);
 			}
 			if (vt.getEngineInformation() != null) {
-				this.writeEngineInformation(vt.getEngineInformation());
+				this.writeEngineInformation(VehicleUtils.getEngineInformation(vt));
 			}
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV1Names.SECONDSPERPERSON, vt.getAccessTime()));

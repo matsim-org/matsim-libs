@@ -62,15 +62,20 @@ public class VehicleUtils {
 		final Object attribute = vehicleType.getAttributes().getAttribute( DOOR_OPERATION_MODE );
 		if ( attribute==null ) {
 			return VehicleType.DoorOperationMode.serial; // this was the default value in V1; could also return null instead.
-		} else {
+		} else if (attribute instanceof VehicleType.DoorOperationMode ){
+			return (VehicleType.DoorOperationMode) attribute;
+		} else if (attribute instanceof String) {
 			String modeString = (String) attribute;
-			if( VehicleType.DoorOperationMode.serial.toString().equalsIgnoreCase( modeString ) ){
+			if (VehicleType.DoorOperationMode.serial.toString().equalsIgnoreCase(modeString)) {
 				return VehicleType.DoorOperationMode.serial;
-			} else if( VehicleType.DoorOperationMode.parallel.toString().equalsIgnoreCase( modeString ) ){
+			} else if (VehicleType.DoorOperationMode.parallel.toString().equalsIgnoreCase(modeString)) {
 				return VehicleType.DoorOperationMode.parallel;
-			} else{
-				throw new IllegalArgumentException( "VehicleType " + vehicleType.getId().toString() + " : Door operation mode " + modeString + "is not supported" );
+			} else {
+				throw new IllegalArgumentException("VehicleType " + vehicleType.getId().toString() + " : Door operation mode " + modeString + "is not supported");
 			}
+		}
+		else {
+			throw new RuntimeException("Type of " + attribute + "is not supported here");
 		}
 	}
 
