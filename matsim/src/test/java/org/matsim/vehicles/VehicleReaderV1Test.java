@@ -37,7 +37,7 @@ public class VehicleReaderV1Test extends MatsimTestCase {
 	private final Id<Vehicle> id42_23 = Id.create(" 42  23", Vehicle.class); //indeed this should be double blank in the middle but due to collapse this is only one blank
 
 	// todo: test for minimal vehicle (was kann man alles weglassen)?
-	//
+	// TODO: Bring to "normal" test design: @Test,...
 
 	public void testBasicParser() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
@@ -65,8 +65,8 @@ public class VehicleReaderV1Test extends MatsimTestCase {
 		assertEquals(23.23, vehType.getCapacity().getFreightCapacity().getVolume(), EPSILON);
 		assertNotNull(vehType.getEngineInformation());
 		assertEquals(EngineInformation.FuelType.diesel, VehicleUtils.getEngineInformation(vehType).getFuelType());
-		assertEquals(0.23, VehicleUtils.getEngineInformation(vehType).getGasConsumption(), EPSILON);
-		assertEquals(0.23, VehicleUtils.getGasConsumption(vehType), EPSILON);
+		assertEquals(0.23, VehicleUtils.getEngineInformation(vehType).getFuelConsumption(), EPSILON);
+		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehType), EPSILON);
 		assertEquals(23.23, vehType.getAccessTime(), EPSILON);
 		assertEquals(42.42, vehType.getEgressTime(), EPSILON);
 		assertEquals(DoorOperationMode.parallel, vehType.getDoorOperationMode());

@@ -48,7 +48,7 @@ public class CarrierVehicleTypeWriter extends MatsimXmlWriter {
 			writer.write("\t\t<vehicleType id=\"" + type.getId() + "\">\n");
 			writer.write("\t\t\t<description>" + type.getDescription() + "</description>\n");
 			EngineInformation engineInformation = type.getEngineInformation();
-			if(engineInformation != null) writer.write("\t\t\t<engineInformation fuelType=\"" + engineInformation.getFuelType().toString() + "\" gasConsumption=\"" + engineInformation.getGasConsumption() + "\"/>\n");
+			if(engineInformation != null) writer.write("\t\t\t<engineInformation fuelType=\"" + engineInformation.getFuelType().toString() + "\" gasConsumption=\"" + engineInformation.getFuelConsumption() + "\"/>\n");
 			writer.write("\t\t\t<capacity>" + type.getCarrierVehicleCapacity() + "</capacity>\n");
 			VehicleCostInformation vehicleCostInformation = type.getVehicleCostInformation();
 			if(vehicleCostInformation == null) throw new IllegalStateException("vehicleCostInformation is missing.");

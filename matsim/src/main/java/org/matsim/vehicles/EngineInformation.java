@@ -28,10 +28,10 @@ public interface EngineInformation {
 
 	public FuelType getFuelType();
 
-	public double getGasConsumption();
+	public double getFuelConsumption();
 
 	public void setFuelType(FuelType fueltype);
 
-	public void setGasConsumption(double literPerMeter);
+	public void setFuelConsumption(double literPerMeter);
 
 }

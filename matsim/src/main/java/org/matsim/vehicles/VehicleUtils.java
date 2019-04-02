@@ -22,7 +22,6 @@ package org.matsim.vehicles;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.Gbl;
 
 
 /**
@@ -38,7 +37,7 @@ public class VehicleUtils {
 	private static final String DOOR_OPERATION_MODE = "doorOperationMode" ;
 	private static final String EGRESSTIME = "egressTimeInSecondsPerPerson";
 	private static final String ACCESSTIME = "accessTimeInSecondsPerPerson";
-	private static final String GASCONSUMPTION = "gasConsumptionLitersPerMeter";
+	private static final String FUELCONSUMPTION = "fuelConsumptionLitersPerMeter";
 	private static final String FREIGHT_CAPACITY_UNITS = "freightCapacityInUnits";
 
 	static {
@@ -60,7 +59,19 @@ public class VehicleUtils {
 	}
 
 	public static VehicleType.DoorOperationMode getDoorOperationMode( VehicleType vehicleType ){
-		return (VehicleType.DoorOperationMode) vehicleType.getAttributes().getAttribute( DOOR_OPERATION_MODE );
+		final Object attribute = vehicleType.getAttributes().getAttribute( DOOR_OPERATION_MODE );
+		if ( attribute==null ) {
+			return VehicleType.DoorOperationMode.serial; // this was the default value in V1; could also return null instead.
+		} else {
+			String modeString = (String) attribute;
+			if( VehicleType.DoorOperationMode.serial.toString().equalsIgnoreCase( modeString ) ){
+				return VehicleType.DoorOperationMode.serial;
+			} else if( VehicleType.DoorOperationMode.parallel.toString().equalsIgnoreCase( modeString ) ){
+				return VehicleType.DoorOperationMode.parallel;
+			} else{
+				throw new IllegalArgumentException( "VehicleType " + vehicleType.getId().toString() + " : Door operation mode " + modeString + "is not supported" );
+			}
+		}
 	}
 
 	public static void setDoorOperationMode( VehicleType vehicleType, VehicleType.DoorOperationMode mode ){
@@ -93,26 +104,31 @@ public class VehicleUtils {
 		vehicleType.getAttributes().putAttribute(ACCESSTIME, accessTime);
 	}
 
-	public static double getGasConsumption(VehicleType vehicleType) {
-		return (double) vehicleType.getAttributes().getAttribute(GASCONSUMPTION);
+	public static double getFuelConsumption(VehicleType vehicleType) {
+		final Object attribute = vehicleType.getAttributes().getAttribute(FUELCONSUMPTION);
+		if ( attribute==null ) {
+			return Double.NaN ; // this was the default value in V1; could also return Double-null instead.
+		} else {
+			return (double) attribute;
+		}
 	}
 
-	public static void setGasConsumption(VehicleType vehicleType, double literPerMeter) {
-		vehicleType.getAttributes().putAttribute(GASCONSUMPTION, literPerMeter);
+	public static void setFuelConsumption(VehicleType vehicleType, double literPerMeter) {
+		vehicleType.getAttributes().putAttribute(FUELCONSUMPTION, literPerMeter);
 	}
 
 	public static EngineInformation getEngineInformation(VehicleType vehicleType){
 		EngineInformation engineInformation = vehicleType.getEngineInformation();
 		//if not stored in the "old" format, organize values from the attributes. This will be probably changed in the future, kmt mar'19
-		if (Double.isNaN(engineInformation.getGasConsumption())){
-			engineInformation.setGasConsumption(getGasConsumption(vehicleType));
+		if (Double.isNaN(engineInformation.getFuelConsumption())){
+			engineInformation.setFuelConsumption(getFuelConsumption(vehicleType));
 		}
 		return engineInformation;
 	}
 
 	public static void setEngineInformation(VehicleType vehicleType, EngineInformation.FuelType fuelType, double literPerMeter){
 		vehicleType.setEngineInformation(new EngineInformationImpl(fuelType));
-		setGasConsumption(vehicleType, literPerMeter);
+		setFuelConsumption(vehicleType, literPerMeter);
 	}
 
 	public static double getFreightCapacityUnits (VehicleType vehicleType) {

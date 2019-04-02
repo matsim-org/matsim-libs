@@ -44,7 +44,6 @@ import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.EngineInformation.FuelType;
@@ -216,7 +215,7 @@ public class TestFreightUtils {
 			Assert.assertEquals(0.001, carrierVehicleType.getVehicleCostInformation().getPerTimeUnit(), 0.0);
 			Assert.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
 			Assert.assertEquals(EngineInformation.FuelType.diesel, carrierVehicleType.getEngineInformation().getFuelType());
-			Assert.assertEquals(0.015, carrierVehicleType.getEngineInformation().getGasConsumption(), 0.0);
+			Assert.assertEquals(0.015, carrierVehicleType.getEngineInformation().getFuelConsumption(), 0.0);
 		}
 		
 		Assert.assertEquals(FleetSize.INFINITE, carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getFleetSize());
@@ -228,7 +227,7 @@ public class TestFreightUtils {
 			Assert.assertEquals(0.001, carrierVehicleType.getVehicleCostInformation().getPerTimeUnit(), 0.0);
 			Assert.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
 			Assert.assertEquals(EngineInformation.FuelType.diesel, carrierVehicleType.getEngineInformation().getFuelType());
-			Assert.assertEquals(0.015, carrierVehicleType.getEngineInformation().getGasConsumption(), 0.0);
+			Assert.assertEquals(0.015, carrierVehicleType.getEngineInformation().getFuelConsumption(), 0.0);
 		}
 	}
 

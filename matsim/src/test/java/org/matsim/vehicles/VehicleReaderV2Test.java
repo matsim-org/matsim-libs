@@ -38,7 +38,7 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 
 	// todo: test for minimal vehicle (was kann man alles weglassen)?
 	// TODO: FEF, Einlesen und setztn neuer Attributes: DoorOperationm, accessTime,egressTime, doorOperationMode, LitersPerMeter, FreightCapaUnits.
-	// TODO: Use VehicleUtils ... 25.3.19
+	//TODO: Bring to "normal" test design: @Test,...
 
 	public void testBasicParser_v2() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
@@ -65,31 +65,30 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		assertNotNull(vehTypeNormalCar.getCapacity().getFreightCapacity());
 		assertEquals(23.23, vehTypeNormalCar.getCapacity().getFreightCapacity().getVolume(), EPSILON);
 		assertEquals(9.5, vehTypeNormalCar.getCapacity().getFreightCapacity().getWeight(), EPSILON);
-//		assertEquals(200, vehTypeNormalCar.getCapacity().getFreightCapacity().getUnits());      //TODO wie zugreifen?
-
+		assertEquals(200.0, VehicleUtils.getFreightCapacityUnits(vehTypeNormalCar), EPSILON);
 		assertEquals(100, vehTypeNormalCar.getCostInformation().getFixedCosts(), EPSILON);
 		assertEquals(0.15,vehTypeNormalCar.getCostInformation().getCostsPerMeter(), EPSILON);
 		assertEquals(0.08, vehTypeNormalCar.getCostInformation().getCostsPerSecond(),EPSILON);
-
 		assertNotNull(vehTypeNormalCar.getEngineInformation());
 		assertEquals(EngineInformation.FuelType.diesel, vehTypeNormalCar.getEngineInformation().getFuelType());
-//		assertEquals(0.23, vehTypeNormalCar.getEngineInformation().getGasConsumption(), EPSILON); //TODO wie zugreifen?
-		assertEquals(23.23, vehTypeNormalCar.getAccessTime(), EPSILON);
-		assertEquals(42.42, vehTypeNormalCar.getEgressTime(), EPSILON);
-//		assertEquals(DoorOperationMode.parallel, vehTypeNormalCar.getDoorOperationMode()); //TODO: make compatible
+		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehTypeNormalCar), EPSILON);
+		assertEquals(23.23, VehicleUtils.getAccessTime(vehTypeNormalCar), EPSILON);
+		assertEquals(42.42, VehicleUtils.getEgressTime(vehTypeNormalCar), EPSILON);
+		assertEquals(DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehTypeNormalCar));
 		assertEquals(2.0, vehTypeNormalCar.getPcuEquivalents());
+		assertEquals(1.5, vehTypeNormalCar.getFlowEfficiencyFactor());
 		assertEquals("abc", vehTypeNormalCar.getAttributes().getAttribute("Attribute1"));
 		assertEquals(1.3, (double) vehTypeNormalCar.getAttributes().getAttribute("Attribute2"), EPSILON);
 
-
 		VehicleType vehTypeDefaultCar = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
-//		assertNotNull(vehTypeDefaultCar);
-//		assertEquals(7.5, vehTypeDefaultCar.getLength(), EPSILON);
-//		assertEquals(1.0, vehTypeDefaultCar.getWidth(), EPSILON);
-//		assertTrue(Double.isInfinite(vehTypeDefaultCar.getMaximumVelocity()));
-//		assertNull(vehTypeDefaultCar.getCapacity());
-//		assertEquals(DoorOperationMode.serial, vehTypeDefaultCar.getDoorOperationMode());
-//		assertEquals(1.0, vehTypeDefaultCar.getPcuEquivalents());
+		assertNotNull(vehTypeDefaultCar);
+		assertEquals(7.5, vehTypeDefaultCar.getLength(), EPSILON);
+		assertEquals(1.0, vehTypeDefaultCar.getWidth(), EPSILON);
+		assertTrue(Double.isInfinite(vehTypeDefaultCar.getMaximumVelocity()));
+		assertNull(vehTypeDefaultCar.getCapacity());
+		assertEquals(DoorOperationMode.serial, vehTypeDefaultCar.getDoorOperationMode());
+		assertEquals(1.0, vehTypeDefaultCar.getPcuEquivalents());
+		assertEquals(1.0, vehTypeDefaultCar.getFlowEfficiencyFactor());
 		assertEquals("def", vehTypeDefaultCar.getAttributes().getAttribute("Attribute1"));
 		assertEquals(2, vehTypeDefaultCar.getAttributes().getAttribute("Attribute2"));
 

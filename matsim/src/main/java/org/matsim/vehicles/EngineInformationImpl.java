@@ -38,12 +38,12 @@ public class EngineInformationImpl implements EngineInformation {
 	@Deprecated
 	public EngineInformationImpl(FuelType fueltype, double literPerMeter) {
 		this.setFuelType(fueltype);
-		this.setGasConsumption(literPerMeter);
+		this.setFuelConsumption(literPerMeter);
 	}
 
 	public EngineInformationImpl(FuelType fueltype) {
 		this.setFuelType(fueltype);
-		this.setGasConsumption(Double.NaN);
+		this.setFuelConsumption(Double.NaN);
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class EngineInformationImpl implements EngineInformation {
 	}
 
 	@Override
-	public double getGasConsumption() {
+	public double getFuelConsumption() {
 		return this.gasConsumption;
 	}
 
@@ -62,7 +62,7 @@ public class EngineInformationImpl implements EngineInformation {
 	}
 
 	@Override
-	public void setGasConsumption(double literPerMeter) {
+	public void setFuelConsumption(double literPerMeter) {
 		this.gasConsumption = literPerMeter ;
 	}
 

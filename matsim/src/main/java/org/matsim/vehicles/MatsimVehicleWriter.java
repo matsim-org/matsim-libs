@@ -129,7 +129,7 @@ public class MatsimVehicleWriter extends MatsimXmlWriter {
 		this.writeContent(ei.getFuelType().toString(), false);
 		this.writeEndTag(VehicleSchemaV1Names.FUELTYPE);
 		atts.clear();
-		atts.add(this.createTuple(VehicleSchemaV1Names.LITERPERMETER, Double.toString(ei.getGasConsumption())));
+		atts.add(this.createTuple(VehicleSchemaV1Names.LITERPERMETER, Double.toString(ei.getFuelConsumption())));
 		this.writeStartTag(VehicleSchemaV1Names.GASCONSUMPTION, atts, true);
 		this.writeEndTag(VehicleSchemaV1Names.ENGINEINFORMATION);
 	}

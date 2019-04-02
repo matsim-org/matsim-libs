@@ -28,7 +28,7 @@ class VehicleReaderV1 extends MatsimXmlParser{
 		if( VehicleSchemaV1Names.DESCRIPTION.equalsIgnoreCase( name ) && (content.trim().length() > 0) ){
 			this.currentVehType.setDescription( content.trim() );
 		} else if( VehicleSchemaV1Names.ENGINEINFORMATION.equalsIgnoreCase( name ) ){
-			VehicleUtils.setEngineInformation(this.currentVehType, this.currentFuelType, VehicleUtils.getGasConsumption(this.currentVehType));
+			VehicleUtils.setEngineInformation(this.currentVehType, this.currentFuelType, VehicleUtils.getFuelConsumption(this.currentVehType));
 			this.currentFuelType = null;
 		} else if( VehicleSchemaV1Names.FUELTYPE.equalsIgnoreCase( name ) ){
 			this.currentFuelType = this.parseFuelType( content.trim() );
@@ -94,7 +94,7 @@ class VehicleReaderV1 extends MatsimXmlParser{
 		} else if( VehicleSchemaV1Names.VOLUME.equalsIgnoreCase( name ) ){
 			this.currentFreightCap.setVolume( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.CUBICMETERS ) ) );
 		} else if( VehicleSchemaV1Names.GASCONSUMPTION.equalsIgnoreCase( name ) ){
-			VehicleUtils.setGasConsumption(this.currentVehType, Double.parseDouble( atts.getValue( VehicleSchemaV1Names.LITERPERMETER )) );
+			VehicleUtils.setFuelConsumption(this.currentVehType, Double.parseDouble( atts.getValue( VehicleSchemaV1Names.LITERPERMETER )) );
 		} else if( VehicleSchemaV1Names.VEHICLE.equalsIgnoreCase( name ) ){
 			Id<VehicleType> typeId = Id.create( atts.getValue( VehicleSchemaV1Names.TYPE ), VehicleType.class );
 			VehicleType type = this.vehicles.getVehicleTypes().get( typeId );

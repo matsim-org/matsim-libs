@@ -63,7 +63,7 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 	@Test
 	public void test_whenCreatingTypeMedium_itCreatesEngineInfoCorrectly(){
 		CarrierVehicleType medium = types.getVehicleTypes().get(Id.create("medium", VehicleType.class));
-		assertEquals(0.02, medium.getEngineInformation().getGasConsumption(),0.001);
+		assertEquals(0.02, medium.getEngineInformation().getFuelConsumption(),0.001);
 		assertEquals(FuelType.diesel, medium.getEngineInformation().getFuelType());
 	}
 
@@ -97,7 +97,7 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 	@Test
 	public void test_whenCopyingTypeMedium_itCopiesEngineInfoCorrectly(){
 		CarrierVehicleType medium2 = types.getVehicleTypes().get(Id.create("medium2", VehicleType.class));
-		assertEquals(0.02, medium2.getEngineInformation().getGasConsumption(),0.001);
+		assertEquals(0.02, medium2.getEngineInformation().getFuelConsumption(),0.001);
 		assertEquals(FuelType.diesel, medium2.getEngineInformation().getFuelType());
 	}
 
@@ -131,7 +131,7 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 	@Test
 	public void test_whenModifyingTypesmall_itModifiesEngineInfoCorrectly(){
 		CarrierVehicleType small = types.getVehicleTypes().get(Id.create("small", VehicleType.class));
-		assertEquals(0.015, small.getEngineInformation().getGasConsumption(),0.001);
+		assertEquals(0.015, small.getEngineInformation().getFuelConsumption(),0.001);
 		assertEquals(FuelType.gasoline, small.getEngineInformation().getFuelType());
 	}
 
