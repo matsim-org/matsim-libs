@@ -39,15 +39,15 @@ public class MatsimVehicleWriter extends MatsimXmlWriter {
   
 	private static final Logger log = Logger.getLogger(MatsimVehicleWriter.class);
 
-	private VehicleWriterV1 delegate;
+	private VehicleWriterV2 delegate;
 
 	public MatsimVehicleWriter(Vehicles vehicles) {
-		delegate = new VehicleWriterV1(vehicles);
+		delegate = new VehicleWriterV2(vehicles);
 	}
 
 	/**
 	 * Writes the vehicles in the current default format
-	 * (currently vehicleDefinitions_v1.dtd).
+	 * (currently vehicleDefinitions_v2.0.dtd).
 	 */
 	public void writeFile(String filename) throws UncheckedIOException {
 		log.info( Gbl.aboutToWrite( "vehicles", filename) ) ;

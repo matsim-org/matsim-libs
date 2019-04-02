@@ -31,16 +31,18 @@ import java.util.Map;
 
 /**
  * @author dgrether
- * @author kturner
  */
-public class VehicleWriterV1Test extends MatsimTestCase {
-	private static final Logger log = Logger.getLogger( VehicleWriterV1Test.class ) ;
+public class VehicleWriterV2Test extends MatsimTestCase {
+	private static final Logger log = Logger.getLogger( VehicleWriterV2Test.class ) ;
 
-	private static final String TESTXML  = "testVehicles_v1.xml";
+	private static final String TESTXML  = "testVehicles_v2.xml";
 
 	private final Id<Vehicle> id23 = Id.create("23", Vehicle.class);
 	private final Id<Vehicle> id42 = Id.create("42", Vehicle.class);
 	private final Id<Vehicle> id42_23 = Id.create(" 42  23", Vehicle.class); //indeed this should be double blank in the middle but due to collapse this is only one blank
+
+	// todo: Umbauen auf V2
+
 
 	public void testWriter() throws FileNotFoundException, IOException {
 
@@ -52,7 +54,7 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 
 		//write it
-		VehicleWriterV1 writer = new VehicleWriterV1(vehicles);
+		VehicleWriterV2 writer = new VehicleWriterV2(vehicles);
 		writer.writeFile(outfileName);
 		assertTrue(new File(outfileName).exists()); 
 		//read it again
