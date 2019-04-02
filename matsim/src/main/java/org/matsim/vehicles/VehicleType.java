@@ -72,32 +72,26 @@ public class VehicleType{
 	}
 
 	public double getAccessTime() {
-//		return this.accessTime;
 		return VehicleUtils.getAccessTime(this);
 	}
 
 	public double getEgressTime() {
-//		return this.egressTime;
 		return VehicleUtils.getEgressTime(this);
 	}
 
 	public void setAccessTime(double seconds) {
-//		this.accessTime = seconds;
 		VehicleUtils.setAccessTime(this, seconds);
 	}
 
 	public void setEgressTime(double seconds) {
-//		this.egressTime = seconds;
 		VehicleUtils.setEgressTime(this, seconds);
 	}
 
 	public DoorOperationMode getDoorOperationMode() {
-//		return this.doorOperationMode;
 		return VehicleUtils.getDoorOperationMode( this ) ;
 	}
 
 	public void setDoorOperationMode(DoorOperationMode mode) {
-//		this.doorOperationMode = mode;
 		VehicleUtils.setDoorOperationMode( this, mode ) ;
 	}
 

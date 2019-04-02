@@ -60,9 +60,9 @@ class PVehiclesFactory {
 		vehType.setCapacity(capacity);
 		vehType.setPcuEquivalents(this.pConfig.getPassengerCarEquivalents());
 		vehType.setMaximumVelocity(this.pConfig.getVehicleMaximumVelocity());
-		vehType.setAccessTime(this.pConfig.getDelayPerBoardingPassenger());
-		vehType.setEgressTime(this.pConfig.getDelayPerAlightingPassenger());
-		vehType.setDoorOperationMode(this.pConfig.getDoorOperationMode());
+        VehicleUtils.setAccessTime(vehType, this.pConfig.getDelayPerBoardingPassenger());
+		VehicleUtils.setEgressTime(vehType, this.pConfig.getDelayPerAlightingPassenger());
+		VehicleUtils.setDoorOperationMode(vehType, this.pConfig.getDoorOperationMode()) ;
 		vehicles.addVehicleType( vehType);
 	
 		for (TransitLine line : pTransitSchedule.getTransitLines().values()) {

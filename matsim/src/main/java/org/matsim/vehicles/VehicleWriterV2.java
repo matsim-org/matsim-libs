@@ -109,13 +109,13 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 				this.writeEngineInformation(vt.getEngineInformation());
 			}
 			atts.clear();
-			atts.add(this.createTuple(VehicleSchemaV1Names.SECONDSPERPERSON, vt.getAccessTime()));
+			atts.add(this.createTuple(VehicleSchemaV1Names.SECONDSPERPERSON, VehicleUtils.getAccessTime(vt)));
 			this.writeStartTag(VehicleSchemaV1Names.ACCESSTIME, atts, true);
 			atts.clear();
-      atts.add(this.createTuple(VehicleSchemaV1Names.SECONDSPERPERSON, vt.getEgressTime()));
+			atts.add(this.createTuple(VehicleSchemaV1Names.SECONDSPERPERSON, VehicleUtils.getEgressTime(vt)));
       this.writeStartTag(VehicleSchemaV1Names.EGRESSTIME, atts, true);
       atts.clear();
-      atts.add(this.createTuple(VehicleSchemaV1Names.MODE, vt.getDoorOperationMode().toString()));
+			atts.add(this.createTuple(VehicleSchemaV1Names.MODE, VehicleUtils.getDoorOperationMode(vt).toString()));
       this.writeStartTag(VehicleSchemaV1Names.DOOROPERATION, atts, true);
       atts.clear();
       atts.add(this.createTuple(VehicleSchemaV1Names.PCE, vt.getPcuEquivalents()));

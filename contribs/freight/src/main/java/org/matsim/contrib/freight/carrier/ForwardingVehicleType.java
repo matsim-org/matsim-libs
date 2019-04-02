@@ -5,6 +5,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class ForwardingVehicleType extends VehicleType{
 
@@ -55,27 +56,25 @@ public class ForwardingVehicleType extends VehicleType{
 	@Override
 	public Id<VehicleType> getId() { return vType.getId(); }
 
-	@Override
 	@Deprecated
 	public double getAccessTime() { throw new UnsupportedOperationException(); }
 
-	@Override
 	@Deprecated
 	public void setAccessTime(double seconds) { throw new UnsupportedOperationException(); }
 
-	@Override
 	@Deprecated
 	public double getEgressTime() { throw new UnsupportedOperationException(); }
 
-	@Override
 	@Deprecated
 	public void setEgressTime(double seconds) { throw new UnsupportedOperationException(); }
 
-	@Override
-	public DoorOperationMode getDoorOperationMode() { return vType.getDoorOperationMode(); }
+	public DoorOperationMode getDoorOperationMode() {
+		return VehicleUtils.getDoorOperationMode(vType) ;
+	}
 
-	@Override
-	public void setDoorOperationMode(DoorOperationMode mode) { vType.setDoorOperationMode(mode); }
+	public void setDoorOperationMode(DoorOperationMode mode) {
+		VehicleUtils.setDoorOperationMode(vType, mode) ;
+	}
 
 	@Override
 	public double getPcuEquivalents() { return vType.getPcuEquivalents(); } 

@@ -85,9 +85,9 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertNotNull(vehType.getEngineInformation());
 		assertEquals(EngineInformation.FuelType.diesel, vehType.getEngineInformation().getFuelType());
 		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehType), EPSILON);
-		assertEquals(23.23, vehType.getAccessTime(), EPSILON);
-		assertEquals(42.42, vehType.getEgressTime(), EPSILON);
-		assertEquals(DoorOperationMode.parallel, vehType.getDoorOperationMode());
+		assertEquals(23.23, VehicleUtils.getAccessTime(vehType), EPSILON);
+		assertEquals(42.42, VehicleUtils.getEgressTime(vehType), EPSILON);
+		assertEquals(DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehType));
 		assertEquals(2.0, vehType.getPcuEquivalents());
 
 
@@ -97,7 +97,7 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertEquals(1.0, vehType.getWidth(), EPSILON);
 		assertTrue(Double.isInfinite(vehType.getMaximumVelocity()));
 		assertNull(vehType.getCapacity());
-		assertEquals(DoorOperationMode.serial, vehType.getDoorOperationMode());
+		assertEquals(DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehType));
 		assertEquals(1.0, vehType.getPcuEquivalents());
 
 		assertNotNull(vehicles);
