@@ -14,8 +14,6 @@
     <attribute name="egressTimeInSecondsPerPerson" class="java.lang.Double">42.42</attribute>
     <attribute name="doorOperationMode" class="java.lang.String">parallel</attribute>
     <attribute name="freightCapacityInUnits" class="java.lang.Double">200</attribute>
-
-
   </attributes>
   <description></description>
   <!-- capacity including driver -->

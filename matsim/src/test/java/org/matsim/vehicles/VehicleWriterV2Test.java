@@ -89,6 +89,9 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertEquals(42.42, VehicleUtils.getEgressTime(vehType), EPSILON);
 		assertEquals(DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehType));
 		assertEquals(2.0, vehType.getPcuEquivalents());
+		assertEquals(1.5, vehType.getFlowEfficiencyFactor());
+		assertEquals("abc", vehType.getAttributes().getAttribute("Attribute1"));
+		assertEquals(1.3, (double) vehType.getAttributes().getAttribute("Attribute2"), EPSILON);
 
 
 		vehType = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));

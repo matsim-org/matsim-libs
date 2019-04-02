@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.vehicles;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,7 @@ public class MatsimVehicleWriter extends MatsimXmlWriter {
 	 * Writes the vehicles in the current default format
 	 * (currently vehicleDefinitions_v2.0.dtd).
 	 */
-	public void writeFile(String filename) throws UncheckedIOException {
+	public void writeFile(String filename) throws UncheckedIOException, IOException {
 		log.info( Gbl.aboutToWrite( "vehicles", filename) ) ;
 		delegate.writeFile(filename);
 	}

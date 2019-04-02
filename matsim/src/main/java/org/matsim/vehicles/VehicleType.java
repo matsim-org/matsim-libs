@@ -53,7 +53,7 @@ public class VehicleType{
 	public enum DoorOperationMode { serial, parallel }
 	private DoorOperationMode doorOperationMode = DoorOperationMode.serial;
 
-	private final Attributes attributes = new Attributes();
+	private static final Attributes attributes = new Attributes();
 
 	public VehicleType( Id<VehicleType> typeId ) {
 		this.id = typeId;
@@ -135,7 +135,7 @@ public class VehicleType{
         this.flowEfficiencyFactor = flowEfficiencyFactor;
     }
 
-	public Attributes getAttributes() {
+	public static Attributes getAttributes() {
 		return attributes ;
     }
 
