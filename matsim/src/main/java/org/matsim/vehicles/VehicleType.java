@@ -71,26 +71,50 @@ public class VehicleType{
 		return id;
 	}
 
+	/**
+	 * @deprecated please use {@see VehicleUtils} instead.
+	 */
+	@Deprecated
 	public double getAccessTime() {
 		return VehicleUtils.getAccessTime(this);
 	}
 
+	/**
+	 * @deprecated please use {@see VehicleUtils} instead.
+	 */
+	@Deprecated
 	public double getEgressTime() {
 		return VehicleUtils.getEgressTime(this);
 	}
 
+	/**
+	 * @deprecated please use {@see VehicleUtils} instead.
+	 */
+	@Deprecated
 	public void setAccessTime(double seconds) {
 		VehicleUtils.setAccessTime(this, seconds);
 	}
 
+	/**
+	 * @deprecated please use {@see VehicleUtils} instead.
+	 */
+	@Deprecated
 	public void setEgressTime(double seconds) {
 		VehicleUtils.setEgressTime(this, seconds);
 	}
 
+	/**
+	 * @deprecated please use {@see VehicleUtils} instead.
+	 */
+	@Deprecated
 	public DoorOperationMode getDoorOperationMode() {
 		return VehicleUtils.getDoorOperationMode( this ) ;
 	}
 
+	/**
+	 * @deprecated please use {@see VehicleUtils} instead.
+	 */
+	@Deprecated
 	public void setDoorOperationMode(DoorOperationMode mode) {
 		VehicleUtils.setDoorOperationMode( this, mode ) ;
 	}
