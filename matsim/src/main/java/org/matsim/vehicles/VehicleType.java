@@ -33,7 +33,7 @@ public class VehicleType{
     private double pcuEquivalents = 1.0;
     private double flowEfficiencyFactor = 1.0;
 	private EngineInformation engineInformation;
-	private CostInformation costInformation;		//TODO: Needs to be created, kmt feb19
+	private CostInformation costInformation;
 	private FreightCapacity freightCapacity;
 	private String description;
 	private VehicleCapacity capacity;

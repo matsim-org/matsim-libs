@@ -39,7 +39,6 @@ import java.util.Map;
  * @author kturner
  */
 
-//TODO add FEF
 public class VehicleWriterV2 extends MatsimXmlWriter {
 
 	private static final Logger log = Logger.getLogger(VehicleWriterV2.class);
@@ -90,7 +89,7 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 			this.writeStartTag(VehicleSchemaV2Names.VEHICLETYPE, atts);
 
 			this.writer.write("\n");
-			attributesWriter.writeAttributes( "\t\t" , this.writer , VehicleType.getAttributes() );
+			attributesWriter.writeAttributes( "\t\t" , this.writer , vt.getAttributes() );  //TODO: Er schreibt immer die Werte des letzen eingelesenen VehTypes raus :(
 
 			if (vt.getDescription() != null) {
 				this.writeStartTag(VehicleSchemaV2Names.DESCRIPTION, null);
@@ -121,6 +120,11 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV2Names.PCE, vt.getPcuEquivalents()));
 			this.writeStartTag(VehicleSchemaV2Names.PASSENGERCAREQUIVALENTS, atts, true);
+			if (!Double.isNaN(vt.getFlowEfficiencyFactor())) {
+                atts.clear();
+                atts.add(this.createTuple(VehicleSchemaV2Names.FEF, vt.getFlowEfficiencyFactor()));
+                this.writeStartTag(VehicleSchemaV2Names.FLOWEFFICIENCYFACTOR, atts, true);
+            }
 			this.writeEndTag(VehicleSchemaV2Names.VEHICLETYPE);
 			this.writer.write("\n");
 		}
@@ -132,8 +136,6 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 		this.writeContent(ei.getFuelType().toString(), false);
 		this.writeEndTag(VehicleSchemaV2Names.FUELTYPE);
 		atts.clear();
-//		atts.add(this.createTuple(VehicleSchemaV2Names.LITERPERMETER, Double.toString(ei.getFuelConsumption())));
-//		this.writeStartTag(VehicleSchemaV2Names.GASCONSUMPTION, atts, true);
 		this.writeEndTag(VehicleSchemaV2Names.ENGINEINFORMATION);
 	}
 

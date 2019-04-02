@@ -25,8 +25,6 @@ class VehicleReaderV2 extends MatsimXmlParser{
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
 		  new org.matsim.utils.objectattributes.attributable.Attributes();
 
-//	TODO: flowEfficiencyFactor fef (NEU)
-
 	public VehicleReaderV2( final Vehicles vehicles ){
 		log.info("Using " + this.getClass().getName());
 		this.vehicles = vehicles;
