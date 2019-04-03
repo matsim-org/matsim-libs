@@ -30,30 +30,19 @@ public class VehicleType{
 	private double width = 1.0;
 	private double maxVelocity = Double.POSITIVE_INFINITY; // default: constrained only by the link speed
 	private double length = 7.5;
-    private double pcuEquivalents = 1.0;
-    private double flowEfficiencyFactor = 1.0;
+	private double pcuEquivalents = 1.0;
+	private double flowEfficiencyFactor = 1.0;
 	private EngineInformation engineInformation;
 	private CostInformation costInformation;
 	private FreightCapacity freightCapacity;
 	private String description;
 	private VehicleCapacity capacity;
 
-	/**
-	 * default from xml schema
-	 */
-	private double accessTime = 1.0;
-
-	/**
-	 * default from xml schema
-	 */
-	private double egressTime = 1.0;
-
 	private Id<VehicleType> id;
 
 	public enum DoorOperationMode { serial, parallel }
-	private DoorOperationMode doorOperationMode = DoorOperationMode.serial;
 
-	private static final Attributes attributes = new Attributes();
+	private final Attributes attributes = new Attributes();
 
 	public VehicleType( Id<VehicleType> typeId ) {
 		this.id = typeId;
@@ -119,25 +108,25 @@ public class VehicleType{
 		VehicleUtils.setDoorOperationMode( this, mode ) ;
 	}
 
-    public double getPcuEquivalents() {
-        return pcuEquivalents;
-    }
+	public double getPcuEquivalents() {
+		return pcuEquivalents;
+	}
 
-    public void setPcuEquivalents(double pcuEquivalents) {
-        this.pcuEquivalents = pcuEquivalents;
-    }
+	public void setPcuEquivalents(double pcuEquivalents) {
+		this.pcuEquivalents = pcuEquivalents;
+	}
 
-    public double getFlowEfficiencyFactor() {
-        return flowEfficiencyFactor;
-    }
+	public double getFlowEfficiencyFactor() {
+		return flowEfficiencyFactor;
+	}
 
-    public void setFlowEfficiencyFactor(double flowEfficiencyFactor) {
-        this.flowEfficiencyFactor = flowEfficiencyFactor;
-    }
+	public void setFlowEfficiencyFactor(double flowEfficiencyFactor) {
+		this.flowEfficiencyFactor = flowEfficiencyFactor;
+	}
 
-	public static Attributes getAttributes() {
+	public  Attributes getAttributes() {
 		return attributes ;
-    }
+	}
 
 	public void setCapacity(VehicleCapacity capacity) {
 		this.capacity = capacity;

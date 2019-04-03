@@ -44,24 +44,30 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 
 
 	public void testWriter() throws FileNotFoundException, IOException {
+		{
+			String outfileName = this.getOutputDirectory() + "testOutputVehicles.xml";
 
-		String outfileName = this.getOutputDirectory() + "testOutputVehicles.xml";
+			// create empty vehicles container:
+			Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
-		//read it
-		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
-		reader.readFile(this.getPackageInputDirectory() + TESTXML);
-		//write it
-		MatsimVehicleWriter writer = new MatsimVehicleWriter(vehicles);
-		writer.writeFile(outfileName);
-		assertTrue(new File(outfileName).exists()); 
-		//read it again
-		vehicles = VehicleUtils.createVehiclesContainer();
-		reader = new MatsimVehicleReader(vehicles);
-		reader.readFile(this.getOutputDirectory() + "testOutputVehicles.xml");
+			// read, which will be v1:
+			MatsimVehicleReader reader = new MatsimVehicleReader( vehicles );
+			reader.readFile( this.getPackageInputDirectory() + TESTXML );
 
-		//check it, check it, check it now!
-		this.checkContent(vehicles);
+			// write, which will be the newest fmt:
+			MatsimVehicleWriter writer = new MatsimVehicleWriter( vehicles );
+			writer.writeFile( outfileName );
+			assertTrue( new File( outfileName ).exists() );
+		}
+		{
+			// read, which will now be in the newest fmt:
+			Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+			MatsimVehicleReader reader = new MatsimVehicleReader( vehicles );
+			reader.readFile( this.getOutputDirectory() + "testOutputVehicles.xml" );
+
+			//check it, check it, check it now!
+			this.checkContent( vehicles );
+		}
 	}
 
 	private void checkContent(Vehicles vehdef) {
