@@ -40,8 +40,6 @@ public class VehicleType{
 
 	private Id<VehicleType> id;
 
-	public enum DoorOperationMode { serial, parallel }
-
 	private final Attributes attributes = new Attributes();
 
 	public VehicleType( Id<VehicleType> typeId ) {

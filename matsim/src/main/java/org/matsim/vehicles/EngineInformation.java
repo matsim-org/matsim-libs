@@ -28,10 +28,12 @@ public interface EngineInformation {
 
 	public FuelType getFuelType();
 
+	@Deprecated // use VehicleUtils... method instead
 	public double getFuelConsumption();
 
 	public void setFuelType(FuelType fueltype);
 
+	@Deprecated // use VehicleUtils... method instead
 	public void setFuelConsumption(double literPerMeter);
 
 }

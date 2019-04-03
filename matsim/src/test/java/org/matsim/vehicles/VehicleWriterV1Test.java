@@ -22,7 +22,6 @@ package org.matsim.vehicles;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
 import java.io.File;
 import java.io.FileNotFoundException;

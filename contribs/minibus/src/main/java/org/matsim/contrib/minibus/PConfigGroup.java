@@ -32,7 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.misc.StringUtils;
-import org.matsim.vehicles.VehicleType.DoorOperationMode;
+import org.matsim.vehicles.DoorOperationMode;
 
 /**
  * Config group to configure p

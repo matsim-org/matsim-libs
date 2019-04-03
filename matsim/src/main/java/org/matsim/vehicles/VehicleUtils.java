@@ -58,18 +58,18 @@ public class VehicleUtils {
 		return DEFAULT_VEHICLE_TYPE;
 	}
 
-	public static VehicleType.DoorOperationMode getDoorOperationMode( VehicleType vehicleType ){
+	public static DoorOperationMode getDoorOperationMode( VehicleType vehicleType ){
 		final Object attribute = vehicleType.getAttributes().getAttribute( DOOR_OPERATION_MODE );
 		if ( attribute==null ) {
-			return VehicleType.DoorOperationMode.serial; // this was the default value in V1; could also return null instead.
-		} else if (attribute instanceof VehicleType.DoorOperationMode ){
-			return (VehicleType.DoorOperationMode) attribute;
+			return DoorOperationMode.serial; // this was the default value in V1; could also return null instead.
+		} else if (attribute instanceof DoorOperationMode ){
+			return (DoorOperationMode) attribute;
 		} else if (attribute instanceof String) {
 			String modeString = (String) attribute;
-			if (VehicleType.DoorOperationMode.serial.toString().equalsIgnoreCase(modeString)) {
-				return VehicleType.DoorOperationMode.serial;
-			} else if (VehicleType.DoorOperationMode.parallel.toString().equalsIgnoreCase(modeString)) {
-				return VehicleType.DoorOperationMode.parallel;
+			if ( DoorOperationMode.serial.toString().equalsIgnoreCase(modeString )) {
+				return DoorOperationMode.serial;
+			} else if ( DoorOperationMode.parallel.toString().equalsIgnoreCase(modeString )) {
+				return DoorOperationMode.parallel;
 			} else {
 				throw new IllegalArgumentException("VehicleType " + vehicleType.getId().toString() + " : Door operation mode " + modeString + "is not supported");
 			}
@@ -79,7 +79,7 @@ public class VehicleUtils {
 		}
 	}
 
-	public static void setDoorOperationMode( VehicleType vehicleType, VehicleType.DoorOperationMode mode ){
+	public static void setDoorOperationMode( VehicleType vehicleType, DoorOperationMode mode ){
 		vehicleType.getAttributes().putAttribute( DOOR_OPERATION_MODE, mode ) ;
 	}
 

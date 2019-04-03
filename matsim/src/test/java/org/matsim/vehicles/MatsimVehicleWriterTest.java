@@ -24,14 +24,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
 /**
  * @author dgrether
  */
 public class MatsimVehicleWriterTest extends MatsimTestCase {
+	private static final Logger log = Logger.getLogger( MatsimVehicleWriterTest.class ) ;
 
 	private static final String TESTXML  = "testVehicles_v1.xml";
 
@@ -54,6 +55,9 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 			MatsimVehicleReader reader = new MatsimVehicleReader( vehicles );
 			reader.readFile( this.getPackageInputDirectory() + TESTXML );
 
+			VehicleType vehType = vehicles.getVehicleTypes().get(Id.create("normal&Car", VehicleType.class));
+			log.warn( "doorOperation=" + VehicleUtils.getDoorOperationMode( vehType ) ) ;
+
 			// write, which will be the newest fmt:
 			MatsimVehicleWriter writer = new MatsimVehicleWriter( vehicles );
 			writer.writeFile( outfileName );
@@ -64,6 +68,9 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 			Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 			MatsimVehicleReader reader = new MatsimVehicleReader( vehicles );
 			reader.readFile( this.getOutputDirectory() + "testOutputVehicles.xml" );
+
+			VehicleType vehType = vehicles.getVehicleTypes().get(Id.create("normal&Car", VehicleType.class));
+			log.warn( "doorOperation=" + VehicleUtils.getDoorOperationMode( vehType ) ) ;
 
 			//check it, check it, check it now!
 			this.checkContent( vehicles );

@@ -58,11 +58,11 @@ class VehicleReaderV1 extends MatsimXmlParser{
 		}
 	}
 
-	private VehicleType.DoorOperationMode parseDoorOperationMode( final String modeString ){
-		if( VehicleType.DoorOperationMode.serial.toString().equalsIgnoreCase( modeString ) ){
-			return VehicleType.DoorOperationMode.serial;
-		} else if( VehicleType.DoorOperationMode.parallel.toString().equalsIgnoreCase( modeString ) ){
-			return VehicleType.DoorOperationMode.parallel;
+	private DoorOperationMode parseDoorOperationMode( final String modeString ){
+		if( DoorOperationMode.serial.toString().equalsIgnoreCase( modeString ) ){
+			return DoorOperationMode.serial;
+		} else if( DoorOperationMode.parallel.toString().equalsIgnoreCase( modeString ) ){
+			return DoorOperationMode.parallel;
 		} else{
 			throw new IllegalArgumentException( "Door operation mode " + modeString + " is not supported" );
 		}

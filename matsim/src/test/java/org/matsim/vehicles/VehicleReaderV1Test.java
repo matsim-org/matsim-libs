@@ -23,7 +23,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
 import java.util.Map;
 

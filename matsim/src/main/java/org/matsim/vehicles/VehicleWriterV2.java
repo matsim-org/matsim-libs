@@ -30,6 +30,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegat
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +53,20 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 	public VehicleWriterV2(Vehicles vehicles) {
 		this.vehicleTypes = vehicles.getVehicleTypes();
 		this.vehicles = vehicles.getVehicles();
+//		Map<Class<?>, AttributeConverter<?>> converters = new HashMap<>() ;
+//		AttributeConverter<VehicleType.DoorOperationMode> converter = new AttributeConverter<VehicleType.DoorOperationMode>(){
+//			@Override
+//			public VehicleType.DoorOperationMode convert( String value ){
+//				return VehicleType.DoorOperationMode.valueOf( value ) ;
+//			}
+//
+//			@Override
+//			public String convertToString( Object o ){
+//				return ((VehicleType.DoorOperationMode)o).name() ;
+//			}
+//		} ;
+//		converters.put( VehicleType.DoorOperationMode.class, converter ) ;
+//		this.attributesWriter.putAttributeConverters( converters );
 	}
 
 	public void writeFile(String filename) throws UncheckedIOException, IOException {
@@ -88,8 +103,14 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 			atts.add(this.createTuple(VehicleSchemaV2Names.ID, vt.getId().toString()));
 			this.writeStartTag(VehicleSchemaV2Names.VEHICLETYPE, atts);
 
+			log.warn("writing vehType=" + vt.getId() ) ;
+			for( Map.Entry<String, Object> entry : vt.getAttributes().getAsMap().entrySet() ){
+				log.warn("attrib: key=" + entry.getKey() + "; val=" + entry.getValue() ) ;
+			}
+
+
 			this.writer.write("\n");
-			attributesWriter.writeAttributes( "\t\t" , this.writer , vt.getAttributes() );  //TODO: Er schreibt immer die Werte des letzen eingelesenen VehTypes raus :(
+			attributesWriter.writeAttributes( "\t\t" , this.writer , vt.getAttributes() );
 
 			if (vt.getDescription() != null) {
 				this.writeStartTag(VehicleSchemaV2Names.DESCRIPTION, null);

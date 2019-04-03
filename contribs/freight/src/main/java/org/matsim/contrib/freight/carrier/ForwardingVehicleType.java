@@ -2,10 +2,7 @@ package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.utils.objectattributes.attributable.Attributes;
-import org.matsim.vehicles.EngineInformation;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.*;
 
 public class ForwardingVehicleType extends VehicleType{
 
@@ -72,7 +69,7 @@ public class ForwardingVehicleType extends VehicleType{
 		return VehicleUtils.getDoorOperationMode(vType) ;
 	}
 
-	public void setDoorOperationMode(DoorOperationMode mode) {
+	public void setDoorOperationMode( DoorOperationMode mode ) {
 		VehicleUtils.setDoorOperationMode(vType, mode) ;
 	}
 
