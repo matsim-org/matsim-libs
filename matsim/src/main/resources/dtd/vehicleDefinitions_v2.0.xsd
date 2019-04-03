@@ -3,8 +3,8 @@
  targetNamespace="http://www.matsim.org/files/dtd" xmlns="http://www.matsim.org/files/dtd"
  elementFormDefault="qualified" 
  xml:lang="en">
-  <!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
-  <!-- This xml schema contains xml definitions for household information in the MATSim framework  -->
+  <!-- Editor: Kai Martins-Turner, VSP, Berlin Institute of Technology -->
+  <!-- This xml schema contains xml definitions for vehicles and vehicleTypes in the MATSim framework  -->
 
   <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
   <xs:include schemaLocation="http://www.matsim.org/files/dtd/vehicleDefinitionsEnumTypes.xsd"/>
@@ -47,21 +47,6 @@
           </xs:element>
           <xs:element name="engineInformation" type="engineInformationType" minOccurs="0" maxOccurs="1" />
           <xs:element name="costsInformation" type="costInformationType" minOccurs="0" maxOccurs="1" />
-          <!--<xs:element name="accessTime" minOccurs="0" maxOccurs="1">-->
-            <!--<xs:complexType>-->
-              <!--<xs:attribute name="secondsPerPerson" type="xs:decimal" default="1.0"></xs:attribute>-->
-            <!--</xs:complexType>-->
-          <!--</xs:element>-->
-          <!--<xs:element name="egressTime" minOccurs="0" maxOccurs="1">-->
-            <!--<xs:complexType>-->
-              <!--<xs:attribute name="secondsPerPerson" type="xs:decimal" default="1.0"></xs:attribute>-->
-            <!--</xs:complexType>-->
-          <!--</xs:element>-->
-          <!--<xs:element name="doorOperation" minOccurs="0" maxOccurs="1">-->
-            <!--<xs:complexType>-->
-              <!--<xs:attribute name="mode" type="doorOperationModeType" default="serial"/>-->
-            <!--</xs:complexType>-->
-          <!--</xs:element>-->
           <xs:element name="passengerCarEquivalents" minOccurs="0" maxOccurs="1">
             <xs:complexType>
               <xs:attribute name="pce" type="xs:decimal" default="1.0"/>
@@ -75,7 +60,6 @@
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
-    <!--  <xs:attribute name="typeId" type="xs:string" use="required" />-->
   </xs:complexType>
 
   <xs:complexType name="capacityType">
@@ -103,11 +87,6 @@
                 <xs:attribute name="tons" type="xs:double"/>
               </xs:complexType>
             </xs:element>
-            <!--<xs:element name="unit" minOccurs="0" maxOccurs="1">-->
-              <!--<xs:complexType>-->
-                <!--<xs:attribute name="units" type="xs:nonNegativeInteger"/>-->
-              <!--</xs:complexType>-->
-            <!--</xs:element>-->
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -118,12 +97,6 @@
     <xs:sequence>
       <xs:element name="fuelType" type="fuelTypeType" minOccurs="1" maxOccurs="1">
       </xs:element>
-      <!--<xs:element name="gasConsumption" minOccurs="1" maxOccurs="1">-->
-        <!--<xs:complexType>-->
-          <!--<xs:attribute name="literPerMeter" type="xs:decimal">-->
-          <!--</xs:attribute>-->
-        <!--</xs:complexType>-->
-      <!--</xs:element>-->
     </xs:sequence>
   </xs:complexType>
 
