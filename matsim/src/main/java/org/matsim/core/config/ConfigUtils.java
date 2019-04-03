@@ -31,6 +31,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -69,6 +70,26 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 
 	public static Config loadConfig(final String filename, ConfigGroup... customModules) throws UncheckedIOException {
 		return loadConfig(IOUtils.getUrlFromFileOrResource(filename), customModules);
+	}
+
+	public static Config loadConfig( String [] args, ConfigGroup... customModules ) {
+		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
+		return loadConfig( IOUtils.getUrlFromFileOrResource( args[0] ), typedArgs, customModules );
+	}
+
+	public static Config loadConfig( final URL url, String [] typedArgs, ConfigGroup... customModules ) {
+		Config config = loadConfig( url, customModules ) ;
+		try{
+			CommandLine.Builder bld = new CommandLine.Builder( typedArgs ) ;
+			bld.allowAnyOption( true  );
+			bld.allowPositionalArguments( false ) ;
+			CommandLine cmd = bld.build();
+			cmd.applyConfiguration( config );
+		} catch( CommandLine.ConfigurationException e ){
+			e.printStackTrace();
+			throw new RuntimeException( e ) ;
+		}
+		return config ;
 	}
 
 	public static Config loadConfig(final URL url, ConfigGroup... customModules) throws UncheckedIOException {
