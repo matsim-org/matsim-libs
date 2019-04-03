@@ -35,11 +35,7 @@ class VehicleReaderV2 extends MatsimXmlParser{
 	public void endTag( final String name, final String content, final Stack<String> context ){
 		if( VehicleSchemaV2Names.DESCRIPTION.equalsIgnoreCase( name ) && (content.trim().length() > 0) ){
 			this.currentVehType.setDescription( content.trim() );
-		} else if (name.equalsIgnoreCase( VehicleSchemaV2Names.ATTRIBUTES )) {
-			this.currAttributes = null;
-		} else if (name.equalsIgnoreCase(VehicleSchemaV2Names.ATTRIBUTE)) {
-			this.attributesReader.endTag( name , content , context );}
-		else if( VehicleSchemaV2Names.ENGINEINFORMATION.equalsIgnoreCase( name ) ){
+		} else if( VehicleSchemaV2Names.ENGINEINFORMATION.equalsIgnoreCase( name ) ){
 			VehicleUtils.setEngineInformation(this.currentVehType, this.currentFuelType, VehicleUtils.getFuelConsumption(this.currentVehType));
 			this.currentFuelType = null;
 		} else if( VehicleSchemaV2Names.COSTSINFORMATION.equalsIgnoreCase( name ) ){
@@ -59,7 +55,10 @@ class VehicleReaderV2 extends MatsimXmlParser{
 		} else if( VehicleSchemaV2Names.VEHICLETYPE.equalsIgnoreCase( name ) ){
 			this.vehicles.addVehicleType( this.currentVehType );
 			this.currentVehType = null;
-
+		} else if (name.equalsIgnoreCase( VehicleSchemaV2Names.ATTRIBUTES )) {
+			this.currAttributes = null;
+		} else if (name.equalsIgnoreCase(VehicleSchemaV2Names.ATTRIBUTE)) {
+			this.attributesReader.endTag( name , content , context );
 		}
 	}
 
@@ -77,15 +76,15 @@ class VehicleReaderV2 extends MatsimXmlParser{
 		}
 	}
 
-	private VehicleType.DoorOperationMode parseDoorOperationMode( final String modeString ){
-		if( VehicleType.DoorOperationMode.serial.toString().equalsIgnoreCase( modeString ) ){
-			return VehicleType.DoorOperationMode.serial;
-		} else if( VehicleType.DoorOperationMode.parallel.toString().equalsIgnoreCase( modeString ) ){
-			return VehicleType.DoorOperationMode.parallel;
-		} else{
-			throw new IllegalArgumentException( "Door operation mode " + modeString + " is not supported" );
-		}
-	}
+//	private VehicleType.DoorOperationMode parseDoorOperationMode( final String modeString ){
+//		if( VehicleType.DoorOperationMode.serial.toString().equalsIgnoreCase( modeString ) ){
+//			return VehicleType.DoorOperationMode.serial;
+//		} else if( VehicleType.DoorOperationMode.parallel.toString().equalsIgnoreCase( modeString ) ){
+//			return VehicleType.DoorOperationMode.parallel;
+//		} else{
+//			throw new IllegalArgumentException( "Door operation mode " + modeString + " is not supported" );
+//		}
+//	}
 
 	@Override
 	public void startTag( final String name, final Attributes atts, final Stack<String> context ){

@@ -21,6 +21,8 @@ package org.matsim.vehicles;
 
 import java.util.Map;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
@@ -36,22 +38,28 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 	private final Id<Vehicle> id42 = Id.create("42", Vehicle.class);
 	private final Id<Vehicle> id42_23 = Id.create(" 42  23", Vehicle.class); //indeed this should be double blank in the middle but due to collapse this is only one blank
 
-	//TODO: Bring to "normal" test design: @Test,...
+	private Map<Id<VehicleType>, VehicleType> vehicleTypes ;
+	private Map<Id<Vehicle>, Vehicle> vehicles ;
 
-	public void testBasicParser_v2() {
-		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
+	@BeforeClass
+	public void setUp() throws Exception {
+		super.setUp();
+		Vehicles veh = VehicleUtils.createVehiclesContainer();
+		MatsimVehicleReader reader = new MatsimVehicleReader(veh);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML2);
 
-		checkContent(vehicles);
+		vehicleTypes = veh.getVehicleTypes();
+        vehicles = veh.getVehicles();
 	}
 
-	private void checkContent(Vehicles vehdef) {
-		Map<Id<VehicleType>, VehicleType> vehicleTypes = vehdef.getVehicleTypes();
-		Map<Id<Vehicle>, Vehicle> vehicles = vehdef.getVehicles();
-
+	@Test
+	public void test_NumberOfVehicleTypeisReadCorrectly() {
 		assertNotNull(vehicleTypes);
 		assertEquals(2, vehicleTypes.size());
+	}
+
+	@Test
+	public void test_VehicleTypeValuesAreReadCorrectly_normalCar() {
 		VehicleType vehTypeNormalCar = vehicleTypes.get(Id.create("normal&Car", VehicleType.class));
 		assertNotNull(vehTypeNormalCar);
 		assertEquals(9.5, vehTypeNormalCar.getLength(), EPSILON);
@@ -65,8 +73,8 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		assertEquals(9.5, vehTypeNormalCar.getCapacity().getFreightCapacity().getWeight(), EPSILON);
 		assertEquals(200.0, VehicleUtils.getFreightCapacityUnits(vehTypeNormalCar), EPSILON);
 		assertEquals(100, vehTypeNormalCar.getCostInformation().getFixedCosts(), EPSILON);
-		assertEquals(0.15,vehTypeNormalCar.getCostInformation().getCostsPerMeter(), EPSILON);
-		assertEquals(0.08, vehTypeNormalCar.getCostInformation().getCostsPerSecond(),EPSILON);
+		assertEquals(0.15, vehTypeNormalCar.getCostInformation().getCostsPerMeter(), EPSILON);
+		assertEquals(0.08, vehTypeNormalCar.getCostInformation().getCostsPerSecond(), EPSILON);
 		assertNotNull(vehTypeNormalCar.getEngineInformation());
 		assertEquals(EngineInformation.FuelType.diesel, vehTypeNormalCar.getEngineInformation().getFuelType());
 		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehTypeNormalCar), EPSILON);
@@ -77,7 +85,10 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		assertEquals(1.5, vehTypeNormalCar.getFlowEfficiencyFactor());
 		assertEquals("abc", vehTypeNormalCar.getAttributes().getAttribute("Attribute1"));
 		assertEquals(1.3, (double) vehTypeNormalCar.getAttributes().getAttribute("Attribute2"), EPSILON);
+	}
 
+	@Test
+	public void test_VehicleTypeValuesAreReadCorrectly_defaultCar() {
 		VehicleType vehTypeDefaultCar = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
 		assertNotNull(vehTypeDefaultCar);
 		assertEquals(7.5, vehTypeDefaultCar.getLength(), EPSILON);
@@ -90,9 +101,16 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		assertEquals("def", vehTypeDefaultCar.getAttributes().getAttribute("Attribute1"));
 		assertEquals(2, vehTypeDefaultCar.getAttributes().getAttribute("Attribute2"));
 
+	}
+
+	@Test
+	public void test_NumberOfVehiclesIsReadCorrectly() {
 		assertNotNull(vehicles);
 		assertEquals(3, vehicles.size());
+	}
 
+	@Test
+	public void test_VehicleTypeToVehiclesAssignmentIsReadCorrectly(){
 		assertNotNull(vehicles.get(id23));
 		assertEquals(id23, vehicles.get(id23).getId());
 		assertEquals(Id.create("normal&Car", VehicleType.class), vehicles.get(id23).getType().getId());

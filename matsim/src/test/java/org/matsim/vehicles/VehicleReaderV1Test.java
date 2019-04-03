@@ -19,11 +19,13 @@
 
 package org.matsim.vehicles;
 
-import java.util.Map;
-
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
+
+import java.util.Map;
 
 /**
  * @author dgrether
@@ -36,20 +38,29 @@ public class VehicleReaderV1Test extends MatsimTestCase {
 	private final Id<Vehicle> id42 = Id.create("42", Vehicle.class);
 	private final Id<Vehicle> id42_23 = Id.create(" 42  23", Vehicle.class); //indeed this should be double blank in the middle but due to collapse this is only one blank
 
-	// TODO: Bring to "normal" test design: @Test,...
+    private Map<Id<VehicleType>, VehicleType> vehicleTypes ;
+    private Map<Id<Vehicle>, Vehicle> vehicles ;
 
-	public void testBasicParser() {
-		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
+    @BeforeClass
+	public void setUp() throws Exception {
+		super.setUp();
+		Vehicles veh = VehicleUtils.createVehiclesContainer();
+		MatsimVehicleReader reader = new MatsimVehicleReader(veh);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 
-		checkContent(vehicles);
+        vehicleTypes = veh.getVehicleTypes();
+        vehicles = veh.getVehicles();
 	}
 
-	private void checkContent(Vehicles vehdef) {
-		Map<Id<VehicleType>, VehicleType> vehicleTypes = vehdef.getVehicleTypes();
-		Map<Id<Vehicle>, Vehicle> vehicles = vehdef.getVehicles();
+	@Test
+	public void test_NumberOfVehicleTypeisReadCorrectly() {
+		assertNotNull(vehicleTypes);
+		assertEquals(2, vehicleTypes.size());
+	}
 
+
+	@Test
+	public void test_VehicleTypeValuesAreReadCorrectly_normalCar() {
 		assertNotNull(vehicleTypes);
 		assertEquals(2, vehicleTypes.size());
 		VehicleType vehType = vehicleTypes.get(Id.create("normal&Car", VehicleType.class));
@@ -70,30 +81,37 @@ public class VehicleReaderV1Test extends MatsimTestCase {
 		assertEquals(42.42, VehicleUtils.getEgressTime(vehType), EPSILON);
 		assertEquals(DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehType));
 		assertEquals(2.0, vehType.getPcuEquivalents());
+    }
 
-		vehType = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
+	@Test
+	public void test_VehicleTypeValuesAreReadCorrectly_defaultCar() {
+		VehicleType vehType = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
 		assertNotNull(vehType);
 		assertEquals(7.5, vehType.getLength(), EPSILON);
 		assertEquals(1.0, vehType.getWidth(), EPSILON);
 		assertTrue(Double.isInfinite(vehType.getMaximumVelocity()));
 		assertNull(vehType.getCapacity());
 		assertEquals(1.0, vehType.getPcuEquivalents());
+	}
 
+	@Test
+	public void test_NumberOfVehiclesIsReadCorrectly(){
 		assertNotNull(vehicles);
 		assertEquals(3, vehicles.size());
+    }
 
-		assertNotNull(vehicles.get(id23));
-		assertEquals(id23, vehicles.get(id23).getId());
-		assertEquals(Id.create("normal&Car", VehicleType.class), vehicles.get(id23).getType().getId());
+	@Test
+    public void test_VehicleTypeToVehiclesAssignmentIsReadCorrectly(){
+        assertNotNull(vehicles.get(id23));
+        assertEquals(id23, vehicles.get(id23).getId());
+        assertEquals(Id.create("normal&Car", VehicleType.class), vehicles.get(id23).getType().getId());
 
-		assertNotNull(vehicles.get(id42));
-		assertEquals(id42, vehicles.get(id42).getId());
-		assertEquals(Id.create("defaultValue>Car", VehicleType.class), vehicles.get(id42).getType().getId());
+        assertNotNull(vehicles.get(id42));
+        assertEquals(id42, vehicles.get(id42).getId());
+        assertEquals(Id.create("defaultValue>Car", VehicleType.class), vehicles.get(id42).getType().getId());
 
-		assertNotNull(vehicles.get(id42_23));
-		assertEquals(id42_23, vehicles.get(id42_23).getId());
-
-
-	}
+        assertNotNull(vehicles.get(id42_23));
+        assertEquals(id42_23, vehicles.get(id42_23).getId());
+    }
 
 }
