@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="http://www.matsim.org/files/dtd" xmlns="http://www.matsim.org/files/dtd"
+ elementFormDefault="qualified" 
+ xml:lang="en">
+  <!-- Editor: Kai Martins-Turner, VSP, Berlin Institute of Technology -->
+  <!-- This xml schema contains xml definitions for vehicles and vehicleTypes in the MATSim framework  -->
+
+  <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+  <xs:include schemaLocation="http://www.matsim.org/files/dtd/vehicleDefinitionsEnumTypes.xsd"/>
+
+  <xs:element name="vehicleDefinitions">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="vehicleType" type="vehicleTypeType" minOccurs="1" maxOccurs="unbounded" />
+        <xs:element name="vehicle" type="vehicleDefType" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="vehicleTypeType">
+    <xs:complexContent>
+      <xs:extension base="matsimObjectType">
+        <xs:sequence>
+          <xs:element name="attributes" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"></xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1" />
+          <xs:element name="capacity" type="capacityType" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="length" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:attribute name="meter" type="xs:decimal" default="7.5"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="width" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:attribute name="meter" type="xs:decimal" default="1"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="maximumVelocity" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:attribute name="meterPerSecond" type="xs:double" use="optional" default="INF"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="engineInformation" type="engineInformationType" minOccurs="0" maxOccurs="1" />
+          <xs:element name="costsInformation" type="costInformationType" minOccurs="0" maxOccurs="1" />
+          <xs:element name="passengerCarEquivalents" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:attribute name="pce" type="xs:decimal" default="1.0"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="flowEfficiencyFactor" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:attribute name="fef" type="xs:decimal" default="1.0"/>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="capacityType">
+    <xs:sequence>
+      <xs:element name="seats" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="persons" type="xs:nonNegativeInteger"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="standingRoom" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="persons" type="xs:nonNegativeInteger"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="freightCapacity" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="volume" minOccurs="0" maxOccurs="1">
+              <xs:complexType>
+                <xs:attribute name="cubicMeters" type="xs:double"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="weight" minOccurs="0" maxOccurs="1">
+              <xs:complexType>
+                <xs:attribute name="tons" type="xs:double"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="engineInformationType">
+    <xs:sequence>
+      <xs:element name="fuelType" type="fuelTypeType" minOccurs="1" maxOccurs="1">
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="costInformationType">
+    <xs:sequence>
+      <xs:element name="costInformation" minOccurs="1" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="fixedCostsPerDay" type="xs:decimal">
+          </xs:attribute>
+          <xs:attribute name="costsPerMeter" type="xs:decimal">
+          </xs:attribute>
+          <xs:attribute name="costsPerSecond" type="xs:decimal">
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <xs:complexType name="vehicleDefType">
+    <xs:annotation>
+      <xs:documentation></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="matsimObjectType">
+        <xs:attribute name="type" type="xs:string" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+</xs:schema>
