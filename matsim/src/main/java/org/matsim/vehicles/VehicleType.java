@@ -20,12 +20,13 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author dgrether
  */
-public class VehicleType{
+public class VehicleType implements Attributable {
 
 	private double width = 1.0;
 	private double maxVelocity = Double.POSITIVE_INFINITY; // default: constrained only by the link speed
@@ -122,6 +123,7 @@ public class VehicleType{
 		this.flowEfficiencyFactor = flowEfficiencyFactor;
 	}
 
+	@Override
 	public  Attributes getAttributes() {
 		return attributes ;
 	}
