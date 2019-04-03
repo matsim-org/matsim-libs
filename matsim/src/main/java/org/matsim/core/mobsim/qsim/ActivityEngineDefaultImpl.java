@@ -32,23 +32,21 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
-import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.misc.Time;
 
 import javax.inject.Inject;
 
-public class DefaultActivityEngine implements ActivityEngine {
-	private static final Logger log = Logger.getLogger( DefaultActivityEngine.class ) ;
+public class ActivityEngineDefaultImpl implements ActivityEngine {
+	private static final Logger log = Logger.getLogger( ActivityEngineDefaultImpl.class ) ;
 
 	private EventsManager eventsManager;
 	@Inject
-	public DefaultActivityEngine( EventsManager eventsManager ) {
+	public ActivityEngineDefaultImpl( EventsManager eventsManager ) {
 		this.eventsManager = eventsManager;
 	}
 
-	public DefaultActivityEngine( EventsManager eventsManager, AgentCounter agentCounter ) {
+	public ActivityEngineDefaultImpl( EventsManager eventsManager, AgentCounter agentCounter ) {
 		this.eventsManager = eventsManager;
 	}
 
