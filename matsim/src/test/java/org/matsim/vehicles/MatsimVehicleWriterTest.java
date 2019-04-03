@@ -40,9 +40,6 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 	private final Id<Vehicle> id42 = Id.create("42", Vehicle.class);
 	private final Id<Vehicle> id42_23 = Id.create(" 42  23", Vehicle.class); //indeed this should be double blank in the middle but due to collapse this is only one blank
 
-	// todo: make it for read V1, write V2
-	// Todo: read V2, write V2
-
 
 	public void testWriter() throws FileNotFoundException, IOException {
 		{
