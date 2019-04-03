@@ -20,7 +20,9 @@
 package org.matsim.core.utils.misc;
 
 import java.io.IOException;
+import java.net.URL;
 
+import org.apache.log4j.Logger;
 import org.hamcrest.core.AnyOf;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -36,6 +38,7 @@ import static org.hamcrest.CoreMatchers.*;
  * @author mrieser
  */
 public class ConfigUtilsTest {
+	private static final Logger log = Logger.getLogger( ConfigUtilsTest.class ) ;
 
 	@Rule
 	public MatsimTestUtils util = new MatsimTestUtils();
@@ -83,4 +86,25 @@ public class ConfigUtilsTest {
 		Assert.assertThat(config.network().getInputFile(), anyOf(is("/home/username/matsim/network.xml"),is("/home/username/matsim\\network.xml")));
 	}
 
+	@Test
+	public void loadConfigWithTypedArgs(){
+		final URL url = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
+		final String [] typedArgs = {"--config:controler.outputDirectory=abc"} ;
+		Config config = ConfigUtils.loadConfig( url, typedArgs );
+		Assert.assertEquals("abc", config.controler().getOutputDirectory());
+	}
+	@Test
+	public void loadConfigWithTypedArgsWithTypo(){
+		boolean hasFailed = false ;
+		try{
+			final URL url = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
+			final String[] typedArgs = {"--config:controler.outputDirector=abc"};
+			Config config = ConfigUtils.loadConfig( url, typedArgs );
+			//		Assert.assertEquals("abc", config.controler().getOutputDirectory());
+		} catch (Exception ee ){
+			hasFailed = true ;
+			log.warn("the above exception was expected") ;
+		}
+		Assert.assertTrue( hasFailed );
+	}
 }

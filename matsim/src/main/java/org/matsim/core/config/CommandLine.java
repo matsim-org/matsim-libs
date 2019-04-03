@@ -591,7 +591,7 @@ public class CommandLine {
 			if (configGroup.getParams().containsKey(remainder)) {
 				String value = options.get(option);
 				configGroup.addParam(remainder, value);
-				logger.info(String.format("Setting %s to %s", path, value));
+				logger.info(String.format("Setting %s to %s", option, value));
 			} else {
 				throw new ConfigurationException(String.format("Parameter %s in %s is not available", remainder, path));
 			}
