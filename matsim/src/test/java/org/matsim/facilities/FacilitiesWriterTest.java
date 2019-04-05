@@ -11,8 +11,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
 /**
- * @author mrieser / Senozon AG
+ * @author mrieser
  */
 public class FacilitiesWriterTest {
 
@@ -61,4 +64,70 @@ public class FacilitiesWriterTest {
         Assert.assertNull(fac3b.getLinkId());
         Assert.assertEquals("pepsiCo", fac3b.getAttributes().getAttribute("owner"));
     }
+
+    @Test
+    // the better fix for https://github.com/matsim-org/matsim/pull/505
+    public void testFacilityDescription() {
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        ActivityFacilities facilities = scenario.getActivityFacilities();
+        ActivityFacilitiesFactory factory = facilities.getFactory();
+
+        String desc = "Some special text & that could pose <problems> to \"html\' or { json }.";
+
+
+        ActivityFacility fac1 = factory.createActivityFacility(Id.create("1", ActivityFacility.class), new Coord(10.0, 15.0));
+        ((ActivityFacilityImpl) fac1).setDesc(desc);
+        facilities.addActivityFacility(fac1);
+
+        // write
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(500);
+        new FacilitiesWriter(facilities).write(outputStream);
+
+        // read
+
+        scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        facilities = scenario.getActivityFacilities();
+        MatsimFacilitiesReader reader = new MatsimFacilitiesReader(scenario);
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+        reader.parse(inputStream);
+
+        // check
+
+        Assert.assertEquals(1, facilities.getFacilities().size());
+        ActivityFacility fac1b = facilities.getFacilities().get(Id.create(1, ActivityFacility.class));
+        String desc2 = ((ActivityFacilityImpl) fac1b).getDesc();
+        Assert.assertEquals(desc, desc2);
+    }
+
+    @Test
+    // inspired by https://github.com/matsim-org/matsim/pull/505
+    public void testFacilitiesName() {
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        ActivityFacilities facilities = scenario.getActivityFacilities();
+        ActivityFacilitiesFactory factory = facilities.getFactory();
+
+        String desc = "Some special text & that could pose <problems> to \"html\' or { json }.";
+
+        facilities.setName(desc);
+
+        // write
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(500);
+        new FacilitiesWriter(facilities).write(outputStream);
+
+        // read
+
+        scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        facilities = scenario.getActivityFacilities();
+        MatsimFacilitiesReader reader = new MatsimFacilitiesReader(scenario);
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+        reader.parse(inputStream);
+
+        // check
+
+        String desc2 = facilities.getName();
+        Assert.assertEquals(desc, desc2);
+    }
+
 }
