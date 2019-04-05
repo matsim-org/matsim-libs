@@ -27,7 +27,7 @@ package org.matsim.core.mobsim.jdeqsim;
 public class DeadlockPreventionMessage extends EventMessage {
 
 	@Override
-	// let enter the car into the road immediatly
+	// let enter the car into the road immediately
 	public void handleMessage() {
 
 		Road road = (Road) this.getReceivingUnit();
