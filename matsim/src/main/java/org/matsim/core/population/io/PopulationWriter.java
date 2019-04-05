@@ -134,6 +134,7 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	@Override
 	public final void write(final String filename) {
 		try {
+			this.handler.putAttributeConverters(converters);
 			this.openFile(filename);
 			this.handler.writeHeaderAndStartElement(this.writer);
 			this.handler.startPlans(this.population, this.writer);
@@ -156,6 +157,7 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	 */
 	public final void write(OutputStream outputStream) {
 		try {
+			this.handler.putAttributeConverters(converters);
 			this.openOutputStream(outputStream);
 			this.handler.writeHeaderAndStartElement(this.writer);
 			this.handler.startPlans(this.population, this.writer);
@@ -207,13 +209,11 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 
 	public final void writeV6(final String filename) {
 		this.handler = new PopulationWriterHandlerImplV6(coordinateTransformation);
-		((PopulationWriterHandlerImplV6) handler).putAttributeConverters( converters );
 		write(filename);
 	}
 
 	public final void writeV6(final OutputStream stream) {
 		this.handler = new PopulationWriterHandlerImplV6(coordinateTransformation);
-		((PopulationWriterHandlerImplV6) handler).putAttributeConverters( converters );
 		write(stream);
 	}
 

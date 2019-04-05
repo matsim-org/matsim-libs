@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
@@ -28,10 +29,24 @@ public class PopulationAttributeConversionTest {
 	}
 
 	@Test
+	public void testDefaultsStream() {
+		final String path = utils.getOutputDirectory()+"/plans.xml";
+
+		testWriteAndReread(w -> w.write(IOUtils.getOutputStream(path)), w -> w.readFile(path));
+	}
+
+	@Test
 	public void testV6() {
 		final String path = utils.getOutputDirectory()+"/plans.xml";
 
 		testWriteAndReread(w -> w.writeV6(path), w -> w.readFile(path));
+	}
+
+	@Test
+	public void testV7() {
+		final String path = utils.getOutputDirectory()+"/plans.xml";
+
+		testWriteAndReread(w -> w.writeV6(IOUtils.getOutputStream(path)), w -> w.readFile(path));
 	}
 
 	public void testWriteAndReread(
