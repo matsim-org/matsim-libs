@@ -5,7 +5,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim</artifactId>
 	<name>MATSim</name>
-    <version>0.10.2</version>
+  <version>0.10.1-beam-3</version>
 	<description>Multi-Agent Transport Simulation</description>
 	<url>http://ci.matsim.org:8080/job/MATSim_M2/ws/matsim/target/site</url>
 	<inceptionYear>2005</inceptionYear>
@@ -283,6 +283,10 @@
 	</reporting>
 
 	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
 		<repository>
             <!-- Geotools is not on Maven central -->
 			<id>osgeo</id>
