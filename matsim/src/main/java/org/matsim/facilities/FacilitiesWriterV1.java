@@ -103,7 +103,7 @@ import java.util.SortedSet;
                 }
                 this.endActivity(this.writer);
             }
-						this.attributesWriter.writeAttributes("\t\t", this.writer, f.getAttributes());
+            this.attributesWriter.writeAttributes("\t\t", this.writer, f.getAttributes());
             this.endFacility(this.writer);
             this.writeSeparator(this.writer);
             this.writer.flush();
