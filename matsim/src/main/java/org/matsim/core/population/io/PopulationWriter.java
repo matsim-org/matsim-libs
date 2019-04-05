@@ -124,6 +124,10 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 		this.converters.putAll( converters );
 	}
 
+	public void putAttributeConverter( Class<?> key, AttributeConverter<?> converter ) {
+		this.converters.put( key, converter );
+	}
+
 	/**
 	 * Writes all plans to the file.
 	 */
