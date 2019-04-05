@@ -5,7 +5,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim</artifactId>
 	<name>MATSim</name>
-	<version>0.11.0-SNAPSHOT</version>
+	<version>12.x-SNAPSHOT</version>
 	<description>Multi-Agent Transport Simulation</description>
 	<url>http://ci.matsim.org:8080/job/MATSim_M2/ws/matsim/target/site</url>
 	<inceptionYear>2005</inceptionYear>
@@ -377,7 +377,7 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
+			<version>12.x-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
