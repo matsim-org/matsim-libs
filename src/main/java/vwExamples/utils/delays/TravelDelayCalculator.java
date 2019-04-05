@@ -70,22 +70,27 @@ public class TravelDelayCalculator implements PersonDepartureEventHandler, Perso
 		Geometry geom = boundary;
 		
 
-		if(geom.contains(to) & !geom.contains(from))
+		if(geom.contains(to) && !geom.contains(from))
 		{
 			return "inbound";
 		}
 		
-		else if(geom.contains(from) & !geom.contains(to))
+		else if(geom.contains(from) && !geom.contains(to))
 		{
 			return "outbound";
 		}
 		
-		else if(!geom.contains(from) & !geom.contains(to) & geom.intersects(beeline) )
+		else if(!(geom.contains(from)) && !(geom.contains(to)) && (beeline.intersects(geom)))
 		{
-			return "througth";
+			return "through";
 		}
 		
-		else if(geom.contains(from) & geom.contains(to))
+		else if(!(geom.contains(from)) && !(geom.contains(to)) && !(beeline.intersects(geom)))
+		{
+			return "outside";
+		}
+		
+		else if(geom.contains(from) && geom.contains(to))
 		{
 			return "inside";
 		}

@@ -78,7 +78,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static final double CHARGING_SPEED_FACTOR = 1.0;
 	public static final double BATTERYREPLACETIME = 180.0;
 
-	static boolean BatteryReplace = true;
+	static boolean BatteryReplace = false;
 	
 	static int[] fleetRange = {25,50,100,150};
 //	static int[] fleetRange = {100};
@@ -100,7 +100,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static void run(int vehiclePerDepot, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "H_1xRate_batteryReplace_0C_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
+		String runId = "H_1xRate_batteryRecharge_0C_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\K-GERAK\\";

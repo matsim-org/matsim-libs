@@ -122,6 +122,7 @@ public class CreatePeoplemoverStopsFromCSV {
 			if (!schedule.getFacilities().containsKey(forwardKey)) {
 				TransitStopFacility forwardStop = f.createTransitStopFacility(forwardKey, forwardLink.getCoord(),
 						false);
+				forwardStop.setLinkId(forwardLink.getId());
 				schedule.addStopFacility(forwardStop);
 			}
 
@@ -131,6 +132,7 @@ public class CreatePeoplemoverStopsFromCSV {
 //				if (!schedule.getFacilities().containsKey(backwardKey)) {
 //					TransitStopFacility backwardStop = f.createTransitStopFacility(backwardKey, backwordLink.getCoord(),
 //							false);
+//				backwardStop.setLinkId(backwordLink.getId());
 //					schedule.addStopFacility(backwardStop);
 //				}
 //

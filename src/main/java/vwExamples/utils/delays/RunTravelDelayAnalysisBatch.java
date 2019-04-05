@@ -67,7 +67,7 @@ public class RunTravelDelayAnalysisBatch {
 
 	public static void main(String[] args) {
 
-		String runDir = "D:\\Matsim\\Thiel\\Basecase\\Hannover\\output\\";
+		String runDir = "D:\\Matsim\\Axer\\Hannover\\ZIM\\output\\";
 //		String runId = "vw219_netnet150_veh_idx0.";
 
 		readShape(shapeFile, shapeFeature);
@@ -125,7 +125,7 @@ public class RunTravelDelayAnalysisBatch {
 		}
 
 		geometryCollection = (GeometryCollection) geomfactory.buildGeometry(districtGeometryList);
-		boundary = geometryCollection.convexHull();
+		boundary = geometryCollection.union();
 
 	}
 	
