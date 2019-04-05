@@ -232,7 +232,7 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 	 * (non-Javadoc)
 	 * 
 	 * @see org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler#handleEvent(org.matsim.contrib.drt.
-	 * passenger.events.DrtRequestScheduledEvent)
+	 * passenger.events.PassengerRequestScheduledEvent)
 	 */
 	@Override
 	public void handleEvent(DrtRequestSubmittedEvent event) {

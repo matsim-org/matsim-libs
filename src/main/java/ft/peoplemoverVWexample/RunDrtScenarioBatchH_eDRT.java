@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package vwExamples.peoplemoverVWExample;
+package ft.peoplemoverVWexample;
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import electric.edrt.run.RunVWEDrtScenario;
