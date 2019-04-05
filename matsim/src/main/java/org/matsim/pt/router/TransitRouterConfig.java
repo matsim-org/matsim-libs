@@ -114,10 +114,10 @@ public class TransitRouterConfig implements MatsimParameters {
 		}
 		
 		// walk:
-		this.beelineDistanceFactor = pcrConfig.getModeRoutingParams().get( TransportMode.access_walk ).getBeelineDistanceFactor();
-		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.access_walk) / beelineDistanceFactor ;
-		// yyyyyy the two above need to be moved away from walk since otherwise one is not able to move walk routing to network routing!!!!!! Now trying access_walk ...  kai,
-		// apr'19
+		this.beelineDistanceFactor = pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
+
+		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk)
+				/ beelineDistanceFactor ;
 		
 		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
 		
