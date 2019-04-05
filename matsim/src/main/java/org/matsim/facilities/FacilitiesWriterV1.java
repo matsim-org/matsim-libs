@@ -39,7 +39,7 @@ import java.util.SortedSet;
 /**
  * @author mrieser
  */
-/*package*/ class FacilitiesWriterV1 extends MatsimXmlWriter implements MatsimWriter {
+class FacilitiesWriterV1 extends MatsimXmlWriter implements MatsimWriter {
 
     private static final String DTD = "http://www.matsim.org/files/dtd/facilities_v1.dtd";
 
@@ -76,14 +76,9 @@ import java.util.SortedSet;
     }
 
     private void writeInit() {
-        try {
-            this.writeXmlHead();
-            this.writeDoctype("facilities", DTD);
-            this.startFacilities(this.facilities, this.writer);
-            this.writeSeparator(this.writer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.writeXmlHead();
+        this.writeDoctype("facilities", DTD);
+        this.startFacilities(this.facilities, this.writer);
     }
 
     private void writeFacility(final ActivityFacilityImpl f) {
@@ -100,7 +95,6 @@ import java.util.SortedSet;
             }
 						this.attributesWriter.writeAttributes("\t\t", this.writer, f.getAttributes());
             this.endFacility();
-            this.writeSeparator(this.writer);
             this.writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -166,7 +160,7 @@ import java.util.SortedSet;
 
     public void startActivity(final ActivityOptionImpl activity) {
         List<Tuple<String, String>> attributes = new ArrayList<>();
-        attributes.add(new Tuple<>("id", activity.getType()));
+        attributes.add(new Tuple<>("type", activity.getType()));
         writeStartTag("activity", attributes);
     }
 
@@ -196,15 +190,6 @@ import java.util.SortedSet;
         out.write(" start_time=\"" + Time.writeTime(opentime.getStartTime()) + "\"");
         out.write(" end_time=\"" + Time.writeTime(opentime.getEndTime()) + "\"");
         out.write(" />\n");
-    }
-
-    //////////////////////////////////////////////////////////////////////
-    // <!-- ============ ... ========== -->
-    //////////////////////////////////////////////////////////////////////
-
-    public void writeSeparator(final BufferedWriter out) throws IOException {
-        out.write("<!-- =================================================" +
-                "===================== -->\n\n");
     }
 
     public void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {
