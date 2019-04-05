@@ -54,6 +54,7 @@ import java.util.Map;
 		this.coordinateTransformation = coordinateTransformation;
 	}
 
+	@Override
 	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
 		this.attributesWriter.putAttributeConverters( converters );
 	}
