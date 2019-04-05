@@ -1,7 +1,6 @@
 package org.matsim.facilities;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -9,7 +8,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,9 +16,6 @@ import java.io.ByteArrayOutputStream;
  * @author mrieser
  */
 public class FacilitiesWriterTest {
-
-    @Rule
-    public MatsimTestUtils testUtil = new MatsimTestUtils();
 
     @Test
     public void testWriteLinkId() {
@@ -42,13 +37,15 @@ public class FacilitiesWriterTest {
         facilities.addActivityFacility(fac2);
         facilities.addActivityFacility(fac3);
 
-        String filename = testUtil.getOutputDirectory() + "/facilities.xml";
-        new FacilitiesWriter(facilities).write(filename);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1000);
+        new FacilitiesWriter(facilities).write(outputStream);
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
 
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         facilities = scenario.getActivityFacilities();
         MatsimFacilitiesReader reader = new MatsimFacilitiesReader(scenario);
-        reader.readFile(filename);
+        reader.parse(inputStream);
 
         Assert.assertEquals(3, facilities.getFacilities().size());
 
