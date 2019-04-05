@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.utils.objectattributes.AttributeConverter;
@@ -44,9 +45,12 @@ public interface PopulationWriterHandler {
 	void writeSeparator(final BufferedWriter out) throws IOException;
 
 	default void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {
-		throw new UnsupportedOperationException(
-				getClass().getName()+
-						" does not support custom attributes." +
-						" Please use a more recent file format.");
+		if (!converters.isEmpty()) {
+			Logger.getLogger(getClass()).warn(
+					getClass().getName() +
+							" does not support custom attributes." +
+							" Please use a more recent file format" +
+							" if you need this feature.");
+		}
 	}
 }
