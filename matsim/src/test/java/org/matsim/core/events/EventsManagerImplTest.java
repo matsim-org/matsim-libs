@@ -55,11 +55,8 @@ public class EventsManagerImplTest {
 		manager.addHandler(handler);
 		try {
 			manager.processEvent(new MyEvent(123.45));
-			Assert.fail("expected exception, but got none.");
 		} catch (final RuntimeException e) {
-			log.info("Catched expected exception.", e);
-			Assert.assertEquals(1, handler.counter);
-			Assert.assertTrue(e.getCause() instanceof ArithmeticException);
+			Assert.fail("No exception must be thrown from processEvent.");
 		}
 	}
 

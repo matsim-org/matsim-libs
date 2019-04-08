@@ -108,6 +108,11 @@ public class EventsManagerImpl implements EventsManager {
 			this.eventHandler = eventHandler;
 			this.method = method;
 		}
+
+		@Override
+		public String toString() {
+			return String.format("eventClass: %s, eventHandler: %s", eventClass.toString(), eventHandler.toString());
+		}
 	}
 
 	private final List<HandlerData> handlerData = new ArrayList<HandlerData>();
@@ -219,17 +224,27 @@ public class EventsManagerImpl implements EventsManager {
 	private void computeEvent(final Event event) {
 		for (HandlerInfo info : getHandlersForClass(event.getClass())) {
 			synchronized(info.eventHandler) {
-				if (callHandlerFast(info.eventClass, event, info.eventHandler)) {
-					continue;
-				}
 				try {
-					info.method.invoke(info.eventHandler, event);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					throw new RuntimeException("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e);
-				} catch (InvocationTargetException e) {
-					throw new RuntimeException("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e.getCause());
+					handle(event, info);
+				}
+				catch (Exception ex) {
+					log.error(String.format("Could not handle event '%s' by handler '%s'. Error: %s" ,event.toString(),
+							info.toString(), ex.getMessage()), ex);
 				}
 			}
+		}
+	}
+
+	private void handle(Event event, HandlerInfo info) {
+		if (callHandlerFast(info.eventClass, event, info.eventHandler)) {
+			return;
+		}
+		try {
+			info.method.invoke(info.eventHandler, event);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			throw new RuntimeException("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e.getCause());
 		}
 	}
 
