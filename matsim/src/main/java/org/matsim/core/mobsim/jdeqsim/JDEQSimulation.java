@@ -34,7 +34,6 @@ import javax.inject.Inject;
 
 import java.util.HashMap;
 
-
 /**
  * The starting point of the whole micro-simulation.
  * @see <a href="http://www.matsim.org/docs/jdeqsim">http://www.matsim.org/docs/jdeqsim</a>
@@ -44,11 +43,13 @@ public class JDEQSimulation implements Mobsim {
 
 	private final static Logger log = Logger.getLogger(JDEQSimulation.class);
 
-	private final JDEQSimConfigGroup config;
 	protected Scenario scenario;
+	protected final PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation;
+
+	private final JDEQSimConfigGroup config;
 	private final EventsManager events;
 
-	protected final PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation;
+    private final Scheduler scheduler;
 
 	@Inject
 	public JDEQSimulation(final JDEQSimConfigGroup config, final Scenario scenario, final EventsManager events) {
@@ -57,33 +58,51 @@ public class JDEQSimulation implements Mobsim {
 		this.config = config;
 		this.scenario = scenario;
 		this.events = events;
-		this.activityDurationInterpretation = this.scenario.getConfig().plans().getActivityDurationInterpretation();
+		activityDurationInterpretation = scenario.getConfig().plans().getActivityDurationInterpretation();
+		scheduler = new Scheduler(new MessageQueue(), config.getSimulationEndTime());
 	}
 
 	@Override
 	public void run() {
 		events.initProcessing();
-		Timer t = new Timer();
-		t.startTimer();
+		Timer timer = new Timer();
+		timer.startTimer();
 
-		Scheduler scheduler = new Scheduler(new MessageQueue(), config.getSimulationEndTime());
-		Road.setAllRoads(new HashMap<Id<Link>, Road>());
-
-		// initialize network
-		Road road;
-		for (Link link : this.scenario.getNetwork().getLinks().values()) {
-			road = new Road(scheduler, link);
-			Road.getAllRoads().put(link.getId(), road);
-		}
-
-		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			new Vehicle(scheduler, person, activityDurationInterpretation); // the vehicle registers itself to the scheduler
-		}
+		initializeRoads();
+		initializeVehicles();
 
 		scheduler.startSimulation();
 
-		t.endTimer();
-		log.info("Time needed for one iteration (only JDEQSimulation part): " + t.getMeasuredTime() + "[ms]");
+		timer.endTimer();
+		log.info("Time needed for one iteration (only JDEQSimulation part): " + timer.getMeasuredTime() + "[ms]");
 		events.finishProcessing();
 	}
+
+	protected void initializeRoads() {
+		HashMap<Id<Link>, Road> allRoads = new HashMap<>();
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			allRoads.put(link.getId(), new Road(scheduler, link));
+		}
+		Road.setAllRoads(allRoads);
+	}
+
+	protected void initializeVehicles() {
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			// the vehicle registers itself to the scheduler
+			new Vehicle(scheduler, person, activityDurationInterpretation);
+		}
+	}
+
+    protected Scheduler getScheduler() {
+        return scheduler;
+    }
+
+    public EventsManager getEvents() {
+		return events;
+	}
+
+	public JDEQSimConfigGroup getConfig() {
+		return config;
+	}
+
 }
