@@ -19,25 +19,26 @@
 
 package org.matsim.contrib.dynagent.run;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent.State;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.inject.Inject;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimAgent.State;
-import org.matsim.core.mobsim.qsim.DefaultActivityEngine;
-import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-
+/**
+ * DynActivityEngine and ActivityEngine could be decoupled (if we can ensure DynActivityEngine's handleActivity() is
+ * called before that of ActivityEngine)
+ */
 public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 	// This is now _additive_ to the normal ActivityEngine!
 
@@ -45,8 +46,6 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 
 	private final List<DynAgent> dynAgents = new LinkedList<>();
 	private final List<DynAgent> newDynAgents = new ArrayList<>();// will to be handled in the next timeStep
-
-	public interface ActivityEngineDelegate4Drt extends ActivityHandler, MobsimEngine {}
 
 	// See handleActivity for the reason for this.
 	private boolean beforeFirstSimStep = true;
@@ -78,7 +77,6 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 			}
 			// TODO what if not activity?
 		}
-
 	}
 
 	@Override
