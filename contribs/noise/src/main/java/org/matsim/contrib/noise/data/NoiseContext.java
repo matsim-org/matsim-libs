@@ -73,6 +73,8 @@ public class NoiseContext {
 	
 	private final Set<Id<Vehicle>> asBusConsideredTransitVehicleIDs = new HashSet<>();
 	private final Set<Id<Vehicle>> notConsideredTransitVehicleIDs = new HashSet<>();
+	private final Set<Id<Vehicle>> ignoredNetworkModeVehicleIDs = new HashSet<>();
+
 	private final Map<Id<Link>, Map<Id<Vehicle>, Double>> linkId2vehicleId2lastEnterTime = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>();
 	
@@ -409,5 +411,9 @@ public class NoiseContext {
 
 	public Map<Id<Vehicle>, Id<Person>> getVehicleId2PersonId() {
 		return vehicleId2personId;
+	}
+
+	public Set<Id<Vehicle>> getIgnoredNetworkModeVehicleIDs() {
+		return ignoredNetworkModeVehicleIDs;
 	}
 }
