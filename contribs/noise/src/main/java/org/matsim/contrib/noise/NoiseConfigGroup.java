@@ -85,6 +85,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private static final String WRITE_OUTPUT_ITERATION_CMT = "Specifies how often the noise-specific output is written out.";
 	private static final String CONSIDER_NOISE_BARRIERS = "considerNoiseBarriers";
 	private static final String NOISE_BARRIERS_GEOJSON_FILE = "noiseBarriersGeojsonPath";
+	private static final String NETWORK_MODES_TO_IGNORE = "networkModesToIgnore";
 
     public NoiseConfigGroup() {
 		super(GROUP_NAME);
@@ -127,13 +128,13 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private String[] hgvIdPrefixes = { "lkw" };
 	private Set<String> busIdIdentifier = new HashSet<String>();
 	private Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
+	private Set<String> networkModesToIgnore = new HashSet<String>();
 	
 	private double noiseTollFactor = 1.0;
 
 	private boolean considerNoiseBarriers = false;
     private String noiseBarriersFilePath = null;
-
-
+    
     // ########################################################################################################
 	
 	@Override
@@ -185,6 +186,8 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 
 		comments.put(CONSIDER_NOISE_BARRIERS, "Set to 'true' if noise barriers / building shielding should be considered. Otherwise set to 'false'.");
         comments.put(NOISE_BARRIERS_GEOJSON_FILE, "Path to the geojson file for noise barriers.");
+
+        comments.put(NETWORK_MODES_TO_IGNORE, "Specifies the network modes to be excluded from the noise computation, e.g. 'bike'.");
 
 		return comments;
 	}
@@ -622,16 +625,6 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 		this.setHgvIdPrefixesArray(CollectionUtils.stringToArray(hgvIdPrefixes));
 	}
 
-	@StringGetter(BUS_ID_IDENTIFIER)
-	private String getBusIdPrefixes() {
-		return CollectionUtils.setToString(busIdIdentifier);
-	}
-
-	@StringSetter(BUS_ID_IDENTIFIER)
-	public void setBusIdIdentifiers(String busIdPrefixes) {		
-		this.setBusIdIdentifierSet(CollectionUtils.stringToSet(busIdPrefixes));
-	}
-
 	@StringGetter(TUNNEL_LINK_IDS)
 	private String getTunnelLinkIDs() {
 		return this.linkIdSetToString(tunnelLinkIDs);
@@ -680,6 +673,16 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 		return tunnelLinkIDs;
 	}
 	
+	@StringGetter(BUS_ID_IDENTIFIER)
+	private String getBusIdPrefixes() {
+		return CollectionUtils.setToString(busIdIdentifier);
+	}
+
+	@StringSetter(BUS_ID_IDENTIFIER)
+	public void setBusIdIdentifiers(String busIdPrefixes) {		
+		this.setBusIdIdentifierSet(CollectionUtils.stringToSet(busIdPrefixes));
+	}
+	
 	public Set<String> getBusIdIdentifierSet() {
 		return busIdIdentifier;
 	}
@@ -687,6 +690,25 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	public void setBusIdIdentifierSet(Set<String> busIdPrefixes) {
 		log.info("setting the bus Id identifiers to : " + busIdPrefixes.toString());
 		this.busIdIdentifier = busIdPrefixes;
+	}
+	
+	@StringGetter(NETWORK_MODES_TO_IGNORE)
+	public String getNetworkModesToIgnore() {
+		return CollectionUtils.setToString(networkModesToIgnore);
+	}
+
+    @StringSetter(NETWORK_MODES_TO_IGNORE)
+	public void setNetworkModesToIgnore(String networkModesToIgnore) {
+		this.setNetworkModesToIgnoreSet(CollectionUtils.stringToSet(networkModesToIgnore));
+	}
+
+	public Set<String> getNetworkModesToIgnoreSet() {
+		return networkModesToIgnore;
+	}
+
+	public void setNetworkModesToIgnoreSet(Set<String> networkModesToIgnore) {
+		log.info("setting the network modes to ignore to : " + networkModesToIgnore.toString());
+		this.networkModesToIgnore = networkModesToIgnore;
 	}
 	
 	private String linkIdSetToString (Set<Id<Link>> linkIds) {
@@ -761,5 +783,5 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
     public void setConsiderNoiseBarriers(String noiseBarriersFilePath) {
         this.noiseBarriersFilePath = noiseBarriersFilePath;
     }
-	
+    
 }
