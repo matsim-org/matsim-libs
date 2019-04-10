@@ -123,9 +123,14 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 									|| this.activityFacilities.getFacilities().get(act.getFacilityId()) == null
 									|| this.activityFacilities.getFacilities().get(act.getFacilityId()).getLinkId() == null)
 							) {
-					    	needsXY2Links = true;
-							needsReRoute = true;
-							break;
+						needsXY2Links = true;
+
+//						needsReRoute = true;
+						// this will trigger re-route no matter what.  However, when there is a valid route, e.g. given by the user, then this
+						// may not be necessary.  Hm.  Will send it to the regression tests and see what happens.  kai, apr'19
+
+//						break;
+						// IMO not needed. kai, apr'19
 					}
 				} else if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
