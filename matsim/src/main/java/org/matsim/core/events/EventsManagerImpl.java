@@ -22,11 +22,7 @@ package org.matsim.core.events;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -122,243 +118,258 @@ public class EventsManagerImpl implements EventsManager {
 	private long counter = 0;
 	private long nextCounterMsg = 1;
 
-	private HandlerData findHandler(final Class<?> evklass) {
-		for (HandlerData handler : this.handlerData) {
-			if (handler.eventklass == evklass) {
-				return handler;
-			}
-		}
-		return null;
-	}
+    private final Map<StackTraceElement, Exception> stacktraceToException = new ConcurrentHashMap<>();
 
-	@Override
-	public void processEvent(final Event event) {
-		this.counter++;
-		if (this.counter == this.nextCounterMsg) {
-			this.nextCounterMsg *= 4;
-			log.info(" event # " + this.counter);
-		}
-		computeEvent(event);
-	}
+    private HandlerData findHandler(final Class<?> evklass) {
+        for (HandlerData handler : this.handlerData) {
+            if (handler.eventklass == evklass) {
+                return handler;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void processEvent(final Event event) {
+        this.counter++;
+        if (this.counter == this.nextCounterMsg) {
+            this.nextCounterMsg *= 4;
+            log.info(" event # " + this.counter);
+        }
+        computeEvent(event);
+    }
 
 
-	@Override
-	public void addHandler (final EventHandler handler) {
-		Set<Class<?>> addedHandlers = new HashSet<Class<?>>();
-		Class<?> test = handler.getClass();
-		log.info("adding Event-Handler: " + test.getName());
-		while (test != Object.class) {
-			for (Class<?> theInterface: test.getInterfaces()) {
-				if (!addedHandlers.contains(theInterface)) {
-					log.info("  " + theInterface.getName());
-					addHandlerInterfaces(handler, theInterface);
-					addedHandlers.add(theInterface);
-				}
-			}
-			test = test.getSuperclass();
-		}
-		this.cacheHandlers.clear();
-		log.info("");
-	}
+    @Override
+    public void addHandler(final EventHandler handler) {
+        Set<Class<?>> addedHandlers = new HashSet<Class<?>>();
+        Class<?> test = handler.getClass();
+        log.info("adding Event-Handler: " + test.getName());
+        while (test != Object.class) {
+            for (Class<?> theInterface : test.getInterfaces()) {
+                if (!addedHandlers.contains(theInterface)) {
+                    log.info("  " + theInterface.getName());
+                    addHandlerInterfaces(handler, theInterface);
+                    addedHandlers.add(theInterface);
+                }
+            }
+            test = test.getSuperclass();
+        }
+        this.cacheHandlers.clear();
+        log.info("");
+    }
 
-	@Override
-	public void removeHandler(final EventHandler handler) {
-		log.info("removing Event-Handler: " + handler.getClass().getName());
-		for (HandlerData handlerList : this.handlerData) {
-			handlerList.removeHandler(handler);
-		}
-		this.cacheHandlers.clear();
-	}
+    @Override
+    public void removeHandler(final EventHandler handler) {
+        log.info("removing Event-Handler: " + handler.getClass().getName());
+        for (HandlerData handlerList : this.handlerData) {
+            handlerList.removeHandler(handler);
+        }
+        this.cacheHandlers.clear();
+    }
 
-	@Override
-	public void resetHandlers(final int iteration) {
-		log.info("resetting Event-Handlers");
-		this.counter = 0;
-		this.nextCounterMsg = 1;
-		Set<EventHandler> resetHandlers = new HashSet<EventHandler>();
-		for (HandlerData handlerdata : this.handlerData) {
-			for (EventHandler handler : handlerdata.handlerList) {
-				if (!resetHandlers.contains(handler)) {
-					log.info("  " + handler.getClass().getName());
-					handler.reset(iteration);
-					resetHandlers.add(handler);
-				}
-			}
-		}
-	}
+    @Override
+    public void resetHandlers(final int iteration) {
+        log.info("resetting Event-Handlers");
+        this.counter = 0;
+        this.nextCounterMsg = 1;
+        Set<EventHandler> resetHandlers = new HashSet<EventHandler>();
+        for (HandlerData handlerdata : this.handlerData) {
+            for (EventHandler handler : handlerdata.handlerList) {
+                if (!resetHandlers.contains(handler)) {
+                    log.info("  " + handler.getClass().getName());
+                    handler.reset(iteration);
+                    resetHandlers.add(handler);
+                }
+            }
+        }
+    }
 
-	@Override
-	public void initProcessing() {
-		// nothing to do in this implementation
-	}
+    @Override
+    public void initProcessing() {
+        stacktraceToException.clear();
+    }
 
-	@Override
-	public void afterSimStep(double time) {
-		// nothing to do in this implementation
-	}
+    @Override
+    public void afterSimStep(double time) {
+        // nothing to do in this implementation
+    }
 
-	@Override
-	public void finishProcessing() {
-		// nothing to do in this implementation
-	}
+    @Override
+    public void finishProcessing() {
+        if (!stacktraceToException.isEmpty()) {
+            log.error("There were errors during events processing: ");
+            stacktraceToException.forEach((st, ex) ->  {
+                log.error(st, ex);
+            });
+        }
+    }
 
-	private void addHandlerInterfaces(final EventHandler handler, final Class<?> handlerClass) {
-		Method[] classmethods = handlerClass.getMethods();
-		for (Method method : classmethods) {
-			if (method.getName().equals("handleEvent")) {
-				Class<?>[] params = method.getParameterTypes();
-				if (params.length == 1) {
-					Class<?> eventClass = params[0];
-					log.info("    > " + eventClass.getName());
-					HandlerData dat = findHandler(eventClass);
-					if (dat == null) {
-						dat = new HandlerData(eventClass, method);
-						this.handlerData.add(dat);
-					}
-					dat.handlerList.add(handler);
-				}
-			}
-		}
-	}
+    private void addHandlerInterfaces(final EventHandler handler, final Class<?> handlerClass) {
+        Method[] classmethods = handlerClass.getMethods();
+        for (Method method : classmethods) {
+            if (method.getName().equals("handleEvent")) {
+                Class<?>[] params = method.getParameterTypes();
+                if (params.length == 1) {
+                    Class<?> eventClass = params[0];
+                    log.info("    > " + eventClass.getName());
+                    HandlerData dat = findHandler(eventClass);
+                    if (dat == null) {
+                        dat = new HandlerData(eventClass, method);
+                        this.handlerData.add(dat);
+                    }
+                    dat.handlerList.add(handler);
+                }
+            }
+        }
+    }
 
-	private void computeEvent(final Event event) {
-		for (HandlerInfo info : getHandlersForClass(event.getClass())) {
-			synchronized(info.eventHandler) {
-				try {
-					handle(event, info);
-				}
-				catch (Exception ex) {
-					log.error(String.format("Could not handle event '%s' by handler '%s'. Error: %s" ,event.toString(),
-							info.toString(), ex.getMessage()), ex);
-				}
-			}
-		}
-	}
+    private void computeEvent(final Event event) {
+        for (HandlerInfo info : getHandlersForClass(event.getClass())) {
+            synchronized (info.eventHandler) {
+                try {
+                    handle(event, info);
+                } catch (Exception ex) {
+                    if (shouldLog(ex)) {
+                        log.error(String.format("Could not handle event '%s' by handler '%s'. Error: %s", event.toString(),
+                                info.toString(), ex.getMessage()), ex);
+                        if (ex.getStackTrace().length > 0)
+                            stacktraceToException.put(ex.getStackTrace()[0], ex);
+                    }
+                }
+            }
+        }
+    }
 
-	private void handle(Event event, HandlerInfo info) {
-		if (callHandlerFast(info.eventClass, event, info.eventHandler)) {
-			return;
-		}
-		try {
-			info.method.invoke(info.eventHandler, event);
-		} catch (IllegalArgumentException | IllegalAccessException e) {
-			throw new RuntimeException("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e.getCause());
-		}
-	}
+    private void handle(Event event, HandlerInfo info) {
+        if (callHandlerFast(info.eventClass, event, info.eventHandler)) {
+            return;
+        }
+        try {
+            info.method.invoke(info.eventHandler, event);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            throw new RuntimeException("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e.getCause());
+        }
+    }
 
-	private HandlerInfo[] getHandlersForClass(final Class<?> eventClass) {
-		Class<?> klass = eventClass;
-		HandlerInfo[] cache = this.cacheHandlers.get(eventClass);
-		if (cache != null) {
-			return cache;
-		}
+    private HandlerInfo[] getHandlersForClass(final Class<?> eventClass) {
+        Class<?> klass = eventClass;
+        HandlerInfo[] cache = this.cacheHandlers.get(eventClass);
+        if (cache != null) {
+            return cache;
+        }
 
-		ArrayList<HandlerInfo> info = new ArrayList<HandlerInfo>();
-		// first search in class-hierarchy
-		while (klass != Object.class) {
-			HandlerData dat = findHandler(klass);
-			if (dat != null) {
-				for(EventHandler handler: dat.handlerList) {
-					info.add(new HandlerInfo(klass, handler, dat.method));
-				}
-			}
-			klass = klass.getSuperclass();
-		}
-		// now search in implemented interfaces
-		for (Class<?> intfc : getAllInterfaces(eventClass)) {
-			HandlerData dat = findHandler(intfc);
-			if (dat != null) {
-				for(EventHandler handler: dat.handlerList) {
-					info.add(new HandlerInfo(intfc, handler, dat.method));
-				}
-			}
-		}
+        ArrayList<HandlerInfo> info = new ArrayList<HandlerInfo>();
+        // first search in class-hierarchy
+        while (klass != Object.class) {
+            HandlerData dat = findHandler(klass);
+            if (dat != null) {
+                for (EventHandler handler : dat.handlerList) {
+                    info.add(new HandlerInfo(klass, handler, dat.method));
+                }
+            }
+            klass = klass.getSuperclass();
+        }
+        // now search in implemented interfaces
+        for (Class<?> intfc : getAllInterfaces(eventClass)) {
+            HandlerData dat = findHandler(intfc);
+            if (dat != null) {
+                for (EventHandler handler : dat.handlerList) {
+                    info.add(new HandlerInfo(intfc, handler, dat.method));
+                }
+            }
+        }
 
-		cache = info.toArray(new HandlerInfo[info.size()]);
-		this.cacheHandlers.put(eventClass, cache);
-		return cache;
-	}
+        cache = info.toArray(new HandlerInfo[info.size()]);
+        this.cacheHandlers.put(eventClass, cache);
+        return cache;
+    }
 
-	private Set<Class<?>> getAllInterfaces(final Class<?> klass) {
-		Set<Class<?>> intfs = new HashSet<Class<?>>();
-		for (Class<?> intf : klass.getInterfaces()) {
-			intfs.add(intf);
-			intfs.addAll(getAllInterfaces(intf));
-		}
-		if (!klass.isInterface()) {
-			Class<?> superclass = klass.getSuperclass();
-			while (superclass != Object.class) {
-				intfs.addAll(getAllInterfaces(superclass));
-				superclass = superclass.getSuperclass();
-			}
-		}
-		return intfs;
-	}
+    private Set<Class<?>> getAllInterfaces(final Class<?> klass) {
+        Set<Class<?>> intfs = new HashSet<Class<?>>();
+        for (Class<?> intf : klass.getInterfaces()) {
+            intfs.add(intf);
+            intfs.addAll(getAllInterfaces(intf));
+        }
+        if (!klass.isInterface()) {
+            Class<?> superclass = klass.getSuperclass();
+            while (superclass != Object.class) {
+                intfs.addAll(getAllInterfaces(superclass));
+                superclass = superclass.getSuperclass();
+            }
+        }
+        return intfs;
+    }
 
-	// this method is purely for performance reasons and need not be implemented
-	private boolean callHandlerFast(final Class<?> klass, final Event ev, final EventHandler handler) {
-		if (klass == LinkLeaveEvent.class) {
-			((LinkLeaveEventHandler)handler).handleEvent((LinkLeaveEvent)ev);
-			return true;
-		} else if (klass == LinkEnterEvent.class) {
-			((LinkEnterEventHandler)handler).handleEvent((LinkEnterEvent)ev);
-			return true;
-		} else if (klass == VehicleEntersTrafficEvent.class) {
-			((VehicleEntersTrafficEventHandler)handler).handleEvent((VehicleEntersTrafficEvent)ev);
-			return true;
-		} else if (klass == PersonArrivalEvent.class) {
-			((PersonArrivalEventHandler)handler).handleEvent((PersonArrivalEvent)ev);
-			return true;
-		} else if (klass == PersonDepartureEvent.class) {
-			((PersonDepartureEventHandler)handler).handleEvent((PersonDepartureEvent)ev);
-			return true;
-		} else if (klass == ActivityEndEvent.class) {
-			((ActivityEndEventHandler)handler).handleEvent((ActivityEndEvent)ev);
-			return true;
-		} else if (klass == ActivityStartEvent.class) {
-			((ActivityStartEventHandler)handler).handleEvent((ActivityStartEvent)ev);
-			return true;
-		} else if (klass == TransitDriverStartsEvent.class) {
-			((TransitDriverStartsEventHandler) handler).handleEvent((TransitDriverStartsEvent) ev);
-			return true;
-		} else if (klass == PersonStuckEvent.class) {
-			((PersonStuckEventHandler)handler).handleEvent((PersonStuckEvent)ev);
-			return true;
-		} else if (klass == PersonMoneyEvent.class) {
-			((PersonMoneyEventHandler)handler).handleEvent((PersonMoneyEvent)ev);
-			return true;
-		} else if (klass == AgentWaitingForPtEvent.class) {
-			((AgentWaitingForPtEventHandler)handler).handleEvent((AgentWaitingForPtEvent)ev);
-			return true;
-		} else if (klass == PersonEntersVehicleEvent.class) {
-			((PersonEntersVehicleEventHandler)handler).handleEvent((PersonEntersVehicleEvent)ev);
-			return true;
-		} else if (klass == PersonLeavesVehicleEvent.class) {
-			((PersonLeavesVehicleEventHandler)handler).handleEvent((PersonLeavesVehicleEvent)ev);
-			return true;
-		} else if (klass == VehicleDepartsAtFacilityEvent.class) {
-			((VehicleDepartsAtFacilityEventHandler) handler).handleEvent((VehicleDepartsAtFacilityEvent) ev);
-			return true;
-		} else if (klass == VehicleArrivesAtFacilityEvent.class) {
-			((VehicleArrivesAtFacilityEventHandler) handler).handleEvent((VehicleArrivesAtFacilityEvent) ev);
-			return true;
-		} else if (klass == Event.class) {
-			((BasicEventHandler)handler).handleEvent(ev);
-			return true;
-		}
-		return false;
-	}
+    // this method is purely for performance reasons and need not be implemented
+    private boolean callHandlerFast(final Class<?> klass, final Event ev, final EventHandler handler) {
+        if (klass == LinkLeaveEvent.class) {
+            ((LinkLeaveEventHandler) handler).handleEvent((LinkLeaveEvent) ev);
+            return true;
+        } else if (klass == LinkEnterEvent.class) {
+            ((LinkEnterEventHandler) handler).handleEvent((LinkEnterEvent) ev);
+            return true;
+        } else if (klass == VehicleEntersTrafficEvent.class) {
+            ((VehicleEntersTrafficEventHandler) handler).handleEvent((VehicleEntersTrafficEvent) ev);
+            return true;
+        } else if (klass == PersonArrivalEvent.class) {
+            ((PersonArrivalEventHandler) handler).handleEvent((PersonArrivalEvent) ev);
+            return true;
+        } else if (klass == PersonDepartureEvent.class) {
+            ((PersonDepartureEventHandler) handler).handleEvent((PersonDepartureEvent) ev);
+            return true;
+        } else if (klass == ActivityEndEvent.class) {
+            ((ActivityEndEventHandler) handler).handleEvent((ActivityEndEvent) ev);
+            return true;
+        } else if (klass == ActivityStartEvent.class) {
+            ((ActivityStartEventHandler) handler).handleEvent((ActivityStartEvent) ev);
+            return true;
+        } else if (klass == TransitDriverStartsEvent.class) {
+            ((TransitDriverStartsEventHandler) handler).handleEvent((TransitDriverStartsEvent) ev);
+            return true;
+        } else if (klass == PersonStuckEvent.class) {
+            ((PersonStuckEventHandler) handler).handleEvent((PersonStuckEvent) ev);
+            return true;
+        } else if (klass == PersonMoneyEvent.class) {
+            ((PersonMoneyEventHandler) handler).handleEvent((PersonMoneyEvent) ev);
+            return true;
+        } else if (klass == AgentWaitingForPtEvent.class) {
+            ((AgentWaitingForPtEventHandler) handler).handleEvent((AgentWaitingForPtEvent) ev);
+            return true;
+        } else if (klass == PersonEntersVehicleEvent.class) {
+            ((PersonEntersVehicleEventHandler) handler).handleEvent((PersonEntersVehicleEvent) ev);
+            return true;
+        } else if (klass == PersonLeavesVehicleEvent.class) {
+            ((PersonLeavesVehicleEventHandler) handler).handleEvent((PersonLeavesVehicleEvent) ev);
+            return true;
+        } else if (klass == VehicleDepartsAtFacilityEvent.class) {
+            ((VehicleDepartsAtFacilityEventHandler) handler).handleEvent((VehicleDepartsAtFacilityEvent) ev);
+            return true;
+        } else if (klass == VehicleArrivesAtFacilityEvent.class) {
+            ((VehicleArrivesAtFacilityEventHandler) handler).handleEvent((VehicleArrivesAtFacilityEvent) ev);
+            return true;
+        } else if (klass == Event.class) {
+            ((BasicEventHandler) handler).handleEvent(ev);
+            return true;
+        }
+        return false;
+    }
 
-	public void printEventHandlers() {
-		log.info("currently registered event-handlers:");
-		for (HandlerData handlerType : this.handlerData) {
-			log.info("+ " + handlerType.eventklass.getName());
-			for (EventHandler handler : handlerType.handlerList) {
-				log.info("  - " + handler.getClass().getName());
-			}
-		}
-	}
+    public void printEventHandlers() {
+        log.info("currently registered event-handlers:");
+        for (HandlerData handlerType : this.handlerData) {
+            log.info("+ " + handlerType.eventklass.getName());
+            for (EventHandler handler : handlerType.handlerList) {
+                log.info("  - " + handler.getClass().getName());
+            }
+        }
+    }
 
+    private boolean shouldLog(Exception ex) {
+        StackTraceElement[] stackTrace = ex.getStackTrace();
+        if (stackTrace.length == 0) return false;
+        return !stacktraceToException.containsKey(stackTrace[0]);
+    }
 }

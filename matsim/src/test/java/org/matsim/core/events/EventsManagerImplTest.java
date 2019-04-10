@@ -55,6 +55,8 @@ public class EventsManagerImplTest {
 		manager.addHandler(handler);
 		try {
 			manager.processEvent(new MyEvent(123.45));
+			// Even this even handling will fail, we won't see any log, because we log only first exception from the handler
+			manager.processEvent(new MyEvent(123.45));
 		} catch (final RuntimeException e) {
 			Assert.fail("No exception must be thrown from processEvent.");
 		}
