@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.minibus.hook;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import com.google.inject.Inject;
@@ -184,6 +185,10 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 		TransitScheduleWriter writer = new TransitScheduleWriter(controler.getScenario().getTransitSchedule());
 		MatsimVehicleWriter writer2 = new MatsimVehicleWriter(controler.getScenario().getTransitVehicles());
 		writer.writeFile(controler.getControlerIO().getIterationFilename(iteration, "transitSchedule.xml.gz"));
-		writer2.writeFile(controler.getControlerIO().getIterationFilename(iteration, "transitVehicles.xml.gz"));
+		try {
+			writer2.writeFile(controler.getControlerIO().getIterationFilename(iteration, "transitVehicles.xml.gz"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
