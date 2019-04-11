@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>                                                                                                                                                                                                                                        
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v6.dtd">
+
+<population>
+	<person id="person1_car">
+		<!-- this plan contains two legs that should be simulated on the network 
+		     because they use the main mode (car) -->
+		<plan>
+			<activity type="home" x="-15000" y="0" end_time="07:30:00" />
+			<leg mode="car" />
+			<activity type="work" x="0" y="0" start_time="07:40:00" end_time="17:30:00" />
+			<leg mode="car" />
+			<activity type="home" x="-15000" y="0" />
+		</plan>
+	</person>
+	<person id="person2_car+bike">
+		<!-- this plan contains one leg that should be simulated on the network,
+			and one leg with predefined travel time which should be used as-is by MATSim --> 
+		<plan>
+			<activity type="home" x="-15000" y="0" end_time="07:30:00" />
+			<leg mode="car" />
+			<activity type="work" x="0" y="0" start_time="07:40:00" end_time="17:30:00" />
+			<leg mode="bike">
+				<route type="generic" trav_time="00:12:34" distance="1234" />
+			</leg>
+			<activity type="home" x="-15000" y="0" />
+		</plan>
+	</person>
+	<person id="person3_bike">
+		<!-- this plan contains two legs that have a predefined travel time and
+			should be used as-is by MATSim --> 
+		<plan>
+			<activity type="home" x="-15000" y="0" end_time="07:30:00" />
+			<leg mode="bike">
+				<route type="generic" trav_time="00:12:34" distance="1234" />
+			</leg>
+			<activity type="work" x="0" y="0" start_time="07:42:34" end_time="17:30:00" />
+			<leg mode="bike">
+				<route type="generic" trav_time="00:12:34" distance="1234" />
+			</leg>
+			<activity type="home" x="-15000" y="0" />
+		</plan>
+	</person>
+</population>

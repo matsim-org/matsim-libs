@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="coordinateSystem" value="Atlantis" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="network.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="population.xml" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="./output" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="10" />
+	</module>
+
+	<module name="qsim">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="00:00:00" />
+		<param name="mainMode" value="car" />
+	</module>
+	
+	<module name="planCalcScore">
+		<param name="activityType_0" value="home" />
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+
+		<param name="activityType_1" value="work" />
+		<param name="activityTypicalDuration_1" value="08:00:00" />
+	</module>
+	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="0" /> <!-- 0 means unlimited -->
+
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="BestScore"/>
+			<param name="weight" value="0.5"/>
+		</parameterset>
+
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="ReRoute"/>
+			<param name="weight" value="0.5"/>
+		</parameterset>
+	</module>
+
+</config>
