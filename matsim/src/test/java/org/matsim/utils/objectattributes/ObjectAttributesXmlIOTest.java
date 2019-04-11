@@ -59,7 +59,7 @@ public class ObjectAttributesXmlIOTest {
 		MyTuple t = new MyTuple(3, 4);
 		oa1.putAttribute("1", "A", t);
 		ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(oa1);
-		MyTupleConverter converter = new MyTupleConverter();
+		MyTuple.MyTupleConverter converter = new MyTuple.MyTupleConverter();
 		writer.putAttributeConverter(MyTuple.class, converter);
 		writer.writeFile(this.utils.getOutputDirectory() + "oa.xml");
 		
@@ -67,7 +67,7 @@ public class ObjectAttributesXmlIOTest {
 
 		ObjectAttributes oa2 = new ObjectAttributes();
 		ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(oa2);
-		reader.putAttributeConverter(MyTuple.class, new MyTupleConverter());
+		reader.putAttributeConverter(MyTuple.class, new MyTuple.MyTupleConverter());
 		reader.readFile(this.utils.getOutputDirectory() + "oa.xml");
 		
 		Object o = oa2.getAttribute("1", "A");
@@ -78,16 +78,4 @@ public class ObjectAttributesXmlIOTest {
 		Assert.assertEquals(4, t2.b);
 	}
 
-	public static class MyTupleConverter implements AttributeConverter<MyTuple> {
-		@Override
-		public MyTuple convert(String value) {
-			String[] parts = value.split(",");
-			return new MyTuple(Integer.valueOf(parts[0]), Integer.valueOf(parts[1]));
-		}
-		@Override
-		public String convertToString(Object o) {
-			MyTuple t = (MyTuple) o;
-			return t.a + "," + t.b; // make it something different from MyTuple.toString()
-		}
-	}
 }

@@ -30,4 +30,17 @@ public class MyTuple {
     public String toString() {
         return a + "/" + b;
     }
+
+    public static class MyTupleConverter implements AttributeConverter<MyTuple> {
+        @Override
+        public MyTuple convert(String value) {
+            String[] parts = value.split(",");
+            return new MyTuple(Integer.valueOf(parts[0]), Integer.valueOf(parts[1]));
+        }
+        @Override
+        public String convertToString(Object o) {
+            MyTuple t = (MyTuple) o;
+            return t.a + "," + t.b; // make it something different from MyTuple.toString()
+        }
+    }
 }
