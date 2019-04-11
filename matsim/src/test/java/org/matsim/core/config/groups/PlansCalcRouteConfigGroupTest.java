@@ -63,6 +63,7 @@ public class PlansCalcRouteConfigGroupTest {
 	@Test
 	public void testDefaultsAreCleared() {
 		PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup();
+		group.clearModeRoutingParams();
 		group.setTeleportedModeSpeed( "skateboard" , 20 / 3.6 );
 		group.setTeleportedModeSpeed( "longboard" , 20 / 3.6 );
 		Assert.assertEquals(

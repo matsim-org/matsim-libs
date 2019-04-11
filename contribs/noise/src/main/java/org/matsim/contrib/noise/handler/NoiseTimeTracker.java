@@ -34,9 +34,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.noise.NoiseConfigGroup;
@@ -63,7 +65,7 @@ import com.google.inject.Inject;
  *
  */
 
-public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEnterEventHandler, TransitDriverStartsEventHandler {
+public class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEntersVehicleEventHandler, LinkEnterEventHandler, TransitDriverStartsEventHandler {
 
 	private static final Logger log = Logger.getLogger(NoiseTimeTracker.class);
 	private static final boolean printLog = false;
@@ -149,7 +151,7 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 		this.noiseContext.getLinkId2vehicleId2lastEnterTime().clear();
 		this.noiseContext.setCurrentTimeBinEndTime(this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
 		this.noiseContext.getVehicleId2PersonId().clear();
-
+		
 		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			rp.reset();
 		}
@@ -292,10 +294,11 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 	public void handleEvent(LinkEnterEvent event) {
 		checkTime(event.getTime());
 
-		if (this.noiseContext.getNotConsideredTransitVehicleIDs().contains(event.getVehicleId())) {
-			// not considered transit vehicle
+		if (this.noiseContext.getIgnoredNetworkModeVehicleIDs().contains(event.getVehicleId()) || this.noiseContext.getNotConsideredTransitVehicleIDs().contains(event.getVehicleId())) {
+			// a not considered mode (e.g. 'bike') or a not considered transit vehicle (e.g. train)
+			
 		} else {
-			// car, lkw or a considered transit vehicle (e.g. bus)
+			// car, HGV or a considered transit vehicle (e.g. a bus)
 					
 			if (this.noiseContext.getLinkId2vehicleId2lastEnterTime().get(event.getLinkId()) != null) {
 				this.noiseContext.getLinkId2vehicleId2lastEnterTime().get(event.getLinkId()).put(event.getVehicleId(), event.getTime());
@@ -967,5 +970,16 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 	public void setOutputFilePath(String outputFilePath) {
 		this.outputDirectory = outputFilePath;
 	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		if (this.noiseContext.getNoiseParams().getNetworkModesToIgnore() != null) {
+			if (this.noiseContext.getNoiseParams().getNetworkModesToIgnore().contains(event.getNetworkMode())) {
+				this.noiseContext.getIgnoredNetworkModeVehicleIDs().add(event.getVehicleId());
+			}
+		}
+	}
+	
+	
 	
 }

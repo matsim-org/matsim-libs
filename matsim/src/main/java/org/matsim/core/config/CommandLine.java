@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
  * <h1>General usage</h1>
  * 
  * <p>
- * The command line interpreter is set up using the {@link CommandLine$Builder}:
+ * The command line interpreter is set up using the {@link CommandLine.Builder}:
  * </p>
  * 
  * <pre>
@@ -136,6 +136,11 @@ public class CommandLine {
 		 */
 		public Builder(String[] args) {
 			this.arguments = Arrays.asList(args);
+			for( String argument : this.arguments ){
+				if ( argument==null) {
+					throw new RuntimeException( "one of the entries in args is null; this will not work ..." ) ;
+				}
+			}
 		}
 
 		/**
@@ -221,7 +226,7 @@ public class CommandLine {
 		 * <li>An unnamed (positional) command line argument is passed, although it is
 		 * forbidden (see {{@link #allowPositionalArguments(boolean)})</li>
 		 * <li>A named command line argument is passed, but it is not allowed (see
-		 * {@link #allowOptions(Collec</li>tion)}. This can be disabled via
+		 * {@link #allowOptions(Collection)}. This can be disabled via
 		 * {@link #allowAnyOption}.</li>
 		 * <li>A named command line argument with a prefix is passed, but the prefix is
 		 * not allowed (see {@link #allowPrefixes(Collection)}. This can be disabled via
@@ -591,7 +596,7 @@ public class CommandLine {
 			if (configGroup.getParams().containsKey(remainder)) {
 				String value = options.get(option);
 				configGroup.addParam(remainder, value);
-				logger.info(String.format("Setting %s to %s", path, value));
+				logger.info(String.format("Setting %s to %s", option, value));
 			} else {
 				throw new ConfigurationException(String.format("Parameter %s in %s is not available", remainder, path));
 			}
