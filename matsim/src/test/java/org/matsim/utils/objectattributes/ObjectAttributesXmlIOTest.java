@@ -77,19 +77,6 @@ public class ObjectAttributesXmlIOTest {
 		Assert.assertEquals(3, t2.a);
 		Assert.assertEquals(4, t2.b);
 	}
-	
-	public static class MyTuple {
-		public final int a;
-		public final int b;
-		public MyTuple(final int a, final int b) {
-			this.a = a;
-			this.b = b;
-		}
-		@Override
-		public String toString() {
-			return a + "/" + b;
-		}
-	}
 
 	public static class MyTupleConverter implements AttributeConverter<MyTuple> {
 		@Override
