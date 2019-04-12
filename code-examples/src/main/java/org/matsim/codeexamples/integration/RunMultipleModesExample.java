@@ -41,6 +41,7 @@ final class RunMultipleModesExample{
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
+		// add the modes to each link:
 		for( Link link : scenario.getNetwork().getLinks().values() ){
 			Set<String> modes = new LinkedHashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ));
 			link.setAllowedModes( modes );

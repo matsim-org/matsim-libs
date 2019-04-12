@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.AllowsConfiguration;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -18,6 +19,7 @@ public final class RunAbcExample{
 	private final String[] args;
 	private Config config = null ;
 	private Scenario scenario = null ;
+	private Controler controler = null ;
 
 	public static void main ( String [] args ) {
 		new RunAbcExample( args ).run() ;
@@ -28,9 +30,11 @@ public final class RunAbcExample{
 	}
 
 	public final Config prepareConfig() {
-		URL url = ExamplesUtils.getTestScenarioURL( "equil" ) ;
-		URL configUrl = IOUtils.newUrl( url, "config.xml" );;
-		config = ConfigUtils.loadConfig( configUrl ) ;
+		if ( args!=null && args.length > 0 ) {
+			config = ConfigUtils.loadConfig( args[0] ) ;
+		} else{
+			throw new RuntimeException("need to provide path to config file. aborting ...") ;
+		}
 		return config ;
 	}
 
@@ -42,28 +46,32 @@ public final class RunAbcExample{
 		return scenario ;
 	}
 
-	public final void prepareAndRunControler( Collection<AbstractModule> controlerOverrides, Collection<AbstractQSimModule> qsimOverrides ) {
+	public final void addOverridingModule( AbstractModule controlerModule ) {
+		if ( controler==null ){
+			prepareControler();
+		}
+		controler.addOverridingModule( controlerModule ) ;
+	}
+	public final void addOverridingQSimModule( AbstractQSimModule qSimModule ) {
+		if ( controler==null ){
+			prepareControler();
+		}
+		controler.addOverridingQSimModule( qSimModule ) ;
+	}
+
+	public final void run() {
+		if ( controler==null ) {
+			prepareControler() ;
+		}
+		controler.run() ;
+	}
+
+	public final Controler prepareControler() {
 		if ( scenario==null ) {
 			prepareScenario() ;
 		}
-
-		Controler controler = new Controler( scenario );;
-
-		if ( controlerOverrides!=null ) {
-			for( AbstractModule controlerOverride : controlerOverrides ){
-				controler.addOverridingModule( controlerOverride ) ;
-			}
-		}
-		if ( qsimOverrides!=null ) {
-			for( AbstractQSimModule qsimOverride : qsimOverrides ){
-				controler.addOverridingQSimModule( qsimOverride ) ;
-			}
-		}
-
-	}
-
-	void run() {
-		prepareAndRunControler( null, null );
+		controler = new Controler( scenario ) ;
+		return controler ;
 	}
 
 }
