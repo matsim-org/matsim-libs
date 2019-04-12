@@ -86,19 +86,28 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		final List<Trip> trips = TripStructureUtils.getTrips( plan , tripRouter.getStageActivityTypes() );
 
 		for (Trip oldTrip : trips) {
+			final String routingMode = tripRouter.getMainModeIdentifier().identifyMainMode( oldTrip.getTripElements() );
+
+			Config config = tripRouter.getConfig();
+			// it feels a bit strange to get this in this way, but with that we don't need to change constructor arguments.  kai, apr'19
+
+			if ( config.plansCalcRoute().getIgnoredModes().contains( routingMode ) ) {
+				continue ;
+			}
+
 			final List<? extends PlanElement> newTrip =
-					tripRouter.calcRoute(
-							tripRouter.getMainModeIdentifier().identifyMainMode( oldTrip.getTripElements() ),
-						  FacilitiesUtils.toFacility( oldTrip.getOriginActivity(), facilities ),
-						  FacilitiesUtils.toFacility( oldTrip.getDestinationActivity(), facilities ),
-							calcEndOfActivity( oldTrip.getOriginActivity() , plan, tripRouter.getConfig() ),
-							plan.getPerson() );
-			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
+				  tripRouter.calcRoute(
+					    routingMode,
+					    FacilitiesUtils.toFacility( oldTrip.getOriginActivity(), facilities ),
+					    FacilitiesUtils.toFacility( oldTrip.getDestinationActivity(), facilities ),
+					    calcEndOfActivity( oldTrip.getOriginActivity(), plan, tripRouter.getConfig() ),
+					    plan.getPerson() );
+			putVehicleFromOldTripIntoNewTripIfMeaningful( oldTrip, newTrip );
 			TripRouter.insertTrip(
-					plan, 
-					oldTrip.getOriginActivity(),
-					newTrip,
-					oldTrip.getDestinationActivity());
+				  plan,
+				  oldTrip.getOriginActivity(),
+				  newTrip,
+				  oldTrip.getDestinationActivity() );
 		}
 	}
 

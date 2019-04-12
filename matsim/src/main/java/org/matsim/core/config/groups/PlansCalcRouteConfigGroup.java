@@ -74,7 +74,25 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	private static final String RANDOMNESS = "routingRandomness" ;
 	private double routingRandomness = 3. ;
-	
+
+	// ---
+
+	public static final String IGNORED_MODES_CMT = "Modes that should not be routed, i.e. the whole trip is not touched." ;
+	private Set<String> ignoredModes = Collections.emptySet() ;
+
+	/**
+	 * @return {@value #IGNORED_MODES_CMT}
+	 */
+	public Set<String> getIgnoredModes(){
+		return ignoredModes ;
+	}
+	/**
+	 * @param set -- {@value #IGNORED_MODES_CMT}
+	 */
+	public void setIgnoredModes( Set<String> set ) {
+		ignoredModes = set ;
+	}
+
 	// ---
 
 	public static class ModeRoutingParams extends ReflectiveConfigGroup implements MatsimParameters {

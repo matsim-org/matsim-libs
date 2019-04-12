@@ -1,5 +1,6 @@
 package org.matsim.integration.replanning;
 
+import com.google.inject.Inject;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -12,6 +13,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.*;
@@ -23,6 +25,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class NoRoutingForCertainModes {
@@ -38,10 +41,12 @@ public class NoRoutingForCertainModes {
 		config.controler().setLastIteration( 1 );
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 
+		final String strangeMode = "abc";
 		{
-			PlanCalcScoreConfigGroup.ModeParams params = new PlanCalcScoreConfigGroup.ModeParams( "abc" ) ;
+			PlanCalcScoreConfigGroup.ModeParams params = new PlanCalcScoreConfigGroup.ModeParams( strangeMode ) ;
 			config.planCalcScore().addModeParams( params );
 		}
+		config.plansCalcRoute().setIgnoredModes( Collections.singleton( strangeMode ) );
 
 		// ---
 
@@ -56,15 +61,17 @@ public class NoRoutingForCertainModes {
 				trip.getOriginActivity().setLinkId( null );
 				trip.getDestinationActivity().setLinkId( null );
 
+				// ----
+
+				Link originLink = NetworkUtils.getNearestLink( scenario.getNetwork(), trip.getOriginActivity().getCoord() );
+				Link destinationLink = NetworkUtils.getNearestLink( scenario.getNetwork(), trip.getDestinationActivity().getCoord() ) ;
+
 				List<PlanElement> def = new ArrayList<>() ;
-				Leg leg = pf.createLeg( "abc" ) ;
+				Leg leg = pf.createLeg( strangeMode ) ;
 				leg.setTravelTime( 100. );
 				def.add( leg ) ;
 
-				Id<Link> startLinkId = PopulationUtils.decideOnLinkIdForActivity( trip.getOriginActivity(), scenario );
-				Id<Link> endLinkId = PopulationUtils.decideOnLinkIdForActivity( trip.getDestinationActivity(), scenario ) ;
-
-				Route route = pf.getRouteFactories().createRoute( GenericRouteImpl.class, startLinkId, endLinkId ) ;
+				Route route = pf.getRouteFactories().createRoute( GenericRouteImpl.class, originLink.getId(), destinationLink.getId() ) ;
 				route.setTravelTime( leg.getTravelTime() );
 				route.setDistance( 1000. );
 				leg.setRoute( route ) ;
@@ -78,28 +85,27 @@ public class NoRoutingForCertainModes {
 
 		Controler controler = new Controler( scenario ) ;
 
-		controler.addOverridingModule( new AbstractModule(){
-			@Override
-			public void install(){
-				this.addRoutingModuleBinding( "abc" ).toInstance( new RoutingModule(){
-					@Override
-					public List<? extends PlanElement> calcRoute( Facility fromFacility, Facility toFacility, double departureTime, Person person ){
-						List<PlanElement> def = new ArrayList<>() ;
-						Leg leg = pf.createLeg( "abc" ) ;
-						def.add( leg ) ;
-
-						Route route = pf.getRouteFactories().createRoute( GenericRouteImpl.class, fromFacility.getLinkId(), toFacility.getLinkId() ) ;
-						leg.setRoute( route ) ;
-
-						return def ;
-					}
-
-					@Override public StageActivityTypes getStageActivityTypes(){
-						return abc ;
-					}
-				} );
-			}
-		} ) ;
+//		controler.addOverridingModule( new AbstractModule(){
+//			@Override
+//			public void install(){
+//				this.addRoutingModuleBinding( strangeMode ).toInstance( new RoutingModule(){
+//					@Override public List<? extends PlanElement> calcRoute( Facility fromFacility, Facility toFacility, double departureTime, Person person ){
+//						List<PlanElement> def = new ArrayList<>() ;
+//						Leg leg = pf.createLeg( strangeMode ) ;
+//						def.add( leg ) ;
+//
+//						Route route = pf.getRouteFactories().createRoute( GenericRouteImpl.class, fromFacility.getLinkId(), toFacility.getLinkId() ) ;
+//						leg.setRoute( route ) ;
+//
+//						return def ;
+//					}
+//
+//					@Override public StageActivityTypes getStageActivityTypes(){
+//						return abc ;
+//					}
+//				} );
+//			}
+//		} ) ;
 
 		// ---
 
