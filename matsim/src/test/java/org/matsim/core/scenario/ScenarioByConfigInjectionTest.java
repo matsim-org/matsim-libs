@@ -14,7 +14,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 /**
@@ -197,17 +196,4 @@ public class ScenarioByConfigInjectionTest {
 		return config;
 	}
 
-	private static class StupidClass {}
-
-	private static class StupidClassConverter implements AttributeConverter<StupidClass> {
-		@Override
-		public StupidClass convert(String value) {
-			return new StupidClass();
-		}
-
-		@Override
-		public String convertToString(Object o) {
-			return "just some stupid instance";
-		}
-	}
 }
