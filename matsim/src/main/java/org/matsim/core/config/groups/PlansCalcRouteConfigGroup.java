@@ -215,11 +215,11 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		super(GROUP_NAME);
 
 		acceptModeParamsWithoutClearing = true;
-		{
-			final ModeRoutingParams bike = new ModeRoutingParams( TransportMode.bike );
-			bike.setTeleportedModeSpeed( 15.0 / 3.6 ); // 15.0 km/h --> m/s
-			addParameterSet( bike );
-		}
+//		{
+//			final ModeRoutingParams bike = new ModeRoutingParams( TransportMode.bike );
+//			bike.setTeleportedModeSpeed( 15.0 / 3.6 ); // 15.0 km/h --> m/s
+//			addParameterSet( bike );
+//		}
 
 		{
 			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.walk );
@@ -247,23 +247,23 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		// for any modes, and the simulation would teleport all those modes it does not know anything about.
 		// With the travel times and travel distances given by the mode.  In practice, it seems that people can live better
 		// with the concept that mobsim figures it out by itself.  Although it is a much less flexible design.  kai, jun'2012
-		{
-			final ModeRoutingParams undefined = new ModeRoutingParams( UNDEFINED );
-			undefined.setTeleportedModeSpeed( 50. / 3.6 ); // 50.0 km/h --> m/s
-			addParameterSet( undefined );
-		}
+//		{
+//			final ModeRoutingParams undefined = new ModeRoutingParams( UNDEFINED );
+//			undefined.setTeleportedModeSpeed( 50. / 3.6 ); // 50.0 km/h --> m/s
+//			addParameterSet( undefined );
+//		}
 
-		{
-			final ModeRoutingParams ride = new ModeRoutingParams( TransportMode.ride );
-			ride.setTeleportedModeFreespeedFactor(1.0);
-			addParameterSet( ride );
-		}
+//		{
+//			final ModeRoutingParams ride = new ModeRoutingParams( TransportMode.ride );
+//			ride.setTeleportedModeFreespeedFactor(1.0);
+//			addParameterSet( ride );
+//		}
 
-		{
-			final ModeRoutingParams pt = new ModeRoutingParams( TransportMode.pt );
-			pt.setTeleportedModeFreespeedFactor( 2.0 );
-			addParameterSet( pt );
-		}
+//		{
+//			final ModeRoutingParams pt = new ModeRoutingParams( TransportMode.pt );
+//			pt.setTeleportedModeFreespeedFactor( 2.0 );
+//			addParameterSet( pt );
+//		}
 
 		//		{
 //			final ModeRoutingParams transit_walk = new ModeRoutingParams( TransportMode.transit_walk ) ;
