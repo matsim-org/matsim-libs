@@ -19,19 +19,21 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package org.matsim.codeexamples.network.createNetworkExample;
+package org.matsim.codeexamples.network;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.NetworkWriter;
-import org.matsim.core.scenario.ScenarioUtils;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * @author tthunig
@@ -47,21 +49,20 @@ public class RunCreateNetworkExample {
 	private static final long LINK_LENGTH = 200; // [m]
 
 	// travel time for the middle link
-	private static final double LINK_TT_MID = 1 * 60;
+	private static final double LINK_TT_MID = 60;
 	// travel time for the middle route links
-	private static final double LINK_TT_SMALL = 1 * 60; // [s]
+	private static final double LINK_TT_SMALL = 60; // [s]
 	// travel time for the two remaining outer route links (choose at least
 	// 3*LINK_TT_SMALL!)
 	private static final double LINK_TT_BIG = 10 * 60; // [s]
 	// travel time for links that all agents have to use
 	private static final double MINIMAL_LINK_TT = 1; // [s]
 
-	
-	public static void main(String[] args) {
 
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		Network net = scenario.getNetwork();
+	public static void main(String[] args) throws IOException {
+
+		// create an empty network
+		Network net = NetworkUtils.createNetwork();
 		NetworkFactory fac = net.getFactory();
 
 		// create nodes
@@ -106,8 +107,11 @@ public class RunCreateNetworkExample {
 		setLinkAttributes(l, CAP_FIRST_LAST, LINK_LENGTH, MINIMAL_LINK_TT);
 		net.addLink(l);
 
+		// create output folder if necessary
+		Path outputFolder = Files.createDirectories(Paths.get("output"));
+
 		// write network
-		new NetworkWriter(net).write("output/network.xml");
+		new NetworkWriter(net).write(outputFolder.resolve("network.xml").toString());
 	}
 
 	
