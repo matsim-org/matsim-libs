@@ -94,7 +94,8 @@ public class DriveDischargingHandler
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		EVDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime());
+//		EVDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime());
+		EVDrive evDrive = evDrives.get(event.getVehicleId());
 		if (evDrive != null) {
 			evDrives.remove(evDrive.vehicleId);
 		}
