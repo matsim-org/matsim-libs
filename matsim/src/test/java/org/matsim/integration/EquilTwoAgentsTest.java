@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -38,6 +39,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -60,12 +62,12 @@ import static org.matsim.testcases.MatsimTestUtils.EPSILON;
  * to check the calculation of scores and traveltimes in the framework.
  * The scores and traveltimes calculated by MATSim are compared
  * with values analytically computed by hand.
- * 
+ *
  * Note: This used to be a "white box" test, where intermediate results were pulled
  * from the scoring function. However, this is an undefined state of the scoring
  * function -- the contract says you have to call finish on the scoring function
  * before it delivers a meaningful result. -- michaz 2012
- * 
+ *
  * @author dgrether
  */
 public class EquilTwoAgentsTest {
@@ -93,17 +95,26 @@ public class EquilTwoAgentsTest {
 		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		ConfigUtils.loadConfig(config, IOUtils.newUrl(utils.classInputResourcePath(), "config.xml"));
 		config.plans().setInputFile(IOUtils.newUrl(utils.classInputResourcePath(), "plans2.xml").toString());
+		// !! note that the above mostly (entirely?) uses inputs from the resource path!  kai, apr'19
 
 		PlanCalcScoreConfigGroup pcsConfig = config.planCalcScore() ;
 		ActivityParams params = new ActivityParams("h") ;
-        params.setTypicalDuration(123456789.0) ; // probably dummy
+//		params.setTypicalDuration(123456789.0) ; // probably dummy
 		params.setScoringThisActivityAtAll(false);
 		pcsConfig.addActivityParams(params) ;
-		
+		// (The above will effectively disable the scoring of the "h" activity.  No explanation was/is given why this is done here.  kai, apr'19)
+
+		{
+			final PlansCalcRouteConfigGroup.ModeRoutingParams pt = new PlansCalcRouteConfigGroup.ModeRoutingParams( TransportMode.pt );
+			pt.setTeleportedModeFreespeedFactor( 2.0 );
+			config.plansCalcRoute().addModeRoutingParams( pt ) ;
+		}
+
+
 		final Controler controler = new Controler(config);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
-        controler.getConfig().controler().setWriteEventsInterval(0);
+		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
