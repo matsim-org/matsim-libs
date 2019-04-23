@@ -44,7 +44,7 @@ public final class HexagonalGrid<T> extends Grid<T> {
 
     @Override
     double getCentroidDistanceY() {
-        return horizontalCentroidDistance * 0.75;
+        return horizontalCentroidDistance * 0.8660254;  // sin(30deg)
     }
 
     @Override
