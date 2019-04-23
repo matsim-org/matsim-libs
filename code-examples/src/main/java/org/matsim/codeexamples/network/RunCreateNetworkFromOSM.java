@@ -28,8 +28,8 @@ import java.util.Collection;
 public class RunCreateNetworkFromOSM {
 
 	private static String UTM32nAsEpsg = "EPSG:25832";
-	private static Path input = Paths.get("C:\\Users\\Janek\\Downloads\\thueringen-latest.osm\\thueringen-latest.osm");
-	private static Path filterShape = Paths.get("C:\\Users\\Janek\\Desktop\\erfurt.shp");
+	private static Path input = Paths.get("/path/to/your/input/data.osm");
+	private static Path filterShape = Paths.get("/path/to/your/filter/shape-file.shp");
 
 	public static void main(String[] args) {
 		new RunCreateNetworkFromOSM().create();
@@ -57,7 +57,7 @@ public class RunCreateNetworkFromOSM {
 		new NetworkCleaner().run(network);
 
 		// write out the network into a file
-		new NetworkWriter(network).write("C:\\Users\\Janek\\Desktop\\network-test.xml");
+		new NetworkWriter(network).write("/path/to/your/output/network.xml.gz");
 	}
 
 	/**
