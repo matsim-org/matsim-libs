@@ -232,7 +232,16 @@ public final class TripRouter implements MatsimExtensionPoint {
 			return trip;
 		}
 
-		throw new UnknownModeException( "unregistered main mode |"+mainMode+"|: does not pertain to "+routingModules.keySet() );
+		throw new UnknownModeException( "unregistered main mode |"+mainMode+"|: does not pertain to "+routingModules.keySet() + "." + System.lineSeparator() +
+								    "If this worked before: The default teleportation routers were removed in apr'19.  In any case, you will " +
+								    "need in your config something like:" + System.lineSeparator() +
+								    "<module name=\"planscalcroute\" >" + System.lineSeparator() +
+								    "   <parameterset type=\"teleportedModeParameters\" >" + System.lineSeparator() +
+								    "      <param name=\"mode\" value=\"<mode>\" />" + System.lineSeparator() +
+								    "      <param name=\"teleportedModeSpeed\" value=\"<speed in m/s>\" />" + System.lineSeparator() +
+								    "   </parameterset>" + System.lineSeparator() +
+								    "   ..."
+		);
 	}
 
 	public static class UnknownModeException extends RuntimeException {
