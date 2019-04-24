@@ -39,7 +39,9 @@ public class QuadTreeRebuilder<T> {
 	private double maxY = Double.NEGATIVE_INFINITY;
 
 	private final List< Tuple<Coord, T> > elements = new ArrayList< Tuple<Coord, T> >();
-	private QuadTree<T> quadTree = null;
+	// initialize with empty QuadTree centered around 0, 0
+	// the re-build algorithm assumes there is at least on element
+	private QuadTree<T> quadTree = new QuadTree<>(-EPSILON, -EPSILON, EPSILON, EPSILON);
 
 	public synchronized QuadTree<T> getQuadTree() {
 		if ( quadTree == null ) buildQuadTree();
@@ -49,6 +51,7 @@ public class QuadTreeRebuilder<T> {
 	private void buildQuadTree() {
 		assert minX <= maxX : minX +" > "+maxX;
 		assert minY <= maxY : minY +" > "+maxY;
+
 		this.quadTree = new QuadTree<T>(
 				minX - EPSILON ,
 				minY - EPSILON ,

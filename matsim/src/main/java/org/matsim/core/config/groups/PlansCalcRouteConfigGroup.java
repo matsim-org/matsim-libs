@@ -298,18 +298,34 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 	}
 
+	public void clearModeRoutingParams() {
+		clearParameterSetsForType( ModeRoutingParams.SET_TYPE ) ;
+	}
+
 	@Override
 	public void addParameterSet(final ConfigGroup set) {
-		if ( set.getName().equals( ModeRoutingParams.SET_TYPE ) && !this.acceptModeParamsWithoutClearing ) {
-			clearParameterSetsForType( set.getName() );
-			this.acceptModeParamsWithoutClearing = true;
-			
-		}
-		ModeRoutingParams pars = (ModeRoutingParams) set ;
-		// for the time being pushing the "global" factor into the local ones if they are not initialized by
-		// themselves.  Necessary for some tests; maybe we should eventually disable them.  kai, feb'15
-		if ( pars.getBeelineDistanceFactor()== null ) {
-			pars.setBeelineDistanceFactor( this.beelineDistanceFactor );
+		if ( set.getName().equals( ModeRoutingParams.SET_TYPE ) ){
+			if( !this.acceptModeParamsWithoutClearing ){
+				//			clearParameterSetsForType( set.getName() );
+				log.warn( "It used to be the case that manually setting one mode routing here would first clear all the default values.  I have now removed " +
+						    "this clearing, i.e. default values will remain.  If they are in the way, removeModeRoutingParams(...) can be used to " +
+						    "individually remove them.  kai, apr'19" );
+				this.acceptModeParamsWithoutClearing = true;
+			}
+			ModeRoutingParams pars = (ModeRoutingParams) set;
+
+			ModeRoutingParams result = this.getModeRoutingParams().get( pars.getMode() );
+			if ( result != null ) {
+				log.info("Replacing mode routing params for mode=" + pars.getMode() + "." ) ;
+				// above warning can be converted to info in about 2 years.  kai, apr'19
+				this.removeModeRoutingParams( pars.getMode() );
+			}
+
+			// for the time being pushing the "global" factor into the local ones if they are not initialized by
+			// themselves.  Necessary for some tests; maybe we should eventually disable them.  kai, feb'15
+			if( pars.getBeelineDistanceFactor() == null ){
+				pars.setBeelineDistanceFactor( this.beelineDistanceFactor );
+			}
 		}
 		super.addParameterSet( set );
 	}
@@ -470,7 +486,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		return map ;
 	}
 	
-	@Deprecated // use mode-specific factors.  kai, apr'15
+//	@Deprecated // use mode-specific factors.  kai, apr'15
 	public void setTeleportedModeFreespeedFactor(String mode, double freespeedFactor) {
 		testForLocked() ;
 		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
@@ -479,7 +495,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		addParameterSet( pars );
 	}
 
-	@Deprecated // use mode-specific factors.  kai, apr'15
+//	@Deprecated // use mode-specific factors.  kai, apr'15
 	public void setTeleportedModeSpeed(String mode, double speed) {
 		testForLocked() ;
 		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
