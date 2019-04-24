@@ -62,7 +62,6 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	public final int positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
 			final Link link, int cnt2, final Queue<QVehicle> waitingList) {
 		for (QVehicle veh : waitingList) {
-			log.warn("120") ;
 			Collection<Identifiable<?>> peopleInVehicle = VisUtils.getPeopleInVehicle(veh);
 			boolean first = true;
 			for (Identifiable passenger : peopleInVehicle) {
@@ -78,7 +77,6 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 				}
 				final Person person = scenario.getPopulation().getPersons().get( passenger.getId() );
 				if ( person != null && person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ) {
-					log.warn("130") ;
 					passengerPosition.setAgentState( AgentState.PERSON_OTHER_MODE );
 				}
 				positions.add(passengerPosition);

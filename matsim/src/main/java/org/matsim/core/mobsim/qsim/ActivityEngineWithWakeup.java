@@ -51,7 +51,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 
 	@Inject
 	ActivityEngineWithWakeup( EventsManager eventsManager, PreplanningEngine preplanningEngine ) {
-		this.delegate = new DefaultActivityEngine(eventsManager);
+		this.delegate = new ActivityEngineDefaultImpl(eventsManager);
 		this.eventsManager = eventsManager;
 		this.preplanningEngine = preplanningEngine ;
 	}
