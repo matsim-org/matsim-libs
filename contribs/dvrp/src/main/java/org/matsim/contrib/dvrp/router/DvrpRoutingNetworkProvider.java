@@ -24,8 +24,10 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 
 /**
@@ -51,6 +53,7 @@ public class DvrpRoutingNetworkProvider implements Provider<Network> {
 
 		Network dvrpNetwork = NetworkUtils.createNetwork();
 		new TransportModeNetworkFilter(network).filter(dvrpNetwork, Collections.singleton(dvrpCfg.getNetworkMode()));
+		(new NetworkCleaner()).run(dvrpNetwork);
 		return dvrpNetwork;
 	}
 }

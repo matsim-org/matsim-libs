@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.drt.passenger;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -35,6 +36,7 @@ import org.matsim.core.mobsim.framework.PlanAgent;
  * @author michalm
  */
 public class DrtRequestCreator implements PassengerRequestCreator {
+	private static final Logger log = Logger.getLogger(DrtRequestCreator.class);
 	private final String mode;
 	private final EventsManager eventsManager;
 	private final MobsimTimer timer;
@@ -55,6 +57,17 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		double latestDepartureTime = departureTime + drtRoute.getMaxWaitTime();
 		double latestArrivalTime = departureTime + drtRoute.getTravelTime();
 
+		log.debug("");
+		log.debug(timer.getTimeOfDay() + " ");
+		log.debug(mode + " ");
+		log.debug(id + " ");
+		log.debug(passenger.getId() + " ");
+		log.debug(fromLink.getId() + " ");
+		log.debug(toLink.getId() + " ");
+		log.debug(drtRoute.getDirectRideTime() + " ");
+		log.debug(drtRoute.getDistance() + " ");
+		log.debug("");
+		
 		eventsManager.processEvent(
 				new DrtRequestSubmittedEvent(timer.getTimeOfDay(), mode, id, passenger.getId(), fromLink.getId(),
 						toLink.getId(), drtRoute.getDirectRideTime(), drtRoute.getDistance()));
