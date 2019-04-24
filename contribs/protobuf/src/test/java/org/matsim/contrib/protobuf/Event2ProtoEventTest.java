@@ -45,21 +45,7 @@ public class Event2ProtoEventTest {
 		ActivityEndEvent e = new ActivityEndEvent(42.0, Id.createPersonId("Alice"),
 				Id.createLinkId("link123"), Id.create(55, ActivityFacility.class), "sleep");
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
-		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.ActivityEnd);
-		Assert.assertTrue(pbe.hasActStart() == false);
-		Assert.assertTrue(pbe.hasActEnd() == true);
-		Assert.assertTrue(pbe.hasLinkEnter() == false);
-		Assert.assertTrue(pbe.hasLinkLeave() == false);
-		Assert.assertTrue(pbe.hasPersonArrival() == false);
-		Assert.assertTrue(pbe.hasPersonDeparture() == false);
-		Assert.assertTrue(pbe.hasPersonEntersVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonLeavesVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonMoney() == false);
-		Assert.assertTrue(pbe.hasPersonStuck() == false);
-		Assert.assertTrue(pbe.hasTransitDriverStarts() == false);
-		Assert.assertTrue(pbe.hasVehicleAborts() == false);
-		Assert.assertTrue(pbe.hasVehicleEntersTraffic() == false);
-		Assert.assertTrue(pbe.hasVehicleLeavesTraffic() == false);
+		Assert.assertEquals(ProtobufEvents.Event.EventTypeCase.ACTEND, pbe.getEventTypeCase());
 
 		Assert.assertEquals(42.0,pbe.getActEnd().getTime(),0.);
 		Assert.assertEquals("Alice",pbe.getActEnd().getPersId().getId());
@@ -74,21 +60,7 @@ public class Event2ProtoEventTest {
 		ActivityStartEvent e = new ActivityStartEvent(42.0, Id.createPersonId("Bob"),
 				Id.createLinkId("link123"), Id.create(55, ActivityFacility.class), "sleep");
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
-		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.ActivityStart);
-		Assert.assertTrue(pbe.hasActStart() == true);
-		Assert.assertTrue(pbe.hasActEnd() == false);
-		Assert.assertTrue(pbe.hasLinkEnter() == false);
-		Assert.assertTrue(pbe.hasLinkLeave() == false);
-		Assert.assertTrue(pbe.hasPersonArrival() == false);
-		Assert.assertTrue(pbe.hasPersonDeparture() == false);
-		Assert.assertTrue(pbe.hasPersonEntersVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonLeavesVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonMoney() == false);
-		Assert.assertTrue(pbe.hasPersonStuck() == false);
-		Assert.assertTrue(pbe.hasTransitDriverStarts() == false);
-		Assert.assertTrue(pbe.hasVehicleAborts() == false);
-		Assert.assertTrue(pbe.hasVehicleEntersTraffic() == false);
-		Assert.assertTrue(pbe.hasVehicleLeavesTraffic() == false);
+		Assert.assertEquals(ProtobufEvents.Event.EventTypeCase.ACTSTART, pbe.getEventTypeCase());
 
 		Assert.assertEquals(42.0,pbe.getActStart().getTime(),0.);
 		Assert.assertEquals("Bob",pbe.getActStart().getPersId().getId());
@@ -102,21 +74,7 @@ public class Event2ProtoEventTest {
 
 		LinkEnterEvent e = new LinkEnterEvent(42.0,Id.createVehicleId("K.I.T.T."),Id.createLinkId("link123"));
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
-		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.LinkEnter);
-		Assert.assertTrue(pbe.hasActStart() == false);
-		Assert.assertTrue(pbe.hasActEnd() == false);
-		Assert.assertTrue(pbe.hasLinkEnter() == true);
-		Assert.assertTrue(pbe.hasLinkLeave() == false);
-		Assert.assertTrue(pbe.hasPersonArrival() == false);
-		Assert.assertTrue(pbe.hasPersonDeparture() == false);
-		Assert.assertTrue(pbe.hasPersonEntersVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonLeavesVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonMoney() == false);
-		Assert.assertTrue(pbe.hasPersonStuck() == false);
-		Assert.assertTrue(pbe.hasTransitDriverStarts() == false);
-		Assert.assertTrue(pbe.hasVehicleAborts() == false);
-		Assert.assertTrue(pbe.hasVehicleEntersTraffic() == false);
-		Assert.assertTrue(pbe.hasVehicleLeavesTraffic() == false);
+		Assert.assertEquals(ProtobufEvents.Event.EventTypeCase.LINKENTER, pbe.getEventTypeCase());
 
 		Assert.assertEquals(42.0,pbe.getLinkEnter().getTime(),0.);
 		Assert.assertEquals("K.I.T.T.",pbe.getLinkEnter().getVehId().getId());
@@ -128,21 +86,7 @@ public class Event2ProtoEventTest {
 
 		LinkLeaveEvent e = new LinkLeaveEvent(42.0,Id.createVehicleId("K.I.T.T."),Id.createLinkId("link123"));
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
-		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.LinkLeave);
-		Assert.assertTrue(pbe.hasActStart() == false);
-		Assert.assertTrue(pbe.hasActEnd() == false);
-		Assert.assertTrue(pbe.hasLinkEnter() == false);
-		Assert.assertTrue(pbe.hasLinkLeave() == true);
-		Assert.assertTrue(pbe.hasPersonArrival() == false);
-		Assert.assertTrue(pbe.hasPersonDeparture() == false);
-		Assert.assertTrue(pbe.hasPersonEntersVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonLeavesVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonMoney() == false);
-		Assert.assertTrue(pbe.hasPersonStuck() == false);
-		Assert.assertTrue(pbe.hasTransitDriverStarts() == false);
-		Assert.assertTrue(pbe.hasVehicleAborts() == false);
-		Assert.assertTrue(pbe.hasVehicleEntersTraffic() == false);
-		Assert.assertTrue(pbe.hasVehicleLeavesTraffic() == false);
+		Assert.assertEquals(ProtobufEvents.Event.EventTypeCase.LINKLEAVE, pbe.getEventTypeCase());
 
 		Assert.assertEquals(42.0,pbe.getLinkLeave().getTime(),0.);
 		Assert.assertEquals("K.I.T.T.",pbe.getLinkLeave().getVehId().getId());
@@ -154,21 +98,7 @@ public class Event2ProtoEventTest {
 
 		PersonArrivalEvent e = new PersonArrivalEvent(42.0,Id.createPersonId("Alice"),Id.createLinkId("link123"),"swim");
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
-		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.PersonArrival);
-		Assert.assertTrue(pbe.hasActStart() == false);
-		Assert.assertTrue(pbe.hasActEnd() == false);
-		Assert.assertTrue(pbe.hasLinkEnter() == false);
-		Assert.assertTrue(pbe.hasLinkLeave() == false);
-		Assert.assertTrue(pbe.hasPersonArrival() == true);
-		Assert.assertTrue(pbe.hasPersonDeparture() == false);
-		Assert.assertTrue(pbe.hasPersonEntersVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonLeavesVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonMoney() == false);
-		Assert.assertTrue(pbe.hasPersonStuck() == false);
-		Assert.assertTrue(pbe.hasTransitDriverStarts() == false);
-		Assert.assertTrue(pbe.hasVehicleAborts() == false);
-		Assert.assertTrue(pbe.hasVehicleEntersTraffic() == false);
-		Assert.assertTrue(pbe.hasVehicleLeavesTraffic() == false);
+		Assert.assertEquals(ProtobufEvents.Event.EventTypeCase.PERSONARRIVAL, pbe.getEventTypeCase());
 
 		Assert.assertEquals(42.0,pbe.getPersonArrival().getTime(),0.);
 		Assert.assertEquals("Alice",pbe.getPersonArrival().getPersId().getId());
@@ -180,21 +110,7 @@ public class Event2ProtoEventTest {
 
 		PersonDepartureEvent e = new PersonDepartureEvent(42.0,Id.createPersonId("Bob"),Id.createLinkId("link123"),"swim");
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
-		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.PersonDeparture);
-		Assert.assertTrue(pbe.hasActStart() == false);
-		Assert.assertTrue(pbe.hasActEnd() == false);
-		Assert.assertTrue(pbe.hasLinkEnter() == false);
-		Assert.assertTrue(pbe.hasLinkLeave() == false);
-		Assert.assertTrue(pbe.hasPersonArrival() == false);
-		Assert.assertTrue(pbe.hasPersonDeparture() == true);
-		Assert.assertTrue(pbe.hasPersonEntersVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonLeavesVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonMoney() == false);
-		Assert.assertTrue(pbe.hasPersonStuck() == false);
-		Assert.assertTrue(pbe.hasTransitDriverStarts() == false);
-		Assert.assertTrue(pbe.hasVehicleAborts() == false);
-		Assert.assertTrue(pbe.hasVehicleEntersTraffic() == false);
-		Assert.assertTrue(pbe.hasVehicleLeavesTraffic() == false);
+		Assert.assertEquals(ProtobufEvents.Event.EventTypeCase.PERSONDEPARTURE, pbe.getEventTypeCase());
 
 		Assert.assertEquals(42.0,pbe.getPersonDeparture().getTime(),0.);
 		Assert.assertEquals("Bob",pbe.getPersonDeparture().getPersId().getId());
@@ -206,21 +122,7 @@ public class Event2ProtoEventTest {
 
 		PersonEntersVehicleEvent e = new PersonEntersVehicleEvent(42.,Id.createPersonId("Alice"),Id.createVehicleId("K.I.T.T."));
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
-		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.PersonEntersVehicle);
-		Assert.assertTrue(pbe.hasActStart() == false);
-		Assert.assertTrue(pbe.hasActEnd() == false);
-		Assert.assertTrue(pbe.hasLinkEnter() == false);
-		Assert.assertTrue(pbe.hasLinkLeave() == false);
-		Assert.assertTrue(pbe.hasPersonArrival() == false);
-		Assert.assertTrue(pbe.hasPersonDeparture() == false);
-		Assert.assertTrue(pbe.hasPersonEntersVehicle() == true);
-		Assert.assertTrue(pbe.hasPersonLeavesVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonMoney() == false);
-		Assert.assertTrue(pbe.hasPersonStuck() == false);
-		Assert.assertTrue(pbe.hasTransitDriverStarts() == false);
-		Assert.assertTrue(pbe.hasVehicleAborts() == false);
-		Assert.assertTrue(pbe.hasVehicleEntersTraffic() == false);
-		Assert.assertTrue(pbe.hasVehicleLeavesTraffic() == false);
+		Assert.assertEquals(ProtobufEvents.Event.EventTypeCase.PERSONENTERSVEHICLE, pbe.getEventTypeCase());
 
 		Assert.assertEquals(42.0,pbe.getPersonEntersVehicle().getTime(),0.);
 		Assert.assertEquals("Alice",pbe.getPersonEntersVehicle().getPersId().getId());
@@ -232,21 +134,7 @@ public class Event2ProtoEventTest {
 
 		PersonLeavesVehicleEvent e = new PersonLeavesVehicleEvent(42.,Id.createPersonId("Alice"),Id.createVehicleId("K.I.T.T."));
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
-		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.PersonLeavesVehicle);
-		Assert.assertTrue(pbe.hasActStart() == false);
-		Assert.assertTrue(pbe.hasActEnd() == false);
-		Assert.assertTrue(pbe.hasLinkEnter() == false);
-		Assert.assertTrue(pbe.hasLinkLeave() == false);
-		Assert.assertTrue(pbe.hasPersonArrival() == false);
-		Assert.assertTrue(pbe.hasPersonDeparture() == false);
-		Assert.assertTrue(pbe.hasPersonEntersVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonLeavesVehicle() == true);
-		Assert.assertTrue(pbe.hasPersonMoney() == false);
-		Assert.assertTrue(pbe.hasPersonStuck() == false);
-		Assert.assertTrue(pbe.hasTransitDriverStarts() == false);
-		Assert.assertTrue(pbe.hasVehicleAborts() == false);
-		Assert.assertTrue(pbe.hasVehicleEntersTraffic() == false);
-		Assert.assertTrue(pbe.hasVehicleLeavesTraffic() == false);
+		Assert.assertEquals(ProtobufEvents.Event.EventTypeCase.PERSONLEAVESVEHICLE, pbe.getEventTypeCase());
 
 		Assert.assertEquals(42.0,pbe.getPersonLeavesVehicle().getTime(),0.);
 		Assert.assertEquals("Alice",pbe.getPersonLeavesVehicle().getPersId().getId());
@@ -258,21 +146,7 @@ public class Event2ProtoEventTest {
 
 		PersonMoneyEvent e = new PersonMoneyEvent(42.0,Id.createPersonId("Bob"),-123.45);
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
-		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.PersonMoney);
-		Assert.assertTrue(pbe.hasActStart() == false);
-		Assert.assertTrue(pbe.hasActEnd() == false);
-		Assert.assertTrue(pbe.hasLinkEnter() == false);
-		Assert.assertTrue(pbe.hasLinkLeave() == false);
-		Assert.assertTrue(pbe.hasPersonArrival() == false);
-		Assert.assertTrue(pbe.hasPersonDeparture() == false);
-		Assert.assertTrue(pbe.hasPersonEntersVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonLeavesVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonMoney() == true);
-		Assert.assertTrue(pbe.hasPersonStuck() == false);
-		Assert.assertTrue(pbe.hasTransitDriverStarts() == false);
-		Assert.assertTrue(pbe.hasVehicleAborts() == false);
-		Assert.assertTrue(pbe.hasVehicleEntersTraffic() == false);
-		Assert.assertTrue(pbe.hasVehicleLeavesTraffic() == false);
+		Assert.assertEquals(ProtobufEvents.Event.EventTypeCase.PERSONMONEY, pbe.getEventTypeCase());
 
 		Assert.assertEquals(42.0,pbe.getPersonMoney().getTime(),0.);
 		Assert.assertEquals("Bob",pbe.getPersonMoney().getPersId().getId());
@@ -284,21 +158,7 @@ public class Event2ProtoEventTest {
 
 		PersonStuckEvent e = new PersonStuckEvent(42.0,Id.createPersonId("Alice"), Id.createLinkId("link123"),"fly");
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
-		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.PersonStuck);
-		Assert.assertTrue(pbe.hasActStart() == false);
-		Assert.assertTrue(pbe.hasActEnd() == false);
-		Assert.assertTrue(pbe.hasLinkEnter() == false);
-		Assert.assertTrue(pbe.hasLinkLeave() == false);
-		Assert.assertTrue(pbe.hasPersonArrival() == false);
-		Assert.assertTrue(pbe.hasPersonDeparture() == false);
-		Assert.assertTrue(pbe.hasPersonEntersVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonLeavesVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonMoney() == false);
-		Assert.assertTrue(pbe.hasPersonStuck() == true);
-		Assert.assertTrue(pbe.hasTransitDriverStarts() == false);
-		Assert.assertTrue(pbe.hasVehicleAborts() == false);
-		Assert.assertTrue(pbe.hasVehicleEntersTraffic() == false);
-		Assert.assertTrue(pbe.hasVehicleLeavesTraffic() == false);
+		Assert.assertEquals(ProtobufEvents.Event.EventTypeCase.PERSONSTUCK, pbe.getEventTypeCase());
 
 		Assert.assertEquals(42.0,pbe.getPersonStuck().getTime(),0.);
 		Assert.assertEquals("Alice",pbe.getPersonStuck().getPersId().getId());
@@ -312,21 +172,7 @@ public class Event2ProtoEventTest {
 		TransitDriverStartsEvent e = new TransitDriverStartsEvent(42.0,Id.createPersonId("Bob"),Id.createVehicleId("K.I.T.T."),
 				Id.create("l11", TransitLine.class),Id.create("r11", TransitRoute.class),Id.create("d11", Departure.class));
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
-		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.TransitDriverStarts);
-		Assert.assertTrue(pbe.hasActStart() == false);
-		Assert.assertTrue(pbe.hasActEnd() == false);
-		Assert.assertTrue(pbe.hasLinkEnter() == false);
-		Assert.assertTrue(pbe.hasLinkLeave() == false);
-		Assert.assertTrue(pbe.hasPersonArrival() == false);
-		Assert.assertTrue(pbe.hasPersonDeparture() == false);
-		Assert.assertTrue(pbe.hasPersonEntersVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonLeavesVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonMoney() == false);
-		Assert.assertTrue(pbe.hasPersonStuck() == false);
-		Assert.assertTrue(pbe.hasTransitDriverStarts() == true);
-		Assert.assertTrue(pbe.hasVehicleAborts() == false);
-		Assert.assertTrue(pbe.hasVehicleEntersTraffic() == false);
-		Assert.assertTrue(pbe.hasVehicleLeavesTraffic() == false);
+		Assert.assertEquals(ProtobufEvents.Event.EventTypeCase.TRANSITDRIVERSTARTS, pbe.getEventTypeCase());
 
 		Assert.assertEquals(42.0,pbe.getTransitDriverStarts().getTime(),0.);
 		Assert.assertEquals("Bob",pbe.getTransitDriverStarts().getDriverId().getId());
@@ -341,21 +187,7 @@ public class Event2ProtoEventTest {
 
 		VehicleAbortsEvent e = new VehicleAbortsEvent(42.0,Id.createVehicleId("K.I.T.T."),Id.createLinkId("link123"));
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
-		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.VehicleAborts);
-		Assert.assertTrue(pbe.hasActStart() == false);
-		Assert.assertTrue(pbe.hasActEnd() == false);
-		Assert.assertTrue(pbe.hasLinkEnter() == false);
-		Assert.assertTrue(pbe.hasLinkLeave() == false);
-		Assert.assertTrue(pbe.hasPersonArrival() == false);
-		Assert.assertTrue(pbe.hasPersonDeparture() == false);
-		Assert.assertTrue(pbe.hasPersonEntersVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonLeavesVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonMoney() == false);
-		Assert.assertTrue(pbe.hasPersonStuck() == false);
-		Assert.assertTrue(pbe.hasTransitDriverStarts() == false);
-		Assert.assertTrue(pbe.hasVehicleAborts() == true);
-		Assert.assertTrue(pbe.hasVehicleEntersTraffic() == false);
-		Assert.assertTrue(pbe.hasVehicleLeavesTraffic() == false);
+		Assert.assertEquals(ProtobufEvents.Event.EventTypeCase.VEHICLEABORTS, pbe.getEventTypeCase());
 
 		Assert.assertEquals(42.0,pbe.getVehicleAborts().getTime(),0.);
 		Assert.assertEquals("K.I.T.T.",pbe.getVehicleAborts().getVehId().getId());
@@ -369,21 +201,7 @@ public class Event2ProtoEventTest {
 		VehicleEntersTrafficEvent e = new VehicleEntersTrafficEvent(42.0,Id.createPersonId("Alice"),Id.createLinkId("link123"),
 				Id.createVehicleId("K.I.T.T."),"super pursuit",111.0);
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
-		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.VehicleEntersTraffic);
-		Assert.assertTrue(pbe.hasActStart() == false);
-		Assert.assertTrue(pbe.hasActEnd() == false);
-		Assert.assertTrue(pbe.hasLinkEnter() == false);
-		Assert.assertTrue(pbe.hasLinkLeave() == false);
-		Assert.assertTrue(pbe.hasPersonArrival() == false);
-		Assert.assertTrue(pbe.hasPersonDeparture() == false);
-		Assert.assertTrue(pbe.hasPersonEntersVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonLeavesVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonMoney() == false);
-		Assert.assertTrue(pbe.hasPersonStuck() == false);
-		Assert.assertTrue(pbe.hasTransitDriverStarts() == false);
-		Assert.assertTrue(pbe.hasVehicleAborts() == false);
-		Assert.assertTrue(pbe.hasVehicleEntersTraffic() == true);
-		Assert.assertTrue(pbe.hasVehicleLeavesTraffic() == false);
+		Assert.assertEquals(ProtobufEvents.Event.EventTypeCase.VEHICLEENTERSTRAFFIC, pbe.getEventTypeCase());
 
 		Assert.assertEquals(42.0,pbe.getVehicleEntersTraffic().getTime(),0.);
 		Assert.assertEquals("Alice",pbe.getVehicleEntersTraffic().getDriverId().getId());
@@ -400,21 +218,7 @@ public class Event2ProtoEventTest {
 		VehicleLeavesTrafficEvent e = new VehicleLeavesTrafficEvent(42.0,Id.createPersonId("Alice"),Id.createLinkId("link123"),
 				Id.createVehicleId("K.I.T.T."),"super pursuit",111.0);
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
-		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.VehicleLeavesTraffic);
-		Assert.assertTrue(pbe.hasActStart() == false);
-		Assert.assertTrue(pbe.hasActEnd() == false);
-		Assert.assertTrue(pbe.hasLinkEnter() == false);
-		Assert.assertTrue(pbe.hasLinkLeave() == false);
-		Assert.assertTrue(pbe.hasPersonArrival() == false);
-		Assert.assertTrue(pbe.hasPersonDeparture() == false);
-		Assert.assertTrue(pbe.hasPersonEntersVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonLeavesVehicle() == false);
-		Assert.assertTrue(pbe.hasPersonMoney() == false);
-		Assert.assertTrue(pbe.hasPersonStuck() == false);
-		Assert.assertTrue(pbe.hasTransitDriverStarts() == false);
-		Assert.assertTrue(pbe.hasVehicleAborts() == false);
-		Assert.assertTrue(pbe.hasVehicleEntersTraffic() == false);
-		Assert.assertTrue(pbe.hasVehicleLeavesTraffic() == true);
+		Assert.assertEquals(ProtobufEvents.Event.EventTypeCase.VEHICLELEAVESTRAFFIC, pbe.getEventTypeCase());
 
 		Assert.assertEquals(42.0,pbe.getVehicleLeavesTraffic().getTime(),0.);
 		Assert.assertEquals("Alice",pbe.getVehicleLeavesTraffic().getDriverId().getId());

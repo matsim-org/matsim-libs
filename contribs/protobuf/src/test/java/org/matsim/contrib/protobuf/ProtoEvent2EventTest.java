@@ -38,7 +38,7 @@ public class ProtoEvent2EventTest {
 		ProtobufEvents.LinkEnterEvent.Builder le = ProtobufEvents.LinkEnterEvent.newBuilder().setTime(42.0).
 				setLinkId(ProtobufEvents.LinkId.newBuilder().setId("link123")).setVehId(ProtobufEvents.VehicleId.newBuilder().setId("K.I.T.T."));
 
-		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.LinkEnter).
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().
 				setLinkEnter(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
@@ -53,7 +53,7 @@ public class ProtoEvent2EventTest {
 		ProtobufEvents.LinkLeaveEvent.Builder le = ProtobufEvents.LinkLeaveEvent.newBuilder().setTime(42.0).
 				setLinkId(ProtobufEvents.LinkId.newBuilder().setId("link123")).setVehId(ProtobufEvents.VehicleId.newBuilder().setId("K.I.T.T."));
 
-		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.LinkLeave).
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().
 				setLinkLeave(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
@@ -68,7 +68,7 @@ public class ProtoEvent2EventTest {
 		ProtobufEvents.ActivityEndEvent.Builder le = ProtobufEvents.ActivityEndEvent.newBuilder().setTime(42.0).
 				setLinkId(ProtobufEvents.LinkId.newBuilder().setId("link123")).setPersId(ProtobufEvents.PersonId.newBuilder().setId("Bob"));
 
-		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.ActivityEnd).
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().
 				setActEnd(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
@@ -83,7 +83,7 @@ public class ProtoEvent2EventTest {
 		ProtobufEvents.ActivityStartEvent.Builder le = ProtobufEvents.ActivityStartEvent.newBuilder().setTime(42.0).
 				setLinkId(ProtobufEvents.LinkId.newBuilder().setId("link123")).setPersId(ProtobufEvents.PersonId.newBuilder().setId("Bob"));
 
-		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.ActivityStart).
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().
 				setActStart(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
@@ -99,7 +99,7 @@ public class ProtoEvent2EventTest {
 				setLinkId(ProtobufEvents.LinkId.newBuilder().setId("link123")).setPersId(ProtobufEvents.PersonId.newBuilder().
 				setId("Bob")).setLegMode("crawling");
 
-		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.PersonArrival).
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().
 				setPersonArrival(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
@@ -116,7 +116,7 @@ public class ProtoEvent2EventTest {
 				setLinkId(ProtobufEvents.LinkId.newBuilder().setId("link123")).setPersId(ProtobufEvents.PersonId.newBuilder().
 				setId("Alice")).setLegMode("crawling");
 
-		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.PersonDeparture).
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().
 				setPersonDeparture(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
@@ -132,7 +132,7 @@ public class ProtoEvent2EventTest {
 		ProtobufEvents.PersonEntersVehicleEvent.Builder le = ProtobufEvents.PersonEntersVehicleEvent.newBuilder().setTime(42.0).
 				setPersId(ProtobufEvents.PersonId.newBuilder().setId("Alice")).setVehId(ProtobufEvents.VehicleId.newBuilder().setId("K.I.T.T."));
 
-		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.PersonEntersVehicle).
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().
 				setPersonEntersVehicle(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
@@ -147,7 +147,7 @@ public class ProtoEvent2EventTest {
 		ProtobufEvents.PersonLeavesVehicleEvent.Builder le = ProtobufEvents.PersonLeavesVehicleEvent.newBuilder().setTime(42.0).
 				setPersId(ProtobufEvents.PersonId.newBuilder().setId("Alice")).setVehId(ProtobufEvents.VehicleId.newBuilder().setId("K.I.T.T."));
 
-		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.PersonLeavesVehicle).
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().
 				setPersonLeavesVehicle(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
@@ -162,7 +162,7 @@ public class ProtoEvent2EventTest {
 		ProtobufEvents.PersonMoneyEvent.Builder le = ProtobufEvents.PersonMoneyEvent.newBuilder().setTime(42.0).
 				setPersId(ProtobufEvents.PersonId.newBuilder().setId("Alice")).setAmount(-123.45);
 
-		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.PersonMoney).
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().
 				setPersonMoney(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
@@ -179,7 +179,7 @@ public class ProtoEvent2EventTest {
 				setLegMode("flying");
 
 
-		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.PersonStuck).
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().
 				setPersonStuck(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
@@ -199,7 +199,7 @@ public class ProtoEvent2EventTest {
 				setDepartureId(ProtobufEvents.DepartureId.newBuilder().setId("d11"));
 
 
-		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.TransitDriverStarts).
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().
 				setTransitDriverStarts(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
@@ -219,7 +219,7 @@ public class ProtoEvent2EventTest {
 				setLinkId(ProtobufEvents.LinkId.newBuilder().setId("link123"));
 
 
-		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.VehicleAborts).
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().
 				setVehicleAborts(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
@@ -237,7 +237,7 @@ public class ProtoEvent2EventTest {
 				setNetworkMode("super pursuit").setRelPosOnLink(3.1415);
 
 
-		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.VehicleEntersTraffic).
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().
 				setVehicleEntersTraffic(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
@@ -258,7 +258,7 @@ public class ProtoEvent2EventTest {
 				setNetworkMode("super pursuit").setRelPosOnLink(3.1415);
 
 
-		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.VehicleLeavesTraffic).
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().
 				setVehicleLeavesTraffic(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);

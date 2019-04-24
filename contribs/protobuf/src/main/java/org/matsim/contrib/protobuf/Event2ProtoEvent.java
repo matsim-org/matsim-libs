@@ -42,7 +42,7 @@ public abstract class Event2ProtoEvent {
 					.setTime(event.getTime())
 					.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((LinkLeaveEvent) event).getLinkId().toString()))
 					.setVehId(ProtobufEvents.VehicleId.newBuilder().setId(((LinkLeaveEvent) event).getVehicleId().toString()));
-			eb.setType(ProtobufEvents.Event.Type.LinkLeave).setLinkLeave(ll);
+			eb.setLinkLeave(ll);
 		}
 		else {
 			if (event instanceof LinkEnterEvent) {
@@ -50,7 +50,7 @@ public abstract class Event2ProtoEvent {
 						.setTime(event.getTime())
 						.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((LinkEnterEvent) event).getLinkId().toString()))
 						.setVehId(ProtobufEvents.VehicleId.newBuilder().setId(((LinkEnterEvent) event).getVehicleId().toString()));
-				eb.setType(ProtobufEvents.Event.Type.LinkEnter).setLinkEnter(ll);
+				eb.setLinkEnter(ll);
 			}
 			else {
 				if (event instanceof ActivityEndEvent) {
@@ -60,7 +60,7 @@ public abstract class Event2ProtoEvent {
 							.setPersId(ProtobufEvents.PersonId.newBuilder().setId(((ActivityEndEvent) event).getPersonId().toString()))
 							.setActType(((ActivityEndEvent) event).getActType());
 					if (((ActivityEndEvent) event).getFacilityId() != null)  ae.setFacilityId(ProtobufEvents.ActivityFacilityId.newBuilder().setId(((ActivityEndEvent) event).getFacilityId().toString()));
-					eb.setType(ProtobufEvents.Event.Type.ActivityEnd).setActEnd(ae);
+					eb.setActEnd(ae);
 
 				}
 				else {
@@ -73,7 +73,7 @@ public abstract class Event2ProtoEvent {
 						if (((ActivityStartEvent) event).getFacilityId() != null ) {
 							as.setFacilityId(ProtobufEvents.ActivityFacilityId.newBuilder().setId(((ActivityStartEvent) event).getFacilityId().toString()));
 						}
-						eb.setType(ProtobufEvents.Event.Type.ActivityStart).setActStart(as);
+						eb.setActStart(as);
 					}
 					else {
 						if (event instanceof PersonArrivalEvent) {
@@ -82,7 +82,7 @@ public abstract class Event2ProtoEvent {
 									.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((PersonArrivalEvent) event).getLinkId().toString()))
 									.setLegMode(((PersonArrivalEvent) event).getLegMode())
 									.setPersId(ProtobufEvents.PersonId.newBuilder().setId(((PersonArrivalEvent) event).getPersonId().toString()));
-							eb.setType(ProtobufEvents.Event.Type.PersonArrival).setPersonArrival(pa);
+							eb.setPersonArrival(pa);
 						}
 						else {
 							if (event instanceof PersonDepartureEvent) {
@@ -91,7 +91,7 @@ public abstract class Event2ProtoEvent {
 										.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((PersonDepartureEvent) event).getLinkId().toString()))
 										.setLegMode(((PersonDepartureEvent) event).getLegMode())
 										.setPersId(ProtobufEvents.PersonId.newBuilder().setId(((PersonDepartureEvent) event).getPersonId().toString()));
-								eb.setType(ProtobufEvents.Event.Type.PersonDeparture).setPersonDeparture(pd);
+								eb.setPersonDeparture(pd);
 							}
 							else {
 								if (event instanceof PersonEntersVehicleEvent) {
@@ -99,7 +99,7 @@ public abstract class Event2ProtoEvent {
 											.setTime(event.getTime())
 											.setPersId(ProtobufEvents.PersonId.newBuilder().setId(((PersonEntersVehicleEvent) event).getPersonId().toString()))
 											.setVehId(ProtobufEvents.VehicleId.newBuilder().setId(((PersonEntersVehicleEvent) event).getVehicleId().toString()));
-									eb.setType(ProtobufEvents.Event.Type.PersonEntersVehicle).setPersonEntersVehicle(pe);
+									eb.setPersonEntersVehicle(pe);
 								}
 								else {
 									if (event instanceof PersonLeavesVehicleEvent) {
@@ -107,7 +107,7 @@ public abstract class Event2ProtoEvent {
 												.setTime(event.getTime())
 												.setPersId(ProtobufEvents.PersonId.newBuilder().setId(((PersonLeavesVehicleEvent) event).getPersonId().toString()))
 												.setVehId(ProtobufEvents.VehicleId.newBuilder().setId(((PersonLeavesVehicleEvent) event).getVehicleId().toString()));
-										eb.setType(ProtobufEvents.Event.Type.PersonLeavesVehicle).setPersonLeavesVehicle(pl);
+										eb.setPersonLeavesVehicle(pl);
 									}
 									else {
 										if (event instanceof PersonMoneyEvent) {
@@ -115,7 +115,7 @@ public abstract class Event2ProtoEvent {
 													.setTime(event.getTime())
 													.setPersId(ProtobufEvents.PersonId.newBuilder().setId(((PersonMoneyEvent) event).getPersonId().toString()))
 													.setAmount(((PersonMoneyEvent) event).getAmount());
-											eb.setType(ProtobufEvents.Event.Type.PersonMoney).setPersonMoney(pm);
+											eb.setPersonMoney(pm);
 										}
 										else {
 											if (event instanceof PersonStuckEvent) {
@@ -124,7 +124,7 @@ public abstract class Event2ProtoEvent {
 														.setPersId(ProtobufEvents.PersonId.newBuilder().setId(((PersonStuckEvent) event).getPersonId().toString()))
 														.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((PersonStuckEvent) event).getLinkId().toString()))
 														.setLegMode(((PersonStuckEvent) event).getLegMode());
-												eb.setType(ProtobufEvents.Event.Type.PersonStuck).setPersonStuck(ps);
+												eb.setPersonStuck(ps);
 											}
 											else {
 												if (event instanceof TransitDriverStartsEvent) {
@@ -135,7 +135,7 @@ public abstract class Event2ProtoEvent {
 															.setTransitRouteId(ProtobufEvents.TransitRouteId.newBuilder().setId(((TransitDriverStartsEvent) event).getTransitRouteId().toString()))
 															.setTransitLineId(ProtobufEvents.TransitLineId.newBuilder().setId(((TransitDriverStartsEvent) event).getTransitLineId().toString()))
 															.setDepartureId(ProtobufEvents.DepartureId.newBuilder().setId(((TransitDriverStartsEvent) event).getDepartureId().toString()));
-													eb.setType(ProtobufEvents.Event.Type.TransitDriverStarts).setTransitDriverStarts(td);
+													eb.setTransitDriverStarts(td);
 												}
 												else {
 													if (event instanceof VehicleAbortsEvent) {
@@ -143,7 +143,7 @@ public abstract class Event2ProtoEvent {
 																.setTime(event.getTime())
 																.setVehId(ProtobufEvents.VehicleId.newBuilder().setId(((VehicleAbortsEvent) event).getVehicleId().toString()))
 																.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((VehicleAbortsEvent) event).getLinkId().toString()));
-														eb.setType(ProtobufEvents.Event.Type.VehicleAborts).setVehicleAborts(va);
+														eb.setVehicleAborts(va);
 													}
 													else {
 														if (event instanceof VehicleEntersTrafficEvent) {
@@ -154,7 +154,7 @@ public abstract class Event2ProtoEvent {
 																	.setVehId(ProtobufEvents.VehicleId.newBuilder().setId(((VehicleEntersTrafficEvent) event).getVehicleId().toString()))
 																	.setNetworkMode(((VehicleEntersTrafficEvent) event).getNetworkMode())
 																	.setRelPosOnLink(((VehicleEntersTrafficEvent) event).getRelativePositionOnLink());
-															eb.setType(ProtobufEvents.Event.Type.VehicleEntersTraffic).setVehicleEntersTraffic(ve);
+															eb.setVehicleEntersTraffic(ve);
 														}
 														else {
 															if (event instanceof VehicleLeavesTrafficEvent) {
@@ -165,7 +165,7 @@ public abstract class Event2ProtoEvent {
 																		.setVehId(ProtobufEvents.VehicleId.newBuilder().setId(((VehicleLeavesTrafficEvent) event).getVehicleId().toString()))
 																		.setNetworkMode(((VehicleLeavesTrafficEvent) event).getNetworkMode())
 																		.setRelPosOnLink(((VehicleLeavesTrafficEvent) event).getRelativePositionOnLink());
-																eb.setType(ProtobufEvents.Event.Type.VehicleLeavesTraffic).setVehicleLeavesTraffic(vl);
+																eb.setVehicleLeavesTraffic(vl);
 															}
 															else {
 																if (Event2ProtoEvent.REPORT_GENERIC_EVENT) {
@@ -178,7 +178,7 @@ public abstract class Event2ProtoEvent {
 																for (Map.Entry<String,String> e : event.getAttributes().entrySet()) {
 																	ge.addAttrVal(ProtobufEvents.AttrVal.newBuilder().setValue(e.getValue()).setAttribut(e.getKey()));
 																}
-																eb.setType(ProtobufEvents.Event.Type.GenericEvent).setGenericEvent(ge);
+																eb.setGenericEvent(ge);
 															}
 														}
 													}

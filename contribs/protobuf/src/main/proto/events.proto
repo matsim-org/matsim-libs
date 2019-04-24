@@ -28,25 +28,27 @@ option java_outer_classname = "ProtobufEvents";
 
 
 message Event {
-	enum Type { ActivityEnd = 0; ActivityStart = 1; LinkEnter = 2; LinkLeave = 3; PersonArrival = 4; PersonDeparture = 5;
-		PersonEntersVehicle = 6; PersonLeavesVehicle = 7; PersonMoney = 8; PersonStuck = 9; TransitDriverStarts = 10;
-		VehicleAborts = 11; VehicleEntersTraffic = 12; VehicleLeavesTraffic = 13; GenericEvent = 14;}
-	Type type =  1;
-	ActivityEndEvent actEnd = 2;
-	ActivityStartEvent actStart = 3;
-	LinkEnterEvent linkEnter = 4;
-	LinkLeaveEvent linkLeave = 5;
-	PersonArrivalEvent personArrival = 6;
-	PersonDepartureEvent personDeparture = 7;
-	PersonEntersVehicleEvent personEntersVehicle = 8;
-	PersonLeavesVehicleEvent personLeavesVehicle = 9;
-	PersonMoneyEvent personMoney = 10;
-	PersonStuckEvent personStuck = 11;
-	TransitDriverStartsEvent transitDriverStarts = 12;
-	VehicleAbortsEvent vehicleAborts = 13;
-	VehicleEntersTrafficEvent vehicleEntersTraffic = 14;
-	VehicleLeavesTrafficEvent vehicleLeavesTraffic = 15;
-	GenericEvent genericEvent = 16;
+	//enum Type { ActivityEnd = 0; ActivityStart = 1; LinkEnter = 2; LinkLeave = 3; PersonArrival = 4; PersonDeparture = 5;
+	//	PersonEntersVehicle = 6; PersonLeavesVehicle = 7; PersonMoney = 8; PersonStuck = 9; TransitDriverStarts = 10;
+	//	VehicleAborts = 11; VehicleEntersTraffic = 12; VehicleLeavesTraffic = 13; GenericEvent = 14;}
+	//Type type =  1;
+	oneof event_type {
+		ActivityEndEvent actEnd = 2;
+		ActivityStartEvent actStart = 3;
+		LinkEnterEvent linkEnter = 4;
+		LinkLeaveEvent linkLeave = 5;
+		PersonArrivalEvent personArrival = 6;
+		PersonDepartureEvent personDeparture = 7;
+		PersonEntersVehicleEvent personEntersVehicle = 8;
+		PersonLeavesVehicleEvent personLeavesVehicle = 9;
+		PersonMoneyEvent personMoney = 10;
+		PersonStuckEvent personStuck = 11;
+		TransitDriverStartsEvent transitDriverStarts = 12;
+		VehicleAbortsEvent vehicleAborts = 13;
+		VehicleEntersTrafficEvent vehicleEntersTraffic = 14;
+		VehicleLeavesTrafficEvent vehicleLeavesTraffic = 15;
+		GenericEvent genericEvent = 16;
+	}
 }
 
 message GenericEvent {
