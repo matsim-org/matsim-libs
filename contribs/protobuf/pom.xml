@@ -14,7 +14,7 @@
         <!-- protobuf paths -->
 
         <!--<protobuf.input.directory>/Users/laemmel/svn/codesprint/matsim/contribs/protobuf/src/main/proto/</protobuf.input.directory>-->
-        <protobuf.input.directory>${project.basedir}/src/main/proto</protobuf.input.directory>
+        <protobuf.input.directory>${project.basedir}/src/main/resources/proto</protobuf.input.directory>
         <protobuf.output.directory>${project.build.directory}/generated-sources</protobuf.output.directory>
 
 	<!-- It fails because ${project.build.directory} has spaces in it,
