@@ -19,11 +19,6 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -42,6 +37,11 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class PassengerEngine implements MobsimEngine, DepartureHandler {
 	private static final Logger LOGGER = Logger.getLogger(PassengerEngine.class);
@@ -160,7 +160,14 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 			double departureTime, double now) {
 		Map<Id<Link>, ? extends Link> links = network.getLinks();
 		Link fromLink = links.get(fromLinkId);
+		if (fromLink == null) {
+			throw new RuntimeException("fromLink does not exist. Id " + fromLinkId);
+		}
 		Link toLink = links.get(toLinkId);
+
+		if (toLink == null) {
+			throw new RuntimeException("toLink does not exist. Id " + toLinkId);
+		}
 		Id<Request> id = Id.create(mode + "_" + nextId++, Request.class);
 
 		PassengerRequest request = requestCreator.createRequest(id, passenger, fromLink, toLink, departureTime, now);
