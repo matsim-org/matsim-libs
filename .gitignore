@@ -27,3 +27,6 @@ hs_err_pid*
 /scenarios/chessboard/carrierPlanned.xml
 
 *.orig
+result
+scenarios/dassignment/in_ALL.csv
+
