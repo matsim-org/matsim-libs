@@ -18,8 +18,6 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
@@ -32,7 +30,6 @@ public class LinearRebalancingTargetCalculator implements RebalancingTargetCalcu
 	private final ZonalDemandAggregator demandAggregator;
 	private final MinCostFlowRebalancingParams params;
 
-	@Inject
 	public LinearRebalancingTargetCalculator(ZonalDemandAggregator demandAggregator, DrtConfigGroup drtCfg) {
 		this.demandAggregator = demandAggregator;
 		params = drtCfg.getMinCostFlowRebalancing();

@@ -68,11 +68,12 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 		super(nOfThreads);
 		this.availableModes = modes.clone();
 		this.ignoreCarAvailability = ignoreCarAvailabilty;
+		this.allowSwitchFromListedModesOnly = allowSwitchFromListedModesOnly;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(this.availableModes, MatsimRandom.getLocalInstance(), false);
+		ChooseRandomLegMode algo = new ChooseRandomLegMode(this.availableModes, MatsimRandom.getLocalInstance(), this.allowSwitchFromListedModesOnly);
 		algo.setIgnoreCarAvailability(this.ignoreCarAvailability);
 		return algo;
 	}

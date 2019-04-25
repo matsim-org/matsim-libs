@@ -3,8 +3,6 @@
 <config>
 <!-- ====================================================================== -->
 	<module name="accessibility" >
-		<!-- if only a sample of destinations should be used (reduces accuracy  not recommended except when necessary for computational speed reasons) -->
-		<param name="accessibilityDestinationSamplingRate" value="null" />
 		<!-- defines type of measure for accessibility computation. -->
 		<param name="accessibilityMeasureType" value="logSum" />
 		<!-- method to determine the area for which the accessibility will be computed; possible values: fromNetwork fromBoundingBox fromShapeFile fromFile  -->
@@ -14,7 +12,7 @@
 		<param name="boundingBoxLeft" value="0.0" />
 		<param name="boundingBoxRight" value="200.0" />
 		<param name="boundingBoxTop" value="200.0" />
-		<param name="cellSizeForCellBasedAccessibility" value="100" />
+		<param name="tileSize_m" value="100" />
 		<param name="extentOfAccessibilityComputationShapeFile" value="null" />
 		<!-- if the accibility is computed using the `fromFile` option, the this must be the file containing the measuring points' coordinates.  -->
 		<param name="measuringPointsFile" value="null" />

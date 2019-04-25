@@ -6,7 +6,6 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
@@ -16,29 +15,21 @@ import com.google.inject.Singleton;
 public class CarSharingQSimModule extends AbstractQSimModule {
 	public final static String COMPONENT_NAME = "Carsharing";
 
-	private final CarsharingSupplyInterface carsharingSupply;
-	private final CarsharingManagerInterface carsharingManager;
-
-	public CarSharingQSimModule(CarsharingSupplyInterface carsharingSupply,
-			CarsharingManagerInterface carsharingManager) {
-		this.carsharingSupply = carsharingSupply;
-		this.carsharingManager = carsharingManager;
-	}
-
 	@Override
 	protected void configureQSim() {
+		//addQSimComponentBinding(COMPONENT_NAME).to(ParkCSVehicles.class);
 		addNamedComponent(ParkCSVehicles.class, COMPONENT_NAME);
 	}
 
 	@Provides
 	@Singleton
-	ParkCSVehicles provideParkCSVehicles(QSim qsim) {
+	ParkCSVehicles provideParkCSVehicles(QSim qsim, CarsharingSupplyInterface carsharingSupply) {
 		return new ParkCSVehicles(qsim, carsharingSupply);
 	}
 
 	@Provides
 	@Singleton
-	AgentFactory provideAgentFactory(Netsim netsim) {
+	AgentFactory provideAgentFactory(Netsim netsim, CarsharingManagerInterface carsharingManager) {
 		return new CSAgentFactory(netsim, carsharingManager);
 	}
 	

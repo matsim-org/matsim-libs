@@ -56,13 +56,13 @@ import org.matsim.core.utils.misc.Time;
 					} else if ( actDurInterp == PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly ) {
 						
 						// always set duration to undefined:
-						act.setMaximumDuration( Time.UNDEFINED_TIME ) ;
+						act.setMaximumDuration( Time.getUndefinedTime()) ;
 						
 					} else if ( actDurInterp == PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration ) {
 						
 						// set duration to undefined if there is an activity end time:
-						if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
-							act.setMaximumDuration(Time.UNDEFINED_TIME) ;
+						if ( !Time.isUndefinedTime(act.getEndTime()) ) {
+							act.setMaximumDuration(Time.getUndefinedTime()) ;
 						}
 						
 					} else {
@@ -70,7 +70,7 @@ import org.matsim.core.utils.misc.Time;
 					}
 					
 					if (plansConfigGroup.isRemovingUnneccessaryPlanAttributes()) {
-						act.setStartTime(Time.UNDEFINED_TIME) ;
+						act.setStartTime(Time.getUndefinedTime()) ;
 					}
 					
 				} else if ( pe instanceof Leg ) {
@@ -79,7 +79,7 @@ import org.matsim.core.utils.misc.Time;
 //						leg.setDepartureTime(Time.UNDEFINED_TIME) ;
 						//this information is not unneccesary, but may be used, e.g., by DRTRoutes and others.
 						if ( leg.getRoute()!=null ) {
-							leg.setTravelTime( Time.UNDEFINED_TIME );
+							leg.setTravelTime( Time.getUndefinedTime());
 						}
 						
 					}

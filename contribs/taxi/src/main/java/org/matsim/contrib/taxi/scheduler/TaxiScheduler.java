@@ -24,9 +24,8 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.Vehicles;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelDataImpl;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -41,9 +40,8 @@ import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.tracker.TaskTrackers;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
-import org.matsim.contrib.taxi.run.Taxi;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
+import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiEmptyDriveTask;
@@ -60,7 +58,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
-import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 public class TaxiScheduler implements TaxiScheduleInquiry {
@@ -70,11 +67,9 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	private final TravelTime travelTime;
 	private final LeastCostPathCalculator router;
 
-	@Inject
-	public TaxiScheduler(TaxiConfigGroup taxiCfg, @Taxi Fleet fleet,
+	public TaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Taxi TravelDisutility travelDisutility) {
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility) {
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
 		this.timer = timer;
@@ -82,25 +77,18 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 
 		router = new FastAStarEuclideanFactory(taxiCfg.getAStarEuclideanOverdoFactor()).createPathCalculator(network,
 				travelDisutility, travelTime);
-		initFleet(taxiCfg);
+		initFleet();
 	}
 
-	private void initFleet(TaxiConfigGroup taxiCfg) {
-		if (taxiCfg.isChangeStartLinkToLastLinkInSchedule()) {
-			for (Vehicle veh : fleet.getVehicles().values()) {
-				Vehicles.changeStartLinkToLastLinkInSchedule(veh);
-			}
-		}
-
-		fleet.resetSchedules();
-		for (Vehicle veh : fleet.getVehicles().values()) {
+	private void initFleet() {
+		for (DvrpVehicle veh : fleet.getVehicles().values()) {
 			veh.getSchedule()
 					.addTask(new TaxiStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));
 		}
 	}
 
 	@Override
-	public boolean isIdle(Vehicle vehicle) {
+	public boolean isIdle(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		if (timer.getTimeOfDay() >= vehicle.getServiceEndTime() || schedule.getStatus() != ScheduleStatus.STARTED) {
 			return false;
@@ -115,7 +103,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	 * If the returned LinkTimePair is not null, then time is not smaller than the current time
 	 */
 	@Override
-	public LinkTimePair getImmediateDiversionOrEarliestIdleness(Vehicle veh) {
+	public LinkTimePair getImmediateDiversionOrEarliestIdleness(DvrpVehicle veh) {
 		if (taxiCfg.isVehicleDiversion()) {
 			LinkTimePair diversion = getImmediateDiversion(veh);
 			if (diversion != null) {
@@ -130,7 +118,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	 * If the returned LinkTimePair is not null, then time is not smaller than the current time
 	 */
 	@Override
-	public LinkTimePair getEarliestIdleness(Vehicle veh) {
+	public LinkTimePair getEarliestIdleness(DvrpVehicle veh) {
 		if (timer.getTimeOfDay() >= veh.getServiceEndTime()) {// time window exceeded
 			return null;
 		}
@@ -175,7 +163,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	 * If the returned LinkTimePair is not null, then time is not smaller than the current time
 	 */
 	@Override
-	public LinkTimePair getImmediateDiversion(Vehicle veh) {
+	public LinkTimePair getImmediateDiversion(DvrpVehicle veh) {
 		if (!taxiCfg.isVehicleDiversion()) {
 			throw new RuntimeException("Diversion must be on");
 		}
@@ -198,17 +186,17 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		return filterValidLinkTimePair(tracker.getDiversionPoint(), veh);
 	}
 
-	private static LinkTimePair filterValidLinkTimePair(LinkTimePair pair, Vehicle veh) {
+	private static LinkTimePair filterValidLinkTimePair(LinkTimePair pair, DvrpVehicle veh) {
 		return pair.time >= veh.getServiceEndTime() ? null : pair;
 	}
 
-	private static LinkTimePair createValidLinkTimePair(Link link, double time, Vehicle veh) {
+	private static LinkTimePair createValidLinkTimePair(Link link, double time, DvrpVehicle veh) {
 		return time >= veh.getServiceEndTime() ? null : new LinkTimePair(link, time);
 	}
 
 	// =========================================================================================
 
-	public void scheduleRequest(Vehicle vehicle, TaxiRequest request, VrpPathWithTravelData vrpPath) {
+	public void scheduleRequest(DvrpVehicle vehicle, TaxiRequest request, VrpPathWithTravelData vrpPath) {
 		if (request.getStatus() != TaxiRequestStatus.UNPLANNED) {
 			throw new IllegalStateException();
 		}
@@ -284,14 +272,14 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	 * {@link #removeAwaitingRequestsFromAllSchedules()} method)
 	 */
 	public void stopAllAimlessDriveTasks() {
-		for (Vehicle veh : fleet.getVehicles().values()) {
+		for (DvrpVehicle veh : fleet.getVehicles().values()) {
 			if (getImmediateDiversion(veh) != null) {
 				stopVehicle(veh);
 			}
 		}
 	}
 
-	public void stopVehicle(Vehicle vehicle) {
+	public void stopVehicle(DvrpVehicle vehicle) {
 		if (!taxiCfg.isVehicleDiversion()) {
 			throw new RuntimeException("Diversion must be on");
 		}
@@ -311,7 +299,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	 * Check and decide if the schedule should be updated due to if vehicle is Update timings (i.e. beginTime and
 	 * endTime) of all tasks in the schedule.
 	 */
-	public void updateBeforeNextTask(Vehicle vehicle) {
+	public void updateBeforeNextTask(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		// Assumption: there is no delay as long as the schedule has not been started (PLANNED)
 		if (schedule.getStatus() != ScheduleStatus.STARTED) {
@@ -333,7 +321,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		TaxiPickupTask pickupStayTask = (TaxiPickupTask)Schedules.getLastTask(schedule);
 
 		// add DELIVERY after SERVE
-		TaxiRequest req = ((TaxiPickupTask)pickupStayTask).getRequest();
+		TaxiRequest req = pickupStayTask.getRequest();
 		Link reqFromLink = req.getFromLink();
 		Link reqToLink = req.getToLink();
 		double t3 = pickupStayTask.getEndTime();
@@ -350,11 +338,11 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		return VrpPaths.calcAndCreatePath(fromLink, toLink, departureTime, router, travelTime);
 	}
 
-	protected void appendTasksAfterDropoff(Vehicle vehicle) {
+	protected void appendTasksAfterDropoff(DvrpVehicle vehicle) {
 		appendStayTask(vehicle);
 	}
 
-	protected void appendStayTask(Vehicle vehicle) {
+	protected void appendStayTask(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		double tBegin = schedule.getEndTime();
 		double tEnd = Math.max(tBegin, vehicle.getServiceEndTime());// even 0-second WAIT
@@ -362,7 +350,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		schedule.addTask(new TaxiStayTask(tBegin, tEnd, link));
 	}
 
-	public void updateTimeline(Vehicle vehicle) {
+	public void updateTimeline(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() != ScheduleStatus.STARTED) {
 			return;
@@ -372,7 +360,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		updateTimelineImpl(vehicle, predictedEndTime);
 	}
 
-	private void updateTimelineImpl(Vehicle vehicle, double newEndTime) {
+	private void updateTimelineImpl(DvrpVehicle vehicle, double newEndTime) {
 		Schedule schedule = vehicle.getSchedule();
 		Task currentTask = schedule.getCurrentTask();
 		if (currentTask.getEndTime() == newEndTime) {
@@ -402,7 +390,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		}
 	}
 
-	protected double calcNewEndTime(Vehicle vehicle, TaxiTask task, double newBeginTime) {
+	protected double calcNewEndTime(DvrpVehicle vehicle, TaxiTask task, double newBeginTime) {
 		switch (task.getTaxiTaskType()) {
 			case STAY: {
 				if (Schedules.getLastTask(vehicle.getSchedule()).equals(task)) {// last task
@@ -452,20 +440,20 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	 */
 	public List<TaxiRequest> removeAwaitingRequestsFromAllSchedules() {
 		removedRequests = new ArrayList<>();
-		for (Vehicle veh : fleet.getVehicles().values()) {
+		for (DvrpVehicle veh : fleet.getVehicles().values()) {
 			removeAwaitingRequestsImpl(veh);
 		}
 
 		return removedRequests;
 	}
 
-	public List<TaxiRequest> removeAwaitingRequests(Vehicle vehicle) {
+	public List<TaxiRequest> removeAwaitingRequests(DvrpVehicle vehicle) {
 		removedRequests = new ArrayList<>();
 		removeAwaitingRequestsImpl(vehicle);
 		return removedRequests;
 	}
 
-	private void removeAwaitingRequestsImpl(Vehicle vehicle) {
+	private void removeAwaitingRequestsImpl(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		switch (schedule.getStatus()) {
 			case STARTED:
@@ -523,7 +511,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		}
 	}
 
-	protected void removePlannedTasks(Vehicle vehicle, int newLastTaskIdx) {
+	protected void removePlannedTasks(DvrpVehicle vehicle, int newLastTaskIdx) {
 		Schedule schedule = vehicle.getSchedule();
 		List<? extends Task> tasks = schedule.getTasks();
 		for (int i = schedule.getTaskCount() - 1; i > newLastTaskIdx; i--) {
@@ -533,7 +521,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		}
 	}
 
-	protected void taskRemovedFromSchedule(Vehicle vehicle, TaxiTask task) {
+	protected void taskRemovedFromSchedule(DvrpVehicle vehicle, TaxiTask task) {
 		if (task instanceof TaxiTaskWithRequest) {
 			TaxiRequest request = ((TaxiTaskWithRequest)task).getRequest();
 
@@ -547,7 +535,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	}
 
 	// only for planned/started schedule
-	private void cleanupScheduleAfterTaskRemoval(Vehicle vehicle) {
+	private void cleanupScheduleAfterTaskRemoval(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
 			schedule.addTask(new TaxiStayTask(vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),

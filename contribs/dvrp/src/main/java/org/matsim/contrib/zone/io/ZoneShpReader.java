@@ -19,14 +19,14 @@
 
 package org.matsim.contrib.zone.io;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
+import org.locationtech.jts.geom.MultiPolygon;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.zone.Zone;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class ZoneShpReader {
 	private final Map<Id<Zone>, Zone> zones;

@@ -34,9 +34,9 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
  * @author nagel
  *
  */
-public interface InternalInterface extends ActivityEndRescheduler {
-	public Netsim getMobsim();
-	public void arrangeNextAgentState(MobsimAgent agent);
+public interface InternalInterface {
+	QSim getMobsim();
+	void arrangeNextAgentState( MobsimAgent agent );
 	void registerAdditionalAgentOnLink(MobsimAgent agent);
 	MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId);
 }

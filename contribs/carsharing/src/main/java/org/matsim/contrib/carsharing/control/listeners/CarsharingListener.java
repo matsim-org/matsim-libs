@@ -19,54 +19,62 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 
-/** 
+/**
  * 
  * @author balac
  */
-public class CarsharingListener implements IterationEndsListener{
+public class CarsharingListener implements IterationEndsListener {
 
-	@Inject private MatsimServices controler;
-	@Inject private DemandHandler demandHandler;
-	@Inject private CarsharingSupplyInterface carsharingSupply;
+	@Inject
+	private MatsimServices controler;
+	@Inject
+	private DemandHandler demandHandler;
+	@Inject
+	private CarsharingSupplyInterface carsharingSupply;
 
 	ArrayList<Integer> rentalsPerIteration = new ArrayList<>();
 
 	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {		
+	public void notifyIterationEnds(IterationEndsEvent event) {
 		int numberOfRentals = 0;
 
 		Map<Id<Person>, AgentRentals> agentRentalsMap = demandHandler.getAgentRentalsMap();
-		final BufferedWriter outLink = IOUtils.getBufferedWriter(this.controler.getControlerIO().getIterationFilename(event.getIteration(), "CS.txt"));
+		final BufferedWriter outLink = IOUtils.getBufferedWriter(
+				this.controler.getControlerIO().getIterationFilename(event.getIteration(), "CS.txt"));
 		try {
-			outLink.write("personID,carsharingType,startTime,endTIme,startLink,pickupLink,dropoffLink,endLink,distance,inVehicleTime,accessTime,egressTime,vehicleID,"
-					+ "companyID,vehicleType");
-			outLink.newLine();		
-		
-		for (Id<Person> personId: agentRentalsMap.keySet()) {
-			
-			for (RentalInfo i : agentRentalsMap.get(personId).getArr()) {
-				CSVehicle vehicle = this.carsharingSupply.getAllVehicles().get(i.getVehId().toString());		
-				numberOfRentals++;
-				outLink.write(personId + "," + i.toString() + "," + vehicle.getCompanyId() + "," + vehicle.getType());
-				outLink.newLine();
-			}
-			
-		}
-		rentalsPerIteration.add(numberOfRentals);
+			outLink.write(
+					"personID,carsharingType,startTime,endTIme,startLink,pickupLink,dropoffLink,endLink,startCoordX,startCoordY,"
+							+ "pickupCoordX,pickupCoordY,dropoffCoordX,dropoffCoordY,endCoordX,endCoordY,distance,"
+							+ "inVehicleTime,accessTime,egressTime,vehicleID," + "companyID,vehicleType");
+			outLink.newLine();
 
-		outLink.flush();
-		outLink.close();
-		
+			for (Id<Person> personId : agentRentalsMap.keySet()) {
+
+				for (RentalInfo i : agentRentalsMap.get(personId).getArr()) {
+					CSVehicle vehicle = this.carsharingSupply.getAllVehicles().get(i.getVehId().toString());
+					numberOfRentals++;
+					outLink.write(
+							personId + "," + i.toString() + "," + vehicle.getCompanyId() + "," + vehicle.getType());
+					outLink.newLine();
+				}
+
+			}
+			rentalsPerIteration.add(numberOfRentals);
+
+			outLink.flush();
+			outLink.close();
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
-		
+		}
+
 		if (event.getIteration() == controler.getConfig().controler().getLastIteration()) {
-			final BufferedWriter outLinkStats = IOUtils.getBufferedWriter(this.controler.getControlerIO().getOutputFilename("CS.txt"));
+			final BufferedWriter outLinkStats = IOUtils
+					.getBufferedWriter(this.controler.getControlerIO().getOutputFilename("CS.txt"));
 			try {
 				outLinkStats.write("iteration,numberOfRentals");
-			
+
 				outLinkStats.newLine();
 				int k = 0;
 				for (Integer i : rentalsPerIteration) {
@@ -74,16 +82,15 @@ public class CarsharingListener implements IterationEndsListener{
 					k++;
 					outLinkStats.newLine();
 				}
-				
+
 				outLinkStats.flush();
 				outLinkStats.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		}
-		
-		
+
 	}
 }

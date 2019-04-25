@@ -75,7 +75,11 @@ public class ModalProviders {
 		}
 
 		public <T> T getModal(Class<T> type) {
-			return injector.getInstance(Key.get(type, Names.named(mode)));
+			return injector.getInstance(DvrpModes.key(type, mode));
+		}
+
+		public <T> T getNamed(Class<T> type, String name) {
+			return injector.getInstance(Key.get(type, Names.named(name)));
 		}
 	}
 
@@ -90,7 +94,7 @@ public class ModalProviders {
 		}
 
 		protected <I> I getModalInstance(Class<I> type) {
-			return injector.getInstance(Key.get(type, Names.named(mode)));
+			return injector.getInstance(DvrpModes.key(type, mode));
 		}
 	}
 }

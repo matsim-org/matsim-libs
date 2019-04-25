@@ -19,52 +19,21 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.file.FleetProvider;
-import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dynagent.run.DynRoutingModule;
-import org.matsim.contrib.taxi.data.validator.DefaultTaxiRequestValidator;
-import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
-import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
-import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
-import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 import com.google.inject.Inject;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm
  */
 public final class TaxiModule extends AbstractModule {
+
 	@Inject
 	private TaxiConfigGroup taxiCfg;
 
 	@Override
 	public void install() {
-		String mode = taxiCfg.getMode();
-		install(FleetProvider.createModule(mode, taxiCfg.getTaxisFileUrl(getConfig().getContext())));
-		bind(Fleet.class).annotatedWith(Taxi.class).to(Key.get(Fleet.class, Names.named(mode))).asEagerSingleton();
-
-		bind(TravelDisutilityFactory.class).annotatedWith(Taxi.class)
-				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
-
-		bind(SubmittedTaxiRequestsCollector.class).asEagerSingleton();
-		addControlerListenerBinding().to(SubmittedTaxiRequestsCollector.class);
-
-		addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
-		addControlerListenerBinding().to(TaxiStatsDumper.class);
-
-		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
-
-		if (taxiCfg.getTimeProfiles()) {
-			addMobsimListenerBinding().toProvider(TaxiStatusTimeProfileCollectorProvider.class);
-			// add more time profiles if necessary
-		}
-
-		bind(TaxiRequestValidator.class).to(DefaultTaxiRequestValidator.class);
+		install(new TaxiModeModule(taxiCfg));
+		installQSimModule(new TaxiModeQSimModule(taxiCfg));
 	}
 }

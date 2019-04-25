@@ -8,13 +8,21 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
-import com.vividsolutions.jts.geom.*;
 import org.geotools.geometry.jts.GeometryBuilder;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * @author kainagel
@@ -86,6 +94,7 @@ public class GeometryUtils {
 	}
 	
 	public static Polygon createGeotoolsPolygon(List<Coord> coords ) {
+		
 		// better way to do this is welcome.  kai, dec'17
 		double [] flatArray = new double[coords.size()*2] ;
 		int ii=0 ;
@@ -96,6 +105,31 @@ public class GeometryUtils {
 			ii++ ;
 		}
 		return new GeometryBuilder().polygon( flatArray ) ;
+		
+		// the following yields some failing tests in the minibus contrib. ihab, feb'19
+		
+//		Coordinate[] coordinates = new Coordinate[coords.size()] ;
+//		int ii=0 ;
+//		for ( Coord coord : coords ) {
+//			coordinates[ii] = new Coordinate(coord.getX(), coord.getY()); ;
+//			ii++ ;
+//		}
+//		return new GeometryFactory().createPolygon(coordinates);
+		
 	}
-	
+
+	public static Point getRandomPointInFeature( Random rnd, SimpleFeature ft ) {
+		Gbl.assertNotNull(ft );
+		Point p = null;
+		double x, y;
+		// generate a random point until a point inside the feature geometry is found
+		do {
+			x = ft.getBounds().getMinX() + rnd.nextDouble() * (ft.getBounds().getMaxX() - ft.getBounds().getMinX());
+			y = ft.getBounds().getMinY() + rnd.nextDouble() * (ft.getBounds().getMaxY() - ft.getBounds().getMinY());
+			p = MGC.xy2Point(x, y);
+		} while ( ! (((Geometry) ft.getDefaultGeometry()).contains(p)) );
+		return p;
+	}
+
+
 }

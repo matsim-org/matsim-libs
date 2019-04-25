@@ -28,7 +28,7 @@ import java.util.concurrent.ForkJoinPool;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.drt.data.DrtRequest;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
@@ -99,7 +99,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 		private void updateStats(Collection<Entry> vEntries, DetourLinksProvider detourLinksProvider) {
 			addSet(detourLinksProvider.getDetourLinksSet(), vEntries.size());
-			updateInsertionStats(vEntries, detourLinksProvider.getFilteredInsertions());
+			updateInsertionStats(detourLinksProvider.getFilteredInsertions());
 		}
 
 		private void addSet(DetourLinksSet set, int vEntriesCount) {
@@ -110,8 +110,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 			vEntriesStats.addValue(vEntriesCount);
 		}
 
-		private void updateInsertionStats(Collection<Entry> vEntries,
-				Map<Entry, List<Insertion>> filteredInsertionsPerVehicle) {
+		private void updateInsertionStats(Map<Entry, List<Insertion>> filteredInsertionsPerVehicle) {
 			int insertionCount = 0;
 			int insertionAtEndCount = 0;
 			int insertionAtEndToEmptyCount = 0;

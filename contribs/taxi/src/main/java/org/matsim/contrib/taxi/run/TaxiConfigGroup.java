@@ -24,14 +24,15 @@ import java.util.Map;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Positive;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-public class TaxiConfigGroup extends ReflectiveConfigGroup {
+public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 	public static final String GROUP_NAME = "taxi";
 
 	@SuppressWarnings("deprecation")
@@ -53,10 +54,10 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 			+ " Requires online tracking. False by default.";
 
 	public static final String PICKUP_DURATION = "pickupDuration";
-	static final String PICKUP_DURATION_EXP = "Typically, 120 seconds";
+	static final String PICKUP_DURATION_EXP = "Pickup duration. Must be positive.";
 
 	public static final String DROPOFF_DURATION = "dropoffDuration";
-	static final String DROPOFF_DURATION_EXP = "Typically, 60 seconds";
+	static final String DROPOFF_DURATION_EXP = "Dropoff duration. Must be positive.";
 
 	public static final String A_STAR_EUCLIDEAN_OVERDO_FACTOR = "AStarEuclideanOverdoFactor";
 	static final String A_STAR_EUCLIDEAN_OVERDO_FACTOR_EXP =
@@ -90,7 +91,7 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 	public static final String DETAILED_STATS = "detailedStats";
 	static final String DETAILED_STATS_EXP = "If true, detailed hourly taxi stats are dumped after each iteration."
 			+ " False by default.";
-	
+
 	public static final String PRINT_WARNINGS = "plotDetailedWarnings";
 	static final String PRINT_WARNINGS_EXP = "Prints detailed warnings for taxi customers that cannot be served or routed. True by default.";
 
@@ -110,10 +111,10 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 	private boolean destinationKnown = false;
 	private boolean vehicleDiversion = false;
 
-	@PositiveOrZero
+	@Positive
 	private double pickupDuration = Double.NaN;// seconds
 
-	@PositiveOrZero
+	@Positive
 	private double dropoffDuration = Double.NaN;// seconds
 
 	@Min(1)
@@ -129,7 +130,7 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 	private boolean detailedStats = false;
 
 	private boolean breakSimulationIfNotAllRequestsServed = true;
-	
+
 	private boolean printDetailedWarnings = true;
 
 	public TaxiConfigGroup() {
@@ -159,6 +160,8 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 	/**
 	 * @return {@value #MODE_EXP}
 	 */
+
+	@Override
 	@StringGetter(MODE)
 	public String getMode() {
 		return mode;

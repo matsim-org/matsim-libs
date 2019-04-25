@@ -252,7 +252,7 @@ public class NoiseIT {
 		
 		for(double currentTimeSlot : timeSlots){
 			
-			pathToConsideredAgentUnitsFile = runDirectory + "noise-analysis_it.0/consideredAgentUnits/consideredAgentUnits_" + Double.toString(currentTimeSlot) + ".csv";
+			pathToConsideredAgentUnitsFile = runDirectory + "noise-analysis/consideredAgentUnits/consideredAgentUnits_" + Double.toString(currentTimeSlot) + ".csv";
 			
 			br = IOUtils.getBufferedReader(pathToConsideredAgentUnitsFile);
 			
@@ -479,7 +479,7 @@ public class NoiseIT {
 
 		line = null;
 		
-		String pathToEmissionsFile = runDirectory + "noise-analysis_it.0/emissions/emission_" + Double.toString(endTime) + ".csv";
+		String pathToEmissionsFile = runDirectory + "noise-analysis/emissions/emission_" + Double.toString(endTime) + ".csv";
 		
 		Map<Id<Link>, Double> emissionsPerLink = new HashMap<Id<Link>, Double>();
 		idxFromKey = new ConcurrentHashMap<String, Integer>();
@@ -565,7 +565,7 @@ public class NoiseIT {
 
 		line = null;
 		
-		String pathToImmissionsFile = runDirectory + "noise-analysis_it.0/immissions/immission_" + Double.toString(endTime) + ".csv";
+		String pathToImmissionsFile = runDirectory + "noise-analysis/immissions/immission_" + Double.toString(endTime) + ".csv";
 		
 		Map<Id<ReceiverPoint>, Double> immissionPerReceiverPointId = new HashMap<Id<ReceiverPoint>, Double>();
 		
@@ -620,7 +620,7 @@ public class NoiseIT {
 				
 		}
 		
-		Assert.assertEquals("Wrong amount of immission!", 77.2591534246579, immissionPerReceiverPointId.get(Id.create("15", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong amount of immission!", 77.25915342419277, immissionPerReceiverPointId.get(Id.create("15", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong amount of immission!", 67.9561670074151, immissionPerReceiverPointId.get(Id.create("31", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong amount of immission!", 0., immissionPerReceiverPointId.get(Id.create("0", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		
@@ -630,7 +630,7 @@ public class NoiseIT {
 
 		line = null;
 		
-		String pathToDamagesFile = runDirectory + "noise-analysis_it.0/damages_receiverPoint/damages_receiverPoint_" + Double.toString(endTime) + ".csv";
+		String pathToDamagesFile = runDirectory + "noise-analysis/damages_receiverPoint/damages_receiverPoint_" + Double.toString(endTime) + ".csv";
 		
 		Map<Id<ReceiverPoint>, Double> damagesPerReceiverPointId = new HashMap<Id<ReceiverPoint>, Double>();
 		
@@ -692,7 +692,7 @@ public class NoiseIT {
 		
 		line = null;
 		
-		String pathToDamageLinkFile = runDirectory + "noise-analysis_it.0/average_damages_link/average_damages_link_" + Double.toString(endTime) + ".csv";
+		String pathToDamageLinkFile = runDirectory + "noise-analysis/average_damages_link/average_damages_link_" + Double.toString(endTime) + ".csv";
 		
 		Map<Id<Link>, Double> damagesPerlinkId = new HashMap<Id<Link>, Double>();
 		
@@ -742,7 +742,7 @@ public class NoiseIT {
 		
 		line = null;
 		
-		String pathToDamageLinkCar = runDirectory + "noise-analysis_it.0/average_damages_link_car/average_damages_link_car_" + Double.toString(endTime) + ".csv";
+		String pathToDamageLinkCar = runDirectory + "noise-analysis/average_damages_link_car/average_damages_link_car_" + Double.toString(endTime) + ".csv";
 		
 		Map<Id<Link>, Double> damagesPerCar = new HashMap<Id<Link>, Double>();
 		
@@ -789,7 +789,7 @@ public class NoiseIT {
 				
 		line = null;
 		
-		String pathToMarginalDamageLinkCar = runDirectory + "noise-analysis_it.0/marginal_damages_link_car/marginal_damages_link_car_" + Double.toString(endTime) + ".csv";
+		String pathToMarginalDamageLinkCar = runDirectory + "noise-analysis/marginal_damages_link_car/marginal_damages_link_car_" + Double.toString(endTime) + ".csv";
 		
 		Map<Id<Link>, Double> marginaldamagesPerCar = new HashMap<Id<Link>, Double>();
 		
@@ -1118,7 +1118,7 @@ public class NoiseIT {
 
 		line = null;
 		
-		String pathToEmissionsFile = runDirectory + "noise-analysis_it.0/emissions/emission_" + Double.toString(endTime) + ".csv";
+		String pathToEmissionsFile = runDirectory + "noise-analysis/emissions/emission_" + Double.toString(endTime) + ".csv";
 		
 		Map<Id<Link>, Double> emissionsPerLink = new HashMap<Id<Link>, Double>();
 		idxFromKey = new ConcurrentHashMap<String, Integer>();

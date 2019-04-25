@@ -50,6 +50,7 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
     private boolean cacheTree;
     private TransitLeastCostPathTree tree;
 	private Facility previousFromFacility;
+	private double previousDepartureTime;
 
     public TransitRouterImpl(final TransitRouterConfig trConfig, final TransitSchedule schedule) {
         super(trConfig);
@@ -124,7 +125,7 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
         TransitPassengerRoute transitPassengerRoute = null;
 
         if (cacheTree) {
-        	if (fromFacility != previousFromFacility) { // Compute tree only if the fromFacility is other than that of the last request.
+        	if ((fromFacility != previousFromFacility) && (departureTime != previousDepartureTime)) { // Compute tree only if fromFacility and departure time are different from previous request.
     			tree = new TransitLeastCostPathTree(getTransitRouterNetwork(),
     					getTravelDisutility(),
     					getTravelTime(),
@@ -157,7 +158,8 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
             return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
         }
         
-        previousFromFacility = fromFacility;        
+        previousFromFacility = fromFacility;
+        previousDepartureTime = departureTime;
         
         return convertPassengerRouteToLegList(departureTime,
                 transitPassengerRoute,

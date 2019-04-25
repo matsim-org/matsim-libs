@@ -36,6 +36,25 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 			return new Builder(typeId);
 		}
 		
+		/**
+		 * Returns a new instance of builder initialized with the typeId and the values the given from existing CarrierVehicleType.
+		 * 
+		 * Can be used for create a new, modified CarrierVehicleType basing on an existing one. 
+		 * Values can be changed within the builder afterwards.
+		 * 
+		 * @param carrierVehicleType
+		 * @param typeId
+		 * @return a type builder
+		 */
+		public static Builder newInstance(Id<VehicleType> typeId, CarrierVehicleType carrierVehicleType){
+			return new Builder(typeId)
+					.setDescription(carrierVehicleType.getDescription())
+					.setEngineInformation(carrierVehicleType.getEngineInformation())
+					.setCapacity(carrierVehicleType.getCarrierVehicleCapacity())
+					.setMaxVelocity(carrierVehicleType.getMaximumVelocity())
+					.setVehicleCostInformation(carrierVehicleType.getVehicleCostInformation());		
+		}
+		
 		private Id<VehicleType> typeId;
 		private double fix = 0.0;
 		private double perDistanceUnit = 1.0;
@@ -155,15 +174,27 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 	
 	public static class VehicleCostInformation {
 
-		public final double fix;
-		public final double perDistanceUnit;
-		public final double perTimeUnit;
+		private double fix;
+		private double perDistanceUnit;
+		private double perTimeUnit;
 
 		public VehicleCostInformation(double fix, double perDistanceUnit, double perTimeUnit) {
 			super();
 			this.fix = fix;
 			this.perDistanceUnit = perDistanceUnit;
 			this.perTimeUnit = perTimeUnit;
+		}
+		
+		public double getFix() {
+			return fix;
+		}
+
+		public double getPerDistanceUnit() {
+			return perDistanceUnit;
+		}
+
+		public double getPerTimeUnit() {
+			return perTimeUnit;
 		}
 
 	}
@@ -192,6 +223,7 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 		return vehicleCostInformation;
 	}
 	
+
 	/**
 	 * Returns the capacity of carrierVehicleType.
 	 * 

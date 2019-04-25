@@ -127,6 +127,13 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		// get the "Person" behind the id:
 		Person person = this.scenario.getPopulation().getPersons().get(driverId);
 		
+		// return if the driver is not in the standard population:
+		if ( person==null ) {
+			return ;
+		}
+		// (I think that this will be ok: they will be counted, as they will be in reality.  But we cannot influence them in the normal way because they are not part of normal replanning.  Cadyts
+		// should still work, since it operates on all the others. kai, based on https://matsim.atlassian.net/browse/MATSIM-648, nov'18
+		
 		// get the selected plan:
 		Plan selectedPlan = person.getSelectedPlan();
 		

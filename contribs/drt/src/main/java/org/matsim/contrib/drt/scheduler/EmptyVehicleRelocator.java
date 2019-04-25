@@ -21,10 +21,9 @@ package org.matsim.contrib.drt.scheduler;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.run.Drt;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
@@ -36,7 +35,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 /**
@@ -48,9 +46,8 @@ public class EmptyVehicleRelocator {
 	private final DrtTaskFactory taskFactory;
 	private final LeastCostPathCalculator router;
 
-	@Inject
 	public EmptyVehicleRelocator(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, @Drt TravelDisutility travelDisutility,
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
 			MobsimTimer timer, DrtTaskFactory taskFactory) {
 		this.travelTime = travelTime;
 		this.timer = timer;
@@ -58,7 +55,7 @@ public class EmptyVehicleRelocator {
 		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
 
-	public void relocateVehicle(Vehicle vehicle, Link link) {
+	public void relocateVehicle(DvrpVehicle vehicle, Link link) {
 		DrtStayTask currentTask = (DrtStayTask)vehicle.getSchedule().getCurrentTask();
 		Link currentLink = currentTask.getLink();
 
@@ -71,7 +68,7 @@ public class EmptyVehicleRelocator {
 		}
 	}
 
-	private void relocateVehicleImpl(Vehicle vehicle, VrpPathWithTravelData vrpPath) {
+	private void relocateVehicleImpl(DvrpVehicle vehicle, VrpPathWithTravelData vrpPath) {
 		Schedule schedule = vehicle.getSchedule();
 		DrtStayTask stayTask = (DrtStayTask)schedule.getCurrentTask();
 		if (stayTask.getTaskIdx() != schedule.getTaskCount() - 1) {

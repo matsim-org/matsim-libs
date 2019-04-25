@@ -53,6 +53,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
@@ -63,6 +64,7 @@ import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -77,7 +79,9 @@ import org.matsim.utils.objectattributes.attributable.AttributesUtils;
  */
 public final class PopulationUtils {
 	private static final Logger log = Logger.getLogger( PopulationUtils.class );
-	private static final PopulationFactory populationFactory = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory() ;
+//	private static final PopulationFactory populationFactory = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory() ;
+	private static final PopulationFactory populationFactory = createPopulation( new PlansConfigGroup(), null  ).getFactory() ;
+	// try to avoid misleading comment about config context.  kai, dec'18
 
 	/**
 	 * Is a namespace, so don't instantiate:
@@ -144,6 +148,16 @@ public final class PopulationUtils {
 
 	public static Leg unmodifiableLeg( Leg leg ) {
 		return new UnmodifiableLeg( leg ) ;
+	}
+
+	public static void resetRoutes( final Plan plan ) {
+		// loop over all <leg>s, remove route-information
+		// routing is done after location choice
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				((Leg) pe).setRoute(null);
+			}
+		}
 	}
 
 	static class UnmodifiableLeg implements Leg {
@@ -398,32 +412,38 @@ public final class PopulationUtils {
 	}
 
 	/**
+	 * @deprecated Use {@link #decideOnActivityEndTime(Activity, double, Config)}
+	 */
+	@Deprecated // was renamed
+	public static double getActivityEndTime( Activity act, double now, Config config ) {
+		return decideOnActivityEndTime( act, now, config ) ;
+	}
+
+	/**
 	 * Computes the (expected or planned) activity end time, depending on the configured time interpretation.
 	 */
-	public static double getActivityEndTime( Activity act, double now, Config config ) {
+	public static double decideOnActivityEndTime( Activity act, double now, Config config ) {
 		switch ( config.plans().getActivityDurationInterpretation() ) {
 		case endTimeOnly:
 			return act.getEndTime() ;
 		case tryEndTimeThenDuration:
-			if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
+			if ( !Time.isUndefinedTime(act.getEndTime()) ) {
 				return act.getEndTime() ;
-			} else if ( act.getMaximumDuration() != Time.UNDEFINED_TIME ) {
+			} else if ( !Time.isUndefinedTime(act.getMaximumDuration()) ) {
 				return now + act.getMaximumDuration() ;
 			} else {
-				return Time.UNDEFINED_TIME ;
+				return Time.getUndefinedTime();
 			}
 		case minOfDurationAndEndTime:
 			return Math.min( now + act.getMaximumDuration() , act.getEndTime() ) ;
 		default:
 			break ;
 		}
-		return Time.UNDEFINED_TIME ;
+		return Time.getUndefinedTime();
 	}
 
 	private static int missingFacilityCnt = 0 ;
-	/**
-	 * @param config
-	 */
+
 	@Deprecated // use decideOnLinkIdForActivity.  kai, sep'18
 	public static Id<Link> computeLinkIdFromActivity( Activity act, ActivityFacilities facs, Config config ) {
 		// the following might eventually become configurable by config. kai, feb'16
@@ -612,17 +632,8 @@ public final class PopulationUtils {
 	 */
 	public static boolean equalPopulation(final Population s1, final Population s2) {
 		try {
-			@SuppressWarnings("resource")
-			InputStream inputStream1 = null;
-			@SuppressWarnings("resource")
-			InputStream inputStream2 = null;
-			try {
-				inputStream1 = openPopulationInputStream(s1);
-				inputStream2 = openPopulationInputStream(s2);
-				return IOUtils.isEqual(inputStream1, inputStream2);
-			} finally {
-				if (inputStream1 != null) inputStream1.close();
-				if (inputStream2 != null) inputStream2.close();
+			try( InputStream inputStream1 = openPopulationInputStream( s1 ) ; InputStream inputStream2 = openPopulationInputStream( s2 ) ){
+				return IOUtils.isEqual( inputStream1, inputStream2 );
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -937,8 +948,8 @@ public final class PopulationUtils {
 			if (index != plan.getPlanElements().size()-2) {
 				// not the last leg
 				Leg next_leg = (Leg)plan.getPlanElements().get(index+2);
-				next_leg.setDepartureTime(Time.UNDEFINED_TIME);
-				next_leg.setTravelTime(Time.UNDEFINED_TIME);
+				next_leg.setDepartureTime(Time.getUndefinedTime());
+				next_leg.setTravelTime(Time.getUndefinedTime());
 				next_leg.setRoute(null);
 			}
 			plan.getPlanElements().remove(index+1); // following act
@@ -967,8 +978,8 @@ public final class PopulationUtils {
 			else {
 				// remove an in-between act
 				Leg prev_leg = (Leg)plan.getPlanElements().get(index-1); // prev leg;
-				prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
-				prev_leg.setTravelTime(Time.UNDEFINED_TIME);
+				prev_leg.setDepartureTime(Time.getUndefinedTime());
+				prev_leg.setTravelTime(Time.getUndefinedTime());
 				prev_leg.setRoute(null);
 
 				plan.getPlanElements().remove(index+1); // following leg
@@ -1060,5 +1071,18 @@ public final class PopulationUtils {
 		log.info( "population size before downsampling=" + pop.getPersons().size() ) ;
 		pop.getPersons().values().removeIf( person ->  rnd.nextDouble() >= sample ) ;
 		log.info( "population size after downsampling=" + pop.getPersons().size() ) ;
+	}
+	public static void readPopulation( Population population, String filename ) {
+		MutableScenario scenario = ScenarioUtils.createMutableScenario( ConfigUtils.createConfig() ) ;
+		scenario.setPopulation( population );
+		new PopulationReader( scenario ).readFile( filename );
+		// (yyyy population reader uses network to retrofit some missing geo information such as route lenth.
+		// In my opinion, that should be done in prepareForSim, not in the parser.  It is commented as such
+		// in the PopulationReader class.  kai, nov'18)
+	}
+
+	public static boolean comparePopulations( Population population1, Population population2 ) {
+		boolean result = PopulationUtils.equalPopulation( population1, population2 );
+		return result ;
 	}
 }

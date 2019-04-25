@@ -19,13 +19,12 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
-import java.util.Collections;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -52,8 +51,9 @@ public final class RunOneTaxiExample {
 
 		// setup controler
 		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new OneTaxiModule(TAXIS_FILE));
-		controler.addOverridingModule(DvrpModule.createModule(TransportMode.taxi, Collections.emptySet()));
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.taxi));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation

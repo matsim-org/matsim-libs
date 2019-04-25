@@ -5,10 +5,13 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim</artifactId>
 	<name>MATSim</name>
-	<version>0.11.0-SNAPSHOT</version>
+	<version>12.0-SNAPSHOT</version>
 	<description>Multi-Agent Transport Simulation</description>
 	<url>http://ci.matsim.org:8080/job/MATSim_M2/ws/matsim/target/site</url>
 	<inceptionYear>2005</inceptionYear>
+	<!--<properties>-->
+	<!--	<skip.surefire.tests>${skipTests}</skip.surefire.tests>-->
+	<!--</properties>-->
 	<licenses>
 		<license>
 			<name>GNU General Public License</name>
@@ -101,8 +104,10 @@
 					</excludes>
 					<forkMode>once</forkMode>
 					<!-- avoid out of memory errors: -->
-					<argLine>-Xmx700m -Djava.awt.headless=true
-						-Dmatsim.preferLocalDtds=true</argLine>
+					<argLine>-Xmx700m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true</argLine>
+					<!-- skips surefire tests without skipping failsafe tests.
+					     Property value seems to magically default to false -->
+					<!--<skipTests>${skip.surefire.tests}</skipTests>-->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -152,6 +157,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<source>8</source><!--can be skipped from maven-javadoc-plugin 3.1.0-->
 					<quiet>true</quiet>
 					<header>MATSim API</header>
 					<excludePackageNames>org.matsim.jaxb:org.matsim.jaxb.*</excludePackageNames>
@@ -371,7 +377,7 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
+			<version>12.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -454,6 +460,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<geotools.version>14.0</geotools.version>
+		<geotools.version>20.2</geotools.version>
     </properties>
 </project>

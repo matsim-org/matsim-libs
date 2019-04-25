@@ -20,18 +20,15 @@
 package org.matsim.contrib.dvrp.examples.onetruck;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.contrib.dynagent.StaticDynActivity;
+import org.matsim.contrib.dynagent.IdleDynActivity;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.QSim;
 
 import com.google.inject.Inject;
 
@@ -42,20 +39,19 @@ final class OneTruckActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final MobsimTimer timer;
 
 	@Inject
-	public OneTruckActionCreator(QSim qSim) {
-		this.timer = qSim.getSimTimer();
+	public OneTruckActionCreator(MobsimTimer timer) {
+		this.timer = timer;
 	}
 
 	@Override
-	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
+	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
 		Task task = vehicle.getSchedule().getCurrentTask();
 		if (task instanceof DriveTask) {
 			return VrpLegFactory.createWithOfflineTracker(TransportMode.truck, vehicle, timer);
-		} else if (task instanceof OneTruckServeTask) { // PICKUP or DROPOFF
-			return new StaticDynActivity(((OneTruckServeTask)task).isPickup() ? "pickup" : "dropoff",
-					task.getEndTime());
+		} else if (task instanceof OneTruckServeTask) { // PICKUP or DELIVERY
+			return new IdleDynActivity(((OneTruckServeTask)task).isPickup() ? "pickup" : "delivery", task::getEndTime);
 		} else { // WAIT
-			return new VrpActivity("OneTaxiStay", (StayTask)task);
+			return new IdleDynActivity("OneTaxiStay", task::getEndTime);
 		}
 	}
 }

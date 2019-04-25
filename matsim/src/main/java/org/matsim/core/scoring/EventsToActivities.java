@@ -20,11 +20,6 @@
 
  package org.matsim.core.scoring;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -32,13 +27,16 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.population.PopulationUtils;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -67,19 +65,18 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
     }
 
     @Inject
-    EventsToActivities(ControlerListenerManager controlerListenerManager, EventsManager eventsManager) {
+    EventsToActivities(ControlerListenerManager controlerListenerManager) {
         controlerListenerManager.addControlerListener(new AfterMobsimListener() {
             @Override
             public void notifyAfterMobsim(AfterMobsimEvent event) {
                 finish();
             }
         });
-        eventsManager.addHandler(this);
     }
 
     @Override
     public void handleEvent(ActivityEndEvent event) {
-        Activity activity = activities.get(event.getPersonId());
+        Activity activity = activities.remove(event.getPersonId());
         if (activity == null) {
             Activity firstActivity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
             firstActivity.setFacilityId(event.getFacilityId());
@@ -89,7 +86,6 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
         for (ActivityHandler activityHandler : activityHandlers) {
             activityHandler.handleActivity(new PersonExperiencedActivity(event.getPersonId(), activity));
         }
-        activities.remove(event.getPersonId());
     }
 
     @Override

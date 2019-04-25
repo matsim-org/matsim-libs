@@ -22,6 +22,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
@@ -41,13 +42,22 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
  */
 public class FreightUtils {
 
-	private static final Logger log = Logger.getLogger(FreightUtils.class);
+	/**
+	 * From the outside, rather use {@link FreightUtils#getCarriers(Scenario)} .  This string constant will eventually become private.
+	 */
+	@Deprecated
+	public static final String CARRIERS = "carriers" ;
+	private static final Logger log = Logger.getLogger(FreightUtils.class );
 
 	/**
-	 * Creates a new Carries only with @link{CarrierShipment}s for creating a new VRP. 
-	 * As consequence of the transformation of @link{CarrierService}s to @link{CarrierShipment}s the solution of the VRP can have tours with
-	 * vehicles returning to the depot and load for another tour instead of creating another vehicle with additional (fix) costs. 
-	 * 
+	 * Creates a new {@link Carriers} container only with {@link CarrierShipment}s for creating a new VRP.
+	 * As consequence of the transformation of {@link CarrierService}s to {@link CarrierShipment}s the solution of the VRP can have tours with
+	 * vehicles returning to the depot and load for another tour instead of creating another vehicle with additional (fix) costs.
+	 * <br/>
+	 * The method is meant for multi-depot problems.  Here, the original "services" input does not have an assignment of services
+	 * to depots.  The solution to the problem, however, does.  So the assignment is taken from that solution, and each returned
+	 * {@link Carrier} has that depot as pickup location in each shipment.
+	 *
 	 * @param carriers	carriers with a Solution (result of solving the VRP).
 	 * @return Carriers carriersWithShipments
 	 */
@@ -67,6 +77,15 @@ public class FreightUtils {
 			carriersWithShipments.addCarrier(carrierWS);
 		}
 		return carriersWithShipments;
+	}
+
+	public static Carriers getCarriers( Scenario scenario ){
+		Carriers carriers = (Carriers) scenario.getScenarioElement( CARRIERS );
+		if ( carriers==null ) {
+			carriers = new Carriers(  ) ;
+			scenario.addScenarioElement( CARRIERS, carriers );
+		}
+		return carriers;
 	}
 
 	/**
@@ -130,8 +149,8 @@ public class FreightUtils {
 		for (CarrierService carrierService : carrier.getServices()) {
 			log.debug("Converting CarrierService to CarrierShipment: " + carrierService.getId());
 			CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class), 
-					depotServiceIsdeliveredFrom.get(carrierService.getId()), 
-					carrierService.getLocationLinkId(), 
+					depotServiceIsdeliveredFrom.get(carrierService.getId()),
+					carrierService.getLocationLinkId(),
 					carrierService.getCapacityDemand())
 					.setDeliveryServiceTime(carrierService.getServiceDuration())
 					//						.setPickupServiceTime(pickupServiceTime)			//Not set yet, because in service we have now time for that. Maybe change it later, kmt sep18

@@ -1,5 +1,6 @@
 package org.matsim.contrib.freight.carrier;
 
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -18,6 +19,7 @@ public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
 		new CarrierPlanXmlReaderV2(carriers).readFile(getClassInputDirectory() + "carrierPlansEquils.xml");
 	}
 
+	@Test
 	public void test_whenLoadingTypes_allAssignmentsInLightVehicleAreCorrectly(){
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 		CarrierVehicle v = getVehicle("lightVehicle");
@@ -25,6 +27,7 @@ public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
 		
 	}
 	
+	@Test
 	public void test_whenLoadingTypes_allAssignmentsInMediumVehicleAreCorrectly(){
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 		CarrierVehicle v = getVehicle("mediumVehicle");

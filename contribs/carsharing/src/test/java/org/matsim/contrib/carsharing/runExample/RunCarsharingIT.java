@@ -29,6 +29,7 @@ import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
 import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
@@ -58,7 +59,8 @@ public class RunCarsharingIT {
 				new FreeFloatingConfigGroup(), 
 				new OneWayCarsharingConfigGroup(), 
 				new TwoWayCarsharingConfigGroup(),
-				new CarsharingConfigGroup() ) ;
+				new CarsharingConfigGroup(),
+				new DvrpConfigGroup()) ;
 
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles );
@@ -155,8 +157,9 @@ public class RunCarsharingIT {
 					} else if ( TransportMode.car.equals(legMode) ) {
 						Assert.assertEquals( 0, nOfModeLegs ) ;
 					} else if ( "twoway_vehicle".equals(legMode) ) {
-						Assert.assertEquals( 10, nOfModeLegs ) ;
-//						Assert.assertEquals( 8, nOfModeLegs ) ;
+
+						Assert.assertEquals( 8, nOfModeLegs ) ;
+
 					}
 					else if ( "oneway_vehicle".equals(legMode) ) {
 						Assert.assertEquals( 0, nOfModeLegs ) ;
@@ -181,12 +184,13 @@ public class RunCarsharingIT {
 							
 				else if ( iteration==20 ) {
 					if ( TransportMode.walk.equals(legMode) ) {
-						Assert.assertEquals(4, nOfModeLegs );
+						Assert.assertEquals(2, nOfModeLegs );
 					} else if ( "twoway_vehicle".equals(legMode) ) {
-						Assert.assertEquals( 10, nOfModeLegs ) ;
-//						Assert.assertEquals( 8, nOfModeLegs ) ;
+
+						Assert.assertEquals( 8, nOfModeLegs ) ;
+
 					} else if ( TransportMode.car.equals(legMode) ) {
-						Assert.assertEquals( 0, nOfModeLegs ) ;
+						Assert.assertEquals( 2, nOfModeLegs ) ;
 					} else if ( "egress_walk_tw".equals(legMode) ) {
 						Assert.assertEquals( 4, nOfModeLegs ) ;
 					}

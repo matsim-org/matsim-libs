@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
-public class TravelTimeDataHashMapFactory implements TravelTimeDataFactory {
+class TravelTimeDataHashMapFactory implements TravelTimeDataFactory {
 
 	private final Network network;
 	

@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -84,11 +85,12 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 		config.qsim().setEndTime(24 * 3600);
 		
 		config.controler().setLastIteration(0);
+		config.controler().setRoutingAlgorithmType( ControlerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(16*3600);
 		config.planCalcScore().addActivityParams(homeParams);
-			
+
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
 		createNetwork(scenario);

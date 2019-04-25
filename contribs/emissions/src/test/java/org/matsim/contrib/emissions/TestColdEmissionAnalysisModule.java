@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
-import org.matsim.contrib.emissions.types.*;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.testcases.MatsimTestUtils;
@@ -35,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import static org.matsim.contrib.emissions.types.HbefaVehicleCategory.*;
+import static org.matsim.contrib.emissions.HbefaVehicleCategory.*;
 
 
 /**
@@ -69,8 +68,8 @@ public class TestColdEmissionAnalysisModule {
 	// same values as int for table
 	private static final int tableParkingDuration = (int) Math.round( parkingDuration );
 	private static final int tableAccDistance = 1;
-	private final int numberOfColdEmissions = ColdPollutant.values().length;
-	
+	private static final Set<String> pollutants = new HashSet<>(Arrays.asList("CO", "CO2(total)", "FC", "HC", "NMHC", "NOx", "NO2","PM", "SO2"));
+	private final int numberOfColdEmissions = pollutants.size();
 	// strings for test cases
 	
 	// The material below was confused in the way that strings like "petrol" or "diesel" were given for the
@@ -79,8 +78,8 @@ public class TestColdEmissionAnalysisModule {
 	
 	// first case: complete data - corresponding entry in average table
 	private static final String petrol_technology = "petrol";
-	private static final String none_sizeClass = "none";
-	private static final String none_emConcept = "none";
+	private static final String none_sizeClass = "average";
+	private static final String none_emConcept = "average";
 	// second case: complete data - corresponding entry in detailed table
 	private static final String petrol_technology2 = "petrol";  // maybe use same as above? kai, jul'18
 	private static final String leq14l_sizeClass = "<1,4L";
@@ -186,7 +185,7 @@ public class TestColdEmissionAnalysisModule {
 		// seventh case: no corresponding entry either in the detailed nor the average table
 		Id<VehicleType> vehicleInfoForNoCase = Id.create( "PASSENGER_CAR;PC diesel;;>=2L", VehicleType.class );
 //		Id<VehicleType> vehicleInfoForNoCase = Id.create( "PASSENGER_CAR;"+diesel_technology+";" + geq2l_sizeClass + ";", VehicleType.class );
-		testCasesExceptions.add( vehicleInfoForNoCase );
+//		testCasesExceptions.add( vehicleInfoForNoCase ); //this will return the average passenger car value
 		// eighth case: vehicle category not specified
 		testCasesExceptions.add( Id.create( ";;;", VehicleType.class ) );
 		// ninth case: empty string as id
@@ -249,7 +248,7 @@ public class TestColdEmissionAnalysisModule {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setUsingVehicleTypeIdAsVehicleDescription( true );
 		
-		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, ecg ), emissionEventManager, rescaleFactor );
+		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants, ecg), emissionEventManager, rescaleFactor );
 		HandlerToTestEmissionAnalysisModules.reset();
 		
 		Id<Link> idForAvgTable = Id.create( "link id avg", Link.class );
@@ -276,7 +275,7 @@ public class TestColdEmissionAnalysisModule {
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setUsingVehicleTypeIdAsVehicleDescription( true );
-		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, ecg ), emissionEventManager, null );
+		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants , ecg), emissionEventManager, null );
 		
 	}
 	
@@ -348,7 +347,7 @@ public class TestColdEmissionAnalysisModule {
 	
 	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable,
 								 final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
-		for ( ColdPollutant cp : ColdPollutant.values() ) {
+		for ( String cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
 			detColdKey.setHbefaDistance( tableAccDistance );
 			detColdKey.setHbefaParkingTime( tableParkingDuration );

@@ -45,6 +45,7 @@ import org.matsim.facilities.ActivityFacilities;
 /**
  * @author thomas, dziemke
  */
+@Deprecated
 public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownListener {
 	// yyyy The zone based and the grid based accessibility controler listeners should be combined, since the coordinate points on which this is
 	// computed are now external anyways.  There is probably one or the other grid dependency in the grid based accessibility controler
@@ -213,8 +214,8 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		for (String mode : accessibilityCalculator.getModes() ) {
 			writer.writeField(mode + "_accessibility");
 		}
-		writer.writeField(Labels.POPULATION_DENSITIY); // TODO I think this has to be made adjustable
-		writer.writeField(Labels.POPULATION_DENSITIY);
+		writer.writeField(Labels.DENSITIY); // TODO I think this has to be made adjustable
+		writer.writeField(Labels.DENSITIY);
 		writer.writeNewLine();
 
 		final SpatialGrid spatialGrid = spatialGridAggregator.getAccessibilityGrids().get(Modes4Accessibility.freespeed.name() ) ;

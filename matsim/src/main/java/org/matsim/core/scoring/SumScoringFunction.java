@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
 
 import java.util.ArrayList;
@@ -11,8 +12,8 @@ import java.util.ArrayList;
 public final class SumScoringFunction implements ScoringFunction {
 
 	public interface BasicScoring {
-		public void finish();
-		public double getScore();
+		void finish();
+		double getScore();
 	}
 
 	public interface ActivityScoring extends BasicScoring {
@@ -23,6 +24,10 @@ public final class SumScoringFunction implements ScoringFunction {
 
 	public interface LegScoring extends BasicScoring {
 		void handleLeg(final Leg leg);
+	}
+
+	public interface TripScoring extends BasicScoring{
+		void handleTrip(final Trip trip) ;
 	}
 
 	public interface MoneyScoring extends BasicScoring {
@@ -50,65 +55,74 @@ public final class SumScoringFunction implements ScoringFunction {
 
 	private static Logger log = Logger.getLogger(SumScoringFunction.class);
 
-	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();
-	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<ActivityScoring>();
-	private ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<MoneyScoring>();
-	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<LegScoring>();
-	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<AgentStuckScoring>();
-	private ArrayList<ArbitraryEventScoring> arbtraryEventScoringFunctions = new ArrayList<ArbitraryEventScoring>() ;
+	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<>();
+	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<>();
+	private ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<>();
+	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<>();
+	private ArrayList<TripScoring> tripScoringFunctions = new ArrayList<>();
+	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<>();
+	private ArrayList<ArbitraryEventScoring> arbitraryEventScoringFunctions = new ArrayList<>() ;
 
 	@Override
 	public final void handleActivity(Activity activity) {
 		double startTime = activity.getStartTime();
 		double endTime = activity.getEndTime();
-		if (startTime == Time.UNDEFINED_TIME && endTime != Time.UNDEFINED_TIME) {
-			for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
+		if (Time.isUndefinedTime(startTime) && !Time.isUndefinedTime(endTime)) {
+			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleFirstActivity(activity);
 			}
-		} else if (startTime != Time.UNDEFINED_TIME && endTime != Time.UNDEFINED_TIME) {
-			for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
+		} else if (!Time.isUndefinedTime(startTime) && !Time.isUndefinedTime(endTime)) {
+			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleActivity(activity);
 			}
-		} else if (startTime != Time.UNDEFINED_TIME && endTime == Time.UNDEFINED_TIME) {
-			for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
+		} else if (!Time.isUndefinedTime(startTime) && Time.isUndefinedTime(endTime)) {
+			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleLastActivity(activity);
 			}
 		} else {
-			throw new RuntimeException("Trying to score an activity without start or end time. Should not happen."); 	
+			throw new RuntimeException("Trying to score an activity without start or end time. Should not happen. Activity="
+			+ activity );
 		}
 	}
 
 	@Override
 	public final void handleLeg(Leg leg) {
-		for (LegScoring legScoringFunction : legScoringFunctions) {
+		for (LegScoring legScoringFunction : this.legScoringFunctions) {
 			legScoringFunction.handleLeg(leg);
 		}
 	}
 
 	@Override
+	public final void handleTrip(Trip trip) {
+		for (TripScoring tripScoringFunction : this.tripScoringFunctions) {
+			tripScoringFunction.handleTrip(trip);
+		}
+	}
+
+	@Override
 	public void addMoney(double amount) {
-		for (MoneyScoring moneyScoringFunction : moneyScoringFunctions) {
+		for (MoneyScoring moneyScoringFunction : this.moneyScoringFunctions) {
 			moneyScoringFunction.addMoney(amount);
 		}
 	}
 
 	@Override
 	public void agentStuck(double time) {
-		for (AgentStuckScoring agentStuckScoringFunction : agentStuckScoringFunctions) {
+		for (AgentStuckScoring agentStuckScoringFunction : this.agentStuckScoringFunctions) {
 			agentStuckScoringFunction.agentStuck(time);
 		}
 	}
 
 	@Override
 	public void handleEvent(Event event) {
-		for ( ArbitraryEventScoring eventScoringFunction : this.arbtraryEventScoringFunctions ) {
+		for (ArbitraryEventScoring eventScoringFunction : this.arbitraryEventScoringFunctions) {
 			eventScoringFunction.handleEvent(event) ;
 		}
 	}
 
 	@Override
 	public void finish() {
-		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
+		for (BasicScoring basicScoringFunction : this.basicScoringFunctions) {
 			basicScoringFunction.finish();
 		}
 	}
@@ -119,7 +133,7 @@ public final class SumScoringFunction implements ScoringFunction {
 	@Override
 	public double getScore() {
 		double score = 0.0;
-		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
+		for (BasicScoring basicScoringFunction : this.basicScoringFunctions) {
 			double contribution = basicScoringFunction.getScore();
 			if (log.isTraceEnabled()) {
 				log.trace("Contribution of scoring function: " + basicScoringFunction.getClass().getName() + " is: " + contribution);
@@ -135,26 +149,30 @@ public final class SumScoringFunction implements ScoringFunction {
 	}
 
 	public void addScoringFunction(BasicScoring scoringFunction) {
-		basicScoringFunctions.add(scoringFunction);
+		this.basicScoringFunctions.add(scoringFunction);
 
 		if (scoringFunction instanceof ActivityScoring) {
-			activityScoringFunctions.add((ActivityScoring) scoringFunction);
+			this.activityScoringFunctions.add((ActivityScoring) scoringFunction);
 		}
 
 		if (scoringFunction instanceof AgentStuckScoring) {
-			agentStuckScoringFunctions.add((AgentStuckScoring) scoringFunction);
+			this.agentStuckScoringFunctions.add((AgentStuckScoring) scoringFunction);
 		}
 
 		if (scoringFunction instanceof LegScoring) {
-			legScoringFunctions.add((LegScoring) scoringFunction);
+			this.legScoringFunctions.add((LegScoring) scoringFunction);
+		}
+
+		if (scoringFunction instanceof TripScoring) {
+			this.tripScoringFunctions.add((TripScoring) scoringFunction);
 		}
 
 		if (scoringFunction instanceof MoneyScoring) {
-			moneyScoringFunctions.add((MoneyScoring) scoringFunction);
+			this.moneyScoringFunctions.add((MoneyScoring) scoringFunction);
 		}
 
-		if (scoringFunction instanceof ArbitraryEventScoring ) {
-			this.arbtraryEventScoringFunctions.add((ArbitraryEventScoring) scoringFunction) ;
+		if (scoringFunction instanceof ArbitraryEventScoring) {
+			this.arbitraryEventScoringFunctions.add((ArbitraryEventScoring) scoringFunction);
 		}
 
 	}

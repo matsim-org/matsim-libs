@@ -1,11 +1,11 @@
 package org.matsim.contrib.carsharing.readers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -42,7 +42,7 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 	private boolean hasFF = false;
 	private boolean hasOW = false;
 	private boolean hasTW = false;
-	private Map<String, CompanyContainer> companies = new HashMap<String, CompanyContainer>();
+	private Map<String, CompanyContainer> companies = new ConcurrentHashMap<String, CompanyContainer>();
 	private Set<String> companyNames = new TreeSet<String>();
 	private Map<String, FreefloatingAreas> freefloatingAreas;
 
@@ -58,13 +58,13 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 		return companies;
 	}
 
-	private Map<String, CSVehicle> allVehicles = new HashMap<String, CSVehicle>();
+	private Map<String, CSVehicle> allVehicles = new ConcurrentHashMap<String, CSVehicle>();
 	
 	public Map<String, CSVehicle> getAllVehicles() {
 		return allVehicles;
 	}
 
-	private Map<CSVehicle, Link> allVehicleLocations = new HashMap<CSVehicle, Link>();
+	private Map<CSVehicle, Link> allVehicleLocations = new ConcurrentHashMap<CSVehicle, Link>();
 
 	
 	private ArrayList<CarsharingStation> twStations = new ArrayList<CarsharingStation>();
@@ -74,20 +74,20 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 	private QuadTree<CarsharingStation> owvehicleLocationQuadTree;	
 	private QuadTree<CarsharingStation> twvehicleLocationQuadTree;
 
-	private Map<String, CarsharingStation> twowaycarsharingstationsMap = new HashMap<String, CarsharingStation>();
-	private Map<String, CarsharingStation> onewaycarsharingstationsMap = new HashMap<String, CarsharingStation>();
+	private Map<String, CarsharingStation> twowaycarsharingstationsMap = new ConcurrentHashMap<String, CarsharingStation>();
+	private Map<String, CarsharingStation> onewaycarsharingstationsMap = new ConcurrentHashMap<String, CarsharingStation>();
 	
-	private Map<CSVehicle, Link> ffvehiclesMap = new HashMap<CSVehicle, Link>();	
-	private Map<String, CSVehicle> ffvehicleIdMap = new HashMap<String, CSVehicle>();
+	private Map<CSVehicle, Link> ffvehiclesMap = new ConcurrentHashMap<CSVehicle, Link>();	
+	private Map<String, CSVehicle> ffvehicleIdMap = new ConcurrentHashMap<String, CSVehicle>();
 	
-	private Map<String, CSVehicle> owvehicleIdMap = new HashMap<String, CSVehicle>();
-	private Map<CSVehicle, Link> owvehiclesMap = new HashMap<CSVehicle, Link>();
+	private Map<String, CSVehicle> owvehicleIdMap = new ConcurrentHashMap<String, CSVehicle>();
+	private Map<CSVehicle, Link> owvehiclesMap = new ConcurrentHashMap<CSVehicle, Link>();
 	
 	
-	private Map<String, CSVehicle> twvehicleIdMap = new HashMap<String, CSVehicle>();
-	private Map<CSVehicle, Link> twvehiclesMap = new HashMap<CSVehicle, Link>();
+	private Map<String, CSVehicle> twvehicleIdMap = new ConcurrentHashMap<String, CSVehicle>();
+	private Map<CSVehicle, Link> twvehiclesMap = new ConcurrentHashMap<CSVehicle, Link>();
 
-	private Map<CSVehicle, String> owvehicleToStationMap = new HashMap<CSVehicle, String>();
+	private Map<CSVehicle, String> owvehicleToStationMap = new ConcurrentHashMap<CSVehicle, String>();
 		
 	public Map<String, CarsharingStation> getTwowaycarsharingstationsMap() {
 		return twowaycarsharingstationsMap;
@@ -143,23 +143,23 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 			this.companyNames.add(companyName);
 			createQuadTrees();
 
-			twowaycarsharingstationsMap = new HashMap<String, CarsharingStation>();
-			onewaycarsharingstationsMap = new HashMap<String, CarsharingStation>();
+			twowaycarsharingstationsMap = new ConcurrentHashMap<String, CarsharingStation>();
+			onewaycarsharingstationsMap = new ConcurrentHashMap<String, CarsharingStation>();
 
-			ffvehiclesMap = new HashMap<CSVehicle, Link>();	
-			ffvehicleIdMap = new HashMap<String, CSVehicle>();
+			ffvehiclesMap = new ConcurrentHashMap<CSVehicle, Link>();	
+			ffvehicleIdMap = new ConcurrentHashMap<String, CSVehicle>();
 			
-			owvehicleIdMap = new HashMap<String, CSVehicle>();
-			owvehiclesMap = new HashMap<CSVehicle, Link>();			
+			owvehicleIdMap = new ConcurrentHashMap<String, CSVehicle>();
+			owvehiclesMap = new ConcurrentHashMap<CSVehicle, Link>();			
 			
-			twvehicleIdMap = new HashMap<String, CSVehicle>();
-			twvehiclesMap = new HashMap<CSVehicle, Link>();
+			twvehicleIdMap = new ConcurrentHashMap<String, CSVehicle>();
+			twvehiclesMap = new ConcurrentHashMap<CSVehicle, Link>();
 			
-			owvehicleToStationMap = new HashMap<CSVehicle, String>();
+			owvehicleToStationMap = new ConcurrentHashMap<CSVehicle, String>();
 			
 			
-			//allVehicles = new HashMap<String, CSVehicle>();
-			//companies = new HashMap<String, CompanyContainer>();
+			//allVehicles = new ConcurrentHashMap<String, CSVehicle>();
+			//companies = new ConcurrentHashMap<String, CompanyContainer>();
 		}
 		
 		else if (name.equals("twoway") || name.equals("oneway")) {
@@ -240,8 +240,8 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 			
 		}
 		else if (name.equals("twoway") || name.equals("oneway")) {
-			Map<String, Integer> numberOfVehiclesPerType = new HashMap<String, Integer>();
-			Map<String, ArrayList<CSVehicle>> vehiclesPerType = new HashMap<String, ArrayList<CSVehicle>>();
+			Map<String, Integer> numberOfVehiclesPerType = new ConcurrentHashMap<String, Integer>();
+			Map<String, ArrayList<CSVehicle>> vehiclesPerType = new ConcurrentHashMap<String, ArrayList<CSVehicle>>();
 			
 			for (CSVehicle vehicle : vehicles) {
 				if (name.equals("oneway")) {

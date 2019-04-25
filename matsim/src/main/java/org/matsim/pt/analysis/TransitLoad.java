@@ -255,8 +255,8 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 	public static class StopInformation {
 		public short nOfEntering = 0;
 		public short nOfLeaving = 0;
-		public double arrivalTime = Time.UNDEFINED_TIME;
-		public double departureTime = Time.UNDEFINED_TIME;
+		public double arrivalTime = Time.getUndefinedTime();
+		public double departureTime = Time.getUndefinedTime();
 	}
 
 }

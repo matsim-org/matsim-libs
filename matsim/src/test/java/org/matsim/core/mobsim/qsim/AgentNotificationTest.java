@@ -47,6 +47,8 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
@@ -254,15 +256,14 @@ public class AgentNotificationTest {
 					bind(PopulationAgentSource.class).asEagerSingleton();
 					addNamedComponent(PopulationAgentSource.class, PopulationModule.COMPONENT_NAME);
 					bind(AgentFactory.class).to(MyAgentFactory.class).asEagerSingleton();
+					bind( QVehicleFactory.class ).toProvider( () -> QVehicleImpl::new ) ;
 				}
 			})
-			.configureComponents(components -> {
+			.configureQSimComponents( components -> {
 				components.removeNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
-			}) //
+			} ) //
 			.build(scenario, eventsManager) //
 			.run();
-		
-		// yyyyyy I can comment out the above line and the test still passes (will say: "skipped"). ?????? kai, feb'16
 		
 		assumeThat(handler.getEvents(), hasItem(
 				is(both(eventWithTime(25200.0)).and(instanceOf(PersonDepartureEvent.class)))));

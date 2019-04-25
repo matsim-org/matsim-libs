@@ -8,7 +8,7 @@ public class DummyMessage1 extends Message {
 
 	@Override
 	public void handleMessage() {
-		this.getSendingUnit().getScheduler().unschedule(messageToUnschedule);
+		this.getReceivingUnit().getScheduler().unschedule(messageToUnschedule);
 	}
 
 	@Override

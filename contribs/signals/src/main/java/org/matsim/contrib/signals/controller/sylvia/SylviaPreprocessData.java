@@ -56,7 +56,7 @@ public final class SylviaPreprocessData {
 
 	public static final String SYLVIA_PREFIX = "sylvia_plan_";
 
-	private static final int MIN_GREEN_SECONDS = 5; //see RILSA pp. 28
+	private static final int MIN_GREEN_SECONDS = 5; // RILSA pp. 28 says 5s
 	
 	
 	private static void convertFixedTimePlansToSylviaBasePlans(String signalControlInputFile, String signalControlOutputFile)
@@ -195,7 +195,7 @@ public final class SylviaPreprocessData {
 	/**
 	 * move all droppings and onsets behind shrinkStart by secondsToBeRemoved
 	 * seconds to the left, i.e. shrink the whole signal plan by secondsToBeRemoved
-	 * seconds beginning at second shrinkStart.
+	 * seconds beginning at second shrinkStart. Move the offset accordingly.
 	 */
 	private static void shrinkSignalPlan(SignalPlanData signalPlan, int shrinkStart, int secondsToBeRemoved) {
 		signalPlan.setCycleTime(signalPlan.getCycleTime() - secondsToBeRemoved);
@@ -206,6 +206,12 @@ public final class SylviaPreprocessData {
 			if (setting.getDropping() > shrinkStart) {
 				setting.setDropping(setting.getDropping() - secondsToBeRemoved);
 			}
+		}
+		// move offset accordingly
+		if (signalPlan.getOffset() > shrinkStart + secondsToBeRemoved) {
+			signalPlan.setOffset(signalPlan.getOffset() - secondsToBeRemoved);			
+		} else if (signalPlan.getOffset() > shrinkStart) {
+			signalPlan.setOffset(shrinkStart);
 		}
 	}
 	

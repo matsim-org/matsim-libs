@@ -36,11 +36,11 @@ public class StayTaskImpl extends AbstractTask implements StayTask {
 	}
 
 	@Override
-	public Link getLink() {
+	public final Link getLink() {
 		return link;
 	}
 
-	public String getName() {
+	public final String getName() {
 		return name;
 	}
 

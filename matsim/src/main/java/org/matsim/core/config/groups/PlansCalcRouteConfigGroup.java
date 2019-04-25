@@ -29,10 +29,7 @@ import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Config Module for PlansCalcRoute class.
@@ -65,7 +62,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	private static final Logger log = Logger.getLogger(PlansCalcRouteConfigGroup.class) ;
 	
-	private Collection<String> networkModes = Arrays.asList(TransportMode.car);
+	private Collection<String> networkModes = Collections.singletonList( TransportMode.car );
 
 	private boolean acceptModeParamsWithoutClearing = false;
 	
@@ -301,18 +298,34 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 	}
 
+	public void clearModeRoutingParams() {
+		clearParameterSetsForType( ModeRoutingParams.SET_TYPE ) ;
+	}
+
 	@Override
 	public void addParameterSet(final ConfigGroup set) {
-		if ( set.getName().equals( ModeRoutingParams.SET_TYPE ) && !this.acceptModeParamsWithoutClearing ) {
-			clearParameterSetsForType( set.getName() );
-			this.acceptModeParamsWithoutClearing = true;
-			
-		}
-		ModeRoutingParams pars = (ModeRoutingParams) set ;
-		// for the time being pushing the "global" factor into the local ones if they are not initialized by
-		// themselves.  Necessary for some tests; maybe we should eventually disable them.  kai, feb'15
-		if ( pars.getBeelineDistanceFactor()== null ) {
-			pars.setBeelineDistanceFactor( this.beelineDistanceFactor );
+		if ( set.getName().equals( ModeRoutingParams.SET_TYPE ) ){
+			if( !this.acceptModeParamsWithoutClearing ){
+				//			clearParameterSetsForType( set.getName() );
+				log.warn( "It used to be the case that manually setting one mode routing here would first clear all the default values.  I have now removed " +
+						    "this clearing, i.e. default values will remain.  If they are in the way, removeModeRoutingParams(...) can be used to " +
+						    "individually remove them.  kai, apr'19" );
+				this.acceptModeParamsWithoutClearing = true;
+			}
+			ModeRoutingParams pars = (ModeRoutingParams) set;
+
+			ModeRoutingParams result = this.getModeRoutingParams().get( pars.getMode() );
+			if ( result != null ) {
+				log.info("Replacing mode routing params for mode=" + pars.getMode() + "." ) ;
+				// above warning can be converted to info in about 2 years.  kai, apr'19
+				this.removeModeRoutingParams( pars.getMode() );
+			}
+
+			// for the time being pushing the "global" factor into the local ones if they are not initialized by
+			// themselves.  Necessary for some tests; maybe we should eventually disable them.  kai, feb'15
+			if( pars.getBeelineDistanceFactor() == null ){
+				pars.setBeelineDistanceFactor( this.beelineDistanceFactor );
+			}
 		}
 		super.addParameterSet( set );
 	}
@@ -473,7 +486,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		return map ;
 	}
 	
-	@Deprecated // use mode-specific factors.  kai, apr'15
+//	@Deprecated // use mode-specific factors.  kai, apr'15
 	public void setTeleportedModeFreespeedFactor(String mode, double freespeedFactor) {
 		testForLocked() ;
 		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
@@ -482,7 +495,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		addParameterSet( pars );
 	}
 
-	@Deprecated // use mode-specific factors.  kai, apr'15
+//	@Deprecated // use mode-specific factors.  kai, apr'15
 	public void setTeleportedModeSpeed(String mode, double speed) {
 		testForLocked() ;
 		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
@@ -524,6 +537,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 	@Override protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
+
 //		if ( this.insertingAccessEgressWalk ) {
 //			// we need scoring parameters for each resulting interaction activity
 //			for ( String mode : this.getNetworkModes() ) {
@@ -539,5 +553,23 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		// these are now added in the config consistency checker of PlanCalcScoreConfigGroup,
 		// so there is no point in checking here since the checker here might be called
 		// earlier. kai, jan'18
+
+		Set<String> modesRoutedAsTeleportation = this.getModeRoutingParams().keySet();
+		Collection<String> modesRoutedAsNetworkModes = this.getNetworkModes();
+
+		for( String mode : modesRoutedAsTeleportation ){
+			if ( modesRoutedAsNetworkModes.contains( mode ) ) {
+				throw new RuntimeException( "mode \"" + mode + "\" is defined both as teleportation (mode routing param) and for network routing.  You need to remove " +
+										"one or the other.") ;
+			}
+		}
+
 	}
+
+	public void printModeRoutingParams(){
+		for( Map.Entry<String, PlansCalcRouteConfigGroup.ModeRoutingParams> entry : this.getModeRoutingParams().entrySet() ){
+			log.warn( "key=" + entry.getKey() + "; value=" + entry.getValue() );
+		}
+	}
+
 }

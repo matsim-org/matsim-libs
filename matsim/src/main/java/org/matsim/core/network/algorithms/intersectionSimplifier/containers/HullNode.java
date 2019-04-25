@@ -19,7 +19,7 @@
 
 package org.matsim.core.network.algorithms.intersectionSimplifier.containers;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 
 public class HullNode {
 	/** ID of the vertex */

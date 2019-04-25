@@ -20,18 +20,18 @@
 package org.matsim.contrib.taxi.util;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
+import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.utils.misc.Time;
 
 import com.google.inject.Inject;
 
-public class TaxiSimulationConsistencyChecker implements AfterMobsimListener {
+public class TaxiSimulationConsistencyChecker implements MobsimBeforeCleanupListener {
 	private final SubmittedTaxiRequestsCollector requestCollector;
 	private final TaxiConfigGroup taxiCfg;
 
@@ -51,14 +51,14 @@ public class TaxiSimulationConsistencyChecker implements AfterMobsimListener {
 				} else {
 					Logger.getLogger(getClass())
 							.warn("Taxi request not performed. Request time:\t" + Time.writeTime(
-									tr.getEarliestStartTime()) + "\tPassenger:\t" + tr.getPassenger().getId());
+									tr.getEarliestStartTime()) + "\tPassenger:\t" + tr.getPassengerId());
 				}
 			}
 		}
 	}
 
 	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
+	public void notifyMobsimBeforeCleanup(final MobsimBeforeCleanupEvent e) {
 		addCheckAllRequestsPerformed();
 	}
 }

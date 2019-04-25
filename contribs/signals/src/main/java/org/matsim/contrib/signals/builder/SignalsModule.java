@@ -25,6 +25,7 @@ package org.matsim.contrib.signals.builder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.controller.SignalControllerFactory;
@@ -55,12 +56,16 @@ import com.google.inject.multibindings.MapBinder;
  * 
  * @author tthunig
  */
-public class SignalsModule extends AbstractModule {
-	
+class SignalsModule extends AbstractModule {
+	// This is no longer public since there is now also material that needs to be injected at the QSim level (see
+	// Signals.configure(...)), and making SignalsModule nonpublic seems the best way of forcibly notifying users.  kai, nov'18
+
+	private static final Logger log = Logger.getLogger( SignalsModule.class ) ;
+
 	private MapBinder<String, SignalControllerFactory> signalControllerFactoryMultibinder;
 	private Map<String, Class<? extends SignalControllerFactory>> signalControllerFactoryClassNames = new HashMap<>();
-//	
-	public SignalsModule() {
+
+	SignalsModule() {
 		// specify default signal controller. you can add your own by calling addSignalControllerFactory (see method java-doc below)
 		signalControllerFactoryClassNames.put(DefaultPlanbasedSignalSystemController.IDENTIFIER, DefaultPlanbasedSignalSystemController.FixedTimeFactory.class);
 		signalControllerFactoryClassNames.put(SylviaSignalController.IDENTIFIER, SylviaSignalController.SylviaFactory.class);
@@ -69,6 +74,11 @@ public class SignalsModule extends AbstractModule {
 	
 	@Override
 	public void install() {
+
+		getConfig().travelTimeCalculator().setSeparateModes( false );
+		log.warn("setting travelTimeCalculatur.setSeparateModes to false since otherwise link2link routing does not work") ;
+		// yyyy move to individual config files???  kai, feb'19
+
 		this.signalControllerFactoryMultibinder = MapBinder.newMapBinder(binder(), new TypeLiteral<String>() {}, new TypeLiteral<SignalControllerFactory>() {});
 		
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
@@ -88,7 +98,7 @@ public class SignalsModule extends AbstractModule {
 			// general signal bindings
 			bind(SignalSystemsManager.class).toProvider(FromDataBuilder.class);
 			addMobsimListenerBinding().to(QSimSignalEngine.class);
-			bind(QNetworkFactory.class).to(QSignalsNetworkFactory.class);
+//			bind(QNetworkFactory.class).to(QSignalsNetworkFactory.class);
 
 			// bind tool to write information about signal states for via
 			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
@@ -111,7 +121,7 @@ public class SignalsModule extends AbstractModule {
 	 * 
 	 * @param signalControllerFactoryClassName
 	 */
-	public final void addSignalControllerFactory(String key, Class<? extends SignalControllerFactory> signalControllerFactoryClassName) {
+	final void addSignalControllerFactory(String key, Class<? extends SignalControllerFactory> signalControllerFactoryClassName) {
 		this.signalControllerFactoryClassNames.put(key, signalControllerFactoryClassName);
 	}
 }

@@ -86,7 +86,7 @@ final public class QSimComponentsConfig {
 		keys.clear();
 	}
 
-	List<Object> getActiveComponents() {
+	public List<Object> getActiveComponents() {
 		return Collections.unmodifiableList(components);
 	}
 }

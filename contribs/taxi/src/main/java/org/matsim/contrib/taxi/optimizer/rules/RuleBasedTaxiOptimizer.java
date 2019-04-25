@@ -20,16 +20,15 @@
 package org.matsim.contrib.taxi.optimizer.rules;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.data.validator.TaxiRequestValidator;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
@@ -46,34 +45,32 @@ import org.matsim.core.router.util.TravelTime;
  * @author michalm
  */
 public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
-	public static RuleBasedTaxiOptimizer create(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
-			Network network, MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility,
-			RuleBasedTaxiOptimizerParams params, TaxiRequestValidator requestValidator, EventsManager events) {
-		return create(taxiCfg, fleet, scheduler, network, timer, travelTime, travelDisutility, params,
-				new SquareGridSystem(network, params.cellSize), requestValidator, events);
+	public static RuleBasedTaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
+			TaxiScheduler scheduler, Network network, MobsimTimer timer, TravelTime travelTime,
+			TravelDisutility travelDisutility, RuleBasedTaxiOptimizerParams params) {
+		return create(eventsManager, taxiCfg, fleet, scheduler, network, timer, travelTime, travelDisutility, params,
+				new SquareGridSystem(network, params.cellSize));
 	}
 
-	public static RuleBasedTaxiOptimizer create(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
-			Network network, MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility,
-			RuleBasedTaxiOptimizerParams params, ZonalSystem zonalSystem,
-			TaxiRequestValidator requestValidator, EventsManager events) {
+	public static RuleBasedTaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
+			TaxiScheduler scheduler, Network network, MobsimTimer timer, TravelTime travelTime,
+			TravelDisutility travelDisutility, RuleBasedTaxiOptimizerParams params, ZonalSystem zonalSystem) {
 		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, scheduler);
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
 		RuleBasedRequestInserter requestInserter = new RuleBasedRequestInserter(scheduler, timer, network, travelTime,
 				travelDisutility, params, idleTaxiRegistry, unplannedRequestRegistry);
-		return new RuleBasedTaxiOptimizer(taxiCfg, fleet, scheduler, params, idleTaxiRegistry, unplannedRequestRegistry,
-				requestInserter, requestValidator, events);
+		return new RuleBasedTaxiOptimizer(eventsManager, taxiCfg, fleet, scheduler, params, idleTaxiRegistry,
+				unplannedRequestRegistry, requestInserter);
 	}
 
 	private final TaxiScheduler scheduler;
 	private final IdleTaxiZonalRegistry idleTaxiRegistry;
 	private final UnplannedRequestZonalRegistry unplannedRequestRegistry;
 
-	public RuleBasedTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
-			RuleBasedTaxiOptimizerParams params, IdleTaxiZonalRegistry idleTaxiRegistry,
-			UnplannedRequestZonalRegistry unplannedRequestRegistry, UnplannedRequestInserter requestInserter,
-			TaxiRequestValidator requestValidator, EventsManager events) {
-		super(taxiCfg, fleet, scheduler, params, requestInserter, requestValidator, events);
+	public RuleBasedTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
+			TaxiScheduler scheduler, RuleBasedTaxiOptimizerParams params, IdleTaxiZonalRegistry idleTaxiRegistry,
+			UnplannedRequestZonalRegistry unplannedRequestRegistry, UnplannedRequestInserter requestInserter) {
+		super(eventsManager, taxiCfg, fleet, scheduler, params, requestInserter);
 
 		this.scheduler = scheduler;
 		this.idleTaxiRegistry = idleTaxiRegistry;
@@ -92,7 +89,7 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 	}
 
 	@Override
-	public void nextTask(Vehicle vehicle) {
+	public void nextTask(DvrpVehicle vehicle) {
 		super.nextTask(vehicle);
 
 		Schedule schedule = vehicle.getSchedule();

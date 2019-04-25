@@ -21,8 +21,6 @@ package org.matsim.contrib.drt.optimizer;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.EntryFactory;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
@@ -32,7 +30,7 @@ import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
@@ -46,7 +44,6 @@ import com.google.common.collect.ImmutableList;
 public class VehicleDataEntryFactoryImpl implements EntryFactory {
 	private final double lookAhead;
 
-	@Inject
 	public VehicleDataEntryFactoryImpl(DrtConfigGroup drtCfg) {
 		lookAhead = drtCfg.getMaxWaitTime() - drtCfg.getStopDuration();
 		if (lookAhead < 0) {
@@ -55,7 +52,7 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		}
 	}
 
-	public Entry create(Vehicle vehicle, double currentTime) {
+	public Entry create(DvrpVehicle vehicle, double currentTime) {
 		if (!isEligibleForRequestInsertion(vehicle, currentTime)) {
 			return null;
 		}
@@ -114,7 +111,7 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		return new Entry(vehicle, start, outputOccupancy, ImmutableList.copyOf(stops));
 	}
 
-	public boolean isEligibleForRequestInsertion(Vehicle vehicle, double currentTime) {
+	public boolean isEligibleForRequestInsertion(DvrpVehicle vehicle, double currentTime) {
 		return !(currentTime + lookAhead < vehicle.getServiceBeginTime()//
 				|| currentTime >= vehicle.getServiceEndTime());
 	}

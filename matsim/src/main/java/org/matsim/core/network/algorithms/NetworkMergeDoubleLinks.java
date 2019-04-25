@@ -94,7 +94,7 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 
 				double cap = link1.getCapacity() + link2.getCapacity();
 				double fs = Math.max(link1.getFreespeed(),link2.getFreespeed());
-				int lanes = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link1) + NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link2);
+				int lanes = NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), link1) + NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link2);
 				double length = Math.max(link1.getLength(),link2.getLength());
 				//			String origid = "add-merge(" + link1.getId() + "," + link2.getId() + ")";
 				link1.setCapacity(cap);
@@ -112,7 +112,7 @@ public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 				{
 					double cap = Math.max(link1.getCapacity(),link2.getCapacity());
 					double fs = Math.max(link1.getFreespeed(),link2.getFreespeed());
-					int lanes = Math.max(NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link1), NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link2));
+					int lanes = Math.max(NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), link1), NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link2));
 					double length = Math.max(link1.getLength(),link2.getLength());
 					//			String origid = "max-merge(" + link1.getId() + "," + link2.getId() + ")";
 					link1.setCapacity(cap);

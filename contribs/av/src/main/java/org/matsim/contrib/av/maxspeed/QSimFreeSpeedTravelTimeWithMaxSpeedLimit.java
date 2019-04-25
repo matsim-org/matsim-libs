@@ -25,7 +25,7 @@ import javax.inject.Named;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -42,7 +42,7 @@ public class QSimFreeSpeedTravelTimeWithMaxSpeedLimit implements TravelTime {
 
 	@Inject
 	public QSimFreeSpeedTravelTimeWithMaxSpeedLimit(QSimConfigGroup qsimCfg,
-			@Named(VrpAgentSource.DVRP_VEHICLE_TYPE) VehicleType vehicleType) {
+			@Named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE) VehicleType vehicleType) {
 		this.timeStepSize = qsimCfg.getTimeStepSize();
 		this.maxSpeed = vehicleType.getMaximumVelocity();
 	}

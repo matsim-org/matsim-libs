@@ -21,24 +21,20 @@ package org.matsim.contrib.minibus.replanning;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.operation.buffer.BufferOp;
+import org.locationtech.jts.operation.buffer.BufferParameters;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.operation.buffer.BufferOp;
-import com.vividsolutions.jts.operation.buffer.BufferParameters;
 
 /**
  * Provide a common constructor and some common methods which should not differ between strategies,
@@ -51,48 +47,6 @@ abstract class AbstractPStrategyModule implements PStrategy {
 
 	AbstractPStrategyModule() {
 
-	}
-
-	/**
-	 * Find the 2nd terminus stop (1st terminus is at index 0 per definition).
-	 * 
-	 * Returns stop index instead of the stop, in order to cater for stops which are
-	 * served multiple times
-	 * 
-	 * @param stops
-	 * @return index of the stop which is half way on the route from start stop over
-	 *         all stops back to the start stop
-	 */
-	final int findStopIndexWithLargestDistance(ArrayList<TransitStopFacility> stops) {
-		double totatDistance = 0;
-		Map<Integer, Double> distFromStart2StopIndex = new HashMap<>();
-		TransitStopFacility previousStop = stops.get(0);
-
-		for (int i = 0; i < stops.size(); i++) {
-			TransitStopFacility currentStop = stops.get(i);
-			totatDistance = totatDistance
-					+ CoordUtils.calcEuclideanDistance(previousStop.getCoord(), currentStop.getCoord());
-			distFromStart2StopIndex.put(i, totatDistance);
-			previousStop = currentStop;
-		}
-		// add leg from last to first stop
-		totatDistance = totatDistance
-				+ CoordUtils.calcEuclideanDistance(previousStop.getCoord(), stops.get(0).getCoord());
-
-		// first terminus is first stop in stops, other terminus is stop half way on the
-		// circular route beginning at the first stop
-		for (int i = 1; i < stops.size(); i++) {
-			if (distFromStart2StopIndex.get(i) >= totatDistance / 2) {
-				if (Math.abs(totatDistance / 2 - distFromStart2StopIndex.get(i - 1)) > Math
-						.abs(totatDistance / 2 - distFromStart2StopIndex.get(i))) {
-					return i;
-				} else {
-					return i - 1;
-				}
-			}
-		}
-
-		return 0;
 	}
 
 	final Set<Id<TransitStopFacility>> getStopsUsed(Collection<TransitRoute> routes) {

@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.Collection;
 
 import org.jfree.chart.JFreeChart;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts.DescriptionCreator;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts.PaintSelector;
@@ -12,7 +12,7 @@ import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTaskWithRequest;
 
 public class TaxiScheduleCharts {
-	public static JFreeChart chartSchedule(Collection<? extends Vehicle> vehicles) {
+	public static JFreeChart chartSchedule(Collection<? extends DvrpVehicle> vehicles) {
 		return ScheduleCharts.chartSchedule(vehicles, TAXI_DESCRIPTION_CREATOR, TAXI_PAINT_SELECTOR);
 	}
 
@@ -21,7 +21,7 @@ public class TaxiScheduleCharts {
 	public static final DescriptionCreator TAXI_DESCRIPTION_WITH_PASSENGER_ID_CREATOR = task -> {
 		if (task instanceof TaxiTaskWithRequest) {
 			TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
-			return taskWithReq.getTaxiTaskType().name() + "_" + taskWithReq.getRequest().getPassenger().getId();
+			return taskWithReq.getTaxiTaskType().name() + "_" + taskWithReq.getRequest().getPassengerId();
 		}
 
 		return ((TaxiTask)task).getTaxiTaskType().name();
