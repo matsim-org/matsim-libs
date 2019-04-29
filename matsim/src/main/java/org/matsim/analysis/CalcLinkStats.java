@@ -24,7 +24,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -45,7 +45,7 @@ public class CalcLinkStats {
 
 	private final static Logger log = Logger.getLogger(CalcLinkStats.class);
 
-	private static class LinkData {
+	public static class LinkData {
 		public final double[][] volumes;
 		public final double[][] ttimes;
 
@@ -59,7 +59,7 @@ public class CalcLinkStats {
 
 	private int count = 0;
 	private final Map<Id<Link>, LinkData> linkData;
-	private final int nofHours;
+	private int nofHours;
 	private final Network network;
 
 	private static final int MIN = 0;
@@ -70,7 +70,7 @@ public class CalcLinkStats {
 	@Inject
 	public CalcLinkStats(final Network network) {
 		this.network = network;
-		this.linkData = new TreeMap<>();
+		this.linkData = new ConcurrentHashMap<>();
 		this.nofHours = 24;
 		reset();
 	}
@@ -408,4 +408,16 @@ public class CalcLinkStats {
 		return avgTTimes;
 	}
 
+
+	public void setNofHours(int nofHours) {
+		this.nofHours = nofHours;
+	}
+
+	public Network getNetwork(){
+		return this.network;
+	}
+
+	public Map<Id<Link>, LinkData> getLinkData() {
+		return linkData;
+	}
 }
