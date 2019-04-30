@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -73,11 +74,11 @@ public class StrategyManagerSubpopulationsTest {
 					@Override
 					public void run(HasPlansAndId<Plan, Person> person) {
 						counter.incCounter();
+						Person person1 = population.getPersons().get( person.getId() ) ;
+						Gbl.assertNotNull( person1 );
 						Assert.assertNull(
 							"unexpected subpopulation",
-							PopulationUtils.getAttribute(
-								  population, person.getId(),
-								SUBPOP_ATT_NAME ) );
+							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME, population ) );
 
 					}
 
@@ -93,12 +94,12 @@ public class StrategyManagerSubpopulationsTest {
 					@Override
 					public void run(HasPlansAndId<Plan, Person> person) {
 						counter.incCounter();
+						Person person1 = population.getPersons().get( person.getId() ) ;
+						Gbl.assertNotNull( person1 );
 						Assert.assertEquals(
 							"unexpected subpopulation",
 							POP_NAME_1,
-							PopulationUtils.getAttribute(
-								  population, person.getId(),
-								SUBPOP_ATT_NAME ) );
+							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME, population ) );
 					}
 
 					@Override
@@ -113,12 +114,12 @@ public class StrategyManagerSubpopulationsTest {
 					@Override
 					public void run(HasPlansAndId<Plan, Person> person) {
 						counter.incCounter();
+						Person person1 = population.getPersons().get( person.getId() ) ;
+						Gbl.assertNotNull( person1 );
 						Assert.assertEquals(
 							"unexpected subpopulation",
 							POP_NAME_2,
-							PopulationUtils.getAttribute(
-								  population, person.getId(),
-								SUBPOP_ATT_NAME ) );
+							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME, population ) );
 					}
 
 					@Override

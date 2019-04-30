@@ -50,7 +50,7 @@ public class ScenarioByConfigInjectionTest {
 		Population population = scenario.getPopulation();
 		Person person = population.getPersons().get( Id.createPersonId( "1" ) ) ;
 		Gbl.assertNotNull( person );
-		Object stupid = PopulationUtils.getPersonAttribute( "stupidAttribute", person, population.getPersonAttributes() );
+		Object stupid = PopulationUtils.getPersonAttribute( person, "stupidAttribute", population );
 
 		// TODO test for ALL attribute containers...
 		Assert.assertEquals(

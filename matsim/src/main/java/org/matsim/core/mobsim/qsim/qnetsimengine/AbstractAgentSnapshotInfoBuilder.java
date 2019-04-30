@@ -148,7 +148,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			pos.setAgentState(AgentState.PERSON_OTHER_MODE );
 		}
 		if ( driverAgent instanceof HasPerson ){
-			if( PopulationUtils.getAttribute( scenario.getPopulation(), ((HasPerson) driverAgent).getPerson(), AgentSnapshotInfo.marker ) != null ){
+			if( PopulationUtils.getPersonAttribute( ((HasPerson) driverAgent).getPerson(), AgentSnapshotInfo.marker, scenario.getPopulation() ) != null ){
 				pos.setAgentState( AgentState.PERSON_OTHER_MODE );
 			}
 		}

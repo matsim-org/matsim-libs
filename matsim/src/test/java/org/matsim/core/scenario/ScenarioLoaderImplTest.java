@@ -72,7 +72,7 @@ public class ScenarioLoaderImplTest {
 		Population population = scenario.getPopulation();
 		Person person = population.getPersons().get( Id.createPersonId( "1" ) ) ;
 		Gbl.assertNotNull( person );
-		Assert.assertEquals("world", PopulationUtils.getPersonAttribute( "hello", person, population.getPersonAttributes() ) );
+		Assert.assertEquals("world", PopulationUtils.getPersonAttribute( person, "hello", population ) );
 	}
 
 	@Test
