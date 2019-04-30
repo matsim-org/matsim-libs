@@ -23,7 +23,7 @@ import org.matsim.core.controler.AbstractModule;
 /**
  * @author smetzler, dziemke
  */
-public class BicycleModule extends AbstractModule {
+public final class BicycleModule extends AbstractModule {
 	private boolean considerMotorizedInteraction;
 	
 	@Override

@@ -32,7 +32,9 @@ import com.google.inject.Inject;
 /**
  * @author smetzler, dziemke
  */
-public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
+public final class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
+	// public-final is ok since ctor is package-private. kai, apr'19
+
 	private static final Logger LOG = Logger.getLogger(BicycleTravelDisutilityFactory.class);
 
 	@Inject	BicycleConfigGroup bicycleConfigGroup;
@@ -40,6 +42,8 @@ public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
 	@Inject	PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 	
 	private static int normalisationWrnCnt = 0;
+
+	/* package-private */ BicycleTravelDisutilityFactory(){}
 	
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {

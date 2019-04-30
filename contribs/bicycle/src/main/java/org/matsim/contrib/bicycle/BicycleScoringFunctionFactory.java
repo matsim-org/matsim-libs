@@ -36,13 +36,16 @@ import com.google.inject.Inject;
 /**
  * @author dziemke
  */
-public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
+public final class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
+	// ok to have this public final when the constructor is package-private/injected.
+
 	@Inject ScoringParametersForPerson parameters;
 	
 	@Inject Scenario scenario;
-	@Inject BicycleTravelTime bicycleTravelTime;
-	
+
 	@Inject EventsManager eventsManager;
+
+	/* package */ BicycleScoringFunctionFactory(){}
 	
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
