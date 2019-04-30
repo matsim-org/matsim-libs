@@ -476,12 +476,12 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		double maxPayment = Double.NEGATIVE_INFINITY ;
 		Set<String> subPopTypes = new HashSet<>() ;
 		for ( Person person : pop.getPersons().values() ) {
-			Double payment = (Double) PopulationUtils.getAttribute( pop.getPersonAttributes(), person.getId().toString(), PAYMENTS ) ;
+			Double payment = (Double) PopulationUtils.getAttribute( pop, person, PAYMENTS ) ;
 			if ( payment==null ) continue ;
 			if ( payment > maxPayment ) {
 				maxPayment = payment ;
 			}
-			String subPopType = (String) PopulationUtils.getAttribute( pop.getPersonAttributes(), person.getId().toString(), SUBPOPULATION ) ;
+			String subPopType = (String) PopulationUtils.getAttribute( pop, person, SUBPOPULATION ) ;
 			if (subPopType!=null) subPopTypes.add(subPopType) ;
 		}
 
@@ -496,8 +496,8 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		}
 
 		for ( Person person : pop.getPersons().values() ) {
-			String subPopType = (String) PopulationUtils.getAttribute( pop.getPersonAttributes(), person.getId().toString(), SUBPOPULATION ) ;
-			Double payment = (Double) PopulationUtils.getAttribute( pop.getPersonAttributes(), person.getId().toString(), PAYMENTS ) ;
+			String subPopType = (String) PopulationUtils.getAttribute( pop, person, SUBPOPULATION ) ;
+			Double payment = (Double) PopulationUtils.getAttribute( pop, person, PAYMENTS ) ;
 			if (payment==null || subPopType == null) continue ;
 			int bin = (int) (payment/binSize) ;
 			sum.get(subPopType)[bin] += payment ;
