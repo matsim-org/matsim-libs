@@ -19,60 +19,63 @@
 
 package org.matsim.codeexamples.population.downsamplePopulation;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author kn
+ * @author jlaudan
  */
 class RunPopulationDownsamplingExample {
 
-	void run(final String[] args) {
-		String inputPopFilename = null ;
-		String outputPopFilename = null ;
-		String netFilename = null ;
-				
-		if ( args!=null ) {
-			if ( !(args.length==2 || args.length==3) ) {
-				System.err.println( "Usage: cmd inputPop.xml.gz outputPop.xml.gz [network.xml.gz]");
-			} else {
-				inputPopFilename = args[0] ;
-				outputPopFilename = args[1] ;
-				if ( args.length==3 ) {
-					netFilename = args[2] ;
-				}
-			}
-		}
-		
-		
-		Config config = ConfigUtils.createConfig() ;
-		config.network().setInputFile( netFilename ) ;
-		config.plans().setInputFile( inputPopFilename ) ;
+	private final String inputPopFilename;
+	private final String outputPopFilename;
 
-		Population pop = ScenarioUtils.loadScenario(config).getPopulation() ;
-
-		Population newPop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation() ;
-		for ( Person person : pop.getPersons().values() ) {
-			if ( Math.random() < 0.1 ) {
-				System.out.println("adding person...");
-				newPop.addPerson(person);
-			}
-		}
-		
-
-		PopulationWriter popwriter = new PopulationWriter(newPop,ScenarioUtils.loadScenario(config).getNetwork()) ;
-		popwriter.write( outputPopFilename ) ;
-
-		System.out.println("done.");
+	private RunPopulationDownsamplingExample(String inputPopFilename, String outputPopFilename) {
+		this.inputPopFilename = inputPopFilename;
+		this.outputPopFilename = outputPopFilename;
 	}
 
 	public static void main(final String[] args) {
-		RunPopulationDownsamplingExample app = new RunPopulationDownsamplingExample();
-		app.run(args);
+
+		String outputPopFilename = "";
+		String inputPopFilename = "";
+
+		if ( args!=null ) {
+			if (args.length != 2) {
+				System.err.println("Usage: cmd inputPop.xml.gz outputPop.xml.gz");
+				System.exit(401);
+			} else {
+				inputPopFilename = args[0] ;
+				outputPopFilename = args[1] ;
+			}
+		}
+
+		RunPopulationDownsamplingExample app = new RunPopulationDownsamplingExample(inputPopFilename, outputPopFilename);
+		app.run();
 	}
 
+	private void run() {
+
+		// create an empty scenario using an empty configuration
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		// the writer will be called by the reader and write the new population file. As parameter the fraction of the
+		// input population is passed. In our case we will downsize the population to 1%.
+		StreamingPopulationWriter writer = new StreamingPopulationWriter(0.1);
+
+		// the reader will read in an existing population file
+		StreamingPopulationReader reader = new StreamingPopulationReader(scenario);
+		reader.addAlgorithm(writer);
+
+		try {
+			writer.startStreaming(outputPopFilename);
+			reader.readFile(inputPopFilename);
+		} finally {
+			writer.closeStreaming();
+		}
+	}
 }
