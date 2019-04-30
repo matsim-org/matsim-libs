@@ -71,6 +71,8 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.PersonAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
@@ -1085,4 +1087,23 @@ public final class PopulationUtils {
 		boolean result = PopulationUtils.equalPopulation( population1, population2 );
 		return result ;
 	}
+
+	public static Object getPersonAttribute( String key, Person person, ObjectAttributes popAttribs ) {
+		Object result = person.getAttributes().getAttribute( key );
+		if ( result != null ) {
+			return result ;
+		}
+		return popAttribs.getAttribute( person.getId().toString(), key ) ;
+	}
+
+	public static Object getAttribute( Population population, Person person, String key ) {
+		return getPersonAttribute( key, person, population.getPersonAttributes() ) ;
+	}
+	public static Object getAttribute( Population population, Id<Person> personId, String key ) {
+		Person person = population.getPersons().get( personId ) ;
+		Gbl.assertNotNull( person );
+		return getPersonAttribute( key, person, population.getPersonAttributes() ) ;
+	}
+
+
 }

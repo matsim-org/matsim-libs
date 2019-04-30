@@ -41,7 +41,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
 import org.matsim.lanes.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.PersonAttributes;
 import org.matsim.vehicles.Vehicles;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
@@ -281,7 +281,7 @@ import org.xml.sax.helpers.AttributesImpl;
 		}
 
 		@Override
-		public ObjectAttributes getPersonAttributes() {
+		public PersonAttributes getPersonAttributes() {
 			return population.getPersonAttributes();
 		}
 		

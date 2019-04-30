@@ -13,6 +13,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -45,7 +47,10 @@ public class ScenarioByConfigInjectionTest {
 		final Scenario scenario = injector.getInstance( Scenario.class );
 
 		log.info( "get object attribute" );
-		Object stupid = scenario.getPopulation().getPersonAttributes().getAttribute( "1" , "stupidAttribute" );
+		Population population = scenario.getPopulation();
+		Person person = population.getPersons().get( Id.createPersonId( "1" ) ) ;
+		Gbl.assertNotNull( person );
+		Object stupid = PopulationUtils.getPersonAttribute( "stupidAttribute", person, population.getPersonAttributes() );
 
 		// TODO test for ALL attribute containers...
 		Assert.assertEquals(

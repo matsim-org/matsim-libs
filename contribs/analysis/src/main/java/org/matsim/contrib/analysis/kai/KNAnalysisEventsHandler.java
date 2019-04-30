@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
@@ -477,12 +476,12 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		double maxPayment = Double.NEGATIVE_INFINITY ;
 		Set<String> subPopTypes = new HashSet<>() ;
 		for ( Person person : pop.getPersons().values() ) {
-			Double payment = (Double) pop.getPersonAttributes().getAttribute( person.getId().toString(), PAYMENTS ) ;
+			Double payment = (Double) PopulationUtils.getAttribute( pop.getPersonAttributes(), person.getId().toString(), PAYMENTS ) ;
 			if ( payment==null ) continue ;
 			if ( payment > maxPayment ) {
 				maxPayment = payment ;
 			}
-			String subPopType = (String) pop.getPersonAttributes().getAttribute( person.getId().toString(), SUBPOPULATION ) ;
+			String subPopType = (String) PopulationUtils.getAttribute( pop.getPersonAttributes(), person.getId().toString(), SUBPOPULATION ) ;
 			if (subPopType!=null) subPopTypes.add(subPopType) ;
 		}
 
@@ -497,8 +496,8 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		}
 
 		for ( Person person : pop.getPersons().values() ) {
-			String subPopType = (String) pop.getPersonAttributes().getAttribute( person.getId().toString(), SUBPOPULATION ) ;
-			Double payment = (Double) pop.getPersonAttributes().getAttribute( person.getId().toString(), PAYMENTS ) ;
+			String subPopType = (String) PopulationUtils.getAttribute( pop.getPersonAttributes(), person.getId().toString(), SUBPOPULATION ) ;
+			Double payment = (Double) PopulationUtils.getAttribute( pop.getPersonAttributes(), person.getId().toString(), PAYMENTS ) ;
 			if (payment==null || subPopType == null) continue ;
 			int bin = (int) (payment/binSize) ;
 			sum.get(subPopType)[bin] += payment ;

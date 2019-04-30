@@ -23,9 +23,14 @@ package org.matsim.core.scenario;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -64,7 +69,10 @@ public class ScenarioLoaderImplTest {
 		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(this.util.classInputResourcePath(), "personAttributesConfig.xml"));
 		config.plans().addParam("inputPersonAttributesFile", "personAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Assert.assertEquals("world", scenario.getPopulation().getPersonAttributes().getAttribute("1", "hello"));
+		Population population = scenario.getPopulation();
+		Person person = population.getPersons().get( Id.createPersonId( "1" ) ) ;
+		Gbl.assertNotNull( person );
+		Assert.assertEquals("world", PopulationUtils.getPersonAttribute( "hello", person, population.getPersonAttributes() ) );
 	}
 
 	@Test

@@ -31,6 +31,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.population.PopulationUtils;
 
 public class ScoringParameters implements MatsimParameters {
 
@@ -97,13 +98,13 @@ public class ScoringParameters implements MatsimParameters {
 
 		public Builder(
 				final Scenario scenario,
-				final Id<Person> person ) {
+				final Person person ) {
 			this(
 					scenario.getConfig().planCalcScore(),
 					scenario.getConfig().planCalcScore().getScoringParameters(
 							(String)
-									scenario.getPopulation().getPersonAttributes().getAttribute(
-											person.toString(),
+									PopulationUtils.getAttribute(
+										  scenario.getPopulation(), person,
 											scenario.getConfig().plans().getSubpopulationAttributeName() ) ),
 					scenario.getConfig().scenario() );
 		}
