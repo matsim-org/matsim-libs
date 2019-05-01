@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Default, abstract implementation of the {@link Route}-interface.
@@ -43,6 +44,8 @@ public abstract class AbstractRoute implements Route, Cloneable {
 
 	private Id<Link> startLinkId = null;
 	private Id<Link> endLinkId = null;
+
+	private final Attributes attributes = new Attributes();
 
 	public AbstractRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		this.startLinkId = startLinkId;
@@ -90,7 +93,12 @@ public abstract class AbstractRoute implements Route, Cloneable {
 	public final Id<Link> getEndLinkId() {
 		return this.endLinkId;
 	}
-	
+
+	@Override
+	public Attributes getAttributes() {
+		return this.attributes;
+	}
+
 	public final void setLocked() {
 		locked = true ;
 	}

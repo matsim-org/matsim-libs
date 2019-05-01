@@ -23,13 +23,13 @@ package org.matsim.api.core.v01.population;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimPopulationObject;
-import org.matsim.core.scenario.Lockable;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * @author nagel
  *
  */
-public interface Route extends MatsimPopulationObject {
+public interface Route extends MatsimPopulationObject, Attributable {
 
 	public double getDistance();
 
