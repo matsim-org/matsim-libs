@@ -35,9 +35,6 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author  jbischoff
  *
  */
-/**
- *
- */
 public class RunParkingSearchScenarioIT {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
