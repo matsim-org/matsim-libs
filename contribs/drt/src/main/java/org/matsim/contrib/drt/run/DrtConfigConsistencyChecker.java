@@ -24,7 +24,6 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebal
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParamsConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup.OperationalScheme;
 import org.matsim.contrib.dvrp.run.ConfigConsistencyCheckers;
-import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.groups.GlobalConfigGroup;
@@ -36,8 +35,6 @@ public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
 
 	@Override
 	public void checkConsistency(Config config) {
-		new DvrpConfigConsistencyChecker().checkConsistency(config);
-
 		ConfigConsistencyCheckers.checkSingleOrMultiModeConsistency(DrtConfigGroup.get(config),
 				MultiModeDrtConfigGroup.get(config), drtCfg -> checkDrtConfigConsistency(drtCfg, config.global()));
 
