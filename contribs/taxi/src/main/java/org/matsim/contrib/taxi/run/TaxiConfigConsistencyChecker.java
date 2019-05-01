@@ -20,15 +20,12 @@
 package org.matsim.contrib.taxi.run;
 
 import org.matsim.contrib.dvrp.run.ConfigConsistencyCheckers;
-import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 
 public class TaxiConfigConsistencyChecker implements ConfigConsistencyChecker {
 	@Override
 	public void checkConsistency(Config config) {
-		new DvrpConfigConsistencyChecker().checkConsistency(config);
-
 		ConfigConsistencyCheckers.checkSingleOrMultiModeConsistency(TaxiConfigGroup.get(config),
 				MultiModeTaxiConfigGroup.get(config), this::checkTaxiConfigConsistency);
 

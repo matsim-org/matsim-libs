@@ -101,6 +101,12 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+		new DvrpConfigConsistencyChecker().checkConsistency(config);
+	}
+
+	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
 		map.put(NETWORK_MODE, NETWORK_MODE_EXP);
