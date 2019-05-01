@@ -33,7 +33,7 @@ import com.google.inject.Inject;
  * @author smetzler, dziemke
  */
 public final class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
-	// public-final is ok since ctor is package-private. kai, apr'19
+	// public-final is ok since ctor is package-private: can only be used through injection
 
 	private static final Logger LOG = Logger.getLogger(BicycleTravelDisutilityFactory.class);
 

@@ -27,6 +27,7 @@ import org.matsim.core.config.ConfigGroup;
  * @author smetzler, dziemke
  */
 public final class BicycleConfigGroup extends ConfigGroup {
+	// necessary to have this public
 
 	public static final String GROUP_NAME = "bicycle";
 

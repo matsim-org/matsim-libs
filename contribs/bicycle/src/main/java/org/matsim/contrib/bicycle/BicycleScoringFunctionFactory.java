@@ -20,9 +20,11 @@
 package org.matsim.contrib.bicycle;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.bicycle.BicycleConfigGroup.BicycleScoringType;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -37,7 +39,7 @@ import com.google.inject.Inject;
  * @author dziemke
  */
 public final class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
-	// ok to have this public final when the constructor is package-private/injected.
+	// ok to have this public final when the constructor is package-private/injected: can only used through injection
 
 	@Inject ScoringParametersForPerson parameters;
 	
@@ -74,16 +76,18 @@ public final class BicycleScoringFunctionFactory implements ScoringFunctionFacto
 	}
 
 	
-	private class CarCounter implements MotorizedInteractionEventHandler {
+	private class CarCounter implements BasicEventHandler{
 		private BicycleLinkScoring bicycleLinkScoring;
 
-		public CarCounter(BicycleLinkScoring bicycleLinkScoring) {
+		private CarCounter( BicycleLinkScoring bicycleLinkScoring ) {
 			this.bicycleLinkScoring = bicycleLinkScoring;
 		}
 
 		@Override
-		public void handleEvent(MotorizedInteractionEvent event) {
-			bicycleLinkScoring.handleEvent(event);
+		public void handleEvent( Event event ) {
+			if ( event instanceof MotorizedInteractionEvent ){
+				bicycleLinkScoring.handleEvent( (MotorizedInteractionEvent) event );
+			}
 		}
 	}
 }

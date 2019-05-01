@@ -40,7 +40,7 @@ import org.matsim.vehicles.Vehicle;
  * This link-based scoring should be used when true times spent on an individual link are relevant
  * and for the scoring of the interaction with motorized traffic.
  */
-class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring, MotorizedInteractionEventHandler {
+class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 	private static final Logger LOG = Logger.getLogger(BicycleLinkScoring.class);
 	
 	private final ScoringParameters params;
@@ -116,6 +116,12 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring, Mo
 			previousLinkRelativePosition = 0.;
 			previousLinkEnterTime = linkEnterEvent.getTime();
 		}
+		if ( event instanceof MotorizedInteractionEvent ) {
+			if ( ((MotorizedInteractionEvent) event).getLinkId().equals(previousLink )){
+				this.carCountOnLink++;
+			}
+		}
+
 	}
 	
 	private void calculateScoreForPreviousLink(Id<Link> linkId, Double enterTime, Id<Vehicle> vehId, double travelTime, double relativeLinkEnterPosition) {
@@ -171,11 +177,4 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring, Mo
 		return tmpScore;
 	}
 	
-
-	@Override
-	public void handleEvent(MotorizedInteractionEvent event) {
-		if (event.getLinkId().equals(previousLink)) {
-			this.carCountOnLink++;
-		}
-	}
 }

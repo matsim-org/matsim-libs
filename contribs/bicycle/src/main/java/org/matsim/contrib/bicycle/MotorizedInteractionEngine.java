@@ -34,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
  * @author dziemke
  */
 public final class MotorizedInteractionEngine implements MobsimBeforeSimStepListener {
-	// ok to have this public final when ctor is package-private/injected.
+	// ok to have this public final when ctor is package-private/injected: can only be used through injection
 
 	private static final Logger log = Logger.getLogger(MotorizedInteractionEngine.class);
 
