@@ -30,15 +30,20 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParamsConsistencyChecker;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.utils.misc.Time;
 
 public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
+	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
 
 	public static final String GROUP_NAME = "drt";
 
@@ -175,6 +180,48 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
+	}
+
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+
+		if (Time.isUndefinedTime(config.qsim().getEndTime())
+				&& config.qsim().getSimEndtimeInterpretation()
+				!= QSimConfigGroup.EndtimeInterpretation.onlyUseEndtime) {
+			// Not an issue if all request rejections are immediate (i.e. happen during request submission)
+			log.warn("qsim.endTime should be specified and qsim.simEndtimeInterpretation should be 'onlyUseEndtime'"
+					+ " if postponed request rejection is allowed. Otherwise, rejected passengers"
+					+ " (who are stuck endlessly waiting for a DRT vehicle) will prevent QSim from stopping."
+					+ " Keep also in mind that not setting an end time may result in agents "
+					+ "attempting to travel without vehicles being available.");
+		}
+		if (config.qsim().getNumberOfThreads() != 1) {
+			throw new RuntimeException("Only a single-threaded QSim allowed");
+		}
+		if (getMaxWaitTime() < getStopDuration()) {
+			throw new RuntimeException(
+					DrtConfigGroup.MAX_WAIT_TIME + " must not be smaller than " + DrtConfigGroup.STOP_DURATION);
+		}
+		if (getOperationalScheme() == OperationalScheme.stopbased && getTransitStopFile() == null) {
+			throw new RuntimeException(DrtConfigGroup.TRANSIT_STOP_FILE
+					+ " must not be null when "
+					+ DrtConfigGroup.OPERATIONAL_SCHEME
+					+ " is "
+					+ DrtConfigGroup.OperationalScheme.stopbased);
+		}
+		if (getNumberOfThreads() > Runtime.getRuntime().availableProcessors()) {
+			throw new RuntimeException(
+					DrtConfigGroup.NUMBER_OF_THREADS + " is higher than the number of logical cores available to JVM");
+		}
+		if (config.global().getNumberOfThreads() < getNumberOfThreads()) {
+			log.warn("Consider increasing global.numberOfThreads to at least the value of drt.numberOfThreads"
+					+ " in order to speed up the DRT route update during the replanning phase.");
+		}
+		if (getParameterSets(MinCostFlowRebalancingParams.SET_NAME).size() > 1) {
+			throw new RuntimeException("More then one rebalancing parameter sets is specified");
+		}
+		new MinCostFlowRebalancingParamsConsistencyChecker().checkConsistency(this);
 	}
 
 	@Override
