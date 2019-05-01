@@ -35,7 +35,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParamsConsistencyChecker;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -222,8 +221,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 		if (getParameterSets(MinCostFlowRebalancingParams.SET_NAME).size() > 1) {
 			throw new RuntimeException("More then one rebalancing parameter sets is specified");
 		}
-
-		getMinCostFlowRebalancing().ifPresent(new MinCostFlowRebalancingParamsConsistencyChecker()::checkConsistency);
 	}
 
 	@Override
