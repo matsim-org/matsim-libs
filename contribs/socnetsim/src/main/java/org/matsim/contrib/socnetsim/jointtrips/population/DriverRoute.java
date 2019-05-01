@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author thibautd
@@ -41,6 +41,7 @@ import org.matsim.core.population.routes.RouteUtils;
 public class DriverRoute implements Route , NetworkRoute {
 	private final NetworkRoute netRoute;
 	private final Set<Id<Person>> passengers = new TreeSet<Id<Person>>();
+	private final Attributes attributes = new Attributes();
 
 	public DriverRoute(final Id<Link> startLink , final Id<Link> endLink) {
 		netRoute = RouteUtils.createLinkNetworkRouteImpl(startLink, endLink);
@@ -205,7 +206,12 @@ public class DriverRoute implements Route , NetworkRoute {
 	public String getRouteType() {
 		return "driver";
 	}
-	
+
+	@Override
+	public Attributes getAttributes() {
+		return this.attributes;
+	}
+
 	@Override
 	public String toString() {
 		return "[DriverRoute: delegate="+netRoute+"; passengers="+passengers+"]";

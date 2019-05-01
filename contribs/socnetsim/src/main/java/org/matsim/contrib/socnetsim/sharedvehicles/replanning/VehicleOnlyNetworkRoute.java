@@ -24,6 +24,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * to put vehicle Id in legs without route.
@@ -132,6 +133,11 @@ class VehicleOnlyNetworkRoute implements NetworkRoute {
 
 	@Override
 	public VehicleOnlyNetworkRoute clone() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Attributes getAttributes() {
 		throw new UnsupportedOperationException();
 	}
 }

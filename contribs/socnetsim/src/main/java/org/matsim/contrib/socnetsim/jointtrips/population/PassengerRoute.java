@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * A route for passenger trips.
@@ -35,6 +36,7 @@ public class PassengerRoute implements Route {
 	private Id<Link> startLink = null;
 	private Id<Link> endLink = null;
 	private Id<Person> driver = null;
+	private final Attributes attributes = new Attributes();
 
 	private PassengerRoute() {}
 
@@ -108,6 +110,11 @@ public class PassengerRoute implements Route {
 	@Override
 	public String getRouteType() {
 		return "passenger";
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return this.attributes;
 	}
 
 	@Override
