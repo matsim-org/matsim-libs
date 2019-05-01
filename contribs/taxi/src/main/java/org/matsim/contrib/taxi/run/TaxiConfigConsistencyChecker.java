@@ -29,15 +29,8 @@ public class TaxiConfigConsistencyChecker implements ConfigConsistencyChecker {
 		ConfigConsistencyCheckers.checkSingleOrMultiModeConsistency(TaxiConfigGroup.get(config),
 				MultiModeTaxiConfigGroup.get(config), this::checkTaxiConfigConsistency);
 
-		if (config.qsim().getNumberOfThreads() != 1) {
-			throw new RuntimeException("Only a single-threaded QSim allowed");
-		}
 	}
 
 	private void checkTaxiConfigConsistency(TaxiConfigGroup taxiCfg) {
-		if (taxiCfg.isVehicleDiversion() && !taxiCfg.isOnlineVehicleTracker()) {
-			throw new RuntimeException(
-					TaxiConfigGroup.VEHICLE_DIVERSION + " requires " + TaxiConfigGroup.ONLINE_VEHICLE_TRACKER);
-		}
 	}
 }
