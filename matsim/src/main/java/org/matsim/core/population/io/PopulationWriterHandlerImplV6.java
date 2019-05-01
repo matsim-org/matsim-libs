@@ -20,10 +20,20 @@
 
 package org.matsim.core.population.io;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -32,10 +42,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 import org.matsim.vehicles.Vehicle;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author thibautd
@@ -95,7 +101,7 @@ import java.util.Map;
 					// route
 					Route route = leg.getRoute();
 					if (route != null) {
-						PopulationWriterHandlerImplV6.startRoute(route, out);
+						this.startRoute(route, out);
 						PopulationWriterHandlerImplV6.endRoute(out);
 					}
 					PopulationWriterHandlerImplV6.endLeg(out);
@@ -234,7 +240,7 @@ import java.util.Map;
 		out.write("\t\t\t</leg>\n");
 	}
 
-	private static void startRoute(final Route route, final BufferedWriter out) throws IOException {
+	private void startRoute(final Route route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route ");
 		out.write("type=\"");
 		out.write(route.getRouteType());
@@ -266,6 +272,8 @@ import java.util.Map;
 		if (rd != null) {
 			out.write(rd);
 		}
+
+		this.attributesWriter.writeAttributes("\t\t\t\t\t", out, route.getAttributes());
 	}
 
 	private static void endRoute(final BufferedWriter out) throws IOException {

@@ -6,9 +6,15 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -157,6 +163,41 @@ public class PopulationV6IOTest {
 				leg.getAttributes().getAttribute( "mpg" ) ,
 				readLeg.getAttributes().getAttribute( "mpg" ) );
 	}
+
+	@Test
+	public void testRouteAttributesIO() {
+		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+
+		final Person person = population.getFactory().createPerson(Id.createPersonId("Donald Trump"));
+		population.addPerson(person);
+
+		final Plan plan = population.getFactory().createPlan();
+		person.addPlan(plan);
+		final Leg leg = population.getFactory().createLeg("SUV");
+		plan.addActivity(population.getFactory().createActivityFromLinkId("speech", Id.createLinkId(1)));
+		plan.addLeg(leg);
+		plan.addActivity(population.getFactory().createActivityFromLinkId("tweet", Id.createLinkId(2)));
+
+		Route route = new GenericRouteImpl(Id.createLinkId(1), Id.createLinkId(2));
+		leg.setRoute(route);
+
+		route.getAttributes().putAttribute("energyConsumption", 9999.);
+
+		final String file = utils.getOutputDirectory() + "/population.xml";
+		new PopulationWriter(population).writeV6(file);
+
+		final Scenario readScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new PopulationReader(readScenario).readFile(file);
+
+		final Person readPerson = readScenario.getPopulation().getPersons().get(Id.createPersonId("Donald Trump"));
+		final Leg readLeg = (Leg)readPerson.getSelectedPlan().getPlanElements().get(1);
+		final GenericRouteImpl readRoute = (GenericRouteImpl)readLeg.getRoute();
+
+		Assert.assertEquals("Unexpected Double attribute in " + readRoute.getAttributes(),
+				route.getAttributes().getAttribute("energyConsumption"),
+				readRoute.getAttributes().getAttribute("energyConsumption"));
+	}
+
 
 	@Test
 	public void testPlanAttributesIO() {

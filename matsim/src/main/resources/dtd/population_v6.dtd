@@ -39,7 +39,7 @@
           dep_time       CDATA                                                 #IMPLIED
           trav_time      CDATA                                                 #IMPLIED>
 
-<!ELEMENT route          (#PCDATA)>
+		<!ELEMENT route          (#PCDATA|attributes)*>
 <!ATTLIST route
           type           CDATA #IMPLIED
           start_link	 CDATA #IMPLIED

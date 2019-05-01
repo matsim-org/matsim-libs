@@ -19,13 +19,21 @@
 
 package org.matsim.core.population.io;
 
-import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Stack;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -45,9 +53,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegat
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Stack;
+import com.google.inject.Inject;
 
 /**
  * A reader for plans files of MATSim according to <code>population_v6.dtd</code>.
@@ -162,6 +168,9 @@ import java.util.Stack;
 						break;
 					case LEG:
 						currAttributes = currleg.getAttributes();
+						break;
+					case ROUTE:
+						currAttributes = currRoute.getAttributes();
 						break;
 					default:
 						throw new RuntimeException( context.peek() );
