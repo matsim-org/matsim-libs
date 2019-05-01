@@ -29,7 +29,7 @@ package org.matsim.contrib.bicycle;
 class BicycleSpeedUtils {
 	static double getSpeed( final String travelMode ){
 		double speed;
-		if (travelMode == "bicycle") {
+		if ( travelMode.equals( "bicycle" ) ) {
 			speed = 20.0/3.6;
 		} else {
 			throw new RuntimeException("No speed is set for travel mode " + travelMode + ".");
