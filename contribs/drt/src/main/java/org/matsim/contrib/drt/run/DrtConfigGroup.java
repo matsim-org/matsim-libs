@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.run;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -221,7 +222,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 		if (getParameterSets(MinCostFlowRebalancingParams.SET_NAME).size() > 1) {
 			throw new RuntimeException("More then one rebalancing parameter sets is specified");
 		}
-		new MinCostFlowRebalancingParamsConsistencyChecker().checkConsistency(this);
+
+		getMinCostFlowRebalancing().ifPresent(new MinCostFlowRebalancingParamsConsistencyChecker()::checkConsistency);
 	}
 
 	@Override
@@ -539,15 +541,19 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	 * @return 'minCostFlowRebalancing' parameter set defined in the DRT config or null if the parameters were not
 	 * specified
 	 */
-	@Valid
-	public MinCostFlowRebalancingParams getMinCostFlowRebalancing() {
+	public Optional<@Valid MinCostFlowRebalancingParams> getMinCostFlowRebalancing() {
 		Collection<? extends ConfigGroup> parameterSets = getParameterSets(MinCostFlowRebalancingParams.SET_NAME);
-		return parameterSets.isEmpty() ? null : (MinCostFlowRebalancingParams)parameterSets.iterator().next();
+		if (parameterSets.size() > 1) {
+			throw new RuntimeException("More then one rebalancing parameter sets is specified");
+		}
+		return parameterSets.isEmpty() ?
+				Optional.empty() :
+				Optional.of((MinCostFlowRebalancingParams)parameterSets.iterator().next());
 	}
 
 	@Override
 	public ConfigGroup createParameterSet(String type) {
-		if (type.startsWith(MinCostFlowRebalancingParams.SET_NAME)) {
+		if (type.equals(MinCostFlowRebalancingParams.SET_NAME)) {
 			return new MinCostFlowRebalancingParams();
 		}
 		return super.createParameterSet(type);

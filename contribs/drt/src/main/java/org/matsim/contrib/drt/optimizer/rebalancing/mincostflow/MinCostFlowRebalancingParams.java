@@ -29,15 +29,11 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  * @author michalm
  */
 public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
-	public static boolean isRebalancingEnabled(MinCostFlowRebalancingParams params) {
-		return params != null && params.getInterval() > 0;
-	}
-
 	public static final String SET_NAME = "minCostFlowRebalancing";
 
 	public static final String INTERVAL = "interval";
 	static final String INTERVAL_EXP = "Specifies how often empty vehicle rebalancing is executed."
-			+ " 0 s means no rebalancing. Default is 1800 s.";
+			+ " Must be positive. Default is 1800 s.";
 
 	public static final String MIN_SERVICE_TIME = "minServiceTime";
 	static final String MIN_SERVICE_TIME_EXP = //
@@ -61,8 +57,8 @@ public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	static final String CELL_SIZE_EXP = "size of square cells used for demand aggregation."
 			+ " Depends on demand, supply and network. Often used with values in the range of 500 - 2000 m";
 
-	@PositiveOrZero
-	private int interval = 1800;// [s], if 0 then no rebalancing
+	@Positive
+	private int interval = 1800;// [s]
 
 	@Positive
 	public double minServiceTime = 2 * interval;// [s]

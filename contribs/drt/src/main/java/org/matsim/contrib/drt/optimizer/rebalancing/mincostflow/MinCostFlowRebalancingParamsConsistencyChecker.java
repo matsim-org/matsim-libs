@@ -19,14 +19,8 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-
 public class MinCostFlowRebalancingParamsConsistencyChecker {
-	public void checkConsistency(DrtConfigGroup drtCfg) {
-		MinCostFlowRebalancingParams params = drtCfg.getMinCostFlowRebalancing();
-		if (params == null) {
-			return;// no rebalancing
-		}
+	public void checkConsistency(MinCostFlowRebalancingParams params) {
 		if (params.getMinServiceTime() <= params.getMaxTimeBeforeIdle()) {
 			throw new RuntimeException(MinCostFlowRebalancingParams.MIN_SERVICE_TIME
 					+ " must be greater than "
