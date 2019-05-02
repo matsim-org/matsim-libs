@@ -34,6 +34,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 
+/**
+ * @author Michal Maciejewski (michalm)
+ */
 public class BeanValidationConfigConsistencyChecker implements ConfigConsistencyChecker {
 	private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
@@ -46,12 +49,20 @@ public class BeanValidationConfigConsistencyChecker implements ConfigConsistency
 			Set<ConstraintViolation<ConfigGroup>> groupViolations = validator.validate(group);
 			violations.addAll(groupViolations);
 			for (ConstraintViolation<ConfigGroup> v : groupViolations) {
-				messages.add(group.getName() + "." + v.getPropertyPath() + ": " + v.getMessage());
+				messages.add((messages.size() + 1)
+						+ ") "
+						+ group.getClass().getName()
+						+ "(name="
+						+ group.getName()
+						+ ")."
+						+ v.getPropertyPath()
+						+ ": "
+						+ v.getMessage());
 			}
 		}
 
 		if (!violations.isEmpty()) {
-			String message = "Errors in config:\n" + messages.stream().collect(Collectors.joining("\n"));
+			String message = messages.size() + " error(s) found in the config:\n" + messages.stream().collect(Collectors.joining("\n"));
 			throw new ConstraintViolationException(message, violations);
 		}
 	}
