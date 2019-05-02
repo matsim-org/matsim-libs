@@ -36,7 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.utils.objectattributes.PersonAttributes;
+import org.matsim.core.population.PersonAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public final class StreamingPopulationReader implements MatsimReader {

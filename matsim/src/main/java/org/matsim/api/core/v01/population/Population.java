@@ -24,8 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.PersonAttributes;
+import org.matsim.core.population.PersonAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**

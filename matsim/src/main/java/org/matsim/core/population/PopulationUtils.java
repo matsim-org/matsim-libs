@@ -24,14 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -1086,13 +1079,38 @@ public final class PopulationUtils {
 		return result ;
 	}
 
+	// ---
+
 	public static Object getPersonAttribute( Person person, String key, Population population ) {
 		Object result = person.getAttributes().getAttribute( key );
 		if ( result != null ) {
 			return result ;
 		}
-		return population.getPersonAttributes().getAttribute( person.getId().toString(), key ) ;
+		return population.getPersonAttributes().getAttributeDirectly( person.getId().toString(), key ) ;
 	}
-
+	public static void putPersonAttribute( Person person, String key, Object value ) {
+		person.getAttributes().putAttribute( key, value ) ;
+	}
+	public static Object removePersonAttribute( Person person, String key, Population population ) {
+		Object result1 = person.getAttributes().removeAttribute( key );
+		Object result2 = population.getPersonAttributes().removeAttributeDirectly( person.getId().toString(), key ) ;
+		if( result1==null ) {
+			return result2 ;
+		}
+		if ( result2==null ) {
+			return result1 ;
+		}
+		if ( Objects.equals( result1, result2 ) ) {
+			return result1 ;
+		}
+		throw new RuntimeException("inconsistent object attributes state; don't know what to do.  Try using PopulationUtils" +
+							     ".get/put/...PersonAttribute instead of population.getPersonAttributes... .. kai, " +
+							     "mar'19") ;
+	}
+	@Deprecated  // this command is a bit dangerous, since it might clear someone else's attributes.  Maybe best don't use.  kai, may'19
+	public static void removePersonAttributes( Person person, Population population ) {
+		population.getPersonAttributes().removeAllAttributesDirectly( person.getId().toString() );
+		person.getAttributes().clear();
+	}
 
 }

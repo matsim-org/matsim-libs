@@ -36,7 +36,7 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.utils.objectattributes.PersonAttributes;
+import org.matsim.core.population.PersonAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public final class StreamingPopulationWriter implements PersonAlgorithm {
