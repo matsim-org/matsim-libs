@@ -21,7 +21,6 @@
 package org.matsim.contrib.dvrp.run;
 
 import java.util.HashSet;
-import java.util.function.Consumer;
 
 import org.matsim.core.config.ConfigGroup;
 
@@ -30,17 +29,15 @@ import org.matsim.core.config.ConfigGroup;
  */
 public class ConfigConsistencyCheckers {
 	public static <C extends ConfigGroup & Modal> void checkSingleOrMultiModeConsistency(C cfg,
-			MultiModal<C> multiModeCfg, Consumer<C> consistencyChecker) {
+			MultiModal<C> multiModeCfg) {///
 		if (cfg != null) {
 			if (multiModeCfg != null) {
 				throw new RuntimeException("Either single or multi-mode " + cfg.getName() + " must be defined");
 			}
-			consistencyChecker.accept(cfg);
 		} else {
 			if (multiModeCfg == null) {
 				throw new RuntimeException("Either single or multi-mode " + cfg.getName() + " must be defined");
 			}
-			multiModeCfg.getModalElements().stream().forEach(consistencyChecker);
 			if (!areModesUnique(multiModeCfg)) {
 				throw new RuntimeException("Modes in multi-mode config are not unique");
 			}

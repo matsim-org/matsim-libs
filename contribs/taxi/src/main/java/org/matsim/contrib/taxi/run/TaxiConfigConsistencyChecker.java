@@ -27,10 +27,6 @@ public class TaxiConfigConsistencyChecker implements ConfigConsistencyChecker {
 	@Override
 	public void checkConsistency(Config config) {
 		ConfigConsistencyCheckers.checkSingleOrMultiModeConsistency(TaxiConfigGroup.get(config),
-				MultiModeTaxiConfigGroup.get(config), this::checkTaxiConfigConsistency);
-
-	}
-
-	private void checkTaxiConfigConsistency(TaxiConfigGroup taxiCfg) {
+				MultiModeTaxiConfigGroup.get(config));
 	}
 }
