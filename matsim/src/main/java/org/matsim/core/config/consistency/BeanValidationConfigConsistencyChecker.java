@@ -62,7 +62,8 @@ public class BeanValidationConfigConsistencyChecker implements ConfigConsistency
 		}
 
 		if (!violations.isEmpty()) {
-			String message = messages.size() + " error(s) found in the config:\n" + messages.stream().collect(Collectors.joining("\n"));
+			String message = messages.size() + " error(s) found in the config:\n" + messages.stream()
+					.collect(Collectors.joining("\n"));
 			throw new ConstraintViolationException(message, violations);
 		}
 	}
