@@ -19,17 +19,17 @@
 
 package org.matsim.contrib.drt.run;
 
-import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.run.ConfigConsistencyCheckers;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 
 public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
-	private static final Logger log = Logger.getLogger(DrtConfigConsistencyChecker.class);
-
 	@Override
 	public void checkConsistency(Config config) {
-		ConfigConsistencyCheckers.checkSingleOrMultiModeConsistency(DrtConfigGroup.get(config),
-				MultiModeDrtConfigGroup.get(config));
+		if (!ConfigConsistencyCheckers.isEitherSingleOrMultiModeDeclared(DrtConfigGroup.get(config),
+				MultiModeDrtConfigGroup.get(config))) {
+			throw new RuntimeException(
+					"Either DrtConfigGroup or MultiModeDrtConfigGroup must be defined at the config top level");
+		}
 	}
 }

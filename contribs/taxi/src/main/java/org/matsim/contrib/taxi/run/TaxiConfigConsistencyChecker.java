@@ -26,7 +26,10 @@ import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 public class TaxiConfigConsistencyChecker implements ConfigConsistencyChecker {
 	@Override
 	public void checkConsistency(Config config) {
-		ConfigConsistencyCheckers.checkSingleOrMultiModeConsistency(TaxiConfigGroup.get(config),
-				MultiModeTaxiConfigGroup.get(config));
+		if (!ConfigConsistencyCheckers.isEitherSingleOrMultiModeDeclared(TaxiConfigGroup.get(config),
+				MultiModeTaxiConfigGroup.get(config))) {
+			throw new RuntimeException(
+					"Either TaxiConfigGroup or MultiModeTaxiConfigGroup must be defined at the config top level");
+		}
 	}
 }
