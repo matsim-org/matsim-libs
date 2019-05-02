@@ -430,6 +430,12 @@
 			<artifactId>javax.el</artifactId>
 			<version>3.0.1-b10</version>
 		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.12.2</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!--According to https://stackoverflow.com/questions/43574426/how-to-resolve-java-lang-noclassdeffounderror-javax-xml-bind-jaxbexception-in-j/43574427#43574427,-->
 		<!--the following is needed to include jaxb into java9 and later. kai based on thibaut, feb'18-->
