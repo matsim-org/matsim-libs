@@ -28,17 +28,9 @@ import org.matsim.core.config.ConfigGroup;
  * @author Michal Maciejewski (michalm)
  */
 public class ConfigConsistencyCheckers {
-	public static <C extends ConfigGroup & Modal> void checkSingleOrMultiModeConsistency(C cfg,
-			MultiModal<C> multiModeCfg) {///
-		if (cfg != null) {
-			if (multiModeCfg != null) {
-				throw new RuntimeException("Either single or multi-mode " + cfg.getName() + " must be defined");
-			}
-		} else {
-			if (multiModeCfg == null) {
-				throw new RuntimeException("Either single or multi-mode " + cfg.getName() + " must be defined");
-			}
-		}
+	public static <C extends ConfigGroup & Modal> boolean isEitherSingleOrMultiModeDeclared(C cfg,
+			MultiModal<C> multiModeCfg) {
+		return cfg != null ^ multiModeCfg != null;
 	}
 
 	public static boolean areModesUnique(MultiModal<?> multiModal) {
