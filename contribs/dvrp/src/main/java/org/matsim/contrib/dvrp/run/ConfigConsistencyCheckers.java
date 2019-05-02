@@ -38,9 +38,6 @@ public class ConfigConsistencyCheckers {
 			if (multiModeCfg == null) {
 				throw new RuntimeException("Either single or multi-mode " + cfg.getName() + " must be defined");
 			}
-			if (!areModesUnique(multiModeCfg)) {
-				throw new RuntimeException("Modes in multi-mode config are not unique");
-			}
 		}
 	}
 

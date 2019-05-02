@@ -22,6 +22,7 @@ package org.matsim.contrib.taxi.run;
 
 import java.util.Collection;
 
+import org.matsim.contrib.dvrp.run.ConfigConsistencyCheckers;
 import org.matsim.contrib.dvrp.run.MultiModal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -40,6 +41,15 @@ public class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements M
 
 	public MultiModeTaxiConfigGroup() {
 		super(GROUP_NAME);
+	}
+
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+
+		if (!ConfigConsistencyCheckers.areModesUnique(this)) {
+			throw new RuntimeException("Taxi modes in MultiModeTaxiConfigGroup are not unique");
+		}
 	}
 
 	@Override
