@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.run.ConfigConsistencyCheckers;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
-import org.matsim.core.config.groups.GlobalConfigGroup;
 
 public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
 	private static final Logger log = Logger.getLogger(DrtConfigConsistencyChecker.class);
@@ -31,9 +30,6 @@ public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
 	@Override
 	public void checkConsistency(Config config) {
 		ConfigConsistencyCheckers.checkSingleOrMultiModeConsistency(DrtConfigGroup.get(config),
-				MultiModeDrtConfigGroup.get(config), drtCfg -> checkDrtConfigConsistency(drtCfg, config.global()));
-	}
-
-	private void checkDrtConfigConsistency(DrtConfigGroup drtCfg, GlobalConfigGroup global) {
+				MultiModeDrtConfigGroup.get(config));
 	}
 }
