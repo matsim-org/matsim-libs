@@ -33,9 +33,6 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class TaxiControlerCreator {
 	public static Controler createControler(Config config, boolean otfvis) {
-		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
-		config.checkConsistency();
-
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 
