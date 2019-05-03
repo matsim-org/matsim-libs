@@ -60,29 +60,29 @@ public class BeanValidationConfigConsistencyCheckerTest {
 		}
 		{
 			Config config = ConfigUtils.createConfig();
-			config.global().setNumberOfThreads(0);
+			config.global().setNumberOfThreads(-1);
 			Assertions.assertThat(getViolationTuples(config))
-					.containsExactlyInAnyOrder(Tuple.of("numberOfThreads", Positive.class));
+					.containsExactlyInAnyOrder(Tuple.of("numberOfThreads", PositiveOrZero.class));
 		}
 		{
 			Config config = ConfigUtils.createConfig();
 			config.qsim().setFlowCapFactor(0);
 			config.qsim().setSnapshotPeriod(-1);
-			config.global().setNumberOfThreads(0);
+			config.global().setNumberOfThreads(-1);
 			Assertions.assertThat(getViolationTuples(config))
 					.containsExactlyInAnyOrder(Tuple.of("flowCapFactor", Positive.class),
 							Tuple.of("snapshotPeriod", PositiveOrZero.class),
-							Tuple.of("numberOfThreads", Positive.class));
+							Tuple.of("numberOfThreads", PositiveOrZero.class));
 
 			Assertions.assertThatThrownBy(() -> new BeanValidationConfigConsistencyChecker().checkConsistency(config))
 					.isExactlyInstanceOf(ConstraintViolationException.class)
 					.hasMessageStartingWith("3 error(s) found in the config:")
 					.hasMessageContaining(
-							"org.matsim.core.config.groups.GlobalConfigGroup(name=global).numberOfThreads: must be greater than 0")
+							") org.matsim.core.config.groups.GlobalConfigGroup(name=global).numberOfThreads: must be greater than or equal to 0")
 					.hasMessageContaining(
-							"org.matsim.core.config.groups.QSimConfigGroup(name=qsim).flowCapFactor: must be greater than 0")
+							") org.matsim.core.config.groups.QSimConfigGroup(name=qsim).flowCapFactor: must be greater than 0")
 					.hasMessageContaining(
-							"org.matsim.core.config.groups.QSimConfigGroup(name=qsim).snapshotPeriod: must be greater than or equal to 0");
+							") org.matsim.core.config.groups.QSimConfigGroup(name=qsim).snapshotPeriod: must be greater than or equal to 0");
 		}
 	}
 
