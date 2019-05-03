@@ -20,10 +20,12 @@
 
 package org.matsim.core.config.groups;
 
+import java.util.Map;
+
+import javax.validation.constraints.Positive;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
-
-import java.util.Map;
 
 public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
@@ -42,6 +44,7 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private static final String COORDINATE_SYSTEM = "coordinateSystem";
 
 	private long randomSeed = 4711L;
+	@Positive
 	private int numberOfThreads = 2;
 	private String coordinateSystem = "Atlantis" ;
 	// see https://matsim.atlassian.net/browse/MATSIM-898
