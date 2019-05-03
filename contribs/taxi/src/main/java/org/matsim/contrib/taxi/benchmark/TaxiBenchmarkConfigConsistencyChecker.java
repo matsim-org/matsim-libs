@@ -20,14 +20,12 @@
 package org.matsim.contrib.taxi.benchmark;
 
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkConfigConsistencyChecker;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 
 public class TaxiBenchmarkConfigConsistencyChecker implements ConfigConsistencyChecker {
 	@Override
 	public void checkConsistency(Config config) {
-		new TaxiConfigConsistencyChecker().checkConsistency(config);
 		new DvrpBenchmarkConfigConsistencyChecker().checkConsistency(config);
 	}
 }

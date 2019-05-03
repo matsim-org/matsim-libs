@@ -49,6 +49,11 @@ public class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements M
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
+		if (TaxiConfigGroup.get(config) != null) {
+			throw new RuntimeException(
+					"In the multi-mode taxi setup, TaxiConfigGroup must not be defined at the config top level");
+		}
+
 		if (!ConfigConsistencyCheckers.areModesUnique(this)) {
 			throw new RuntimeException("Taxi modes in MultiModeTaxiConfigGroup are not unique");
 		}
