@@ -24,8 +24,8 @@ import java.util.Collection;
 
 import javax.validation.Valid;
 
-import org.matsim.contrib.dvrp.run.ConfigConsistencyCheckers;
 import org.matsim.contrib.dvrp.run.MultiModal;
+import org.matsim.contrib.dvrp.run.MultiModals;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -54,7 +54,7 @@ public class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements M
 					"In the multi-mode taxi setup, TaxiConfigGroup must not be defined at the config top level");
 		}
 
-		if (!ConfigConsistencyCheckers.areModesUnique(this)) {
+		if (!MultiModals.isAllModesUnique(this)) {
 			throw new RuntimeException("Taxi modes in MultiModeTaxiConfigGroup are not unique");
 		}
 	}
