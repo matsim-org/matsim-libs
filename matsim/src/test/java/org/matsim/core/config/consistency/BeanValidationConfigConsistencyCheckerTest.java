@@ -22,7 +22,8 @@ package org.matsim.core.config.consistency;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -33,6 +34,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -41,40 +43,39 @@ public class BeanValidationConfigConsistencyCheckerTest {
 
 	@Test
 	public void checkConsistency() {
-		Assertions.assertThat(getViolations(new Config())).isEmpty();
+		Assertions.assertThat(getViolationTuples(new Config())).isEmpty();
 
 		Config config = ConfigUtils.createConfig();
-		Assertions.assertThat(getViolations(config)).isEmpty();
+		Assertions.assertThat(getViolationTuples(config)).isEmpty();
 
-		{
-			config.qsim().setFlowCapFactor(0);
-			Set<ConstraintViolation<?>> violations = getViolations(config);
-			Assertions.assertThat(violations).hasSize(1);
-			assertViolation(violations.iterator().next(), "flowCapFactor", Positive.class);
-			config.qsim().setFlowCapFactor(1);
-		}
-		{
-			config.qsim().setSnapshotPeriod(-1);
-			Set<ConstraintViolation<?>> violations = getViolations(config);
-			Assertions.assertThat(violations).hasSize(1);
-			assertViolation(violations.iterator().next(), "snapshotPeriod", PositiveOrZero.class);
-			config.qsim().setSnapshotPeriod(0);
-		}
+		config.qsim().setFlowCapFactor(0);
+		Assertions.assertThat(getViolationTuples(config))
+				.containsExactlyInAnyOrder(Tuple.of("floswCapFactor", Positive.class));
+		config.qsim().setFlowCapFactor(1);
+
+		config.qsim().setSnapshotPeriod(-1);
+		Assertions.assertThat(getViolationTuples(config))
+				.containsExactlyInAnyOrder(Tuple.of("snapshotPeriod", PositiveOrZero.class));
+		config.qsim().setSnapshotPeriod(0);
+
+		config.qsim().setFlowCapFactor(0);
+		config.qsim().setSnapshotPeriod(-1);
+		Assertions.assertThat(getViolationTuples(config))
+				.containsExactlyInAnyOrder(Tuple.of("flowCapFactor", Positive.class),
+						Tuple.of("snapshotPeriod", PositiveOrZero.class));
 	}
 
-	private Set<ConstraintViolation<?>> getViolations(Config config) {
+	private Tuple<String, Class<? extends Annotation>> violationTuples(ConstraintViolation<?> violation) {
+		return Tuple.of(violation.getPropertyPath().toString(),
+				violation.getConstraintDescriptor().getAnnotation().annotationType());
+	}
+
+	private List<Tuple<String, Class<? extends Annotation>>> getViolationTuples(Config config) {
 		try {
 			new BeanValidationConfigConsistencyChecker().checkConsistency(config);
-			return Collections.emptySet();
+			return Collections.emptyList();
 		} catch (ConstraintViolationException e) {
-			return e.getConstraintViolations();
+			return e.getConstraintViolations().stream().map(this::violationTuples).collect(Collectors.toList());
 		}
-	}
-
-	private void assertViolation(ConstraintViolation<?> violation, String path,
-			Class<? extends Annotation> annotationType) {
-		Assertions.assertThat(violation.getPropertyPath().toString()).isEqualTo(path);
-		Assertions.assertThat(violation.getConstraintDescriptor().getAnnotation().annotationType())
-				.isEqualTo(annotationType);
 	}
 }
