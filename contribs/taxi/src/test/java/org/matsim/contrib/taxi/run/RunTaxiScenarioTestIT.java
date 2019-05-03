@@ -61,7 +61,7 @@ public class RunTaxiScenarioTestIT {
 		taxiCfg.setTaxisFile(taxisFile);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setDumpDataAtEnd(false);
-		TaxiControlerCreator.createControler(config, false).run();
+		TaxiControlerCreator.createControlerWithSingleModeDrt(config, false).run();
 	}
 
 	private void runMielecWithRejection(String plansFile, String taxisFile) {
@@ -74,7 +74,7 @@ public class RunTaxiScenarioTestIT {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setDumpDataAtEnd(false);
 		config.qsim().setEndTime(36. * 3600);
-		Controler controler = TaxiControlerCreator.createControler(config, false);
+		Controler controler = TaxiControlerCreator.createControlerWithSingleModeDrt(config, false);
 
 		controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(taxiCfg.getMode()) {
 			@Override
