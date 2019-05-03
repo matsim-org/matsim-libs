@@ -66,7 +66,7 @@ public class RunDrtScenario2Batch {
 			// config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/drt_population_iteration/population/run124.100.output_plans.xml.gz");
 			DrtConfigGroup drt = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
 
-			MinCostFlowRebalancingParams rebalancingParams = drt.getMinCostFlowRebalancing();
+			MinCostFlowRebalancingParams rebalancingParams = drt.getMinCostFlowRebalancing().get();
 			// fuehrt ein re-balancing im 30 minuten takt durch. hoehere Taktung
 			// ist nicht sinnvoll, da die Nachfrage in Halbstundenscheiben
 			// gespeichert wird.

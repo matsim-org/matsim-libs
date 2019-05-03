@@ -21,7 +21,6 @@
 package peoplemover.run;
 
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -34,13 +33,6 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 /** * @author axer */
 
 public class RunDrtScenarioBatchBS_10pct_TUBTest {
-
-	// Class to create the controller
-	public static Controler createControler(Config config, boolean otfvis) {
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.checkConsistency();
-		return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
-	}
 
 	public static void main(String[] args) {
 
@@ -93,7 +85,7 @@ public class RunDrtScenarioBatchBS_10pct_TUBTest {
 
 		// Define the MATSim Controler
 		// Based on the prepared configuration this part creates a controller that runs
-		Controler controler = createControler(config, otfvis);
+		Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
 
 		// Every x-seconds the simulation calls a re-balancing process.
 		// Re-balancing has the task to move vehicles into cells or zones that fits
@@ -101,7 +93,7 @@ public class RunDrtScenarioBatchBS_10pct_TUBTest {
 		// The technically used re-balancing strategy is then installed/binded within
 		// the initialized controler
 		System.out.println("Rebalancing Online");
-		MinCostFlowRebalancingParams rebalancingParams = drt.getMinCostFlowRebalancing();
+		MinCostFlowRebalancingParams rebalancingParams = drt.getMinCostFlowRebalancing().get();
 		rebalancingParams.setInterval(600);
 		rebalancingParams.setCellSize(2000);
 

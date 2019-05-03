@@ -20,8 +20,10 @@
 
 package vwExamples.peoplemoverVWExample;
 
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import electric.edrt.run.RunVWEDrtScenario;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,29 +46,20 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import electric.edrt.run.RunVWEDrtScenario;
 import parking.ParkingRouterConfigGroup;
 import parking.ParkingRouterModule;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
 import vwExamples.utils.parking.createParkingNetwork.CreateParkingNetwork;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author axer
  */
 
 public class RunDrtScenarioBatchBS_eDRT_withParking {
-
-	// Class to create the controller
-	// public static Controler createControlerWithSingleModeDrt(Config config,
-	// boolean otfvis) {
-	// config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-	// config.checkConsistency();
-	// return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
-	// }
 
 	public static void main(String[] args) throws IOException {
         int count = 1;

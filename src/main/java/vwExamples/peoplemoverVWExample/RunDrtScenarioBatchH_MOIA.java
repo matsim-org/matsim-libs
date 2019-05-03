@@ -20,11 +20,10 @@
 
 package vwExamples.peoplemoverVWExample;
 
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
-import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
-import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
-import org.matsim.api.core.v01.Id;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -32,21 +31,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
-import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.EvModule;
-import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
-import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
-import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
-import org.matsim.contrib.ev.temperature.TemperatureChangeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -57,18 +44,9 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import vwExamples.utils.CreateEDRTVehiclesAndChargers;
-import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
-import vwExamples.utils.VehicleFromCSV.CreatePeoplemoverVehicleFromCSV;
-import vwExamples.utils.customEV.BatteryReplacementCharge;
-import vwExamples.utils.customEV.CustomFastThenSlowCharging;
-import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import vwExamples.utils.VehicleFromCSV.CreatePeoplemoverVehicleFromCSV;
 
 /**
  * @author axer
@@ -172,7 +150,7 @@ public class RunDrtScenarioBatchH_MOIA {
 
 		// Define the MATSim Controler
 		// Based on the prepared configuration this part creates a controller that runs
-		Controler controler = createStandardDRTControler(config, false);
+		Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config, false);
 
 		//Controler controler = createControler(config);
 
@@ -270,14 +248,5 @@ public class RunDrtScenarioBatchH_MOIA {
 		}
 
 	}
-	
-	
-	public static Controler createStandardDRTControler(Config config, boolean otfvis) {
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.checkConsistency();
-		return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
-	}
-
-
 
 }
