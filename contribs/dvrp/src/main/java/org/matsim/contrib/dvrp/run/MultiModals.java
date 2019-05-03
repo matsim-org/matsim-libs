@@ -22,18 +22,11 @@ package org.matsim.contrib.dvrp.run;
 
 import java.util.HashSet;
 
-import org.matsim.core.config.ConfigGroup;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class ConfigConsistencyCheckers {
-	public static <C extends ConfigGroup & Modal> boolean isEitherSingleOrMultiModeDeclared(C cfg,
-			MultiModal<C> multiModeCfg) {
-		return cfg != null ^ multiModeCfg != null;
-	}
-
-	public static boolean areModesUnique(MultiModal<?> multiModal) {
+public class MultiModals {
+	public static boolean isAllModesUnique(MultiModal<?> multiModal) {
 		return multiModal.modes().allMatch(new HashSet<>()::add);
 	}
 }
