@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,21 +15,18 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.drt.run;
+package org.matsim.contrib.dvrp.run;
 
-import org.matsim.contrib.dvrp.run.ConfigConsistencyCheckers;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.consistency.ConfigConsistencyChecker;
+import java.util.HashSet;
 
-public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
-	@Override
-	public void checkConsistency(Config config) {
-		if (!ConfigConsistencyCheckers.isEitherSingleOrMultiModeDeclared(DrtConfigGroup.get(config),
-				MultiModeDrtConfigGroup.get(config))) {
-			throw new RuntimeException(
-					"Either DrtConfigGroup or MultiModeDrtConfigGroup must be defined at the config top level");
-		}
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class MultiModals {
+	public static boolean isAllModesUnique(MultiModal<?> multiModal) {
+		return multiModal.modes().allMatch(new HashSet<>()::add);
 	}
 }

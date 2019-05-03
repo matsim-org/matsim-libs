@@ -22,8 +22,10 @@ package org.matsim.contrib.drt.run;
 
 import java.util.Collection;
 
-import org.matsim.contrib.dvrp.run.ConfigConsistencyCheckers;
+import javax.validation.Valid;
+
 import org.matsim.contrib.dvrp.run.MultiModal;
+import org.matsim.contrib.dvrp.run.MultiModals;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -47,7 +49,12 @@ public class MultiModeDrtConfigGroup extends ReflectiveConfigGroup implements Mu
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		if (!ConfigConsistencyCheckers.areModesUnique(this)) {
+		if (DrtConfigGroup.get(config) != null) {
+			throw new RuntimeException(
+					"In the multi-mode DRT setup, DrtConfigGroup must not be defined at the config top level");
+		}
+
+		if (!MultiModals.isAllModesUnique(this)) {
 			throw new RuntimeException("DRT modes in MultiModeDrtConfigGroup are not unique");
 		}
 	}
@@ -62,7 +69,7 @@ public class MultiModeDrtConfigGroup extends ReflectiveConfigGroup implements Mu
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Collection<DrtConfigGroup> getModalElements() {
+	public Collection<@Valid DrtConfigGroup> getModalElements() {
 		return (Collection<DrtConfigGroup>)getParameterSets(DrtConfigGroup.GROUP_NAME);
 	}
 }

@@ -89,9 +89,6 @@ public final class DrtControlerCreator {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
 
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.checkConsistency();
-
 		Scenario scenario = scenarioLoader.apply(config);
 
 		Controler controler = new Controler(scenario);
