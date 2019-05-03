@@ -44,25 +44,46 @@ public class BeanValidationConfigConsistencyCheckerTest {
 	@Test
 	public void checkConsistency() {
 		Assertions.assertThat(getViolationTuples(new Config())).isEmpty();
+		Assertions.assertThat(getViolationTuples(ConfigUtils.createConfig())).isEmpty();
 
-		Config config = ConfigUtils.createConfig();
-		Assertions.assertThat(getViolationTuples(config)).isEmpty();
+		{
+			Config config = ConfigUtils.createConfig();
+			config.qsim().setFlowCapFactor(0);
+			Assertions.assertThat(getViolationTuples(config))
+					.containsExactlyInAnyOrder(Tuple.of("flowCapFactor", Positive.class));
+		}
+		{
+			Config config = ConfigUtils.createConfig();
+			config.qsim().setSnapshotPeriod(-1);
+			Assertions.assertThat(getViolationTuples(config))
+					.containsExactlyInAnyOrder(Tuple.of("snapshotPeriod", PositiveOrZero.class));
+		}
+		{
+			Config config = ConfigUtils.createConfig();
+			config.global().setNumberOfThreads(0);
+			Assertions.assertThat(getViolationTuples(config))
+					.containsExactlyInAnyOrder(Tuple.of("numberOfThreads", Positive.class));
+		}
+		{
+			Config config = ConfigUtils.createConfig();
+			config.qsim().setFlowCapFactor(0);
+			config.qsim().setSnapshotPeriod(-1);
+			config.global().setNumberOfThreads(0);
+			Assertions.assertThat(getViolationTuples(config))
+					.containsExactlyInAnyOrder(Tuple.of("flowCapFactor", Positive.class),
+							Tuple.of("snapshotPeriod", PositiveOrZero.class),
+							Tuple.of("numberOfThreads", Positive.class));
 
-		config.qsim().setFlowCapFactor(0);
-		Assertions.assertThat(getViolationTuples(config))
-				.containsExactlyInAnyOrder(Tuple.of("floswCapFactor", Positive.class));
-		config.qsim().setFlowCapFactor(1);
-
-		config.qsim().setSnapshotPeriod(-1);
-		Assertions.assertThat(getViolationTuples(config))
-				.containsExactlyInAnyOrder(Tuple.of("snapshotPeriod", PositiveOrZero.class));
-		config.qsim().setSnapshotPeriod(0);
-
-		config.qsim().setFlowCapFactor(0);
-		config.qsim().setSnapshotPeriod(-1);
-		Assertions.assertThat(getViolationTuples(config))
-				.containsExactlyInAnyOrder(Tuple.of("flowCapFactor", Positive.class),
-						Tuple.of("snapshotPeriod", PositiveOrZero.class));
+			Assertions.assertThatThrownBy(() -> new BeanValidationConfigConsistencyChecker().checkConsistency(config))
+					.isExactlyInstanceOf(ConstraintViolationException.class)
+					.hasMessageStartingWith("3 error(s) found in the config:")
+					.hasMessageContaining(
+							"org.matsim.core.config.groups.GlobalConfigGroup(name=global).numberOfThreads: must be greater than 0")
+					.hasMessageContaining(
+							"org.matsim.core.config.groups.QSimConfigGroup(name=qsim).flowCapFactor: must be greater than 0")
+					.hasMessageContaining(
+							"org.matsim.core.config.groups.QSimConfigGroup(name=qsim).snapshotPeriod: must be greater than or equal to 0");
+		}
 	}
 
 	private Tuple<String, Class<? extends Annotation>> violationTuples(ConstraintViolation<?> violation) {
