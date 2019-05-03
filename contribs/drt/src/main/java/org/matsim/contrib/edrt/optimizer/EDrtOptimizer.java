@@ -25,7 +25,6 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.edrt.scheduler.EmptyVehicleChargingScheduler;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 /**
@@ -34,13 +33,10 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 public class EDrtOptimizer implements DrtOptimizer {
 	private final DefaultDrtOptimizer optimizer;
 	private final EmptyVehicleChargingScheduler chargingScheduler;
-	private final MobsimTimer timer;
 
-	public EDrtOptimizer(DefaultDrtOptimizer optimizer, EmptyVehicleChargingScheduler chargingScheduler,
-			MobsimTimer timer) {
+	public EDrtOptimizer(DefaultDrtOptimizer optimizer, EmptyVehicleChargingScheduler chargingScheduler) {
 		this.optimizer = optimizer;
 		this.chargingScheduler = chargingScheduler;
-		this.timer = timer;
 	}
 
 	@Override
