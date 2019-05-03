@@ -49,6 +49,11 @@ public class MultiModeDrtConfigGroup extends ReflectiveConfigGroup implements Mu
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
+		if (DrtConfigGroup.get(config) != null) {
+			throw new RuntimeException(
+					"In the multi-mode DRT setup, DrtConfigGroup must not be defined at the config top level");
+		}
+
 		if (!ConfigConsistencyCheckers.areModesUnique(this)) {
 			throw new RuntimeException("DRT modes in MultiModeDrtConfigGroup are not unique");
 		}
