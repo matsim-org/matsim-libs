@@ -30,7 +30,8 @@ import org.matsim.contrib.ev.data.ElectricVehicle;
  */
 public class EvDvrpVehicle implements DvrpVehicle {
 	static EvDvrpVehicle create(DvrpVehicle vehicle, ElectricFleet evFleet) {
-		return new EvDvrpVehicle(vehicle, evFleet.getElectricVehicles().get(vehicle.getId()));
+		return new EvDvrpVehicle(vehicle,
+				evFleet.getElectricVehicles().get(Id.create(vehicle.getId(), ElectricVehicle.class)));
 	}
 
 	private final DvrpVehicle vehicle;
