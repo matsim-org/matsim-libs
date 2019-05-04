@@ -20,10 +20,10 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.data.ElectricVehicle;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -31,7 +31,7 @@ import org.matsim.contrib.ev.data.ElectricVehicle;
 public class ImmutableElectricVehicleSpecification implements ElectricVehicleSpecification {
 	private final Id<ElectricVehicle> id;
 	private final String vehicleType;
-	private final List<String> chargerTypes;
+	private final ImmutableList<String> chargerTypes;
 	private final double initialSoc;
 	private final double batteryCapacity;
 
@@ -68,7 +68,7 @@ public class ImmutableElectricVehicleSpecification implements ElectricVehicleSpe
 	}
 
 	@Override
-	public List<String> getChargerTypes() {
+	public ImmutableList<String> getChargerTypes() {
 		return null;
 	}
 
@@ -85,7 +85,7 @@ public class ImmutableElectricVehicleSpecification implements ElectricVehicleSpe
 	public static final class Builder {
 		private Id<ElectricVehicle> id;
 		private String vehicleType;
-		private List<String> chargerTypes;
+		private ImmutableList<String> chargerTypes;
 		private double initialSoc;
 		private double batteryCapacity;
 
@@ -102,7 +102,7 @@ public class ImmutableElectricVehicleSpecification implements ElectricVehicleSpe
 			return this;
 		}
 
-		public Builder chargerTypes(List<String> val) {
+		public Builder chargerTypes(ImmutableList<String> val) {
 			chargerTypes = val;
 			return this;
 		}
