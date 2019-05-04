@@ -20,10 +20,10 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.data.ElectricVehicle;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -33,7 +33,7 @@ public interface ElectricVehicleSpecification {
 
 	String getVehicleType();
 
-	List<String> getChargerTypes();
+	ImmutableList<String> getChargerTypes();
 
 	//FIXME consider renaming to getInitialCharge -- SOC suggest [%] not [J]
 	double getInitialSoc();//[J]
