@@ -23,7 +23,6 @@ package org.matsim.contrib.ev.fleet;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.data.ElectricVehicle;
 
 /**
  * A container of ElectricVehicleSpecifications. Its lifespan covers all iterations.

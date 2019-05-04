@@ -21,7 +21,7 @@ package org.matsim.contrib.edrt.schedule;
 
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.dvrp.ChargingTaskImpl;
 
 public class EDrtChargingTask extends ChargingTaskImpl implements DrtTask {

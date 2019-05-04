@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,24 +15,29 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.data;
+package org.matsim.contrib.ev.fleet;
 
-public interface Battery {
-	double getCapacity();
+import java.util.List;
 
-	double getSoc();
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
+import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 
-	void setSoc(double soc);
+public interface ElectricVehicle extends Identifiable<ElectricVehicle> {
+	DriveEnergyConsumption getDriveEnergyConsumption();
 
-	void resetSoc();// to the initial/start SOC
+	AuxEnergyConsumption getAuxEnergyConsumption();
 
-	default void charge(double energy) {
-		setSoc(Math.min(getSoc() + energy, getCapacity()));
-	}
+	Battery getBattery();
 
-	default void discharge(double energy) {
-		setSoc(Math.max(getSoc() - energy, 0));
-	}
+	List<String> getChargerTypes();
+
+	String getVehicleType();
+
+	void setDriveEnergyConsumption(DriveEnergyConsumption driveEnergyConsumption);
+
+	void setAuxEnergyConsumption(AuxEnergyConsumption auxEnergyConsumption);
 }

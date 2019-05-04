@@ -20,7 +20,7 @@
 package org.matsim.contrib.ev;
 
 import org.matsim.contrib.ev.charging.ChargingModule;
-import org.matsim.contrib.ev.data.ElectricFleetModule;
+import org.matsim.contrib.ev.fleet.ElectricFleetModule;
 import org.matsim.contrib.ev.discharging.DischargingModule;
 import org.matsim.contrib.ev.stats.EvStatsModule;
 import org.matsim.core.controler.AbstractModule;

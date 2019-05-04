@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 import java.util.function.BiPredicate;
 import java.util.function.DoubleSupplier;

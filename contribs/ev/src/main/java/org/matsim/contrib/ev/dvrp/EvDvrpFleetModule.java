@@ -32,7 +32,7 @@ import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.contrib.ev.data.ElectricFleet;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 

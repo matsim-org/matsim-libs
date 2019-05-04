@@ -21,8 +21,8 @@ package org.matsim.contrib.ev.stats;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import org.matsim.contrib.ev.data.ElectricFleet;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.util.histogram.UniformHistogram;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts.ChartType;
