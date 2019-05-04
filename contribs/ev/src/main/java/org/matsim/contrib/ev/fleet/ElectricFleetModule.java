@@ -20,8 +20,6 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import javax.annotation.Nullable;
-
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
@@ -64,8 +62,7 @@ public class ElectricFleetModule extends AbstractModule {
 					private ElectricFleetSpecification fleetSpecification;
 					@Inject
 					private DriveEnergyConsumption.Factory driveConsumptionFactory;
-					@Inject
-					@Nullable
+					@Inject(optional = true)
 					private AuxEnergyConsumption.Factory auxConsumptionFactory;
 
 					@Override
