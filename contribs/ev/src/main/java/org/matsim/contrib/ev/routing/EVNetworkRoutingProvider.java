@@ -1,12 +1,20 @@
 package org.matsim.contrib.ev.routing;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
-import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -17,13 +25,6 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
     private static final Logger log = Logger.getLogger(EVNetworkRoutingProvider.class);
@@ -119,8 +120,8 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
         if (travelTime == null) {
             throw new RuntimeException("No TravelTime bound for mode " + routingMode + ".");
         }
-        electricFleet.resetBatteriesAndConsumptions(driveConsumptionFactory, auxConsumptionFactory);
-        LeastCostPathCalculator routeAlgo =
+
+		LeastCostPathCalculator routeAlgo =
                 leastCostPathCalculatorFactory.createPathCalculator(
                         filteredNetwork,
                         travelDisutilityFactory.createTravelDisutility(travelTime),
