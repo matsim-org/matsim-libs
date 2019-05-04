@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.data.ElectricVehicle;
@@ -48,7 +47,7 @@ public class ElectricVehicleWriter extends MatsimXmlWriter {
 	public void write(String file) {
 		openFile(file);
 		writeDoctype("vehicles", "http://matsim.org/files/dtd/electric_vehicles_v1.dtd");
-		writeStartTag("vehicles", Collections.<Tuple<String, String>>emptyList());
+		writeStartTag("vehicles", Collections.emptyList());
 		writeVehicles();
 		writeEndTag("vehicles");
 		close();
@@ -58,8 +57,10 @@ public class ElectricVehicleWriter extends MatsimXmlWriter {
 		for (ElectricVehicle v : vehicles) {
 			List<Tuple<String, String>> atts = Arrays.asList(Tuple.of("id", v.getId().toString()),
 					Tuple.of("battery_capacity", format.format(EvUnits.J_to_kWh(v.getBattery().getCapacity())) + ""),
+					//TODO consider renaming to initial_charge -- SOC suggest [%] not [J]
 					Tuple.of("initial_soc", format.format(EvUnits.J_to_kWh(v.getBattery().getSoc())) + ""),
-					Tuple.of("chargerTypes", v.getChargingTypes().stream().collect(Collectors.joining(","))),
+					//TODO change to: charger_types and vehicle_type in DTD
+					Tuple.of("chargerTypes", String.join(",", v.getChargingTypes())),
 					Tuple.of("vehicleType", v.getVehicleType()));
 			writeStartTag("vehicle", atts, true);
 		}
