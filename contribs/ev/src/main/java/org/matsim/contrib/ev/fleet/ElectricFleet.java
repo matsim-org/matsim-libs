@@ -20,15 +20,17 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
-
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
+
+/**
+ * Contains all ElectricVehicles generated for a given iteration. Its lifespan is limited to a single QSim simulation.
+ * <p>
+ * Fleet (ond the contained ElectricVehicles) are created from ElectricFleetSpecification (and the contained ElectricVehicleSpecifications)
+ *
+ * @author michalm
+ */
 public interface ElectricFleet {
 	Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles();
-
-	void resetBatteriesAndConsumptions(DriveEnergyConsumption.Factory driveConsumptionFactory,
-			AuxEnergyConsumption.Factory auxConsumptionFactory);
 }

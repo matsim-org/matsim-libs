@@ -27,8 +27,6 @@ public interface Battery {
 
 	void setSoc(double soc);
 
-	void resetSoc();// to the initial/start SOC
-
 	default void charge(double energy) {
 		setSoc(Math.min(getSoc() + energy, getCapacity()));
 	}
