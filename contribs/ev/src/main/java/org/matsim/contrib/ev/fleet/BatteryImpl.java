@@ -20,21 +20,19 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import org.geotools.util.logging.Logging;
-
 import java.util.logging.Logger;
+
+import org.geotools.util.logging.Logging;
 
 public class BatteryImpl implements Battery {
 	private static final Logger LOGGER = Logging.getLogger(BatteryImpl.class);
 
 	private final double capacity;
-	private final double initialSoc;
 	private double soc;
 
-	public BatteryImpl(double capacity, double initialSoc) {
+	public BatteryImpl(double capacity, double soc) {
 		this.capacity = capacity;
-		this.initialSoc = initialSoc;
-		this.soc = initialSoc;
+		this.soc = soc;
 	}
 
 	@Override
@@ -54,12 +52,7 @@ public class BatteryImpl implements Battery {
 		}
 		this.soc = soc;
 		if (soc == 0) {
-//			LOGGER.warning("Battery SoC is 0");
+			//			LOGGER.warning("Battery SoC is 0");
 		}
-	}
-
-	@Override
-	public void resetSoc() {
-		soc = initialSoc;
 	}
 }
