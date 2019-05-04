@@ -21,25 +21,27 @@ package org.matsim.contrib.ev.discharging;/*
  * created by jbischoff, 11.10.2018
  */
 
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
+
 public class VehicleTypeSpecificDriveEnergyConsumptionFactory implements DriveEnergyConsumption.Factory {
 
-    private Map<String, DriveEnergyConsumption> consumptionMap = new HashMap<>();
+	private Map<String, DriveEnergyConsumption> consumptionMap = new HashMap<>();
 
-    public void addEnergyConsumptionModel(String vehicleType, DriveEnergyConsumption driveEnergyConsumption) {
-        consumptionMap.put(vehicleType, driveEnergyConsumption);
-    }
+	public void addEnergyConsumptionModel(String vehicleType, DriveEnergyConsumption driveEnergyConsumption) {
+		consumptionMap.put(vehicleType, driveEnergyConsumption);
+	}
 
-    @Override
-    public DriveEnergyConsumption create(ElectricVehicle electricVehicle) {
-        DriveEnergyConsumption c = consumptionMap.get(electricVehicle.getVehicleType());
-        if (c != null)
-            return c;
-        else
-            throw new RuntimeException("No EnergyconsumptionModel for VehicleType " + electricVehicle.getVehicleType() + " has been defined.");
-    }
+	@Override
+	public DriveEnergyConsumption create(ElectricVehicleSpecification electricVehicleSpecification) {
+		DriveEnergyConsumption c = consumptionMap.get(electricVehicleSpecification.getVehicleType());
+		if (c == null) {
+			throw new RuntimeException("No EnergyconsumptionModel for VehicleType "
+					+ electricVehicleSpecification.getVehicleType()
+					+ " has been defined.");
+		}
+		return c;
+	}
 }
