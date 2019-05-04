@@ -19,11 +19,11 @@
 
 package org.matsim.contrib.ev.data;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
-
-import java.util.List;
 
 public interface ElectricVehicle extends Identifiable<ElectricVehicle> {
 	DriveEnergyConsumption getDriveEnergyConsumption();
@@ -32,11 +32,9 @@ public interface ElectricVehicle extends Identifiable<ElectricVehicle> {
 
 	Battery getBattery();
 
-    List<String> getChargingTypes();
+	List<String> getChargerTypes();
 
 	String getVehicleType();
-
-	Battery swapBattery(Battery battery);
 
 	void setDriveEnergyConsumption(DriveEnergyConsumption driveEnergyConsumption);
 
