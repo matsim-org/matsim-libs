@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
-import org.matsim.contrib.ev.data.ElectricFleet;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import javax.inject.Inject;

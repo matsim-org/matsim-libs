@@ -26,7 +26,7 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
-import org.matsim.contrib.ev.data.ElectricFleet;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;

@@ -35,13 +35,13 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetWriter;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.data.BatteryImpl;
+import org.matsim.contrib.ev.fleet.BatteryImpl;
 import org.matsim.contrib.ev.data.Charger;
 import org.matsim.contrib.ev.data.ChargerImpl;
-import org.matsim.contrib.ev.data.ElectricVehicle;
-import org.matsim.contrib.ev.data.ElectricVehicleImpl;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
 import org.matsim.contrib.ev.data.file.ChargerWriter;
-import org.matsim.contrib.ev.data.file.ElectricVehicleWriter;
+import org.matsim.contrib.ev.fleet.ElectricFleetWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -117,7 +117,7 @@ public class CreateEDRTVehiclesAndChargers {
 
         }
         new FleetWriter(vehicles.stream()).write(DRT_VEHICLE_FILE);
-        new ElectricVehicleWriter(evehicles).write(E_VEHICLE_FILE);
+        new ElectricFleetWriter(evehicles).write(E_VEHICLE_FILE);
         new ChargerWriter(chargers).write(CHARGER_FILE);
     }
 

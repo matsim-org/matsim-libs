@@ -22,7 +22,7 @@ package vwExamples.utils.customEV;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup.AuxDischargingSimulation;
 import org.matsim.contrib.ev.charging.ChargingModule;
-import org.matsim.contrib.ev.data.ElectricFleetModule;
+import org.matsim.contrib.ev.fleet.ElectricFleetModule;
 import org.matsim.contrib.ev.discharging.DischargingModule;
 import org.matsim.contrib.ev.stats.EvStatsModule;
 import org.matsim.core.controler.AbstractModule;
