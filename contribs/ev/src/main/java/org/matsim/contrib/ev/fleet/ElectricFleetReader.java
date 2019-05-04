@@ -60,7 +60,7 @@ public class ElectricFleetReader extends MatsimXmlParser {
 				.batteryCapacity(EvUnits.kWh_to_J(Double.parseDouble(atts.getValue("battery_capacity"))))
 				.initialSoc(EvUnits.kWh_to_J(Double.parseDouble(atts.getValue("initial_soc"))))
 				.vehicleType(Optional.ofNullable(atts.getValue("vehicleType"))
-						.orElse(ElectricVehicleImpl.DEFAULTVEHICLETYPE))
+						.orElse(ElectricVehicleImpl.DEFAULT_VEHICLE_TYPE))
 				.chargerTypes(ImmutableList.copyOf(Optional.ofNullable(atts.getValue("chargerTypes"))
 						.orElse(ChargerImpl.DEFAULT_CHARGER_TYPE)
 						.split(",")))
