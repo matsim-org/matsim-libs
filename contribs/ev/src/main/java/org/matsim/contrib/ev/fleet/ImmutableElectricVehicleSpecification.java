@@ -58,27 +58,27 @@ public class ImmutableElectricVehicleSpecification implements ElectricVehicleSpe
 
 	@Override
 	public Id<ElectricVehicle> getId() {
-		return null;
+		return id;
 	}
 
 	@Override
 	public String getVehicleType() {
-		return null;
+		return vehicleType;
 	}
 
 	@Override
 	public ImmutableList<String> getChargerTypes() {
-		return null;
+		return chargerTypes;
 	}
 
 	@Override
 	public double getInitialSoc() {
-		return 0;
+		return initialSoc;
 	}
 
 	@Override
 	public double getBatteryCapacity() {
-		return 0;
+		return batteryCapacity;
 	}
 
 	public static final class Builder {
