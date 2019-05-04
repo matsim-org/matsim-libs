@@ -19,36 +19,37 @@
 
 package org.matsim.contrib.ev.data;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 
-import java.util.Collections;
-import java.util.List;
-
 public class ElectricVehicleImpl implements ElectricVehicle {
 	public static final String DEFAULTVEHICLETYPE = "defaultVehicleType";
 	private final Id<ElectricVehicle> vehicleId;
-	private Battery battery;// not final -- can be swapped
-    private final List<String> chargingTypes;
+	private final Battery battery;
+	private final List<String> chargingTypes;
 	private final String vehicleType;
 
 	private DriveEnergyConsumption driveEnergyConsumption;
 	private AuxEnergyConsumption auxEnergyConsumption;
 
-    public ElectricVehicleImpl(Id<ElectricVehicle> vehicleId, Battery battery) {
-        this.vehicleId = vehicleId;
-        this.battery = battery;
-        this.chargingTypes = Collections.singletonList(ChargerImpl.DEFAULT_CHARGER_TYPE);
+	public ElectricVehicleImpl(Id<ElectricVehicle> vehicleId, Battery battery) {
+		this.vehicleId = vehicleId;
+		this.battery = battery;
+		this.chargingTypes = Collections.singletonList(ChargerImpl.DEFAULT_CHARGER_TYPE);
 		this.vehicleType = DEFAULTVEHICLETYPE;
-    }
+	}
 
-	public ElectricVehicleImpl(Id<ElectricVehicle> vehicleId, Battery battery, List<String> chargingTypes, String vehicleType) {
-        this.vehicleId = vehicleId;
-        this.battery = battery;
-        this.chargingTypes = chargingTypes;
+	public ElectricVehicleImpl(Id<ElectricVehicle> vehicleId, Battery battery, List<String> chargingTypes,
+			String vehicleType) {
+		this.vehicleId = vehicleId;
+		this.battery = battery;
+		this.chargingTypes = chargingTypes;
 		this.vehicleType = vehicleType;
-    }
+	}
 
 	@Override
 	public Id<ElectricVehicle> getId() {
@@ -60,10 +61,10 @@ public class ElectricVehicleImpl implements ElectricVehicle {
 		return battery;
 	}
 
-    @Override
-    public List<String> getChargingTypes() {
-        return chargingTypes;
-    }
+	@Override
+	public List<String> getChargerTypes() {
+		return chargingTypes;
+	}
 
 	@Override
 	public String getVehicleType() {
@@ -78,13 +79,6 @@ public class ElectricVehicleImpl implements ElectricVehicle {
 	@Override
 	public AuxEnergyConsumption getAuxEnergyConsumption() {
 		return auxEnergyConsumption;
-	}
-
-	@Override
-	public Battery swapBattery(Battery battery) {
-		Battery old = this.battery;
-		this.battery = battery;
-		return old;
 	}
 
 	@Override
