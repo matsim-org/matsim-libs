@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import com.google.inject.util.Providers;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 
@@ -65,9 +64,6 @@ public class DischargingModule extends AbstractModule {
 			bind(AuxEnergyConsumption.Factory.class).toInstance(auxConsumptionFactory);
 			bind(AuxDischargingHandler.class).asEagerSingleton();
 			addMobsimListenerBinding().to(AuxDischargingHandler.class);
-		} else if (evCfg.getAuxDischargingSimulation()
-				== EvConfigGroup.AuxDischargingSimulation.none) {
-			bind(AuxEnergyConsumption.Factory.class).toProvider(Providers.of(null));
 		}
 	}
 }
