@@ -20,19 +20,22 @@
 
 package org.matsim.contrib.ev.data;
 
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.contrib.ev.data.file.ElectricFleetProvider;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+import org.matsim.contrib.ev.fleet.ElectricFleetReader;
+import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
+import org.matsim.contrib.ev.fleet.ElectricFleetSpecificationImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -46,8 +49,13 @@ public class ElectricFleetModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind(ElectricFleet.class).toProvider(
-				new ElectricFleetProvider(evCfg.getVehiclesFileUrl(getConfig().getContext()))).asEagerSingleton();
+		bind(ElectricFleetSpecification.class).toProvider(() -> {
+			ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationImpl();
+			new ElectricFleetReader(fleetSpecification).parse(
+					ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.getVehiclesFile()));
+			return fleetSpecification;
+		}).asEagerSingleton();
+
 		addControlerListenerBinding().to(InitAtIterationStart.class);
 
 	}
