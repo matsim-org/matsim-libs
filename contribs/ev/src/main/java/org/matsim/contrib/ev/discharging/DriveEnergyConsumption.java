@@ -20,7 +20,7 @@
 package org.matsim.contrib.ev.discharging;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 /**
  * Net energy taken from the battery to propel the vehicle, i.e. consumed by the motor minus effectively regenerated

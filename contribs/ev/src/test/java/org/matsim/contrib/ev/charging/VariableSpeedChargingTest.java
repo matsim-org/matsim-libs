@@ -24,10 +24,10 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Percentage;
 import org.junit.Test;
 import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.data.Battery;
-import org.matsim.contrib.ev.data.BatteryImpl;
-import org.matsim.contrib.ev.data.ElectricVehicle;
-import org.matsim.contrib.ev.data.ElectricVehicleImpl;
+import org.matsim.contrib.ev.fleet.Battery;
+import org.matsim.contrib.ev.fleet.BatteryImpl;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
 
 public class VariableSpeedChargingTest {
 

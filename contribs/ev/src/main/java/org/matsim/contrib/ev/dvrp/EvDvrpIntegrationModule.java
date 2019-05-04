@@ -30,7 +30,7 @@ import org.matsim.contrib.ev.charging.ChargingModule;
 import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ElectricFleetModule;
+import org.matsim.contrib.ev.fleet.ElectricFleetModule;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DischargingModule;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;

@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.data.ElectricVehicle;
 
 /**
  * @author Michal Maciejewski (michalm)

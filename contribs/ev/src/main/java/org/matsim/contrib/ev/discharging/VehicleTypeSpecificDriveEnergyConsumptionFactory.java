@@ -21,7 +21,7 @@ package org.matsim.contrib.ev.discharging;/*
  * created by jbischoff, 11.10.2018
  */
 
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 import java.util.HashMap;
 import java.util.Map;

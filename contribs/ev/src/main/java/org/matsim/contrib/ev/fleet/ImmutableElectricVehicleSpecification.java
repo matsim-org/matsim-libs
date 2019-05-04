@@ -21,7 +21,6 @@
 package org.matsim.contrib.ev.fleet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.data.ElectricVehicle;
 
 import com.google.common.collect.ImmutableList;
 

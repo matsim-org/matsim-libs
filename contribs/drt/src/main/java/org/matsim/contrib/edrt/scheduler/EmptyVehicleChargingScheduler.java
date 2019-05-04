@@ -35,7 +35,7 @@ import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.data.Charger;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 

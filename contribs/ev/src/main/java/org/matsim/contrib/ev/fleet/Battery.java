@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,19 +15,25 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.data;
+package org.matsim.contrib.ev.fleet;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+public interface Battery {
+	double getCapacity();
 
-import java.util.Map;
+	double getSoc();
 
-public interface ElectricFleet {
-	Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles();
+	void setSoc(double soc);
 
-	void resetBatteriesAndConsumptions(DriveEnergyConsumption.Factory driveConsumptionFactory,
-			AuxEnergyConsumption.Factory auxConsumptionFactory);
+	void resetSoc();// to the initial/start SOC
+
+	default void charge(double energy) {
+		setSoc(Math.min(getSoc() + energy, getCapacity()));
+	}
+
+	default void discharge(double energy) {
+		setSoc(Math.max(getSoc() - energy, 0));
+	}
 }
