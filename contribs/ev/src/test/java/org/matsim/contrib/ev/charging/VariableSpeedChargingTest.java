@@ -73,7 +73,8 @@ public class VariableSpeedChargingTest {
 		assertCalcEnergyCharge(100, 100, 50, 5);
 	}
 
-	private void assertCalcEnergyCharge(double capacity_kWh, double soc_kWh, double power_kW, double energyAfterOneHour_kWh) {
+	private void assertCalcEnergyCharge(double capacity_kWh, double soc_kWh, double power_kW,
+			double energyAfterOneHour_kWh) {
 		ElectricVehicleSpecification specification = ImmutableElectricVehicleSpecification.newBuilder()
 				.batteryCapacity(EvUnits.kWh_to_J(capacity_kWh))
 				.initialSoc(EvUnits.kWh_to_J(soc_kWh))
