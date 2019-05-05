@@ -55,10 +55,12 @@ public class DischargingModule extends AbstractModule {
 
 	@Override
 	public void install() {
+		//XXX "isTurnedOn" returns true ==> should not be used when for "seperateAuxDischargingHandler"
+		boolean isSeperateAuxDischargingHandler = evCfg.getAuxDischargingSimulation()
+				== EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler;
+
 		bind(DriveEnergyConsumption.Factory.class).toInstance(driveConsumptionFactory);
-		if (evCfg.getAuxDischargingSimulation()
-				== EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler) {
-			// "isTurnedOn" returns true ==> should not be used when for "seperateAuxDischargingHandler"
+		if (isSeperateAuxDischargingHandler) {
 			bind(AuxEnergyConsumption.Factory.class).toInstance(auxConsumptionFactory);
 		}
 
@@ -66,11 +68,7 @@ public class DischargingModule extends AbstractModule {
 			@Override
 			protected void configureQSim() {
 				bind(DriveDischargingHandler.class).asEagerSingleton();
-
-				if (evCfg.getAuxDischargingSimulation()
-						== EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler) {
-					// "isTurnedOn" returns true ==> should not be used when for "seperateAuxDischargingHandler"
-					bind(AuxEnergyConsumption.Factory.class).toInstance(auxConsumptionFactory);
+				if (isSeperateAuxDischargingHandler) {
 					bind(AuxDischargingHandler.class).asEagerSingleton();
 					addQSimComponentBinding(EvModule.EV_COMPONENT).to(AuxDischargingHandler.class);
 				}
