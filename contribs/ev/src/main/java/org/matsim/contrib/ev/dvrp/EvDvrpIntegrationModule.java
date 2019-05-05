@@ -26,6 +26,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup.AuxDischargingSimulation;
 import org.matsim.contrib.ev.EvModule;
@@ -51,6 +53,16 @@ import com.google.inject.name.Names;
  * @author michalm
  */
 public class EvDvrpIntegrationModule extends AbstractDvrpModeModule {
+	public static QSimComponentsConfigurator activateModes(String... modes) {
+		return components -> {
+			DynActivityEngineModule.configureComponents(components);
+			components.addNamedComponent(EvModule.EV_COMPONENT);
+			for (String m : modes) {
+				components.addComponent(DvrpModes.mode(m));
+			}
+		};
+	}
+
 	private Function<Charger, ChargingStrategy> chargingStrategyFactory;
 	private DoubleSupplier temperatureProvider;
 	private BiPredicate<DvrpVehicleSpecification, Double> turnedOnPredicate;
