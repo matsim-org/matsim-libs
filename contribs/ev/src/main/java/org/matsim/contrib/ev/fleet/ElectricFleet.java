@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,30 +15,22 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.data.file;
+package org.matsim.contrib.ev.fleet;
 
-import com.google.inject.Provider;
-import org.matsim.contrib.ev.data.ElectricFleet;
-import org.matsim.contrib.ev.data.ElectricFleetImpl;
+import java.util.Map;
 
-import java.net.URL;
+import org.matsim.api.core.v01.Id;
 
 /**
+ * Contains all ElectricVehicles generated for a given iteration. Its lifespan is limited to a single QSim simulation.
+ * <p>
+ * Fleet (ond the contained ElectricVehicles) are created from ElectricFleetSpecification (and the contained ElectricVehicleSpecifications)
+ *
  * @author michalm
  */
-public class ElectricFleetProvider implements Provider<ElectricFleet> {
-	private final URL url;
-
-	public ElectricFleetProvider(URL url) {
-		this.url = url;
-	}
-
-	@Override
-	public ElectricFleet get() {
-		ElectricFleetImpl fleet = new ElectricFleetImpl();
-		new ElectricVehicleReader(fleet).parse(url);
-		return fleet;
-	}
+public interface ElectricFleet {
+	Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles();
 }

@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,30 +15,44 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.data;
+package org.matsim.contrib.ev.fleet;
 
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+import java.util.logging.Logger;
 
-import java.util.List;
+import org.geotools.util.logging.Logging;
 
-public interface ElectricVehicle extends Identifiable<ElectricVehicle> {
-	DriveEnergyConsumption getDriveEnergyConsumption();
+public class BatteryImpl implements Battery {
+	private static final Logger LOGGER = Logging.getLogger(BatteryImpl.class);
 
-	AuxEnergyConsumption getAuxEnergyConsumption();
+	private final double capacity;
+	private double soc;
 
-	Battery getBattery();
+	public BatteryImpl(double capacity, double soc) {
+		this.capacity = capacity;
+		this.soc = soc;
+	}
 
-    List<String> getChargingTypes();
+	@Override
+	public double getCapacity() {
+		return capacity;
+	}
 
-	String getVehicleType();
+	@Override
+	public double getSoc() {
+		return soc;
+	}
 
-	Battery swapBattery(Battery battery);
-
-	void setDriveEnergyConsumption(DriveEnergyConsumption driveEnergyConsumption);
-
-	void setAuxEnergyConsumption(AuxEnergyConsumption auxEnergyConsumption);
+	@Override
+	public void setSoc(double soc) {
+		if (soc < 0 || soc > capacity) {
+			throw new IllegalArgumentException("SoC=" + soc);
+		}
+		this.soc = soc;
+		if (soc == 0) {
+			//			LOGGER.warning("Battery SoC is 0");
+		}
+	}
 }

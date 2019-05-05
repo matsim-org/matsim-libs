@@ -27,7 +27,7 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.etaxi.ETaxiChargingTask;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.BestChargerFinder;
-import org.matsim.contrib.ev.data.Battery;
+import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.data.Charger;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;

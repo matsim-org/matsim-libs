@@ -47,7 +47,7 @@ public class EDrtOptimizer implements DrtOptimizer {
 		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() == ScheduleStatus.STARTED // only active vehicles
 				&& schedule.getCurrentTask().getTaskIdx() == schedule.getTaskCount() - 1) {
-			//TODO: if all vehicles are at depots at the very beginning, they will all start charging (incl. queueing for charging)
+			//XXX if all vehicles are at depots at the very beginning, they will all start charging (incl. queueing for charging)
 			// since charging is uninterruptible, all not fully charged vehicles (could be the whole fleet) would get frozen
 			// to prevent this -- do not allow opportunistic charging when switching to the first (STAY) task
 			if (schedule.getTasks().size() > 1) {

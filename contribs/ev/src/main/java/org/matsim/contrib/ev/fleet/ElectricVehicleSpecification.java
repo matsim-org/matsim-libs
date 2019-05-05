@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,22 +15,27 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.edrt.schedule;
+package org.matsim.contrib.ev.fleet;
 
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.dvrp.ChargingTaskImpl;
+import org.matsim.api.core.v01.Id;
 
-public class EDrtChargingTask extends ChargingTaskImpl implements DrtTask {
-	public EDrtChargingTask(double beginTime, double endTime, Charger charger, ElectricVehicle ev, double totalEnergy) {
-		super(beginTime, endTime, charger, ev, totalEnergy);
-	}
+import com.google.common.collect.ImmutableList;
 
-	@Override
-	public DrtTaskType getDrtTaskType() {
-		return DrtTaskType.STAY;
-	}
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public interface ElectricVehicleSpecification {
+	Id<ElectricVehicle> getId();
+
+	String getVehicleType();
+
+	ImmutableList<String> getChargerTypes();
+
+	//FIXME consider renaming to getInitialCharge -- SOC suggest [%] not [J]
+	double getInitialSoc();//[J]
+
+	double getBatteryCapacity();//[J]
 }

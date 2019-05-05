@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,22 +15,30 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.charging;
+package org.matsim.contrib.ev.fleet;
 
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 
 /**
- * @author michalm
+ * A container of ElectricVehicleSpecifications. Its lifespan covers all iterations.
+ * <p>
+ * It can be modified between iterations by add/replace/removeVehicleSpecification().
+ * <p>
+ * The contained ElectricVehicleSpecifications are (meant to be) immutable, so to modify them, use replaceVehicleSpecification()
+ *
+ * @author Michal Maciejewski (michalm)
  */
-public interface ChargingStrategy {
-	double calcEnergyCharge(ElectricVehicle ev, double chargePeriod);
+public interface ElectricFleetSpecification {
+	Map<Id<ElectricVehicle>, ElectricVehicleSpecification> getVehicleSpecifications();
 
-	boolean isChargingCompleted(ElectricVehicle ev);
+	void addVehicleSpecification(ElectricVehicleSpecification specification);
 
-	double calcRemainingEnergyToCharge(ElectricVehicle ev);
+	void replaceVehicleSpecification(ElectricVehicleSpecification specification);
 
-	// should include potentially longer charging if AUX remains turned on
-	double calcRemainingTimeToCharge(ElectricVehicle ev);
+	void removeVehicleSpecification(Id<ElectricVehicle> vehicleId);
 }
