@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
-import org.matsim.contrib.ev.MobsimScopeEventHandling;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
@@ -74,12 +73,9 @@ public class RunEVExample {
 				charger.getPower());
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new EvModule());
-		controler.configureQSimComponents(components -> components.addNamedComponent(EvModule.EV_COMPONENT));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(MobsimScopeEventHandling.class).asEagerSingleton();
-				addControlerListenerBinding().to(MobsimScopeEventHandling.class);
 				addRoutingModuleBinding(TransportMode.car).toProvider(new EVNetworkRoutingProvider(TransportMode.car));
 				bind(ChargingLogic.Factory.class).toInstance(
 						charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
@@ -91,9 +87,9 @@ public class RunEVExample {
 						bind(VehicleChargingHandler.class).asEagerSingleton();
 					}
 				});
-
 			}
 		});
+		controler.configureQSimComponents(components -> components.addNamedComponent(EvModule.EV_COMPONENT));
 
 		controler.run();
 	}
