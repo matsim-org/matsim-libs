@@ -28,13 +28,14 @@ import java.nio.file.Paths;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.discharging.DriveDischargingHandler;
+import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 
 import com.google.inject.Inject;
 
-public class EvControlerListener implements IterationEndsListener {
+public class EvMobsimListener implements MobsimBeforeCleanupListener {
 
 	@Inject
 	DriveDischargingHandler driveDischargingHandler;
@@ -43,20 +44,24 @@ public class EvControlerListener implements IterationEndsListener {
 	@Inject
 	OutputDirectoryHierarchy controlerIO;
 	@Inject
+	IterationCounter iterationCounter;
+	@Inject
 	Network network;
 
 	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent event) {
 		try {
-			Files.write(Paths.get(controlerIO.getIterationFilename(event.getIteration(), "chargingStats.csv")),
-					() -> chargerPowerCollector.getLogList().stream().<CharSequence>map(e -> e.toString()).iterator());
-			Files.write(Paths.get(controlerIO.getIterationFilename(event.getIteration(), "evConsumptionPerLink.csv")),
+			Files.write(Paths.get(
+					controlerIO.getIterationFilename(iterationCounter.getIterationNumber(), "chargingStats.csv")),
+					() -> chargerPowerCollector.getLogList().stream().<CharSequence>map(Object::toString).iterator());
+			Files.write(Paths.get(controlerIO.getIterationFilename(iterationCounter.getIterationNumber(),
+					"evConsumptionPerLink.csv")),
 					() -> driveDischargingHandler.getEnergyConsumptionPerLink().entrySet().stream().<CharSequence>map(
-							e -> e.getKey() + ";" + (EvUnits.J_to_kWh(e.getValue())) / (network.getLinks()
-									.get(e.getKey())
-									.getLength() / 1000.0) + ";" + EvUnits.J_to_kWh(e.getValue())).iterator());
+							ec -> ec.getKey() + ";" + (EvUnits.J_to_kWh(ec.getValue())) / (network.getLinks()
+									.get(ec.getKey())
+									.getLength() / 1000.0) + ";" + EvUnits.J_to_kWh(ec.getValue())).iterator());
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 
 	}
