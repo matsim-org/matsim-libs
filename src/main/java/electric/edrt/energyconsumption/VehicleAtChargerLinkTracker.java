@@ -21,6 +21,11 @@ package electric.edrt.energyconsumption;/*
  * created by jbischoff, 12.01.2019
  */
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -29,11 +34,8 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
-
-import javax.inject.Inject;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Tracks vehicles that park at charger locations. These will not have any AUX consumption while parked.
@@ -77,7 +79,7 @@ public class VehicleAtChargerLinkTracker implements VehicleLeavesTrafficEventHan
         }
     }
 
-    public boolean isAtCharger(ElectricVehicle electricVehicle) {
+	public boolean isAtCharger(ElectricVehicleSpecification electricVehicle) {
 
         return evsAtChargers.contains(electricVehicle.getId());
     }
