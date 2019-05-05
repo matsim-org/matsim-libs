@@ -22,7 +22,6 @@ package org.matsim.contrib.etaxi.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.VariableSpeedCharging;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
@@ -56,7 +55,7 @@ public class RunETaxiScenario {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new ETaxiModule());
 		controler.addOverridingModule(new DvrpModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(taxiCfg.getMode()));
+		controler.configureQSimComponents(EvDvrpIntegrationModule.activateModes(taxiCfg.getMode()));
 
 		controler.addOverridingModule(createEvDvrpIntegrationModule(taxiCfg.getMode()));
 
@@ -70,9 +69,10 @@ public class RunETaxiScenario {
 	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(String mode) {
 		return new EvDvrpIntegrationModule(mode).setChargingStrategyFactory(
 				charger -> VariableSpeedCharging.createStrategyForNissanLeaf(charger.getPower() * CHARGING_SPEED_FACTOR,
-						MAX_RELATIVE_SOC))
-				.setTemperatureProvider(() -> TEMPERATURE)
-				.setTurnedOnPredicate((vehicle, time) -> (time >= vehicle.getServiceBeginTime() && time <= vehicle.getServiceEndTime()));
+						MAX_RELATIVE_SOC)).setTemperatureProvider(() -> TEMPERATURE)
+				//FIXME should use actual vehicle to check if schedule is STARTED
+				.setTurnedOnPredicate((vehicle, time) -> (time >= vehicle.getServiceBeginTime()
+						&& time <= vehicle.getServiceEndTime()));
 	}
 
 	public static void main(String[] args) {

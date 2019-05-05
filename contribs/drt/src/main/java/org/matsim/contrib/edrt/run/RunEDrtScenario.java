@@ -71,6 +71,7 @@ public class RunEDrtScenario {
 	}
 
 	private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
+		//FIXME should use actual vehicle to check if schedule is STARTED
 		return vehicle.getServiceBeginTime() <= time && time <= vehicle.getServiceEndTime();
 	}
 
