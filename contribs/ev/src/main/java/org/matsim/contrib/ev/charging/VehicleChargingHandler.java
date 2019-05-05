@@ -35,16 +35,17 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.ev.MobsimScopeEventHandler;
+import org.matsim.contrib.ev.MobsimScopeEventHandling;
 import org.matsim.contrib.ev.data.Charger;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
 public class VehicleChargingHandler
 		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonLeavesVehicleEventHandler,
-		ChargingEndEventHandler {
+		ChargingEndEventHandler, MobsimScopeEventHandler {
 
 	public static final String CHARGING_IDENTIFIER = " charging";
 	private Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
@@ -56,10 +57,10 @@ public class VehicleChargingHandler
 
 	@Inject
 	public VehicleChargingHandler(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet,
-			EventsManager events) {
+			MobsimScopeEventHandling events) {
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.electricFleet = electricFleet;
-		events.addHandler(this);
+		events.addMobsimScopeHandler(this);
 	}
 
 	@Override
@@ -97,12 +98,6 @@ public class VehicleChargingHandler
 				}
 			}
 		}
-	}
-
-	@Override
-	public void reset(int iteration) {
-		lastVehicleUsed.clear();
-		vehiclesAtChargers.clear();
 	}
 
 	@Override

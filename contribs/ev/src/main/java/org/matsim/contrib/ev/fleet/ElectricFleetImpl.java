@@ -37,7 +37,7 @@ public class ElectricFleetImpl implements ElectricFleet {
 				.values()
 				.stream()
 				.map(s -> new ElectricVehicleImpl(s, driveConsumptionFactory.create(s),
-						auxConsumptionFactory.create(s)))
+						auxConsumptionFactory == null ? null : auxConsumptionFactory.create(s)))
 				.forEach(fleet::addElectricVehicle);
 		return fleet;
 	}
