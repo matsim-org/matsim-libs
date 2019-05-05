@@ -75,7 +75,6 @@ public class ElectricFleetModule extends AbstractModule {
 		});
 
 		addControlerListenerBinding().to(InitAtIterationStart.class);
-
 	}
 
 	private static class InitAtIterationStart implements IterationStartsListener {
