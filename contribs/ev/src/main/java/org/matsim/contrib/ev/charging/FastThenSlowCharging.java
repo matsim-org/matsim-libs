@@ -27,8 +27,8 @@ package org.matsim.contrib.ev.charging;/*
  * This charging behavior is based on research conducted at LTH / University of Lund
  */
 
-import org.matsim.contrib.ev.data.Battery;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.Battery;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 public class FastThenSlowCharging implements ChargingStrategy {
 

@@ -18,21 +18,22 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.data;
+package org.matsim.contrib.ev.fleet;
 
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.contrib.ev.data.file.ElectricFleetProvider;
+import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
-import javax.annotation.Nullable;
-import javax.inject.Inject;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -46,41 +47,47 @@ public class ElectricFleetModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind(ElectricFleet.class).toProvider(
-				new ElectricFleetProvider(evCfg.getVehiclesFileUrl(getConfig().getContext()))).asEagerSingleton();
-		addControlerListenerBinding().to(InitAtIterationStart.class);
+		bind(ElectricFleetSpecification.class).toProvider(() -> {
+			ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationImpl();
+			new ElectricFleetReader(fleetSpecification).parse(
+					ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.getVehiclesFile()));
+			return fleetSpecification;
+		}).asEagerSingleton();
 
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(ElectricFleet.class).toProvider(new Provider<ElectricFleet>() {
+					@Inject
+					private ElectricFleetSpecification fleetSpecification;
+					@Inject
+					private DriveEnergyConsumption.Factory driveConsumptionFactory;
+					@Inject(optional = true)
+					private AuxEnergyConsumption.Factory auxConsumptionFactory;
+
+					@Override
+					public ElectricFleet get() {
+						return ElectricFleetImpl.create(fleetSpecification, driveConsumptionFactory,
+								auxConsumptionFactory);
+					}
+				}).asEagerSingleton();
+			}
+		});
+
+		addControlerListenerBinding().to(InitAtIterationStart.class);
 	}
 
 	private static class InitAtIterationStart implements IterationStartsListener {
-		@Inject
-		private ElectricFleet evFleet;
 		@Inject
 		private ChargingInfrastructure chargingInfrastructure;
 		@Inject
 		private ChargingLogic.Factory logicFactory;
 		@Inject
 		private EventsManager eventsManager;
-		@Inject
-		private DriveEnergyConsumption.Factory driveConsumptionFactory;
-
-		@Inject
-		@Nullable
-		private AuxEnergyConsumption.Factory auxConsumptionFactory;
-		@Inject
-		private Config config;
 
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
-			EvConfigGroup evConfigGroup = EvConfigGroup.get(config);
-			if (evConfigGroup.getAuxDischargingSimulation() == EvConfigGroup.AuxDischargingSimulation.none) {
-				evFleet.resetBatteriesAndConsumptions(driveConsumptionFactory, null);
-			} else {
-				evFleet.resetBatteriesAndConsumptions(driveConsumptionFactory, auxConsumptionFactory);
-
-			}
 			chargingInfrastructure.initChargingLogics(logicFactory, eventsManager);
 		}
 	}
-
 }

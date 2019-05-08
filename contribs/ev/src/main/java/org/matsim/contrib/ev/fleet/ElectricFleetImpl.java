@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,39 +15,41 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.data;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+package org.matsim.contrib.ev.fleet;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
+import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+
 public class ElectricFleetImpl implements ElectricFleet {
-	private final Map<Id<ElectricVehicle>, ElectricVehicle> eVehicles = new LinkedHashMap<>();
+	public static ElectricFleet create(ElectricFleetSpecification fleetSpecification,
+			DriveEnergyConsumption.Factory driveConsumptionFactory,
+			AuxEnergyConsumption.Factory auxConsumptionFactory) {
+		ElectricFleetImpl fleet = new ElectricFleetImpl();
+		fleetSpecification.getVehicleSpecifications()
+				.values()
+				.stream()
+				.map(s -> new ElectricVehicleImpl(s, driveConsumptionFactory.create(s),
+						auxConsumptionFactory == null ? null : auxConsumptionFactory.create(s)))
+				.forEach(fleet::addElectricVehicle);
+		return fleet;
+	}
+
+	private final Map<Id<ElectricVehicle>, ElectricVehicle> electricVehicles = new LinkedHashMap<>();
 
 	@Override
 	public Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles() {
-		return Collections.unmodifiableMap(eVehicles);
+		return Collections.unmodifiableMap(electricVehicles);
 	}
 
 	public void addElectricVehicle(ElectricVehicle ev) {
-		eVehicles.put(ev.getId(), ev);
-	}
-
-	@Override
-	public void resetBatteriesAndConsumptions(DriveEnergyConsumption.Factory driveConsumptionFactory,
-			AuxEnergyConsumption.Factory auxConsumptionFactory) {
-		for (ElectricVehicle ev : eVehicles.values()) {
-			ev.getBattery().resetSoc();
-			ev.setDriveEnergyConsumption(driveConsumptionFactory.create(ev));
-			if (auxConsumptionFactory != null) {
-				ev.setAuxEnergyConsumption(auxConsumptionFactory.create(ev));
-			}
-		}
+		electricVehicles.put(ev.getId(), ev);
 	}
 }

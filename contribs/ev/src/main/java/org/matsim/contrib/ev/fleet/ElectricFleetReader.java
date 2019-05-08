@@ -18,26 +18,28 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.fleet;
+package org.matsim.contrib.ev.fleet;
 
 import java.util.Optional;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.ev.EvUnits;
+import org.matsim.contrib.ev.data.ChargerImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
+import com.google.common.collect.ImmutableList;
+
 /**
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public class FleetReader extends MatsimXmlParser {
+public class ElectricFleetReader extends MatsimXmlParser {
 	private static final String VEHICLE = "vehicle";
 
-	private static final int DEFAULT_CAPACITY = 1;
+	private final ElectricFleetSpecification fleet;
 
-	private final FleetSpecification fleet;
-
-	public FleetReader(FleetSpecification fleet) {
+	public ElectricFleetReader(ElectricFleetSpecification fleet) {
 		this.fleet = fleet;
 	}
 
@@ -52,22 +54,16 @@ public class FleetReader extends MatsimXmlParser {
 	public void endTag(String name, String content, Stack<String> context) {
 	}
 
-	private DvrpVehicleSpecification createSpecification(Attributes atts) {
-		return ImmutableDvrpVehicleSpecification.newBuilder()
-				.id(Id.create(atts.getValue("id"), DvrpVehicle.class))
-				.startLinkId(Id.createLinkId(atts.getValue("start_link")))
-				.capacity(getCapacity(atts.getValue("capacity")))
-				.serviceBeginTime(Double.parseDouble(atts.getValue("t_0")))
-				.serviceEndTime(Double.parseDouble(atts.getValue("t_1")))
+	private ElectricVehicleSpecification createSpecification(Attributes atts) {
+		return ImmutableElectricVehicleSpecification.newBuilder()
+				.id(Id.create(atts.getValue("id"), ElectricVehicle.class))
+				.batteryCapacity(EvUnits.kWh_to_J(Double.parseDouble(atts.getValue("battery_capacity"))))
+				.initialSoc(EvUnits.kWh_to_J(Double.parseDouble(atts.getValue("initial_soc"))))
+				.vehicleType(Optional.ofNullable(atts.getValue("vehicleType"))
+						.orElse(ElectricVehicleImpl.DEFAULT_VEHICLE_TYPE))
+				.chargerTypes(ImmutableList.copyOf(Optional.ofNullable(atts.getValue("chargerTypes"))
+						.orElse(ChargerImpl.DEFAULT_CHARGER_TYPE)
+						.split(",")))
 				.build();
-	}
-
-	private static int getCapacity(String capacityAttribute) {
-		double capacity = Double.parseDouble(Optional.ofNullable(capacityAttribute).orElse(DEFAULT_CAPACITY + ""));
-		if ((int)capacity != capacity) {
-			//for backwards compatibility: use double when reading files (capacity used to be double)
-			throw new IllegalArgumentException("capacity must be an integer value");
-		}
-		return (int)capacity;
 	}
 }

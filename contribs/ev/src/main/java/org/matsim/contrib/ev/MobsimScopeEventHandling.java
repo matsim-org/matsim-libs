@@ -18,43 +18,42 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.stats;
+package org.matsim.contrib.ev;
 
-import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.EvModule;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 
 /**
+ * Meant for event handlers that are created anew in each iteration and should operate only until the end of the current
+ * mobsim. Typically, these are event handlers created in AbstractQSimModules.
+ *
  * @author Michal Maciejewski (michalm)
  */
-public class EvStatsModule extends AbstractModule {
-	private final EvConfigGroup evCfg;
+@Singleton
+public class MobsimScopeEventHandling implements AfterMobsimListener {
+	private final Collection<MobsimScopeEventHandler> eventHandlers = new ConcurrentLinkedQueue<>();
+	private final EventsManager eventsManager;
 
-	public EvStatsModule(EvConfigGroup evCfg) {
-		this.evCfg = evCfg;
+	@Inject
+	public MobsimScopeEventHandling(EventsManager eventsManager) {
+		this.eventsManager = eventsManager;
+	}
+
+	public void addMobsimScopeHandler(MobsimScopeEventHandler handler) {
+		eventHandlers.add(handler);
+		eventsManager.addHandler(handler);
 	}
 
 	@Override
-	public void install() {
-		installQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				if (evCfg.getTimeProfiles()) {
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							SocHistogramTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							IndividualSocTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							ChargerOccupancyTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(ChargerOccupancyXYDataProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							VehicleTypeAggregatedSocTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).to(EvMobsimListener.class);
-					bind(ChargerPowerCollector.class).asEagerSingleton();
-					// add more time profiles if necessary
-				}
-			}
-		});
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		eventHandlers.forEach(eventsManager::removeHandler);
+		eventHandlers.clear();
 	}
 }

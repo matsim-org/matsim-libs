@@ -54,20 +54,24 @@ public class GridTest {
     @Test
     public void getArea_HexagonalGrid() {
 
+        // actually area of hexagon is r^2 * sqrt(3)/2
         final double horizontalDistance = 2;
-        // area of hexagon is: 2 * sqrt(3*r^2)
-        final double expected = 2 * Math.sqrt(3 * horizontalDistance * horizontalDistance / 4);
-
+        final double expected = Math.sqrt(3) / 2 * horizontalDistance * horizontalDistance;
         Grid<String> grid = new HexagonalGrid<>(horizontalDistance, () -> "value", SpatialTestUtils.createRect(10, 10));
 
+        final double horizontalDistance5 = 5;
+        final double expected5 = Math.sqrt(3) / 2 * horizontalDistance5 * horizontalDistance5;
+        Grid<String> grid5 = new HexagonalGrid<>(horizontalDistance5, () -> "value", SpatialTestUtils.createRect(10, 10));
+
         assertEquals(expected, grid.getCellArea(), 0.0001);
+        assertEquals(expected5, grid5.getCellArea(), 0.0001);
     }
 
     @Test
     public void getValue_withExactCoord() {
 
         final String testValue = "initialValue";
-        final Coordinate expectedCoordinate = new Coordinate(2, 2.5);
+        final Coordinate expectedCoordinate = new Coordinate(2, 1+Math.sqrt(3));
         Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
 
         Grid.Cell<String> result = grid.getCell(expectedCoordinate);
@@ -82,9 +86,9 @@ public class GridTest {
         Grid<String> grid = new HexagonalGrid<>(2, () -> testValue, SpatialTestUtils.createRect(10, 10));
 
         // retrieve a cell somewhere near (2, 2.5)
-        Grid.Cell<String> result = grid.getCell(new Coordinate(1.1, 2.3));
+        Grid.Cell<String> result = grid.getCell(new Coordinate(2, 2.5));
 
-        assertEquals(new Coordinate(2, 2.5), result.getCoordinate());
+        assertEquals(new Coordinate(2, 1+Math.sqrt(3)), result.getCoordinate());
     }
 
     @Test
@@ -95,7 +99,7 @@ public class GridTest {
 
         Grid.Cell<String> result = grid.getCell(new Coordinate(100, 100));
 
-        assertEquals(new Coordinate(8, 8.5), result.getCoordinate());
+        assertEquals(new Coordinate(8, 1 + 5*Math.sqrt(3)), result.getCoordinate());
     }
 
     @Test
