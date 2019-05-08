@@ -17,28 +17,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package freight;/*
- * created by jbischoff, 03.05.2019
+package commercialtraffic.deliveryGeneration;/*
+ * created by jbischoff, 11.04.2019
  */
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 
-import static org.matsim.core.config.ConfigUtils.createConfig;
-import static org.matsim.core.scenario.ScenarioUtils.createScenario;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.freight.carrier.Carrier;
 
-public class RunCommercialTraffic {
-    public static void main(String[] args) {
+public class PersonDelivery {
 
-
-        Config config = createConfig();
-        Scenario scenario = createScenario(config);
-
-        Controler controler = new Controler(scenario);
-
-        controler.addOverridingModule(new CommercialTrafficModule());
+    public static final String DELIEVERY_SIZE = "deliveryAmount";
+    public static final String DELIEVERY_TYPE = "deliveryType";
+    public static final String DELIEVERY_DURATION = "deliveryDuration";
+    public static final String DELIEVERY_TIME_START = "deliveryTimeStart";
+    public static final String SERVICE_OPERATOR = "operator";
+    public static final String DELIEVERY_TIME_END = "deliveryTimeEnd";
 
 
+    public static Id<Carrier> getCarrierId(Activity activity) {
+        return Id.create(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TYPE).toString() + "_" + activity.getAttributes().getAttribute(PersonDelivery.SERVICE_OPERATOR).toString(), Carrier.class);
     }
 }

@@ -1,4 +1,4 @@
-package freight.deliveryGeneration;
+package commercialtraffic.deliveryGeneration;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -31,6 +31,7 @@ public class DeliveryGeneratorTest {
         addPopulation(scenario);
         DeliveryGenerator generator = new DeliveryGenerator(scenario, carriers);
 
+        new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write("carriertypes.xml");
         generator.notifyBeforeMobsim(new BeforeMobsimEvent(null, 0));
     }
 

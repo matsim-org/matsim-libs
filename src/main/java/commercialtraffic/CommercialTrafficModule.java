@@ -17,11 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package freight;/*
+package commercialtraffic;/*
  * created by jbischoff, 03.05.2019
  */
 
-import freight.deliveryGeneration.DeliveryGenerator;
+import commercialtraffic.deliveryGeneration.DeliveryGenerator;
 import org.matsim.core.controler.AbstractModule;
 
 public class CommercialTrafficModule extends AbstractModule {

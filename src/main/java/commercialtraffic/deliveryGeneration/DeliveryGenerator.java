@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package freight.deliveryGeneration;/*
+package commercialtraffic.deliveryGeneration;/*
  * created by jbischoff, 11.04.2019
  */
 
@@ -27,6 +27,7 @@ import com.graphhopper.jsprit.core.algorithm.termination.VariationCoefficientTer
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
+import commercialtraffic.CommercialTrafficConfigGroup;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,7 +36,6 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -44,6 +44,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
@@ -58,11 +59,13 @@ import java.util.stream.Collectors;
 public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListener {
 
 
+    public final double firsttourTraveltimeBuffer;
+    private final int maxIterations;
+
     @Inject
     private Scenario scenario;
 
-    @Inject
-    Population population;
+    private Population population;
 
     private Carriers carriers;
 
@@ -79,18 +82,32 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     }
 
     @Inject
-    public DeliveryGenerator(Scenario scenario, Config config) {
+    public DeliveryGenerator(Scenario scenario) {
+        CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(scenario.getConfig());
         this.carriers = new Carriers();
-        new CarrierPlanReader(carriers).readFile("test-carriers.xml");
+        firsttourTraveltimeBuffer = ctcg.getFirstLegTraveltimeBufferFactor();
+
+        new CarrierPlanXmlReaderV2(carriers).readFile(ctcg.getCarriersFileUrl(scenario.getConfig().getContext()).getFile());
+        CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
+        new CarrierVehicleTypeReader(vehicleTypes).readFile(ctcg.getCarriersVehicleTypesFileUrl(scenario.getConfig().getContext()).getFile());
+        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
+
+
         this.scenario = scenario;
         this.population = scenario.getPopulation();
 
+        maxIterations = ctcg.getJspritIterations();
     }
 
+    /**
+     * Test only
+     */
     DeliveryGenerator(Scenario scenario, Carriers carriers) {
         this.population = scenario.getPopulation();
         this.carriers = carriers;
         this.scenario = scenario;
+        firsttourTraveltimeBuffer = 2;
+        maxIterations = 100;
     }
 
     private void generateIterationServices() {
@@ -109,7 +126,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
             serviceBuilder.setCapacityDemand((int) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_SIZE));
             serviceBuilder.setServiceDuration((int) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_DURATION));
             serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance((int) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_START), (int) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_END)));
-
+            i++;
             Id<Carrier> carrierId = PersonDelivery.getCarrierId(activity);
             if (carriers.getCarriers().containsKey(carrierId)) {
                 Carrier carrier = carriers.getCarriers().get(carrierId);
@@ -140,7 +157,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
             // get the algorithm out-of-the-box, search solution and get the best one.
             VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 
-            algorithm.setMaxIterations(100);
+            algorithm.setMaxIterations(maxIterations);
 
             // variationCoefficient = stdDeviation/mean. so i set the threshold rather soft
             algorithm.addTerminationCriterion(new VariationCoefficientTermination(50, 0.01));
@@ -181,10 +198,16 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
                 Person driverPerson = createDriverPerson(driverId);
                 Plan plan = PopulationUtils.createPlan();
                 Activity startActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.START, scheduledTour.getVehicle().getLocation());
-                startActivity.setEndTime(scheduledTour.getDeparture());
                 plan.addActivity(startActivity);
+                Activity lastTourElementActivity = null;
+                Leg lastTourLeg = null;
+
+
+
                 for (Tour.TourElement tourElement : scheduledTour.getTour().getTourElements()) {
                     if (tourElement instanceof org.matsim.contrib.freight.carrier.Tour.Leg) {
+
+
                         org.matsim.contrib.freight.carrier.Tour.Leg tourLeg = (org.matsim.contrib.freight.carrier.Tour.Leg) tourElement;
                         Route route = tourLeg.getRoute();
                         route.setDistance(RouteUtils.calcDistance((NetworkRoute) route, 1.0, 1.0, scenario.getNetwork()));
@@ -197,13 +220,25 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
                         leg.setTravelTime(tourLeg.getExpectedTransportTime());
                         leg.setTravelTime(tourLeg.getExpectedDepartureTime() + tourLeg.getExpectedTransportTime() - leg.getDepartureTime());
                         plan.addLeg(leg);
+                        if (lastTourElementActivity != null) {
+                            lastTourElementActivity.setEndTime(tourLeg.getExpectedDepartureTime());
+                            if (Time.isUndefinedTime(startActivity.getEndTime())) {
+                                startActivity.setEndTime(lastTourElementActivity.getEndTime() - lastTourElementActivity.getMaximumDuration() - lastTourLeg.getTravelTime() * firsttourTraveltimeBuffer);
+                                lastTourElementActivity.setMaximumDuration(Time.getUndefinedTime());
+                            }
+                        }
+                        lastTourLeg = leg;
+
                     } else if (tourElement instanceof Tour.TourActivity) {
                         Tour.TourActivity act = (Tour.TourActivity) tourElement;
                         Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(act.getActivityType(), act.getLocation());
-
-                        double duration = act.getDuration();
-                        tourElementActivity.setMaximumDuration(duration);
                         plan.addActivity(tourElementActivity);
+                        if (lastTourElementActivity == null) {
+                            tourElementActivity.setMaximumDuration(act.getDuration());
+                        }
+
+                        lastTourElementActivity = tourElementActivity;
+
                     }
                 }
                 Activity endActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.END, scheduledTour.getVehicle().getLocation());
@@ -241,5 +276,6 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     private void removeFreightAgents() {
         freightDrivers.forEach(d -> scenario.getPopulation().removePerson(d));
         freightVehicles.forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
+        CarrierVehicleTypes.getVehicleTypes(carriers).getVehicleTypes().keySet().forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
     }
 }
