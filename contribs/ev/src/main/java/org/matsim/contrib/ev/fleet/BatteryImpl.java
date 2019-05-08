@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,30 +15,44 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-
-package org.matsim.contrib.ev.data.file;
-
-import com.google.inject.Provider;
-import org.matsim.contrib.ev.data.ElectricFleet;
-import org.matsim.contrib.ev.data.ElectricFleetImpl;
-
-import java.net.URL;
-
-/**
- * @author michalm
+ * *********************************************************************** *
  */
-public class ElectricFleetProvider implements Provider<ElectricFleet> {
-	private final URL url;
 
-	public ElectricFleetProvider(URL url) {
-		this.url = url;
+package org.matsim.contrib.ev.fleet;
+
+import java.util.logging.Logger;
+
+import org.geotools.util.logging.Logging;
+
+public class BatteryImpl implements Battery {
+	private static final Logger LOGGER = Logging.getLogger(BatteryImpl.class);
+
+	private final double capacity;
+	private double soc;
+
+	public BatteryImpl(double capacity, double soc) {
+		this.capacity = capacity;
+		this.soc = soc;
 	}
 
 	@Override
-	public ElectricFleet get() {
-		ElectricFleetImpl fleet = new ElectricFleetImpl();
-		new ElectricVehicleReader(fleet).parse(url);
-		return fleet;
+	public double getCapacity() {
+		return capacity;
+	}
+
+	@Override
+	public double getSoc() {
+		return soc;
+	}
+
+	@Override
+	public void setSoc(double soc) {
+		if (soc < 0 || soc > capacity) {
+			throw new IllegalArgumentException("SoC=" + soc);
+		}
+		this.soc = soc;
+		if (soc == 0) {
+			//			LOGGER.warning("Battery SoC is 0");
+		}
 	}
 }

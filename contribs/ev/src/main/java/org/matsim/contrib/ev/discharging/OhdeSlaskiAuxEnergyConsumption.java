@@ -19,10 +19,10 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import org.matsim.contrib.ev.data.ElectricVehicle;
-
 import java.util.function.BiPredicate;
 import java.util.function.DoubleSupplier;
+
+import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 
 public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	private static final double a = 1.3;// [W]
@@ -42,22 +42,21 @@ public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 		return (a * temp + b) * temp + c;
 	}
 
-	public static OhdeSlaskiAuxEnergyConsumption createConsumptionForFixedTemperatureAndAlwaysOn(ElectricVehicle ev,
-			int temperature) {
+	public static OhdeSlaskiAuxEnergyConsumption createConsumptionForFixedTemperatureAndAlwaysOn(
+			ElectricVehicleSpecification ev, int temperature) {
 		return new OhdeSlaskiAuxEnergyConsumption(ev, () -> temperature, (v, t) -> true);
 	}
 
-	private final ElectricVehicle ev;
+	private final ElectricVehicleSpecification ev;
 	private final DoubleSupplier temperatureProvider;
-	private final BiPredicate<ElectricVehicle, Double> isTurnedOn;
+	private final BiPredicate<ElectricVehicleSpecification, Double> isTurnedOn;
 
-	public OhdeSlaskiAuxEnergyConsumption(ElectricVehicle ev, DoubleSupplier temperatureProvider,
-										  BiPredicate<ElectricVehicle, Double> isTurnedOn) {
+	public OhdeSlaskiAuxEnergyConsumption(ElectricVehicleSpecification ev, DoubleSupplier temperatureProvider,
+			BiPredicate<ElectricVehicleSpecification, Double> isTurnedOn) {
 		this.ev = ev;
 		this.temperatureProvider = temperatureProvider;
 		this.isTurnedOn = isTurnedOn;
 	}
-
 
 	@Override
 	public double calcEnergyConsumption(double period, double timeOfDay) {

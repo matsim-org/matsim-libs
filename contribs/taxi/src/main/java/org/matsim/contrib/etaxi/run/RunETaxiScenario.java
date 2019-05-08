@@ -22,12 +22,10 @@ package org.matsim.contrib.etaxi.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.VariableSpeedCharging;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -50,8 +48,6 @@ public class RunETaxiScenario {
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
-		config.checkConsistency();
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -59,7 +55,7 @@ public class RunETaxiScenario {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new ETaxiModule());
 		controler.addOverridingModule(new DvrpModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(taxiCfg.getMode()));
+		controler.configureQSimComponents(EvDvrpIntegrationModule.activateModes(taxiCfg.getMode()));
 
 		controler.addOverridingModule(createEvDvrpIntegrationModule(taxiCfg.getMode()));
 
@@ -73,9 +69,10 @@ public class RunETaxiScenario {
 	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(String mode) {
 		return new EvDvrpIntegrationModule(mode).setChargingStrategyFactory(
 				charger -> VariableSpeedCharging.createStrategyForNissanLeaf(charger.getPower() * CHARGING_SPEED_FACTOR,
-						MAX_RELATIVE_SOC))
-				.setTemperatureProvider(() -> TEMPERATURE)
-				.setTurnedOnPredicate((vehicle, time) -> (time >= vehicle.getServiceBeginTime() && time <= vehicle.getServiceEndTime()));
+						MAX_RELATIVE_SOC)).setTemperatureProvider(() -> TEMPERATURE)
+				//FIXME should use actual vehicle to check if schedule is STARTED
+				.setTurnedOnPredicate((vehicle, time) -> (time >= vehicle.getServiceBeginTime()
+						&& time <= vehicle.getServiceEndTime()));
 	}
 
 	public static void main(String[] args) {

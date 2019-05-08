@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,24 +15,18 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.data;
+package org.matsim.contrib.dvrp.run;
 
-public interface Battery {
-	double getCapacity();
+import java.util.HashSet;
 
-	double getSoc();
-
-	void setSoc(double soc);
-
-	void resetSoc();// to the initial/start SOC
-
-	default void charge(double energy) {
-		setSoc(Math.min(getSoc() + energy, getCapacity()));
-	}
-
-	default void discharge(double energy) {
-		setSoc(Math.max(getSoc() - energy, 0));
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class MultiModals {
+	public static boolean isAllModesUnique(MultiModal<?> multiModal) {
+		return multiModal.modes().allMatch(new HashSet<>()::add);
 	}
 }

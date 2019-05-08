@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,22 +15,27 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
+package org.matsim.contrib.ev.fleet;
 
-import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.api.core.v01.Id;
 
-public class MinCostFlowRebalancingParamsConsistencyChecker {
-	public void checkConsistency(DrtConfigGroup drtCfg) {
-		MinCostFlowRebalancingParams params = drtCfg.getMinCostFlowRebalancing();
-		if (params == null) {
-			return;// no rebalancing
-		}
-		if (params.getMinServiceTime() <= params.getMaxTimeBeforeIdle()) {
-			throw new RuntimeException(MinCostFlowRebalancingParams.MIN_SERVICE_TIME
-					+ " must be greater than "
-					+ MinCostFlowRebalancingParams.MAX_TIME_BEFORE_IDLE);
-		}
-	}
+import com.google.common.collect.ImmutableList;
+
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public interface ElectricVehicleSpecification {
+	Id<ElectricVehicle> getId();
+
+	String getVehicleType();
+
+	ImmutableList<String> getChargerTypes();
+
+	//FIXME consider renaming to getInitialCharge -- SOC suggest [%] not [J]
+	double getInitialSoc();//[J]
+
+	double getBatteryCapacity();//[J]
 }
