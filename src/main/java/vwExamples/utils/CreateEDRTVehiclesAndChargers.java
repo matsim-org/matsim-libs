@@ -40,12 +40,15 @@ import org.matsim.contrib.ev.data.ChargerImpl;
 import org.matsim.contrib.ev.data.file.ChargerWriter;
 import org.matsim.contrib.ev.fleet.ElectricFleetWriter;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.fleet.ImmutableElectricVehicleSpecification;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author axer This is a modified version of Joschka's depot and charger
@@ -112,6 +115,8 @@ public class CreateEDRTVehiclesAndChargers {
 						.id(Id.create(v.getId(), ElectricVehicle.class))
 						.batteryCapacity(EvUnits.kWh_to_J(BATTERY_CAPACITY_KWH))
 						.initialSoc(EvUnits.kWh_to_J(initialSoc_kWh))
+						.vehicleType(ElectricVehicleImpl.DEFAULT_VEHICLE_TYPE)
+						.chargerTypes(ImmutableList.of(ChargerImpl.DEFAULT_CHARGER_TYPE))
 						.build();
 				eVehicles.add(ev);
 
