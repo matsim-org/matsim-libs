@@ -4,19 +4,17 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 
 @Deprecated // for refactoring only
 public class PersonAttributes extends ObjectAttributes{
-	public static final String MSG="population.getPersonAttributes()... will be deprecated; use PopulationUtils" +
-							   ".get/put/...PersonAttribute... instead.  kai, may'19" ;
 	@Override public Object getAttribute( String personId, String key) {
-		throw new RuntimeException( MSG ) ;
+		throw new RuntimeException( msg("getAttribute") ) ;
 	}
 	@Override public Object putAttribute( String personId, String key, Object value) {
-		throw new RuntimeException( MSG ) ;
+		throw new RuntimeException( msg("putAttribute")) ;
 	}
 	@Override public Object removeAttribute( String personId, String key ) {
-		throw new RuntimeException( MSG ) ;
+		throw new RuntimeException( msg("removeAttribute") ) ;
 	}
 	@Override public void removeAllAttributes( String personId ) {
-		throw new RuntimeException( MSG ) ;
+		throw new RuntimeException( msg("removeAllAttributes") ) ;
 	}
 
 	// for retrofitting.  Called from PopulationUtils only.  Remove eventually.  kai, may'19
@@ -28,5 +26,10 @@ public class PersonAttributes extends ObjectAttributes{
 	}
 	void removeAllAttributesDirectly( String personId ) {
 		super.removeAllAttributes( personId );
+	}
+
+	private static String msg (String str) {
+		return "population.getPersonAttributes()." + str + " will be deprecated; use PopulationUtils" +
+				   ".get/put/...PersonAttribute... instead.  kai, may'19" ;
 	}
 }

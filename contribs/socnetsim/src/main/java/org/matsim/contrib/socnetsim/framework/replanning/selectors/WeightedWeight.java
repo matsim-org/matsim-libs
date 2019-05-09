@@ -20,6 +20,8 @@
 package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
@@ -31,15 +33,15 @@ public class WeightedWeight implements WeightCalculator {
 	private final WeightCalculator delegate;
 
 	private final String weightAttribute;
-	private final ObjectAttributes personAttributes;
+	private final Population population;
 
 	public WeightedWeight(
 			final WeightCalculator delegate,
 			final String weightAttribute,
-			final ObjectAttributes personAttributes) {
+			final Population population ) {
 		this.delegate = delegate;
 		this.weightAttribute = weightAttribute;
-		this.personAttributes = personAttributes;
+		this.population = population;
 	}
 
 	@Override
@@ -47,9 +49,10 @@ public class WeightedWeight implements WeightCalculator {
 			final Plan indivPlan,
 			final ReplanningGroup replanningGroup) {
 		final Double weight = (Double)
-			personAttributes.getAttribute(
-				indivPlan.getPerson().getId().toString(),
-				weightAttribute );
+//			personAttributes.getAttribute(
+//				indivPlan.getPerson().getId().toString(),
+//				weightAttribute );
+							PopulationUtils.getPersonAttribute( indivPlan.getPerson(), weightAttribute, population ) ;
 		return (weight == null ? 1 : weight.doubleValue()) * delegate.getWeight( indivPlan , replanningGroup );
 	}
 }

@@ -33,14 +33,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -1081,10 +1074,17 @@ public final class PopulationUtils {
 
 	// ---
 
-	public static Object getPersonAttribute( Person person, String key, Population population ) {
+	public static Object getPersonAttribute( HasPlansAndId person, String key, Population population ) {
 		Object result = person.getAttributes().getAttribute( key );
 		if ( result != null ) {
 			return result ;
+		}
+		if ( population==null ) {
+			log.warn( "population==null (which is ok) but requested attribute not in person.  Probably ok; will return null" ) ;
+			// person.getAttributes().getAttribute( key ) would also return null when attribute is not there; remaining corner case is that it is
+			// actually in population.getPersonAttributes() but that is not available when population is null. kai, may'19
+
+			return null ;
 		}
 		return population.getPersonAttributes().getAttributeDirectly( person.getId().toString(), key ) ;
 	}

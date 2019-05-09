@@ -27,37 +27,37 @@ import org.xml.sax.Attributes;
  */
 public class CarrierPlanReader extends MatsimXmlParser {
 
-	public static Logger logger = Logger.getLogger(CarrierPlanReader.class);
+	public static final Logger logger = Logger.getLogger(CarrierPlanReader.class);
 
-	public static String CARRIERS = "carriers";
+	public static final String CARRIERS = "carriers";
 
-	public static String CARRIER = "carrier";
+	public static final String CARRIER = "carrier";
 
-	public static String LINKID = "linkId";
+	public static final String LINKID = "linkId";
 
-	public static String SHIPMENTS = "shipments";
+	public static final String SHIPMENTS = "shipments";
 
-	public static String SHIPMENT = "shipment";
+	public static final String SHIPMENT = "shipment";
 
-	public static String ID = "id";
+	public static final String ID = "id";
 
-	public static String FROM = "from";
+	public static final String FROM = "from";
 
-	public static String TO = "to";
+	public static final String TO = "to";
 
-	public static String SIZE = "size";
+	public static final String SIZE = "size";
 
-	public static String ACTIVITY = "act";
+	public static final String ACTIVITY = "act";
 
-	public static String TYPE = "type";
+	public static final String TYPE = "type";
 
-	public static String SHIPMENTID = "shipmentId";
+	public static final String SHIPMENTID = "shipmentId";
 
-	public static String START = "start";
+	public static final String START = "start";
 
-	public static String VEHICLE = "vehicle";
+	public static final String VEHICLE = "vehicle";
 
-	public static String VEHICLES = "vehicles";
+	public static final String VEHICLES = "vehicles";
 
 	private static final String VEHICLESTART = "earliestStart";
 
@@ -121,61 +121,75 @@ public class CarrierPlanReader extends MatsimXmlParser {
 	
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
-		if (name.equals(CARRIER)) {
-			String id = atts.getValue(ID);
-			currentCarrier = CarrierImpl.newInstance(Id.create(id, Carrier.class)); 
-		}
-		if (name.equals(SHIPMENTS)) {
-			currentShipments = new HashMap<String, CarrierShipment>();
-		}
-		if (name.equals(SHIPMENT)) {
-			String id = atts.getValue(ID);
-			String from = atts.getValue(FROM);
-			String to = atts.getValue(TO);
-			int size = getInt(atts.getValue(SIZE));
-			String startPickup = atts.getValue("startPickup");
-			String endPickup = atts.getValue("endPickup");
-			String startDelivery = atts.getValue("startDelivery");
-			String endDelivery = atts.getValue("endDelivery");
-			String pickupServiceTime = atts.getValue("pickupServiceTime");
-			String deliveryServiceTime = atts.getValue("deliveryServiceTime");
-			CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance(Id.create(id, CarrierShipment.class), Id.create(from, Link.class), Id.create(to, Link.class), size);
-			if (startPickup == null) {
-				shipmentBuilder.setPickupTimeWindow(TimeWindow.newInstance(0.0, Integer.MAX_VALUE)).setDeliveryTimeWindow(TimeWindow.newInstance(0.0, Integer.MAX_VALUE));
-			} else {
-				shipmentBuilder.setPickupTimeWindow(TimeWindow.newInstance(getDouble(startPickup), getDouble(endPickup))).
-						setDeliveryTimeWindow(TimeWindow.newInstance(getDouble(startDelivery), getDouble(endDelivery)));
+		switch( name ){
+			case CARRIER:{
+				String id = atts.getValue( ID );
+				currentCarrier = CarrierImpl.newInstance( Id.create( id, Carrier.class ) );
+				break;
 			}
-			if (pickupServiceTime != null) shipmentBuilder.setPickupServiceTime(getDouble(pickupServiceTime)); 
-			if (deliveryServiceTime != null) shipmentBuilder.setDeliveryServiceTime(getDouble(deliveryServiceTime));
-			CarrierShipment shipment = shipmentBuilder.build();
-			currentShipments.put(atts.getValue(ID), shipment);
-			currentCarrier.getShipments().add(shipment);
-		}
-
-		if (name.equals(VEHICLES)) {
-			vehicles = new HashMap<String, CarrierVehicle>();
-		}
-		if (name.equals(VEHICLE)) {
-			String vId = atts.getValue(ID);
-			String linkId = atts.getValue(LINKID);
-			String startTime = atts.getValue(VEHICLESTART);
-			String endTime = atts.getValue(VEHICLEEND);
-			String typeId = atts.getValue("typeId");
-			if (typeId == null) {
-				logger.warn("no vehicle type. set type='default' -> defaultVehicleType (see CarrierVehicleTypeImpl)");
-				typeId = "default";
+			case SHIPMENTS:{
+				currentShipments = new HashMap<String, CarrierShipment>();
+				break;
 			}
-			CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vId, Vehicle.class), Id.create(linkId, Link.class));
-			vehicleBuilder.setTypeId(Id.create(typeId, VehicleType.class));
-			vehicleBuilder.setType(CarrierVehicleType.Builder.newInstance(Id.create(typeId, VehicleType.class)).build());
-			if (startTime != null) vehicleBuilder.setEarliestStart(getDouble(startTime));
-			if (endTime != null) vehicleBuilder.setLatestEnd(getDouble(endTime));
-			CarrierVehicle vehicle = vehicleBuilder.build();
-			currentCarrier.getCarrierCapabilities().getCarrierVehicles().add(vehicle);
-			vehicles.put(vId, vehicle);
-		}
-		if(name.equals("plan")){
+			case SHIPMENT:{
+				String id = atts.getValue( ID );
+				String from = atts.getValue( FROM );
+				String to = atts.getValue( TO );
+				int size = getInt( atts.getValue( SIZE ) );
+				String startPickup = atts.getValue( "startPickup" );
+				String endPickup = atts.getValue( "endPickup" );
+				String startDelivery = atts.getValue( "startDelivery" );
+				String endDelivery = atts.getValue( "endDelivery" );
+				String pickupServiceTime = atts.getValue( "pickupServiceTime" );
+				String deliveryServiceTime = atts.getValue( "deliveryServiceTime" );
+				CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance( Id.create( id, CarrierShipment.class ),
+					  Id.create( from, Link.class ), Id.create( to, Link.class ), size );
+				if( startPickup == null ){
+					shipmentBuilder.setPickupTimeWindow( TimeWindow.newInstance( 0.0, Integer.MAX_VALUE ) ).setDeliveryTimeWindow(
+						  TimeWindow.newInstance( 0.0, Integer.MAX_VALUE ) );
+				} else{
+					shipmentBuilder.setPickupTimeWindow( TimeWindow.newInstance( getDouble( startPickup ), getDouble( endPickup ) ) ).
+																									 setDeliveryTimeWindow(
+																										   TimeWindow.newInstance(
+																											     getDouble(
+																													 startDelivery ),
+																											     getDouble(
+																													 endDelivery ) ) );
+				}
+				if( pickupServiceTime != null ) shipmentBuilder.setPickupServiceTime( getDouble( pickupServiceTime ) );
+				if( deliveryServiceTime != null ) shipmentBuilder.setDeliveryServiceTime( getDouble( deliveryServiceTime ) );
+				CarrierShipment shipment = shipmentBuilder.build();
+				currentShipments.put( atts.getValue( ID ), shipment );
+				currentCarrier.getShipments().add( shipment );
+				break ;
+			}
+			case VEHICLES:
+			{
+				vehicles = new HashMap<String, CarrierVehicle>();
+				break;
+			}
+			case VEHICLE:{
+				String vId = atts.getValue( ID );
+				String linkId = atts.getValue( LINKID );
+				String startTime = atts.getValue( VEHICLESTART );
+				String endTime = atts.getValue( VEHICLEEND );
+				String typeId = atts.getValue( "typeId" );
+				if( typeId == null ){
+					logger.warn( "no vehicle type. set type='default' -> defaultVehicleType (see CarrierVehicleTypeImpl)" );
+					typeId = "default";
+				}
+				CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance( Id.create( vId, Vehicle.class ),
+					  Id.create( linkId, Link.class ) );
+				vehicleBuilder.setTypeId( Id.create( typeId, VehicleType.class ) );
+				vehicleBuilder.setType( CarrierVehicleType.Builder.newInstance( Id.create( typeId, VehicleType.class ) ).build() );
+				if( startTime != null ) vehicleBuilder.setEarliestStart( getDouble( startTime ) );
+				if( endTime != null ) vehicleBuilder.setLatestEnd( getDouble( endTime ) );
+				CarrierVehicle vehicle = vehicleBuilder.build();
+				currentCarrier.getCarrierCapabilities().getCarrierVehicles().add( vehicle );
+				vehicles.put( vId, vehicle );
+			}
+			case "plan":
+			{
 			String score = atts.getValue("score");
 			if(score != null){
 				currentScore = getDouble(score);
@@ -194,37 +208,46 @@ public class CarrierPlanReader extends MatsimXmlParser {
 				this.selected = false;
 			}
 			scheduledTours = new ArrayList<ScheduledTour>();
-		}
-		if (name.equals("tour")) {
+			}
+			case "tour":
+			{
 			String vehicleId = atts.getValue("vehicleId");
 			currentVehicle = vehicles.get(vehicleId);
 			currentTourBuilder = Tour.Builder.newInstance();
-		}
-		if (name.equals("leg")) {
+			}
+			case "leg":
+			{
 			currentLegDepTime = getDouble(atts.getValue("dep_time"));
 			currentLegTransTime = getDouble(atts.getValue("transp_time"));
-		}
-		if (name.equals(ACTIVITY)) {
-			if (atts.getValue(TYPE).equals("start")) {
-				currentStartTime = getDouble(atts.getValue("end_time"));
-				previousActLoc = currentVehicle.getLocation();
-				currentTourBuilder.scheduleStart(currentVehicle.getLocation(),TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
-			} else if (atts.getValue(TYPE).equals("pickup")) {
-				String id = atts.getValue(SHIPMENTID);
-				CarrierShipment s = currentShipments.get(id);
-				finishLeg(s.getFrom());
-				currentTourBuilder.schedulePickup(s);
-				previousActLoc = s.getFrom();
-			} else if (atts.getValue(TYPE).equals("delivery")) {
-				String id = atts.getValue(SHIPMENTID);
-				CarrierShipment s = currentShipments.get(id);
-				finishLeg(s.getTo());
-				currentTourBuilder.scheduleDelivery(s);
-				previousActLoc = s.getTo();
-			} else if (atts.getValue(TYPE).equals("end")) {
-				finishLeg(currentVehicle.getLocation());
-				currentTourBuilder.scheduleEnd(currentVehicle.getLocation(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(),currentVehicle.getLatestEndTime()));
 			}
+			case ACTIVITY:
+			{
+				if( atts.getValue( TYPE ).equals( "start" ) ){
+					currentStartTime = getDouble( atts.getValue( "end_time" ) );
+					previousActLoc = currentVehicle.getLocation();
+					currentTourBuilder.scheduleStart( currentVehicle.getLocation(),
+						  TimeWindow.newInstance( currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
+				} else if( atts.getValue( TYPE ).equals( "pickup" ) ){
+					String id = atts.getValue( SHIPMENTID );
+					CarrierShipment s = currentShipments.get( id );
+					finishLeg( s.getFrom() );
+					currentTourBuilder.schedulePickup( s );
+					previousActLoc = s.getFrom();
+				} else if( atts.getValue( TYPE ).equals( "delivery" ) ){
+					String id = atts.getValue( SHIPMENTID );
+					CarrierShipment s = currentShipments.get( id );
+					finishLeg( s.getTo() );
+					currentTourBuilder.scheduleDelivery( s );
+					previousActLoc = s.getTo();
+				} else if( atts.getValue( TYPE ).equals( "end" ) ){
+					finishLeg( currentVehicle.getLocation() );
+					currentTourBuilder.scheduleEnd( currentVehicle.getLocation(),
+						  TimeWindow.newInstance( currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
+				}
+			}
+			default:
+				throw new RuntimeException( "encountered xml tag which cannot be processed; aborting ..." ) ;
+				// in particular for <attributes>, which someone should implement. kai, may'19
 		}
 	}
 

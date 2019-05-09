@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * This is a carrier that has capabilities and resources, jobs and plans to fulfill its obligations.
@@ -30,7 +31,9 @@ public class CarrierImpl implements Carrier {
 	private CarrierCapabilities carrierCapabilities;
 	
 	private CarrierPlan selectedPlan;
-	
+
+	private final Attributes attributes = new Attributes();
+
 	private CarrierImpl(final Id<Carrier> id) {
 		super();
 		this.carrierCapabilities = CarrierCapabilities.newInstance();
@@ -127,5 +130,12 @@ public class CarrierImpl implements Carrier {
 
 	@Override
 	public void clearPlans() { this.plans.clear(); }
+
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
+
+
 
 }

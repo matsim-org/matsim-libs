@@ -30,8 +30,10 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -171,11 +173,11 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 	 */
 	public final void run(
 			final Iterable<? extends HasPlansAndId<PL, AG>> persons,
-					ObjectAttributes subpopLookup,
+					Population population,
 					final int iteration,
 					final ReplanningContext replanningContext ) {
 		handleChangeRequests(iteration);
-		run(persons, subpopLookup, replanningContext);
+		run(persons, population, replanningContext);
 	}
 
 	/**
@@ -185,7 +187,7 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 	 */
 	final void run(
 			final Iterable<? extends HasPlansAndId<PL, AG>> persons,
-					ObjectAttributes subPopLookup,
+					Population population,
 					final ReplanningContext replanningContext) {
 
 		// initialize all strategies
@@ -204,7 +206,7 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 			// ... choose the strategy to be used for this person (in evol comp lang this would be the choice of the mutation operator)
 			String subpopName = null;
 			if (this.subpopulationAttributeName != null) {
-				subpopName = (String) subPopLookup.getAttribute(person.getId().toString(), this.subpopulationAttributeName);
+				subpopName = (String) PopulationUtils.getPersonAttribute( person, this.subpopulationAttributeName, population ) ;
 			}
 			GenericPlanStrategy<PL, AG> strategy = this.chooseStrategy(person, subpopName);
 

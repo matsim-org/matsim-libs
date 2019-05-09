@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -39,17 +40,17 @@ public class SubpopulationScoringParameters implements ScoringParametersForPerso
 	private final PlanCalcScoreConfigGroup config;
 	private final ScenarioConfigGroup scConfig;
 	private final TransitConfigGroup transitConfigGroup;
-	private final ObjectAttributes personAttributes;
 	private final String subpopulationAttributeName;
 	private final Map<String, ScoringParameters> params = new HashMap<>();
+	private final Population population;
 
 	@Inject
 	SubpopulationScoringParameters(PlansConfigGroup plansConfigGroup, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ScenarioConfigGroup scenarioConfigGroup, Population population, TransitConfigGroup transitConfigGroup) {
 		this.config = planCalcScoreConfigGroup;
 		this.scConfig = scenarioConfigGroup;
 		this.transitConfigGroup = transitConfigGroup;
-		this.personAttributes = population.getPersonAttributes();
 		this.subpopulationAttributeName = plansConfigGroup.getSubpopulationAttributeName();
+		this.population = population ;
 	}
 
 	public SubpopulationScoringParameters(Scenario scenario) {
@@ -58,9 +59,7 @@ public class SubpopulationScoringParameters implements ScoringParametersForPerso
 
 	@Override
 	public ScoringParameters getScoringParameters(Person person) {
-		final String subpopulation = (String) personAttributes.getAttribute(
-				person.getId().toString(),
-				subpopulationAttributeName);
+		final String subpopulation = (String) PopulationUtils.getPersonAttribute( person, subpopulationAttributeName, population ) ;
 
 		if (!this.params.containsKey(subpopulation)) {
 			/* lazy initialization of params. not strictly thread safe, as different threads could

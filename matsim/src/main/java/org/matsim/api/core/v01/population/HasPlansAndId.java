@@ -3,8 +3,14 @@ package org.matsim.api.core.v01.population;
 import java.util.List;
 
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
-public interface HasPlansAndId<T extends BasicPlan, I> extends Identifiable<I> {
+public interface HasPlansAndId<T extends BasicPlan, I> extends Identifiable<I> /*, Attributable*/ {
+
+	// I added "Attributable".  Does not feel like it keeps the interface minimal.  However, the subpopulation attribute comes from it, which is used
+	// rather centrally in the StrategyManager stuff, which is the place for which this interface exists.  Also so far wasn't totally systematic there
+	// since it was doing something for persons (subpopulation-based strategy) that it was not offering for others, forcing those who use StrategyManager
+	// to implement Attributable seems like an acceptable burden.  kai, may'19
 
 	/**
 	 * Seems that <? extends T> is actually more restrictive than <T>, i.e. we may later switch from 
