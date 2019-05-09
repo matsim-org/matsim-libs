@@ -80,7 +80,9 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.relocator = relocator;
 		this.requestInserter = requestInserter;
-		rebalancingInterval = drtCfg.getMinCostFlowRebalancing().getInterval();
+		rebalancingInterval = drtCfg.getMinCostFlowRebalancing()
+				.map(MinCostFlowRebalancingParams::getInterval)
+				.orElse(null);
 	}
 
 	@Override
