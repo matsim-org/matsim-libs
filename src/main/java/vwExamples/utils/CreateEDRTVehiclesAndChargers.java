@@ -48,78 +48,82 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * @author axer
- * This is a modified version of Joschka's depot and charger script.
+ * @author axer This is a modified version of Joschka's depot and charger
+ *         script.
  */
 public class CreateEDRTVehiclesAndChargers {
 
-    public int BATTERY_CAPACITY_KWH = 30;
-    public int MIN_START_CAPACITY_KWH = 10;
-    public int MAX_START_CAPACITY_KWH = 30;
-    public int CHARGINGPOWER_KW = 50;
-    public int SEATS = 8;
-    public String NETWORKFILE = null; //"D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\network\\drtServiceAreaNetwork.xml.gz";
-    public String E_VEHICLE_FILE = null; //"D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\fleets\\e-vehicles_bs_100.xml";
-    public String DRT_VEHICLE_FILE = null; //"D:\\\\Matsim\\\\Axer\\\\BSWOB2.0_Scenarios\\\\fleets\\\\e-drt_bs_100.xml";
-    public String CHARGER_FILE = null; //"D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\chargers\\chargers_bs_100.xml";
-    public double OPERATIONSTARTTIME = 0.; //t0
-    public double OPERATIONENDTIME = 30 * 3600.;    //t1
-    public double FRACTION_OF_CHARGERS_PER_DEPOT = 0.4; //relative number of chargers to numbers of vehicle at location
-    public String drtTag = "drt";
+	public int BATTERY_CAPACITY_KWH = 30;
+	public int MIN_START_CAPACITY_KWH = 10;
+	public int MAX_START_CAPACITY_KWH = 30;
+	public int CHARGINGPOWER_KW = 50;
+	public int SEATS = 8;
+	public String NETWORKFILE = null; // "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\network\\drtServiceAreaNetwork.xml.gz";
+	public String E_VEHICLE_FILE = null; // "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\fleets\\e-vehicles_bs_100.xml";
+	public String DRT_VEHICLE_FILE = null; // "D:\\\\Matsim\\\\Axer\\\\BSWOB2.0_Scenarios\\\\fleets\\\\e-drt_bs_100.xml";
+	public String CHARGER_FILE = null; // "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\chargers\\chargers_bs_100.xml";
+	public double OPERATIONSTARTTIME = 0.; // t0
+	public double OPERATIONENDTIME = 30 * 3600.; // t1
+	public double FRACTION_OF_CHARGERS_PER_DEPOT = 0.4; // relative number of chargers to numbers of vehicle at location
+	public String drtTag = "drt";
+	public int CHAGERSPERDEPOT = 0;
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        Map<Id<Link>, Integer> depotsAndVehicles = new HashMap<>();
-        depotsAndVehicles.put(Id.createLinkId(40158), 25); //BS HBF
-        depotsAndVehicles.put(Id.createLinkId(8097), 25); //Zentrum SO
-        depotsAndVehicles.put(Id.createLinkId(13417), 25); //Zentrum N
-        depotsAndVehicles.put(Id.createLinkId(14915), 25); //Flugplatz
-        new CreateEDRTVehiclesAndChargers().run(depotsAndVehicles);
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Map<Id<Link>, Integer> depotsAndVehicles = new HashMap<>();
+		depotsAndVehicles.put(Id.createLinkId(40158), 25); // BS HBF
+		depotsAndVehicles.put(Id.createLinkId(8097), 25); // Zentrum SO
+		depotsAndVehicles.put(Id.createLinkId(13417), 25); // Zentrum N
+		depotsAndVehicles.put(Id.createLinkId(14915), 25); // Flugplatz
+		new CreateEDRTVehiclesAndChargers().run(depotsAndVehicles);
 
+	}
 
-    }
+	public void run(Map<Id<Link>, Integer> depotsAndVehicles) {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		List<DvrpVehicleSpecification> vehicles = new ArrayList<>();
+		List<ElectricVehicle> evehicles = new ArrayList<>();
+		List<Charger> chargers = new ArrayList<>();
+		Random random = MatsimRandom.getLocalInstance();
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
+		for (Entry<Id<Link>, Integer> e : depotsAndVehicles.entrySet()) {
+			Link startLink;
+			startLink = scenario.getNetwork().getLinks().get(e.getKey());
+			if (!startLink.getAllowedModes().contains(TransportMode.drt)) {
+				throw new RuntimeException("StartLink " + startLink.getId().toString() + " does not allow car mode.");
+			}
+			for (int i = 0; i < e.getValue(); i++) {
 
-    public void run(Map<Id<Link>, Integer> depotsAndVehicles) {
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        List<DvrpVehicleSpecification> vehicles = new ArrayList<>();
-        List<ElectricVehicle> evehicles = new ArrayList<>();
-        List<Charger> chargers = new ArrayList<>();
-        Random random = MatsimRandom.getLocalInstance();
-        new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
-        for (Entry<Id<Link>, Integer> e : depotsAndVehicles.entrySet()) {
-            Link startLink;
-            startLink = scenario.getNetwork().getLinks().get(e.getKey());
-            if (!startLink.getAllowedModes().contains(TransportMode.drt)) {
-                throw new RuntimeException("StartLink " + startLink.getId().toString() + " does not allow car mode.");
-            }
-            for (int i = 0; i < e.getValue(); i++) {
-
-                DvrpVehicleSpecification v = ImmutableDvrpVehicleSpecification.newBuilder()
+				DvrpVehicleSpecification v = ImmutableDvrpVehicleSpecification.newBuilder()
 						.id(Id.create(drtTag + "_" + startLink.getId().toString() + "_" + i, DvrpVehicle.class))
-                        .startLinkId(startLink.getId())
-                        .capacity(SEATS)
-                        .serviceBeginTime(OPERATIONSTARTTIME)
-                        .serviceEndTime(OPERATIONENDTIME)
-                        .build();
-                vehicles.add(v);
-                double initialSoc_kWh = MIN_START_CAPACITY_KWH + random.nextDouble() * (MAX_START_CAPACITY_KWH - MIN_START_CAPACITY_KWH);
-                ElectricVehicle ev = new ElectricVehicleImpl(Id.create(v.getId(), ElectricVehicle.class),
-                        new BatteryImpl(BATTERY_CAPACITY_KWH * EvUnits.J_PER_kWh, initialSoc_kWh * EvUnits.J_PER_kWh));
-                evehicles.add(ev);
+						.startLinkId(startLink.getId()).capacity(SEATS).serviceBeginTime(OPERATIONSTARTTIME)
+						.serviceEndTime(OPERATIONENDTIME).build();
+				vehicles.add(v);
+				double initialSoc_kWh = MIN_START_CAPACITY_KWH
+						+ random.nextDouble() * (MAX_START_CAPACITY_KWH - MIN_START_CAPACITY_KWH);
+				ElectricVehicle ev = new ElectricVehicleImpl(Id.create(v.getId(), ElectricVehicle.class),
+						new BatteryImpl(BATTERY_CAPACITY_KWH * EvUnits.J_PER_kWh, initialSoc_kWh * EvUnits.J_PER_kWh));
+				evehicles.add(ev);
 
-            }
-            int chargersPerDepot = (int) (e.getValue() * FRACTION_OF_CHARGERS_PER_DEPOT);
-            Charger charger = new ChargerImpl(Id.create("charger_" + startLink.getId(), Charger.class),
-                    CHARGINGPOWER_KW * EvUnits.W_PER_kW, chargersPerDepot, startLink);
-            chargers.add(charger);
+			}
+			int chargersPerDepot;
+			if (CHAGERSPERDEPOT == 0) {
+				chargersPerDepot = (int) (e.getValue() * FRACTION_OF_CHARGERS_PER_DEPOT);
+			}else {
+				chargersPerDepot = (int) CHAGERSPERDEPOT;
+				System.out.println("Numbers of chargers per hub is directy given: "+chargersPerDepot);
+			}
 
-        }
-        new FleetWriter(vehicles.stream()).write(DRT_VEHICLE_FILE);
-        new ElectricVehicleWriter(evehicles).write(E_VEHICLE_FILE);
-        new ChargerWriter(chargers).write(CHARGER_FILE);
-    }
+			Charger charger = new ChargerImpl(Id.create("charger_" + startLink.getId(), Charger.class),
+					CHARGINGPOWER_KW * EvUnits.W_PER_kW, chargersPerDepot, startLink);
+			chargers.add(charger);
 
+		}
+		new FleetWriter(vehicles.stream()).write(DRT_VEHICLE_FILE);
+		new ElectricVehicleWriter(evehicles).write(E_VEHICLE_FILE);
+		new ChargerWriter(chargers).write(CHARGER_FILE);
+	}
 
 }

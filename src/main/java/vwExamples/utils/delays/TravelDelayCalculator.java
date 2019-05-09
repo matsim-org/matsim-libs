@@ -55,6 +55,9 @@ public class TravelDelayCalculator implements PersonDepartureEventHandler, Perso
 	private GeometryFactory geomfactory = JTSFactoryFinder.getGeometryFactory(null);
 	private GeometryCollection geometryCollection = geomfactory.createGeometryCollection(null);
 	private Geometry boundary;
+	private Map<Id<Link>, MutableDouble> LinkFlowMap = new HashMap<>();
+	private Map<Id<Link>, MutableDouble> LinkDelayMap = new HashMap<>();
+	private Map<Id<Link>, List<Double>> CongestionIdxMap = new HashMap<>();
 	// private Set<Id<Person>> relevantAgents = new HashSet<>();
 
 	public TravelDelayCalculator(Network network, Geometry boundary) {
@@ -63,52 +66,56 @@ public class TravelDelayCalculator implements PersonDepartureEventHandler, Perso
 		this.boundary = boundary;
 	}
 	
+	public Map<Id<Link>, MutableDouble> getLinkFlowMap() {
+		return LinkFlowMap;
+	}
+	
+	public Map<Id<Link>, MutableDouble> getLinkDelayMap() {
+		return LinkDelayMap;
+	}
+
+
 	public String intersectShape(LineString beeline) {
 
 		Point from = beeline.getStartPoint();
 		Point to = beeline.getEndPoint();
 		Geometry geom = boundary;
-		
 
-		if(geom.contains(to) && !geom.contains(from))
-		{
+		if (geom.contains(to) && !geom.contains(from)) {
 			return "inbound";
 		}
-		
-		else if(geom.contains(from) && !geom.contains(to))
-		{
+
+		else if (geom.contains(from) && !geom.contains(to)) {
 			return "outbound";
 		}
-		
-		else if(!(geom.contains(from)) && !(geom.contains(to)) && (beeline.intersects(geom)))
-		{
+
+		else if (!(geom.contains(from)) && !(geom.contains(to)) && (beeline.intersects(geom))) {
 			return "through";
 		}
-		
-		else if(!(geom.contains(from)) && !(geom.contains(to)) && !(beeline.intersects(geom)))
-		{
+
+		else if (!(geom.contains(from)) && !(geom.contains(to)) && !(beeline.intersects(geom))) {
 			return "outside";
 		}
-		
-		else if(geom.contains(from) && geom.contains(to))
-		{
+
+		else if (geom.contains(from) && geom.contains(to)) {
 			return "inside";
-		}
-		else return "undefined";
-		
-//		
-//		for (Entry<String, Geometry> zoneGeom : zoneMap.entrySet()) {
-//			if (zoneGeom.getValue().intersects(beeline)) {
-//				return true;
-//			}
-//		}
-//
-//		return false;
+		} else
+			return "undefined";
+
+		//
+		// for (Entry<String, Geometry> zoneGeom : zoneMap.entrySet()) {
+		// if (zoneGeom.getValue().intersects(beeline)) {
+		// return true;
+		// }
+		// }
+		//
+		// return false;
 
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
+		
 		if (linkEnterTimes.containsKey(event.getVehicleId())) {
 			double enterTime = linkEnterTimes.remove(event.getVehicleId());
 			double travelTime = event.getTime() - enterTime;
@@ -121,6 +128,26 @@ public class TravelDelayCalculator implements PersonDepartureEventHandler, Perso
 				t.get(0).add(freeSpeedTravelTime);
 				t.get(1).add(travelTime);
 				t.get(2).add(l.getLength());
+				
+				double congestionIdx = travelTime / freeSpeedTravelTime;
+
+				if (LinkFlowMap.containsKey(l.getId())) {
+					LinkFlowMap.get(l.getId()).add(1);
+					
+					LinkDelayMap.get(l.getId()).add(travelTime-freeSpeedTravelTime);
+					CongestionIdxMap.get(l.getId()).add(congestionIdx);
+//					System.out.println(l.getId() + "||" +  LinkDelayMap.get(l.getId()).toString());
+
+				}
+				else {
+					LinkFlowMap.put((l.getId()), new MutableDouble());
+					LinkDelayMap.put((l.getId()), new MutableDouble());
+					CongestionIdxMap.put(l.getId(), new ArrayList<Double>());
+					
+					LinkFlowMap.get(l.getId()).add(1);
+					LinkDelayMap.get(l.getId()).add(travelTime-freeSpeedTravelTime);
+					CongestionIdxMap.get(l.getId()).add(congestionIdx);
+				}
 			}
 
 		}
@@ -174,9 +201,9 @@ public class TravelDelayCalculator implements PersonDepartureEventHandler, Perso
 
 						String tripType = intersectShape(beeline);
 
-						String result = event.getPersonId() + ";" + event.getTime() + ";" + t.get(0).intValue()
-								+ ";" + t.get(1).intValue() + ";" + (t.get(1).intValue()
-										- t.get(0).intValue() + ";" + beeline.toString() + ";" + tripType+ ";"+ t.get(2));
+						String result = event.getPersonId() + ";" + event.getTime() + ";" + t.get(0).intValue() + ";"
+								+ t.get(1).intValue() + ";" + (t.get(1).intValue() - t.get(0).intValue() + ";"
+										+ beeline.toString() + ";" + tripType + ";" + t.get(2));
 						trips.add(result);
 
 					}
@@ -190,12 +217,20 @@ public class TravelDelayCalculator implements PersonDepartureEventHandler, Perso
 	public List<String> getTrips() {
 		return trips;
 	}
+	
+	public double getMeanCongestionIdxPerLink(Id<Link> linkId)
+	{
+		List<Double> idxList = CongestionIdxMap.get(linkId);
+		Double average = idxList.stream().mapToDouble(val -> val).average().orElse(0.0);
+		return average;
+		
+	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().equals(TransportMode.car)) {
-			this.travelTimes.put(event.getPersonId(),new ArrayList<MutableDouble>());
-			//Add three empty values
+			this.travelTimes.put(event.getPersonId(), new ArrayList<MutableDouble>());
+			// Add three empty values
 			this.travelTimes.get(event.getPersonId()).add(new MutableDouble());
 			this.travelTimes.get(event.getPersonId()).add(new MutableDouble());
 			this.travelTimes.get(event.getPersonId()).add(new MutableDouble());

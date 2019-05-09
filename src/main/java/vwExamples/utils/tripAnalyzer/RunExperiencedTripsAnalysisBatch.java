@@ -55,7 +55,7 @@ public class RunExperiencedTripsAnalysisBatch {
 
 	public static void main(String[] args) {
 
-		run("D:\\Matsim\\Axer\\Hannover\\MOIA\\output\\");
+		run("D:\\Matsim\\Axer\\Hannover\\K-GERAK\\output\\");
 	}
 
 	public static void run(String runDir) {

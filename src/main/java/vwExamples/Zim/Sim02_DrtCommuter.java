@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package vwExamples.peoplemoverVWExample;
+package vwExamples.Zim;
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
@@ -71,17 +71,17 @@ import java.util.Set;
  * @author axer
  */
 
-public class RunDrtScenarioBatchH_eDRT_KGERAK {
+public class Sim02_DrtCommuter {
 
 	public static final double MAX_RELATIVE_SOC = 0.8;// charge up to 80% SOC
 	public static final double MIN_RELATIVE_SOC = 0.1;// send to chargers vehicles below 20% SOC
 	public static final double CHARGING_SPEED_FACTOR = 1.0;
 	public static final double BATTERYREPLACETIME = 180.0;
 
-	static boolean BatteryReplace = true;
+	static boolean BatteryReplace = false;
 	
-	static int[] fleetRange = {100,120};
-//	static int[] fleetRange = {100};
+	static int[] fleetRange = {200,300,400};
+//	static int[] fleetRange = {150,250,300};
 
 	public static void main(String[] args) throws IOException {
 		//int count = 7;
@@ -100,12 +100,12 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static void run(int vehiclePerDepot, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "H3stat_1xRate_batteryReplace_0C_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
+		String runId = "10pct7hubscommuterDrt2nd" + vehiclePerDepot + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
-		String inbase = "D:\\Matsim\\Axer\\Hannover\\K-GERAK\\";
+		String inbase = "D:\\Matsim\\Axer\\Hannover\\ZIM\\";
 
-		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\hannover_edrt.xml", new DrtConfigGroup(),
+		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\Sim02_CommuterDRT.xml", new DrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
 				new TemperatureChangeConfigGroup());
 		
@@ -122,7 +122,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
-		config.plans().setInputFile(inbase + "\\input\\plans\\vw235_drt_plan_1x_selected.xml.gz");
+		config.plans().setInputFile(inbase + "\\input\\plans\\0.1_commuterdrt_vw235_nocad.1.0.output_plans_selected.xml.gz");
 		config.controler().setLastIteration(2); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
@@ -130,7 +130,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 
 		String networkFilePath = inbase + "\\input\\network\\network.xml.gz";
-		String shapeFilePath = inbase + "\\input\\shp\\Hannover_Stadtteile.shp";
+		String shapeFilePath = inbase + "\\input\\shp\\Real_Region_Hannover.shp";
 		String shapeFeature = "NO"; // shapeFeature is used to read the shapeFilePath. All zones in shapeFile are
 									// used to generate a drt service area
 		String drtTag = "drt"; // drtTag is assigned to roads that should be used by the drt service
@@ -144,10 +144,10 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 		drt.setPrintDetailedWarnings(false);
 		// Parameters to setup the DRT service
-		drt.setMaxTravelTimeBeta(500.0);
-		drt.setMaxTravelTimeAlpha(1.3);
-		drt.setMaxWaitTime(500.0);
-		drt.setStopDuration(30.0);
+		drt.setMaxTravelTimeBeta(600.0);
+		drt.setMaxTravelTimeAlpha(1.4);
+		drt.setMaxWaitTime(900.0);
+		drt.setStopDuration(105);
 		drt.setRequestRejection(true);
 
 		// Create the virtual stops for the drt service
@@ -169,11 +169,21 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		// Define infrastructure for eDRT (vehicles, depots and chargers)
 		CreateEDRTVehiclesAndChargers vehiclesAndChargers = new CreateEDRTVehiclesAndChargers();
 		Map<Id<Link>, Integer> depotsAndVehicles = new HashMap<>();
-		depotsAndVehicles.put(Id.createLinkId(314700), vehiclePerDepot); // H HBF
-		depotsAndVehicles.put(Id.createLinkId(108636), vehiclePerDepot); // VWN
-		depotsAndVehicles.put(Id.createLinkId(162930), vehiclePerDepot); // Linden Süd
-		depotsAndVehicles.put(Id.createLinkId(123095), vehiclePerDepot); // Wülferode
+//		depotsAndVehicles.put(Id.createLinkId(314700), vehiclePerDepot); // H HBF
+//		depotsAndVehicles.put(Id.createLinkId(108636), vehiclePerDepot); // VWN
+//		depotsAndVehicles.put(Id.createLinkId(162930), vehiclePerDepot); // Linden Süd
+//		depotsAndVehicles.put(Id.createLinkId(123095), vehiclePerDepot); // Wülferode
 
+		
+		depotsAndVehicles.put(Id.createLinkId(314700), vehiclePerDepot); // H HBF
+		depotsAndVehicles.put(Id.createLinkId(119060), vehiclePerDepot); // 
+		depotsAndVehicles.put(Id.createLinkId(111476), vehiclePerDepot); // 
+		depotsAndVehicles.put(Id.createLinkId(202515), vehiclePerDepot); // 
+		depotsAndVehicles.put(Id.createLinkId(253095), vehiclePerDepot); // 
+		depotsAndVehicles.put(Id.createLinkId(239977), vehiclePerDepot); //
+		depotsAndVehicles.put(Id.createLinkId(361079), vehiclePerDepot); //
+
+		
 		vehiclesAndChargers.CHARGER_FILE = inbase + "\\input\\chargers\\chargers.xml.gz";
 		vehiclesAndChargers.NETWORKFILE = inbase + "\\input\\network\\drtServiceAreaNetwork.xml.gz";
 		vehiclesAndChargers.DRT_VEHICLE_FILE = inbase + "\\input\\fleets\\fleet.xml.gz";
@@ -184,7 +194,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		vehiclesAndChargers.MIN_START_CAPACITY_KWH = 78;
 		vehiclesAndChargers.BATTERY_CAPACITY_KWH = 78;
 		vehiclesAndChargers.CHARGINGPOWER_KW = (int) (100);
-		vehiclesAndChargers.CHAGERSPERDEPOT = 3;
+		vehiclesAndChargers.FRACTION_OF_CHARGERS_PER_DEPOT = 0.2;
 		vehiclesAndChargers.run(depotsAndVehicles);
 
 		drt.setVehiclesFile(inbase + "\\input\\fleets\\fleet.xml.gz");
@@ -231,13 +241,22 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 			MinCostFlowRebalancingParams rebalancingParams = new MinCostFlowRebalancingParams();
 
-			rebalancingParams.setInterval(300);
+//			rebalancingParams.setInterval(300);
+//			rebalancingParams.setCellSize(1000);
+//			rebalancingParams.setTargetAlpha(0.3);
+//			rebalancingParams.setTargetBeta(0.3);
+//			rebalancingParams.setMaxTimeBeforeIdle(500);
+//			rebalancingParams.setMinServiceTime(3600);
+//			drt.addParameterSet(rebalancingParams);
+			
+			rebalancingParams.setInterval(600);
 			rebalancingParams.setCellSize(1000);
 			rebalancingParams.setTargetAlpha(0.3);
 			rebalancingParams.setTargetBeta(0.3);
-			rebalancingParams.setMaxTimeBeforeIdle(500);
+			rebalancingParams.setMaxTimeBeforeIdle(900);
 			rebalancingParams.setMinServiceTime(3600);
 			drt.addParameterSet(rebalancingParams);
+			
 
 		}
 
@@ -356,7 +375,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
 		return new EvDvrpIntegrationModule(drtCfg.getMode()).
 				setAuxDischargingFactory(new VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory()).
-				setDriveDischargingFactory(f -> new VwDrtDriveEnergyConsumption()).setTurnedOnPredicate(RunDrtScenarioBatchH_eDRT_KGERAK::isTurnedOn);
+				setDriveDischargingFactory(f -> new VwDrtDriveEnergyConsumption()).setTurnedOnPredicate(Sim02_DrtCommuter::isTurnedOn);
 	}
 
     private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {

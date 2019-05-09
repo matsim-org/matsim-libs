@@ -81,8 +81,8 @@ public class modalSplitEvaluator {
 	String shapeFile = "D:\\Matsim\\Axer\\Hannover\\K-GERAK\\input\\shp\\Hannover_Stadtteile.shp";
 	String shapeFeature = "NO";
 	StageActivityTypes stageActs;
-	static String inFileName = "D:\\Matsim\\Axer\\Hannover\\K-GERAK\\input\\plans\\vw235_nocad.1.0.output_plans.xml.gz";
-	static String OutFileName = "D:\\Matsim\\Axer\\Hannover\\K-GERAK\\input\\plans\\vw235_drt_plan_2x.xml.gz";
+	static String inFileName = "D:\\Matsim\\Axer\\Hannover\\K-GERAK\\output\\H_1xRate_batteryReplace_0C_100_veh_idx0\\H_1xRate_batteryReplace_0C_100_veh_idx0.output_plans.xml.gz";
+	static String OutFileName = "D:\\Matsim\\Axer\\Hannover\\K-GERAK\\input\\plans\\dummy.xml.gz";
 
 	static List<String> primaryActivies = new ArrayList<>();
 	static List<String> primaryLegModes = new ArrayList<>();
@@ -92,7 +92,7 @@ public class modalSplitEvaluator {
 	// Caution, the actual pt in our Berlin Model is overestimated. Thus, we need to
 	// reduce it by factor 0.58, the get the correct amount of DRT users
 	// Like Berlin
-	static double factor = 2.;
+	static double factor = 1.;
 	static {
 		desiredModalShiftRatesMap.put("car", 0.01*factor);
 		desiredModalShiftRatesMap.put("pt", 0.04*factor);

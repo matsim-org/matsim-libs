@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package vwExamples.utils;
+package vwExamples.utils.LinksToShape;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -122,7 +122,7 @@ public class Links2ESRIShape {
         builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
         builder.setWidthCoefficient(0.5);
         builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
-        //new Links2ESRIShape(network,outputFileLs, builder).write();
+        new Links2ESRIShape(network,outputFileLs, builder).write();
 
         CoordinateReferenceSystem crs = MGC.getCRS(defaultCRS);
         builder.setWidthCoefficient((commonWealth ? -1 : 1) * 0.003);

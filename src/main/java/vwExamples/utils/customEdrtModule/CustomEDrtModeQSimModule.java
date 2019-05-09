@@ -96,7 +96,7 @@ public class CustomEDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class))))
 				.asEagerSingleton();
 
-		bindModal(DepotFinder.class).to(NearestChargerAsDepot.class);
+		bindModal(DepotFinder.class).to(GetBestDepot.class);
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 
@@ -111,7 +111,7 @@ public class CustomEDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 					@Inject
 					private ChargingInfrastructure chargingInfrastructure;
-
+					
 					@Override
 					public EmptyVehicleChargingScheduler get() {
 						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
