@@ -54,7 +54,7 @@
           </xs:element>
           <xs:element name="flowEfficiencyFactor" minOccurs="0" maxOccurs="1">
             <xs:complexType>
-              <xs:attribute name="fef" type="xs:decimal" default="1.0"/>
+              <xs:attribute name="factor" type="xs:decimal" default="1.0"/>
             </xs:complexType>
           </xs:element>
         </xs:sequence>

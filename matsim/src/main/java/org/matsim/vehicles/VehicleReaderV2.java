@@ -130,7 +130,7 @@ class VehicleReaderV2 extends MatsimXmlParser{
 		} else if( VehicleSchemaV2Names.PASSENGERCAREQUIVALENTS.equalsIgnoreCase( name ) ){
 			this.currentVehType.setPcuEquivalents( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.PCE ) ) );
 		} else if( VehicleSchemaV2Names.FLOWEFFICIENCYFACTOR.equalsIgnoreCase( name ) ){
-			this.currentVehType.setFlowEfficiencyFactor( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FEF ) ) );
+			this.currentVehType.setFlowEfficiencyFactor( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FACTOR) ) );
 		} else if (name.equalsIgnoreCase(VehicleSchemaV2Names.ATTRIBUTES)) {
 			if (context.peek().equalsIgnoreCase(VehicleSchemaV2Names.VEHICLETYPE)) {
 				currAttributes = this.currentVehType.getAttributes();

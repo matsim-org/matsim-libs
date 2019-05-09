@@ -30,7 +30,6 @@ import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegat
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -137,7 +136,7 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 			this.writeStartTag(VehicleSchemaV2Names.PASSENGERCAREQUIVALENTS, atts, true);
 			if (!Double.isNaN(vt.getFlowEfficiencyFactor())) {
                 atts.clear();
-                atts.add(this.createTuple(VehicleSchemaV2Names.FEF, vt.getFlowEfficiencyFactor()));
+                atts.add(this.createTuple(VehicleSchemaV2Names.FACTOR, vt.getFlowEfficiencyFactor()));
                 this.writeStartTag(VehicleSchemaV2Names.FLOWEFFICIENCYFACTOR, atts, true);
             }
 			this.writeEndTag(VehicleSchemaV2Names.VEHICLETYPE);
