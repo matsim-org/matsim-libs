@@ -17,30 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package vwExamples.utils.customEV;
+package freight;/*
+ * created by jbischoff, 03.05.2019
+ */
 
-import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.EvConfigGroup.AuxDischargingSimulation;
-import org.matsim.contrib.ev.charging.ChargingModule;
-import org.matsim.contrib.ev.fleet.ElectricFleetModule;
-import org.matsim.contrib.ev.discharging.DischargingModule;
-import org.matsim.contrib.ev.stats.EvStatsModule;
+import freight.deliveryGeneration.DeliveryGenerator;
 import org.matsim.core.controler.AbstractModule;
 
-public class CustomEvModule extends AbstractModule {
+public class CommercialTrafficModule extends AbstractModule {
 
-	@Override
-	public void install() {
-		EvConfigGroup evCfg = EvConfigGroup.get(getConfig());
-		install(new ElectricFleetModule(evCfg));
-		install(new ChargingModule(evCfg));
-		install(new DischargingModule(evCfg));
-		install(new EvStatsModule(evCfg));
 
-		if (evCfg.getAuxDischargingSimulation() == AuxDischargingSimulation.seperateAuxDischargingHandler) {
-			bind(CustomAuxDischargingHandler.class).asEagerSingleton();
-			addMobsimListenerBinding().to(CustomAuxDischargingHandler.class);
-			addEventHandlerBinding().to(CustomAuxDischargingHandler.class);
-		}
-	}
+    @Override
+    public void install() {
+        addControlerListenerBinding().to(DeliveryGenerator.class);
+    }
 }

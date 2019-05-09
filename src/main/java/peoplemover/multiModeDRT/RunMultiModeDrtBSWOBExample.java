@@ -21,7 +21,6 @@
 package peoplemover.multiModeDRT;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -53,8 +52,6 @@ public class RunMultiModeDrtBSWOBExample {
 
 		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(config);
 		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtCfg, config.planCalcScore());
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.checkConsistency();
 
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);

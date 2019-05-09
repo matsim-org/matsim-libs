@@ -63,8 +63,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.run.QSimScopeObjectListener;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.data.ElectricFleet;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 

@@ -17,30 +17,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package vwExamples.utils.customEV;
+package freight.deliveryGeneration;/*
+ * created by jbischoff, 11.04.2019
+ */
 
-import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.EvConfigGroup.AuxDischargingSimulation;
-import org.matsim.contrib.ev.charging.ChargingModule;
-import org.matsim.contrib.ev.fleet.ElectricFleetModule;
-import org.matsim.contrib.ev.discharging.DischargingModule;
-import org.matsim.contrib.ev.stats.EvStatsModule;
-import org.matsim.core.controler.AbstractModule;
 
-public class CustomEvModule extends AbstractModule {
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.freight.carrier.Carrier;
 
-	@Override
-	public void install() {
-		EvConfigGroup evCfg = EvConfigGroup.get(getConfig());
-		install(new ElectricFleetModule(evCfg));
-		install(new ChargingModule(evCfg));
-		install(new DischargingModule(evCfg));
-		install(new EvStatsModule(evCfg));
+public class PersonDelivery {
 
-		if (evCfg.getAuxDischargingSimulation() == AuxDischargingSimulation.seperateAuxDischargingHandler) {
-			bind(CustomAuxDischargingHandler.class).asEagerSingleton();
-			addMobsimListenerBinding().to(CustomAuxDischargingHandler.class);
-			addEventHandlerBinding().to(CustomAuxDischargingHandler.class);
-		}
-	}
+    public static final String DELIEVERY_SIZE = "deliveryAmount";
+    public static final String DELIEVERY_TYPE = "deliveryType";
+    public static final String DELIEVERY_DURATION = "deliveryDuration";
+    public static final String DELIEVERY_TIME_START = "deliveryTimeStart";
+    public static final String SERVICE_OPERATOR = "operator";
+    public static final String DELIEVERY_TIME_END = "deliveryTimeEnd";
+
+
+    public static Id<Carrier> getCarrierId(Activity activity) {
+        return Id.create(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TYPE).toString() + "_" + activity.getAttributes().getAttribute(PersonDelivery.SERVICE_OPERATOR).toString(), Carrier.class);
+    }
 }

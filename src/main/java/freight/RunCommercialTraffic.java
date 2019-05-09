@@ -17,30 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package vwExamples.utils.customEV;
+package freight;/*
+ * created by jbischoff, 03.05.2019
+ */
 
-import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.EvConfigGroup.AuxDischargingSimulation;
-import org.matsim.contrib.ev.charging.ChargingModule;
-import org.matsim.contrib.ev.fleet.ElectricFleetModule;
-import org.matsim.contrib.ev.discharging.DischargingModule;
-import org.matsim.contrib.ev.stats.EvStatsModule;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 
-public class CustomEvModule extends AbstractModule {
+import static org.matsim.core.config.ConfigUtils.createConfig;
+import static org.matsim.core.scenario.ScenarioUtils.createScenario;
 
-	@Override
-	public void install() {
-		EvConfigGroup evCfg = EvConfigGroup.get(getConfig());
-		install(new ElectricFleetModule(evCfg));
-		install(new ChargingModule(evCfg));
-		install(new DischargingModule(evCfg));
-		install(new EvStatsModule(evCfg));
+public class RunCommercialTraffic {
+    public static void main(String[] args) {
 
-		if (evCfg.getAuxDischargingSimulation() == AuxDischargingSimulation.seperateAuxDischargingHandler) {
-			bind(CustomAuxDischargingHandler.class).asEagerSingleton();
-			addMobsimListenerBinding().to(CustomAuxDischargingHandler.class);
-			addEventHandlerBinding().to(CustomAuxDischargingHandler.class);
-		}
-	}
+
+        Config config = createConfig();
+        Scenario scenario = createScenario(config);
+
+        Controler controler = new Controler(scenario);
+
+        controler.addOverridingModule(new CommercialTrafficModule());
+
+
+    }
 }

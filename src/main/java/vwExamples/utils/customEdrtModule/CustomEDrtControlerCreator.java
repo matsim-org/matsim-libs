@@ -19,7 +19,6 @@
 package vwExamples.utils.customEdrtModule;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -29,7 +28,6 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import vwExamples.utils.customEdrtModule.CustomEDrtModule;
 
 /**
  * @author axer
@@ -39,9 +37,6 @@ public class CustomEDrtControlerCreator {
 	public static Controler createControler(Config config, boolean otfvis) {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
-
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.checkConsistency();
 
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
