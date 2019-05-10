@@ -19,6 +19,16 @@
 
 package vwExamples.utils.DrtTrajectoryAnalyzer;
 
+import com.google.inject.Inject;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.IterationCounter;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.vehicles.Vehicle;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,22 +39,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.vehicles.Vehicle;
-
-import com.google.inject.Inject;
-
 /**
  * @author saxer
  *
  */
-public class DrtTrajectryControlerListener implements IterationEndsListener {
+public class DrtTrajectoryStatsListener implements MobsimBeforeCleanupListener {
 
 	@Inject
 	MyDynModeTrajectoryStats myDynModeTrajectoryStats;
@@ -54,21 +53,21 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 	// private boolean vheaderWritten = false;
 	private final String runId;
 	private final DecimalFormat format = new DecimalFormat();
-	private final MatsimServices matsimServices;
 	private final DrtConfigGroup drtCfg;
+
+	@Inject
+	IterationCounter iterationCounter;
+	@Inject
+	OutputDirectoryHierarchy controlerIO;
 
 	/**
 	 * @param myDynModeTrajectoryStats
-	 * @param fleet
 	 * @param drtCfg
-	 * @param network
-	 * @param matsimServices
-	 * 
+	 *
 	 */
 	@Inject
-	public DrtTrajectryControlerListener(Config config, DrtConfigGroup drtCfg,
-			MyDynModeTrajectoryStats myDynModeTrajectoryStats, MatsimServices matsimServices,
-			Network network) {
+	public DrtTrajectoryStatsListener(Config config, DrtConfigGroup drtCfg,
+									  MyDynModeTrajectoryStats myDynModeTrajectoryStats) {
 		drtgroup = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 		runId = config.controler().getRunId();
 
@@ -78,48 +77,14 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 		format.setGroupingUsed(false);
 
 		this.myDynModeTrajectoryStats = myDynModeTrajectoryStats;
-		this.matsimServices = matsimServices;
 		this.drtCfg = drtCfg;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(
-	 * org.matsim.core.controler.events. IterationEndsEvent)
-	 */
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
 
-		for (Entry<Id<Vehicle>, List<String>> entry : myDynModeTrajectoryStats.vehicleTrajectoryMap.entrySet()) {
-
-			String csvfilepath = filename(event, entry.getKey().toString(), ".csv");
-			
-			try {
-				writeCSVExample(csvfilepath, entry.getValue());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
-		
-		//Clean myDynModeTrajectoryStats.vehicleTrajectoryMap
-		myDynModeTrajectoryStats.vehicleTrajectoryMap.clear();
-
+	private String filename(String prefix, String extension) {
+		return controlerIO.getIterationFilename(iterationCounter.getIterationNumber(), prefix + "_" + drtCfg.getMode() + extension);
 	}
 
-	private String filename(IterationEndsEvent event, String prefix) {
-		return filename(event, prefix, "");
-	}
-
-	private String filename(IterationEndsEvent event, String prefix, String extension) {
-		return matsimServices.getControlerIO()
-				.getIterationFilename(event.getIteration(), prefix + "_" + drtCfg.getMode() + extension);
-	}
-
-	
 
 
 	private static void writeCSVExample(String csvfilepath, List<String> trajectroyList) throws IOException {
@@ -146,4 +111,23 @@ public class DrtTrajectryControlerListener implements IterationEndsListener {
 
 	}
 
+	@Override
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent event) {
+
+		for (Entry<Id<Vehicle>, List<String>> entry : myDynModeTrajectoryStats.vehicleTrajectoryMap.entrySet()) {
+
+			String csvfilepath = filename(entry.getKey().toString(), ".csv");
+
+			try {
+				writeCSVExample(csvfilepath, entry.getValue());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+		//Clean myDynModeTrajectoryStats.vehicleTrajectoryMap
+		myDynModeTrajectoryStats.vehicleTrajectoryMap.clear();
+	}
 }

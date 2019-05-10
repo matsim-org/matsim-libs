@@ -20,16 +20,10 @@
 
 package vwExamples.utils.DrtTrajectoryAnalyzer;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
-import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
-import org.matsim.contrib.ev.fleet.ElectricFleet;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.MatsimServices;
+import org.matsim.contrib.ev.EvModule;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 /**
  * @author saxer
@@ -44,17 +38,14 @@ public class MyDrtTrajectoryAnalysisModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		bindModal(MyDynModeTrajectoryStats.class).toProvider(modalProvider(
-				getter -> new MyDynModeTrajectoryStats(getter.get(Network.class), getter.get(EventsManager.class),
-						drtCfg, getter.getModal(FleetSpecification.class), getter.get(ElectricFleet.class))))
-				.asEagerSingleton();
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(MyDynModeTrajectoryStats.class).asEagerSingleton();
+				addQSimComponentBinding(EvModule.EV_COMPONENT).to(DrtTrajectoryStatsListener.class);
+			}
+		});
 
-		installQSimModule(QSimScopeObjectListenerModule.createSimplifiedModule(getMode(), Fleet.class,
-				MyDynModeTrajectoryStats.class));
 
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new DrtTrajectryControlerListener(getter.get(Config.class), drtCfg,
-						getter.getModal(MyDynModeTrajectoryStats.class), getter.get(MatsimServices.class),
-						getter.get(Network.class))));
 	}
 }
