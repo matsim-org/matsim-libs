@@ -52,6 +52,7 @@ import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory;
 import org.matsim.contrib.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.edrt.scheduler.EmptyVehicleChargingScheduler;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
