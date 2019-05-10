@@ -21,21 +21,20 @@ package electric.edrt.energyconsumption;/*
  * created by jbischoff, 12.01.2019
  */
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
-import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
+
+import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Tracks vehicles that park at charger locations. These will not have any AUX consumption while parked.
@@ -46,11 +45,11 @@ public class VehicleAtChargerLinkTracker implements VehicleLeavesTrafficEventHan
 
 
     private final ChargingInfrastructure chargingInfrastructure;
-    private final ElectricFleet evFleet;
+    private final ElectricFleetSpecification evFleet;
     private final Set<Id<ElectricVehicle>> evsAtChargers = new HashSet<>();
 
     @Inject
-    public VehicleAtChargerLinkTracker(ChargingInfrastructure chargingInfrastructure, EventsManager events, ElectricFleet evFleet) {
+    public VehicleAtChargerLinkTracker(ChargingInfrastructure chargingInfrastructure, EventsManager events, ElectricFleetSpecification evFleet) {
         this.chargingInfrastructure = chargingInfrastructure;
         events.addHandler(this);
         this.evFleet = evFleet;
@@ -59,7 +58,7 @@ public class VehicleAtChargerLinkTracker implements VehicleLeavesTrafficEventHan
     @Override
     public void reset(int iteration) {
         evsAtChargers.clear();
-        evsAtChargers.addAll(evFleet.getElectricVehicles().keySet());
+        evsAtChargers.addAll(evFleet.getVehicleSpecifications().keySet());
 
     }
 
@@ -73,7 +72,7 @@ public class VehicleAtChargerLinkTracker implements VehicleLeavesTrafficEventHan
     public void handleEvent(VehicleLeavesTrafficEvent event) {
         if (chargingInfrastructure.getChargersAtLink(event.getLinkId()) != null) {
             Id<ElectricVehicle> evId = Id.create(event.getVehicleId(), ElectricVehicle.class);
-            if (evFleet.getElectricVehicles().containsKey(evId)) {
+            if (evFleet.getVehicleSpecifications().containsKey(evId)) {
                 evsAtChargers.add(evId);
             }
         }
