@@ -33,7 +33,7 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.etaxi.ETaxiChargingTask;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentChargerPlugData.ChargerPlug;
-import org.matsim.contrib.ev.data.Battery;
+import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;

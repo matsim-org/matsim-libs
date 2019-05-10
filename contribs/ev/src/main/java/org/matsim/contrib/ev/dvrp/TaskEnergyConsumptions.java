@@ -22,7 +22,7 @@ import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 
 /**

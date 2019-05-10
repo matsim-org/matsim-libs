@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,19 +15,22 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.taxi.benchmark;
+package org.matsim.contrib.ev.fleet;
 
-import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkConfigConsistencyChecker;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.consistency.ConfigConsistencyChecker;
+import java.util.Map;
 
-public class TaxiBenchmarkConfigConsistencyChecker implements ConfigConsistencyChecker {
-	@Override
-	public void checkConsistency(Config config) {
-		new TaxiConfigConsistencyChecker().checkConsistency(config);
-		new DvrpBenchmarkConfigConsistencyChecker().checkConsistency(config);
-	}
+import org.matsim.api.core.v01.Id;
+
+/**
+ * Contains all ElectricVehicles generated for a given iteration. Its lifespan is limited to a single QSim simulation.
+ * <p>
+ * Fleet (ond the contained ElectricVehicles) are created from ElectricFleetSpecification (and the contained ElectricVehicleSpecifications)
+ *
+ * @author michalm
+ */
+public interface ElectricFleet {
+	Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles();
 }

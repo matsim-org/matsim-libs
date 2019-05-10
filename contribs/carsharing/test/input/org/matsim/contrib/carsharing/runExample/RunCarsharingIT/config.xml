@@ -34,6 +34,7 @@
 			<param name="flowCapacityFactor" value="1"   />
 			<param name="storageCapacityFactor" value="10.0"   />
 			<param name="mainMode" value="car,oneway_vehicle,twoway_vehicle,freefloating_vehicle"   />
+			<param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
 		</module>
 
     <module name="Carsharing" >

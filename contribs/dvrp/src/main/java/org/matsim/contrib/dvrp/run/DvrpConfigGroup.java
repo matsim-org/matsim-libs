@@ -27,11 +27,14 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class DvrpConfigGroup extends ReflectiveConfigGroup {
+	private static final Logger log = Logger.getLogger(DvrpConfigGroup.class);
 
 	public static final String GROUP_NAME = "dvrp";
 
@@ -98,6 +101,29 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 
 	public DvrpConfigGroup() {
 		super(GROUP_NAME);
+	}
+
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+		new DynQSimConfigConsistencyChecker().checkConsistency(config);
+
+		if (!config.qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles()) {
+			// Typically, vrp paths are calculated from startLink to endLink
+			// (not from startNode to endNode). That requires making some assumptions
+			// on how much time travelling on the first and last links takes.
+			// The current implementation assumes:
+			// (a) free-flow travelling on the last link, which is actually the case in QSim, and
+			// (b) a 1-second stay on the first link (spent on moving over the first node).
+			// The latter expectation is assumes that departing vehicles must be inserted before driving ones
+			// (though that still does not guarantee 1-second stay since the vehicle may need to wait if the next
+			// link is fully congested)
+			log.warn(" 'QSim.insertingWaitingVehiclesBeforeDrivingVehicles' should be true in order to get"
+					+ " more precise travel time estimates. See comments in DvrpConfigGroup.checkConsistency()");
+		}
+		if (config.qsim().isRemoveStuckVehicles()) {
+			throw new RuntimeException("Stuck DynAgents cannot be removed from simulation");
+		}
 	}
 
 	@Override
