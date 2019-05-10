@@ -51,11 +51,10 @@ public class RunEDrtScenario {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		Controler controler = EDrtControlerCreator.createControler(config, otfvis);
 
-		controler.addOverridingModule(createEvDvrpIntegrationModule(drtCfg.getMode()));
-
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				install(createEvDvrpIntegrationModule(drtCfg.getMode()));
 				bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
 						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
 			}
@@ -72,8 +71,8 @@ public class RunEDrtScenario {
 	}
 
 	private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
-		if (vehicle.getServiceBeginTime() <= time && time <= vehicle.getServiceEndTime()) return true;
-		else return false;
+		//FIXME should use actual vehicle to check if schedule is STARTED
+		return vehicle.getServiceBeginTime() <= time && time <= vehicle.getServiceEndTime();
 	}
 
 	public static void main(String[] args) {

@@ -21,7 +21,6 @@ package org.matsim.contrib.dvrp.examples.onetruck;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
@@ -43,8 +42,6 @@ public final class RunOneTruckExample {
 		// load config
 		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new DvrpConfigGroup(), new OTFVisConfigGroup());
 		config.controler().setLastIteration(lastIteration);
-		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
-		config.checkConsistency();
 
 		// load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);

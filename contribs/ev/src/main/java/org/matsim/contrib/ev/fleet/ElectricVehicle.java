@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,15 +15,16 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.data;
+package org.matsim.contrib.ev.fleet;
 
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 
 public interface ElectricVehicle extends Identifiable<ElectricVehicle> {
 	DriveEnergyConsumption getDriveEnergyConsumption();
@@ -32,13 +33,7 @@ public interface ElectricVehicle extends Identifiable<ElectricVehicle> {
 
 	Battery getBattery();
 
-    List<String> getChargingTypes();
-
 	String getVehicleType();
 
-	Battery swapBattery(Battery battery);
-
-	void setDriveEnergyConsumption(DriveEnergyConsumption driveEnergyConsumption);
-
-	void setAuxEnergyConsumption(AuxEnergyConsumption auxEnergyConsumption);
+	ImmutableList<String> getChargerTypes();
 }

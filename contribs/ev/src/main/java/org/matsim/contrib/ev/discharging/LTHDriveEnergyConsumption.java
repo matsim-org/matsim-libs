@@ -21,8 +21,6 @@ package org.matsim.contrib.ev.discharging;/*
  * created by jbischoff, 23.08.2018
  */
 
-import com.google.common.primitives.Doubles;
-import com.google.inject.OutOfScopeException;
 import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolatingFunction;
 import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolator;
 import org.apache.log4j.Logger;
@@ -31,6 +29,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.VehicleType;
+
+import com.google.common.primitives.Doubles;
 
 public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 
@@ -66,7 +66,7 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 
 		if (speed > maxSpeed) {
 			if (crashIfOutOfBoundValue) {
-				throw new OutOfScopeException("Speed not covered" + speed);
+				throw new IllegalArgumentException("Speed greater than the supported maxSpeed; speed =" + speed);
 			} else {
 				if (!hasWarnedMaxSpeed) {
 					Logger.getLogger(getClass())
@@ -80,7 +80,7 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 
 		if (speed < minSpeed) {
 			if (crashIfOutOfBoundValue) {
-				throw new OutOfScopeException("Speed not covered" + speed);
+				throw new IllegalArgumentException("Speed less than the supported minSpeed; speed =" + speed);
 			} else {
 				if (!hasWarnedMinSpeed) {
 					Logger.getLogger(getClass())
@@ -111,7 +111,7 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 	private double checkSlope(double currentSlope) {
 		if (currentSlope < minSlope) {
 			if (crashIfOutOfBoundValue) {
-				throw new OutOfScopeException("Slope not covered" + currentSlope);
+				throw new IllegalArgumentException("Slope less than the supported minSlope; slope =" + currentSlope);
 			} else {
 				Logger.getLogger(getClass())
 						.warn("Assuming minSlope, as Slope not covered by consumption data" + currentSlope);
@@ -119,7 +119,7 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 			}
 		} else if (currentSlope > maxSlope) {
 			if (crashIfOutOfBoundValue) {
-				throw new OutOfScopeException("Slope not covered" + currentSlope);
+				throw new IllegalArgumentException("Slope greater than the supported maxSlope; slope =" + currentSlope);
 			} else {
 				Logger.getLogger(getClass())
 						.warn("Assuming maxSlope, as Slope not covered by consumption data" + currentSlope);

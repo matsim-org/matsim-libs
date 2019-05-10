@@ -23,21 +23,18 @@ import java.util.Map;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author michalm
  */
 public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
-	public static boolean isRebalancingEnabled(MinCostFlowRebalancingParams params) {
-		return params != null && params.getInterval() > 0;
-	}
-
 	public static final String SET_NAME = "minCostFlowRebalancing";
 
 	public static final String INTERVAL = "interval";
 	static final String INTERVAL_EXP = "Specifies how often empty vehicle rebalancing is executed."
-			+ " 0 s means no rebalancing. Default is 1800 s.";
+			+ " Must be positive. Default is 1800 s.";
 
 	public static final String MIN_SERVICE_TIME = "minServiceTime";
 	static final String MIN_SERVICE_TIME_EXP = //
@@ -61,8 +58,8 @@ public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	static final String CELL_SIZE_EXP = "size of square cells used for demand aggregation."
 			+ " Depends on demand, supply and network. Often used with values in the range of 500 - 2000 m";
 
-	@PositiveOrZero
-	private int interval = 1800;// [s], if 0 then no rebalancing
+	@Positive
+	private int interval = 1800;// [s]
 
 	@Positive
 	public double minServiceTime = 2 * interval;// [s]
@@ -81,6 +78,17 @@ public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 
 	public MinCostFlowRebalancingParams() {
 		super(SET_NAME);
+	}
+
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+
+		if (getMinServiceTime() <= getMaxTimeBeforeIdle()) {
+			throw new RuntimeException(MinCostFlowRebalancingParams.MIN_SERVICE_TIME
+					+ " must be greater than "
+					+ MinCostFlowRebalancingParams.MAX_TIME_BEFORE_IDLE);
+		}
 	}
 
 	@Override
@@ -104,8 +112,7 @@ public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param interval
-	 *            -- {@value #INTERVAL_EXP}
+	 * @param interval -- {@value #INTERVAL_EXP}
 	 */
 	@StringSetter(INTERVAL)
 	public void setInterval(int interval) {
@@ -121,8 +128,7 @@ public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param minServiceTime
-	 *            -- {@value #MIN_SERVICE_TIME_EXP}
+	 * @param minServiceTime -- {@value #MIN_SERVICE_TIME_EXP}
 	 */
 	@StringSetter(MIN_SERVICE_TIME)
 	public void setMinServiceTime(double minServiceTime) {
@@ -138,8 +144,7 @@ public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param maxTimeBeforeIdle--
-	 *            {@value #MAX_TIME_BEFORE_IDLE_EXP}
+	 * @param maxTimeBeforeIdle-- {@value #MAX_TIME_BEFORE_IDLE_EXP}
 	 */
 	@StringSetter(MAX_TIME_BEFORE_IDLE)
 	public void setMaxTimeBeforeIdle(double maxTimeBeforeIdle) {
@@ -155,8 +160,7 @@ public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param targetAlpha
-	 *            -- {@value #TARGET_ALPHA_EXP}
+	 * @param targetAlpha -- {@value #TARGET_ALPHA_EXP}
 	 */
 	@StringSetter(TARGET_ALPHA)
 	public void setTargetAlpha(double targetAlpha) {
@@ -172,8 +176,7 @@ public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param targetBeta
-	 *            -- {@value #TARGET_BETA_EXP}
+	 * @param targetBeta -- {@value #TARGET_BETA_EXP}
 	 */
 	@StringSetter(TARGET_BETA)
 	public void setTargetBeta(double targetBeta) {
@@ -189,8 +192,7 @@ public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param cellSize
-	 *            -- {@value #CELL_SIZE_EXP}
+	 * @param cellSize -- {@value #CELL_SIZE_EXP}
 	 */
 	@StringSetter(CELL_SIZE)
 	public void setCellSize(double cellSize) {

@@ -22,7 +22,7 @@ package org.matsim.contrib.ev.charging;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 import java.util.Map;
 
