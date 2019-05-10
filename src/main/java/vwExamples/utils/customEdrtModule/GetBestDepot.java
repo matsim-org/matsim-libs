@@ -18,27 +18,25 @@
 
 package vwExamples.utils.customEdrtModule;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang.mutable.MutableInt;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
-import org.matsim.contrib.drt.optimizer.depot.Depots;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.ev.data.Charger;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.core.network.NetworkUtils;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * @author axer
@@ -48,12 +46,15 @@ public class GetBestDepot implements DepotFinder {
 	private final Map<Link, MutableInt> CurrentHubCapacityMap;
 	private final Map<Charger, Integer> ChargerQueueMap;
 	private final ChargingInfrastructure chargingInfrastructure;
+	private final Fleet fleet;
+	private final ElectricFleet electricFleet;
 
-	@Inject
-	public GetBestDepot(ChargingInfrastructure chargingInfrastructure) {
+	public GetBestDepot(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet, Fleet fleet) {
 		for (Charger c : chargingInfrastructure.getChargers().values()) {
 			chargerLinks.add(c.getLink());
 		}
+		this.electricFleet = electricFleet;
+		this.fleet = fleet;
 		this.ChargerQueueMap = new HashMap<>();
 		this.CurrentHubCapacityMap = new HashMap<>();
 		this.chargingInfrastructure = chargingInfrastructure;
