@@ -43,6 +43,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -50,6 +51,7 @@ import org.matsim.vehicles.Vehicle;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -57,6 +59,7 @@ import java.util.stream.Collectors;
  * Generates carriers and tours depending on next iteration's freight demand
  */
 public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListener {
+
 
 
     public final double firsttourTraveltimeBuffer;
@@ -68,6 +71,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     private Population population;
 
     private Carriers carriers;
+    private final TravelTime carTT;
 
     private Set<Id<Person>> freightDrivers = new HashSet<>();
     private Set<Id<Vehicle>> freightVehicles = new HashSet<>();
@@ -78,25 +82,22 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         generateIterationServices();
         buildTours();
         createFreightAgents();
-
     }
 
     @Inject
-    public DeliveryGenerator(Scenario scenario) {
+    public DeliveryGenerator(Scenario scenario, Map<String, TravelTime> travelTimes) {
         CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(scenario.getConfig());
         this.carriers = new Carriers();
         firsttourTraveltimeBuffer = ctcg.getFirstLegTraveltimeBufferFactor();
-
         new CarrierPlanXmlReaderV2(carriers).readFile(ctcg.getCarriersFileUrl(scenario.getConfig().getContext()).getFile());
         CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
         new CarrierVehicleTypeReader(vehicleTypes).readFile(ctcg.getCarriersVehicleTypesFileUrl(scenario.getConfig().getContext()).getFile());
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
-
-
         this.scenario = scenario;
         this.population = scenario.getPopulation();
-
         maxIterations = ctcg.getJspritIterations();
+        carTT = travelTimes.get(TransportMode.car);
+
     }
 
     /**
@@ -108,6 +109,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         this.scenario = scenario;
         firsttourTraveltimeBuffer = 2;
         maxIterations = 100;
+        carTT = new FreeSpeedTravelTime();
     }
 
     private void generateIterationServices() {
@@ -119,9 +121,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         });
         int i = 0;
         for (PlanElement pe : activitiesWithServcies) {
-
             Activity activity = (Activity) pe;
-
             CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(i, CarrierService.class), activity.getLinkId());
             serviceBuilder.setCapacityDemand((int) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_SIZE));
             serviceBuilder.setServiceDuration((int) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_DURATION));
@@ -145,7 +145,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         carriers.getCarriers().values().forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
         NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), vehicleTypes);
         netBuilder.setTimeSliceWidth(900); // !!!! otherwise it will not do anything.
-        netBuilder.setTravelTime(new FreeSpeedTravelTime());
+        netBuilder.setTravelTime(carTT);
         final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
 
         for (Carrier carrier : carriers.getCarriers().values()) {
@@ -168,13 +168,6 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
 
             //get the CarrierPlan
             CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
-
-
-            /* calculate the route - we need this because otherwise we only have the duration of the service task and do not have a clue about tour duration
-             * BUT: the routes themselves cannot be used later. please also see ConvertFreightForDvrp.convertToList()
-             */
-
-            //if we use this default method, a router is created by leastCostPathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
             NetworkRouter.routePlan(carrierPlan, netBasedCosts);
 
             carrier.setSelectedPlan(carrierPlan);
@@ -201,7 +194,6 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
                 plan.addActivity(startActivity);
                 Activity lastTourElementActivity = null;
                 Leg lastTourLeg = null;
-
 
 
                 for (Tour.TourElement tourElement : scheduledTour.getTour().getTourElements()) {
