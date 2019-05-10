@@ -20,9 +20,13 @@
 
 package vwExamples.utils.DrtTrajectoryAnalyzer;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.MobsimScopeEventHandling;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 /**
@@ -41,7 +45,7 @@ public class MyDrtTrajectoryAnalysisModule extends AbstractDvrpModeModule {
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bind(MyDynModeTrajectoryStats.class).asEagerSingleton();
+				bind(MyDynModeTrajectoryStats.class).toProvider(modalProvider(getter -> new MyDynModeTrajectoryStats(getter.get(Network.class), drtCfg, getter.get(ElectricFleet.class), getter.getModal(Fleet.class), getter.get(MobsimScopeEventHandling.class)))).asEagerSingleton();
 				addQSimComponentBinding(EvModule.EV_COMPONENT).to(DrtTrajectoryStatsListener.class);
 			}
 		});
