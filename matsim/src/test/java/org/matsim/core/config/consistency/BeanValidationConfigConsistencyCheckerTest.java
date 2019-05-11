@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -33,6 +32,7 @@ import javax.validation.constraints.PositiveOrZero;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -77,18 +77,14 @@ public class BeanValidationConfigConsistencyCheckerTest {
 			Assertions.assertThatThrownBy(() -> new BeanValidationConfigConsistencyChecker().checkConsistency(config))
 					.isExactlyInstanceOf(ConstraintViolationException.class)
 					.hasMessageStartingWith("3 error(s) found in the config:")
-					.hasMessageContaining(
-							") org.matsim.core.config.groups.GlobalConfigGroup(name=global).numberOfThreads: must be greater than or equal to 0")
-					.hasMessageContaining(
-							") org.matsim.core.config.groups.QSimConfigGroup(name=qsim).flowCapFactor: must be greater than 0")
-					.hasMessageContaining(
-							") org.matsim.core.config.groups.QSimConfigGroup(name=qsim).snapshotPeriod: must be greater than or equal to 0");
+					.hasMessageContaining(partialMessage(config.global(), "numberOfThreads"))
+					.hasMessageContaining(partialMessage(config.qsim(), "flowCapFactor"))
+					.hasMessageContaining(partialMessage(config.qsim(), "snapshotPeriod"));
 		}
 	}
 
-	private Tuple<String, Class<? extends Annotation>> violationTuples(ConstraintViolation<?> violation) {
-		return Tuple.of(violation.getPropertyPath().toString(),
-				violation.getConstraintDescriptor().getAnnotation().annotationType());
+	private String partialMessage(ConfigGroup group, String property) {
+		return ") " + group.getClass().getName() + "(name=" + group.getName() + ")." + property + ": ";
 	}
 
 	private List<Tuple<String, Class<? extends Annotation>>> getViolationTuples(Config config) {
@@ -96,7 +92,10 @@ public class BeanValidationConfigConsistencyCheckerTest {
 			new BeanValidationConfigConsistencyChecker().checkConsistency(config);
 			return Collections.emptyList();
 		} catch (ConstraintViolationException e) {
-			return e.getConstraintViolations().stream().map(this::violationTuples).collect(Collectors.toList());
+			return e.getConstraintViolations().stream().<Tuple<String, Class<? extends Annotation>>>map(
+					violation -> Tuple.of(violation.getPropertyPath().toString(),
+							violation.getConstraintDescriptor().getAnnotation().annotationType())).collect(
+					Collectors.toList());
 		}
 	}
 }
