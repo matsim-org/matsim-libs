@@ -21,17 +21,36 @@
 package org.matsim.contrib.ev.fleet;
 
 public interface Battery {
-	double getCapacity();
+    /**
+     * @return Battery Capacity [J]
+     */
+    double getCapacity();
 
-	double getSoc();
+    /**
+     *
+     * @return Vehicle State of Charge [J]
+     */
+    double getSoc();
 
-	void setSoc(double soc);
+    /**
+     *
+     * @param soc Vehicle State of Charge [J]
+     */
+    void setSoc(double soc);
 
-	default void charge(double energy) {
-		setSoc(Math.min(getSoc() + energy, getCapacity()));
-	}
+    /**
+     *
+     * @param energy Energy to charge[J]
+     */
+    default void charge(double energy) {
+        setSoc(Math.min(getSoc() + energy, getCapacity()));
+    }
 
-	default void discharge(double energy) {
-		setSoc(Math.max(getSoc() - energy, 0));
-	}
+    /**
+     *
+     * @param energy Energy to discharge [J]
+     */
+    default void discharge(double energy) {
+        setSoc(Math.max(getSoc() - energy, 0));
+    }
 }
