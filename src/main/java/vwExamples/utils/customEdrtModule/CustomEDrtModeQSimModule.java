@@ -57,6 +57,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
 
 /**
  * @author axer
@@ -86,7 +87,7 @@ public class CustomEDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 				.asEagerSingleton();
 
 
-        bindModal(DepotFinder.class).toProvider(modalProvider(getter -> new GetBestDepot(getter.get(ChargingInfrastructure.class)))).asEagerSingleton();
+        bindModal(DepotFinder.class).toProvider(modalProvider(getter -> new GetBestDepot(getter.get(ChargingInfrastructure.class), getter.get(ElectricFleet.class), getter.getModal(Fleet.class)))).asEagerSingleton();
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 

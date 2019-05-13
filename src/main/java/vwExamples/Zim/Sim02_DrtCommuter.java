@@ -36,9 +36,11 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
+import org.matsim.contrib.edrt.run.EDrtControlerCreator;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.charging.FastThenSlowCharging;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
@@ -333,6 +335,39 @@ public class Sim02_DrtCommuter {
 
 	}
 
+//	public static Controler createControler(Config config) {
+//		Controler controler = CustomEDrtControlerCreator.createControler(config, false);
+//		controler.addOverridingModule(new TemperatureChangeModule());
+//		
+//
+//		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config)));
+//		controler.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				bind(EDrtVehicleDataEntryFactoryProvider.class)
+//						.toInstance(new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
+//				bind(DriveEnergyConsumption.Factory.class)
+//						.toInstance(evconsumption -> new VwDrtDriveEnergyConsumption());
+//				bind(AuxEnergyConsumption.Factory.class)
+//						.to(VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
+//
+//				if (BatteryReplace) {
+//					bind(ChargingLogic.Factory.class)
+//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+//									new BatteryReplacementCharge(BATTERYREPLACETIME)));
+//					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
+//				} else {
+//					bind(ChargingLogic.Factory.class)
+//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+//									new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
+//					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
+//				}
+//			}
+//		});
+//
+//		return controler;
+//	}
+	
 	public static Controler createControler(Config config) {
 		Controler controler = CustomEDrtControlerCreator.createControler(config, false);
 		controler.addOverridingModule(new TemperatureChangeModule());
@@ -341,24 +376,28 @@ public class Sim02_DrtCommuter {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(EDrtVehicleDataEntryFactoryProvider.class)
-						.toInstance(new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
-				bind(DriveEnergyConsumption.Factory.class)
-						.toInstance(evconsumption -> new VwDrtDriveEnergyConsumption());
-				bind(AuxEnergyConsumption.Factory.class)
-						.to(VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
-
+				bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
+						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
+				bind(DriveEnergyConsumption.Factory.class).toInstance(
+						evconsumption -> new VwDrtDriveEnergyConsumption());
+				bind(AuxEnergyConsumption.Factory.class).to(
+						VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
+				
 				if (BatteryReplace) {
-					bind(ChargingLogic.Factory.class)
-							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-									new BatteryReplacementCharge(BATTERYREPLACETIME)));
-					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
-				} else {
-					bind(ChargingLogic.Factory.class)
-							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-									new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
-					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
-				}
+				bind(ChargingLogic.Factory.class)
+						.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+								new BatteryReplacementCharge(BATTERYREPLACETIME)));
+				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
+			} else {
+				bind(ChargingLogic.Factory.class)
+						.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+								new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
+				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
+			}
+				
+//				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
+//				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(240.0)));
+//				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
 			}
 		});
 
