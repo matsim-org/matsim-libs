@@ -38,10 +38,20 @@ abstract class AbstractQNode implements QNodeI {
 	
 	
 	@Override
-	public final Node getNode() {
+	public Node getNode() {
 		return this.node;
 	}
 	
+	/**
+	 * The ParallelQSim replaces the activator with the QSimEngineRunner 
+	 * that handles this node.
+	 */
+	/*package*/ void setNetElementActivationRegistry(NetElementActivationRegistry activator) {
+		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
+		// not be a stable/robust API.  kai, jul'17
+		
+		this.activator = activator;
+	}
 	
 	/**
 	 * This method is called from QueueWithBuffer.addToBuffer(...) which is triggered at 
@@ -64,7 +74,6 @@ abstract class AbstractQNode implements QNodeI {
 		}
 	}
 	
-	
 	final boolean isActive() {
 		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
 		// not be a stable/robust API.  kai, jul'17
@@ -72,22 +81,10 @@ abstract class AbstractQNode implements QNodeI {
 		return this.active.get();
 	}
 	
-	final void setActive(boolean active) {
+	void setActive(boolean active) {
 		this.active.set(active);
 	}
 
-
-	
-	/**
-	 * The ParallelQSim replaces the activator with the QSimEngineRunner 
-	 * that handles this node.
-	 */
-	/*package*/ final void setNetElementActivationRegistry(NetElementActivationRegistry activator) {
-		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
-		// not be a stable/robust API.  kai, jul'17
-		
-		this.activator = activator;
-	}
 	
 	@Override
 	public final Map<String, Object> getCustomAttributes() {

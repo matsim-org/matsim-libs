@@ -65,13 +65,6 @@ final class QNodeImpl extends AbstractQNode {
 	private final QLinkI[] inLinksArrayCache;
 	private final QLinkI[] tempLinks;
 	
-	/*
-	 * This needs to be atomic since this allows us to ensure that an node which is
-	 * already active is not activated again. This could happen if multiple thread call
-	 * activateNode() concurrently.
-	 * cdobler, sep'14
-	 */
-	private final AtomicBoolean active = new AtomicBoolean(false);
 	
 	private final Random random;
 	private final NetsimEngineContext context;
@@ -154,9 +147,9 @@ final class QNodeImpl extends AbstractQNode {
 		}
 		
 		if (inLinksCounter == 0) {
-			this.active.set(false);
+			this.setActive(false);
 			return false; // Nothing to do
-		}
+		} 
 		
 		// randomize based on capacity
 		for (int auxCounter = 0; auxCounter < inLinksCounter; auxCounter++) {
@@ -202,7 +195,7 @@ final class QNodeImpl extends AbstractQNode {
 	private boolean moveVehicleOverNode( final QVehicle veh, QLinkI fromLink, final QLaneI fromLane, final double now ) {
 		Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = fromLink.getLink() ;
-
+	
 		AcceptTurn turn = turnAcceptanceLogic.isAcceptingTurn(currentLink, fromLane, nextLinkId, veh, this.netsimEngine.getNetsimNetwork(), now);
 		if ( turn.equals(AcceptTurn.ABORT) ) {
 			moveVehicleFromInlinkToAbort( veh, fromLane, now, currentLink.getId() ) ;
