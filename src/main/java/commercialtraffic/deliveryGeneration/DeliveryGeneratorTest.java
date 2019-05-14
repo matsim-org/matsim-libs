@@ -1,5 +1,6 @@
 package commercialtraffic.deliveryGeneration;
 
+import org.junit.Ignore;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -22,6 +23,7 @@ import static org.matsim.core.scenario.ScenarioUtils.createScenario;
 public class DeliveryGeneratorTest {
 
 
+    @Ignore
     @org.junit.Test
     public void notifyBeforeMobsim() {
         Carriers carriers = generateCarriers();
