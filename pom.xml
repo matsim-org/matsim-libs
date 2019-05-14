@@ -9,6 +9,12 @@
 	<name>MATSim example project</name>
 	<description>MATSim example project</description>
 
+	<properties>
+
+		<!-- for the weekly release: matsim.version>12.0-2019w19-20190513.010711-1</matsim.version-->
+		<matsim.version>12.0-SNAPSHOT</matsim.version>
+	</properties>
+
 	<repositories>
 		<repository>
 			<!-- Geotools is not on Maven central -->
@@ -45,7 +51,7 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-            <version>12.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -56,7 +62,7 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-            <version>12.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
@@ -68,30 +74,30 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
-            <version>12.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>signals</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 		</dependency>
 
 		<!-- An example on how to add a contribution using the 0.9.0-SNAPSHOT -->
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>av</artifactId>
-            <version>12.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>drt</artifactId>
-            <version>12.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>emissions</artifactId>
-            <version>12.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 		</dependency>
 
 		<!-- <dependency> <groupId>com.github.msmobility</groupId> <artifactId>silo</artifactId> 
@@ -99,31 +105,24 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
-            <version>12.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>parking</artifactId>
-            <version>12.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>cadytsIntegration</artifactId>
-            <version>12.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>analysis</artifactId>
-            <version>12.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 		</dependency>
-		<!--<dependency>-->
-		<!--<groupId>org.matsim.contrib</groupId>-->
-		<!--<artifactId>networkEditor</artifactId>-->
-        <!--<version>12.0-SNAPSHOT</version>-->
-		<!--</dependency>-->
-
-
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
 			<artifactId>json-simple</artifactId>
@@ -143,13 +142,13 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>ev</artifactId>
-            <version>12.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.matsim.contrib</groupId>
             <artifactId>freight</artifactId>
-            <version>12.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 		</dependency>
 
 
