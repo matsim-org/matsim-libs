@@ -19,11 +19,11 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 public interface AuxEnergyConsumption {
 	interface Factory {
-		AuxEnergyConsumption create(ElectricVehicleSpecification electricVehicleSpecification);
+		AuxEnergyConsumption create(ElectricVehicle electricVehicle);
 	}
 
 	double calcEnergyConsumption(double period, double timeOfDay);

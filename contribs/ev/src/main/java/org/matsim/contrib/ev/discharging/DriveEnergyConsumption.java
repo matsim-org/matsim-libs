@@ -20,7 +20,7 @@
 package org.matsim.contrib.ev.discharging;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 /**
  * Net energy taken from the battery to propel the vehicle, i.e. consumed by the motor minus effectively regenerated
@@ -28,8 +28,10 @@ import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
  */
 public interface DriveEnergyConsumption {
 	interface Factory {
-		DriveEnergyConsumption create(ElectricVehicleSpecification electricVehicleSpecification);
+		DriveEnergyConsumption create(ElectricVehicle electricVehicle);
 	}
 
 	double calcEnergyConsumption(Link link, double travelTime);
+
+
 }
