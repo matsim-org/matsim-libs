@@ -28,15 +28,15 @@ import java.util.Map;
 
 public class VehicleTypeSpecificDriveEnergyConsumptionFactory implements DriveEnergyConsumption.Factory {
 
-	private Map<String, DriveEnergyConsumption> consumptionMap = new HashMap<>();
+    private Map<String, DriveEnergyConsumption.Factory> consumptionMap = new HashMap<>();
 
-	public void addEnergyConsumptionModel(String vehicleType, DriveEnergyConsumption driveEnergyConsumption) {
+    public void addEnergyConsumptionModelFactory(String vehicleType, DriveEnergyConsumption.Factory driveEnergyConsumption) {
 		consumptionMap.put(vehicleType, driveEnergyConsumption);
 	}
 
 	@Override
 	public DriveEnergyConsumption create(ElectricVehicle electricVehicle) {
-		DriveEnergyConsumption c = consumptionMap.get(electricVehicle.getVehicleType());
+        DriveEnergyConsumption c = consumptionMap.get(electricVehicle.getVehicleType()).create(electricVehicle);
 		if (c == null) {
 			throw new RuntimeException("No EnergyconsumptionModel for VehicleType "
 					+ electricVehicle.getVehicleType()
