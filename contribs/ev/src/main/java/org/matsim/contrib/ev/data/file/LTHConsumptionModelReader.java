@@ -47,7 +47,7 @@ public class LTHConsumptionModelReader {
         this.vehicleTypeId = vehicleTypeId;
     }
 
-    public LTHDriveEnergyConsumption readFile(String filename) {
+    public LTHDriveEnergyConsumption.Factory readFile(String filename) {
         List<Double> speeds = new ArrayList<>();
         List<Double> slopes = new ArrayList<>();
         TabularFileParserConfig tabularFileParserConfig = new TabularFileParserConfig();
@@ -86,7 +86,7 @@ public class LTHConsumptionModelReader {
             }
         });
 
-        LTHDriveEnergyConsumption lthDriveEnergyConsumption = new LTHDriveEnergyConsumption(Doubles.toArray(speeds), Doubles.toArray(slopes), consumptionPerSpeedAndSlope, vehicleTypeId, false);
-        return lthDriveEnergyConsumption;
+        return new LTHDriveEnergyConsumption.Factory(Doubles.toArray(speeds), Doubles.toArray(slopes), consumptionPerSpeedAndSlope, vehicleTypeId, false);
+
     }
 }
