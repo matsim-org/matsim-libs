@@ -72,6 +72,15 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		return loadConfig(IOUtils.getUrlFromFileOrResource(filename), customModules);
 	}
 
+	/**
+	 *  This variant is meant such that one can have a command line call to MATSim that first provides a config file, and then
+	 *  overrides some of it.  Should be particularly useful for integration tests for main methods, since, if those main methods are using
+	 *  this method here, it should be possible to test them via
+	 *  <pre>
+	 *        ...main( <config.xml> --config:controler.outputDir=... )
+	 *  </pre>
+	 *  i.e. the current necessity to break runnable scripts into pieces to change things like output directory or lastIteration should be gone with this.
+	 */
 	public static Config loadConfig( String [] args, ConfigGroup... customModules ) {
 		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
 		return loadConfig( IOUtils.getUrlFromFileOrResource( args[0] ), typedArgs, customModules );
