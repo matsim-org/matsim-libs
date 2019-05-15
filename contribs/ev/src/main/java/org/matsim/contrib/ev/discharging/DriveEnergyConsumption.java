@@ -20,6 +20,7 @@
 package org.matsim.contrib.ev.discharging;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 
 /**
@@ -32,4 +33,7 @@ public interface DriveEnergyConsumption {
 	}
 
 	double calcEnergyConsumption(Link link, double travelTime);
+
+	default void setElectricVehicle(ElectricVehicle ev) {
+	}
 }
