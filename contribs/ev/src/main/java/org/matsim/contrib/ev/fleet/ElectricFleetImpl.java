@@ -20,13 +20,13 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ElectricFleetImpl implements ElectricFleet {
 	public static ElectricFleet create(ElectricFleetSpecification fleetSpecification,
@@ -36,8 +36,7 @@ public class ElectricFleetImpl implements ElectricFleet {
 		fleetSpecification.getVehicleSpecifications()
 				.values()
 				.stream()
-				.map(s -> new ElectricVehicleImpl(s, driveConsumptionFactory.create(s),
-						auxConsumptionFactory == null ? null : auxConsumptionFactory.create(s)))
+				.map(s -> ElectricVehicleImpl.create(s, driveConsumptionFactory, auxConsumptionFactory))
 				.forEach(fleet::addElectricVehicle);
 		return fleet;
 	}

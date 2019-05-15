@@ -31,18 +31,23 @@ public class ElectricVehicleImpl implements ElectricVehicle {
     private final ElectricVehicleSpecification vehicleSpecification;
     private final Battery battery;
 
-    private final DriveEnergyConsumption driveEnergyConsumption;
-    private final AuxEnergyConsumption auxEnergyConsumption;
+    private DriveEnergyConsumption driveEnergyConsumption;
+    private AuxEnergyConsumption auxEnergyConsumption;
 
-    public ElectricVehicleImpl(ElectricVehicleSpecification vehicleSpecification,
-                               DriveEnergyConsumption driveEnergyConsumption, AuxEnergyConsumption auxEnergyConsumption) {
+
+    public static ElectricVehicle create(ElectricVehicleSpecification vehicleSpecification, DriveEnergyConsumption.Factory driveFactory, AuxEnergyConsumption.Factory auxFactory) {
+        ElectricVehicleImpl ev = new ElectricVehicleImpl(vehicleSpecification);
+        ev.driveEnergyConsumption = driveFactory == null ? null : driveFactory.create(ev);
+        ev.auxEnergyConsumption = auxFactory == null ? null : auxFactory.create(ev);
+
+        return ev;
+    }
+
+
+    private ElectricVehicleImpl(ElectricVehicleSpecification vehicleSpecification) {
         this.vehicleSpecification = vehicleSpecification;
-        this.driveEnergyConsumption = driveEnergyConsumption;
-        this.auxEnergyConsumption = auxEnergyConsumption;
         battery = new BatteryImpl(vehicleSpecification.getBatteryCapacity(), vehicleSpecification.getInitialSoc());
-        if (this.driveEnergyConsumption != null) {
-            this.driveEnergyConsumption.setElectricVehicle(this);
-        }
+
     }
 
     @Override

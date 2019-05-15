@@ -19,10 +19,10 @@
 
 package org.matsim.contrib.ev.discharging;
 
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+
 import java.util.function.BiPredicate;
 import java.util.function.DoubleSupplier;
-
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 
 public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	private static final double a = 1.3;// [W]
@@ -43,16 +43,16 @@ public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	}
 
 	public static OhdeSlaskiAuxEnergyConsumption createConsumptionForFixedTemperatureAndAlwaysOn(
-			ElectricVehicleSpecification ev, int temperature) {
+			ElectricVehicle ev, int temperature) {
 		return new OhdeSlaskiAuxEnergyConsumption(ev, () -> temperature, (v, t) -> true);
 	}
 
-	private final ElectricVehicleSpecification ev;
+	private final ElectricVehicle ev;
 	private final DoubleSupplier temperatureProvider;
-	private final BiPredicate<ElectricVehicleSpecification, Double> isTurnedOn;
+	private final BiPredicate<ElectricVehicle, Double> isTurnedOn;
 
-	public OhdeSlaskiAuxEnergyConsumption(ElectricVehicleSpecification ev, DoubleSupplier temperatureProvider,
-			BiPredicate<ElectricVehicleSpecification, Double> isTurnedOn) {
+	public OhdeSlaskiAuxEnergyConsumption(ElectricVehicle ev, DoubleSupplier temperatureProvider,
+										  BiPredicate<ElectricVehicle, Double> isTurnedOn) {
 		this.ev = ev;
 		this.temperatureProvider = temperatureProvider;
 		this.isTurnedOn = isTurnedOn;
