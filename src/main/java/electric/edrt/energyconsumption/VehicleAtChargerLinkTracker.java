@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import javax.inject.Inject;
@@ -78,8 +77,8 @@ public class VehicleAtChargerLinkTracker implements VehicleLeavesTrafficEventHan
         }
     }
 
-	public boolean isAtCharger(ElectricVehicleSpecification electricVehicle) {
+    public boolean isAtCharger(Id<ElectricVehicle> evid) {
 
-        return evsAtChargers.contains(electricVehicle.getId());
+        return evsAtChargers.contains(evid);
     }
 }
