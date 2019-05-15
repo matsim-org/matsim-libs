@@ -29,7 +29,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author smetzler, dziemke
  */
-public class BicycleTravelDisutilityV2 implements TravelDisutility {
+class BicycleTravelDisutilityV2 implements TravelDisutility {
 	private static final Logger LOG = Logger.getLogger(BicycleTravelDisutilityV2.class);
 
 	private final double marginalCostOfInfrastructure_m;

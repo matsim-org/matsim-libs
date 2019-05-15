@@ -25,6 +25,7 @@ package org.matsim.contrib.bicycle;
  * @author dziemke
  */
 public final class BicycleLabels {
+	// I think that this should rather be used through a BicycleUtils class.  kai, may'19
 
 	public static final String GRADIENT = "gradient";
 	public static final String AVERAGE_ELEVATION = "average_elevation";
