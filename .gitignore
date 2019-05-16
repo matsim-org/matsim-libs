@@ -17,6 +17,7 @@ hs_err_pid*
 /output/
 /bin/
 /test/
+/input/vwintegrationtest/output/
 
 #intellij file
 *.iml
