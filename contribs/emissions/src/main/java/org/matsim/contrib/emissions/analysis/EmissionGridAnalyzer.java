@@ -2,13 +2,12 @@ package org.matsim.contrib.emissions.analysis;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -31,6 +30,7 @@ import org.matsim.core.network.NetworkUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
  * This class may be used to collect emission events of some events file and assign those emissions to a grid structure.
@@ -38,6 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class EmissionGridAnalyzer {
 
+    private static final Double minimumThreshold = 1e-6;
     private static final Logger logger = Logger.getLogger(EmissionGridAnalyzer.class);
 
     private final double binSize;
@@ -49,6 +50,9 @@ public class EmissionGridAnalyzer {
     private final double gridSize;
     private final Network network;
     private final Geometry bounds;
+    private TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> emissionsByPollutant;
+    private TimeBinMap<Grid<Map<Pollutant, Double>>> binHolder;
+    private Iterator<TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>>> bins;
 
     private double shortestDistanceWithWeightToZero = Double.MAX_VALUE;
 
@@ -89,6 +93,33 @@ public class EmissionGridAnalyzer {
 
         logger.info("Shortest distance with weight equal to 0: " + shortestDistanceWithWeightToZero);
         return result;
+    }
+
+
+    public void processTimeBinsWithEmissions(String eventsFile) {
+
+        this.emissionsByPollutant = processEventsFile(eventsFile);
+
+        logger.info("!! Event data ready for first time bin grid.");
+
+        this.binHolder = new TimeBinMap<>(binSize);
+        this.bins = this.emissionsByPollutant.getTimeBins().iterator();
+    }
+
+    public Tuple<Double, String> processNextTimeBin() {
+        if (!this.bins.hasNext()) return null;
+
+        TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> nextBin = this.bins.next();
+        logger.info("creating grid for time bin with start time: " + nextBin.getStartTime());
+
+        Grid<Map<Pollutant, Double>> grid = writeAllLinksToGrid(nextBin.getValue());
+
+        ObjectMapper mapper = createObjectMapper();
+        try {
+            return new Tuple(nextBin.getStartTime(), mapper.writeValueAsString(grid));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -177,9 +208,17 @@ public class EmissionGridAnalyzer {
         // the cell weight
         Map<Pollutant, Double> newValues = Stream.concat(cell.getValue().entrySet().stream(),
                 emissions.getEmissions().entrySet().stream()
-                        .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue() * weight * countScaleFactor)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Double::sum));
-        cell.setValue(newValues);
+                    .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue() * weight * countScaleFactor)))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Double::sum));
+
+        Map<Pollutant, Double> valuesWithoutTinyResults = removeTinyValuesFromResults(newValues);
+        cell.setValue(valuesWithoutTinyResults);
+    }
+
+    private Map<Pollutant, Double> removeTinyValuesFromResults(Map<Pollutant, Double> values) {
+        return values.entrySet().stream()
+                .filter(entry -> entry.getValue() >= minimumThreshold)
+                .collect(Collectors.toMap(entry->entry.getKey(), entry->entry.getValue()));
     }
 
     private boolean isWithinBounds(Link link) {
