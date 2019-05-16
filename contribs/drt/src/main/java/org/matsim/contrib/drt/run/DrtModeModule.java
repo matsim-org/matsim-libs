@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.routing.ClosestAccessEgressStopFinder;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
@@ -73,7 +72,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		install(new FleetModule(getMode(), drtCfg.getVehiclesFile(), drtCfg.isChangeStartLinkToLastLinkInSchedule()));
 
-		if (MinCostFlowRebalancingParams.isRebalancingEnabled(drtCfg.getMinCostFlowRebalancing())) {
+		if (drtCfg.getMinCostFlowRebalancing().isPresent()) {
 			install(new DrtModeMinCostFlowRebalancingModule(drtCfg));
 		} else {
 			bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();

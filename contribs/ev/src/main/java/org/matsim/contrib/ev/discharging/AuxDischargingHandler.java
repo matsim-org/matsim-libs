@@ -21,8 +21,8 @@ package org.matsim.contrib.ev.discharging;
 
 import com.google.inject.Inject;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.data.ElectricFleet;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 

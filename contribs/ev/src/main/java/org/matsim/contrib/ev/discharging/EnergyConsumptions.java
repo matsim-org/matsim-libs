@@ -20,7 +20,7 @@
 package org.matsim.contrib.ev.discharging;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 public class EnergyConsumptions {
 	public static void consumeFixedDriveEnergy(ElectricVehicle ev, double rate, Link link) {

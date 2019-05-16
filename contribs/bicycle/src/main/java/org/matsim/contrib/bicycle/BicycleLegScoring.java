@@ -35,14 +35,14 @@ import java.util.Set;
 /**
  * @author dziemke
  */
-public class BicycleLegScoring extends CharyparNagelLegScoring {
+class BicycleLegScoring extends CharyparNagelLegScoring {
 	// private static final Logger LOG = Logger.getLogger(BicycleLegScoring.class);
 
 	private final double marginalUtilityOfInfrastructure_m;
 	private final double marginalUtilityOfComfort_m;
 	private final double marginalUtilityOfGradient_m_100m;
 
-	public BicycleLegScoring(final ScoringParameters params, Network network, Set<String> ptModes, BicycleConfigGroup bicycleConfigGroup) {
+	BicycleLegScoring( final ScoringParameters params, Network network, Set<String> ptModes, BicycleConfigGroup bicycleConfigGroup ) {
 		super(params, network, ptModes);
 
 		this.marginalUtilityOfInfrastructure_m = bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m();

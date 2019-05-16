@@ -34,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
  * @author smetzler, dziemke
  * based on RandomizingTimeDistanceTravelDisutility and adding more components
  */
-public class BicycleTravelDisutility implements TravelDisutility {
+class BicycleTravelDisutility implements TravelDisutility {
 	private static final Logger LOG = Logger.getLogger(BicycleTravelDisutility.class);
 
 	private final double marginalCostOfTime_s;

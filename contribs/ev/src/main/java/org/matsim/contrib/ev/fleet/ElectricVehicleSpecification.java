@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,19 +15,27 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.data;
+package org.matsim.contrib.ev.fleet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 
-import java.util.Map;
+import com.google.common.collect.ImmutableList;
 
-public interface ElectricFleet {
-	Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles();
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public interface ElectricVehicleSpecification {
+	Id<ElectricVehicle> getId();
 
-	void resetBatteriesAndConsumptions(DriveEnergyConsumption.Factory driveConsumptionFactory,
-			AuxEnergyConsumption.Factory auxConsumptionFactory);
+	String getVehicleType();
+
+	ImmutableList<String> getChargerTypes();
+
+	//FIXME consider renaming to getInitialCharge -- SOC suggest [%] not [J]
+	double getInitialSoc();//[J]
+
+	double getBatteryCapacity();//[J]
 }
