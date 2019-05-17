@@ -33,5 +33,11 @@ public interface DriveEnergyConsumption {
 
 	double calcEnergyConsumption(Link link, double travelTime);
 
+	default double calcEnergyConsumption(Link link, double travelTime, double timeOfDay) {
+		return calcEnergyConsumption(link, travelTime);
+	}
+
+	;
+
 
 }
