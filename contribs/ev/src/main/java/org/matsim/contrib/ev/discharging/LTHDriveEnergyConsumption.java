@@ -43,8 +43,8 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 	private final double minSlope;
 	private final double maxSlope;
 
-	private boolean hasWarnedMaxSpeed = false;
-	private boolean hasWarnedMinSpeed = false;
+	private static boolean hasWarnedMaxSpeed = false;
+	private static boolean hasWarnedMinSpeed = false;
 
 	private final Id<VehicleType> vehicleTypeId;
 	private final boolean crashIfOutOfBoundValue;
