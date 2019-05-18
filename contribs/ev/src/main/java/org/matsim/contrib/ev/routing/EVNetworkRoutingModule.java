@@ -47,6 +47,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 
 import java.util.*;
@@ -200,7 +201,7 @@ public final class EVNetworkRoutingModule implements RoutingModule {
         AuxEnergyConsumption auxEnergyConsumption = auxConsumptionFactory == null ? null : auxConsumptionFactory.create(pseudoVehicle);
         for (Link l : links) {
             double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime(), null, null);
-            double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT);
+            double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, Time.getUndefinedTime());
             if (auxEnergyConsumption != null) {
                 consumption += auxEnergyConsumption.calcEnergyConsumption(travelT, basicLeg.getDepartureTime());
             }

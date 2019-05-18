@@ -22,8 +22,9 @@ import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * @author michalm
@@ -54,7 +55,7 @@ public class TaskEnergyConsumptions {
 		DriveEnergyConsumption consumption = ev.getDriveEnergyConsumption();
 		double energy = 0;
 		for (int i = Math.max(currentLinkIdx, 1); i < path.getLinkCount(); i++) {// skip first link
-			energy += consumption.calcEnergyConsumption(path.getLink(i), path.getLinkTravelTime(i));
+			energy += consumption.calcEnergyConsumption(path.getLink(i), path.getLinkTravelTime(i), Time.getUndefinedTime());
 		}
 		return energy;
 	}

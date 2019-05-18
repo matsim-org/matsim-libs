@@ -19,9 +19,7 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
@@ -38,7 +36,8 @@ import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Because in QSim and JDEQSim vehicles enter and leave traffic at the end of links, we skip the first link when
@@ -112,7 +111,7 @@ public class DriveDischargingHandler
 			Link link = network.getLinks().get(linkId);
 			double tt = eventTime - evDrive.movedOverNodeTime;
 			ElectricVehicle ev = evDrive.ev;
-			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt);
+			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime);
 			if (handleAuxDischarging) {
 				energy += ev.getAuxEnergyConsumption().calcEnergyConsumption(tt, eventTime);
 			}
