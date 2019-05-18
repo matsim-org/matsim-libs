@@ -31,11 +31,14 @@ public interface DriveEnergyConsumption {
 		DriveEnergyConsumption create(ElectricVehicle electricVehicle);
 	}
 
-	double calcEnergyConsumption(Link link, double travelTime);
+	/**
+	 * @param link       Link where energy is consumed
+	 * @param travelTime TravelTime spent on link
+	 * @param timeOfDay  time of link Leave (may be undefined)
+	 * @return energy consumed by vehicle on link in J
+	 */
+	double calcEnergyConsumption(Link link, double travelTime, double timeOfDay);
 
-	default double calcEnergyConsumption(Link link, double travelTime, double timeOfDay) {
-		return calcEnergyConsumption(link, travelTime);
-	}
 
 	;
 
