@@ -25,12 +25,12 @@ public class PlanCalcScoreConfigGroupTest {
 		PlanCalcScoreConfigGroup c = new PlanCalcScoreConfigGroup();
         int originalSize = c.getActivityParams().size();
 		Assert.assertNull(c.getActivityParams("type1"));
-        Assert.assertEquals(originalSize + 1, c.getActivityParams().size());
+        Assert.assertEquals(originalSize, c.getActivityParams().size());
 
 		ActivityParams ap = new ActivityParams("type1");
 		c.addActivityParams(ap);
 		Assert.assertEquals(ap, c.getActivityParams("type1"));
-        Assert.assertEquals(originalSize + 2, c.getActivityParams().size());
+        Assert.assertEquals(originalSize + 1, c.getActivityParams().size());
 	}
 
 	@Test
