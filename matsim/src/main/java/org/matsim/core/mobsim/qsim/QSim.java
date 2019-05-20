@@ -110,8 +110,6 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	private WithinDayEngine withindayEngine = null;
 
-	private ActivityHandler activityEngine;
-
 	private final Date realWorldStarttime = new Date();
 	private double stopTime = 100 * 3600;
 	private final MobsimListenerManager listenerManager;
@@ -128,6 +126,8 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private long startTime = 0;
 	private long qSimInternalTime = 0;
 	private final Map<MobsimEngine, AtomicLong> mobsimEngineRunTimes;
+	private ActivityEngine activityEngine;
+
 	{
 		if (analyzeRunTimes) this.mobsimEngineRunTimes = new HashMap<>();
 		else this.mobsimEngineRunTimes = null;
@@ -182,7 +182,9 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	
 	@Override
 	public final void rescheduleActivityEnd(MobsimAgent agent) {
-		this.activityEngine.rescheduleActivityEnd(agent);
+		for( ActivityHandler activityHandler : this.activityHandlers ){
+			activityHandler.rescheduleActivityEnd( agent );
+		}
 	}
 
 	/**
@@ -215,9 +217,12 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	@Override
 	public void run() {
 		try {
-			// Teleportation must be last (default) departure handler, so add it
-			// only before running.
+			// Teleportation must be last (default) departure handler, so add it only before running:
 			this.departureHandlers.add(this.teleportationEngine);
+
+			// ActivityEngine must be last (=default) activity handler, so add it only before running:
+			this.activityHandlers.add( this.activityEngine ) ;
+
 			prepareSim();
 			this.listenerManager.fireQueueSimulationInitializedEvent();
 
@@ -552,11 +557,15 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 //			}
 //			this.transitEngine = (TransitQSimEngine) mobsimEngine;
 //		}
+
+		// yy note that what follows here somewhat interacts with the QSimProvider, which is doing similar things.  I just fixed a resulting misunderstanding re
+		// ActivityEngine, but presumably more thinking should be invested here.  kai, mar'19
+
 		if ( mobsimEngine instanceof AgentTracker ) {
 			agentTrackers.add((AgentTracker) mobsimEngine);
 		}
-		if (mobsimEngine instanceof ActivityHandler) {
-			this.activityEngine = (ActivityHandler) mobsimEngine;
+		if (mobsimEngine instanceof ActivityEngine) {
+			this.activityEngine = (ActivityEngine) mobsimEngine;
 		}
 		if (mobsimEngine instanceof NetsimEngine) {
 			this.netEngine = (NetsimEngine) mobsimEngine;
@@ -586,7 +595,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	}
 
 	public void addActivityHandler(ActivityHandler activityHandler) {
-		this.activityHandlers.add(activityHandler);
+		if ( ! ( activityHandler instanceof ActivityEngine ) ){
+			// We add the ActivityEngine manually later
+			this.activityHandlers.add( activityHandler );
+		}
 	}
 
 	/**

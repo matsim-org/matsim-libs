@@ -45,7 +45,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 
 	@Override
 	public void install() {
-		MinCostFlowRebalancingParams params = drtCfg.getMinCostFlowRebalancing();
+		MinCostFlowRebalancingParams params = drtCfg.getMinCostFlowRebalancing().get();
 		bindModal(DrtZonalSystem.class).toProvider(new DrtZonalSystem.DrtZonalSystemProvider(params.getCellSize()));
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
@@ -54,11 +54,11 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				bindModal(RebalancingStrategy.class).toProvider(modalProvider(
 						getter -> new MinCostFlowRebalancingStrategy(getter.getModal(RebalancingTargetCalculator.class),
 								getter.getModal(DrtZonalSystem.class), getter.getModal(Fleet.class),
-								getter.getModal(MinCostRelocationCalculator.class), drtCfg))).asEagerSingleton();
+								getter.getModal(MinCostRelocationCalculator.class), params))).asEagerSingleton();
 
 				bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
 						getter -> new LinearRebalancingTargetCalculator(getter.getModal(ZonalDemandAggregator.class),
-								drtCfg))).asEagerSingleton();
+								params))).asEagerSingleton();
 
 				bindModal(MinCostRelocationCalculator.class).toProvider(modalProvider(
 						getter -> new AggregatedMinCostRelocationCalculator(getter.getModal(DrtZonalSystem.class),

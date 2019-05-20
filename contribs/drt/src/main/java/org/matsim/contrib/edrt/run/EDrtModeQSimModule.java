@@ -87,7 +87,7 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		addModalComponent(DrtOptimizer.class, modalProvider(
 				getter -> new EDrtOptimizer(getter.getModal(DefaultDrtOptimizer.class),
-						getter.getModal(EmptyVehicleChargingScheduler.class), getter.get(MobsimTimer.class))));
+						getter.getModal(EmptyVehicleChargingScheduler.class))));
 
 		bindModal(DefaultDrtOptimizer.class).toProvider(modalProvider(
 				getter -> new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),

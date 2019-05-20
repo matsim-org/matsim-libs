@@ -21,7 +21,7 @@ package org.matsim.contrib.ev.charging;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import java.util.*;
@@ -108,7 +108,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 		if (pluggedVehicles.put(ev.getId(), ev) != null) {
 			throw new IllegalArgumentException();
 		}
-		eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId()));
+        eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId(), charger.getChargerType()));
 		listeners.get(ev.getId()).notifyChargingStarted(ev, now);
 	}
 

@@ -120,7 +120,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		if ((this.capacity <= 0.0) && (cpWarnCnt < maxCpWarnCnt) ) {
 			cpWarnCnt++ ;
 			log.warn("capacity=" + this.capacity + " of link id " + this.getId() + " may cause problems");
-			log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+			if ( cpWarnCnt==maxCpWarnCnt ){
+				log.warn( Gbl.FUTURE_SUPPRESSED );
+			}
 		}
 	}
 

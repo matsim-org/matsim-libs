@@ -20,9 +20,10 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import com.google.inject.util.Providers;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvModule;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -54,20 +55,24 @@ public class DischargingModule extends AbstractModule {
 
 	@Override
 	public void install() {
+		//XXX "isTurnedOn" returns true ==> should not be used when for "seperateAuxDischargingHandler"
+		boolean isSeperateAuxDischargingHandler = evCfg.getAuxDischargingSimulation()
+				== EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler;
+
 		bind(DriveEnergyConsumption.Factory.class).toInstance(driveConsumptionFactory);
-
-		bind(DriveDischargingHandler.class).asEagerSingleton();
-		addEventHandlerBinding().to(DriveDischargingHandler.class);
-
-		if (evCfg.getAuxDischargingSimulation()
-				== EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler) {
-			// "isTurnedOn" returns true ==> should not be used when for "seperateAuxDischargingHandler"
+		if (isSeperateAuxDischargingHandler) {
 			bind(AuxEnergyConsumption.Factory.class).toInstance(auxConsumptionFactory);
-			bind(AuxDischargingHandler.class).asEagerSingleton();
-			addMobsimListenerBinding().to(AuxDischargingHandler.class);
-		} else if (evCfg.getAuxDischargingSimulation()
-				== EvConfigGroup.AuxDischargingSimulation.none) {
-			bind(AuxEnergyConsumption.Factory.class).toProvider(Providers.of(null));
 		}
+
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(DriveDischargingHandler.class).asEagerSingleton();
+				if (isSeperateAuxDischargingHandler) {
+					bind(AuxDischargingHandler.class).asEagerSingleton();
+					addQSimComponentBinding(EvModule.EV_COMPONENT).to(AuxDischargingHandler.class);
+				}
+			}
+		});
 	}
 }

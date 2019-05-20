@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,22 +15,18 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
+package org.matsim.contrib.dvrp.run;
 
-import org.matsim.contrib.drt.run.DrtConfigGroup;
+import java.util.HashSet;
 
-public class MinCostFlowRebalancingParamsConsistencyChecker {
-	public void checkConsistency(DrtConfigGroup drtCfg) {
-		MinCostFlowRebalancingParams params = drtCfg.getMinCostFlowRebalancing();
-		if (params == null) {
-			return;// no rebalancing
-		}
-		if (params.getMinServiceTime() <= params.getMaxTimeBeforeIdle()) {
-			throw new RuntimeException(MinCostFlowRebalancingParams.MIN_SERVICE_TIME
-					+ " must be greater than "
-					+ MinCostFlowRebalancingParams.MAX_TIME_BEFORE_IDLE);
-		}
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class MultiModals {
+	public static boolean isAllModesUnique(MultiModal<?> multiModal) {
+		return multiModal.modes().allMatch(new HashSet<>()::add);
 	}
 }
