@@ -5,11 +5,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ConfigReader;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.*;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.testcases.MatsimTestUtils;
@@ -30,7 +26,7 @@ public class PlanCalcScoreConfigGroupTest {
 		Assert.assertNull(c.getActivityParams("type1"));
 
 //		Assert.assertEquals(0, c.getActivityParams().size());
-		Assert.assertEquals(6, c.getActivityParams().size());
+        Assert.assertEquals(8, c.getActivityParams().size());
 		// yyyyyy see PlanCalcScoreConfigGroup, where I am currently adding interaction activities hard-wired.  kai, feb'16
 		// yyyyyy and now also the "dummy" activity.  kai, jul'17
 		
@@ -39,7 +35,7 @@ public class PlanCalcScoreConfigGroupTest {
 		Assert.assertEquals(ap, c.getActivityParams("type1"));
 
 		//		Assert.assertEquals(1, c.getActivityParams().size());
-		Assert.assertEquals(7, c.getActivityParams().size());
+        Assert.assertEquals(9, c.getActivityParams().size());
 		// yyyyyy see PlanCalcScoreConfigGroup, where I am currently adding  interaction activities hard-wired.  kai, feb'16
 		// yyyyyy and now also the "dummy" activity.  kai, jul'17
 	}
