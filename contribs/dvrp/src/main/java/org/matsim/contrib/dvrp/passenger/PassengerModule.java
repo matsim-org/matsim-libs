@@ -18,27 +18,37 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.run;
+package org.matsim.contrib.dvrp.passenger;
 
-import org.matsim.contrib.dvrp.passenger.PassengerModule;
-import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.PreplanningEngine;
 
 /**
- * @author Michal Maciejewski (michalm)
+ * This module initialises generic (i.e. not taxi or drt-specific) AND global (not mode-specific) dvrp objects relating
+ * to serving passengers (e.g. booking engine).
+ * <p>
+ * Some of the initialised objects will become modal at some point in the future. E.g. VehicleType or TravelTime
+ * are likely to be provided separately per each mode in the future.
+ *
+ * @author michalm
  */
-public class DvrpQSimComponents {
-	public static QSimComponentsConfigurator activateModes(String... modes) {
-		return components -> {
-			DynActivityEngineModule.configureComponents(components);
-			components.addNamedComponent(PassengerModule.BookingEngineQSimModule.COMPONENT_NAME);
-			for (String m : modes) {
-				components.addComponent(DvrpModes.mode(m));
-			}
-		};
+public final class PassengerModule extends AbstractModule {
+
+	@Override
+	public void install() {
+		bind(PassengerRequestEventToPassengerEngineForwarder.class).asEagerSingleton();
+		addEventHandlerBinding().to(PassengerRequestEventToPassengerEngineForwarder.class);
+		installQSimModule(new BookingEngineQSimModule());
 	}
 
-	public static QSimComponentsConfigurator activateAllModes(MultiModal<?> multiModal) {
-		return activateModes(multiModal.modes().toArray(String[]::new));
+	public static class BookingEngineQSimModule extends AbstractQSimModule {
+		public final static String COMPONENT_NAME = "BookingEngine";
+
+		@Override
+		protected void configureQSim() {
+			bind( PreplanningEngine.class ).asEagerSingleton();
+			addQSimComponentBinding(COMPONENT_NAME).to( PreplanningEngine.class );
+		}
 	}
 }

@@ -173,6 +173,11 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 //			// "arrangeNextAgentState" and "(un)registerAgentOnLink" need to be protected.  But not this one.  kai, mar'15
 //			QSim.this.activityEngine.rescheduleActivityEnd(agent);
 //		}
+
+		@Override
+		public final List<DepartureHandler> getDepartureHandlers() {
+			return departureHandlers ;
+		}
 	};
 
 	private Collection<AgentTracker> agentTrackers = new ArrayList<>() ;
@@ -183,6 +188,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	@Override
 	public final void rescheduleActivityEnd(MobsimAgent agent) {
 		for( ActivityHandler activityHandler : this.activityHandlers ){
+			Gbl.assertNotNull( activityHandler );
 			activityHandler.rescheduleActivityEnd( agent );
 		}
 	}
@@ -597,6 +603,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	public void addActivityHandler(ActivityHandler activityHandler) {
 		if ( ! ( activityHandler instanceof ActivityEngine ) ){
 			// We add the ActivityEngine manually later
+			Gbl.assertNotNull( activityHandler );
 			this.activityHandlers.add( activityHandler );
 		}
 	}

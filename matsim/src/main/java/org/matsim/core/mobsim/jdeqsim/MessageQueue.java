@@ -19,10 +19,15 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+import org.matsim.core.mobsim.qsim.jdeqsimengine.SteppableScheduler;
+
 import java.util.PriorityQueue;
 
 /**
  * The message queue of the micro-simulation.
+ * <br/>
+ * Via injection, one can currently get hold both of {@link MessageQueue} and {@link SteppableScheduler}.  Seems to me that the intendet API is actually the latter??  But I
+ * don't actually know.
  *
  * @author rashid_waraich
  */

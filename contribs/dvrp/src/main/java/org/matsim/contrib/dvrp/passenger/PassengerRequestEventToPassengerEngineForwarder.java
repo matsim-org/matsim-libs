@@ -18,27 +18,40 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.run;
+package org.matsim.contrib.dvrp.passenger;
 
-import org.matsim.contrib.dvrp.passenger.PassengerModule;
-import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
+ * This class has a multi-iteration scope, whereas {@link PassengerEngine} has only a single-iteration scope.
+ * <p>
+ * PassengerRequestEventToPassengerEngineForwarder is registered at {@link org.matsim.core.api.experimental.events.EventsManager}
+ * and forwards events to PassengerEngine
+ *
  * @author Michal Maciejewski (michalm)
  */
-public class DvrpQSimComponents {
-	public static QSimComponentsConfigurator activateModes(String... modes) {
-		return components -> {
-			DynActivityEngineModule.configureComponents(components);
-			components.addNamedComponent(PassengerModule.BookingEngineQSimModule.COMPONENT_NAME);
-			for (String m : modes) {
-				components.addComponent(DvrpModes.mode(m));
-			}
-		};
+public class PassengerRequestEventToPassengerEngineForwarder
+		implements PassengerRequestRejectedEventHandler, PassengerRequestScheduledEventHandler {
+	private final Map<String, PassengerEngine> passengerEngines = new HashMap<>();
+
+	@Override
+	public void handleEvent(PassengerRequestRejectedEvent event) {
+		passengerEngines.get(event.getMode()).notifyPassengerRequestEvent(event );
 	}
 
-	public static QSimComponentsConfigurator activateAllModes(MultiModal<?> multiModal) {
-		return activateModes(multiModal.modes().toArray(String[]::new));
+	@Override
+	public void handleEvent(PassengerRequestScheduledEvent event) {
+		passengerEngines.get(event.getMode()).notifyPassengerRequestEvent(event );
+		// yyyyyy typo? (rejected --> scheduled?)
+	}
+
+	void registerPassengerEngineEventsHandler(PassengerEngine passengerEngine) {
+		passengerEngines.put(passengerEngine.getMode(), passengerEngine);
+	}
+
+	@Override
+	public void reset(int iteration) {
+		passengerEngines.clear();
 	}
 }

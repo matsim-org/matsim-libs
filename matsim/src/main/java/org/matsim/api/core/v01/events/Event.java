@@ -20,6 +20,8 @@
 
 package org.matsim.api.core.v01.events;
 
+import org.matsim.core.api.internal.HasPersonId;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -38,6 +40,11 @@ public abstract class Event {
 		Map<String, String> attr = new LinkedHashMap<String, String>();
 		attr.put(ATTRIBUTE_TIME, Double.toString(this.time));
 		attr.put(ATTRIBUTE_TYPE, getEventType());
+		if ( this instanceof HasPersonId ) {
+			attr.put( HasPersonId.ATTRIBUTE_PERSON, ((HasPersonId) this).getPersonId().toString() ) ;
+			// many derived types do this by themselves, for historical reasons.  Since the information is put into a map, it still exists only once under that key.  kai,
+			// mar'19
+		}
 		return attr;
 	}
 

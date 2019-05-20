@@ -98,34 +98,39 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		// yyyyyy find better solution for this. kai, dec'15
 		{
-			ActivityParams params = new ActivityParams("car interaction");
+			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.car ) ) ;
 			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);
 		}
 		{
-			ActivityParams params = new ActivityParams("pt interaction"); // need
-																			// this
-																			// for
-																			// self-programmed
-																			// pseudo
-																			// pt.
-																			// kai,
-																			// nov'16
+			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.pt ));
+			// need this for self-programmed pseudo pt. kai, nov'16
+
 			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);
 		}
 		{
-			ActivityParams params = new ActivityParams("bike interaction");
+			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.bike ) ) ;
 			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);
 		}
 		{
-			ActivityParams params = new ActivityParams("other interaction");
+			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.drt ) ) ;
 			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);
 		}
 		{
-			ActivityParams params = new ActivityParams("walk interaction");
+			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.taxi ) ) ;
+			params.setScoringThisActivityAtAll(false);
+			this.addActivityParams(params);
+		}
+		{
+			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.other ) ) ;
+			params.setScoringThisActivityAtAll(false);
+			this.addActivityParams(params);
+		}
+		{
+			ActivityParams params = new ActivityParams( createStageActivityType( TransportMode.walk ) );
 			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);
 			// bushwhacking_walk---network_walk---bushwhacking_walk
@@ -150,6 +155,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	// ---
 	private static final String FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA = "fractionOfIterationsToStartScoreMSA";
+
+	public static String createStageActivityType( String mode ){
+		return mode + " interaction";
+	}
 
 	// ---
 

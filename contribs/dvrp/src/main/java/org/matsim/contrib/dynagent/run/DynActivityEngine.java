@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -39,6 +40,8 @@ import java.util.List;
  * called before that of ActivityEngine)
  */
 public class DynActivityEngine implements MobsimEngine, ActivityHandler {
+	// This is now _additive_ to the normal ActivityEngine!
+
 	private InternalInterface internalInterface;
 
 	private final List<DynAgent> dynAgents = new LinkedList<>();
@@ -79,7 +82,8 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
 		if (!(agent instanceof DynAgent)) {
-			return false ; // fall through
+			return false ;
+			// (this means "I am not responsible").
 		}
 
 		double endTime = agent.getActivityEndTime();
