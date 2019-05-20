@@ -19,27 +19,23 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-
 import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.dvrp.passenger.*;
-import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dvrp.passenger.PassengerModule;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dynagent.run.DynActivityEngine;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -48,15 +44,19 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.ActivityEngineModule;
+import org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
-import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class RunOneTaxiWithPrebookingExampleIT {
 	private static final Logger log = Logger.getLogger(RunOneTaxiWithPrebookingExampleIT.class);
@@ -80,7 +80,6 @@ public class RunOneTaxiWithPrebookingExampleIT {
 			log.info("mobsimComponent=" + component);
 		}
 
-		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
 		config.checkConsistency();
 
 		// load scenario

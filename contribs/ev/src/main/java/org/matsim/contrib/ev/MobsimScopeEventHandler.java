@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,24 +15,19 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.data;
+package org.matsim.contrib.ev;
 
-public interface Battery {
-	double getCapacity();
+import org.matsim.core.events.handler.EventHandler;
 
-	double getSoc();
-
-	void setSoc(double soc);
-
-	void resetSoc();// to the initial/start SOC
-
-	default void charge(double energy) {
-		setSoc(Math.min(getSoc() + energy, getCapacity()));
-	}
-
-	default void discharge(double energy) {
-		setSoc(Math.max(getSoc() - energy, 0));
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public interface MobsimScopeEventHandler extends EventHandler {
+	@Override
+	default void reset(int iteration) {
+		throw new IllegalStateException("This handler should have been unregistered on AfterMobsimEvent");
 	}
 }

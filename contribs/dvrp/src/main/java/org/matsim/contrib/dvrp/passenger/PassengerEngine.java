@@ -57,6 +57,7 @@ import org.matsim.facilities.FacilitiesUtils;
 import com.google.common.collect.ImmutableList;
 
 public final class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo.Provider {
+
 	private static final Logger LOGGER = Logger.getLogger(PassengerEngine.class);
 
 	private final String mode;
@@ -204,7 +205,14 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 
 		Map<Id<Link>, ? extends Link> links = network.getLinks();
 		Link fromLink = links.get(fromLinkId);
+		if (fromLink == null) {
+			throw new RuntimeException("fromLink does not exist. Id " + fromLinkId);
+		}
 		Link toLink = links.get(toLinkId);
+
+		if (toLink == null) {
+			throw new RuntimeException("toLink does not exist. Id " + toLinkId);
+		}
 		Id<Request> id = Id.create(mode + "_" + nextId++, Request.class);
 		//TODO have not decided yet how VrpOptimizer determines if request is prebooked, maybe 'boolean prebooked'??
 		return requestCreator.createRequest(id, passenger, fromLink, toLink, departureTime, now);

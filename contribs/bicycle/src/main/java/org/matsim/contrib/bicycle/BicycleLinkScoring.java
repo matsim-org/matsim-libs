@@ -40,10 +40,10 @@ import org.matsim.vehicles.Vehicle;
  * This link-based scoring should be used when true times spent on an individual link are relevant
  * and for the scoring of the interaction with motorized traffic.
  */
-public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring, MotorizedInteractionEventHandler {
+class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 	private static final Logger LOG = Logger.getLogger(BicycleLinkScoring.class);
 	
-	protected final ScoringParameters params;
+	private final ScoringParameters params;
 	
 	private Scenario scenario;
 	private Vehicle2DriverEventHandler vehicle2Driver = new Vehicle2DriverEventHandler();
@@ -59,7 +59,7 @@ public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScor
 	
 	private static int ccc=0 ;
 	
-	public BicycleLinkScoring(final ScoringParameters params, Scenario scenario, BicycleConfigGroup bicycleConfigGroup) {
+	BicycleLinkScoring( final ScoringParameters params, Scenario scenario, BicycleConfigGroup bicycleConfigGroup ) {
 		this.params = params;
 		this.scenario = scenario;
 		
@@ -116,6 +116,12 @@ public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScor
 			previousLinkRelativePosition = 0.;
 			previousLinkEnterTime = linkEnterEvent.getTime();
 		}
+		if ( event instanceof MotorizedInteractionEvent ) {
+			if ( ((MotorizedInteractionEvent) event).getLinkId().equals(previousLink )){
+				this.carCountOnLink++;
+			}
+		}
+
 	}
 	
 	private void calculateScoreForPreviousLink(Id<Link> linkId, Double enterTime, Id<Vehicle> vehId, double travelTime, double relativeLinkEnterPosition) {
@@ -145,7 +151,7 @@ public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScor
 	
 	
 	// Copied and adapted from CharyparNagelLegScoring
-	protected double computeTimeDistanceBasedScoreComponent(double travelTime, double dist) {
+	private double computeTimeDistanceBasedScoreComponent( double travelTime, double dist ) {
 		double tmpScore = 0.0;
 		ModeUtilityParameters modeParams = this.params.modeParams.get("bicycle");
 		if (modeParams == null) {
@@ -171,11 +177,4 @@ public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScor
 		return tmpScore;
 	}
 	
-
-	@Override
-	public void handleEvent(MotorizedInteractionEvent event) {
-		if (event.getLinkId().equals(previousLink)) {
-			this.carCountOnLink++;
-		}
-	}
 }

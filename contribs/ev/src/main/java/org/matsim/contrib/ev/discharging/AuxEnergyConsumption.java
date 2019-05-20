@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 public interface AuxEnergyConsumption {
 	interface Factory {

@@ -18,36 +18,27 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.run;
+package org.matsim.contrib.ev.fleet;
 
-import java.util.HashSet;
-import java.util.function.Consumer;
+import java.util.Map;
 
-import org.matsim.core.config.ConfigGroup;
+import org.matsim.api.core.v01.Id;
 
 /**
+ * A container of ElectricVehicleSpecifications. Its lifespan covers all iterations.
+ * <p>
+ * It can be modified between iterations by add/replace/removeVehicleSpecification().
+ * <p>
+ * The contained ElectricVehicleSpecifications are (meant to be) immutable, so to modify them, use replaceVehicleSpecification()
+ *
  * @author Michal Maciejewski (michalm)
  */
-public class ConfigConsistencyCheckers {
-	public static <C extends ConfigGroup & Modal> void checkSingleOrMultiModeConsistency(C cfg,
-			MultiModal<C> multiModeCfg, Consumer<C> consistencyChecker) {
-		if (cfg != null) {
-			if (multiModeCfg != null) {
-				throw new RuntimeException("Either single or multi-mode " + cfg.getName() + " must be defined");
-			}
-			consistencyChecker.accept(cfg);
-		} else {
-			if (multiModeCfg == null) {
-				throw new RuntimeException("Either single or multi-mode " + cfg.getName() + " must be defined");
-			}
-			multiModeCfg.getModalElements().stream().forEach(consistencyChecker);
-			if (!areModesUnique(multiModeCfg)) {
-				throw new RuntimeException("Modes in multi-mode config are not unique");
-			}
-		}
-	}
+public interface ElectricFleetSpecification {
+	Map<Id<ElectricVehicle>, ElectricVehicleSpecification> getVehicleSpecifications();
 
-	public static boolean areModesUnique(MultiModal<?> multiModal) {
-		return multiModal.modes().allMatch(new HashSet<>()::add);
-	}
+	void addVehicleSpecification(ElectricVehicleSpecification specification);
+
+	void replaceVehicleSpecification(ElectricVehicleSpecification specification);
+
+	void removeVehicleSpecification(Id<ElectricVehicle> vehicleId);
 }
