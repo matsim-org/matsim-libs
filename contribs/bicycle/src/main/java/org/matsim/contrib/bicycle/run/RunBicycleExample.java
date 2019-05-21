@@ -26,7 +26,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
+import org.matsim.contrib.bicycle.BicycleLinkSpeedCalculator;
 import org.matsim.contrib.bicycle.BicycleModule;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -35,9 +37,15 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author dziemke
@@ -94,6 +102,24 @@ public class RunBicycleExample {
 			bicycleModule.setConsiderMotorizedInteraction(true);
 		}
 		controler.addOverridingModule(bicycleModule);
+		
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+
+            @Override
+            protected void configureQSim() {
+                bind(QNetworkFactory.class).toProvider(new Provider<QNetworkFactory>() {
+                    @Inject
+                    private EventsManager events;
+
+                    @Override
+                    public QNetworkFactory get() {
+                        final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
+                        factory.setLinkSpeedCalculator(new BicycleLinkSpeedCalculator());
+                        return factory;
+                    }
+                });
+            }
+        });
 		
 		controler.run();
 	}

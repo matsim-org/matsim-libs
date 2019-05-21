@@ -49,24 +49,24 @@ public final class BicycleModule extends AbstractModule {
 			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
 		}
 		
-		this.installQSimModule(new AbstractQSimModule() {
-			@Inject Scenario scenario;
-
-            @Override
-            protected void configureQSim() {
-                bind(QNetworkFactory.class).toProvider(new Provider<QNetworkFactory>() {
-                    @Inject
-                    private EventsManager events;
-
-                    @Override
-                    public QNetworkFactory get() {
-                        final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
-                        factory.setLinkSpeedCalculator(new BicycleLinkSpeedCalculator());
-                        return factory;
-                    }
-                });
-            }
-        });
+//		installQSimModule(new AbstractQSimModule() {
+//			@Inject Scenario scenario;
+//
+//            @Override
+//            protected void configureQSim() {
+//                bind(QNetworkFactory.class).toProvider(new Provider<QNetworkFactory>() {
+//                    @Inject
+//                    private EventsManager events;
+//
+//                    @Override
+//                    public QNetworkFactory get() {
+//                        final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
+//                        factory.setLinkSpeedCalculator(new BicycleLinkSpeedCalculator());
+//                        return factory;
+//                    }
+//                });
+//            }
+//        });
 	}
 	
 	public void setConsiderMotorizedInteraction(boolean considerMotorizedInteraction) {
