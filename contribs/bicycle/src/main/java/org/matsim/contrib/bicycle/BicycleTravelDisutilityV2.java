@@ -29,6 +29,8 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author smetzler, dziemke
  */
+// Used version seesm to be BicycleTravelDisutility (without V2)
+@Deprecated
 class BicycleTravelDisutilityV2 implements TravelDisutility {
 	private static final Logger LOG = Logger.getLogger(BicycleTravelDisutilityV2.class);
 

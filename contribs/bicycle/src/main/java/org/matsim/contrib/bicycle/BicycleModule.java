@@ -18,14 +18,21 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author smetzler, dziemke
  */
 public final class BicycleModule extends AbstractModule {
 	// necessary to have this public
-
 	private boolean considerMotorizedInteraction;
 	
 	@Override
@@ -41,6 +48,25 @@ public final class BicycleModule extends AbstractModule {
 		if (considerMotorizedInteraction) {
 			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
 		}
+		
+		this.installQSimModule(new AbstractQSimModule() {
+			@Inject Scenario scenario;
+
+            @Override
+            protected void configureQSim() {
+                bind(QNetworkFactory.class).toProvider(new Provider<QNetworkFactory>() {
+                    @Inject
+                    private EventsManager events;
+
+                    @Override
+                    public QNetworkFactory get() {
+                        final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
+                        factory.setLinkSpeedCalculator(new BicycleLinkSpeedCalculator());
+                        return factory;
+                    }
+                });
+            }
+        });
 	}
 	
 	public void setConsiderMotorizedInteraction(boolean considerMotorizedInteraction) {

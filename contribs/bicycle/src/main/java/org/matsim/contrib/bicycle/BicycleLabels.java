@@ -32,6 +32,7 @@ public final class BicycleLabels {
 	public static final String SURFACE = "surface";
 	public static final String SMOOTHNESS = "smoothness";
 	public static final String CYCLEWAY = "cycleway";
+	public static final String BICYCLE_SPEED_FACTOR = "bike_speed_factor";
 
 	private BicycleLabels() {
 		// Don't allow to create instances of this class

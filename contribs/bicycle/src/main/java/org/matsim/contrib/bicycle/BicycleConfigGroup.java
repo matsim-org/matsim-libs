@@ -28,6 +28,7 @@ import org.matsim.core.config.ConfigGroup;
  */
 public final class BicycleConfigGroup extends ConfigGroup {
 	// necessary to have this public
+	// TODO Change to reflective config group
 
 	public static final String GROUP_NAME = "bicycle";
 
