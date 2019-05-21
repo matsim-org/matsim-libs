@@ -21,6 +21,7 @@ package org.matsim.core.router;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -32,6 +33,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.controler.PrepareForSimImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -42,6 +44,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +58,7 @@ import java.util.List;
  */
 public final class NetworkRoutingInclAccessEgressModule implements RoutingModule {
 	private static final Logger log = Logger.getLogger( NetworkRoutingInclAccessEgressModule.class );
+	private final Scenario scenario;
 
 	private final class AccessEgressStageActivityTypes implements StageActivityTypes {
 		@Override public boolean isStageActivity(String activityType) {
@@ -84,12 +88,12 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final LeastCostPathCalculator routeAlgo;
 	private String stageActivityType;
 
-	public NetworkRoutingInclAccessEgressModule(
-			final String mode,
-			final PopulationFactory populationFactory,
-			final Network network,
-			final LeastCostPathCalculator routeAlgo,
-			PlansCalcRouteConfigGroup calcRouteConfig) {
+	NetworkRoutingInclAccessEgressModule(
+		  final String mode,
+		  final PopulationFactory populationFactory,
+		  final Network network,
+		  final LeastCostPathCalculator routeAlgo,
+		  PlansCalcRouteConfigGroup calcRouteConfig, Scenario scenario ) {
 		Gbl.assertNotNull(network);
 		Gbl.assertIf( network.getLinks().size()>0 ) ; // otherwise network for mode probably not defined
 		this.network = network;
@@ -101,6 +105,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
 					+ "currently not supported; there are too many other problems") ;
 		}
+		this.scenario = scenario ;
 	}
 
 	@Override
@@ -248,6 +253,14 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Node endNode = toLink.getFromNode(); // the target is the start of the link
 
 		if (toLink != fromLink) { // (a "true" route)
+
+			Vehicle vehicle =
+//				  this.scenario.getVehicles().getVehicles().get( PrepareForSimImpl.obtainVehicleId( person, this.mode, scenario.getConfig() ) ) ;
+				  person.getVehicles().get(mode) ;
+
+			String key = mode + "_vehicle" ;
+			Vehicle vehicle = person.getAttributes().getAttribute( key ) ;
+
 
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");

@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -64,14 +65,15 @@ public final class DefaultRoutingModules {
 				routeAlgo);
 	}
 	
-	public static RoutingModule createAccessEgressNetworkRouter( String mode, PopulationFactory popFact, Network net, 
-			final LeastCostPathCalculator routeAlgo, PlansCalcRouteConfigGroup calcRouteConfig ) {
+	static RoutingModule createAccessEgressNetworkRouter( String mode, PopulationFactory popFact, Network net,
+										final LeastCostPathCalculator routeAlgo, PlansCalcRouteConfigGroup calcRouteConfig,
+										Scenario scenario ) {
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
 				popFact,
 				net,
 				routeAlgo,
-				calcRouteConfig );
+				calcRouteConfig, scenario);
 	}
 
 }

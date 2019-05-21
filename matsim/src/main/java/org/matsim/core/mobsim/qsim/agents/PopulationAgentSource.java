@@ -31,7 +31,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -88,7 +87,7 @@ public final class PopulationAgentSource implements AgentSource {
 				vehicleId = route.getVehicleId();
 			}
 			if (vehicleId == null) {
-				vehicleId = PrepareForSimImpl.obtainAutomaticVehicleId(person.getId(), leg.getMode(), qsim.getScenario().getConfig().qsim() );
+				vehicleId = PrepareForSimImpl.obtainVehicleId(person, leg.getMode(), qsim.getScenario().getConfig() );
 				if(route!=null) {
 					route.setVehicleId( vehicleId );
 				}

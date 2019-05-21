@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -169,9 +170,9 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	}
 
 	private void createAndAddVehiclesForEveryNetworkMode(final Map<String, VehicleType> modeVehicleTypes) {
-		for (Id<Person> personId : scenario.getPopulation().getPersons().keySet()) {
+		for ( Person person : scenario.getPopulation().getPersons().values()) {
 			for (String mode : scenario.getConfig().qsim().getMainModes()) {
-				Id<Vehicle> vehicleId = obtainAutomaticVehicleId(personId, mode, this.qSimConfigGroup);
+				Id<Vehicle> vehicleId = obtainVehicleId(person, mode, this.scenario.getConfig() );
 				createAndAddVehicleIfNotPresent(vehicleId, modeVehicleTypes.get(mode));
 			}
 		}
@@ -233,9 +234,14 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		}
 	}
 
-	public static Id<Vehicle> obtainAutomaticVehicleId( Id<Person> personId, String mode, QSimConfigGroup config ) {
-		
+	public static Id<Vehicle> obtainVehicleId( Person person, String mode, Config config2 ) {
+		// yyyy: move to PopulationUtils
+
+
+		QSimConfigGroup config = config2.qsim() ;
+
 		Id<Vehicle> vehicleId ;
+
 		if (config.getUsePersonIdForMissingVehicleId()) {
 
 			// yyyy my strong preference would be to do away with this "car_" exception and to just
@@ -244,21 +250,20 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			switch (config.getVehiclesSource()) {
 				case defaultVehicle:
 				case fromVehiclesData:
-					vehicleId = Id.createVehicleId(personId);
+					vehicleId = Id.createVehicleId( person.getId() );
 					break;
 				case modeVehicleTypesFromVehiclesData:
 					if(! mode.equals(TransportMode.car)) {
-						vehicleId = Id.createVehicleId( personId.toString() + "_" + mode );
+						vehicleId = Id.createVehicleId( person.getId().toString() + "_" + mode );
 					} else {
-						vehicleId = Id.createVehicleId(personId);
+						vehicleId = Id.createVehicleId( person.getId() );
 					}
 					break;
 				default:
 					throw new RuntimeException("not implemented") ;
 			}
 		} else {
-			throw new IllegalStateException("Found a network route without a vehicle id.");
-			// yyyyyy condition not really logical here. kai, jul'18
+			throw new RuntimeException( "not implemented" ) ;
 		}
 		return vehicleId;
 	}
