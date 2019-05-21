@@ -115,7 +115,12 @@ public class DriveDischargingHandler
 			if (handleAuxDischarging) {
 				energy += ev.getAuxEnergyConsumption().calcEnergyConsumption(tt, eventTime);
 			}
-			ev.getBattery().discharge(energy);
+            //Energy consumption might be negative on links with negative slope
+            if (energy < 0) {
+                ev.getBattery().charge(Math.abs(energy));
+            } else {
+                ev.getBattery().discharge(energy);
+            }
 			double linkConsumption = energy + energyConsumptionPerLink.getOrDefault(linkId, 0.0);
 			energyConsumptionPerLink.put(linkId, linkConsumption);
 		}
