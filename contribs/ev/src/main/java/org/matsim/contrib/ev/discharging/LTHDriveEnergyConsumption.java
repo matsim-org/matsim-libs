@@ -45,6 +45,8 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 
 	private static boolean hasWarnedMaxSpeed = false;
 	private static boolean hasWarnedMinSpeed = false;
+    private static boolean hasWarnedMinSlope = false;
+    private static boolean hasWarnedMaxSlope = false;
 
 	private final Id<VehicleType> vehicleTypeId;
 	private final boolean crashIfOutOfBoundValue;
@@ -140,18 +142,26 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 			if (crashIfOutOfBoundValue) {
 				throw new IllegalArgumentException("Slope less than the supported minSlope; slope =" + currentSlope);
 			} else {
-				Logger.getLogger(getClass())
-						.warn("Assuming minSlope, as Slope not covered by consumption data" + currentSlope);
+                if (!hasWarnedMinSlope) {
+                    Logger.getLogger(getClass())
+                            .warn("Assuming minSlope, as Slope not covered by consumption data" + currentSlope);
+                    hasWarnedMinSlope = true;
+                }
 				currentSlope = minSlope;
+
 			}
 		} else if (currentSlope > maxSlope) {
 			if (crashIfOutOfBoundValue) {
 				throw new IllegalArgumentException("Slope greater than the supported maxSlope; slope =" + currentSlope);
 			} else {
-				Logger.getLogger(getClass())
-						.warn("Assuming maxSlope, as Slope not covered by consumption data" + currentSlope);
+                if (!hasWarnedMaxSlope) {
+                    Logger.getLogger(getClass())
+                            .warn("Assuming maxSlope, as Slope not covered by consumption data" + currentSlope);
+                    hasWarnedMaxSlope = true;
+                }
 				currentSlope = maxSlope;
-			}
+
+            }
 		}
 		return currentSlope;
 	}
