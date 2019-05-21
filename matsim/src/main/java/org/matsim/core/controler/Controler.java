@@ -489,7 +489,10 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		});
 		return this ;
 	}
-	@Deprecated // for experts only
+
+    /**
+     * Only use if you know what you are doing, for experts only.
+     */
 	@Override
 	public final Controler configureQSimComponents(QSimComponentsConfigurator configurator) {
 		this.addOverridingModule(new AbstractModule() {
