@@ -18,13 +18,12 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import java.util.Map;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ReflectiveConfigGroup;
+import java.util.Map;
 
 /**
  * @author michalm
@@ -34,7 +33,7 @@ public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 
 	public static final String INTERVAL = "interval";
 	static final String INTERVAL_EXP = "Specifies how often empty vehicle rebalancing is executed."
-			+ " Must be positive. Default is 1800 s.";
+			+ " Must be positive. Default is 1800 s. Expects an Integer Value";
 
 	public static final String MIN_SERVICE_TIME = "minServiceTime";
 	static final String MIN_SERVICE_TIME_EXP = //
@@ -48,11 +47,11 @@ public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 
 	public static final String TARGET_ALPHA = "targetAlpha";
 	static final String TARGET_ALPHA_EXP = "alpha coefficient in linear target calculation."
-			+ " In general, should be lower then 1.0 to prevent over-reacting and high empty milleage.";
+			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty milleage.";
 
 	public static final String TARGET_BETA = "targetBeta";
 	static final String TARGET_BETA_EXP = "beta constant in linear target calculation."
-			+ " In general, should be lower then 1.0 to prevent over-reacting and high empty milleage.";
+			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty milleage.";
 
 	public static final String CELL_SIZE = "cellSize";
 	static final String CELL_SIZE_EXP = "size of square cells used for demand aggregation."
