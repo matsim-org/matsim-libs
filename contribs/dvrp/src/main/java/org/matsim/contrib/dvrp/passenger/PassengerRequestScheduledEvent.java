@@ -40,7 +40,6 @@ public final class PassengerRequestScheduledEvent extends Event implements HasPe
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_PICKUP_TIME = "pickupTime";
 	public static final String ATTRIBUTE_DROPOFF_TIME = "dropoffTime";
-    public static final String ATTRIBUTE_PASSENGER = "personId";
 
 	private final String mode;
 	private final Id<Request> requestId;
@@ -109,7 +108,6 @@ public final class PassengerRequestScheduledEvent extends Event implements HasPe
 		attr.put(ATTRIBUTE_VEHICLE, vehicleId + "");
 		attr.put(ATTRIBUTE_PICKUP_TIME, pickupTime + "");
 		attr.put(ATTRIBUTE_DROPOFF_TIME, dropoffTime + "");
-        attr.put(ATTRIBUTE_PERSON, personId.toString());
 		return attr;
 	}
 

@@ -37,7 +37,6 @@ public class PassengerRequestRejectedEvent extends Event implements HasPersonId 
 	public static final String ATTRIBUTE_MODE = "mode";
 	public static final String ATTRIBUTE_REQUEST = "request";
 	public static final String ATTRIBUTE_CAUSE = "cause";
-	public static final String ATTRIBUTE_PASSENGER = "personId";
 
 
 	private final String mode;
@@ -85,6 +84,6 @@ public class PassengerRequestRejectedEvent extends Event implements HasPersonId 
 
 	@Override
 	public Id<Person> getPersonId() {
-		return null;
+		return personId;
 	}
 }
