@@ -22,6 +22,7 @@ package commercialtraffic.integration;/*
  */
 
 import commercialtraffic.deliveryGeneration.DeliveryGenerator;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.controler.AbstractModule;
 
 public class CommercialTrafficModule extends AbstractModule {
@@ -29,6 +30,14 @@ public class CommercialTrafficModule extends AbstractModule {
 
     @Override
     public void install() {
+        CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(getConfig());
+        Carriers carriers = new Carriers();
+        new CarrierPlanXmlReaderV2(carriers).readFile(ctcg.getCarriersFileUrl(getConfig().getContext()).getFile());
+        CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
+        new CarrierVehicleTypeReader(vehicleTypes).readFile(ctcg.getCarriersVehicleTypesFileUrl(getConfig().getContext()).getFile());
+        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
+
+        bind(Carriers.class).toInstance(carriers);
         addControlerListenerBinding().to(DeliveryGenerator.class);
     }
 }

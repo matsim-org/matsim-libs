@@ -65,9 +65,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     public final double firsttourTraveltimeBuffer;
     private final int maxIterations;
 
-    @Inject
     private Scenario scenario;
-
     private Population population;
 
     private Carriers carriers;
@@ -85,14 +83,11 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     }
 
     @Inject
-    public DeliveryGenerator(Scenario scenario, Map<String, TravelTime> travelTimes) {
+    public DeliveryGenerator(Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers) {
         CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(scenario.getConfig());
-        this.carriers = new Carriers();
+        this.carriers = carriers;
         firsttourTraveltimeBuffer = ctcg.getFirstLegTraveltimeBufferFactor();
-        new CarrierPlanXmlReaderV2(carriers).readFile(ctcg.getCarriersFileUrl(scenario.getConfig().getContext()).getFile());
-        CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(vehicleTypes).readFile(ctcg.getCarriersVehicleTypesFileUrl(scenario.getConfig().getContext()).getFile());
-        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
+
         this.scenario = scenario;
         this.population = scenario.getPopulation();
         maxIterations = ctcg.getJspritIterations();
