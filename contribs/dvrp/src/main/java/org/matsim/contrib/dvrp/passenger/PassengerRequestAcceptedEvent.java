@@ -20,28 +20,35 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.core.api.internal.HasPersonId;
+
+import java.util.Map;
 
 /**
  * @author michalm
  */
-public class PassengerRequestAcceptedEvent extends Event {
+public class PassengerRequestAcceptedEvent extends Event implements HasPersonId {
 	public static final String EVENT_TYPE = "PassengersRequest accepted";
 
 	public static final String ATTRIBUTE_MODE = "mode";
 	public static final String ATTRIBUTE_REQUEST = "request";
+	public static final String ATTRIBUTE_PASSENGER = "personId";
+
 
 	private final String mode;
 	private final Id<Request> requestId;
+	private final Id<Person> personId;
 
-	public PassengerRequestAcceptedEvent(double time, String mode, Id<Request> requestId) {
+
+	public PassengerRequestAcceptedEvent(double time, String mode, Id<Request> requestId, Id<Person> personId) {
 		super(time);
 		this.mode = mode;
 		this.requestId = requestId;
+		this.personId = personId;
 	}
 
 	@Override
@@ -66,5 +73,10 @@ public class PassengerRequestAcceptedEvent extends Event {
 		attr.put(ATTRIBUTE_MODE, mode);
 		attr.put(ATTRIBUTE_REQUEST, requestId + "");
 		return attr;
+	}
+
+	@Override
+	public Id<Person> getPersonId() {
+		return null;
 	}
 }

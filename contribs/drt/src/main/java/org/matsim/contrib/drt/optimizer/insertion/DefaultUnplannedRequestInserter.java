@@ -105,7 +105,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				}
 			} else {
 				eventsManager.processEvent(
-						new PassengerRequestAcceptedEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId()));
+                        new PassengerRequestAcceptedEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(), req.getPassengerId()));
 				BestInsertion bestInsertion = best.get();
 				insertionScheduler.scheduleRequest(bestInsertion.vehicleEntry, req, bestInsertion.insertion);
 				vData.updateEntry(bestInsertion.vehicleEntry.vehicle);
