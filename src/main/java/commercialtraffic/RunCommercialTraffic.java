@@ -21,6 +21,8 @@ package commercialtraffic;/*
  * created by jbischoff, 03.05.2019
  */
 
+import commercialtraffic.integration.CommercialTrafficConfigGroup;
+import commercialtraffic.integration.CommercialTrafficModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;

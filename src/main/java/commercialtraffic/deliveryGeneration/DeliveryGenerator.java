@@ -27,7 +27,7 @@ import com.graphhopper.jsprit.core.algorithm.termination.VariationCoefficientTer
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
-import commercialtraffic.CommercialTrafficConfigGroup;
+import commercialtraffic.integration.CommercialTrafficConfigGroup;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;

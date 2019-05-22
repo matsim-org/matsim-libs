@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic;/*
+package commercialtraffic.integration;/*
  * created by jbischoff, 08.05.2019
  */
 
