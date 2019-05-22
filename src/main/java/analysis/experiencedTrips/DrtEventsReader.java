@@ -93,8 +93,9 @@ public class DrtEventsReader extends MatsimXmlParser {
 				Id<Request> requestId = Id.create(attributes.get(PassengerRequestRejectedEvent.ATTRIBUTE_REQUEST),
 						Request.class);
 				String cause = attributes.get(PassengerRequestRejectedEvent.ATTRIBUTE_CAUSE);
+                Id<Person> personId = Id.createPersonId(attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_PERSON));
 
-				return new PassengerRequestRejectedEvent(time, mode, requestId, cause);
+                return new PassengerRequestRejectedEvent(time, mode, requestId, cause, personId);
 			}
 		};
 
