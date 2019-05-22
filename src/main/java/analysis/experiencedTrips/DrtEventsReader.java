@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package analysis.experiencedTrips;
 
-import java.util.Map;
-import java.util.Stack;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -37,6 +34,9 @@ import org.matsim.core.events.EventsReaderXMLv1.CustomEventMapper;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * An events reader which reads the default events and the additional custom events CongestionEvent, NoiseEventAffected, NoiseEventCaused.
@@ -117,9 +117,9 @@ public class DrtEventsReader extends MatsimXmlParser {
 						attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_PICKUP_TIME));
 				double dropOffDistance = Double.parseDouble(
 						attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_DROPOFF_TIME));
-
+                Id<Person> personId = Id.createPersonId(attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_PERSON));
 				return new PassengerRequestScheduledEvent(time, mode, requestId, vehicleId, pickUpTime,
-						dropOffDistance);
+                        dropOffDistance, personId);
 			}
 		};
 
