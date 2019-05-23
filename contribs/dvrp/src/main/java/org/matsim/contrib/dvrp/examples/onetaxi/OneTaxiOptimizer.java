@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
-import java.util.List;
-
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -35,13 +35,8 @@ import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpMode;
-import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.DijkstraFactory;
@@ -49,8 +44,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.util.List;
 
 /**
  * @author michalm
@@ -85,8 +79,10 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 
 	@Override
 	public void requestSubmitted(Request request) {
+		OneTaxiRequest req = (OneTaxiRequest) request;
+
 		eventsManager.processEvent(
-				new PassengerRequestAcceptedEvent(timer.getTimeOfDay(), TransportMode.taxi, request.getId()));
+				new PassengerRequestAcceptedEvent(timer.getTimeOfDay(), TransportMode.taxi, request.getId(), req.getPassengerId()));
 
 		Schedule schedule = vehicle.getSchedule();
 		StayTask lastTask = (StayTask)Schedules.getLastTask(schedule);// only WaitTask possible here
@@ -106,7 +102,6 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 				throw new IllegalStateException();
 		}
 
-		OneTaxiRequest req = (OneTaxiRequest)request;
 		Link fromLink = req.getFromLink();
 		Link toLink = req.getToLink();
 
@@ -146,7 +141,7 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 
 	/**
 	 * Simplified version. For something more advanced, see
-	 * {@link org.matsim.contrib.taxi.scheduler.TaxiScheduler#updateBeforeNextTask(DvrpVehicle)} in the taxi contrib
+	 * {@link org.matsim.contrib.taxi.scheduler(DvrpVehicle)} in the taxi contrib
 	 */
 	private void updateTimings() {
 		Schedule schedule = vehicle.getSchedule();

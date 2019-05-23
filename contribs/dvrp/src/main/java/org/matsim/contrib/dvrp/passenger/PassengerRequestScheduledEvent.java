@@ -20,14 +20,14 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.core.api.internal.HasPersonId;
+
+import java.util.Map;
 
 /**
  * @author michalm
@@ -50,12 +50,7 @@ public final class PassengerRequestScheduledEvent extends Event implements HasPe
 
 
 	/**
-	 * yyyy (1) could we add the personId of the passenger here?  I can see that we could potentially also transport freight item, but this event already has "passenger" in
-	 * its name. kai, mar'19
-	 * yyyy (2) And if so, could we please use {@link org.matsim.core.api.internal.HasPersonId}?   I know that "person" is less
-	 * expressive here than "passenger" (since, e.g., there might also be a human taxi driver).  It is, however, the interface
-	 * that we use across matsim for such things.  kai, mar'19
-	 * (I have now tentatively included these things since they are useful for debugging  kai, mar'19(
+     * An event processed upon request submission.
 	 */
 	public PassengerRequestScheduledEvent( double time, String mode, Id<Request> requestId, Id<DvrpVehicle> vehicleId,
 							   double pickupTime, double dropoffTime, Id<Person> personId ) {

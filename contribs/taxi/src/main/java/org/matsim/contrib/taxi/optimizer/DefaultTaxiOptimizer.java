@@ -19,10 +19,6 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
@@ -37,6 +33,10 @@ import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
 
 /**
  * @author michalm
@@ -72,7 +72,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 		if (requiresReoptimization && isNewDecisionEpoch(e, params.reoptimizationTimeStep)) {
 			for (TaxiRequest req : unplannedRequests) {
 				eventsManager.processEvent(
-						new PassengerRequestAcceptedEvent(e.getSimulationTime(), taxiCfg.getMode(), req.getId()));
+                        new PassengerRequestAcceptedEvent(e.getSimulationTime(), taxiCfg.getMode(), req.getId(), req.getPassengerId()));
 			}
 
 			if (params.doUnscheduleAwaitingRequests) {
