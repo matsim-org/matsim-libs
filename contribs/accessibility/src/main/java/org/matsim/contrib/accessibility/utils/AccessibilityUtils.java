@@ -277,7 +277,7 @@ public class AccessibilityUtils {
 					}
 				}
 			}
-			LOG.warn(additionalDataFacilitiesToAssign + " have not been assigned to a measure point geometry.");
+			LOG.warn(additionalDataFacilitiesToAssign + " additional data facilies have not been assigned to a measure point geometry.");
 		}
 		LOG.info("Finished assigning additional facilities data to measure point.");
 	}

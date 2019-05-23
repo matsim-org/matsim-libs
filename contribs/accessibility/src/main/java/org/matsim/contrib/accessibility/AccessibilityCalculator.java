@@ -215,7 +215,7 @@ public final class AccessibilityCalculator {
 			}
 //			LOG.info("--- numberOfObjects = " + jco.getNumberOfObjects() + " --- objectIds = " + jco.getObjectIds());
 		}
-		LOG.warn("Here is an error in the aggregation! Fix this soon with other changes that alter test reults!");
+		LOG.info("Quite convoluted aggregation here...");
 		LOG.info("Aggregated " + opportunities.getFacilities().size() + " opportunities to " + opportunityClusterMap.size() + " nodes.");
 		return opportunityClusterMap.values().toArray(new AggregationObject[opportunityClusterMap.size()]);
 	}
@@ -246,7 +246,7 @@ public final class AccessibilityCalculator {
 	public final void putAccessibilityContributionCalculator(String mode, AccessibilityContributionCalculator calculator) {
 		LOG.info("Adding accessibility contribution calculator for " + mode + ".");
 		Gbl.assertNotNull(calculator);
-		this.calculators.put(mode , calculator) ;
+		this.calculators.put(mode, calculator) ;
 	}
 
 	public Set<String> getModes() {
