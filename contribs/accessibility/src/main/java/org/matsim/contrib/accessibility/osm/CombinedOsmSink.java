@@ -508,6 +508,12 @@ public class CombinedOsmSink implements Sink {
 				buildingLevels = (Integer.parseInt(subString[0]));
 				log.warn("Simplified level number of building " + entityKey + " by truncating decimal places.");
 				
+			} else if (buildingLevelsAsString.contains("+")) {
+				log.info("Level string of building " + entityKey + " is " + buildingLevelsAsString + ".");
+				String[] subString = buildingLevelsAsString.split("+");
+				buildingLevels = (Integer.parseInt(subString[0])) + 1;
+				log.warn("Simplified level number of building " + entityKey + " by using numeric number plus one floor for additional non-numeric information.");
+				
 			} else {
 				buildingLevels = Integer.parseInt(buildingLevelsAsString);
 			}
