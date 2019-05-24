@@ -37,15 +37,22 @@ public class DeliveryGeneratorTest {
         generator.notifyBeforeMobsim(new BeforeMobsimEvent(null, 0));
     }
 
-    private Carriers generateCarriers() {
+    public static Carriers generateCarriers() {
         Carriers carriers = new Carriers();
         Carrier pizza_1 = CarrierImpl.newInstance(Id.create("pizza_1", Carrier.class));
+        Carrier pizza_2 = CarrierImpl.newInstance(Id.create("pizza_2", Carrier.class));
         Carrier shopping_1 = CarrierImpl.newInstance(Id.create("shopping_1", Carrier.class));
         carriers.addCarrier(pizza_1);
+        carriers.addCarrier(pizza_2);
         carriers.addCarrier(shopping_1);
         pizza_1.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
         pizza_1.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(Id.createVehicleId(1), Id.createLinkId(111), "one"));
         pizza_1.getCarrierCapabilities().getVehicleTypes().add(createLightType());
+
+        pizza_2.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+        pizza_2.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(Id.createVehicleId(1), Id.createLinkId(111), "one"));
+        pizza_2.getCarrierCapabilities().getVehicleTypes().add(createLightType());
+
 
         shopping_1.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
         shopping_1.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(Id.createVehicleId(2), Id.createLinkId(111), "one"));
@@ -93,7 +100,7 @@ public class DeliveryGeneratorTest {
     }
 
 
-    private static CarrierVehicle getLightVehicle(Id<?> id, Id<Link> homeId, String depot) {
+    public static CarrierVehicle getLightVehicle(Id<?> id, Id<Link> homeId, String depot) {
         CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create(("carrier_" + id.toString() + "_lightVehicle_" + depot), Vehicle.class), homeId);
         vBuilder.setEarliestStart(6 * 60 * 60);
         vBuilder.setLatestEnd(16 * 60 * 60);
@@ -101,7 +108,7 @@ public class DeliveryGeneratorTest {
         return vBuilder.build();
     }
 
-    private static CarrierVehicleType createLightType() {
+    public static CarrierVehicleType createLightType() {
         CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create("small", VehicleType.class));
         typeBuilder.setCapacity(6);
         typeBuilder.setFixCost(80.0);

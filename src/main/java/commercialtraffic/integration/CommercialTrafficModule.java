@@ -22,14 +22,23 @@ package commercialtraffic.integration;/*
  */
 
 import commercialtraffic.deliveryGeneration.DeliveryGenerator;
+import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import org.matsim.contrib.freight.carrier.*;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 public class CommercialTrafficModule extends AbstractModule {
 
 
     @Override
     public void install() {
+
         CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(getConfig());
         Carriers carriers = new Carriers();
         new CarrierPlanXmlReaderV2(carriers).readFile(ctcg.getCarriersFileUrl(getConfig().getContext()).getFile());
@@ -39,5 +48,20 @@ public class CommercialTrafficModule extends AbstractModule {
 
         bind(Carriers.class).toInstance(carriers);
         addControlerListenerBinding().to(DeliveryGenerator.class);
+
+        addPlanStrategyBinding(ChangeDeliveryServiceOperator.SELECTOR_NAME).toProvider(new Provider<PlanStrategy>() {
+            @Inject
+            Config config;
+            @Inject
+            Carriers carriers;
+
+            @Override
+            public PlanStrategy get() {
+                final PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
+                builder.addStrategyModule(new ChangeDeliveryServiceOperator(config.global(), carriers));
+                return builder.build();
+            }
+        });
+
     }
 }

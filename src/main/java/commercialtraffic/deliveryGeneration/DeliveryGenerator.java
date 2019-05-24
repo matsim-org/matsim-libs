@@ -170,7 +170,6 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         }
 
 
-        new CarrierPlanXmlWriterV2(carriers).write("test-carriers.xml");
     }
 
     private void createFreightAgents() {
@@ -234,8 +233,9 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
                 plan.setPerson(driverPerson);
 
                 scenario.getPopulation().addPerson(driverPerson);
-                if (!scenario.getVehicles().getVehicleTypes().containsKey(carrierVehicle.getVehicleTypeId())) {
+                try {
                     scenario.getVehicles().addVehicleType(carrierVehicle.getVehicleType());
+                } catch (IllegalArgumentException e) {
                 }
                 Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
                 scenario.getVehicles().addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getVehicleType()));
@@ -264,5 +264,10 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         freightDrivers.forEach(d -> scenario.getPopulation().removePerson(d));
         freightVehicles.forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
         CarrierVehicleTypes.getVehicleTypes(carriers).getVehicleTypes().keySet().forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
+        carriers.getCarriers().values().forEach(carrier -> {
+            carrier.getServices().clear();
+            carrier.getShipments().clear();
+            carrier.clearPlans();
+        });
     }
 }
