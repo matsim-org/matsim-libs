@@ -2,6 +2,7 @@ package org.matsim.codeexamples.mobsim.mobsimPassingVehicleQ;
 
 import java.io.File;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
@@ -16,17 +17,20 @@ public class RunMobsimWithMultipleModeVehiclesExampleTest {
 
 	@Test
 	public void test() {
-		// using an appropriate config file, that is included in the repository.
-		// unfortunately, the test now depends on this file. if someone removes/changes it, problems might occur.
-		String[] args = {"scenarios/equil/example5-config.xml"};
+		String[] args = {
+			  "scenarios/equil/example5-config.xml",
+			  "--config:controler.outputDirectory", utils.getOutputDirectory(),
+			  "--config:controler.lastIteration=2",
+			  "--config:controler.writeEventsInterval=1"
+		} ;
 
-		RunMobsimWithMultipleModeVehiclesExample matsim = new RunMobsimWithMultipleModeVehiclesExample( args );
+		try{
+			RunMobsimWithMultipleModeVehiclesExample.main( args );
+		} catch ( Exception ee ) {
+			ee.printStackTrace();
+			Assert.fail();
+		}
 
-		Config config = matsim.prepareConfig() ;
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-
-		matsim.run() ;
 	}
 
 }
