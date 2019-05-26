@@ -85,7 +85,7 @@ final class RunMultipleModesExample{
 			config.qsim().setMainModes( new HashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ) ) ) ;
 		}
 
-		config.travelTimeCalculator().setSeparateModes( true ); // otherwise, router will use speeds averaged over modes.
+		config.travelTimeCalculator().setSeparateModes( true ); // otherwise, router will use speeds averaged over modes.  For 11.x, this is the default.
 //		config.travelTimeCalculator().setSeparateModes( false ); // this used to be the default
 
 //		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
