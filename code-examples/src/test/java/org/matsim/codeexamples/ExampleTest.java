@@ -1,5 +1,6 @@
 package org.matsim.codeexamples;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -92,11 +93,21 @@ public class ExampleTest {
 
 	@Test
 	public void testRunAbcExample() {
-		RunAbcSimpleExample abc = new RunAbcSimpleExample() ;
-		Config config = abc.prepareConfig() ;
-		config.controler().setOverwriteFileSetting( deleteDirectoryIfExists );
-		config.controler().setLastIteration( 2 );
-		abc.run() ;
+		// using an appropriate config file, that is included in the repository.
+		// unfortunately, the test now depends on this file. if someone removes/changes it, problems might occur.
+		String[] args = {
+			  "scenarios/equil/example5-config.xml",
+			  "--config:controler.outputDirectory", utils.getOutputDirectory(),
+			  "--config:controler.lastIteration=1",
+			  "--config:controler.writeEventsInterval=1"
+		} ;
+
+		try{
+			RunAbcExample.main( args );
+		} catch ( Exception ee ) {
+			ee.printStackTrace();
+			Assert.fail();
+		}
 	}
 	
 }

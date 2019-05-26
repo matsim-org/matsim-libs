@@ -10,20 +10,13 @@ import org.matsim.examples.ExamplesUtils;
 
 public final class RunAbcSimpleExample{
 
-	private Config config = null ;
-
 	public static void main ( String [] args ) {
-		new RunAbcSimpleExample().run() ;
-	}
 
-	public final Config prepareConfig() {
-		config = ConfigUtils.loadConfig( IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) ) ;
-		return config ;
-	}
-
-	void run() {
-		if ( config==null ) {
-			prepareConfig() ;
+		Config config ;
+		if ( args != null && args.length>=1 ) {
+			config = ConfigUtils.loadConfig( args ) ;
+		} else {
+			config = ConfigUtils.loadConfig( IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) ) ;
 		}
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );

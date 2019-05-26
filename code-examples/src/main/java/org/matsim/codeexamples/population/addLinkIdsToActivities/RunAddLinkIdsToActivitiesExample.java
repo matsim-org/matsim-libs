@@ -1,4 +1,4 @@
-package org.matsim.codeexamples.population.addLinkIds;
+package org.matsim.codeexamples.population.addLinkIdsToActivities;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -12,7 +12,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-class RunAddLinkIdsExample{
+class RunAddLinkIdsToActivitiesExample{
 
 	public static void main( String[] args ){
 
