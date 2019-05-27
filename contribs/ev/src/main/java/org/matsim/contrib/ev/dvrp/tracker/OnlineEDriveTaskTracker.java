@@ -46,10 +46,9 @@ public class OnlineEDriveTaskTracker implements OnlineDriveTaskTracker, ETaskTra
 	public double predictSocAtEnd() {
 		ElectricVehicle ev = vehicle.getElectricVehicle();
 		double currentSoc = ev.getBattery().getSoc();
-		double driveEnergy = TaskEnergyConsumptions.calcRemainingDriveEnergy(ev, driveTracker.getPath(),
-				driveTracker.getCurrentLinkIdx());
-		double auxEnergy = TaskEnergyConsumptions.calcAuxEnergy(ev, timer.getTimeOfDay(),
-				driveTracker.predictEndTime());
+		double driveEnergy = TaskEnergyConsumptions.calcRemainingDriveEnergy(ev, getPath(), getCurrentLinkIdx(),
+				getCurrentLinkEnterTime());
+		double auxEnergy = TaskEnergyConsumptions.calcAuxEnergy(ev, timer.getTimeOfDay(), predictEndTime());
 		return currentSoc - driveEnergy - auxEnergy;
 	}
 
