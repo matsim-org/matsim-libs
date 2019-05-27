@@ -28,6 +28,8 @@ import com.google.common.collect.ImmutableList;
  * @author Michal Maciejewski (michalm)
  */
 public interface ElectricVehicleSpecification {
+	String DEFAULT_VEHICLE_TYPE = "defaultVehicleType";
+
 	Id<ElectricVehicle> getId();
 
 	String getVehicleType();

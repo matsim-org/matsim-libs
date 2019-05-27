@@ -20,14 +20,13 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import com.google.common.collect.ImmutableList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 
-public class ElectricVehicleImpl implements ElectricVehicle {
-    public static final String DEFAULT_VEHICLE_TYPE = "defaultVehicleType";
+import com.google.common.collect.ImmutableList;
 
+public class ElectricVehicleImpl implements ElectricVehicle {
     private final ElectricVehicleSpecification vehicleSpecification;
     private final Battery battery;
 
