@@ -81,6 +81,11 @@ public class OnlineDriveTaskTrackerImpl implements OnlineDriveTaskTracker {
 	}
 
 	@Override
+	public double getCurrentLinkEnterTime() {
+		return linkEnterTime;
+	}
+
+	@Override
 	public void movedOverNode(Link nextLink) {
 		currentLinkIdx++;
 		linkEnterTime = timer.getTimeOfDay();

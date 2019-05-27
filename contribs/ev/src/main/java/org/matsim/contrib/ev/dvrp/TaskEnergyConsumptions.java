@@ -24,19 +24,20 @@ import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * @author michalm
  */
 public class TaskEnergyConsumptions {
 	public static double calcTotalEnergyConsumption(ElectricVehicle ev, Task task) {
-		double driveEnergy = task instanceof DriveTask ? calcDriveEnergy(ev, ((DriveTask)task).getPath()) : 0;
+		double driveEnergy = task instanceof DriveTask ?
+				calcDriveEnergy(ev, ((DriveTask)task).getPath(), task.getBeginTime()) :
+				0;
 		return calcAuxEnergy(ev, task) + driveEnergy;
 	}
 
-	public static double calcTotalEnergyConsumption(ElectricVehicle ev, VrpPathWithTravelData path) {
-		return calcAuxEnergy(ev, path.getDepartureTime(), path.getArrivalTime()) + calcDriveEnergy(ev, path);
+	public static double calcTotalEnergyConsumption(ElectricVehicle ev, VrpPathWithTravelData path, double beginTime) {
+		return calcAuxEnergy(ev, path.getDepartureTime(), path.getArrivalTime()) + calcDriveEnergy(ev, path, beginTime);
 	}
 
 	public static double calcAuxEnergy(ElectricVehicle ev, Task task) {
@@ -44,18 +45,20 @@ public class TaskEnergyConsumptions {
 	}
 
 	public static double calcAuxEnergy(ElectricVehicle ev, double beginTime, double endTime) {
-		return ev.getAuxEnergyConsumption().calcEnergyConsumption(endTime - beginTime, beginTime);
+		return ev.getAuxEnergyConsumption().calcEnergyConsumption(beginTime, endTime - beginTime);
 	}
 
-	public static double calcDriveEnergy(ElectricVehicle ev, VrpPath path) {
-		return calcRemainingDriveEnergy(ev, path, 1);// skip first link
+	public static double calcDriveEnergy(ElectricVehicle ev, VrpPath path, double beginTime) {
+		return calcRemainingDriveEnergy(ev, path, 1, beginTime + 1);// skip first link
 	}
 
-	public static double calcRemainingDriveEnergy(ElectricVehicle ev, VrpPath path, int currentLinkIdx) {
+	public static double calcRemainingDriveEnergy(ElectricVehicle ev, VrpPath path, int currentLinkIdx,
+			double currentLinkEnterTime) {
 		DriveEnergyConsumption consumption = ev.getDriveEnergyConsumption();
 		double energy = 0;
 		for (int i = Math.max(currentLinkIdx, 1); i < path.getLinkCount(); i++) {// skip first link
-			energy += consumption.calcEnergyConsumption(path.getLink(i), path.getLinkTravelTime(i), Time.getUndefinedTime());
+			energy += consumption.calcEnergyConsumption(path.getLink(i), path.getLinkTravelTime(i),
+					currentLinkEnterTime);
 		}
 		return energy;
 	}

@@ -23,9 +23,9 @@ import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.dvrp.TaskEnergyConsumptions;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 /**
  * @author michalm
@@ -34,7 +34,7 @@ public class EDrtTaskFactoryImpl implements DrtTaskFactory {
 	@Override
 	public EDrtDriveTask createDriveTask(DvrpVehicle vehicle, VrpPathWithTravelData path) {
 		ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
-		double totalEnergy = TaskEnergyConsumptions.calcTotalEnergyConsumption(ev, path);
+		double totalEnergy = TaskEnergyConsumptions.calcTotalEnergyConsumption(ev, path, path.getDepartureTime());
 		return new EDrtDriveTask(path, totalEnergy);
 	}
 

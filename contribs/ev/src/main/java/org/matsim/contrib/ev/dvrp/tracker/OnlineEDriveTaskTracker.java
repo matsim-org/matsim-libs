@@ -23,9 +23,9 @@ import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.dvrp.TaskEnergyConsumptions;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
@@ -46,10 +46,9 @@ public class OnlineEDriveTaskTracker implements OnlineDriveTaskTracker, ETaskTra
 	public double predictSocAtEnd() {
 		ElectricVehicle ev = vehicle.getElectricVehicle();
 		double currentSoc = ev.getBattery().getSoc();
-		double driveEnergy = TaskEnergyConsumptions.calcRemainingDriveEnergy(ev, driveTracker.getPath(),
-				driveTracker.getCurrentLinkIdx());
-		double auxEnergy = TaskEnergyConsumptions.calcAuxEnergy(ev, timer.getTimeOfDay(),
-				driveTracker.predictEndTime());
+		double driveEnergy = TaskEnergyConsumptions.calcRemainingDriveEnergy(ev, getPath(), getCurrentLinkIdx(),
+				getCurrentLinkEnterTime());
+		double auxEnergy = TaskEnergyConsumptions.calcAuxEnergy(ev, timer.getTimeOfDay(), predictEndTime());
 		return currentSoc - driveEnergy - auxEnergy;
 	}
 
@@ -66,6 +65,11 @@ public class OnlineEDriveTaskTracker implements OnlineDriveTaskTracker, ETaskTra
 	@Override
 	public int getCurrentLinkIdx() {
 		return driveTracker.getCurrentLinkIdx();
+	}
+
+	@Override
+	public double getCurrentLinkEnterTime() {
+		return driveTracker.getCurrentLinkEnterTime();
 	}
 
 	@Override
