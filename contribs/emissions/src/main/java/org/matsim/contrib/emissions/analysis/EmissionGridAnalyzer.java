@@ -52,7 +52,7 @@ public class EmissionGridAnalyzer {
     private final Geometry bounds;
     private TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> emissionsByPollutant;
     private TimeBinMap<Grid<Map<Pollutant, Double>>> binHolder;
-    private Iterator<TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>>> bins;
+    private Iterator<TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>>> timeBins;
 
     private double shortestDistanceWithWeightToZero = Double.MAX_VALUE;
 
@@ -66,6 +66,7 @@ public class EmissionGridAnalyzer {
         this.smoothingRadius = smoothingRadius;
         this.countScaleFactor = countScaleFactor;
         this.bounds = bounds;
+        this.timeBins = null;
     }
 
     /**
@@ -96,6 +97,12 @@ public class EmissionGridAnalyzer {
     }
 
 
+    /**
+     * Process the events file of the given path, and set up an iterator that will be used for
+     * returning the results one bin at a time; see processNextTimeBin().
+     *
+     * @param eventsFile
+     */
     public void processTimeBinsWithEmissions(String eventsFile) {
 
         this.emissionsByPollutant = processEventsFile(eventsFile);
@@ -103,13 +110,33 @@ public class EmissionGridAnalyzer {
         logger.info("!! Event data ready for first time bin grid.");
 
         this.binHolder = new TimeBinMap<>(binSize);
-        this.bins = this.emissionsByPollutant.getTimeBins().iterator();
+        this.timeBins = this.emissionsByPollutant.getTimeBins().iterator();
     }
 
-    public Tuple<Double, String> processNextTimeBin() {
-        if (!this.bins.hasNext()) return null;
+    /**
+     * Whether or not there are more time bins to process
+     * @throws RuntimeException if processTimeBinsWithEmissions was not called before this method
+     */
+    public boolean hasNextTimeBin() {
+        if (this.timeBins == null) throw new RuntimeException("Must call processTimeBinsWithEmissions() first.");
 
-        TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> nextBin = this.bins.next();
+        return this.timeBins.hasNext();
+    }
+
+    /**
+     * Generate the emissions grid data for the next time bin. Requires that the events file has already
+     * been processed by calling processTimeBinsWithEmissions(). This method should be called in a loop
+     * to exhaust the time bin iterator.
+     *
+     * @return tuple containing the start time of the next time bin and the emissions grid for that time bin. Returns
+     * null if there are no further time bins.
+     *
+     */
+    public Tuple<Double, String> processNextTimeBin() {
+        if (this.timeBins == null) throw new RuntimeException("Must call processTimeBinsWithEmissions() first.");
+        if (!this.timeBins.hasNext()) throw new RuntimeException("processNextTimeBin() was called too many times");
+
+        TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> nextBin = this.timeBins.next();
         logger.info("creating grid for time bin with start time: " + nextBin.getStartTime());
 
         Grid<Map<Pollutant, Double>> grid = writeAllLinksToGrid(nextBin.getValue());
