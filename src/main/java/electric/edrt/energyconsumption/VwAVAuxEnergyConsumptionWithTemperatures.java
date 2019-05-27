@@ -1,13 +1,13 @@
 package electric.edrt.energyconsumption;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.commons.math.ArgumentOutsideDomainException;
 import org.apache.commons.math.analysis.interpolation.LinearInterpolator;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.temperature.TemperatureService;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * @author Joschka Bischoff
@@ -51,7 +51,7 @@ public class VwAVAuxEnergyConsumptionWithTemperatures implements AuxEnergyConsum
 	}
 
 	@Override
-	public double calcEnergyConsumption(double period, double timeOfDay) {
+	public double calcEnergyConsumption(double beginTime, double duration) {
 		if (tracker.isAtCharger(ev.getId()))
 			return 0;
 		double temp = temperatureService.getCurrentTemperature();
@@ -62,7 +62,7 @@ public class VwAVAuxEnergyConsumptionWithTemperatures implements AuxEnergyConsum
 			throw new IllegalArgumentException("Reported temperature " + temp + " is out of bound.");
 
 		}
-		return period * (AVauxConsumption_per_s + auxConsumption_per_s + consumptionTemp);
+		return duration * (AVauxConsumption_per_s + auxConsumption_per_s + consumptionTemp);
 	}
 
 }

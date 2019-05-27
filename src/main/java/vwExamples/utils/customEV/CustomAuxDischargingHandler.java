@@ -19,7 +19,9 @@
 
 package vwExamples.utils.customEV;
 
-import com.google.inject.Inject;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -36,8 +38,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.google.inject.Inject;
 
 /**
  * This AUX Discharge runs also when vehicles are not in use. This is handy for
@@ -71,7 +72,8 @@ public class CustomAuxDischargingHandler
 					 //System.out.println("Do not discharge " + ev.getId());
 
 				} else {
-					double energy = ev.getAuxEnergyConsumption().calcEnergyConsumption(auxDischargeTimeStep, e.getSimulationTime());
+					double energy = ev.getAuxEnergyConsumption()
+							.calcEnergyConsumption(e.getSimulationTime(), auxDischargeTimeStep);
 					ev.getBattery().discharge(energy);
 				}
 
