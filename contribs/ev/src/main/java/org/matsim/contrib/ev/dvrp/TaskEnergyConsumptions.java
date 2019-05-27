@@ -44,7 +44,7 @@ public class TaskEnergyConsumptions {
 	}
 
 	public static double calcAuxEnergy(ElectricVehicle ev, double beginTime, double endTime) {
-		return ev.getAuxEnergyConsumption().calcEnergyConsumption(endTime - beginTime, beginTime);
+		return ev.getAuxEnergyConsumption().calcEnergyConsumption(beginTime, endTime - beginTime);
 	}
 
 	public static double calcDriveEnergy(ElectricVehicle ev, VrpPath path) {

@@ -18,6 +18,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.ev.routing;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -49,8 +55,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
-
-import java.util.*;
 
 /**
  * This network Routing module adds stages for re-charging into the Route.
@@ -203,7 +207,7 @@ public final class EVNetworkRoutingModule implements RoutingModule {
             double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime(), null, null);
             double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, Time.getUndefinedTime());
             if (auxEnergyConsumption != null) {
-                consumption += auxEnergyConsumption.calcEnergyConsumption(travelT, basicLeg.getDepartureTime());
+				consumption += auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime(), travelT);
             }
             consumptions.put(l, consumption);
         }

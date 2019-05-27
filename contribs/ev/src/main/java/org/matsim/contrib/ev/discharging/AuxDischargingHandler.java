@@ -19,12 +19,13 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import com.google.inject.Inject;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+
+import com.google.inject.Inject;
 
 /**
  * This AUX Discharge runs also when vehicles are not in use. This is handy for vehicles with idle engines, such as taxis (where heating is on while the vehicle is idle), but should not be used with ordinary passenger cars.
@@ -43,7 +44,8 @@ public class AuxDischargingHandler implements MobsimAfterSimStepListener {
 	public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
 		if ((e.getSimulationTime() + 1) % auxDischargeTimeStep == 0) {
 			for (ElectricVehicle ev : evFleet.getElectricVehicles().values()) {
-				double energy = ev.getAuxEnergyConsumption().calcEnergyConsumption(auxDischargeTimeStep, e.getSimulationTime() + 1);
+				double energy = ev.getAuxEnergyConsumption()
+						.calcEnergyConsumption(e.getSimulationTime() + 1, auxDischargeTimeStep);
 				ev.getBattery().discharge(energy);
 			}
 		}

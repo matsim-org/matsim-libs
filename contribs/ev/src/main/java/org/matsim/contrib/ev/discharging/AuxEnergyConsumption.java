@@ -26,5 +26,5 @@ public interface AuxEnergyConsumption {
 		AuxEnergyConsumption create(ElectricVehicle electricVehicle);
 	}
 
-	double calcEnergyConsumption(double period, double timeOfDay);
+	double calcEnergyConsumption(double beginTime, double duration);
 }
