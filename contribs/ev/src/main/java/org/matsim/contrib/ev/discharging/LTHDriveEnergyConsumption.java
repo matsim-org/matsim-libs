@@ -90,7 +90,7 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 	}
 
 	@Override
-	public double calcEnergyConsumption(Link link, double travelTime, double linkLeaveTime) {
+	public double calcEnergyConsumption(Link link, double travelTime, double linkEnterTime) {
 		double length = link.getLength();
 		double speed = length / travelTime;
 
