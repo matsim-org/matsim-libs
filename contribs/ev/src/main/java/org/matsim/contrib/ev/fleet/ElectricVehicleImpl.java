@@ -27,55 +27,52 @@ import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import com.google.common.collect.ImmutableList;
 
 public class ElectricVehicleImpl implements ElectricVehicle {
-    private final ElectricVehicleSpecification vehicleSpecification;
-    private final Battery battery;
+	public static ElectricVehicle create(ElectricVehicleSpecification vehicleSpecification,
+			DriveEnergyConsumption.Factory driveFactory, AuxEnergyConsumption.Factory auxFactory) {
+		ElectricVehicleImpl ev = new ElectricVehicleImpl(vehicleSpecification);
+		ev.driveEnergyConsumption = driveFactory == null ? null : driveFactory.create(ev);
+		ev.auxEnergyConsumption = auxFactory == null ? null : auxFactory.create(ev);
+		return ev;
+	}
 
-    private DriveEnergyConsumption driveEnergyConsumption;
-    private AuxEnergyConsumption auxEnergyConsumption;
+	private final ElectricVehicleSpecification vehicleSpecification;
+	private final Battery battery;
 
+	private DriveEnergyConsumption driveEnergyConsumption;
+	private AuxEnergyConsumption auxEnergyConsumption;
 
-    public static ElectricVehicle create(ElectricVehicleSpecification vehicleSpecification, DriveEnergyConsumption.Factory driveFactory, AuxEnergyConsumption.Factory auxFactory) {
-        ElectricVehicleImpl ev = new ElectricVehicleImpl(vehicleSpecification);
-        ev.driveEnergyConsumption = driveFactory == null ? null : driveFactory.create(ev);
-        ev.auxEnergyConsumption = auxFactory == null ? null : auxFactory.create(ev);
+	private ElectricVehicleImpl(ElectricVehicleSpecification vehicleSpecification) {
+		this.vehicleSpecification = vehicleSpecification;
+		battery = new BatteryImpl(vehicleSpecification.getBatteryCapacity(), vehicleSpecification.getInitialSoc());
+	}
 
-        return ev;
-    }
+	@Override
+	public Id<ElectricVehicle> getId() {
+		return vehicleSpecification.getId();
+	}
 
+	@Override
+	public Battery getBattery() {
+		return battery;
+	}
 
-    private ElectricVehicleImpl(ElectricVehicleSpecification vehicleSpecification) {
-        this.vehicleSpecification = vehicleSpecification;
-        battery = new BatteryImpl(vehicleSpecification.getBatteryCapacity(), vehicleSpecification.getInitialSoc());
+	@Override
+	public String getVehicleType() {
+		return vehicleSpecification.getVehicleType();
+	}
 
-    }
+	@Override
+	public ImmutableList<String> getChargerTypes() {
+		return vehicleSpecification.getChargerTypes();
+	}
 
-    @Override
-    public Id<ElectricVehicle> getId() {
-        return vehicleSpecification.getId();
-    }
+	@Override
+	public DriveEnergyConsumption getDriveEnergyConsumption() {
+		return driveEnergyConsumption;
+	}
 
-    @Override
-    public Battery getBattery() {
-        return battery;
-    }
-
-    @Override
-    public String getVehicleType() {
-        return vehicleSpecification.getVehicleType();
-    }
-
-    @Override
-    public ImmutableList<String> getChargerTypes() {
-        return vehicleSpecification.getChargerTypes();
-    }
-
-    @Override
-    public DriveEnergyConsumption getDriveEnergyConsumption() {
-        return driveEnergyConsumption;
-    }
-
-    @Override
-    public AuxEnergyConsumption getAuxEnergyConsumption() {
-        return auxEnergyConsumption;
-    }
+	@Override
+	public AuxEnergyConsumption getAuxEnergyConsumption() {
+		return auxEnergyConsumption;
+	}
 }
