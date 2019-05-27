@@ -20,7 +20,7 @@ public class VwDrtDriveEnergyConsumption implements DriveEnergyConsumption {
 
 
 	@Override
-	public double calcEnergyConsumption(Link link, double travelTime, double timeOfDay) {
+	public double calcEnergyConsumption(Link link, double travelTime, double linkLeaveTime) {
 
 		//double speed_kmh = link.getLength() / travelTime * 3.6;		
 //		double speedControl_kmh = link.getLength() / travelTime * 3.6;
