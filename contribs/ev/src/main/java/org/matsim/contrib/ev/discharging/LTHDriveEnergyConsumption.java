@@ -21,7 +21,6 @@ package org.matsim.contrib.ev.discharging;/*
  * created by jbischoff, 23.08.2018
  */
 
-import com.google.common.primitives.Doubles;
 import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolatingFunction;
 import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolator;
 import org.apache.log4j.Logger;
@@ -31,6 +30,8 @@ import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.VehicleType;
+
+import com.google.common.primitives.Doubles;
 
 public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 
@@ -89,7 +90,7 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 	}
 
 	@Override
-	public double calcEnergyConsumption(Link link, double travelTime, double timeOfDay) {
+	public double calcEnergyConsumption(Link link, double travelTime, double linkLeaveTime) {
 		double length = link.getLength();
 		double speed = length / travelTime;
 

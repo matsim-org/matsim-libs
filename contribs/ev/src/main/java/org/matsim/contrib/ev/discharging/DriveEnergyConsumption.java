@@ -32,15 +32,10 @@ public interface DriveEnergyConsumption {
 	}
 
 	/**
-	 * @param link       Link where energy is consumed
-	 * @param travelTime TravelTime spent on link
-	 * @param timeOfDay  time of link Leave (may be undefined)
+	 * @param link          Link where energy is consumed
+	 * @param travelTime    TravelTime spent on link
+	 * @param linkLeaveTime time of link Leave (may be undefined)
 	 * @return energy consumed by vehicle on link in J
 	 */
-	double calcEnergyConsumption(Link link, double travelTime, double timeOfDay);
-
-
-	;
-
-
+	double calcEnergyConsumption(Link link, double travelTime, double linkLeaveTime);
 }
