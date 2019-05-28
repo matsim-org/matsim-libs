@@ -27,10 +27,10 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.etaxi.ETaxiChargingTask;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.BestChargerFinder;
-import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.data.Charger;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
+import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
@@ -55,7 +55,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 			TravelDisutility travelDisutility, RuleBasedETaxiOptimizerParams params,
 			ChargingInfrastructure chargingInfrastructure) {
 		return RuleBasedETaxiOptimizer.create(eventsManager, taxiCfg, fleet, eScheduler, network, timer, travelTime,
-				travelDisutility, params, chargingInfrastructure, new SquareGridSystem(network, params.cellSize));
+				travelDisutility, params, chargingInfrastructure, new SquareGridSystem(network, params.getCellSize()));
 	}
 
 	public static RuleBasedETaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,

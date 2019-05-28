@@ -49,7 +49,7 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 			TaxiScheduler scheduler, Network network, MobsimTimer timer, TravelTime travelTime,
 			TravelDisutility travelDisutility, RuleBasedTaxiOptimizerParams params) {
 		return create(eventsManager, taxiCfg, fleet, scheduler, network, timer, travelTime, travelDisutility, params,
-				new SquareGridSystem(network, params.cellSize));
+				new SquareGridSystem(network, params.getCellSize()));
 	}
 
 	public static RuleBasedTaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,

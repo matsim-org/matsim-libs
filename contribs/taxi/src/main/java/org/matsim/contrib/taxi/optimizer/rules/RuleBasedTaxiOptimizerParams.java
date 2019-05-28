@@ -19,24 +19,56 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 import org.apache.commons.configuration.Configuration;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
 
 public class RuleBasedTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public static final String GOAL = "goal";
+	static final String GOAL_EXP = "Optimisation goal, one of:"
+			+ " MIN_WAIT_TIME (aka 'nearest idle taxi', a request-initiated dispatch),"
+			+ " MIN_PICKUP_TIME (aka 'nearest open request', a vehicle-initiated dispatch),"
+			+ " DEMAND_SUPPLY_EQUIL (aka 'demand-supply balancing' or 'nearest idle taxi/nearest open request';"
+			+ " switches between two modes depending on the demand-supply balance)."
+			+ " The default and recommended value is DEMAND_SUPPLY_EQUIL."
+			+ " See: M. Maciejewski, J. Bischoff, K. Nagel: An assignment-based approach to efficient real-time"
+			+ " city-scale taxi dispatching. IEEE Intelligent Systems, 2016.";
+	@NotNull
+	private Goal goal = Goal.DEMAND_SUPPLY_EQUIL;
 
 	public static final String NEAREST_REQUESTS_LIMIT = "nearestRequestsLimit";
+	static final String NEAREST_REQUESTS_LIMIT_EXP = "Limits the number of open requests considered during"
+			+ " a vehicle-initiated dispatch to 'nearestRequestsLimit' nearest to a given location"
+			+ " using pre-calculated distances between zone centroids."
+			+ " Used to speed up computations."
+			+ " Values 20 to 40 make a good trade-off between computational speed and quality of results."
+			+ " To turn off this feature - specify a sufficiently big number."
+			+ " The default value is 30.";
+	@Positive
+	private int nearestRequestsLimit = 30;
+
 	public static final String NEAREST_VEHICLES_LIMIT = "nearestVehiclesLimit";
+	static final String NEAREST_VEHICLES_LIMIT_EXP = "Limits the number of idle vehicles considered during"
+			+ " a request-initiated dispatch to 'nearestVehiclesLimit' nearest to a given location"
+			+ " using pre-calculated distances between zone centroids."
+			+ " Used to speed up computations."
+			+ " Values 20 to 40 make a good trade-off between computational speed and quality of results."
+			+ " To turn off this feature - specify a sufficiently big number."
+			+ " The default value is 30.";
+	@Positive
+	private int nearestVehiclesLimit = 30;
 
 	public static final String CELL_SIZE = "cellSize";
-
-	public final Goal goal;
-
-	public final int nearestRequestsLimit;
-	public final int nearestVehiclesLimit;
-
-	public final double cellSize;
+	static final String CELL_SIZE_EXP = "The side length of square zones used in zonal registers of idle vehicles"
+			+ " and open requests. The default value is 1000 m. This value is good for urban areas. For large areas"
+			+ " with sparsely distributed taxis and low taxi demand, you may consider using a bigger cell size."
+			+ " On the other hand, if 'nearestRequestsLimit' or 'nearestVehiclesLimit' are very low,"
+			+ " a smaller cell size may work better.";
+	@Positive
+	private double cellSize = 1000;
 
 	public RuleBasedTaxiOptimizerParams(Configuration optimizerConfig) {
 		super(optimizerConfig, false, false);
@@ -46,6 +78,70 @@ public class RuleBasedTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 		nearestRequestsLimit = optimizerConfig.getInt(NEAREST_REQUESTS_LIMIT);
 		nearestVehiclesLimit = optimizerConfig.getInt(NEAREST_VEHICLES_LIMIT);
 
-		cellSize = optimizerConfig.getDouble(CELL_SIZE);// 1000 m tested for Berlin
+		cellSize = optimizerConfig.getDouble(CELL_SIZE);
+	}
+
+	/**
+	 * @return {@value #GOAL_EXP}
+	 */
+	@StringGetter(GOAL)
+	public Goal getGoal() {
+		return goal;
+	}
+
+	/**
+	 * @param goal {@value #GOAL_EXP}
+	 */
+	@StringSetter(GOAL)
+	public void setGoal(Goal goal) {
+		this.goal = goal;
+	}
+
+	/**
+	 * @return {@value #NEAREST_REQUESTS_LIMIT_EXP}
+	 */
+	@StringGetter(NEAREST_REQUESTS_LIMIT)
+	public Integer getNearestRequestsLimit() {
+		return nearestRequestsLimit;
+	}
+
+	/**
+	 * @param nearestRequestsLimit {@value #NEAREST_REQUESTS_LIMIT_EXP}
+	 */
+	@StringSetter(NEAREST_REQUESTS_LIMIT)
+	public void setNearestRequestsLimit(Integer nearestRequestsLimit) {
+		this.nearestRequestsLimit = nearestRequestsLimit;
+	}
+
+	/**
+	 * @return {@value #NEAREST_VEHICLES_LIMIT_EXP}
+	 */
+	@StringGetter(NEAREST_VEHICLES_LIMIT)
+	public Integer getNearestVehiclesLimit() {
+		return nearestVehiclesLimit;
+	}
+
+	/**
+	 * @param nearestVehiclesLimit {@value #NEAREST_VEHICLES_LIMIT_EXP}
+	 */
+	@StringSetter(NEAREST_VEHICLES_LIMIT)
+	public void setNearestVehiclesLimit(Integer nearestVehiclesLimit) {
+		this.nearestVehiclesLimit = nearestVehiclesLimit;
+	}
+
+	/**
+	 * @return {@value #CELL_SIZE_EXP}
+	 */
+	@StringGetter(CELL_SIZE)
+	public Double getCellSize() {
+		return cellSize;
+	}
+
+	/**
+	 * @param cellSize {@value #CELL_SIZE_EXP}
+	 */
+	@StringSetter(CELL_SIZE)
+	public void setCellSize(Double cellSize) {
+		this.cellSize = cellSize;
 	}
 }
