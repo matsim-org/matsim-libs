@@ -20,12 +20,12 @@
 package org.matsim.contrib.etaxi.optimizer.assignment;
 
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentChargerPlugData.ChargerPlug;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.VehicleData.Entry;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
 import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.AssignmentCost;
-import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentChargerPlugData.ChargerPlug;
 
 public class ETaxiToPlugAssignmentCostProvider {
 	public enum Mode {
@@ -77,7 +77,7 @@ public class ETaxiToPlugAssignmentCostProvider {
 
 	private double calcArrivalTime(VehicleData.Entry departure, PathData pathData) {
 		double travelTime = pathData == null ? //
-				params.nullPathCost : // no path (too far away)
+				params.getNullPathCost() : // no path (too far away)
 				pathData.getTravelTime();
 		return departure.time + travelTime;
 	}
