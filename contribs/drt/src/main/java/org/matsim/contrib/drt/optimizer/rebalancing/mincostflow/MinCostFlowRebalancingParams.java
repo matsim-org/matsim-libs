@@ -18,12 +18,13 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ReflectiveConfigGroup;
+import java.util.Map;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.Map;
+
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author michalm
@@ -61,19 +62,19 @@ public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	private int interval = 1800;// [s]
 
 	@Positive
-	public double minServiceTime = 2 * interval;// [s]
+	private double minServiceTime = 2 * interval;// [s]
 
 	@PositiveOrZero
-	public double maxTimeBeforeIdle = 0.5 * interval;// [s], if 0 then soon-idle vehicle will not be considered
+	private double maxTimeBeforeIdle = 0.5 * interval;// [s], if 0 then soon-idle vehicle will not be considered
 
 	@PositiveOrZero
-	public double targetAlpha = Double.NaN;
+	private double targetAlpha = Double.NaN;
 
 	@PositiveOrZero
-	public double targetBeta = Double.NaN;
+	private double targetBeta = Double.NaN;
 
 	@Positive
-	public double cellSize = Double.NaN;// [m]
+	private double cellSize = Double.NaN;// [m]
 
 	public MinCostFlowRebalancingParams() {
 		super(SET_NAME);
