@@ -23,6 +23,8 @@ import org.apache.commons.configuration.Configuration;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 
 public class FifoTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
+	public static final String SET_NAME = "FifoTaxiOptimizer";
+
 	public FifoTaxiOptimizerParams(Configuration optimizerConfig) {
 		super(1, true, true);
 	}

@@ -30,6 +30,8 @@ import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostP
 import org.matsim.core.config.Config;
 
 public class AssignmentTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
+	public static final String SET_NAME = "AssignmentTaxiOptimizer";
+
 	public static final String MODE = "mode";
 	static final String MODE_EXP = "Specifies the formula used to calculate assgnment cost."
 			+ " See comments in TaxiToRequestAssignmentCostProvider."

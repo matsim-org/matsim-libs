@@ -28,6 +28,8 @@ import org.apache.commons.configuration.Configuration;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 
 public class ZonalTaxiOptimizerParams extends RuleBasedTaxiOptimizerParams {
+	public static final String SET_NAME = "ZonalTaxiOptimizer";
+
 	public static final String ZONES_XML_FILE = "zonesXmlFile";
 	static final String ZONES_XML_FILE_EXP = "An XML file specifying the zonal system";
 	@NotBlank

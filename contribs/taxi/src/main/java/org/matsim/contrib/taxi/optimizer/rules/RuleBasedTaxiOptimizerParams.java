@@ -29,6 +29,8 @@ import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
 
 public class RuleBasedTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
+	public static final String SET_NAME = "RuleBasedTaxiOptimizer";
+
 	public static final String GOAL = "goal";
 	static final String GOAL_EXP = "Optimisation goal, one of:"
 			+ " MIN_WAIT_TIME (aka 'nearest idle taxi', a request-initiated dispatch),"
