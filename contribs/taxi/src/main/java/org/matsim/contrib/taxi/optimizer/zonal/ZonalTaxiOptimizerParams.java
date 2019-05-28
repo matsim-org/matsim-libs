@@ -19,17 +19,29 @@
 
 package org.matsim.contrib.taxi.optimizer.zonal;
 
+import java.util.Map;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
+
 import org.apache.commons.configuration.Configuration;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 
 public class ZonalTaxiOptimizerParams extends RuleBasedTaxiOptimizerParams {
 	public static final String ZONES_XML_FILE = "zonesXmlFile";
-	public static final String ZONES_SHP_FILE = "zonesShpFile";
-	public static final String EXPANSION_DISTANCE = "expansionDistance";
+	static final String ZONES_XML_FILE_EXP = "An XML file specifying the zonal system";
+	@NotBlank
+	private String zonesXmlFile;
 
-	public final String zonesXmlFile;
-	public final String zonesShpFile;
-	public final double expansionDistance;
+	public static final String ZONES_SHP_FILE = "zonesShpFile";
+	static final String ZONES_SHP_FILE_EXP = "A shape file specifying the geometries of zones";
+	@NotBlank
+	private String zonesShpFile;
+
+	public static final String EXPANSION_DISTANCE = "expansionDistance";
+	static final String EXPANSION_DISTANCE_EXP = "";
+	@PositiveOrZero
+	private double expansionDistance = 0;
 
 	public ZonalTaxiOptimizerParams(Configuration optimizerConfig) {
 		super(optimizerConfig);
@@ -37,5 +49,62 @@ public class ZonalTaxiOptimizerParams extends RuleBasedTaxiOptimizerParams {
 		zonesXmlFile = optimizerConfig.getString(ZONES_XML_FILE);
 		zonesShpFile = optimizerConfig.getString(ZONES_SHP_FILE);
 		expansionDistance = optimizerConfig.getDouble(EXPANSION_DISTANCE);
+	}
+
+	@Override
+	public Map<String, String> getComments() {
+		Map<String, String> map = super.getComments();
+		map.put(ZONES_XML_FILE, ZONES_XML_FILE_EXP);
+		map.put(ZONES_SHP_FILE, ZONES_SHP_FILE_EXP);
+		map.put(EXPANSION_DISTANCE, EXPANSION_DISTANCE_EXP);
+		return map;
+	}
+
+	/**
+	 * @return {@value #ZONES_XML_FILE_EXP}
+	 */
+	@StringGetter(ZONES_XML_FILE)
+	public String getZonesXmlFile() {
+		return zonesXmlFile;
+	}
+
+	/**
+	 * @param zonesXmlFile {@value #ZONES_XML_FILE_EXP}
+	 */
+	@StringSetter(ZONES_XML_FILE)
+	public void setZonesXmlFile(String zonesXmlFile) {
+		this.zonesXmlFile = zonesXmlFile;
+	}
+
+	/**
+	 * @return {@value #ZONES_SHP_FILE_EXP}
+	 */
+	@StringGetter(ZONES_SHP_FILE)
+	public String getZonesShpFile() {
+		return zonesShpFile;
+	}
+
+	/**
+	 * @param zonesShpFile {@value #ZONES_SHP_FILE_EXP}
+	 */
+	@StringSetter(ZONES_SHP_FILE)
+	public void setZonesShpFile(String zonesShpFile) {
+		this.zonesShpFile = zonesShpFile;
+	}
+
+	/**
+	 * @return {@value #EXPANSION_DISTANCE_EXP}
+	 */
+	@StringGetter(EXPANSION_DISTANCE)
+	public double getExpansionDistance() {
+		return expansionDistance;
+	}
+
+	/**
+	 * @param expansionDistance {@value #EXPANSION_DISTANCE_EXP}
+	 */
+	@StringSetter(EXPANSION_DISTANCE)
+	public void setExpansionDistance(double expansionDistance) {
+		this.expansionDistance = expansionDistance;
 	}
 }
