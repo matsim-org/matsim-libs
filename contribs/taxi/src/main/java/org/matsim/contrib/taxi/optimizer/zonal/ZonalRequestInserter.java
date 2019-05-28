@@ -32,12 +32,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.rules.IdleTaxiZonalRegistry;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.rules.UnplannedRequestZonalRegistry;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.zone.Zone;
 import org.matsim.contrib.zone.Zones;
@@ -51,8 +51,8 @@ import org.matsim.core.router.util.TravelTime;
  * @author michalm
  */
 public class ZonalRequestInserter implements UnplannedRequestInserter {
-	private static final Comparator<DvrpVehicle> LONGEST_WAITING_FIRST = (v1, v2) -> Double.compare(
-			v1.getSchedule().getCurrentTask().getBeginTime(), v2.getSchedule().getCurrentTask().getBeginTime());
+	private static final Comparator<DvrpVehicle> LONGEST_WAITING_FIRST = Comparator.comparingDouble(
+			v -> v.getSchedule().getCurrentTask().getBeginTime());
 
 	private final Fleet fleet;
 	private final TaxiScheduler scheduler;
