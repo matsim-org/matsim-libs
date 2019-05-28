@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
+import java.util.Map;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
@@ -79,6 +81,16 @@ public class RuleBasedTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 		nearestVehiclesLimit = optimizerConfig.getInt(NEAREST_VEHICLES_LIMIT);
 
 		cellSize = optimizerConfig.getDouble(CELL_SIZE);
+	}
+
+	@Override
+	public Map<String, String> getComments() {
+		Map<String, String> map = super.getComments();
+		map.put(GOAL, GOAL_EXP);
+		map.put(NEAREST_REQUESTS_LIMIT, NEAREST_REQUESTS_LIMIT_EXP);
+		map.put(NEAREST_VEHICLES_LIMIT, NEAREST_VEHICLES_LIMIT_EXP);
+		map.put(CELL_SIZE, CELL_SIZE_EXP);
+		return map;
 	}
 
 	/**
