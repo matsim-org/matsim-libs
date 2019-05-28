@@ -44,7 +44,7 @@ public class AssignmentTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public final int nearestVehiclesLimit;
 
 	public AssignmentTaxiOptimizerParams(Configuration optimizerConfig) {
-		super(optimizerConfig, true, true);
+		super(10, true, true);
 
 		mode = Mode.valueOf(optimizerConfig.getString(MODE));
 

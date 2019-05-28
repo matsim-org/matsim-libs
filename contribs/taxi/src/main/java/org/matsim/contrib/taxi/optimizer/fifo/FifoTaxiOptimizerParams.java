@@ -24,6 +24,6 @@ import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 
 public class FifoTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public FifoTaxiOptimizerParams(Configuration optimizerConfig) {
-		super(optimizerConfig, true, true);
+		super(1, true, true);
 	}
 }

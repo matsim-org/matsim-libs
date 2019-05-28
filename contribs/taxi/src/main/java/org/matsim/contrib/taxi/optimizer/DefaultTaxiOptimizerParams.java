@@ -23,7 +23,6 @@ import java.util.Map;
 
 import javax.validation.constraints.Positive;
 
-import org.apache.commons.configuration.Configuration;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -32,23 +31,23 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 public class DefaultTaxiOptimizerParams extends ReflectiveConfigGroup {
 	public static final String REOPTIMIZATION_TIME_STEP = "reoptimizationTimeStep";
 	static final String REOPTIMIZATION_TIME_STEP_EXP = "Specifies how often the reoptimization algorithm is executed."
-			+ " Must be a positive integer value. Default is 1 s (low reaction time)."
-			+ " However, some algorithms, such as AssignmentTaxiOptimizer, may produce better results"
-			+ " if new requests are buffered over a longer period, e.g. 10 or 30 seconds.";
+			+ " Must be a positive integer value. Smaller values mean lower reaction time."
+			+ " However, algorithms that find more than 1 taxi-request matching in each run,"
+			+ " such as AssignmentTaxiOptimizer, may produce better results"
+			+ " if new requests are buffered over a longer period, e.g. 10 or 30 seconds."
+			+ " Therefore, the default value is algorithm dependent.";
 	@Positive
-	private int reoptimizationTimeStep = 1;
+	private int reoptimizationTimeStep;
 
 	public final boolean doUnscheduleAwaitingRequests;// PLANNED requests
 	public final boolean doUpdateTimelines;// STARTED+PLANNED requests
 
-	public DefaultTaxiOptimizerParams(Configuration optimizerConfig, boolean doUnscheduleAwaitingRequests,
+	public DefaultTaxiOptimizerParams(int defaultReoptimizationTimeStep, boolean doUnscheduleAwaitingRequests,
 			boolean doUpdateTimelines) {
 		super(null);//FIXME pass it from the subclass
-
+		reoptimizationTimeStep = defaultReoptimizationTimeStep;
 		this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;
 		this.doUpdateTimelines = doUpdateTimelines;
-
-		reoptimizationTimeStep = optimizerConfig.getInt(REOPTIMIZATION_TIME_STEP, 1);
 	}
 
 	@Override
