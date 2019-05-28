@@ -47,7 +47,7 @@ public class RuleBasedTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 			+ " using pre-calculated distances between zone centroids."
 			+ " Used to speed up computations."
 			+ " Values 20 to 40 make a good trade-off between computational speed and quality of results."
-			+ " To turn off this feature - specify a sufficiently big number."
+			+ " To turn off this feature - specify a sufficiently big number (not recommended)."
 			+ " The default value is 30.";
 	@Positive
 	private int nearestRequestsLimit = 30;
@@ -58,7 +58,7 @@ public class RuleBasedTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 			+ " using pre-calculated distances between zone centroids."
 			+ " Used to speed up computations."
 			+ " Values 20 to 40 make a good trade-off between computational speed and quality of results."
-			+ " To turn off this feature - specify a sufficiently big number."
+			+ " To turn off this feature - specify a sufficiently big number (not recommended)."
 			+ " The default value is 30.";
 	@Positive
 	private int nearestVehiclesLimit = 30;
