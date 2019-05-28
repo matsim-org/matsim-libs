@@ -33,9 +33,9 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.etaxi.ETaxiChargingTask;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentChargerPlugData.ChargerPlug;
-import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
+import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
 import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
@@ -118,7 +118,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 			throw new IllegalArgumentException("Unsupported");
 		}
 
-		if (params.socCheckTimeStep % params.reoptimizationTimeStep != 0) {
+		if (params.socCheckTimeStep % params.getReoptimizationTimeStep() != 0) {
 			throw new RuntimeException("charge-scheduling must be followed up by req-scheduling");
 		}
 
