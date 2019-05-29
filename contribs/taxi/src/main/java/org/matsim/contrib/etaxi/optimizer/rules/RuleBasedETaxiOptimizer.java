@@ -85,8 +85,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 			RuleBasedETaxiOptimizerParams params, IdleTaxiZonalRegistry idleTaxiRegistry,
 			UnplannedRequestZonalRegistry unplannedRequestRegistry, BestDispatchFinder dispatchFinder,
 			UnplannedRequestInserter requestInserter) {
-		super(eventsManager, taxiCfg, fleet, eScheduler, params, idleTaxiRegistry, unplannedRequestRegistry,
-				requestInserter);
+		super(eventsManager, taxiCfg, fleet, eScheduler, idleTaxiRegistry, unplannedRequestRegistry, requestInserter);
 		this.params = params;
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.eScheduler = eScheduler;
@@ -96,7 +95,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-		if (isNewDecisionEpoch(e, params.socCheckTimeStep)) {
+		if (isNewDecisionEpoch(e, params.getSocCheckTimeStep())) {
 			@SuppressWarnings("unchecked")
 			Stream<EvDvrpVehicle> eTaxis = (Stream<EvDvrpVehicle>)(Stream<? extends DvrpVehicle>)idleTaxiRegistry.vehicles();
 			chargeIdleUnderchargedVehicles(eTaxis.filter(this::isUndercharged));
@@ -132,6 +131,6 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 
 	private boolean isUndercharged(EvDvrpVehicle v) {
 		Battery b = v.getElectricVehicle().getBattery();
-		return b.getSoc() < params.minRelativeSoc * b.getCapacity();
+		return b.getSoc() < params.getMinRelativeSoc() * b.getCapacity();
 	}
 }
