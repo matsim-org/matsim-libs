@@ -19,25 +19,67 @@
 
 package org.matsim.contrib.etaxi.optimizer.assignment;
 
-import org.apache.commons.configuration.Configuration;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.Positive;
+
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
 
 public class AssignmentETaxiOptimizerParams extends AssignmentTaxiOptimizerParams {
+
+	public static final String SET_NAME = "AssignmentETaxiOptimizer";
+
 	public static final String MIN_RELATIVE_SOC = "minRelativeSoc";
+	static final String MIN_RELATIVE_SOC_EXP = "Taxis with SOC below this level are considered undercharged"
+			+ " and should be recharged. The value must be in (0, 1]."
+			+ " The default value is 0.3 (used for simulating Nissan Leaf taxis).";
+	// 30% SOC (=6 kWh) is enough to travel 40 km (all AUX off);
+	// alternatively, in cold winter, it is enough to travel for 1 hour
+	// (for approx. 20 km => 3kWh) with 3 kW-heating on
+	@Positive
+	@DecimalMax("1.0")
+	private double minRelativeSoc = 0.3;
+
 	public static final String SOC_CHECK_TIME_STEP = "socCheckTimeStep";
+	static final String SOC_CHECK_TIME_STEP_EXP = "Specifies how often idle vehicles are checked if they have become"
+			+ " undercharged. The most undercharged ones will be considered in the vehicle-charger assignment procedure."
+			+ " The default value is 300 (used for simulating Nissan Leaf taxis).";
+	// in cold winter, 3kW heating consumes 1.25% SOC every 5 min
+	@Positive
+	private int socCheckTimeStep = 300;
 
-	public final double minRelativeSoc;// XXX or absolute?
-	public final int socCheckTimeStep;
+	public AssignmentETaxiOptimizerParams() {
+		super(SET_NAME);
+	}
 
-	public AssignmentETaxiOptimizerParams(Configuration optimizerConfig) {
-		super(optimizerConfig);
+	/**
+	 * @return {@value #MIN_RELATIVE_SOC_EXP}
+	 */
+	@StringGetter(MIN_RELATIVE_SOC)
+	public double getMinRelativeSoc() {
+		return minRelativeSoc;
+	}
 
-		// 30% SOC (=6 kWh) is enough to travel 40 km (all AUX off);
-		// alternatively, in cold winter, it is enough to travel for 1 hour
-		// (for approx. 20 km => 3kWh) with 3 kW-heating on
-		minRelativeSoc = optimizerConfig.getDouble(MIN_RELATIVE_SOC, 0.3);
+	/**
+	 * @param minRelativeSoc {@value #MIN_RELATIVE_SOC_EXP}
+	 */
+	@StringSetter(MIN_RELATIVE_SOC)
+	public void setMinRelativeSoc(double minRelativeSoc) {
+		this.minRelativeSoc = minRelativeSoc;
+	}
 
-		// in cold winter, 3kW heating consumes 1.25% SOC every 5 min
-		socCheckTimeStep = optimizerConfig.getInt(SOC_CHECK_TIME_STEP, 300);
+	/**
+	 * @return {@value #SOC_CHECK_TIME_STEP_EXP}
+	 */
+	@StringGetter(SOC_CHECK_TIME_STEP)
+	public int getSocCheckTimeStep() {
+		return socCheckTimeStep;
+	}
+
+	/**
+	 * @param socCheckTimeStep {@value #SOC_CHECK_TIME_STEP_EXP}
+	 */
+	@StringSetter(SOC_CHECK_TIME_STEP)
+	public void setSocCheckTimeStep(int socCheckTimeStep) {
+		this.socCheckTimeStep = socCheckTimeStep;
 	}
 }
