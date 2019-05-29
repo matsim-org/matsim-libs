@@ -105,11 +105,6 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 			"Specifies whether the simulation should interrupt if not all requests were performed when"
 					+ " an interation ends. Otherwise, a warning is given. True by default.";
 
-	public static final String OPTIMIZER_PARAMETER_SET = "optimizer";
-	static final String OPTIMIZER_PARAMETER_SET_EXP =
-			"Specifies the type and parameters of the TaxiOptimizer. See: TaxiOptimizerParams and classes"
-					+ " implementing it, e.g. AbstractTaxiOptimizerParams.";
-
 	@NotBlank
 	private String mode = TransportMode.taxi; // travel mode (passengers'/customers' perspective)
 
@@ -171,7 +166,6 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 		map.put(TIME_PROFILES, TIME_PROFILES_EXP);
 		map.put(DETAILED_STATS, DETAILED_STATS_EXP);
 		map.put(BREAK_IF_NOT_ALL_REQUESTS_SERVED, BREAK_IF_NOT_ALL_REQUESTS_SERVED_EXP);
-		map.put(OPTIMIZER_PARAMETER_SET, OPTIMIZER_PARAMETER_SET_EXP);
 		map.put(PRINT_WARNINGS, PRINT_WARNINGS_EXP);
 		return map;
 	}
