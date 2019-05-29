@@ -78,8 +78,7 @@ import com.google.common.collect.Maps;
 public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 	public static AssignmentETaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			Network network, MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility,
-			ETaxiScheduler eScheduler, ChargingInfrastructure chargingInfrastructure,
-			AssignmentETaxiOptimizerParams params) {
+			ETaxiScheduler eScheduler, ChargingInfrastructure chargingInfrastructure) {
 		MultiNodePathCalculator multiNodeRouter = (MultiNodePathCalculator)new FastMultiNodeDijkstraFactory(
 				true).createPathCalculator(network, travelDisutility, travelTime);
 		BackwardMultiNodePathCalculator backwardMultiNodeRouter = (BackwardMultiNodePathCalculator)new BackwardFastMultiNodeDijkstraFactory(
@@ -87,7 +86,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 		LeastCostPathCalculator router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility,
 				travelTime);
 		return new AssignmentETaxiOptimizer(eventsManager, taxiCfg, fleet, timer, travelTime, eScheduler,
-				chargingInfrastructure, params, multiNodeRouter, backwardMultiNodeRouter, router);
+				chargingInfrastructure, multiNodeRouter, backwardMultiNodeRouter, router);
 	}
 
 	private final AssignmentETaxiOptimizerParams params;
@@ -102,13 +101,13 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 
 	public AssignmentETaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			MobsimTimer timer, TravelTime travelTime, ETaxiScheduler eScheduler,
-			ChargingInfrastructure chargingInfrastructure, AssignmentETaxiOptimizerParams params,
-			MultiNodePathCalculator multiNodeRouter, BackwardMultiNodePathCalculator backwardMultiNodeRouter,
-			LeastCostPathCalculator router) {
+			ChargingInfrastructure chargingInfrastructure, MultiNodePathCalculator multiNodeRouter,
+			BackwardMultiNodePathCalculator backwardMultiNodeRouter, LeastCostPathCalculator router) {
 		super(eventsManager, taxiCfg, fleet, eScheduler,
-				new AssignmentRequestInserter(fleet, timer, travelTime, eScheduler, params, multiNodeRouter,
+				new AssignmentRequestInserter(fleet, timer, travelTime, eScheduler,
+						(AssignmentETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams(), multiNodeRouter,
 						backwardMultiNodeRouter, router));
-		this.params = params;
+		this.params = (AssignmentETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams();
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.eScheduler = eScheduler;
 		this.fleet = fleet;
