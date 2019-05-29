@@ -1,4 +1,24 @@
 <?xml version="1.0" ?>
+<!--
+  ~ ************************************************************************ *
+  ~ project: org.matsim.*
+  ~ ************************************************************************ *
+  ~                                                                         *
+  ~ copyright       : (C) 2019 by the members listed in the COPYING,        *
+  ~                   LICENSE and WARRANTY file.                            *
+  ~ email           : info at matsim dot org                                *
+  ~                                                                         *
+  ~ ************************************************************************ *
+  ~                                                                         *
+  ~   This program is free software; you can redistribute it and/or modify  *
+  ~   it under the terms of the GNU General Public License as published by  *
+  ~   the Free Software Foundation; either version 2 of the License, or     *
+  ~   (at your option) any later version.                                   *
+  ~   See also COPYING, LICENSE and WARRANTY file                           *
+  ~                                                                         *
+  ~ ************************************************************************ *
+  -->
+
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 	<module name="dvrp">
@@ -17,15 +37,17 @@
 		<param name="timeProfiles" value="true"/>
 		<param name="detailedStats" value="true"/>
 
-		<parameterset type="RuleBasedETaxiOptimizer">
-			<parameterset type="RuleBasedTaxiOptimizer">
-				<param name="goal" value="DEMAND_SUPPLY_EQUIL"/>
-				<param name="nearestRequestsLimit" value="99999"/>
-				<param name="nearestVehiclesLimit" value="99999"/>
-				<param name="cellSize" value="1000"/>
+		<parameterset type="AssignmentETaxiOptimizer">
+			<parameterset type="AssignmentTaxiOptimizer">
+				<param name="reoptimizationTimeStep" value="10"/>
+				<param name="mode" value="DSE"/>
+				<param name="vehPlanningHorizonOversupply" value="480"/>
+				<param name="vehPlanningHorizonUndersupply" value="120"/>
+				<param name="nearestRequestsLimit" value="99"/>
+				<param name="nearestVehiclesLimit" value="99"/>
 			</parameterset>
 
-			<param name="minRelativeSoc" value="0.3"/>
+			<param name="minRelativeSoc" value="0.5"/>
 			<param name="socCheckTimeStep" value="60"/>
 		</parameterset>
 	</module>

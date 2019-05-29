@@ -25,8 +25,15 @@ import org.junit.Test;
  */
 public class RunETaxiScenarioIT {
 	@Test
-	public void test() {
+	public void testRuleBased() {
 		String configFile = "mielec_2014_02/mielec_etaxi_config.xml";
 		RunETaxiScenario.run(configFile, false);
 	}
+
+	@Test
+	public void testAssignment() {
+		String configFile = "mielec_2014_02/mielec_etaxi_config_assignment.xml";
+		RunETaxiScenario.run(configFile, false);
+	}
+
 }
