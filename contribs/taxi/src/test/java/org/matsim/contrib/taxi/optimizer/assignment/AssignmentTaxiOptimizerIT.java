@@ -38,19 +38,26 @@ public class AssignmentTaxiOptimizerIT {
 		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
 		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
 
-		params.setMode(Mode.DSE);
+		params.setMode(Mode.ARRIVAL_TIME);
 		params.setVehPlanningHorizonOversupply(99999);
 		params.setVehPlanningHorizonUndersupply(99999);
 		params.setNearestRequestsLimit(99999);
 		params.setNearestVehiclesLimit(99999);
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_A");
 
-		params.setMode(Mode.DSE);
+		params.setMode(Mode.PICKUP_TIME);
 		params.setVehPlanningHorizonOversupply(120);
 		params.setVehPlanningHorizonUndersupply(30);
 		params.setNearestRequestsLimit(10);
 		params.setNearestVehiclesLimit(10);
 		params.setReoptimizationTimeStep(10);
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_B");
+
+		params.setMode(Mode.DSE);
+		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_C");
+
+		params.setMode(Mode.TOTAL_WAIT_TIME);
+		params.setNullPathCost(300);
+		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_D");
 	}
 }

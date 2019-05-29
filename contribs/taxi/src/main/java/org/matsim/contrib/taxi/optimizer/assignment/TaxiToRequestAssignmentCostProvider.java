@@ -44,8 +44,6 @@ public class TaxiToRequestAssignmentCostProvider {
 		// balance between demand (ARRIVAL_TIME) and supply (PICKUP_TIME)
 	}
 
-	;
-
 	private final AssignmentTaxiOptimizerParams params;
 
 	public TaxiToRequestAssignmentCostProvider(AssignmentTaxiOptimizerParams params) {
