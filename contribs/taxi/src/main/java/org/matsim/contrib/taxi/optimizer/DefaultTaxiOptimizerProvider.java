@@ -91,4 +91,19 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 				throw new IllegalStateException();
 		}
 	}
+
+	public static DefaultTaxiOptimizerParams createParameterSet(String type) {
+		switch (type) {
+			case AssignmentTaxiOptimizerParams.SET_NAME:
+				return new AssignmentTaxiOptimizerParams();
+			case FifoTaxiOptimizerParams.SET_NAME:
+				return new FifoTaxiOptimizerParams();
+			case RuleBasedTaxiOptimizerParams.SET_NAME:
+				return new RuleBasedTaxiOptimizerParams();
+			case ZonalTaxiOptimizerParams.SET_NAME:
+				return new ZonalTaxiOptimizerParams();
+			default:
+				return null;
+		}
+	}
 }
