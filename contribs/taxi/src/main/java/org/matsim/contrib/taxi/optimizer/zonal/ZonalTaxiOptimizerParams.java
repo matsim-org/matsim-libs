@@ -19,89 +19,61 @@
 
 package org.matsim.contrib.taxi.optimizer.zonal;
 
-import java.util.Map;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.PositiveOrZero;
-
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
+import org.matsim.contrib.zone.ZonalSystemParams;
+import org.matsim.core.config.ConfigGroup;
 
-public class ZonalTaxiOptimizerParams extends RuleBasedTaxiOptimizerParams {
+public class ZonalTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public static final String SET_NAME = "ZonalTaxiOptimizer";
 
-	public static final String ZONES_XML_FILE = "zonesXmlFile";
-	static final String ZONES_XML_FILE_EXP = "An XML file specifying the zonal system";
-	@NotBlank
-	private String zonesXmlFile;
-
-	public static final String ZONES_SHP_FILE = "zonesShpFile";
-	static final String ZONES_SHP_FILE_EXP = "A shape file specifying the geometries of zones";
-	@NotBlank
-	private String zonesShpFile;
-
-	public static final String EXPANSION_DISTANCE = "expansionDistance";
-	static final String EXPANSION_DISTANCE_EXP = "";
-	@PositiveOrZero
-	private double expansionDistance = 0;
+	private RuleBasedTaxiOptimizerParams ruleBasedTaxiOptimizerParams;
+	private ZonalSystemParams zonalSystemParams;
 
 	public ZonalTaxiOptimizerParams() {
-		super(SET_NAME);
+		super(SET_NAME, false, false);
 	}
 
 	@Override
-	public Map<String, String> getComments() {
-		Map<String, String> map = super.getComments();
-		map.put(ZONES_XML_FILE, ZONES_XML_FILE_EXP);
-		map.put(ZONES_SHP_FILE, ZONES_SHP_FILE_EXP);
-		map.put(EXPANSION_DISTANCE, EXPANSION_DISTANCE_EXP);
-		return map;
+	public ConfigGroup createParameterSet(String type) {
+		switch (type) {
+			case RuleBasedTaxiOptimizerParams.SET_NAME:
+				return new RuleBasedTaxiOptimizerParams();
+			case ZonalSystemParams.SET_NAME:
+				return new ZonalSystemParams();
+		}
+		return super.createParameterSet(type);
 	}
 
-	/**
-	 * @return {@value #ZONES_XML_FILE_EXP}
-	 */
-	@StringGetter(ZONES_XML_FILE)
-	public String getZonesXmlFile() {
-		return zonesXmlFile;
+	@Override
+	public void addParameterSet(ConfigGroup set) {
+		switch (set.getName()) {
+			case RuleBasedTaxiOptimizerParams.SET_NAME:
+				ruleBasedTaxiOptimizerParams = (RuleBasedTaxiOptimizerParams)set;
+				break;
+			case ZonalSystemParams.SET_NAME:
+				zonalSystemParams = (ZonalSystemParams)set;
+				break;
+		}
+
+		super.addParameterSet(set);
 	}
 
-	/**
-	 * @param zonesXmlFile {@value #ZONES_XML_FILE_EXP}
-	 */
-	@StringSetter(ZONES_XML_FILE)
-	public void setZonesXmlFile(String zonesXmlFile) {
-		this.zonesXmlFile = zonesXmlFile;
+	ZonalSystemParams getZonalSystemParams() {
+		return zonalSystemParams;
 	}
 
-	/**
-	 * @return {@value #ZONES_SHP_FILE_EXP}
-	 */
-	@StringGetter(ZONES_SHP_FILE)
-	public String getZonesShpFile() {
-		return zonesShpFile;
+	RuleBasedTaxiOptimizerParams getRuleBasedTaxiOptimizerParams() {
+		return ruleBasedTaxiOptimizerParams;
 	}
 
-	/**
-	 * @param zonesShpFile {@value #ZONES_SHP_FILE_EXP}
-	 */
-	@StringSetter(ZONES_SHP_FILE)
-	public void setZonesShpFile(String zonesShpFile) {
-		this.zonesShpFile = zonesShpFile;
+	@Override
+	public int getReoptimizationTimeStep() {
+		return ruleBasedTaxiOptimizerParams.getReoptimizationTimeStep();
 	}
 
-	/**
-	 * @return {@value #EXPANSION_DISTANCE_EXP}
-	 */
-	@StringGetter(EXPANSION_DISTANCE)
-	public double getExpansionDistance() {
-		return expansionDistance;
-	}
-
-	/**
-	 * @param expansionDistance {@value #EXPANSION_DISTANCE_EXP}
-	 */
-	@StringSetter(EXPANSION_DISTANCE)
-	public void setExpansionDistance(double expansionDistance) {
-		this.expansionDistance = expansionDistance;
+	@Override
+	public void setReoptimizationTimeStep(int reoptimizationTimeStep) {
+		ruleBasedTaxiOptimizerParams.setReoptimizationTimeStep(reoptimizationTimeStep);
 	}
 }

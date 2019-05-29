@@ -37,7 +37,8 @@ public class ZonalTaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public static ZonalTaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			TaxiScheduler scheduler, Network network, MobsimTimer timer, TravelTime travelTime,
 			TravelDisutility travelDisutility) {
-		double cellSize = ((ZonalTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getCellSize();
+		double cellSize = ((ZonalTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams()
+				.getCellSize();
 		return create(eventsManager, taxiCfg, fleet, scheduler, network, timer, travelTime, travelDisutility,
 				new SquareGridSystem(network, cellSize));
 	}
