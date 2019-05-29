@@ -33,7 +33,7 @@ import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-public class DvrpConfigGroup extends ReflectiveConfigGroup {
+public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger(DvrpConfigGroup.class);
 
 	public static final String GROUP_NAME = "dvrp";

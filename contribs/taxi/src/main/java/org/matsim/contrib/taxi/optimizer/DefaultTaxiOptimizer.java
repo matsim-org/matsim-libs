@@ -19,6 +19,10 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
@@ -33,10 +37,6 @@ import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.TreeSet;
 
 /**
  * @author michalm
@@ -53,26 +53,27 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final UnplannedRequestInserter requestInserter;
 
 	private final TaxiConfigGroup taxiCfg;
-	private final DefaultTaxiOptimizerParams params;
+	private final AbstractTaxiOptimizerParams params;
 
 	private boolean requiresReoptimization = false;
 
 	public DefaultTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			TaxiScheduler scheduler, DefaultTaxiOptimizerParams params, UnplannedRequestInserter requestInserter) {
+			TaxiScheduler scheduler, UnplannedRequestInserter requestInserter) {
 		this.eventsManager = eventsManager;
 		this.fleet = fleet;
 		this.scheduler = scheduler;
 		this.requestInserter = requestInserter;
-		this.params = params;
 		this.taxiCfg = taxiCfg;
+		params = taxiCfg.getTaxiOptimizerParams();
 	}
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-		if (requiresReoptimization && isNewDecisionEpoch(e, params.reoptimizationTimeStep)) {
+		if (requiresReoptimization && isNewDecisionEpoch(e, params.getReoptimizationTimeStep())) {
 			for (TaxiRequest req : unplannedRequests) {
 				eventsManager.processEvent(
-                        new PassengerRequestAcceptedEvent(e.getSimulationTime(), taxiCfg.getMode(), req.getId(), req.getPassengerId()));
+						new PassengerRequestAcceptedEvent(e.getSimulationTime(), taxiCfg.getMode(), req.getId(),
+								req.getPassengerId()));
 			}
 
 			if (params.doUnscheduleAwaitingRequests) {
