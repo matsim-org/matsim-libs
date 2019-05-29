@@ -20,9 +20,7 @@
 			<param name="timeProfiles" value="true"/>
 			<param name="detailedStats" value="true"/>
 
-			<parameterset type="optimizer">
-				<param name="type" value="RULE_BASED"/>
-				<param name="id" value="example"/>
+			<parameterset type="RuleBasedTaxiOptimizer">
 				<param name="goal" value="DEMAND_SUPPLY_EQUIL"/>
 				<param name="nearestRequestsLimit" value="99999"/>
 				<param name="nearestVehiclesLimit" value="99999"/>
@@ -45,9 +43,7 @@
 			<param name="timeProfiles" value="true"/>
 			<param name="detailedStats" value="true"/>
 
-			<parameterset type="optimizer">
-				<param name="type" value="RULE_BASED"/>
-				<param name="id" value="example"/>
+			<parameterset type="RuleBasedTaxiOptimizer">
 				<param name="goal" value="DEMAND_SUPPLY_EQUIL"/>
 				<param name="nearestRequestsLimit" value="99999"/>
 				<param name="nearestVehiclesLimit" value="99999"/>
@@ -70,9 +66,7 @@
 			<param name="timeProfiles" value="true"/>
 			<param name="detailedStats" value="true"/>
 
-			<parameterset type="optimizer">
-				<param name="type" value="RULE_BASED"/>
-				<param name="id" value="example"/>
+			<parameterset type="RuleBasedTaxiOptimizer">
 				<param name="goal" value="DEMAND_SUPPLY_EQUIL"/>
 				<param name="nearestRequestsLimit" value="99999"/>
 				<param name="nearestVehiclesLimit" value="99999"/>

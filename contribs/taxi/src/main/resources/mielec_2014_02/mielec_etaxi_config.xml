@@ -19,7 +19,6 @@
 
 		<parameterset type="optimizer">
 			<param name="type" value="E_RULE_BASED" />
-			<param name="id" value="example" />
 			<param name="goal" value="DEMAND_SUPPLY_EQUIL" />
 			<param name="nearestRequestsLimit" value="99999" />
 			<param name="nearestVehiclesLimit" value="99999" />
@@ -31,7 +30,6 @@
 		
 		<!--parameterset type="optimizer">
 			<param name="type" value="E_ASSIGNMENT" />
-			<param name="id" value="example" />
 			<param name="reoptimizationTimeStep" value="10" />
 			<param name="mode" value="DSE" />
 			<param name="vehPlanningHorizonOversupply" value="480" />
