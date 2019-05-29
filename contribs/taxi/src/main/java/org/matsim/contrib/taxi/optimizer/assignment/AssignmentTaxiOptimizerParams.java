@@ -89,6 +89,10 @@ public class AssignmentTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	private double nullPathCost = 48 * 3600;
 
 	public AssignmentTaxiOptimizerParams() {
+		this(SET_NAME);
+	}
+
+	protected AssignmentTaxiOptimizerParams(String paramSetName) {
 		super(SET_NAME, 10, true, true);
 	}
 
