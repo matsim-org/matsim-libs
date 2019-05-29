@@ -73,12 +73,15 @@ public class RuleBasedTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	@Positive
 	private double cellSize = 1000;
 
+	@Positive
+	private int reoptimizationTimeStep = 1;
+
 	public RuleBasedTaxiOptimizerParams() {
 		this(SET_NAME);
 	}
 
 	protected RuleBasedTaxiOptimizerParams(String paramSetName) {
-		super(paramSetName, 1, false, false);
+		super(paramSetName, false, false);
 	}
 
 	@Override
@@ -153,5 +156,15 @@ public class RuleBasedTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	@StringSetter(CELL_SIZE)
 	public void setCellSize(Double cellSize) {
 		this.cellSize = cellSize;
+	}
+
+	@StringGetter(REOPTIMIZATION_TIME_STEP)
+	public int getReoptimizationTimeStep() {
+		return reoptimizationTimeStep;
+	}
+
+	@StringSetter(REOPTIMIZATION_TIME_STEP)
+	public void setReoptimizationTimeStep(int reoptimizationTimeStep) {
+		this.reoptimizationTimeStep = reoptimizationTimeStep;
 	}
 }

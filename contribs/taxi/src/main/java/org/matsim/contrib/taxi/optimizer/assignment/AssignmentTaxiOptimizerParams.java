@@ -88,12 +88,15 @@ public class AssignmentTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	@Positive
 	private double nullPathCost = 48 * 3600;
 
+	@Positive
+	private int reoptimizationTimeStep = 10;
+
 	public AssignmentTaxiOptimizerParams() {
 		this(SET_NAME);
 	}
 
 	protected AssignmentTaxiOptimizerParams(String paramSetName) {
-		super(SET_NAME, 10, true, true);
+		super(SET_NAME, true, true);
 	}
 
 	@Override
@@ -212,5 +215,15 @@ public class AssignmentTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	@StringSetter(NULL_PATH_COST)
 	public void setNullPathCost(double nullPathCost) {
 		this.nullPathCost = nullPathCost;
+	}
+
+	@StringGetter(REOPTIMIZATION_TIME_STEP)
+	public int getReoptimizationTimeStep() {
+		return reoptimizationTimeStep;
+	}
+
+	@StringSetter(REOPTIMIZATION_TIME_STEP)
+	public void setReoptimizationTimeStep(int reoptimizationTimeStep) {
+		this.reoptimizationTimeStep = reoptimizationTimeStep;
 	}
 }

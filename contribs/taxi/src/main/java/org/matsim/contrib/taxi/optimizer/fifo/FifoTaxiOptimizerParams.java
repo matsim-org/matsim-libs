@@ -19,12 +19,26 @@
 
 package org.matsim.contrib.taxi.optimizer.fifo;
 
+import javax.validation.constraints.Positive;
+
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 
 public class FifoTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public static final String SET_NAME = "FifoTaxiOptimizer";
+	@Positive
+	private int reoptimizationTimeStep = 1;
 
 	public FifoTaxiOptimizerParams() {
-		super(SET_NAME, 1, true, true);
+		super(SET_NAME, true, true);
+	}
+
+	@StringGetter(REOPTIMIZATION_TIME_STEP)
+	public int getReoptimizationTimeStep() {
+		return reoptimizationTimeStep;
+	}
+
+	@StringSetter(REOPTIMIZATION_TIME_STEP)
+	public void setReoptimizationTimeStep(int reoptimizationTimeStep) {
+		this.reoptimizationTimeStep = reoptimizationTimeStep;
 	}
 }

@@ -21,14 +21,12 @@ package org.matsim.contrib.taxi.optimizer;
 
 import java.util.Map;
 
-import javax.validation.constraints.Positive;
-
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author michalm
  */
-public class DefaultTaxiOptimizerParams extends ReflectiveConfigGroup {
+public abstract class DefaultTaxiOptimizerParams extends ReflectiveConfigGroup {
 	public static final String REOPTIMIZATION_TIME_STEP = "reoptimizationTimeStep";
 	static final String REOPTIMIZATION_TIME_STEP_EXP = "Specifies how often the reoptimization algorithm is executed."
 			+ " Must be a positive integer value. Smaller values mean lower reaction time."
@@ -36,16 +34,13 @@ public class DefaultTaxiOptimizerParams extends ReflectiveConfigGroup {
 			+ " such as AssignmentTaxiOptimizer, may produce better results"
 			+ " if new requests are buffered over a longer period, e.g. 10 or 30 seconds."
 			+ " Therefore, the default value is algorithm dependent.";
-	@Positive
-	private int reoptimizationTimeStep;
 
 	public final boolean doUnscheduleAwaitingRequests;// PLANNED requests
 	public final boolean doUpdateTimelines;// STARTED+PLANNED requests
 
-	protected DefaultTaxiOptimizerParams(String paramSetName, int defaultReoptimizationTimeStep,
-			boolean doUnscheduleAwaitingRequests, boolean doUpdateTimelines) {
+	protected DefaultTaxiOptimizerParams(String paramSetName, boolean doUnscheduleAwaitingRequests,
+			boolean doUpdateTimelines) {
 		super(paramSetName);
-		reoptimizationTimeStep = defaultReoptimizationTimeStep;
 		this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;
 		this.doUpdateTimelines = doUpdateTimelines;
 	}
@@ -60,16 +55,10 @@ public class DefaultTaxiOptimizerParams extends ReflectiveConfigGroup {
 	/**
 	 * @return {@value #REOPTIMIZATION_TIME_STEP_EXP}
 	 */
-	@StringGetter(REOPTIMIZATION_TIME_STEP)
-	public int getReoptimizationTimeStep() {
-		return reoptimizationTimeStep;
-	}
+	public abstract int getReoptimizationTimeStep();
 
 	/**
 	 * @param reoptimizationTimeStep {@value #REOPTIMIZATION_TIME_STEP_EXP}
 	 */
-	@StringSetter(REOPTIMIZATION_TIME_STEP)
-	public void setReoptimizationTimeStep(int reoptimizationTimeStep) {
-		this.reoptimizationTimeStep = reoptimizationTimeStep;
-	}
+	public abstract void setReoptimizationTimeStep(int reoptimizationTimeStep);
 }
