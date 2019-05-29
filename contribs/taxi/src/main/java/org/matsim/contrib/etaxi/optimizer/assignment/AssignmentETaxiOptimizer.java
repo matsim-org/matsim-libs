@@ -105,8 +105,8 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 			BackwardMultiNodePathCalculator backwardMultiNodeRouter, LeastCostPathCalculator router) {
 		super(eventsManager, taxiCfg, fleet, eScheduler,
 				new AssignmentRequestInserter(fleet, timer, travelTime, eScheduler,
-						(AssignmentETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams(), multiNodeRouter,
-						backwardMultiNodeRouter, router));
+						((AssignmentETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getAssignmentTaxiOptimizerParams(),
+						multiNodeRouter, backwardMultiNodeRouter, router));
 		this.params = (AssignmentETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams();
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.eScheduler = eScheduler;

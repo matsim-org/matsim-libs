@@ -22,10 +22,11 @@ package org.matsim.contrib.etaxi.optimizer.assignment;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Positive;
 
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
+import org.matsim.core.config.ConfigGroup;
 
-public class AssignmentETaxiOptimizerParams extends AssignmentTaxiOptimizerParams {
-
+public final class AssignmentETaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public static final String SET_NAME = "AssignmentETaxiOptimizer";
 
 	public static final String MIN_RELATIVE_SOC = "minRelativeSoc";
@@ -47,8 +48,39 @@ public class AssignmentETaxiOptimizerParams extends AssignmentTaxiOptimizerParam
 	@Positive
 	private int socCheckTimeStep = 300;
 
+	private AssignmentTaxiOptimizerParams assignmentTaxiOptimizerParams;
+
 	public AssignmentETaxiOptimizerParams() {
-		super(SET_NAME);
+		super(SET_NAME, true, true);
+	}
+
+	@Override
+	public ConfigGroup createParameterSet(String type) {
+		return type.equals(AssignmentTaxiOptimizerParams.SET_NAME) ?
+				new AssignmentTaxiOptimizerParams() :
+				super.createParameterSet(type);
+	}
+
+	@Override
+	public void addParameterSet(ConfigGroup set) {
+		if (set.getName().equals(AssignmentTaxiOptimizerParams.SET_NAME)) {
+			assignmentTaxiOptimizerParams = (AssignmentTaxiOptimizerParams)set;
+		}
+		super.addParameterSet(set);
+	}
+
+	AssignmentTaxiOptimizerParams getAssignmentTaxiOptimizerParams() {
+		return assignmentTaxiOptimizerParams;
+	}
+
+	@Override
+	public int getReoptimizationTimeStep() {
+		return assignmentTaxiOptimizerParams.getReoptimizationTimeStep();
+	}
+
+	@Override
+	public void setReoptimizationTimeStep(int reoptimizationTimeStep) {
+		assignmentTaxiOptimizerParams.setReoptimizationTimeStep(reoptimizationTimeStep);
 	}
 
 	/**
