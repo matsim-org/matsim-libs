@@ -36,7 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
+public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 	public static final String GROUP_NAME = "taxi";
 
 	@SuppressWarnings("deprecation")

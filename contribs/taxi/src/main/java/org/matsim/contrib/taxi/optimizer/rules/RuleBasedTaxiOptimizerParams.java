@@ -27,7 +27,7 @@ import javax.validation.constraints.Positive;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
 
-public class RuleBasedTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
+public final class RuleBasedTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public static final String SET_NAME = "RuleBasedTaxiOptimizer";
 
 	public static final String GOAL = "goal";
@@ -77,11 +77,7 @@ public class RuleBasedTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	private int reoptimizationTimeStep = 1;
 
 	public RuleBasedTaxiOptimizerParams() {
-		this(SET_NAME);
-	}
-
-	protected RuleBasedTaxiOptimizerParams(String paramSetName) {
-		super(paramSetName, false, false);
+		super(SET_NAME, false, false);
 	}
 
 	@Override

@@ -41,7 +41,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.utils.misc.Time;
 
-public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
+public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
 
 	public static final String GROUP_NAME = "drt";

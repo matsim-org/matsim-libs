@@ -19,15 +19,16 @@
 
 package org.matsim.contrib.ev;
 
+import java.net.URL;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import java.net.URL;
-
-public class EvConfigGroup extends ReflectiveConfigGroup {
+public final class EvConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "ev";
 
 	@SuppressWarnings("deprecation")

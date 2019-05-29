@@ -27,7 +27,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-public class ZonalSystemParams extends ReflectiveConfigGroup {
+public final class ZonalSystemParams extends ReflectiveConfigGroup {
 	public static final String SET_NAME = "ZonalSystemParams";
 
 	public static final String ZONES_XML_FILE = "zonesXmlFile";

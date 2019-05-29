@@ -28,7 +28,7 @@ import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
 import org.matsim.core.config.Config;
 
-public class AssignmentTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
+public final class AssignmentTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public static final String SET_NAME = "AssignmentTaxiOptimizer";
 
 	public static final String MODE = "mode";
@@ -92,10 +92,6 @@ public class AssignmentTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	private int reoptimizationTimeStep = 10;
 
 	public AssignmentTaxiOptimizerParams() {
-		this(SET_NAME);
-	}
-
-	protected AssignmentTaxiOptimizerParams(String paramSetName) {
 		super(SET_NAME, true, true);
 	}
 

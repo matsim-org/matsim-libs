@@ -24,7 +24,7 @@ import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.contrib.zone.ZonalSystemParams;
 import org.matsim.core.config.ConfigGroup;
 
-public class ZonalTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
+public final class ZonalTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public static final String SET_NAME = "ZonalTaxiOptimizer";
 
 	private RuleBasedTaxiOptimizerParams ruleBasedTaxiOptimizerParams;

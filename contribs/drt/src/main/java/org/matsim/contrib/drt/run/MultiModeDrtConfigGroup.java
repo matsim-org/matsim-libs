@@ -33,7 +33,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModeDrtConfigGroup extends ReflectiveConfigGroup implements MultiModal<DrtConfigGroup> {
+public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup implements MultiModal<DrtConfigGroup> {
 	public static final String GROUP_NAME = "multiModeDrt";
 
 	@SuppressWarnings("deprecation")

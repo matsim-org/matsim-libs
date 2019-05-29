@@ -29,7 +29,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 /**
  * @author michalm
  */
-public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
+public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	public static final String SET_NAME = "minCostFlowRebalancing";
 
 	public static final String INTERVAL = "interval";

@@ -23,7 +23,7 @@ import javax.validation.constraints.Positive;
 
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 
-public class FifoTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
+public final class FifoTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public static final String SET_NAME = "FifoTaxiOptimizer";
 	@Positive
 	private int reoptimizationTimeStep = 1;
