@@ -85,4 +85,15 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 				throw new RuntimeException();
 		}
 	}
+
+	public static DefaultTaxiOptimizerParams createParameterSet(String type) {
+		switch (type) {
+			case AssignmentETaxiOptimizerParams.SET_NAME:
+				return new AssignmentETaxiOptimizerParams();
+			case RuleBasedETaxiOptimizerParams.SET_NAME:
+				return new RuleBasedETaxiOptimizerParams();
+			default:
+				return null;
+		}
+	}
 }

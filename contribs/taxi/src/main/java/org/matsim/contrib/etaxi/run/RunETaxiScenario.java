@@ -22,6 +22,7 @@ package org.matsim.contrib.etaxi.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.VariableSpeedCharging;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
@@ -41,7 +42,8 @@ public class RunETaxiScenario {
 	private static final double TEMPERATURE = 20;// oC
 
 	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configFile,
+				new TaxiConfigGroup(ETaxiOptimizerProvider::createParameterSet), new DvrpConfigGroup(),
 				new OTFVisConfigGroup(), new EvConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		createControler(config, otfvis).run();
