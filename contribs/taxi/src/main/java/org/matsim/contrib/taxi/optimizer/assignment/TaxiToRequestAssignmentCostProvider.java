@@ -21,7 +21,6 @@ package org.matsim.contrib.taxi.optimizer.assignment;
 
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
-import org.matsim.contrib.taxi.optimizer.VehicleData.Entry;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
 import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.AssignmentCost;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
@@ -55,27 +54,25 @@ public class TaxiToRequestAssignmentCostProvider {
 
 	public AssignmentCost<TaxiRequest> getCost(AssignmentRequestData rData, VehicleData vData) {
 		final Mode currentMode = getCurrentMode(rData, vData);
-		return new AssignmentCost<TaxiRequest>() {
-			public double calc(Entry departure, DestEntry<TaxiRequest> reqEntry, PathData pathData) {
-				double pickupBeginTime = calcPickupBeginTime(departure, reqEntry, pathData);
-				switch (currentMode) {
-					case PICKUP_TIME:
-						// this will work different than ARRIVAL_TIME at oversupply -> will reduce T_P and fairness
-						return pickupBeginTime - departure.time;
+		return (departure, reqEntry, pathData) -> {
+			double pickupBeginTime = calcPickupBeginTime(departure, reqEntry, pathData);
+			switch (currentMode) {
+				case PICKUP_TIME:
+					// this will work different than ARRIVAL_TIME at oversupply -> will reduce T_P and fairness
+					return pickupBeginTime - departure.time;
 
-					case ARRIVAL_TIME:
-						// less fairness, higher throughput
-						return pickupBeginTime;
+				case ARRIVAL_TIME:
+					// less fairness, higher throughput
+					return pickupBeginTime;
 
-					case TOTAL_WAIT_TIME:
-						// more fairness, lower throughput
-						// this will work different than ARRIVAL_TIME at undersupply -> will reduce unfairness and
-						// throughput
-						return pickupBeginTime - reqEntry.destination.getEarliestStartTime();
+				case TOTAL_WAIT_TIME:
+					// more fairness, lower throughput
+					// this will work different than ARRIVAL_TIME at undersupply -> will reduce unfairness and
+					// throughput
+					return pickupBeginTime - reqEntry.destination.getEarliestStartTime();
 
-					default:
-						throw new IllegalStateException();
-				}
+				default:
+					throw new IllegalStateException();
 			}
 		};
 	}
