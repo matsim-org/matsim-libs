@@ -19,16 +19,13 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
-import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.createAbstractOptimParams;
 import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.createDefaultTaxiConfigVariants;
 import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.runBenchmark;
 
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider.OptimizerType;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.PreloadedBenchmark;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.TaxiConfigVariant;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
@@ -41,20 +38,19 @@ public class RuleBasedTaxiOptimizerIT {
 	@Test
 	public void testRuleBased() {
 		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-
 		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(false);
-		Map<String, String> params = createAbstractOptimParams(OptimizerType.RULE_BASED);
+		RuleBasedTaxiOptimizerParams params = new RuleBasedTaxiOptimizerParams();
 
-		params.put(RuleBasedTaxiOptimizerParams.GOAL, Goal.DEMAND_SUPPLY_EQUIL.name());
-		params.put(RuleBasedTaxiOptimizerParams.NEAREST_REQUESTS_LIMIT, 99999 + "");
-		params.put(RuleBasedTaxiOptimizerParams.NEAREST_VEHICLES_LIMIT, 99999 + "");
-		params.put(RuleBasedTaxiOptimizerParams.CELL_SIZE, 99999 + "");
+		params.setGoal(Goal.DEMAND_SUPPLY_EQUIL);
+		params.setNearestRequestsLimit(99999);
+		params.setNearestVehiclesLimit(99999);
+		params.setCellSize(99999.);
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_A");
 
-		params.put(RuleBasedTaxiOptimizerParams.GOAL, Goal.MIN_WAIT_TIME.name());
-		params.put(RuleBasedTaxiOptimizerParams.NEAREST_REQUESTS_LIMIT, 10 + "");
-		params.put(RuleBasedTaxiOptimizerParams.NEAREST_VEHICLES_LIMIT, 10 + "");
-		params.put(RuleBasedTaxiOptimizerParams.CELL_SIZE, 1000 + "");
+		params.setGoal(Goal.MIN_WAIT_TIME);
+		params.setNearestRequestsLimit(10);
+		params.setNearestVehiclesLimit(10);
+		params.setCellSize(1000.);
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_B");
 	}
 }

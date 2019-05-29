@@ -20,17 +20,13 @@
 package org.matsim.contrib.taxi.optimizer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider.OptimizerType;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 
@@ -83,12 +79,6 @@ public class TaxiOptimizerTests {
 		return variants;
 	}
 
-	public static Map<String, String> createAbstractOptimParams(OptimizerType type) {
-		Map<String, String> params = new HashMap<>();
-		params.put(DefaultTaxiOptimizerProvider.TYPE, type.name());
-		return params;
-	}
-
 	public static class PreloadedBenchmark {
 		private final Config config;
 		private final Controler controler;
@@ -107,16 +97,12 @@ public class TaxiOptimizerTests {
 		}
 	}
 
-	public static void runBenchmark(List<TaxiConfigVariant> variants, Map<String, String> params,
+	public static void runBenchmark(List<TaxiConfigVariant> variants, DefaultTaxiOptimizerParams taxiOptimizerParams,
 			PreloadedBenchmark benchmark, String outputDir) {
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(benchmark.config);
+		Optional.ofNullable(taxiCfg.getTaxiOptimizerParams()).ifPresent(taxiCfg::removeParameterSet);
+		taxiCfg.addParameterSet(taxiOptimizerParams);
 
-		ConfigGroup optimizerCfg = new ConfigGroup(TaxiConfigGroup.OPTIMIZER_PARAMETER_SET);
-		for (Entry<String, String> e : params.entrySet()) {
-			optimizerCfg.addParam(e.getKey(), e.getValue());
-		}
-		taxiCfg.setOptimizerConfigGroup(optimizerCfg);
-		
 		int i = 0;
 		for (TaxiConfigVariant v : variants) {
 			v.updateTaxiConfig(taxiCfg);

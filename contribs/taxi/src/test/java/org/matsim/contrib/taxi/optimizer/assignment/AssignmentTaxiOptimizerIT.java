@@ -21,12 +21,10 @@ package org.matsim.contrib.taxi.optimizer.assignment;
 
 import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
 
-import java.util.*;
+import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider.OptimizerType;
 import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -37,23 +35,22 @@ public class AssignmentTaxiOptimizerIT {
 	@Test
 	public void testAssignment() {
 		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-
 		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
-		Map<String, String> params = createAbstractOptimParams(OptimizerType.ASSIGNMENT);
+		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
 
-		params.put(AssignmentTaxiOptimizerParams.MODE, Mode.DSE.name());
-		params.put(AssignmentTaxiOptimizerParams.VEH_PLANNING_HORIZON_OVERSUPPLY, 99999 + "");
-		params.put(AssignmentTaxiOptimizerParams.VEH_PLANNING_HORIZON_UNDERSUPPLY, 99999 + "");
-		params.put(AssignmentTaxiOptimizerParams.NEAREST_REQUESTS_LIMIT, 99999 + "");
-		params.put(AssignmentTaxiOptimizerParams.NEAREST_VEHICLES_LIMIT, 99999 + "");
+		params.setMode(Mode.DSE);
+		params.setVehPlanningHorizonOversupply(99999);
+		params.setVehPlanningHorizonUndersupply(99999);
+		params.setNearestRequestsLimit(99999);
+		params.setNearestVehiclesLimit(99999);
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_A");
 
-		params.put(AssignmentTaxiOptimizerParams.MODE, Mode.DSE.name());
-		params.put(AssignmentTaxiOptimizerParams.VEH_PLANNING_HORIZON_OVERSUPPLY, 120 + "");
-		params.put(AssignmentTaxiOptimizerParams.VEH_PLANNING_HORIZON_UNDERSUPPLY, 30 + "");
-		params.put(AssignmentTaxiOptimizerParams.NEAREST_REQUESTS_LIMIT, 10 + "");
-		params.put(AssignmentTaxiOptimizerParams.NEAREST_VEHICLES_LIMIT, 10 + "");
-		params.put(DefaultTaxiOptimizerParams.REOPTIMIZATION_TIME_STEP, 10 + "");
+		params.setMode(Mode.DSE);
+		params.setVehPlanningHorizonOversupply(120);
+		params.setVehPlanningHorizonUndersupply(30);
+		params.setNearestRequestsLimit(10);
+		params.setNearestVehiclesLimit(10);
+		params.setReoptimizationTimeStep(10);
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_B");
 	}
 }
