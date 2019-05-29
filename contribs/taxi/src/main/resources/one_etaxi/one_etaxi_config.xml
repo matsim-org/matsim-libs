@@ -17,10 +17,12 @@
 		<param name="detailedStats" value="true" />
 
 		<parameterset type="RuleBasedETaxiOptimizer">
-			<param name="goal" value="DEMAND_SUPPLY_EQUIL" />
-			<param name="nearestRequestsLimit" value="99999" />
-			<param name="nearestVehiclesLimit" value="99999" />
-			<param name="cellSize" value="1000" />
+			<parameterset type="RuleBasedTaxiOptimizer">
+				<param name="goal" value="DEMAND_SUPPLY_EQUIL"/>
+				<param name="nearestRequestsLimit" value="99999"/>
+				<param name="nearestVehiclesLimit" value="99999"/>
+				<param name="cellSize" value="1000"/>
+			</parameterset>
 
 			<param name="minRelativeSoc" value="0.7" />
 			<param name="socCheckTimeStep" value="60" />

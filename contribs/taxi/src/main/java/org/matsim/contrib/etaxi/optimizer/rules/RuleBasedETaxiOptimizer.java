@@ -37,7 +37,6 @@ import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.rules.IdleTaxiZonalRegistry;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
-import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.UnplannedRequestZonalRegistry;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
@@ -54,7 +53,8 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public static RuleBasedETaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			ETaxiScheduler eScheduler, Network network, MobsimTimer timer, TravelTime travelTime,
 			TravelDisutility travelDisutility, ChargingInfrastructure chargingInfrastructure) {
-		double cellSize = ((RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getCellSize();
+		double cellSize = ((RuleBasedETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams()
+				.getCellSize();
 		return RuleBasedETaxiOptimizer.create(eventsManager, taxiCfg, fleet, eScheduler, network, timer, travelTime,
 				travelDisutility, chargingInfrastructure, new SquareGridSystem(network, cellSize));
 	}
@@ -67,8 +67,8 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 		BestDispatchFinder dispatchFinder = new BestDispatchFinder(eScheduler, network, timer, travelTime,
 				travelDisutility);
 		RuleBasedRequestInserter requestInserter = new RuleBasedRequestInserter(eScheduler, timer, dispatchFinder,
-				(RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams(), idleTaxiRegistry,
-				unplannedRequestRegistry);
+				((RuleBasedETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams(),
+				idleTaxiRegistry, unplannedRequestRegistry);
 
 		return new RuleBasedETaxiOptimizer(eventsManager, taxiCfg, fleet, eScheduler, chargingInfrastructure,
 				idleTaxiRegistry, unplannedRequestRegistry, dispatchFinder, requestInserter);

@@ -22,9 +22,11 @@ package org.matsim.contrib.etaxi.optimizer.rules;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Positive;
 
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
+import org.matsim.core.config.ConfigGroup;
 
-public class RuleBasedETaxiOptimizerParams extends RuleBasedTaxiOptimizerParams {
+public final class RuleBasedETaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public static final String SET_NAME = "RuleBasedETaxiOptimizer";
 
 	public static final String MIN_RELATIVE_SOC = "minRelativeSoc";
@@ -46,8 +48,39 @@ public class RuleBasedETaxiOptimizerParams extends RuleBasedTaxiOptimizerParams 
 	@Positive
 	private int socCheckTimeStep = 300;
 
+	private RuleBasedTaxiOptimizerParams ruleBasedTaxiOptimizerParams;
+
 	public RuleBasedETaxiOptimizerParams() {
-		super(SET_NAME);
+		super(SET_NAME, false, false);
+	}
+
+	@Override
+	public ConfigGroup createParameterSet(String type) {
+		return type.equals(RuleBasedTaxiOptimizerParams.SET_NAME) ?
+				new RuleBasedTaxiOptimizerParams() :
+				super.createParameterSet(type);
+	}
+
+	@Override
+	public void addParameterSet(ConfigGroup set) {
+		if (set.getName().equals(RuleBasedTaxiOptimizerParams.SET_NAME)) {
+			ruleBasedTaxiOptimizerParams = (RuleBasedTaxiOptimizerParams)set;
+		}
+		super.addParameterSet(set);
+	}
+
+	RuleBasedTaxiOptimizerParams getRuleBasedTaxiOptimizerParams() {
+		return ruleBasedTaxiOptimizerParams;
+	}
+
+	@Override
+	public int getReoptimizationTimeStep() {
+		return ruleBasedTaxiOptimizerParams.getReoptimizationTimeStep();
+	}
+
+	@Override
+	public void setReoptimizationTimeStep(int reoptimizationTimeStep) {
+		ruleBasedTaxiOptimizerParams.setReoptimizationTimeStep(reoptimizationTimeStep);
 	}
 
 	/**
