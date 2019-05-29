@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-import org.apache.commons.configuration.Configuration;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
 
@@ -74,15 +73,12 @@ public class RuleBasedTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	@Positive
 	private double cellSize = 1000;
 
-	public RuleBasedTaxiOptimizerParams(Configuration optimizerConfig) {
-		super(1, false, false);
+	public RuleBasedTaxiOptimizerParams() {
+		this(SET_NAME);
+	}
 
-		goal = Goal.valueOf(optimizerConfig.getString(GOAL));
-
-		nearestRequestsLimit = optimizerConfig.getInt(NEAREST_REQUESTS_LIMIT);
-		nearestVehiclesLimit = optimizerConfig.getInt(NEAREST_VEHICLES_LIMIT);
-
-		cellSize = optimizerConfig.getDouble(CELL_SIZE);
+	protected RuleBasedTaxiOptimizerParams(String paramSetName) {
+		super(paramSetName, 1, false, false);
 	}
 
 	@Override

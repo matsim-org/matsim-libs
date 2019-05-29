@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.MapConfiguration;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
@@ -45,10 +43,6 @@ import com.google.inject.name.Named;
 
 public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	public static final String TYPE = "type";
-
-	public enum OptimizerType {
-		ASSIGNMENT, FIFO, RULE_BASED, ZONAL;
-	}
 
 	private final EventsManager eventsManager;
 	private final TaxiConfigGroup taxiCfg;
@@ -75,25 +69,23 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
 	@Override
 	public TaxiOptimizer get() {
-		Configuration optimizerConfig = new MapConfiguration(taxiCfg.getOptimizerConfigGroup().getParams());
-		OptimizerType type = OptimizerType.valueOf(optimizerConfig.getString(TYPE));
-
-		switch (type) {
-			case ASSIGNMENT:
+		DefaultTaxiOptimizerParams taxiOptimizerParams = taxiCfg.getTaxiOptimizerParams();
+		switch (taxiOptimizerParams.getName()) {
+			case AssignmentTaxiOptimizerParams.SET_NAME:
 				return new AssignmentTaxiOptimizer(eventsManager, taxiCfg, fleet, network, timer, travelTime,
-						travelDisutility, scheduler, new AssignmentTaxiOptimizerParams(optimizerConfig));
+						travelDisutility, scheduler);
 
-			case FIFO:
+			case FifoTaxiOptimizerParams.SET_NAME:
 				return new FifoTaxiOptimizer(eventsManager, taxiCfg, fleet, network, timer, travelTime,
-						travelDisutility, scheduler, new FifoTaxiOptimizerParams(optimizerConfig));
+						travelDisutility, scheduler);
 
-			case RULE_BASED:
+			case RuleBasedTaxiOptimizerParams.SET_NAME:
 				return RuleBasedTaxiOptimizer.create(eventsManager, taxiCfg, fleet, scheduler, network, timer,
-						travelTime, travelDisutility, new RuleBasedTaxiOptimizerParams(optimizerConfig));
+						travelTime, travelDisutility);
 
-			case ZONAL:
+			case ZonalTaxiOptimizerParams.SET_NAME:
 				return ZonalTaxiOptimizer.create(eventsManager, taxiCfg, fleet, scheduler, network, timer, travelTime,
-						travelDisutility, new ZonalTaxiOptimizerParams(optimizerConfig));
+						travelDisutility);
 
 			default:
 				throw new IllegalStateException();

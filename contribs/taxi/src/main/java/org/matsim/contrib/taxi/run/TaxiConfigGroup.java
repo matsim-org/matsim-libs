@@ -28,6 +28,11 @@ import javax.validation.constraints.Positive;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.run.Modal;
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.fifo.FifoTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.zonal.ZonalTaxiOptimizerParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -365,13 +370,51 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 		this.breakSimulationIfNotAllRequestsServed = breakSimulationIfNotAllRequestsServed;
 	}
 
-	public ConfigGroup getOptimizerConfigGroup() {
-		return getParameterSets(OPTIMIZER_PARAMETER_SET).iterator().next();
+	private DefaultTaxiOptimizerParams taxiOptimizerParams;
+
+	public DefaultTaxiOptimizerParams getTaxiOptimizerParams() {
+		return taxiOptimizerParams;
 	}
 
-	public void setOptimizerConfigGroup(ConfigGroup optimizerCfg) {
-		clearParameterSetsForType(OPTIMIZER_PARAMETER_SET);
-		addParameterSet(optimizerCfg);
+	@Override
+	public ConfigGroup createParameterSet(String type) {
+		switch (type) {
+			case AssignmentTaxiOptimizerParams.SET_NAME:
+				return new AssignmentTaxiOptimizerParams();
+			case FifoTaxiOptimizerParams.SET_NAME:
+				return new FifoTaxiOptimizerParams();
+			case RuleBasedTaxiOptimizerParams.SET_NAME:
+				return new RuleBasedTaxiOptimizerParams();
+			case ZonalTaxiOptimizerParams.SET_NAME:
+				return new ZonalTaxiOptimizerParams();
+		}
+
+		return super.createParameterSet(type);
+	}
+
+	@Override
+	public void addParameterSet(ConfigGroup set) {
+		if (set instanceof DefaultTaxiOptimizerParams) {
+			if (taxiOptimizerParams != null) {
+				throw new IllegalStateException(
+						"Remove the existing taxi optimizer parameter set before adding a new one");
+			}
+			taxiOptimizerParams = (DefaultTaxiOptimizerParams)set;
+		}
+
+		super.addParameterSet(set);
+	}
+
+	@Override
+	public boolean removeParameterSet(ConfigGroup set) {
+		if (set instanceof DefaultTaxiOptimizerParams) {
+			if (taxiOptimizerParams == null) {
+				throw new IllegalStateException("The existing taxi optimizer param set is null. Cannot remove it.");
+			}
+			taxiOptimizerParams = null;
+		}
+
+		return super.removeParameterSet(set);
 	}
 
 	public URL getTaxisFileUrl(URL context) {

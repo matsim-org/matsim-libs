@@ -42,9 +42,9 @@ public class DefaultTaxiOptimizerParams extends ReflectiveConfigGroup {
 	public final boolean doUnscheduleAwaitingRequests;// PLANNED requests
 	public final boolean doUpdateTimelines;// STARTED+PLANNED requests
 
-	public DefaultTaxiOptimizerParams(int defaultReoptimizationTimeStep, boolean doUnscheduleAwaitingRequests,
-			boolean doUpdateTimelines) {
-		super(null);//FIXME pass it from the subclass
+	protected DefaultTaxiOptimizerParams(String paramSetName, int defaultReoptimizationTimeStep,
+			boolean doUnscheduleAwaitingRequests, boolean doUpdateTimelines) {
+		super(paramSetName);
 		reoptimizationTimeStep = defaultReoptimizationTimeStep;
 		this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;
 		this.doUpdateTimelines = doUpdateTimelines;

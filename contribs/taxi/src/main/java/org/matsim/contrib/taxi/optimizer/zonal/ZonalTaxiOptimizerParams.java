@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 
-import org.apache.commons.configuration.Configuration;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 
 public class ZonalTaxiOptimizerParams extends RuleBasedTaxiOptimizerParams {
@@ -45,12 +44,8 @@ public class ZonalTaxiOptimizerParams extends RuleBasedTaxiOptimizerParams {
 	@PositiveOrZero
 	private double expansionDistance = 0;
 
-	public ZonalTaxiOptimizerParams(Configuration optimizerConfig) {
-		super(optimizerConfig);
-
-		zonesXmlFile = optimizerConfig.getString(ZONES_XML_FILE);
-		zonesShpFile = optimizerConfig.getString(ZONES_SHP_FILE);
-		expansionDistance = optimizerConfig.getDouble(EXPANSION_DISTANCE);
+	public ZonalTaxiOptimizerParams() {
+		super(SET_NAME);
 	}
 
 	@Override

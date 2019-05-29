@@ -19,13 +19,12 @@
 
 package org.matsim.contrib.taxi.optimizer.fifo;
 
-import org.apache.commons.configuration.Configuration;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 
 public class FifoTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public static final String SET_NAME = "FifoTaxiOptimizer";
 
-	public FifoTaxiOptimizerParams(Configuration optimizerConfig) {
-		super(1, true, true);
+	public FifoTaxiOptimizerParams() {
+		super(SET_NAME, 1, true, true);
 	}
 }

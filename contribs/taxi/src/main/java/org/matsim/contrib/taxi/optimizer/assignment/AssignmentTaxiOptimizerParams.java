@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-import org.apache.commons.configuration.Configuration;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
 import org.matsim.core.config.Config;
@@ -85,24 +84,12 @@ public class AssignmentTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public static final String NULL_PATH_COST = "nullPathCost";
 	static final String NULL_PATH_COST_EXP = "Specifies the cost for vehicle-request pairs not included in the matrix"
 			+ " calculation. Should be high enough to prevent choosing such assignments."
-			+ " The default value is 48 * 3600 (2 days) (used for simulating taxis in Berlin).";
+			+ " The default value is 48 * 3600 seconds (2 days) (used for simulating taxis in Berlin).";
 	@Positive
 	private double nullPathCost = 48 * 3600;
 
-	public AssignmentTaxiOptimizerParams(Configuration optimizerConfig) {
-		super(10, true, true);
-
-		mode = Mode.valueOf(optimizerConfig.getString(MODE));
-
-		vehPlanningHorizonOversupply = optimizerConfig.getInt(VEH_PLANNING_HORIZON_OVERSUPPLY);
-		vehPlanningHorizonUndersupply = optimizerConfig.getInt(VEH_PLANNING_HORIZON_UNDERSUPPLY);
-
-		nearestRequestsLimit = optimizerConfig.getInt(NEAREST_REQUESTS_LIMIT);
-		nearestVehiclesLimit = optimizerConfig.getInt(NEAREST_VEHICLES_LIMIT);
-
-		// when the cost is measured in time units (seconds),
-		// 48 * 36000 s (2 days) seem big enough to prevent such assignments
-		nullPathCost = optimizerConfig.getDouble(NULL_PATH_COST, 48 * 3600);
+	public AssignmentTaxiOptimizerParams() {
+		super(SET_NAME, 10, true, true);
 	}
 
 	@Override
