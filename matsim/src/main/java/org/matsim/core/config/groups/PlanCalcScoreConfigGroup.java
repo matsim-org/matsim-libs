@@ -527,7 +527,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 	}
 
-	public void addScoringParameters(final ScoringParameterSet params) {
+	private void addScoringParameters( final ScoringParameterSet params ) {
 		final ScoringParameterSet previous = this.getScoringParameters(params.getSubpopulation());
 
 		if (previous != null) {
