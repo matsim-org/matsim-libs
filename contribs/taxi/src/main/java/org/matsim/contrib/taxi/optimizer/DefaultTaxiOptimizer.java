@@ -53,7 +53,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final UnplannedRequestInserter requestInserter;
 
 	private final TaxiConfigGroup taxiCfg;
-	private final DefaultTaxiOptimizerParams params;
+	private final AbstractTaxiOptimizerParams params;
 
 	private boolean requiresReoptimization = false;
 

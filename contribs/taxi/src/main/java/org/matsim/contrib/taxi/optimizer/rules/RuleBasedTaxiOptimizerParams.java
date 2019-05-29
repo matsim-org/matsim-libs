@@ -24,10 +24,10 @@ import java.util.Map;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
 
-public final class RuleBasedTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
+public final class RuleBasedTaxiOptimizerParams extends AbstractTaxiOptimizerParams {
 	public static final String SET_NAME = "RuleBasedTaxiOptimizer";
 
 	public static final String GOAL = "goal";

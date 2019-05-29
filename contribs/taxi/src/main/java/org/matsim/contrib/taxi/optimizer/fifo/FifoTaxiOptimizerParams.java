@@ -21,9 +21,9 @@ package org.matsim.contrib.taxi.optimizer.fifo;
 
 import javax.validation.constraints.Positive;
 
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 
-public final class FifoTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
+public final class FifoTaxiOptimizerParams extends AbstractTaxiOptimizerParams {
 	public static final String SET_NAME = "FifoTaxiOptimizer";
 	@Positive
 	private int reoptimizationTimeStep = 1;

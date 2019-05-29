@@ -29,7 +29,7 @@ import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentETaxiOptimizerPar
 import org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizer;
 import org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizerParams;
 import org.matsim.contrib.ev.data.ChargingInfrastructure;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -70,7 +70,7 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
 	@Override
 	public TaxiOptimizer get() {
-		DefaultTaxiOptimizerParams taxiOptimizerParams = taxiCfg.getTaxiOptimizerParams();
+		AbstractTaxiOptimizerParams taxiOptimizerParams = taxiCfg.getTaxiOptimizerParams();
 
 		switch (taxiOptimizerParams.getName()) {
 			case RuleBasedETaxiOptimizerParams.SET_NAME:
@@ -86,7 +86,7 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 		}
 	}
 
-	public static DefaultTaxiOptimizerParams createParameterSet(String type) {
+	public static AbstractTaxiOptimizerParams createParameterSet(String type) {
 		switch (type) {
 			case AssignmentETaxiOptimizerParams.SET_NAME:
 				return new AssignmentETaxiOptimizerParams();

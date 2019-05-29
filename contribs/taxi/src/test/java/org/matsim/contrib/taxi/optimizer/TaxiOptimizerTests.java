@@ -97,7 +97,7 @@ public class TaxiOptimizerTests {
 		}
 	}
 
-	public static void runBenchmark(List<TaxiConfigVariant> variants, DefaultTaxiOptimizerParams taxiOptimizerParams,
+	public static void runBenchmark(List<TaxiConfigVariant> variants, AbstractTaxiOptimizerParams taxiOptimizerParams,
 			PreloadedBenchmark benchmark, String outputDir) {
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(benchmark.config);
 		Optional.ofNullable(taxiCfg.getTaxiOptimizerParams()).ifPresent(taxiCfg::removeParameterSet);

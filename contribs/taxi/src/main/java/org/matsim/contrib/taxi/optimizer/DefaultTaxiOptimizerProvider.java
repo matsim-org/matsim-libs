@@ -69,7 +69,7 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
 	@Override
 	public TaxiOptimizer get() {
-		DefaultTaxiOptimizerParams taxiOptimizerParams = taxiCfg.getTaxiOptimizerParams();
+		AbstractTaxiOptimizerParams taxiOptimizerParams = taxiCfg.getTaxiOptimizerParams();
 		switch (taxiOptimizerParams.getName()) {
 			case AssignmentTaxiOptimizerParams.SET_NAME:
 				return new AssignmentTaxiOptimizer(eventsManager, taxiCfg, fleet, network, timer, travelTime,
@@ -92,7 +92,7 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 		}
 	}
 
-	public static DefaultTaxiOptimizerParams createParameterSet(String type) {
+	public static AbstractTaxiOptimizerParams createParameterSet(String type) {
 		switch (type) {
 			case AssignmentTaxiOptimizerParams.SET_NAME:
 				return new AssignmentTaxiOptimizerParams();

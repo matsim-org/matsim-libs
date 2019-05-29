@@ -19,12 +19,12 @@
 
 package org.matsim.contrib.taxi.optimizer.zonal;
 
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.contrib.zone.ZonalSystemParams;
 import org.matsim.core.config.ConfigGroup;
 
-public final class ZonalTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
+public final class ZonalTaxiOptimizerParams extends AbstractTaxiOptimizerParams {
 	public static final String SET_NAME = "ZonalTaxiOptimizer";
 
 	private RuleBasedTaxiOptimizerParams ruleBasedTaxiOptimizerParams;

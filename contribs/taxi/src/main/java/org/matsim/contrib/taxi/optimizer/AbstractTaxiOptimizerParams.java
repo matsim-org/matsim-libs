@@ -26,7 +26,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 /**
  * @author michalm
  */
-public abstract class DefaultTaxiOptimizerParams extends ReflectiveConfigGroup {
+public abstract class AbstractTaxiOptimizerParams extends ReflectiveConfigGroup {
 	public static final String REOPTIMIZATION_TIME_STEP = "reoptimizationTimeStep";
 	static final String REOPTIMIZATION_TIME_STEP_EXP = "Specifies how often the reoptimization algorithm is executed."
 			+ " Must be a positive integer value. Smaller values mean lower reaction time."
@@ -38,7 +38,7 @@ public abstract class DefaultTaxiOptimizerParams extends ReflectiveConfigGroup {
 	public final boolean doUnscheduleAwaitingRequests;// PLANNED requests
 	public final boolean doUpdateTimelines;// STARTED+PLANNED requests
 
-	protected DefaultTaxiOptimizerParams(String paramSetName, boolean doUnscheduleAwaitingRequests,
+	protected AbstractTaxiOptimizerParams(String paramSetName, boolean doUnscheduleAwaitingRequests,
 			boolean doUpdateTimelines) {
 		super(paramSetName);
 		this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;

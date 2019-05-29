@@ -22,11 +22,11 @@ package org.matsim.contrib.etaxi.optimizer.assignment;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Positive;
 
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
 import org.matsim.core.config.ConfigGroup;
 
-public final class AssignmentETaxiOptimizerParams extends DefaultTaxiOptimizerParams {
+public final class AssignmentETaxiOptimizerParams extends AbstractTaxiOptimizerParams {
 	public static final String SET_NAME = "AssignmentETaxiOptimizer";
 
 	public static final String MIN_RELATIVE_SOC = "minRelativeSoc";

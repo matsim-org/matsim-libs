@@ -30,7 +30,7 @@ import javax.validation.constraints.Positive;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.run.Modal;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -132,14 +132,14 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 
 	private boolean printDetailedWarnings = true;
 
-	private final Function<String, DefaultTaxiOptimizerParams> taxiOptimizerParamsCreator;
-	private DefaultTaxiOptimizerParams taxiOptimizerParams;
+	private final Function<String, AbstractTaxiOptimizerParams> taxiOptimizerParamsCreator;
+	private AbstractTaxiOptimizerParams taxiOptimizerParams;
 
 	public TaxiConfigGroup() {
 		this(DefaultTaxiOptimizerProvider::createParameterSet);
 	}
 
-	public TaxiConfigGroup(Function<String, DefaultTaxiOptimizerParams> taxiOptimizerParamsCreator) {
+	public TaxiConfigGroup(Function<String, AbstractTaxiOptimizerParams> taxiOptimizerParamsCreator) {
 		super(GROUP_NAME);
 		this.taxiOptimizerParamsCreator = taxiOptimizerParamsCreator;
 	}
@@ -371,7 +371,7 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 		this.breakSimulationIfNotAllRequestsServed = breakSimulationIfNotAllRequestsServed;
 	}
 
-	public DefaultTaxiOptimizerParams getTaxiOptimizerParams() {
+	public AbstractTaxiOptimizerParams getTaxiOptimizerParams() {
 		return taxiOptimizerParams;
 	}
 
@@ -383,12 +383,12 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 
 	@Override
 	public void addParameterSet(ConfigGroup set) {
-		if (set instanceof DefaultTaxiOptimizerParams) {
+		if (set instanceof AbstractTaxiOptimizerParams) {
 			if (taxiOptimizerParams != null) {
 				throw new IllegalStateException(
 						"Remove the existing taxi optimizer parameter set before adding a new one");
 			}
-			taxiOptimizerParams = (DefaultTaxiOptimizerParams)set;
+			taxiOptimizerParams = (AbstractTaxiOptimizerParams)set;
 		}
 
 		super.addParameterSet(set);
@@ -396,7 +396,7 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 
 	@Override
 	public boolean removeParameterSet(ConfigGroup set) {
-		if (set instanceof DefaultTaxiOptimizerParams) {
+		if (set instanceof AbstractTaxiOptimizerParams) {
 			if (taxiOptimizerParams == null) {
 				throw new IllegalStateException("The existing taxi optimizer param set is null. Cannot remove it.");
 			}
