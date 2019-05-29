@@ -52,5 +52,11 @@ public class RuleBasedTaxiOptimizerIT {
 		params.setNearestVehiclesLimit(10);
 		params.setCellSize(1000.);
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_B");
+
+		params.setGoal(Goal.MIN_PICKUP_TIME);
+		params.setNearestRequestsLimit(1);
+		params.setNearestVehiclesLimit(1);
+		params.setCellSize(100.);
+		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_C");
 	}
 }

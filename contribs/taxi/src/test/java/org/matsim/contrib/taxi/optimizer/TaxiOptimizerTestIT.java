@@ -30,26 +30,11 @@ import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.PreloadedBenchmark;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.TaxiConfigVariant;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
-import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
-import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class TaxiOptimizerTestIT {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
-
-	@Test
-	public void testRuleBased() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(false);
-		RuleBasedTaxiOptimizerParams params = new RuleBasedTaxiOptimizerParams();
-
-		params.setGoal(Goal.MIN_PICKUP_TIME);
-		params.setNearestRequestsLimit(1);
-		params.setNearestVehiclesLimit(1);
-		params.setCellSize(100.);
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory());
-	}
 
 	@Test
 	public void testAssignment() {
