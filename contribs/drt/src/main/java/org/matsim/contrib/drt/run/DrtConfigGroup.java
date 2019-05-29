@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -538,7 +537,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	 * @return 'minCostFlowRebalancing' parameter set defined in the DRT config or null if the parameters were not
 	 * specified
 	 */
-	public Optional<@Valid MinCostFlowRebalancingParams> getMinCostFlowRebalancing() {
+	public Optional<MinCostFlowRebalancingParams> getMinCostFlowRebalancing() {
 		Collection<? extends ConfigGroup> parameterSets = getParameterSets(MinCostFlowRebalancingParams.SET_NAME);
 		if (parameterSets.size() > 1) {
 			throw new RuntimeException("More then one rebalancing parameter sets is specified");
