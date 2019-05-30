@@ -18,27 +18,17 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.run;
-
-import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
-import org.matsim.core.mobsim.qsim.PreplanningEngineQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
+package org.matsim.core.mobsim.qsim;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DvrpQSimComponents {
-	public static QSimComponentsConfigurator activateModes(String... modes) {
-		return components -> {
-			DynActivityEngineModule.configureComponents(components);
-			components.addNamedComponent(PreplanningEngineQSimModule.COMPONENT_NAME);
-			for (String m : modes) {
-				components.addComponent(DvrpModes.mode(m));
-			}
-		};
-	}
+public class PreplanningEngineQSimModule extends AbstractQSimModule {
+	public final static String COMPONENT_NAME = "PreplanningEngine";
 
-	public static QSimComponentsConfigurator activateAllModes(MultiModal<?> multiModal) {
-		return activateModes(multiModal.modes().toArray(String[]::new));
+	@Override
+	protected void configureQSim() {
+		bind(PreplanningEngine.class).asEagerSingleton();
+		addQSimComponentBinding(COMPONENT_NAME).to(PreplanningEngine.class);
 	}
 }

@@ -19,7 +19,9 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
-import com.google.inject.Singleton;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -30,7 +32,6 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.dvrp.passenger.PassengerModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -47,6 +48,7 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup;
+import org.matsim.core.mobsim.qsim.PreplanningEngineQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
@@ -55,8 +57,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import java.util.Arrays;
-import java.util.List;
+import com.google.inject.Singleton;
 
 public class RunOneTaxiWithPrebookingExampleIT {
 	private static final Logger log = Logger.getLogger(RunOneTaxiWithPrebookingExampleIT.class);
@@ -75,7 +76,8 @@ public class RunOneTaxiWithPrebookingExampleIT {
 
 		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
 
-		QSimComponentsConfigGroup componentsConfig = ConfigUtils.addOrGetModule(config, QSimComponentsConfigGroup.class);
+		QSimComponentsConfigGroup componentsConfig = ConfigUtils.addOrGetModule(config,
+				QSimComponentsConfigGroup.class);
 		for (String component : componentsConfig.getActiveComponents()) {
 			log.info("mobsimComponent=" + component);
 		}
@@ -87,7 +89,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
-			plan.getAttributes().putAttribute( ActivityEngineWithWakeup.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900. );
+			plan.getAttributes().putAttribute(ActivityEngineWithWakeup.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900.);
 			//			for( PlanElement pe : plan.getPlanElements() ){
 			//				if ( pe instanceof Leg ) {
 			//					if ( ((Leg) pe).getMode().equals( TransportMode.drt ) || ((Leg) pe).getMode().equals( TransportMode.taxi ) ) {
@@ -98,26 +100,26 @@ public class RunOneTaxiWithPrebookingExampleIT {
 			//			}
 		}
 
-//		scenario.getPopulation().getPersons().values().removeIf( result -> !result.getId().toString().equals( "passenger_0" ) );
+		//		scenario.getPopulation().getPersons().values().removeIf( result -> !result.getId().toString().equals( "passenger_0" ) );
 
 		PopulationUtils.writePopulation(scenario.getPopulation(), utils.getOutputDirectory() + "/../pop.xml");
 
 		// setup controler
 		Controler controler = new Controler(scenario);
 
-		controler.configureQSimComponents( new QSimComponentsConfigurator(){
+		controler.configureQSimComponents(new QSimComponentsConfigurator() {
 			@Override
-			public void configure( QSimComponentsConfig components ){
+			public void configure(QSimComponentsConfig components) {
 				// this method, other than the methods in addOverriding..., is _not_ additive.  It always starts afresh, from the default configuration.
-				components.removeNamedComponent( ActivityEngineModule.COMPONENT_NAME );
-				components.addNamedComponent( "abc" );
-				components.addNamedComponent( "def" );
-				components.addNamedComponent( PassengerModule.BookingEngineQSimModule.COMPONENT_NAME );
-				for( String m : new String[]{TransportMode.taxi} ){
-					components.addComponent( DvrpModes.mode( m ) );
+				components.removeNamedComponent(ActivityEngineModule.COMPONENT_NAME);
+				components.addNamedComponent("abc");
+				components.addNamedComponent("def");
+				components.addNamedComponent(PreplanningEngineQSimModule.COMPONENT_NAME);
+				for (String m : new String[] { TransportMode.taxi }) {
+					components.addComponent(DvrpModes.mode(m));
 				}
 			}
-		} );
+		});
 		// yyyy in the somewhat longer run, would rather not have the components configuration in user code.  kai, mar'19
 
 		controler.addOverridingModule(new DvrpModule());
@@ -126,20 +128,21 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		// yyyy I find it unexpected to have an example as "module".  kai, mar'19
 
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
-			@Override protected void configureQSim() {
-				this.addQSimComponentBinding( "def" ).to( ActivityEngineWithWakeup.class ) ;
-				this.addQSimComponentBinding( "abc" ).to( DynActivityEngine.class ) ;
+			@Override
+			protected void configureQSim() {
+				this.addQSimComponentBinding("def").to(ActivityEngineWithWakeup.class);
+				this.addQSimComponentBinding("abc").to(DynActivityEngine.class);
 			}
 		});
 
-//		controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
+		//		controler.addOverridingModule(new OTFVisLiveModule() ); // OTFVis visualisation
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.bind( Checker.class ).in( Singleton.class ) ;
-				this.addEventHandlerBinding().to( Checker.class ) ;
-				this.addControlerListenerBinding().to( Checker.class ) ;
+				this.bind(Checker.class).in(Singleton.class);
+				this.addEventHandlerBinding().to(Checker.class);
+				this.addControlerListenerBinding().to(Checker.class);
 			}
 		});
 
@@ -152,20 +155,20 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		private int cnt2 = 0;
 
 		@Override
-		public synchronized void handleEvent( Event event ) {
+		public synchronized void handleEvent(Event event) {
 			if (event instanceof ActivityEngineWithWakeup.AgentWakeupEvent) {
 				final ActivityEngineWithWakeup.AgentWakeupEvent ev = (ActivityEngineWithWakeup.AgentWakeupEvent)event;
-//				System.out.println() ;
-//				System.err.println(event) ;
-//				System.out.println("") ;
+				//				System.out.println() ;
+				//				System.err.println(event) ;
+				//				System.out.println("") ;
 				switch (cnt) {
 					case 0:
 					case 1:
 					case 2:
 					case 3:
-						Assert.assertEquals(0., event.getTime(), Double.MIN_VALUE );
-						final List<String> personIds = Arrays.asList("passenger_0", "passenger_1",
-								"passenger_2", "passenger_3" );
+						Assert.assertEquals(0., event.getTime(), Double.MIN_VALUE);
+						final List<String> personIds = Arrays.asList("passenger_0", "passenger_1", "passenger_2",
+								"passenger_3");
 						Assert.assertTrue(personIds.contains(ev.getPersonId().toString()));
 						break;
 					case 4:
@@ -194,27 +197,27 @@ public class RunOneTaxiWithPrebookingExampleIT {
 						break;
 				}
 				cnt++;
-			} else if (event instanceof PassengerRequestScheduledEvent ) {
+			} else if (event instanceof PassengerRequestScheduledEvent) {
 				PassengerRequestScheduledEvent ev = (PassengerRequestScheduledEvent)event;
 				//				System.out.println("") ;
-//				System.err.println( event) ;
+				//				System.err.println( event) ;
 				//				System.out.println(""); ;
 				Assert.assertEquals("taxi_one", ev.getVehicleId().toString());
 				switch (ev.getPersonId().toString()) {
 					case "passenger_0":
-						Assert.assertEquals(61.66, ev.getPickupTime(), 0.1 );
+						Assert.assertEquals(61.66, ev.getPickupTime(), 0.1);
 						Assert.assertEquals("taxi_0", ev.getRequestId().toString());
 						break;
 					case "passenger_1":
-						Assert.assertEquals(567.0, ev.getPickupTime(), 0.1 );
+						Assert.assertEquals(567.0, ev.getPickupTime(), 0.1);
 						Assert.assertEquals("taxi_1", ev.getRequestId().toString());
 						break;
 					case "passenger_2":
-						Assert.assertEquals(954.33, ev.getPickupTime(), 0.1 );
+						Assert.assertEquals(954.33, ev.getPickupTime(), 0.1);
 						Assert.assertEquals("taxi_2", ev.getRequestId().toString());
 						break;
 					case "passenger_3":
-						Assert.assertEquals(1401.66, ev.getPickupTime(), 0.1 );
+						Assert.assertEquals(1401.66, ev.getPickupTime(), 0.1);
 						Assert.assertEquals("taxi_3", ev.getRequestId().toString());
 						break;
 					case "passenger_4":
@@ -243,21 +246,21 @@ public class RunOneTaxiWithPrebookingExampleIT {
 						break;
 				}
 				cnt2++;
-			} else if (event instanceof ActivityEndEvent  && ((ActivityEndEvent) event).getActType().equals( "dummy" ) ) {
+			} else if (event instanceof ActivityEndEvent && ((ActivityEndEvent)event).getActType().equals("dummy")) {
 				ActivityEndEvent ev = (ActivityEndEvent)event;
-//				System.err.println( event) ;
+				//				System.err.println( event) ;
 				switch (ev.getPersonId().toString()) {
 					case "passenger_0":
-						Assert.assertEquals(2., ev.getTime(), 0.1 );
+						Assert.assertEquals(2., ev.getTime(), 0.1);
 						break;
 					case "passenger_1":
-						Assert.assertEquals(2., ev.getTime(), 0.1 );
+						Assert.assertEquals(2., ev.getTime(), 0.1);
 						break;
 					case "passenger_2":
-						Assert.assertEquals(55., ev.getTime(), 0.1 );
+						Assert.assertEquals(55., ev.getTime(), 0.1);
 						break;
 					case "passenger_3":
-						Assert.assertEquals(502., ev.getTime(), 0.1 );
+						Assert.assertEquals(502., ev.getTime(), 0.1);
 						break;
 					case "passenger_4":
 						Assert.assertEquals(1078., ev.getTime(), 0.1);
@@ -278,19 +281,19 @@ public class RunOneTaxiWithPrebookingExampleIT {
 						Assert.assertEquals(3434., ev.getTime(), 0.1);
 						break;
 				}
-			} else if ( event instanceof HasPersonId ) {
-				if ( ((HasPersonId) event).getPersonId().toString().contains( "passenger" )){
-					System.err.println( event );
+			} else if (event instanceof HasPersonId) {
+				if (((HasPersonId)event).getPersonId().toString().contains("passenger")) {
+					System.err.println(event);
 				}
 			}
 		}
 
 		@Override
-		public void notifyShutdown( ShutdownEvent event ){
-			log.info("cnt=" + cnt ) ;
-			log.info("cnt2=" + cnt2 ) ;
-//			Assert.assertEquals( 10, cnt );
-//			Assert.assertEquals( 10, cnt2 );
+		public void notifyShutdown(ShutdownEvent event) {
+			log.info("cnt=" + cnt);
+			log.info("cnt2=" + cnt2);
+			//			Assert.assertEquals( 10, cnt );
+			//			Assert.assertEquals( 10, cnt2 );
 		}
 	}
 }

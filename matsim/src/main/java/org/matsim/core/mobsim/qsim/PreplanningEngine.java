@@ -1,13 +1,28 @@
 package org.matsim.core.mobsim.qsim;
 
-import java.util.*;
+import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
@@ -21,7 +36,10 @@ import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.router.*;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
@@ -31,8 +49,6 @@ import org.matsim.withinday.utils.EditPlans;
 import org.matsim.withinday.utils.EditTrips;
 
 import com.google.inject.Inject;
-
-import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
 
 public final class PreplanningEngine implements MobsimEngine {
 	// Could implement this as a generalized version of the bdi-abm implementation: can send notifications to agent, and agent can react.  Similar to the drive-to action.
@@ -277,7 +293,7 @@ public final class PreplanningEngine implements MobsimEngine {
 												 .setTime(drtTrip.getOriginActivity().getEndTime())
 												 .createRequest();
 
-		//first simulate ActivityEngineWithWakeup and then BookingEngine --> decision process
+		//first simulate ActivityEngineWithWakeup and then PreplanningEngine --> decision process
 		//in the same time step
 		this.notifyTripInfoNeeded(agent, request );
 	}

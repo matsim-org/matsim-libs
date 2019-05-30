@@ -20,10 +20,10 @@
 
 package org.matsim.api.core.v01.events;
 
-import org.matsim.core.api.internal.HasPersonId;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.matsim.core.api.internal.HasPersonId;
 
 public abstract class Event {
 
@@ -51,7 +51,7 @@ public abstract class Event {
 	/** @return a unique, descriptive name for this event type, used to identify event types in files. */
 	abstract public String getEventType();
 
-	public double getTime() {
+	public final double getTime() {
 		return this.time;
 	}
 	
@@ -74,7 +74,7 @@ public abstract class Event {
 			return false;
 		} else {
 			Event other = (Event) obj;
-			return time == other.getTime() &&
+			return time == other.time &&
 					getEventType().equals(other.getEventType()) &&
 					getAttributes().equals(other.getAttributes());
 		}
@@ -84,7 +84,6 @@ public abstract class Event {
 	public int hashCode() {
 		return getAttributes().hashCode(); // Two equal events must at least have the same attributes, so they will get the same hashCode like this.
 	}
-
 }
 
 
