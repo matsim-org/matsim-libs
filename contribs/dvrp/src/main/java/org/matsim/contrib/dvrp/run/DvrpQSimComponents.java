@@ -31,7 +31,7 @@ public class DvrpQSimComponents {
 	public static QSimComponentsConfigurator activateModes(String... modes) {
 		return components -> {
 			DynActivityEngineModule.configureComponents(components);
-			components.addNamedComponent(PassengerModule.BookingEngineQSimModule.COMPONENT_NAME);
+			components.addNamedComponent(PassengerModule.PreplanningEngineQSimModule.COMPONENT_NAME);
 			for (String m : modes) {
 				components.addComponent(DvrpModes.mode(m));
 			}

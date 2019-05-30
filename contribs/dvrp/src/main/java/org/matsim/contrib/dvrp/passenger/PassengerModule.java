@@ -39,16 +39,16 @@ public final class PassengerModule extends AbstractModule {
 	public void install() {
 		bind(PassengerRequestEventToPassengerEngineForwarder.class).asEagerSingleton();
 		addEventHandlerBinding().to(PassengerRequestEventToPassengerEngineForwarder.class);
-		installQSimModule(new BookingEngineQSimModule());
+		installQSimModule(new PreplanningEngineQSimModule());
 	}
 
-	public static class BookingEngineQSimModule extends AbstractQSimModule {
-		public final static String COMPONENT_NAME = "BookingEngine";
+	public static class PreplanningEngineQSimModule extends AbstractQSimModule {
+		public final static String COMPONENT_NAME = "PreplanningEngine";
 
 		@Override
 		protected void configureQSim() {
-			bind( PreplanningEngine.class ).asEagerSingleton();
-			addQSimComponentBinding(COMPONENT_NAME).to( PreplanningEngine.class );
+			bind(PreplanningEngine.class).asEagerSingleton();
+			addQSimComponentBinding(COMPONENT_NAME).to(PreplanningEngine.class);
 		}
 	}
 }
