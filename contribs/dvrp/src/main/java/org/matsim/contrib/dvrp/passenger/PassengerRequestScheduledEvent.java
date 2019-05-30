@@ -20,14 +20,14 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.core.api.internal.HasPersonId;
-
-import java.util.Map;
 
 /**
  * @author michalm
@@ -48,12 +48,11 @@ public final class PassengerRequestScheduledEvent extends Event implements HasPe
 	private final double dropoffTime;
 	private final Id<Person> personId;
 
-
 	/**
-     * An event processed upon request submission.
+	 * An event processed upon request submission.
 	 */
-	public PassengerRequestScheduledEvent( double time, String mode, Id<Request> requestId, Id<DvrpVehicle> vehicleId,
-							   double pickupTime, double dropoffTime, Id<Person> personId ) {
+	public PassengerRequestScheduledEvent(double time, String mode, Id<Request> requestId, Id<DvrpVehicle> vehicleId,
+			double pickupTime, double dropoffTime, Id<Person> personId) {
 		super(time);
 		this.mode = mode;
 		this.requestId = requestId;
@@ -112,7 +111,7 @@ public final class PassengerRequestScheduledEvent extends Event implements HasPe
 	}
 
 	@Override
-	public Id<Person> getPersonId(){
+	public Id<Person> getPersonId() {
 		return personId;
 	}
 }

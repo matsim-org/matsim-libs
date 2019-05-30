@@ -98,7 +98,6 @@ public class PassengerRequestSubmittedEvent extends Event {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_MODE, mode);
 		attr.put(ATTRIBUTE_REQUEST, requestId + "");
-		attr.put(ATTRIBUTE_PERSON, personId + "");
 		attr.put(ATTRIBUTE_FROM_LINK, fromLinkId + "");
 		attr.put(ATTRIBUTE_TO_LINK, toLinkId + "");
 		return attr;
