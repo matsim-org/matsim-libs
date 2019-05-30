@@ -19,7 +19,15 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import com.google.common.collect.ImmutableList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -38,12 +46,15 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.PreplanningEngine;
-import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
 import org.matsim.facilities.FacilitiesUtils;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
+import com.google.common.collect.ImmutableList;
 
 public final class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo.Provider {
 
@@ -67,10 +78,10 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 	//keeps all received requests until rejection or dropoff
 	private final Map<Id<Request>, RequestEntry> requests = new HashMap<>();
 
-	PassengerEngine( String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
-			     PreplanningEngine bookingEngine, PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
-			     Network network, PassengerRequestValidator requestValidator,
-			     PassengerRequestEventToPassengerEngineForwarder passengerRequestEventForwarder) {
+	PassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer, PreplanningEngine bookingEngine,
+			PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
+			PassengerRequestValidator requestValidator,
+			PassengerRequestEventToPassengerEngineForwarder passengerRequestEventForwarder) {
 		// yyyyyy I think it is ok to say that the only thing that uses injection is PassengerEngineQSimModule.  However, my very strong intuition is that everything that
 		// is used from there needs to have little or no public footprint.  Otherwise, one is quickly back in a world where one cannot change dependencies without breaking
 		// other users' code. kai, mar'19
@@ -121,7 +132,8 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 
 		//FIXME we need to send TripInfoRequest to VrpOptimizer and actually get TripInfos from there
 		// for the time being: generating TripInfo object that will be returned to the potential passenger:
-		return ImmutableList.of(new DvrpTripInfo(mode, pickupLink, dropoffLink, tripInfoRequest.getTime(), now, tripInfoRequest) );
+		return ImmutableList.of(
+				new DvrpTripInfo(mode, pickupLink, dropoffLink, tripInfoRequest.getTime(), now, tripInfoRequest));
 	}
 
 	/**
@@ -135,7 +147,8 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		double now = mobsimTimer.getTimeOfDay();
 
 		PassengerRequest request = createValidateAndSubmitRequest(passenger, tripInfo.getPickupLocation().getLinkId(),
-				tripInfo.getDropoffLocation().getLinkId(), tripInfo.getExpectedBoardingTime(), now, true, tripInfo.getOriginalRequest() );
+				tripInfo.getDropoffLocation().getLinkId(), tripInfo.getExpectedBoardingTime(), now, true,
+				tripInfo.getOriginalRequest());
 		advanceRequestStorage.storeRequest(request);
 	}
 
@@ -155,7 +168,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 
 		if (prebookedRequests.isEmpty()) {// this is an immediate request
 			//TODO what if it was already rejected while prebooking??
-			createValidateAndSubmitRequest(passenger, fromLinkId, toLinkId, departureTime, now, false, null );
+			createValidateAndSubmitRequest(passenger, fromLinkId, toLinkId, departureTime, now, false, null);
 		} else if (prebookedRequests.size() == 1) {
 			PassengerRequest prebookedRequest = prebookedRequests.get(0);
 			PassengerPickupActivity awaitingPickup = awaitingPickupStorage.retrieveAwaitingPickup(
@@ -174,12 +187,11 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 
 	// ================ REQUESTS HANDLING
 
-	private PassengerRequest createValidateAndSubmitRequest( MobsimPassengerAgent passenger, Id<Link> fromLinkId,
-										   Id<Link> toLinkId, double departureTime, double now, boolean prebooked,
-										   TripInfoRequest originalRequest ) {
+	private PassengerRequest createValidateAndSubmitRequest(MobsimPassengerAgent passenger, Id<Link> fromLinkId,
+			Id<Link> toLinkId, double departureTime, double now, boolean prebooked, TripInfoRequest originalRequest) {
 		// yyyy remove parameter MobsimPassengerAgent. kai/gregor, jan'19
 		PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime, now);
-		requests.put(request.getId(), new RequestEntry(request, passenger, prebooked, originalRequest ) );
+		requests.put(request.getId(), new RequestEntry(request, passenger, prebooked, originalRequest));
 		if (validateRequest(request)) {
 			optimizer.requestSubmitted(request);//optimizer can also reject request if cannot handle it
 		}
@@ -218,7 +230,8 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 					+ " will not be served. The agent will get stuck. Causes: "
 					+ causes);
 			eventsManager.processEvent(
-					new PassengerRequestRejectedEvent(mobsimTimer.getTimeOfDay(), mode, request.getId(), causes, request.getPassengerId()));
+					new PassengerRequestRejectedEvent(mobsimTimer.getTimeOfDay(), mode, request.getId(), causes,
+							request.getPassengerId()));
 		}
 		return violations.isEmpty();
 	}
@@ -270,11 +283,11 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 	private final Queue<PassengerRequestRejectedEvent> rejectedEvents = new ConcurrentLinkedQueue<>();
 	private final Queue<PassengerRequestScheduledEvent> scheduledEvents = new ConcurrentLinkedQueue<>();
 
-	void notifyPassengerRequestEvent( PassengerRequestRejectedEvent event ) {
+	void notifyPassengerRequestRejected(PassengerRequestRejectedEvent event) {
 		rejectedEvents.add(event);
 	}
 
-	void notifyPassengerRequestEvent( PassengerRequestScheduledEvent event ) {
+	void notifyPassengerRequestScheduled(PassengerRequestScheduledEvent event) {
 		scheduledEvents.add(event);
 	}
 
@@ -307,7 +320,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 			PassengerRequest request = requestEntry.request;
 			bookingEngine.notifyChangedTripInformation(requestEntry.passenger, Optional.of(
 					new DvrpTripInfo(mode, request.getFromLink(), request.getToLink(), event.getPickupTime(),
-							event.getTime(), requestEntry.originalRequest) ) );
+							event.getTime(), requestEntry.originalRequest)));
 		}
 	}
 
@@ -317,8 +330,8 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		private final boolean prebooked; // != immediate request
 		private final TripInfoRequest originalRequest;
 
-		private RequestEntry( PassengerRequest request, MobsimPassengerAgent passenger, boolean prebooked,
-					    TripInfoRequest originalRequest ) {
+		private RequestEntry(PassengerRequest request, MobsimPassengerAgent passenger, boolean prebooked,
+				TripInfoRequest originalRequest) {
 			this.request = request;
 			this.passenger = passenger;
 			this.prebooked = prebooked;
