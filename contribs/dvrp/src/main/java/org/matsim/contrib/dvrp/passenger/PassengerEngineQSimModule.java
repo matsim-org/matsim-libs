@@ -9,9 +9,9 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.PreplanningEngine;
 
 import com.google.inject.name.Named;
-import org.matsim.core.mobsim.qsim.PreplanningEngine;
 
 public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 	public PassengerEngineQSimModule(String mode) {
@@ -28,7 +28,7 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 			private MobsimTimer mobsimTimer;
 
 			@Inject
-			private PreplanningEngine bookingEngine;
+			private PreplanningEngine preplanningEngine;
 
 			@Inject
 			private PassengerRequestEventToPassengerEngineForwarder passengerRequestEventForwarder;
@@ -39,7 +39,7 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 
 			@Override
 			public PassengerEngine get() {
-				return new PassengerEngine(getMode(), eventsManager, mobsimTimer, bookingEngine,
+				return new PassengerEngine(getMode(), eventsManager, mobsimTimer, preplanningEngine,
 						getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class), network,
 						getModalInstance(PassengerRequestValidator.class), passengerRequestEventForwarder);
 			}

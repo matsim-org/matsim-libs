@@ -62,7 +62,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 	private final String mode;
 	private final EventsManager eventsManager;
 	private final MobsimTimer mobsimTimer;
-	private final PreplanningEngine bookingEngine;
+	private final PreplanningEngine preplanningEngine;
 
 	private final PassengerRequestCreator requestCreator;
 	private final VrpOptimizer optimizer;
@@ -78,14 +78,14 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 	private final Map<Id<Request>, RequestEntry> requests = new HashMap<>();
 
 	//package protected -> meant to be instantiated via PassengerEngineQSimModule
-	PassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer, PreplanningEngine bookingEngine,
-			PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
-			PassengerRequestValidator requestValidator,
+	PassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
+			PreplanningEngine preplanningEngine, PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
+			Network network, PassengerRequestValidator requestValidator,
 			PassengerRequestEventToPassengerEngineForwarder passengerRequestEventForwarder) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;
-		this.bookingEngine = bookingEngine;
+		this.preplanningEngine = preplanningEngine;
 		this.requestCreator = requestCreator;
 		this.optimizer = optimizer;
 		this.network = network;
@@ -221,8 +221,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 			String cause = String.join(", ", violations);
 			LOGGER.warn("Request: "
 					+ request.getId()
-					+ " of mode: "
-					+ mode + " will not be served. The agent will get stuck. Cause: " + cause);
+					+ " of mode: " + mode + " will not be served. The agent will get stuck. Cause: " + cause);
 			eventsManager.processEvent(
 					new PassengerRequestRejectedEvent(mobsimTimer.getTimeOfDay(), mode, request.getId(),
 							request.getPassengerId(), cause));
@@ -298,8 +297,8 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		RequestEntry requestEntry = requests.remove(event.getRequestId());
 		if (requestEntry.prebooked) {
 			advanceRequestStorage.removeRequest(requestEntry.passenger.getId(), event.getRequestId());
-			//let agent/BookingEngine decide what to do next
-			bookingEngine.notifyChangedTripInformation(requestEntry.passenger, Optional.empty());
+			//let agent/preplanningEngine decide what to do next
+			preplanningEngine.notifyChangedTripInformation(requestEntry.passenger, Optional.empty());
 		} else {
 			//not much else can be done for immediate requests
 			PassengerRequest request = requestEntry.request;
@@ -312,7 +311,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		RequestEntry requestEntry = requests.get(event.getRequestId());
 		if (requestEntry.prebooked) {
 			PassengerRequest request = requestEntry.request;
-			bookingEngine.notifyChangedTripInformation(requestEntry.passenger, Optional.of(
+			preplanningEngine.notifyChangedTripInformation(requestEntry.passenger, Optional.of(
 					new DvrpTripInfo(mode, request.getFromLink(), request.getToLink(), event.getPickupTime(),
 							event.getTime(), requestEntry.originalRequest)));
 		}
