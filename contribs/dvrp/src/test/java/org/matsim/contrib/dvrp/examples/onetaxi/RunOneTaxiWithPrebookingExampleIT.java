@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.dvrp.passenger.PassengerModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -49,6 +48,7 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup;
+import org.matsim.core.mobsim.qsim.PreplanningEngineQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
@@ -114,7 +114,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 				components.removeNamedComponent(ActivityEngineModule.COMPONENT_NAME);
 				components.addNamedComponent("abc");
 				components.addNamedComponent("def");
-				components.addNamedComponent(PassengerModule.PreplanningEngineQSimModule.COMPONENT_NAME);
+				components.addNamedComponent(PreplanningEngineQSimModule.COMPONENT_NAME);
 				for (String m : new String[] { TransportMode.taxi }) {
 					components.addComponent(DvrpModes.mode(m));
 				}

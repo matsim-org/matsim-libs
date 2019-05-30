@@ -21,8 +21,7 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.PreplanningEngine;
+import org.matsim.core.mobsim.qsim.PreplanningEngineQSimModule;
 
 /**
  * This module initialises generic (i.e. not taxi or drt-specific) AND global (not mode-specific) dvrp objects relating
@@ -42,13 +41,4 @@ public final class PassengerModule extends AbstractModule {
 		installQSimModule(new PreplanningEngineQSimModule());
 	}
 
-	public static class PreplanningEngineQSimModule extends AbstractQSimModule {
-		public final static String COMPONENT_NAME = "PreplanningEngine";
-
-		@Override
-		protected void configureQSim() {
-			bind(PreplanningEngine.class).asEagerSingleton();
-			addQSimComponentBinding(COMPONENT_NAME).to(PreplanningEngine.class);
-		}
-	}
 }
