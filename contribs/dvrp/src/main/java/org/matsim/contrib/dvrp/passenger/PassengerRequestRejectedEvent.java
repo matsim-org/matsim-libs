@@ -36,8 +36,8 @@ public class PassengerRequestRejectedEvent extends AbstractPassengerRequestEvent
 
 	private final String cause;
 
-	public PassengerRequestRejectedEvent(double time, String mode, Id<Request> requestId, String cause,
-			Id<Person> personId) {
+	public PassengerRequestRejectedEvent(double time, String mode, Id<Request> requestId, Id<Person> personId,
+			String cause) {
 		super(time, mode, requestId, personId);
 		this.cause = cause;
 	}

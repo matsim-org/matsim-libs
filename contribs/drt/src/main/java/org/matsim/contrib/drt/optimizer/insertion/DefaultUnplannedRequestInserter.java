@@ -19,6 +19,11 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.concurrent.ForkJoinPool;
+
 import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
@@ -33,11 +38,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.concurrent.ForkJoinPool;
 
 /**
  * @author michalm
@@ -94,7 +94,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			if (!best.isPresent()) {
 				eventsManager.processEvent(
 						new PassengerRequestRejectedEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
-								NO_INSERTION_FOUND_CAUSE, req.getPassengerId()));
+								req.getPassengerId(), NO_INSERTION_FOUND_CAUSE));
 				if (drtCfg.isPrintDetailedWarnings()) {
 					log.warn("No insertion found for drt request "
 							+ req
@@ -105,14 +105,15 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				}
 			} else {
 				eventsManager.processEvent(
-                        new PassengerRequestAcceptedEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(), req.getPassengerId()));
+						new PassengerRequestAcceptedEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
+								req.getPassengerId()));
 				BestInsertion bestInsertion = best.get();
 				insertionScheduler.scheduleRequest(bestInsertion.vehicleEntry, req, bestInsertion.insertion);
 				vData.updateEntry(bestInsertion.vehicleEntry.vehicle);
 				eventsManager.processEvent(
 						new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
-								bestInsertion.vehicleEntry.vehicle.getId(), req.getPickupTask().getEndTime(),
-								req.getDropoffTask().getBeginTime(), req.getPassengerId() ) );
+								req.getPassengerId(), bestInsertion.vehicleEntry.vehicle.getId(),
+								req.getPickupTask().getEndTime(), req.getDropoffTask().getBeginTime()));
 			}
 			reqIter.remove();
 		}

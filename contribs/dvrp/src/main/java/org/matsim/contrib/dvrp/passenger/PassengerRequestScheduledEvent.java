@@ -44,8 +44,8 @@ public class PassengerRequestScheduledEvent extends AbstractPassengerRequestEven
 	/**
 	 * An event processed upon request submission.
 	 */
-	public PassengerRequestScheduledEvent(double time, String mode, Id<Request> requestId, Id<DvrpVehicle> vehicleId,
-			double pickupTime, double dropoffTime, Id<Person> personId) {
+	public PassengerRequestScheduledEvent(double time, String mode, Id<Request> requestId, Id<Person> personId,
+			Id<DvrpVehicle> vehicleId, double pickupTime, double dropoffTime) {
 		super(time, mode, requestId, personId);
 		this.vehicleId = vehicleId;
 		this.pickupTime = pickupTime;

@@ -80,7 +80,8 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 
 	//package protected -> meant to be instantiated via PassengerEngineQSimModule
 	PassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer, PreplanningEngine bookingEngine,
-			PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network, PassengerRequestValidator requestValidator,
+			PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
+			PassengerRequestValidator requestValidator,
 			PassengerRequestEventToPassengerEngineForwarder passengerRequestEventForwarder) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
@@ -226,8 +227,8 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 					+ " will not be served. The agent will get stuck. Causes: "
 					+ causes);
 			eventsManager.processEvent(
-					new PassengerRequestRejectedEvent(mobsimTimer.getTimeOfDay(), mode, request.getId(), causes,
-							request.getPassengerId()));
+					new PassengerRequestRejectedEvent(mobsimTimer.getTimeOfDay(), mode, request.getId(),
+							request.getPassengerId(), causes));
 		}
 		return violations.isEmpty();
 	}
