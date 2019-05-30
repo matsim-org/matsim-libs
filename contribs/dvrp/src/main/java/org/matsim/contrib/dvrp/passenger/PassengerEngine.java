@@ -78,14 +78,10 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 	//keeps all received requests until rejection or dropoff
 	private final Map<Id<Request>, RequestEntry> requests = new HashMap<>();
 
+	//package protected -> meant to be instantiated via PassengerEngineQSimModule
 	PassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer, PreplanningEngine bookingEngine,
-			PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
-			PassengerRequestValidator requestValidator,
+			PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network, PassengerRequestValidator requestValidator,
 			PassengerRequestEventToPassengerEngineForwarder passengerRequestEventForwarder) {
-		// yyyyyy I think it is ok to say that the only thing that uses injection is PassengerEngineQSimModule.  However, my very strong intuition is that everything that
-		// is used from there needs to have little or no public footprint.  Otherwise, one is quickly back in a world where one cannot change dependencies without breaking
-		// other users' code. kai, mar'19
-
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;
