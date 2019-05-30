@@ -23,7 +23,6 @@ package org.matsim.contrib.dvrp.passenger;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -31,27 +30,18 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 /**
  * @author michalm
  */
-public class PassengerRequestSubmittedEvent extends Event {
+public class PassengerRequestSubmittedEvent extends AbstractPassengerRequestEvent {
 	public static final String EVENT_TYPE = "PassengersRequest scheduled";
 
-	public static final String ATTRIBUTE_MODE = "mode";
-	public static final String ATTRIBUTE_REQUEST = "request";
-	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String ATTRIBUTE_FROM_LINK = "fromLink";
 	public static final String ATTRIBUTE_TO_LINK = "toLink";
 
-	private final String mode;
-	private final Id<Request> requestId;
-	private final Id<Person> personId;
 	private final Id<Link> fromLinkId;
 	private final Id<Link> toLinkId;
 
 	public PassengerRequestSubmittedEvent(double time, String mode, Id<Request> requestId, Id<Person> personId,
 			Id<Link> fromLinkId, Id<Link> toLinkId) {
-		super(time);
-		this.mode = mode;
-		this.requestId = requestId;
-		this.personId = personId;
+		super(time, mode, requestId, personId);
 		this.fromLinkId = fromLinkId;
 		this.toLinkId = toLinkId;
 	}
@@ -61,43 +51,23 @@ public class PassengerRequestSubmittedEvent extends Event {
 		return EVENT_TYPE;
 	}
 
-	public String getMode() {
-		return mode;
-	}
-
 	/**
-	 * the ID of the initial request submitted
+	 * @return id of the request's origin link
 	 */
-	public Id<Request> getRequestId() {
-		return requestId;
-	}
-
-	/**
-	 * the Person Id that submitted the request
-	 */
-	public Id<Person> getPersonId() {
-		return personId;
-	}
-
-	/**
-	 * the request's origin
-	 */
-	public Id<Link> getFromLinkId() {
+	public final Id<Link> getFromLinkId() {
 		return fromLinkId;
 	}
 
 	/**
-	 * the request's destination
+	 * @return id of the request's destination link
 	 */
-	public Id<Link> getToLinkId() {
+	public final Id<Link> getToLinkId() {
 		return toLinkId;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_MODE, mode);
-		attr.put(ATTRIBUTE_REQUEST, requestId + "");
 		attr.put(ATTRIBUTE_FROM_LINK, fromLinkId + "");
 		attr.put(ATTRIBUTE_TO_LINK, toLinkId + "");
 		return attr;

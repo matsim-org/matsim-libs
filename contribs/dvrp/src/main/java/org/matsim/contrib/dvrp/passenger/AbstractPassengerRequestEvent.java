@@ -23,67 +23,57 @@ package org.matsim.contrib.dvrp.passenger;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.core.api.internal.HasPersonId;
 
 /**
- * @author michalm
+ * This class is designed for inheritance without overriding.
+ * It is okay to add new attributes and getters, but overriding the inherited ones should not take place.
+ * To enforce that, please make sure that all attributes are 'private final' and getters are 'final'.
+ *
+ * @author Michal Maciejewski (michalm)
  */
-public class PassengerRequestScheduledEvent extends AbstractPassengerRequestEvent {
-	public static final String EVENT_TYPE = "PassengersRequest scheduled";
+public abstract class AbstractPassengerRequestEvent extends Event implements HasPersonId {
+	public static final String ATTRIBUTE_MODE = "mode";
+	public static final String ATTRIBUTE_REQUEST = "request";
 
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	public static final String ATTRIBUTE_PICKUP_TIME = "pickupTime";
-	public static final String ATTRIBUTE_DROPOFF_TIME = "dropoffTime";
+	private final String mode;
+	private final Id<Request> requestId;
+	private final Id<Person> personId;
 
-	private final Id<DvrpVehicle> vehicleId;
-	private final double pickupTime;
-	private final double dropoffTime;
-
-	/**
-	 * An event processed upon request submission.
-	 */
-	public PassengerRequestScheduledEvent(double time, String mode, Id<Request> requestId, Id<DvrpVehicle> vehicleId,
-			double pickupTime, double dropoffTime, Id<Person> personId) {
-		super(time, mode, requestId, personId);
-		this.vehicleId = vehicleId;
-		this.pickupTime = pickupTime;
-		this.dropoffTime = dropoffTime;
+	AbstractPassengerRequestEvent(double time, String mode, Id<Request> requestId, Id<Person> personId) {
+		super(time);
+		this.mode = mode;
+		this.requestId = requestId;
+		this.personId = personId;
 	}
 
+	public final String getMode() {
+		return mode;
+	}
+
+	/**
+	 * @return id of the request
+	 */
+	public final Id<Request> getRequestId() {
+		return requestId;
+	}
+
+	/**
+	 * @return id of the passenger (person)
+	 */
 	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-
-	/**
-	 * @return id of the vehicle assigned to the request
-	 */
-	public final Id<DvrpVehicle> getVehicleId() {
-		return vehicleId;
-	}
-
-	/**
-	 * @return <b>estimated</b> pickup time
-	 */
-	public final double getPickupTime() {
-		return pickupTime;
-	}
-
-	/**
-	 * @return <b>estimated</b> dropoff time
-	 */
-	public final double getDropoffTime() {
-		return dropoffTime;
+	public final Id<Person> getPersonId() {
+		return personId;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_VEHICLE, vehicleId + "");
-		attr.put(ATTRIBUTE_PICKUP_TIME, pickupTime + "");
-		attr.put(ATTRIBUTE_DROPOFF_TIME, dropoffTime + "");
+		attr.put(ATTRIBUTE_MODE, mode);
+		attr.put(ATTRIBUTE_REQUEST, requestId + "");
 		return attr;
 	}
 }
