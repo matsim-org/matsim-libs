@@ -41,12 +41,10 @@ import com.google.inject.Provider;
 import com.google.inject.name.Named;
 
 public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
-	public static final String TYPE = "type";
-
 	private final EventsManager eventsManager;
 	private final TaxiConfigGroup taxiCfg;
-	private final Network network;
 	private final Fleet fleet;
+	private final Network network;
 	private final MobsimTimer timer;
 	private final TravelTime travelTime;
 	private final TravelDisutility travelDisutility;
@@ -70,20 +68,15 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
 	@Override
 	public TaxiOptimizer get() {
-		AbstractTaxiOptimizerParams taxiOptimizerParams = taxiCfg.getTaxiOptimizerParams();
-
-		switch (taxiOptimizerParams.getName()) {
+		switch (taxiCfg.getTaxiOptimizerParams().getName()) {
 			case RuleBasedETaxiOptimizerParams.SET_NAME:
 				return RuleBasedETaxiOptimizer.create(eventsManager, taxiCfg, fleet, eScheduler, network, timer,
 						travelTime, travelDisutility, chargingInfrastructure);
-
 			case AssignmentETaxiOptimizerParams.SET_NAME:
 				return AssignmentETaxiOptimizer.create(eventsManager, taxiCfg, fleet, network, timer, travelTime,
 						travelDisutility, eScheduler, chargingInfrastructure);
-
-			default:
-				throw new RuntimeException();
 		}
+		throw new RuntimeException("Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().getName());
 	}
 
 	public static AbstractTaxiOptimizerParams createParameterSet(String type) {
