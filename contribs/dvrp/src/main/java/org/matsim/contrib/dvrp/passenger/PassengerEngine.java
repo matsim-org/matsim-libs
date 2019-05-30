@@ -26,7 +26,6 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -219,16 +218,14 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 	private boolean validateRequest(PassengerRequest request) {
 		Set<String> violations = requestValidator.validateRequest(request);
 		if (!violations.isEmpty()) {
-			String causes = violations.stream().collect(Collectors.joining(", "));
+			String cause = String.join(", ", violations);
 			LOGGER.warn("Request: "
 					+ request.getId()
 					+ " of mode: "
-					+ mode
-					+ " will not be served. The agent will get stuck. Causes: "
-					+ causes);
+					+ mode + " will not be served. The agent will get stuck. Cause: " + cause);
 			eventsManager.processEvent(
 					new PassengerRequestRejectedEvent(mobsimTimer.getTimeOfDay(), mode, request.getId(),
-							request.getPassengerId(), causes));
+							request.getPassengerId(), cause));
 		}
 		return violations.isEmpty();
 	}
