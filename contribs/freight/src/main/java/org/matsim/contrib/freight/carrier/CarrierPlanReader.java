@@ -21,7 +21,7 @@ import org.xml.sax.Attributes;
 
 /**
  * A reader that reads carriers and their plans.
- * 
+ *
  * @author sschroeder
  *
  */
@@ -82,9 +82,9 @@ public class CarrierPlanReader extends MatsimXmlParser {
 	public Collection<ScheduledTour> scheduledTours = null;
 
 	public CarrierPlan currentPlan = null;
-	
+
 	public Double currentScore;
-	
+
 	public boolean selected;
 
 	public Carriers carriers;
@@ -95,7 +95,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 
 	/**
 	 * Constructs a reader with an empty carriers-container for the carriers to be constructed. 
-	 * 
+	 *
 	 * @param carriers which is a map that stores carriers
 	 */
 	public CarrierPlanReader(Carriers carriers) {
@@ -104,21 +104,21 @@ public class CarrierPlanReader extends MatsimXmlParser {
 		this.setValidating(false);
 	}
 
-//	/**
-//	 * Reads a xml-file that contains carriers and their plans.
-//	 * 
-//	 * <p> Builds carriers and plans, and stores them in the carriers-object coming with this constructor.
-//	 * 
-//	 * @param filename
-//	 */
-//	public void read(String filename) {
-//		logger.info("read carrier plans");
-//		this.setValidating(false);
-//		read(filename);
-//		logger.info("done");
-//
-//	}
-	
+	//	/**
+	//	 * Reads a xml-file that contains carriers and their plans.
+	//	 *
+	//	 * <p> Builds carriers and plans, and stores them in the carriers-object coming with this constructor.
+	//	 *
+	//	 * @param filename
+	//	 */
+	//	public void read(String filename) {
+	//		logger.info("read carrier plans");
+	//		this.setValidating(false);
+	//		read(filename);
+	//		logger.info("done");
+	//
+	//	}
+
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		switch( name ){
@@ -187,66 +187,82 @@ public class CarrierPlanReader extends MatsimXmlParser {
 				CarrierVehicle vehicle = vehicleBuilder.build();
 				currentCarrier.getCarrierCapabilities().getCarrierVehicles().add( vehicle );
 				vehicles.put( vId, vehicle );
+				break;
 			}
 			case "plan":
 			{
-			String score = atts.getValue("score");
-			if(score != null){
-				currentScore = getDouble(score);
-			}
-			else{
-				currentScore = null;
-			}
-			String selected = atts.getValue("selected");
-			if(selected == null ) {
-				this.selected = false;
-			}
-			else if(selected.equals("true")){
-				this.selected = true;
-			}
-			else{
-				this.selected = false;
-			}
-			scheduledTours = new ArrayList<ScheduledTour>();
+				String score = atts.getValue("score");
+				if(score != null){
+					currentScore = getDouble(score);
+				}
+				else{
+					currentScore = null;
+				}
+				String selected = atts.getValue("selected");
+				if(selected == null ) {
+					this.selected = false;
+				}
+				else if(selected.equals("true")){
+					this.selected = true;
+				}
+				else{
+					this.selected = false;
+				}
+				scheduledTours = new ArrayList<ScheduledTour>();
+				break ;
 			}
 			case "tour":
 			{
-			String vehicleId = atts.getValue("vehicleId");
-			currentVehicle = vehicles.get(vehicleId);
-			currentTourBuilder = Tour.Builder.newInstance();
+				String vehicleId = atts.getValue("vehicleId");
+				currentVehicle = vehicles.get(vehicleId);
+				currentTourBuilder = Tour.Builder.newInstance();
+				break ;
 			}
 			case "leg":
 			{
-			currentLegDepTime = getDouble(atts.getValue("dep_time"));
-			currentLegTransTime = getDouble(atts.getValue("transp_time"));
+				currentLegDepTime = getDouble(atts.getValue("dep_time"));
+				currentLegTransTime = getDouble(atts.getValue("transp_time"));
+				break ;
 			}
 			case ACTIVITY:
 			{
-				if( atts.getValue( TYPE ).equals( "start" ) ){
-					currentStartTime = getDouble( atts.getValue( "end_time" ) );
-					previousActLoc = currentVehicle.getLocation();
-					currentTourBuilder.scheduleStart( currentVehicle.getLocation(),
-						  TimeWindow.newInstance( currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
-				} else if( atts.getValue( TYPE ).equals( "pickup" ) ){
-					String id = atts.getValue( SHIPMENTID );
-					CarrierShipment s = currentShipments.get( id );
-					finishLeg( s.getFrom() );
-					currentTourBuilder.schedulePickup( s );
-					previousActLoc = s.getFrom();
-				} else if( atts.getValue( TYPE ).equals( "delivery" ) ){
-					String id = atts.getValue( SHIPMENTID );
-					CarrierShipment s = currentShipments.get( id );
-					finishLeg( s.getTo() );
-					currentTourBuilder.scheduleDelivery( s );
-					previousActLoc = s.getTo();
-				} else if( atts.getValue( TYPE ).equals( "end" ) ){
-					finishLeg( currentVehicle.getLocation() );
-					currentTourBuilder.scheduleEnd( currentVehicle.getLocation(),
-						  TimeWindow.newInstance( currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
+				switch( atts.getValue( TYPE ) ){
+					case "start":
+						currentStartTime = getDouble( atts.getValue( "end_time" ) );
+						previousActLoc = currentVehicle.getLocation();
+						currentTourBuilder.scheduleStart( currentVehicle.getLocation(),
+							  TimeWindow.newInstance( currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
+						break;
+					case "pickup":{
+						String id = atts.getValue( SHIPMENTID );
+						CarrierShipment s = currentShipments.get( id );
+						finishLeg( s.getFrom() );
+						currentTourBuilder.schedulePickup( s );
+						previousActLoc = s.getFrom();
+						break;
+					}
+					case "delivery":{
+						String id = atts.getValue( SHIPMENTID );
+						CarrierShipment s = currentShipments.get( id );
+						finishLeg( s.getTo() );
+						currentTourBuilder.scheduleDelivery( s );
+						previousActLoc = s.getTo();
+						break;
+					}
+					case "end":
+						finishLeg( currentVehicle.getLocation() );
+						currentTourBuilder.scheduleEnd( currentVehicle.getLocation(),
+							  TimeWindow.newInstance( currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime() ) );
+						break;
 				}
+				break ;
 			}
+			case CARRIERS:
+			case "route":
+				// do nothing
+				break ;
 			default:
-				throw new RuntimeException( "encountered xml tag which cannot be processed; aborting ..." ) ;
+				throw new RuntimeException( "encountered xml tag=" + name + " which cannot be processed; aborting ..." ) ;
 				// in particular for <attributes>, which someone should implement. kai, may'19
 		}
 	}
