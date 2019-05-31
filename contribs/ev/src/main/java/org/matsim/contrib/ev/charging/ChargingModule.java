@@ -22,8 +22,8 @@ package org.matsim.contrib.ev.charging;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.data.file.ChargingInfrastructureProvider;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureProvider;
 import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Key;
