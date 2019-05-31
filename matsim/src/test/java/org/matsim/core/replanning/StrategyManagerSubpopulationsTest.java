@@ -56,12 +56,14 @@ public class StrategyManagerSubpopulationsTest {
 			case 0:
 				break; // "default" population
 			case 1:
-				population.getPersonAttributes().putAttribute(
-						p.getId().toString(), SUBPOP_ATT_NAME, POP_NAME_1);
+//				population.getPersonAttributes().putAttribute(
+//						p.getId().toString(), SUBPOP_ATT_NAME, POP_NAME_1);
+				PopulationUtils.putPersonAttribute( p, SUBPOP_ATT_NAME, POP_NAME_1 );
 				break;
 			case 2:
-				population.getPersonAttributes().putAttribute(
-						p.getId().toString(), SUBPOP_ATT_NAME, POP_NAME_2);
+//				population.getPersonAttributes().putAttribute(
+//						p.getId().toString(), SUBPOP_ATT_NAME, POP_NAME_2);
+				PopulationUtils.putPersonAttribute( p, SUBPOP_ATT_NAME, POP_NAME_2 );
 				break;
 			default:
 				throw new RuntimeException(group + " ???");
