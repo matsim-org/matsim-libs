@@ -18,37 +18,42 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.fleet;
+package org.matsim.contrib.util;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.util.SpecificationContainer;
+import org.matsim.api.core.v01.Identifiable;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public final class ElectricFleetSpecificationImpl implements ElectricFleetSpecification {
-	private final SpecificationContainer<ElectricVehicle, ElectricVehicleSpecification> container = new SpecificationContainer<>();
+public final class SpecificationContainer<I, S extends Identifiable<I>> {
+	private final Map<Id<I>, S> specifications = new LinkedHashMap<>();
 
-	@Override
-	public Map<Id<ElectricVehicle>, ElectricVehicleSpecification> getVehicleSpecifications() {
-		return container.getSpecifications();
+	public final Map<Id<I>, S> getSpecifications() {
+		return Collections.unmodifiableMap(specifications);
 	}
 
-	@Override
-	public void addVehicleSpecification(ElectricVehicleSpecification specification) {
-		container.addSpecification(specification);
+	public final void addSpecification(S specification) {
+		if (specifications.putIfAbsent(specification.getId(), specification) != null) {
+			throw new RuntimeException("A specification with id=" + specification.getId() + " already exists");
+		}
 	}
 
-	@Override
-	public void replaceVehicleSpecification(ElectricVehicleSpecification specification) {
-		container.replaceSpecification(specification);
+	public final void replaceSpecification(S specification) {
+		if (specifications.computeIfPresent(specification.getId(), (k, v) -> specification) == null) {
+			throw new RuntimeException("A specification with id=" + specification.getId() + " does not exist");
+		}
 	}
 
-	@Override
-	public void removeVehicleSpecification(Id<ElectricVehicle> vehicleId) {
-		container.removeSpecification(vehicleId);
+	public final void removeSpecification(Id<I> id) {
+		if (specifications.remove(Objects.requireNonNull(id)) == null) {
+			throw new RuntimeException("A specification with id=" + id + " does not exist");
+		}
 	}
 }
 
