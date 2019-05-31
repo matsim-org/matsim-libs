@@ -20,19 +20,22 @@
 
 package org.matsim.contrib.ev.infrastructure;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.api.core.v01.network.Link;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public interface ChargingInfrastructure {
-	String CHARGERS = "chargers";
-
-	Map<Id<Charger>, Charger> getChargers();
-
-	void initChargingLogics(ChargingLogic.Factory logicFactory, EventsManager eventsManager);
+public class ChargingInfrastructures {
+	//FIXME calls to this method (used in event handlers) should be cached
+	public static ImmutableMap<Id<Charger>, Charger> getChargersAtLink(ChargingInfrastructure infrastructure,
+			Id<Link> linkId) {
+		return infrastructure.getChargers()
+				.values()
+				.stream()
+				.filter(charger -> charger.getLink().getId().equals(linkId))
+				.collect(ImmutableMap.toImmutableMap(Charger::getId, charger -> charger));
+	}
 }

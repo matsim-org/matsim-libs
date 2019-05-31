@@ -23,10 +23,8 @@ package org.matsim.contrib.ev.infrastructure;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 
@@ -36,16 +34,10 @@ import org.matsim.core.api.experimental.events.EventsManager;
 public class ChargingInfrastructureImpl implements ChargingInfrastructure {
 	private final Map<Id<Charger>, Charger> chargers = new LinkedHashMap<>();
 
-
 	@Override
 	public Map<Id<Charger>, Charger> getChargers() {
 		return Collections.unmodifiableMap(chargers);
 	}
-
-    @Override
-    public Map<Id<Charger>, Charger> getChargersAtLink(Id<Link> linkId) {
-        return chargers.values().stream().filter(charger -> charger.getLink().getId().equals(linkId)).collect(Collectors.toMap(Charger::getId, charger -> charger));
-    }
 
 	public void addCharger(Charger charger) {
 		chargers.put(charger.getId(), charger);
