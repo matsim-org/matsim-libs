@@ -30,7 +30,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
  * @author michalm
  */
 public interface ChargingInfrastructure {
-	String CHARGERS = "chargers";
 
 	Map<Id<Charger>, Charger> getChargers();
 

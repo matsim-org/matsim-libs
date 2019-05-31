@@ -52,7 +52,7 @@ public class ChargingModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind(Network.class).annotatedWith(Names.named(ChargingInfrastructure.CHARGERS))
+		bind(Network.class).annotatedWith(Names.named(ChargingInfrastructureProvider.CHARGERS))
 				.to(networkKey)
 				.asEagerSingleton();
 		bind(ChargingInfrastructure.class).toProvider(

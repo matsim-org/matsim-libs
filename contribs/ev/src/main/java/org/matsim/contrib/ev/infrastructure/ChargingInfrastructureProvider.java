@@ -32,8 +32,10 @@ import com.google.inject.name.Named;
  * @author michalm
  */
 public class ChargingInfrastructureProvider implements Provider<ChargingInfrastructure> {
+	public static final String CHARGERS = "chargers";
+
 	@Inject
-	@Named(ChargingInfrastructure.CHARGERS)
+	@Named(CHARGERS)
 	private Network network;
 
 	private final URL url;
