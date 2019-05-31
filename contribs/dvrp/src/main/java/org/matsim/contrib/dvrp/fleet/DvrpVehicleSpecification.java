@@ -28,18 +28,31 @@ import org.matsim.api.core.v01.network.Link;
  * <p>
  * Its lifespan can span over all iterations, but can be also changed before each iteration.
  * <p>
- * Changing a vehicle specification (e.g. setting a different startLinkId) should be done only "between" iterations by passing a new instance to FleetSpecification.
+ * Changing a vehicle specification (e.g. setting a different startLinkId) should be done only "between" iterations
+ * by passing a new instance to FleetSpecification.
  *
  * @author Michal Maciejewski (michalm)
  */
 public interface DvrpVehicleSpecification {
 	Id<DvrpVehicle> getId();
 
+	/**
+	 * @return id of the link where the vehicle stays at the beginning of simulation
+	 */
 	Id<Link> getStartLinkId();
 
+	/**
+	 * @return vehicle capacity
+	 */
 	int getCapacity();
 
+	/**
+	 * @return vehicle operations start time
+	 */
 	double getServiceBeginTime();
 
+	/**
+	 * @return vehicle operations end time
+	 */
 	double getServiceEndTime();
 }

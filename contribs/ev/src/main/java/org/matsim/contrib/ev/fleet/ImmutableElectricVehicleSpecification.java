@@ -25,9 +25,11 @@ import org.matsim.api.core.v01.Id;
 import com.google.common.collect.ImmutableList;
 
 /**
+ * Immutable implementation of ElectricVehicleSpecification
+ *
  * @author Michal Maciejewski (michalm)
  */
-public class ImmutableElectricVehicleSpecification implements ElectricVehicleSpecification {
+public final class ImmutableElectricVehicleSpecification implements ElectricVehicleSpecification {
 	private final Id<ElectricVehicle> id;
 	private final String vehicleType;
 	private final ImmutableList<String> chargerTypes;
