@@ -27,9 +27,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ChargerImpl;
-import org.matsim.contrib.ev.data.ChargingInfrastructureImpl;
+import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargerImpl;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 

@@ -25,7 +25,7 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.data.ChargerImpl;
+import org.matsim.contrib.ev.infrastructure.ChargerImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 

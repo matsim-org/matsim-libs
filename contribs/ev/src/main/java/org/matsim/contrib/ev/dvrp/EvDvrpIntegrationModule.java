@@ -35,12 +35,12 @@ import org.matsim.contrib.ev.MobsimScopeEventHandling;
 import org.matsim.contrib.ev.charging.ChargingModule;
 import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.data.Charger;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DischargingModule;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.discharging.OhdeSlaskiDriveEnergyConsumption;
 import org.matsim.contrib.ev.fleet.ElectricFleetModule;
+import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.stats.EvStatsModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 

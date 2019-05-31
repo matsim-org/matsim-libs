@@ -19,11 +19,11 @@
 
 package org.matsim.contrib.ev.charging;
 
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.core.api.experimental.events.EventsManager;
-
 import java.util.Collection;
+
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 public interface ChargingLogic {
 	static interface Factory {

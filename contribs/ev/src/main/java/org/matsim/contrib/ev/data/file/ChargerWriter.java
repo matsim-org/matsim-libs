@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.data.Charger;
+import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 

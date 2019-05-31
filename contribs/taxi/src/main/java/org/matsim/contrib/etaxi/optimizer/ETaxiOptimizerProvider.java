@@ -28,7 +28,7 @@ import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentETaxiOptimizer;
 import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentETaxiOptimizerParams;
 import org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizer;
 import org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizerParams;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;

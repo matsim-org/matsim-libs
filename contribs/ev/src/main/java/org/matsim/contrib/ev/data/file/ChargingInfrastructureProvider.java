@@ -18,14 +18,15 @@
 
 package org.matsim.contrib.ev.data.file;
 
+import java.net.URL;
+
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureImpl;
+
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
-import org.matsim.contrib.ev.data.ChargingInfrastructureImpl;
-
-import java.net.URL;
 
 /**
  * @author michalm
