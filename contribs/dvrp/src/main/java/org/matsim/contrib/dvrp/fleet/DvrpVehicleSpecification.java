@@ -21,6 +21,7 @@
 package org.matsim.contrib.dvrp.fleet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 
 /**
@@ -33,9 +34,7 @@ import org.matsim.api.core.v01.network.Link;
  *
  * @author Michal Maciejewski (michalm)
  */
-public interface DvrpVehicleSpecification {
-	Id<DvrpVehicle> getId();
-
+public interface DvrpVehicleSpecification extends Identifiable<DvrpVehicle> {
 	/**
 	 * @return id of the link where the vehicle stays at the beginning of simulation
 	 */
