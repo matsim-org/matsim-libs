@@ -246,7 +246,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 			controlStatisticsSum += travTime ;
 			controlStatisticsCnt ++ ;
 
-			add(person.getId(),travTime, TRAV_TIME) ;
+			add(person,travTime, TRAV_TIME) ;
 
 			int legNr = this.agentLegs.get(event.getPersonId());
 			Plan plan = person.getSelectedPlan();
@@ -330,10 +330,11 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 	}
 
 	private String getSubpopName(Person person) {
-		return "yy_" + getSubpopName( person.getId(), this.population.getPersonAttributes(), this.scenario.getConfig().plans().getSubpopulationAttributeName() ) ;
+		return "yy_" + getSubpopName( person, this.scenario.getConfig().plans().getSubpopulationAttributeName() ) ;
 	}
-	public static final String getSubpopName( Id<Person> personId, ObjectAttributes personAttributes, String subpopAttrName ) {
-		String subpop = (String) personAttributes.getAttribute( personId.toString(), subpopAttrName ) ;
+	private String getSubpopName( Person person, String subpopAttrName ) {
+//		String subpop = (String) personAttributes.getAttribute( personId.toString(), subpopAttrName ) ;
+		String subpop = (String) PopulationUtils.getPersonAttribute( person, subpopAttrName, this.population ) ;
 		return "subpop_" + subpop;
 	}
 
@@ -367,14 +368,26 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		}
 
 		for ( Person person : this.scenario.getPopulation().getPersons().values() ) {
-			ObjectAttributes attribs = this.scenario.getPopulation().getPersonAttributes() ;
-			attribs.putAttribute( person.getId().toString(), TRAV_TIME, 0. ) ;
-			if ( attribs.getAttribute( person.getId().toString(), CERTAIN_LINKS_CNT ) != null ) {
-				attribs.putAttribute( person.getId().toString(), CERTAIN_LINKS_CNT, 0. ) ;
+//			ObjectAttributes attribs = this.scenario.getPopulation().getPersonAttributes() ;
+
+//			attribs.putAttribute( person.getId().toString(), TRAV_TIME, 0. ) ;
+			PopulationUtils.putPersonAttribute( person, TRAV_TIME, 0. );
+
+//			if ( attribs.getAttribute( person.getId().toString(), CERTAIN_LINKS_CNT ) != null ) {
+//				attribs.putAttribute( person.getId().toString(), CERTAIN_LINKS_CNT, 0. ) ;
+//			}
+			if ( PopulationUtils.getPersonAttribute( person, CERTAIN_LINKS_CNT, this.population ) != null ) {
+				PopulationUtils.putPersonAttribute( person, CERTAIN_LINKS_CNT, 0. );
 			}
-			if ( attribs.getAttribute( person.getId().toString(), PAYMENTS) != null ) {
-				attribs.putAttribute( person.getId().toString(), PAYMENTS, 0. ) ;
+			// yy I must have written this myself, but I don't know where there is the null check first.  kai, may'19
+
+//			if ( attribs.getAttribute( person.getId().toString(), PAYMENTS) != null ) {
+//				attribs.putAttribute( person.getId().toString(), PAYMENTS, 0. ) ;
+//			}
+			if ( PopulationUtils.getPersonAttribute( person, PAYMENTS, this.population  ) != null ) {
+				PopulationUtils.putPersonAttribute( person, PAYMENTS, 0. );
 			}
+			// yy I must have written this myself, but I don't know where there is the null check first.  kai, may'19
 		}
 		// (yy not sure if I like the above; might be better to just use a local data structure. kai, may'14)
 
@@ -398,17 +411,19 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		// are added up in the legType category.  kai, feb'14)
 
 
-		add(person.getId(), item, PAYMENTS);
+		add(person, item, PAYMENTS);
 	}
 
-	private void add(Id<Person> id, double val, final String attributeName) {
-		final ObjectAttributes pAttribs = this.scenario.getPopulation().getPersonAttributes();
-		Double oldVal = (Double) pAttribs.getAttribute( id.toString(), attributeName) ;
+	private void add( Person person, double val, final String attributeName ) {
+//		final ObjectAttributes pAttribs = this.scenario.getPopulation().getPersonAttributes();
+//		Double oldVal = (Double) pAttribs.getAttribute( person.toString(), attributeName ) ;
+		Double oldVal = (Double) PopulationUtils.getPersonAttribute( person, attributeName, this.population ) ;
 		double newVal = val ;
 		if ( oldVal!=null ) {
 			newVal += oldVal ;
 		}
-		pAttribs.putAttribute( id.toString(), attributeName, newVal ) ;
+//		pAttribs.putAttribute( person.toString(), attributeName, newVal ) ;
+		PopulationUtils.putPersonAttribute( person, attributeName, newVal );
 	}
 
 	public void writeStats(final String filenameTmp) {
@@ -631,7 +646,9 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		}
 
 		if ( this.otherTolledLinkIds.contains( event.getLinkId() ) ) {
-			add( delegate.getDriverOfVehicle(event.getVehicleId()), 1., CERTAIN_LINKS_CNT );
+			final Person person = this.population.getPersons().get( delegate.getDriverOfVehicle( event.getVehicleId() ) );
+			Gbl.assertNotNull( person );
+			add( person, 1., CERTAIN_LINKS_CNT );
 		}
 
 	}
