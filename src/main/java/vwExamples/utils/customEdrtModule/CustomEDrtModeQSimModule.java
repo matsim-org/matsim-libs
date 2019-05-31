@@ -20,15 +20,16 @@
 
 package vwExamples.utils.customEdrtModule;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.name.Named;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
-import org.matsim.contrib.drt.optimizer.insertion.*;
+import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
+import org.matsim.contrib.drt.optimizer.insertion.PrecalculablePathDataProvider;
+import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -39,7 +40,11 @@ import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
+import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -51,14 +56,17 @@ import org.matsim.contrib.edrt.EDrtActionCreator;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory;
 import org.matsim.contrib.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.edrt.scheduler.EmptyVehicleChargingScheduler;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.contrib.ev.fleet.ElectricFleet;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.name.Named;
 
 /**
  * @author axer

@@ -18,23 +18,6 @@
 
 package vwExamples.utils.customEdrtModule;
 
-import org.apache.commons.lang.mutable.MutableInt;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
-import org.matsim.contrib.ev.fleet.Battery;
-import org.matsim.contrib.ev.fleet.ElectricFleet;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.core.network.NetworkUtils;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -42,6 +25,21 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang.mutable.MutableInt;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
+import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.ev.fleet.Battery;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.core.network.NetworkUtils;
 
 /**
  * @author axer
