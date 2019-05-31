@@ -218,12 +218,20 @@ public final class EditTrips {
 //		oldNWRoute.setEndLinkId( newNWRoute.getEndLinkId() ) ;
 		WithinDayAgentUtils.resetCaches(agent);
 	}
+	private static int wrnCnt = 0 ;
 	private static void pruneUpToCurrentLeg(Leg currentLeg, List<? extends PlanElement> newTrip) {
 //		while ( newTrip.get(0) instanceof Leg && !((Leg)newTrip.get(0)).getMode().equals( currentLeg.getMode()) ) {
 //			newTrip.remove(0) ;
 //		}
 		// yyyyyy do nothing for time being and hope for the best.
-		log.warn("yyyyyy pruneUpToCurrentLeg needs to be fixed for multimodal trips & for access/egress routing.") ;
+		if ( wrnCnt < 5 ){
+			wrnCnt++;
+			log.warn( "yyyyyy pruneUpToCurrentLeg needs to be fixed for multimodal trips & for access/egress routing." );
+			if ( wrnCnt==5 ) {
+				log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+			}
+		}
+
 	}
 
 	// static methods:
