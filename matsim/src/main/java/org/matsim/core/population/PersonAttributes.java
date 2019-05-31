@@ -16,6 +16,12 @@ public class PersonAttributes extends ObjectAttributes{
 	@Override public void removeAllAttributes( String personId ) {
 		throw new RuntimeException( msg("removeAllAttributes") ) ;
 	}
+	@Override public void clear() {
+		throw new RuntimeException( msg( "clear") ) ;
+	}
+	@Override public String toString() {
+		return super.toString() ;
+	}
 
 	// for retrofitting.  Called from PopulationUtils only.  Remove eventually.  kai, may'19
 	Object getAttributeDirectly( String personId, String key ){

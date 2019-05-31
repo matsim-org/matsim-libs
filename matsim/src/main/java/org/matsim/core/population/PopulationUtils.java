@@ -57,6 +57,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
@@ -1083,7 +1084,10 @@ public final class PopulationUtils {
 	// ---
 
 	public static Object getPersonAttribute( HasPlansAndId person, String key, Population population ) {
-		Object result = person.getAttributes().getAttribute( key );
+		Object result = null ;
+		if ( person instanceof Attributable ){
+			result = ((Attributable) person).getAttributes().getAttribute( key );
+		}
 		if ( result != null ) {
 			return result ;
 		}
