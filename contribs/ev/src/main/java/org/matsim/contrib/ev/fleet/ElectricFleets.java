@@ -24,31 +24,17 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
 
-public class ElectricFleetImpl implements ElectricFleet {
-	public static ElectricFleet create(ElectricFleetSpecification fleetSpecification,
+public class ElectricFleets {
+	public static ElectricFleet createDefaultFleet(ElectricFleetSpecification fleetSpecification,
 			DriveEnergyConsumption.Factory driveConsumptionFactory,
 			AuxEnergyConsumption.Factory auxConsumptionFactory) {
-		ElectricFleetImpl fleet = new ElectricFleetImpl();
-		fleetSpecification.getVehicleSpecifications()
+		ImmutableMap<Id<ElectricVehicle>, ? extends ElectricVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
 				.values()
 				.stream()
 				.map(s -> ElectricVehicleImpl.create(s, driveConsumptionFactory, auxConsumptionFactory))
-				.forEach(fleet::addElectricVehicle);
-		return fleet;
-	}
-
-	private final Map<Id<ElectricVehicle>, ElectricVehicle> electricVehicles = new LinkedHashMap<>();
-
-	@Override
-	public Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles() {
-		return Collections.unmodifiableMap(electricVehicles);
-	}
-
-	public void addElectricVehicle(ElectricVehicle ev) {
-		electricVehicles.put(ev.getId(), ev);
+				.collect(ImmutableMap.toImmutableMap(ElectricVehicle::getId, v -> v));
+		return () -> vehicles;
 	}
 }

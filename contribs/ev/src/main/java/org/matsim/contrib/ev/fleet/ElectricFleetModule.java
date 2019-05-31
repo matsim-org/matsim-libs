@@ -67,7 +67,7 @@ public class ElectricFleetModule extends AbstractModule {
 
 					@Override
 					public ElectricFleet get() {
-						return ElectricFleetImpl.create(fleetSpecification, driveConsumptionFactory,
+						return ElectricFleets.createDefaultFleet(fleetSpecification, driveConsumptionFactory,
 								auxConsumptionFactory);
 					}
 				}).asEagerSingleton();
