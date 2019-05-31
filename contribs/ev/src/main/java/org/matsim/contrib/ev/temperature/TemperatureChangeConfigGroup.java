@@ -21,13 +21,13 @@ package org.matsim.contrib.ev.temperature;/*
  * created by jbischoff, 15.08.2018
  */
 
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
 import java.net.URL;
 import java.util.Map;
 
-public class TemperatureChangeConfigGroup extends ReflectiveConfigGroup {
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
+
+public final class TemperatureChangeConfigGroup extends ReflectiveConfigGroup {
 
     public static final String GROUP_NAME = "temperature";
     public static final String TEMP_CHANGE_FILE = "temperatureChangeFile";

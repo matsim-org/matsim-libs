@@ -77,6 +77,10 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 				} else {
 					passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE);
 				}
+				final Person person = scenario.getPopulation().getPersons().get( passenger.getId() );
+				if ( person != null && person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ) {
+					passengerPosition.setAgentState( AgentState.PERSON_OTHER_MODE );
+				}
 				positions.add(passengerPosition);
 				first = false;
 			}
@@ -89,6 +93,13 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		for (MobsimAgent pa : agentsInActivities) {
 			AgentSnapshotInfo agInfo = snapshotInfoFactory.createAgentSnapshotInfo(pa.getId(), link, 0.9*link.getLength(), cnt2) ;
 			agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
+			final Person person = scenario.getPopulation().getPersons().get( pa.getId() );
+			if ( person != null ) {
+				if ( person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ){
+					agInfo.setAgentState( AgentState.PERSON_OTHER_MODE );
+				}
+			}
+
 			positions.add(agInfo) ;
 			cnt2++ ;
 		}
@@ -151,6 +162,10 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			if( PopulationUtils.getPersonAttribute( ((HasPerson) driverAgent).getPerson(), AgentSnapshotInfo.marker, scenario.getPopulation() ) != null ){
 				pos.setAgentState( AgentState.PERSON_OTHER_MODE );
 			}
+		}
+		final Person person = scenario.getPopulation().getPersons().get( driverAgent.getId() );
+		if ( person != null && person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ) {
+			pos.setAgentState( AgentState.PERSON_OTHER_MODE );
 		}
 
 		this.positionPassengers(positions, veh.getPassengers(), distanceFromFromNode, startCoord, 

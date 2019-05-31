@@ -20,15 +20,16 @@
 package org.matsim.contrib.etaxi.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
+import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
-import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -48,7 +49,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
  */
 public class RunETaxiBenchmark {
 	public static void run(String configFile, int runs) {
-		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configFile,
+				new TaxiConfigGroup(ETaxiOptimizerProvider::createParameterSet), new DvrpConfigGroup(),
 				new EvConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		createControler(config, runs).run();
@@ -57,7 +59,7 @@ public class RunETaxiBenchmark {
 	public static Controler createControler(Config config, int runs) {
 		DvrpConfigGroup.get(config).setNetworkMode(null);// to switch off network filtering
 		config.controler().setLastIteration(runs - 1);
-		config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
+		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
 		config.checkConsistency();
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 

@@ -26,7 +26,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author dziemke
  */
-public class BicycleTravelTime implements TravelTime {
+class BicycleTravelTime implements TravelTime {
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {

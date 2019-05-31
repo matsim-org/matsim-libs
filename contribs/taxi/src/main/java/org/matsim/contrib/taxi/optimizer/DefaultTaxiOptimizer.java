@@ -53,26 +53,27 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final UnplannedRequestInserter requestInserter;
 
 	private final TaxiConfigGroup taxiCfg;
-	private final DefaultTaxiOptimizerParams params;
+	private final AbstractTaxiOptimizerParams params;
 
 	private boolean requiresReoptimization = false;
 
 	public DefaultTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			TaxiScheduler scheduler, DefaultTaxiOptimizerParams params, UnplannedRequestInserter requestInserter) {
+			TaxiScheduler scheduler, UnplannedRequestInserter requestInserter) {
 		this.eventsManager = eventsManager;
 		this.fleet = fleet;
 		this.scheduler = scheduler;
 		this.requestInserter = requestInserter;
-		this.params = params;
 		this.taxiCfg = taxiCfg;
+		params = taxiCfg.getTaxiOptimizerParams();
 	}
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-		if (requiresReoptimization && isNewDecisionEpoch(e, params.reoptimizationTimeStep)) {
+		if (requiresReoptimization && isNewDecisionEpoch(e, params.getReoptimizationTimeStep())) {
 			for (TaxiRequest req : unplannedRequests) {
 				eventsManager.processEvent(
-						new PassengerRequestAcceptedEvent(e.getSimulationTime(), taxiCfg.getMode(), req.getId()));
+						new PassengerRequestAcceptedEvent(e.getSimulationTime(), taxiCfg.getMode(), req.getId(),
+								req.getPassengerId()));
 			}
 
 			if (params.doUnscheduleAwaitingRequests) {

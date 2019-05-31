@@ -23,33 +23,30 @@ package org.matsim.contrib.dvrp.passenger;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
 /**
  * @author michalm
  */
-public class PassengerRequestScheduledEvent extends Event {
+public class PassengerRequestScheduledEvent extends AbstractPassengerRequestEvent {
 	public static final String EVENT_TYPE = "PassengersRequest scheduled";
 
-	public static final String ATTRIBUTE_MODE = "mode";
-	public static final String ATTRIBUTE_REQUEST = "request";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_PICKUP_TIME = "pickupTime";
 	public static final String ATTRIBUTE_DROPOFF_TIME = "dropoffTime";
 
-	private final String mode;
-	private final Id<Request> requestId;
 	private final Id<DvrpVehicle> vehicleId;
 	private final double pickupTime;
 	private final double dropoffTime;
 
-	public PassengerRequestScheduledEvent(double time, String mode, Id<Request> requestId, Id<DvrpVehicle> vehicleId,
-			double pickupTime, double dropoffTime) {
-		super(time);
-		this.mode = mode;
-		this.requestId = requestId;
+	/**
+	 * An event processed upon request submission.
+	 */
+	public PassengerRequestScheduledEvent(double time, String mode, Id<Request> requestId, Id<Person> personId,
+			Id<DvrpVehicle> vehicleId, double pickupTime, double dropoffTime) {
+		super(time, mode, requestId, personId);
 		this.vehicleId = vehicleId;
 		this.pickupTime = pickupTime;
 		this.dropoffTime = dropoffTime;
@@ -60,43 +57,30 @@ public class PassengerRequestScheduledEvent extends Event {
 		return EVENT_TYPE;
 	}
 
-	public String getMode() {
-		return mode;
-	}
-
 	/**
-	 * the ID of the request
+	 * @return id of the vehicle assigned to the request
 	 */
-	public Id<Request> getRequestId() {
-		return requestId;
-	}
-
-	/**
-	 * the vehicle scheduled to the request
-	 */
-	public Id<DvrpVehicle> getVehicleId() {
+	public final Id<DvrpVehicle> getVehicleId() {
 		return vehicleId;
 	}
 
 	/**
-	 * the <b>estimated</b> pickup time of the request
+	 * @return <b>estimated</b> pickup time
 	 */
-	public double getPickupTime() {
+	public final double getPickupTime() {
 		return pickupTime;
 	}
 
 	/**
-	 * the <b>estimated</b> arrival time of the request
+	 * @return <b>estimated</b> dropoff time
 	 */
-	public double getDropoffTime() {
+	public final double getDropoffTime() {
 		return dropoffTime;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_MODE, mode);
-		attr.put(ATTRIBUTE_REQUEST, requestId + "");
 		attr.put(ATTRIBUTE_VEHICLE, vehicleId + "");
 		attr.put(ATTRIBUTE_PICKUP_TIME, pickupTime + "");
 		attr.put(ATTRIBUTE_DROPOFF_TIME, dropoffTime + "");

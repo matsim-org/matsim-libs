@@ -21,6 +21,7 @@ package org.matsim.core.network.filter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -98,6 +99,9 @@ public final class NetworkFilterManager {
 		ll.setFreespeed(l.getFreespeed());
 		ll.setLength(l.getLength());
 		ll.setNumberOfLanes(l.getNumberOfLanes());
+		for(Entry<String, Object> entry : l.getAttributes().getAsMap().entrySet()) {
+			ll.getAttributes().putAttribute(entry.getKey(), entry.getValue());
+		}
 		net.addLink(ll);
 	}
 	
@@ -106,9 +110,8 @@ public final class NetworkFilterManager {
 	 * @return
 	 */
 	public Network applyFilters() {
-		log.info("applying filters to network...");
-		int nodeCount = 0;
-		int linkCount = 0;
+		log.info("applying filters to network with " + network.getNodes().size() + " nodes and "
+				+ network.getLinks().size() + " links...");
 		Network net = NetworkUtils.createNetwork();
 		if (!this.nodeFilters.isEmpty()) {
 			for (Node n : this.network.getNodes().values()) {
@@ -121,7 +124,6 @@ public final class NetworkFilterManager {
 				}
 				if (add) {
 					this.addNode(net, n);
-					nodeCount++;
 				}
 			}
 		}
@@ -136,12 +138,10 @@ public final class NetworkFilterManager {
 				}
 				if (add) {
 					this.addLink(net, l);
-					linkCount++;
 				}
 			}
 		}
-		log.info("filtered " + nodeCount + " of " + network.getNodes().size() + " nodes...");
-		log.info("filtered " + linkCount + " of " + network.getLinks().size() + " links.");
+		log.info("filtered network contains " + net.getNodes().size() + " nodes and " + net.getLinks().size() + " links.");
 		return net;
 	}
 

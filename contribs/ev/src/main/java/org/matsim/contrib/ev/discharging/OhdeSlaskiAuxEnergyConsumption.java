@@ -19,10 +19,10 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import org.matsim.contrib.ev.data.ElectricVehicle;
-
 import java.util.function.BiPredicate;
 import java.util.function.DoubleSupplier;
+
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	private static final double a = 1.3;// [W]
@@ -42,8 +42,8 @@ public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 		return (a * temp + b) * temp + c;
 	}
 
-	public static OhdeSlaskiAuxEnergyConsumption createConsumptionForFixedTemperatureAndAlwaysOn(ElectricVehicle ev,
-			int temperature) {
+	public static OhdeSlaskiAuxEnergyConsumption createConsumptionForFixedTemperatureAndAlwaysOn(
+			ElectricVehicle ev, int temperature) {
 		return new OhdeSlaskiAuxEnergyConsumption(ev, () -> temperature, (v, t) -> true);
 	}
 
@@ -58,9 +58,8 @@ public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 		this.isTurnedOn = isTurnedOn;
 	}
 
-
 	@Override
-	public double calcEnergyConsumption(double period, double timeOfDay) {
-		return isTurnedOn.test(ev, timeOfDay) ? calcPower(temperatureProvider.getAsDouble()) * period : 0;
+	public double calcEnergyConsumption(double beginTime, double duration) {
+		return isTurnedOn.test(ev, beginTime) ? calcPower(temperatureProvider.getAsDouble()) * duration : 0;
 	}
 }
