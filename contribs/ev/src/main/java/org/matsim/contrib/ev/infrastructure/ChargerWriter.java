@@ -23,16 +23,17 @@ package org.matsim.contrib.ev.infrastructure;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 public class ChargerWriter extends MatsimXmlWriter {
-	private Iterable<Charger> chargers;
+	private final Stream<? extends ChargerSpecification> chargerSpecifications;
 
-	public ChargerWriter(Iterable<Charger> chargers) {
-		this.chargers = chargers;
+	public ChargerWriter(Stream<? extends ChargerSpecification> chargerSpecifications) {
+		this.chargerSpecifications = chargerSpecifications;
 	}
 
 	public void write(String file) {
@@ -45,11 +46,12 @@ public class ChargerWriter extends MatsimXmlWriter {
 	}
 
 	private void writeChargers() {
-		for (Charger c : chargers) {
+		chargerSpecifications.forEach(c -> {
 			List<Tuple<String, String>> atts = Arrays.asList(Tuple.of("id", c.getId().toString()),
-					Tuple.of("link", c.getLink().getId() + ""), Tuple.of("power", EvUnits.W_to_kW(c.getPower()) + ""),
-					Tuple.of("capacity", c.getPlugs() + ""), Tuple.of("type", c.getChargerType()));
+					Tuple.of("link", c.getLinkId() + ""), Tuple.of("type", c.getChargerType()),
+					Tuple.of("power", EvUnits.W_to_kW(c.getMaxPower()) + ""),
+					Tuple.of("capacity", c.getPlugCount() + ""));
 			writeStartTag("charger", atts, true);
-		}
+		});
 	}
 }
