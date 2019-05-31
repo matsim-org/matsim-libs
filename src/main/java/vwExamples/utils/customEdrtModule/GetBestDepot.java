@@ -39,6 +39,7 @@ import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
 import org.matsim.core.network.NetworkUtils;
 
 /**
@@ -50,6 +51,7 @@ public class GetBestDepot implements DepotFinder {
 	private final Map<Link, MutableInt> InitalHubCapacityMap;
 	private final Map<Charger, Integer> ChargerQueueMap;
 	private final ChargingInfrastructure chargingInfrastructure;
+
 	private final Fleet fleet;
 	private final ElectricFleet electricFleet;
 
@@ -110,8 +112,8 @@ public class GetBestDepot implements DepotFinder {
 		if (isLocatedinHub) {
 			// Check if vehicle is at charger or at queue of an charger
 
-			Set<Entry<Id<Charger>, Charger>> chargerEntrys = chargingInfrastructure
-					.getChargersAtLink(currentLink.getId()).entrySet();
+			Set<Entry<Id<Charger>, Charger>> chargerEntrys = ChargingInfrastructures.getChargersAtLink(
+					chargingInfrastructure, currentLink.getId()).entrySet();
 
 			for (Entry<Id<Charger>, Charger> charger : chargerEntrys) {
 

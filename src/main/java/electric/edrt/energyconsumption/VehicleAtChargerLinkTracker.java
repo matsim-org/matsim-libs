@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
@@ -70,7 +71,7 @@ public class VehicleAtChargerLinkTracker implements VehicleLeavesTrafficEventHan
 
     @Override
     public void handleEvent(VehicleLeavesTrafficEvent event) {
-        if (chargingInfrastructure.getChargersAtLink(event.getLinkId()) != null) {
+		if (ChargingInfrastructures.getChargersAtLink(chargingInfrastructure, event.getLinkId()) != null) {
             Id<ElectricVehicle> evId = Id.create(event.getVehicleId(), ElectricVehicle.class);
             if (evFleet.getVehicleSpecifications().containsKey(evId)) {
                 evsAtChargers.add(evId);
