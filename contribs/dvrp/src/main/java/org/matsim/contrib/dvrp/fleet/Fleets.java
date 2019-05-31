@@ -39,10 +39,11 @@ public class Fleets {
 
 	public static Fleet createCustomFleet(FleetSpecification fleetSpecification,
 			Function<DvrpVehicleSpecification, DvrpVehicle> vehicleCreator) {
-		return () -> fleetSpecification.getVehicleSpecifications()
+		ImmutableMap<Id<DvrpVehicle>, ? extends DvrpVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
 				.values()
 				.stream()
 				.map(vehicleCreator)
 				.collect(ImmutableMap.toImmutableMap(DvrpVehicle::getId, v -> v));
+		return () -> vehicles;
 	}
 }
