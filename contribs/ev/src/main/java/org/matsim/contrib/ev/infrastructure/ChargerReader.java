@@ -20,13 +20,10 @@
 
 package org.matsim.contrib.ev.infrastructure;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -34,18 +31,16 @@ import org.xml.sax.Attributes;
 public class ChargerReader extends MatsimXmlParser {
 	private final static String CHARGER = "charger";
 
-	private final ChargingInfrastructureImpl chargingInfrastructure;
-	private Map<Id<Link>, ? extends Link> links;
+	private final ChargingInfrastructureSpecification chargingInfrastructure;
 
-	public ChargerReader(Network network, ChargingInfrastructureImpl chargingInfrastructure) {
+	public ChargerReader(ChargingInfrastructureSpecification chargingInfrastructure) {
 		this.chargingInfrastructure = chargingInfrastructure;
-		links = network.getLinks();
 	}
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (CHARGER.equals(name)) {
-			chargingInfrastructure.addCharger(createCharger(atts));
+			chargingInfrastructure.addChargerSpecification(createSpecification(atts));
 		}
 	}
 
@@ -53,12 +48,13 @@ public class ChargerReader extends MatsimXmlParser {
 	public void endTag(String name, String content, Stack<String> context) {
 	}
 
-	private Charger createCharger(Attributes atts) {
-		Id<Charger> id = Id.create(atts.getValue("id"), Charger.class);
-		Link link = links.get(Id.createLinkId(atts.getValue("link")));
-		double power_kW = Double.parseDouble(atts.getValue("power"));
-		int plugs = Integer.parseInt(atts.getValue("capacity"));
-		String chargerType = Optional.ofNullable(atts.getValue("type")).orElse(ChargerImpl.DEFAULT_CHARGER_TYPE);
-		return new ChargerImpl(id, EvUnits.kW_to_W(power_kW), plugs, link, link.getCoord(), chargerType);
+	private ChargerSpecification createSpecification(Attributes atts) {
+		return ImmutableChargerSpecification.newBuilder()
+				.id(Id.create(atts.getValue("id"), Charger.class))
+				.linkId(Id.createLinkId(atts.getValue("link")))
+				.chargerType(Optional.ofNullable(atts.getValue("type")).orElse(ChargerImpl.DEFAULT_CHARGER_TYPE))
+				.maxPower(EvUnits.kW_to_W(Double.parseDouble(atts.getValue("power"))))
+				.plugCount(Integer.parseInt(atts.getValue("capacity")))//TODO rename to "plugCount" in DTD
+				.build();
 	}
 }

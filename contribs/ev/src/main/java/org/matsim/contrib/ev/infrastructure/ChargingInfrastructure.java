@@ -31,7 +31,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
  */
 public interface ChargingInfrastructure {
 
+	//FIXME change to ImmutableMap
 	Map<Id<Charger>, Charger> getChargers();
 
+	//FIXME remove
 	void initChargingLogics(ChargingLogic.Factory logicFactory, EventsManager eventsManager);
 }

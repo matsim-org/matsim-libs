@@ -30,10 +30,9 @@ public interface Charger extends BasicLocation, Identifiable<Charger> {
 
 	void setLogic(ChargingLogic logic);
 
-	String getChargerType();
-
-
 	Link getLink();
+
+	String getChargerType();
 
 	/**
 	 * @return max power at a single plug, in [W]

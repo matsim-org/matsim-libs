@@ -26,7 +26,7 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 public interface ChargingLogic {
-	static interface Factory {
+	interface Factory {
 		ChargingLogic create(Charger charger);
 	}
 
