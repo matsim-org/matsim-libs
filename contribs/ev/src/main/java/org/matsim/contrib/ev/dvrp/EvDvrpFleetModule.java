@@ -22,12 +22,11 @@ package org.matsim.contrib.ev.dvrp;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.FleetImpl;
 import org.matsim.contrib.dvrp.fleet.FleetReader;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
+import org.matsim.contrib.dvrp.fleet.Fleets;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -75,13 +74,9 @@ public class EvDvrpFleetModule extends AbstractDvrpModeModule {
 					@Override
 					public Fleet get() {
 						FleetSpecification fleetSpecification = getModalInstance(FleetSpecification.class);
+						return Fleets.createCustomFleet(fleetSpecification, s -> EvDvrpVehicle.create(
+								new DvrpVehicleImpl(s, network.getLinks().get(s.getStartLinkId())), evFleet));
 
-						FleetImpl evDvrpFleet = new FleetImpl();
-						for (DvrpVehicleSpecification s : fleetSpecification.getVehicleSpecifications().values()) {
-							evDvrpFleet.addVehicle(EvDvrpVehicle.create(
-									DvrpVehicleImpl.createWithLinkProvider(s, network.getLinks()::get), evFleet));
-						}
-						return evDvrpFleet;
 					}
 				}).asEagerSingleton();
 			}
