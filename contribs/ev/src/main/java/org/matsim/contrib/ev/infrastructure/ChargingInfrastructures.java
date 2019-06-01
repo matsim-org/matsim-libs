@@ -37,7 +37,7 @@ public class ChargingInfrastructures {
 				.stream()
 				.map(s -> new ChargerImpl(s, linkProvider.apply(s.getLinkId())))
 				.collect(ImmutableMap.toImmutableMap(Charger::getId, ch -> ch));
-		return new ChargingInfrastructureImpl(chargers);
+		return () -> chargers;
 	}
 
 	//FIXME calls to this method (used in event handlers) should be cached

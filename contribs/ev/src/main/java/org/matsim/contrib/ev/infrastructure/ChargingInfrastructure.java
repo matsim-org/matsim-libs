@@ -33,5 +33,11 @@ public interface ChargingInfrastructure {
 	ImmutableMap<Id<Charger>, Charger> getChargers();
 
 	//FIXME remove (after switching to the Qsim scope)
-	void initChargingLogics(ChargingLogic.Factory logicFactory, EventsManager eventsManager);
+	default void initChargingLogics(ChargingLogic.Factory logicFactory, EventsManager eventsManager) {
+		for (Charger c : getChargers().values()) {
+			ChargingLogic logic = logicFactory.create(c);
+			logic.initEventsHandling(eventsManager);
+			c.setLogic(logic);
+		}
+	}
 }
