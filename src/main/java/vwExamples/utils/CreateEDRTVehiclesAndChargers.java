@@ -41,7 +41,9 @@ import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.fleet.ImmutableElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargerImpl;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargerWriter;
+import org.matsim.contrib.ev.infrastructure.ImmutableChargerSpecification;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -87,7 +89,7 @@ public class CreateEDRTVehiclesAndChargers {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		List<DvrpVehicleSpecification> vehicles = new ArrayList<>();
 		List<ElectricVehicleSpecification> eVehicles = new ArrayList<>();
-		List<Charger> chargers = new ArrayList<>();
+		List<ChargerSpecification> chargers = new ArrayList<>();
 		Random random = MatsimRandom.getLocalInstance();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
 		for (Entry<Id<Link>, Integer> e : depotsAndVehicles.entrySet()) {
@@ -130,14 +132,19 @@ public class CreateEDRTVehiclesAndChargers {
 				System.out.println("Numbers of chargers per hub is directy given: " + chargersPerDepot);
 			}
 
-			Charger charger = new ChargerImpl(Id.create("charger_" + startLink.getId(), Charger.class),
-					CHARGINGPOWER_KW * EvUnits.W_PER_kW, chargersPerDepot, startLink);
+			ChargerSpecification charger = ImmutableChargerSpecification.newBuilder()
+					.id(Id.create("charger_" + startLink.getId(), Charger.class))
+					.maxPower(CHARGINGPOWER_KW * EvUnits.W_PER_kW)
+					.plugCount(chargersPerDepot)
+					.linkId(startLink.getId())
+					.chargerType(ChargerImpl.DEFAULT_CHARGER_TYPE)
+					.build();
 			chargers.add(charger);
 
 		}
 		new FleetWriter(vehicles.stream()).write(DRT_VEHICLE_FILE);
 		new ElectricFleetWriter(eVehicles.stream()).write(E_VEHICLE_FILE);
-		new ChargerWriter(chargers).write(CHARGER_FILE);
+		new ChargerWriter(chargers.stream()).write(CHARGER_FILE);
 	}
 
 }
