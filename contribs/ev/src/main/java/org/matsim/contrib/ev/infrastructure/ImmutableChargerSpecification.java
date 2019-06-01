@@ -51,7 +51,7 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 		return new Builder();
 	}
 
-	public static Builder newBuilder(ImmutableChargerSpecification copy) {
+	public static Builder newBuilder(ChargerSpecification copy) {
 		Builder builder = new Builder();
 		builder.id = copy.getId();
 		builder.linkId = copy.getLinkId();

@@ -50,7 +50,7 @@ public final class ImmutableElectricVehicleSpecification implements ElectricVehi
 		return new Builder();
 	}
 
-	public static Builder newBuilder(ImmutableElectricVehicleSpecification copy) {
+	public static Builder newBuilder(ElectricVehicleSpecification copy) {
 		Builder builder = new Builder();
 		builder.id = copy.getId();
 		builder.vehicleType = copy.getVehicleType();
