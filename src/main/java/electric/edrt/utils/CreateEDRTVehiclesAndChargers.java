@@ -40,7 +40,6 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.fleet.ImmutableElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.Charger;
-import org.matsim.contrib.ev.infrastructure.ChargerImpl;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargerWriter;
 import org.matsim.contrib.ev.infrastructure.ImmutableChargerSpecification;
@@ -125,8 +124,7 @@ public class CreateEDRTVehiclesAndChargers {
 					.id(Id.create("charger_" + startLink.getId(), Charger.class))
 					.maxPower(CHARGINGPOWER_KW * EvUnits.W_PER_kW)
 					.plugCount(chargersPerDepot)
-					.linkId(startLink.getId())
-					.chargerType(ChargerImpl.DEFAULT_CHARGER_TYPE)
+					.linkId(startLink.getId()).chargerType(ChargerSpecification.DEFAULT_CHARGER_TYPE)
 					.build();
 			chargers.add(charger);
 
