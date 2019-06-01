@@ -19,14 +19,14 @@
 
 package org.matsim.contrib.ev.charging;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 
 public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueingLogic {
 	private final Map<Id<ElectricVehicle>, ElectricVehicle> assignedVehicles = new LinkedHashMap<>();

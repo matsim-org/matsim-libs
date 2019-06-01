@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,27 +15,35 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.data;
+package org.matsim.contrib.dvrp.fleet;
+
+import java.util.function.Function;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.contrib.util.LinkProvider;
 
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * @author michalm
  */
-public interface ChargingInfrastructure {
-	public static final String CHARGERS = "chargers";
+public class Fleets {
+	public static Fleet createDefaultFleet(FleetSpecification fleetSpecification, LinkProvider<Id<Link>> linkProvider) {
+		return createCustomFleet(fleetSpecification,
+				s -> new DvrpVehicleImpl(s, linkProvider.apply(s.getStartLinkId())));
+	}
 
-	Map<Id<Charger>, Charger> getChargers();
-
-    Map<Id<Charger>, Charger> getChargersAtLink(Id<Link> linkId);
-
-
-	void initChargingLogics(ChargingLogic.Factory logicFactory, EventsManager eventsManager);
+	public static Fleet createCustomFleet(FleetSpecification fleetSpecification,
+			Function<DvrpVehicleSpecification, DvrpVehicle> vehicleCreator) {
+		ImmutableMap<Id<DvrpVehicle>, ? extends DvrpVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
+				.values()
+				.stream()
+				.map(vehicleCreator)
+				.collect(ImmutableMap.toImmutableMap(DvrpVehicle::getId, v -> v));
+		return () -> vehicles;
+	}
 }

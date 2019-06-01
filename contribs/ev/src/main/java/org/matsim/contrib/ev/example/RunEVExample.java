@@ -34,7 +34,7 @@ import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FastThenSlowCharging;
 import org.matsim.contrib.ev.charging.VehicleChargingHandler;
-import org.matsim.contrib.ev.data.Charger;
+import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.routing.EVNetworkRoutingProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;

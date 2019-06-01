@@ -35,10 +35,10 @@ import org.matsim.contrib.ev.charging.ChargingEndEvent;
 import org.matsim.contrib.ev.charging.ChargingEndEventHandler;
 import org.matsim.contrib.ev.charging.ChargingStartEvent;
 import org.matsim.contrib.ev.charging.ChargingStartEventHandler;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.utils.misc.Time;
 
 import com.google.inject.Inject;
