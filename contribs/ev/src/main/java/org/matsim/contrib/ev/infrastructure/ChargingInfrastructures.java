@@ -22,6 +22,7 @@ package org.matsim.contrib.ev.infrastructure;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.util.LinkProvider;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -29,6 +30,16 @@ import com.google.common.collect.ImmutableMap;
  * @author Michal Maciejewski (michalm)
  */
 public class ChargingInfrastructures {
+	public static ChargingInfrastructure createChargingInfrastructure(
+			ChargingInfrastructureSpecification infrastructureSpecification, LinkProvider<Id<Link>> linkProvider) {
+		ImmutableMap<Id<Charger>, Charger> chargers = infrastructureSpecification.getChargerSpecifications()
+				.values()
+				.stream()
+				.map(s -> new ChargerImpl(s, linkProvider.apply(s.getLinkId())))
+				.collect(ImmutableMap.toImmutableMap(Charger::getId, ch -> ch));
+		return new ChargingInfrastructureImpl(chargers);
+	}
+
 	//FIXME calls to this method (used in event handlers) should be cached
 	public static ImmutableMap<Id<Charger>, Charger> getChargersAtLink(ChargingInfrastructure infrastructure,
 			Id<Link> linkId) {

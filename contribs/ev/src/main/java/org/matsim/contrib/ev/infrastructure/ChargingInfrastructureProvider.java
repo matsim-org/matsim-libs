@@ -48,13 +48,7 @@ public class ChargingInfrastructureProvider implements Provider<ChargingInfrastr
 	public ChargingInfrastructure get() {
 		ChargingInfrastructureSpecification infrastructureSpecification = new ChargingInfrastructureSpecificationImpl();
 		new ChargerReader(infrastructureSpecification).parse(url);
-
-		ChargingInfrastructureImpl chargingInfrastructure = new ChargingInfrastructureImpl();
-		infrastructureSpecification.getChargerSpecifications()
-				.values()
-				.stream()
-				.map(s -> new ChargerImpl(s, network.getLinks().get(s.getLinkId())))
-				.forEach(chargingInfrastructure::addCharger);
-		return chargingInfrastructure;
+		return ChargingInfrastructures.createChargingInfrastructure(infrastructureSpecification,
+				network.getLinks()::get);
 	}
 }

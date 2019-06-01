@@ -20,27 +20,25 @@
 
 package org.matsim.contrib.ev.infrastructure;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * @author michalm
  */
 public class ChargingInfrastructureImpl implements ChargingInfrastructure {
-	private final Map<Id<Charger>, Charger> chargers = new LinkedHashMap<>();
+	private final ImmutableMap<Id<Charger>, Charger> chargers;
 
-	@Override
-	public Map<Id<Charger>, Charger> getChargers() {
-		return Collections.unmodifiableMap(chargers);
+	public ChargingInfrastructureImpl(ImmutableMap<Id<Charger>, Charger> chargers) {
+		this.chargers = chargers;
 	}
 
-	public void addCharger(Charger charger) {
-		chargers.put(charger.getId(), charger);
+	@Override
+	public ImmutableMap<Id<Charger>, Charger> getChargers() {
+		return chargers;
 	}
 
 	@Override
