@@ -29,9 +29,14 @@ public class ScenarioByConfigInjectionTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testAttributeConvertersAreInjected() {
+	public void testAttributeConvertersAreInjected_deprecated() {
 		log.info( "create test scenario" );
 		final Config config = createTestScenario();
+
+		config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile( true );
+		// yy this enables reading the old attributes file.  The true test, however, would have to test (all) the attribute converters for Attributable.
+		// kai, jun'19
+
 		log.info( "create injector" );
 		com.google.inject.Injector injector =
 				Injector.createInjector(

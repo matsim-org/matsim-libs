@@ -65,14 +65,30 @@ public class ScenarioLoaderImplTest {
 	}
 
 	@Test
-	public void testLoadScenario_loadPersonAttributes() {
+	public void testLoadScenario_loadPersonAttributes_nowDeprecated() {
 		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(this.util.classInputResourcePath(), "personAttributesConfig.xml"));
 		config.plans().addParam("inputPersonAttributesFile", "personAttributes.xml");
+		config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile( true );
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Population population = scenario.getPopulation();
 		Person person = population.getPersons().get( Id.createPersonId( "1" ) ) ;
 		Gbl.assertNotNull( person );
 		Assert.assertEquals("world", PopulationUtils.getPersonAttribute( person, "hello", population ) );
+	}
+
+	@Test
+	public void testLoadScenario_loadPersonAttributes() {
+		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(this.util.classInputResourcePath(), "personAttributesConfig.xml"));
+		config.plans().addParam("inputPersonAttributesFile", "personAttributes.xml");
+		boolean caughtException=false ;
+		Scenario scenario = null ;
+		try{
+			scenario = ScenarioUtils.loadScenario( config );
+		} catch ( Exception ee ) {
+			// expected exception
+			caughtException = true ;
+		}
+		Assert.assertTrue( caughtException );
 	}
 
 	@Test

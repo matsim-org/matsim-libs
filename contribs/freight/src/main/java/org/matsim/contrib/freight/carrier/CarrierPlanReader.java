@@ -27,37 +27,37 @@ import org.xml.sax.Attributes;
  */
 public class CarrierPlanReader extends MatsimXmlParser {
 
-	public static final Logger logger = Logger.getLogger(CarrierPlanReader.class);
+	private static final Logger logger = Logger.getLogger(CarrierPlanReader.class);
 
-	public static final String CARRIERS = "carriers";
+	private static final String CARRIERS = "carriers";
 
-	public static final String CARRIER = "carrier";
+	private static final String CARRIER = "carrier";
 
-	public static final String LINKID = "linkId";
+	private static final String LINKID = "linkId";
 
-	public static final String SHIPMENTS = "shipments";
+	private static final String SHIPMENTS = "shipments";
 
-	public static final String SHIPMENT = "shipment";
+	private static final String SHIPMENT = "shipment";
 
-	public static final String ID = "id";
+	private static final String ID = "id";
 
-	public static final String FROM = "from";
+	private static final String FROM = "from";
 
-	public static final String TO = "to";
+	private static final String TO = "to";
 
-	public static final String SIZE = "size";
+	private static final String SIZE = "size";
 
-	public static final String ACTIVITY = "act";
+	private static final String ACTIVITY = "act";
 
-	public static final String TYPE = "type";
+	private static final String TYPE = "type";
 
-	public static final String SHIPMENTID = "shipmentId";
+	private static final String SHIPMENTID = "shipmentId";
 
-	public static final String START = "start";
+	private static final String START = "start";
 
-	public static final String VEHICLE = "vehicle";
+	private static final String VEHICLE = "vehicle";
 
-	public static final String VEHICLES = "vehicles";
+	private static final String VEHICLES = "vehicles";
 
 	private static final String VEHICLESTART = "earliestStart";
 
@@ -75,19 +75,17 @@ public class CarrierPlanReader extends MatsimXmlParser {
 
 	private String previousRouteContent;
 
-	public Map<String, CarrierShipment> currentShipments = null;
+	private Map<String, CarrierShipment> currentShipments = null;
 
-	public Map<String, CarrierVehicle> vehicles = null;
+	private Map<String, CarrierVehicle> vehicles = null;
 
-	public Collection<ScheduledTour> scheduledTours = null;
+	private Collection<ScheduledTour> scheduledTours = null;
 
-	public CarrierPlan currentPlan = null;
+	private Double currentScore;
 
-	public Double currentScore;
+	private boolean selected;
 
-	public boolean selected;
-
-	public Carriers carriers;
+	private Carriers carriers;
 
 	private double currentLegTransTime;
 
@@ -298,11 +296,11 @@ public class CarrierPlanReader extends MatsimXmlParser {
 			carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
 		}
 		if (name.equals("plan")) {
-			currentPlan = new CarrierPlan(currentCarrier, scheduledTours);
-			currentPlan.setScore(currentScore);
-			currentCarrier.getPlans().add(currentPlan);
+			CarrierPlan currentPlan = new CarrierPlan( currentCarrier, scheduledTours );
+			currentPlan.setScore(currentScore );
+			currentCarrier.getPlans().add( currentPlan );
 			if(this.selected){
-				currentCarrier.setSelectedPlan(currentPlan);
+				currentCarrier.setSelectedPlan( currentPlan );
 			}
 		}
 		if (name.equals("tour")) {

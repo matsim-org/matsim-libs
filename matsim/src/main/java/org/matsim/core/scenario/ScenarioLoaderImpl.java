@@ -48,6 +48,8 @@ import org.matsim.vehicles.VehicleReaderV1;
 import java.net.URL;
 import java.util.*;
 
+import static org.matsim.core.config.groups.PlansConfigGroup.MESSAGE;
+
 /**
  * Loads elements of Scenario from file. Non standardized elements
  * can also be loaded however they require a specific instance of
@@ -195,6 +197,9 @@ class ScenarioLoaderImpl {
 		}
 
 		if ((this.config.plans() != null) && (this.config.plans().getInputPersonAttributeFile() != null)) {
+			if ( !this.config.plans().isInsistingOnUsingDeprecatedPersonAttributeFile() ) {
+				throw new RuntimeException( MESSAGE ) ;
+			}
 			URL personAttributesURL = this.config.plans().getInputPersonAttributeFileURL(this.config.getContext());
 			log.info("loading person attributes from " + personAttributesURL);
 //			final PersonAttributes personAttributes = this.scenario.getPopulation().getPersonAttributes();
@@ -209,9 +214,19 @@ class ScenarioLoaderImpl {
 					Object value = personAttributes.getAttribute( person.getId().toString(), key );
 					person.getAttributes().putAttribute( key, value ) ;
 				}
+				personAttributes.removeAllAttributes( person.getId().toString() );
 			}
 			// (some of the above could also become a static helper method in ObjectAttributesUtils, but this here seems the only
 			// place within matsim core where the personAttributes are automatically read so maybe there is no need for this. kai, jun'19)
+
+			if ( !personAttributes.toString().equals( "" ) ) {
+				String message = "personAttributes not empty after going through all persons, meaning that it contains material for personIDs that " +
+								 "are not in the population.  This is not necessarily a bug so we will continue, but note that such material " +
+								 "will no longer be contained in the output_* files.  The material that is still there will follow.  kai, " +
+								 "jun'19" ;
+				log.warn( message ) ;
+				log.warn( personAttributes.toString() ) ;
+			}
 
 		}
 		else {

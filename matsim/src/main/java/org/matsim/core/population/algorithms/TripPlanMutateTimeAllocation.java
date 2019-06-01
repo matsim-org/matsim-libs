@@ -189,7 +189,10 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 		else if (this.personAttributes == null) return null; 
 		else {
 			Object o = this.personAttributes.getAttribute(plan.getPerson().getId().toString(), this.subpopulationAttribute);
-			if (o != null) return o.toString();
+			if (o != null) {
+				throw new RuntimeException("abc") ;
+//				return o.toString();
+			}
 			else return null;
 		}
 	}
