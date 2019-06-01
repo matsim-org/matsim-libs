@@ -68,7 +68,9 @@ public class RunCarsharingIT {
 		config.network().setInputFile("network.xml" );
 
 		config.plans().setInputFile("10persons.xml");
-		config.plans().setInputPersonAttributeFile("1000desiresAttributes.xml");
+//		config.plans().setInputPersonAttributeFile("1000desiresAttributes.xml");
+		config.plans().setInputPersonAttributeFile( null );
+		// yyyyyy test passes also with this setting.  ???  kai, jun'19
 
 		config.facilities().setInputFile("facilities.xml" );
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);

@@ -197,9 +197,6 @@ class ScenarioLoaderImpl {
 		}
 
 		if ((this.config.plans() != null) && (this.config.plans().getInputPersonAttributeFile() != null)) {
-			if ( !this.config.plans().isInsistingOnUsingDeprecatedPersonAttributeFile() ) {
-				throw new RuntimeException( MESSAGE ) ;
-			}
 			URL personAttributesURL = this.config.plans().getInputPersonAttributeFileURL(this.config.getContext());
 			log.info("loading person attributes from " + personAttributesURL);
 //			final PersonAttributes personAttributes = this.scenario.getPopulation().getPersonAttributes();
@@ -228,6 +225,15 @@ class ScenarioLoaderImpl {
 				log.warn( personAttributes.toString() ) ;
 			}
 
+			String outFilename = this.config.controler().getOutputDirectory() + "/plans_with_person_attributes.xml.gz" ;
+			PopulationUtils.writePopulation( scenario.getPopulation(), outFilename );
+
+			log.warn( "a file with path=" + outFilename + " was just written in order to facilitate the transition to having person attributes inside " +
+						"the persons. ") ;
+
+			if ( !this.config.plans().isInsistingOnUsingDeprecatedPersonAttributeFile() ) {
+				throw new RuntimeException( MESSAGE ) ;
+			}
 		}
 		else {
 			log.info("no person-attributes file set in config, not loading any person attributes");
