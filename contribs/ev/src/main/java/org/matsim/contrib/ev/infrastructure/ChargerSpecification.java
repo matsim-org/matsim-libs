@@ -35,6 +35,8 @@ import org.matsim.api.core.v01.network.Link;
  * @author Michal Maciejewski (michalm)
  */
 public interface ChargerSpecification extends Identifiable<Charger> {
+	String DEFAULT_CHARGER_TYPE = "default";
+
 	Id<Link> getLinkId();
 
 	/**

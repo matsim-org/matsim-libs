@@ -52,7 +52,8 @@ public class ChargerReader extends MatsimXmlParser {
 		return ImmutableChargerSpecification.newBuilder()
 				.id(Id.create(atts.getValue("id"), Charger.class))
 				.linkId(Id.createLinkId(atts.getValue("link")))
-				.chargerType(Optional.ofNullable(atts.getValue("type")).orElse(ChargerImpl.DEFAULT_CHARGER_TYPE))
+				.chargerType(
+						Optional.ofNullable(atts.getValue("type")).orElse(ChargerSpecification.DEFAULT_CHARGER_TYPE))
 				.maxPower(
 						EvUnits.kW_to_W(Double.parseDouble(atts.getValue("power"))))//TODO rename to "maxPower" in DTD??
 				.plugCount(Integer.parseInt(atts.getValue("capacity")))//TODO rename to "plugCount" in DTD

@@ -26,8 +26,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 
 public class ChargerImpl implements Charger {
-	public static final String DEFAULT_CHARGER_TYPE = "default";
-
 	private ChargerSpecification specification;
 	private final Link link;
 	private ChargingLogic logic;
