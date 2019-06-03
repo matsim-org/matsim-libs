@@ -37,11 +37,11 @@ public class DischargingModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		boolean isSeperateAuxDischargingHandler = evCfg.getAuxDischargingSimulation()
+		boolean isSeparateAuxDischargingHandler = evCfg.getAuxDischargingSimulation()
 				== EvConfigGroup.AuxDischargingSimulation.separateAuxDischargingHandler;
 
 		bind(DriveEnergyConsumption.Factory.class).toInstance(ev -> new OhdeSlaskiDriveEnergyConsumption());
-		if (isSeperateAuxDischargingHandler) {
+		if (isSeparateAuxDischargingHandler) {
 			// TODO fixed temperature 15 oC
 			// FIXME start using TemperatureService
 			// FIXME "isTurnedOn" returns true ==> should not be used when for "separateAuxDischargingHandler"
@@ -53,7 +53,7 @@ public class DischargingModule extends AbstractModule {
 			@Override
 			protected void configureQSim() {
 				bind(DriveDischargingHandler.class).asEagerSingleton();
-				if (isSeperateAuxDischargingHandler) {
+				if (isSeparateAuxDischargingHandler) {
 					bind(AuxDischargingHandler.class).asEagerSingleton();
 					addQSimComponentBinding(EvModule.EV_COMPONENT).to(AuxDischargingHandler.class);
 				}

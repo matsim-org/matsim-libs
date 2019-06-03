@@ -52,7 +52,7 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	@Positive
 	private int chargeTimeStep = 5; // 5 s ==> 0.35% SOC (fast charging, 50 kW)
 
-	// only used if SeperateAuxDischargingHandler is used, otherwise ignored
+	// only used if SeparateAuxDischargingHandler is used, otherwise ignored
 	@Positive
 	private int auxDischargeTimeStep = 60; // 1 min ==> 0.25% SOC (3 kW AUX power)
 
