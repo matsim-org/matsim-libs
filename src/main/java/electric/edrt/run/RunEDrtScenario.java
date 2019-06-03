@@ -29,7 +29,6 @@ import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FastThenSlowCharging;
-import org.matsim.contrib.ev.charging.FixedSpeedChargingStrategy;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
@@ -105,13 +104,11 @@ public class RunEDrtScenario {
 	}
 
 	public static Controler createControler(Config config) {
+		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		Controler controler = EDrtControlerCreator.createControler(config, false);
 		controler.addOverridingModule(new TemperatureChangeModule());
+		controler.addOverridingModule(new EvDvrpIntegrationModule(drtCfg.getMode()));
 
-		controler.addOverridingModule(
-				new EvDvrpIntegrationModule(DrtConfigGroup.get(config).getMode()).setChargingStrategyFactory(
-						charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
-								MAX_RELATIVE_SOC)));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

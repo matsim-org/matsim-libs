@@ -26,6 +26,8 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.edrt.run.EDrtControlerCreator;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FastThenSlowCharging;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
@@ -98,14 +100,18 @@ public class RunVWEDrtScenario {
 	}
 
 	public static Controler createControler(Config config) {
+		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		Controler controler = EDrtControlerCreator.createControler(config, false);
 		controler.addOverridingModule(new TemperatureChangeModule());
-		controler.addOverridingModule(
-				new EvDvrpIntegrationModule(DrtConfigGroup.get(config).getMode()).setChargingStrategyFactory(
-						charger -> new FastThenSlowCharging(charger.getPower() * CHARGING_SPEED_FACTOR)));
+		controler.addOverridingModule(new EvDvrpIntegrationModule(drtCfg.getMode()));
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				bind(ChargingLogic.Factory.class).toInstance(
+						charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+								new FastThenSlowCharging(charger.getPower() * CHARGING_SPEED_FACTOR)));
+
 				bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
 						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
 				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
