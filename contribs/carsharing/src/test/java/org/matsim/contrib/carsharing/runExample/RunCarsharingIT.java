@@ -69,8 +69,8 @@ public class RunCarsharingIT {
 
 		config.plans().setInputFile("10persons.xml");
 //		config.plans().setInputPersonAttributeFile("1000desiresAttributes.xml");
-		config.plans().setInputPersonAttributeFile( null );
-		// yyyyyy test passes also with this setting.  ???  kai, jun'19
+//		config.plans().setInputPersonAttributeFile( null );
+		// (Not needed.  I removed this from config.xml, so setting to null is not needed here.. kai, jun'19)
 
 		config.facilities().setInputFile("facilities.xml" );
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);

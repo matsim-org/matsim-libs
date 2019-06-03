@@ -45,6 +45,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
 
+import java.io.File;
 import java.net.URL;
 import java.util.*;
 
@@ -225,11 +226,20 @@ class ScenarioLoaderImpl {
 				log.warn( personAttributes.toString() ) ;
 			}
 
-			String outFilename = this.config.controler().getOutputDirectory() + "/plans_with_person_attributes.xml.gz" ;
-			PopulationUtils.writePopulation( scenario.getPopulation(), outFilename );
+			final String outputDirectory = this.config.controler().getOutputDirectory();
+			final File outDir = new File( outputDirectory );
+			if ( outDir.exists() && outDir.canWrite() ){
+				// since ScenarioLoader is supposed to only read material,  there are cases where the output directory does not exist at
+				// this stage. One could maybe write to the "config.getContext()" directory.  However, sometimes this is a URL, and thus also
+				// non-writeable, and it is even less systematic than writing into the output directory. kai, jun'19
 
-			log.warn( "a file with path=" + outFilename + " was just written in order to facilitate the transition to having person attributes inside " +
-						"the persons. ") ;
+				String outFilename = outputDirectory + "/input_plans_with_person_attributes.xml.gz";
+				PopulationUtils.writePopulation( scenario.getPopulation(), outFilename );
+
+				log.warn(
+					  "a file with path=" + outFilename + " was just written in order to facilitate the transition to having person attributes inside " +
+						    "the persons. " );
+			}
 
 			if ( !this.config.plans().isInsistingOnUsingDeprecatedPersonAttributeFile() ) {
 				throw new RuntimeException( MESSAGE ) ;
