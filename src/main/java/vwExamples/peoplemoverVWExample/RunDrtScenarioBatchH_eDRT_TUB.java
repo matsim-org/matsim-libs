@@ -192,7 +192,7 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
         eDrt.setChargersFile("chargers\\chargers.xml.gz");
         eDrt.setVehiclesFile("fleets\\eFleet.xml.gz");
         eDrt.setAuxDischargeTimeStep(10);
-        eDrt.setAuxDischargingSimulation(EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler);
+		eDrt.setAuxDischargingSimulation(EvConfigGroup.AuxDischargingSimulation.separateAuxDischargingHandler);
         eDrt.setTimeProfiles(true);
 
 

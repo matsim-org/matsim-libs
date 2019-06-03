@@ -205,7 +205,7 @@ public class Sim02_DrtCommuter {
 		eDrt.setChargersFile(inbase + "\\input\\chargers\\chargers.xml.gz");
 		eDrt.setVehiclesFile(inbase + "\\input\\fleets\\eFleet.xml.gz");
 		eDrt.setAuxDischargeTimeStep(10);
-		eDrt.setAuxDischargingSimulation(EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler);
+		eDrt.setAuxDischargingSimulation(EvConfigGroup.AuxDischargingSimulation.separateAuxDischargingHandler);
 		eDrt.setTimeProfiles(true);
 
 		// config.addModule(new ParkingRouterConfigGroup());

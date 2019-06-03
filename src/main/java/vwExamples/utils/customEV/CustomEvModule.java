@@ -22,8 +22,8 @@ package vwExamples.utils.customEV;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup.AuxDischargingSimulation;
 import org.matsim.contrib.ev.charging.ChargingModule;
-import org.matsim.contrib.ev.fleet.ElectricFleetModule;
 import org.matsim.contrib.ev.discharging.DischargingModule;
+import org.matsim.contrib.ev.fleet.ElectricFleetModule;
 import org.matsim.contrib.ev.stats.EvStatsModule;
 import org.matsim.core.controler.AbstractModule;
 
@@ -37,7 +37,7 @@ public class CustomEvModule extends AbstractModule {
 		install(new DischargingModule(evCfg));
 		install(new EvStatsModule(evCfg));
 
-		if (evCfg.getAuxDischargingSimulation() == AuxDischargingSimulation.seperateAuxDischargingHandler) {
+		if (evCfg.getAuxDischargingSimulation() == AuxDischargingSimulation.separateAuxDischargingHandler) {
 			bind(CustomAuxDischargingHandler.class).asEagerSingleton();
 			addMobsimListenerBinding().to(CustomAuxDischargingHandler.class);
 			addEventHandlerBinding().to(CustomAuxDischargingHandler.class);
