@@ -20,10 +20,12 @@
 
 package vwExamples.peoplemoverVWExample;
 
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
-import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
-import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -33,10 +35,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
-import org.matsim.contrib.edrt.run.EDrtControlerCreator;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
@@ -55,17 +55,16 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
+import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
+import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
 import vwExamples.utils.customEV.BatteryReplacementCharge;
 import vwExamples.utils.customEV.CustomFastThenSlowCharging;
 import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author axer
@@ -79,15 +78,15 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static final double BATTERYREPLACETIME = 180.0;
 
 	static boolean BatteryReplace = false;
-	
-	static int[] fleetRange = {100};
-//	static int[] fleetRange = {100};
+
+	static int[] fleetRange = { 100 };
+	//	static int[] fleetRange = {100};
 
 	public static void main(String[] args) throws IOException {
 		//int count = 7;
 		int n_iterations = 1;
 		for (int it = 0; it < n_iterations; it++) {
-			for (int fleet : fleetRange ) {
+			for (int fleet : fleetRange) {
 				int vehiclePerDepot = fleet;
 
 				run(vehiclePerDepot, it);
@@ -108,10 +107,8 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\hannover_edrt.xml", new DrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
 				new TemperatureChangeConfigGroup());
-		
-		
 
-		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup) config.getModules()
+		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup)config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);
 		tcg.setTempFile(inbase + "\\input\\temp\\temperatures_0.csv");
 		config.travelTimeCalculator().setTraveltimeBinSize(900);
@@ -132,7 +129,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		String networkFilePath = inbase + "\\input\\network\\network.xml.gz";
 		String shapeFilePath = inbase + "\\input\\shp\\Hannover_Stadtteile.shp";
 		String shapeFeature = "NO"; // shapeFeature is used to read the shapeFilePath. All zones in shapeFile are
-									// used to generate a drt service area
+		// used to generate a drt service area
 		String drtTag = "drt"; // drtTag is assigned to roads that should be used by the drt service
 		// Adding drtTag to the network in order to define a service area
 		vwExamples.utils.serviceAreaShapeToNetwork.run(networkFilePath, shapeFilePath, shapeFeature, drtTag);
@@ -140,7 +137,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		config.network().setInputFile(inbase + "\\input\\network\\drtServiceAreaNetwork.xml.gz");
 
 		// This part allows to change dynamically DRT config parameters
-		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		DrtConfigGroup drt = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
 
 		drt.setPrintDetailedWarnings(false);
 		// Parameters to setup the DRT service
@@ -183,7 +180,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		vehiclesAndChargers.MAX_START_CAPACITY_KWH = 78;
 		vehiclesAndChargers.MIN_START_CAPACITY_KWH = 78;
 		vehiclesAndChargers.BATTERY_CAPACITY_KWH = 78;
-		vehiclesAndChargers.CHARGINGPOWER_KW = (int) (100);
+		vehiclesAndChargers.CHARGINGPOWER_KW = (int)(100);
 		vehiclesAndChargers.CHAGERSPERDEPOT = 5;
 		vehiclesAndChargers.run(depotsAndVehicles);
 
@@ -192,7 +189,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		drt.setOperationalScheme("stopbased");
 		drt.setPlotDetailedCustomerStats(true);
 
-		EvConfigGroup eDrt = (EvConfigGroup) config.getModules().get(EvConfigGroup.GROUP_NAME);
+		EvConfigGroup eDrt = (EvConfigGroup)config.getModules().get(EvConfigGroup.GROUP_NAME);
 		eDrt.setChargersFile(inbase + "\\input\\chargers\\chargers.xml.gz");
 		eDrt.setVehiclesFile(inbase + "\\input\\fleets\\eFleet.xml.gz");
 		eDrt.setAuxDischargeTimeStep(10);
@@ -257,8 +254,8 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 				// 0.05
 				DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.05);
 				DvrpConfigGroup.get(config).setTravelTimeEstimationBeta(900);
-//				DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.05);
-//				DvrpConfigGroup.get(config).setTravelTimeEstimationBeta(3600*24);
+				//				DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.05);
+				//				DvrpConfigGroup.get(config).setTravelTimeEstimationBeta(3600*24);
 				// bind(RelocationWriter.class).asEagerSingleton();
 				// addControlerListenerBinding().to(RelocationWriter.class);
 
@@ -268,16 +265,21 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		// controler.addOverridingModule(new ParkingRouterModule());
 		controler.addOverridingModule(new SwissRailRaptorModule());
 		controler.addOverridingModule(new MyDrtTrajectoryAnalysisModule(drt));
-		
 
 		// We finally run the controller to start MATSim
 
 		boolean deleteRoutes = false;
 
 		if (deleteRoutes) {
-			controler.getScenario().getPopulation().getPersons().values().stream().flatMap(p -> p.getPlans().stream())
-					.flatMap(pl -> pl.getPlanElements().stream()).filter(Leg.class::isInstance)
-					.forEach(pe -> ((Leg) pe).setRoute(null));
+			controler.getScenario()
+					.getPopulation()
+					.getPersons()
+					.values()
+					.stream()
+					.flatMap(p -> p.getPlans().stream())
+					.flatMap(pl -> pl.getPlanElements().stream())
+					.filter(Leg.class::isInstance)
+					.forEach(pe -> ((Leg)pe).setRoute(null));
 		}
 
 		controler.run();
@@ -315,43 +317,43 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 	}
 
-//	public static Controler createControler(Config config) {
-//		Controler controler = CustomEDrtControlerCreator.createControler(config, false);
-//		controler.addOverridingModule(new TemperatureChangeModule());
-//
-//		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config)));
-//		controler.addOverridingModule(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				bind(EDrtVehicleDataEntryFactoryProvider.class)
-//						.toInstance(new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
-//				bind(DriveEnergyConsumption.Factory.class)
-//						.toInstance(evconsumption -> new VwDrtDriveEnergyConsumption());
-//				bind(AuxEnergyConsumption.Factory.class)
-//						.to(VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
-//
-//				if (BatteryReplace) {
-//					bind(ChargingLogic.Factory.class)
-//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-//									new BatteryReplacementCharge(BATTERYREPLACETIME)));
-//					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
-//				} else {
-//					bind(ChargingLogic.Factory.class)
-//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-//									new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
-//					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
-//				}
-//			}
-//		});
-//
-//		return controler;
-//	}
+	//	public static Controler createControler(Config config) {
+	//		Controler controler = CustomEDrtControlerCreator.createControler(config, false);
+	//		controler.addOverridingModule(new TemperatureChangeModule());
+	//
+	//		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config)));
+	//		controler.addOverridingModule(new AbstractModule() {
+	//			@Override
+	//			public void install() {
+	//				bind(EDrtVehicleDataEntryFactoryProvider.class)
+	//						.toInstance(new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
+	//				bind(DriveEnergyConsumption.Factory.class)
+	//						.toInstance(evconsumption -> new VwDrtDriveEnergyConsumption());
+	//				bind(AuxEnergyConsumption.Factory.class)
+	//						.to(VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
+	//
+	//				if (BatteryReplace) {
+	//					bind(ChargingLogic.Factory.class)
+	//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+	//									new BatteryReplacementCharge(BATTERYREPLACETIME)));
+	//					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
+	//				} else {
+	//					bind(ChargingLogic.Factory.class)
+	//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+	//									new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
+	//					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
+	//				}
+	//			}
+	//		});
+	//
+	//		return controler;
+	//	}
 
 	public static Controler createControler(Config config) {
 		Controler controler = CustomEDrtControlerCreator.createControler(config, false);
 		controler.addOverridingModule(new TemperatureChangeModule());
 
-		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config)));
+		controler.addOverridingModule(new EvDvrpIntegrationModule(DrtConfigGroup.get(config).getMode()));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -361,41 +363,25 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 						evconsumption -> new VwDrtDriveEnergyConsumption());
 				bind(AuxEnergyConsumption.Factory.class).to(
 						VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
-				
+
 				if (BatteryReplace) {
-				bind(ChargingLogic.Factory.class)
-						.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-								new BatteryReplacementCharge(BATTERYREPLACETIME)));
-				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
-			} else {
-				bind(ChargingLogic.Factory.class)
-						.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-								new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
-				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
-			}
-				
-//				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
-//				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(240.0)));
-//				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
+					bind(ChargingLogic.Factory.class).toInstance(
+							charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+									new BatteryReplacementCharge(BATTERYREPLACETIME)));
+					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
+				} else {
+					bind(ChargingLogic.Factory.class).toInstance(
+							charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+									new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
+					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
+				}
+
+				//				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
+				//				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(240.0)));
+				//				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
 			}
 		});
 
 		return controler;
-	}
-	
-//	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
-//		return new EvDvrpIntegrationModule(drtCfg.getMode())
-//				.setTurnedOnPredicate(RunDrtScenarioBatchH_eDRT_KGERAK::isTurnedOn);
-//	}
-	
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
-		return new EvDvrpIntegrationModule(drtCfg.getMode()).
-				setAuxDischargingFactory(new VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory()).
-				setDriveDischargingFactory(f -> new VwDrtDriveEnergyConsumption()).setTurnedOnPredicate(RunDrtScenarioBatchH_eDRT_KGERAK::isTurnedOn);
-	}
-
-    private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
-        if (vehicle.getServiceBeginTime() <= time && time <= vehicle.getServiceEndTime()) return true;
-        else return false;
 	}
 }

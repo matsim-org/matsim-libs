@@ -20,9 +20,10 @@
 
 package vwExamples.peoplemoverVWExample;
 
-import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
-import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
-import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -31,7 +32,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
@@ -52,14 +52,14 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
+import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
+import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
 import vwExamples.utils.customEV.BatteryReplacementCharge;
 import vwExamples.utils.customEV.CustomFastThenSlowCharging;
 import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author axer
@@ -255,7 +255,7 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
         Controler controler = CustomEDrtControlerCreator.createControler(config, false);
         controler.addOverridingModule(new TemperatureChangeModule());
 
-        controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config)));
+		controler.addOverridingModule(new EvDvrpIntegrationModule(DrtConfigGroup.get(config).getMode()));
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -283,17 +283,5 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
         });
 
         return controler;
-    }
-
-
-    public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
-        return new EvDvrpIntegrationModule(drtCfg.getMode()).
-                setAuxDischargingFactory(new VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory()).
-                setDriveDischargingFactory(f -> new VwDrtDriveEnergyConsumption()).setTurnedOnPredicate(RunDrtScenarioBatchH_eDRT_TUB::isTurnedOn);
-    }
-
-    private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
-        if (vehicle.getServiceBeginTime() <= time && time <= vehicle.getServiceEndTime()) return true;
-        else return false;
     }
 }

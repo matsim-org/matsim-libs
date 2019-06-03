@@ -22,7 +22,6 @@ package electric.edrt.run;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.av.maxspeed.DvrpTravelTimeWithMaxSpeedLimitModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.edrt.run.EDrtControlerCreator;
@@ -109,7 +108,10 @@ public class RunEDrtScenario {
 		Controler controler = EDrtControlerCreator.createControler(config, false);
 		controler.addOverridingModule(new TemperatureChangeModule());
 
-		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config)));
+		controler.addOverridingModule(
+				new EvDvrpIntegrationModule(DrtConfigGroup.get(config).getMode()).setChargingStrategyFactory(
+						charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
+								MAX_RELATIVE_SOC)));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -119,7 +121,9 @@ public class RunEDrtScenario {
 						evconsumption -> new VwDrtDriveEnergyConsumption());
 				bind(AuxEnergyConsumption.Factory.class).to(
 						VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
-				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
+				bind(ChargingLogic.Factory.class).toInstance(
+						charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+								new FastThenSlowCharging(charger.getPower())));
 				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(240.0)));
 				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
 			}
@@ -127,17 +131,4 @@ public class RunEDrtScenario {
 
 		return controler;
 	}
-
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
-		return new EvDvrpIntegrationModule(drtCfg.getMode()).setChargingStrategyFactory(
-				charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC))
-				.setTemperatureProvider(() -> TEMPERATURE)
-				.setTurnedOnPredicate(RunEDrtScenario::isTurnedOn);
-	}
-
-    private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
-        if (vehicle.getServiceBeginTime() <= time && time <= vehicle.getServiceEndTime()) return true;
-        else return false;
-	}
-
 }

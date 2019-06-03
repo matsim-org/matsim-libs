@@ -19,13 +19,9 @@
 
 package electric.edrt.run;
 
-import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
-import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
-import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.av.maxspeed.DvrpTravelTimeWithMaxSpeedLimitModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.edrt.run.EDrtControlerCreator;
@@ -42,6 +38,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
 
 public class RunVWEDrtScenario {
 	private static final double CHARGING_SPEED_FACTOR = 1.; // full speed
@@ -102,7 +100,9 @@ public class RunVWEDrtScenario {
 	public static Controler createControler(Config config) {
 		Controler controler = EDrtControlerCreator.createControler(config, false);
 		controler.addOverridingModule(new TemperatureChangeModule());
-		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config)));
+		controler.addOverridingModule(
+				new EvDvrpIntegrationModule(DrtConfigGroup.get(config).getMode()).setChargingStrategyFactory(
+						charger -> new FastThenSlowCharging(charger.getPower() * CHARGING_SPEED_FACTOR)));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -114,17 +114,4 @@ public class RunVWEDrtScenario {
 
 		return controler;
 	}
-
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
-		return new EvDvrpIntegrationModule(drtCfg.getMode()).setChargingStrategyFactory(
-				charger -> new FastThenSlowCharging(charger.getPower() * CHARGING_SPEED_FACTOR)).
-				setAuxDischargingFactory(new VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory()).
-				setDriveDischargingFactory(f -> new VwDrtDriveEnergyConsumption()).setTurnedOnPredicate(RunVWEDrtScenario::isTurnedOn);
-	}
-
-    private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
-        if (vehicle.getServiceBeginTime() <= time && time <= vehicle.getServiceEndTime()) return true;
-        else return false;
-	}
-
 }
