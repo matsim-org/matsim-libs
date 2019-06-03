@@ -56,9 +56,9 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	@Positive
 	private int auxDischargeTimeStep = 60; // 1 min ==> 0.25% SOC (3 kW AUX power)
 
-	public static enum AuxDischargingSimulation {
+	public enum AuxDischargingSimulation {
 		// AuxDischargingHandler handles AUX consumption (every {@code auxDischargeTimeStep} seconds)
-		seperateAuxDischargingHandler,
+		separateAuxDischargingHandler,
 		// DriveDischargingHandler handles AUX consumption during drives
 		// an external handler needs to be used to simulate AUX consumption when a vehicle is parked
 		insideDriveDischargingHandler,

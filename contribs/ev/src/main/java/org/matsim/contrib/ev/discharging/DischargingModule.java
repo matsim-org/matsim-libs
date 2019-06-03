@@ -37,14 +37,14 @@ public class DischargingModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		//XXX "isTurnedOn" returns true ==> should not be used when for "seperateAuxDischargingHandler"
 		boolean isSeperateAuxDischargingHandler = evCfg.getAuxDischargingSimulation()
-				== EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler;
+				== EvConfigGroup.AuxDischargingSimulation.separateAuxDischargingHandler;
 
 		bind(DriveEnergyConsumption.Factory.class).toInstance(ev -> new OhdeSlaskiDriveEnergyConsumption());
 		if (isSeperateAuxDischargingHandler) {
 			// TODO fixed temperature 15 oC
 			// FIXME start using TemperatureService
+			// FIXME "isTurnedOn" returns true ==> should not be used when for "separateAuxDischargingHandler"
 			bind(AuxEnergyConsumption.Factory.class).toInstance(
 					ev -> new OhdeSlaskiAuxEnergyConsumption(ev, () -> 15, (v, t) -> true));
 		}
