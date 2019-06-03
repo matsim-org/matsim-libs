@@ -48,7 +48,9 @@ public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	}
 
 	private final ElectricVehicle ev;
+	//TODO temperature should be accessible via TemperatureService
 	private final DoubleSupplier temperatureProvider;
+	//TODO this predicate should be used as a wrapper around AuxEnergyConsumption
 	private final BiPredicate<ElectricVehicle, Double> isTurnedOn;
 
 	public OhdeSlaskiAuxEnergyConsumption(ElectricVehicle ev, DoubleSupplier temperatureProvider,

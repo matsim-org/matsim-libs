@@ -31,44 +31,29 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 public class DischargingModule extends AbstractModule {
 	private final EvConfigGroup evCfg;
 
-	private static DriveEnergyConsumption.Factory DEFAULT_DRIVE_CONSUMPTION_FACTORY //
-			= ev -> new OhdeSlaskiDriveEnergyConsumption();
-
-	// TODO fixed temperature 15 oC
-	// FIXME reintroduce TemperatureProvider
-	private static AuxEnergyConsumption.Factory DEFAULT_AUX_CONSUMPTION_FACTORY //
-			= ev -> new OhdeSlaskiAuxEnergyConsumption(ev, () -> 15, (v, t) -> true);
-
-	private final DriveEnergyConsumption.Factory driveConsumptionFactory;
-	private final AuxEnergyConsumption.Factory auxConsumptionFactory;
-
 	public DischargingModule(EvConfigGroup evCfg) {
-		this(evCfg, DEFAULT_DRIVE_CONSUMPTION_FACTORY, DEFAULT_AUX_CONSUMPTION_FACTORY);
-	}
-
-	public DischargingModule(EvConfigGroup evCfg, DriveEnergyConsumption.Factory driveConsumptionFactory,
-			AuxEnergyConsumption.Factory auxConsumptionFactory) {
 		this.evCfg = evCfg;
-		this.driveConsumptionFactory = driveConsumptionFactory;
-		this.auxConsumptionFactory = auxConsumptionFactory;
 	}
 
 	@Override
 	public void install() {
-		//XXX "isTurnedOn" returns true ==> should not be used when for "seperateAuxDischargingHandler"
-		boolean isSeperateAuxDischargingHandler = evCfg.getAuxDischargingSimulation()
-				== EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler;
+		boolean isSeparateAuxDischargingHandler = evCfg.getAuxDischargingSimulation()
+				== EvConfigGroup.AuxDischargingSimulation.separateAuxDischargingHandler;
 
-		bind(DriveEnergyConsumption.Factory.class).toInstance(driveConsumptionFactory);
-		if (isSeperateAuxDischargingHandler) {
-			bind(AuxEnergyConsumption.Factory.class).toInstance(auxConsumptionFactory);
+		bind(DriveEnergyConsumption.Factory.class).toInstance(ev -> new OhdeSlaskiDriveEnergyConsumption());
+		if (isSeparateAuxDischargingHandler) {
+			// TODO fixed temperature 15 oC
+			// FIXME start using TemperatureService
+			// FIXME "isTurnedOn" returns true ==> should not be used when for "separateAuxDischargingHandler"
+			bind(AuxEnergyConsumption.Factory.class).toInstance(
+					ev -> new OhdeSlaskiAuxEnergyConsumption(ev, () -> 15, (v, t) -> true));
 		}
 
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
 				bind(DriveDischargingHandler.class).asEagerSingleton();
-				if (isSeperateAuxDischargingHandler) {
+				if (isSeparateAuxDischargingHandler) {
 					bind(AuxDischargingHandler.class).asEagerSingleton();
 					addQSimComponentBinding(EvModule.EV_COMPONENT).to(AuxDischargingHandler.class);
 				}
