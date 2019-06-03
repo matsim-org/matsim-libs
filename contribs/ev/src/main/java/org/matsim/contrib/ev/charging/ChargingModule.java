@@ -53,8 +53,8 @@ public class ChargingModule extends AbstractModule {
 		bind(ChargingInfrastructure.class).toProvider(
 				new ChargingInfrastructureProvider(evCfg.getChargersFileUrl(getConfig().getContext())))
 				.asEagerSingleton();
-		bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-				new FixedSpeedChargingStrategy(charger.getPower())));
+		bind(ChargingLogic.Factory.class).toInstance(
+				charger -> new ChargingWithQueueingLogic(charger, new FixedSpeedChargingStrategy(charger.getPower())));
 
 		bind(ChargingHandler.class).asEagerSingleton();
 		addMobsimListenerBinding().to(ChargingHandler.class);

@@ -18,8 +18,6 @@
 
 package org.matsim.contrib.ev.dvrp;
 
-import java.util.function.Function;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -29,10 +27,8 @@ import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.MobsimScopeEventHandling;
 import org.matsim.contrib.ev.charging.ChargingModule;
-import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.discharging.DischargingModule;
 import org.matsim.contrib.ev.fleet.ElectricFleetModule;
-import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.stats.EvStatsModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 
@@ -55,8 +51,6 @@ public class EvDvrpIntegrationModule extends AbstractDvrpModeModule {
 		};
 	}
 
-	private Function<Charger, ChargingStrategy> chargingStrategyFactory;
-
 	public EvDvrpIntegrationModule(String mode) {
 		super(mode);
 	}
@@ -75,11 +69,5 @@ public class EvDvrpIntegrationModule extends AbstractDvrpModeModule {
 
 		install(new DischargingModule(evCfg));
 		install(new EvStatsModule(evCfg));
-	}
-
-	public EvDvrpIntegrationModule setChargingStrategyFactory(
-			Function<Charger, ChargingStrategy> chargingStrategyFactory) {
-		this.chargingStrategyFactory = chargingStrategyFactory;
-		return this;
 	}
 }

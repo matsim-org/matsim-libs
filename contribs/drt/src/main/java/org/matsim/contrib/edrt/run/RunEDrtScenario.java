@@ -24,6 +24,8 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedChargingStrategy;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.dvrp.DvrpAuxConsumptionFactory;
@@ -53,18 +55,18 @@ public class RunEDrtScenario {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		Controler controler = EDrtControlerCreator.createControler(config, otfvis);
 
+		controler.addOverridingModule(new EvDvrpIntegrationModule(drtCfg.getMode()));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				install(createEvDvrpIntegrationModule(drtCfg.getMode()));
 				bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
 						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
-			}
-		});
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
+				bind(ChargingLogic.Factory.class).toInstance(
+						charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+								new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
+										MAX_RELATIVE_SOC)));
+
 				bind(AuxEnergyConsumption.Factory.class).toInstance(
 						new DvrpAuxConsumptionFactory(drtCfg.getMode(), () -> TEMPERATURE,
 								RunEDrtScenario::isTurnedOn));
@@ -72,12 +74,6 @@ public class RunEDrtScenario {
 		});
 
 		return controler;
-	}
-
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(String mode) {
-		return new EvDvrpIntegrationModule(mode).setChargingStrategyFactory(
-				charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
-						MAX_RELATIVE_SOC));
 	}
 
 	private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
