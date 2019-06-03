@@ -42,7 +42,6 @@ import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
-import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
 import org.matsim.contrib.ev.temperature.TemperatureChangeModule;
 import org.matsim.core.config.Config;
@@ -370,7 +369,6 @@ public class Sim02_DrtCommuter {
 		Controler controler = CustomEDrtControlerCreator.createControler(config, false);
 		controler.addOverridingModule(new TemperatureChangeModule());
 
-		controler.addOverridingModule(new EvDvrpIntegrationModule(DrtConfigGroup.get(config).getMode()));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
