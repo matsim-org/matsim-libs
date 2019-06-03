@@ -20,9 +20,9 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Contains all ElectricVehicles generated for a given iteration. Its lifespan is limited to a single QSim simulation.
@@ -32,5 +32,5 @@ import org.matsim.api.core.v01.Id;
  * @author michalm
  */
 public interface ElectricFleet {
-	Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles();
+	ImmutableMap<Id<ElectricVehicle>, ? extends ElectricVehicle> getElectricVehicles();
 }

@@ -20,45 +20,35 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.util.SpecificationContainer;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public final class ElectricFleetSpecificationImpl implements ElectricFleetSpecification {
-	private final Map<Id<ElectricVehicle>, ElectricVehicleSpecification> specifications = new LinkedHashMap<>();
+	private final SpecificationContainer<ElectricVehicle, ElectricVehicleSpecification> container = new SpecificationContainer<>();
 
 	@Override
 	public Map<Id<ElectricVehicle>, ElectricVehicleSpecification> getVehicleSpecifications() {
-		return Collections.unmodifiableMap(specifications);
+		return container.getSpecifications();
 	}
 
 	@Override
 	public void addVehicleSpecification(ElectricVehicleSpecification specification) {
-		if (specifications.putIfAbsent(specification.getId(), specification) != null) {
-			throw new RuntimeException(
-					"A vehicle specification for vehicle id=" + specification.getId() + " already exists");
-		}
+		container.addSpecification(specification);
 	}
 
 	@Override
 	public void replaceVehicleSpecification(ElectricVehicleSpecification specification) {
-		if (specifications.computeIfPresent(specification.getId(), (k, v) -> specification) == null) {
-			throw new RuntimeException(
-					"A vehicle specification for vehicle id=" + specification.getId() + " does not exist");
-		}
+		container.replaceSpecification(specification);
 	}
 
 	@Override
 	public void removeVehicleSpecification(Id<ElectricVehicle> vehicleId) {
-		if (specifications.remove(Objects.requireNonNull(vehicleId)) == null) {
-			throw new RuntimeException("A vehicle specification for vehicle id=" + vehicleId + " does not exist");
-		}
+		container.removeSpecification(vehicleId);
 	}
 }
 

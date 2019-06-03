@@ -22,8 +22,8 @@ package org.matsim.contrib.ev.charging;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
-import org.matsim.contrib.ev.data.file.ChargingInfrastructureProvider;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureProvider;
 import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Key;
@@ -52,7 +52,7 @@ public class ChargingModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind(Network.class).annotatedWith(Names.named(ChargingInfrastructure.CHARGERS))
+		bind(Network.class).annotatedWith(Names.named(ChargingInfrastructureProvider.CHARGERS))
 				.to(networkKey)
 				.asEagerSingleton();
 		bind(ChargingInfrastructure.class).toProvider(

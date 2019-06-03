@@ -18,19 +18,27 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.fleet;
+package org.matsim.contrib.ev.infrastructure;
+
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-import com.google.common.collect.ImmutableMap;
-
 /**
- * Contains all DvrpVehicles generated for a given iteration. Its lifespan is limited to a single QSim simulation.
+ * A container of {@link ChargerSpecification}. Its lifespan covers all iterations.
  * <p>
- * Fleet (ond the contained DvrpVehicles) are created from FleetSpecification (and the contained DvrpVehicleSpecifications)
+ * It can be modified between iterations by add/replace/removeChargerSpecification().
+ * <p>
+ * The contained DvrpChargerSpecifications are (meant to be) immutable, so to modify them, use replaceVehicleSpecification()
  *
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public interface Fleet {
-	ImmutableMap<Id<DvrpVehicle>, ? extends DvrpVehicle> getVehicles();
+public interface ChargingInfrastructureSpecification {
+	Map<Id<Charger>, ChargerSpecification> getChargerSpecifications();
+
+	void addChargerSpecification(ChargerSpecification specification);
+
+	void replaceChargerSpecification(ChargerSpecification specification);
+
+	void removeChargerSpecification(Id<Charger> chargerId);
 }

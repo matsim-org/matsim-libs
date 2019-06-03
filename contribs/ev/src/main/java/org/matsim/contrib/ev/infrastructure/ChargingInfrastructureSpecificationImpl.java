@@ -18,37 +18,36 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.fleet;
+package org.matsim.contrib.ev.infrastructure;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
-
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class ElectricFleetImpl implements ElectricFleet {
-	public static ElectricFleet create(ElectricFleetSpecification fleetSpecification,
-			DriveEnergyConsumption.Factory driveConsumptionFactory,
-			AuxEnergyConsumption.Factory auxConsumptionFactory) {
-		ElectricFleetImpl fleet = new ElectricFleetImpl();
-		fleetSpecification.getVehicleSpecifications()
-				.values()
-				.stream()
-				.map(s -> ElectricVehicleImpl.create(s, driveConsumptionFactory, auxConsumptionFactory))
-				.forEach(fleet::addElectricVehicle);
-		return fleet;
-	}
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.util.SpecificationContainer;
 
-	private final Map<Id<ElectricVehicle>, ElectricVehicle> electricVehicles = new LinkedHashMap<>();
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class ChargingInfrastructureSpecificationImpl implements ChargingInfrastructureSpecification {
+	private final SpecificationContainer<Charger, ChargerSpecification> container = new SpecificationContainer<>();
 
 	@Override
-	public Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles() {
-		return Collections.unmodifiableMap(electricVehicles);
+	public Map<Id<Charger>, ChargerSpecification> getChargerSpecifications() {
+		return container.getSpecifications();
 	}
 
-	public void addElectricVehicle(ElectricVehicle ev) {
-		electricVehicles.put(ev.getId(), ev);
+	@Override
+	public void addChargerSpecification(ChargerSpecification specification) {
+		container.addSpecification(specification);
+	}
+
+	@Override
+	public void replaceChargerSpecification(ChargerSpecification specification) {
+		container.replaceSpecification(specification);
+	}
+
+	@Override
+	public void removeChargerSpecification(Id<Charger> chargerId) {
+		container.removeSpecification(chargerId);
 	}
 }

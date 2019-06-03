@@ -20,14 +20,18 @@
 
 package org.matsim.contrib.ev.fleet;
 
+import java.util.Objects;
+
 import org.matsim.api.core.v01.Id;
 
 import com.google.common.collect.ImmutableList;
 
 /**
+ * Immutable implementation of ElectricVehicleSpecification
+ *
  * @author Michal Maciejewski (michalm)
  */
-public class ImmutableElectricVehicleSpecification implements ElectricVehicleSpecification {
+public final class ImmutableElectricVehicleSpecification implements ElectricVehicleSpecification {
 	private final Id<ElectricVehicle> id;
 	private final String vehicleType;
 	private final ImmutableList<String> chargerTypes;
@@ -35,18 +39,18 @@ public class ImmutableElectricVehicleSpecification implements ElectricVehicleSpe
 	private final double batteryCapacity;
 
 	private ImmutableElectricVehicleSpecification(Builder builder) {
-		id = builder.id;
-		vehicleType = builder.vehicleType;
-		chargerTypes = builder.chargerTypes;
-		initialSoc = builder.initialSoc;
-		batteryCapacity = builder.batteryCapacity;
+		id = Objects.requireNonNull(builder.id);
+		vehicleType = Objects.requireNonNull(builder.vehicleType);
+		chargerTypes = Objects.requireNonNull(builder.chargerTypes);
+		initialSoc = Objects.requireNonNull(builder.initialSoc);
+		batteryCapacity = Objects.requireNonNull(builder.batteryCapacity);
 	}
 
 	public static Builder newBuilder() {
 		return new Builder();
 	}
 
-	public static Builder newBuilder(ImmutableElectricVehicleSpecification copy) {
+	public static Builder newBuilder(ElectricVehicleSpecification copy) {
 		Builder builder = new Builder();
 		builder.id = copy.getId();
 		builder.vehicleType = copy.getVehicleType();
@@ -85,8 +89,8 @@ public class ImmutableElectricVehicleSpecification implements ElectricVehicleSpe
 		private Id<ElectricVehicle> id;
 		private String vehicleType;
 		private ImmutableList<String> chargerTypes;
-		private double initialSoc;
-		private double batteryCapacity;
+		private Double initialSoc;
+		private Double batteryCapacity;
 
 		private Builder() {
 		}

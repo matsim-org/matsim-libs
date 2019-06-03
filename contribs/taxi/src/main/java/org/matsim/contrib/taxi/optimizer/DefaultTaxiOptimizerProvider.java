@@ -42,8 +42,6 @@ import com.google.inject.Provider;
 import com.google.inject.name.Named;
 
 public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
-	public static final String TYPE = "type";
-
 	private final EventsManager eventsManager;
 	private final TaxiConfigGroup taxiCfg;
 	private final Fleet fleet;
@@ -69,27 +67,21 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
 	@Override
 	public TaxiOptimizer get() {
-		AbstractTaxiOptimizerParams taxiOptimizerParams = taxiCfg.getTaxiOptimizerParams();
-		switch (taxiOptimizerParams.getName()) {
+		switch (taxiCfg.getTaxiOptimizerParams().getName()) {
 			case AssignmentTaxiOptimizerParams.SET_NAME:
 				return new AssignmentTaxiOptimizer(eventsManager, taxiCfg, fleet, network, timer, travelTime,
 						travelDisutility, scheduler);
-
 			case FifoTaxiOptimizerParams.SET_NAME:
 				return new FifoTaxiOptimizer(eventsManager, taxiCfg, fleet, network, timer, travelTime,
 						travelDisutility, scheduler);
-
 			case RuleBasedTaxiOptimizerParams.SET_NAME:
 				return RuleBasedTaxiOptimizer.create(eventsManager, taxiCfg, fleet, scheduler, network, timer,
 						travelTime, travelDisutility);
-
 			case ZonalTaxiOptimizerParams.SET_NAME:
 				return ZonalTaxiOptimizer.create(eventsManager, taxiCfg, fleet, scheduler, network, timer, travelTime,
 						travelDisutility);
-
-			default:
-				throw new IllegalStateException();
 		}
+		throw new RuntimeException("Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().getName());
 	}
 
 	public static AbstractTaxiOptimizerParams createParameterSet(String type) {

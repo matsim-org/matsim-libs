@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,25 +15,27 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.data.file;
+package org.matsim.contrib.ev.infrastructure;
+
+import java.net.URL;
+
+import org.matsim.api.core.v01.network.Network;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
-import org.matsim.contrib.ev.data.ChargingInfrastructureImpl;
-
-import java.net.URL;
 
 /**
  * @author michalm
  */
 public class ChargingInfrastructureProvider implements Provider<ChargingInfrastructure> {
+	public static final String CHARGERS = "chargers";
+
 	@Inject
-	@Named(ChargingInfrastructure.CHARGERS)
+	@Named(CHARGERS)
 	private Network network;
 
 	private final URL url;
@@ -43,8 +46,9 @@ public class ChargingInfrastructureProvider implements Provider<ChargingInfrastr
 
 	@Override
 	public ChargingInfrastructure get() {
-		ChargingInfrastructureImpl chargingInfrastructure = new ChargingInfrastructureImpl();
-		new ChargerReader(network, chargingInfrastructure).parse(url);
-		return chargingInfrastructure;
+		ChargingInfrastructureSpecification infrastructureSpecification = new ChargingInfrastructureSpecificationImpl();
+		new ChargerReader(infrastructureSpecification).parse(url);
+		return ChargingInfrastructures.createChargingInfrastructure(infrastructureSpecification,
+				network.getLinks()::get);
 	}
 }

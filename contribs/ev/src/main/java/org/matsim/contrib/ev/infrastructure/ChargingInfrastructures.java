@@ -18,19 +18,35 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.fleet;
+package org.matsim.contrib.ev.infrastructure;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.util.LinkProvider;
 
 import com.google.common.collect.ImmutableMap;
 
 /**
- * Contains all DvrpVehicles generated for a given iteration. Its lifespan is limited to a single QSim simulation.
- * <p>
- * Fleet (ond the contained DvrpVehicles) are created from FleetSpecification (and the contained DvrpVehicleSpecifications)
- *
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public interface Fleet {
-	ImmutableMap<Id<DvrpVehicle>, ? extends DvrpVehicle> getVehicles();
+public class ChargingInfrastructures {
+	public static ChargingInfrastructure createChargingInfrastructure(
+			ChargingInfrastructureSpecification infrastructureSpecification, LinkProvider<Id<Link>> linkProvider) {
+		ImmutableMap<Id<Charger>, Charger> chargers = infrastructureSpecification.getChargerSpecifications()
+				.values()
+				.stream()
+				.map(s -> new ChargerImpl(s, linkProvider.apply(s.getLinkId())))
+				.collect(ImmutableMap.toImmutableMap(Charger::getId, ch -> ch));
+		return () -> chargers;
+	}
+
+	//FIXME calls to this method (used in event handlers) should be cached
+	public static ImmutableMap<Id<Charger>, Charger> getChargersAtLink(ChargingInfrastructure infrastructure,
+			Id<Link> linkId) {
+		return infrastructure.getChargers()
+				.values()
+				.stream()
+				.filter(charger -> charger.getLink().getId().equals(linkId))
+				.collect(ImmutableMap.toImmutableMap(Charger::getId, charger -> charger));
+	}
 }

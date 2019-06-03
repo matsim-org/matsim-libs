@@ -18,19 +18,42 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.fleet;
+package org.matsim.contrib.util;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import org.matsim.api.core.v01.Id;
-
-import com.google.common.collect.ImmutableMap;
+import org.matsim.api.core.v01.Identifiable;
 
 /**
- * Contains all DvrpVehicles generated for a given iteration. Its lifespan is limited to a single QSim simulation.
- * <p>
- * Fleet (ond the contained DvrpVehicles) are created from FleetSpecification (and the contained DvrpVehicleSpecifications)
- *
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public interface Fleet {
-	ImmutableMap<Id<DvrpVehicle>, ? extends DvrpVehicle> getVehicles();
+public final class SpecificationContainer<I, S extends Identifiable<I>> {
+	private final Map<Id<I>, S> specifications = new LinkedHashMap<>();
+
+	public final Map<Id<I>, S> getSpecifications() {
+		return Collections.unmodifiableMap(specifications);
+	}
+
+	public final void addSpecification(S specification) {
+		if (specifications.putIfAbsent(specification.getId(), specification) != null) {
+			throw new RuntimeException("A specification with id=" + specification.getId() + " already exists");
+		}
+	}
+
+	public final void replaceSpecification(S specification) {
+		if (specifications.computeIfPresent(specification.getId(), (k, v) -> specification) == null) {
+			throw new RuntimeException("A specification with id=" + specification.getId() + " does not exist");
+		}
+	}
+
+	public final void removeSpecification(Id<I> id) {
+		if (specifications.remove(Objects.requireNonNull(id)) == null) {
+			throw new RuntimeException("A specification with id=" + id + " does not exist");
+		}
+	}
 }
+

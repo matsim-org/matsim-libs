@@ -18,36 +18,23 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.fleet;
-
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+package org.matsim.contrib.ev.fleet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.util.LinkProvider;
+import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
+import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 
-/**
- * @author michalm
- */
-public class FleetImpl implements Fleet {
-	public static Fleet create(FleetSpecification fleetSpecification, LinkProvider<Id<Link>> linkProvider) {
-		FleetImpl fleet = new FleetImpl();
-		fleetSpecification.getVehicleSpecifications()
-				.values().stream().map(s -> DvrpVehicleImpl.createWithLinkProvider(s, linkProvider))
-				.forEach(fleet::addVehicle);
-		return fleet;
-	}
+import com.google.common.collect.ImmutableMap;
 
-	private final Map<Id<DvrpVehicle>, DvrpVehicle> vehicles = new LinkedHashMap<>();
-
-	@Override
-	public Map<Id<DvrpVehicle>, ? extends DvrpVehicle> getVehicles() {
-		return Collections.unmodifiableMap(vehicles);
-	}
-
-	public void addVehicle(DvrpVehicle vehicle) {
-		vehicles.put(vehicle.getId(), vehicle);
+public class ElectricFleets {
+	public static ElectricFleet createDefaultFleet(ElectricFleetSpecification fleetSpecification,
+			DriveEnergyConsumption.Factory driveConsumptionFactory,
+			AuxEnergyConsumption.Factory auxConsumptionFactory) {
+		ImmutableMap<Id<ElectricVehicle>, ? extends ElectricVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
+				.values()
+				.stream()
+				.map(s -> ElectricVehicleImpl.create(s, driveConsumptionFactory, auxConsumptionFactory))
+				.collect(ImmutableMap.toImmutableMap(ElectricVehicle::getId, v -> v));
+		return () -> vehicles;
 	}
 }

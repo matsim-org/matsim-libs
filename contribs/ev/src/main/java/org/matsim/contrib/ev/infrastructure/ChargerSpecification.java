@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,32 +15,42 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.data;
+package org.matsim.contrib.ev.infrastructure;
 
-import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.ev.charging.ChargingLogic;
 
-public interface Charger extends BasicLocation, Identifiable<Charger> {
-	ChargingLogic getLogic();
+/**
+ * ChargerSpecification is assumed to be immutable.
+ * <p>
+ * Its lifespan can span over all iterations, but can be also changed before each iteration.
+ * <p>
+ * Changing a charger specification (e.g. setting a different plug count) should be done only "between" iterations
+ * by passing a new instance to ChargingInfrastructureSpecification.
+ *
+ * @author Michal Maciejewski (michalm)
+ */
+public interface ChargerSpecification extends Identifiable<Charger> {
+	String DEFAULT_CHARGER_TYPE = "default";
 
-	void setLogic(ChargingLogic logic);
+	Id<Link> getLinkId();
 
+	/**
+	 * @return charger type
+	 */
 	String getChargerType();
-
-
-	Link getLink();
 
 	/**
 	 * @return max power at a single plug, in [W]
 	 */
-	double getPower();
+	double getMaxPower();
 
 	/**
 	 * @return number of plugs
 	 */
-	int getPlugs();
+	int getPlugCount();
 }

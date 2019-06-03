@@ -18,19 +18,29 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.fleet;
+package org.matsim.contrib.ev.infrastructure;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.ev.charging.ChargingLogic;
 
-import com.google.common.collect.ImmutableMap;
+public interface Charger extends BasicLocation, Identifiable<Charger> {
+	ChargingLogic getLogic();
 
-/**
- * Contains all DvrpVehicles generated for a given iteration. Its lifespan is limited to a single QSim simulation.
- * <p>
- * Fleet (ond the contained DvrpVehicles) are created from FleetSpecification (and the contained DvrpVehicleSpecifications)
- *
- * @author michalm
- */
-public interface Fleet {
-	ImmutableMap<Id<DvrpVehicle>, ? extends DvrpVehicle> getVehicles();
+	void setLogic(ChargingLogic logic);
+
+	Link getLink();
+
+	String getChargerType();
+
+	/**
+	 * @return max power at a single plug, in [W]
+	 */
+	double getPower();
+
+	/**
+	 * @return number of plugs
+	 */
+	int getPlugs();
 }

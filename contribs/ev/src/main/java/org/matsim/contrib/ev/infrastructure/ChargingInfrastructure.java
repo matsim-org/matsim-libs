@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,44 +15,26 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.data;
+package org.matsim.contrib.ev.infrastructure;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * @author michalm
  */
-public class ChargingInfrastructureImpl implements ChargingInfrastructure {
-	private final Map<Id<Charger>, Charger> chargers = new LinkedHashMap<>();
+public interface ChargingInfrastructure {
+	ImmutableMap<Id<Charger>, Charger> getChargers();
 
-
-	@Override
-	public Map<Id<Charger>, Charger> getChargers() {
-		return Collections.unmodifiableMap(chargers);
-	}
-
-    @Override
-    public Map<Id<Charger>, Charger> getChargersAtLink(Id<Link> linkId) {
-        return chargers.values().stream().filter(charger -> charger.getLink().getId().equals(linkId)).collect(Collectors.toMap(Charger::getId, charger -> charger));
-    }
-
-	public void addCharger(Charger charger) {
-		chargers.put(charger.getId(), charger);
-	}
-
-	@Override
-	public void initChargingLogics(ChargingLogic.Factory logicFactory, EventsManager eventsManager) {
-		for (Charger c : chargers.values()) {
+	//FIXME remove (after switching to the Qsim scope)
+	default void initChargingLogics(ChargingLogic.Factory logicFactory, EventsManager eventsManager) {
+		for (Charger c : getChargers().values()) {
 			ChargingLogic logic = logicFactory.create(c);
 			logic.initEventsHandling(eventsManager);
 			c.setLogic(logic);

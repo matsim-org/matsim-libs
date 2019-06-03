@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,14 +15,17 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.ev.data.file;/*
+package org.matsim.contrib.ev.infrastructure;/*
  *
  * created by jbischoff, 23.08.2018
  */
 
-import com.google.common.primitives.Doubles;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.discharging.LTHDriveEnergyConsumption;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -30,8 +33,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.primitives.Doubles;
 
 /**
  * This class reads Energy consumption files from CSV as used in the IDEAS project between TU Berlin and LTH Lund.

@@ -25,7 +25,7 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.data.ChargerImpl;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -62,7 +62,7 @@ public class ElectricFleetReader extends MatsimXmlParser {
 				.vehicleType(Optional.ofNullable(atts.getValue("vehicleType"))
 						.orElse(ElectricVehicleSpecification.DEFAULT_VEHICLE_TYPE))
 				.chargerTypes(ImmutableList.copyOf(Optional.ofNullable(atts.getValue("chargerTypes"))
-						.orElse(ChargerImpl.DEFAULT_CHARGER_TYPE)
+						.orElse(ChargerSpecification.DEFAULT_CHARGER_TYPE)
 						.split(",")))
 				.build();
 	}
