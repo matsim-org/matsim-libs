@@ -29,7 +29,6 @@ import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedChargingStrategy;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.dvrp.DvrpAuxConsumptionFactory;
-import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -55,7 +54,6 @@ public class RunEDrtScenario {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		Controler controler = EDrtControlerCreator.createControler(config, otfvis);
 
-		controler.addOverridingModule(new EvDvrpIntegrationModule(drtCfg.getMode()));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

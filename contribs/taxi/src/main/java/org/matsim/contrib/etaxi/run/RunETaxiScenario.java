@@ -25,6 +25,7 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.VariableSpeedCharging;
@@ -63,9 +64,10 @@ public class RunETaxiScenario {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new ETaxiModule());
 		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new EvModule());
+		controler.addOverridingModule(new EvDvrpIntegrationModule());
 		controler.configureQSimComponents(EvDvrpIntegrationModule.activateModes(taxiCfg.getMode()));
 
-		controler.addOverridingModule(new EvDvrpIntegrationModule(taxiCfg.getMode()));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
