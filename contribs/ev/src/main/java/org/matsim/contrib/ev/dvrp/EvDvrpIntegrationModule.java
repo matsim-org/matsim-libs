@@ -30,7 +30,6 @@ import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.MobsimScopeEventHandling;
 import org.matsim.contrib.ev.charging.ChargingModule;
 import org.matsim.contrib.ev.charging.ChargingStrategy;
-import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.discharging.DischargingModule;
 import org.matsim.contrib.ev.fleet.ElectricFleetModule;
 import org.matsim.contrib.ev.infrastructure.Charger;
@@ -71,9 +70,8 @@ public class EvDvrpIntegrationModule extends AbstractDvrpModeModule {
 
 		install(new ElectricFleetModule(evCfg));
 
-		install(new ChargingModule(evCfg, Key.get(Network.class, Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)),
-				charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-						chargingStrategyFactory.apply(charger))));
+		install(new ChargingModule(evCfg,
+				Key.get(Network.class, Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))));
 
 		install(new DischargingModule(evCfg));
 		install(new EvStatsModule(evCfg));
