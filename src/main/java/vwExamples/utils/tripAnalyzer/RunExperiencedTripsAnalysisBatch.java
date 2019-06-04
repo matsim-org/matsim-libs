@@ -50,12 +50,12 @@ public class RunExperiencedTripsAnalysisBatch {
 	static Set<Id<Person>> relevantAgents = new HashSet<>();
 	static Map<String, Geometry> zoneMap = new HashMap<>();
 	static Set<String> zones = new HashSet<>();
-	static String shapeFile = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Real_Region_Hannover.shp";
+	static String shapeFile = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Hannover_Stadtteile.shp";
 	static String shapeFeature = "NO";
 
 	public static void main(String[] args) {
 
-		run("D:\\Matsim\\Axer\\Hannover\\K-GERAK\\output\\");
+		run("D:\\Matsim\\Axer\\Hannover\\Base\\");
 	}
 
 	public static void run(String runDir) {
@@ -63,11 +63,19 @@ public class RunExperiencedTripsAnalysisBatch {
 		readShape(shapeFile, shapeFeature);
 		File[] directories = new File(runDir).listFiles(File::isDirectory);
 		for (File scenarioDir : directories) {
-			relevantAgents.clear();
+
 			String[] StringList = scenarioDir.toString().split("\\\\");
 			String scenarioName = StringList[StringList.length - 1];
-			System.out.println(runDir + "\\" + scenarioName);
-			analyzeTrips(runDir + "\\" + scenarioName, scenarioName);
+
+			Set<String> scenarioToBeAnalyzed = new HashSet<String>();
+			scenarioToBeAnalyzed.add("vw236_nocad.0.1");
+
+			if (scenarioToBeAnalyzed.contains(scenarioName)) {
+
+				relevantAgents.clear();
+				System.out.println(runDir + "\\" + scenarioName);
+				analyzeTrips(runDir + "\\" + scenarioName, scenarioName);
+			}
 
 		}
 
@@ -99,33 +107,35 @@ public class RunExperiencedTripsAnalysisBatch {
 		if (useTransitSchedule) {
 			new TransitScheduleReader(scenario).readFile(runPrefix + "output_transitSchedule.xml.gz");
 		}
-		StreamingPopulationReader spr = new StreamingPopulationReader(scenario);
-		spr.addAlgorithm(new PersonAlgorithm() {
-			@Override
-			public void run(Person person) {
-				relevantAgents.add(person.getId());
-//Take only specific agents
-//				for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-//					if (pe instanceof Activity) {
-//						if (((Activity) pe).getType().contains("home")) {
+//		StreamingPopulationReader spr = new StreamingPopulationReader(scenario);
+//		spr.addAlgorithm(new PersonAlgorithm() {
+//			@Override
+//			public void run(Person person) {
+//				relevantAgents.add(person.getId());
+//				// Take only specific agents
+//				// for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+//				// if (pe instanceof Activity) {
+//				// if (((Activity) pe).getType().contains("home")) {
+//				//
+//				// Activity activity = ((Activity) pe);
+//				// Coord coord = activity.getCoord();
+//				// if
+//				// (vwExamples.utils.modalSplitAnalyzer.modalSplitEvaluator.isWithinZone(coord,
+//				// zoneMap)) {
+//				// relevantAgents.add(person.getId());
+//				// // System.out.println(person.getId().toString());
+//				// break;
+//				//
+//				// }
+//				//
+//				// }
+//				// }
+//				// }
 //
-//							Activity activity = ((Activity) pe);
-//							Coord coord = activity.getCoord();
-//							if (vwExamples.utils.modalSplitAnalyzer.modalSplitEvaluator.isWithinZone(coord, zoneMap)) {
-//								relevantAgents.add(person.getId());
-//								// System.out.println(person.getId().toString());
-//								break;
+//			}
 //
-//							}
-//
-//						}
-//					}
-//				}
-
-			}
-
-		});
-		spr.readFile(runPrefix + "output_plans.xml.gz");
+//		});
+//		spr.readFile(runPrefix + "output_plans.xml.gz");
 
 		// System.out.println(relevantAgents.size());
 
@@ -142,11 +152,11 @@ public class RunExperiencedTripsAnalysisBatch {
 		ExperiencedTripsWriter tripsWriter = new ExperiencedTripsWriter(runPrefix + "experiencedTrips.csv",
 				eventHandler.getPerson2ExperiencedTrips(), monitoredModes, scenario.getNetwork(), relevantAgents,
 				zoneMap);
-		tripsWriter.writeExperiencedTripsIntersectZoneMap();
-		ExperiencedTripsWriter legsWriter = new ExperiencedTripsWriter(runPrefix + "experiencedLegs.csv",
-				eventHandler.getPerson2ExperiencedTrips(), monitoredModes, scenario.getNetwork(), relevantAgents,
-				zoneMap);
-		legsWriter.writeExperiencedLegsIntersectZoneMap();
+		tripsWriter.writeExperiencedTrips();
+//		ExperiencedTripsWriter legsWriter = new ExperiencedTripsWriter(runPrefix + "experiencedLegs.csv",
+//				eventHandler.getPerson2ExperiencedTrips(), monitoredModes, scenario.getNetwork(), relevantAgents,
+//				zoneMap);
+//		legsWriter.writeExperiencedLegs();
 
 	}
 
