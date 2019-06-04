@@ -52,10 +52,13 @@ public class DischargingModule extends AbstractModule {
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bind(DriveDischargingHandler.class).asEagerSingleton();
+				this.bind(DriveDischargingHandler.class).asEagerSingleton();
 				if (isSeparateAuxDischargingHandler) {
-					bind(AuxDischargingHandler.class).asEagerSingleton();
-					addQSimComponentBinding(EvModule.EV_COMPONENT).to(AuxDischargingHandler.class);
+					this.bind(AuxDischargingHandler.class).asEagerSingleton();
+					this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(AuxDischargingHandler.class);
+
+					//by default, no vehicle will be AUX-discharged while not moving
+					this.bind(AuxDischargingHandler.VehicleProvider.class).toInstance(event -> null);
 				}
 			}
 		});
