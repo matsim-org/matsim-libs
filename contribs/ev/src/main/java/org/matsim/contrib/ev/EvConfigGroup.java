@@ -20,6 +20,7 @@
 package org.matsim.contrib.ev;
 
 import java.net.URL;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -37,16 +38,27 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	public static final String CHARGE_TIME_STEP = "chargeTimeStep";
+	static final String CHARGE_TIME_STEP_EXP = "charging will be simulated every 'chargeTimeStep'-th time step";
 
 	public static final String AUX_DISCHARGE_TIME_STEP = "auxDischargeTimeStep";
+	static final String AUX_DISCHARGE_TIME_STEP_EXP = "AUX discharging will be simulated every 'auxDischargeTimeStep'-th time step";
+
 	public static final String ADD_AUX_CONSUMPTION_TO_DRIVE_CONSUMPTION = "addAuxConsumptionToDriveConsumption";
+	static final String ADD_AUX_CONSUMPTION_TO_DRIVE_CONSUMPTION_EXP =
+			"if true, AuxEnergyConsumption estimate will be added to DriveEnergyConsumption estimate."
+					+ " Enable this option if DriveEnergyConsumption estimate does not include non-drive consumption."
+					+ " No default value (needs to be set)";
 
 	// input
 	public static final String CHARGERS_FILE = "chargersFile";
+	static final String CHARGERS_FILE_EXP = "Location of the chargers file";
+
 	public static final String VEHICLES_FILE = "vehiclesFile";
+	static final String VEHICLES_FILE_EXP = "Location of the vehicles file";
 
 	// output
 	public static final String TIME_PROFILES = "timeProfiles";
+	static final String TIME_PROFILES_EXP = "If true, SOC time profile plots will be created";
 
 	// no need to simulate with 1-second time step
 	@Positive
@@ -61,6 +73,7 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 
 	@NotNull
 	private String chargersFile = null;
+
 	@NotNull
 	private String vehiclesFile = null;
 
@@ -68,6 +81,18 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 
 	public EvConfigGroup() {
 		super(GROUP_NAME);
+	}
+
+	@Override
+	public Map<String, String> getComments() {
+		Map<String, String> map = super.getComments();
+		map.put(CHARGE_TIME_STEP, CHARGE_TIME_STEP_EXP);
+		map.put(AUX_DISCHARGE_TIME_STEP, AUX_DISCHARGE_TIME_STEP_EXP);
+		map.put(ADD_AUX_CONSUMPTION_TO_DRIVE_CONSUMPTION, ADD_AUX_CONSUMPTION_TO_DRIVE_CONSUMPTION_EXP);
+		map.put(CHARGERS_FILE, CHARGERS_FILE_EXP);
+		map.put(VEHICLES_FILE, VEHICLES_FILE_EXP);
+		map.put(TIME_PROFILES, TIME_PROFILES_EXP);
+		return map;
 	}
 
 	@StringGetter(CHARGE_TIME_STEP)
