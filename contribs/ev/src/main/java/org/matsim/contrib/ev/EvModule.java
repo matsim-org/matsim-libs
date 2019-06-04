@@ -25,9 +25,6 @@ import org.matsim.contrib.ev.fleet.ElectricFleetModule;
 import org.matsim.contrib.ev.stats.EvStatsModule;
 import org.matsim.core.controler.AbstractModule;
 
-/**
- * For EDVRP, use EvDvrpIntegrationModule instead
- */
 public class EvModule extends AbstractModule {
 	public static final String EV_COMPONENT = "EV_COMPONENT";
 
