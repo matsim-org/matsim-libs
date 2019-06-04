@@ -1,5 +1,6 @@
 package org.matsim.core.router;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
@@ -15,10 +16,10 @@ class BeelineTeleportationRouting implements Provider<RoutingModule> {
 	}
 
 	@Inject
-	private PopulationFactory populationFactory;
+	private Scenario scenario ;
 
 	@Override
 	public RoutingModule get() {
-		return DefaultRoutingModules.createTeleportationRouter(params.getMode(), populationFactory, params);
+		return DefaultRoutingModules.createTeleportationRouter(params.getMode(), scenario, params);
 	}
 }

@@ -1044,8 +1044,16 @@ public final class PopulationUtils {
 		return act.getLinkId() ;
 	}
 	public static Coord decideOnCoordForActivity( Activity act, Scenario sc ) {
-		if ( act.getFacilityId() !=null ) {
-			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get( act.getFacilityId() );;
+		Id<ActivityFacility> facilityId ;
+		try {
+			facilityId = act.getFacilityId() ;
+		} catch (Exception ee ) {
+			facilityId = null ;
+		}
+		// some people prefer throwing exceptions over using null
+
+		if ( facilityId !=null ) {
+			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get( facilityId );;
 			Gbl.assertNotNull( facility  );
 			Gbl.assertNotNull( facility.getCoord() ) ;
 			return facility.getCoord() ;

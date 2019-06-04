@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -45,10 +46,10 @@ public final class DefaultRoutingModules {
 				params) ;
 	}
 
-	public static RoutingModule createTeleportationRouter( String mode, PopulationFactory popFac, ModeRoutingParams params ) {
+	public static RoutingModule createTeleportationRouter( String mode, Scenario scenario, ModeRoutingParams params ) {
 		return new TeleportationRoutingModule(
 				mode,
-				popFac,
+			  scenario,
 				params.getTeleportedModeSpeed(),
                 params.getBeelineDistanceFactor() );
 	}

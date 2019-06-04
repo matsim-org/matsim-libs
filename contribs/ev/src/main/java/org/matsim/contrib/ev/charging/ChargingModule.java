@@ -22,8 +22,8 @@ package org.matsim.contrib.ev.charging;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
-import org.matsim.contrib.ev.data.file.ChargingInfrastructureProvider;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureProvider;
 import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Key;
@@ -33,32 +33,28 @@ import com.google.inject.name.Names;
  * @author Michal Maciejewski (michalm)
  */
 public class ChargingModule extends AbstractModule {
-	private static ChargingLogic.Factory DEFAULT_CHARGING_LOGIC_FACTORY = charger -> new ChargingWithQueueingLogic(
-			charger, new FixedSpeedChargingStrategy(charger.getPower()));
-
 	private final EvConfigGroup evCfg;
 	private final Key<Network> networkKey;
-	private final ChargingLogic.Factory chargingLogicFactory;
 
 	public ChargingModule(EvConfigGroup evCfg) {
-		this(evCfg, Key.get(Network.class), DEFAULT_CHARGING_LOGIC_FACTORY);
+		this(evCfg, Key.get(Network.class));
 	}
 
-	public ChargingModule(EvConfigGroup evCfg, Key<Network> networkKey, ChargingLogic.Factory chargingLogicFactory) {
+	public ChargingModule(EvConfigGroup evCfg, Key<Network> networkKey) {
 		this.evCfg = evCfg;
 		this.networkKey = networkKey;
-		this.chargingLogicFactory = chargingLogicFactory;
 	}
 
 	@Override
 	public void install() {
-		bind(Network.class).annotatedWith(Names.named(ChargingInfrastructure.CHARGERS))
+		bind(Network.class).annotatedWith(Names.named(ChargingInfrastructureProvider.CHARGERS))
 				.to(networkKey)
 				.asEagerSingleton();
 		bind(ChargingInfrastructure.class).toProvider(
 				new ChargingInfrastructureProvider(evCfg.getChargersFileUrl(getConfig().getContext())))
 				.asEagerSingleton();
-		bind(ChargingLogic.Factory.class).toInstance(chargingLogicFactory);
+		bind(ChargingLogic.Factory.class).toInstance(
+				charger -> new ChargingWithQueueingLogic(charger, new FixedSpeedChargingStrategy(charger.getPower())));
 
 		bind(ChargingHandler.class).asEagerSingleton();
 		addMobsimListenerBinding().to(ChargingHandler.class);

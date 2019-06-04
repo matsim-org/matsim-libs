@@ -65,7 +65,7 @@ public class OhdeSlaskiDriveEnergyConsumption implements DriveEnergyConsumption 
 	}
 
 	@Override
-	public double calcEnergyConsumption(Link link, double travelTime) {
+	public double calcEnergyConsumption(Link link, double travelTime, double linkEnterTime) {
 		if (travelTime == 0) {
 			return 0;
 		}

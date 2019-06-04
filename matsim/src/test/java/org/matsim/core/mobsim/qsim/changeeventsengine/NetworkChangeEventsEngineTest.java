@@ -18,9 +18,12 @@ import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.List;
 
 /**
  * @author mrieser / Simunto GmbH
@@ -158,6 +161,11 @@ public class NetworkChangeEventsEngineTest {
 		@Override
 		public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
 			return null;
+		}
+
+		@Override
+		public List<DepartureHandler> getDepartureHandlers(){
+			throw new RuntimeException( "not implemented" );
 		}
 
 	}

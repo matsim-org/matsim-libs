@@ -183,11 +183,13 @@ public final class EditTrips {
 	 * @param mainMode
 	 * @return
 	 */
-	public final boolean replanFutureTrip(Trip trip, Plan plan, String mainMode) {
+	public final List<? extends PlanElement> replanFutureTrip( Trip trip, Plan plan, String mainMode ) {
 		double departureTime = PlanRouter.calcEndOfActivity( trip.getOriginActivity(), plan, tripRouter.getConfig() ) ;
 		return replanFutureTrip( trip, plan, mainMode, departureTime ) ;
 	}
-	public final boolean replanFutureTrip(Trip trip, Plan plan, String routingMode, double departureTime) {
+
+	public final List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String routingMode,
+			double departureTime) {
 		return replanFutureTrip(trip, plan, routingMode, departureTime, tripRouter, scenario );
 	}
 
@@ -241,7 +243,8 @@ public final class EditTrips {
 	 * and pt_interaction activities.  
 	 */
 	@Deprecated // prefer the non-static methods
-	public static boolean replanFutureTrip( Trip trip, Plan plan, String routingMode, double departureTime, TripRouter tripRouter, Scenario scenario ) {
+	public static List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String routingMode,
+			double departureTime, TripRouter tripRouter, Scenario scenario) {
 		Person person = plan.getPerson();
 
 		Facility fromFacility = FacilitiesUtils.toFacility( trip.getOriginActivity(), scenario.getActivityFacilities() );
@@ -256,7 +259,7 @@ public final class EditTrips {
 
 		TripRouter.insertTrip(plan, trip.getOriginActivity(), newTrip, trip.getDestinationActivity());
 
-		return true;
+		return newTrip ;
 	}
 
 	/** Convenience method, to be consistent with earlier syntax.  kai, may'16
@@ -268,7 +271,8 @@ public final class EditTrips {
 	 * @param scenario
 	 */
 	@Deprecated // prefer the non-static methods
-	public static boolean relocateFutureTrip( Trip trip, Plan plan, String mainMode, double departureTime, TripRouter tripRouter, Scenario scenario ) {
+	public static List<? extends PlanElement> relocateFutureTrip(Trip trip, Plan plan, String mainMode,
+			double departureTime, TripRouter tripRouter, Scenario scenario) {
 		return replanFutureTrip(trip, plan, mainMode, departureTime, tripRouter, scenario );
 	}
 	public StageActivityTypes getStageActivities() {

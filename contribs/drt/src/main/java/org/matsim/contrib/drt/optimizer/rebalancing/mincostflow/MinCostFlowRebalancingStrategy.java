@@ -29,7 +29,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -53,12 +52,12 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 
 	public MinCostFlowRebalancingStrategy(RebalancingTargetCalculator rebalancingTargetCalculator,
 			DrtZonalSystem zonalSystem, Fleet fleet, MinCostRelocationCalculator minCostRelocationCalculator,
-			DrtConfigGroup drtCfg) {
+			MinCostFlowRebalancingParams params) {
 		this.rebalancingTargetCalculator = rebalancingTargetCalculator;
 		this.zonalSystem = zonalSystem;
 		this.fleet = fleet;
 		this.minCostRelocationCalculator = minCostRelocationCalculator;
-		params = drtCfg.getMinCostFlowRebalancing();
+		this.params = params;
 	}
 
 	@Override

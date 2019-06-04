@@ -55,7 +55,7 @@ public class IdleTaxiZonalRegistry {
 
 		vehiclesInZones = Maps.newHashMapWithExpectedSize(zonalSystem.getZones().size());
 		for (Id<Zone> id : zonalSystem.getZones().keySet()) {
-			vehiclesInZones.put(id, new HashMap<Id<DvrpVehicle>, DvrpVehicle>());
+			vehiclesInZones.put(id, new HashMap<>());
 		}
 	}
 

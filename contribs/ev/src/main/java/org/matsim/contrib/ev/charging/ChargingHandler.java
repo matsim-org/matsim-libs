@@ -19,12 +19,13 @@
 
 package org.matsim.contrib.ev.charging;
 
-import com.google.inject.Inject;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+
+import com.google.inject.Inject;
 
 public class ChargingHandler implements MobsimAfterSimStepListener {
 	private final Iterable<Charger> chargers;

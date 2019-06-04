@@ -3,7 +3,7 @@
 <config>
     <module name="ev">
         <param name="auxDischargeTimeStep" value="10"/>
-        <!-- Possible values: seperateAuxDischargingHandler, insideDriveDischargingHandler, none -->
+		<!-- Possible values: separateAuxDischargingHandler, insideDriveDischargingHandler, none -->
         <param name="auxDischargingSimulation" value="none"/>
         <param name="chargeTimeStep" value="5"/>
         <param name="chargersFile" value="chargers.xml"/>

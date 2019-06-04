@@ -58,7 +58,7 @@ import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory;
 import org.matsim.contrib.edrt.optimizer.depot.NearestChargerAsDepot;
 import org.matsim.contrib.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.edrt.scheduler.EmptyVehicleChargingScheduler;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -87,7 +87,7 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		addModalComponent(DrtOptimizer.class, modalProvider(
 				getter -> new EDrtOptimizer(getter.getModal(DefaultDrtOptimizer.class),
-						getter.getModal(EmptyVehicleChargingScheduler.class), getter.get(MobsimTimer.class))));
+						getter.getModal(EmptyVehicleChargingScheduler.class))));
 
 		bindModal(DefaultDrtOptimizer.class).toProvider(modalProvider(
 				getter -> new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),

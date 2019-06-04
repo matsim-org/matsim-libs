@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -40,7 +41,8 @@ public class TeleportationRoutingModuleTest {
 
 	@Test
 	public void testRouteLeg() {
-		PopulationFactory populationFactory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
+		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		RouteFactories routeFactory = new RouteFactories();
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = PopulationUtils.createLeg(TransportMode.walk);
@@ -50,7 +52,7 @@ public class TeleportationRoutingModuleTest {
 		TeleportationRoutingModule router =
 				new TeleportationRoutingModule(
 						"mode",
-						populationFactory, 10.0, 1.0);
+						scenario, 10.0, 1.0);
 		double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
 		Assert.assertEquals(100.0, tt, 10e-7);
 		Assert.assertEquals(100.0, leg.getTravelTime(), 10e-7);
@@ -59,7 +61,7 @@ public class TeleportationRoutingModuleTest {
         router =
 				new TeleportationRoutingModule(
 						"mode",
-						populationFactory,
+					  scenario,
 						20.0,
 						1.0);
 		tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
@@ -72,7 +74,7 @@ public class TeleportationRoutingModuleTest {
 		router =
                 new TeleportationRoutingModule(
 						"mode",
-						populationFactory,
+				scenario,
 						10.0,
 						manhattanBeelineDistanceFactor);
 		tt = router.routeLeg(person, leg, fromAct, otherToAct, 7.0 * 3600);

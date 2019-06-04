@@ -20,44 +20,35 @@
 
 package org.matsim.contrib.dvrp.fleet;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.util.SpecificationContainer;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public final class FleetSpecificationImpl implements FleetSpecification {
-	private final Map<Id<DvrpVehicle>, DvrpVehicleSpecification> specifications = new LinkedHashMap<>();
+	private final SpecificationContainer<DvrpVehicle, DvrpVehicleSpecification> container = new SpecificationContainer<>();
 
 	@Override
 	public Map<Id<DvrpVehicle>, DvrpVehicleSpecification> getVehicleSpecifications() {
-		return Collections.unmodifiableMap(specifications);
+		return container.getSpecifications();
 	}
 
 	@Override
 	public void addVehicleSpecification(DvrpVehicleSpecification specification) {
-		if (specifications.putIfAbsent(specification.getId(), specification) != null) {
-			throw new RuntimeException("A vehicle specification for vehicle id=" + specification.getId() + " already exists");
-		}
+		container.addSpecification(specification);
 	}
 
 	@Override
 	public void replaceVehicleSpecification(DvrpVehicleSpecification specification) {
-		if (specifications.computeIfPresent(specification.getId(), (k, v) -> specification) == null) {
-			throw new RuntimeException(
-					"A vehicle specification for vehicle id=" + specification.getId() + " does not exist");
-		}
+		container.replaceSpecification(specification);
 	}
 
 	@Override
 	public void removeVehicleSpecification(Id<DvrpVehicle> vehicleId) {
-		if (specifications.remove(Objects.requireNonNull(vehicleId)) == null) {
-			throw new RuntimeException("A vehicle specification for vehicle id=" + vehicleId + " does not exist");
-		}
+		container.removeSpecification(vehicleId);
 	}
 }
 

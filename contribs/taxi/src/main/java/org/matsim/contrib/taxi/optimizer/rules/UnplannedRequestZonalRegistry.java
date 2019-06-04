@@ -45,7 +45,7 @@ public class UnplannedRequestZonalRegistry {
 
 		requestsInZones = new HashMap<>(zonalSystem.getZones().size());
 		for (Id<Zone> id : zonalSystem.getZones().keySet()) {
-			requestsInZones.put(id, new HashMap<Id<Request>, TaxiRequest>());
+			requestsInZones.put(id, new HashMap<>());
 		}
 	}
 
