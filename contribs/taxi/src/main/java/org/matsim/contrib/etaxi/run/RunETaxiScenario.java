@@ -29,7 +29,7 @@ import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.VariableSpeedCharging;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.dvrp.DvrpAuxConsumptionFactory;
+import org.matsim.contrib.ev.discharging.OhdeSlaskiAuxEnergyConsumption;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -75,7 +75,8 @@ public class RunETaxiScenario {
 								VariableSpeedCharging.createStrategyForNissanLeaf(
 										charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC)));
 
-				bind(AuxEnergyConsumption.Factory.class).toInstance(new DvrpAuxConsumptionFactory(() -> TEMPERATURE));
+				bind(AuxEnergyConsumption.Factory.class).toInstance(
+						ev -> new OhdeSlaskiAuxEnergyConsumption(() -> TEMPERATURE));
 			}
 		});
 
