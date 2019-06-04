@@ -53,7 +53,8 @@ public class DvrpBenchmarkModule extends AbstractModule {
 			@Override
 			protected void configureQSim() {
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-				bind(DvrpVehicleLookup.class).asEagerSingleton();
+				bind(DvrpVehicleLookup.class).toProvider(DvrpVehicleLookup.DvrpVehicleLookupProvider.class)
+						.asEagerSingleton();
 			}
 		});
 

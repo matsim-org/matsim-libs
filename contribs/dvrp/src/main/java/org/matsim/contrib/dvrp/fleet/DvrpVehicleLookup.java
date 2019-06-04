@@ -30,15 +30,10 @@ import org.matsim.contrib.dvrp.run.DvrpMode;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 /**
- * By default, this class works only for DvrpModes that are bound via a Multibinder:
- * <p>
- * Multibinder.newSetBinder(binder(), DvrpMode.class).addBinding().toInstance(DvrpModes.mode(getMode()));
- * <p>
- * However, a custom DvrpVehicleLookup can be created for selected DvrpModes
- *
  * @author Michal Maciejewski (michalm)
  */
 @Singleton
@@ -53,20 +48,31 @@ public class DvrpVehicleLookup {
 		}
 	}
 
-	private Map<Id<DvrpVehicle>, VehicleAndMode> vehicleLookupMap;
-	private final Set<DvrpMode> dvrpModes;
+	private final Map<Id<DvrpVehicle>, VehicleAndMode> vehicleLookupMap;
 
-	@Inject
-	private Injector injector;
-
-	@Inject
-	public DvrpVehicleLookup(Set<DvrpMode> dvrpModes) {
-		this.dvrpModes = dvrpModes;
+	public DvrpVehicleLookup(Map<Id<DvrpVehicle>, VehicleAndMode> vehicleLookupMap) {
+		this.vehicleLookupMap = vehicleLookupMap;
 	}
 
 	public VehicleAndMode lookupVehicleAndMode(Id<DvrpVehicle> id) {
-		if (vehicleLookupMap == null) {
-			vehicleLookupMap = new HashMap<>();
+		return vehicleLookupMap.get(id);
+	}
+
+	public DvrpVehicle lookupVehicle(Id<DvrpVehicle> id) {
+		VehicleAndMode vehicleAndMode = lookupVehicleAndMode(id);
+		return vehicleAndMode == null ? null : vehicleAndMode.vehicle;
+	}
+
+	public static class DvrpVehicleLookupProvider implements Provider<DvrpVehicleLookup> {
+		@Inject
+		private Injector injector;
+
+		@Inject
+		private Set<DvrpMode> dvrpModes;
+
+		@Override
+		public DvrpVehicleLookup get() {
+			Map<Id<DvrpVehicle>, VehicleAndMode> vehicleLookupMap = new HashMap<>();
 			for (DvrpMode m : dvrpModes) {
 				for (DvrpVehicle v : injector.getInstance(Key.get(Fleet.class, m)).getVehicles().values()) {
 					if (vehicleLookupMap.put(v.getId(), new VehicleAndMode(v, m.value())) != null) {
@@ -74,13 +80,7 @@ public class DvrpVehicleLookup {
 					}
 				}
 			}
+			return new DvrpVehicleLookup(vehicleLookupMap);
 		}
-
-		return vehicleLookupMap.get(id);
-	}
-
-	public DvrpVehicle lookupVehicle(Id<DvrpVehicle> id) {
-		VehicleAndMode vehicleAndMode = lookupVehicleAndMode(id);
-		return vehicleAndMode == null ? null : vehicleAndMode.vehicle;
 	}
 }
