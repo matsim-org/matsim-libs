@@ -75,8 +75,7 @@ public class DriveDischargingHandler
 			MobsimScopeEventHandling events) {
 		this.network = network;
 		eVehicles = data.getElectricVehicles();
-		handleAuxDischarging = evCfg.getAuxDischargingSimulation()
-				== EvConfigGroup.AuxDischargingSimulation.insideDriveDischargingHandler;
+		handleAuxDischarging = evCfg.isAddAuxConsumptionToDriveConsumption();
 		evDrives = new HashMap<>(eVehicles.size() / 10);
 		events.addMobsimScopeHandler(this);
 	}

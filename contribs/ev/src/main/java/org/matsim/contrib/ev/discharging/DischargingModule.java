@@ -37,27 +37,20 @@ public class DischargingModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		boolean isSeparateAuxDischargingHandler = evCfg.getAuxDischargingSimulation()
-				== EvConfigGroup.AuxDischargingSimulation.separateAuxDischargingHandler;
-
 		bind(DriveEnergyConsumption.Factory.class).toInstance(ev -> new OhdeSlaskiDriveEnergyConsumption());
-		if (isSeparateAuxDischargingHandler) {
-			// TODO fixed temperature 15 oC
-			// FIXME start using TemperatureService
-			bind(AuxEnergyConsumption.Factory.class).toInstance(ev -> new OhdeSlaskiAuxEnergyConsumption(() -> 15));
-		}
+		// TODO fixed temperature 15 oC
+		// FIXME start using TemperatureService
+		bind(AuxEnergyConsumption.Factory.class).toInstance(ev -> new OhdeSlaskiAuxEnergyConsumption(() -> 15));
 
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
 				this.bind(DriveDischargingHandler.class).asEagerSingleton();
-				if (isSeparateAuxDischargingHandler) {
-					this.bind(AuxDischargingHandler.class).asEagerSingleton();
-					this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(AuxDischargingHandler.class);
+				this.bind(AuxDischargingHandler.class).asEagerSingleton();
+				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(AuxDischargingHandler.class);
 
-					//by default, no vehicle will be AUX-discharged while not moving
-					this.bind(AuxDischargingHandler.VehicleProvider.class).toInstance(event -> null);
-				}
+				//by default, no vehicle will be AUX-discharged when not moving
+				this.bind(AuxDischargingHandler.VehicleProvider.class).toInstance(event -> null);
 			}
 		});
 	}

@@ -39,7 +39,7 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	public static final String CHARGE_TIME_STEP = "chargeTimeStep";
 
 	public static final String AUX_DISCHARGE_TIME_STEP = "auxDischargeTimeStep";
-	public static final String AUX_DISCHARGING_SIMULATION = "auxDischargingSimulation";
+	public static final String ADD_AUX_CONSUMPTION_TO_DRIVE_CONSUMPTION = "addAuxConsumptionToDriveConsumption";
 
 	// input
 	public static final String CHARGERS_FILE = "chargersFile";
@@ -56,19 +56,8 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	@Positive
 	private int auxDischargeTimeStep = 60; // 1 min ==> 0.25% SOC (3 kW AUX power)
 
-	public enum AuxDischargingSimulation {
-		// AuxDischargingHandler handles AUX consumption (every {@code auxDischargeTimeStep} seconds)
-		separateAuxDischargingHandler,
-		// DriveDischargingHandler handles AUX consumption during drives
-		// an external handler needs to be used to simulate AUX consumption when a vehicle is parked
-		insideDriveDischargingHandler,
-		// AUX consumption is not simulated directly
-		// an external handler needs to be used to simulate AUX consumption
-		none;
-	}
-
 	@NotNull
-	private AuxDischargingSimulation auxDischargingSimulation;
+	private Boolean addAuxConsumptionToDriveConsumption;
 
 	@NotNull
 	private String chargersFile = null;
@@ -101,14 +90,14 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 		this.auxDischargeTimeStep = auxDischargeTimeStep;
 	}
 
-	@StringGetter(AUX_DISCHARGING_SIMULATION)
-	public AuxDischargingSimulation getAuxDischargingSimulation() {
-		return auxDischargingSimulation;
+	@StringGetter(ADD_AUX_CONSUMPTION_TO_DRIVE_CONSUMPTION)
+	public Boolean isAddAuxConsumptionToDriveConsumption() {
+		return addAuxConsumptionToDriveConsumption;
 	}
 
-	@StringSetter(AUX_DISCHARGING_SIMULATION)
-	public void setAuxDischargingSimulation(AuxDischargingSimulation auxDischargingSimulation) {
-		this.auxDischargingSimulation = auxDischargingSimulation;
+	@StringSetter(ADD_AUX_CONSUMPTION_TO_DRIVE_CONSUMPTION)
+	public void setAddAuxConsumptionToDriveConsumption(Boolean addAuxConsumptionToDriveConsumption) {
+		this.addAuxConsumptionToDriveConsumption = addAuxConsumptionToDriveConsumption;
 	}
 
 	@StringGetter(CHARGERS_FILE)
