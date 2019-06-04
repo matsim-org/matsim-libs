@@ -26,7 +26,6 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
-import org.matsim.contrib.ev.dvrp.OperatingVehicleProvider;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -54,7 +53,7 @@ public class CustomEDrtControlerCreator {
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				this.bind(AuxDischargingHandler.VehicleProvider.class).to(OperatingVehicleProvider.class);
+				this.bind(AuxDischargingHandler.VehicleProvider.class).to(OperatingVehicleOutsideDepotProvider.class);
 			}
 		});
 
