@@ -43,12 +43,10 @@ public class OperatingVehicleProvider implements AuxDischargingHandler.VehiclePr
 
 	@Override
 	public ElectricVehicle getVehicle(ActivityStartEvent event) {
-		DvrpVehicleLookup.VehicleAndMode vehicleAndMode = dvrpVehicleLookup.lookup(
-				(Id<DvrpVehicle>)(Id<?>)event.getPersonId());//assumes driverId == vehicleId
-		if (vehicleAndMode != null
-				&& vehicleAndMode.vehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED) {
-			return ((EvDvrpVehicle)vehicleAndMode.vehicle).getElectricVehicle();
-		}
-		return null;
+		//assumes driverId == vehicleId
+		DvrpVehicle vehicle = dvrpVehicleLookup.lookupVehicle((Id<DvrpVehicle>)(Id<?>)event.getPersonId());
+		return vehicle != null && vehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED ?
+				((EvDvrpVehicle)vehicle).getElectricVehicle() :
+				null;
 	}
 }

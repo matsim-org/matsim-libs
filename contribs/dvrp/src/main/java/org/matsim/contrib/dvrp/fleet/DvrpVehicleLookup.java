@@ -64,7 +64,7 @@ public class DvrpVehicleLookup {
 		this.dvrpModes = dvrpModes;
 	}
 
-	public VehicleAndMode lookup(Id<DvrpVehicle> id) {
+	public VehicleAndMode lookupVehicleAndMode(Id<DvrpVehicle> id) {
 		if (vehicleLookupMap == null) {
 			vehicleLookupMap = new HashMap<>();
 			for (DvrpMode m : dvrpModes) {
@@ -77,5 +77,10 @@ public class DvrpVehicleLookup {
 		}
 
 		return vehicleLookupMap.get(id);
+	}
+
+	public DvrpVehicle lookupVehicle(Id<DvrpVehicle> id) {
+		VehicleAndMode vehicleAndMode = lookupVehicleAndMode(id);
+		return vehicleAndMode == null ? null : vehicleAndMode.vehicle;
 	}
 }
