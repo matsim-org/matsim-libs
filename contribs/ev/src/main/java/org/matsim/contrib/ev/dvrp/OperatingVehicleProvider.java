@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
@@ -45,8 +45,10 @@ public class OperatingVehicleProvider implements AuxDischargingHandler.VehiclePr
 	public ElectricVehicle getVehicle(ActivityStartEvent event) {
 		//assumes driverId == vehicleId
 		DvrpVehicle vehicle = dvrpVehicleLookup.lookupVehicle((Id<DvrpVehicle>)(Id<?>)event.getPersonId());
-		return vehicle != null && vehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED ?
-				((EvDvrpVehicle)vehicle).getElectricVehicle() :
-				null;
+
+		//do not discharge if (1) not a DVRP vehicle or (2) a DVRP vehicle that just completed the schedule
+		return vehicle == null || event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE) ?
+				null :
+				((EvDvrpVehicle)vehicle).getElectricVehicle();
 	}
 }
