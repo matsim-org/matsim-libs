@@ -44,9 +44,7 @@ public class DischargingModule extends AbstractModule {
 		if (isSeparateAuxDischargingHandler) {
 			// TODO fixed temperature 15 oC
 			// FIXME start using TemperatureService
-			// FIXME "isTurnedOn" returns true ==> should not be used when for "separateAuxDischargingHandler"
-			bind(AuxEnergyConsumption.Factory.class).toInstance(
-					ev -> new OhdeSlaskiAuxEnergyConsumption(ev, () -> 15, (v, t) -> true));
+			bind(AuxEnergyConsumption.Factory.class).toInstance(ev -> new OhdeSlaskiAuxEnergyConsumption(() -> 15));
 		}
 
 		installQSimModule(new AbstractQSimModule() {

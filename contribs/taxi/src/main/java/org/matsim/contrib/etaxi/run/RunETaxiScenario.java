@@ -20,7 +20,6 @@
 package org.matsim.contrib.etaxi.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
@@ -76,9 +75,7 @@ public class RunETaxiScenario {
 								VariableSpeedCharging.createStrategyForNissanLeaf(
 										charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC)));
 
-				bind(AuxEnergyConsumption.Factory.class).toInstance(
-						new DvrpAuxConsumptionFactory(taxiCfg.getMode(), () -> TEMPERATURE,
-								RunETaxiScenario::isTurnedOn));
+				bind(AuxEnergyConsumption.Factory.class).toInstance(new DvrpAuxConsumptionFactory(() -> TEMPERATURE));
 			}
 		});
 
@@ -87,11 +84,6 @@ public class RunETaxiScenario {
 		}
 
 		return controler;
-	}
-
-	private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
-		//FIXME should use actual vehicle to check if schedule is STARTED
-		return vehicle.getServiceBeginTime() <= time && time <= vehicle.getServiceEndTime();
 	}
 
 	public static void main(String[] args) {

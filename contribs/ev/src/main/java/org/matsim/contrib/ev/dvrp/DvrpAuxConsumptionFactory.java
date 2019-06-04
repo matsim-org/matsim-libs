@@ -19,40 +19,21 @@
 
 package org.matsim.contrib.ev.dvrp;
 
-import com.google.inject.Injector;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.run.DvrpModes;
+import java.util.function.DoubleSupplier;
+
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.OhdeSlaskiAuxEnergyConsumption;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
-import javax.inject.Inject;
-import java.util.function.BiPredicate;
-import java.util.function.DoubleSupplier;
-
 public class DvrpAuxConsumptionFactory implements AuxEnergyConsumption.Factory {
-	@Inject
-	private Injector injector;
-
-	private final String mode;
 	private final DoubleSupplier temperatureProvider;
-	//FIXME change to BiPredicate<DvrpVehicle, Double> or even Predicate<DvrpVehicle>
-	private final BiPredicate<DvrpVehicleSpecification, Double> turnedOnPredicate;
 
-	public DvrpAuxConsumptionFactory(String mode, DoubleSupplier temperatureProvider,
-			BiPredicate<DvrpVehicleSpecification, Double> turnedOnPredicate) {
-		this.mode = mode;
+	public DvrpAuxConsumptionFactory(DoubleSupplier temperatureProvider) {
 		this.temperatureProvider = temperatureProvider;
-		this.turnedOnPredicate = turnedOnPredicate == null ? (v, t) -> true : turnedOnPredicate;
 	}
 
 	@Override
 	public AuxEnergyConsumption create(ElectricVehicle electricVehicle) {
-		FleetSpecification fleet = injector.getInstance(DvrpModes.key(FleetSpecification.class, mode));
-		DvrpVehicleSpecification vehicle = fleet.getVehicleSpecifications().get(electricVehicle.getId());
-
-		return new OhdeSlaskiAuxEnergyConsumption(electricVehicle, temperatureProvider,
-				(ev, t) -> turnedOnPredicate.test(vehicle, t));
+		return new OhdeSlaskiAuxEnergyConsumption(temperatureProvider);
 	}
 }
