@@ -59,7 +59,7 @@ public class ElectricFleetModule extends AbstractModule {
 					private ElectricFleetSpecification fleetSpecification;
 					@Inject
 					private DriveEnergyConsumption.Factory driveConsumptionFactory;
-					@Inject(optional = true)
+					@Inject
 					private AuxEnergyConsumption.Factory auxConsumptionFactory;
 
 					@Override

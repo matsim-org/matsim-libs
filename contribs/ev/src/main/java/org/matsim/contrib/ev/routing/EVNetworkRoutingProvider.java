@@ -59,7 +59,7 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
 	@Inject
 	private DriveEnergyConsumption.Factory driveConsumptionFactory;
 
-	@Inject(optional = true)
+	@Inject
 	private AuxEnergyConsumption.Factory auxConsumptionFactory;
 
 	/**
