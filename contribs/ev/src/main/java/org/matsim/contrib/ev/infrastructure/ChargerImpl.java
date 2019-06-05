@@ -26,7 +26,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 
 public class ChargerImpl implements Charger {
-	private ChargerSpecification specification;
+	public static Charger create(ChargerSpecification chargerSpecification, Link link,
+			ChargingLogic.Factory logicFactory) {
+		ChargerImpl charger = new ChargerImpl(chargerSpecification, link);
+		charger.logic = logicFactory.create(charger);
+		return charger;
+	}
+
+	private final ChargerSpecification specification;
 	private final Link link;
 	private ChargingLogic logic;
 
@@ -42,11 +49,6 @@ public class ChargerImpl implements Charger {
 	@Override
 	public ChargingLogic getLogic() {
 		return logic;
-	}
-
-	@Override
-	public void setLogic(ChargingLogic logic) {
-		this.logic = logic;
 	}
 
 	@Override

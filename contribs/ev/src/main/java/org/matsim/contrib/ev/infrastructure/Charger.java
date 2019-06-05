@@ -28,8 +28,6 @@ import org.matsim.contrib.ev.charging.ChargingLogic;
 public interface Charger extends BasicLocation, Identifiable<Charger> {
 	ChargingLogic getLogic();
 
-	void setLogic(ChargingLogic logic);
-
 	Link getLink();
 
 	String getChargerType();
