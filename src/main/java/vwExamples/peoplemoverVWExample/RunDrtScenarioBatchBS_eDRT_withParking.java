@@ -186,7 +186,6 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 		eDrt.setChargersFile(inbase + "\\chargers\\chargers.xml.gz");
 		eDrt.setVehiclesFile(inbase + "\\fleets\\eFleet.xml.gz");
 		eDrt.setAuxDischargeTimeStep(10);
-		eDrt.setAddAuxConsumptionToDriveConsumption(true);
 		eDrt.setTimeProfiles(true);
 
 		config.addModule(new ParkingRouterConfigGroup());
