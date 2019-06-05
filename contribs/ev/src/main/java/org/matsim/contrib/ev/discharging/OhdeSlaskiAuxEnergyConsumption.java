@@ -55,7 +55,7 @@ public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 		return calcPower(temperatureService.getCurrentTemperature(linkId)) * duration;
 	}
 
-	public class Factory implements AuxEnergyConsumption.Factory {
+	public static class Factory implements AuxEnergyConsumption.Factory {
 		private final TemperatureService temperatureService;
 
 		@Inject
