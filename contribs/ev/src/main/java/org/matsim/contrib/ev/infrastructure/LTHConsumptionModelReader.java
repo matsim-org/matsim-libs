@@ -42,53 +42,52 @@ import com.google.common.primitives.Doubles;
  */
 public class LTHConsumptionModelReader {
 
-    private final Id<VehicleType> vehicleTypeId;
+	private final Id<VehicleType> vehicleTypeId;
 
+	public LTHConsumptionModelReader(Id<VehicleType> vehicleTypeId) {
+		this.vehicleTypeId = vehicleTypeId;
+	}
 
-    public LTHConsumptionModelReader(Id<VehicleType> vehicleTypeId) {
-        this.vehicleTypeId = vehicleTypeId;
-    }
+	public LTHDriveEnergyConsumption.Factory readFile(String filename) {
+		List<Double> speeds = new ArrayList<>();
+		List<Double> slopes = new ArrayList<>();
+		TabularFileParserConfig tabularFileParserConfig = new TabularFileParserConfig();
+		tabularFileParserConfig.setDelimiterTags(new String[] { "," });
+		tabularFileParserConfig.setFileName(filename);
 
-    public LTHDriveEnergyConsumption.Factory readFile(String filename) {
-        List<Double> speeds = new ArrayList<>();
-        List<Double> slopes = new ArrayList<>();
-        TabularFileParserConfig tabularFileParserConfig = new TabularFileParserConfig();
-        tabularFileParserConfig.setDelimiterTags(new String[]{","});
-        tabularFileParserConfig.setFileName(filename);
+		new TabularFileParser().parse(tabularFileParserConfig, row -> {
+			if (speeds.isEmpty()) {
+				for (int i = 1; i < row.length; i++) {
+					speeds.add(Double.parseDouble(row[i]));
+				}
+			} else {
+				slopes.add(Double.parseDouble(row[0]) / 100);
+			}
+		});
 
-        new TabularFileParser().parse(tabularFileParserConfig, row -> {
-            if (speeds.isEmpty()) {
-                for (int i = 1; i < row.length; i++) {
-                    speeds.add(Double.parseDouble(row[i]));
-                }
-            } else {
-                slopes.add(Double.parseDouble(row[0]) / 100);
-            }
-        });
+		double[][] consumptionPerSpeedAndSlope = new double[speeds.size()][slopes.size()];
 
-        double[][] consumptionPerSpeedAndSlope = new double[speeds.size()][slopes.size()];
+		new TabularFileParser().parse(tabularFileParserConfig, new TabularFileHandler() {
+			int line = 0;
 
-        new TabularFileParser().parse(tabularFileParserConfig, new TabularFileHandler() {
-            int line = 0;
+			@Override
+			public void startRow(String[] row) {
+				if (line > 0) {
+					double lastValidValue = Double.MIN_VALUE;
+					for (int i = 1; i < row.length; i++) {
+						double value = Double.parseDouble(row[i]);
+						if (Double.isNaN(value)) {
+							value = lastValidValue;
+						}
+						lastValidValue = value;
+						consumptionPerSpeedAndSlope[i - 1][line - 1] = value;
+					}
+				}
+				line++;
+			}
+		});
 
-            @Override
-            public void startRow(String[] row) {
-                if (line > 0) {
-                    double lastValidValue = Double.MIN_VALUE;
-                    for (int i = 1; i < row.length; i++) {
-                        double value = Double.parseDouble(row[i]);
-                        if (Double.isNaN(value)) {
-                            value = lastValidValue;
-                        }
-                        lastValidValue = value;
-                        consumptionPerSpeedAndSlope[i - 1][line - 1] = value;
-                    }
-                }
-                line++;
-            }
-        });
-
-        return new LTHDriveEnergyConsumption.Factory(Doubles.toArray(speeds), Doubles.toArray(slopes), consumptionPerSpeedAndSlope, vehicleTypeId, false);
-
-    }
+		return new LTHDriveEnergyConsumption.Factory(Doubles.toArray(speeds), Doubles.toArray(slopes),
+				consumptionPerSpeedAndSlope, false);
+	}
 }
