@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.core.controler.AbstractModule;
@@ -30,12 +29,6 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
  * @author Michal Maciejewski (michalm)
  */
 public class DischargingModule extends AbstractModule {
-	private final EvConfigGroup evCfg;
-
-	public DischargingModule(EvConfigGroup evCfg) {
-		this.evCfg = evCfg;
-	}
-
 	@Override
 	public void install() {
 		bind(DriveEnergyConsumption.Factory.class).toInstance(ev -> new OhdeSlaskiDriveEnergyConsumption());

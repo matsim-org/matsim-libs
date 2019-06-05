@@ -30,13 +30,12 @@ public class EvModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		EvConfigGroup evCfg = EvConfigGroup.get(getConfig());
 		bind(MobsimScopeEventHandling.class).asEagerSingleton();
 		addControlerListenerBinding().to(MobsimScopeEventHandling.class);
 
-		install(new ElectricFleetModule(evCfg));
-		install(new ChargingModule(evCfg));
-		install(new DischargingModule(evCfg));
-		install(new EvStatsModule(evCfg));
+		install(new ElectricFleetModule());
+		install(new ChargingModule());
+		install(new DischargingModule());
+		install(new EvStatsModule());
 	}
 }
