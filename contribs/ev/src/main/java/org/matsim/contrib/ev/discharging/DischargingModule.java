@@ -22,6 +22,7 @@ package org.matsim.contrib.ev.discharging;
 
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
@@ -38,9 +39,8 @@ public class DischargingModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(DriveEnergyConsumption.Factory.class).toInstance(ev -> new OhdeSlaskiDriveEnergyConsumption());
-		// TODO fixed temperature 15 oC
-		// FIXME start using TemperatureService
-		bind(AuxEnergyConsumption.Factory.class).toInstance(ev -> new OhdeSlaskiAuxEnergyConsumption(() -> 15));
+		bind(TemperatureService.class).toInstance(linkId -> 15);// XXX fixed temperature 15 oC
+		bind(AuxEnergyConsumption.Factory.class).to(OhdeSlaskiAuxEnergyConsumption.Factory.class).asEagerSingleton();
 
 		installQSimModule(new AbstractQSimModule() {
 			@Override

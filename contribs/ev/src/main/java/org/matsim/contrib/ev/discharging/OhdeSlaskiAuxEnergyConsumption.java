@@ -19,10 +19,12 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import java.util.function.DoubleSupplier;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.temperature.TemperatureService;
+
+import com.google.inject.Inject;
 
 public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	private static final double a = 1.3;// [W]
@@ -42,15 +44,28 @@ public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 		return (a * temp + b) * temp + c;
 	}
 
-	//TODO temperature should be accessible via TemperatureService
-	private final DoubleSupplier temperatureProvider;
+	private final TemperatureService temperatureService;
 
-	public OhdeSlaskiAuxEnergyConsumption(DoubleSupplier temperatureProvider) {
-		this.temperatureProvider = temperatureProvider;
+	public OhdeSlaskiAuxEnergyConsumption(TemperatureService temperatureService) {
+		this.temperatureService = temperatureService;
 	}
 
 	@Override
 	public double calcEnergyConsumption(double beginTime, double duration, Id<Link> linkId) {
-		return calcPower(temperatureProvider.getAsDouble()) * duration;
+		return calcPower(temperatureService.getCurrentTemperature(linkId)) * duration;
+	}
+
+	public class Factory implements AuxEnergyConsumption.Factory {
+		private final TemperatureService temperatureService;
+
+		@Inject
+		public Factory(TemperatureService temperatureService) {
+			this.temperatureService = temperatureService;
+		}
+
+		@Override
+		public AuxEnergyConsumption create(ElectricVehicle electricVehicle) {
+			return new OhdeSlaskiAuxEnergyConsumption(temperatureService);
+		}
 	}
 }

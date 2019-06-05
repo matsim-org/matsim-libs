@@ -26,8 +26,7 @@ import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedChargingStrategy;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.discharging.OhdeSlaskiAuxEnergyConsumption;
+import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -64,8 +63,7 @@ public class RunEDrtScenario {
 								new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
 										MAX_RELATIVE_SOC)));
 
-				bind(AuxEnergyConsumption.Factory.class).toInstance(
-						ev -> new OhdeSlaskiAuxEnergyConsumption(() -> TEMPERATURE));
+				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
 		});
 
