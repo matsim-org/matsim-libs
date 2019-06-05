@@ -12,13 +12,16 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
+import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.ArrayList;
@@ -55,7 +58,7 @@ public class PtAlongALineTest{
 			scenario.getNetwork().addNode( node );
 			prevNode = node;
 		}
-		for( int ii = 1 ; ii < 1000 ; ii++ ){
+		for( int ii = 1 ; ii <= 1000 ; ii++ ){
 			Node node = nf.createNode( Id.createNodeId( ii ), new Coord( ii * 100, 0. ) );
 			scenario.getNetwork().addNode( node );
 			// ---
@@ -106,6 +109,63 @@ public class PtAlongALineTest{
 //				}
 			}
 		}
+
+		Node node0 = scenario.getNetwork().getNodes().get( Id.createNodeId( 0 ) );
+		Gbl.assertNotNull(node0);
+
+		Node nodeLast = scenario.getNetwork().getNodes().get( Id.createNodeId( 1000 ) ) ;
+		Gbl.assertNotNull( nodeLast );
+
+		Link loopLink0 = nf.createLink( Id.createLinkId( "loopLink0" ), node0, node0 ) ;
+		loopLink0.setLength( 100. );
+		scenario.getNetwork().addLink( loopLink0 );
+
+		Link loopLinkLast = nf.createLink( Id.createLinkId( "loopLinkLast" ), nodeLast, nodeLast ) ;
+		loopLink0.setLength( 100. );
+		scenario.getNetwork().addLink( loopLinkLast );
+
+		Link longTransitLink = nf.createLink( Id.createLinkId( "longTransitLink" ), node0, nodeLast ) ;
+		longTransitLink.setLength( CoordUtils.calcEuclideanDistance( node0.getCoord(), nodeLast.getCoord() ) );
+		scenario.getNetwork().addLink( longTransitLink );
+
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		TransitScheduleFactory sf = schedule.getFactory();;
+
+		Id<TransitStopFacility> facilityId0 = Id.create("StopFac0", TransitStopFacility.class ) ;
+		Coord coordinate0 = new Coord(0.,0.) ;
+		TransitStopFacility stopFacility0 = sf.createTransitStopFacility( facilityId0, coordinate0, false ) ;
+		schedule.addStopFacility( stopFacility0 );
+
+		Id<TransitStopFacility> facilityId10000 = Id.create("StopFac10000", TransitStopFacility.class ) ;
+		Coord coordinate10000 = new Coord(10000.,0.) ;
+		TransitStopFacility stopFacility10000 = sf.createTransitStopFacility( facilityId10000, coordinate10000, false ) ;
+		schedule.addStopFacility( stopFacility10000 );
+
+		{
+			NetworkRoute route = pf.getRouteFactories().createRoute( NetworkRoute.class, loopLink0.getId(), loopLinkLast.getId() ) ;
+
+			List<TransitRouteStop> stops = new ArrayList<>() ;
+			{
+				TransitRouteStop stop = sf.createTransitRouteStop( stopFacility0, 0., 0. );
+				stops.add( stop ) ;
+			}
+			{
+				TransitRouteStop stop = sf.createTransitRouteStop( stopFacility10000, 0., 0. );
+				stops.add( stop ) ;
+			}
+
+			TransitRoute transitRoute = sf.createTransitRoute( Id.create("route1",TransitRoute.class), route, stops, "bus" ) ;
+
+			TransitLine line = sf.createTransitLine( Id.create("line1", TransitLine.class) ) ;
+			line.addRoute( transitRoute );
+
+			schedule.addTransitLine( line );
+		}
+
+		TransitScheduleValidator.ValidationResult result = TransitScheduleValidator.validateAll( schedule, scenario.getNetwork() );
+		TransitScheduleValidator.printResult( result );
+
+		System.exit(-1) ;
 
 		Controler controler = new Controler( scenario ) ;
 
