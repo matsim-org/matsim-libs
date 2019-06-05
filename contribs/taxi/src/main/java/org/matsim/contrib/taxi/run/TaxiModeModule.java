@@ -24,7 +24,6 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
-import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
@@ -32,8 +31,6 @@ import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-
-import com.google.inject.multibindings.Multibinder;
 
 /**
  * @author michalm
@@ -48,7 +45,7 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		Multibinder.newSetBinder(binder(), DvrpMode.class).addBinding().toInstance(DvrpModes.mode(getMode()));
+		DvrpModes.registerDvrpMode(binder(), getMode());
 
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
