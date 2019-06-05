@@ -27,12 +27,14 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueingLogic {
 	private final Map<Id<ElectricVehicle>, ElectricVehicle> assignedVehicles = new LinkedHashMap<>();
 
-	public ChargingWithQueueingAndAssignmentLogic(Charger charger, ChargingStrategy chargingStrategy) {
-		super(charger, chargingStrategy);
+	public ChargingWithQueueingAndAssignmentLogic(Charger charger, ChargingStrategy chargingStrategy,
+			EventsManager eventsManager) {
+		super(charger, chargingStrategy, eventsManager);
 	}
 
 	public void assignVehicle(ElectricVehicle ev) {
@@ -47,8 +49,8 @@ public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueing
 		}
 	}
 
-	private final Collection<ElectricVehicle> unmodifiableAssignedVehicles = Collections
-			.unmodifiableCollection(assignedVehicles.values());
+	private final Collection<ElectricVehicle> unmodifiableAssignedVehicles = Collections.unmodifiableCollection(
+			assignedVehicles.values());
 
 	public Collection<ElectricVehicle> getAssignedVehicles() {
 		return unmodifiableAssignedVehicles;

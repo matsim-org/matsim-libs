@@ -34,22 +34,17 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 public class ChargingWithQueueingLogic implements ChargingLogic {
-	private final ChargingStrategy chargingStrategy;
-
 	private final Charger charger;
+	private final ChargingStrategy chargingStrategy;
+	private final EventsManager eventsManager;
+
 	private final Map<Id<ElectricVehicle>, ElectricVehicle> pluggedVehicles = new LinkedHashMap<>();
 	private final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
 	private final Map<Id<ElectricVehicle>, ChargingListener> listeners = new HashMap<>();
 
-	private EventsManager eventsManager;
-
-	public ChargingWithQueueingLogic(Charger charger, ChargingStrategy chargingStrategy) {
+	public ChargingWithQueueingLogic(Charger charger, ChargingStrategy chargingStrategy, EventsManager eventsManager) {
 		this.chargingStrategy = chargingStrategy;
 		this.charger = charger;
-	}
-
-	@Override
-	public void initEventsHandling(EventsManager eventsManager) {
 		this.eventsManager = eventsManager;
 	}
 
