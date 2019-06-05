@@ -26,6 +26,7 @@ import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureProvider;
 import org.matsim.core.controler.AbstractModule;
 
+import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
@@ -33,15 +34,16 @@ import com.google.inject.name.Names;
  * @author Michal Maciejewski (michalm)
  */
 public class ChargingModule extends AbstractModule {
-	private final EvConfigGroup evCfg;
+	@Inject
+	private EvConfigGroup evCfg;
+
 	private final Key<Network> networkKey;
 
-	public ChargingModule(EvConfigGroup evCfg) {
-		this(evCfg, Key.get(Network.class));
+	public ChargingModule() {
+		this(Key.get(Network.class));
 	}
 
-	public ChargingModule(EvConfigGroup evCfg, Key<Network> networkKey) {
-		this.evCfg = evCfg;
+	public ChargingModule(Key<Network> networkKey) {
 		this.networkKey = networkKey;
 	}
 

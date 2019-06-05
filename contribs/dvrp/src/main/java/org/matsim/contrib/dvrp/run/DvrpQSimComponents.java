@@ -32,6 +32,7 @@ public class DvrpQSimComponents {
 		return components -> {
 			DynActivityEngineModule.configureComponents(components);
 			components.addNamedComponent(PreplanningEngineQSimModule.COMPONENT_NAME);
+			MultiModals.requireAllModesUnique(modes);
 			for (String m : modes) {
 				components.addComponent(DvrpModes.mode(m));
 			}

@@ -20,13 +20,31 @@
 
 package org.matsim.contrib.dvrp.run;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.stream.Stream;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class MultiModals {
-	public static boolean isAllModesUnique(MultiModal<?> multiModal) {
-		return multiModal.modes().allMatch(new HashSet<>()::add);
+	public static void requireAllModesUnique(MultiModal<?> multiModal) {
+		if (!isAllModesUnique(multiModal.modes())) {
+			throw new RuntimeException("There are non-unique modes in: " + multiModal);
+		}
+	}
+
+	public static void requireAllModesUnique(String... modes) {
+		if (!isAllModesUnique(Arrays.stream(modes))) {
+			throw new RuntimeException("There are non-unique modes in: " + modes);
+		}
+	}
+
+	public static boolean isAllModesUnique(Stream<String> modes) {
+		return modes.allMatch(new HashSet<>()::add);
+	}
+
+	public static boolean isAllDvrpModesUnique(Stream<DvrpMode> dvrpModes) {
+		return dvrpModes.allMatch(new HashSet<>()::add);
 	}
 }

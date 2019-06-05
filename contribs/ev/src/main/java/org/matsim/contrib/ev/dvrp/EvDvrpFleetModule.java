@@ -32,7 +32,6 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 
 import com.google.inject.Inject;
@@ -61,9 +60,6 @@ public class EvDvrpFleetModule extends AbstractDvrpModeModule {
 			@Override
 			protected void configureQSim() {
 				bindModal(Fleet.class).toProvider(new ModalProviders.AbstractProvider<Fleet>(getMode()) {
-					@Inject
-					private Config config;
-
 					@Inject
 					private ElectricFleet evFleet;
 

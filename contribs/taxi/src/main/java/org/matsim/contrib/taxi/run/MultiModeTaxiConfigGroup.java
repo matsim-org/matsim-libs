@@ -54,9 +54,7 @@ public final class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implem
 					"In the multi-mode taxi setup, TaxiConfigGroup must not be defined at the config top level");
 		}
 
-		if (!MultiModals.isAllModesUnique(this)) {
-			throw new RuntimeException("Taxi modes in MultiModeTaxiConfigGroup are not unique");
-		}
+		MultiModals.requireAllModesUnique(this);
 	}
 
 	@Override

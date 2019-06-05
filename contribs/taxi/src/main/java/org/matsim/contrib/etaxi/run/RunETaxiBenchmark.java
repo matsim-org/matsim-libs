@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
@@ -34,9 +33,10 @@ import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.VariableSpeedCharging;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.dvrp.DvrpAuxConsumptionFactory;
+import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
+import org.matsim.contrib.ev.dvrp.OperatingVehicleProvider;
+import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
@@ -45,6 +45,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 /**
  * For a fair and consistent benchmarking of taxi dispatching algorithms we assume that link travel times are
@@ -84,6 +85,14 @@ public class RunETaxiBenchmark {
 		controler.addOverridingModule(new DvrpBenchmarkModule());
 		controler.addOverridingModule(new EvModule());
 		controler.addOverridingModule(new EvDvrpIntegrationModule());
+
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				this.bind(AuxDischargingHandler.VehicleProvider.class).to(OperatingVehicleProvider.class);
+			}
+		});
+
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(taxiCfg.getMode()));
 
 		controler.addOverridingModule(new AbstractModule() {
@@ -94,9 +103,7 @@ public class RunETaxiBenchmark {
 								VariableSpeedCharging.createStrategyForNissanLeaf(
 										charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC)));
 
-				bind(AuxEnergyConsumption.Factory.class).toInstance(
-						new DvrpAuxConsumptionFactory(taxiCfg.getMode(), () -> TEMPERATURE,
-								RunETaxiBenchmark::isTurnedOn));
+				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
 		});
 
@@ -107,11 +114,6 @@ public class RunETaxiBenchmark {
 				.build());
 
 		return controler;
-	}
-
-	private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
-		//FIXME should use actual vehicle to check if schedule is STARTED
-		return vehicle.getServiceBeginTime() <= time && time <= vehicle.getServiceEndTime();
 	}
 
 	public static void main(String[] args) {

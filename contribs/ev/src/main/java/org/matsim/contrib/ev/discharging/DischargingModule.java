@@ -20,8 +20,8 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
@@ -29,34 +29,21 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
  * @author Michal Maciejewski (michalm)
  */
 public class DischargingModule extends AbstractModule {
-	private final EvConfigGroup evCfg;
-
-	public DischargingModule(EvConfigGroup evCfg) {
-		this.evCfg = evCfg;
-	}
-
 	@Override
 	public void install() {
-		boolean isSeparateAuxDischargingHandler = evCfg.getAuxDischargingSimulation()
-				== EvConfigGroup.AuxDischargingSimulation.separateAuxDischargingHandler;
-
 		bind(DriveEnergyConsumption.Factory.class).toInstance(ev -> new OhdeSlaskiDriveEnergyConsumption());
-		if (isSeparateAuxDischargingHandler) {
-			// TODO fixed temperature 15 oC
-			// FIXME start using TemperatureService
-			// FIXME "isTurnedOn" returns true ==> should not be used when for "separateAuxDischargingHandler"
-			bind(AuxEnergyConsumption.Factory.class).toInstance(
-					ev -> new OhdeSlaskiAuxEnergyConsumption(ev, () -> 15, (v, t) -> true));
-		}
+		bind(TemperatureService.class).toInstance(linkId -> 15);// XXX fixed temperature 15 oC
+		bind(AuxEnergyConsumption.Factory.class).to(OhdeSlaskiAuxEnergyConsumption.Factory.class).asEagerSingleton();
 
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bind(DriveDischargingHandler.class).asEagerSingleton();
-				if (isSeparateAuxDischargingHandler) {
-					bind(AuxDischargingHandler.class).asEagerSingleton();
-					addQSimComponentBinding(EvModule.EV_COMPONENT).to(AuxDischargingHandler.class);
-				}
+				this.bind(DriveDischargingHandler.class).asEagerSingleton();
+				this.bind(AuxDischargingHandler.class).asEagerSingleton();
+				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(AuxDischargingHandler.class);
+
+				//by default, no vehicle will be AUX-discharged when not moving
+				this.bind(AuxDischargingHandler.VehicleProvider.class).toInstance(event -> null);
 			}
 		});
 	}

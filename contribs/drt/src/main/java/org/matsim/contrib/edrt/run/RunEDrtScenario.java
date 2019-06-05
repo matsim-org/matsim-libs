@@ -20,15 +20,13 @@
 package org.matsim.contrib.edrt.run;
 
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedChargingStrategy;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.dvrp.DvrpAuxConsumptionFactory;
+import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -65,18 +63,11 @@ public class RunEDrtScenario {
 								new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
 										MAX_RELATIVE_SOC)));
 
-				bind(AuxEnergyConsumption.Factory.class).toInstance(
-						new DvrpAuxConsumptionFactory(drtCfg.getMode(), () -> TEMPERATURE,
-								RunEDrtScenario::isTurnedOn));
+				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
 		});
 
 		return controler;
-	}
-
-	private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
-		//FIXME should use actual vehicle to check if schedule is STARTED
-		return vehicle.getServiceBeginTime() <= time && time <= vehicle.getServiceEndTime();
 	}
 
 	public static void main(String[] args) {
