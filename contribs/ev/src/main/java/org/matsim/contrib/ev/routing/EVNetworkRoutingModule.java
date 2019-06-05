@@ -207,7 +207,8 @@ public final class EVNetworkRoutingModule implements RoutingModule {
             double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime(), null, null);
             double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, Time.getUndefinedTime());
             if (auxEnergyConsumption != null) {
-				consumption += auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime(), travelT);
+				consumption += auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime(), travelT,
+						l.getId());
             }
             consumptions.put(l, consumption);
         }

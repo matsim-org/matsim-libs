@@ -21,6 +21,9 @@ package org.matsim.contrib.ev.discharging;
 
 import java.util.function.DoubleSupplier;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+
 public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	private static final double a = 1.3;// [W]
 	private static final double b = -63.4;// [W]
@@ -47,7 +50,7 @@ public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	}
 
 	@Override
-	public double calcEnergyConsumption(double beginTime, double duration) {
+	public double calcEnergyConsumption(double beginTime, double duration, Id<Link> linkId) {
 		return calcPower(temperatureProvider.getAsDouble()) * duration;
 	}
 }
