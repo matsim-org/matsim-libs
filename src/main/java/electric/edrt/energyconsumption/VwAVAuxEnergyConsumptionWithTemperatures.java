@@ -56,7 +56,7 @@ public class VwAVAuxEnergyConsumptionWithTemperatures implements AuxEnergyConsum
 	public double calcEnergyConsumption(double beginTime, double duration, Id<Link> linkId) {
 		if (tracker.isAtCharger(ev.getId()))
 			return 0;
-		double temp = temperatureService.getCurrentTemperature();
+		double temp = temperatureService.getCurrentTemperature(linkId);
 		double consumptionTemp;
 		try {
 			consumptionTemp = linearInterpolator.interpolate(x, y).value(temp);
