@@ -66,7 +66,6 @@ public class DriveDischargingHandler
 
 	private final Network network;
 	private final Map<Id<ElectricVehicle>, ? extends ElectricVehicle> eVehicles;
-	private final boolean handleAuxDischarging;
 	private final Map<Id<Vehicle>, EVDrive> evDrives;
 	private Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
 
@@ -75,7 +74,6 @@ public class DriveDischargingHandler
 			MobsimScopeEventHandling events) {
 		this.network = network;
 		eVehicles = data.getElectricVehicles();
-		handleAuxDischarging = evCfg.isAddAuxConsumptionToDriveConsumption();
 		evDrives = new HashMap<>(eVehicles.size() / 10);
 		events.addMobsimScopeHandler(this);
 	}
@@ -111,10 +109,8 @@ public class DriveDischargingHandler
 			Link link = network.getLinks().get(linkId);
 			double tt = eventTime - evDrive.movedOverNodeTime;
 			ElectricVehicle ev = evDrive.ev;
-			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt);
-			if (handleAuxDischarging) {
-				energy += ev.getAuxEnergyConsumption().calcEnergyConsumption(eventTime - tt, tt, linkId);
-			}
+			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt)
+					+ ev.getAuxEnergyConsumption().calcEnergyConsumption(eventTime - tt, tt, linkId);
 			//Energy consumption might be negative on links with negative slope
 			if (energy < 0) {
 				ev.getBattery().charge(Math.abs(energy));

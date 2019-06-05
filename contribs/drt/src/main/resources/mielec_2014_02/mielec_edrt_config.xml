@@ -25,7 +25,6 @@
 	<module name="ev">
 		<param name="chargeTimeStep" value="5" />
 		<param name="auxDischargeTimeStep" value="10" />
-		<param name="addAuxConsumptionToDriveConsumption" value="true"/>
 
 		<param name="chargersFile" value="chargers-1-plugs-1.xml" />
 		<param name="vehiclesFile" value="evehicles-10.xml" />
