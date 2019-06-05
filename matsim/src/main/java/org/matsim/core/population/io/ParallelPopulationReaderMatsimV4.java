@@ -281,11 +281,6 @@ import org.xml.sax.helpers.AttributesImpl;
 		}
 
 		@Override
-		public PersonAttributes getPersonAttributes() {
-			return population.getPersonAttributes();
-		}
-		
-		@Override
 		public String getName() {
 			throw new RuntimeException("Calls to this method are not expected to happen...");
 		}

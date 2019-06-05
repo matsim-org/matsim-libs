@@ -14,10 +14,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 /**
@@ -56,7 +56,7 @@ public class ScenarioByConfigInjectionTest {
 		Population population = scenario.getPopulation();
 		Person person = population.getPersons().get( Id.createPersonId( "1" ) ) ;
 		Gbl.assertNotNull( person );
-		Object stupid = PopulationUtils.getPersonAttribute( person, "stupidAttribute", population );
+		Object stupid = PopulationUtils.getPersonAttribute( person, "stupidAttribute");
 
 		// TODO test for ALL attribute containers...
 		Assert.assertEquals(
@@ -179,7 +179,7 @@ public class ScenarioByConfigInjectionTest {
 		final PopulationWriter popWriter = new PopulationWriter( sc.getPopulation() , sc.getNetwork() );
 		popWriter.putAttributeConverter( StupidClass.class , new StupidClassConverter() );
 		popWriter.writeV6( plansFile );
-		final ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes());
+		final ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(new ObjectAttributes());
 		writer.putAttributeConverter( StupidClass.class , new StupidClassConverter() );
 		writer.writeFile( attributeFile );
 

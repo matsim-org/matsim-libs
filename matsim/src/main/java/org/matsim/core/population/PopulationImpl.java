@@ -40,7 +40,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private String name;
 	private Map<Id<Person>, Person> persons = new LinkedHashMap<>();
 	private final PopulationFactory populationFactory;
-	@Deprecated private final PersonAttributes personAttributes = new PersonAttributes();
 	private long counter = 0;
 	private long nextMsg = 1;
 
@@ -76,12 +75,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public final Map<Id<Person>, ? extends Person> getPersons() {
 		return persons ;
-	}
-
-	@Override
-	@Deprecated
-	public PersonAttributes getPersonAttributes() {
-		return this.personAttributes;
 	}
 
 	@Override

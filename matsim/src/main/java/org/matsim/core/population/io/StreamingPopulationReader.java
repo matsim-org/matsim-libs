@@ -173,9 +173,6 @@ public final class StreamingPopulationReader implements MatsimReader {
 		@Override public Person removePerson(Id<Person> personId) {
 			return delegate.removePerson(personId);
 		}
-		@Override public PersonAttributes getPersonAttributes() {
-			return delegate.getPersonAttributes();
-		}
 
 		@Override
 		public Attributes getAttributes() {

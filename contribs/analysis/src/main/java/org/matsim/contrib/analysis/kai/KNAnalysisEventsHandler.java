@@ -334,7 +334,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 	}
 	private String getSubpopName( Person person, String subpopAttrName ) {
 //		String subpop = (String) personAttributes.getAttribute( personId.toString(), subpopAttrName ) ;
-		String subpop = (String) PopulationUtils.getPersonAttribute( person, subpopAttrName, this.population ) ;
+		String subpop = (String) PopulationUtils.getPersonAttribute( person, subpopAttrName) ;
 		return "subpop_" + subpop;
 	}
 
@@ -376,7 +376,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 //			if ( attribs.getAttribute( person.getId().toString(), CERTAIN_LINKS_CNT ) != null ) {
 //				attribs.putAttribute( person.getId().toString(), CERTAIN_LINKS_CNT, 0. ) ;
 //			}
-			if ( PopulationUtils.getPersonAttribute( person, CERTAIN_LINKS_CNT, this.population ) != null ) {
+			if ( PopulationUtils.getPersonAttribute( person, CERTAIN_LINKS_CNT) != null ) {
 				PopulationUtils.putPersonAttribute( person, CERTAIN_LINKS_CNT, 0. );
 			}
 			// yy I must have written this myself, but I don't know where there is the null check first.  kai, may'19
@@ -384,7 +384,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 //			if ( attribs.getAttribute( person.getId().toString(), PAYMENTS) != null ) {
 //				attribs.putAttribute( person.getId().toString(), PAYMENTS, 0. ) ;
 //			}
-			if ( PopulationUtils.getPersonAttribute( person, PAYMENTS, this.population  ) != null ) {
+			if ( PopulationUtils.getPersonAttribute( person, PAYMENTS) != null ) {
 				PopulationUtils.putPersonAttribute( person, PAYMENTS, 0. );
 			}
 			// yy I must have written this myself, but I don't know where there is the null check first.  kai, may'19
@@ -417,7 +417,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 	private void add( Person person, double val, final String attributeName ) {
 //		final ObjectAttributes pAttribs = this.scenario.getPopulation().getPersonAttributes();
 //		Double oldVal = (Double) pAttribs.getAttribute( person.toString(), attributeName ) ;
-		Double oldVal = (Double) PopulationUtils.getPersonAttribute( person, attributeName, this.population ) ;
+		Double oldVal = (Double) PopulationUtils.getPersonAttribute( person, attributeName) ;
 		double newVal = val ;
 		if ( oldVal!=null ) {
 			newVal += oldVal ;
@@ -491,12 +491,12 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		double maxPayment = Double.NEGATIVE_INFINITY ;
 		Set<String> subPopTypes = new HashSet<>() ;
 		for ( Person person : pop.getPersons().values() ) {
-			Double payment = (Double) PopulationUtils.getPersonAttribute( person, PAYMENTS, pop ) ;
+			Double payment = (Double) PopulationUtils.getPersonAttribute( person, PAYMENTS) ;
 			if ( payment==null ) continue ;
 			if ( payment > maxPayment ) {
 				maxPayment = payment ;
 			}
-			String subPopType = (String) PopulationUtils.getPersonAttribute( person, SUBPOPULATION, pop ) ;
+			String subPopType = (String) PopulationUtils.getPersonAttribute( person, SUBPOPULATION) ;
 			if (subPopType!=null) subPopTypes.add(subPopType) ;
 		}
 
@@ -511,8 +511,8 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		}
 
 		for ( Person person : pop.getPersons().values() ) {
-			String subPopType = (String) PopulationUtils.getPersonAttribute( person, SUBPOPULATION, pop ) ;
-			Double payment = (Double) PopulationUtils.getPersonAttribute( person, PAYMENTS, pop ) ;
+			String subPopType = (String) PopulationUtils.getPersonAttribute( person, SUBPOPULATION) ;
+			Double payment = (Double) PopulationUtils.getPersonAttribute( person, PAYMENTS) ;
 			if (payment==null || subPopType == null) continue ;
 			int bin = (int) (payment/binSize) ;
 			sum.get(subPopType)[bin] += payment ;

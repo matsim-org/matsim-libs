@@ -52,5 +52,5 @@ public final class ObjectAttributesUtils {
 		}
 		return Collections.unmodifiableCollection(map.keySet());
 	}
-	
+
 }

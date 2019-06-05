@@ -1083,45 +1083,21 @@ public final class PopulationUtils {
 
 	// ---
 
-	public static Object getPersonAttribute( HasPlansAndId person, String key, Population population ) {
-		Object result = null ;
+	public static Object getPersonAttribute(HasPlansAndId person, String key) {
 		if ( person instanceof Attributable ){
-			result = ((Attributable) person).getAttributes().getAttribute( key );
+			return ((Attributable) person).getAttributes().getAttribute( key );
 		}
-		if ( result != null ) {
-			return result ;
-		}
-		if ( population==null ) {
-			log.warn( "population==null (which is ok) but requested attribute not in person.  Probably ok; will return null" ) ;
-			// person.getAttributes().getAttribute( key ) would also return null when attribute is not there; remaining corner case is that it is
-			// actually in population.getPersonAttributes() but that is not available when population is null. kai, may'19
-
-			return null ;
-		}
-		return population.getPersonAttributes().getAttributeDirectly( person.getId().toString(), key ) ;
+		return null;
 	}
 	public static void putPersonAttribute( Person person, String key, Object value ) {
 		person.getAttributes().putAttribute( key, value ) ;
 	}
-	public static Object removePersonAttribute( Person person, String key, Population population ) {
-		Object result1 = person.getAttributes().removeAttribute( key );
-		Object result2 = population.getPersonAttributes().removeAttributeDirectly( person.getId().toString(), key ) ;
-		if( result1==null ) {
-			return result2 ;
-		}
-		if ( result2==null ) {
-			return result1 ;
-		}
-		if ( Objects.equals( result1, result2 ) ) {
-			return result1 ;
-		}
-		throw new RuntimeException("inconsistent object attributes state; don't know what to do.  Try using PopulationUtils" +
-							     ".get/put/...PersonAttribute instead of population.getPersonAttributes... .. kai, " +
-							     "mar'19") ;
+	public static Object removePersonAttribute( Person person, String key ) {
+		return person.getAttributes().removeAttribute( key );
 	}
 	@Deprecated  // this command is a bit dangerous, since it might clear someone else's attributes.  Maybe best don't use.  kai, may'19
 	public static void removePersonAttributes( Person person, Population population ) {
-		population.getPersonAttributes().removeAllAttributesDirectly( person.getId().toString() );
+		//population.getPersonAttributes().removeAllAttributesDirectly( person.getId().toString() );
 		person.getAttributes().clear();
 	}
 

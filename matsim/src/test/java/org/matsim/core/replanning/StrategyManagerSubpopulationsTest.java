@@ -80,7 +80,7 @@ public class StrategyManagerSubpopulationsTest {
 						Gbl.assertNotNull( person1 );
 						Assert.assertNull(
 							"unexpected subpopulation",
-							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME, population ) );
+							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
 
 					}
 
@@ -101,7 +101,7 @@ public class StrategyManagerSubpopulationsTest {
 						Assert.assertEquals(
 							"unexpected subpopulation",
 							POP_NAME_1,
-							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME, population ) );
+							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
 					}
 
 					@Override
@@ -121,7 +121,7 @@ public class StrategyManagerSubpopulationsTest {
 						Assert.assertEquals(
 							"unexpected subpopulation",
 							POP_NAME_2,
-							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME, population ) );
+							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
 					}
 
 					@Override

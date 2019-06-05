@@ -27,9 +27,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
  * Copy/Paste of PlanMutateTimeAllocation, but with special handling
@@ -46,24 +46,22 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 	private boolean useActivityDurations = true;
 	private final boolean affectingDuration;
 	private final String subpopulationAttribute;
-	private final ObjectAttributes personAttributes;
 	private final Map<String, Double> subpopulationMutationRanges;
 	private final Map<String, Boolean> subpopulationAffectingDuration;
 
 	public TripPlanMutateTimeAllocation(final StageActivityTypes stageActivities, final double mutationRange,
 			final boolean affectingDuration, final Random random) {
-		this(stageActivities, mutationRange, affectingDuration, random, null, null, null, null);
+		this(stageActivities, mutationRange, affectingDuration, random, null, null, null);
 	}
 
 	public TripPlanMutateTimeAllocation(final StageActivityTypes stageActivities, final double mutationRange, 
-			final boolean affectingDuration, final Random random, final String subpopulationAttribute, final ObjectAttributes personAttributes, 
+			final boolean affectingDuration, final Random random, final String subpopulationAttribute,
 			final Map<String, Double> subpopulationMutationRanges, final Map<String, Boolean> subpopulationAffectingDuration) {
 		this.stageActivities = stageActivities;
 		this.mutationRange = mutationRange;
 		this.affectingDuration = affectingDuration;
 		this.random = random;
 		this.subpopulationAttribute = subpopulationAttribute;
-		this.personAttributes = personAttributes;
 		this.subpopulationMutationRanges = subpopulationMutationRanges;
 		this.subpopulationAffectingDuration = subpopulationAffectingDuration;
 	}
@@ -185,16 +183,8 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 	
 	private final String getSubpopulation(final Plan plan) {
 		if (this.subpopulationAttribute == null) return null;
-		else if (plan.getPerson() == null) return null;
-		else if (this.personAttributes == null) return null; 
-		else {
-			Object o = this.personAttributes.getAttribute(plan.getPerson().getId().toString(), this.subpopulationAttribute);
-			if (o != null) {
-				throw new RuntimeException("abc") ;
-//				return o.toString();
-			}
-			else return null;
-		}
+		if (plan.getPerson() == null) return null;
+		return (String) PopulationUtils.getPersonAttribute(plan.getPerson(), this.subpopulationAttribute);
 	}
 	
 	private final boolean isAffectingDuration(final String subpopulation) {

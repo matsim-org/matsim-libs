@@ -38,7 +38,6 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
  * Notes:<ul>
@@ -206,7 +205,7 @@ public class GenericStrategyManager<PL extends BasicPlan, AG extends HasPlansAnd
 			// ... choose the strategy to be used for this person (in evol comp lang this would be the choice of the mutation operator)
 			String subpopName = null;
 			if (this.subpopulationAttributeName != null) {
-				subpopName = (String) PopulationUtils.getPersonAttribute( person, this.subpopulationAttributeName, population ) ;
+				subpopName = (String) PopulationUtils.getPersonAttribute( person, this.subpopulationAttributeName) ;
 			}
 			GenericPlanStrategy<PL, AG> strategy = this.chooseStrategy(person, subpopName);
 

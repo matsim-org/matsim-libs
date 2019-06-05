@@ -27,7 +27,6 @@ import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -59,7 +58,7 @@ public class SubpopulationScoringParameters implements ScoringParametersForPerso
 
 	@Override
 	public ScoringParameters getScoringParameters(Person person) {
-		final String subpopulation = (String) PopulationUtils.getPersonAttribute( person, subpopulationAttributeName, population ) ;
+		final String subpopulation = (String) PopulationUtils.getPersonAttribute( person, subpopulationAttributeName) ;
 
 		if (!this.params.containsKey(subpopulation)) {
 			/* lazy initialization of params. not strictly thread safe, as different threads could
