@@ -56,7 +56,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
 import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
@@ -334,12 +333,10 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	//					bind(ChargingLogic.Factory.class)
 	//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
 	//									new BatteryReplacementCharge(BATTERYREPLACETIME)));
-	//					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
 	//				} else {
 	//					bind(ChargingLogic.Factory.class)
 	//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
 	//									new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
-	//					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
 	//				}
 	//			}
 	//		});
@@ -365,17 +362,14 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 					bind(ChargingLogic.Factory.class).toInstance(
 							charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
 									new BatteryReplacementCharge(BATTERYREPLACETIME)));
-					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
 				} else {
 					bind(ChargingLogic.Factory.class).toInstance(
 							charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
 									new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
-					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
 				}
 
 				//				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
 				//				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(240.0)));
-				//				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
 			}
 		});
 

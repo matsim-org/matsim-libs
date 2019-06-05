@@ -29,6 +29,7 @@ import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FastThenSlowCharging;
+import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
@@ -39,12 +40,13 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
 import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
+import vwExamples.utils.customEdrtModule.OperatingVehicleOutsideDepotProvider;
 
 public class RunEDrtScenario {
 	public static final double CHARGING_SPEED_FACTOR = 1.; // full speed
@@ -120,7 +122,13 @@ public class RunEDrtScenario {
 						charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
 								new FastThenSlowCharging(charger.getPower())));
 				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(240.0)));
-				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
+			}
+		});
+
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				this.bind(AuxDischargingHandler.VehicleProvider.class).to(OperatingVehicleOutsideDepotProvider.class);
 			}
 		});
 

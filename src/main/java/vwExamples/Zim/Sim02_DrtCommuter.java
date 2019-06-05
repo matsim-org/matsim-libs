@@ -56,7 +56,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
 import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
@@ -77,15 +76,15 @@ public class Sim02_DrtCommuter {
 	public static final double BATTERYREPLACETIME = 180.0;
 
 	static boolean BatteryReplace = false;
-	
-	static int[] fleetRange = {200,300,400};
-//	static int[] fleetRange = {150,250,300};
+
+	static int[] fleetRange = { 200, 300, 400 };
+	//	static int[] fleetRange = {150,250,300};
 
 	public static void main(String[] args) throws IOException {
 		//int count = 7;
 		int n_iterations = 1;
 		for (int it = 0; it < n_iterations; it++) {
-			for (int fleet : fleetRange ) {
+			for (int fleet : fleetRange) {
 				int vehiclePerDepot = fleet;
 
 				run(vehiclePerDepot, it);
@@ -106,10 +105,8 @@ public class Sim02_DrtCommuter {
 		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\Sim02_CommuterDRT.xml", new DrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
 				new TemperatureChangeConfigGroup());
-		
-		
 
-		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup) config.getModules()
+		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup)config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);
 		tcg.setTempFile(inbase + "\\input\\temp\\temperatures_0.csv");
 		config.travelTimeCalculator().setTraveltimeBinSize(900);
@@ -120,7 +117,8 @@ public class Sim02_DrtCommuter {
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
-		config.plans().setInputFile(inbase + "\\input\\plans\\0.1_commuterdrt_vw235_nocad.1.0.output_plans_selected.xml.gz");
+		config.plans()
+				.setInputFile(inbase + "\\input\\plans\\0.1_commuterdrt_vw235_nocad.1.0.output_plans_selected.xml.gz");
 		config.controler().setLastIteration(2); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
@@ -130,7 +128,7 @@ public class Sim02_DrtCommuter {
 		String networkFilePath = inbase + "\\input\\network\\network.xml.gz";
 		String shapeFilePath = inbase + "\\input\\shp\\Real_Region_Hannover.shp";
 		String shapeFeature = "NO"; // shapeFeature is used to read the shapeFilePath. All zones in shapeFile are
-									// used to generate a drt service area
+		// used to generate a drt service area
 		String drtTag = "drt"; // drtTag is assigned to roads that should be used by the drt service
 		// Adding drtTag to the network in order to define a service area
 		vwExamples.utils.serviceAreaShapeToNetwork.run(networkFilePath, shapeFilePath, shapeFeature, drtTag);
@@ -138,7 +136,7 @@ public class Sim02_DrtCommuter {
 		config.network().setInputFile(inbase + "\\input\\network\\drtServiceAreaNetwork.xml.gz");
 
 		// This part allows to change dynamically DRT config parameters
-		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		DrtConfigGroup drt = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
 
 		drt.setPrintDetailedWarnings(false);
 		// Parameters to setup the DRT service
@@ -167,12 +165,11 @@ public class Sim02_DrtCommuter {
 		// Define infrastructure for eDRT (vehicles, depots and chargers)
 		CreateEDRTVehiclesAndChargers vehiclesAndChargers = new CreateEDRTVehiclesAndChargers();
 		Map<Id<Link>, Integer> depotsAndVehicles = new HashMap<>();
-//		depotsAndVehicles.put(Id.createLinkId(314700), vehiclePerDepot); // H HBF
-//		depotsAndVehicles.put(Id.createLinkId(108636), vehiclePerDepot); // VWN
-//		depotsAndVehicles.put(Id.createLinkId(162930), vehiclePerDepot); // Linden Süd
-//		depotsAndVehicles.put(Id.createLinkId(123095), vehiclePerDepot); // Wülferode
+		//		depotsAndVehicles.put(Id.createLinkId(314700), vehiclePerDepot); // H HBF
+		//		depotsAndVehicles.put(Id.createLinkId(108636), vehiclePerDepot); // VWN
+		//		depotsAndVehicles.put(Id.createLinkId(162930), vehiclePerDepot); // Linden Süd
+		//		depotsAndVehicles.put(Id.createLinkId(123095), vehiclePerDepot); // Wülferode
 
-		
 		depotsAndVehicles.put(Id.createLinkId(314700), vehiclePerDepot); // H HBF
 		depotsAndVehicles.put(Id.createLinkId(119060), vehiclePerDepot); // 
 		depotsAndVehicles.put(Id.createLinkId(111476), vehiclePerDepot); // 
@@ -181,7 +178,6 @@ public class Sim02_DrtCommuter {
 		depotsAndVehicles.put(Id.createLinkId(239977), vehiclePerDepot); //
 		depotsAndVehicles.put(Id.createLinkId(361079), vehiclePerDepot); //
 
-		
 		vehiclesAndChargers.CHARGER_FILE = inbase + "\\input\\chargers\\chargers.xml.gz";
 		vehiclesAndChargers.NETWORKFILE = inbase + "\\input\\network\\drtServiceAreaNetwork.xml.gz";
 		vehiclesAndChargers.DRT_VEHICLE_FILE = inbase + "\\input\\fleets\\fleet.xml.gz";
@@ -191,7 +187,7 @@ public class Sim02_DrtCommuter {
 		vehiclesAndChargers.MAX_START_CAPACITY_KWH = 78;
 		vehiclesAndChargers.MIN_START_CAPACITY_KWH = 78;
 		vehiclesAndChargers.BATTERY_CAPACITY_KWH = 78;
-		vehiclesAndChargers.CHARGINGPOWER_KW = (int) (100);
+		vehiclesAndChargers.CHARGINGPOWER_KW = (int)(100);
 		vehiclesAndChargers.FRACTION_OF_CHARGERS_PER_DEPOT = 0.2;
 		vehiclesAndChargers.run(depotsAndVehicles);
 
@@ -200,7 +196,7 @@ public class Sim02_DrtCommuter {
 		drt.setOperationalScheme("stopbased");
 		drt.setPlotDetailedCustomerStats(true);
 
-		EvConfigGroup eDrt = (EvConfigGroup) config.getModules().get(EvConfigGroup.GROUP_NAME);
+		EvConfigGroup eDrt = (EvConfigGroup)config.getModules().get(EvConfigGroup.GROUP_NAME);
 		eDrt.setChargersFile(inbase + "\\input\\chargers\\chargers.xml.gz");
 		eDrt.setVehiclesFile(inbase + "\\input\\fleets\\eFleet.xml.gz");
 		eDrt.setAuxDischargeTimeStep(10);
@@ -238,14 +234,14 @@ public class Sim02_DrtCommuter {
 
 			MinCostFlowRebalancingParams rebalancingParams = new MinCostFlowRebalancingParams();
 
-//			rebalancingParams.setInterval(300);
-//			rebalancingParams.setCellSize(1000);
-//			rebalancingParams.setTargetAlpha(0.3);
-//			rebalancingParams.setTargetBeta(0.3);
-//			rebalancingParams.setMaxTimeBeforeIdle(500);
-//			rebalancingParams.setMinServiceTime(3600);
-//			drt.addParameterSet(rebalancingParams);
-			
+			//			rebalancingParams.setInterval(300);
+			//			rebalancingParams.setCellSize(1000);
+			//			rebalancingParams.setTargetAlpha(0.3);
+			//			rebalancingParams.setTargetBeta(0.3);
+			//			rebalancingParams.setMaxTimeBeforeIdle(500);
+			//			rebalancingParams.setMinServiceTime(3600);
+			//			drt.addParameterSet(rebalancingParams);
+
 			rebalancingParams.setInterval(600);
 			rebalancingParams.setCellSize(1000);
 			rebalancingParams.setTargetAlpha(0.3);
@@ -253,7 +249,6 @@ public class Sim02_DrtCommuter {
 			rebalancingParams.setMaxTimeBeforeIdle(900);
 			rebalancingParams.setMinServiceTime(3600);
 			drt.addParameterSet(rebalancingParams);
-			
 
 		}
 
@@ -273,8 +268,8 @@ public class Sim02_DrtCommuter {
 				// 0.05
 				DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.05);
 				DvrpConfigGroup.get(config).setTravelTimeEstimationBeta(900);
-//				DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.05);
-//				DvrpConfigGroup.get(config).setTravelTimeEstimationBeta(3600*24);
+				//				DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.05);
+				//				DvrpConfigGroup.get(config).setTravelTimeEstimationBeta(3600*24);
 				// bind(RelocationWriter.class).asEagerSingleton();
 				// addControlerListenerBinding().to(RelocationWriter.class);
 
@@ -284,16 +279,21 @@ public class Sim02_DrtCommuter {
 		// controler.addOverridingModule(new ParkingRouterModule());
 		controler.addOverridingModule(new SwissRailRaptorModule());
 		controler.addOverridingModule(new MyDrtTrajectoryAnalysisModule(drt));
-		
 
 		// We finally run the controller to start MATSim
 
 		boolean deleteRoutes = false;
 
 		if (deleteRoutes) {
-			controler.getScenario().getPopulation().getPersons().values().stream().flatMap(p -> p.getPlans().stream())
-					.flatMap(pl -> pl.getPlanElements().stream()).filter(Leg.class::isInstance)
-					.forEach(pe -> ((Leg) pe).setRoute(null));
+			controler.getScenario()
+					.getPopulation()
+					.getPersons()
+					.values()
+					.stream()
+					.flatMap(p -> p.getPlans().stream())
+					.flatMap(pl -> pl.getPlanElements().stream())
+					.filter(Leg.class::isInstance)
+					.forEach(pe -> ((Leg)pe).setRoute(null));
 		}
 
 		controler.run();
@@ -331,39 +331,37 @@ public class Sim02_DrtCommuter {
 
 	}
 
-//	public static Controler createControler(Config config) {
-//		Controler controler = CustomEDrtControlerCreator.createControler(config, false);
-//		controler.addOverridingModule(new TemperatureChangeModule());
-//		
-//
-//		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config)));
-//		controler.addOverridingModule(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				bind(EDrtVehicleDataEntryFactoryProvider.class)
-//						.toInstance(new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
-//				bind(DriveEnergyConsumption.Factory.class)
-//						.toInstance(evconsumption -> new VwDrtDriveEnergyConsumption());
-//				bind(AuxEnergyConsumption.Factory.class)
-//						.to(VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
-//
-//				if (BatteryReplace) {
-//					bind(ChargingLogic.Factory.class)
-//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-//									new BatteryReplacementCharge(BATTERYREPLACETIME)));
-//					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
-//				} else {
-//					bind(ChargingLogic.Factory.class)
-//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-//									new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
-//					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
-//				}
-//			}
-//		});
-//
-//		return controler;
-//	}
-	
+	//	public static Controler createControler(Config config) {
+	//		Controler controler = CustomEDrtControlerCreator.createControler(config, false);
+	//		controler.addOverridingModule(new TemperatureChangeModule());
+	//
+	//
+	//		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config)));
+	//		controler.addOverridingModule(new AbstractModule() {
+	//			@Override
+	//			public void install() {
+	//				bind(EDrtVehicleDataEntryFactoryProvider.class)
+	//						.toInstance(new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
+	//				bind(DriveEnergyConsumption.Factory.class)
+	//						.toInstance(evconsumption -> new VwDrtDriveEnergyConsumption());
+	//				bind(AuxEnergyConsumption.Factory.class)
+	//						.to(VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
+	//
+	//				if (BatteryReplace) {
+	//					bind(ChargingLogic.Factory.class)
+	//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+	//									new BatteryReplacementCharge(BATTERYREPLACETIME)));
+	//				} else {
+	//					bind(ChargingLogic.Factory.class)
+	//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+	//									new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
+	//				}
+	//			}
+	//		});
+	//
+	//		return controler;
+	//	}
+
 	public static Controler createControler(Config config) {
 		Controler controler = CustomEDrtControlerCreator.createControler(config, false);
 		controler.addOverridingModule(new TemperatureChangeModule());
@@ -377,22 +375,19 @@ public class Sim02_DrtCommuter {
 						evconsumption -> new VwDrtDriveEnergyConsumption());
 				bind(AuxEnergyConsumption.Factory.class).to(
 						VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
-				
+
 				if (BatteryReplace) {
-				bind(ChargingLogic.Factory.class)
-						.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-								new BatteryReplacementCharge(BATTERYREPLACETIME)));
-				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
-			} else {
-				bind(ChargingLogic.Factory.class)
-						.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-								new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
-				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
-			}
-				
-//				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
-//				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(240.0)));
-//				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
+					bind(ChargingLogic.Factory.class).toInstance(
+							charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+									new BatteryReplacementCharge(BATTERYREPLACETIME)));
+				} else {
+					bind(ChargingLogic.Factory.class).toInstance(
+							charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+									new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
+				}
+
+				//				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
+				//				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(240.0)));
 			}
 		});
 
