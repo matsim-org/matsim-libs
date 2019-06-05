@@ -32,43 +32,42 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-//mobsim event handler?????
 public class TemperatureServiceImpl implements TemperatureService, TemperatureChangeEventHandler {
 	private final Network network;
 	private final Map<Link, Double> temperatures = new HashMap<>();
 
-    @Inject
-    TemperatureServiceImpl(EventsManager events, Network network) {
-        this.network = network;
-        events.addHandler(this);
-    }
+	@Inject
+	TemperatureServiceImpl(EventsManager events, Network network) {
+		this.network = network;
+		events.addHandler(this);
+	}
 
-    @Override
-    public double getCurrentTemperature(Id<Link> linkId) {
-        Link l = network.getLinks().get(linkId);
-        double closestdistance = Double.POSITIVE_INFINITY;
-        double closestTemperature = Double.NaN;
-        for (Map.Entry<Link, Double> e : temperatures.entrySet()) {
-            double dist = DistanceUtils.calculateSquaredDistance(e.getKey().getCoord(), l.getCoord());
-            if (dist < closestdistance) {
-                closestdistance = dist;
-                closestTemperature = e.getValue();
-            }
-        }
-        if (Double.isNaN(closestTemperature)) {
-            throw new RuntimeException("No temperature information provided so far");
-        }
-        return closestTemperature;
-    }
+	@Override
+	public double getCurrentTemperature(Id<Link> linkId) {
+		Link l = network.getLinks().get(linkId);
+		double closestdistance = Double.POSITIVE_INFINITY;
+		double closestTemperature = Double.NaN;
+		for (Map.Entry<Link, Double> e : temperatures.entrySet()) {
+			double dist = DistanceUtils.calculateSquaredDistance(e.getKey().getCoord(), l.getCoord());
+			if (dist < closestdistance) {
+				closestdistance = dist;
+				closestTemperature = e.getValue();
+			}
+		}
+		if (Double.isNaN(closestTemperature)) {
+			throw new RuntimeException("No temperature information provided so far");
+		}
+		return closestTemperature;
+	}
 
-    @Override
-    public void handleEvent(TemperatureChangeEvent event) {
-        Link l = network.getLinks().get(event.getLinkId());
-        temperatures.put(l, event.getNewTemperatureC());
-    }
+	@Override
+	public void handleEvent(TemperatureChangeEvent event) {
+		Link l = network.getLinks().get(event.getLinkId());
+		temperatures.put(l, event.getNewTemperatureC());
+	}
 
-    @Override
-    public void reset(int iteration) {
-        temperatures.clear();
-    }
+	@Override
+	public void reset(int iteration) {
+		temperatures.clear();
+	}
 }
