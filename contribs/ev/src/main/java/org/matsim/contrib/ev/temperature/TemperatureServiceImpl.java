@@ -21,59 +21,53 @@ package org.matsim.contrib.ev.temperature;/*
  * created by jbischoff, 15.08.2018
  */
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
-
 public class TemperatureServiceImpl implements TemperatureService, TemperatureChangeEventHandler {
+	private final Network network;
+	private final Map<Link, Double> temperatures = new HashMap<>();
 
-    private Network network;
-    private Map<Link, Double> temperatures = new HashMap<>();
-    double lastRecordedTemperature = Double.NaN;
-    @Inject
-    TemperatureServiceImpl(EventsManager events, Network network) {
-        this.network = network;
-        events.addHandler(this);
-    }
+	@Inject
+	TemperatureServiceImpl(EventsManager events, Network network) {
+		this.network = network;
+		events.addHandler(this);
+	}
 
-    @Override
-    public double getCurrentTemperature(Id<Link> linkId) {
-        Link l = network.getLinks().get(linkId);
-        double closestdistance = Double.POSITIVE_INFINITY;
-        double closestTemperature = Double.NaN;
-        for (Map.Entry<Link, Double> e : temperatures.entrySet()) {
-            double dist = DistanceUtils.calculateSquaredDistance(e.getKey().getCoord(), l.getCoord());
-            if (dist < closestdistance) {
-                closestdistance = dist;
-                closestTemperature = e.getValue();
-            }
-        }
-        if (Double.isNaN(closestTemperature)) {
-            throw new RuntimeException("No temperature information provided so far");
-        }
-        return closestTemperature;
-    }
+	@Override
+	public double getCurrentTemperature(Id<Link> linkId) {
+		Link l = network.getLinks().get(linkId);
+		double closestdistance = Double.POSITIVE_INFINITY;
+		double closestTemperature = Double.NaN;
+		for (Map.Entry<Link, Double> e : temperatures.entrySet()) {
+			double dist = DistanceUtils.calculateSquaredDistance(e.getKey().getCoord(), l.getCoord());
+			if (dist < closestdistance) {
+				closestdistance = dist;
+				closestTemperature = e.getValue();
+			}
+		}
+		if (Double.isNaN(closestTemperature)) {
+			throw new RuntimeException("No temperature information provided so far");
+		}
+		return closestTemperature;
+	}
 
-    @Override
-    public double getCurrentTemperature() {
-        return lastRecordedTemperature;
-    }
+	@Override
+	public void handleEvent(TemperatureChangeEvent event) {
+		Link l = network.getLinks().get(event.getLinkId());
+		temperatures.put(l, event.getNewTemperatureC());
+	}
 
-    @Override
-    public void handleEvent(TemperatureChangeEvent event) {
-        Link l = network.getLinks().get(event.getLinkId());
-        temperatures.put(l, event.getNewTemperatureC());
-        lastRecordedTemperature = event.getNewTemperatureC();
-    }
-
-    @Override
-    public void reset(int iteration) {
-        temperatures.clear();
-    }
+	@Override
+	public void reset(int iteration) {
+		temperatures.clear();
+	}
 }

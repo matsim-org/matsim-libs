@@ -20,6 +20,7 @@
 package org.matsim.contrib.dvrp.run;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
 import org.matsim.contrib.dvrp.passenger.PassengerModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
@@ -63,6 +64,8 @@ public final class DvrpModule extends AbstractModule {
 			@Override
 			protected void configureQSim() {
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
+				bind(DvrpVehicleLookup.class).toProvider(DvrpVehicleLookup.DvrpVehicleLookupProvider.class)
+						.asEagerSingleton();
 			}
 		});
 

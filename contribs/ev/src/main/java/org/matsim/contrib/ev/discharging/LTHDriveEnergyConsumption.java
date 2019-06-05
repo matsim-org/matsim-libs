@@ -24,18 +24,15 @@ package org.matsim.contrib.ev.discharging;/*
 import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolatingFunction;
 import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolator;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.vehicles.VehicleType;
 
 import com.google.common.primitives.Doubles;
 
 public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 
-    private final ElectricVehicle electricVehicle;
 	private PiecewiseBicubicSplineInterpolator splineInterpolater = new PiecewiseBicubicSplineInterpolator();
 	private PiecewiseBicubicSplineInterpolatingFunction function;
 
@@ -46,47 +43,41 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 
 	private static boolean hasWarnedMaxSpeed = false;
 	private static boolean hasWarnedMinSpeed = false;
-    private static boolean hasWarnedMinSlope = false;
-    private static boolean hasWarnedMaxSlope = false;
+	private static boolean hasWarnedMinSlope = false;
+	private static boolean hasWarnedMaxSlope = false;
 
-	private final Id<VehicleType> vehicleTypeId;
 	private final boolean crashIfOutOfBoundValue;
 
-    public static class Factory implements DriveEnergyConsumption.Factory {
+	public static class Factory implements DriveEnergyConsumption.Factory {
 
-        private final boolean crashIfOutOfBoundValue;
-        private final Id<VehicleType> vehicleTypeId;
-        private final double[] speeds;
-        private final double[] slopes;
-        private final double[][] consumptionPerSpeedAndSlope;
+		private final boolean crashIfOutOfBoundValue;
+		private final double[] speeds;
+		private final double[] slopes;
+		private final double[][] consumptionPerSpeedAndSlope;
 
-        public Factory(double[] speeds, double[] slopes, double[][] consumptionPerSpeedAndSlope,
-                       Id<VehicleType> vehicleTypeId, boolean crashIfOutOfBoundValue) {
-            this.speeds = speeds;
-            this.slopes = slopes;
-            this.consumptionPerSpeedAndSlope = consumptionPerSpeedAndSlope;
-            this.vehicleTypeId = vehicleTypeId;
-            this.crashIfOutOfBoundValue = crashIfOutOfBoundValue;
+		public Factory(double[] speeds, double[] slopes, double[][] consumptionPerSpeedAndSlope,
+				boolean crashIfOutOfBoundValue) {
+			this.speeds = speeds;
+			this.slopes = slopes;
+			this.consumptionPerSpeedAndSlope = consumptionPerSpeedAndSlope;
+			this.crashIfOutOfBoundValue = crashIfOutOfBoundValue;
 
-        }
+		}
 
-        @Override
-        public DriveEnergyConsumption create(ElectricVehicle electricVehicle) {
-            return new LTHDriveEnergyConsumption(speeds, slopes, consumptionPerSpeedAndSlope, vehicleTypeId, crashIfOutOfBoundValue, electricVehicle);
-        }
-    }
+		@Override
+		public DriveEnergyConsumption create(ElectricVehicle electricVehicle) {
+			return new LTHDriveEnergyConsumption(speeds, slopes, consumptionPerSpeedAndSlope, crashIfOutOfBoundValue);
+		}
+	}
 
-
-    private LTHDriveEnergyConsumption(double[] speeds, double[] slopes, double[][] consumptionPerSpeedAndSlope,
-                                      Id<VehicleType> vehicleTypeId, boolean crashIfOutOfBoundValue, ElectricVehicle electricVehicle) {
+	private LTHDriveEnergyConsumption(double[] speeds, double[] slopes, double[][] consumptionPerSpeedAndSlope,
+			boolean crashIfOutOfBoundValue) {
 		this.function = splineInterpolater.interpolate(speeds, slopes, consumptionPerSpeedAndSlope);
 		this.minSpeed = Doubles.min(speeds);
 		this.maxSpeed = Doubles.max(speeds);
 		this.minSlope = Doubles.min(slopes);
 		this.maxSlope = Doubles.max(slopes);
-		this.vehicleTypeId = vehicleTypeId;
 		this.crashIfOutOfBoundValue = crashIfOutOfBoundValue;
-        this.electricVehicle = electricVehicle;
 	}
 
 	@Override
@@ -143,11 +134,11 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 			if (crashIfOutOfBoundValue) {
 				throw new IllegalArgumentException("Slope less than the supported minSlope; slope =" + currentSlope);
 			} else {
-                if (!hasWarnedMinSlope) {
-                    Logger.getLogger(getClass())
-                            .warn("Assuming minSlope, as Slope not covered by consumption data" + currentSlope);
-                    hasWarnedMinSlope = true;
-                }
+				if (!hasWarnedMinSlope) {
+					Logger.getLogger(getClass())
+							.warn("Assuming minSlope, as Slope not covered by consumption data" + currentSlope);
+					hasWarnedMinSlope = true;
+				}
 				currentSlope = minSlope;
 
 			}
@@ -155,14 +146,14 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 			if (crashIfOutOfBoundValue) {
 				throw new IllegalArgumentException("Slope greater than the supported maxSlope; slope =" + currentSlope);
 			} else {
-                if (!hasWarnedMaxSlope) {
-                    Logger.getLogger(getClass())
-                            .warn("Assuming maxSlope, as Slope not covered by consumption data" + currentSlope);
-                    hasWarnedMaxSlope = true;
-                }
+				if (!hasWarnedMaxSlope) {
+					Logger.getLogger(getClass())
+							.warn("Assuming maxSlope, as Slope not covered by consumption data" + currentSlope);
+					hasWarnedMaxSlope = true;
+				}
 				currentSlope = maxSlope;
 
-            }
+			}
 		}
 		return currentSlope;
 	}

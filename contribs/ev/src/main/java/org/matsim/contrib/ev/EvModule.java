@@ -25,21 +25,17 @@ import org.matsim.contrib.ev.fleet.ElectricFleetModule;
 import org.matsim.contrib.ev.stats.EvStatsModule;
 import org.matsim.core.controler.AbstractModule;
 
-/**
- * For EDVRP, use EvDvrpIntegrationModule instead
- */
 public class EvModule extends AbstractModule {
 	public static final String EV_COMPONENT = "EV_COMPONENT";
 
 	@Override
 	public void install() {
-		EvConfigGroup evCfg = EvConfigGroup.get(getConfig());
 		bind(MobsimScopeEventHandling.class).asEagerSingleton();
 		addControlerListenerBinding().to(MobsimScopeEventHandling.class);
 
-		install(new ElectricFleetModule(evCfg));
-		install(new ChargingModule(evCfg));
-		install(new DischargingModule(evCfg));
-		install(new EvStatsModule(evCfg));
+		install(new ElectricFleetModule());
+		install(new ChargingModule());
+		install(new DischargingModule());
+		install(new EvStatsModule());
 	}
 }

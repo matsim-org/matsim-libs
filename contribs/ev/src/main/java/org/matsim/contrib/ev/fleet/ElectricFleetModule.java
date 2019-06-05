@@ -39,11 +39,8 @@ import com.google.inject.Provider;
  * @author Michal Maciejewski (michalm)
  */
 public class ElectricFleetModule extends AbstractModule {
-	private final EvConfigGroup evCfg;
-
-	public ElectricFleetModule(EvConfigGroup evCfg) {
-		this.evCfg = evCfg;
-	}
+	@Inject
+	private EvConfigGroup evCfg;
 
 	@Override
 	public void install() {

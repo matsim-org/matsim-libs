@@ -20,12 +20,13 @@
 package org.matsim.contrib.edrt.run;
 
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedChargingStrategy;
-import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
+import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -54,25 +55,19 @@ public class RunEDrtScenario {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				install(createEvDvrpIntegrationModule(drtCfg.getMode()));
 				bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
 						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
+
+				bind(ChargingLogic.Factory.class).toInstance(
+						charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+								new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
+										MAX_RELATIVE_SOC)));
+
+				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
 		});
 
 		return controler;
-	}
-
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(String mode) {
-		return new EvDvrpIntegrationModule(mode).setChargingStrategyFactory(
-				charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC))
-				.setTemperatureProvider(() -> TEMPERATURE)
-				.setTurnedOnPredicate(RunEDrtScenario::isTurnedOn);
-	}
-
-	private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
-		//FIXME should use actual vehicle to check if schedule is STARTED
-		return vehicle.getServiceBeginTime() <= time && time <= vehicle.getServiceEndTime();
 	}
 
 	public static void main(String[] args) {

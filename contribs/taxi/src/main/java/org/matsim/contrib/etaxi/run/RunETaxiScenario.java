@@ -24,14 +24,22 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.VariableSpeedCharging;
+import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
+import org.matsim.contrib.ev.dvrp.OperatingVehicleProvider;
+import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -57,24 +65,35 @@ public class RunETaxiScenario {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new ETaxiModule());
 		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new EvModule());
+		controler.addOverridingModule(new EvDvrpIntegrationModule());
+
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				this.bind(AuxDischargingHandler.VehicleProvider.class).to(OperatingVehicleProvider.class);
+			}
+		});
+
 		controler.configureQSimComponents(EvDvrpIntegrationModule.activateModes(taxiCfg.getMode()));
 
-		controler.addOverridingModule(createEvDvrpIntegrationModule(taxiCfg.getMode()));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(ChargingLogic.Factory.class).toInstance(
+						charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
+								VariableSpeedCharging.createStrategyForNissanLeaf(
+										charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC)));
+
+				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
+			}
+		});
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
 
 		return controler;
-	}
-
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(String mode) {
-		return new EvDvrpIntegrationModule(mode).setChargingStrategyFactory(
-				charger -> VariableSpeedCharging.createStrategyForNissanLeaf(charger.getPower() * CHARGING_SPEED_FACTOR,
-						MAX_RELATIVE_SOC)).setTemperatureProvider(() -> TEMPERATURE)
-				//FIXME should use actual vehicle to check if schedule is STARTED
-				.setTurnedOnPredicate((vehicle, time) -> (time >= vehicle.getServiceBeginTime()
-						&& time <= vehicle.getServiceEndTime()));
 	}
 
 	public static void main(String[] args) {
