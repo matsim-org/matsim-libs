@@ -75,7 +75,7 @@ public class ChargerImpl implements Charger {
 	}
 
 	//TODO in order to add a separate coord: adapt DTD, ChargerSpecification and ChargerReader/Writer
-	// Aditionally, the reader and writer should convert coordinates if CRS different than that of the network
+	// Additionally, the reader and writer should convert coordinates if CRS different than that of the network
 	@Override
 	public Coord getCoord() {
 		return link.getCoord();
