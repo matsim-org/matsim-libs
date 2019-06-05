@@ -5,6 +5,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.math.ArgumentOutsideDomainException;
 import org.apache.commons.math.analysis.interpolation.LinearInterpolator;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.temperature.TemperatureService;
@@ -51,7 +53,7 @@ public class VwAVAuxEnergyConsumptionWithTemperatures implements AuxEnergyConsum
 	}
 
 	@Override
-	public double calcEnergyConsumption(double beginTime, double duration) {
+	public double calcEnergyConsumption(double beginTime, double duration, Id<Link> linkId) {
 		if (tracker.isAtCharger(ev.getId()))
 			return 0;
 		double temp = temperatureService.getCurrentTemperature();
