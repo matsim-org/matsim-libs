@@ -23,7 +23,9 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
 import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedChargingStrategy;
 import org.matsim.contrib.ev.temperature.TemperatureService;
@@ -59,8 +61,10 @@ public class RunEDrtScenario {
 						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
 
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
-								MAX_RELATIVE_SOC)));
+						charger -> new ChargeUpToMaxSocStrategy(MAX_RELATIVE_SOC)));
+
+				bind(ChargingPower.Factory.class).toInstance(
+						ev -> new FixedSpeedChargingStrategy(ev, CHARGING_SPEED_FACTOR));
 
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}

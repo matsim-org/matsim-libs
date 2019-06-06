@@ -40,12 +40,12 @@ public class ChargingModule extends AbstractModule {
 
 			@Override
 			public ChargingLogic.Factory get() {
-				return charger -> new ChargingWithQueueingLogic(charger,
-						new FixedSpeedChargingStrategy(charger.getPower()), eventsManager);
+				return charger -> new ChargingWithQueueingLogic(charger, new ChargeUpToMaxSocStrategy(1.),
+						eventsManager);
 			}
 		});
 
-		bind(ChargingPower.Factory.class).toInstance(ev -> null);
+		bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedChargingStrategy(ev, 1));
 
 		installQSimModule(new AbstractQSimModule() {
 			@Override
