@@ -24,14 +24,14 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 /**
  * @author michalm
  */
-public class FixedSpeedChargingStrategy implements ChargingPower {
+public class FixedSpeedCharging implements ChargingPower {
 	private final double maxPower;
 
 	/**
 	 * @param electricVehicle
 	 * @param relativeSpeed   in C, where 1 C = full recharge in 1 hour
 	 */
-	public FixedSpeedChargingStrategy(ElectricVehicle electricVehicle, double relativeSpeed) {
+	public FixedSpeedCharging(ElectricVehicle electricVehicle, double relativeSpeed) {
 		double c = electricVehicle.getBattery().getCapacity() / 3600.;
 		maxPower = relativeSpeed * c;
 	}

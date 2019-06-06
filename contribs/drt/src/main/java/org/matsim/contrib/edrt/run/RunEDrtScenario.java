@@ -27,7 +27,7 @@ import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.charging.FixedSpeedChargingStrategy;
+import org.matsim.contrib.ev.charging.FixedSpeedCharging;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -63,8 +63,7 @@ public class RunEDrtScenario {
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
 						charger -> new ChargeUpToMaxSocStrategy(MAX_RELATIVE_SOC)));
 
-				bind(ChargingPower.Factory.class).toInstance(
-						ev -> new FixedSpeedChargingStrategy(ev, CHARGING_SPEED_FACTOR));
+				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, CHARGING_SPEED_FACTOR));
 
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
