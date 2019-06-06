@@ -20,39 +20,16 @@
 
 package org.matsim.contrib.ev.charging;
 
-import org.matsim.contrib.ev.EvModule;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class ChargingModule extends AbstractModule {
-	@Override
-	public void install() {
-		bind(ChargingLogic.Factory.class).toProvider(new Provider<ChargingLogic.Factory>() {
-			@Inject
-			private EventsManager eventsManager;
-
-			@Override
-			public ChargingLogic.Factory get() {
-				return charger -> new ChargingWithQueueingLogic(charger,
-						new FixedSpeedChargingStrategy(charger.getPower()), eventsManager);
-			}
-		});
-
-		bind(ChargingPower.Factory.class).toInstance(ev -> null);
-
-		installQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				this.bind(ChargingHandler.class).asEagerSingleton();
-				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(ChargingHandler.class);
-			}
-		});
+public interface ChargingPower {
+	interface Factory {
+		ChargingPower create(ElectricVehicle electricVehicle);
 	}
+
+	double calcChargingPower(Charger charger);
 }

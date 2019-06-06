@@ -21,6 +21,7 @@
 package org.matsim.contrib.ev.fleet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 
@@ -28,10 +29,12 @@ import com.google.common.collect.ImmutableList;
 
 public class ElectricVehicleImpl implements ElectricVehicle {
 	public static ElectricVehicle create(ElectricVehicleSpecification vehicleSpecification,
-			DriveEnergyConsumption.Factory driveFactory, AuxEnergyConsumption.Factory auxFactory) {
+			DriveEnergyConsumption.Factory driveFactory, AuxEnergyConsumption.Factory auxFactory,
+			ChargingPower.Factory chargingFactory) {
 		ElectricVehicleImpl ev = new ElectricVehicleImpl(vehicleSpecification);
 		ev.driveEnergyConsumption = driveFactory.create(ev);
 		ev.auxEnergyConsumption = auxFactory.create(ev);
+		ev.chargingPower = chargingFactory.create(ev);
 		return ev;
 	}
 
@@ -40,6 +43,7 @@ public class ElectricVehicleImpl implements ElectricVehicle {
 
 	private DriveEnergyConsumption driveEnergyConsumption;
 	private AuxEnergyConsumption auxEnergyConsumption;
+	private ChargingPower chargingPower;
 
 	private ElectricVehicleImpl(ElectricVehicleSpecification vehicleSpecification) {
 		this.vehicleSpecification = vehicleSpecification;
@@ -74,5 +78,10 @@ public class ElectricVehicleImpl implements ElectricVehicle {
 	@Override
 	public AuxEnergyConsumption getAuxEnergyConsumption() {
 		return auxEnergyConsumption;
+	}
+
+	@Override
+	public ChargingPower getChargingPower() {
+		return chargingPower;
 	}
 }
