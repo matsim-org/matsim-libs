@@ -201,16 +201,11 @@ public final class EVNetworkRoutingModule implements RoutingModule {
 		List<Link> links = NetworkUtils.getLinks(network, route.getLinkIds());
 		ElectricVehicle pseudoVehicle = ElectricVehicleImpl.create(ev, driveConsumptionFactory, auxConsumptionFactory);
 		DriveEnergyConsumption driveEnergyConsumption = driveConsumptionFactory.create(pseudoVehicle);
-		AuxEnergyConsumption auxEnergyConsumption = auxConsumptionFactory == null ?
-				null :
-				auxConsumptionFactory.create(pseudoVehicle);
+		AuxEnergyConsumption auxEnergyConsumption = auxConsumptionFactory.create(pseudoVehicle);
 		for (Link l : links) {
 			double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime(), null, null);
-			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, Time.getUndefinedTime());
-			if (auxEnergyConsumption != null) {
-				consumption += auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime(), travelT,
-						l.getId());
-			}
+			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, Time.getUndefinedTime())
+					+ auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime(), travelT, l.getId());
 			consumptions.put(l, consumption);
 		}
 		return consumptions;
