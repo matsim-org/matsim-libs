@@ -20,15 +20,12 @@
 
 package org.matsim.contrib.ev.charging;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureProvider;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Inject;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
+import com.google.inject.Provider;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -37,26 +34,19 @@ public class ChargingModule extends AbstractModule {
 	@Inject
 	private EvConfigGroup evCfg;
 
-	private final Key<Network> networkKey;
-
-	public ChargingModule() {
-		this(Key.get(Network.class));
-	}
-
-	public ChargingModule(Key<Network> networkKey) {
-		this.networkKey = networkKey;
-	}
-
 	@Override
 	public void install() {
-		bind(Network.class).annotatedWith(Names.named(ChargingInfrastructureProvider.CHARGERS))
-				.to(networkKey)
-				.asEagerSingleton();
-		bind(ChargingInfrastructure.class).toProvider(
-				new ChargingInfrastructureProvider(evCfg.getChargersFileUrl(getConfig().getContext())))
-				.asEagerSingleton();
-		bind(ChargingLogic.Factory.class).toInstance(
-				charger -> new ChargingWithQueueingLogic(charger, new FixedSpeedChargingStrategy(charger.getPower())));
+		bind(ChargingLogic.Factory.class).toProvider(new Provider<ChargingLogic.Factory>() {
+			@Inject
+			private EventsManager eventsManager;
+
+			@Override
+			public ChargingLogic.Factory get() {
+				return charger -> new ChargingWithQueueingLogic(charger,
+						new FixedSpeedChargingStrategy(charger.getPower()), eventsManager);
+			}
+		});
+
 
 		bind(ChargingHandler.class).asEagerSingleton();
 		addMobsimListenerBinding().to(ChargingHandler.class);
