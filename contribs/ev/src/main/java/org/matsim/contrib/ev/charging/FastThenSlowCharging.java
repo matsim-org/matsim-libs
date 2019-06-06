@@ -17,7 +17,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.ev.charging;/*
+package org.matsim.contrib.ev.charging;
+/*
  * created by jbischoff, 16.11.2018
  *
  * This charging strategy mimics the typical behavior at fast-chargers:
@@ -29,40 +30,26 @@ package org.matsim.contrib.ev.charging;/*
 
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 
-public class FastThenSlowCharging implements ChargingStrategy {
+public class FastThenSlowCharging implements ChargingPower {
+	private final ElectricVehicle electricVehicle;
 
-	private final double chargingPower;
-
-	public FastThenSlowCharging(double chargingPower) {
-		if (chargingPower <= 0) {
-			throw new IllegalArgumentException("chargingPower must be positive");
-		}
-		this.chargingPower = chargingPower;
+	public FastThenSlowCharging(ElectricVehicle electricVehicle) {
+		this.electricVehicle = electricVehicle;
 	}
 
 	@Override
-	public double calcChargingPower(ElectricVehicle ev) {
-		Battery b = ev.getBattery();
+	public double calcChargingPower(Charger charger) {
+		Battery b = electricVehicle.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 		double c = b.getCapacity() / 3600;
 		if (relativeSoc <= 0.5) {
-			return Math.min(chargingPower, 1.75 * c);
+			return Math.min(charger.getPower(), 1.75 * c);
 		} else if (relativeSoc <= 0.75) {
-			return Math.min(chargingPower, 1.25 * c);
+			return Math.min(charger.getPower(), 1.25 * c);
 		} else {
-			return Math.min(chargingPower, 0.5 * c);
+			return Math.min(charger.getPower(), 0.5 * c);
 		}
-	}
-
-	@Override
-	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
-		Battery b = ev.getBattery();
-		return b.getCapacity() - b.getSoc();
-	}
-
-	@Override
-	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
-		return calcRemainingEnergyToCharge(ev) / chargingPower;//TODO should consider variable charging speed
 	}
 }

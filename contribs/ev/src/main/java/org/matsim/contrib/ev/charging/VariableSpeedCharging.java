@@ -22,40 +22,39 @@ package org.matsim.contrib.ev.charging;
 
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class VariableSpeedCharging implements ChargingStrategy {
+public class VariableSpeedCharging implements ChargingPower {
 	public static class Point {
 		private final double relativeSoc;
 		private final double relativePower;
 
-		public Point(double relativeSoc, double relativePower) {
+		public Point(double relativeSoc, double relativeSpeed) {
 			this.relativeSoc = relativeSoc;
-			this.relativePower = relativePower;
+			this.relativePower = relativeSpeed;
 		}
 	}
 
-	public static VariableSpeedCharging createStrategyForTesla(double chargingPower, double maxRelativeSoc) {
+	public static VariableSpeedCharging createStrategyForTesla(ElectricVehicle electricVehicle) {
 		Point pointA = new Point(0, 0.75);// 0% => 0.75 C
 		Point pointB = new Point(0.15, 1.5);// 15% => 1.5 C
 		Point pointC = new Point(0.5, 1.5);// 50% => 1.5 C
 		Point pointD = new Point(1.0, 0.05);// 100% => 0.05 C
-		return new VariableSpeedCharging(chargingPower, maxRelativeSoc, pointA, pointB, pointC, pointD);
+		return new VariableSpeedCharging(electricVehicle, pointA, pointB, pointC, pointD);
 	}
 
-	public static VariableSpeedCharging createStrategyForNissanLeaf(double chargingPower, double maxRelativeSoc) {
+	public static VariableSpeedCharging createStrategyForNissanLeaf(ElectricVehicle electricVehicle) {
 		Point pointA = new Point(0, 0.75);// 0% => 0.75 C
 		Point pointB = new Point(0.1, 1.75);// 10% => 1.75 C
 		Point pointC = new Point(0.6, 1.75);// 60% => 1.75 C
 		Point pointD = new Point(1.0, 0.05);// 100% => 0.05 C
-		return new VariableSpeedCharging(chargingPower, maxRelativeSoc, pointA, pointB, pointC, pointD);
+		return new VariableSpeedCharging(electricVehicle, pointA, pointB, pointC, pointD);
 	}
 
-	private final double chargingPower;
-	private final double maxRelativeSoc;
-
+	private final ElectricVehicle electricVehicle;
 	private final Point pointA;
 	private final Point pointB;
 	private final Point pointC;
@@ -64,32 +63,23 @@ public class VariableSpeedCharging implements ChargingStrategy {
 	//XXX To avoid infinite charging simulation at 0 or close to 1.0 ensure:
 	// 1. pointD.relativePower > 0.0
 	// 2. pointA.relativePower > 0.0
-	public VariableSpeedCharging(double chargingPower, double maxRelativeSoc, Point pointA, Point pointB, Point pointC,
+	public VariableSpeedCharging(ElectricVehicle electricVehicle, Point pointA, Point pointB, Point pointC,
 			Point pointD) {
-		if (chargingPower <= 0) {
-			throw new IllegalArgumentException("chargingPower must be positive");
-		}
-		if (maxRelativeSoc <= 0 || maxRelativeSoc > 1) {
-			throw new IllegalArgumentException("maxRelativeSoc must be in (0,1]");
-		}
-
+		this.electricVehicle = electricVehicle;
 		this.pointA = pointA;
 		this.pointB = pointB;
 		this.pointC = pointC;
 		this.pointD = pointD;
-
-		this.chargingPower = chargingPower;
-		this.maxRelativeSoc = maxRelativeSoc;
 	}
 
 	@Override
-	public double calcChargingPower(ElectricVehicle ev) {
-		Battery b = ev.getBattery();
+	public double calcChargingPower(Charger charger) {
+		Battery b = electricVehicle.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 		double c = b.getCapacity() / 3600.;
 
-		Point adjustedPointB = adjustPointIfSlowerCharging(c, pointA, pointB);
-		Point adjustedPointC = adjustPointIfSlowerCharging(c, pointD, pointC);
+		Point adjustedPointB = adjustPointIfSlowerCharging(charger.getPower(), c, pointA, pointB);
+		Point adjustedPointC = adjustPointIfSlowerCharging(charger.getPower(), c, pointD, pointC);
 
 		if (relativeSoc <= adjustedPointB.relativeSoc) {
 			return c * approxRelativePower(relativeSoc, pointA, adjustedPointB);
@@ -105,20 +95,13 @@ public class VariableSpeedCharging implements ChargingStrategy {
 		return point0.relativePower + a * (point1.relativePower - point0.relativePower);
 	}
 
-	@Override
-	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
-		Battery b = ev.getBattery();
-		return maxRelativeSoc * b.getCapacity() - b.getSoc();
-	}
-
-	@Override
-	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
-		Battery b = ev.getBattery();
+	public double calcRemainingTimeToCharge(Charger charger) {
+		Battery b = electricVehicle.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 		double c = b.getCapacity() / 3600.;
 
-		Point adjustedPointB = adjustPointIfSlowerCharging(c, pointA, pointB);
-		Point adjustedPointC = adjustPointIfSlowerCharging(c, pointD, pointC);
+		Point adjustedPointB = adjustPointIfSlowerCharging(charger.getPower(), c, pointA, pointB);
+		Point adjustedPointC = adjustPointIfSlowerCharging(charger.getPower(), c, pointD, pointC);
 
 		if (relativeSoc <= adjustedPointB.relativeSoc) {
 			return approximateRemainingChargeTime(relativeSoc, pointA, adjustedPointB)//
@@ -132,7 +115,7 @@ public class VariableSpeedCharging implements ChargingStrategy {
 		}
 	}
 
-	private Point adjustPointIfSlowerCharging(double c, Point lowerPoint, Point higherPoint) {
+	private Point adjustPointIfSlowerCharging(double chargingPower, double c, Point lowerPoint, Point higherPoint) {
 		if (chargingPower >= c * higherPoint.relativePower) {
 			return higherPoint;
 		}

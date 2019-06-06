@@ -18,47 +18,26 @@
 
 package org.matsim.contrib.ev.charging;
 
-import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 
 /**
  * @author michalm
  */
-public class FixedSpeedChargingStrategy implements ChargingStrategy {
-	private final double chargingPower;
-	private final double maxRelativeSoc;
+public class FixedSpeedChargingStrategy implements ChargingPower {
+	private final double maxPower;
 
-	//TODO add maxRelativeSoc to constructor args
-	public FixedSpeedChargingStrategy(double chargingPower) {
-		this(chargingPower, 1);
-	}
-
-	// e.g. maxRelativeSoc = 0.8 to model linear (fast) charging up to 80% of the battery capacity
-	public FixedSpeedChargingStrategy(double chargingPower, double maxRelativeSoc) {
-		if (chargingPower <= 0) {
-			throw new IllegalArgumentException("chargingPower must be positive");
-		}
-		if (maxRelativeSoc <= 0 || maxRelativeSoc > 1) {
-			throw new IllegalArgumentException("maxRelativeSoc must be in (0,1]");
-		}
-
-		this.chargingPower = chargingPower;
-		this.maxRelativeSoc = maxRelativeSoc;
+	/**
+	 * @param electricVehicle
+	 * @param relativeSpeed   in C, where 1 C = full recharge in 1 hour
+	 */
+	public FixedSpeedChargingStrategy(ElectricVehicle electricVehicle, double relativeSpeed) {
+		double c = electricVehicle.getBattery().getCapacity() / 3600.;
+		maxPower = relativeSpeed * c;
 	}
 
 	@Override
-	public double calcChargingPower(ElectricVehicle ev) {
-		return chargingPower;
-	}
-
-	@Override
-	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
-		Battery b = ev.getBattery();
-		return maxRelativeSoc * b.getCapacity() - b.getSoc();
-	}
-
-	@Override
-	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
-		return calcRemainingEnergyToCharge(ev) / chargingPower;
+	public double calcChargingPower(Charger charger) {
+		return Math.min(maxPower, charger.getPower());
 	}
 }
