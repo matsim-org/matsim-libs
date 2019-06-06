@@ -26,9 +26,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 
 public class ChargerImpl implements Charger {
-	public static Charger create(ChargerSpecification chargerSpecification, Link link,
-			ChargingLogic.Factory logicFactory) {
-		ChargerImpl charger = new ChargerImpl(chargerSpecification, link);
+	/**
+	 * @param specification charger specification
+	 * @param link          link at which the charger is located
+	 * @param logicFactory  ChargingLogic factory
+	 */
+	public static Charger create(ChargerSpecification specification, Link link, ChargingLogic.Factory logicFactory) {
+		ChargerImpl charger = new ChargerImpl(specification, link);
 		charger.logic = logicFactory.create(charger);
 		return charger;
 	}
@@ -37,11 +41,7 @@ public class ChargerImpl implements Charger {
 	private final Link link;
 	private ChargingLogic logic;
 
-	/**
-	 * @param specification charger specification
-	 * @param link          link at which the charger is located
-	 */
-	public ChargerImpl(ChargerSpecification specification, Link link) {
+	private ChargerImpl(ChargerSpecification specification, Link link) {
 		this.specification = specification;
 		this.link = link;
 	}
