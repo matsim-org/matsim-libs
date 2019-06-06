@@ -58,11 +58,6 @@ public class FastThenSlowCharging implements ChargingStrategy {
 	}
 
 	@Override
-	public boolean isChargingCompleted(ElectricVehicle ev) {
-		return calcRemainingEnergyToCharge(ev) <= 0;
-	}
-
-	@Override
 	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
 		Battery b = ev.getBattery();
 		return b.getCapacity() - b.getSoc();

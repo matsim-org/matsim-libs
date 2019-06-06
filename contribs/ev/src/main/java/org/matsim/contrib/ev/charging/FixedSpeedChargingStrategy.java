@@ -28,6 +28,7 @@ public class FixedSpeedChargingStrategy implements ChargingStrategy {
 	private final double chargingPower;
 	private final double maxRelativeSoc;
 
+	//TODO add maxRelativeSoc to constructor args
 	public FixedSpeedChargingStrategy(double chargingPower) {
 		this(chargingPower, 1);
 	}
@@ -48,11 +49,6 @@ public class FixedSpeedChargingStrategy implements ChargingStrategy {
 	@Override
 	public double calcEnergyCharge(ElectricVehicle ev, double chargePeriod) {
 		return chargingPower * chargePeriod;
-	}
-
-	@Override
-	public boolean isChargingCompleted(ElectricVehicle ev) {
-		return calcRemainingEnergyToCharge(ev) <= 0;
 	}
 
 	@Override

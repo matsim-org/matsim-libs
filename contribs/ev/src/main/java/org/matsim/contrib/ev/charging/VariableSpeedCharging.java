@@ -108,11 +108,6 @@ public class VariableSpeedCharging implements ChargingStrategy {
 	}
 
 	@Override
-	public boolean isChargingCompleted(ElectricVehicle ev) {
-		return calcRemainingEnergyToCharge(ev) <= 0;
-	}
-
-	@Override
 	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
 		Battery b = ev.getBattery();
 		return maxRelativeSoc * b.getCapacity() - b.getSoc();
