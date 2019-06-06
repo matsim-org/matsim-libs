@@ -21,8 +21,6 @@
 package org.matsim.contrib.ev.infrastructure;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.core.api.experimental.events.EventsManager;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -31,13 +29,4 @@ import com.google.common.collect.ImmutableMap;
  */
 public interface ChargingInfrastructure {
 	ImmutableMap<Id<Charger>, Charger> getChargers();
-
-	//FIXME remove (after switching to the Qsim scope)
-	default void initChargingLogics(ChargingLogic.Factory logicFactory, EventsManager eventsManager) {
-		for (Charger c : getChargers().values()) {
-			ChargingLogic logic = logicFactory.create(c);
-			logic.initEventsHandling(eventsManager);
-			c.setLogic(logic);
-		}
-	}
 }
