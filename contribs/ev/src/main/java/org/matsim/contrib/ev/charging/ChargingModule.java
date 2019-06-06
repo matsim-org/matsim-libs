@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.ev.charging;
 
-import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
@@ -33,9 +32,6 @@ import com.google.inject.Provider;
  * @author Michal Maciejewski (michalm)
  */
 public class ChargingModule extends AbstractModule {
-	@Inject
-	private EvConfigGroup evCfg;
-
 	@Override
 	public void install() {
 		bind(ChargingLogic.Factory.class).toProvider(new Provider<ChargingLogic.Factory>() {
