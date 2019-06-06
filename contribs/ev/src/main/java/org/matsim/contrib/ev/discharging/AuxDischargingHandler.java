@@ -38,10 +38,12 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
 import com.google.inject.Inject;
 
-//TODO rename to IdleVehicleDischargingHandler????
-
 /**
- * This AUX Discharge runs also when vehicles are not in use. This is handy for vehicles with idle engines, such as taxis (where heating is on while the vehicle is idle), but should not be used with ordinary passenger cars.
+ * AUX discharging is executed for non-moving vehicles. This is useful for vehicles with idle engines,
+ * such as taxis (where heating is on during a stay at a taxi rank), but should not be used with ordinary passenger cars.
+ * <p>
+ * VehicleProvider is responsible to decide if AUX discharging applies to a given vehicle based on information from
+ * ActivityStartEvent.
  */
 public class AuxDischargingHandler
 		implements MobsimAfterSimStepListener, ActivityStartEventHandler, ActivityEndEventHandler,

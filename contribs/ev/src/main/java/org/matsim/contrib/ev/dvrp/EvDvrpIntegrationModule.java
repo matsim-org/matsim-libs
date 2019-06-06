@@ -23,7 +23,7 @@ import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
 import org.matsim.contrib.ev.EvModule;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureProvider;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 
@@ -48,7 +48,7 @@ public class EvDvrpIntegrationModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind(Network.class).annotatedWith(Names.named(ChargingInfrastructureProvider.CHARGERS))
+		bind(Network.class).annotatedWith(Names.named(ChargingInfrastructureModule.CHARGERS))
 				.to(Key.get(Network.class, Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)))
 				.asEagerSingleton();
 	}

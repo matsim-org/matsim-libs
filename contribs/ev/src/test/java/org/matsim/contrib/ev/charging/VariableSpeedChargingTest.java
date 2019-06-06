@@ -85,7 +85,7 @@ public class VariableSpeedChargingTest {
 				.batteryCapacity(EvUnits.kWh_to_J(capacity_kWh))
 				.initialSoc(EvUnits.kWh_to_J(soc_kWh))
 				.build();
-		ElectricVehicle electricVehicle = ElectricVehicleImpl.create(specification, null, null);
+		ElectricVehicle electricVehicle = ElectricVehicleImpl.create(specification, ev -> null, ev -> null);
 		VariableSpeedCharging charging = VariableSpeedCharging.createStrategyForTesla(EvUnits.kW_to_W(power_kW), 1);
 		Assertions.assertThat(charging.calcEnergyCharge(electricVehicle, 3600))
 				.isCloseTo(EvUnits.kWh_to_J(energyAfterOneHour_kWh), Percentage.withPercentage(1e-13));

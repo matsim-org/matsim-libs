@@ -30,8 +30,8 @@ public class ElectricVehicleImpl implements ElectricVehicle {
 	public static ElectricVehicle create(ElectricVehicleSpecification vehicleSpecification,
 			DriveEnergyConsumption.Factory driveFactory, AuxEnergyConsumption.Factory auxFactory) {
 		ElectricVehicleImpl ev = new ElectricVehicleImpl(vehicleSpecification);
-		ev.driveEnergyConsumption = driveFactory == null ? null : driveFactory.create(ev);
-		ev.auxEnergyConsumption = auxFactory == null ? null : auxFactory.create(ev);
+		ev.driveEnergyConsumption = driveFactory.create(ev);
+		ev.auxEnergyConsumption = auxFactory.create(ev);
 		return ev;
 	}
 

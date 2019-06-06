@@ -98,10 +98,9 @@ public class RunETaxiBenchmark {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ChargingLogic.Factory.class).toInstance(
-						charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-								VariableSpeedCharging.createStrategyForNissanLeaf(
-										charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC)));
+				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
+						charger -> VariableSpeedCharging.createStrategyForNissanLeaf(
+								charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC)));
 
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}

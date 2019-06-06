@@ -58,10 +58,9 @@ public class RunEDrtScenario {
 				bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
 						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
 
-				bind(ChargingLogic.Factory.class).toInstance(
-						charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-								new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
-										MAX_RELATIVE_SOC)));
+				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
+						charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR,
+								MAX_RELATIVE_SOC)));
 
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}

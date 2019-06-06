@@ -18,49 +18,66 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.fleet;
+package org.matsim.contrib.ev.infrastructure;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 import com.google.inject.Inject;
+import com.google.inject.Key;
 import com.google.inject.Provider;
+import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class ElectricFleetModule extends AbstractModule {
+public class ChargingInfrastructureModule extends AbstractModule {
+	public static final String CHARGERS = "chargers";
+	private final Key<Network> networkKey;
+
 	@Inject
 	private EvConfigGroup evCfg;
 
+	public ChargingInfrastructureModule() {
+		this(Key.get(Network.class));
+	}
+
+	public ChargingInfrastructureModule(Key<Network> networkKey) {
+		this.networkKey = networkKey;
+	}
+
 	@Override
 	public void install() {
-		bind(ElectricFleetSpecification.class).toProvider(() -> {
-			ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationImpl();
-			new ElectricFleetReader(fleetSpecification).parse(
-					ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.getVehiclesFile()));
-			return fleetSpecification;
+		bind(Network.class).annotatedWith(Names.named(CHARGERS)).to(networkKey).asEagerSingleton();
+
+		bind(ChargingInfrastructureSpecification.class).toProvider(() -> {
+			ChargingInfrastructureSpecification chargingInfrastructureSpecification = new ChargingInfrastructureSpecificationImpl();
+			new ChargerReader(chargingInfrastructureSpecification).parse(
+					ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.getChargersFile()));
+			return chargingInfrastructureSpecification;
 		}).asEagerSingleton();
 
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bind(ElectricFleet.class).toProvider(new Provider<ElectricFleet>() {
+				bind(ChargingInfrastructure.class).toProvider(new Provider<ChargingInfrastructure>() {
 					@Inject
-					private ElectricFleetSpecification fleetSpecification;
+					@Named(CHARGERS)
+					private Network network;
 					@Inject
-					private DriveEnergyConsumption.Factory driveConsumptionFactory;
+					private ChargingInfrastructureSpecification chargingInfrastructureSpecification;
 					@Inject
-					private AuxEnergyConsumption.Factory auxConsumptionFactory;
+					private ChargingLogic.Factory chargingLogicFactory;
 
 					@Override
-					public ElectricFleet get() {
-						return ElectricFleets.createDefaultFleet(fleetSpecification, driveConsumptionFactory,
-								auxConsumptionFactory);
+					public ChargingInfrastructure get() {
+						return ChargingInfrastructures.createChargingInfrastructure(chargingInfrastructureSpecification,
+								network.getLinks()::get, chargingLogicFactory);
 					}
 				}).asEagerSingleton();
 			}

@@ -19,14 +19,12 @@
 
 package org.matsim.contrib.ev;
 
-import java.net.URL;
 import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class EvConfigGroup extends ReflectiveConfigGroup {
@@ -133,13 +131,5 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(TIME_PROFILES)
 	public void setTimeProfiles(boolean timeProfiles) {
 		this.timeProfiles = timeProfiles;
-	}
-
-	public URL getChargersFileUrl(URL context) {
-		return ConfigGroup.getInputFileURL(context, this.chargersFile);
-	}
-
-	public URL getVehiclesFileUrl(URL context) {
-		return ConfigGroup.getInputFileURL(context, this.vehiclesFile);
 	}
 }
