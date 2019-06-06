@@ -108,9 +108,8 @@ public class RunVWEDrtScenario {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ChargingLogic.Factory.class).toInstance(
-						charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-								new FastThenSlowCharging(charger.getPower() * CHARGING_SPEED_FACTOR)));
+				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
+						charger -> new FastThenSlowCharging(charger.getPower() * CHARGING_SPEED_FACTOR)));
 
 				bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
 						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));

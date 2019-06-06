@@ -377,13 +377,13 @@ public class Sim02_DrtCommuter {
 						VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
 
 				if (BatteryReplace) {
-					bind(ChargingLogic.Factory.class).toInstance(
-							charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-									new BatteryReplacementCharge(BATTERYREPLACETIME)));
+					bind(ChargingLogic.Factory.class).toProvider(
+							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
+									charger -> new BatteryReplacementCharge(BATTERYREPLACETIME)));
 				} else {
-					bind(ChargingLogic.Factory.class).toInstance(
-							charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-									new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
+					bind(ChargingLogic.Factory.class).toProvider(
+							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
+									charger -> new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
 				}
 
 				//				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
