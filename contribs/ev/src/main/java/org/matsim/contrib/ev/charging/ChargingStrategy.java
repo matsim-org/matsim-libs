@@ -24,7 +24,11 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
  * @author michalm
  */
 public interface ChargingStrategy {
-	double calcEnergyCharge(ElectricVehicle ev, double chargePeriod);
+	double calcChargingPower(ElectricVehicle ev);
+
+	default double calcEnergyCharge(ElectricVehicle ev, double chargePeriod) {
+		return calcChargingPower(ev) * chargePeriod;
+	}
 
 	default boolean isChargingCompleted(ElectricVehicle ev) {
 		return calcRemainingEnergyToCharge(ev) <= 0;

@@ -82,24 +82,22 @@ public class VariableSpeedCharging implements ChargingStrategy {
 		this.maxRelativeSoc = maxRelativeSoc;
 	}
 
-	//TODO calcCurrentPower
-	public double calcEnergyCharge(ElectricVehicle ev, double chargePeriod) {
+	@Override
+	public double calcChargingPower(ElectricVehicle ev) {
 		Battery b = ev.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 		double c = b.getCapacity() / 3600.;
-		double currentPower;
 
 		Point adjustedPointB = adjustPointIfSlowerCharging(c, pointA, pointB);
 		Point adjustedPointC = adjustPointIfSlowerCharging(c, pointD, pointC);
 
 		if (relativeSoc <= adjustedPointB.relativeSoc) {
-			currentPower = c * approxRelativePower(relativeSoc, pointA, adjustedPointB);
+			return c * approxRelativePower(relativeSoc, pointA, adjustedPointB);
 		} else if (relativeSoc <= adjustedPointC.relativeSoc) {
-			currentPower = c * approxRelativePower(relativeSoc, adjustedPointB, adjustedPointC);
+			return c * approxRelativePower(relativeSoc, adjustedPointB, adjustedPointC);
 		} else {
-			currentPower = c * approxRelativePower(relativeSoc, adjustedPointC, pointD);
+			return c * approxRelativePower(relativeSoc, adjustedPointC, pointD);
 		}
-		return currentPower * chargePeriod;
 	}
 
 	private double approxRelativePower(double relativeSoc, Point point0, Point point1) {
