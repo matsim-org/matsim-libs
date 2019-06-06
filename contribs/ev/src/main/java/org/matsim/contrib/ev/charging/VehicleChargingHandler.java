@@ -37,10 +37,11 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.ev.MobsimScopeEventHandler;
 import org.matsim.contrib.ev.MobsimScopeEventHandling;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
 import org.matsim.vehicles.Vehicle;
 
 public class VehicleChargingHandler
@@ -71,7 +72,8 @@ public class VehicleChargingHandler
 				Id<ElectricVehicle> evId = Id.create(vehicleId, ElectricVehicle.class);
 				if (electricFleet.getElectricVehicles().containsKey(evId)) {
 					ElectricVehicle ev = electricFleet.getElectricVehicles().get(evId);
-					Map<Id<Charger>, Charger> chargers = chargingInfrastructure.getChargersAtLink(event.getLinkId());
+					Map<Id<Charger>, Charger> chargers = ChargingInfrastructures.getChargersAtLink(
+							chargingInfrastructure, event.getLinkId());
 					Charger c = chargers.values()
 							.stream()
 							.filter(ch -> ev.getChargerTypes().contains(ch.getChargerType()))

@@ -27,7 +27,7 @@ public class EnergyConsumptions {
 		ev.getBattery().discharge(rate * link.getLength());
 	}
 
-	public static void consumeFixedAuxEnergy(ElectricVehicle ev, double auxPower, double period) {
-		ev.getBattery().discharge(auxPower * period);
+	public static void consumeFixedAuxEnergy(ElectricVehicle ev, double auxPower, double duration) {
+		ev.getBattery().discharge(auxPower * duration);
 	}
 }

@@ -37,7 +37,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.etaxi.ETaxiActionCreator;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;

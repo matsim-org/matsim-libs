@@ -52,7 +52,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		// (Also in reality, such information is not pushed into the person, but stored somewhere on the provider side.)
 		// kai, gregor, jan'19
 
-		//XXX this will not work if pre-booking is allowed in DRT
+		//FIXME this will not work if pre-booking is allowed in DRT
 		Leg leg = (Leg)((PlanAgent)passenger).getCurrentPlanElement();
 		DrtRoute drtRoute = (DrtRoute)leg.getRoute();
 		double latestDepartureTime = departureTime + drtRoute.getMaxWaitTime();

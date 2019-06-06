@@ -19,7 +19,9 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
@@ -36,8 +38,7 @@ import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.inject.Inject;
 
 /**
  * Because in QSim and JDEQSim vehicles enter and leave traffic at the end of links, we skip the first link when
@@ -65,7 +66,6 @@ public class DriveDischargingHandler
 
 	private final Network network;
 	private final Map<Id<ElectricVehicle>, ? extends ElectricVehicle> eVehicles;
-	private final boolean handleAuxDischarging;
 	private final Map<Id<Vehicle>, EVDrive> evDrives;
 	private Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
 
@@ -74,8 +74,6 @@ public class DriveDischargingHandler
 			MobsimScopeEventHandling events) {
 		this.network = network;
 		eVehicles = data.getElectricVehicles();
-		handleAuxDischarging = evCfg.getAuxDischargingSimulation()
-				== EvConfigGroup.AuxDischargingSimulation.insideDriveDischargingHandler;
 		evDrives = new HashMap<>(eVehicles.size() / 10);
 		events.addMobsimScopeHandler(this);
 	}
@@ -111,16 +109,14 @@ public class DriveDischargingHandler
 			Link link = network.getLinks().get(linkId);
 			double tt = eventTime - evDrive.movedOverNodeTime;
 			ElectricVehicle ev = evDrive.ev;
-			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime);
-			if (handleAuxDischarging) {
-				energy += ev.getAuxEnergyConsumption().calcEnergyConsumption(tt, eventTime);
+			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt)
+					+ ev.getAuxEnergyConsumption().calcEnergyConsumption(eventTime - tt, tt, linkId);
+			//Energy consumption might be negative on links with negative slope
+			if (energy < 0) {
+				ev.getBattery().charge(Math.abs(energy));
+			} else {
+				ev.getBattery().discharge(energy);
 			}
-            //Energy consumption might be negative on links with negative slope
-            if (energy < 0) {
-                ev.getBattery().charge(Math.abs(energy));
-            } else {
-                ev.getBattery().discharge(energy);
-            }
 			double linkConsumption = energy + energyConsumptionPerLink.getOrDefault(linkId, 0.0);
 			energyConsumptionPerLink.put(linkId, linkConsumption);
 		}

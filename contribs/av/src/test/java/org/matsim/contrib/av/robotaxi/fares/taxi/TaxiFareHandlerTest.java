@@ -22,12 +22,16 @@
  */
 package org.matsim.contrib.av.robotaxi.fares.taxi;
 
-import org.apache.commons.lang.mutable.MutableDouble;
+import org.apache.commons.lang3.mutable.MutableDouble;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -90,7 +94,7 @@ public class TaxiFareHandlerTest {
 		events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("23"), taxiCfg.getMode()));
 		
 		//fare: 1 (daily fee) +2*1(basefare)+ 2*1 (distance) + (36/60)*2 = -(1+2+2+0,12) = -6.2 
-		Assert.assertEquals(-6.2, fare.getValue());
+		Assert.assertEquals(-6.2, fare.getValue(), 0);
 		
         // test minFarePerTrip
 		events.processEvent(new PersonDepartureEvent(360.0, p1 , Id.createLinkId("23"), taxiCfg.getMode()));
@@ -102,7 +106,7 @@ public class TaxiFareHandlerTest {
          * fare new trip: 0 (daily fee already paid) + 0.1 (distance)+ 1 basefare + 0.1 (time) = 1.2 < minFarePerTrip = 1.5
          * --> new total fare: 6.2 (previous trip) + 1.5 (minFarePerTrip for new trip) = 7.7
          */
-		Assert.assertEquals(-7.7, fare.getValue());
+		Assert.assertEquals(-7.7, fare.getValue(), 0);
 	}
 
 	private Network createNetwork(){

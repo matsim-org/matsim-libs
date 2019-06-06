@@ -19,10 +19,12 @@
 
 package org.matsim.contrib.ev.discharging;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.temperature.TemperatureService;
 
-import java.util.function.BiPredicate;
-import java.util.function.DoubleSupplier;
+import com.google.inject.Inject;
 
 public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	private static final double a = 1.3;// [W]
@@ -30,36 +32,40 @@ public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	private static final double c = 1748.1;// [W]
 
 	// precomputed values
-	private static final int minTemp = -20;
-	private static final int maxTemp = 40;
+	private static final int MIN_TEMP = -20;
+	private static final int MAX_TEMP = 40;
 
 	// temp - air temp [oC]
 	// power - avg power [W]
 	private static double calcPower(double temp) {
-		if (temp < minTemp || temp > maxTemp) {
+		if (temp < MIN_TEMP || temp > MAX_TEMP) {
 			throw new IllegalArgumentException();
 		}
 		return (a * temp + b) * temp + c;
 	}
 
-	public static OhdeSlaskiAuxEnergyConsumption createConsumptionForFixedTemperatureAndAlwaysOn(
-			ElectricVehicle ev, int temperature) {
-		return new OhdeSlaskiAuxEnergyConsumption(ev, () -> temperature, (v, t) -> true);
-	}
+	private final TemperatureService temperatureService;
 
-	private final ElectricVehicle ev;
-	private final DoubleSupplier temperatureProvider;
-	private final BiPredicate<ElectricVehicle, Double> isTurnedOn;
-
-	public OhdeSlaskiAuxEnergyConsumption(ElectricVehicle ev, DoubleSupplier temperatureProvider,
-										  BiPredicate<ElectricVehicle, Double> isTurnedOn) {
-		this.ev = ev;
-		this.temperatureProvider = temperatureProvider;
-		this.isTurnedOn = isTurnedOn;
+	public OhdeSlaskiAuxEnergyConsumption(TemperatureService temperatureService) {
+		this.temperatureService = temperatureService;
 	}
 
 	@Override
-	public double calcEnergyConsumption(double period, double timeOfDay) {
-		return isTurnedOn.test(ev, timeOfDay) ? calcPower(temperatureProvider.getAsDouble()) * period : 0;
+	public double calcEnergyConsumption(double beginTime, double duration, Id<Link> linkId) {
+		return calcPower(temperatureService.getCurrentTemperature(linkId)) * duration;
+	}
+
+	public static class Factory implements AuxEnergyConsumption.Factory {
+		private final TemperatureService temperatureService;
+
+		@Inject
+		public Factory(TemperatureService temperatureService) {
+			this.temperatureService = temperatureService;
+		}
+
+		@Override
+		public AuxEnergyConsumption create(ElectricVehicle electricVehicle) {
+			return new OhdeSlaskiAuxEnergyConsumption(temperatureService);
+		}
 	}
 }

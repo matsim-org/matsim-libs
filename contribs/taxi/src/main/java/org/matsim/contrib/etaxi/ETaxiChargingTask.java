@@ -19,9 +19,9 @@
 
 package org.matsim.contrib.etaxi;
 
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.dvrp.ChargingTaskImpl;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 
 public class ETaxiChargingTask extends ChargingTaskImpl implements TaxiTask {

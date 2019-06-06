@@ -37,13 +37,12 @@ public class PassengerRequestEventToPassengerEngineForwarder
 
 	@Override
 	public void handleEvent(PassengerRequestRejectedEvent event) {
-		passengerEngines.get(event.getMode()).notifyPassengerRequestEvent(event );
+		passengerEngines.get(event.getMode()).notifyPassengerRequestRejected(event);
 	}
 
 	@Override
 	public void handleEvent(PassengerRequestScheduledEvent event) {
-		passengerEngines.get(event.getMode()).notifyPassengerRequestEvent(event );
-		// yyyyyy typo? (rejected --> scheduled?)
+		passengerEngines.get(event.getMode()).notifyPassengerRequestScheduled(event);
 	}
 
 	void registerPassengerEngineEventsHandler(PassengerEngine passengerEngine) {

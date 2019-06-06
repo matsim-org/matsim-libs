@@ -20,12 +20,10 @@
 package org.matsim.contrib.etaxi.optimizer.assignment;
 
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
-import org.matsim.contrib.taxi.optimizer.VehicleData;
-import org.matsim.contrib.taxi.optimizer.VehicleData.Entry;
-import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData;
-import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
-import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.AssignmentCost;
 import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentChargerPlugData.ChargerPlug;
+import org.matsim.contrib.taxi.optimizer.VehicleData;
+import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData;
+import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.AssignmentCost;
 
 public class ETaxiToPlugAssignmentCostProvider {
 	public enum Mode {
@@ -57,27 +55,25 @@ public class ETaxiToPlugAssignmentCostProvider {
 	}
 
 	public AssignmentCost<ChargerPlug> getCost(AssignmentDestinationData<ChargerPlug> pData, VehicleData vData) {
-		final Mode currentMode = Mode.CHARGING_START_TIME;
-		return new AssignmentCost<ChargerPlug>() {
-			public double calc(Entry departure, DestEntry<ChargerPlug> plugEntry, PathData pathData) {
-				double arrivalTime = calcArrivalTime(departure, pathData);
-				switch (currentMode) {
-					case ARRIVAL_TIME:
-						return arrivalTime;
+		final Mode currentMode = Mode.CHARGING_START_TIME;//FIXME move to config group
+		return (departure, plugEntry, pathData) -> {
+			double arrivalTime = calcArrivalTime(departure, pathData);
+			switch (currentMode) {
+				case ARRIVAL_TIME:
+					return arrivalTime;
 
-					case CHARGING_START_TIME:
-						return Math.max(plugEntry.time, arrivalTime);
+				case CHARGING_START_TIME:
+					return Math.max(plugEntry.time, arrivalTime);
 
-					default:
-						throw new IllegalStateException();
-				}
+				default:
+					throw new IllegalStateException();
 			}
 		};
 	}
 
 	private double calcArrivalTime(VehicleData.Entry departure, PathData pathData) {
 		double travelTime = pathData == null ? //
-				params.nullPathCost : // no path (too far away)
+				params.getAssignmentTaxiOptimizerParams().getNullPathCost() : // no path (too far away)
 				pathData.getTravelTime();
 		return departure.time + travelTime;
 	}

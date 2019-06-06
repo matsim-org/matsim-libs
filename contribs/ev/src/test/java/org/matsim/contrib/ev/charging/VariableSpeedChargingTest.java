@@ -23,11 +23,14 @@ package org.matsim.contrib.ev.charging;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Percentage;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.fleet.ImmutableElectricVehicleSpecification;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -76,10 +79,13 @@ public class VariableSpeedChargingTest {
 	private void assertCalcEnergyCharge(double capacity_kWh, double soc_kWh, double power_kW,
 			double energyAfterOneHour_kWh) {
 		ElectricVehicleSpecification specification = ImmutableElectricVehicleSpecification.newBuilder()
+				.id(Id.create("id", ElectricVehicle.class))
+				.vehicleType("vt")
+				.chargerTypes(ImmutableList.of("ct"))
 				.batteryCapacity(EvUnits.kWh_to_J(capacity_kWh))
 				.initialSoc(EvUnits.kWh_to_J(soc_kWh))
 				.build();
-		ElectricVehicle electricVehicle = ElectricVehicleImpl.create(specification, null, null);
+		ElectricVehicle electricVehicle = ElectricVehicleImpl.create(specification, ev -> null, ev -> null);
 		VariableSpeedCharging charging = VariableSpeedCharging.createStrategyForTesla(EvUnits.kW_to_W(power_kW), 1);
 		Assertions.assertThat(charging.calcEnergyCharge(electricVehicle, 3600))
 				.isCloseTo(EvUnits.kWh_to_J(energyAfterOneHour_kWh), Percentage.withPercentage(1e-13));

@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.ScheduleImpl;
-import org.matsim.contrib.util.LinkProvider;
 
 import com.google.common.base.MoreObjects;
 
@@ -32,11 +31,6 @@ import com.google.common.base.MoreObjects;
  * @author michalm
  */
 public class DvrpVehicleImpl implements DvrpVehicle {
-
-	public static DvrpVehicleImpl createWithLinkProvider(DvrpVehicleSpecification specification,
-			LinkProvider<Id<Link>> linkProvider) {
-		return new DvrpVehicleImpl(specification, linkProvider.apply(specification.getStartLinkId()));
-	}
 
 	private final DvrpVehicleSpecification specification;
 	private final Link startLink;

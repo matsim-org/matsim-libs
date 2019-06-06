@@ -20,15 +20,15 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 
 import com.google.common.collect.ImmutableList;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public interface ElectricVehicleSpecification {
-	Id<ElectricVehicle> getId();
+public interface ElectricVehicleSpecification extends Identifiable<ElectricVehicle> {
+	String DEFAULT_VEHICLE_TYPE = "defaultVehicleType";
 
 	String getVehicleType();
 
