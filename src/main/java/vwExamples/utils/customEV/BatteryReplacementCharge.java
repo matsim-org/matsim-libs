@@ -39,36 +39,26 @@ public class BatteryReplacementCharge implements ChargingStrategy {
 	// Calculate the max energy that can be charged within the
 	@Override
 	public double calcEnergyCharge(ElectricVehicle ev, double chargePeriod) {
-		Battery b = ev.getBattery();
-        double c = b.getCapacity() / 3600;
-        double currentPower;
-        
-        if (!chargingVehicleMap.keySet().contains(ev.getId()))
-        {
-        //Does not consider the effectiveChargingPower
-        currentPower =  (calcRemainingEnergyToCharge(ev)/3600) / (timeForBatteryReplacement/3600);
-        chargingVehicleMap.put(ev.getId(), currentPower);
-        //System.out.println("Registered Vehicle in chargingVehicleMap: "+ev.getId() );
-        }
-        else {
-        	
-        	currentPower = chargingVehicleMap.get(ev.getId());
-        }
-        
-        return currentPower * chargePeriod;
+		final double currentPower;
+		if (!chargingVehicleMap.keySet().contains(ev.getId())) {
+			//Does not consider the effectiveChargingPower
+			currentPower = (calcRemainingEnergyToCharge(ev) / 3600) / (timeForBatteryReplacement / 3600);
+			chargingVehicleMap.put(ev.getId(), currentPower);
+			//System.out.println("Registered Vehicle in chargingVehicleMap: "+ev.getId() );
+		} else {
+			currentPower = chargingVehicleMap.get(ev.getId());
+		}
+
+		return currentPower * chargePeriod;
 	}
 
 	@Override
 	public boolean isChargingCompleted(ElectricVehicle ev) {
-		
-		boolean finishedCharging = calcRemainingEnergyToCharge(ev) <= 0;
-		
-		if (finishedCharging)
-		{
+		boolean finishedCharging = ChargingStrategy.super.isChargingCompleted(ev);
+		if (finishedCharging) {
 			chargingVehicleMap.remove(ev.getId());
 			//System.out.println("Dropped Vehicle in chargingVehicleMap: "+ev.getId() );
 		}
-		
 		return finishedCharging;
 	}
 
