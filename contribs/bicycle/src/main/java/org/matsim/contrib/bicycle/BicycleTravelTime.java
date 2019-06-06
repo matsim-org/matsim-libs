@@ -20,60 +20,45 @@ package org.matsim.contrib.bicycle;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
+
+import com.google.inject.Inject;
 
 /**
  * @author dziemke
  */
 class BicycleTravelTime implements TravelTime {
+	@Inject Config config;
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		// TODO make this speed adjustable
-		double minimumSpeedForDedicatedCyclingInfrastructure = 15.0/3.6;
-		
-		String type = (String) link.getAttributes().getAttribute("type");
-		String cycleway = (String) link.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
-		double cyclingInfrastructureSpeed = computeMinimumCyclingInfrastructureSpeed(type,
-				cycleway, minimumSpeedForDedicatedCyclingInfrastructure);
-		double infrastructureSpeed = Math.max(link.getFreespeed(), cyclingInfrastructureSpeed);
+		if (link.getAttributes().getAttribute(BicycleLabels.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR) == null) {
+			throw new RuntimeException("Infrastructure speed factors must be set for all links that allow the bicycle mode!");
+		}
 		
 		// This is not yet available, but might be at some point, see https://matsim.atlassian.net/browse/MATSIM-700
 		// double bicycleVelocity = vehicle.getType().getMaximumVelocity()
-		// ... until then, use this workaround:
-		double vehicleLinkSpeed = Math.min(infrastructureSpeed, BicycleSpeedUtils.getSpeed("bicycle"));
-
-		double gradientSpeed = computeGradientSpeed(link, vehicleLinkSpeed);
+		double maxBicycleSpeed = ((BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME)).getMaxBicycleSpeed();
+		double bicycleInfrastructureSpeedFactor = Double.parseDouble(link.getAttributes().getAttribute(BicycleLabels.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR).toString());
+		if (bicycleInfrastructureSpeedFactor > 1.0) {
+			throw new RuntimeException("A bicycle infrastructure speed factor of > 1.0 is not allowed as it would lead to exceeding the maximum biclce speed.");
+		}
+		
+		double infrastructureSpeed = maxBicycleSpeed * bicycleInfrastructureSpeedFactor;
+		double gradientSpeed = computeGradientSpeed(link, infrastructureSpeed);
 
 		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
-		double surfaceSpeed = vehicleLinkSpeed;
+		double surfaceSpeed = infrastructureSpeed;
 		if (surface != null) {
-			surfaceSpeed = computeSurfaceSpeed(vehicleLinkSpeed, surface, type);
+			String type = (String) link.getAttributes().getAttribute("type");
+			surfaceSpeed = computeSurfaceSpeed(infrastructureSpeed, surface, type);
 		}
 		
 		double effectiveSpeed = Math.min(gradientSpeed, surfaceSpeed);
 		
 		return (link.getLength() / effectiveSpeed);
-	}
-	
-	/**
-	 * If there is a dedicated cycling infrastructure, it is unlikely that the speed (before later consideration
-	 * of slopes) falls under a certain minimum
-	 * @return
-	 */
-	private double computeMinimumCyclingInfrastructureSpeed(String type, String cycleway, double minimumSpeedForDedicatedCyclingInfrastructure) {
-		double cyclingInfrastructureSpeed = 0.;
-		if (type.equals("cycleway")) {
-			cyclingInfrastructureSpeed = minimumSpeedForDedicatedCyclingInfrastructure; // Assume that this speed is always feasible on a dedicated cycleway
-		}
-		
-		if (cycleway != null) {
-			if (cycleway.equals("track") || cycleway.equals("track")) {
-				cyclingInfrastructureSpeed = minimumSpeedForDedicatedCyclingInfrastructure; // Assume that this speed is always feasible on a dedicated cycleway
-			}
-		}
-		return cyclingInfrastructureSpeed;
 	}
 
 	/**
@@ -100,7 +85,7 @@ class BicycleTravelTime implements TravelTime {
 	
 	// TODO combine this with comfort
 	private double computeSurfaceSpeed(double vehicleLinkSpeed, String surface, String type) {
-		if (type.equals("cycleway")) {
+		if (type == null || type.equals("cycleway")) {
 			return vehicleLinkSpeed; // Assuming that dedicated cycleways are on good surface like ashalt
 		}
 		double surfaceSpeedFactor;

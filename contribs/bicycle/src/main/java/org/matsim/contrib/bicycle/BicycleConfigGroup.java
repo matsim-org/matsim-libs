@@ -36,6 +36,7 @@ public final class BicycleConfigGroup extends ConfigGroup {
 	private static final String INPUT_COMFORT = "marginalUtilityOfComfort_m";
 	private static final String INPUT_INFRASTRUCTURE = "marginalUtilityOfInfrastructure_m";
 	private static final String INPUT_GRADIENT = "marginalUtilityOfGradient_m_100m";
+	private static final String MAX_BICYCLE_SPEED = "maxBicycleSpeed";
 	
 	public static enum BicycleScoringType {legBased, linkBased};
 
@@ -44,6 +45,7 @@ public final class BicycleConfigGroup extends ConfigGroup {
 	private double marginalUtilityOfInfrastructure;
 	private double marginalUtilityOfGradient;
 	private BicycleScoringType bicycleScoringType = BicycleScoringType.legBased;
+	private double maxBicycleSpeed = 25.0/3.6;
 	
 	public BicycleConfigGroup() {
 		super(GROUP_NAME);
@@ -62,6 +64,8 @@ public final class BicycleConfigGroup extends ConfigGroup {
 			setMarginalUtilityOfInfrastructure_m(Double.parseDouble(value));
 		} else if (INPUT_GRADIENT.equals(key)) {
 			setMarginalUtilityOfGradient_m_100m(Double.parseDouble(value));
+		} else if (MAX_BICYCLE_SPEED.equals(key)) {
+			setMaxBicycleSpeed(Double.parseDouble(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -77,6 +81,8 @@ public final class BicycleConfigGroup extends ConfigGroup {
 			return Double.toString(getMarginalUtilityOfInfrastructure_m());
 		} else if (INPUT_GRADIENT.equals(key)) {
 			return Double.toString(getMarginalUtilityOfGradient_m_100m());
+		} else if (MAX_BICYCLE_SPEED.equals(key)) {
+			return Double.toString(getMaxBicycleSpeed());
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -89,6 +95,7 @@ public final class BicycleConfigGroup extends ConfigGroup {
 		map.put(INPUT_COMFORT, getValue(INPUT_COMFORT));
 		map.put(INPUT_INFRASTRUCTURE, getValue(INPUT_INFRASTRUCTURE));
 		map.put(INPUT_GRADIENT, getValue(INPUT_GRADIENT));
+		map.put(MAX_BICYCLE_SPEED, getValue(MAX_BICYCLE_SPEED));
 		return map;
 	}
 
@@ -99,6 +106,7 @@ public final class BicycleConfigGroup extends ConfigGroup {
 		map.put(INPUT_COMFORT, "marginalUtilityOfSurfacetype");
 		map.put(INPUT_INFRASTRUCTURE, "marginalUtilityOfStreettype");
 		map.put(INPUT_GRADIENT, "marginalUtilityOfGradient");
+		map.put(MAX_BICYCLE_SPEED, "maxBicycleSpeed");
 		return map;
 	}
 	void setNetworkAttFile(String file) {
@@ -139,5 +147,13 @@ public final class BicycleConfigGroup extends ConfigGroup {
 
 	public BicycleScoringType getBicycleScoringType() {
 		return this.bicycleScoringType;
+	}
+	
+	public void setMaxBicycleSpeed(final double value) {
+		this.maxBicycleSpeed = value;
+	}
+
+	public double getMaxBicycleSpeed() {
+		return this.maxBicycleSpeed;
 	}
 }

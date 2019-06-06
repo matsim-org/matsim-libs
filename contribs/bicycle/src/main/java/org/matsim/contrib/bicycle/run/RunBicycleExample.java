@@ -131,6 +131,7 @@ public class RunBicycleExample {
 		bicycleConfigGroup.addParam("marginalUtilityOfInfrastructure_m", "-0.0002");
 		bicycleConfigGroup.addParam("marginalUtilityOfComfort_m", "-0.0002");
 		bicycleConfigGroup.addParam("marginalUtilityOfGradient_m_100m", "-0.02");
+		bicycleConfigGroup.addParam("maxBicycleSpeed", "4.16666666");
 		
 		List<String> mainModeList = new ArrayList<>();
 		mainModeList.add("bicycle");
