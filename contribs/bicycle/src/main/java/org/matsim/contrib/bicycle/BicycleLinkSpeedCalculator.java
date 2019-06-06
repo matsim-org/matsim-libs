@@ -18,8 +18,8 @@ public class BicycleLinkSpeedCalculator implements LinkSpeedCalculator {
 
     private double getMaximumVelocityForBike(QVehicle qVehicle, Link link, double time) {
         try {
-            double speedFactor = (double) link.getAttributes().getAttribute(BicycleLabels.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR);
-            return Math.min(qVehicle.getMaximumVelocity() * speedFactor, link.getFreespeed(time));
+            double bicycleInfrastructureSpeedFactor = (double) link.getAttributes().getAttribute(BicycleLabels.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR);
+            return Math.min(qVehicle.getMaximumVelocity() * bicycleInfrastructureSpeedFactor, link.getFreespeed(time));
         } catch (Exception e) {
             throw new RuntimeException("Could not retrieve speed factor from link. Set the speed factor for bikes on each link of the network if you want to use BikLinkSpeedCalculator!");
         }
