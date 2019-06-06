@@ -20,22 +20,19 @@ public class CustomFastThenSlowCharging implements ChargingStrategy {
 		this.chargingPower = chargingPower;
 		this.maxRelativeSoc = maxRelativeSoc;
 	}
-	
 
 	@Override
-	public double calcEnergyCharge(ElectricVehicle ev, double chargePeriod) {
+	public double calcChargingPower(ElectricVehicle ev) {
 		Battery b = ev.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 		double c = b.getCapacity() / 3600;
-		double currentPower;
 		if (relativeSoc <= 0.5) {
-			currentPower = Math.min(chargingPower, 1.75 * c);
+			return Math.min(chargingPower, 1.75 * c);
 		} else if (relativeSoc <= 0.75) {
-			currentPower = Math.min(chargingPower, 1.25 * c);
+			return Math.min(chargingPower, 1.25 * c);
 		} else {
-			currentPower = Math.min(chargingPower, 0.5 * c);
+			return Math.min(chargingPower, 0.5 * c);
 		}
-		return currentPower * chargePeriod;
 	}
 
 	@Override
