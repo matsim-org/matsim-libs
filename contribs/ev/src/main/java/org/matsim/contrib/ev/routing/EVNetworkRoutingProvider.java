@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -54,7 +54,7 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
 	private ElectricFleetSpecification electricFleetSpecification;
 
 	@Inject
-	private ChargingInfrastructure chargingInfrastructure;
+	private ChargingInfrastructureSpecification chargingInfrastructureSpecification;
 
 	@Inject
 	private DriveEnergyConsumption.Factory driveConsumptionFactory;
@@ -129,7 +129,8 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
 		} else {
 			return new EVNetworkRoutingModule(mode, filteredNetwork,
 					DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo),
-					electricFleetSpecification, chargingInfrastructure, travelTime, driveConsumptionFactory,
+					electricFleetSpecification, chargingInfrastructureSpecification, travelTime,
+					driveConsumptionFactory,
 					auxConsumptionFactory);
 		}
 	}
