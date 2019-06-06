@@ -21,8 +21,10 @@
 package org.matsim.contrib.ev.charging;
 
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -47,8 +49,12 @@ public class ChargingModule extends AbstractModule {
 			}
 		});
 
-
-		bind(ChargingHandler.class).asEagerSingleton();
-		addMobsimListenerBinding().to(ChargingHandler.class);
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				this.bind(ChargingHandler.class).asEagerSingleton();
+				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(ChargingHandler.class);
+			}
+		});
 	}
 }
