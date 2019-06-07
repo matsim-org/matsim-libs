@@ -24,7 +24,7 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 /**
  * @author michalm
  */
-public class FixedSpeedCharging implements ChargingPower {
+public class FixedSpeedCharging implements BatteryCharging {
 	private final double maxPower;
 
 	/**
@@ -39,5 +39,10 @@ public class FixedSpeedCharging implements ChargingPower {
 	@Override
 	public double calcChargingPower(Charger charger) {
 		return Math.min(maxPower, charger.getPower());
+	}
+
+	@Override
+	public double calcChargingTime(Charger charger, double energy) {
+		return energy / calcChargingPower(charger);
 	}
 }
