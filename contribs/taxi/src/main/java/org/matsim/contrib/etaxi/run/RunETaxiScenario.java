@@ -81,7 +81,7 @@ public class RunETaxiScenario {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> VariableSpeedCharging.createStrategyForNissanLeaf(
+						charger -> VariableSpeedCharging.createForNissanLeaf(
 								charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC)));
 
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);

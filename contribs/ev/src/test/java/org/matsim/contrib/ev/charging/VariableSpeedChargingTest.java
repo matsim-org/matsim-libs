@@ -99,7 +99,7 @@ public class VariableSpeedChargingTest {
 		Charger charger = ChargerImpl.create(chargerSpecification, null, ch -> null);
 
 		ElectricVehicle electricVehicle = ElectricVehicleImpl.create(specification, ev -> null, ev -> null,
-				VariableSpeedCharging::createStrategyForTesla);
+				VariableSpeedCharging::createForTesla);
 		Assertions.assertThat(electricVehicle.getChargingPower().calcChargingPower(charger))
 				.isCloseTo(EvUnits.kW_to_W(expectedChargingPower_kW), Percentage.withPercentage(1e-13));
 	}

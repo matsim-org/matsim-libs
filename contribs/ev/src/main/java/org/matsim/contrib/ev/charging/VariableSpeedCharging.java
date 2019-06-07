@@ -38,7 +38,7 @@ public class VariableSpeedCharging implements ChargingPower {
 		}
 	}
 
-	public static VariableSpeedCharging createStrategyForTesla(ElectricVehicle electricVehicle) {
+	public static VariableSpeedCharging createForTesla(ElectricVehicle electricVehicle) {
 		Point pointA = new Point(0, 0.75);// 0% => 0.75 C
 		Point pointB = new Point(0.15, 1.5);// 15% => 1.5 C
 		Point pointC = new Point(0.5, 1.5);// 50% => 1.5 C
@@ -46,7 +46,7 @@ public class VariableSpeedCharging implements ChargingPower {
 		return new VariableSpeedCharging(electricVehicle, pointA, pointB, pointC, pointD);
 	}
 
-	public static VariableSpeedCharging createStrategyForNissanLeaf(ElectricVehicle electricVehicle) {
+	public static VariableSpeedCharging createForNissanLeaf(ElectricVehicle electricVehicle) {
 		Point pointA = new Point(0, 0.75);// 0% => 0.75 C
 		Point pointB = new Point(0.1, 1.75);// 10% => 1.75 C
 		Point pointC = new Point(0.6, 1.75);// 60% => 1.75 C
