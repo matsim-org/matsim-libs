@@ -26,7 +26,9 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.edrt.run.EDrtControlerCreator;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
 import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FastThenSlowCharging;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
@@ -49,7 +51,6 @@ import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import vwExamples.utils.customEdrtModule.OperatingVehicleOutsideDepotProvider;
 
 public class RunEDrtScenario {
-	public static final double CHARGING_SPEED_FACTOR = 1.; // full speed
 	public static final double MAX_RELATIVE_SOC = 0.8;// charge up to 80% SOC
 	public static final double MIN_RELATIVE_SOC = 0.2;// send to chargers vehicles below 20% SOC
 	public static final double TEMPERATURE = 20;// oC
@@ -119,7 +120,8 @@ public class RunEDrtScenario {
 				bind(AuxEnergyConsumption.Factory.class).to(
 						VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> new FastThenSlowCharging(charger.getPower())));
+						charger -> new ChargeUpToMaxSocStrategy(MAX_RELATIVE_SOC)));
+				bind(ChargingPower.Factory.class).toInstance(FastThenSlowCharging::new);
 				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(240.0)));
 			}
 		});
