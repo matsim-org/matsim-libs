@@ -47,6 +47,7 @@ class BicycleTravelTime implements TravelTime {
 		}
 		
 		double infrastructureSpeed = maxBicycleSpeed * bicycleInfrastructureSpeedFactor;
+		
 		double gradientSpeed = computeGradientSpeed(link, infrastructureSpeed);
 
 		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
@@ -69,17 +70,23 @@ class BicycleTravelTime implements TravelTime {
 	 * Not linear; highest speeds at 5% or 6% gradient; at gradients higher than 6% braking
 	 */
 	private double computeGradientSpeed(Link link, double vehicleLinkSpeed) {
+		
 		double gradientSpeedFactor = 1.;
-		Double fromNodeZ = link.getFromNode().getCoord().getZ();
-		Double toNodeZ = link.getToNode().getCoord().getZ();
-		if ((fromNodeZ != null) && (toNodeZ != null)) {
-			if (toNodeZ > fromNodeZ) { // No positive speed increase for downhill, only decrease for uphill
-				gradientSpeedFactor = 1 - 5. * ((toNodeZ - fromNodeZ) / link.getLength()); // 50% reducation at 10% up-slope
+		
+		if (link.getFromNode().getCoord().hasZ() && link.getToNode().getCoord().hasZ()) {
+			Double fromNodeZ = link.getFromNode().getCoord().getZ();
+			Double toNodeZ = link.getToNode().getCoord().getZ();
+			
+			if ((fromNodeZ != null) && (toNodeZ != null)) {
+				if (toNodeZ > fromNodeZ) { // No positive speed increase for downhill, only decrease for uphill
+					gradientSpeedFactor = 1 - 5. * ((toNodeZ - fromNodeZ) / link.getLength()); // 50% reducation at 10% up-slope
+				}
+			}
+			if (gradientSpeedFactor < 0.1) {
+				gradientSpeedFactor = 0.1;
 			}
 		}
-		if (gradientSpeedFactor < 0.1) {
-			gradientSpeedFactor = 0.1;
-		}
+		
 		return vehicleLinkSpeed * gradientSpeedFactor;
 	}
 	
