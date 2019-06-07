@@ -200,7 +200,9 @@ public final class EVNetworkRoutingModule implements RoutingModule {
 		NetworkRoute route = (NetworkRoute)basicLeg.getRoute();
 		List<Link> links = NetworkUtils.getLinks(network, route.getLinkIds());
 		ElectricVehicle pseudoVehicle = ElectricVehicleImpl.create(ev, driveConsumptionFactory, auxConsumptionFactory,
-				v -> null);
+				v -> charger -> {
+					throw new UnsupportedOperationException();
+				});
 		DriveEnergyConsumption driveEnergyConsumption = pseudoVehicle.getDriveEnergyConsumption();
 		AuxEnergyConsumption auxEnergyConsumption = pseudoVehicle.getAuxEnergyConsumption();
 		for (Link l : links) {

@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.ev.fleet;
 
+import java.util.Objects;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
@@ -32,9 +34,9 @@ public class ElectricVehicleImpl implements ElectricVehicle {
 			DriveEnergyConsumption.Factory driveFactory, AuxEnergyConsumption.Factory auxFactory,
 			ChargingPower.Factory chargingFactory) {
 		ElectricVehicleImpl ev = new ElectricVehicleImpl(vehicleSpecification);
-		ev.driveEnergyConsumption = driveFactory.create(ev);
-		ev.auxEnergyConsumption = auxFactory.create(ev);
-		ev.chargingPower = chargingFactory.create(ev);
+		ev.driveEnergyConsumption = Objects.requireNonNull(driveFactory.create(ev));
+		ev.auxEnergyConsumption = Objects.requireNonNull(auxFactory.create(ev));
+		ev.chargingPower = Objects.requireNonNull(chargingFactory.create(ev));
 		return ev;
 	}
 
