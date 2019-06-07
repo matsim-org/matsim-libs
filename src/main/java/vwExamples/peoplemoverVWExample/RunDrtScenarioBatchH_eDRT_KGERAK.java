@@ -363,11 +363,14 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 				if (BatteryReplace) {
 					bind(ChargingLogic.Factory.class).toProvider(
 							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-									charger -> new BatteryReplacementCharging(BATTERYREPLACETIME)));
+									charger -> new BatteryReplacementCharging.Strategy(charger,
+											new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC))));
+					bind(ChargingPower.Factory.class).toInstance(
+							ev -> new BatteryReplacementCharging(ev, BATTERYREPLACETIME));
 				} else {
 					bind(ChargingLogic.Factory.class).toProvider(
 							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-									charger -> new ChargeUpToMaxSocStrategy(MAX_RELATIVE_SOC)));
+									charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
 					bind(ChargingPower.Factory.class).toInstance(CustomFastThenSlowCharging::new);
 				}
 

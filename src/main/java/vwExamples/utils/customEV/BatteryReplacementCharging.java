@@ -19,13 +19,13 @@
 
 package vwExamples.utils.customEV;
 
-import org.matsim.contrib.ev.charging.ChargingPower;
+import org.matsim.contrib.ev.charging.BatteryCharging;
 import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
-public class BatteryReplacementCharging implements ChargingPower {
+public class BatteryReplacementCharging implements BatteryCharging {
 	private final ElectricVehicle electricVehicle;
 	private final double timeForBatteryReplacement;
 	private Double chargingPowerEquivalent = null;
@@ -48,10 +48,17 @@ public class BatteryReplacementCharging implements ChargingPower {
 		return b.getCapacity() - b.getSoc();
 	}
 
+	@Override
+	public double calcChargingTime(Charger charger, double energy) {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
 	public static class Strategy implements ChargingStrategy {
+		private final Charger charger;
 		private final ChargingStrategy delegate;
 
-		public Strategy(ChargingStrategy delegate) {
+		public Strategy(Charger charger, ChargingStrategy delegate) {
+			this.charger = charger;
 			this.delegate = delegate;
 		}
 
@@ -67,6 +74,12 @@ public class BatteryReplacementCharging implements ChargingPower {
 		@Override
 		public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
 			return delegate.calcRemainingEnergyToCharge(ev);
+		}
+
+		@Override
+		public double calcRemainingTimeToCharge(ElectricVehicle ev) {
+			return ((BatteryReplacementCharging)ev.getChargingPower()).calcChargingTime(charger,
+					delegate.calcRemainingEnergyToCharge(ev));
 		}
 	}
 }

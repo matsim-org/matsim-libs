@@ -120,7 +120,7 @@ public class RunEDrtScenario {
 				bind(AuxEnergyConsumption.Factory.class).to(
 						VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> new ChargeUpToMaxSocStrategy(MAX_RELATIVE_SOC)));
+						charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
 				bind(ChargingPower.Factory.class).toInstance(FastThenSlowCharging::new);
 				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharging(240.0)));
 			}

@@ -110,7 +110,7 @@ public class RunVWEDrtScenario {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> new ChargeUpToMaxSocStrategy(MAX_RELATIVE_SOC)));
+						charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
 				bind(ChargingPower.Factory.class).toInstance(FastThenSlowCharging::new);
 				bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
 						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));

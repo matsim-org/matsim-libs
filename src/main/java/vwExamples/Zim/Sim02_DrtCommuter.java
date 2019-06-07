@@ -38,7 +38,9 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
 import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
@@ -379,11 +381,15 @@ public class Sim02_DrtCommuter {
 				if (BatteryReplace) {
 					bind(ChargingLogic.Factory.class).toProvider(
 							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-									charger -> new BatteryReplacementCharging(BATTERYREPLACETIME)));
+									charger -> new BatteryReplacementCharging.Strategy(charger,
+											new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC))));
+					bind(ChargingPower.Factory.class).toInstance(
+							ev -> new BatteryReplacementCharging(ev, BATTERYREPLACETIME));
 				} else {
 					bind(ChargingLogic.Factory.class).toProvider(
 							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-									charger -> new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
+									charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
+					bind(ChargingPower.Factory.class).toInstance(CustomFastThenSlowCharging::new);
 				}
 
 				//				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
