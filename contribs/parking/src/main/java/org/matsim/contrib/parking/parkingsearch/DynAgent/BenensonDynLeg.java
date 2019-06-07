@@ -1,11 +1,8 @@
 package org.matsim.contrib.parking.parkingsearch.DynAgent;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.parking.parkingsearch.DynAgent.ParkingDynLeg;
 import org.matsim.contrib.parking.parkingsearch.events.StartParkingSearchEvent;
 import org.matsim.contrib.parking.parkingsearch.manager.FacilityBasedParkingManager;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
@@ -17,17 +14,32 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.List;
+
+
+/**
+ * @author schlenther
+ * <p>
+ * Benenson et al defined 3 phases of parking search
+ * OBSERVING: 				observation of parking situation while driving towards destination
+ * SEARCH_WHILE_APPROACH: 	estimating the amount of free parking lots on the way to destination
+ * and if applicable parking before arriving
+ * SEARCH_FOR_NEXT:			taking the next free parking space if it isn't too far away from destination
+ */
+enum ParkingMode {
+    DRIVING, OBSERVING, SEARCH_WHILE_APPROACH, SEARCH_FOR_NEXT
+}
 
 public class BenensonDynLeg extends ParkingDynLeg{
-	
+
 	private static final Logger logger = Logger.getLogger(BenensonDynLeg.class);
 	private static final boolean logForDebug = false;
-	
+
 	private double totalObservedParkingSpaces = 0.0;
 	private double observedFreeParkingSpaces = 0.0;
-	private double firstDestLinkEnterTime = 0;
-	private ParkingMode legStage = ParkingMode.DRIVING;
-	
+    private double firstDestinationLinkEnterTime = 0;
+    private ParkingMode legStage = ParkingMode.DRIVING;
+
 	public BenensonDynLeg(String mode, NetworkRoute route, ParkingSearchLogic logic,
 			ParkingSearchManager parkingManager, Id<Vehicle> vehicleId, MobsimTimer timer, EventsManager events) {
 		super(mode, route, logic, parkingManager, vehicleId, timer, events);
@@ -41,26 +53,26 @@ public class BenensonDynLeg extends ParkingDynLeg{
 		currentLinkIdx++;
 		currentLinkId = newLinkId;
 		if (this.legStage == ParkingMode.DRIVING) {
-			
-			if(((BenensonParkingSearchLogic)this.logic).goIntoObserving(currentLinkId, this.route.getEndLinkId())){
-				this.legStage = ParkingMode.OBSERVING;
+
+            if (((BenensonParkingSearchLogic) this.logic).transitionToObservingBehaviour(currentLinkId, this.route.getEndLinkId())) {
+                this.legStage = ParkingMode.OBSERVING;
 				this.events.processEvent(new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
 				if(logForDebug)logger.error("vehicle " + this.vehicleId + " goes into observing on link " + this.currentLinkId);
 			}
 		}
 		if(this.legStage == ParkingMode.OBSERVING ){
 			memorizeParkingSituationAndIsSomethingFree();
-			
-			if(((BenensonParkingSearchLogic)this.logic).goIntoParking(currentLinkId, this.route.getEndLinkId())){
-				this.legStage = ParkingMode.SEARCH_WHILE_APPROACH;
+
+            if (((BenensonParkingSearchLogic) this.logic).transitionToParkingBehaviour(currentLinkId, this.route.getEndLinkId())) {
+                this.legStage = ParkingMode.SEARCH_WHILE_APPROACH;
 				if(logForDebug)logger.error("vehicle " + this.vehicleId + " goes into parking on link " + this.currentLinkId);
 			}
 		}
 		if(this.legStage == ParkingMode.SEARCH_WHILE_APPROACH){
 			if(currentLinkId.equals(route.getEndLinkId())){
 				this.legStage = ParkingMode.SEARCH_FOR_NEXT;
-				this.firstDestLinkEnterTime = timer.getTimeOfDay();
-			}
+                this.firstDestinationLinkEnterTime = timer.getTimeOfDay();
+            }
 			else{
 				if(memorizeParkingSituationAndIsSomethingFree()){
 					double pUnoccupied = 0;
@@ -68,10 +80,10 @@ public class BenensonDynLeg extends ParkingDynLeg{
 						pUnoccupied = this.observedFreeParkingSpaces / this.totalObservedParkingSpaces;
 					}
 					if ( ((BenensonParkingSearchLogic)this.logic).wantToParkHere(pUnoccupied, currentLinkId, route.getEndLinkId())){
-						if(logForDebug)logger.error("vehicle " + this.vehicleId + " würde gerne auf Link " + currentLinkId + " parken.\n "
-								+ "\t pUnoccupied = " + pUnoccupied + "\n\t totalObservedParkingSpaces = " + totalObservedParkingSpaces + "\n\t observedFreeSpaces = " + this.observedFreeParkingSpaces );
-						hasFoundParking = parkingManager.reserveSpaceIfVehicleCanParkHere(vehicleId, currentLinkId);	
-					}
+                        if (logForDebug) logger.error("vehicle " + this.vehicleId + " would like to park on link" + currentLinkId
+                                + "\n \t pUnoccupied = " + pUnoccupied + "\n\t totalObservedParkingSpaces = " + totalObservedParkingSpaces + "\n\t observedFreeSpaces = " + this.observedFreeParkingSpaces);
+                        hasFoundParking = parkingManager.reserveSpaceIfVehicleCanParkHere(vehicleId, currentLinkId);
+                    }
 				}
 				else{
 					if(logForDebug)logger.error("nothing free for vehicle " + vehicleId + " on link " + currentLinkId);
@@ -79,18 +91,19 @@ public class BenensonDynLeg extends ParkingDynLeg{
 			}
 		}
 		if (this.legStage == ParkingMode.SEARCH_FOR_NEXT){
-			if(logForDebug)logger.error("vehicle " + this.vehicleId + " in PHASE3 auf link " + this.currentLinkId);
-			//if( ((BenensonParkingSearchLogic)this.logic).isDriverInAcceptableDistance(currentLinkId, route.getEndLinkId(), this.firstDestLinkEnterTimer, timer.getTimeOfDay()) ){
-			
+            if (logForDebug) logger.error("vehicle " + this.vehicleId + " is in PHASE3 on link " + this.currentLinkId);
+            //if( ((BenensonParkingSearchLogic)this.logic).isDriverInAcceptableDistance(currentLinkId, route.getEndLinkId(), this.firstDestLinkEnterTimer, timer.getTimeOfDay()) ){
+
 				hasFoundParking = parkingManager.reserveSpaceIfVehicleCanParkHere(vehicleId, currentLinkId);
-				
-				if(logForDebug)logger.error("vehicle " + this.vehicleId + " probiert in Phase 3 auf Link " + this.currentLinkId + ", " +
-						(int)(timer.getTimeOfDay() - this.firstDestLinkEnterTime)/60 + ":" + (int)(timer.getTimeOfDay() - this.firstDestLinkEnterTime)%60
-						+ " min nach Erreichen des Ziels zu parken. Resultat: " + hasFoundParking);
-			//}
-		}
-	}	
-	/**
+
+            if (logForDebug) logger.error("vehicle " + this.vehicleId + " tries in PHASE3 to park on link " + this.currentLinkId + ", " +
+                    (int) (timer.getTimeOfDay() - this.firstDestinationLinkEnterTime) / 60 + ":" + (int) (timer.getTimeOfDay() - this.firstDestinationLinkEnterTime) % 60
+                    + " min after passing destination. Result: " + hasFoundParking);
+            //}
+        }
+    }
+
+    /**
 	 * returns true if there is at least one empty slot on the current link
 	 */
 	private boolean memorizeParkingSituationAndIsSomethingFree() {
@@ -126,32 +139,15 @@ public class BenensonDynLeg extends ParkingDynLeg{
 
 				Id<Link> nextLinkId;
 				if(this.legStage == ParkingMode.SEARCH_FOR_NEXT){
-					nextLinkId = ((BenensonParkingSearchLogic) this.logic).getNextLinkRandomInAcceptableDistance(currentLinkId, this.route.getEndLinkId(), vehicleId, firstDestLinkEnterTime, this.timer.getTimeOfDay());
-				}
+                    nextLinkId = ((BenensonParkingSearchLogic) this.logic).getNextLinkRandomInAcceptableDistance(currentLinkId, this.route.getEndLinkId(), vehicleId, firstDestinationLinkEnterTime, this.timer.getTimeOfDay());
+                }
 				else{
-					nextLinkId = ((BenensonParkingSearchLogic) (this.logic)).getNextLinkBenensonRouting(currentLinkId, route.getEndLinkId(), vehicleId);
-				}
-//				if(nextLinkId.equals(route.getEndLinkId()) && this.legStage == ParkingMode.SEARCH_WHILE_APPROACH){
-//						this.legStage = ParkingMode.SEARCH_FOR_NEXT;
-//						this.firstDestLinkEnterTime = timer.getTimeOfDay();
-//				}
-				currentAndNextParkLink = new Tuple<Id<Link>, Id<Link>>(currentLinkId, nextLinkId);
-				return nextLinkId;
+                    nextLinkId = ((BenensonParkingSearchLogic) (this.logic)).getNextLinkBenensonRouting(currentLinkId, route.getEndLinkId());
+                }
+                currentAndNextParkLink = new Tuple<>(currentLinkId, nextLinkId);
+                return nextLinkId;
 			}
 		}
 	}
 
-}
-/**
- * 
- * @author schlenther
- *
- *Benenson et al defined 3 phases of parking search
- *OBSERVING: 				observation of parking situation while driving towards destination
- *SEARCH_WHILE_APPROACH: 	estimating the amount of free parking lots on the way to destination
- *							and if applicable parking before arriving
- *SEARCH_FOR_NEXT:			taking the next free parking space if it isn't too far away from destination
- */
-enum ParkingMode{
-	DRIVING, OBSERVING, SEARCH_WHILE_APPROACH, SEARCH_FOR_NEXT;
 }
