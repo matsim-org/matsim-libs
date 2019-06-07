@@ -61,7 +61,7 @@ public class RunEDrtScenario {
 						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
 
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> new ChargeUpToMaxSocStrategy(MAX_RELATIVE_SOC)));
+						charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
 
 				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, CHARGING_SPEED_FACTOR));
 

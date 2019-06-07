@@ -97,7 +97,7 @@ public class RunETaxiBenchmark {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> new ChargeUpToMaxSocStrategy(0.8)));
+						charger -> new ChargeUpToMaxSocStrategy(charger, 0.8)));
 				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, 1));
 				bind(TemperatureService.class).toInstance(linkId -> 20);
 			}
