@@ -6,12 +6,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.BenensonDynLeg;
+import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -73,7 +73,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	 * @param destinationLinkId
 	 * @return
 	 */
-    public Id<Link> getNextLinkBenensonRouting(Id<Link> currentLinkId, Id<Link> destinationLinkId) {
+	public Id<Link> getNextLinkBenensonRouting(Id<Link> currentLinkId, Id<Link> destinationLinkId, String mode) {
 		Link currentLink = network.getLinks().get(currentLinkId);
 
         //calculate the distance to fromNode of destination link instead of distance to activity
@@ -83,39 +83,40 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 		Node nextNode;
 		Id<Link> nextLinkId = null;
 
-		for (Id<Link> outlinkId : currentLink.getToNode().getOutLinks().keySet()){
-			if(outlinkId.equals(destinationLinkId)){
-				return outlinkId;
+		for (Link outLink : ParkingUtils.getOutgoingLinksForMode(currentLink, mode)) {
+			Id<Link> outLinkId = outLink.getId();
+			if (outLinkId.equals(destinationLinkId)) {
+				return outLinkId;
 			}
-			nextNode = network.getLinks().get(outlinkId).getToNode();
+			nextNode = outLink.getToNode();
 			double dd = NetworkUtils.getEuclideanDistance(destination.getCoord(),nextNode.getCoord());
 			if( dd < distanceToDest){
-				nextLinkId = outlinkId;
+				nextLinkId = outLinkId;
 				distanceToDest = dd;
 			}
 			else if(dd == distanceToDest){
 				if (Math.random() > 0.5){
-					nextLinkId = outlinkId;
+					nextLinkId = outLinkId;
 				}
 			}
 		}
 		return nextLinkId;
 	}
 
-	public Id<Link> getNextLinkRandomInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId, Id<Vehicle> vehicleId, double firstDestLinkEnterTime, double timeOfDay) {
+	public Id<Link> getNextLinkRandomInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId, Id<Vehicle> vehicleId, double firstDestLinkEnterTime, double timeOfDay, String mode) {
 
 		Id<Link> nextLink = null;
 		Link currentLink = network.getLinks().get(currentLinkId);
-		List<Id<Link>> keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
+		List<Link> keys = ParkingUtils.getOutgoingLinksForMode(currentLink, mode);
 		do{
             if (!(nextLink == null)) keys.remove(nextLink);
 			
 			if(keys.size() == 0){	//no outlink in acceptable Distance
-				keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
+				keys = ParkingUtils.getOutgoingLinksForMode(currentLink, mode);
 				logger.error("vehicle " + vehicleId + " finds no outlink in acceptable distance going out from link " + currentLinkId + ". it just takes a random next link");
-				return keys.get(random.nextInt(keys.size()));
+				return keys.get(random.nextInt(keys.size())).getId();
 			}
-			nextLink= keys.get(random.nextInt(keys.size()));	
+			nextLink = keys.get(random.nextInt(keys.size())).getId();
 		}
 		while(!isDriverInAcceptableDistance(nextLink, endLinkId, firstDestLinkEnterTime, timeOfDay));
 		return nextLink;
@@ -186,7 +187,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	}
 
 	@Override
-	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId) {
+	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId, String mode) {
 		throw new RuntimeException("this should not happen!");
 	}
 	

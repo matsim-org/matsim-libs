@@ -139,10 +139,11 @@ public class BenensonDynLeg extends ParkingDynLeg{
 
 				Id<Link> nextLinkId;
 				if(this.legStage == ParkingMode.SEARCH_FOR_NEXT){
-                    nextLinkId = ((BenensonParkingSearchLogic) this.logic).getNextLinkRandomInAcceptableDistance(currentLinkId, this.route.getEndLinkId(), vehicleId, firstDestinationLinkEnterTime, this.timer.getTimeOfDay());
+					nextLinkId = ((BenensonParkingSearchLogic) this.logic).getNextLinkRandomInAcceptableDistance(currentLinkId, this.route.getEndLinkId(),
+							vehicleId, firstDestinationLinkEnterTime, this.timer.getTimeOfDay(), mode);
                 }
 				else{
-                    nextLinkId = ((BenensonParkingSearchLogic) (this.logic)).getNextLinkBenensonRouting(currentLinkId, route.getEndLinkId());
+					nextLinkId = ((BenensonParkingSearchLogic) (this.logic)).getNextLinkBenensonRouting(currentLinkId, route.getEndLinkId(), mode);
                 }
                 currentAndNextParkLink = new Tuple<>(currentLinkId, nextLinkId);
                 return nextLinkId;

@@ -19,16 +19,12 @@
 
 package org.matsim.contrib.parking.parkingsearch;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import javax.swing.DropMode;
-
-import org.apache.commons.lang3.mutable.MutableDouble;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
 
 /**
  * @author  jbischoff, tschlenther
@@ -134,6 +130,18 @@ public class ParkingUtils {
 			}
 				return points;
 		}
+	}
+
+	public static List<Link> getOutgoingLinksForMode(Link link, String mode) {
+		List<Link> outGoingModeLinks = new ArrayList();
+		for (Link outLink : link.getToNode().getOutLinks().values()) {
+			if (outLink.getAllowedModes().contains(mode)) outGoingModeLinks.add(outLink);
+		}
+		if (outGoingModeLinks.size() == 0) {
+			throw new RuntimeException("could not find an outgoing link for mode " + mode +
+					" from link " + link + ". Consequences are not checked. Please check the network. \n Aborting...");
+		}
+		return outGoingModeLinks;
 	}
 
 }
