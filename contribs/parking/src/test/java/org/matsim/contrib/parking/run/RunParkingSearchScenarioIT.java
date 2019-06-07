@@ -35,14 +35,11 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author  jbischoff
  *
  */
-/**
- *
- */
 public class RunParkingSearchScenarioIT {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public void testRunOneTaxi() {
+	public void testRunParking() {
 		String configFile = "./src/main/resources/parkingsearch/config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new ParkingSearchConfigGroup());
 		config.controler().setLastIteration(0);

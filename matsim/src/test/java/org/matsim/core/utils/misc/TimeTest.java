@@ -147,6 +147,9 @@ public class TimeTest extends TestCase {
 		assertEquals(-12*3600.0 - 34*60.0 - 56.7, Time.parseTime("-12:34:56.7"), 0.0);
 		assertEquals(0.0, Time.parseTime("00:00:00"), 0.0);
 		assertEquals(Integer.MIN_VALUE, Time.parseTime("-596523:14:08"), 0.0);
+		/* test for parsing hours greater than 2^31-1 (i.e. hour of type long)
+		 */
+		assertEquals(Long.MAX_VALUE, Time.parseTime("2562047788015215:28:07"), 0.0);
 	}
 	
 	public void testConvertHHMMInteger() {

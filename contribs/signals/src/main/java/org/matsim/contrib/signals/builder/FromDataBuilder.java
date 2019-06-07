@@ -23,42 +23,50 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.contrib.signals.model.AmberLogicImpl;
-import org.matsim.contrib.signals.model.DatabasedSignal;
-import org.matsim.contrib.signals.model.IntergreensLogicImpl;
-import org.matsim.contrib.signals.model.SignalGroupImpl;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.controller.SignalController;
 import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.model.AmberLogic;
+import org.matsim.contrib.signals.model.AmberLogicImpl;
+import org.matsim.contrib.signals.model.ConflictingDirectionsLogic;
+import org.matsim.contrib.signals.model.ConflictingDirectionsLogicImpl;
+import org.matsim.contrib.signals.model.DatabasedSignal;
 import org.matsim.contrib.signals.model.IntergreensLogic;
+import org.matsim.contrib.signals.model.IntergreensLogicImpl;
 import org.matsim.contrib.signals.model.Signal;
-import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalGroupImpl;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.contrib.signals.model.SignalSystemsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.Gbl;
 
 import com.google.inject.Inject;
-
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import com.google.inject.Provider;
 
 /**
+ * Builds the signal system model based on the data of the
+ * <code>org.matsim.contrib.signals.data</code> package. It uses a
+ * SignalModelFactory that can be exchanged if certain model components should
+ * be created by the use of the data classes but with an extended behavior.
+ * 
  * @author dgrether
  *
  */
-public class FromDataBuilder implements SignalSystemsModelBuilder{
+class FromDataBuilder implements Provider<SignalSystemsManager>{
 
-	private SignalsData signalsData;
-	private SignalModelFactory factory;
-	private EventsManager events;
-	private Scenario scenario;
+	private final SignalsData signalsData;
+	private final SignalModelFactory factory;
+	private final EventsManager events;
+	private final Scenario scenario;
 
 	@Inject
 	private FromDataBuilder(Scenario scenario, SignalModelFactory factory, EventsManager events){
@@ -92,6 +100,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 			SignalGroup group = new SignalGroupImpl(signalGroupData.getId());
 			for (Id<Signal> signalId : signalGroupData.getSignalIds()){
 				Signal signal = system.getSignals().get(signalId);
+				Gbl.assertNotNull(signal);
 				group.addSignal(signal);
 			}
 			system.addSignalGroup(group);
@@ -114,35 +123,46 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	
 	private void createAndAddAmberLogic(SignalSystemsManager manager){
 		//process information of AmberTimesData object
-		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseAmbertimes()){
+		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).isUseAmbertimes()){
 			AmberLogic amberLogic = new AmberLogicImpl(this.signalsData.getAmberTimesData());
 			manager.setAmberLogic(amberLogic);
 		}
 	}
 	
 	private void createAndAddIntergreenTimesLogic(SignalSystemsManager manager){
-		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseIntergreenTimes()){
-			IntergreensLogic intergreensLogic = new IntergreensLogicImpl(this.signalsData.getIntergreenTimesData(), ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
+		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).isUseIntergreenTimes()){
+			IntergreensLogic intergreensLogic = new IntergreensLogicImpl(this.signalsData.getIntergreenTimesData(), ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class));
 			this.events.addHandler(intergreensLogic);
 		}
 	}
 	
+	private void createAndAddConflictingDirectionsLogic(SignalSystemsManager manager) {
+		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).getIntersectionLogic().toString().startsWith("CONFLICTING_DIRECTIONS")){
+			ConflictingDirectionsLogic conflictLogic = new ConflictingDirectionsLogicImpl(this.scenario.getNetwork(), this.scenario.getLanes(), this.signalsData, 
+					ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).getActionOnConflictingDirectionViolation());
+			this.events.addHandler(conflictLogic);
+		}
+	}
+	
 	@Override
-	public SignalSystemsManager createAndInitializeSignalSystemsManager() {
-		//1.) SignalSystemsManager
+	public SignalSystemsManager get() {
+		// 1.) SignalSystemsManager
 		SignalSystemsManager manager = new SignalSystemsManagerImpl(signalsData, events);
-		//2.) SignalSystems
+		// 2.) SignalSystems
 		this.createAndAddSignalSystemsFromData(manager);
-		//3.) Signals then SignalGroups then SignalController
-		for (SignalSystem system : manager.getSignalSystems().values()){
+		// 3.) Signals then SignalGroups then SignalController
+		for (SignalSystem system : manager.getSignalSystems().values()) {
 			this.createAndAddSignals(system);
 			this.createAndAddSignalGroupsFromData(system);
 			this.createAndAddSignalSystemControllerFromData(system);
 		}
-		//4.) AmberLogic
+		// 4.) AmberLogic
 		this.createAndAddAmberLogic(manager);
-		//5.) IntergreenTimesLogic 
+		// 5.) IntergreenTimesLogic
 		this.createAndAddIntergreenTimesLogic(manager);
+		// 6.) ConflictingDirectionsLogic
+		this.createAndAddConflictingDirectionsLogic(manager);
+
 		return manager;
 	}
 }

@@ -65,7 +65,7 @@ public abstract class AbstractTask implements Task {
 	}
 
 	@Override
-	public void setBeginTime(double beginTime) {
+	public final void setBeginTime(double beginTime) {
 		if (status == TaskStatus.STARTED || status == TaskStatus.PERFORMED) {
 			throw new IllegalStateException("It is too late to change the beginTime");
 		}
@@ -74,7 +74,7 @@ public abstract class AbstractTask implements Task {
 	}
 
 	@Override
-	public void setEndTime(double endTime) {
+	public final void setEndTime(double endTime) {
 		if (status == TaskStatus.PERFORMED) {
 			throw new IllegalStateException("It is too late to change the endTime");
 		}
@@ -83,7 +83,7 @@ public abstract class AbstractTask implements Task {
 	}
 
 	@Override
-	public TaskTracker getTaskTracker() {
+	public final TaskTracker getTaskTracker() {
 		if (status != TaskStatus.STARTED) {
 			throw new IllegalStateException("Allowed only for STARTED tasks");
 		}
@@ -92,7 +92,7 @@ public abstract class AbstractTask implements Task {
 	}
 
 	@Override
-	public void initTaskTracker(TaskTracker taskTracker1) {
+	public final void initTaskTracker(TaskTracker taskTracker) {
 		if (this.taskTracker != null) {
 			throw new IllegalStateException("Tracking already initialized");
 		}
@@ -101,7 +101,7 @@ public abstract class AbstractTask implements Task {
 			throw new IllegalStateException("Allowed only for STARTED tasks");
 		}
 
-		this.taskTracker = taskTracker1;
+		this.taskTracker = taskTracker;
 	}
 
 	protected String commonToString() {

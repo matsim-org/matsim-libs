@@ -1,9 +1,8 @@
 package org.matsim.contrib.matrixbasedptrouter.utils;
 
+import org.locationtech.jts.geom.Envelope;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 public final class BoundingBox {
 	

@@ -34,6 +34,7 @@
 			<param name="flowCapacityFactor" value="1"   />
 			<param name="storageCapacityFactor" value="10.0"   />
 			<param name="mainMode" value="car,oneway_vehicle,twoway_vehicle,freefloating_vehicle"   />
+			<param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
 		</module>
 
     <module name="Carsharing" >
@@ -112,22 +113,22 @@
 
 <module name="strategy">
 
-		<param name="ModuleProbability_1" value="0.0" />
-		<param name="Module_1" value="SelectExpBeta" />
+	<param name="ModuleProbability_1" value="0.0" />
+	<param name="Module_1" value="SelectExpBeta" />
 
-		<param name="maxAgentPlanMemorySize" value="5" />
-		<param name="ModuleProbability_2" value="0.5" />
+	<param name="maxAgentPlanMemorySize" value="5" />
 
-		<param name="Module_2" value="RandomTripToCarsharingStrategy" />
-		<param name="ModuleDisableAfterIteration_2" value="1000" />
+	<param name="ModuleProbability_2" value="0.5" />
+	<param name="Module_2" value="RandomTripToCarsharingStrategy" />
+	<param name="ModuleDisableAfterIteration_2" value="1000" />
 
-        <param name="ModuleProbability_3" value="1.0" />
-        <param name="Module_3" value="CarsharingSubtourModeChoiceStrategy" />
-		<param name="ModuleDisableAfterIteration_3" value="1000" />
-		
-		 <param name="ModuleProbability_4" value="1.0" />
-        <param name="Module_4" value="SubtourModeChoice" />
-		<param name="ModuleDisableAfterIteration_4" value="1000" />
+	<param name="ModuleProbability_3" value="1.0" />
+	<param name="Module_3" value="CarsharingSubtourModeChoiceStrategy" />
+	<param name="ModuleDisableAfterIteration_3" value="1000" />
+
+	<param name="ModuleProbability_4" value="1.0" />
+	<param name="Module_4" value="SubtourModeChoice" />
+	<param name="ModuleDisableAfterIteration_4" value="1000" />
 
 </module>
 

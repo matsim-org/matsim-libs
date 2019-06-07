@@ -20,9 +20,6 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Collection;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
@@ -32,6 +29,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultPlansRemover;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Configuration group for specifying the plans-replanning to be used.
@@ -99,9 +99,12 @@ public final class StrategyConfigGroup extends ConfigGroup {
 			sels.append( DefaultSelector.SelectPathSizeLogit ) ;
 			
 			StringBuilder strats = new StringBuilder() ;
-			for ( DefaultStrategy strat : DefaultStrategy.values() ) {
-				strats.append( strat.toString() + " ") ;
-			}
+			strats.append( DefaultStrategy.ReRoute ) ;
+			strats.append( DefaultStrategy.TimeAllocationMutator ) ;
+			strats.append( DefaultStrategy.TimeAllocationMutator_ReRoute ) ;
+			strats.append( DefaultStrategy.ChangeSingleTripMode ) ;
+			strats.append( DefaultStrategy.ChangeTripMode ) ;
+			strats.append( DefaultStrategy.SubtourModeChoice ) ;
 			
 			map.put( "strategyName",
 					"strategyName of strategy.  Possible default names: " + sels + " (selectors), " + strats + " (innovative strategies)." );
@@ -257,7 +260,7 @@ public final class StrategyConfigGroup extends ConfigGroup {
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(ReflectiveDelegate.ITERATION_FRACTION_TO_DISABLE_INNOVATION, "fraction of iterations where innovative strategies are switched off.  Something link 0.8 should be good.  E.g. if you run from iteration 400 to iteration 500, innovation is switched off at iteration 480" ) ;
+		map.put(ReflectiveDelegate.ITERATION_FRACTION_TO_DISABLE_INNOVATION, "fraction of iterations where innovative strategies are switched off.  Something like 0.8 should be good.  E.g. if you run from iteration 400 to iteration 500, innovation is switched off at iteration 480" ) ;
 		map.put(ReflectiveDelegate.MAX_AGENT_PLAN_MEMORY_SIZE, "maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number");
 
 		StringBuilder strb = new StringBuilder() ;

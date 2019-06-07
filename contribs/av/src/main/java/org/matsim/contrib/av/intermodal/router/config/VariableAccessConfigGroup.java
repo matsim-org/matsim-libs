@@ -32,10 +32,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  * @author  jbischoff
  *
  */
-/**
- *
- */
-public class VariableAccessConfigGroup extends ReflectiveConfigGroup {
+public final class VariableAccessConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUPNAME = "variableAccess";
 	private static final String STYLE = "VariableAccessStyle";
@@ -48,17 +45,10 @@ public class VariableAccessConfigGroup extends ReflectiveConfigGroup {
 	
 	public static final String MODEGROUPNAME = "variableAccessMode";
 
-	/**
-	 * @param name
-	 */
 	public VariableAccessConfigGroup() {
 		super(GROUPNAME);
-		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @return the mode
-	 */
 	@StringGetter(STYLE)
 	public String getStyle() {
 		return style;
@@ -88,10 +78,6 @@ public class VariableAccessConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	
-	/**
-	 * @param mode
-	 *            the mode to set
-	 */
 	@StringSetter(STYLE)
 	public void setStyle(String style) {
 		this.style = style;

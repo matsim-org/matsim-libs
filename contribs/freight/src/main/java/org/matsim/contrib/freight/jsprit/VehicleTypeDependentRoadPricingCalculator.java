@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import jsprit.core.problem.vehicle.VehicleType;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;

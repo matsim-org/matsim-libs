@@ -20,29 +20,36 @@ package org.matsim.contrib.emissions.example;
 
 import static org.junit.Assert.*;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.emissions.example.archive.RunEmissionToolOnlineExample;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author nagel
  *
  */
 public class RunEmissionToolOnlineExampleIT {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
-	 * Test method for {@link RunEmissionToolOnlineExampleV2#main(java.lang.String[])}.
+	 * Test method for {@link RunEmissionToolOnlineExample#main(java.lang.String[])}.
 	 */
 	@SuppressWarnings("static-method")
 	@Test
 	public final void testMain() {
 		try {
-			RunEmissionToolOnlineExampleV2 tool = new RunEmissionToolOnlineExampleV2(null) ;
+			Config config = RunEmissionToolOnlineExample.prepareConfig( null ) ;
+			
+			config.controler().setOutputDirectory( utils.getOutputDirectory() );
+			
+			config.controler().setLastIteration( 1 );
+			
+			Scenario scenario = RunEmissionToolOnlineExample.prepareScenario( config ) ;
+			
+			RunEmissionToolOnlineExample.run( scenario ) ;
 
-			tool.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-			// otherwise the test fails on jenkins
-
-			tool.run();
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
 			fail("something did not work" ) ;

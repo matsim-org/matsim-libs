@@ -70,30 +70,27 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return act.getLinkId();
 	}
 
 	@Override
-	public Id getFacilityId() {
+	public Id<ActivityFacility> getFacilityId() {
 		return act.getFacilityId();
 	}
 
 	@Override
 	public void setLinkId(Id<Link> id) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public void setFacilityId(Id<ActivityFacility> id) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
 	public void setCoord(Coord coord) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 

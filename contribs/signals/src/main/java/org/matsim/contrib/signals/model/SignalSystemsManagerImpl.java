@@ -76,17 +76,6 @@ public class SignalSystemsManagerImpl implements SignalSystemsManager {
 	}
 
 	@Override
-	public void resetModel(Integer iterationNumber) {
-		for (SignalSystem system : this.getSignalSystems().values()){
-			system.getSignalController().reset(iterationNumber);
-			for (Signal signal : system.getSignals().values()){
-				signal.getSignalizeableItems().clear();
-			}
-		}
-	
-	}
-
-	@Override
 	public Map<Id<SignalSystem>, SignalSystem> getSignalSystems() {
 		return this.signalSystems;
 	}

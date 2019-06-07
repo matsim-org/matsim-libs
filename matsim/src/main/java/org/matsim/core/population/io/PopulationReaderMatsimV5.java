@@ -42,7 +42,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.vehicles.Vehicle;
@@ -106,11 +105,11 @@ import org.xml.sax.Attributes;
 
 	private Activity prevAct = null;
 
-	public PopulationReaderMatsimV5(final Scenario scenario) {
+	PopulationReaderMatsimV5(final Scenario scenario) {
 		this( new IdentityTransformation() , scenario );
 	}
 
-	public PopulationReaderMatsimV5(
+	PopulationReaderMatsimV5(
 			final CoordinateTransformation coordinateTransformation,
 			final Scenario scenario) {
 		this.coordinateTransformation = coordinateTransformation;
@@ -208,8 +207,7 @@ import org.xml.sax.Attributes;
 
 	private void startAct(final Attributes atts) {
 		if (atts.getValue(ATTR_ACT_LINK) != null) {
-			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
-			final Id<Link> linkId1 = linkId;
+			Id<Link> linkId1 = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 			this.curract = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue(ATTR_ACT_TYPE), linkId1);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 				final Coord coord = parseCoord( atts );
@@ -234,7 +232,7 @@ import org.xml.sax.Attributes;
 	}
 
 	private Coord parseCoord(Attributes atts) {
-		return coordinateTransformation.transform(
+		return this.coordinateTransformation.transform(
 				new Coord(
 						Double.parseDouble(atts.getValue( ATTR_ACT_X )),
 						Double.parseDouble(atts.getValue( ATTR_ACT_Y )) ) );
@@ -276,7 +274,7 @@ import org.xml.sax.Attributes;
 				}
 			}
 		}
-		if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
+		if (Time.isUndefinedTime(this.currRoute.getTravelTime())) {
 			this.currRoute.setTravelTime(this.currleg.getTravelTime());
 		}
 
@@ -380,7 +378,7 @@ import org.xml.sax.Attributes;
 				}
 			}
 		}
-		if (this.currRoute.getTravelTime() == Time.UNDEFINED_TIME) {
+		if (Time.isUndefinedTime(this.currRoute.getTravelTime())) {
 			this.currRoute.setTravelTime(this.currleg.getTravelTime());
 		}
 

@@ -1,0 +1,82 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<module name="dvrp">
+	</module>
+
+	<module name="multiModeDrt">
+		<parameterset type="drt">
+			<param name="mode" value="drt_A"/>
+			<param name="stopDuration" value="60"/>
+			<param name="maxWaitTime" value="900"/>
+			<param name="maxTravelTimeAlpha" value="1.3"/>
+			<param name="maxTravelTimeBeta" value="600"/>
+			<param name="requestRejection" value="false"/>
+			<param name="vehiclesFile" value="one_shared_taxi_vehicles_A.xml"/>
+			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
+		</parameterset>
+
+		<parameterset type="drt">
+			<param name="mode" value="drt_B"/>
+			<param name="stopDuration" value="60"/>
+			<param name="maxWaitTime" value="900"/>
+			<param name="maxTravelTimeAlpha" value="1.3"/>
+			<param name="maxTravelTimeBeta" value="600"/>
+			<param name="requestRejection" value="false"/>
+			<param name="vehiclesFile" value="one_shared_taxi_vehicles_B.xml"/>
+			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
+		</parameterset>
+
+		<parameterset type="drt">
+			<param name="mode" value="drt_C"/>
+			<param name="stopDuration" value="60"/>
+			<param name="maxWaitTime" value="900"/>
+			<param name="maxTravelTimeAlpha" value="1.3"/>
+			<param name="maxTravelTimeBeta" value="600"/>
+			<param name="requestRejection" value="false"/>
+			<param name="vehiclesFile" value="one_shared_taxi_vehicles_C.xml"/>
+			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
+		</parameterset>
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="grid_network.xml"/>
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="multi_mode_one_shared_taxi_population.xml"/>
+	</module>
+
+	<module name="qsim">
+		<param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
+		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true"/>
+		<param name="snapshotStyle" value="queue"/>
+	</module>
+
+	<module name="otfvis">
+		<param name="coloringScheme" value="taxicab"/>
+		<param name="drawNonMovingItems" value="true"/>
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="test/output/multi_mode_one_shared_taxi"/>
+		<param name="overwriteFiles" value="deleteDirectoryIfExists"/>
+		<param name="firstIteration" value="0"/>
+		<param name="lastIteration" value="0"/>
+	</module>
+
+	<module name="planCalcScore">
+		<param name="activityType_0" value="dummy"/>
+		<param name="activityTypicalDuration_0" value="24:00:00"/>
+		<param name="traveling_drt_A" value="-6"/>
+		<param name="traveling_drt_B" value="-6"/>
+		<param name="traveling_drt_C" value="-6"/>
+	</module>
+
+	<module name="strategy">
+		<!-- We focus only on DynAgents. "Standard" agents do not change their behaviour -->
+		<param name="maxAgentPlanMemorySize" value="1"/>
+		<param name="ModuleProbability_1" value="1.0"/>
+		<param name="Module_1" value="KeepLastSelected"/>
+	</module>
+</config>

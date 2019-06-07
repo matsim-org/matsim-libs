@@ -24,7 +24,7 @@ import java.util.Comparator;
 import java.util.Optional;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.data.DrtRequest;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -37,22 +37,26 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class SequentialMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
 	private final SingleVehicleInsertionProblem insertionProblem;
+	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
 
 	public SequentialMultiVehicleInsertionProblem(Network network, TravelTime travelTime,
-			TravelDisutility travelDisutility, DrtConfigGroup drtCfg, MobsimTimer timer) {
-		this(new SequentialPathDataProvider(network, travelTime, travelDisutility, drtCfg), drtCfg, timer);
+			TravelDisutility travelDisutility, DrtConfigGroup drtCfg, MobsimTimer timer,
+			InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
+		this(new SequentialPathDataProvider(network, travelTime, travelDisutility, drtCfg), drtCfg, timer,
+				penaltyCalculator);
 	}
 
 	public SequentialMultiVehicleInsertionProblem(PathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
-			MobsimTimer timer) {
+			MobsimTimer timer, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
 		this.insertionProblem = new SingleVehicleInsertionProblem(pathDataProvider,
-				new InsertionCostCalculator(drtCfg, timer));
+				new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));
 	}
 
 	@Override
 	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
 		return vEntries.stream()//
-				.map(v -> insertionProblem.findBestInsertion(drtRequest, v))//
+				.map(v -> insertionProblem.findBestInsertion(drtRequest, v,
+						insertionGenerator.generateInsertions(drtRequest, v)))//
 				.filter(Optional::isPresent)//
 				.map(Optional::get)//
 				.min(Comparator.comparing(i -> i.cost));

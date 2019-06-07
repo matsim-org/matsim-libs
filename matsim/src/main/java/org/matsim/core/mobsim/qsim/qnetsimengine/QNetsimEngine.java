@@ -20,28 +20,11 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.Phaser;
-import java.util.concurrent.ThreadFactory;
-
-import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -63,6 +46,21 @@ import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.Phaser;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -170,8 +168,6 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		} else {
 			Scenario scenario = sim.getScenario();
 			EventsManager events = sim.getEventsManager() ;
-			QSimConfigGroup qsimConfig = sim.getScenario().getConfig().qsim() ;
-			Network net = scenario.getNetwork() ;
 			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario );
 			MobsimTimer mobsimTimer = sim.getSimTimer() ;
 			AgentCounter agentCounter = sim.getAgentCounter() ;
@@ -396,6 +392,9 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		Id<Link> linkId = planAgent.getCurrentLinkId(); 
 		if (linkId != null) { // may be bushwacking
 			QLinkI qLink = this.network.getNetsimLink(linkId);
+			if ( qLink==null ) {
+				throw new RuntimeException("netsim link lookup failed; agentId=" + planAgent.getId() + "; linkId=" + linkId ) ;
+			}
 			qLink.registerAdditionalAgentOnLink(planAgent);
 		}
 	}
@@ -473,8 +472,8 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		int roundRobin = 0;
 		for (QNodeI node : network.getNetsimNodes().values()) {
 			int i = roundRobin % this.numOfRunners;
-			if ( node instanceof QNodeImpl ) {
-				((QNodeImpl) node).setNetElementActivationRegistry(this.engines.get(i));
+			if( node instanceof AbstractQNode){
+				((AbstractQNode) node).setNetElementActivationRegistry(this.engines.get(i));
 			}
 			nodes[i]++;
 
@@ -516,12 +515,17 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		if (printRunTimesPerTimeStep) log.info("detailed QNetsimEngineRunner run times per time step:");
 		{
 			StringBuffer sb = new StringBuffer();
-			sb.append("\t" + "time");
+			sb.append("\t");
+			sb.append("time");
 			for (int i = 0; i < this.engines.size(); i++) {
-				sb.append("\t" + "thread_" + i); 
+				sb.append("\t");
+				sb.append("thread_");
+				sb.append(Integer.toString(i));
 			}
-			sb.append("\t" + "min");
-			sb.append("\t" + "max");
+			sb.append("\t");
+			sb.append("min");
+			sb.append("\t");
+			sb.append("max");
 			if (printRunTimesPerTimeStep) log.info(sb.toString());
 		}
 		long sum = 0;
@@ -537,10 +541,13 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 				sum += runTime;
 				if (runTime < min) min = runTime;
 				if (runTime > max) max = runTime;
-				sb.append("\t" + runTime);
+				sb.append("\t");
+				sb.append(Long.toString(runTime));
 			}
-			sb.append("\t" + min);
-			sb.append("\t" + max);
+			sb.append("\t");
+			sb.append(Long.toString(min));
+			sb.append("\t");
+			sb.append(Long.toString(max));
 			if (printRunTimesPerTimeStep) log.info(sb.toString());
 			sumMin += min;
 			sumMax += max;

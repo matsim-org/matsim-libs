@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
 public class RequestRecorder implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler {
 	private final Map<Id<Person>, TaxiRequest> ongoingRequests = new HashMap<>();
@@ -53,7 +53,8 @@ public class RequestRecorder implements PersonDepartureEventHandler, PersonEnter
 			Id<Request> id = Id.create(requestCounter++, Request.class);
 			Link fromLink = reconstructor.links.get(event.getLinkId());
 			double time = event.getTime();
-			TaxiRequest request = new TaxiRequestWithModifiableToLink(id, fromLink, time);
+			TaxiRequest request = new TaxiRequestWithModifiableToLink(id, event.getPersonId(), event.getLegMode(),
+					fromLink, time);
 			TaxiRequest oldRequest = ongoingRequests.put(event.getPersonId(), request);
 			if (oldRequest != null) {
 				throw new IllegalStateException("Currently only one request per passenger");

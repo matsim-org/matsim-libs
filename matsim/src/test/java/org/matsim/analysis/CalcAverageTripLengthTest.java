@@ -22,7 +22,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class CalcAverageTripLengthTest {
 

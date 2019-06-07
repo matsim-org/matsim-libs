@@ -43,18 +43,31 @@ public class StrategyManagerModule extends AbstractModule {
 	@Override
 	public void install() {
 		int externalCounter = 0;
+		
 		install(new DefaultPlanStrategiesModule());
+		// (does commands of type "bind(PlanStrategy.class).annotatedWith(Names.named(strategyName))", i.e.
+		// plan strategies can be looked up under their names (*))
+		
 		bind(StrategyManager.class).in(Singleton.class);
 		bind(ReplanningContext.class).to(ReplanningContextImpl.class).asEagerSingleton();
+		
 		MapBinder<StrategyConfigGroup.StrategySettings, PlanStrategy> planStrategyMapBinder = MapBinder.newMapBinder(binder(), StrategyConfigGroup.StrategySettings.class, PlanStrategy.class);
+		// (this will bind a Map that has StrategySettings as key, and PlanStrategy as value.  Not sure why StrategySettings as key, and not just the name, but possibly this is mean to allow adding
+		// the same strategy multiple times, with possibly different settings.)
+		
 		for (StrategyConfigGroup.StrategySettings settings : getConfig().strategy().getStrategySettings()) {
 			String name = settings.getStrategyName() ;
 			if (name.equals("ExternalModule")) {
+				// plan strategy is some external executable:
 				externalCounter++;
 				planStrategyMapBinder.addBinding(settings).toProvider(new ExternalModuleProvider(externalCounter, settings.getExePath()));
 			} else if (name.contains(".")) {
-				if (name.startsWith("org.matsim.") && !name.startsWith("org.matsim.contrib.")) {
-					throw new RuntimeException("Strategies in the org.matsim package must not be loaded by name!");
+				// plan strategy is in Java, but it is found via the class loader:
+				if (name.startsWith("org.matsim.core")
+						    // && !name.startsWith("org.matsim.contrib.")
+				) {
+					// org.matsim.core strategies are not to be loaded via the class loader:
+					throw new RuntimeException("Strategies in the org.matsim.core package must not be loaded by name!");
 				} else {
 					try {
 						Class klass = Class.forName(name);
@@ -70,11 +83,16 @@ public class StrategyManagerModule extends AbstractModule {
 					}
 				}
 			} else {
+				// this is the normal case: plan strategy comes from within matsim
 				planStrategyMapBinder.addBinding(settings).to(Key.get(PlanStrategy.class, Names.named(settings.getStrategyName())));
+				// (settings is the key ... ok.  The Key.get(...) returns the PlanStrategy that was registered under its name at (*) above.)
 			}
 		}
 	}
-
+	
+	/**
+	 * If plan strategy comes from some external executable.  E.g. some external router that is not in Java.
+	 */
 	private static class ExternalModuleProvider implements Provider<PlanStrategy> {
 
 		@Inject

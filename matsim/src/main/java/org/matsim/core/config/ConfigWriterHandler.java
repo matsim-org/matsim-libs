@@ -22,15 +22,15 @@ package org.matsim.core.config;
 
 import java.io.BufferedWriter;
 
-/*package*/ interface ConfigWriterHandler {
+/*package*/ abstract class ConfigWriterHandler {
 
-	public void startConfig(final Config config, final BufferedWriter out);
+	abstract void startConfig(final Config config, final BufferedWriter out);
 	
-	public void endConfig(final BufferedWriter out);
-
-	public void writeModule(final ConfigGroup module, final BufferedWriter out);
+	abstract void endConfig(final BufferedWriter out);
 	
-	public void writeSeparator(final BufferedWriter out);
+	abstract void writeModule(final ConfigGroup module, final BufferedWriter out);
+	
+	abstract void writeSeparator(final BufferedWriter out);
 	
 	/**
 	 * Sets the string to be used as newline separator (see <code>System.getProperty("line.separator");</code>).
@@ -42,5 +42,5 @@ import java.io.BufferedWriter;
 	 * @param newline the newline separator
 	 * @return the former newline separator
 	 */
-	public String setNewline(final String newline);
+	abstract String setNewline(final String newline);
 }

@@ -20,13 +20,17 @@
 
 package org.matsim.pt.router;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.config.TransitRouterConfigGroup;
+
+import java.util.Map;
 
 /**
  * Design decisions:<ul>
@@ -94,6 +98,8 @@ public class TransitRouterConfig implements MatsimParameters {
 	private Double beelineDistanceFactor;
 
 	private final double directWalkFactor ;
+	
+	private boolean cacheTree;
 
 	public TransitRouterConfig(final Config config) {
 		this(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
@@ -104,11 +110,24 @@ public class TransitRouterConfig implements MatsimParameters {
 	{
 		pcsConfig.setLocked(); pcrConfig.setLocked() ; trConfig.setLocked() ; vspConfig.setLocked() ;
 		
+		if (pcsConfig.getScoringParametersPerSubpopulation().size()>1){
+			Logger.getLogger(getClass()).warn("More than one subpopulation is used in plansCalcScore. "
+					+ "This is not currently implemented in the TransitRouter (but should work for scoring),"
+					+ " so the values for the \"default\" subpopulation will be used. (jb, Feb 2018)");
+		}
+		
 		// walk:
-		this.beelineDistanceFactor = pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
-
-		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk)
-				/ beelineDistanceFactor ;
+		{
+			for( Map.Entry<String, PlansCalcRouteConfigGroup.ModeRoutingParams> entry : pcrConfig.getModeRoutingParams().entrySet() ){
+				Logger.getLogger( this.getClass() ).warn("mode=" + entry.getKey() + "; params=" + entry.getValue()) ;
+			}
+			final PlansCalcRouteConfigGroup.ModeRoutingParams params = pcrConfig.getModeRoutingParams().get( TransportMode.access_walk );
+			Gbl.assertNotNull( params );
+			this.beelineDistanceFactor = params.getBeelineDistanceFactor();
+			this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get( TransportMode.access_walk ) / beelineDistanceFactor;
+		}
+		// yyyyyy the two above need to be moved away from walk since otherwise one is not able to move walk routing to network routing!!!!!! Now trying access_walk ...  kai,
+		// apr'19
 		
 		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
 		
@@ -133,6 +152,7 @@ public class TransitRouterConfig implements MatsimParameters {
 		this.setBeelineWalkConnectionDistance(trConfig.getMaxBeelineWalkConnectionDistance());
 		this.setAdditionalTransferTime(trConfig.getAdditionalTransferTime());
 		this.directWalkFactor = trConfig.getDirectWalkFactor() ;
+		this.cacheTree = trConfig.isCacheTree();
 	}
 
 	public void setUtilityOfLineSwitch_utl(final double utilityOfLineSwitch_utl_sec) {
@@ -246,5 +266,11 @@ public class TransitRouterConfig implements MatsimParameters {
 		return this.directWalkFactor ;
 	}
 
+	public boolean isCacheTree() {
+		return cacheTree;
+	}
 
+	public void setCacheTree(boolean cacheTree) {
+		this.cacheTree = cacheTree;
+	}
 }

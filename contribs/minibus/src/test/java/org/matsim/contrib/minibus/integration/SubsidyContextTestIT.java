@@ -50,18 +50,18 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class SubsidyContextTestIT implements TabularFileHandler {
 	
-	private static final String gridScenarioDirectory = "http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/atlantis/minibus/input/";
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final ArrayList<String[]> pStatsResults = new ArrayList<>();
-
+	private String gridScenarioDirectory ="../../example-scenario/input/";
+	
 	@Ignore
 	@Test
 	public final void testDefaultPControler() {
 			
 		Config config1 = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config.xml", new PConfigGroup() ) ;
-				
+		
 		config1.network().setInputFile(gridScenarioDirectory  + "network.xml");
 		config1.transit().setVehiclesFile(gridScenarioDirectory + "transitVehicles.xml");
 		config1.transit().setTransitScheduleFile(gridScenarioDirectory + "transitSchedule_10min.xml");

@@ -26,8 +26,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.minibus.operator.BasicOperator;
+import org.matsim.contrib.minibus.scoring.routeDesignScoring.RouteDesignScoringManager;
+import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
@@ -44,6 +47,14 @@ public final class PConfigGroup extends ConfigGroup{
 	 */
 	private static final long serialVersionUID = 4840713748058034511L;
 	private static final Logger log = Logger.getLogger(PConfigGroup.class);
+	
+	public static enum StopLocationSelector {allCarLinks ("allCarLinks"), 
+		junctionApproachesAndBetweenJunctions ("junctionApproachesAndBetweenJunctions");
+		public final String name;
+		StopLocationSelector(String name) {this.name = name;}
+	}
+	
+	public static enum LogRouteDesignVsTotalScore {no, onlyNonZeroRouteDesignScore}
 	
 	// Tags
 	
@@ -78,6 +89,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private static final String USEFRANCHISE = "useFranchise";
 	private static final String WRITESTATS_INTERVAL = "writeStatsInterval";
 	private static final String LOG_OPERATORS = "logOperators";
+	private static final String LOG_ROUTE_DESIGN_VS_TOTAL_SCORE = "logRouteDesignVsTotalScore";
 	private static final String WRITE_METRICS = "writeMetrics";
 	private static final String WRITE_GEXF_STATS_INTERVAL = "writeGexfStatsInterval";
 	private static final String ROUTE_PROVIDER = "routeProvider";
@@ -94,9 +106,11 @@ public final class PConfigGroup extends ConfigGroup{
 	private static final String TRANSIT_SCHEDULE_TO_START_WITH = "transitScheduleToStartWith";
 	private static final String MERGE_TRANSIT_LINE = "mergeTransitLine";
 	private static final String PT_ENABLER = "ptEnabler";
-	private static final String PT_ROUTER = "ptRouter";
 	private static final String OPERATIONMODE = "OperationMode";
 	private static final String TOPOTYPESFORSTOPS = "TopoTypesForStops";
+	private static final String MIN_CAPACITY_FOR_STOPS = "minCapacityForStops";
+	private static final String STOP_LOCATION_SELECTOR = "stopLocationSelector";
+	private static final String STOP_LOCATION_SELECTOR_PARAMETER = "stopLocationSelectorParameter";
 	
 	private static final String PMODULE = "Module_";
 	private static final String PMODULE_PROBABILITY = "ModuleProbability_";
@@ -135,6 +149,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private boolean useFranchise = false;
 	private int writeStatsInterval = 0;
 	private boolean logOperators = false;
+	private LogRouteDesignVsTotalScore logRouteDesignVsTotalScore = LogRouteDesignVsTotalScore.no;
 	private boolean writeMetrics = false;
 	private int writeGexfStatsInterval = 0;
 	private String routeProvider = "SimpleCircleScheduleProvider";
@@ -151,9 +166,11 @@ public final class PConfigGroup extends ConfigGroup{
 	private String transitScheduleToStartWith = null;
 	private boolean mergeTransitLine = false;
 	private String ptEnabler = null;
-	private String ptRouter = "none set";
 	private String operationMode = TransportMode.pt;
 	private String topoTypesForStops = null;
+	private double minCapacityForStops = 0.0;
+	private StopLocationSelector stopLocationSelector = StopLocationSelector.allCarLinks;
+	private String stopLocationSelectorParameter = "";
 	private String subsidyApproach = null;
 
 	// Strategies
@@ -235,6 +252,8 @@ public final class PConfigGroup extends ConfigGroup{
 			this.writeStatsInterval = Integer.parseInt(value);
 		} else if (LOG_OPERATORS.equals(key)){
 			this.logOperators = Boolean.parseBoolean(value);		
+		} else if (LOG_ROUTE_DESIGN_VS_TOTAL_SCORE.equals(key)){
+			this.logRouteDesignVsTotalScore = LogRouteDesignVsTotalScore.valueOf(value);	
 		} else if (WRITE_METRICS.equals(key)){
 			this.writeMetrics = Boolean.parseBoolean(value);		
 		} else if (WRITE_GEXF_STATS_INTERVAL.equals(key)) {
@@ -267,13 +286,19 @@ public final class PConfigGroup extends ConfigGroup{
 			this.mergeTransitLine = Boolean.parseBoolean(value);
 		} else if (PT_ENABLER.equals(key)){
 			this.ptEnabler = value;
-		} else if (PT_ROUTER.equals(key)){
-			this.ptRouter = value;
-		} else if(OPERATIONMODE.equals(key)){
+		} else if (OPERATIONMODE.equals(key)){
 			this.operationMode = value;
-		} else if(TOPOTYPESFORSTOPS.equals(key)){
+		} else if (TOPOTYPESFORSTOPS.equals(key)){
 			this.topoTypesForStops = value;
-		}else if (key != null && key.startsWith(PMODULE)) {
+		} else if (MIN_CAPACITY_FOR_STOPS.equals(key)){
+			this.minCapacityForStops = Double.parseDouble(value);
+		} else if (STOP_LOCATION_SELECTOR.equals(key)){
+			if (value.equals(StopLocationSelector.allCarLinks.name)) {this.stopLocationSelector = StopLocationSelector.allCarLinks;}
+			else if (value.equals(StopLocationSelector.junctionApproachesAndBetweenJunctions.name)) {this.stopLocationSelector = StopLocationSelector.junctionApproachesAndBetweenJunctions;}
+			else {log.error("unknown parameter value: " + key + ": " + value);}
+		} else if (STOP_LOCATION_SELECTOR_PARAMETER.equals(key)){
+			this.stopLocationSelectorParameter = value;
+		} else if (key != null && key.startsWith(PMODULE)) {
 			PStrategySettings settings = getStrategySettings(Id.create(key.substring(PMODULE.length()), PStrategySettings.class), true);
 			settings.setModuleName(value);
 		} else if (key != null && key.startsWith(PMODULE_PROBABILITY)) {
@@ -327,6 +352,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(USEFRANCHISE, Boolean.toString(this.useFranchise));
 		map.put(WRITESTATS_INTERVAL, Integer.toString(this.writeStatsInterval));
 		map.put(LOG_OPERATORS, Boolean.toString(this.logOperators));
+		map.put(LOG_ROUTE_DESIGN_VS_TOTAL_SCORE, this.logRouteDesignVsTotalScore.toString());
 		map.put(WRITE_METRICS, Boolean.toString(this.writeMetrics));
 		map.put(WRITE_GEXF_STATS_INTERVAL, Integer.toString(this.writeGexfStatsInterval));
 		map.put(ROUTE_PROVIDER, this.routeProvider);
@@ -342,9 +368,11 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(PASSENGERS_BOARD_EVERY_LINE, Boolean.toString(this.passengersBoardEveryLine));
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, this.transitScheduleToStartWith);
 		map.put(MERGE_TRANSIT_LINE, Boolean.toString(this.mergeTransitLine));
-		map.put(PT_ROUTER, this.ptRouter);
 		map.put(OPERATIONMODE, this.operationMode);
 		map.put(TOPOTYPESFORSTOPS, this.topoTypesForStops);
+		map.put(MIN_CAPACITY_FOR_STOPS, Double.toString(this.minCapacityForStops));
+		map.put(STOP_LOCATION_SELECTOR, this.stopLocationSelector.name);
+		map.put(STOP_LOCATION_SELECTOR_PARAMETER, this.stopLocationSelectorParameter);
 		map.put(SUBSIDY_APPROACH, this.subsidyApproach);
 		
 		for (Entry<Id<PStrategySettings>, PStrategySettings> entry : this.strategies.entrySet()) {
@@ -390,6 +418,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(USEFRANCHISE, "Will use a franchise system if set to true");
 		map.put(WRITESTATS_INTERVAL, "interval in which statistics will be plotted. Set to zero to turn this feature off. Set to something larger than the total number of iterations to turn off the plots, but write the statistics file anyway");
 		map.put(LOG_OPERATORS, "will log operators individually if set to true");
+		map.put(LOG_ROUTE_DESIGN_VS_TOTAL_SCORE, "will log total score before and after adding route design score. Values: " + LogRouteDesignVsTotalScore.no + " and " + LogRouteDesignVsTotalScore.onlyNonZeroRouteDesignScore);
 		map.put(WRITE_METRICS, "will calculate common performance metrics if set to true, default is false");
 		map.put(WRITE_GEXF_STATS_INTERVAL, "number of iterations the gexf output gets updated. Set to zero to turn this feature off");
 		map.put(ROUTE_PROVIDER, "The route provider used. Currently, there are SimpleCircleScheduleProvider and SimpleBackAndForthScheduleProvider");
@@ -405,9 +434,11 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(PASSENGERS_BOARD_EVERY_LINE, "Agents will board every vehicles serving the destination (stop), if set to true. Set to false, to force agents to take only vehicles of the line planned. Default is false.");
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, "Will initialize one operator for each transit line with the given time of operation and number of vehicles");
 		map.put(MERGE_TRANSIT_LINE, "Merges all routes of a transit line that have the same sequence of stops. Does not respect the time profile of the routes. Default is false.");
-		map.put(PT_ROUTER, "Uses a experimental connection scan algorithm for routing if set to 'raptor'. Defaults to MATSim standard router.");
 		map.put(OPERATIONMODE, "the mode of transport in which the paratransit operates");
 		map.put(TOPOTYPESFORSTOPS, "comma separated integer-values, as used in NetworkCalcTopoTypes");
+		map.put(MIN_CAPACITY_FOR_STOPS, "Link cannot serve as paratransit stop, if its capacity is lower than the limit set here. Default is 0.");
+		map.put(STOP_LOCATION_SELECTOR, "The paratransit stop locator, either one stop per car link (allCarLinks) or on approaches to junction areas and some stops between junction areas (junctionApproachesAndBetweenJunctions). Default is allCarLinks.");
+		map.put(STOP_LOCATION_SELECTOR_PARAMETER, "Parameters for the paratransit stop locator. For allCarLinks there are no parameters to set. For junctionApproachesAndBetweenJunctions, which is based on the IntersectionSimplifier, there is pmin (maximum distance betwen 2 nodes to be merged into the same cluster, should be smaller than the maximum transfer distance), epsilon (minimum number of nodes to consider it a cluster) and rough distance between stops (used in NetworkSimplifier). Default is \"\" for allCarLinks and \"50.0,2,500\" for junctionApproachesAndBetweenJunctions.");
 		map.put(SUBSIDY_APPROACH, "Optional: add a subsidy to the operators' scores. Currently implemented: 'null': no subsidy; 'perPassenger': a subsidy of 100000 monetary units per passenger");
 		
 		for (Entry<Id<PStrategySettings>, PStrategySettings>  entry : this.strategies.entrySet()) {
@@ -536,6 +567,10 @@ public final class PConfigGroup extends ConfigGroup{
 		return this.logOperators;
 	}
 	
+	public LogRouteDesignVsTotalScore getLogLogRouteDesignVsTotalScore() {
+		return this.logRouteDesignVsTotalScore;
+	}
+	
 	public boolean getWriteMetrics() {
 		return this.writeMetrics;
 	}
@@ -599,10 +634,6 @@ public final class PConfigGroup extends ConfigGroup{
 	public String getPtEnabler() {
 		return this.ptEnabler;
 	}
-	
-	public String getPtRouter() {
-		return this.ptRouter;
-	}
 
 	public String getMode() {
 		return this.operationMode;
@@ -624,6 +655,18 @@ public final class PConfigGroup extends ConfigGroup{
 			list.add(Integer.parseInt(s.trim()));
 		}
 		return list;
+	}
+	
+	public double getMinCapacityForStops(){
+		return this.minCapacityForStops;
+	}
+	
+	public StopLocationSelector getStopLocationSelector() {
+		return this.stopLocationSelector;
+	}
+	
+	public String getStopLocationSelectorParameter() {
+		return this.stopLocationSelectorParameter;
 	}
 
 	public Collection<PStrategySettings> getStrategySettings() {
@@ -719,6 +762,192 @@ public final class PConfigGroup extends ConfigGroup{
 		}
 
 	}
+	
+	public static class RouteDesignScoreParams extends ReflectiveConfigGroup implements MatsimParameters {
+		public static final String SET_TYPE = "routeDesignScoreParameters";
+		public static final String ROUTE_DESIGN_SCORE_FUNCTION = "routeDesignScoreFunction";
+		public static final String COST_FACTOR = "costFactor";
+		public static final String LOG_SCORE = "logScore";
+		public static final String STOP_LIST_TO_EVALUATE = "stopListToEvaluate";
+		public static final String VALUE_T0_START_SCORING = "valueToStartScoring";
+
+		public enum StopListToEvaluate {
+			transitRouteAllStops, pPlanStopsToBeServed
+		}
+		
+		public enum LogRouteDesignScore {
+			no, onlyNonZeroScore
+		}
+		
+		private RouteDesignScoringManager.RouteDesignScoreFunctionName routeDesignScoreFunction = null;
+		private double costFactor = 0.0;
+		private LogRouteDesignScore logScore = LogRouteDesignScore.no;
+		private StopListToEvaluate stopListToEvaluate = StopListToEvaluate.transitRouteAllStops;
+		private double valueToStartScoring = 0.0;
+		
+		public RouteDesignScoreParams() {
+			super(SET_TYPE);
+		}
+		
+		@Override
+		public final Map<String, String> getComments() {
+			Map<String,String> map = super.getComments();
+
+			StringBuilder defaultRouteDesignScoreFunctions = new StringBuilder();
+			for (RouteDesignScoringManager.RouteDesignScoreFunctionName scoreFunctionName: 
+				RouteDesignScoringManager.RouteDesignScoreFunctionName.values()) {
+				defaultRouteDesignScoreFunctions.append(scoreFunctionName.toString());
+				defaultRouteDesignScoreFunctions.append(", ");
+			}
+			
+			map.put( ROUTE_DESIGN_SCORE_FUNCTION,
+					"name of route design score function to be applied. Possible default names: " + defaultRouteDesignScoreFunctions + "." );
+			map.put( COST_FACTOR,
+					"factor with which the score calculated by the route design score function is multiplied to obtain the monetary cost applied to the TransitRoute's score.");
+			map.put( STOP_LIST_TO_EVALUATE,
+					"which stops shall be evaluated. Possible values " + StopListToEvaluate.pPlanStopsToBeServed + " and " + StopListToEvaluate.transitRouteAllStops);
+			map.put( VALUE_T0_START_SCORING,
+					"value which is subtracted from the score calculated by the route design score function before multiplying with the cost factor. If the result is negative, nothing will be added or substracted from the TransitRoute's score. This can be interpreted as an maximum allowable value before a penalty for bad route design is applied.");
+
+			return map ;
+		}
+		
+		@StringSetter( ROUTE_DESIGN_SCORE_FUNCTION )
+		public void setRouteDesignScoreFunction(final String routeDesignScoreFunction) {
+			setRouteDesignScoreFunction(RouteDesignScoringManager.RouteDesignScoreFunctionName.valueOf(routeDesignScoreFunction));
+		}
+		
+		public void setRouteDesignScoreFunction(final RouteDesignScoringManager.RouteDesignScoreFunctionName routeDesignScoreFunction) {
+			this.routeDesignScoreFunction = routeDesignScoreFunction;
+		}
+
+		@StringGetter( ROUTE_DESIGN_SCORE_FUNCTION )
+		public RouteDesignScoringManager.RouteDesignScoreFunctionName getRouteDesignScoreFunction() {
+			return this.routeDesignScoreFunction;
+		}
+		
+		@StringSetter( COST_FACTOR )
+		public void setCostFactor(final double costFactor) {
+			this.costFactor = costFactor;
+		}
+
+		@StringGetter( COST_FACTOR )
+		public double getCostFactor() {
+			return this.costFactor;
+		}
+		
+		@StringSetter( LOG_SCORE )
+		public void setLogScore(final String logScore) {
+			setLogScore(LogRouteDesignScore.valueOf(logScore));
+		}
+		
+		public void setLogScore(final LogRouteDesignScore logScore) {
+			this.logScore = logScore;
+		}
+
+		@StringGetter( LOG_SCORE )
+		public LogRouteDesignScore getLogScore() {
+			return this.logScore;
+		}
+		
+		@StringSetter( STOP_LIST_TO_EVALUATE )
+		public void setStopListToEvaluate(final String stopListToEvaluate) {
+			setStopListToEvaluate(StopListToEvaluate.valueOf(stopListToEvaluate));
+		}
+		
+		public void setStopListToEvaluate(final StopListToEvaluate stopListToEvaluate) {
+			this.stopListToEvaluate = stopListToEvaluate;
+		}
+
+		@StringGetter( STOP_LIST_TO_EVALUATE )
+		public StopListToEvaluate getStopListToEvaluate() {
+			return this.stopListToEvaluate;
+		}
+		
+		@StringSetter( VALUE_T0_START_SCORING )
+		public void setValueToStartScoring(final double valueToStartScoring) {
+			this.valueToStartScoring = valueToStartScoring;
+		}
+
+		@StringGetter( VALUE_T0_START_SCORING )
+		public double getValueToStartScoring() {
+			return this.valueToStartScoring;
+		}
+		
+	}
+	
+	@Override
+	public ConfigGroup createParameterSet( final String type ) {
+		switch ( type ) {
+			case RouteDesignScoreParams.SET_TYPE:
+				return new RouteDesignScoreParams();
+			default:
+				throw new IllegalArgumentException( type );
+		}
+	}
+
+	@Override
+	protected void checkParameterSet( final ConfigGroup module ) {
+		switch ( module.getName() ) {
+			case RouteDesignScoreParams.SET_TYPE:
+				if ( !(module instanceof RouteDesignScoreParams) ) {
+					throw new RuntimeException( "unexpected class for module "+module );
+				}
+				break;
+			default:
+				throw new IllegalArgumentException( module.getName() );
+		}
+	}
+	
+	public void addRouteDesignScoreParams(final RouteDesignScoreParams pars) {
+		testForLocked() ;
+		addParameterSet( pars );
+	}
+	
+	public void removeRouteDesignScoreParams( RouteDesignScoringManager.RouteDesignScoreFunctionName key ) {
+		testForLocked() ;
+		for ( ConfigGroup pars : getParameterSets( RouteDesignScoreParams.SET_TYPE ) ) {
+			final RouteDesignScoringManager.RouteDesignScoreFunctionName routeDesignScoreFunction = ((RouteDesignScoreParams) pars).getRouteDesignScoreFunction();
+			if ( key.equals(routeDesignScoreFunction) ) {
+				this.removeParameterSet(pars) ;
+				break ;
+			}
+		}
+	}
+
+	public Map<RouteDesignScoringManager.RouteDesignScoreFunctionName, RouteDesignScoreParams> getRouteDesignScoreParams() {
+		final Map<RouteDesignScoringManager.RouteDesignScoreFunctionName, RouteDesignScoreParams> map = new LinkedHashMap< >();
+
+		for ( ConfigGroup pars : getParameterSets( RouteDesignScoreParams.SET_TYPE ) ) {
+			if ( this.isLocked() ) {
+				pars.setLocked(); 
+			}
+			
+			RouteDesignScoreParams scoreParams = (RouteDesignScoreParams) pars;
+			
+			final RouteDesignScoringManager.RouteDesignScoreFunctionName routeDesignScoreFunction = scoreParams.getRouteDesignScoreFunction();
+			final RouteDesignScoreParams old = map.put( routeDesignScoreFunction , scoreParams );
+			if ( old != null ) throw new IllegalStateException( "several parameter sets for routeDesignScoreFunction " + routeDesignScoreFunction );
+		}
+
+		return map;
+	}
+
+	public RouteDesignScoreParams getOrCreateRouteDesignScoreParams(final RouteDesignScoringManager.RouteDesignScoreFunctionName routeDesignScoreFunction) {
+		RouteDesignScoreParams pars = getRouteDesignScoreParams().get( routeDesignScoreFunction );
+
+		if ( pars == null ) {
+			pars = (RouteDesignScoreParams) createParameterSet( RouteDesignScoreParams.SET_TYPE );
+			pars.setRouteDesignScoreFunction( routeDesignScoreFunction );
+			addParameterSet( pars );
+		}
+		if ( this.isLocked() ) {
+			pars.setLocked(); 
+		}
+
+		return pars;
+	}
+	
 	@Override
 	protected void checkConsistency( Config config ) {
 		

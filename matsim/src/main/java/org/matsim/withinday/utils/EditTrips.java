@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -20,17 +19,15 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 /**
@@ -46,7 +43,7 @@ public final class EditTrips {
 	private Scenario scenario;
 
 	public EditTrips( TripRouter tripRouter, Scenario scenario ) {
-//		log.setLevel(Level.DEBUG);
+		log.setLevel( Level.INFO);
 		this.tripRouter = tripRouter;
 		this.scenario = scenario;
 		this.pf = scenario.getPopulation().getFactory() ;
@@ -92,13 +89,13 @@ public final class EditTrips {
 			replanCurrentTripFromStageActivity(tripElements, tripElementsIndex, agent, routingMode);
 		} else {
 			// we are on a leg
-			replanCurrentTripFromLeg(trip.getDestinationActivity(), currentPlanElement, routingMode, now, agent, scenario);
+			replanCurrentTripFromLeg(trip.getDestinationActivity(), currentPlanElement, routingMode, now, agent);
 		}
 		WithinDayAgentUtils.resetCaches(agent);
 		return true ;
 	}
 	private void replanCurrentTripFromLeg(Activity newAct, final PlanElement currentPlanElement, final String routingMode,
-			double now, MobsimAgent agent, Scenario scenario) {
+										  double now, MobsimAgent agent) {
 		log.debug("entering replanCurrentTripFromLeg");
 		Leg currentLeg = (Leg) currentPlanElement ;
 		if ( currentLeg.getRoute() instanceof NetworkRoute ) {
@@ -144,12 +141,12 @@ public final class EditTrips {
 	private List<? extends PlanElement> newTripToNewActivity(Activity newAct, String mainMode, double now, 
 			MobsimAgent agent, Person person, Scenario scenario) {
 		log.debug("entering newTripToNewActivity") ;
+
 		Link currentLink = scenario.getNetwork().getLinks().get( agent.getCurrentLinkId() ) ;
-		Facility<?> fromFacility = new LinkWrapperFacility( currentLink ) ; 
-		Facility<?> toFacility = scenario.getActivityFacilities().getFacilities().get( newAct.getFacilityId() ) ;
-		if ( toFacility == null ) {
-			toFacility = new ActivityWrapperFacility( newAct ) ;
-		}
+		Facility fromFacility = new LinkWrapperFacility( currentLink ) ;
+
+		Facility toFacility =  FacilitiesUtils.toFacility( newAct, scenario.getActivityFacilities() );
+
 		List<? extends PlanElement> newTrip = tripRouter.calcRoute(mainMode, fromFacility, toFacility, now, person) ;
 		return newTrip;
 	}
@@ -186,12 +183,14 @@ public final class EditTrips {
 	 * @param mainMode
 	 * @return
 	 */
-	public final boolean replanFutureTrip(Trip trip, Plan plan, String mainMode) {
+	public final List<? extends PlanElement> replanFutureTrip( Trip trip, Plan plan, String mainMode ) {
 		double departureTime = PlanRouter.calcEndOfActivity( trip.getOriginActivity(), plan, tripRouter.getConfig() ) ;
 		return replanFutureTrip( trip, plan, mainMode, departureTime ) ;
 	}
-	public final boolean replanFutureTrip(Trip trip, Plan plan, String routingMode, double departureTime) {
-		return replanFutureTrip(trip, plan, routingMode, departureTime, tripRouter);
+
+	public final List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String routingMode,
+			double departureTime) {
+		return replanFutureTrip(trip, plan, routingMode, departureTime, tripRouter, scenario );
 	}
 
 	// utility methods (plans splicing):
@@ -207,7 +206,8 @@ public final class EditTrips {
 		final NetworkRoute newNWRoute = (NetworkRoute)newCurrentLeg.getRoute();
 		
 		final List<Id<Link>> newLinksIds = newNWRoute.getLinkIds().subList(0,newNWRoute.getLinkIds().size()) ;
-		EditRoutes.spliceNewPathIntoOldRoute(currentRouteLinkIdIndex, newNWRoute.getEndLinkId(), oldNWRoute, oldNWRoute.getLinkIds(), newLinksIds) ;
+		EditRoutes.spliceNewPathIntoOldRoute(currentRouteLinkIdIndex, newNWRoute.getEndLinkId(),
+				oldNWRoute, newLinksIds, agent.getCurrentLinkId()) ;
 		
 //		for (int ii = currentRouteLinkIdIndex; ii<oldNWRoute.getLinkIds().size() ; ii++ ) {
 //			oldNWRoute.getLinkIds().remove(ii) ;
@@ -225,7 +225,7 @@ public final class EditTrips {
 //			newTrip.remove(0) ;
 //		}
 		// yyyyyy do nothing for time being and hope for the best.
-		log.warn("yyyyyy pruneUpToCurrentLeg needs to be fixed.") ;
+		log.warn("yyyyyy pruneUpToCurrentLeg needs to be fixed for multimodal trips & for access/egress routing.") ;
 	}
 
 	// static methods:
@@ -234,11 +234,13 @@ public final class EditTrips {
 	 * by a new one. This is e.g. necessary when replacing a pt trip which might consists of multiple legs
 	 * and pt_interaction activities.  
 	 */
-	public static boolean replanFutureTrip(Trip trip, Plan plan, String routingMode, double departureTime, TripRouter tripRouter) {
+	@Deprecated // prefer the non-static methods
+	public static List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String routingMode,
+			double departureTime, TripRouter tripRouter, Scenario scenario) {
 		Person person = plan.getPerson();
 
-		Facility<?> fromFacility = new ActivityWrapperFacility( trip.getOriginActivity() ) ;
-		Facility<?> toFacility = new ActivityWrapperFacility( trip.getDestinationActivity() ) ;
+		Facility fromFacility = FacilitiesUtils.toFacility( trip.getOriginActivity(), scenario.getActivityFacilities() );
+		Facility toFacility = FacilitiesUtils.toFacility( trip.getDestinationActivity(), scenario.getActivityFacilities() );
 
 		final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, person);
 		
@@ -249,7 +251,7 @@ public final class EditTrips {
 
 		TripRouter.insertTrip(plan, trip.getOriginActivity(), newTrip, trip.getDestinationActivity());
 
-		return true;
+		return newTrip ;
 	}
 
 	/** Convenience method, to be consistent with earlier syntax.  kai, may'16
@@ -257,43 +259,20 @@ public final class EditTrips {
 	 * @param plan
 	 * @param mainMode
 	 * @param departureTime
-	 * @param network
 	 * @param tripRouter
+	 * @param scenario
 	 */
-	public static boolean relocateFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, Network network, TripRouter tripRouter) {
-		return replanFutureTrip(trip, plan, mainMode, departureTime, tripRouter );
+	@Deprecated // prefer the non-static methods
+	public static List<? extends PlanElement> relocateFutureTrip(Trip trip, Plan plan, String mainMode,
+			double departureTime, TripRouter tripRouter, Scenario scenario) {
+		return replanFutureTrip(trip, plan, mainMode, departureTime, tripRouter, scenario );
 	}
 	public StageActivityTypes getStageActivities() {
 		return tripRouter.getStageActivityTypes() ;
 	}
-	/**
-	 * @param trip
-	 * @return the departure time of the first leg of the trip
-	 */
-	public static double getDepartureTime(Trip trip) {
-		// does this always make sense?
-		Leg leg = (Leg) trip.getTripElements().get(0);
-		return leg.getDepartureTime();
+	
+	public Trip findTripAfterActivity( Plan plan, Activity activity ) {
+		return TripStructureUtils.findTripStartingAtActivity( activity, plan, tripRouter.getStageActivityTypes() ) ;
 	}
-	/**
-		 * @param plan
-		 * @param activity
-		 * @param tripRouter
-		 * @return the Trip that starts at the given activity or null, if no trip was found
-		 */
-		public static Trip findTripAfterActivity(Plan plan, Activity activity, TripRouter tripRouter) {
-			return TripStructureUtils.findTripStartingAtActivity(activity, plan, tripRouter.getStageActivityTypes() ) ;
-	//		List<Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes());
-	//
-	//		for (Trip trip : trips) {
-	//			if (trip.getOriginActivity() == fromActivity) return trip;
-	//		}
-	//
-	//		// no matching trip was found
-	//		return null;
-		}
-		public Trip findTripAfterActivity( Plan plan, Activity activity ) {
-			return findTripAfterActivity(plan, activity, tripRouter) ;
-		}
 
 }

@@ -20,11 +20,14 @@
 
 package org.matsim.pt.transitSchedule.api;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimSomeWriter;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
+import org.matsim.pt.transitSchedule.TransitScheduleWriterV2;
 
 /**
  * Writes {@link TransitSchedule}s to file in one of the
@@ -33,7 +36,8 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
  * @author mrieser
  */
 public class TransitScheduleWriter implements MatsimSomeWriter {
-
+	private static final Logger log = Logger.getLogger( TransitScheduleWriter.class ) ;
+	
 	private final TransitSchedule schedule;
 	private final CoordinateTransformation transformation;
 
@@ -50,14 +54,14 @@ public class TransitScheduleWriter implements MatsimSomeWriter {
 
 	/**
 	 * Writes the transit schedule to the specified file in the most
-	 * current file format (currently V1).
+	 * current file format (currently V2).
 	 *
 	 * @param filename
 	 * @throws UncheckedIOException
-	 * @see {@link #writeV1(String)}
+	 * @see {@link #writeFileV2(String)}
 	 */
 	public void writeFile(final String filename) throws UncheckedIOException {
-		writeFileV1(filename);
+		writeFileV2(filename);
 	}
 
 	/**
@@ -68,6 +72,19 @@ public class TransitScheduleWriter implements MatsimSomeWriter {
 	 * @throws UncheckedIOException
 	 */
 	public void writeFileV1(final String filename) throws UncheckedIOException {
-		new TransitScheduleWriterV1( transformation , this.schedule).write(filename);
+		log.info( Gbl.aboutToWrite("transit schedule", filename) ) ;
+		new TransitScheduleWriterV1(this.transformation, this.schedule).write(filename);
+	}
+
+	/**
+	 * Writes the transit schedule to the specified file in the file
+	 * format specified by <tt>transitSchedule_v2.dtd</tt>
+	 *
+	 * @param filename
+	 * @throws UncheckedIOException
+	 */
+	public void writeFileV2(final String filename) throws UncheckedIOException {
+		log.info( Gbl.aboutToWrite( "transit schedule" , filename ) ) ;
+		new TransitScheduleWriterV2(this.transformation, this.schedule).write(filename);
 	}
 }

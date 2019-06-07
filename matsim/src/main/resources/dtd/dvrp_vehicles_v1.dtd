@@ -3,7 +3,7 @@
 <!-- ============================================================ -->
 
 <!-- For further information or questions, please contact
-     Michal Maciejewski, michal.maciejewski at put dot poznan dot pl -->
+     Michal Maciejewski, maciejewski at vsp dot tu-berlin dot de -->
 
 <!-- ============================================================ -->
 
@@ -15,5 +15,5 @@
 	id          CDATA   #REQUIRED
 	start_link  CDATA   #REQUIRED
 	capacity    CDATA   #IMPLIED
-	t_0         CDATA   #IMPLIED
-	t_1         CDATA   #IMPLIED>
+		t_0         CDATA   #REQUIRED
+		t_1         CDATA   #REQUIRED>

@@ -20,9 +20,10 @@
 package org.matsim.contrib.dvrp.tracker;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
-import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.path.DivertedVrpPath;
+import org.matsim.contrib.dvrp.path.VrpPath;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.dvrp.vrpagent.VrpLeg;
@@ -31,12 +32,12 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 /**
  * @author michalm
  */
-class OnlineDriveTaskTrackerImpl implements OnlineDriveTaskTracker {
-	private final Vehicle vehicle;
+public class OnlineDriveTaskTrackerImpl implements OnlineDriveTaskTracker {
+	private final DvrpVehicle vehicle;
 	private final DriveTask driveTask;
 	private final VrpLeg vrpDynLeg;
 
-	private final VrpOptimizerWithOnlineTracking optimizer;
+	private final OnlineTrackerListener onlineTrackerListener;
 	private final MobsimTimer timer;
 
 	private VrpPath path;
@@ -44,12 +45,13 @@ class OnlineDriveTaskTrackerImpl implements OnlineDriveTaskTracker {
 	private double linkEnterTime;
 	private double[] remainingTTs;// excluding the current link
 
-	OnlineDriveTaskTrackerImpl(Vehicle vehicle, VrpLeg vrpDynLeg, VrpOptimizerWithOnlineTracking optimizer,
+	public OnlineDriveTaskTrackerImpl(DvrpVehicle vehicle, VrpLeg vrpDynLeg,
+			OnlineTrackerListener onlineTrackerListener,
 			MobsimTimer timer) {
 		this.vehicle = vehicle;
 		this.driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
 		this.vrpDynLeg = vrpDynLeg;
-		this.optimizer = optimizer;
+		this.onlineTrackerListener = onlineTrackerListener;
 		this.timer = timer;
 
 		initForPath(driveTask.getPath());
@@ -69,10 +71,25 @@ class OnlineDriveTaskTrackerImpl implements OnlineDriveTaskTracker {
 	}
 
 	@Override
+	public VrpPath getPath() {
+		return path;
+	}
+
+	@Override
+	public int getCurrentLinkIdx() {
+		return currentLinkIdx;
+	}
+
+	@Override
+	public double getCurrentLinkEnterTime() {
+		return linkEnterTime;
+	}
+
+	@Override
 	public void movedOverNode(Link nextLink) {
 		currentLinkIdx++;
 		linkEnterTime = timer.getTimeOfDay();
-		optimizer.vehicleEnteredNextLink(vehicle, nextLink);
+		onlineTrackerListener.vehicleEnteredNextLink(vehicle, nextLink);
 	}
 
 	/**
@@ -98,6 +115,7 @@ class OnlineDriveTaskTrackerImpl implements OnlineDriveTaskTracker {
 		return new LinkTimePair(path.getLink(currentLinkIdx + 1), predictedNextLinkExitTime);
 	}
 
+	@Override
 	public void divertPath(VrpPathWithTravelData newSubPath) {
 		LinkTimePair diversionPoint = getDiversionPoint();
 

@@ -19,11 +19,7 @@
 
 package org.matsim.core.scoring;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -48,7 +44,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
@@ -65,7 +60,10 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 
@@ -87,7 +85,7 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
-	private class PendingTransitTravel {
+	private static class PendingTransitTravel {
 
 		final Id<Vehicle> vehicleId;
 		final Id<TransitStopFacility> accessStop;
@@ -99,7 +97,7 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 
 	}
 
-	private class LineAndRoute {
+	private static class LineAndRoute {
 
 		final Id<TransitLine> transitLineId;
 		final Id<TransitRoute> transitRouteId;
@@ -145,9 +143,8 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 
 
 	@Inject
-	EventsToLegs(Network network, EventsManager eventsManager) {
+	EventsToLegs(Network network) {
 		this.network = network;
-		eventsManager.addHandler(this);
 	}
 
 

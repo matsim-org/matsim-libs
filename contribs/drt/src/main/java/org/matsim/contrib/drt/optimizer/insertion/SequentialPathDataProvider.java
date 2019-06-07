@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.data.DrtRequest;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -69,7 +69,7 @@ public class SequentialPathDataProvider implements PathDataProvider {
 				earliestPickupTime);
 
 		PathData pickupToDropoffPath = pathsFromPickup[0];// only if no other passengers on board (optimistic)
-		double minTravelTime = pickupToDropoffPath.path.travelTime + pickupToDropoffPath.firstAndLastLinkTT;
+		double minTravelTime = pickupToDropoffPath.getTravelTime();
 		double earliestDropoffTime = earliestPickupTime + minTravelTime + stopDuration; // over-optimistic
 
 		// calc backward dijkstra from dropoff to ends of all stops

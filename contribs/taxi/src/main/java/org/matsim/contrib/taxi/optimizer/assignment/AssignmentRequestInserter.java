@@ -22,14 +22,14 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
 import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
-import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.AssignmentCost;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.FastAStarEuclideanFactory;
@@ -56,8 +56,8 @@ public class AssignmentRequestInserter implements UnplannedRequestInserter {
 		this(fleet, timer, travelTime, scheduler, params,
 				(MultiNodePathCalculator)new FastMultiNodeDijkstraFactory(true).createPathCalculator(network,
 						travelDisutility, travelTime),
-				(BackwardMultiNodePathCalculator)new BackwardFastMultiNodeDijkstraFactory(true)
-						.createPathCalculator(network, travelDisutility, travelTime),
+				(BackwardMultiNodePathCalculator)new BackwardFastMultiNodeDijkstraFactory(true).createPathCalculator(
+						network, travelDisutility, travelTime),
 				new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime));
 	}
 
@@ -70,7 +70,7 @@ public class AssignmentRequestInserter implements UnplannedRequestInserter {
 		this.params = params;
 
 		assignmentProblem = new VehicleAssignmentProblem<>(travelTime, multiNodeRouter, backwardMultiNodeRouter, router,
-				params.nearestRequestsLimit, params.nearestVehiclesLimit);
+				params.getNearestRequestsLimit(), params.getNearestVehiclesLimit());
 
 		assignmentCostProvider = new TaxiToRequestAssignmentCostProvider(params);
 	}
@@ -99,7 +99,7 @@ public class AssignmentRequestInserter implements UnplannedRequestInserter {
 	private VehicleData initVehicleData(AssignmentRequestData rData) {
 		long idleVehs = fleet.getVehicles().values().stream().filter(scheduler::isIdle).count();
 		double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ? //
-				params.vehPlanningHorizonUndersupply : params.vehPlanningHorizonOversupply;
+				params.getVehPlanningHorizonUndersupply() : params.getVehPlanningHorizonOversupply();
 		return new VehicleData(timer.getTimeOfDay(), scheduler, fleet.getVehicles().values().stream(),
 				vehPlanningHorizon);
 	}

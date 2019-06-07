@@ -5,16 +5,22 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.misc.StringUtils;
 
+import java.util.Arrays;
+import java.util.Map;
+
 public class ChangeModeConfigGroup extends ReflectiveConfigGroup {
 
-//	public final static String CONFIG_MODULE = "changeLegMode";
 	public final static String CONFIG_MODULE = "changeMode";
 	public final static String CONFIG_PARAM_MODES = "modes";
 	public final static String CONFIG_PARAM_IGNORECARAVAILABILITY = "ignoreCarAvailability";
+	public final static String MODE_SWITCH_BEHAVIOR = "modeSwitchBehavior";
+
+
+	public enum Behavior { fromAllModesToSpecifiedModes, fromSpecifiedModesToSpecifiedModes }
+	private Behavior behavior = Behavior.fromSpecifiedModesToSpecifiedModes ;
 
 	private String[] modes = new String[] { TransportMode.car, TransportMode.pt };
 	private boolean ignoreCarAvailability = true;
-
 	public ChangeModeConfigGroup() {
 		super(CONFIG_MODULE);
 	}
@@ -47,7 +53,26 @@ public class ChangeModeConfigGroup extends ReflectiveConfigGroup {
 		return ignoreCarAvailability;
 	}
 
-	private static String toString( final String[] modes ) {
+	@StringGetter(MODE_SWITCH_BEHAVIOR)
+	public Behavior getBehavior() {
+		return behavior;
+	}
+
+	@StringSetter(MODE_SWITCH_BEHAVIOR)
+	public void setBehavior(Behavior behavior) {
+		this.behavior = behavior;
+	}
+
+	@Override
+	public Map<String, String> getComments() {
+		Map<String, String> comments = super.getComments();
+		comments.put(CONFIG_PARAM_MODES, "Defines all the modes available, including chain-based modes, seperated by commas" );
+		comments.put(CONFIG_PARAM_IGNORECARAVAILABILITY, "Defines whether car availability is considered be considered or not. An agent has no car only if it has no license, or never access to a car. Default: true" );
+		comments.put(MODE_SWITCH_BEHAVIOR,"Defines the mode switch behavior. Possible values "+ Arrays.toString(Behavior.values()) +" Default: fromSpecifiedModesToSpecifiedModes.");
+		return comments;
+	}
+
+	private static String toString(final String[] modes ) {
 		// (not same as toString() because of argument!)
 
 		StringBuilder b = new StringBuilder();

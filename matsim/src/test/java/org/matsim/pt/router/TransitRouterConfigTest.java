@@ -19,7 +19,7 @@
 
 package org.matsim.pt.router;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
@@ -53,7 +53,8 @@ public class TransitRouterConfigTest {
 		
 		planScoring.setUtilityOfLineSwitch(-2.34);
 		
-		planRouting.setTeleportedModeSpeed(TransportMode.walk, 1.37);
+		planRouting.setTeleportedModeSpeed(TransportMode.access_walk, 1.37);
+		// (this will clear all defaults!)
 		planRouting.setBeelineDistanceFactor(1.2);
 		
 		transitRouting.setAdditionalTransferTime(128.0);

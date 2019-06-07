@@ -21,27 +21,28 @@ package org.matsim.contrib.taxi.passenger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
-
-import com.google.inject.Inject;
 
 /**
  * @author michalm
  */
 public class TaxiRequestCreator implements PassengerRequestCreator {
-	@Inject(optional = true)
-	private SubmittedTaxiRequestsCollector requestsCollector;
+	private final String mode;
+	private final SubmittedTaxiRequestsCollector requestsCollector;
+
+	public TaxiRequestCreator(String mode, SubmittedTaxiRequestsCollector requestsCollector) {
+		this.mode = mode;
+		this.requestsCollector = requestsCollector;
+	}
 
 	@Override
 	public TaxiRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
 			double departureTime, double submissionTime) {
-		TaxiRequest request = new TaxiRequest(id, passenger, fromLink, toLink, departureTime, submissionTime);
-		if (requestsCollector != null) {
-			requestsCollector.addRequest(request);
-		}
+		TaxiRequest request = new TaxiRequest(id, passenger.getId(), mode, fromLink, toLink, departureTime,
+				submissionTime);
+		requestsCollector.addRequest(request);
 		return request;
 	}
 }

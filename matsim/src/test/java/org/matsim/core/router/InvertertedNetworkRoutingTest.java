@@ -32,7 +32,7 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 
 /**
@@ -51,9 +51,9 @@ public class InvertertedNetworkRoutingTest {
 		LeastCostPathCalculatorFactory lcpFactory = new DijkstraFactory();
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-        Facility<?> fromFacility = new LinkWrapperFacility(//
+        Facility fromFacility = new LinkWrapperFacility(//
                 f.s.getNetwork().getLinks().get(Id.create("12", Link.class)));
-        Facility<?> toFacility = new LinkWrapperFacility(//
+        Facility toFacility = new LinkWrapperFacility(//
                 f.s.getNetwork().getLinks().get(Id.create("78", Link.class)));
 
 		LinkToLinkRoutingModule router =
@@ -100,8 +100,8 @@ public class InvertertedNetworkRoutingTest {
 		
 	}
 
-	private NetworkRoute calcRoute(LinkToLinkRoutingModule router, final Facility<?> fromFacility,
-            final Facility<?> toFacility, final Person person)
+	private NetworkRoute calcRoute(LinkToLinkRoutingModule router, final Facility fromFacility,
+            final Facility toFacility, final Person person)
 	{
         Leg leg = (Leg)router.calcRoute(fromFacility, toFacility, 0.0, person).get(0);
         return (NetworkRoute) leg.getRoute();

@@ -3,20 +3,21 @@ package org.matsim.contrib.freight.replanning.modules;
 import java.io.File;
 import java.util.Collection;
 
-import jsprit.analysis.toolbox.AlgorithmSearchProgressChartListener;
-import jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import jsprit.core.algorithm.VehicleRoutingAlgorithmBuilder;
-import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
-import jsprit.core.algorithm.state.StateManager;
-import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.constraint.ConstraintManager;
-import jsprit.core.problem.cost.VehicleRoutingActivityCosts;
-import jsprit.core.problem.cost.VehicleRoutingTransportCosts;
-import jsprit.core.problem.driver.Driver;
-import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import jsprit.core.problem.solution.route.activity.TourActivity;
-import jsprit.core.problem.vehicle.Vehicle;
-import jsprit.core.util.Solutions;
+import com.graphhopper.jsprit.analysis.toolbox.AlgorithmSearchProgressChartListener;
+import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.algorithm.state.StateManager;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
+import com.graphhopper.jsprit.core.problem.driver.Driver;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import com.graphhopper.jsprit.core.util.Solutions;
+import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
+import com.graphhopper.jsprit.io.algorithm.AlgorithmConfigXmlReader;
+import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -52,13 +53,21 @@ public class VehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
             private double penalty4missedTws = 0.01;
 
+            //TODO: KMT/jan18 Replace per TimeUnit to per Transport/Servie/WaitingTimeUnit ... but make sure that this were set correctly. 
             @Override
             public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {
                 double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
                 double waiting = Math.max(0, act.getTheoreticalEarliestOperationStartTime() - arrivalTime);
                 double service = act.getOperationTime() * vehicle.getType().getVehicleCostParams().perTimeUnit;
-                return penalty4missedTws * tooLate + vehicle.getType().getVehicleCostParams().perTimeUnit * waiting + service;
+                return penalty4missedTws * tooLate + vehicle.getType().getVehicleCostParams().perTimeUnit * waiting + service;		//TODO: KMT/jan 18 It is a bit confusing to me why there are some values already multiplied with costParams and others not.
             }
+
+			@Override
+			public double getActivityDuration(TourActivity tourAct, double arrivalTime, Driver driver,
+					Vehicle vehicle) {
+				double activityDuration = Math.max(0, tourAct.getEndTime() - tourAct.getArrTime()); //including waiting times
+				return activityDuration;
+			}
         };
         vrpAlgorithmConfig = vrpAlgoConfigFile;
     }
@@ -85,25 +94,27 @@ public class VehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
         //build the problem
         VehicleRoutingProblem vrp = vrpBuilder.build();
 
-        VehicleRoutingAlgorithmBuilder vraBuilder = new VehicleRoutingAlgorithmBuilder(vrp, vrpAlgorithmConfig);
-        vraBuilder.addDefaultCostCalculators();
+        //configure the algorithm
+        AlgorithmConfig algorithmConfig = new AlgorithmConfig();
+        AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
+        xmlReader.read(vrpAlgorithmConfig);
 
         StateManager stateManager = new StateManager(vrp);
         stateManager.updateLoadStates();
 
         ConstraintManager constraintManager = new ConstraintManager(vrp,stateManager);
         constraintManager.addLoadConstraint();
-        vraBuilder.setStateAndConstraintManager(stateManager, constraintManager);
-
-        VehicleRoutingAlgorithm vra = vraBuilder.build();
+        
+        Boolean addDefaultCostCalculators = true;
+         
+        VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmConfig, 0, null, stateManager, constraintManager, addDefaultCostCalculators);
 
         //get configures algorithm
 //		VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, vrpAlgorithmConfig);
 //		vra.addListener(new AlgorithmSearchProgressChartListener("output/"+carrierPlan.getCarrier().getId() + "_" + carrierPlan.hashCode() + ".png"));
+        
         //add initial-solution - which is the initialSolution for the vehicle-routing-algo
         vra.addInitialSolution(MatsimJspritFactory.createSolution(carrierPlan, vrp));
-
-
 
         //solve problem
         Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();

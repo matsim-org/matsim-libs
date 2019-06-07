@@ -80,7 +80,7 @@ import org.matsim.core.events.handler.EventHandler;
  * @author dstrippgen
  * @author mrieser
  */
-public class EventsManagerImpl implements EventsManager {
+public final class EventsManagerImpl implements EventsManager {
 
 	private static final Logger log = Logger.getLogger(EventsManagerImpl.class);
 

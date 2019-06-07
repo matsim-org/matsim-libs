@@ -23,6 +23,7 @@ package org.matsim.contrib.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -37,14 +38,13 @@ import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnaly
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
 
 /**
  * @author benjamin
  */
-public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
+final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
 
     private final Logger logger = Logger.getLogger(ColdEmissionHandler.class);
 
@@ -69,6 +69,8 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
         this.vehicles = vehicles;
         this.network = network;
         this.coldEmissionAnalysisModule = new ColdEmissionAnalysisModule(parameterObject2, emissionEventsManager, emissionEfficiencyFactor);
+        emissionEventsManager.addHandler(this);
+
     }
 
     @Override
@@ -160,7 +162,6 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
         this.vehicleId2accumulatedDistance.put(vehicleId, 0.0);
 
         Vehicle vehicle = vehicles.getVehicles().get(vehicleId);
-        VehicleType vt = vehicle.getType();
 
         this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
                 linkId,

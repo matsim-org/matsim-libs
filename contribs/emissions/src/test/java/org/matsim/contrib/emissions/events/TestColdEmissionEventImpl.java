@@ -25,12 +25,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 /*
@@ -48,14 +46,17 @@ public class TestColdEmissionEventImpl {
     private final Double n2=6.;
     private final Double nx=7.;
     private final Double pm=8.;
-					private final Id<Vehicle> vehicleId = Id.create("veh 1", Vehicle.class);
-					private final Id<Link> linkId = Id.create("link 1", Link.class);
+    private final Id<Vehicle> vehicleId = Id.create("veh 1", Vehicle.class);
+    private final Id<Link> linkId = Id.create("link 1", Link.class);
+
+	private final Set<String> coldPollutants = new HashSet<>(Arrays.asList("CO", "FC", "HC", "NMHC", "NOx", "NO2","PM"));
+
 	@Test
 	public final void testGetAttributesForCompleteEmissionMaps(){
 		//test normal functionality
 
 		//create a normal event impl
-		Map<ColdPollutant, Double> coldEmissionsMap = new HashMap<>();
+		Map<String, Double> coldEmissionsMap = new HashMap<>();
 		setColdEmissions(coldEmissionsMap);
 		ColdEmissionEvent ce = new ColdEmissionEvent(0.0, linkId, vehicleId, coldEmissionsMap);
 		
@@ -65,19 +66,20 @@ public class TestColdEmissionEventImpl {
 		Assert.assertEquals("the HC value of this cold emission event was "+ Double.parseDouble(ceg.get("HC"))+ "but should have been "+ hc, Double.parseDouble(ceg.get("HC")), hc, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("the NMHC value of this cold emission event was "+ Double.parseDouble(ceg.get("NMHC"))+ "but should have been "+ nm, Double.parseDouble(ceg.get("NMHC")), nm, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("the NO2 value of this cold emission event was "+ Double.parseDouble(ceg.get("NO2"))+ "but should have been "+ n2, Double.parseDouble(ceg.get("NO2")), n2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the NOX value of this cold emission event was "+ Double.parseDouble(ceg.get("NOX"))+ "but should have been "+ nx, Double.parseDouble(ceg.get("NOX")), nx, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the NOx value of this cold emission event was "+ Double.parseDouble(ceg.get("NOx"))+ "but should have been "+ nx, Double.parseDouble(ceg.get("NOx")), nx, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("the PM value of this cold emission event was "+ Double.parseDouble(ceg.get("PM"))+ "but should have been "+ pm, Double.parseDouble(ceg.get("PM")), pm, MatsimTestUtils.EPSILON);
 		
 	}
 
-	private void setColdEmissions(Map<ColdPollutant, Double> coldEmissionsMap) {
-		coldEmissionsMap.put(ColdPollutant.CO, co);
-		coldEmissionsMap.put(ColdPollutant.FC, fc);
-		coldEmissionsMap.put(ColdPollutant.HC, hc);
-		coldEmissionsMap.put(ColdPollutant.NMHC, nm);
-		coldEmissionsMap.put(ColdPollutant.NO2, n2);
-		coldEmissionsMap.put(ColdPollutant.NOX, nx);
-		coldEmissionsMap.put(ColdPollutant.PM, pm);
+	private void setColdEmissions(Map<String, Double> coldEmissionsMap) {
+		coldEmissionsMap.put("CO", co);
+		coldEmissionsMap.put("FC", fc);
+		coldEmissionsMap.put("HC", hc);
+		coldEmissionsMap.put("NMHC", nm);
+		coldEmissionsMap.put("NO2", n2);
+		coldEmissionsMap.put("NOx", nx);
+		coldEmissionsMap.put("PM", pm);
+
 	}
 	
 	@Test
@@ -88,36 +90,35 @@ public class TestColdEmissionEventImpl {
 		// - throw NullPointerExceptions if no emission map is assigned 
 		
 		//empty map
-		Map<ColdPollutant, Double> emptyMap = new HashMap<>();
+		Map<String, Double> emptyMap = new HashMap<>();
 		ColdEmissionEvent emptyMapEvent = new ColdEmissionEvent(22., linkId, vehicleId, emptyMap);
 		
 		//values not set
-		Map<ColdPollutant, Double> valuesNotSet = new HashMap<>();
-		valuesNotSet.put(ColdPollutant.CO, null);
-		valuesNotSet.put(ColdPollutant.FC, null);
-		valuesNotSet.put(ColdPollutant.HC, null);
-		valuesNotSet.put(ColdPollutant.NMHC, null);
-		valuesNotSet.put(ColdPollutant.NO2, null);
-		valuesNotSet.put(ColdPollutant.NOX, null);
-		valuesNotSet.put(ColdPollutant.PM, null);
+		Map<String, Double> valuesNotSet = new HashMap<>();
+		valuesNotSet.put("CO", null);
+		valuesNotSet.put("FC", null);
+		valuesNotSet.put("HC", null);
+		valuesNotSet.put("NMHC", null);
+		valuesNotSet.put("NO2", null);
+		valuesNotSet.put("NOx", null);
+		valuesNotSet.put("PM", null);
 		ColdEmissionEvent valuesNotSetEvent = new ColdEmissionEvent(44., linkId, vehicleId, valuesNotSet);
 		
 		//no map
 		ColdEmissionEvent noMap = new ColdEmissionEvent(50., linkId, vehicleId, null);
 		
-		int numberOfColdPollutants = ColdPollutant.values().length;	
+		int numberOfColdPollutants = coldPollutants.size();
 
 		int valNullPointers = 0, noMapNullPointers=0;
 		
-		for(ColdPollutant cp : ColdPollutant.values()){
-			String key= cp.toString();
+		for(String cp : coldPollutants){
 
 			//empty map
-			Assert.assertNull(emptyMapEvent.getAttributes().get(key));
+			Assert.assertNull(emptyMapEvent.getAttributes().get(cp));
 			
 			//values not set
 			try{
-				valuesNotSetEvent.getAttributes().get(key);
+				valuesNotSetEvent.getAttributes().get(cp);
 			}
 			catch(NullPointerException e){
 				valNullPointers ++;
@@ -125,7 +126,7 @@ public class TestColdEmissionEventImpl {
 			
 			//no map
 			try{
-				noMap.getAttributes().get(key);
+				noMap.getAttributes().get(cp);
 			}
 			catch(NullPointerException e){
 				noMapNullPointers++;

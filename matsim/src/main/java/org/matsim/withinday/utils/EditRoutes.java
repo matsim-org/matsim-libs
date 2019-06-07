@@ -107,7 +107,7 @@ public final class EditRoutes {
 	 * 
 	 */
 	@Deprecated // not consistent with access/egress approach; can only be used if you know exactly what you are doing.  
-	// Maybe replanXxx is already sufficient?  Otherwise use EditTrips or EditPlans.  kai, nov'17
+	// Maybe replanXxx (which does not have these problems) is already sufficient?  Otherwise use EditTrips or EditPlans.  kai, nov'17
 	public boolean relocateFutureLegRoute(Leg leg, Id<Link> fromLinkId, Id<Link> toLinkId, Person person ) {
 
 		Link fromLink = network.getLinks().get(fromLinkId);
@@ -156,8 +156,8 @@ public final class EditRoutes {
 		Link fromLink = network.getLinks().get(fromLinkId);
 		Link toLink = network.getLinks().get(toLinkId);
 
-		Facility<ActivityFacility> fromFacility = new LinkWrapperFacility(fromLink);
-		Facility<ActivityFacility> toFacility = new LinkWrapperFacility(toLink);
+		Facility fromFacility = new LinkWrapperFacility(fromLink);
+		Facility toFacility = new LinkWrapperFacility(toLink);
 
 		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, leg.getDepartureTime(), person);
 
@@ -261,27 +261,38 @@ public final class EditRoutes {
 		Vehicle vehicle = null ;
 		Path path = this.pathCalculator.calcLeastCostPath(startLink.getToNode(), endLink.getFromNode(), time, person, vehicle) ;
 		
-		spliceNewPathIntoOldRoute(currentLinkIndex, toLinkId, oldRoute, oldLinkIds, NetworkUtils.getLinkIds(path.links) ) ;
+		spliceNewPathIntoOldRoute(currentLinkIndex, toLinkId, oldRoute, NetworkUtils.getLinkIds(path.links), currentLinkId) ;
 
 		return true;
 	}
 	
 	static void spliceNewPathIntoOldRoute(int currentLinkIndex, Id<Link> toLinkId, NetworkRoute oldRoute,
-										  List<Id<Link>> oldLinkIds, List<Id<Link>> newLinksIds) {
+										  List<Id<Link>> newLinksIds, Id<Link> currentLinkId) {
+		List<Id<Link>> oldLinkIds = oldRoute.getLinkIds();;
 		List<Id<Link>> resultingLinkIds = new ArrayList<>();
+		
+		// REMEMBER: the "currentLinkIndex" does not point to the current position, but one beyond. Probably
+		// because there is a starting link, which is not part of getLinkIds().
 
 		/*
 		 * Get those Links which have already been passed.
-		 * allLinkIds contains also the startLinkId, which should not
+		 * oldLinkIds contains also the startLinkId, which should not
 		 * be part of the List - it is set separately. Therefore we start
-		 * at index 1.
+		 * at index 1.  CD, 201X
+		 * --> I cannot confirm this from the code.  Maybe it was like that in earlier times?  kai, feb'18
 		 */
 		if (currentLinkIndex > 0) {
-			resultingLinkIds.addAll(oldLinkIds.subList(1, currentLinkIndex + 1));
+//			log.warn("oldLinkIds.size = " + oldLinkIds.size() + "; currentLinkIndex = " + currentLinkIndex ) ;
+//			resultingLinkIds.addAll(oldLinkIds.subList(1, currentLinkIndex + 1));
+			resultingLinkIds.addAll(oldLinkIds.subList(0, currentLinkIndex-1));
+			// (1) I cannot confirm the "starting at 1" from the code, as stated above.  Maybe it was like that in earlier code.
+			// (2) [0,current-1[ now means [0,current-2].  Since "current-1" is the current link, current-2 is one before.
+			// This will then be compensated below.
 		}
-		
-		//		Leg newLeg = (Leg) planElements.get(0);
-		//		Route newRoute = newLeg.getRoute();
+		if ( !oldRoute.getStartLinkId().equals( currentLinkId ) ) {
+			// (this happens if the agent is still on the departure link: that is not part of getLinkIds().  Otherwise:   )
+			resultingLinkIds.add(currentLinkId);
+		}
 		
 		// Merge old and new Route.
 		/*
@@ -289,13 +300,26 @@ public final class EditRoutes {
 		 * If the new leg ends at the current Link, we have to
 		 * remove that linkId from the linkIds List - it is stored
 		 * in the endLinkId field of the route.
+		 * --> This is essentially the addition of the "currentLinkId" above, which
+		 * could now just be suppressed in this situation.  kai, feb'18
+		 * --> I just tried that, but at least the obvious approach does not pass the tests. kai, feb'18
 		 */
 //		if (newLinkIds.size() > 0 && path.links.size()>0 && newLinkIds.get(newLinkIds.size() - 1).equals( path.links.get( path.links.size()-1 ) ) ) {
-		if (resultingLinkIds.size() > 0 && newLinksIds.size()>0 && resultingLinkIds.get(resultingLinkIds.size() - 1).equals( newLinksIds.get( newLinksIds.size()-1 ) ) ) {
+		if (resultingLinkIds.size() > 0 && newLinksIds.size()>0
+					&& resultingLinkIds.get(resultingLinkIds.size() - 1).equals( newLinksIds.get( newLinksIds.size()-1 ) )
+				) {
 			resultingLinkIds.remove( resultingLinkIds.size()-1 );
 		}
 		
 		resultingLinkIds.addAll( newLinksIds ) ;
+		
+		StringBuilder strb = new StringBuilder() ;
+		for ( int ii= Math.max(0,currentLinkIndex-2) ; ii < Math.min( resultingLinkIds.size(), currentLinkIndex+3) ; ii++ ) {
+			strb.append("-") ;
+			strb.append( resultingLinkIds.get(ii) ) ;
+			strb.append("-") ;
+		}
+		log.info( "linkIds at join: " + strb ) ;
 		
 		// Overwrite old Route
 		oldRoute.setLinkIds(oldRoute.getStartLinkId(), resultingLinkIds, toLinkId );
@@ -350,7 +374,11 @@ public final class EditRoutes {
 		
 		return relocateCurrentLegRoute(leg, person, currentLinkIndex, route.getEndLinkId(), time );
 	}
-
+	
+	public final LeastCostPathCalculator getPathCalculator() {
+		return pathCalculator;
+	}
+	
 	// #########################################################################################
 	// helper methods below
 

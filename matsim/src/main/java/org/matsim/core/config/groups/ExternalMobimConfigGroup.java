@@ -38,8 +38,8 @@ public final class ExternalMobimConfigGroup extends ReflectiveConfigGroup {
 	private static final String EXTERNAL_EXE = "externalExe";
 	private static final String TIMEOUT = "timeout";
 
-	private double startTime = Time.UNDEFINED_TIME;
-	private double endTime = Time.UNDEFINED_TIME;
+	private double startTime = Time.getUndefinedTime();
+	private double endTime = Time.getUndefinedTime();
 	private String externalExe = null;
 	private int timeOut = 3600;
 

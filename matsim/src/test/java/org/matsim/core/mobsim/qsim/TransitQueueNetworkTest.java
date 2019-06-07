@@ -54,9 +54,11 @@ import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitQVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -1073,28 +1075,13 @@ public class TransitQueueNetworkTest extends TestCase {
             tRoute.addDeparture(dep);
             tLine.addRoute(tRoute);
             EventsManager eventsManager = EventsUtils.createEventsManager();
-            QSim qSim = new QSim(scenario, eventsManager);
-			ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
-			qSim.addMobsimEngine(activityEngine);
-			qSim.addActivityHandler(activityEngine);
-            QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
-		  qSim.addMobsimEngine(netsimEngine);
-		  qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		  this.simEngine = netsimEngine ;
-			DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager);
-			qSim.addMobsimEngine(teleportationEngine);
-
-            // setup: simulation
-            AgentFactory agentFactory = new TransitAgentFactory(qSim);
-            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-            qSim.addDepartureHandler(transitEngine);
-            qSim.addAgentSource(transitEngine);
-            qSim.addMobsimEngine(transitEngine);
-
-            PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-            qSim.addAgentSource(agentSource);
-            qsim = qSim;
+            
+            this.qsim = new QSimBuilder(scenario.getConfig()) //
+					.useDefaults() //
+					.build(scenario, eventsManager);
+            TransitQSimEngine transitEngine = qsim.getChildInjector().getInstance(TransitQSimEngine.class);
+            this.simEngine = qsim.getChildInjector().getInstance(QNetsimEngine.class);
+            
             NetsimNetwork qnet = qsim.getNetsimNetwork();
             this.qlink1 = (QLinkImpl) qnet.getNetsimLink(linkId1);
             this.qlink2 = (QLinkImpl) qnet.getNetsimLink(linkId2);
@@ -1130,7 +1117,7 @@ public class TransitQueueNetworkTest extends TestCase {
             this.qsim.internalInterface.arrangeNextAgentState(tDriver) ;
             // (not great, but is a test. kai, dec'11)
 
-            this.normalVehicle = new QVehicle(new VehicleImpl(Id.create("2", Vehicle.class), vehicleType));
+            this.normalVehicle = new QVehicleImpl(new VehicleImpl(Id.create("2", Vehicle.class), vehicleType));
 //            this.qlink1.addParkedVehicle(this.normalVehicle);
             ((QNetsimEngine)this.simEngine).addParkedVehicle(this.normalVehicle, this.qlink1.getLink().getId()) ;
 
@@ -1144,7 +1131,7 @@ public class TransitQueueNetworkTest extends TestCase {
             if (stop2 != null) {
                 /* we're testing two stops. Add another normal vehicle with 20 seconds delay,
                      * that *could* overtake a transit vehicle at its second stop. */
-                this.normalVehicle2 = new QVehicle(new VehicleImpl(Id.create("3", Vehicle.class), vehicleType));
+                this.normalVehicle2 = new QVehicleImpl(new VehicleImpl(Id.create("3", Vehicle.class), vehicleType));
 //                this.qlink1.addParkedVehicle(this.normalVehicle2);
                 ((QNetsimEngine)this.simEngine).addParkedVehicle(this.normalVehicle2, this.qlink1.getLink().getId()) ;
 

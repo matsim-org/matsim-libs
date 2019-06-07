@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -37,6 +38,7 @@ import org.matsim.core.utils.misc.Counter;
  * @author balmermi
  **/
 public final class NetworkCalcTopoType implements NetworkRunnable {
+	private static final Logger log = Logger.getLogger(NetworkCalcTopoType.class) ;
 
 	public final static Integer EMPTY        = 0;
 	public final static Integer SOURCE       = 1;
@@ -47,12 +49,13 @@ public final class NetworkCalcTopoType implements NetworkRunnable {
 	public final static Integer START1WAY    = 6;
 	public final static Integer END1WAY      = 7;
 	public final static Integer INTERSECTION = 8;
+	// yy IMO, replace the above by an enum.  kai, dec'17
 
 	private final Map<Node, Integer> topoTypePerNode = new IdentityHashMap<>(100000);
 
 	@Override
 	public void run(final Network network) {
-		System.out.println("    running " + this.getClass().getName() + " algorithm...");
+		log.info("    running " + this.getClass().getName() + " algorithm...");
 		Counter ctr = new Counter("node #");
 
 		for (Node n : network.getNodes().values()) {
@@ -69,7 +72,10 @@ public final class NetworkCalcTopoType implements NetworkRunnable {
 				else if ((nOfOutLinks == 2) && (nOfInLinks == 1)) { setTopoType(n, START1WAY); }
 				else if ((nOfOutLinks == 1) && (nOfInLinks == 2)) { setTopoType(n, END1WAY); }
 				// The following case is not covered by the paper, but quite common, e.g. parallel roads connecting the same nodes.
-				else if ((nOfOutLinks >= 1) && (nOfInLinks >= 1)) { setTopoType(n, INTERSECTION); }
+				else if ((nOfOutLinks >= 1) && (nOfInLinks >= 1)) {
+					// yyyy intellij says that this condition is always true when the code comes to here.  kai, dec'17
+					setTopoType(n, INTERSECTION);
+				}
 				else { throw new RuntimeException("Node=" + n.toString() + " cannot be assigned to a topo type!"); }
 			}
 			else { // more than two neighbors nodes and no sink or source
@@ -82,18 +88,18 @@ public final class NetworkCalcTopoType implements NetworkRunnable {
 			cnt[getTopoType(n)]++;
 		}
 
-		System.out.println("      #nodes        = " + network.getNodes().size());
-		System.out.println("      #EMTPY        = " + cnt[EMPTY]);
-		System.out.println("      #SOURCE       = " + cnt[SOURCE]);
-		System.out.println("      #SINK         = " + cnt[SINK]);
-		System.out.println("      #DEADEND      = " + cnt[DEADEND]);
-		System.out.println("      #PASS1WAY     = " + cnt[PASS1WAY]);
-		System.out.println("      #PASS2WAY     = " + cnt[PASS2WAY]);
-		System.out.println("      #START1WAY    = " + cnt[START1WAY]);
-		System.out.println("      #END1WAY      = " + cnt[END1WAY]);
-		System.out.println("      #INTERSECTION = " + cnt[INTERSECTION]);
+		log.info("      #nodes        = " + network.getNodes().size());
+		log.info("      #EMTPY        = " + cnt[EMPTY]);
+		log.info("      #SOURCE       = " + cnt[SOURCE]);
+		log.info("      #SINK         = " + cnt[SINK]);
+		log.info("      #DEADEND      = " + cnt[DEADEND]);
+		log.info("      #PASS1WAY     = " + cnt[PASS1WAY]);
+		log.info("      #PASS2WAY     = " + cnt[PASS2WAY]);
+		log.info("      #START1WAY    = " + cnt[START1WAY]);
+		log.info("      #END1WAY      = " + cnt[END1WAY]);
+		log.info("      #INTERSECTION = " + cnt[INTERSECTION]);
 
-		System.out.println("    done.");
+		log.info("    done.");
 	}
 
 	private void setTopoType(final Node node, final Integer topoType) {

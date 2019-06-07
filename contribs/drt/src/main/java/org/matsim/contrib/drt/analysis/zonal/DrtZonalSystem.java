@@ -26,15 +26,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import com.google.inject.Provider;
+import com.google.inject.name.Named;
 
 /**
  * @author jbischoff
@@ -49,9 +54,9 @@ public class DrtZonalSystem {
 	/**
 	 * 
 	 */
-	public DrtZonalSystem(Network network, double cellsize) {
+	public DrtZonalSystem(Network network, double cellSize) {
 		this.network = network;
-		zones = DrtGridUtils.createGridFromNetwork(network, cellsize);
+		zones = DrtGridUtils.createGridFromNetwork(network, cellSize);
 
 	}
 
@@ -99,5 +104,22 @@ public class DrtZonalSystem {
 		}
 		Coord c = MGC.point2Coord(zone.getCentroid());
 		return c;
+	}
+
+	public static class DrtZonalSystemProvider implements Provider<DrtZonalSystem> {
+		@Inject
+		@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
+		private Network network;
+
+		private final double cellSize;
+
+		public DrtZonalSystemProvider(double cellSize) {
+			this.cellSize = cellSize;
+		}
+
+		@Override
+		public DrtZonalSystem get() {
+			return new DrtZonalSystem(network, cellSize);
+		}
 	}
 }

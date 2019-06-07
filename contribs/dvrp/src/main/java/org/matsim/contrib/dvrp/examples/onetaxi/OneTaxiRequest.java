@@ -20,9 +20,12 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 /**
@@ -33,16 +36,19 @@ public final class OneTaxiRequest implements PassengerRequest {
 	private final double submissionTime;
 	private final double earliestStartTime;
 
-	private final MobsimPassengerAgent passenger;
+	private final Id<Person> passengerId;
+	private final String mode;
+
 	private final Link fromLink;
 	private final Link toLink;
 
-	public OneTaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+	public OneTaxiRequest(Id<Request> id, Id<Person> passengerId, String mode, Link fromLink, Link toLink,
 			double departureTime, double submissionTime) {
 		this.id = id;
 		this.submissionTime = submissionTime;
 		this.earliestStartTime = departureTime;
-		this.passenger = passenger;
+		this.passengerId = passengerId;
+		this.mode = mode;
 		this.fromLink = fromLink;
 		this.toLink = toLink;
 	}
@@ -73,7 +79,21 @@ public final class OneTaxiRequest implements PassengerRequest {
 	}
 
 	@Override
-	public MobsimPassengerAgent getPassenger() {
-		return passenger;
+	public Id<Person> getPassengerId() {
+		return passengerId;
+	}
+
+	@Override
+	public String getMode() {
+		return mode;
+	}
+
+	static final class OneTaxiRequestCreator implements PassengerRequestCreator {
+		@Override
+		public OneTaxiRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+				double departureTime, double submissionTime) {
+			return new OneTaxiRequest(id, passenger.getId(), TransportMode.taxi, fromLink, toLink, departureTime,
+					submissionTime);
+		}
 	}
 }

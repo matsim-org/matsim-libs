@@ -39,13 +39,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.MultiNodeDijkstra;
-import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
@@ -109,7 +108,7 @@ public class TransitRouterVariableImpl implements TransitRouter {
 			return new HashMap<>();
 	}
 	    @Override
-	public List<Leg> calcRoute(final Facility<?> fromFacility, final Facility<?> toFacility, final double departureTime, final Person person) {
+	public List<Leg> calcRoute(final Facility fromFacility, final Facility toFacility, final double departureTime, final Person person) {
 		// find possible start stops
 		Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person, fromFacility.getCoord(), departureTime);
 		// find possible end stops
@@ -122,7 +121,8 @@ public class TransitRouterVariableImpl implements TransitRouter {
 		}
 
 		double directWalkCost = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), toFacility.getCoord()) / this.config.getBeelineWalkSpeed() * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
-		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
+			double pathCost = p.travelCost + wrappedFromNodes.get(p.getFromNode()).initialCost + wrappedToNodes.get(
+					p.getToNode()).initialCost;
 		if (directWalkCost < pathCost) {
 			List<Leg> legs = new ArrayList<Leg>();
 			Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
@@ -151,11 +151,13 @@ public class TransitRouterVariableImpl implements TransitRouter {
 		}
 		double directWalkTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
 		double directWalkCost = directWalkTime * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
-		double pathCost = path.travelCost + wrappedFromNodes.get(path.nodes.get(0)).initialCost + wrappedToNodes.get(path.nodes.get(path.nodes.size() - 1)).initialCost;
+		double pathCost = path.travelCost + wrappedFromNodes.get(path.getFromNode()).initialCost + wrappedToNodes.get(
+				path.getToNode()).initialCost;
 		if (directWalkCost < pathCost) {
 			return new Path(new ArrayList<Node>(), new ArrayList<Link>(), directWalkTime, directWalkCost);
 		}
-		double pathTime = path.travelTime + wrappedFromNodes.get(path.nodes.get(0)).initialTime + wrappedToNodes.get(path.nodes.get(path.nodes.size() - 1)).initialTime - 2*departureTime;
+		double pathTime = path.travelTime + wrappedFromNodes.get(path.getFromNode()).initialTime + wrappedToNodes.get(
+				path.getToNode()).initialTime - 2 * departureTime;
 		return new Path(path.nodes, path.links, pathTime, pathCost);
 	}
 	

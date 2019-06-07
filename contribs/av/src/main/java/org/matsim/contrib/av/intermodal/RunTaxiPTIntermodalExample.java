@@ -18,27 +18,31 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.av.intermodal;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterModule;
-import org.matsim.contrib.av.intermodal.router.config.*;
+import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
+import org.matsim.contrib.av.intermodal.router.config.VariableAccessModeConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.run.*;
-import org.matsim.core.config.*;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.run.TaxiModule;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-
 /**
- * @author  jbischoff
- *
+ * @author jbischoff
  */
+
 /**
  *
  */
@@ -48,14 +52,12 @@ public class RunTaxiPTIntermodalExample {
 	}
 
 	public void run(boolean OTFVis) {
-		Config config = ConfigUtils.loadConfig(
-				"intermodal/config.xml",
-				new TaxiConfigGroup(), new DvrpConfigGroup());
+		Config config = ConfigUtils.loadConfig("intermodal/config.xml", new TaxiConfigGroup(), new DvrpConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		// yyyy Could you please javadoc the following?  EmissionsConfigGroup has an example how the explanatory strings
-		// can be kept consistent between config file dump and javadoc.  Thx.  kai, jan'17
+		// yyyy Could you please javadoc the following? EmissionsConfigGroup has an example how the explanatory strings
+		// can be kept consistent between config file dump and javadoc. Thx. kai, jan'17
 		VariableAccessConfigGroup vacfg = new VariableAccessConfigGroup();
 		{
 			VariableAccessModeConfigGroup taxi = new VariableAccessModeConfigGroup();
@@ -80,17 +82,18 @@ public class RunTaxiPTIntermodalExample {
 		otfvis.setDrawNonMovingItems(true);
 		config.addModule(otfvis);
 
-		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
-		config.checkConsistency();
+		String mode = TaxiConfigGroup.get(config).getMode();
+
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
+
 		Controler controler = new Controler(scenario);
 
-		controler.addOverridingModule(new TaxiOutputModule());
+		controler.addOverridingModule(new DvrpModule());
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
 
-        controler.addOverridingModule(new TaxiModule());
-		
+		controler.addOverridingModule(new TaxiModule());
+
 		controler.addOverridingModule(new VariableAccessTransitRouterModule());
 		if (OTFVis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

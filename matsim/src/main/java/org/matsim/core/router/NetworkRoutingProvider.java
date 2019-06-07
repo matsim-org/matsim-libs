@@ -43,11 +43,26 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 	@Inject
     LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	
+	/**
+	 * This is the older (and still more standard) constructor, where the routingMode and the resulting mode were the
+	 * same.
+	 *
+	 * @param mode
+	 */
 	public NetworkRoutingProvider(String mode) {
 		this( mode, mode ) ;
 	}
+	
+	/**
+	 * The effect of this constructor is a router configured for "routingMode" will be used for routing, but the route
+	 * will then have the mode "mode".   So one can, for example, have an uncongested and a congested within-day router,
+	 * for travellers who first might be unaware, but then switch on some help, and the both produce a route of type "car".
+	 *
+	 * @param mode
+	 * @param routingMode
+	 */
 	public NetworkRoutingProvider(String mode, String routingMode ) {
-		log.setLevel(Level.DEBUG);
+//		log.setLevel(Level.DEBUG);
 		
 		this.mode = mode;
 		this.routingMode = routingMode ;

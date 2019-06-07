@@ -20,8 +20,6 @@
 package org.matsim.contrib.signals.data.intergreens.v10;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesDataFactory;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreensForSignalSystemData;
 import org.matsim.contrib.signals.model.SignalSystem;
 
 

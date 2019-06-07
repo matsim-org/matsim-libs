@@ -23,9 +23,8 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
@@ -45,8 +44,10 @@ public interface QLaneI extends Identifiable<Lane> {
 	boolean isActive();
 
 	double getSimulatedFlowCapacityPerTimeStep();
-
-	QVehicle getVehicle( final Id<Vehicle> vehicleId);
+	
+	void recalcTimeVariantAttributes();
+	
+	QVehicle getVehicle(final Id<Vehicle> vehicleId);
 
 	double getStorageCapacity();
 	
@@ -87,7 +88,8 @@ public interface QLaneI extends Identifiable<Lane> {
 
 	boolean isAcceptingFromUpstream();
 
-	void changeSpeedMetersPerSecond(double val) ;
+//	void changeSpeedMetersPerSecond(double val) ;
+	// cannot be consistently implemented with current design, since it is not a parameter of the LinkSpeedCalculator.  kai, feb'18
 
 	/**
 	 * When multiple lanes lead to the same next link, the QLinkLanesImpl needs to decide which lane to use.  It uses
@@ -96,5 +98,6 @@ public interface QLaneI extends Identifiable<Lane> {
 	double getLoadIndicator() ;
 	
 	void initBeforeSimStep();
+	// yyyy could you please explain why this here was added.  Why can't the same thing be done at the beginning of "doSimStep"?  kai, nov'18
 
 }

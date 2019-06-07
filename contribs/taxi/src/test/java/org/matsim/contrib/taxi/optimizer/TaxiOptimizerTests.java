@@ -19,14 +19,15 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider.OptimizerType;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.core.config.*;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 
 public class TaxiOptimizerTests {
@@ -62,26 +63,20 @@ public class TaxiOptimizerTests {
 		List<TaxiConfigVariant> variants = new ArrayList<>();
 
 		// onlineVehicleTracker == false ==> vehicleDiversion == false
-		variants.add(new TaxiConfigVariant(false, false, 120, 60, 1., false));
-		variants.add(new TaxiConfigVariant(true, false, 0, 0, 1., false));
-
-		// onlineVehicleTracker == true, vehicleDiversion == false
-		variants.add(new TaxiConfigVariant(false, false, 120, 60, 1., true));
-		variants.add(new TaxiConfigVariant(true, false, 120, 60, 1., true));
+		variants.add(new TaxiConfigVariant(false, false, 120, 60, 1.5, false));
+		variants.add(new TaxiConfigVariant(true, false, 1, 1, 1.5, false));
 
 		if (diversionSupported) {
-			// onlineVehicleTracker == true, vehicleDiversion == true
-			variants.add(new TaxiConfigVariant(false, true, 0, 0, 1., true));
-			variants.add(new TaxiConfigVariant(true, true, 120, 60, 1., true));
+			// onlineVehicleTracker == true
+			variants.add(new TaxiConfigVariant(false, true, 1, 1, 1.5, true));
+			variants.add(new TaxiConfigVariant(true, true, 120, 60, 1.5, true));
+		} else {
+			// onlineVehicleTracker == true
+			variants.add(new TaxiConfigVariant(false, false, 1, 1, 1.5, true));
+			variants.add(new TaxiConfigVariant(true, false, 120, 60, 1.5, true));
 		}
 
 		return variants;
-	}
-
-	public static Map<String, String> createAbstractOptimParams(OptimizerType type) {
-		Map<String, String> params = new HashMap<>();
-		params.put(DefaultTaxiOptimizerProvider.TYPE, type.name());
-		return params;
 	}
 
 	public static class PreloadedBenchmark {
@@ -102,16 +97,12 @@ public class TaxiOptimizerTests {
 		}
 	}
 
-	public static void runBenchmark(List<TaxiConfigVariant> variants, Map<String, String> params,
+	public static void runBenchmark(List<TaxiConfigVariant> variants, AbstractTaxiOptimizerParams taxiOptimizerParams,
 			PreloadedBenchmark benchmark, String outputDir) {
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(benchmark.config);
+		Optional.ofNullable(taxiCfg.getTaxiOptimizerParams()).ifPresent(taxiCfg::removeParameterSet);
+		taxiCfg.addParameterSet(taxiOptimizerParams);
 
-		ConfigGroup optimizerCfg = new ConfigGroup(TaxiConfigGroup.OPTIMIZER_PARAMETER_SET);
-		for (Entry<String, String> e : params.entrySet()) {
-			optimizerCfg.addParam(e.getKey(), e.getValue());
-		}
-		taxiCfg.setOptimizerConfigGroup(optimizerCfg);
-		
 		int i = 0;
 		for (TaxiConfigVariant v : variants) {
 			v.updateTaxiConfig(taxiCfg);

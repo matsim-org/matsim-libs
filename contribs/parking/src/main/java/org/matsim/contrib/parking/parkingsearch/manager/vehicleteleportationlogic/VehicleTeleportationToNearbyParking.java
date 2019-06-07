@@ -17,9 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic;
 
 import com.google.inject.Inject;
@@ -52,19 +49,12 @@ public class VehicleTeleportationToNearbyParking implements VehicleTeleportation
 	Network network;
 	
 	@Inject
-	/**
-	 * 
-	 */
 	public VehicleTeleportationToNearbyParking(Config config, Network network) {
-		// TODO Auto-generated constructor stub
 		this.beelineDistanceFactor = config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor();
 		this.parkingLogic = new RandomParkingSearchLogic(network);
 		this.network = network;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic#getVehicleLocation(org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id)
-	 */
 	@Override
 	public Id<Link> getVehicleLocation(Id<Link> agentLinkId, Id<Vehicle> vehicleId, Id<Link> vehicleLinkId, double time, String mode) {
 		double walkDistance = CoordUtils.calcEuclideanDistance(network.getLinks().get(vehicleLinkId).getCoord(), network.getLinks().get(agentLinkId).getCoord()) * this.beelineDistanceFactor;

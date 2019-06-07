@@ -20,16 +20,16 @@
 
 package org.matsim.facilities;
 
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.xml.sax.Attributes;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * A reader for facilities-files of MATSim. This reader recognizes the format of the facilities-file and uses
@@ -38,7 +38,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  */
 public class MatsimFacilitiesReader extends MatsimXmlParser {
-	/* Why is this suddenly a "Matsim"FacilitiesReader and not just a Facilities reader to be consistent with all other 
+    /* Why is this suddenly a "Matsim"FacilitiesReader and not just a Facilities reader to be consistent with all other
 	 * naming conventions?  kai, jan09
 	 * because all other readers in Matsim are also called Matsim*Reader,
 	 * e.g. MatsimPopulationReader, MatsimNetworkReader, MatsimWorldReader, ...
@@ -56,56 +56,88 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
 	 */
 
 
-	private final static String FACILITIES_V1 = "facilities_v1.dtd";
+    private final static String FACILITIES_V1 = "facilities_v1.dtd";
 
-	private final static Logger log = Logger.getLogger(MatsimFacilitiesReader.class);
+    private final static Logger log = Logger.getLogger(MatsimFacilitiesReader.class);
 
-	private final CoordinateTransformation coordinateTransformation;
-	private final Scenario scenario;
-	private MatsimXmlParser delegate = null;
+    private final String externalInputCRS;
+    private final String targetCRS;
+    private CoordinateTransformation coordinateTransformation;
 
-	/**
-	 * Creates a new reader for MATSim facilities files.
-	 *
-	 * @param scenario The scenario containing the Facilities-object to store the facilities in.
-	 */
-	public MatsimFacilitiesReader(final Scenario scenario) {
-		this( new IdentityTransformation() , scenario );
-	}
+    private final ActivityFacilities facilities;
+    private MatsimXmlParser delegate = null;
+    private Map<Class<?>, AttributeConverter<?>> attributeConverters = new HashMap<>();
 
-	/**
-	 * Creates a new reader for MATSim facilities files.
-	 *
-	 * @param coordinateTransformation a transformation from the CRS of the data file to the CRS inside MATSim
-	 * @param scenario The scenario containing the Facilities-object to store the facilities in.
-	 */
-	public MatsimFacilitiesReader(
-			final CoordinateTransformation coordinateTransformation,
-			final Scenario scenario) {
-		this.coordinateTransformation = coordinateTransformation;
-		this.scenario = scenario;
-	}
+    /**
+     * Creates a new reader for MATSim facilities files.
+     * Coordinates are not converted
+     *
+     * @param scenario The scenario containing the Facilities-object to store the facilities in.
+     */
+    public MatsimFacilitiesReader(final Scenario scenario) {
+        this(null, scenario);
+    }
 
-	@Override
-	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
-		this.delegate.startTag(name, atts, context);
-	}
+    /**
+     * Creates a new reader for MATSim facilities files.
+     * Converts the coordinates to the target CRS, given the CRS information in the container attributes, or, if absent,
+     * from the config.
+     *
+     * @param targetCRS the CRS the coordinates should be expressed in
+     * @param scenario                 The scenario containing the Facilities-object to store the facilities in.
+     */
+    public MatsimFacilitiesReader(
+            final String targetCRS,
+            final Scenario scenario) {
+        this(scenario.getConfig().facilities().getInputCRS(), targetCRS, scenario.getActivityFacilities());
+    }
 
-	@Override
-	public void endTag(final String name, final String content, final Stack<String> context) {
-		this.delegate.endTag(name, content, context);
-	}
+    /**
+     * Creates a new reader for MATSim facilities files.
+     *
+     * @param externalInputCRS specifies the CRS the coordinates are expressed in. If the CRS is define in the container
+     *                         attributes, this value is ignored
+     * @param targetCRS the CRS the coordinates should be expressed in
+     * @param facilities                 The ActivityFacilities-object to store the facilities in.
+     */
+    public MatsimFacilitiesReader(
+            final String externalInputCRS,
+            final String targetCRS,
+            final ActivityFacilities facilities) {
+        this.externalInputCRS = externalInputCRS;
+        this.targetCRS = targetCRS;
+        this.facilities = facilities;
+    }
 
-	@Override
-	protected void setDoctype(final String doctype) {
-		super.setDoctype(doctype);
-		// Currently the only facilities-type is v1
-		if (FACILITIES_V1.equals(doctype)) {
-			this.delegate = new FacilitiesReaderMatsimV1( coordinateTransformation , scenario );
-			log.info("using facilities_v1-reader.");
-		} else {
-			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
-		}
-	}
+    public void putAttributeConverter(Class<?> clazz, AttributeConverter<?> converter) {
+        this.attributeConverters.put(clazz, converter);
+    }
+
+    public void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {
+        this.attributeConverters.putAll(converters);
+    }
+
+    @Override
+    public void startTag(final String name, final Attributes atts, final Stack<String> context) {
+        this.delegate.startTag(name, atts, context);
+    }
+
+    @Override
+    public void endTag(final String name, final String content, final Stack<String> context) {
+        this.delegate.endTag(name, content, context);
+    }
+
+    @Override
+    protected void setDoctype(final String doctype) {
+        super.setDoctype(doctype);
+        // Currently the only facilities-type is v1
+        if (FACILITIES_V1.equals(doctype)) {
+            this.delegate = new FacilitiesReaderMatsimV1(this.externalInputCRS, this.targetCRS, this.facilities);
+            ((FacilitiesReaderMatsimV1)this.delegate).putAttributeConverters(this.attributeConverters);
+            log.info("using facilities_v1-reader.");
+        } else {
+            throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
+        }
+    }
 
 }

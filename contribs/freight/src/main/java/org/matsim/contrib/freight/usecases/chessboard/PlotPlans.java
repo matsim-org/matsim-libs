@@ -1,8 +1,8 @@
 package org.matsim.contrib.freight.usecases.chessboard;
 
-import jsprit.analysis.toolbox.Plotter;
-import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.analysis.toolbox.Plotter;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -17,7 +17,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class PlotPlans {
+final class PlotPlans {
 
     public static void main(String[] args) {
         Config config = new Config();

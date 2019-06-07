@@ -20,15 +20,9 @@
 
 package org.matsim.withinday.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -48,6 +42,11 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Take the plans that the agents have after within-day replanning, and write them to file.
  * <br>
@@ -55,13 +54,14 @@ import org.matsim.withinday.mobsim.MobsimDataProvider;
  * 
  * @author (of documentation) nagel
   */
+@Singleton
 public class ExecutedPlansServiceImpl implements AfterMobsimListener, ExecutedPlansService {
 	// I renamed this from ExperiencedPlansWriter into ExecutedPlansWriter since we also have an ExperiencedPlansService that
 	// reconstructs experienced plans from events. kai, jun'16
 	
 	private static final Logger log = Logger.getLogger( ExecutedPlansServiceImpl.class );
 
-	public static String EXECUTEDPLANSFILE = "executedPlans.xml.gz";
+	public static final String EXECUTEDPLANSFILE = "executedPlans.xml.gz";
 
 	private Population experiencedPopulation ;
 
@@ -98,15 +98,13 @@ public class ExecutedPlansServiceImpl implements AfterMobsimListener, ExecutedPl
 				experiencedPerson.addPlan(plan);
 				experiencedPerson.setSelectedPlan(plan);
 				
-				// copy attributes if possible
-				if (person instanceof Person && experiencedPerson instanceof Person) {
-					PersonUtils.setAge(experiencedPerson, PersonUtils.getAge(person));
-					PersonUtils.setCarAvail(experiencedPerson, PersonUtils.getCarAvail(person));
-					PersonUtils.setEmployed(experiencedPerson, PersonUtils.isEmployed(person));
-					PersonUtils.setLicence(experiencedPerson, PersonUtils.getLicense(person));
-					PersonUtils.setSex(experiencedPerson, PersonUtils.getSex(person));
-				}
-				
+				// copy attributes
+				PersonUtils.setAge(experiencedPerson, PersonUtils.getAge(person));
+				PersonUtils.setCarAvail(experiencedPerson, PersonUtils.getCarAvail(person));
+				PersonUtils.setEmployed(experiencedPerson, PersonUtils.isEmployed(person));
+				PersonUtils.setLicence(experiencedPerson, PersonUtils.getLicense(person));
+				PersonUtils.setSex(experiencedPerson, PersonUtils.getSex(person));
+
 				experiencedPopulation.addPerson(experiencedPerson);
 			}
 		}

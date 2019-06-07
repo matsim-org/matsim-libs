@@ -33,13 +33,13 @@ import org.matsim.core.controler.MatsimServices;
  * Creates a config file 
  * with necessary emission input files for the {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup}.
  * 
- * This config file is used by the {@link org.matsim.contrib.emissions.example.RunEmissionToolOfflineExampleV2 OfflineExample} and
- * the {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExampleV2 OnlineExample}
+ * This config file is used by the {@link RunDetailedEmissionToolOfflineExample OfflineExample} and
+ * the {@link RunEmissionToolOnlineExample OnlineExample}
  * 
  * @author benjamin, julia
  *
  */
-public class CreateEmissionConfig {
+public final class CreateEmissionConfig {
 
 		private static final String inputPath = "./test/input/org/matsim/contrib/emissions/";
 		private static final String networkFile = //inputPath + 
@@ -108,7 +108,11 @@ public class CreateEmissionConfig {
 		// define emission tool input files	
 	        EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
 	        controler.getConfig().addModule(ecg);
+
+			// one can now directly set the hbefa road types as link attributes
 	        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
+			ecg.setHbefaRoadTypeSource(EmissionsConfigGroup.HbefaRoadTypeSource.fromFile);
+
 	        // emission vehicles are now set in the default vehicle container
 	        config.vehicles().setVehiclesFile(emissionVehicleFile);
 

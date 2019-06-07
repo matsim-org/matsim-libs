@@ -28,6 +28,8 @@ import cadyts.utilities.misc.DynamicDataXMLFileIO;
  * Enables cadyts to persist the cost offsets to file.
  */
 public final class CadytsCostOffsetsXMLFileIO<T extends Identifiable<T>> extends DynamicDataXMLFileIO<T> {
+	// yyyy this is most probably not "costs" but just "offsets" (which end up being added into the scoring function, so if anything
+	// they are negative costs).  --> rename kai/janek, feb'19
 
 	private static final long serialVersionUID = 1L;
 	private LookUpItemFromId<T> lookUp;

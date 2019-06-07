@@ -4,8 +4,19 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim-benchmark</artifactId>
 	<packaging>jar</packaging>
-	<version>0.10.0-SNAPSHOT</version>
+	<version>12.0-SNAPSHOT</version>
 	<name>MATSim Benchmark</name>
+	<distributionManagement>
+		<repository>
+			<id>bintray</id>
+			<url>https://api.bintray.com/maven/matsim/matsim/matsim</url>
+		</repository>
+		<snapshotRepository>
+			<id>oss-jfrog-artifactory</id>
+			<name>artifactory-snapshots</name>
+			<url>http://oss.jfrog.org/oss-snapshot-local</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<build>
 		<plugins>
 			<plugin>
@@ -66,12 +77,12 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.10.0-SNAPSHOT</version>
+			<version>12.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>0.10.0-SNAPSHOT</version>
+			<version>12.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

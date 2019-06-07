@@ -38,6 +38,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -47,8 +48,8 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsWriterV10;
-import org.matsim.lanes.data.Lanes;
-import org.matsim.lanes.data.LanesWriter;
+import org.matsim.lanes.Lanes;
+import org.matsim.lanes.LanesWriter;
 import org.matsim.pt.transitSchedule.api.Transit;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
@@ -130,7 +131,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		dumpLanes();
 		dumpCounts();
 
-		if (!event.isUnexpected() && vspConfig.isWritingOutputEvents()) {
+		if (!event.isUnexpected() && vspConfig.isWritingOutputEvents() && (controlerConfigGroup.getWriteEventsInterval()!=0)) {
 			dumpOutputEvents();
 		}
 		
@@ -139,8 +140,8 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpOutputEvents() {
 		try {
-			File toFile = new File(	controlerIO.getOutputFilename("output_events.xml.gz"));
-			File fromFile = new File(controlerIO.getIterationFilename(controlerConfigGroup.getLastIteration(), "events.xml.gz"));
+			File toFile = new File(	controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_EVENTS_XML));
+			File fromFile = new File(controlerIO.getIterationFilename(controlerConfigGroup.getLastIteration(), Controler.FILENAME_EVENTS_XML));
 			try {
 				Files.copy(fromFile.toPath(), toFile.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.COPY_ATTRIBUTES);
 			} catch (IOException e) {
@@ -148,24 +149,24 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			}
 		} catch ( Exception ee ) {
 			Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
-					+ "generated in the final iteration") ;
+					+ "generated in the final iteration" );
 		}
 	}
 
 	private void dumpExperiencedPlans() {
 		if ( config.planCalcScore().isWriteExperiencedPlans() ) {
-		try {
-			File toFile = new File(	controlerIO.getOutputFilename("output_experienced_plans.xml.gz"));
-			File fromFile = new File(controlerIO.getIterationFilename(controlerConfigGroup.getLastIteration(), "experienced_plans.xml.gz"));
 			try {
-				Files.copy(fromFile.toPath(), toFile.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.COPY_ATTRIBUTES);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+				File toFile = new File(	controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_EXPERIENCED_PLANS));
+				File fromFile = new File(controlerIO.getIterationFilename(controlerConfigGroup.getLastIteration(), Controler.FILENAME_EXPERIENCED_PLANS));
+				try {
+					Files.copy(fromFile.toPath(), toFile.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.COPY_ATTRIBUTES);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			} catch ( Exception ee ) {
+				Logger.getLogger(this.getClass()).error("writing output experienced plans did not work; probably parameters were such that they "
+						+ "were not generated in the final iteration", ee);
 			}
-		} catch ( Exception ee ) {
-			Logger.getLogger(this.getClass()).error("writing output experienced plans did not work; probably parameters were such that they "
-					+ "were not generated in the final iteration") ;
-		}
 		}
 	}
 
@@ -176,7 +177,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 				final String internalCRS = config.global().getCoordinateSystem();
 
 				if ( inputCRS == null ) {
-					new CountsWriter(counts).write(controlerIO.getOutputFilename(Controler.FILENAME_COUNTS));
+					new CountsWriter(counts).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_COUNTS));
 				}
 				else {
 					log.info( "re-projecting counts from "+internalCRS+" back to "+inputCRS+" for export" );
@@ -186,36 +187,46 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 									internalCRS,
 									inputCRS );
 
-					new CountsWriter( transformation , counts).write(controlerIO.getOutputFilename(Controler.FILENAME_COUNTS));
+					new CountsWriter( transformation , counts).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_COUNTS));
 				}
 			}
-		} catch ( Exception ee ) {}
+		} catch ( Exception ee ) {
+			log.error("Exception writing counts.", ee);
+		}
 	}
 
 	private void dumpLanes() {
 		try {
-			new LanesWriter(lanes).write(controlerIO.getOutputFilename(Controler.FILENAME_LANES));
-		} catch ( Exception ee ) {}
+			new LanesWriter(lanes).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_LANES));
+		} catch ( Exception ee ) {
+			log.error("Exception writing lanes.", ee);
+		}
 	}
 
 	private void dumpHouseholds() {
 		try {
-			new HouseholdsWriterV10(households).writeFile(controlerIO.getOutputFilename(Controler.FILENAME_HOUSEHOLDS));
-		} catch ( Exception ee ) {}
+			new HouseholdsWriterV10(households).writeFile(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_HOUSEHOLDS));
+		} catch ( Exception ee ) {
+			log.error("Exception writing households.", ee);
+		}
 	}
 
 	private void dumpVehicles() {
 		try {
-			new VehicleWriterV1(vehicles).writeFile(controlerIO.getOutputFilename("output_vehicles.xml.gz"));
-		} catch ( Exception ee ) {}
+			new VehicleWriterV1(vehicles).writeFile(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_VEHICLES));
+		} catch ( Exception ee ) {
+			log.error("Exception writing vehicles.", ee);
+		}
 	}
 
 	private void dumpTransitVehicles() {
 		try {
 			if ( transitVehicles != null ) {
-				new VehicleWriterV1(transitVehicles).writeFile(controlerIO.getOutputFilename("output_transitVehicles.xml.gz"));
+				new VehicleWriterV1(transitVehicles).writeFile(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_TRANSIT_VEHICLES));
 			}
-		} catch ( Exception ee ) {}
+		} catch ( Exception ee ) {
+			log.error("Exception writing transit vehicles.", ee);
+		}
 	}
 
 	private void dumpTransitSchedule() {
@@ -224,26 +235,16 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 				final String inputCRS = config.transit().getInputScheduleCRS();
 				final String internalCRS = config.global().getCoordinateSystem();
 
-				if ( inputCRS == null ) {
-					new TransitScheduleWriter(transitSchedule).writeFile(controlerIO.getOutputFilename("output_transitSchedule.xml.gz"));
-				}
-				else {
-					log.info( "re-projecting transit schedule from "+internalCRS+" back to "+inputCRS+" for export" );
-
-					final CoordinateTransformation transformation =
-							TransformationFactory.getCoordinateTransformation(
-									internalCRS,
-									inputCRS );
-
-					new TransitScheduleWriter( transformation , transitSchedule ).writeFile(controlerIO.getOutputFilename("output_transitSchedule.xml.gz"));
-				}
+				new TransitScheduleWriter(transitSchedule).writeFile(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_TRANSIT_SCHEDULE));
 			}
-		} catch ( Exception ee ) { }
+		} catch ( Exception ee ) {
+			log.error("Exception writing transit schedule.", ee);
+		}
 	}
 
 	private void dumpNetworkChangeEvents() {
 		if (config.network().isTimeVariantNetwork()) {
-			new NetworkChangeEventsWriter().write(controlerIO.getOutputFilename("output_change_events.xml.gz"),
+			new NetworkChangeEventsWriter().write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_CHANGE_EVENTS_XML),
 					NetworkUtils.getNetworkChangeEvents(network));
 		}
 	}
@@ -254,74 +255,36 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			final String inputCRS = config.facilities().getInputCRS();
 			final String internalCRS = config.global().getCoordinateSystem();
 
-			if ( inputCRS == null ) {
-				new FacilitiesWriter(activityFacilities).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
-			}
-			else {
-				log.info( "re-projecting facilities from "+internalCRS+" back to "+inputCRS+" for export" );
-
-				final CoordinateTransformation transformation =
-						TransformationFactory.getCoordinateTransformation(
-								internalCRS,
-								inputCRS );
-
-				new FacilitiesWriter( transformation , activityFacilities ).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
-			}
-		} catch ( Exception ee ) {}
+			new FacilitiesWriter(activityFacilities).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_FACILITIES));
+		} catch ( Exception ee ) {
+			log.error("Exception writing facilities.", ee);
+		}
 	}
 
 	private void dumpConfig() {
 		// dump config
-		new ConfigWriter(config).write(controlerIO.getOutputFilename(Controler.FILENAME_CONFIG));
+		new ConfigWriter(config).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_CONFIG));
+		new ConfigWriter(config, ConfigWriter.Verbosity.minimal).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_CONFIG_REDUCED));
 	}
 
 	private void dumpNetwork() {
 		// dump network
-		if ( config.network().getInputCRS() == null ) {
-			new NetworkWriter(network).write(controlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
-		}
-		else {
-			log.info( "re-projecting network from "+config.global().getCoordinateSystem()+" back to "+config.network().getInputCRS()+" for export" );
-
-			final CoordinateTransformation transformation =
-					TransformationFactory.getCoordinateTransformation(
-							config.global().getCoordinateSystem(),
-							config.network().getInputCRS() );
-			new NetworkWriter( transformation , network ).write(controlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
-		}
+		new NetworkWriter(network).write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_NETWORK));
 	}
 
 	private void dumpPlans() {
 		// dump plans
 
-		final String inputCRS = config.plans().getInputCRS();
-		final String internalCRS = config.global().getCoordinateSystem();
-
-		if ( inputCRS == null ) {
-			final PopulationWriter writer = new PopulationWriter(population, network);
-			writer.putAttributeConverters( attributeConverters );
-			writer.write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
-		}
-		else {
-			log.info( "re-projecting population from "+internalCRS+" back to "+inputCRS+" for export" );
-
-			final CoordinateTransformation transformation =
-					TransformationFactory.getCoordinateTransformation(
-							internalCRS,
-							inputCRS );
-
-			final PopulationWriter writer = new PopulationWriter(transformation , population, network);
-			writer.putAttributeConverters( attributeConverters );
-			writer.write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
-
-		}
+		final PopulationWriter writer = new PopulationWriter(population, network);
+		writer.putAttributeConverters( attributeConverters );
+		writer.write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_POPULATION));
 
 		final ObjectAttributes personAttributes = population.getPersonAttributes();
 		if ( personAttributes!=null ) {
-			ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(personAttributes) ;
-			writer.setPrettyPrint(true);
-			writer.putAttributeConverters( attributeConverters );
-			writer.writeFile( controlerIO.getOutputFilename( Controler.FILENAME_PERSON_ATTRIBUTES ) );
+			ObjectAttributesXmlWriter attributesXmlWriter = new ObjectAttributesXmlWriter(personAttributes) ;
+			attributesXmlWriter.setPrettyPrint(true);
+			attributesXmlWriter.putAttributeConverters( attributeConverters );
+			attributesXmlWriter.writeFile( controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_PERSON_ATTRIBUTES ) );
 		}
 	}
 

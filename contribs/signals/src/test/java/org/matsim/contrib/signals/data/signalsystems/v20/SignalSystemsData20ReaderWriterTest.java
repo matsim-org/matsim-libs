@@ -24,7 +24,7 @@ import java.io.IOException;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.log4j.Logger;
 import org.junit.Rule;
@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.Lane;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 

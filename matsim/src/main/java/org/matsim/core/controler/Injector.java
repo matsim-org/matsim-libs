@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.inject.spi.LinkedKeyBinding;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
@@ -76,8 +77,9 @@ public final class Injector {
 	}
 
 	public static void printInjector(com.google.inject.Injector injector, Logger log) {
+		Level level = Level.INFO ;
+		log.log(level,"=== printInjector start ===") ;
 		for (Map.Entry<Key<?>, Binding<?>> entry : injector.getBindings().entrySet()) {
-			Level level = Level.INFO ;
 			if ( entry.getKey().toString().contains("type=org.matsim") ) {
 				Annotation annotation = entry.getKey().getAnnotation();
 				log.log( level, entry.getKey().getTypeLiteral() + " " + (annotation != null ? annotation.toString() : ""));
@@ -86,11 +88,15 @@ public final class Injector {
 				if ( entry.getValue() instanceof BindingImpl ) {
 					log.log( level, "  --> scope: " + ((BindingImpl<?>)entry.getValue()).getScoping() ) ;
 				}
-//				log.log(level, "  ==full==> " + entry.getValue() );
+				if ( entry.getValue() instanceof LinkedKeyBinding) {
+					log.log( level, "  --> target: " + ((LinkedKeyBinding) entry.getValue()).getLinkedKey() ) ;
+				}
+				log.log(level, "  ==full==> " + entry.getValue() );
 				// yy could probably format the above in a better way. kai, may'16
 				log.log(level,  "" );
 			}
 		}
+		log.log(level,"=== printInjector end ===") ;
 	}
 
 	private static Module insertMapBindings(List<Module> guiceModules) {

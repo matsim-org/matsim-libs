@@ -45,7 +45,8 @@ import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -204,7 +205,9 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Netsim sim = QSimUtils.createDefaultQSim(scenario, events);
+		QSim sim = new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events);
 		EventsToScore scorer =
 				EventsToScore.createWithScoreUpdating(
 						scenario,
@@ -262,7 +265,9 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 
 		EventsManager events = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Netsim sim = QSimUtils.createDefaultQSim(scenario, events);
+		Netsim sim = new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events);
 		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
 		h.setTypicalDuration(16 * 3600);
 		PlanCalcScoreConfigGroup.ActivityParams w = new PlanCalcScoreConfigGroup.ActivityParams("w");

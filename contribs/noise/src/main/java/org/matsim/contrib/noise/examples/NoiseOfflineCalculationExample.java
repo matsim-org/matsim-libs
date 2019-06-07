@@ -39,18 +39,18 @@ public class NoiseOfflineCalculationExample {
 	
 	private static String runDirectory = "pathTo/RunDirectory/";
 	private static String outputDirectory = "pathTo/analysis-output-directory/";
-	private static int lastIteration = 100;
+	private static String runId = "runXYZ";
 				
 	public static void main(String[] args) {
 	
 		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
-		config.network().setInputFile(runDirectory + "output_network.xml.gz");
-		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
+		config.controler().setRunId(runId);
+		config.network().setInputFile(runDirectory + runId + ".output_network.xml.gz");
+		config.plans().setInputFile(runDirectory + runId + ".output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
-		config.controler().setLastIteration(lastIteration);		
 						
 		// adjust the default noise parameters
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
+		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config,NoiseConfigGroup.class) ;
 		noiseParameters.setReceiverPointGap(12345789.);
 		// ...
 		
@@ -62,7 +62,7 @@ public class NoiseOfflineCalculationExample {
 		// some processing of the output data
 		if (!outputDirectory.endsWith("/")) outputDirectory = outputDirectory + "/";
 		
-		String outputFilePath = outputDirectory + "noise-analysis_it." + scenario.getConfig().controler().getLastIteration() + "/";
+		String outputFilePath = outputDirectory + "noise-analysis/";
 		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
 		process.run();
 				

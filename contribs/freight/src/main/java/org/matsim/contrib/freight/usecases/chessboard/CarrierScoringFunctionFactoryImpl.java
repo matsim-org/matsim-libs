@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -33,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
  * @author stefan
  *
  */
-public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunctionFactory{
+public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunctionFactory{
 
     /**
      *
@@ -56,22 +57,10 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 
         public DriversActivityScoring() {
             super();
-//			try {
-//				fileWriter = new FileWriter(new File("output/act_scoring_"+System.currentTimeMillis()+".txt"));
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
         }
 
         @Override
         public void finish() {
-//			try {
-//				fileWriter.close();
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
         }
 
         @Override
@@ -102,15 +91,6 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 //                log.info("actCosts " + actTimeCosts);
                 assert actTimeCosts >= 0.0 : "actTimeCosts must be positive";
                 score += actTimeCosts*(-1);
-//                try {
-//					fileWriter.write("actLinkId="+ act.getLinkId() + "; actArrTime=" + Time.writeTime(actStartTime) +
-//							"; twEnd=" + tw.getEnd() + "; minTooLate=" + Time.writeTime(Math.max(0, actStartTime-tw.getEnd()))
-//							+ "; penaltyMissedTW=" + (Math.max(0, actStartTime-tw.getEnd())*missedTimeWindowPenalty) +
-//							"; actCosts=" +actTimeCosts + "\n");
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
             }
         }
 
@@ -130,12 +110,6 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
         public VehicleEmploymentScoring(Carrier carrier) {
             super();
             this.carrier = carrier;
-//			try {
-//				fileWriter = new FileWriter(new File("output/veh_employment_"+System.currentTimeMillis()+".txt"));
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
         }
 
         @Override
@@ -150,21 +124,9 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
             if(selectedPlan == null) return 0.;
             for(ScheduledTour tour : selectedPlan.getScheduledTours()){
                 if(!tour.getTour().getTourElements().isEmpty()){
-                    score += (-1)*tour.getVehicle().getVehicleType().getVehicleCostInformation().fix;
-//					try {
-//						fileWriter.write("vehicleId="+tour.getVehicle().getVehicleId()+"; fix="+tour.getVehicle().getVehicleType().getVehicleCostInformation().fix+"\n");
-//					} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+                    score += (-1)*tour.getVehicle().getVehicleType().getVehicleCostInformation().getFix();
                 }
             }
-//			try {
-//				fileWriter.close();
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
             return score;
         }
 
@@ -206,12 +168,12 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
         }
 
         private double getTimeParameter(CarrierVehicle vehicle) {
-            return vehicle.getVehicleType().getVehicleCostInformation().perTimeUnit;
+            return vehicle.getVehicleType().getVehicleCostInformation().getPerTimeUnit();
         }
 
 
         private double getDistanceParameter(CarrierVehicle vehicle) {
-            return vehicle.getVehicleType().getVehicleCostInformation().perDistanceUnit;
+            return vehicle.getVehicleType().getVehicleCostInformation().getPerDistanceUnit();
         }
 
 
@@ -309,6 +271,7 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 
     private Network network;
 
+    @Inject
     public CarrierScoringFunctionFactoryImpl(Network network) {
         super();
         this.network = network;

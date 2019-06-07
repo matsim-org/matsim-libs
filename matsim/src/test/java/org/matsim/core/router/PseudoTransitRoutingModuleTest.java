@@ -49,6 +49,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 public class PseudoTransitRoutingModuleTest {
@@ -110,8 +111,8 @@ public class PseudoTransitRoutingModuleTest {
 			
 			TripRouter tripRouter = injector.getInstance(TripRouter.class) ;
 			
-			Facility<?> fromFacility = new ActivityWrapperFacility(fromAct) ;
-			Facility<?> toFacility = new ActivityWrapperFacility(toAct) ;
+			Facility fromFacility = FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ) ;
+			Facility toFacility = FacilitiesUtils.toFacility(toAct, f.s.getActivityFacilities() );
 			
 			List<? extends PlanElement> result = tripRouter.calcRoute("mode", fromFacility, toFacility, 7.0*3600., person) ;
 			Gbl.assertIf( result.size()==1);

@@ -22,15 +22,12 @@ package org.matsim.pt.router;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -47,7 +44,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.DefaultRoutingModules;
@@ -76,8 +72,6 @@ import org.matsim.testcases.MatsimTestCase;
 public class TransitRouterImplTest {
 	private static final Logger log = Logger.getLogger(TransitRouterImplTest.class) ;
 	
-//	protected static enum TransitRouterType { standard, raptor, connectionScan } ;
-
 	private String routerType ;
 
 	@Parameters(name = "{index}: TransitRouter == {0}")
@@ -243,7 +237,29 @@ public class TransitRouterImplTest {
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
-	@Test@Ignore
+	@Test
+	public void testTransferWalkDistance(){
+		Fixture f = new Fixture();
+		f.init();
+		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
+				f.scenario.getConfig().vspExperimental());
+		TransitRouter router = createTransitRouter(f.schedule, config, routerType);
+		Coord fromCoord = new Coord((double) 3800, (double) 5100);
+		Coord toCoord = new Coord((double) 16100, (double) 10050);
+		List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0*3600, null);
+		Leg leg1 = legs.get(1);
+		ExperimentalTransitRoute route1 = (ExperimentalTransitRoute) leg1.getRoute();
+		Coord coord1 = f.schedule.getFacilities().get(route1.getEgressStopId()).getCoord();
+		Leg leg3 = legs.get(3);
+		ExperimentalTransitRoute route3 = (ExperimentalTransitRoute) leg3.getRoute();
+		Coord coord3 = f.schedule.getFacilities().get(route3.getAccessStopId()).getCoord();
+		double beelineFactor = f.scenario.getConfig().plansCalcRoute().getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor();
+		assertEquals(CoordUtils.calcEuclideanDistance(coord1, coord3) * beelineFactor,
+				legs.get(2).getRoute().getDistance(), MatsimTestCase.EPSILON);
+	}
+
+	@Test
 	public void testFasterAlternative() {
 		Fixture f = new Fixture();
 		f.init();
@@ -477,7 +493,7 @@ public class TransitRouterImplTest {
 			Coord fromCoord = f.fromFacility.getCoord();
 			Coord toCoord = f.toFacility.getCoord();
 			List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 7.0*3600 + 50*60, null);
-			double legDuration = calcTripDuration(new ArrayList<PlanElement>(legs));
+			double legDuration = calcTripDuration(new ArrayList<>(legs));
 			Assert.assertEquals(5, legs.size());
 			Assert.assertEquals(100, legs.get(0).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
 			Assert.assertEquals(800, legs.get(1).getTravelTime(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
@@ -486,7 +502,7 @@ public class TransitRouterImplTest {
 			Assert.assertEquals(100, legs.get(4).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
 			Assert.assertEquals(1900.0, legDuration, 0.0);
 			
-			RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario.getPopulation().getFactory(), 
+			RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario,
 					f.config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk));
 			
 			TransitRouterWrapper routingModule = new TransitRouterWrapper(
@@ -514,7 +530,7 @@ public class TransitRouterImplTest {
 			Coord fromCoord = f.fromFacility.getCoord();
 			Coord toCoord = f.toFacility.getCoord();
 			List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 7.0*3600 + 50*60, null);
-			double legDuration = calcTripDuration(new ArrayList<PlanElement>(legs));
+			double legDuration = calcTripDuration(new ArrayList<>(legs));
 			Assert.assertEquals(5, legs.size());
 			Assert.assertEquals(100, legs.get(0).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
 			Assert.assertEquals(800, legs.get(1).getTravelTime(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
@@ -523,7 +539,7 @@ public class TransitRouterImplTest {
 			Assert.assertEquals(100, legs.get(4).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
 			Assert.assertEquals(5500.0, legDuration, 0.0);
 			
-			RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario.getPopulation().getFactory(), 
+			RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario,
 					f.config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk));
 			
 			TransitRouterWrapper routingModule = new TransitRouterWrapper(
@@ -551,11 +567,11 @@ public class TransitRouterImplTest {
 			Coord fromCoord = f.fromFacility.getCoord();
 			Coord toCoord = f.toFacility.getCoord();
 			List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 7.0*3600 + 50*60, null);
-			double legDuration = calcTripDuration(new ArrayList<PlanElement>(legs));
+			double legDuration = calcTripDuration(new ArrayList<>(legs));
 			Assert.assertEquals(1, legs.size());
 			Assert.assertEquals(50000, legDuration, 1.0);
 			
-			RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario.getPopulation().getFactory(), 
+			RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario,
 					f.config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk));
 			
 			TransitRouterWrapper routingModule = new TransitRouterWrapper(
@@ -702,7 +718,7 @@ public class TransitRouterImplTest {
 				TransitLine tLine = sb.createTransitLine(Id.create("1", TransitLine.class));
 				{
 					NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link1.getId());
-					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
+					List<TransitRouteStop> stops = new ArrayList<>(2);
 					stops.add(sb.createTransitRouteStop(this.stop1, 0, 0));
 					stops.add(sb.createTransitRouteStop(this.stop2, 50, 50));
 					TransitRoute tRoute = sb.createTransitRoute(Id.create("1a", TransitRoute.class), netRoute, stops, "bus");
@@ -716,7 +732,7 @@ public class TransitRouterImplTest {
 				TransitLine tLine = sb.createTransitLine(Id.create("2", TransitLine.class));
 				{
 					NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(link2.getId(), link3.getId());
-					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(3);
+					List<TransitRouteStop> stops = new ArrayList<>(3);
 					stops.add(sb.createTransitRouteStop(this.stop3, 0, 0));
 					stops.add(sb.createTransitRouteStop(this.stop4, 50, 50));
 					stops.add(sb.createTransitRouteStop(this.stop5, 100, 100));
@@ -731,7 +747,7 @@ public class TransitRouterImplTest {
 				TransitLine tLine = sb.createTransitLine(Id.create("3", TransitLine.class));
 				{
 					NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(link4.getId(), link4.getId());
-					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
+					List<TransitRouteStop> stops = new ArrayList<>(2);
 					stops.add(sb.createTransitRouteStop(this.stop6, 0, 0));
 					stops.add(sb.createTransitRouteStop(this.stop7, 50, 50));
 					TransitRoute tRoute = sb.createTransitRoute(Id.create("3a", TransitRoute.class), netRoute, stops, "train");
@@ -834,11 +850,11 @@ public class TransitRouterImplTest {
 				TransitLine line0to1 = sb.createTransitLine(Id.create("0to1", TransitLine.class));
 				this.schedule.addTransitLine(line0to1);
 				NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(link0.getId(), link0.getId());
-				List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
+				List<Id<Link>> routeLinks = new ArrayList<>();
 				netRoute.setLinkIds(link0.getId(), routeLinks, link0.getId());
-				List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-				stops.add(sb.createTransitRouteStop(this.stop0, Time.UNDEFINED_TIME, 0.0));
-				stops.add(sb.createTransitRouteStop(this.stop1, 5*60.0, Time.UNDEFINED_TIME));
+				List<TransitRouteStop> stops = new ArrayList<>();
+				stops.add(sb.createTransitRouteStop(this.stop0, Time.getUndefinedTime(), 0.0));
+				stops.add(sb.createTransitRouteStop(this.stop1, 5*60.0, Time.getUndefinedTime()));
 				TransitRoute route = sb.createTransitRoute(Id.create("0to1", TransitRoute.class), netRoute, stops, "train");
 				line0to1.addRoute(route);
 
@@ -854,11 +870,11 @@ public class TransitRouterImplTest {
 				TransitLine line2to3 = sb.createTransitLine(Id.create("2to3", TransitLine.class));
 				this.schedule.addTransitLine(line2to3);
 				NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link1.getId());
-				List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
+				List<Id<Link>> routeLinks = new ArrayList<>();
 				netRoute.setLinkIds(link1.getId(), routeLinks, link1.getId());
-				List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-				stops.add(sb.createTransitRouteStop(this.stop2, Time.UNDEFINED_TIME, 0.0));
-				stops.add(sb.createTransitRouteStop(this.stop3, 5*60.0, Time.UNDEFINED_TIME));
+				List<TransitRouteStop> stops = new ArrayList<>();
+				stops.add(sb.createTransitRouteStop(this.stop2, Time.getUndefinedTime(), 0.0));
+				stops.add(sb.createTransitRouteStop(this.stop3, 5*60.0, Time.getUndefinedTime()));
 				TransitRoute route = sb.createTransitRoute(Id.create("2to3", TransitRoute.class), netRoute, stops, "train");
 				line2to3.addRoute(route);
 

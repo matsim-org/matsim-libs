@@ -32,6 +32,7 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 
 /**
@@ -43,12 +44,12 @@ public class TransitRouteImpl implements TransitRoute {
 
 	private final Id<TransitRoute> routeId;
 	private NetworkRoute route;
-	private final List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(8);
+	private final List<TransitRouteStop> stops = new ArrayList<>(8);
 	private String description = null;
-	private final Map<Id<Departure>, Departure> departures = new TreeMap<Id<Departure>, Departure>();
+	private final Map<Id<Departure>, Departure> departures = new TreeMap<>();
 	private String transportMode;
-	private String lineRouteName;
 	private String direction;
+	private final Attributes attributes = new Attributes();
 
 	protected TransitRouteImpl(final Id<TransitRoute> id, final NetworkRoute route, final List<TransitRouteStop> stops, final String transportMode) {
 		this.routeId = id;
@@ -132,20 +133,17 @@ public class TransitRouteImpl implements TransitRoute {
 		return null;
 	}
 
-	public String getLineRouteName() {
-		return lineRouteName;
-	}
-
 	public String getDirection() {
-		return direction;
-	}
-
-	public void setLineRouteName(String lineRouteName) {
-		this.lineRouteName = lineRouteName;
+		return this.direction;
 	}
 
 	public void setDirection(String direction) {
 		this.direction = direction;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return this.attributes;
 	}
 
 	@Override

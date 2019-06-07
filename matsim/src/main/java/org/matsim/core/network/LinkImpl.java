@@ -99,8 +99,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.freespeed = freespeed;
 		this.checkFreespeedSemantics();
 		this.capacity = capacity;
-		this.checkCapacitiySemantics();
-		this.checkCapacitiySemantics();
+		this.checkCapacitySemantics();
 		this.nofLanes = lanes;
 		this.checkNumberOfLanesSemantics();
 		if (this.from.equals(this.to) && (loopWarnCnt < maxLoopWarnCnt)) {
@@ -111,7 +110,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		}
 	}
 
-	private void checkCapacitiySemantics() {
+	private void checkCapacitySemantics() {
 		/*
 		 * I see no reason why a freespeed and a capacity of zero should not be
 		 * allowed! joh 9may2008
@@ -121,7 +120,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		if ((this.capacity <= 0.0) && (cpWarnCnt < maxCpWarnCnt) ) {
 			cpWarnCnt++ ;
 			log.warn("capacity=" + this.capacity + " of link id " + this.getId() + " may cause problems");
-			log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+			if ( cpWarnCnt==maxCpWarnCnt ){
+				log.warn( Gbl.FUTURE_SUPPRESSED );
+			}
 		}
 	}
 
@@ -194,7 +195,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public void setCapacity(double capacityPerNetworkCapcityPeriod){
 		this.capacity = capacityPerNetworkCapcityPeriod;
-		this.checkCapacitiySemantics();
+		this.checkCapacitySemantics();
 	}
 
 	@Override
@@ -210,7 +211,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public double getFlowCapacityPerSec() {
-		return getFlowCapacityPerSec(Time.UNDEFINED_TIME);
+		return getFlowCapacityPerSec(Time.getUndefinedTime());
 	}
 	@Override
 	public double getFlowCapacityPerSec(@SuppressWarnings("unused") final double time) {

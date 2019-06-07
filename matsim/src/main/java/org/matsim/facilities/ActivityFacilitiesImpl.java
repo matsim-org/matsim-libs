@@ -20,20 +20,20 @@
 
 package org.matsim.facilities;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
  * Maintainer: mrieser / Senozon AG
@@ -49,6 +49,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 
 	private static final Logger log = Logger.getLogger(ActivityFacilitiesImpl.class);
 	private final ActivityFacilitiesFactory factory ;
+	private final Attributes attributes = new Attributes();
 
 	private final Map<Id<ActivityFacility>, ActivityFacility> facilities = new LinkedHashMap<>();
 
@@ -148,15 +149,22 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 	
 	@Override
 	public String toString() {
-		StringBuilder stb = new StringBuilder() ;
-		stb.append( super.toString() + "\n" ) ;
-		stb.append( "[number of facilities=" + this.facilities.size() + "]\n" ) ;
+		StringBuilder stb = new StringBuilder(200);
+		stb.append(super.toString());
+		stb.append("\n");
+		stb.append("[number of facilities=");
+		stb.append(this.facilities.size());
+		stb.append("]\n");
 		for ( Entry<Id<ActivityFacility>,? extends ActivityFacility> entry : this.facilities.entrySet() ) {
 			final ActivityFacility fac = entry.getValue();
-			stb.append( "[key=" + entry.getKey().toString() + "; value=" + fac.toString() + "]\n" ) ;
+			stb.append("[key=");
+			stb.append(entry.getKey().toString());
+			stb.append("; value=");
+			stb.append(fac.toString());
+			stb.append("]\n");
 		}
 		
-		return stb.toString() ;
+		return stb.toString();
 	}
 
 	synchronized private void buildQuadTree() {
@@ -220,4 +228,8 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 	}
 
 
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
 }

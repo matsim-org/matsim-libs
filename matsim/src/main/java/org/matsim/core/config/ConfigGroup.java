@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import javax.validation.Valid;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.utils.io.IOUtils;
@@ -49,7 +51,7 @@ public class ConfigGroup implements MatsimExtensionPoint {
 
 	private final String name;
 	private final TreeMap<String,String> params;
-	private final Map<String, Collection<ConfigGroup>> parameterSetsPerType = new HashMap<>();
+	private final Map<String, Collection<@Valid ConfigGroup>> parameterSetsPerType = new HashMap<>();
 	private boolean locked = false ;
 
 	private final static Logger log = Logger.getLogger(ConfigGroup.class);
@@ -124,12 +126,16 @@ public class ConfigGroup implements MatsimExtensionPoint {
 
 	@Override
 	public final String toString() {
-		String str = "" ;
+		StringBuilder str = new StringBuilder();
 		for ( Entry<String, String> entry : this.getParams().entrySet() ) {
-			str += "[" + entry.getKey() + "=" + entry.getValue() + "]" ;
+			str.append('[');
+			str.append(entry.getKey());
+			str.append('=');
+			str.append(entry.getValue());
+			str.append(']');
 		}
 		return "[name=" + this.getName() + "]" +
-				"[nOfParams=" + this.getParams().size() + "]" + str ;
+				"[nOfParams=" + this.getParams().size() + "]" + str.toString();
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -232,13 +238,19 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	
 	public final void testForLocked() {
 		if ( locked ) {
-			throw new RuntimeException( "This config group is locked since material from this config group has already been used.") ;
+			throw new RuntimeException( "Too late to change this ...") ;
 		}
 	}
 
 	public static URL getInputFileURL(URL context, String filename) {
 		if (filename.startsWith("~" + File.separator)) {
 			filename = System.getProperty("user.home") + filename.substring(1);
+			return IOUtils.newUrl( null, filename ) ;
+		}
+		if ( filename.startsWith( File.separator ) ) {
+			// (= filename is absolute)
+			// (yyyy this may possibly fail on win systems. kai, sep.18)
+			return IOUtils.newUrl( null, filename ) ;
 		}
 		return IOUtils.newUrl(context, filename);
 	}

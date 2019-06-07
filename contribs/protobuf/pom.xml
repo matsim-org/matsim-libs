@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.matsim</groupId>
         <artifactId>contrib</artifactId>
-        <version>0.10.0-SNAPSHOT</version>
+        <version>12.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.matsim.contrib</groupId>
@@ -105,7 +105,7 @@
                                     <arg value="${protobuf.input.directory}" />
                                     <arg value="--java_out" />
                                     <arg value="${protobuf.output.directory}" />
-                                    <arg line="${protobuf.input.filepaths}" />
+                                    <arg value="${protobuf.input.filepaths}" />
                                 </exec>
                             </target>
                         </configuration>

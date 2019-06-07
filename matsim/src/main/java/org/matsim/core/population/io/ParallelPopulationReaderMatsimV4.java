@@ -39,7 +39,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
-import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vehicles.Vehicles;
@@ -307,7 +307,6 @@ import org.xml.sax.helpers.AttributesImpl;
 
 		@Override
 		public Person removePerson(Id<Person> personId) {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 

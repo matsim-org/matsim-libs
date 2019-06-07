@@ -20,17 +20,14 @@
 
 package org.matsim.core.config;
 
-import java.io.File;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
-import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ExternalMobimConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
+
+import java.util.Stack;
 
 /**
  * A reader for config-files of MATSim according to <code>config_v1.dtd</code>.
@@ -44,7 +41,13 @@ import org.xml.sax.InputSource;
 	private final static String MODULE = "module";
 	private final static String INCLUDE = "include";
 	private final static String PARAM = "param";
-
+	
+	private static final String msg = "using deprecated config version; please switch to config v2; your output_config.xml " +
+							   "will be in the correct version; v1 will fail eventually, since we want to reduce the " +
+							   "workload on keeping everything between v1 and v2 consistent (look into " +
+							   "PlanCalcScoreConfigGroup or PlanCalcRouteConfigGroup if you want to know what we mean).";
+	
+	
 	private final Config config;
 	private ConfigGroup currmodule = null;
 
@@ -52,6 +55,7 @@ import org.xml.sax.InputSource;
 
 	public ConfigReaderMatsimV1(final Config config) {
 		this.config = config;
+		log.warn(msg);
 	}
 
 	@Override
@@ -68,6 +72,17 @@ import org.xml.sax.InputSource;
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (MODULE.equals(name)) {
+			
+			if (GlobalConfigGroup.GROUP_NAME.equals(name) ) {
+				if (!config.global().isInsistingOnDeprecatedConfigVersion()) {
+					throw new RuntimeException(msg);
+				}
+			}
+			// the idea here was to wait until the global config group is read because only then we can
+			// decide if the user is insisting on it.  However, this clearly does not work in full since the condition
+			// will never be triggered when the global config group is not used at all in the file.
+			// :-( kai, aug'18
+			
 			this.currmodule = null;
 		}
 	}
@@ -92,8 +107,7 @@ import org.xml.sax.InputSource;
 	}
 
 	private void startParam(final Attributes meta) {
-		String value = meta.getValue("value");
-		this.currmodule.addParam(meta.getValue("name"),meta.getValue("value"));
+		this.currmodule.addParam(meta.getValue("name"), meta.getValue("value"));
 	}
 
 	/**

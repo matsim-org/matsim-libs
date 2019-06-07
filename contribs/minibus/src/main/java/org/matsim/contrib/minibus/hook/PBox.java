@@ -43,12 +43,13 @@ import org.matsim.contrib.minibus.scoring.OperatorCostCollectorHandler;
 import org.matsim.contrib.minibus.scoring.PScoreContainer;
 import org.matsim.contrib.minibus.scoring.PScorePlansHandler;
 import org.matsim.contrib.minibus.scoring.StageContainer2AgentMoneyEvent;
+import org.matsim.contrib.minibus.scoring.routeDesignScoring.RouteDesignScoringManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -78,6 +79,7 @@ public final class PBox implements POperators {
 	private final StageContainerCreator stageCollectorHandler;
 	private final OperatorCostCollectorHandler operatorCostCollectorHandler;
 	private final PStrategyManager strategyManager = new PStrategyManager();
+	private final RouteDesignScoringManager routeDesignScoreManager = new RouteDesignScoringManager();
 
 	private final TicketMachineI ticketMachine;
 	
@@ -105,6 +107,9 @@ public final class PBox implements POperators {
 
 		// initialize strategy manager
 		this.strategyManager.init(this.pConfig, this.stageCollectorHandler, this.ticketMachine, timeProvider);
+		
+		// initialize route design scoring manager
+		this.routeDesignScoreManager.init(this.pConfig, event.getServices().getScenario().getNetwork());
 
 		// init fare collector
 		this.stageCollectorHandler.init(event.getServices().getScenario().getNetwork());
@@ -183,7 +188,7 @@ public final class PBox implements POperators {
 
 		Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();
 		for (Operator operator : this.operators) {
-			operator.score(driverId2ScoreMap, subsidy);
+			operator.score(driverId2ScoreMap, subsidy, routeDesignScoreManager);
 		}
 
 		// why is the following done twice (see notifyIterationstarts)?
@@ -259,7 +264,7 @@ public final class PBox implements POperators {
 	}
 
 	private void writeScheduleToFile(TransitSchedule schedule, String iterationFilename) {
-		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(schedule);
-		writer.write(iterationFilename);		
+		TransitScheduleWriter writer = new TransitScheduleWriter(schedule);
+		writer.writeFile(iterationFilename);
 	}
 }

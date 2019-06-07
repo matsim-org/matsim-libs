@@ -26,8 +26,8 @@ import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.zone.ZonalSystem;
 import org.matsim.contrib.zone.ZonalSystems;
 import org.matsim.contrib.zone.Zone;
@@ -45,7 +45,7 @@ public class UnplannedRequestZonalRegistry {
 
 		requestsInZones = new HashMap<>(zonalSystem.getZones().size());
 		for (Id<Zone> id : zonalSystem.getZones().keySet()) {
-			requestsInZones.put(id, new HashMap<Id<Request>, TaxiRequest>());
+			requestsInZones.put(id, new HashMap<>());
 		}
 	}
 

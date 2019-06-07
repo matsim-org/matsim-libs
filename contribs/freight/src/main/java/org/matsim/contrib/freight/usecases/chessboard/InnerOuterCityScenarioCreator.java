@@ -7,7 +7,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-public class InnerOuterCityScenarioCreator {
+final class InnerOuterCityScenarioCreator {
 	
 
 	public List<Id<Link>> getInnerCityLinks(){
@@ -37,8 +37,8 @@ public class InnerOuterCityScenarioCreator {
 		return innerCityLinks;
 	}
 	
-	public List<Id> getAccessLinksToInnerCity(){
-		List<Id> accessLinks = new ArrayList<Id>();
+	public List<Id<Link>> getAccessLinksToInnerCity(){
+		List<Id<Link>> accessLinks = new ArrayList<Id<Link>>();
 		List<String> linkStrings = Arrays.asList("j(4,7)R","j(6,7)R","j(5,3)","j(3,3)",
 				"i(3,4)","i(3,6)","i(7,3)R","i(7,5)R");
 		for(String idString : linkStrings) accessLinks.add(Id.create(idString, Link.class));

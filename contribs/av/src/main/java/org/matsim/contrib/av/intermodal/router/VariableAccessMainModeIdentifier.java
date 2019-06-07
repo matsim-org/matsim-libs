@@ -40,24 +40,15 @@ import org.matsim.pt.PtConstants;
  * @author  jbischoff
  *
  */
-/**
- *
- */
 public class VariableAccessMainModeIdentifier implements MainModeIdentifier {
 
 	private final MainModeIdentifier delegate = new MainModeIdentifierImpl();
 	private final VariableAccessConfigGroup va;
-	/**
-	 * 
-	 */
 	@Inject
 	public VariableAccessMainModeIdentifier(Config config) {
 		 va = (VariableAccessConfigGroup) config.getModules().get(VariableAccessConfigGroup.GROUPNAME);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.matsim.core.router.MainModeIdentifier#identifyMainMode(java.util.List)
-	 */
 	@Override
 	public String identifyMainMode(List<? extends PlanElement> tripElements) {
 		String mode = ((Leg) tripElements.get( 0 )).getMode();
@@ -78,5 +69,4 @@ public class VariableAccessMainModeIdentifier implements MainModeIdentifier {
 		}
 		return delegate.identifyMainMode(tripElements);
 	}
-
 }

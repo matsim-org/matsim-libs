@@ -19,22 +19,20 @@
 
 package org.matsim.core.config;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Iterator;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.ConfigWriter.Verbosity;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.File;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * @author mrieser
@@ -74,6 +72,35 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		return loadConfig(IOUtils.getUrlFromFileOrResource(filename), customModules);
 	}
 
+	/**
+	 *  This variant is meant such that one can have a command line call to MATSim that first provides a config file, and then
+	 *  overrides some of it.  Should be particularly useful for integration tests for main methods, since, if those main methods are using
+	 *  this method here, it should be possible to test them via
+	 *  <pre>
+	 *        ...main( <config.xml> --config:controler.outputDir=... )
+	 *  </pre>
+	 *  i.e. the current necessity to break runnable scripts into pieces to change things like output directory or lastIteration should be gone with this.
+	 */
+	public static Config loadConfig( String [] args, ConfigGroup... customModules ) {
+		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
+		return loadConfig( IOUtils.getUrlFromFileOrResource( args[0] ), typedArgs, customModules );
+	}
+
+	public static Config loadConfig( final URL url, String [] typedArgs, ConfigGroup... customModules ) {
+		Config config = loadConfig( url, customModules ) ;
+		try{
+			CommandLine.Builder bld = new CommandLine.Builder( typedArgs ) ;
+			bld.allowAnyOption( true  );
+			bld.allowPositionalArguments( false ) ;
+			CommandLine cmd = bld.build();
+			cmd.applyConfiguration( config );
+		} catch( CommandLine.ConfigurationException e ){
+			e.printStackTrace();
+			throw new RuntimeException( e ) ;
+		}
+		return config ;
+	}
+
 	public static Config loadConfig(final URL url, ConfigGroup... customModules) throws UncheckedIOException {
 		Gbl.assertNotNull(url);
 		
@@ -102,9 +129,27 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	 */
 	public static void loadConfig(final Config config, final String filename) throws UncheckedIOException {
 		if (config.global() == null) {
+			// if the config does not exist yet, we interpret the file name as is:
 			config.addCoreModules();
+			new ConfigReader(config).readFile(filename);
+		} else {
+			// if the config does already exist, this can be used to read a second config file to override
+			// settings from before, e.g. using a base config and then several case study configs.
+			// In this case, using the above syntax generates inconsistent behavior between
+			// gui and command line: command line takes the config file from the java root,
+			// while the gui takes it from the config file root.  The following syntax should
+			// now also take it from the config file root when it is called from the command line
+			// (same as in other places: we are making the command line behavior
+			// and GUI behavior consistent).
+			// kai, jan'18
+//			URL url = ConfigGroup.getInputFileURL(config.getContext(), filename);;
+//			new ConfigReader(config).parse(url) ;
+			// yyyyyy the above probably works, but has ramifications across many test
+			// cases.  Need to discuss first (and then find some time again).
+			// See MATSIM-776 and MATSIM-777.  kai, feb'18
+			
+			new ConfigReader(config).readFile(filename);
 		}
-		new ConfigReader(config).readFile(filename);
 	}
 
 	public static void loadConfig(final Config config, final URL url) throws UncheckedIOException {
@@ -185,8 +230,11 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	
 	
 	/** 
-	 * Convenience method to all addOrGetModule with only two arguments.  
-	 * 
+	 * Convenience method to all addOrGetModule with only two arguments.
+	 * <br/>
+	 * Notes:<ul>
+	 * <li>Seems to be really slow, so don't use in inner loop.</li>
+	 * </ul>
 	 * @param config
 	 * @param moduleClass
 	 * @return instance of moduleClass inside config
@@ -207,6 +255,10 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	 * method with
 	 * ConfigUtils.addOrGetModule(this, VspExperimentalConfigGroup.GROUP_NAME, VspExperimentalConfigGroup.class)
 	 * and then hit Refactor/Inline.
+	 * <br/>
+	 * Notes:<ul>
+	 * <li>Seems to be really slow, so don't use in inner loop.</li>
+	 * </ul>
 	 */
 	public static <T extends ConfigGroup> T addOrGetModule(Config config, String groupName, Class<T> moduleClass) {
 		ConfigGroup module = config.getModule(groupName);

@@ -19,11 +19,9 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.MapConfiguration;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
@@ -35,22 +33,16 @@ import org.matsim.contrib.taxi.optimizer.zonal.ZonalTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.zonal.ZonalTaxiOptimizerParams;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
 
 public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
-	public static final String TAXI_OPTIMIZER = "taxi_optimizer";
-	public static final String TYPE = "type";
-
-	public enum OptimizerType {
-		ASSIGNMENT, FIFO, RULE_BASED, ZONAL;
-	}
-
+	private final EventsManager eventsManager;
 	private final TaxiConfigGroup taxiCfg;
 	private final Fleet fleet;
 	private final Network network;
@@ -59,11 +51,11 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final TravelDisutility travelDisutility;
 	private final TaxiScheduler scheduler;
 
-	@Inject
-	public DefaultTaxiOptimizerProvider(TaxiConfigGroup taxiCfg, Fleet fleet,
-			@Named(DvrpModule.DVRP_ROUTING) Network network, MobsimTimer timer,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Named(TAXI_OPTIMIZER) TravelDisutility travelDisutility, TaxiScheduler scheduler) {
+	public DefaultTaxiOptimizerProvider(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
+			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
+			TaxiScheduler scheduler) {
+		this.eventsManager = eventsManager;
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
 		this.network = network;
@@ -75,28 +67,35 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
 	@Override
 	public TaxiOptimizer get() {
-		Configuration optimizerConfig = new MapConfiguration(taxiCfg.getOptimizerConfigGroup().getParams());
-		OptimizerType type = OptimizerType.valueOf(optimizerConfig.getString(TYPE));
+		switch (taxiCfg.getTaxiOptimizerParams().getName()) {
+			case AssignmentTaxiOptimizerParams.SET_NAME:
+				return new AssignmentTaxiOptimizer(eventsManager, taxiCfg, fleet, network, timer, travelTime,
+						travelDisutility, scheduler);
+			case FifoTaxiOptimizerParams.SET_NAME:
+				return new FifoTaxiOptimizer(eventsManager, taxiCfg, fleet, network, timer, travelTime,
+						travelDisutility, scheduler);
+			case RuleBasedTaxiOptimizerParams.SET_NAME:
+				return RuleBasedTaxiOptimizer.create(eventsManager, taxiCfg, fleet, scheduler, network, timer,
+						travelTime, travelDisutility);
+			case ZonalTaxiOptimizerParams.SET_NAME:
+				return ZonalTaxiOptimizer.create(eventsManager, taxiCfg, fleet, scheduler, network, timer, travelTime,
+						travelDisutility);
+		}
+		throw new RuntimeException("Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().getName());
+	}
 
+	public static AbstractTaxiOptimizerParams createParameterSet(String type) {
 		switch (type) {
-			case ASSIGNMENT:
-				return new AssignmentTaxiOptimizer(taxiCfg, fleet, network, timer, travelTime, travelDisutility,
-						scheduler, new AssignmentTaxiOptimizerParams(optimizerConfig));
-
-			case FIFO:
-				return new FifoTaxiOptimizer(taxiCfg, fleet, network, timer, travelTime, travelDisutility, scheduler,
-						new FifoTaxiOptimizerParams(optimizerConfig));
-
-			case RULE_BASED:
-				return RuleBasedTaxiOptimizer.create(taxiCfg, fleet, scheduler, network, timer, travelTime,
-						travelDisutility, new RuleBasedTaxiOptimizerParams(optimizerConfig));
-
-			case ZONAL:
-				return ZonalTaxiOptimizer.create(taxiCfg, fleet, scheduler, network, timer, travelTime,
-						travelDisutility, new ZonalTaxiOptimizerParams(optimizerConfig));
-
+			case AssignmentTaxiOptimizerParams.SET_NAME:
+				return new AssignmentTaxiOptimizerParams();
+			case FifoTaxiOptimizerParams.SET_NAME:
+				return new FifoTaxiOptimizerParams();
+			case RuleBasedTaxiOptimizerParams.SET_NAME:
+				return new RuleBasedTaxiOptimizerParams();
+			case ZonalTaxiOptimizerParams.SET_NAME:
+				return new ZonalTaxiOptimizerParams();
 			default:
-				throw new IllegalStateException();
+				return null;
 		}
 	}
 }

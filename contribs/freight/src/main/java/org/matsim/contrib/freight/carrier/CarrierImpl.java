@@ -78,23 +78,11 @@ public class CarrierImpl implements Carrier {
 		this.selectedPlan = selectedPlan;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.mzilske.freight.Carrier#setCarrierCapabilities(playground.
-	 * mzilske.freight.CarrierCapabilities)
-	 */
 	@Override
 	public void setCarrierCapabilities(CarrierCapabilities carrierCapabilities) {
 		this.carrierCapabilities = carrierCapabilities;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.mzilske.freight.Carrier#getCarrierCapabilities()
-	 */
 	@Override
 	public CarrierCapabilities getCarrierCapabilities() {
 		return carrierCapabilities;
@@ -107,7 +95,6 @@ public class CarrierImpl implements Carrier {
 
 	@Override
 	public boolean addPlan(CarrierPlan p) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
 
@@ -137,6 +124,8 @@ public class CarrierImpl implements Carrier {
 	public boolean removePlan(CarrierPlan p) {
 		return this.plans.remove(p);
 	}
-	
+
+	@Override
+	public void clearPlans() { this.plans.clear(); }
 
 }

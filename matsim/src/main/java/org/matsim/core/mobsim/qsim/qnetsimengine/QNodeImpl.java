@@ -44,7 +44,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.TurnAcceptanceLogic.AcceptTurn;
 /**
  * Represents a node in the QSimulation.
  */
-final class QNodeImpl implements QNodeI {
+final class QNodeImpl extends AbstractQNode {
 	private static final Logger log = Logger.getLogger(QNodeImpl.class);
 	public static class Builder {
 		private final NetsimInternalInterface netsimEngine;
@@ -61,41 +61,26 @@ final class QNodeImpl implements QNodeI {
 			return new QNodeImpl( n, context, netsimEngine, turnAcceptanceLogic ) ;
 		}
 	}
-
+	
 	private final QLinkI[] inLinksArrayCache;
 	private final QLinkI[] tempLinks;
 	
-	/*
-	 * This needs to be atomic since this allows us to ensure that an node which is
-	 * already active is not activated again. This could happen if multiple thread call
-	 * activateNode() concurrently.
-	 * cdobler, sep'14
-	 */
-	private final AtomicBoolean active = new AtomicBoolean(false);
-
-	private final Node node;
-
-	// necessary if Nodes are (de)activated
-	private NetElementActivationRegistry activator = null;
-
-	// for Customizable
-	private final Map<String, Object> customAttributes = new HashMap<>();
-
+	
 	private final Random random;
 	private final NetsimEngineContext context;
 	private final NetsimInternalInterface netsimEngine;
 	
 	private final TurnAcceptanceLogic turnAcceptanceLogic ;
-
+	
 	private QNodeImpl(final Node n, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, TurnAcceptanceLogic turnAcceptanceLogic) {
-		this.node = n;
+		super(n) ;
 		this.netsimEngine = netsimEngine2 ;
 		this.context = context ;
 		this.turnAcceptanceLogic = turnAcceptanceLogic;
-		int nofInLinks = this.node.getInLinks().size();
+		int nofInLinks = n.getInLinks().size();
 		this.inLinksArrayCache = new QLinkI[nofInLinks];
 		this.tempLinks = new QLinkI[nofInLinks];
-		if (this.context.qsimConfig.getNumberOfThreads() > 1) { 
+		if (this.context.qsimConfig.getNumberOfThreads() > 1) {
 			// This could just as well be the "normal" case. The second alternative
 			// is just there so some scenarios / test cases stay
 			// "event-file-compatible". Consider removing the second alternative.
@@ -130,50 +115,6 @@ final class QNodeImpl implements QNodeI {
 		});
 	}
 
-	@Override
-	public Node getNode() {
-		return this.node;
-	}
-
-	/**
-	 * The ParallelQSim replaces the activator with the QSimEngineRunner 
-	 * that handles this node.
-	 */
-	/*package*/ void setNetElementActivationRegistry(NetElementActivationRegistry activator) {
-		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
-		// not be a stable/robust API.  kai, jul'17
-		
-		this.activator = activator;
-	}
-
-	/**
-	 * This method is called from QueueWithBuffer.addToBuffer(...) which is triggered at 
-	 * some placed, but always initially by a QLink's doSomStep(...) method. I.e. QNodes
-	 * are only activated while moveNodes(...) is performed. However, multiple threads
-	 * could try to activate the same node at a time, therefore this has to be thread-safe.
-	 * cdobler, sep'14 
-	 */
-	/*package*/ final void activateNode() {	
-		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
-		// not be a stable/robust API.  kai, jul'17
-
-		/*
-		 * this.active.compareAndSet(boolean expected, boolean update)
-		 * We expect the value to be false, i.e. the node is de-activated. If this is
-		 * true, the value is changed to true and the activator is informed.
-		 */
-		if (this.active.compareAndSet(false, true)) {
-			this.activator.registerNodeAsActive(this);
-		}
-	}
-
-	final boolean isActive() {
-		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
-		// not be a stable/robust API.  kai, jul'17
-
-		return this.active.get();
-	}
-
 	/**
 	 * Moves vehicles from the inlinks' buffer to the outlinks where possible.<br>
 	 * The inLinks are randomly chosen, and for each link all vehicles in the
@@ -188,7 +129,7 @@ final class QNodeImpl implements QNodeI {
 	 *
 	 * @param now
 	 *          The current time in seconds from midnight.
-	 * @return 
+	 * @return
 	 * 		Whether the QNode stays active or not.
 	 */
 	@Override
@@ -204,46 +145,46 @@ final class QNodeImpl implements QNodeI {
 				inLinksCapSum += link.getLink().getCapacity(now);
 			}
 		}
-
+		
 		if (inLinksCounter == 0) {
-			this.active.set(false);
+			this.setActive(false);
 			return false; // Nothing to do
-		}
-
+		} 
+		
 		// randomize based on capacity
-        for (int auxCounter = 0; auxCounter < inLinksCounter; auxCounter++) {
+		for (int auxCounter = 0; auxCounter < inLinksCounter; auxCounter++) {
 			double rndNum = random.nextDouble() * inLinksCapSum;
 			double selCap = 0.0;
 			for (int i = 0; i < inLinksCounter; i++) {
 				QLinkI link = this.tempLinks[i];
 				if (link != null) {
-                    selCap += link.getLink().getCapacity(now);
-                    if (selCap >= rndNum) {
-                        inLinksCapSum -= link.getLink().getCapacity(now);
-                        this.tempLinks[i] = null;
-                        this.moveLink(link, now);
-                        break;
-                    }
-                }
+					selCap += link.getLink().getCapacity(now);
+					if (selCap >= rndNum) {
+						inLinksCapSum -= link.getLink().getCapacity(now);
+						this.tempLinks[i] = null;
+						this.moveLink(link, now);
+						break;
+					}
+				}
 			}
 		}
 		
 		return true;
 	}
-
+	
 	private void moveLink(final QLinkI link, final double now){
 		for (QLaneI lane : link.getOfferingQLanes()) {
 			while (! lane.isNotOfferingVehicle()) {
 				QVehicle veh = lane.getFirstVehicle();
-                if (! moveVehicleOverNode(veh, lane, now)) {
+				if (! moveVehicleOverNode(veh, link, lane, now )) {
 					break;
 				}
 			}
 		}
 	}
-
-
-
+	
+	
+	
 	// ////////////////////////////////////////////////////////////////////
 	// Queue related movement code
 	// ////////////////////////////////////////////////////////////////////
@@ -251,13 +192,13 @@ final class QNodeImpl implements QNodeI {
 	 * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
 	 * otherwise (e.g. in case where the next link is jammed)
 	 */
-	private boolean moveVehicleOverNode(final QVehicle veh, final QLaneI fromLaneBuffer, final double now) {
+	private boolean moveVehicleOverNode( final QVehicle veh, QLinkI fromLink, final QLaneI fromLane, final double now ) {
 		Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
-		Link currentLink = veh.getCurrentLink();
-		
-		AcceptTurn turn = turnAcceptanceLogic.isAcceptingTurn(currentLink, fromLaneBuffer, nextLinkId, veh, this.netsimEngine.getNetsimNetwork());
+		Link currentLink = fromLink.getLink() ;
+	
+		AcceptTurn turn = turnAcceptanceLogic.isAcceptingTurn(currentLink, fromLane, nextLinkId, veh, this.netsimEngine.getNetsimNetwork(), now);
 		if ( turn.equals(AcceptTurn.ABORT) ) {
-			moveVehicleFromInlinkToAbort( veh, fromLaneBuffer, now, currentLink.getId() ) ;
+			moveVehicleFromInlinkToAbort( veh, fromLane, now, currentLink.getId() ) ;
 			return true ;
 		} else if ( turn.equals(AcceptTurn.WAIT) ) {
 			return false;
@@ -266,30 +207,30 @@ final class QNodeImpl implements QNodeI {
 		QLinkI nextQueueLink = this.netsimEngine.getNetsimNetwork().getNetsimLinks().get(nextLinkId);
 		QLaneI nextQueueLane = nextQueueLink.getAcceptingQLane() ;
 		if (nextQueueLane.isAcceptingFromUpstream()) {
-			moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLaneBuffer, nextLinkId, nextQueueLane);
+			moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLane, nextLinkId, nextQueueLane);
 			return true;
 		}
-
-		if (vehicleIsStuck(fromLaneBuffer, now)) {
+		
+		if (vehicleIsStuck(fromLane, now)) {
 			/* We just push the vehicle further after stucktime is over, regardless
 			 * of if there is space on the next link or not.. optionally we let them
 			 * die here, we have a config setting for that!
 			 */
 			if (this.context.qsimConfig.isRemoveStuckVehicles()) {
-				moveVehicleFromInlinkToAbort(veh, fromLaneBuffer, now, currentLink.getId());
+				moveVehicleFromInlinkToAbort(veh, fromLane, now, currentLink.getId());
 				return false ;
 			} else {
-				moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLaneBuffer, nextLinkId, nextQueueLane);
-				return true; 
+				moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLane, nextLinkId, nextQueueLane);
+				return true;
 				// (yyyy why is this returning `true'?  Since this is a fix to avoid gridlock, this should proceed in small steps. 
 				// kai, feb'12) 
 			}
 		}
-
+		
 		return false;
-
+		
 	}
-
+	
 	private static int wrnCnt = 0 ;
 	private void moveVehicleFromInlinkToAbort(final QVehicle veh, final QLaneI fromLane, final double now, Id<Link> currentLinkId) {
 		fromLane.popFirstVehicle();
@@ -303,44 +244,40 @@ final class QNodeImpl implements QNodeI {
 				((MobsimAgent)pp).setStateToAbort(now);
 				netsimEngine.arrangeNextAgentState((MobsimAgent)pp) ;
 			} else if ( wrnCnt < 1 ) {
-				wrnCnt++ ; 
+				wrnCnt++ ;
 				log.warn("encountering PassengerAgent that cannot be cast into a MobsimAgent; cannot say if this is a problem" ) ;
 				log.warn(Gbl.ONLYONCE) ;
 			}
 		}
-
+		
 		// now treat the driver:
 		veh.getDriver().setStateToAbort(now) ;
 		netsimEngine.arrangeNextAgentState(veh.getDriver()) ;
-	
+		
 	}
-
+	
 	private void moveVehicleFromInlinkToOutlink(final QVehicle veh, Id<Link> currentLinkId, final QLaneI fromLane, Id<Link> nextLinkId, QLaneI nextQueueLane) {
 		double now = this.context.getSimTimer().getTimeOfDay() ;
-
+		
 		fromLane.popFirstVehicle();
 		// -->
-//		network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(now, veh.getId(), currentLinkId, fromLane.getId()));
+		//		network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(now, veh.getId(), currentLinkId, fromLane.getId()));
 		this.context.getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), currentLinkId));
 		// <--
-
+		
 		veh.getDriver().notifyMoveOverNode( nextLinkId );
-
-		nextQueueLane.addFromUpstream(veh);
+		
 		// -->
 		this.context.getEventsManager().processEvent(new LinkEnterEvent(now, veh.getId(), nextLinkId ));
 		// <--
+		nextQueueLane.addFromUpstream(veh);
 	}
-
+	
 	private boolean vehicleIsStuck(final QLaneI fromLaneBuffer, final double now) {
-//		final double stuckTime = network.simEngine.getStuckTime();
+		//		final double stuckTime = network.simEngine.getStuckTime();
 		final double stuckTime = this.context.qsimConfig.getStuckTime() ;
 		return (now - fromLaneBuffer.getLastMovementTimeOfFirstVehicle()) > stuckTime;
 	}
-
-	@Override
-	public Map<String, Object> getCustomAttributes() {
-		return customAttributes;
-	}
+	
 
 }

@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic;
 
+import java.util.Iterator;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -38,8 +40,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.Iterator;
 
 
 /**
@@ -100,8 +100,8 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		this.currentPlanElement = planElemIter.next();
 		Activity act = (Activity) currentPlanElement;
 		//TODO: assume something different regarding initial parking location
-		
-		return new StaticDynActivity(act.getType(), act.getEndTime());
+
+		return new IdleDynActivity(act.getType(), act.getEndTime());
 	}
 
 	@Override
@@ -167,7 +167,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 	protected DynAction nextStateAfterWalkToPark(DynAction oldAction, double now) {
 		//walk2park is complete, we can unpark.
 		this.lastParkActionState = LastParkActionState.UNPARKACTIVITY;
-		return new StaticDynActivity(this.stageInteractionType, now + configGroup.getUnparkduration());
+		return new IdleDynActivity(this.stageInteractionType, now + configGroup.getUnparkduration());
 	}
 
 	protected DynAction nextStateAfterWalkFromPark(DynAction oldAction, double now) {
@@ -194,8 +194,8 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		if (endTime == Time.UNDEFINED_TIME){
 			endTime = Double.POSITIVE_INFINITY;
 		}
-			 
-		return new StaticDynActivity(nextPlannedActivity.getType(),endTime);
+
+		return new IdleDynActivity(nextPlannedActivity.getType(), endTime);
 		
 	}
 
@@ -205,7 +205,8 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		this.lastParkActionState = LastParkActionState.PARKACTIVITY;
 		this.currentlyAssignedVehicleId = null;
 		this.parkingLogic.reset();
-		return new StaticDynActivity(this.stageInteractionType,now + configGroup.getParkduration());}
+			return new IdleDynActivity(this.stageInteractionType, now + configGroup.getParkduration());
+		}
 		else throw new RuntimeException ("No parking possible");
 	}
 

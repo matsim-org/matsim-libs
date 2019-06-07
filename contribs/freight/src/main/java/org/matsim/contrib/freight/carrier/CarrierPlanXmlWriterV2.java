@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import jsprit.core.problem.job.Shipment;
+import com.graphhopper.jsprit.core.problem.job.Shipment;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,9 +32,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 
 	private Collection<Carrier> carriers;
 
-	private int idCounter = 0;
-
-	private Map<CarrierShipment, Id<Shipment>> registeredShipments = new HashMap<>();
+	private Map<CarrierShipment, Id<CarrierShipment>> registeredShipments = new HashMap<>();
 	
 	private Map<CarrierService, Id<CarrierService>> serviceMap = new HashMap<>();
 
@@ -121,7 +119,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 		writer.write("\t\t\t<shipments>\n");
 		for (CarrierShipment s : carrier.getShipments()) {
 			// CarrierShipment s = contract.getShipment();
-			Id<Shipment> shipmentId = Id.create(++idCounter, Shipment.class);
+			Id<CarrierShipment> shipmentId = s.getId();
 			registeredShipments.put(s, shipmentId);
 			writer.write("\t\t\t\t<shipment ");
 			writer.write("id=\"" + shipmentId + "\" ");

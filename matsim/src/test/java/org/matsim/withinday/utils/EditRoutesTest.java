@@ -37,14 +37,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
@@ -241,8 +239,8 @@ public class EditRoutesTest extends MatsimTestCase {
 			// yyyy probably testing only the first failure?  kai, nov'17
 			ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), -1, 8.0*3600 );  
 			ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 100, 8.0*3600 );
-			fail("expected ArrayIndexOutOfBoundsException.");
-		} catch (ArrayIndexOutOfBoundsException e) {
+			fail("expected IndexOutOfBoundsException.");
+		} catch (IndexOutOfBoundsException e) {
 			log.debug("caught expected exception.", e);
 		}
 
@@ -278,7 +276,9 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		activityW1 = (Activity) plan.getPlanElements().get(2);
 		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location		
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 0, 8.0*3600 )); // HW, start Link
+		final boolean result = ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(),
+				0, 8.0 * 3600);
+		assertEquals(true, result); // HW, start Link
 
 		final NetworkRoute route = (NetworkRoute)((Leg)plan.getPlanElements().get(firstCarLeg)).getRoute();
 		log.warn( route );

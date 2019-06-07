@@ -50,7 +50,7 @@ import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
@@ -115,7 +115,7 @@ public final class QLinkTest extends MatsimTestCase {
 	public void testAdd() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size());
-		QVehicle v = new QVehicle(f.basicVehicle);
+		QVehicle v = new QVehicleImpl(f.basicVehicle);
 
 		Person p = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 		p.addPlan(PopulationUtils.createPlan());
@@ -145,7 +145,7 @@ public final class QLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
-		QVehicle veh = new QVehicle(f.basicVehicle);
+		QVehicle veh = new QVehicleImpl(f.basicVehicle);
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(23, Person.class));
 		Plan plan = PopulationUtils.createPlan();
 		p.addPlan(plan);
@@ -210,7 +210,7 @@ public final class QLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
-		QVehicle veh = new QVehicle(f.basicVehicle);
+		QVehicle veh = new QVehicleImpl(f.basicVehicle);
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(42, Person.class));
 		p.addPlan(PopulationUtils.createPlan());
 		veh.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
@@ -246,7 +246,7 @@ public final class QLinkTest extends MatsimTestCase {
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
 
-		QVehicle veh = new QVehicle(f.basicVehicle);
+		QVehicle veh = new QVehicleImpl(f.basicVehicle);
 		Person pers = PopulationUtils.getFactory().createPerson(Id.create(80, Person.class));
 		Plan plan = PopulationUtils.createPlan();
 		pers.addPlan(plan);
@@ -326,19 +326,21 @@ public final class QLinkTest extends MatsimTestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim qsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim qsim = new QSimBuilder(scenario.getConfig()) //
+				.useDefaults() //
+				.build(scenario, eventsManager);
 		NetsimNetwork queueNetwork = qsim.getNetsimNetwork();
 		dummify((QNetwork) queueNetwork);
 		QLinkImpl qlink = (QLinkImpl) queueNetwork.getNetsimLink(Id.create("1", Link.class));
 
-		QVehicle v1 = new QVehicle(new VehicleImpl(Id.create("1", Vehicle.class), new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class))));
+		QVehicle v1 = new QVehicleImpl(new VehicleImpl(Id.create("1", Vehicle.class), new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class))));
 		Person p = createPerson(Id.createPersonId(1), scenario, link1, link2);
 		PersonDriverAgentImpl pa1 = createAndInsertPersonDriverAgentImpl(p, qsim);
 		v1.setDriver(pa1);
 		pa1.setVehicle(v1);
 		pa1.endActivityAndComputeNextState(0);
 
-		QVehicle v2 = new QVehicle(new VehicleImpl(Id.create("2", Vehicle.class), new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class))));
+		QVehicle v2 = new QVehicleImpl(new VehicleImpl(Id.create("2", Vehicle.class), new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class))));
 		Person p2 = createPerson( Id.createPersonId(2),scenario,link1, link2) ;
 		PersonDriverAgentImpl pa2 = createAndInsertPersonDriverAgentImpl(p2, qsim);
 		v2.setDriver(pa2);
@@ -435,19 +437,19 @@ public final class QLinkTest extends MatsimTestCase {
 		double now = 0.0 ;
 		f.sim.getSimTimer().setTime(now);
 		
-		QVehicle veh1 = new QVehicle(new VehicleImpl(Id.create(1, Vehicle.class), defaultVehType));
+		QVehicle veh1 = new QVehicleImpl(new VehicleImpl(Id.create(1, Vehicle.class), defaultVehType));
 		Person p1 = createPerson2(Id.createPersonId(5), f);
 		PersonDriverAgentImpl driver1 = createAndInsertPersonDriverAgentImpl(p1, f.sim);
 		veh1.setDriver(driver1);
 		driver1.setVehicle(veh1);
 		driver1.endActivityAndComputeNextState( now );
-		QVehicle veh25 = new QVehicle(new VehicleImpl(Id.create(2, Vehicle.class), mediumVehType));
+		QVehicle veh25 = new QVehicleImpl(new VehicleImpl(Id.create(2, Vehicle.class), mediumVehType));
 		Person p2 = createPerson2(Id.createPersonId(6), f);
 		PersonDriverAgentImpl driver25 = createAndInsertPersonDriverAgentImpl(p2, f.sim);
 		veh25.setDriver(driver25);
 		driver25.setVehicle(veh25);
 		driver25.endActivityAndComputeNextState( now );
-		QVehicle veh5 = new QVehicle(new VehicleImpl(Id.create(3, Vehicle.class), largeVehType));
+		QVehicle veh5 = new QVehicleImpl(new VehicleImpl(Id.create(3, Vehicle.class), largeVehType));
 		Person p3 = createPerson2(Id.createPersonId(7), f);
 		PersonDriverAgentImpl driver5 = createAndInsertPersonDriverAgentImpl(p3, f.sim);
 		veh5.setDriver(driver5);
@@ -566,7 +568,9 @@ public final class QLinkTest extends MatsimTestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim sim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim sim = new QSimBuilder(scenario.getConfig()) //
+				.useDefaults() //
+				.build(scenario, eventsManager);
 
 		EventsCollector collector = new EventsCollector();
 		sim.getEventsManager().addHandler(collector);
@@ -618,7 +622,9 @@ public final class QLinkTest extends MatsimTestCase {
 			this.link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0 );
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-			sim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+			sim = new QSimBuilder(scenario.getConfig()) //
+					.useDefaults() //
+					.build(scenario, eventsManager);
 			this.queueNetwork = (QNetwork) sim.getNetsimNetwork();
 
             this.qlink1 = (QLinkImpl) this.queueNetwork.getNetsimLink(Id.create("1", Link.class));
@@ -632,7 +638,7 @@ public final class QLinkTest extends MatsimTestCase {
     private static void dummify(QNetwork network) {
         NetElementActivationRegistry netElementActivator = new NetElementActivationRegistry() {
             @Override
-            protected void registerNodeAsActive(QNodeImpl node) {
+            protected void registerNodeAsActive(QNodeI node) {
 
             }
 

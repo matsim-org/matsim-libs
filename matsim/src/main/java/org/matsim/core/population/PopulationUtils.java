@@ -29,12 +29,14 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -50,6 +52,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
@@ -60,6 +64,7 @@ import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -74,7 +79,9 @@ import org.matsim.utils.objectattributes.attributable.AttributesUtils;
  */
 public final class PopulationUtils {
 	private static final Logger log = Logger.getLogger( PopulationUtils.class );
-	private static final PopulationFactory populationFactory = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory() ;
+//	private static final PopulationFactory populationFactory = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory() ;
+	private static final PopulationFactory populationFactory = createPopulation( new PlansConfigGroup(), null  ).getFactory() ;
+	// try to avoid misleading comment about config context.  kai, dec'18
 
 	/**
 	 * Is a namespace, so don't instantiate:
@@ -141,6 +148,16 @@ public final class PopulationUtils {
 
 	public static Leg unmodifiableLeg( Leg leg ) {
 		return new UnmodifiableLeg( leg ) ;
+	}
+
+	public static void resetRoutes( final Plan plan ) {
+		// loop over all <leg>s, remove route-information
+		// routing is done after location choice
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				((Leg) pe).setRoute(null);
+			}
+		}
 	}
 
 	static class UnmodifiableLeg implements Leg {
@@ -281,7 +298,6 @@ public final class PopulationUtils {
 
 		@Override
 		public void setCoord(Coord coord) {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
@@ -396,32 +412,39 @@ public final class PopulationUtils {
 	}
 
 	/**
+	 * @deprecated Use {@link #decideOnActivityEndTime(Activity, double, Config)}
+	 */
+	@Deprecated // was renamed
+	public static double getActivityEndTime( Activity act, double now, Config config ) {
+		return decideOnActivityEndTime( act, now, config ) ;
+	}
+
+	/**
 	 * Computes the (expected or planned) activity end time, depending on the configured time interpretation.
 	 */
-	public static double getActivityEndTime( Activity act, double now, Config config ) {
+	public static double decideOnActivityEndTime( Activity act, double now, Config config ) {
 		switch ( config.plans().getActivityDurationInterpretation() ) {
 		case endTimeOnly:
 			return act.getEndTime() ;
 		case tryEndTimeThenDuration:
-			if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
+			if ( !Time.isUndefinedTime(act.getEndTime()) ) {
 				return act.getEndTime() ;
-			} else if ( act.getMaximumDuration() != Time.UNDEFINED_TIME ) {
+			} else if ( !Time.isUndefinedTime(act.getMaximumDuration()) ) {
 				return now + act.getMaximumDuration() ;
 			} else {
-				return Time.UNDEFINED_TIME ;
+				return Time.getUndefinedTime();
 			}
 		case minOfDurationAndEndTime:
 			return Math.min( now + act.getMaximumDuration() , act.getEndTime() ) ;
 		default:
 			break ;
 		}
-		return Time.UNDEFINED_TIME ;
+		return Time.getUndefinedTime();
 	}
 
 	private static int missingFacilityCnt = 0 ;
-	/**
-	 * @param config  
-	 */
+
+	@Deprecated // use decideOnLinkIdForActivity.  kai, sep'18
 	public static Id<Link> computeLinkIdFromActivity( Activity act, ActivityFacilities facs, Config config ) {
 		// the following might eventually become configurable by config. kai, feb'16
 		if ( act.getFacilityId()==null ) {
@@ -445,18 +468,26 @@ public final class PopulationUtils {
 				return linkIdFromActivity ;
 			} else {
 				return facility.getLinkId() ;
-			} 
+			}
 			// yy sorry about this mess, I am just trying to make explicit which seems to have been the logic so far implicitly.  kai, feb'16
 		}
 	}
-
-	/**
-	 * @param config  
-	 */
+	
+	@Deprecated // use "decideOnCoord..."
 	public static Coord computeCoordFromActivity( Activity act, ActivityFacilities facs, Config config ) {
+		return computeCoordFromActivity( act, facs, null, config ) ;
+	}
+	@Deprecated // use "decideOnCoord..."
+	public static Coord computeCoordFromActivity( Activity act, ActivityFacilities facs, Network network, Config config ) {
 		// the following might eventually become configurable by config. kai, feb'16
 		if ( act.getFacilityId()==null ) {
-			return act.getCoord() ; // if not available, fall back on coord of link?
+			if ( act.getCoord()!=null ) {
+				return act.getCoord() ;
+			} else {
+				Gbl.assertNotNull( network );
+				Link link = network.getLinks().get( act.getLinkId() ) ;
+				return link.getCoord() ;
+			}
 		} else {
 			Gbl.assertIf( facs!=null ) ;
 			ActivityFacility facility = facs.getFacilities().get( act.getFacilityId() ) ;
@@ -508,6 +539,10 @@ public final class PopulationUtils {
 			Leg leg2 = it2.next() ;
 			if ( leg1.getMode().equals( leg2.getMode() ) ) {
 				simil += sameModeReward ;
+			} else {
+				continue ;
+				// don't look for route overlap if different mode.  Makes sense for totally different modes,
+				// but maybe not so obvious for similar modes such as "car" and "ride".  kai, jul'18
 			}
 			// the easy way for the route is to not go along the links but just check for overlap.
 			Route route1 = leg1.getRoute() ;
@@ -517,14 +552,19 @@ public final class PopulationUtils {
 			if ( route1 instanceof NetworkRoute ) {
 				nr1 = (NetworkRoute) route1 ;
 			} else {
+				simil += sameModeReward ;
+				// ("no route" is interpreted as "same route".  One reason is that otherwise plans
+				// with routes always receive higher penalties than plans without routes in the diversity
+				// increasing plans remover, which clearly is not what one wants. kai, jul'18)
 				continue ; // next leg
 			}
 			if ( route2 instanceof NetworkRoute ) {
 				nr2 = (NetworkRoute) route2 ;
 			} else {
+				simil += sameModeReward ;
 				continue ; // next leg
 			}
-			simil += sameRouteReward * RouteUtils.calculateCoverage(nr1, nr2, network) ;
+			simil += sameRouteReward * ( RouteUtils.calculateCoverage(nr1, nr2, network) + RouteUtils.calculateCoverage(nr2, nr1, network) ) / 2 ;
 		}
 		return simil ;
 	}
@@ -592,17 +632,8 @@ public final class PopulationUtils {
 	 */
 	public static boolean equalPopulation(final Population s1, final Population s2) {
 		try {
-			@SuppressWarnings("resource")
-			InputStream inputStream1 = null;
-			@SuppressWarnings("resource")
-			InputStream inputStream2 = null;
-			try {
-				inputStream1 = openPopulationInputStream(s1);
-				inputStream2 = openPopulationInputStream(s2);
-				return IOUtils.isEqual(inputStream1, inputStream2);
-			} finally {
-				if (inputStream1 != null) inputStream1.close();
-				if (inputStream2 != null) inputStream2.close();
+			try( InputStream inputStream1 = openPopulationInputStream( s1 ) ; InputStream inputStream2 = openPopulationInputStream( s2 ) ){
+				return IOUtils.isEqual( inputStream1, inputStream2 );
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -917,8 +948,8 @@ public final class PopulationUtils {
 			if (index != plan.getPlanElements().size()-2) {
 				// not the last leg
 				Leg next_leg = (Leg)plan.getPlanElements().get(index+2);
-				next_leg.setDepartureTime(Time.UNDEFINED_TIME);
-				next_leg.setTravelTime(Time.UNDEFINED_TIME);
+				next_leg.setDepartureTime(Time.getUndefinedTime());
+				next_leg.setTravelTime(Time.getUndefinedTime());
 				next_leg.setRoute(null);
 			}
 			plan.getPlanElements().remove(index+1); // following act
@@ -947,8 +978,8 @@ public final class PopulationUtils {
 			else {
 				// remove an in-between act
 				Leg prev_leg = (Leg)plan.getPlanElements().get(index-1); // prev leg;
-				prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
-				prev_leg.setTravelTime(Time.UNDEFINED_TIME);
+				prev_leg.setDepartureTime(Time.getUndefinedTime());
+				prev_leg.setTravelTime(Time.getUndefinedTime());
 				prev_leg.setRoute(null);
 
 				plan.getPlanElements().remove(index+1); // following leg
@@ -998,5 +1029,68 @@ public final class PopulationUtils {
 	
 	public static void writePopulation( Population population, String filename ) {
 		new PopulationWriter( population).write( filename ); 
+	}
+	
+	public static Id<Link> decideOnLinkIdForActivity( Activity act, Scenario sc ) {
+		if ( act.getFacilityId() !=null ) {
+			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get( act.getFacilityId() );;
+			if ( facility==null ) {
+				throw new RuntimeException("facility ID given but not in facilities container") ;
+			}
+			Gbl.assertNotNull( facility.getLinkId() );
+			return facility.getLinkId();
+		}
+		Gbl.assertNotNull( act.getLinkId() );
+		return act.getLinkId() ;
+	}
+	public static Coord decideOnCoordForActivity( Activity act, Scenario sc ) {
+		Id<ActivityFacility> facilityId ;
+		try {
+			facilityId = act.getFacilityId() ;
+		} catch (Exception ee ) {
+			facilityId = null ;
+		}
+		// some people prefer throwing exceptions over using null
+
+		if ( facilityId !=null ) {
+			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get( facilityId );;
+			Gbl.assertNotNull( facility  );
+			Gbl.assertNotNull( facility.getCoord() ) ;
+			return facility.getCoord() ;
+		}
+		if ( act.getCoord()!=null ) {
+			return act.getCoord() ;
+		} else {
+			Gbl.assertNotNull( sc.getNetwork() );
+			Link link = sc.getNetwork().getLinks().get( act.getLinkId() ) ;
+			Gbl.assertNotNull( link );
+			return link.getCoord() ;
+		}
+	}
+	public static double decideOnTravelTimeForLeg( Leg leg ) {
+		if ( leg.getRoute()!=null ) {
+			return leg.getRoute().getTravelTime() ;
+		} else {
+			return leg.getTravelTime() ;
+		}
+	}
+	public static void sampleDown( Population pop, double sample ) {
+		final Random rnd = MatsimRandom.getLocalInstance();;
+		log.info( "population size before downsampling=" + pop.getPersons().size() ) ;
+		pop.getPersons().values().removeIf( person ->  rnd.nextDouble() >= sample ) ;
+		log.info( "population size after downsampling=" + pop.getPersons().size() ) ;
+	}
+	public static void readPopulation( Population population, String filename ) {
+		MutableScenario scenario = ScenarioUtils.createMutableScenario( ConfigUtils.createConfig() ) ;
+		scenario.setPopulation( population );
+		new PopulationReader( scenario ).readFile( filename );
+		// (yyyy population reader uses network to retrofit some missing geo information such as route lenth.
+		// In my opinion, that should be done in prepareForSim, not in the parser.  It is commented as such
+		// in the PopulationReader class.  kai, nov'18)
+	}
+
+	public static boolean comparePopulations( Population population1, Population population2 ) {
+		boolean result = PopulationUtils.equalPopulation( population1, population2 );
+		return result ;
 	}
 }

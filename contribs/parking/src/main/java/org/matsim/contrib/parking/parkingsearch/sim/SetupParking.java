@@ -24,6 +24,7 @@ package org.matsim.contrib.parking.parkingsearch.sim;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
@@ -39,6 +40,9 @@ import org.matsim.contrib.parking.parkingsearch.routing.WithinDayParkingRouter;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.PrepareForSim;
+import org.matsim.core.mobsim.qsim.PopulationModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.router.StageActivityTypes;
 
 import com.google.inject.name.Names;
@@ -72,7 +76,7 @@ public class SetupParking {
 			@Override
 			public void install() {
 				addRoutingModuleBinding(TransportMode.car).toInstance(routingModuleCar);
-				bind(Network.class).annotatedWith(Names.named(DvrpModule.DVRP_ROUTING)).to(Network.class).asEagerSingleton();
+				bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)).to(Network.class).asEagerSingleton();
 				bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
 				bind(WalkLegFactory.class).asEagerSingleton();
 				bind(PrepareForSim.class).to(ParkingSearchPrepareForSimImpl.class);
@@ -80,6 +84,19 @@ public class SetupParking {
 				addControlerListenerBinding().to(ParkingListener.class);
 				bind(ParkingRouter.class).to(WithinDayParkingRouter.class);
 				bind(VehicleTeleportationLogic.class).to(VehicleTeleportationToNearbyParking.class);
+			}
+		});
+		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				QSimComponentsConfig components = new QSimComponentsConfig();
+				
+				new StandardQSimComponentConfigurator(controler.getConfig()).configure(components);
+				components.removeNamedComponent(PopulationModule.COMPONENT_NAME);
+				components.addNamedComponent(ParkingSearchPopulationModule.COMPONENT_NAME);
+				
+				bind(QSimComponentsConfig.class).toInstance(components);
 			}
 		});
 

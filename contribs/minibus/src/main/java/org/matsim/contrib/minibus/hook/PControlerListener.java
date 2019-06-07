@@ -39,9 +39,10 @@ import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
+import org.matsim.pt.router.TransitScheduleChangedEvent;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -59,8 +60,6 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 	private final static Logger log = Logger.getLogger(PControlerListener.class);
 
 	private final PVehiclesFactory pVehiclesFactory;
-	
-	@Inject private PTransitRouterFactory pTransitRouterFactory;
 
 	@Inject(optional=true) private AgentsStuckHandlerImpl agentsStuckHandler;
 	private final POperators operators ;
@@ -79,10 +78,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 		pBox.notifyStartup(event);
 		addPTransitScheduleToOriginalOne(event.getServices().getScenario().getTransitSchedule(), pBox.getpTransitSchedule());
 		addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(pBox.getpTransitSchedule()));
-
-		//		this.pTransitRouterFactory.createTransitRouterConfig(event.getServices().getConfig());
-		this.pTransitRouterFactory.updateTransitSchedule();
-
+		event.getServices().getEvents().processEvent(new TransitScheduleChangedEvent(0.0));
 		if(this.agentsStuckHandler != null){
 			event.getServices().getEvents().addHandler(this.agentsStuckHandler);
 		}
@@ -100,9 +96,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 			addPTransitScheduleToOriginalOne(event.getServices().getScenario().getTransitSchedule(), pBox.getpTransitSchedule());
 			removePreviousPVehiclesFromScenario(event.getServices().getScenario().getTransitVehicles());
 			addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(pBox.getpTransitSchedule()));
-
-			this.pTransitRouterFactory.updateTransitSchedule();
-
+			event.getServices().getEvents().processEvent(new TransitScheduleChangedEvent(0.0));
 			if(this.agentsStuckHandler != null){
 				ParallelPersonAlgorithmUtils.run(controler.getScenario().getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
 					@Override
@@ -187,9 +181,9 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 	}
 
 	private void dumpTransitScheduleAndVehicles(MatsimServices controler, int iteration){
-		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(controler.getScenario().getTransitSchedule());
+		TransitScheduleWriter writer = new TransitScheduleWriter(controler.getScenario().getTransitSchedule());
 		VehicleWriterV1 writer2 = new VehicleWriterV1(controler.getScenario().getTransitVehicles());
-		writer.write(controler.getControlerIO().getIterationFilename(iteration, "transitSchedule.xml.gz"));
-		writer2.writeFile(controler.getControlerIO().getIterationFilename(iteration, "vehicles.xml.gz"));
+		writer.writeFile(controler.getControlerIO().getIterationFilename(iteration, "transitSchedule.xml.gz"));
+		writer2.writeFile(controler.getControlerIO().getIterationFilename(iteration, "transitVehicles.xml.gz"));
 	}
 }

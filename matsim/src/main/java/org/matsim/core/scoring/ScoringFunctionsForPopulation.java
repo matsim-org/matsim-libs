@@ -20,14 +20,10 @@
 
 package org.matsim.core.scoring;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicReference;
-
+import com.google.inject.Inject;
+import gnu.trove.TDoubleCollection;
+import gnu.trove.iterator.TDoubleIterator;
+import gnu.trove.list.array.TDoubleArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -39,6 +35,7 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
@@ -47,14 +44,23 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
 
-import gnu.trove.TDoubleCollection;
-import gnu.trove.iterator.TDoubleIterator;
-import gnu.trove.list.array.TDoubleArrayList;
+import static org.matsim.core.router.TripStructureUtils.Trip;
 
 /**
  * This class helps EventsToScore by keeping ScoringFunctions for the entire Population - one per Person -, and dispatching Activities
@@ -64,14 +70,17 @@ import gnu.trove.list.array.TDoubleArrayList;
  * @author michaz
  *
  */
-public final class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
-	// yyyyyy there is currently only one place outside package where this is used, and I think it
+ final class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
+	// there is currently only one place outside package where this is used, and I think it
 	// can be changed there.  kai, sep'17
+	// I just removed that.  kai, apr'18
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScoringFunctionsForPopulation.class);
 	private final Population population;
 	private final ScoringFunctionFactory scoringFunctionFactory;
+	
+	private StageActivityTypes stageActivityTypes;
 
 	/*
 	 * Replaced TreeMaps with (Linked)HashMaps since they should perform much better. For 'partialScores'
@@ -86,18 +95,21 @@ public final class ScoringFunctionsForPopulation implements BasicEventHandler, E
 	private final Map<Id<Person>, ScoringFunction> agentScorers = new HashMap<>();
 	private final Map<Id<Person>, TDoubleCollection> partialScores = new LinkedHashMap<>();
 	private final AtomicReference<Throwable> exception = new AtomicReference<>();
+	private final Map<Id<Person>, Plan> tripRecords = new LinkedHashMap<>() ;
 	
-	/**
-	 * For something like the bicycle scoring, we need to know individual links at the level of the scoring function.  This is a first sketch how this could be implemented.
-	 * kai, mar'17
-	 */
-	private boolean passLinkEventsToPerson = false;
+//	/**
+//	 * For something like the bicycle scoring, we need to know individual links at the level of the scoring function.  This is a first sketch how this could be implemented.
+//	 * kai, mar'17
+//	 */
+//	private boolean passLinkEventsToPerson = false;
 	
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
+	@Inject(optional = true)
+	private TripRouter tripRouter;
 
 	@Inject
-	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
-								  Population population, ScoringFunctionFactory scoringFunctionFactory) {
+	ScoringFunctionsForPopulation( ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
+						 Population population, ScoringFunctionFactory scoringFunctionFactory) {
 		controlerListenerManager.addControlerListener(new IterationStartsListener() {
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
@@ -109,18 +121,40 @@ public final class ScoringFunctionsForPopulation implements BasicEventHandler, E
 		eventsManager.addHandler(this);
 		eventsToActivities.addActivityHandler(this);
 		eventsToLegs.addLegHandler(this);
-		if ( passLinkEventsToPerson ) {
-			eventsManager.addHandler(delegate);
-		}
+//		if ( passLinkEventsToPerson ) {
+			eventsManager.addHandler(this.vehicles2Drivers);
+//		}
 	}
 
 	private void init() {
-		for (Person person : population.getPersons().values()) {
-			ScoringFunction data = scoringFunctionFactory.createNewScoringFunction(person);
+		for (Person person : this.population.getPersons().values()) {
+			ScoringFunction data = this.scoringFunctionFactory.createNewScoringFunction(person);
 			this.agentScorers.put(person.getId(), data);
 			this.partialScores.put(person.getId(), new TDoubleArrayList());
+			this.tripRecords.put(person.getId(), PopulationUtils.createPlan());
 		}
 	}
+
+	private StageActivityTypes getStageActivities() {
+		if (this.stageActivityTypes == null) {
+			if (this.tripRouter !=null ) {
+				this.stageActivityTypes = this.tripRouter.getStageActivityTypes() ;
+			} else {
+				this.stageActivityTypes = new StageActivityTypes() {
+					@Override public boolean isStageActivity( final String activityType ) {
+						if ( activityType.contains( "_interaction" ) ) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+				};
+				// yyyyyy this is really terrible, needs to come from global data structure instead.
+			}
+		}
+		return this.stageActivityTypes;
+	}
+	
 
 	@Override
 	synchronized public void handleEvent(Event o) {
@@ -145,18 +179,18 @@ public final class ScoringFunctionsForPopulation implements BasicEventHandler, E
 //				}
 			}
 		}
-		if ( passLinkEventsToPerson ) {
+//		if ( passLinkEventsToPerson ) {
 			// Establish and end connection between driver and vehicle
 			if (o instanceof VehicleEntersTrafficEvent) {
-				delegate.handleEvent((VehicleEntersTrafficEvent) o);
+				this.vehicles2Drivers.handleEvent((VehicleEntersTrafficEvent) o);
 			}
 			if (o instanceof VehicleLeavesTrafficEvent) {
-				delegate.handleEvent((VehicleLeavesTrafficEvent) o);
+				this.vehicles2Drivers.handleEvent((VehicleLeavesTrafficEvent) o);
 			}
 			// Pass LinkEnterEvent to person scoring, required e.g. for bicycle where link attributes are observed in scoring
 			if ( o instanceof LinkEnterEvent ) {
 				Id<Vehicle> vehicleId = ((LinkEnterEvent)o).getVehicleId() ;
-				Id<Person> driverId = delegate.getDriverOfVehicle(vehicleId) ;
+				Id<Person> driverId = this.vehicles2Drivers.getDriverOfVehicle(vehicleId) ;
 				ScoringFunction scoringFunction = getScoringFunctionForAgent( driverId );
 				// (this will NOT do the scoring function lookup twice since LinkEnterEvent is not an instance of HasPersonId.  kai, mar'17)
 				if (scoringFunction != null) {
@@ -170,7 +204,7 @@ public final class ScoringFunctionsForPopulation implements BasicEventHandler, E
 			 * plans service in fact does the same thing, so we should be able to get away without having to do this twice.
 			 * kai, mar'17)
 			 */
-		}
+//		}
 	}
 
 	@Override
@@ -180,8 +214,12 @@ public final class ScoringFunctionsForPopulation implements BasicEventHandler, E
 		ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(agentId);
 		if (scoringFunction != null) {
 			scoringFunction.handleLeg(leg);
-			TDoubleCollection partialScoresForAgent = partialScores.get(agentId);
+			TDoubleCollection partialScoresForAgent = this.partialScores.get(agentId);
 			partialScoresForAgent.add(scoringFunction.getScore());
+		}
+		Plan plan = this.tripRecords.get( agentId ) ; // as container for trip
+		if ( plan!=null ) {
+			plan.addLeg( leg );
 		}
 	}
 
@@ -192,8 +230,39 @@ public final class ScoringFunctionsForPopulation implements BasicEventHandler, E
 		ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(agentId);
 		if (scoringFunction != null) {
 			scoringFunction.handleActivity(activity);
-			TDoubleCollection partialScoresForAgent = partialScores.get(agentId);
+			TDoubleCollection partialScoresForAgent = this.partialScores.get(agentId);
 			partialScoresForAgent.add(scoringFunction.getScore());
+		}
+		
+		Plan plan = this.tripRecords.get( agentId ); // as container for trip
+		if ( plan!= null ) {
+			if ( !plan.getPlanElements().isEmpty() ) {
+				// plan != null, meaning we already have pre-existing material
+				if (getStageActivities().isStageActivity( activity.getType() ) ) {
+					// we are at a stage activity.  Don't do anything ; activity will be added later
+				} else {
+					// we are at a real activity, which is not the first one we see for this agent.  output the trip ...
+					plan.addActivity( activity );
+					final List<Trip> trips = TripStructureUtils.getTrips( plan, getStageActivities());
+					// yyyyyy should in principle only return one trip.  There are, however, situations where
+					// it returns two trips, in particular in conjunction with the minibus raptor.  Possibly
+					// something that has to do with not alternativing between acts and legs.
+					// (To make matters worse, it passes on my local machine, but fails in jenkins.  Possibly,
+					// the byte buffer memory management in the minibus raptor implementation has
+					// issues--???)
+					// kai, sep'18
+					
+					for ( Trip trip : trips ) {
+						if ( trip != null ) {
+							scoringFunction.handleTrip( trip );
+						}
+					}
+					
+					// ... and clean out the intermediate plan:
+					plan.getPlanElements().clear();
+				}
+			}
+			plan.addActivity( activity );
 		}
 	}
 
@@ -213,7 +282,7 @@ public final class ScoringFunctionsForPopulation implements BasicEventHandler, E
 
 	public void finishScoringFunctions() {
 		// Rethrow an exception in a scoring function (user code) if there was one.
-		Throwable throwable = exception.get();
+		Throwable throwable = this.exception.get();
 		if (throwable != null) {
 			if (throwable instanceof RuntimeException) {
 				throw ((RuntimeException) throwable);
@@ -239,7 +308,6 @@ public final class ScoringFunctionsForPopulation implements BasicEventHandler, E
 				}
 				out.newLine();
 			}
-			out.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -250,11 +318,11 @@ public final class ScoringFunctionsForPopulation implements BasicEventHandler, E
 
 	}
 
-	public boolean isPassLinkEventsToPerson() {
-		return passLinkEventsToPerson;
-	}
+//	public boolean isPassLinkEventsToPerson() {
+//		return passLinkEventsToPerson;
+//	}
 
-	public void setPassLinkEventsToPerson(boolean passLinkEventsToPerson) {
-		this.passLinkEventsToPerson = passLinkEventsToPerson;
-	}
+//	public void setPassLinkEventsToPerson(boolean passLinkEventsToPerson) {
+//		this.passLinkEventsToPerson = passLinkEventsToPerson;
+//	}
 }

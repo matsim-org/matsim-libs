@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.oneagent;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,10 +61,11 @@ public class ControlerTest {
 	public void testModifySignalControlDataOnsetOffset() {
 		//configure and load standard scenario
 		Fixture fixture = new Fixture();
-		Scenario scenario = fixture.createAndLoadTestScenario(false);
+		Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(false);
 		scenario.getConfig().controler().setFirstIteration(0);
 		scenario.getConfig().controler().setLastIteration(1);
 		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
+		scenario.getConfig().controler().setWriteEventsInterval(1);
 		
 		Controler controler = new Controler(scenario);
         controler.getConfig().controler().setCreateGraphs(false);
@@ -123,10 +124,10 @@ public class ControlerTest {
 		@Override
 		public void handleEvent(SignalGroupStateChangedEvent e) {
 			if (e.getNewState().equals(SignalGroupState.RED)){
-				Assert.assertEquals(0.0, e.getTime());
+				Assert.assertEquals(0.0, e.getTime(), 1e-7);
 			}
 			else if (e.getNewState().equals(SignalGroupState.GREEN)) {
-				Assert.assertEquals(100.0, e.getTime());
+				Assert.assertEquals(100.0, e.getTime(), 1e-7);
 			}
 		}
 	}

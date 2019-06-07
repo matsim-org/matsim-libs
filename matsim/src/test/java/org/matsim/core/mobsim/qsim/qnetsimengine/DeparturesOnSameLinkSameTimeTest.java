@@ -37,8 +37,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -119,8 +118,10 @@ public class DeparturesOnSameLinkSameTimeTest {
 		});
 
 		PrepareForSimUtils.createDefaultPrepareForSim(inputs.scenario).run();
-		QSim qsim = QSimUtils.createDefaultQSim(inputs.scenario,events);
-		qsim.run();
+		new QSimBuilder(inputs.scenario.getConfig()) //
+			.useDefaults() //
+			.build(inputs.scenario, events) //
+			.run();
 
 		return linkLeaveTimes;
 	}
@@ -145,6 +146,14 @@ public class DeparturesOnSameLinkSameTimeTest {
 			config=ConfigUtils.createConfig();
 			this.scenario = ScenarioUtils.loadScenario(config);
 			config.qsim().setMainModes(Arrays.asList(travelMode));
+
+			//following is necessary for mixed traffic, providing a route was obstructing
+			// the requirement of these which might be all right in some cases. Amit Jan'18
+			config.plansCalcRoute().setNetworkModes(Arrays.asList(travelMode));
+			config.travelTimeCalculator().setAnalyzedModesAsString(travelMode );
+			config.travelTimeCalculator().setSeparateModes(true);
+			config.planCalcScore().getOrCreateModeParams(travelMode);
+
 			network =  (Network) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
 		}

@@ -20,19 +20,19 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger( ControlerConfigGroup.class );
@@ -66,7 +66,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private String outputDirectory = "./output";
 	private int firstIteration = 0;
 	private int lastIteration = 1000;
-	private RoutingAlgorithmType routingAlgorithmType = RoutingAlgorithmType.Dijkstra;
+	private RoutingAlgorithmType routingAlgorithmType = RoutingAlgorithmType.AStarLandmarks;
 
 	private boolean linkToLinkRoutingEnabled = false;
 
@@ -171,9 +171,8 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( RUNID )
 	public void setRunId(final String runid) {
-		
 		if (runid == null) {
-			this.runId = runid;
+			this.runId = null;
 		} else {
 			if (runid.equals("")) {
 				log.info("No run Id provided. Setting run Id to null.");

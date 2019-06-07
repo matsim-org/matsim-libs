@@ -18,10 +18,17 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility.utils;
 
-import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Envelope;
 import org.matsim.contrib.accessibility.Labels;
-import org.matsim.contrib.analysis.vsp.qgis.*;
+import org.matsim.contrib.analysis.vsp.qgis.GraduatedSymbolRenderer;
+import org.matsim.contrib.analysis.vsp.qgis.PolygonLayerRenderer;
+import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
+import org.matsim.contrib.analysis.vsp.qgis.QGisMapnikFileCreator;
+import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
+import org.matsim.contrib.analysis.vsp.qgis.RasterLayer;
+import org.matsim.contrib.analysis.vsp.qgis.RendererFactory;
+import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityXmlRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.utils.ColorRangeUtils;
 import org.matsim.core.utils.misc.ExeRunner;
@@ -75,7 +82,7 @@ public class VisualizationUtils {
 			densityLayer.setXField(Labels.X_COORDINATE);
 			densityLayer.setYField(Labels.Y_COORDINATE);
 			GraduatedSymbolRenderer dRenderer = RendererFactory.createDensitiesRenderer(densityLayer, populationThreshold, symbolSize);
-			dRenderer.setRenderingAttribute(Labels.POPULATION_DENSITIY);
+			dRenderer.setRenderingAttribute(Labels.DENSITIY);
 			writer.addLayer(densityLayer);
 		}
 
@@ -96,22 +103,17 @@ public class VisualizationUtils {
 		writer.write(qGisProjectFile);
 	}
 	
-    
+    // TODO new version; please rescue previous (non-polygon-based) version from history
     public static void createQGisOutputRuleBasedStandardColorRange(String actType, String mode, Envelope envelope,
-			String workingDirectory, String crs, boolean includeDensityLayer,
-			Double lowerBound, Double upperBound, Integer range,
-			int symbolSize, int populationThreshold) {
-    	createQGisOutputRuleBased(actType, mode, envelope,
-	    		workingDirectory, crs, includeDensityLayer, lowerBound, upperBound,
-                range, ColorRangeUtils.ColorRange.DEFAULT_RED_TO_BLUE, 
-                symbolSize, populationThreshold);
+			String workingDirectory, String crs, Double lowerBound, Double upperBound, Integer range, int populationThreshold) {
+    	createQGisOutputRuleBased(actType, mode, envelope, workingDirectory, crs, lowerBound, upperBound,
+                range, ColorRangeUtils.ColorRange.DEFAULT_RED_TO_BLUE, populationThreshold);
     }
 	
-    
+    // TODO new version; please rescue previous (non-polygon-based) version from history
 	public static void createQGisOutputRuleBased(String actType, String mode, Envelope envelope,
-			String workingDirectory, String crs, boolean includeDensityLayer,
-			Double lowerBound, Double upperBound, Integer range,
-			ColorRangeUtils.ColorRange colorRange, int symbolSize, int populationThreshold) {
+			String workingDirectory, String crs, Double lowerBound, Double upperBound, Integer range,
+			ColorRangeUtils.ColorRange colorRange, int populationThreshold) {
 
 		// Create Mapnik file that is needed for OSM layer
 		QGisMapnikFileCreator.writeMapnikFile(workingDirectory + "osm_mapnik.xml");
@@ -132,18 +134,34 @@ public class VisualizationUtils {
 		String actSpecificWorkingDirectory =  workingDirectory + actType + "/";  // has to be the storage location of the file
 		writer.changeWorkingDirectory(actSpecificWorkingDirectory);
 
+//		VectorLayer accessibilityLayer = new VectorLayer(
+//				"accessibility", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
+//		// there are two ways to set x and y fields for csv geometry files
+//		// 1) if there is a header, you can set the members xField and yField to the name of the column headers
+//		// 2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
+//		accessibilityLayer.setXField(Labels.X_COORDINATE);
+//		accessibilityLayer.setYField(Labels.Y_COORDINATE);
+//		RuleBasedRenderer renderer = new RuleBasedRenderer(accessibilityLayer, lowerBound, upperBound, range,
+//				symbolSize, colorRange, mode.toString() + "_accessibility",
+//				Labels.POPULATION_DENSITIY, populationThreshold);
+//		renderer.setRenderingAttribute(mode.toString() + "_accessibility");
+//		writer.addLayer(accessibilityLayer);
+
 		VectorLayer accessibilityLayer = new VectorLayer(
-				"accessibility", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
+				"accessibility", actSpecificWorkingDirectory + "/result.shp", QGisConstants.geometryType.Polygon, false);
 		// there are two ways to set x and y fields for csv geometry files
 		// 1) if there is a header, you can set the members xField and yField to the name of the column headers
 		// 2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
-		accessibilityLayer.setXField(Labels.X_COORDINATE);
-		accessibilityLayer.setYField(Labels.Y_COORDINATE);
-		RuleBasedRenderer renderer = new RuleBasedRenderer(accessibilityLayer, lowerBound, upperBound, range,
-				symbolSize, colorRange, mode.toString() + "_accessibility",
-				Labels.POPULATION_DENSITIY, populationThreshold);
-		renderer.setRenderingAttribute(mode.toString() + "_accessibility");
-		writer.addLayer(accessibilityLayer);
+//		accessibilityLayer.setXField(Labels.X_COORDINATE);
+//		accessibilityLayer.setYField(Labels.Y_COORDINATE);
+		PolygonLayerRenderer renderer = new PolygonLayerRenderer(accessibilityLayer, lowerBound, upperBound, range,
+				colorRange, mode, Labels.DENSITIY, populationThreshold);
+		renderer.setRenderingAttribute(mode);
+//		renderer.setRenderingAttribute(mode.toString() + "_accessibility");
+		accessibilityLayer.setLayerClass(QGisConstants.layerClass.SimpleFill);
+		accessibilityLayer.setSrs("EPSG:4326");
+		accessibilityLayer.setLayerTransparency(50);
+		writer.addLayer(0,accessibilityLayer);
 
 		writer.write(qGisProjectFile);
 	}

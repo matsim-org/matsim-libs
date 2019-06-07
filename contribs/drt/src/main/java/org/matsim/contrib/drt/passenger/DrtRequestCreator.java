@@ -21,69 +21,48 @@ package org.matsim.contrib.drt.passenger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.data.DrtRequest;
-import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.drt.routing.DrtRoute;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.FastAStarEuclideanFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import org.matsim.core.mobsim.framework.PlanAgent;
 
 /**
  * @author michalm
  */
 public class DrtRequestCreator implements PassengerRequestCreator {
-	private final DrtConfigGroup drtCfg;
-	private final TravelTime travelTime;
-	private final LeastCostPathCalculator router;
+	private final String mode;
 	private final EventsManager eventsManager;
 	private final MobsimTimer timer;
 
-	@Inject
-	public DrtRequestCreator(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim,
-			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility) {
-		this.drtCfg = drtCfg;
-		this.travelTime = travelTime;
-		this.eventsManager = qSim.getEventsManager();
-		this.timer = qSim.getSimTimer();
-
-		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
+	public DrtRequestCreator(String mode, EventsManager eventsManager, MobsimTimer timer) {
+		this.mode = mode;
+		this.eventsManager = eventsManager;
+		this.timer = timer;
 	}
 
 	@Override
 	public DrtRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
 			double departureTime, double submissionTime) {
-		double latestDepartureTime = departureTime + drtCfg.getMaxWaitTime();
+		// yyyy remove parameter MobsimPassengerAgent and get necessary info from somewhere else.
+		// (Also in reality, such information is not pushed into the person, but stored somewhere on the provider side.)
+		// kai, gregor, jan'19
 
-		VrpPathWithTravelData unsharedRidePath = VrpPaths.calcAndCreatePath(fromLink, toLink, departureTime, router,
-				travelTime);
+		//FIXME this will not work if pre-booking is allowed in DRT
+		Leg leg = (Leg)((PlanAgent)passenger).getCurrentPlanElement();
+		DrtRoute drtRoute = (DrtRoute)leg.getRoute();
+		double latestDepartureTime = departureTime + drtRoute.getMaxWaitTime();
+		double latestArrivalTime = departureTime + drtRoute.getTravelTime();
 
-		double optimisticTravelTime = unsharedRidePath.getTravelTime();
-		double maxTravelTime = drtCfg.getMaxTravelTimeAlpha() * optimisticTravelTime + drtCfg.getMaxTravelTimeBeta();
-		double latestArrivalTime = departureTime + maxTravelTime;
+		eventsManager.processEvent(
+				new DrtRequestSubmittedEvent(timer.getTimeOfDay(), mode, id, passenger.getId(), fromLink.getId(),
+						toLink.getId(), drtRoute.getDirectRideTime(), drtRoute.getDistance()));
 
-		double unsharedDistance = VrpPaths.calcPathDistance(unsharedRidePath);
-
-		eventsManager.processEvent(new DrtRequestSubmittedEvent(timer.getTimeOfDay(), id, passenger.getId(),
-				fromLink.getId(), toLink.getId(), unsharedRidePath.getTravelTime(), unsharedDistance));
-
-		return new DrtRequest(id, passenger, fromLink, toLink, departureTime, latestDepartureTime, latestArrivalTime,
-				submissionTime, unsharedRidePath);
+		return new DrtRequest(id, passenger.getId(), mode, fromLink, toLink, departureTime, latestDepartureTime,
+				latestArrivalTime, submissionTime);
 	}
 }

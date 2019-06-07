@@ -31,6 +31,8 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 
@@ -40,7 +42,7 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
  * 
  * @see DefaultQNetworkFactory
  */
-public final class ConfigurableQNetworkFactory extends QNetworkFactory {
+public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 	private QSimConfigGroup qsimConfig ;
 	private EventsManager events ;
 	private Network network ;
@@ -49,6 +51,7 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 	private NetsimInternalInterface netsimEngine ;
 	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
 	private TurnAcceptanceLogic turnAcceptanceLogic = new DefaultTurnAcceptanceLogic() ;
+	private VehicleQ.Factory<QVehicle> vehicleQFactory = FIFOVehicleQ::new ;
 
 	public ConfigurableQNetworkFactory( EventsManager events, Scenario scenario ) {
 		this.events = events;
@@ -57,7 +60,7 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 		this.qsimConfig = scenario.getConfig().qsim() ;
 	}
 	@Override
-	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
+	public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
 		this.netsimEngine = netsimEngine1;
 		double effectiveCellSize = network.getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -69,17 +72,20 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
 	}
 	@Override
-	QLinkI createNetsimLink(final Link link, final QNodeI toQueueNode) {
-		QueueWithBuffer.Builder laneFactory = new QueueWithBuffer.Builder(context) ;
-		laneFactory.setLinkSpeedCalculator( linkSpeedCalculator );
+	public QLinkI createNetsimLink( final Link link, final QNodeI toQueueNode ) {
 
 		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
-		linkBuilder.setLaneFactory(laneFactory);
+		{
+			QueueWithBuffer.Builder laneFactory = new QueueWithBuffer.Builder( context );
+			laneFactory.setVehicleQueue( vehicleQFactory.createVehicleQ() );
+			linkBuilder.setLaneFactory( laneFactory );
+		}
+		linkBuilder.setLinkSpeedCalculator( linkSpeedCalculator ) ;
 
 		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override
-	QNodeI createNetsimNode(final Node node) {
+	public QNodeI createNetsimNode( final Node node ) {
 		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
 
 		builder.setTurnAcceptanceLogic( this.turnAcceptanceLogic ) ;
@@ -92,4 +98,8 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 	public final void setTurnAcceptanceLogic( TurnAcceptanceLogic turnAcceptanceLogic ) {
 		this.turnAcceptanceLogic = turnAcceptanceLogic;
 	}
+	public final void setVehicleQFactory( VehicleQ.Factory<QVehicle> factory ) {
+		this.vehicleQFactory = factory ;
+	}
+
 }

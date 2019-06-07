@@ -17,6 +17,7 @@ jobs:
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/drt                 && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/dvrp                && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/taxi                && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/ev                  && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/emissions           && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/freight             && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/signals             && ${MVN_IT_CMD} 
@@ -31,7 +32,6 @@ jobs:
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/socnetgen           && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/transEnergySim      && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/roadpricing         && ${MVN_IT_CMD} 
-    - script: cd ${TRAVIS_BUILD_DIR}/contribs/opdytsIntegration   && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/multimodal          && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/integration         && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/wagonSim            && ${MVN_IT_CMD} 

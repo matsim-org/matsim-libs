@@ -63,10 +63,6 @@ public class StaticDriverDynLeg implements DriverDynLeg {
 	}
 
 	@Override
-	public void finalizeAction(double now) {
-	}
-
-	@Override
 	public String getMode() {
 		return mode;
 	}

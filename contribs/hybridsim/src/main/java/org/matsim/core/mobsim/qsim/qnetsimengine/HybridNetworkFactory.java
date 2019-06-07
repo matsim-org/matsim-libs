@@ -31,9 +31,11 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
-public class HybridNetworkFactory extends QNetworkFactory {
+public final class HybridNetworkFactory implements QNetworkFactory {
 	@Inject QSimConfigGroup qsimConfig ;
 	@Inject EventsManager events ;
 	@Inject Scenario scenario ;
@@ -46,7 +48,7 @@ public class HybridNetworkFactory extends QNetworkFactory {
 	private ExternalEngine externalEngine;
 
 	@Override
-	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface arg2) {
+	public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface arg2 ) {
 		network = arg2.getNetsimNetwork().getNetwork();
 		double effectiveCellSize = ( network).getEffectiveCellSize() ;
 
@@ -73,7 +75,9 @@ public class HybridNetworkFactory extends QNetworkFactory {
 	@Override
 	public QLinkI createNetsimLink(Link link, QNodeI queueNode) {
 		if (link.getAllowedModes().contains("2ext")) {
-			return new QSimExternalTransitionLink(link, this.externalEngine, context, netsimEngine, queueNode );
+			LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
+			// yyyyyy I don't think that this would have been set correctly before I refactored this.  kai, feb'18
+			return new QSimExternalTransitionLink(link, this.externalEngine, context, netsimEngine, queueNode, linkSpeedCalculator);
 		}
 //		QLinkImpl ret = new QLinkImpl(link, network, queueNode, linkSpeedCalculator);
 		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine );

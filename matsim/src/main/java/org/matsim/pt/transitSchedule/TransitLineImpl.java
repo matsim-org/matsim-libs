@@ -27,6 +27,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 
 /**
@@ -38,7 +39,8 @@ public class TransitLineImpl implements TransitLine {
 
 	private final Id<TransitLine> lineId;
 	private String name = null;
-	private final Map<Id<TransitRoute>, TransitRoute> transitRoutes = new LinkedHashMap<Id<TransitRoute>, TransitRoute>(5);
+	private final Map<Id<TransitRoute>, TransitRoute> transitRoutes = new LinkedHashMap<>(5);
+	private final Attributes attributes = new Attributes();
 
 	protected TransitLineImpl(final Id<TransitLine> id) {
 		this.lineId = id;
@@ -76,6 +78,11 @@ public class TransitLineImpl implements TransitLine {
 	@Override
 	public boolean removeRoute(final TransitRoute route) {
 		return null != this.transitRoutes.remove(route.getId());
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return this.attributes;
 	}
 
 	@Override

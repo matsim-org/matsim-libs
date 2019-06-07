@@ -20,14 +20,6 @@
 
 package org.matsim.core.config;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
@@ -55,10 +47,16 @@ import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.run.CreateFullConfig;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * Stores all configuration settings specified in a configuration file and
@@ -420,9 +418,7 @@ public final class Config implements MatsimExtensionPoint {
 			m = createModule(moduleName);
 			log.info("module \"" + moduleName + "\" added.");
 		}
-		if (m != null) {
-			m.addParam(paramName, value);
-		}
+		m.addParam(paramName, value);
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -537,6 +533,12 @@ public final class Config implements MatsimExtensionPoint {
 		}
 	}
 
+	public void removeConfigConsistencyChecker( final Class clazz ) {
+		// I am not saying that I like this.  But I would like to be able to check config consistency before the iterator is created, but by then we still have
+		// unmaterialized config groups, and so I need to remove that checker at that point.  Maybe we can sort this in some different way ...
+		consistencyCheckers.removeIf( ch -> ch.getClass().equals( clazz ) );
+	}
+
 	public final boolean isLocked() {
 		return this.locked;
 	}
@@ -548,9 +550,15 @@ public final class Config implements MatsimExtensionPoint {
 	private void checkIfLocked() {
 		if ( this.isLocked() ) {
 			log.error("too late in execution sequence to set config items. Use");
-			log.error("Config config = ConfigUtils.loadConfig(filename); ");
-			log.error("config.xxx().setYyy(...); ");
-			log.error("Controler ctrl = new Controler( config );");
+			log.error("   Config config = ConfigUtils.loadConfig(filename); ");
+			log.error("   config.xxx().setYyy(...); ");
+			log.error("   Controler ctrl = new Controler( config );");
+			log.error("or") ;
+			log.error("   Config config = ConfigUtils.loadConfig(filename); ");
+			log.error("   config.xxx().setYyy(...); ");
+			log.error("   Scenario scenario = ScenarioUtils.loadScenario(config);") ;
+			log.error("   // do something with scenario") ;
+			log.error("   Controler ctrl = new Controler( scenario );");
 			log.error("This will be changed to an abortive error in the future."); // kai, feb'13
 		}
 	}
@@ -558,9 +566,16 @@ public final class Config implements MatsimExtensionPoint {
 	public final VehiclesConfigGroup vehicles() {
 		return vehicles;
 	}
-
+	
 	public void setContext(URL context) {
-		log.info( "setting context to [" + context + "]" ) ;
+		if ( this.context==null  ||  !(context.toString().equals( this.context.toString() ) ) ) {
+			log.info("setting context to [" + context + "]");
+			// ConfigUtils.createConfig() is used at several places, e.g. when generating an empty
+			// scenario to obtain the default factories.  This will evidently produce output here,
+			// and in some sense the wrong output, since the relevant context is probably set from
+			// some config file path and in fact _not_ changed since this here will be a different
+			// ``throwaway'' config instance.  :-(  kai, jun'18
+		}
 		this.context = context;
 	}
 

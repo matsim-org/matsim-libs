@@ -143,7 +143,7 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 		double now = event.getTime();
 		Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
 		Person person = this.scenario.getPopulation().getPersons().get(driverId);
-		double earliestExitTime = Time.UNDEFINED_TIME;
+		double earliestExitTime;
 		if (this.multiModalTravelTimes != null) {
 			if (transportMode == null) {
 				throw new RuntimeException(

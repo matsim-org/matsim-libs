@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- $Id$ -->
+
+<!-- =============================================================== -->
+<!-- Author: jwjoubert, wlbean                                       -->
+<!-- first try to create a dtd-file for freight-contrib's receiver   -->
+<!-- agent                                                           -->
+<!-- =============================================================== -->
+
+<!ELEMENT freightReceivers  (attributes?, productTypes*, receiver*)> 
+<!ATTLIST freightReceivers
+          desc              CDATA           #IMPLIED>
+
+<!ELEMENT attributes        (attribute*)>
+
+<!ELEMENT attribute         (#PCDATA)>
+<!ATTLIST attribute
+          name              CDATA           #REQUIRED
+          class             CDATA           #REQUIRED>
+
+<!ELEMENT productTypes      (productType*)>
+
+<!ELEMENT productType       (#PCDATA)>
+<!ATTLIST productType  
+        id                  CDATA           #REQUIRED
+        descr               CDATA           #IMPLIED
+        weight              CDATA           #IMPLIED>
+
+<!ELEMENT receiver 			(attributes?, product*, plan*)>
+<!ATTLIST receiver
+        id                  CDATA           #REQUIRED
+        linkId              CDATA           #IMPLIED>
+		
+<!ELEMENT product           (reorderPolicy?, order*)>
+<!ATTLIST product
+        id                  CDATA           #REQUIRED
+        onHand              CDATA           #IMPLIED>
+
+<!ELEMENT reorderPolicy     (attributes?)>
+<!ATTLIST reorderPolicy
+        name                CDATA           #REQUIRED>
+
+<!ELEMENT plan			(timeWindow*, order*)>
+<!ATTLIST plan
+		score				CDATA			#IMPLIED
+		selected			CDATA			#REQUIRED>
+
+<!ELEMENT timeWindow        (#PCDATA)>
+<!ATTLIST timeWindow
+        start               CDATA           #REQUIRED
+        end                 CDATA           #REQUIRED>
+		
+
+<!ELEMENT order             (item*)>
+<!ATTLIST order
+        carrierId           CDATA           #REQUIRED>
+
+<!ELEMENT item              (#PCDATA)>
+<!ATTLIST item
+        id                  CDATA           #REQUIRED
+        name                CDATA           #IMPLIED
+        productId           CDATA           #REQUIRED
+        quantity            CDATA           #IMPLIED
+        serviceTime         CDATA           #IMPLIED>
+
+
+<!-- ============================================================ -->
+         
+<!-- ATTRIBUTE id is required and needs to be unique. They may include:
+     Letters (lower or capital)
+     Numbers 0 to 9
+     Punctuation marks: 
+     	_ (underscore), 
+     	- (single hyphen),
+     	. (Dot) and
+     	: (colon) - however, the colon is reserved for page namespaces
+
+	The first character of a name can not be a number, it must be a letter or one of the 
+	allowed punctuation marks. 
+	In practice, the first character should always be a letter or if needed an underscore.
+	Spaces are NOT allowed. -->     
+	

@@ -30,25 +30,42 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author nagel
  */
 public final class RunRoadPricingExample {
+	private final String[] args;
+	private Config config;
 	// to not change class name: referenced from book.  kai, dec'14
 
 	public static void main(String[] args) {
-		// load the config, telling it to "materialize" the road pricing section:
-		Config config = ConfigUtils.loadConfig( args[0], new RoadPricingConfigGroup() ) ;
-		
+		new RunRoadPricingExample( args ).run() ;
+	}
+
+	public RunRoadPricingExample( String [] args ) {
+		this.args = args ;
+	}
+
+	public void run( ){
+		if ( config==null ) {
+			prepareConfig() ;
+		}
+
 		// load the scenario:
-		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		Scenario scenario = ScenarioUtils.loadScenario(config ) ;
 
 		// instantiate the controler:
 		Controler controler = new Controler(scenario) ;
 
 		// use the road pricing module.
-        // (loads the road pricing scheme, uses custom travel disutility including tolls, etc.)
-//        controler.setModules(new ControlerDefaultsWithRoadPricingModule());
-		controler.addOverridingModule(new RoadPricingModule());
+		// (loads the road pricing scheme, uses custom travel disutility including tolls, etc.)
+		//        controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+		controler.addOverridingModule(new RoadPricingModule() );
 
-        // run the controler:
+		// run the controler:
 		controler.run() ;
+	}
+
+	public Config prepareConfig( ){
+		// load the config, telling it to "materialize" the road pricing section:
+		config = ConfigUtils.loadConfig( args[0], new RoadPricingConfigGroup() );
+		return config ;
 	}
 
 }

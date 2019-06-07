@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility.gis;
 
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Geometry;
 
 /**
  * Representation of a spatial zone. This class is just a wrapper for feature of

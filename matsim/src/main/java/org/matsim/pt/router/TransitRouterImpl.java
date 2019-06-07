@@ -20,18 +20,20 @@
 
 package org.matsim.pt.router;
 
-import java.util.List;
-import java.util.Map;
-
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.router.TransitLeastCostPathTree.InitialNode;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Not thread-safe because MultiNodeDijkstra is not. Does not expect the TransitSchedule to change once constructed! michaz '13
@@ -40,51 +42,141 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  */
 public class TransitRouterImpl extends AbstractTransitRouter implements TransitRouter {
 
-	public TransitRouterImpl(final TransitRouterConfig trConfig, final TransitSchedule schedule) {
-		super(trConfig, schedule) ;
-	}
+    private final TransitRouterNetwork transitNetwork;
+    private final TravelTime travelTime;
+    private final TransitTravelDisutility travelDisutility;
+    private final PreparedTransitSchedule preparedTransitSchedule;
+    
+    private boolean cacheTree;
+    private TransitLeastCostPathTree tree;
+	private Facility previousFromFacility;
+	private double previousDepartureTime;
 
-	public TransitRouterImpl(
-			final TransitRouterConfig config,
-			final PreparedTransitSchedule preparedTransitSchedule,
-			final TransitRouterNetwork routerNetwork,
-			final TravelTime travelTime,
-			final TransitTravelDisutility travelDisutility) {
-		super( config, preparedTransitSchedule, routerNetwork, travelTime, travelDisutility) ;
-	}
+    public TransitRouterImpl(final TransitRouterConfig trConfig, final TransitSchedule schedule) {
+        super(trConfig);
+        this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule,
+                trConfig.getBeelineWalkConnectionDistance());
+        this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
+        TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(
+                trConfig,
+                new PreparedTransitSchedule(schedule));
+        this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
+        this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
+        setTransitTravelDisutility(this.travelDisutility);
+        
+        this.cacheTree = trConfig.isCacheTree();
+    }
 
-	@Override
-	public List<Leg> calcRoute(final Facility<?> fromFacility, final Facility<?> toFacility, final double departureTime, final Person person) {
-		// find possible start stops
-		Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person, fromFacility.getCoord(), departureTime);
-		// find possible end stops
-		Map<Node, InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNodes(person, toFacility.getCoord(), departureTime);
-		
-		double pathCost = Double.POSITIVE_INFINITY ;
-		Path p = null ;
+    public TransitRouterImpl(
+            final TransitRouterConfig trConfig,
+            final PreparedTransitSchedule preparedTransitSchedule,
+            final TransitRouterNetwork routerNetwork,
+            final TravelTime travelTime,
+            final TransitTravelDisutility travelDisutility) {
 
-		if ( wrappedFromNodes != null && wrappedToNodes != null ) {
+        super(trConfig, travelDisutility);
 
-			TransitLeastCostPathTree tree = new TransitLeastCostPathTree(getTransitRouterNetwork(), getTravelDisutility(), getTravelTime(),
-					wrappedFromNodes, wrappedToNodes, person);
-			// yyyyyy This sounds like it is doing the full tree.  But I think it is not. Kai, nov'16
+        this.transitNetwork = routerNetwork;
+        this.preparedTransitSchedule = preparedTransitSchedule;
+        this.travelDisutility = travelDisutility;
+        this.travelTime = travelTime;
+        
+        this.cacheTree = trConfig.isCacheTree();
+    }
 
-			// find routes between start and end stop
-			p = tree.getPath(wrappedToNodes);
+    private Map<Node, InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime) {
+        Collection<TransitRouterNetwork.TransitRouterNetworkNode> nearestNodes = getTransitRouterNetwork().getNearestNodes(
+                coord,
+                this.getConfig().getSearchRadius());
+        if (nearestNodes.size() < 2) {
+            // also enlarge search area if only one stop found, maybe a second one is near the border of the search area
+            TransitRouterNetwork.TransitRouterNetworkNode nearestNode = this.getTransitRouterNetwork()
+                                                                            .getNearestNode(coord);
+            if (nearestNode != null) { // transit schedule might be completely empty!
+                double distance = CoordUtils.calcEuclideanDistance(coord,
+                        nearestNode.stop.getStopFacility().getCoord());
+                nearestNodes = this.getTransitRouterNetwork()
+                                   .getNearestNodes(coord, distance + this.getConfig().getExtensionRadius());
+            }
+        }
+        Map<Node, InitialNode> wrappedNearestNodes = new LinkedHashMap<>();
+        for (TransitRouterNetwork.TransitRouterNetworkNode node : nearestNodes) {
+            Coord toCoord = node.stop.getStopFacility().getCoord();
+            double initialTime = getWalkTime(person, coord, toCoord);
+            double initialCost = getWalkDisutility(person, coord, toCoord);
+            wrappedNearestNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
+        }
+        return wrappedNearestNodes;
+    }
 
-			if (p == null) {
-				return null; // yyyyyy why not return the direct walk leg?? kai/dz, mar'17
-			}
-			pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
-		}
+    @Override
+    public List<Leg> calcRoute( final Facility fromFacility, final Facility toFacility, final double departureTime, final Person person) {
+        // find possible start stops
+        Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person,
+                fromFacility.getCoord(),
+                departureTime);
+        
+        
+        // find possible end stops
+        Map<Node, InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNodes(person,
+                toFacility.getCoord(),
+                departureTime);
 
-		double directWalkCost = getWalkDisutility(person, fromFacility.getCoord(), toFacility.getCoord());
+        TransitPassengerRoute transitPassengerRoute = null;
 
-		if (directWalkCost * getConfig().getDirectWalkFactor() < pathCost ) {
-			return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
-		}
-		Gbl.assertNotNull(p); // this is now a bit confused since I do not understand the logic, see above.  kai, mar'17
-		return convertPathToLegList(departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person);
-	}
+        if (cacheTree) {
+        	if ((fromFacility != previousFromFacility) && (departureTime != previousDepartureTime)) { // Compute tree only if fromFacility and departure time are different from previous request.
+    			tree = new TransitLeastCostPathTree(getTransitRouterNetwork(),
+    					getTravelDisutility(),
+    					getTravelTime(),
+    	                wrappedFromNodes,
+    	                person);
+        	}
+        } else { // Compute new tree for every routing request
+        	tree = new TransitLeastCostPathTree(getTransitRouterNetwork(),
+					getTravelDisutility(),
+					getTravelTime(),
+	                wrappedFromNodes,
+	                wrappedToNodes,
+	                person);
+	        // yyyyyy This sounds like it is doing the full tree.  But I think it is not. Kai, nov'16
+			// Yes, only if you leave out the wrappedToNodes from the argument list, it does compute the full tree. See the new case above. dz, june'18
+        }
 
+        // find routes between start and end stop
+        transitPassengerRoute = tree.getTransitPassengerRoute(wrappedToNodes);
+
+        if (transitPassengerRoute == null) {
+//				return null; // yyyyyy why not return the direct walk leg?? kai/dz, mar'17
+            return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
+        }
+        double pathCost = transitPassengerRoute.getTravelCost();
+
+        double directWalkCost = getWalkDisutility(person, fromFacility.getCoord(), toFacility.getCoord());
+
+        if (directWalkCost * getConfig().getDirectWalkFactor() < pathCost) {
+            return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
+        }
+        
+        previousFromFacility = fromFacility;
+        previousDepartureTime = departureTime;
+        
+        return convertPassengerRouteToLegList(departureTime,
+                transitPassengerRoute,
+                fromFacility.getCoord(),
+                toFacility.getCoord(),
+                person);
+    }
+
+    public TransitRouterNetwork getTransitRouterNetwork() {
+        return transitNetwork;
+    }
+
+    TravelTime getTravelTime() {
+        return travelTime;
+    }
+
+    PreparedTransitSchedule getPreparedTransitSchedule() {
+        return preparedTransitSchedule;
+    }
 }

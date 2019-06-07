@@ -20,12 +20,12 @@
 
 package org.matsim.core.config.groups;
 
-import java.net.URL;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+
+import java.net.URL;
+import java.util.Map;
 
 public final class PlansConfigGroup extends ReflectiveConfigGroup {
 
@@ -36,7 +36,7 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		public static final String CompressedNetworkRoute = "CompressedNetworkRoute";
 	}
 
-	public static enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, @Deprecated endTimeOnly }
+	public enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, @Deprecated endTimeOnly }
 	private static final String INPUT_FILE = "inputPlansFile";
 	private static final String INPUT_PERSON_ATTRIBUTES_FILE = "inputPersonAttributesFile";
 	private static final String NETWORK_ROUTE_TYPE = "networkRouteType";
@@ -68,9 +68,9 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 				"Defines how routes are stored in memory. Currently supported: " +
 				NetworkRouteType.LinkNetworkRoute + ", " +
 				NetworkRouteType.CompressedNetworkRoute + ".");
-		comments.put(
-				INPUT_PERSON_ATTRIBUTES_FILE,
-				"Path to a file containing person attributes (required file format: ObjectAttributes).");
+//		comments.put(
+//				INPUT_PERSON_ATTRIBUTES_FILE,
+//				"Path to a file containing person attributes (required file format: ObjectAttributes).");
 		comments.put(
 				SUBPOPULATION_ATTRIBUTE,
 				"Name of the (Object)Attribute defining the subpopulation to which pertains a Person"+
@@ -85,7 +85,7 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		"(simpler) version of the TimeAllocationMutator.") ;
 		
 		comments.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not tested) will remove plan attributes that are presumably not used, such as " +
-		"activityStartTime. default=false") ;
+                "activityStartTime. default=false. Use with Caution!");
 
 		comments.put( INPUT_CRS , "The Coordinates Reference System in which the coordinates are expressed in the input file." +
 				" At import, the coordinates will be converted to the coordinate system defined in \"global\", and will" +
@@ -109,15 +109,18 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringGetter( INPUT_PERSON_ATTRIBUTES_FILE )
+	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
 	public String getInputPersonAttributeFile() {
 		return this.inputPersonAttributeFile;
 	}
 
 	@StringSetter( INPUT_PERSON_ATTRIBUTES_FILE )
+	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
 	public void setInputPersonAttributeFile(final String inputPersonAttributeFile) {
 		this.inputPersonAttributeFile = inputPersonAttributeFile;
 	}
 
+	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
 	public URL getInputPersonAttributeFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.inputPersonAttributeFile);
 	}

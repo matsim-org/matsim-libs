@@ -29,6 +29,7 @@ import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.opengis.feature.Feature;
@@ -38,6 +39,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -67,7 +69,29 @@ public class ShapeFileReader implements MatsimSomeReader {
 	public static Collection<SimpleFeature> getAllFeatures(final String filename) {
 		try {
 			File dataFile = new File(filename);
+			log.info( "will try to read from " + dataFile.getAbsolutePath() ) ;
+			Gbl.assertIf( dataFile.exists() );
 			FileDataStore store = FileDataStoreFinder.getDataStore(dataFile);
+			SimpleFeatureSource featureSource = store.getFeatureSource();
+
+			SimpleFeatureIterator it = featureSource.getFeatures().features();
+			List<SimpleFeature> featureSet = new ArrayList<SimpleFeature>();
+			while (it.hasNext()) {
+				SimpleFeature ft = it.next();
+				featureSet.add(ft);
+			}
+			it.close();
+			store.dispose();
+			return featureSet;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public static Collection<SimpleFeature> getAllFeatures(final URL url) {
+		try {
+			log.info( "will try to read from " + url.getPath() ) ;
+			FileDataStore store = FileDataStoreFinder.getDataStore(url);
 			SimpleFeatureSource featureSource = store.getFeatureSource();
 
 			SimpleFeatureIterator it = featureSource.getFeatures().features();

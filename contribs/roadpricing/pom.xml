@@ -2,7 +2,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>0.10.0-SNAPSHOT</version>
+		<version>12.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim.contrib</groupId>
@@ -28,7 +28,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>1.0</version>
+				<version>1.4</version>
 				<executions>
 					<execution>
 						<phase>validate</phase>
@@ -53,12 +53,8 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>0.10.0-SNAPSHOT</version>
+			<version>12.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<properties>
-		<svnRevision>${buildNumber}</svnRevision>
-	</properties>
 </project>

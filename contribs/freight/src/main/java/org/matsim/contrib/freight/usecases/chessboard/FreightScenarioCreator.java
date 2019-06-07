@@ -30,7 +30,7 @@ import org.matsim.vehicles.VehicleType;
  * @author stefan
  *
  */
-public class FreightScenarioCreator {
+final class FreightScenarioCreator {
 
     static int agentCounter = 1;
     static Random random = new Random(Long.MAX_VALUE);
@@ -79,10 +79,10 @@ public class FreightScenarioCreator {
             carriers.addCarrier(carrier_);
         }
 
-        CarrierVehicleTypes types = CarrierVehicleTypes.getVehicleTypes(carriers);
-
+//        CarrierVehicleTypes types = CarrierVehicleTypes.getVehicleTypes(carriers);
 //        new CarrierVehicleTypeWriter(types).write("input/usecases/chessboard/freight/vehicleTypes.xml");
-        new CarrierPlanXmlWriterV2(carriers).write("input/usecases/chessboard/freight/scenarios/multipleCarriers_withoutTW_withDepots_withoutPlan.xml");
+        
+        new CarrierPlanXmlWriterV2(carriers).write("input/usecases/chessboard/freight/multipleCarriers_withoutTW_withDepots_withoutPlan.xml");
     }
 
     private static void createCustomers(Carrier carrier, Network network) {
@@ -98,7 +98,7 @@ public class FreightScenarioCreator {
         }
     }
 
-    private static Id drawLocationLinkId(List<Id<Link>> innerCityLinks, List<Id<Link>> outerCityLinks) {
+    private static Id<Link> drawLocationLinkId(List<Id<Link>> innerCityLinks, List<Id<Link>> outerCityLinks) {
         double probInner = 0.5;
         double randomFigure = random.nextDouble();
         if(randomFigure <= probInner){
@@ -164,7 +164,7 @@ public class FreightScenarioCreator {
         }
     }
 
-    private static CarrierVehicle getLightVehicle(Id id, Id<Link> homeId, String depot) {
+    private static CarrierVehicle getLightVehicle(Id<?> id, Id<Link> homeId, String depot) {
         CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create(("carrier_"+id.toString()+"_lightVehicle_" + depot) ,Vehicle.class), homeId);
         vBuilder.setEarliestStart(6*60*60);
         vBuilder.setLatestEnd(16*60*60);
@@ -181,7 +181,7 @@ public class FreightScenarioCreator {
         return typeBuilder.build();
     }
 
-    private static CarrierVehicle getHeavyVehicle(Id id, Id<Link> homeId, String depot) {
+    private static CarrierVehicle getHeavyVehicle(Id<?> id, Id<Link> homeId, String depot) {
         CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create("carrier_" + id.toString() + "_heavyVehicle_" + depot, Vehicle.class), homeId);
         vBuilder.setEarliestStart(6*60*60);
         vBuilder.setLatestEnd(16*60*60);

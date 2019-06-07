@@ -40,8 +40,6 @@ public interface SignalSystemsManager {
 
 	public Map<Id<SignalSystem>, SignalSystem> getSignalSystems();
 	
-	public void resetModel(Integer iterationNumber);
-	
 	public void requestControlUpdate(double time_sec);
 
 	public void setAmberLogic(AmberLogic amberLogic);

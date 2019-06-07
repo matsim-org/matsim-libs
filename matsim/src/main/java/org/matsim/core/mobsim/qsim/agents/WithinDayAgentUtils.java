@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.qsim.agents;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -29,6 +30,8 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
+
+import java.util.List;
 
 /**
  * <p>
@@ -55,12 +58,15 @@ import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
  * 
  * @author cdobler
  */
-public class WithinDayAgentUtils {
-	//	private WithinDayAgentUtils(){} // do not instantiate: static methods only
+public final class WithinDayAgentUtils {
+
+		private WithinDayAgentUtils(){
+			// do not instantiate: static methods only
+		}
 
 	private static final Logger log = Logger.getLogger( WithinDayAgentUtils.class );
 
-	public static final Integer getCurrentPlanElementIndex(MobsimAgent agent) {
+	public static Integer getCurrentPlanElementIndex(MobsimAgent agent) {
 		//		if (agent instanceof PersonDriverAgentImpl) {
 		//			return ((PersonDriverAgentImpl) agent).getCurrentPlanElementIndex() ;
 		//		} else
@@ -74,14 +80,14 @@ public class WithinDayAgentUtils {
 					" which does not support getCurrentPlanElementIndex(...). Aborting!");
 		}
 	}
-
-	public static final Integer getCurrentRouteLinkIdIndex(MobsimAgent agent) {
-		/* NOTES:
-		 * () The current link index does not point to where the agent is, but one ahead.
-		 * () It does that even if there is nothing there in the underlying list.  I keep forgetting the convention, but I think that the
-		 *     arrival link is not in the list, and so for the arrival link special treatment is necessary.
-		 * () Routes may have loops, in which case the "indexOf" approach does not work.
-		 */
+	
+	/** NOTES:
+	 * () The current link index does not point to where the agent is, but one ahead.
+	 * () It does that even if there is nothing there in the underlying list.  I keep forgetting the convention, but I think that the
+	 *     arrival link is not in the list, and so for the arrival link special treatment is necessary.
+	 * () Routes may have loops, in which case the "indexOf" approach does not work.
+	 */
+	public static Integer getCurrentRouteLinkIdIndex(MobsimAgent agent) {
 
 		if (agent instanceof HasModifiablePlan) {
 
@@ -122,7 +128,7 @@ public class WithinDayAgentUtils {
 	//		}
 	//	}
 
-	public static final void resetCaches(MobsimAgent agent) {
+	public static void resetCaches(MobsimAgent agent) {
 		if (agent instanceof HasModifiablePlan) {
 			((HasModifiablePlan) agent).resetCaches();			
 		} else {
@@ -130,7 +136,7 @@ public class WithinDayAgentUtils {
 					" which does not support resetCaches(...). Aborting!");
 		}
 	}
-	public static final void rescheduleActivityEnd( MobsimAgent agent, Mobsim mobsim ) {
+	public static void rescheduleActivityEnd(MobsimAgent agent, Mobsim mobsim ) {
 		if ( mobsim instanceof ActivityEndRescheduler ) {
 			((ActivityEndRescheduler) mobsim).rescheduleActivityEnd(agent);
 		} else {
@@ -138,7 +144,7 @@ public class WithinDayAgentUtils {
 		}
 	}
 
-	public static final Leg getModifiableCurrentLeg(MobsimAgent agent) {
+	public static Leg getModifiableCurrentLeg(MobsimAgent agent) {
 		PlanElement currentPlanElement = getCurrentPlanElement(agent);
 		if (!(currentPlanElement instanceof Leg)) {
 			return null;
@@ -146,7 +152,7 @@ public class WithinDayAgentUtils {
 		return (Leg) currentPlanElement;
 	}
 
-	public static final Plan getModifiablePlan(MobsimAgent agent) {
+	public static Plan getModifiablePlan(MobsimAgent agent) {
 		if (agent instanceof HasModifiablePlan) {
 			return ((HasModifiablePlan) agent).getModifiablePlan();
 		} else {
@@ -155,7 +161,7 @@ public class WithinDayAgentUtils {
 		}
 	}
 
-	public static final PlanElement getCurrentPlanElement(MobsimAgent agent) {
+	public static PlanElement getCurrentPlanElement(MobsimAgent agent) {
 		return getModifiablePlan(agent).getPlanElements().get(getCurrentPlanElementIndex(agent));
 	}
 
@@ -173,5 +179,111 @@ public class WithinDayAgentUtils {
 			return false;
 		}
 		return true ;
+	}
+	
+	public static Plan printPlan(MobsimAgent agent1) {
+		final Plan plan = getModifiablePlan(agent1);
+		return printPlan(plan) ;
+	}
+	
+	public static Plan printPlan(Plan plan) {
+		System.err.println( "plan=" + plan );
+		for ( int ii=0 ; ii<plan.getPlanElements().size() ; ii++ ) {
+			System.err.println( "\t" + ii + ":\t" + plan.getPlanElements().get(ii) );
+		}
+		return plan;
+	}
+	
+	/**
+	 * Only the PlanElements are changed - further Steps
+	 * like updating the Routes of the previous and next Leg
+	 * have to be done elsewhere.
+	 *
+	 * @author cdobler
+	 */
+	public static boolean replaceLegBlindly(Plan plan, Leg oldLeg, Leg newLeg) {
+
+		if (plan == null) return false;
+		if (oldLeg == null) return false;
+		if (newLeg == null) return false;
+
+		int index = plan.getPlanElements().indexOf(oldLeg);
+		// yyyy I can't say how safe this is.  There is no guarantee that the same entry is not used twice in the plan.  This will in
+		// particular be a problem if we override the "equals" contract, in the sense that two legs are equal if
+		// certain (or all) elements are equal.  kai, oct'10
+
+		if (index == -1) return false;
+
+		plan.getPlanElements().remove(index);
+		plan.getPlanElements().add(index,newLeg);
+
+		return true;
+	}
+	
+	/**
+	 * Only the PlanElements are changed - further Steps
+	 * like updating the Routes of the previous and next Leg
+	 * have to be done elsewhere.
+	 *
+	 * @author cdobler
+	 */
+	public static boolean replaceActivityBlindly( Plan plan, Activity oldActivity, Activity newActivity) {
+
+		if (plan == null) return false;
+		if (oldActivity == null) return false;
+		if (newActivity == null) return false;
+
+		int index = plan.getPlanElements().indexOf(oldActivity);
+		// yyyy I can't say how safe this is.  There is no guarantee that the same entry is not used twice in the plan.  This will in
+		// particular be a problem if we override the "equals" contract, in the sense that two activities are equal if
+		// certain (or all) elements are equal.  kai, oct'10
+
+		if (index == -1) return false;
+
+		//		/*
+		//		 *  If the new Activity takes place on a different Link
+		//		 *  we have to replan the Routes from an to that Activity.
+		//		 */
+		//		if (oldActivity.getLinkId() != newActivity.getLinkId())
+		//		{
+		//
+		//		}
+
+		plan.getPlanElements().remove(index);
+		plan.getPlanElements().add(index, newActivity);
+
+		return true;
+	}
+	
+	// === search methods: ===
+	public static int indexOfPlanElement(MobsimAgent agent, PlanElement pe) {
+		Plan plan = getModifiablePlan(agent) ;
+		List<PlanElement> planElements = plan.getPlanElements() ;
+
+		return planElements.indexOf(pe) ;
+	}
+	
+	public static int indexOfNextActivityWithType( MobsimAgent agent, String type ) {
+		Plan plan = getModifiablePlan(agent) ;
+		List<PlanElement> planElements = plan.getPlanElements() ;
+
+		for ( int index = getCurrentPlanElementIndex(agent) ; index < planElements.size() ; index++ ) {
+			PlanElement pe = planElements.get(index) ;
+			if ( pe instanceof Activity ) {
+				if ( ((Activity)pe).getType().equals(type) ) {
+					return index ;
+				}
+			}
+		}
+		return -1 ;
+	}
+	
+	public static Activity findNextActivityWithType( MobsimAgent agent, String type ) {
+		int index = indexOfNextActivityWithType( agent, type ) ;
+		return (Activity) getModifiablePlan(agent).getPlanElements().get(index) ;
+	}
+	
+	public static List<PlanElement> subList( MobsimAgent agent, int fromIndex, int toIndex) {
+		return getModifiablePlan(agent).getPlanElements().subList( fromIndex, toIndex ) ;
 	}
 }

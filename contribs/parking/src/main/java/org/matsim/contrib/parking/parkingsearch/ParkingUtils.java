@@ -37,7 +37,6 @@ public class ParkingUtils {
 
 	
 	public ParkingUtils() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public static Coord getRandomPointAlongLink(Random rnd, Link link){

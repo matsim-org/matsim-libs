@@ -34,7 +34,7 @@ import java.util.*;
  * 
  */
 public final class NetworkChangeEvent {
-
+	
 	public enum ChangeType {
 		ABSOLUTE_IN_SI_UNITS, FACTOR, OFFSET_IN_SI_UNITS
 	}
@@ -106,7 +106,7 @@ public final class NetworkChangeEvent {
 	 * @param startTime
 	 *            the time at which the event occurs.
 	 */
-	public /*package*/ NetworkChangeEvent(double startTime) {
+	public NetworkChangeEvent(double startTime) {
 		this.startTime = startTime;
 	}
 

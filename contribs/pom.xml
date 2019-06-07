@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim</groupId>
 	<artifactId>contrib</artifactId>
 	<packaging>pom</packaging>
-	<version>0.10.0-SNAPSHOT</version>
+	<version>12.0-SNAPSHOT</version>
 	<name>MATSim-Contrib</name>
 
 	<scm>
@@ -14,7 +15,7 @@
 	</scm>
 
 	<distributionManagement>
-        <repository>
+		<repository>
 			<id>bintray</id>
 			<url>https://api.bintray.com/maven/matsim/matsim/matsim</url>
 		</repository>
@@ -23,7 +24,7 @@
 			<name>artifactory-snapshots</name>
 			<url>http://oss.jfrog.org/oss-snapshot-local</url>
 		</snapshotRepository>
-    </distributionManagement>
+	</distributionManagement>
 
 	<build>
 		<plugins>
@@ -39,7 +40,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>1.0</version>
+				<version>1.4</version>
 				<executions>
 					<execution>
 						<phase>validate</phase>
@@ -104,6 +105,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<source>8</source><!--can be skipped from maven-javadoc-plugin 3.1.0-->
 					<linksource>true</linksource>
 					<additionalparam>-Xdoclint:none</additionalparam>
 				</configuration>
@@ -151,58 +153,52 @@
 
 	<modules>
 		<module>accessibility</module>
-		<module>av</module>
 		<module>analysis</module>
+		<module>av</module>
+		<module>bicycle</module>
 		<module>cadytsIntegration</module>
 		<module>carsharing</module>
+		<module>common</module>
+		<module>decongestion</module>
 		<module>drt</module>
 		<module>dvrp</module>
-		<module>taxi</module>
+		<module>ev</module>
 		<module>emissions</module>
-		<module>freight</module>
-		<module>signals</module>
-		<module>locationchoice</module>
-		<module>matsim4urbansim</module>
-		<module>minibus</module>
-		<module>networkEditor</module>
-		<module>otfvis</module>
-		<module>matrixbasedptrouter</module>
-		<module>parking</module>
-		<module>socnetsim</module>
-		<module>socnetgen</module>
-		<module>transEnergySim</module>
-		<module>roadpricing</module>
-		<module>opdytsIntegration</module>
-		<module>multimodal</module>
-		<module>integration</module>
-		<module>wagonSim</module>
-		<module>pseudosimulation</module>
-		<module>common</module>
 		<module>eventsBasedPTRouter</module>
-		<module>travelsummary</module>
-		<module>deprecated</module>
-		<module>protobuf</module>
+		<module>freight</module>
 		<module>hybridsim</module>
+		<module>integration</module>
+		<module>locationchoice</module>
+		<module>matrixbasedptrouter</module>
+		<module>minibus</module>
+		<module>multimodal</module>
 		<module>noise</module>
-		<module>bicycle</module>
+		<module>otfvis</module>
+		<module>parking</module>
+		<module>protobuf</module>
+		<module>pseudosimulation</module>
+		<module>roadpricing</module>
+		<module>signals</module>
+		<module>socnetsim</module>
+		<module>taxi</module>
 	</modules>
 	<repositories>
 		<repository>
-            <!-- Geotools is not on Maven central -->
-            <id>geotools</id>
-            <name>Geotools repository</name>
-            <url>http://download.osgeo.org/webdav/geotools</url>
-        </repository>
-        <repository>
-            <!-- For some dependencies of Geotools which are not on Maven central -->
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net repository</name>
-            <url>http://download.java.net/maven/2</url>
-        </repository>
-        <repository>
+			<!-- Geotools is not on Maven central -->
+			<id>geotools</id>
+			<name>Geotools repository</name>
+			<url>http://download.osgeo.org/webdav/geotools</url>
+		</repository>
+		<repository>
+			<!-- For some dependencies of Geotools which are not on Maven central -->
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net repository</name>
+			<url>http://download.java.net/maven/2</url>
+		</repository>
+		<repository>
 			<id>matsim</id>
-            <url>http://dl.bintray.com/matsim/matsim</url>
-        </repository>
+			<url>http://dl.bintray.com/matsim/matsim</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -222,16 +218,28 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.10.0-SNAPSHOT</version>
+			<version>12.0-SNAPSHOT</version>
 			<type>jar</type>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.10.0-SNAPSHOT</version>
+			<version>12.0-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<!--MATSim examples.  Not inherited from matsim since it-->
+			<!--is in test scope there.  Leave in test scope since-->
+			<!--it is not in weekly releases and then causes problems.  -->
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim-examples</artifactId>
+			<!--<version>0.10.0</version>-->
+			<!--<version>0.11.0-apr17</version>-->
+			<scope>test</scope>
+			<version>12.0-SNAPSHOT</version>
+			<!--(This has possibly no effect here, don't know.)-->
 		</dependency>
 	</dependencies>
 
@@ -290,7 +298,30 @@
 				</plugins>
 			</reporting>
 		</profile>
-    </profiles>
+		<profile>
+			<id>java-9+</id>
+			<activation>
+				<jdk>[9</jdk>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>javax.xml.bind</groupId>
+					<artifactId>jaxb-api</artifactId>
+					<version>2.3.1</version>
+				</dependency>
+				<dependency>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-core</artifactId>
+					<version>2.3.0.1</version>
+				</dependency>
+				<dependency>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-impl</artifactId>
+					<version>2.3.0.1</version>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

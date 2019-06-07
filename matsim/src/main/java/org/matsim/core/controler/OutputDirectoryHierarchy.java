@@ -194,11 +194,11 @@ public final class OutputDirectoryHierarchy {
 						// it is too late to change his mind...
 						// I still have problems understanding why people want such a setting.
 						System.out.flush();
-						log.warn("###########################################################");
-						log.warn("### THE CONTROLER WILL DELETE THE EXISTING OUTPUT DIRECTORY:");
-						log.warn("### " + outputPath);
-						log.warn("###########################################################");
-						System.err.flush();
+						log.info("###########################################################");
+						log.info("### THE CONTROLER WILL DELETE THE EXISTING OUTPUT DIRECTORY:");
+						log.info("### " + outputPath);
+						log.info("###########################################################");
+						System.out.flush();
 						IOUtils.deleteDirectoryRecursively(outputDir.toPath());
 						break;
 					default:

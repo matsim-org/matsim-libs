@@ -19,13 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -37,20 +31,21 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkChangeEventsParser;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.lanes.data.LanesReader;
+import org.matsim.lanes.LanesReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
 
-import com.google.inject.Inject;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -103,9 +98,11 @@ class ScenarioLoaderImpl {
 	 * @return the Scenario
 	 */
 	Scenario loadScenario() {
-		String currentDir = new File("tmp").getAbsolutePath();
-		currentDir = currentDir.substring(0, currentDir.length() - 3);
-		log.info("loading scenario from base directory: " + currentDir);
+//		String currentDir = new File("tmp").getAbsolutePath();
+//		currentDir = currentDir.substring(0, currentDir.length() - 3);
+//		log.info("loading scenario from base directory: " + currentDir);
+		// the above is not used and thus only causing confusion in the log output.  kai, sep'18
+
 		this.loadNetwork();
 		this.loadActivityFacilities();
 		this.loadPopulation();
@@ -128,21 +125,15 @@ class ScenarioLoaderImpl {
 		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
 			URL networkUrl = this.config.network().getInputFileURL(this.config.getContext());
 			log.info("loading network from " + networkUrl);
-			if ( config.network().getInputCRS() == null ) {
-				MatsimNetworkReader reader = new MatsimNetworkReader(this.scenario.getNetwork());
-				reader.putAttributeConverters( attributeConverters );
-				reader.parse(networkUrl);
-			}
-			else {
-				log.info( "re-projecting network from "+config.network().getInputCRS()+" to "+config.global().getCoordinateSystem()+" for import" );
-				final CoordinateTransformation transformation =
-						TransformationFactory.getCoordinateTransformation(
-								config.network().getInputCRS(),
-								config.global().getCoordinateSystem() );
-				MatsimNetworkReader reader = new MatsimNetworkReader( transformation , this.scenario.getNetwork());
-				reader.putAttributeConverters( attributeConverters );
-				reader.parse(networkUrl);
-			}
+			String inputCRS = config.network().getInputCRS();
+
+			MatsimNetworkReader reader =
+					new MatsimNetworkReader(
+							inputCRS,
+							config.global().getCoordinateSystem(),
+							this.scenario.getNetwork());
+            reader.putAttributeConverters( attributeConverters );
+            reader.parse(networkUrl);
 
 			if ((this.config.network().getChangeEventsInputFile()!= null) && this.config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + this.config.network().getChangeEventsInputFileUrl(this.config.getContext()).getFile());
@@ -163,19 +154,10 @@ class ScenarioLoaderImpl {
 			final String inputCRS = config.facilities().getInputCRS();
 			final String internalCRS = config.global().getCoordinateSystem();
 
-			if ( inputCRS == null ) {
-				new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
-			}
-			else {
-				log.info( "re-projecting facilities from "+inputCRS+" to "+internalCRS+" for import" );
+            MatsimFacilitiesReader reader = new MatsimFacilitiesReader(inputCRS, internalCRS, this.scenario.getActivityFacilities());
+            reader.putAttributeConverters(attributeConverters);
+            reader.parse(facilitiesFileName);
 
-				final CoordinateTransformation transformation =
-						TransformationFactory.getCoordinateTransformation(
-								inputCRS,
-								internalCRS );
-
-				new MatsimFacilitiesReader(transformation , this.scenario).parse(facilitiesFileName);
-			}
 			log.info("loaded " + this.scenario.getActivityFacilities().getFacilities().size() + " facilities from " + facilitiesFileName);
 		}
 		else {
@@ -198,32 +180,19 @@ class ScenarioLoaderImpl {
 			URL populationFileName = this.config.plans().getInputFileURL(this.config.getContext());
 			log.info("loading population from " + populationFileName);
 
-			if ( config.plans().getInputCRS() == null ) {
-				final PopulationReader reader = new PopulationReader(this.scenario);
-				reader.putAttributeConverters( attributeConverters );
-				reader.parse( populationFileName );
-			}
-			else {
-				final String inputCRS = config.plans().getInputCRS();
-				final String internalCRS = config.global().getCoordinateSystem();
+            final String targetCRS = config.global().getCoordinateSystem();
+			final String internalCRS = config.global().getCoordinateSystem();
 
-				log.info( "re-projecting population from "+inputCRS+" to "+internalCRS+" for import" );
-
-				final CoordinateTransformation transformation =
-						TransformationFactory.getCoordinateTransformation(
-								inputCRS,
-								internalCRS );
-
-				final PopulationReader reader = new PopulationReader(transformation , this.scenario);
-				reader.putAttributeConverters( attributeConverters );
-				reader.parse( populationFileName );
-			}
+            final PopulationReader reader = new PopulationReader(targetCRS, internalCRS, this.scenario);
+            reader.putAttributeConverters( attributeConverters );
+            reader.parse( populationFileName );
 
 			PopulationUtils.printPlansCount(this.scenario.getPopulation()) ;
 		}
 		else {
 			log.info("no population file set in config, not able to load population");
 		}
+
 		if ((this.config.plans() != null) && (this.config.plans().getInputPersonAttributeFile() != null)) {
 			URL personAttributesURL = this.config.plans().getInputPersonAttributeFileURL(this.config.getContext());
 			log.info("loading person attributes from " + personAttributesURL);
@@ -266,19 +235,7 @@ class ScenarioLoaderImpl {
 			final String inputCRS = config.transit().getInputScheduleCRS();
 			final String internalCRS = config.global().getCoordinateSystem();
 
-			if ( inputCRS == null ) {
-				new TransitScheduleReader(this.scenario).readURL(this.config.transit().getTransitScheduleFileURL(this.config.getContext()));
-			}
-			else {
-				log.info( "re-projecting transit schedule from "+inputCRS+" to "+internalCRS+" for import" );
-
-				final CoordinateTransformation transformation =
-						TransformationFactory.getCoordinateTransformation(
-								inputCRS,
-								internalCRS );
-
-				new TransitScheduleReader( transformation , this.scenario).readURL(transitScheduleFile);
-			}
+            new TransitScheduleReader( inputCRS, internalCRS, this.scenario).readURL(transitScheduleFile );
 		}
 		else {
 			log.info("no transit schedule file set in config, not loading any transit schedule");
@@ -326,7 +283,7 @@ class ScenarioLoaderImpl {
 		String filename = this.config.network().getLaneDefinitionsFile();
 		if (filename != null){
 			LanesReader reader = new LanesReader(this.scenario);
-			reader.readURL(ConfigGroup.getInputFileURL(this.config.getContext(), filename));
+			reader.readURL( ConfigGroup.getInputFileURL(this.config.getContext(), filename ) );
 		}
 		else {
 			log.info("no lanes file set in config, not loading any lanes");

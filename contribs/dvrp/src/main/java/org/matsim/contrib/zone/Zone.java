@@ -19,12 +19,14 @@
 
 package org.matsim.contrib.zone;
 
-import org.matsim.api.core.v01.*;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
-
-public class Zone implements BasicLocation<Zone> {
+public class Zone implements BasicLocation, Identifiable<Zone> {
 	private final Id<Zone> id;
 	private final String type;
 

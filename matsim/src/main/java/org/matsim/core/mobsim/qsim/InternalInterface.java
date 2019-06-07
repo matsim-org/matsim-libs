@@ -23,7 +23,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+
+import java.util.List;
 
 /**
  * Design thoughts:<ul>
@@ -34,9 +37,11 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
  * @author nagel
  *
  */
-public interface InternalInterface extends ActivityEndRescheduler {
-	public Netsim getMobsim();
-	public void arrangeNextAgentState(MobsimAgent agent);
+public interface InternalInterface {
+	QSim getMobsim();
+	void arrangeNextAgentState( MobsimAgent agent );
 	void registerAdditionalAgentOnLink(MobsimAgent agent);
 	MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId);
+
+	List<DepartureHandler> getDepartureHandlers();
 }

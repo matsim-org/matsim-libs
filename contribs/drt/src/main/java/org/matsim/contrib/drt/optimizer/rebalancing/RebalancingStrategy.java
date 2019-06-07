@@ -23,17 +23,19 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
- * @author michalm Idle vehicles (=StayTask) may be re-allocated using this interface.
+ * Idle vehicles (=StayTask) may be re-allocated using this interface.
+ * 
+ * @author michalm
  */
 public interface RebalancingStrategy {
 	public class Relocation {
-		public final Vehicle vehicle;
+		public final DvrpVehicle vehicle;
 		public final Link link;
 
-		public Relocation(Vehicle vehicle, Link link) {
+		public Relocation(DvrpVehicle vehicle, Link link) {
 			this.vehicle = vehicle;
 			this.link = link;
 		}
@@ -43,5 +45,5 @@ public interface RebalancingStrategy {
 	 * This method is called at each re-balancing step (interval defined in config).
 	 * 
 	 */
-	List<Relocation> calcRelocations(Stream<? extends Vehicle> rebalancableVehicles, double time);
+	List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time);
 }

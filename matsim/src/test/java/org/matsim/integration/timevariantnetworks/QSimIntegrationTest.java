@@ -22,6 +22,7 @@ package org.matsim.integration.timevariantnetworks;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -39,13 +40,16 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -100,8 +104,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		events.addHandler(ttcalc);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
-		qsim.run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
 
 		// check that we get the expected result
 		assertEquals("Person 1 should travel for 11 seconds.", 10.0 + 1.0, ttcalc.person1leaveTime - ttcalc.person1enterTime, EPSILON);
@@ -133,7 +139,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		change1.addLink(link2);
 		change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacityFactor));
 		final NetworkChangeEvent event = change1;
-		NetworkUtils.addNetworkChangeEvent(((Network)network),event);
+		NetworkUtils.addNetworkChangeEvent(network,event);
 		/*
 		 * Create a network event the restores the capacity to its original value.
 		 */
@@ -141,20 +147,20 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		change2.addLink(link2);
 		change2.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 1/capacityFactor));
 		final NetworkChangeEvent event1 = change2;
-		NetworkUtils.addNetworkChangeEvent(((Network)network),event1);
+		NetworkUtils.addNetworkChangeEvent(network,event1);
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */
-		Population plans = scenario.getPopulation();
+		Population pop = scenario.getPopulation();
 		List<Person> persons1 = createPersons(0, link1, link3, network, personsPerWave);
 		for(Person p : persons1) {
-			plans.addPerson(p);
+			pop.addPerson(p);
 		}
 		Person person1 = persons1.get(personsPerWave - 1);
 
 		List<Person> persons2 = createPersons(3600, link1, link3, network, personsPerWave);
 		for(Person p : persons2) {
-			plans.addPerson(p);
+			pop.addPerson(p);
 		}
 		Person person2 = persons2.get(personsPerWave - 1);
 		/*
@@ -165,8 +171,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1.getId(), person2.getId(), link2.getId());
 		events.addHandler(ttcalc);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
-        qsim.run();
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
 		/*
 		 * The last person of the first wave should have taken 20 s to travel
 		 * link 3 (because of the spill-back). The last person of the second
@@ -209,7 +217,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		change1.addLink(link2);
 		change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacityFactor));
 		final NetworkChangeEvent event1 = change1;
-		NetworkUtils.addNetworkChangeEvent(((Network)network),event1);
+		NetworkUtils.addNetworkChangeEvent(network,event1);
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */
@@ -252,9 +260,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		});
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
-        qsim.run();
-
+		new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events) //
+			.run();
 	}
 
 	
@@ -263,8 +272,6 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	 * Creates a network with three links of length 100 m, capacity 3600 veh/h
 	 * and freespeed 10 m/s.
 	 *
-	 * @param world the world the network should belong to
-	 * @return a network.
 	 * @author illenberger
 	 */
 	private static Network createNetwork(Scenario scenario) {
@@ -338,10 +345,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		private final Id<Link> linkId;
 		private Id<Vehicle> vehicleId1;
 		private Id<Vehicle> vehicleId2;
-		protected double person1enterTime = Time.UNDEFINED_TIME;
-		protected double person1leaveTime = Time.UNDEFINED_TIME;
-		protected double person2enterTime = Time.UNDEFINED_TIME;
-		protected double person2leaveTime = Time.UNDEFINED_TIME;
+		protected double person1enterTime = Time.getUndefinedTime();
+		protected double person1leaveTime = Time.getUndefinedTime();
+		protected double person2enterTime = Time.getUndefinedTime();
+		protected double person2leaveTime = Time.getUndefinedTime();
 
 		protected TestTravelTimeCalculator(final Id<Person> personId1, final Id<Person> personId2, final Id<Link> linkId) {
 			this.personId1 = personId1;

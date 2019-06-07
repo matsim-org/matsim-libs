@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimeCollectorTest.java
+ * WithinDayTravelTimeTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -87,7 +88,8 @@ public class WithinDayTravelTimeTest extends MatsimTestCase {
 		config.controler().setWritePlansInterval(0);
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
+		config.controler().setRoutingAlgorithmType( ControlerConfigGroup.RoutingAlgorithmType.Dijkstra );
+
 		config.network().setTimeVariantNetwork(true);
 		
 		// ---

@@ -19,49 +19,29 @@
 
 package org.matsim.contrib.dynagent.run;
 
-import java.util.*;
+import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.*;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
-import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
-import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
+/**
+ * Enables basic DynAgent functionality in QSim. However, for DVRP simulation, use DvrpQSimModule instead.
+ */
+public class DynQSimModule extends AbstractQSimModule {
+	public final static String COMPONENT_NAME = "DynAgentSource";
+	private final Class<? extends AgentSource> agentSourceClass;
 
-import com.google.inject.Provides;
-
-public class DynQSimModule<T extends Mobsim> extends AbstractModule {
-	private final Class<? extends javax.inject.Provider<? extends T>> providerClass;
-
-	public DynQSimModule(Class<? extends javax.inject.Provider<? extends T>> providerClass) {
-		this.providerClass = providerClass;
+	public DynQSimModule(Class<? extends AgentSource> agentSourceClass) {
+		this.agentSourceClass = agentSourceClass;
 	}
 
 	@Override
-	public void install() {
-		bindMobsim().toProvider(providerClass);
+	public void configureQSim() {
+		install(new DynActivityEngineModule());
+		addNamedComponent(agentSourceClass, COMPONENT_NAME);
 	}
 
-	@Provides
-	private Collection<AbstractQSimPlugin> provideQSimPlugins(Config config) {
-		return createQSimPlugins(config);
-	}
-
-	public static Collection<AbstractQSimPlugin> createQSimPlugins(Config config) {
-		final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
-		plugins.add(new MessageQueuePlugin(config));
-		plugins.add(new DynActivityEnginePlugin(config));
-		plugins.add(new QNetsimEnginePlugin(config));
-		if (config.network().isTimeVariantNetwork()) {
-			plugins.add(new NetworkChangeEventsPlugin(config));
-		}
-		if (config.transit().isUseTransit()) {
-			plugins.add(new TransitEnginePlugin(config));
-		}
-		plugins.add(new TeleportationPlugin(config));
-		plugins.add(new PopulationPlugin(config));
-		return plugins;
+	public static void configureComponents(QSimComponentsConfig components) {
+		DynActivityEngineModule.configureComponents(components);
+		components.addNamedComponent(COMPONENT_NAME);
 	}
 }

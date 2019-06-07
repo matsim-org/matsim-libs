@@ -5,10 +5,10 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
-import jsprit.core.problem.Location;
-import jsprit.core.problem.driver.Driver;
-import jsprit.core.problem.vehicle.Vehicle;
-import jsprit.core.problem.vehicle.VehicleType;
+import com.graphhopper.jsprit.core.problem.Location;
+import com.graphhopper.jsprit.core.problem.driver.Driver;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -17,7 +17,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType.VehicleCostInformation;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -32,7 +32,7 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		String NETWORK_FILENAME = getClassInputDirectory() + "network.xml";
-		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(NETWORK_FILENAME);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
 		
 		Network network = scenario.getNetwork();
 		NetworkBasedTransportCosts.Builder builder = NetworkBasedTransportCosts.Builder.newInstance(network);
@@ -65,7 +65,7 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		String NETWORK_FILENAME = getClassInputDirectory() + "network.xml";
-		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(NETWORK_FILENAME);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
 		
 		Network network = scenario.getNetwork();
 		NetworkBasedTransportCosts.Builder builder = NetworkBasedTransportCosts.Builder.newInstance(network);
@@ -93,7 +93,7 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		String NETWORK_FILENAME = getClassInputDirectory() + "network.xml";
-		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(NETWORK_FILENAME);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
 		
 		CarrierVehicleType vtype1 = mock(CarrierVehicleType.class);
 		VehicleCostInformation param1 = new VehicleCostInformation(0.0, 2.0, 0.0);

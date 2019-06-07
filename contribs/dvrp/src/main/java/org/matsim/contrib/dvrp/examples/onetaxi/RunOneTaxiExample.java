@@ -20,13 +20,12 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.file.FleetProvider;
-import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -36,27 +35,22 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author michalm
  */
 public final class RunOneTaxiExample {
-	private static final String CONFIG_FILE = "./src/main/resources/one_taxi/one_taxi_config.xml";
-	private static final String TAXIS_FILE = "one_taxi_vehicles.xml";
+	static final String CONFIG_FILE = "./src/main/resources/one_taxi/one_taxi_config.xml";
+	static final String TAXIS_FILE = "one_taxi_vehicles.xml";
 
 	public static void run(boolean otfvis, int lastIteration) {
 		// load config
 		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new DvrpConfigGroup(), new OTFVisConfigGroup());
 		config.controler().setLastIteration(lastIteration);
-		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
-		config.checkConsistency();
 
 		// load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		// setup controler
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(DvrpModule.create( //
-				OneTaxiOptimizer.class, // optimizer that dispatches taxis
-				OneTaxiRequestCreator.class, // converts departures of the "taxi" mode into taxi requests
-				OneTaxiActionCreator.class)); // converts scheduled tasks into simulated actions (legs and activities)
-		controler.addOverridingModule(
-				FleetProvider.createModule(ConfigGroup.getInputFileURL(config.getContext(), TAXIS_FILE)));
+		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new OneTaxiModule(TAXIS_FILE));
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.taxi));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation

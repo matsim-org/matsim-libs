@@ -23,23 +23,28 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestAcceptedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 /**
  * @author michalm
  */
 public class DefaultTaxiOptimizer implements TaxiOptimizer {
+	private static final Logger log = Logger.getLogger(DefaultTaxiOptimizer.class);
+
+	private final EventsManager eventsManager;
 	private final Fleet fleet;
 	private final TaxiScheduler scheduler;
 
@@ -47,26 +52,30 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 			PassengerRequests.ABSOLUTE_COMPARATOR);
 	private final UnplannedRequestInserter requestInserter;
 
-	private final boolean destinationKnown;
-	private final boolean vehicleDiversion;
-	private final DefaultTaxiOptimizerParams params;
+	private final TaxiConfigGroup taxiCfg;
+	private final AbstractTaxiOptimizerParams params;
 
 	private boolean requiresReoptimization = false;
 
-	public DefaultTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
-			DefaultTaxiOptimizerParams params, UnplannedRequestInserter requestInserter) {
+	public DefaultTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
+			TaxiScheduler scheduler, UnplannedRequestInserter requestInserter) {
+		this.eventsManager = eventsManager;
 		this.fleet = fleet;
 		this.scheduler = scheduler;
 		this.requestInserter = requestInserter;
-		this.params = params;
-
-		destinationKnown = taxiCfg.isDestinationKnown();
-		vehicleDiversion = taxiCfg.isVehicleDiversion();
+		this.taxiCfg = taxiCfg;
+		params = taxiCfg.getTaxiOptimizerParams();
 	}
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-		if (requiresReoptimization && isNewDecisionEpoch(e, params.reoptimizationTimeStep)) {
+		if (requiresReoptimization && isNewDecisionEpoch(e, params.getReoptimizationTimeStep())) {
+			for (TaxiRequest req : unplannedRequests) {
+				eventsManager.processEvent(
+						new PassengerRequestAcceptedEvent(e.getSimulationTime(), taxiCfg.getMode(), req.getId(),
+								req.getPassengerId()));
+			}
+
 			if (params.doUnscheduleAwaitingRequests) {
 				unscheduleAwaitingRequests();
 			}
@@ -74,14 +83,14 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 			// TODO update timeline only if the algo really wants to reschedule in this time step,
 			// perhaps by checking if there are any unplanned requests??
 			if (params.doUpdateTimelines) {
-				for (Vehicle v : fleet.getVehicles().values()) {
+				for (DvrpVehicle v : fleet.getVehicles().values()) {
 					scheduler.updateTimeline(v);
 				}
 			}
 
 			scheduleUnplannedRequests();
 
-			if (params.doUnscheduleAwaitingRequests && vehicleDiversion) {
+			if (params.doUnscheduleAwaitingRequests && taxiCfg.isVehicleDiversion()) {
 				handleAimlessDriveTasks();
 			}
 
@@ -114,7 +123,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	}
 
 	@Override
-	public void nextTask(Vehicle vehicle) {
+	public void nextTask(DvrpVehicle vehicle) {
 		scheduler.updateBeforeNextTask(vehicle);
 
 		Task newCurrentTask = vehicle.getSchedule().nextTask();
@@ -125,16 +134,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	}
 
 	protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask) {
-		return !destinationKnown && newCurrentTask.getTaxiTaskType() == TaxiTaskType.OCCUPIED_DRIVE;
-	}
-
-	@Override
-	public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
-		// TODO do we really need this??? timeline is updated always before reoptimisation
-		scheduler.updateTimeline(vehicle);// TODO comment this out...
-
-		// TODO we may here possibly decide whether or not to reoptimize
-		// if (delays/speedups encountered) {requiresReoptimization = true;}
+		return !taxiCfg.isDestinationKnown() && newCurrentTask.getTaxiTaskType() == TaxiTaskType.OCCUPIED_DRIVE;
 	}
 
 	protected void setRequiresReoptimization(boolean requiresReoptimization) {

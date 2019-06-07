@@ -22,40 +22,26 @@ package org.matsim.contrib.drt.passenger.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEvent;
 
 /**
  * @author michalm
  */
-public class DrtRequestSubmittedEvent extends Event {
-
+public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 	public static final String EVENT_TYPE = "DrtRequest submitted";
 
-	public static final String ATTRIBUTE_REQUEST = "request";
-	public static final String ATTRIBUTE_PERSON = "person";
-	public static final String ATTRIBUTE_FROM_LINK = "fromLink";
-	public static final String ATTRIBUTE_TO_LINK = "toLink";
 	public static final String ATTRIBUTE_UNSHARED_RIDE_TIME = "unsharedRideTime";
 	public static final String ATTRIBUTE_UNSHARED_RIDE_DISTANCE = "unsharedRideDistance";
 
-	private final Id<Request> requestId;
-	private final Id<Person> personId;
-	private final Id<Link> fromLinkId;
-	private final Id<Link> toLinkId;
 	private final double unsharedRideTime;
 	private final double unsharedRideDistance;
 
-	
-	public DrtRequestSubmittedEvent(double time, Id<Request> requestId, Id<Person> personId, Id<Link> fromLinkId,
-			Id<Link> toLinkId, double unsharedRideTime, double unsharedRideDistance) {
-		super(time);
-		this.requestId = requestId;
-		this.personId = personId;
-		this.fromLinkId = fromLinkId;
-		this.toLinkId = toLinkId;
+	public DrtRequestSubmittedEvent(double time, String mode, Id<Request> requestId, Id<Person> personId,
+			Id<Link> fromLinkId, Id<Link> toLinkId, double unsharedRideTime, double unsharedRideDistance) {
+		super(time, mode, requestId, personId, fromLinkId, toLinkId);
 		this.unsharedRideTime = unsharedRideTime;
 		this.unsharedRideDistance = unsharedRideDistance;
 	}
@@ -64,54 +50,26 @@ public class DrtRequestSubmittedEvent extends Event {
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-	/**
-	 *  the ID of the initial request submitted
-	 */
-	public Id<Request> getRequestId() {
-		return requestId;
-	}
-	/**
-	 *  the Person Id that submitted the request
-	 */
-	public Id<Person> getPersonId() {
-		return personId;
-	}
 
 	/**
-	 *  the request's origin
+	 * @return estimated travel time it would take to ride without any detours
 	 */
-	public Id<Link> getFromLinkId() {
-		return fromLinkId;
-	}
-	/**
-	 *  the request's destination
-	 */
-	public Id<Link> getToLinkId() {
-		return toLinkId;
-	}
-
-	/**
-	 *  the estimated traveltime it would take to ride without any detours
-	 */
-	public double getUnsharedRideTime() {
+	public final double getUnsharedRideTime() {
 		return unsharedRideTime;
 	}
+
 	/**
-	 *  the estimated distance it would take to ride without any detours
+	 * @return estimated distance it would take to ride without any detours
 	 */
-	public double getUnsharedRideDistance() {
+	public final double getUnsharedRideDistance() {
 		return unsharedRideDistance;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_REQUEST, requestId + "");
-		attr.put(ATTRIBUTE_PERSON, personId + "");
-		attr.put(ATTRIBUTE_FROM_LINK, fromLinkId + "");
-		attr.put(ATTRIBUTE_TO_LINK, toLinkId + "");
 		attr.put(ATTRIBUTE_UNSHARED_RIDE_TIME, unsharedRideTime + "");
-		attr.put(ATTRIBUTE_UNSHARED_RIDE_DISTANCE, unsharedRideDistance+"");
+		attr.put(ATTRIBUTE_UNSHARED_RIDE_DISTANCE, unsharedRideDistance + "");
 		return attr;
 	}
 }

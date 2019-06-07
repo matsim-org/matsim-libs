@@ -20,35 +20,29 @@
 package org.matsim.contrib.util.distance;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.router.*;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.dvrp.router.DijkstraWithDijkstraTreeCache;
+import org.matsim.contrib.dvrp.router.DistanceAsTravelDisutility;
+import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 public class DistanceCalculators {
-	public static final DistanceCalculator BEELINE_DISTANCE_CALCULATOR = new DistanceCalculator() {
-		@Override
-		public double calcDistance(Coord from, Coord to) {
-			return DistanceUtils.calculateDistance(from, to);
-		}
-	};
-
-	public static DistanceCalculator crateFreespeedDistanceCalculator(final Network network) {
-		return crateFreespeedBasedCalculator(network, false);
+	public static DistanceCalculator crateFreespeedDistanceCalculator(Network network) {
+		return crateFreespeedBasedCalculator(network, new DistanceAsTravelDisutility());
 	}
 
-	public static DistanceCalculator crateFreespeedTimeCalculator(final Network network) {
-		return crateFreespeedBasedCalculator(network, true);
+	public static DistanceCalculator crateFreespeedTimeCalculator(Network network) {
+		return crateFreespeedBasedCalculator(network, new TimeAsTravelDisutility(new FreeSpeedTravelTime()));
 	}
 
-	private static DistanceCalculator crateFreespeedBasedCalculator(final Network network, final boolean timeBased) {
-		TravelTime ttimeCalc = new FreeSpeedTravelTime();
-		TravelDisutility tcostCalc = timeBased ? new TimeAsTravelDisutility(ttimeCalc)
-				: new DistanceAsTravelDisutility();
-		final DijkstraWithDijkstraTreeCache dijkstraTree = new DijkstraWithDijkstraTreeCache(network, tcostCalc,
-				ttimeCalc, TimeDiscretizer.CYCLIC_24_HOURS);
+	private static DistanceCalculator crateFreespeedBasedCalculator(Network network,
+			TravelDisutility travelDisutility) {
+		final DijkstraWithDijkstraTreeCache dijkstraTree = new DijkstraWithDijkstraTreeCache(network, travelDisutility,
+				new FreeSpeedTravelTime(), TimeDiscretizer.CYCLIC_24_HOURS);
 
 		return new DistanceCalculator() {
 			@Override

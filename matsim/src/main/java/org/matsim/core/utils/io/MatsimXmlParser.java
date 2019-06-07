@@ -149,10 +149,16 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 		parse(new InputSource(IOUtils.getBufferedReader(filename)));
 	}
 
+	@Override
+	public final void readURL( final URL url ) throws UncheckedIOException {
+		parse( url ) ;
+	}
+
 	public final void parse(final URL url) throws UncheckedIOException {
 		Gbl.assertNotNull(url);
 		this.theSource = url.toString();
 		log.info("starting to parse xml from url " + this.theSource + " ...");
+		System.out.flush();
 		if (url.getFile().endsWith(".gz")) {
 			try {
 				parse(new InputSource(new GZIPInputStream(url.openStream())));

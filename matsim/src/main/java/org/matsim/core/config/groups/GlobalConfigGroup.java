@@ -22,6 +22,8 @@ package org.matsim.core.config.groups;
 
 import java.util.Map;
 
+import javax.validation.constraints.PositiveOrZero;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -29,6 +31,9 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
 
 	public static final String GROUP_NAME = "global";
+
+	private boolean insistingOnDeprecatedConfigVersion = true ;
+	// yyyy this should be set to false eventually.  kai, aug'18
 
 	public GlobalConfigGroup() {
 		super(GROUP_NAME);
@@ -39,9 +44,11 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private static final String COORDINATE_SYSTEM = "coordinateSystem";
 
 	private long randomSeed = 4711L;
+	@PositiveOrZero
 	private int numberOfThreads = 2;
-	private String coordinateSystem = "Atlantis";
-	
+	private String coordinateSystem = "Atlantis" ;
+	// see https://matsim.atlassian.net/browse/MATSIM-898
+
 	@Override
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
@@ -79,6 +86,14 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( COORDINATE_SYSTEM )
 	public void setCoordinateSystem(final String coordinateSystem) {
 		this.coordinateSystem = coordinateSystem;
+	}
+
+	private static final String INSITING_ON_DEPRECATED_CONFIG_VERSION = "insistingOnDeprecatedConfigVersion" ;
+	@StringGetter( INSITING_ON_DEPRECATED_CONFIG_VERSION )
+	public final boolean isInsistingOnDeprecatedConfigVersion() { return this.insistingOnDeprecatedConfigVersion ; }
+	@StringSetter( INSITING_ON_DEPRECATED_CONFIG_VERSION )
+	public final void setInsistingOnDeprecatedConfigVersion( boolean val ) {
+		this.insistingOnDeprecatedConfigVersion = val ;
 	}
 
 }

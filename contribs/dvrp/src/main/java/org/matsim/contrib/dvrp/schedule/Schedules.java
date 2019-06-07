@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 public class Schedules {
@@ -51,18 +51,16 @@ public class Schedules {
 	public static Task getNextTask(Schedule schedule) {
 		int taskIdx = schedule.getStatus() == ScheduleStatus.PLANNED ? //
 				0 : schedule.getCurrentTask().getTaskIdx() + 1;
-
 		return schedule.getTasks().get(taskIdx);
 	}
 
 	public static Task getPreviousTask(Schedule schedule) {
 		int taskIdx = schedule.getStatus() == ScheduleStatus.COMPLETED ? //
 				schedule.getTaskCount() - 1 : schedule.getCurrentTask().getTaskIdx() - 1;
-
 		return schedule.getTasks().get(taskIdx);
 	}
 
-	public static Link getLastLinkInSchedule(Vehicle vehicle) {
+	public static Link getLastLinkInSchedule(DvrpVehicle vehicle) {
 		List<? extends Task> tasks = vehicle.getSchedule().getTasks();
 		return tasks.isEmpty() ? //
 				vehicle.getStartLink() : //

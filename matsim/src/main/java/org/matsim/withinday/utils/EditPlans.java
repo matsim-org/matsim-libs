@@ -2,12 +2,11 @@ package org.matsim.withinday.utils;
 
 import java.util.List;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -27,17 +26,22 @@ public final class EditPlans {
 	private final QSim mobsim;
 	private final EditTrips editTrips;
 	private final PopulationFactory pf;
+	@Deprecated // population factory argument not needed.  kai, apr'18
 	public EditPlans( QSim mobsim, TripRouter tripRouter, EditTrips editTrips, PopulationFactory pf ) {
-//		log.setLevel(Level.DEBUG);
+		this( mobsim, tripRouter, editTrips ) ;
+	}
+	@Deprecated // scenario argument not needed.  kai, apr'18
+	public EditPlans( QSim mobsim, TripRouter tripRouter, EditTrips editTrips, Scenario sc) {
+		this( mobsim, tripRouter, editTrips ) ;
+	}
+	public EditPlans( QSim mobsim, TripRouter tripRouter, EditTrips editTrips ) {
 		Gbl.assertNotNull( this.mobsim = mobsim );
 		Gbl.assertNotNull( this.tripRouter = tripRouter );
 		Gbl.assertNotNull( this.editTrips = editTrips ) ;
-		Gbl.assertNotNull( this.pf = pf ) ;
+		Gbl.assertNotNull( this.pf = mobsim.getScenario().getPopulation().getFactory() ) ;
 	}
 	public boolean addActivityAtEnd(MobsimAgent agent, Activity activity, String routingMode) {
 		log.debug("entering addActivityAtEnd with routingMode=" + routingMode) ;
-		Link link = mobsim.getScenario().getNetwork().getLinks().get(Id.createLinkId(51825));;
-		log.debug( "link 51825 free speed=" + link.getFreespeed( mobsim.getSimTimer().getTimeOfDay()) );
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 		List<PlanElement> planElements = plan.getPlanElements();
@@ -95,10 +99,10 @@ public final class EditPlans {
 	}
 	public final Activity replaceActivity(MobsimAgent agent, int index, Activity newAct, String upstreamMode, String downstreamMode ) {
 		System.err.println("here310");
-		printPlan(agent) ;
+		WithinDayAgentUtils.printPlan(agent) ;
 		System.err.println("here320");
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
-		printPlan(plan) ;
+		WithinDayAgentUtils.printPlan(plan) ;
 		System.err.println("here330");
 		
 		
@@ -117,7 +121,7 @@ public final class EditPlans {
 		// set the new activity:
 		planElements.set(index, newAct) ;
 		System.err.println("here340");
-		printPlan(plan) ;
+		WithinDayAgentUtils.printPlan(plan) ;
 
 		// trip before (if any):
 		if ( index > 0 ) {
@@ -164,7 +168,7 @@ public final class EditPlans {
 			// activity before:
 			Activity actBefore = findRealActBefore(agent, index);
 			if ( actBefore != null ) {
-				if ( EditPlans.indexOfPlanElement(agent, actBefore) < WithinDayAgentUtils.getCurrentPlanElementIndex(agent) ) {
+				if ( WithinDayAgentUtils.indexOfPlanElement(agent, actBefore) < WithinDayAgentUtils.getCurrentPlanElementIndex(agent) ) {
 					// we are already under way
 					editTrips.replanCurrentTrip(agent, this.mobsim.getSimTimer().getTimeOfDay(), upstreamMode );
 				} else {
@@ -183,36 +187,7 @@ public final class EditPlans {
 		WithinDayAgentUtils.resetCaches(agent);
 		this.mobsim.rescheduleActivityEnd(agent);
 	}
-
-	// === search methods: ===
-	public static int indexOfPlanElement(MobsimAgent agent, PlanElement pe) {
-		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
-		List<PlanElement> planElements = plan.getPlanElements() ;
-
-		return planElements.indexOf(pe) ;
-	}
-	public static int indexOfNextActivityWithType( MobsimAgent agent, String type ) {
-		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
-		List<PlanElement> planElements = plan.getPlanElements() ;
-
-		for ( int index = WithinDayAgentUtils.getCurrentPlanElementIndex(agent) ; index < planElements.size() ; index++ ) {
-			PlanElement pe = planElements.get(index) ;
-			if ( pe instanceof Activity ) {
-				if ( ((Activity)pe).getType().equals(type) ) {
-					return index ;
-				}
-			}
-		}
-		return -1 ;
-	}
-	public static Activity findNextActivityWithType( MobsimAgent agent, String type ) {
-		int index = indexOfNextActivityWithType( agent, type ) ;
-		return (Activity) WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements().get(index) ;
-	}
-	public static List<PlanElement> subList(MobsimAgent agent, int fromIndex, int toIndex) {
-		return WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements().subList( fromIndex, toIndex ) ;
-	}
-
+	
 	// === convenience methods: ===
 	/** 
 	 * Convenience method, clarifying that this can be called without giving the mode.
@@ -301,33 +276,8 @@ public final class EditPlans {
 		}
 		return prevAct;
 	}
-	/**
-	 * Only the PlanElements are changed - further Steps
-	 * like updating the Routes of the previous and next Leg
-	 * have to be done elsewhere.
-	 * 
-	 * @author cdobler
-	 */
-	public static boolean replaceLegBlindly(Plan plan, Leg oldLeg, Leg newLeg) {
-
-		if (plan == null) return false;
-		if (oldLeg == null) return false;
-		if (newLeg == null) return false;
-
-		int index = plan.getPlanElements().indexOf(oldLeg);
-		// yyyy I can't say how safe this is.  There is no guarantee that the same entry is not used twice in the plan.  This will in
-		// particular be a problem if we override the "equals" contract, in the sense that two legs are equal if
-		// certain (or all) elements are equal.  kai, oct'10
-
-		if (index == -1) return false;
-
-		plan.getPlanElements().remove(index);
-		plan.getPlanElements().add(index,newLeg);
-
-		return true;
-	}
-	//	private Facility<?> asFacility(Activity activity) {
-	//		Facility<?> hereFacility = new ActivityWrapperFacility( activity ) ;
+	//	private Facility asFacility(Activity activity) {
+	//		Facility hereFacility = new ActivityWrapperFacility( activity ) ;
 	//		if ( activity.getFacilityId()!=null ) {
 	//			ActivityFacility facility = this.mobsim.getScenario().getActivityFacilities().getFacilities().get( activity.getFacilityId() ) ;
 	//			if ( facility != null ) {
@@ -336,40 +286,7 @@ public final class EditPlans {
 	//		}
 	//		return hereFacility;
 	//	}
-	/**
-	 * Only the PlanElements are changed - further Steps
-	 * like updating the Routes of the previous and next Leg
-	 * have to be done elsewhere.
-	 * 
-	 * @author cdobler
-	 */
-	public static boolean replaceActivityBlindly(Plan plan, Activity oldActivity, Activity newActivity) {
-
-		if (plan == null) return false;
-		if (oldActivity == null) return false;
-		if (newActivity == null) return false;
-
-		int index = plan.getPlanElements().indexOf(oldActivity);
-		// yyyy I can't say how safe this is.  There is no guarantee that the same entry is not used twice in the plan.  This will in
-		// particular be a problem if we override the "equals" contract, in the sense that two activities are equal if
-		// certain (or all) elements are equal.  kai, oct'10
-
-		if (index == -1) return false;
-
-		//		/*
-		//		 *  If the new Activity takes place on a different Link
-		//		 *  we have to replan the Routes from an to that Activity.
-		//		 */
-		//		if (oldActivity.getLinkId() != newActivity.getLinkId())
-		//		{
-		//			
-		//		}
-
-		plan.getPlanElements().remove(index);
-		plan.getPlanElements().add(index, newActivity);
-
-		return true;
-	}
+	
 	public void rescheduleActivityEnd(MobsimAgent agent) {
 		// this is mostly for retrofitting existing code.  but maybe also useful by itself
 		this.mobsim.rescheduleActivityEnd(agent);
@@ -385,17 +302,7 @@ public final class EditPlans {
 	public boolean isRealActivity(PlanElement pe) {
 		return pe instanceof Activity && ! ( tripRouter.getStageActivityTypes().isStageActivity( ((Activity)pe).getType() ) );
 	}
-	public static Plan printPlan(MobsimAgent agent1) {
-		final Plan plan = WithinDayAgentUtils.getModifiablePlan(agent1);
-		return printPlan(plan) ;
-	}
-	public static Plan printPlan(Plan plan) {
-		System.err.println( "plan=" + plan );
-		for ( int ii=0 ; ii<plan.getPlanElements().size() ; ii++ ) {
-			System.err.println( "\t" + ii + ":\t" + plan.getPlanElements().get(ii) );
-		}
-		return plan;
-	}
+	
 	public String getModeOfCurrentOrNextTrip(MobsimAgent agent) {
 		Trip trip ;
 		if ( isAtRealActivity( agent ) ) {
@@ -423,9 +330,12 @@ public final class EditPlans {
 		newAct.setEndTime( Double.POSITIVE_INFINITY ) ;
 		return newAct ;
 	}
-	public Activity createAgentThatKeepsMatsimAlive(String type, Id<Link> newLinkId) {
-		Activity newAct = this.pf.createActivityFromLinkId( type, newLinkId);;
-		newAct.setEndTime( Double.MAX_VALUE ) ;
-		return newAct ;
+//	public Activity createAgentThatKeepsMatsimAlive( String type, Id<Link> newLinkId) {
+//		Activity newAct = this.pf.createActivityFromLinkId( type, newLinkId);;
+//		newAct.setEndTime( Double.MAX_VALUE ) ;
+//		return newAct ;
+//	}
+	public static Integer getCurrentPlanElementIndex( MobsimAgent agent ) {
+		return WithinDayAgentUtils.getCurrentPlanElementIndex( agent ) ;
 	}
 }

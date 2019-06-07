@@ -1,5 +1,6 @@
 package org.matsim.contrib.carsharing.replanning;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -11,8 +12,6 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-
-import com.google.inject.Inject;
 import org.matsim.core.router.TripRouter;
 
 import javax.inject.Provider;
@@ -29,6 +28,7 @@ public class RandomTripToCarsharingStrategy implements PlanStrategy{
 		CarsharingTripModeChoice smc = new CarsharingTripModeChoice(tripRouterProvider, scenario, memberships);
 		addStrategyModule(smc );
 		addStrategyModule( new ReRoute(scenario, tripRouterProvider) );
+//		addStrategyModule(new ModeAndRouteConsistencyChecker()) ;
 	}
 	public void addStrategyModule(final PlanStrategyModule module) {
 		strategy.addStrategyModule(module);
@@ -47,11 +47,11 @@ public class RandomTripToCarsharingStrategy implements PlanStrategy{
 
 	@Override
 	public void finish() {
-		// TODO Auto-generated method stub
 		strategy.finish();
 	}
 	@Override
 	public String toString() {
 		return strategy.toString();
 	}
+	
 }

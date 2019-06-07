@@ -1,8 +1,5 @@
 package org.matsim.analysis;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -19,21 +16,24 @@ import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class ChangeableNetworkCreator {
 	private Scenario sc;
 	private TravelTimeCalculator tcc ;
 	private List<NetworkChangeEvent> networkChangeEvents;
-	private final int ENDTIME = 30*3600;
-	private final int TIMESTEP = 15*60;
-	private final String NETWORKFILE = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/networkc.xml.gz";
-	private final String EVENTSFILE =  "C:/Users/Joschka/Documents/runs-svn/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.events.xml.gz";
-	private final String CHANGEFILE = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/changeevents100.xml.gz";
+	private static final int ENDTIME = 30*3600;
+	private static final int TIMESTEP = 15*60;
+	private static final String NETWORKFILE = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/networkc.xml.gz";
+	private static final String EVENTSFILE =  "C:/Users/Joschka/Documents/runs-svn/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.events.xml.gz";
+	private static final String CHANGEFILE = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/changeevents100.xml.gz";
 //	 private final String NETWORKFILE = "C:/local_jb/cottbus/network.xml.gz";
 //	 private final String EVENTSFILE =  "C:/local_jb/cottbus/1212.0.events_nosig.xml.gz";
 //	 private final String CHANGEFILE = "C:/local_jb/cottbus/changeevents.xml";
 	
-	private final double MINIMUMFREESPEED = 3;
+	private static final double MINIMUMFREESPEED = 3;
 
 	public ChangeableNetworkCreator(){
 		this.networkChangeEvents = new ArrayList<NetworkChangeEvent>();
@@ -90,7 +90,7 @@ public class ChangeableNetworkCreator {
 		EventsManager manager = EventsUtils.createEventsManager();
 	
 		TravelTimeCalculatorConfigGroup ttccg = new TravelTimeCalculatorConfigGroup();
-		TravelTimeCalculator tc = new TravelTimeCalculator(sc.getNetwork(), ttccg);
+		TravelTimeCalculator tc = new TravelTimeCalculator( sc.getNetwork(), ttccg );
 		manager.addHandler(tc);
 		new MatsimEventsReader(manager).readFile(EVENTSFILE);
 		return tc;

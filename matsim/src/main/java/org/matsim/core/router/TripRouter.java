@@ -27,14 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -75,7 +73,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 	public static final class Builder {
 		private final Config config;
 		private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
-		private Map<String, Provider<RoutingModule>> routingModules = new LinkedHashMap<>() ;
+		private Map<String, Provider<RoutingModule>> routingModuleProviders = new LinkedHashMap<>() ;
 		public Builder( Config config ) {
 			this.config = config ;
 		}
@@ -83,26 +81,33 @@ public final class TripRouter implements MatsimExtensionPoint {
 			this.mainModeIdentifier = identifier ;
 			return this ;
 		}
-		public Builder putRoutingModule( String mainMode, Provider<RoutingModule> routingModuleProvider ) {
-			this.routingModules.put( mainMode, routingModuleProvider ) ;
+		public Builder setRoutingModule(String mainMode, RoutingModule routingModule ) {
+			// the initial API accepted routing modules.  injection, however, takes routing module providers.  (why?)
+			// trying to bring these two into line here.  maybe some other approach would be preferred, don't know.  kai, jun'18
+			this.routingModuleProviders.put( mainMode, new Provider<RoutingModule>(){
+				@Override public RoutingModule get() {
+					return routingModule ;
+				}
+			} ) ;
 			return this ;
 		}
-		TripRouter builder() {
-			return new TripRouter( routingModules, mainModeIdentifier, config ) ;
+		public TripRouter build() {
+			return new TripRouter( routingModuleProviders, mainModeIdentifier, config ) ;
 		}
 	}
-	@Deprecated // use the Builder instead.  kai, oct'17
-	public TripRouter() {}
-	// yyyyyy I guess this is meant as a way to create the trip router without injection, and to set its internals afterwards.  But
-	// is it so sensible to have this in this way?  The injection stuff states that the material is immutable after injection; here we introduce a
-	// way to get around that again, and even to change the injected material later.  
-	// I would expect a Builder instead. 
-	// kai, sep'16
+
+//	@Deprecated // use the Builder instead.  kai, oct'17
+//	public TripRouter() {}
+//	// yyyyyy I guess this is meant as a way to create the trip router without injection, and to set its internals afterwards.  But
+//	// is it so sensible to have this in this way?  The injection stuff states that the material is immutable after injection; here we introduce a
+//	// way to get around that again, and even to change the injected material later.
+//	// I would expect a Builder instead.
+//	// kai, sep'16
 
 	@Inject
-	TripRouter(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier,
-			Config config ) {
-		for (Map.Entry<String, Provider<RoutingModule>> entry : routingModules.entrySet()) {
+	TripRouter(Map<String, Provider<RoutingModule>> routingModuleProviders, MainModeIdentifier mainModeIdentifier, Config config ) {
+		
+		for (Map.Entry<String, Provider<RoutingModule>> entry : routingModuleProviders.entrySet()) {
 			setRoutingModule(entry.getKey(), entry.getValue().get());
 		}
 		setMainModeIdentifier(mainModeIdentifier);
@@ -123,7 +128,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * @return the previously registered {@link RoutingModule} for this mode if any, null otherwise.
 	 */
 	@Deprecated // use the Builder instead.  kai, oct'17
-	public RoutingModule setRoutingModule(
+	/* package-private */ RoutingModule setRoutingModule(
 			final String mainMode,
 			final RoutingModule module) {
 		RoutingModule old = routingModules.put( mainMode , module );
@@ -172,7 +177,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * @return the previous registered instance
 	 */
 	@Deprecated // use the Builder instead.  kai, oct'17
-	public MainModeIdentifier setMainModeIdentifier(final MainModeIdentifier newIdentifier) {
+	/* package-private */ MainModeIdentifier setMainModeIdentifier(final MainModeIdentifier newIdentifier) {
 		final MainModeIdentifier old = this.mainModeIdentifier;
 		this.mainModeIdentifier = newIdentifier;
 		return old;
@@ -250,42 +255,33 @@ public final class TripRouter implements MatsimExtensionPoint {
 	public static double calcEndOfPlanElement(
 			final double now,
 			final PlanElement pe, Config config) {
-		// yyyy see similar method in PlanRouter. kai, oct'17
-		
-		if (now == Time.UNDEFINED_TIME) {
+
+		if (Time.isUndefinedTime(now)) {
 			throw new RuntimeException("got undefined now to update with plan element" + pe);
 		}
 
 		if (pe instanceof Activity) {
 			Activity act = (Activity) pe;
-			return PopulationUtils.getActivityEndTime(act, now, config) ;
-			
-//			double endTime = act.getEndTime();
-//			double startTime = act.getStartTime();
-//			double dur = act.getMaximumDuration();
-//			if (endTime != Time.UNDEFINED_TIME) {
-//				// use fromAct.endTime as time for routing
-//				return endTime;
-//			}
-//			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
-//				// use fromAct.startTime + fromAct.duration as time for routing
-//				return startTime + dur;
-//			}
-//			else if (dur != Time.UNDEFINED_TIME) {
-//				// use last used time + fromAct.duration as time for routing
-//				return now + dur;
-//			}
-//			else {
-//				return Time.UNDEFINED_TIME;
-//			}
+			return PopulationUtils.decideOnActivityEndTime(act, now, config ) ;
 		}
 		else {
-			Route route = ((Leg) pe).getRoute();
+//			// take travel time from route if possible
+//			Route route = ((Leg) pe).getRoute();
+//			double travelTime = route != null ? route.getTravelTime() : Time.getUndefinedTime();
+//
+//			// travel time from leg will override this
+//			travelTime = Time.isUndefinedTime(travelTime) ? ((Leg) pe).getTravelTime() : travelTime;
+//
+//			// if still undefined, assume zero:
+//			return now + (Time.isUndefinedTime(travelTime) ? 0 : travelTime);
 
-			double travelTime = route != null ? route.getTravelTime() : Time.UNDEFINED_TIME;
-			travelTime = travelTime == Time.UNDEFINED_TIME ? ((Leg) pe).getTravelTime() : travelTime;
+			// replace above by already existing centralized method.  Which, however, does less hedging, and prioritizes route ttime over leg ttime.  Let's run the tests ...
 
-			return now + (travelTime != Time.UNDEFINED_TIME ? travelTime : 0);
+			double ttime = PopulationUtils.decideOnTravelTimeForLeg( (Leg) pe );
+			if ( Time.isUndefinedTime( ttime ) ) {
+				ttime = 0. ;
+			}
+			return now + ttime;
 		}
 	}
 

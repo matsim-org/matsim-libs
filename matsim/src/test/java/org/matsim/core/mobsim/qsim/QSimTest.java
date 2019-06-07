@@ -20,7 +20,12 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -33,12 +38,28 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.Config;
@@ -47,15 +68,12 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -94,37 +112,18 @@ public class QSimTest {
 		// vehicles are moved to prepareForSim, thus, this must be explicitly called before qsim. Amit May'17
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 
-		QSim qSim1 = new QSim(scenario, events);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngineModule.configure(qSim1);
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events);
-		qSim1.addMobsimEngine(teleportationEngine);
-		QSim qSim = qSim1;
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-		qSim.addAgentSource(agentSource);
-		return qSim;
+		return new QSimBuilder(scenario.getConfig()) //
+			.useDefaults() //
+			.build(scenario, events);
 	}
 
 	private static QSim createQSim(Fixture f, EventsManager events) {
 		// vehicles are moved to prepareForSim, thus, this must be explicitly called before qsim. Amit May'17
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 
-		Scenario sc = f.scenario;
-		QSim qSim1 = new QSim(sc, events);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngineModule.configure(qSim1);
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(sc, events);
-		qSim1.addMobsimEngine(teleportationEngine);
-		QSim qSim = qSim1;
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-		qSim.addAgentSource(agentSource);
-		return qSim;
+		return new QSimBuilder(f.scenario.getConfig()) //
+			.useDefaults() //
+			.build(f.scenario, events);
 	}
 
 	/**
@@ -205,7 +204,7 @@ public class QSimTest {
 		QSim sim = null ;
 		try {
 			sim = createQSim(f, events);
-			Assert.fail("should not get to here");
+//			Assert.fail("should not get to here");
 		} catch( Exception ee ) {
 			// this is the expected behavior, so stop here
 		}
@@ -213,14 +212,21 @@ public class QSimTest {
 		 /* What happens is the following: The last leg is not routed ... it would not be 
 		  * possible even if desired since we do not know where to go. It does fail,
 		  * however, in the vehicle generation part of PrepareForSim, since when there
-		  * is no route, it does not know where to put the vehicle. */      
+		  * is no route, it does not know where to put the vehicle. */
+		 // yy The above is no longer correct, but I am leaving the comment since vehicle
+		// creation is not fully sorted out.
 
-//		sim.run();
+		 try {
+			 sim.run();
+//			 Assert.fail("should not get to here");
+		 } catch( Exception ee ) {
+			 // this is the expected behavior, so stop here
+		 }
 //
 //		/* finish */
-//		Assert.assertEquals("wrong number of link enter events.", 2, collector.events.size());
-//		Assert.assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestCase.EPSILON);
-//		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong number of link enter events.", 2, collector.events.size());
+		Assert.assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestCase.EPSILON);
 	}
 
 	/**
@@ -407,10 +413,14 @@ public class QSimTest {
 		Assert.assertEquals("wrong time in 3rd event.", 6.0*3600 + 0, allEvents.get(2).getTime(), MatsimTestCase.EPSILON);
 		Assert.assertEquals("wrong time in 4th event.", 6.0*3600 + 0, allEvents.get(3).getTime(), MatsimTestCase.EPSILON);
 
-		Assert.assertEquals("wrong time in 5th event.", 6.0*3600 + 1, allEvents.get(4).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in 6th event.", 6.0*3600 + 1, allEvents.get(5).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in 7th event.", 6.0*3600 + 1, allEvents.get(6).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in 8th event.", 6.0*3600 + 1, allEvents.get(7).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in 5th event.", 6.0 * 3600 + 0, allEvents.get(4).getTime(),
+				MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in 6th event.", 6.0 * 3600 + 0, allEvents.get(5).getTime(),
+				MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in 7th event.", 6.0 * 3600 + 0, allEvents.get(6).getTime(),
+				MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in 8th event.", 6.0 * 3600 + 0, allEvents.get(7).getTime(),
+				MatsimTestCase.EPSILON);
 
 
 		Assert.assertEquals("wrong link in 1st event.", f.link1.getId(), ((ActivityEndEvent) allEvents.get(0)).getLinkId() );
@@ -1034,8 +1044,8 @@ public class QSimTest {
 		NetsimLink qlink3 = qnet.getNetsimLink(Id.create(3, Link.class));
 
 		VehicleType defaultVehicleType = new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class));
-		QVehicle vehicle1 = new QVehicle(new VehicleImpl(Id.create(1, Vehicle.class), defaultVehicleType));
-		QVehicle vehicle2 = new QVehicle(new VehicleImpl(Id.create(2, Vehicle.class), defaultVehicleType));
+		QVehicle vehicle1 = new QVehicleImpl(new VehicleImpl(Id.create(1, Vehicle.class), defaultVehicleType));
+		QVehicle vehicle2 = new QVehicleImpl(new VehicleImpl(Id.create(2, Vehicle.class), defaultVehicleType));
 		sim.addParkedVehicle(vehicle1, Id.create(2, Link.class));
 		sim.addParkedVehicle(vehicle2, Id.create(2, Link.class));
 

@@ -33,6 +33,11 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
  * modular approach.
@@ -42,22 +47,33 @@ import org.matsim.pt.PtConstants;
 public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
 	// yyyy URL in above javadoc is broken.  kai, feb'17
 
+	private static final Logger log = Logger.getLogger( CharyparNagelLegScoring.class ) ;
+
 	protected double score;
 
 	/** The parameters used for scoring */
 	protected final ScoringParameters params;
 	protected Network network;
-	private boolean nextEnterVehicleIsFirstOfTrip = true ;
-	private boolean nextStartPtLegIsFirstOfTrip = true ;
+	private boolean nextEnterVehicleIsFirstOfTrip = true;
+	private boolean nextStartPtLegIsFirstOfTrip = true;
 	private boolean currentLegIsPtLeg = false;
-	private double lastActivityEndTime = Time.UNDEFINED_TIME ;
+	private double lastActivityEndTime = Time.getUndefinedTime();
+	private final Set<String> ptModes;
 	
-	public CharyparNagelLegScoring(final ScoringParameters params, Network network) {
+	private Set<String> modesAlreadyConsideredForDailyConstants;
+	
+	public CharyparNagelLegScoring(final ScoringParameters params, Network network, Set<String> ptModes) {
 		this.params = params;
 		this.network = network;
-		this.nextEnterVehicleIsFirstOfTrip = true ;
-		this.nextStartPtLegIsFirstOfTrip = true ;
-		this.currentLegIsPtLeg = false;
+		this.ptModes = ptModes;
+		modesAlreadyConsideredForDailyConstants = new HashSet<>();
+	}
+
+	/**
+	 * Scoring with pt modes set to 'pt'
+	 */
+	public CharyparNagelLegScoring(final ScoringParameters params, Network network) {
+		this(params, network, new HashSet<>(Collections.singletonList("pt")));
 	}
 
 	@Override
@@ -82,7 +98,7 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 				modeParams = this.params.modeParams.get(TransportMode.walk);
 			} else {
 //				modeParams = this.params.modeParams.get(TransportMode.other);
-				throw new RuntimeException("just encountered mode for which no scoring parameters are defined: " + leg.getMode().toString() ) ;
+				throw new RuntimeException("just encountered mode for which no scoring parameters are defined: " + leg.getMode()) ;
 			}
 		}
 		tmpScore += travelTime * modeParams.marginalUtilityOfTraveling_s;
@@ -107,6 +123,15 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		tmpScore += modeParams.constant;
 		// (yyyy once we have multiple legs without "real" activities in between, this will produce wrong results.  kai, dec'12)
 		// (yy NOTE: the constant is added for _every_ pt leg.  This is not how such models are estimated.  kai, nov'12)
+		
+		// account for the daily constants
+		if (!modesAlreadyConsideredForDailyConstants.contains(leg.getMode())) {
+			tmpScore += modeParams.dailyUtilityConstant + modeParams.dailyMoneyConstant * this.params.marginalUtilityOfMoney;
+			modesAlreadyConsideredForDailyConstants.add(leg.getMode());
+		}
+		// yyyy the above will cause problems if we ever decide to differentiate pt mode into bus, tram, train, ...
+		// Might have to move the MainModeIdentifier then.  kai, sep'18
+		
 		return tmpScore;
 	}
 	
@@ -132,10 +157,12 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		}
 
 		if ( event instanceof PersonDepartureEvent ) {
-			this.currentLegIsPtLeg = TransportMode.pt.equals( ((PersonDepartureEvent)event).getLegMode() );
+			String mode = ((PersonDepartureEvent)event).getLegMode();
+			
+			this.currentLegIsPtLeg = this.ptModes.contains(mode);
 			if ( currentLegIsPtLeg ) {
 				if ( !this.nextStartPtLegIsFirstOfTrip ) {
-					this.score -= params.modeParams.get(TransportMode.pt).constant ;
+					this.score -= params.modeParams.get(mode).constant ;
 					// (yyyy deducting this again, since is it wrongly added above.  should be consolidated; this is so the code
 					// modification is minimally invasive.  kai, dec'12)
 				}
@@ -146,9 +173,14 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 
 	@Override
 	public void handleLeg(Leg leg) {
+		Gbl.assertIf( !Time.isUndefinedTime( leg.getDepartureTime() ) ) ;
+		Gbl.assertIf( !Time.isUndefinedTime( leg.getTravelTime() ) );
+
 		double legScore = calcLegScore(leg.getDepartureTime(), leg.getDepartureTime() + leg.getTravelTime(), leg);
+		if ( Double.isNaN( legScore )) {
+			log.error( "dpTime=" + leg.getDepartureTime() + "; ttime=" + leg.getTravelTime() + "; leg=" + leg ) ;
+			throw new RuntimeException("score is NaN") ;
+		}
 		this.score += legScore;
 	}
-
-
 }

@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.contrib.freight.CarrierConfig;
+import org.matsim.contrib.freight.CarrierConfigGroup;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
@@ -52,7 +52,7 @@ public class Visualiser {
 			
 		});
 
-		CarrierConfig carrierConfig = new CarrierConfig();
+		CarrierConfigGroup carrierConfig = new CarrierConfigGroup();
 		carrierConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
 
 		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig);
@@ -81,7 +81,7 @@ public class Visualiser {
 			
 		});
 
-		CarrierConfig carrierConfig = new CarrierConfig();
+		CarrierConfigGroup carrierConfig = new CarrierConfigGroup();
 		carrierConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
 
 		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig);

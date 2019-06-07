@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.scoring.functions;
 
-import java.util.Random;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -45,8 +43,11 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.Random;
 
 /**
  * @author thibautd
@@ -123,7 +124,7 @@ public class CharyparNagelLegScoringPtChangeTest {
 
 		return new CharyparNagelLegScoring(
 				new ScoringParameters.Builder(conf, conf.getScoringParameters(null), scenarioConfig).build(),
-				network);
+				network, new TransitConfigGroup().getTransitModes());
 	}
 
 	private static Network createNetwork() {

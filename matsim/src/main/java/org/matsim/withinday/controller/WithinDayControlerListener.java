@@ -59,7 +59,7 @@ public class WithinDayControlerListener implements StartupListener {
 	private static final Logger log = Logger.getLogger(WithinDayControlerListener.class);
 
 	private int numReplanningThreads = 0;
-	@Inject private WithinDayTravelTime travelTimeCollector;
+	@Inject private WithinDayTravelTime withinDayTravelTime;
 	@Inject private ActivityReplanningMap activityReplanningMap;
 	@Inject private LinkReplanningMap linkReplanningMap;
 	@Inject private MobsimDataProvider mobsimDataProvider;
@@ -88,7 +88,7 @@ public class WithinDayControlerListener implements StartupListener {
 		throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
 	}
 	
-	public void setModesAnalyzedByTravelTimeCollector(Set<String> modes) {
+	public void setModesAnalyzedByWithinDayTravelTime(Set<String> modes) {
 		throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
 	}
 	
@@ -106,8 +106,8 @@ public class WithinDayControlerListener implements StartupListener {
 		throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
 	}
 
-	public WithinDayTravelTime getTravelTimeCollector() {
-		return this.travelTimeCollector;
+	public WithinDayTravelTime getWithinDayTravelTime() {
+		return this.withinDayTravelTime;
 	}
 
 	public EarliestLinkExitTimeProvider getEarliestLinkExitTimeProvider() {

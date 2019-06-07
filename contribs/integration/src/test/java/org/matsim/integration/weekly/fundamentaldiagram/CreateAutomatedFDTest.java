@@ -20,7 +20,17 @@ package org.matsim.integration.weekly.fundamentaldiagram;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -57,10 +67,12 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -223,20 +235,13 @@ public class CreateAutomatedFDTest {
 			EventsManager events = EventsUtils.createEventsManager();
 			globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator(mode2FlowData);
 			events.addHandler(globalFlowDynamicsUpdator);
-
-			final QSim qSim = new QSim(scenario, events);
-			ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
-			qSim.addMobsimEngine(activityEngine);
-			qSim.addActivityHandler(activityEngine);
-			QNetsimEngine netsimEngine;
-//			if ( config.qsim().getTrafficDynamics()==TrafficDynamics.assignmentEmulating ) {
-//				QNetworkFactory networkFactory = new AssignmentEmulatingQLaneNetworkFactory(scenario,events) ;
-//				netsimEngine = new QNetsimEngine( qSim, networkFactory ) ;
-//			} else {
-				 netsimEngine = new QNetsimEngine(qSim);
-//			}
-			qSim.addMobsimEngine(netsimEngine);
-			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+			
+			final QSim qSim = new QSimBuilder(config) //
+					.useDefaults()
+					.configureQSimComponents( components -> {
+						components.removeNamedComponent(PopulationModule.COMPONENT_NAME);
+					} )
+					.build(scenario, events);
 
 			final Map<String, VehicleType> travelModesTypes = new HashMap<>();
 
@@ -256,7 +261,11 @@ public class CreateAutomatedFDTest {
 
 						final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), travelModesTypes.get(travelMode));
 						final Id<Link> linkId4VehicleInsertion = Id.createLinkId("home");
-						qSim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+						
+//						qSim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+						QVehicle qVehicle = new QVehicleImpl( vehicle ) ; // yyyyyy should use factory. kai, nov'18
+						qSim.addParkedVehicle( qVehicle, linkId4VehicleInsertion );
+						
 					}
 				}
 			};
@@ -450,12 +459,12 @@ public class CreateAutomatedFDTest {
 		}
 
 		@Override
-		public Facility<? extends Facility<?>> getCurrentFacility() {
+		public Facility getCurrentFacility() {
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		public Facility<? extends Facility<?>> getDestinationFacility() {
+		public Facility getDestinationFacility() {
 			throw new RuntimeException("not implemented") ;
 		}
 	}

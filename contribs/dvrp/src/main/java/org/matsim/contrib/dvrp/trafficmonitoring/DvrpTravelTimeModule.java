@@ -19,35 +19,46 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
 
-import com.google.inject.*;
-import com.google.inject.name.*;
+import com.google.inject.Inject;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 /**
- * Travel times recorded during the previous iteration. They are always updated after the mobsim ends. This is the
- * standard approach for running DVRP
+ * @author michalm
  */
 public class DvrpTravelTimeModule extends AbstractModule {
 	public static final String DVRP_INITIAL = "dvrp_initial";
 	public static final String DVRP_OBSERVED = "dvrp_observed";
 	public static final String DVRP_ESTIMATED = "dvrp_estimated";
 
-	public void install() {
-		bind(TravelTime.class).annotatedWith(Names.named(DvrpTravelTimeModule.DVRP_INITIAL))
-				.toInstance(new FreeSpeedTravelTime());
-		bind(DvrpTravelTimeEstimator.class).to(DvrpTravelTimeEstimatorImpl.class).asEagerSingleton();
-		addTravelTimeBinding(DVRP_ESTIMATED).to(DvrpTravelTimeEstimator.class);
-		addMobsimListenerBinding().to(DvrpTravelTimeEstimator.class);
-	}
+	@Inject
+	private DvrpConfigGroup dvrpCfg;
 
-	@Provides
-	@Named(DvrpTravelTimeModule.DVRP_OBSERVED)
-	@Singleton
-	TravelTime provideTravelTime(@Named(TransportMode.car) TravelTime observedTT) {
-		return observedTT;
+	public void install() {
+		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_INITIAL).to(QSimFreeSpeedTravelTime.class).asEagerSingleton();
+		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_OBSERVED).to(
+				Key.get(TravelTime.class, Names.named(dvrpCfg.getMobsimMode())));
+		addTravelTimeBinding(DVRP_ESTIMATED).to(DvrpTravelTimeEstimator.class);
+
+		bind(DvrpOfflineTravelTimeEstimator.class).asEagerSingleton();
+		addMobsimListenerBinding().to(DvrpOfflineTravelTimeEstimator.class);
+
+		if (dvrpCfg.getTravelTimeEstimationBeta() > 0) {// online estimation
+			bind(DvrpOnlineTravelTimeEstimator.class).asEagerSingleton();
+			addMobsimListenerBinding().to(DvrpOnlineTravelTimeEstimator.class);
+			bind(DvrpTravelTimeEstimator.class).to(DvrpOnlineTravelTimeEstimator.class);
+
+			bind(WithinDayTravelTime.class).asEagerSingleton();
+			addEventHandlerBinding().to(WithinDayTravelTime.class);
+			addMobsimListenerBinding().to(WithinDayTravelTime.class);
+
+		} else { // offline estimation
+			bind(DvrpTravelTimeEstimator.class).to(DvrpOfflineTravelTimeEstimator.class);
+		}
 	}
 }

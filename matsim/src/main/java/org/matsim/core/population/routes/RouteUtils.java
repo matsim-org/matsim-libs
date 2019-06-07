@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -172,6 +174,14 @@ public class RouteUtils {
 		}
 		return routeDistance;
 	}
+	
+	public static double calcDistance( final LeastCostPathCalculator.Path path ) {
+		double length = 0. ;
+		for ( Link link : path.links ) {
+			length += link.getLength() ;
+		}
+		return length ;
+	}
 
 	public static NetworkRoute createNetworkRoute(List<Id<Link>> routeLinkIds, final Network network) {
 		Id<Link> startLinkId = routeLinkIds.get(0);
@@ -233,12 +243,18 @@ public class RouteUtils {
 	 * @return a number between 0 (no coverage) and 1 (route2 fully covers route1)
 	 */
 	public static double calculateCoverage(NetworkRoute route1, NetworkRoute route2, Network network ) {
+		Gbl.assertNotNull( route1 );
+		Gbl.assertNotNull( route2 );
+		Gbl.assertNotNull( network );
+		
 		double routeLength = 0. ;
 		double coveredLength = 0. ;
 		for ( Id<Link> id : route1.getLinkIds() ) {
-			routeLength += network.getLinks().get( id ).getLength() ;
+			final Link link = network.getLinks().get( id );
+			Gbl.assertNotNull( link );
+			routeLength += link.getLength() ;
 			if ( route2.getLinkIds().contains(id) ) {
-				coveredLength += network.getLinks().get( id ).getLength() ;
+				coveredLength += link.getLength() ;
 			}
 		}
 		if ( routeLength > 0. ) {

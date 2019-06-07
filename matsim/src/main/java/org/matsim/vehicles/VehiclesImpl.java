@@ -38,7 +38,7 @@ class VehiclesImpl implements Vehicles {
 	private final VehiclesFactoryImpl builder;
 	private final ObjectAttributes vehicleAttributes = new ObjectAttributes();
 
-	private final Counter counter = new Counter(" vehicles # ");
+	private final Counter counter = new Counter("[VehiclesImpl] added vehicle # " );
 
 	/**
 	 * deliberately non-public since there is a factory.  kai, nov'11

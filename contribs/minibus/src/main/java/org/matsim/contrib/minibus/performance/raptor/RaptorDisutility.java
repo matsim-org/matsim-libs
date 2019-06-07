@@ -20,16 +20,18 @@
 package org.matsim.contrib.minibus.performance.raptor;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.router.*;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * 
  * @author aneumann modified version of {@link TransitRouterNetworkTravelTimeAndDisutility}
  *
  */
-public class RaptorDisutility {
+public class RaptorDisutility implements TransitTravelDisutility {
 	
 	final static double MIDNIGHT = 24.0*3600;
 	
@@ -50,8 +52,8 @@ public class RaptorDisutility {
 		double cost = 0.0;
 		
 		// this assumes dwell time as in-vehicle time
-		double inVehicleTravelTime = routeSegment.travelTime;
-		double inVehicleBeelineDistance = CoordUtils.calcEuclideanDistance(routeSegment.fromStop.getCoord(), routeSegment.toStop.getCoord());
+		double inVehicleTravelTime = routeSegment.getTravelTime();
+		double inVehicleBeelineDistance = CoordUtils.calcEuclideanDistance(routeSegment.getFromStop().getCoord(), routeSegment.getToStop().getCoord());
 		
 		cost += - inVehicleTravelTime * this.config.getMarginalUtilityOfTravelTimePt_utl_s();
 		cost += - inVehicleBeelineDistance * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
@@ -67,6 +69,7 @@ public class RaptorDisutility {
 	 * cost of a single transfer. Fare is included in {@link RaptorDisutility.getInVehicleTravelDisutility}
 	 */
 	protected final double getTransferCost(final Coord fromStop, final Coord toStop) {
+		// this is same as defaultTransferCost in TransitRouterNetworkTravelTimeAndDisutility. Amit Oct'17
 		double cost;
 		
 		double transfertime = getTransferTime(fromStop, toStop);
@@ -92,9 +95,9 @@ public class RaptorDisutility {
 		
 		return cost;
 	}
-	
-	
-	protected double getTravelDisutility(Coord coord, Coord toCoord) {
+
+	@Override
+	public double getWalkTravelDisutility(Person person, Coord coord, Coord toCoord) {
 		//  getMarginalUtilityOfTravelTimeWalk INCLUDES the opportunity cost of time.  kai, dec'12
 		double timeCost = - getTravelTime(coord, toCoord) * config.getMarginalUtilityOfTravelTimeWalk_utl_s() ;
 		// (sign: margUtl is negative; overall it should be positive because it is a cost.)
@@ -112,6 +115,18 @@ public class RaptorDisutility {
 	}
 	
 	protected double getTravelTime(Coord coord, Coord toCoord) {
+		double distance = CoordUtils.calcEuclideanDistance(coord, toCoord);
+		double initialTime = distance / config.getBeelineWalkSpeed();
+		return initialTime;
+	}
+
+	@Override
+	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle, CustomDataManager dataManager) {
+		throw new UnsupportedOperationException("not implemented yet.");
+	}
+
+	@Override
+	public double getWalkTravelTime(Person person, Coord coord, Coord toCoord) {
 		double distance = CoordUtils.calcEuclideanDistance(coord, toCoord);
 		double initialTime = distance / config.getBeelineWalkSpeed();
 		return initialTime;

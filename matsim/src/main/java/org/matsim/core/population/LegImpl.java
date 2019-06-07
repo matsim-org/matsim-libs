@@ -29,8 +29,8 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	private Route route = null;
 
-	private double depTime = Time.UNDEFINED_TIME;
-	private double travTime = Time.UNDEFINED_TIME;
+	private double depTime = Time.getUndefinedTime();
+	private double travTime = Time.getUndefinedTime();
 	private String mode;
 
 	private final Attributes attributes = new Attributes();
@@ -81,7 +81,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public final String toString() {
-		return "[mode=" + this.getMode() + "]" +
+		return "leg [mode=" + this.getMode() + "]" +
 				"[depTime=" + Time.writeTime(this.getDepartureTime()) + "]" +
 				"[travTime=" + Time.writeTime(this.getTravelTime()) + "]" +
 				"[arrTime=" + Time.writeTime(this.getDepartureTime() + this.getTravelTime()) + "]" +

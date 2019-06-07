@@ -24,7 +24,11 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup.IntersectionLogic;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
@@ -38,7 +42,7 @@ import com.google.inject.Inject;
  * 
  * @author tthunig
  */
-public class QSignalsNetworkFactory extends QNetworkFactory{
+public class QSignalsNetworkFactory implements QNetworkFactory{
 
 	private final QNetworkFactory delegate;
 	
@@ -59,7 +63,7 @@ public class QSignalsNetworkFactory extends QNetworkFactory{
 	}
 	
 	@Override
-	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface simEngine1) {
+	public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface simEngine1 ) {
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( scenario.getConfig().qsim().getLinkWidthForVis() );
 		linkWidthCalculator.setLaneWidth( scenario.getNetwork().getEffectiveLaneWidth() );
@@ -74,14 +78,23 @@ public class QSignalsNetworkFactory extends QNetworkFactory{
 	}
 
 	@Override
-	QNodeI createNetsimNode(Node node) {
+	public QNodeI createNetsimNode( Node node ) {
 		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
-		builder.setTurnAcceptanceLogic( new SignalTurnAcceptanceLogic() ) ;
-		return builder.build( node ) ;
+		
+		// check whether turn acceptance logic is enabled
+		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
+				SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
+		if (signalsConfigGroup.getIntersectionLogic().equals(IntersectionLogic.CONFLICTING_DIRECTIONS_AND_TURN_RESTRICTIONS)) {
+			builder.setTurnAcceptanceLogic(new UnprotectedLeftTurnAcceptanceLogic(
+					((SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getConflictingDirectionsData(), scenario.getLanes()));
+		} else {
+			builder.setTurnAcceptanceLogic(new SignalTurnAcceptanceLogic());
+		}
+		return builder.build(node);
 	}
 
 	@Override
-	QLinkI createNetsimLink(Link link, QNodeI queueNode) {
+	public QLinkI createNetsimLink( Link link, QNodeI queueNode ) {
 		return delegate.createNetsimLink(link, queueNode);
 	}
 

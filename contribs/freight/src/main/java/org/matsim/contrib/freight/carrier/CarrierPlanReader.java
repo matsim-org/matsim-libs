@@ -129,6 +129,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 			currentShipments = new HashMap<String, CarrierShipment>();
 		}
 		if (name.equals(SHIPMENT)) {
+			String id = atts.getValue(ID);
 			String from = atts.getValue(FROM);
 			String to = atts.getValue(TO);
 			int size = getInt(atts.getValue(SIZE));
@@ -138,7 +139,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 			String endDelivery = atts.getValue("endDelivery");
 			String pickupServiceTime = atts.getValue("pickupServiceTime");
 			String deliveryServiceTime = atts.getValue("deliveryServiceTime");
-			CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance(Id.create(from, Link.class), Id.create(to, Link.class), size);
+			CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance(Id.create(id, CarrierShipment.class), Id.create(from, Link.class), Id.create(to, Link.class), size);
 			if (startPickup == null) {
 				shipmentBuilder.setPickupTimeWindow(TimeWindow.newInstance(0.0, Integer.MAX_VALUE)).setDeliveryTimeWindow(TimeWindow.newInstance(0.0, Integer.MAX_VALUE));
 			} else {

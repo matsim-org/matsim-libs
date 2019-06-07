@@ -4,6 +4,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -19,6 +20,11 @@ public class NewControlerTest {
 	@Test
 	public void testInjectionBeforeControler() {
 		Config config = testUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+
+		// a scenario is created and none of the files are loaded;
+		// facility file is provided in config and facilitySource is 'fromFile', the facilitySource must be changed. Amit Jan'18
+		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.none);
+
 		config.controler().setLastIteration(1);
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		final Scenario scenario = ScenarioUtils.createScenario(config);

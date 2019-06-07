@@ -25,17 +25,23 @@ import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.facilities.algorithms.FacilityAlgorithm;
 
 /**
  * A Facility is a (Basic)Location ("getCoord") with an Id ("getId") that is connected to a Link ("getLinkId").
  *
  * @author (of javadoc) nagel
  */
-public interface Facility<T extends Facility<?>> extends BasicLocation<T>, Identifiable<T>, Customizable {
+public interface Facility extends BasicLocation, Customizable {
 	// yyyyyy we might consider to not further differentiate the different facility types in id space.  Then it could just be
 	//   interface Facility extends BasicLocation<Facility>, ...
 	// kai, dec'15
 
 	public Id<Link> getLinkId();
 
+
+	public static final String FACILITY_NO_LONGER_IDENTIFIABLE = "After refactoring, facility " +
+													 "does not longer automatically " +
+													 "implement Identifiable.  Don't know what to do.";
+	
 }

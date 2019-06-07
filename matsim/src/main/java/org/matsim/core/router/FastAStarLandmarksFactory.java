@@ -44,19 +44,31 @@ import org.matsim.core.router.util.TravelTime;
  */
 @Singleton
 public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory {
-
+	
 	private final RoutingNetworkFactory routingNetworkFactory;
 	private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();
 	private final Map<Network, PreProcessLandmarks> preProcessData = new HashMap<>();
-	
-	@Inject GlobalConfigGroup globalConfig ;
+
+	private final int nThreads;
 
 	@Inject
-	public FastAStarLandmarksFactory() {
-		this(FastRouterType.ARRAY);
+	public FastAStarLandmarksFactory(final GlobalConfigGroup globalConfigGroup) {
+		this(FastRouterType.ARRAY, globalConfigGroup.getNumberOfThreads());
 	}
 
-	private FastAStarLandmarksFactory(final FastRouterType fastRouterType) {
+	public FastAStarLandmarksFactory() {
+		// the value of 8 threads was the default that I found here when making this configurable without injection.
+		// This was in the create method, with a comment from kai, nov 17.
+		// Not sure why this is a good default. td, nov 18
+		this(8);
+	}
+
+	public FastAStarLandmarksFactory(int nThreads) {
+		this(FastRouterType.ARRAY, nThreads);
+	}
+
+	// hide this constructor, as only one router type is allowed anyway...
+	private FastAStarLandmarksFactory(final FastRouterType fastRouterType, int numberOfThreads) {
 		switch (fastRouterType) {
 		case ARRAY:
 			this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
@@ -66,6 +78,8 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 		default:
 			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
 		}
+
+		this.nThreads = numberOfThreads;
 	}
 
 	@Override
@@ -78,12 +92,7 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 			
 			if (preProcessLandmarks == null) {
 				preProcessLandmarks = new PreProcessLandmarks(travelCosts);
-				if ( globalConfig==null ) {
-					preProcessLandmarks.setNumberOfThreads(8);
-					// (if used without injection.  not so beautiful. kai, nov'17)
-				} else {
-					preProcessLandmarks.setNumberOfThreads(globalConfig.getNumberOfThreads());
-				}
+				preProcessLandmarks.setNumberOfThreads(nThreads);
 				preProcessLandmarks.run(network);
 				this.preProcessData.put(network, preProcessLandmarks);
 				
