@@ -19,33 +19,35 @@
 package org.matsim.contrib.bicycle;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 /**
  * @author smetzler, dziemke
  */
 public final class BicycleModule extends AbstractModule {
 	// necessary to have this public
-	private boolean considerMotorizedInteraction;
+	
+	private final Scenario scenario;
+	
+	public BicycleModule(Scenario scenario) {
+		// at some point let's replace this by some guice approach
+		this.scenario = scenario;
+	}
 	
 	@Override
 	public void install() {
+		
+		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) scenario.getConfig().getModules().get(BicycleConfigGroup.GROUP_NAME);
+
 		bind(BicycleTravelTime.class).asEagerSingleton();
-		addTravelTimeBinding("bicycle").to(BicycleTravelTime.class);
+		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class);
 		bind(BicycleTravelDisutilityFactory.class).asEagerSingleton();
-		addTravelDisutilityFactoryBinding("bicycle").to(BicycleTravelDisutilityFactory.class);
+		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class);
 		bindScoringFunctionFactory().toInstance(new BicycleScoringFunctionFactory());
 		// The following leads to "Tried proxying org.matsim.core.scoring.ScoringFunctionsForPopulation to support a circular dependency, but it is not an interface."
 //		bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class);
 		
-		if (considerMotorizedInteraction) {
+		if (bicycleConfigGroup.isMotorizedInteraction()) {
 			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
 		}
 		
@@ -61,7 +63,7 @@ public final class BicycleModule extends AbstractModule {
 //                    @Override
 //                    public QNetworkFactory get() {
 //                        final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
-//                        factory.setLinkSpeedCalculator(new BicycleLinkSpeedCalculator());
+//                        factory.setLinkSpeedCalculator(new BicycleLinkSpeedCalculator(scenario));
 //                        return factory;
 //                    }
 //                });
@@ -69,7 +71,4 @@ public final class BicycleModule extends AbstractModule {
 //        });
 	}
 	
-	public void setConsiderMotorizedInteraction(boolean considerMotorizedInteraction) {
-		this.considerMotorizedInteraction = considerMotorizedInteraction;
-	}
 }

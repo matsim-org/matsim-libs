@@ -83,6 +83,11 @@ public class RunBicycleExample {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		config.plansCalcRoute().setRoutingRandomness(3.);
+		
+		if (considerMotorizedInteraction) {
+			BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME);
+			bicycleConfigGroup.setMotorizedInteraction(considerMotorizedInteraction);
+		}
 				
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -97,10 +102,7 @@ public class RunBicycleExample {
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		Controler controler = new Controler(scenario);
-		BicycleModule bicycleModule = new BicycleModule();
-		if (considerMotorizedInteraction) {
-			bicycleModule.setConsiderMotorizedInteraction(true);
-		}
+		BicycleModule bicycleModule = new BicycleModule(scenario);
 		controler.addOverridingModule(bicycleModule);
 		
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
@@ -114,7 +116,7 @@ public class RunBicycleExample {
                     @Override
                     public QNetworkFactory get() {
                         final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
-                        factory.setLinkSpeedCalculator(new BicycleLinkSpeedCalculator());
+                        factory.setLinkSpeedCalculator(new BicycleLinkSpeedCalculator(scenario));
                         return factory;
                     }
                 });

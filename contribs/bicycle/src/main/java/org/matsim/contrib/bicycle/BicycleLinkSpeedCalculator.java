@@ -1,13 +1,19 @@
 package org.matsim.contrib.bicycle;
 
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 
 public class BicycleLinkSpeedCalculator implements LinkSpeedCalculator {
+	
+	private final BicycleConfigGroup bicycleConfigGroup;
 
-    @Override
+    public BicycleLinkSpeedCalculator(Scenario scenario) {
+    	bicycleConfigGroup = (BicycleConfigGroup) scenario.getConfig().getModules().get(BicycleConfigGroup.GROUP_NAME);
+    }
+
+	@Override
     public double getMaximumVelocity(QVehicle qVehicle, Link link, double time) {
 
         if (isBike(qVehicle))
@@ -30,6 +36,6 @@ public class BicycleLinkSpeedCalculator implements LinkSpeedCalculator {
     }
 
     private boolean isBike(QVehicle qVehicle) {
-        return qVehicle.getVehicle().getType().getId().toString().equals(TransportMode.bike);
+        return qVehicle.getVehicle().getType().getId().toString().equals(bicycleConfigGroup.getBicycleMode());
     }
 }

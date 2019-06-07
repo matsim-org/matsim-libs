@@ -37,6 +37,8 @@ public final class BicycleConfigGroup extends ConfigGroup {
 	private static final String INPUT_INFRASTRUCTURE = "marginalUtilityOfInfrastructure_m";
 	private static final String INPUT_GRADIENT = "marginalUtilityOfGradient_m_100m";
 	private static final String MAX_BICYCLE_SPEED = "maxBicycleSpeed";
+	private static final String BICYCLE_MODE = "bicycleMode";
+	private static final String MOTORIZED_INTERACTION = "motorizedInteraction";
 	
 	public static enum BicycleScoringType {legBased, linkBased};
 
@@ -46,6 +48,8 @@ public final class BicycleConfigGroup extends ConfigGroup {
 	private double marginalUtilityOfGradient;
 	private BicycleScoringType bicycleScoringType = BicycleScoringType.legBased;
 	private double maxBicycleSpeed = 25.0/3.6;
+	private String bicycleMode = "bicycle";
+	private boolean motorizedInteraction = false;
 	
 	public BicycleConfigGroup() {
 		super(GROUP_NAME);
@@ -66,6 +70,10 @@ public final class BicycleConfigGroup extends ConfigGroup {
 			setMarginalUtilityOfGradient_m_100m(Double.parseDouble(value));
 		} else if (MAX_BICYCLE_SPEED.equals(key)) {
 			setMaxBicycleSpeed(Double.parseDouble(value));
+		} else if (BICYCLE_MODE.equals(key)) {
+			setBicycleMode(value);
+		} else if (MOTORIZED_INTERACTION.equals(key)) {
+			setMotorizedInteraction(Boolean.valueOf(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -83,6 +91,10 @@ public final class BicycleConfigGroup extends ConfigGroup {
 			return Double.toString(getMarginalUtilityOfGradient_m_100m());
 		} else if (MAX_BICYCLE_SPEED.equals(key)) {
 			return Double.toString(getMaxBicycleSpeed());
+		} else if (BICYCLE_MODE.equals(key)) {
+			return getBicycleMode();
+		} else if (MOTORIZED_INTERACTION.equals(key)) {
+			return Boolean.toString(isMotorizedInteraction());
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -155,5 +167,21 @@ public final class BicycleConfigGroup extends ConfigGroup {
 
 	public double getMaxBicycleSpeed() {
 		return this.maxBicycleSpeed;
+	}
+	
+	public String getBicycleMode() {
+		return this.bicycleMode;
+	}
+
+	public void setBicycleMode(String bicycleMode) {
+		this.bicycleMode = bicycleMode;
+	}
+
+	public boolean isMotorizedInteraction() {
+		return motorizedInteraction;
+	}
+
+	public void setMotorizedInteraction(boolean motorizedInteraction) {
+		this.motorizedInteraction = motorizedInteraction;
 	}
 }

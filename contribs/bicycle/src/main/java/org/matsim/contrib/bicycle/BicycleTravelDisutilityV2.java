@@ -46,9 +46,9 @@ class BicycleTravelDisutilityV2 implements TravelDisutility {
 	BicycleTravelDisutilityV2(Network network, TravelDisutility timeDistanceDisutility, BicycleConfigGroup bicycleConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.timeDistanceDisutility = timeDistanceDisutility;
 		
-		final PlanCalcScoreConfigGroup.ModeParams bicycleParams = cnScoringGroup.getModes().get("bicycle");
+		final PlanCalcScoreConfigGroup.ModeParams bicycleParams = cnScoringGroup.getModes().get(bicycleConfigGroup.getBicycleMode());
 		if (bicycleParams == null) {
-			throw new NullPointerException("Bicycle is not part of the valid mode parameters " + cnScoringGroup.getModes().keySet());
+			throw new NullPointerException(bicycleConfigGroup.getBicycleMode() + " is not part of the valid mode parameters " + cnScoringGroup.getModes().keySet());
 		}
 
 		this.marginalCostOfInfrastructure_m = -(bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m());

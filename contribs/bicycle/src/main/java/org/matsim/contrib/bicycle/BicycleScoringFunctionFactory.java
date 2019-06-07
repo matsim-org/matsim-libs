@@ -57,7 +57,7 @@ public final class BicycleScoringFunctionFactory implements ScoringFunctionFacto
 		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) scenario.getConfig().getModule("bicycle");
+		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) scenario.getConfig().getModules().get(BicycleConfigGroup.GROUP_NAME);
 		BicycleScoringType bicycleScoringType = bicycleConfigGroup.getBicycleScoringType();
 		if (bicycleScoringType == BicycleScoringType.legBased) {
 			sumScoringFunction.addScoringFunction(new BicycleLegScoring(params, scenario.getNetwork(), scenario.getConfig().transit().getTransitModes(), bicycleConfigGroup));
