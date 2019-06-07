@@ -30,6 +30,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 
@@ -56,9 +57,11 @@ public final class BicycleScoringFunctionFactory implements ScoringFunctionFacto
 		final ScoringParameters params = parameters.getScoringParameters(person);
 		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring( params ));
 
 		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) scenario.getConfig().getModules().get(BicycleConfigGroup.GROUP_NAME);
 		BicycleScoringType bicycleScoringType = bicycleConfigGroup.getBicycleScoringType();
+		
 		if (bicycleScoringType == BicycleScoringType.legBased) {
 			sumScoringFunction.addScoringFunction(new BicycleLegScoring(params, scenario.getNetwork(), scenario.getConfig().transit().getTransitModes(), bicycleConfigGroup));
 		} else if (bicycleScoringType == BicycleScoringType.linkBased) {
@@ -70,7 +73,6 @@ public final class BicycleScoringFunctionFactory implements ScoringFunctionFacto
 		} else {
 			throw new IllegalArgumentException("Bicycle scoring type " + bicycleScoringType + " not known.");
 		}
-
 
 		return sumScoringFunction;
 	}
