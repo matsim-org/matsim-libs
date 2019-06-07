@@ -214,6 +214,7 @@ public final class MutableScenario implements Scenario, Lockable {
 		testForLocked();
 		this.transitVehicles = vehicles ;
 	}
+
 	public final void setLanes( Lanes lanes ) {
 		testForLocked();
 		this.lanes = lanes ;
