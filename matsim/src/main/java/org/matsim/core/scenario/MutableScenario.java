@@ -67,19 +67,25 @@ public final class MutableScenario implements Scenario, Lockable {
 
 	private Vehicles vehicles ;
 
-	MutableScenario(Config config) {
-		this.config = config;
-		this.network = NetworkUtils.createNetwork(this.config);
-		this.population = PopulationUtils.createPopulation(this.config, this.network);
-		this.facilities = new ActivityFacilitiesImpl();
-		this.households = new HouseholdsImpl();
-		this.lanes = LanesUtils.createLanesContainer();
-		this.vehicles = VehicleUtils.createVehiclesContainer();
-		this.transitVehicles = VehicleUtils.createVehiclesContainer();
-		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		
-		this.config.network().setLocked();
-	}
+    MutableScenario(Config config, boolean buildInternalObjects) {
+        this.config = config;
+        if (buildInternalObjects) {
+            this.network = NetworkUtils.createNetwork(this.config);
+            this.population = PopulationUtils.createPopulation(this.config, this.network);
+            this.facilities = new ActivityFacilitiesImpl();
+            this.households = new HouseholdsImpl();
+            this.lanes = LanesUtils.createLanesContainer();
+            this.vehicles = VehicleUtils.createVehiclesContainer();
+            this.transitVehicles = VehicleUtils.createVehiclesContainer();
+            this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
+
+            this.config.network().setLocked();
+        }
+    }
+
+    MutableScenario(Config config) {
+        this(config, true);
+    }
 
 	@Override
 	public final ActivityFacilities getActivityFacilities() {
