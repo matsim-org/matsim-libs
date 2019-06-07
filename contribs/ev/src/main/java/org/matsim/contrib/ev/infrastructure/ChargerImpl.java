@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.ev.infrastructure;
 
+import java.util.Objects;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -32,8 +34,12 @@ public class ChargerImpl implements Charger {
 	 * @param logicFactory  ChargingLogic factory
 	 */
 	public static Charger create(ChargerSpecification specification, Link link, ChargingLogic.Factory logicFactory) {
+		if (!link.getId().equals(specification.getLinkId())) {
+			throw new IllegalArgumentException("link.id != specification.linkId");
+		}
+
 		ChargerImpl charger = new ChargerImpl(specification, link);
-		charger.logic = logicFactory.create(charger);
+		charger.logic = Objects.requireNonNull(logicFactory.create(charger));
 		return charger;
 	}
 

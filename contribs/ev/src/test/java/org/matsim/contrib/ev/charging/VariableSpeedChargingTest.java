@@ -33,6 +33,8 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargerImpl;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ImmutableChargerSpecification;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.testcases.fakes.FakeLink;
 
 import com.google.common.collect.ImmutableList;
 
@@ -96,7 +98,8 @@ public class VariableSpeedChargingTest {
 				.maxPower(EvUnits.kW_to_W(chargerPower_kW))
 				.plugCount(1)
 				.build();
-		Charger charger = ChargerImpl.create(chargerSpecification, null, ch -> null);
+		Charger charger = ChargerImpl.create(chargerSpecification, new FakeLink(Id.createLinkId("link_id")),
+				ch -> new ChargingWithQueueingLogic(ch, new ChargeUpToMaxSocStrategy(ch, 1), new EventsManagerImpl()));
 
 		ElectricVehicle electricVehicle = ElectricVehicleImpl.create(specification,
 				ev -> (link, travelTime, linkEnterTime) -> {
